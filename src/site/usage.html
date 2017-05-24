@@ -1,0 +1,411 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Examples - Aika</title>
+	<link rel="stylesheet" href="css/style.css" type="text/css">
+	<link rel="shortcut icon" href="images/favicon.png" />
+	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-77552310-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+</head>
+<body>
+<div id="header">
+	<div>
+		<div class="logo">
+			<a href="index.html"></a>
+		</div>
+		<ul id="navigation">
+			<li>
+				<a href="index.html">Overall idea</a>
+			</li>
+			<li>
+				<a href="introduction.html">How it works</a>
+			</li>
+			<li class="active">
+				<a href="usage.html">Examples</a>
+			</li>
+			<li>
+				<a href="resources.html">Resources</a>
+			</li>
+			<li>
+				<a href="contact.html">Contact</a>
+			</li>
+		</ul>
+	</div>
+</div>
+	<div id="contents">
+		<div class="features">
+            <h1>Usage</h1>
+
+            <h2>Mutual exclusion example</h2>
+			<pre class="prettyprint">
+				<code class="language-java">
+
+
+   /**
+     *     |----------------------------|
+     *     | ------                     |
+     *     -*| &  |                     |
+     *  A ---| PA |------\   -------    |
+     *       ------       \  |     |    |
+     *                     \-| OR  |    |
+     *       ------          |     |    |
+     *  B ---| &  |----------|Suppr|----|
+     *     -*| PB |         -|     |    |
+     *     | ------        / -------    |
+     *     |----------------------------|
+     *                   /              |
+     *       ------     /               |
+     *  C ---| &  |----/                |
+     *     -*| PC |                     |
+     *     | ------                     |
+     *     |----------------------------|
+     */
+
+    @Test
+    public void testMutualExclusion() {
+        Model m = new Model();
+
+        Document doc = Document.create("foobar");
+        Iteration t = m.startIteration(doc, 0);
+
+        // Create the input neurons for the network.
+        InputNeuron inA = t.createOrLookupInputSignal("IN-A");
+        InputNeuron inB = t.createOrLookupInputSignal("IN-B");
+        InputNeuron inC = t.createOrLookupInputSignal("IN-C");
+
+        // Instantiate the suppressing neuron. Its inputs will be added later on.
+        Neuron pSuppr = new Neuron("SUPPRESS");
+
+        // Create three neurons that might be suppressed by the suppressing neuron.
+        // createAndNeuron is a helper method which is used set the synapse weights
+        // and bias of new neuron.
+        Neuron pA = t.createAndNeuron(
+                new Neuron("A"),
+                0.001,
+                new Input()
+                        .setNeuron(inA)
+                        .setWeight(10.5)
+                        .setMaxLowerWeightsSum(0.0)
+                        .setRecurrent(false)
+                        .setMinInput(0.9),
+                new Input()                     // This input is negated
+                        .setNeuron(pSuppr)
+                        .setWeight(-10.0)
+                        .setRecurrent(true)
+                        .setMinInput(1.0)
+        );
+
+        Neuron pB = t.createAndNeuron(
+                new Neuron("B"),
+                0.001,
+                new Input()
+                        .setNeuron(inB)
+                        .setWeight(11.0)
+                        .setMaxLowerWeightsSum(0.0)
+                        .setRecurrent(false)
+                        .setMinInput(0.9),
+                new Input()
+                        .setNeuron(pSuppr)
+                        .setWeight(-10.0)
+                        .setRecurrent(true)
+                        .setMinInput(1.0)
+        );
+
+        Neuron pC = t.createAndNeuron(
+                new Neuron("C"),
+                0.001,
+                new Input()
+                        .setNeuron(inC)
+                        .setWeight(10.0)
+                        .setMaxLowerWeightsSum(0.0)
+                        .setRecurrent(false)
+                        .setMinInput(0.9),
+                new Input()
+                        .setNeuron(pSuppr)
+                        .setWeight(-10.0)
+                        .setRecurrent(true)
+                        .setMinInput(1.0)
+        );
+
+        // Finally addInput adds all the inputs to the suppressing neuron.
+        t.createOrNeuron(
+                pSuppr,
+                new Input()
+                        .setNeuron(pA)
+                        .setWeight(10.0)
+                        .setRecurrent(false)
+                        .setMinInput(1.0),
+                new Input()
+                        .setNeuron(pB)
+                        .setWeight(10.0)
+                        .setRecurrent(false)
+                        .setMinInput(1.0),
+                new Input()
+                        .setNeuron(pC)
+                        .setWeight(10.0)
+                        .setRecurrent(false)
+                        .setMinInput(1.0)
+        );
+
+        Neuron outN = t.createOrNeuron(new Neuron("OUT"),
+                new Input()
+                        .setNeuron(pB)
+                        .setWeight(1.0)
+                        .setRecurrent(false)
+                        .setMinInput(1.0)
+        );
+
+        // Now that the model is complete, apply it to a document.
+
+        // Add input activations starting at char 0 and ending at char 1
+        // These inputs will be immediately propagated through the network.
+        inA.addInput(t, 0, 1);
+        inB.addInput(t, 0, 1);
+        inC.addInput(t, 0, 1);
+
+        // Computes the selected option
+        t.process();
+
+        System.out.println("Selected Option: " + doc.selectedOption);
+        System.out.println();
+
+        System.out.println("Show all conflicts with the selected option:");
+        for(Conflict c: doc.selectedOption.conflicts.primary.values()) {
+            System.out.println(c.conflict);
+        }
+        System.out.println();
+
+        System.out.println("Output activation:");
+        for(Activation act: outN.node.getActivations(t)) {
+            System.out.println("Text Range: " + act.key.r);
+            System.out.println("Option: " + act.key.o);
+            System.out.println("Node: " + act.key.n);
+            System.out.println("Rid: " + act.key.rid);
+            System.out.println("Activation weight: " + act.finalState.value);
+            System.out.println();
+        }
+
+        System.out.println("All activations:");
+        System.out.println(t.networkStateToString(true, true));
+        System.out.println();
+
+        System.out.println("Selected activations:");
+        System.out.println(t.networkStateToString(false, true));
+
+        t.clearActivations();
+    }
+                </code>
+			</pre>
+
+			<pre class="prettyprint">
+				<code class="language-java">
+    Selected ExandNode ID: 1
+    Selected Option: (1[(0),(2),(4)],2[()],3[(2)])
+    // The selected options set consist of a comma separated list of options which them self may
+    // consist of a disjunction of lower level options (i.e. the rectangular brackets).
+
+    Show all conflicts with the selected option:
+
+    Output activation:
+    Text Range: (0,1)
+    Option: (3[(2)])
+    Node: 14 OUT - OR[P<5,B>] -
+    Activation weight: 0.24643192793184077
+
+    // Range - Option - Node ID, Neuron Label - Node Logic - final Act. Value, final Weight, final Norm
+    All activations:
+    (0,1) - () - 0 IN-A - P|| - FV:1.0 FW:0.0 FN:0.0
+    (0,1) - () - 1 IN-B - P|| - FV:1.0 FW:0.0 FN:0.0
+    (0,1) - () - 2 IN-C - P|| - FV:1.0 FW:0.0 FN:0.0
+    (0,1) - (0[()]) - 3 A - OR[P<0,IN-A>] - FV:0.0 FW:0.0 FN:1.059
+    (0,1) - (1[(0),(2),(4)]) - 10 SUPPRESS - OR[P<4,A>,P<5,B>,P<6,C>] - FV:0.987 FW:0.0 FN:0.0
+    (0,1) - (2[()]) - 6 B - OR[P<1,IN-B>] - FV:0.504 FW:1.11 FN:1.11
+    (0,1) - (3[(2)]) - 14 OUT - OR[P<5,B>] - FV:0.246 FW:0.0 FN:0.0
+    (0,1) - (4[()]) - 8 C - OR[P<2,IN-C>] - FV:0.0 FW:0.0 FN:1.009
+
+
+    Selected activations:
+    (0,1) - () - 0 IN-A - P|| - FV:1.0 FW:0.0 FN:0.0
+    (0,1) - () - 1 IN-B - P|| - FV:1.0 FW:0.0 FN:0.0
+    (0,1) - () - 2 IN-C - P|| - FV:1.0 FW:0.0 FN:0.0
+    (0,1) - () - 5 - P<0,IN-A>
+    (0,1) - () - 7 - P<1,IN-B>
+    (0,1) - () - 9 - P<2,IN-C>
+    (0,1) - (0[()]) - 3 A - OR[P<0,IN-A>] - FV:0.0 FW:0.0 FN:1.059
+    (0,1) - (0[()]) - 11 - P<4,A>
+    (0,1) - (1[(0),(2),(4)]) - 4 - NR<3,SUPPRESS>
+    (0,1) - (1[(0),(2),(4)]) - 10 SUPPRESS - OR[P<4,A>,P<5,B>,P<6,C>] - FV:0.987 FW:0.0 FN:0.0
+    (0,1) - (2[()]) - 6 B - OR[P<1,IN-B>] - FV:0.504 FW:1.11 FN:1.11
+    (0,1) - (2[()]) - 12 - P<5,B>
+    (0,1) - (3[(2)]) - 14 OUT - OR[P<5,B>] - FV:0.246 FW:0.0 FN:0.0
+    (0,1) - (4[()]) - 8 C - OR[P<2,IN-C>] - FV:0.0 FW:0.0 FN:1.009
+    (0,1) - (4[()]) - 13 - P<6,C>
+
+    WeightSum:W:1.1098999999999997 N:3.1783499999999982 NW:0.3492063492063493
+				</code>
+			</pre>
+
+            <br/>
+            <br/>
+
+            <h2>Pattern matching example</h2>
+			<pre class="prettyprint">
+				<code class="language-java">
+    @Test
+    public void testPatternMatching() {
+        Model m = new Model();
+
+        // Create a simple text document.
+        Document doc = Document.create("a b c d e ");
+
+        Iteration t = m.startIteration(doc, 0);
+
+        Map&lt;Character, InputNeuron&gt; inputNeurons = new HashMap<>();
+        Map&lt;Character, Neuron&gt; relNeurons = new HashMap<>();
+
+        // The space neuron will be used as clock signal for the recurrent neurons.
+        InputNeuron inSpace = t.createOrLookupInputSignal("SPACE");
+
+        InputNeuron startSignal = t.createOrLookupInputSignal("START-SIGNAL");
+
+        // The Cycle Neuron is used to assign each pattern component an relational id (RID).
+        // It is a counter that increases the Rid after each space char.
+        // The createCycleNeuron method is simply a helper method which generates an
+        // ordinary neuron with some input synapses.
+        Neuron ctNeuron = t.createCycleNeuron(new Neuron("CTN"),
+                inSpace, false,
+                startSignal, true,
+                false
+        );
+
+        // Create an input neuron and a relational neuron for every letter in this example.
+        for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
+            InputNeuron in = t.createOrLookupInputSignal(c + "");
+            Neuron rn = t.createRelationalNeuron(
+                    new Neuron(c + "-RN"),
+                    ctNeuron,
+                    in, false
+            );
+
+            inputNeurons.put(c, in);
+            relNeurons.put(c, rn);
+        }
+
+        // Create a pattern neuron with relational neurons as input. The numbers that are
+        // given in the inputs are the relational ids (relativeRid) which specify the positions
+        // of the inputs relative to each other.
+        Neuron pattern = t.createAndNeuron(
+                new Neuron("BCD"),
+                0.4,
+                new Input()
+                        .setNeuron(relNeurons.get('b'))
+                        .setWeight(1.0)
+                        .setRecurrent(false)
+                        .setRelativeRid(0)
+                        .setMinInput(0.9)
+                        .setMatchRange(false),
+                new Input()
+                        .setNeuron(relNeurons.get('c'))
+                        .setWeight(1.0)
+                        .setRecurrent(false)
+                        .setRelativeRid(1)
+                        .setMinInput(0.9)
+                        .setMatchRange(false),
+                new Input()
+                        .setNeuron(relNeurons.get('d'))
+                        .setWeight(1.0)
+                        .setRecurrent(false)
+                        .setRelativeRid(2)
+                        .setMinInput(0.9)
+                        .setMatchRange(false)
+        );
+
+
+        startSignal.addInput(t, 0, 1, 0);  // Parameters: iteration, begin, end, relational id
+
+        // First add the space seperators
+        for(int i = 0; i < doc.length(); i++) {
+            char c = doc.getContent().charAt(i);
+            if(c == ' ') {
+                inSpace.addInput(t, i, i + 1);
+            }
+        }
+
+        // Then add the characters
+        for(int i = 0; i < doc.length(); i++) {
+            char c = doc.getContent().charAt(i);
+            if(c != ' ') {
+                inputNeurons.get(c).addInput(t, i, i + 1);
+            }
+        }
+
+        // Computes the selected option
+        t.process();
+
+        System.out.println("Output activation:");
+        for(Activation act: pattern.node.getActivations(t)) {
+            System.out.println("Text Range: " + act.key.r);
+            System.out.println("Option: " + act.key.o);
+            System.out.println("Node: " + act.key.n);
+            System.out.println("Rid: " + act.key.rid);
+            System.out.println();
+        }
+
+        System.out.println("All activations:");
+        System.out.println(t.networkStateToString(true, true));
+        System.out.println();
+
+        t.clearActivations();
+    }
+				</code>
+			</pre>
+
+            <pre class="prettyprint">
+				<code class="language-java">
+
+    Selected ExandNode ID: 0
+    Output activation:
+    Text Range: (2,8)
+    Option: (9[(6,7,8)])
+    Node: 30 BCD - OR[0:AND[(-1:P<6,b-RN>),(1:P<8,c-RN>),(2:P<10,d-RN>)]] -
+    Rid: 1
+
+    // Range - Option - Node ID, Neuron Label - Relational Id
+    //  - final Activation Value, final Weight, final Norm
+    All activations:
+    (0,1) - () - 9 a - Rid:null - FV:1.0 FW:0.0 FN:0.0
+    (0,1) - () - 1 START-SIGNAL -  - Rid:0 - FV:1.0 FW:0.0 FN:0.0
+    (0,2) - (0[()]) - 2 CTN - Rid:0 - FV:0.964 FW:4.0 FN:4.0
+    (0,2) - (5[(0)]) - 10 a-RN - Rid:0 - FV:1.0 FW:0.0 FN:0.0
+    (2,3) - () - 14 b - Rid:null - FV:1.0 FW:0.0 FN:0.0
+    (2,4) - (1[(0)]) - 2 CTN - Rid:1 - FV:0.952 FW:3.712 FN:3.712
+    (2,4) - (6[(1)]) - 15 b-RN - Rid:1 - FV:1.0 FW:0.0 FN:0.0
+    (2,8) - (9[(6,7,8)]) - 30 BCD - Rid:1 - FV:0.318 FW:0.0 FN:0.0
+    (4,5) - () - 18 c - Rid:null - FV:1.0 FW:0.0 FN:0.0
+    (4,6) - (2[(1)]) - 2 CTN - Rid:2 - FV:0.948 FW:3.619 FN:3.619
+    (4,6) - (7[(2)]) - 19 c-RN - Rid:2 - FV:1.0 FW:0.0 FN:0.0
+    (6,7) - () - 22 d - Rid:null - FV:1.0 FW:0.0 FN:0.0
+    (6,8) - (3[(2)]) - 2 CTN - Rid:3 - FV:0.946 FW:3.582 FN:3.582
+    (6,8) - (8[(3)]) - 23 d-RN - Rid:3 - FV:1.0 FW:0.0 FN:0.0
+    (8,9) - () - 26 e - Rid:null - FV:1.0 FW:0.0 FN:0.0
+    (8,10) - (4[(3)]) - 2 CTN - Rid:4 - FV:0.945 FW:3.567 FN:3.567
+    (8,10) - (10[(4)]) - 27 e-RN - Rid:4 - FV:1.0 FW:0.0 FN:0.0
+
+    WeightSum:W:18.47978276020788 N:18.47978276020788 NW:1.0
+				</code>
+			</pre>
+        </div>
+	</div>
+</body>
+</html>

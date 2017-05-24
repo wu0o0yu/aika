@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>The Aika Algorithm for Text Mining and Information Extraction</title>
+	<link rel="stylesheet" href="css/style.css" type="text/css">
+	<link rel="shortcut icon" href="images/favicon.png" />
+
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-77552310-1', 'auto');
+		ga('send', 'pageview');
+
+	</script>
+</head>
+<body>
+<div id="header">
+	<div>
+		<div class="logo">
+			<a href="index.html"></a>
+		</div>
+		<ul id="navigation">
+			<li>
+				<a href="index.html">Overall idea</a>
+			</li>
+			<li class="active">
+				<a href="introduction.html">How it works</a>
+			</li>
+			<li>
+				<a href="usage.html">Examples</a>
+			</li>
+			<li>
+				<a href="resources.html">Resources</a>
+			</li>
+			<li>
+				<a href="contact.html">Contact</a>
+			</li>
+		</ul>
+	</div>
+</div>
+	<div id="contents">
+		<div class="features">
+			<h1>How it works</h1>
+			<p>
+
+			<h2>Artificial neural networks vs. frequent pattern mining</h2>
+			<p>
+			So how do an <a href="https://en.wikipedia.org/wiki/Artificial_neural_network" rel="nofollow">artificial neural network</a> and a <a href="http://www.charuaggarwal.net/freqbook.pdf" rel="nofollow">frequent pattern mining</a> algorithm fit together? Well, ANNs basically consist of neurons that compute an output value based on the weighted sum of their inputs.
+			These neurons can be reformulated as a set of boolean operations.
+
+			For example, the following <a href="https://en.wikipedia.org/wiki/Artificial_neuron" rel="nofollow">neuron</a> utilizing the <a href="https://de.wikipedia.org/wiki/Heaviside-Funktion" rel="nofollow">heaviside transfer function</a>
+			</p>
+			<img src="images/equ-1.svg"/>
+			<img src="images/equ-2.svg"/>
+			<p>
+			can also be written as boolean equation
+			</p>
+			<img src="images/equ-3.svg"/>
+
+			<p>
+			So it is easy to see that the neuron's weighted sum can be reformulated as a <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form" rel="nofollow">disjunctive normal form</a> boolean equation, meaning that we always
+			get a set of conjunctions that are connected by a disjunction. Now, the trick to bring the two machine learning approaches together is to store these conjunctions as nodes within a <a href="https://en.wikipedia.org/wiki/Lattice_(order)" rel="nofollow">pattern lattice</a>. A
+			pattern lattice is a directed acyclic graph containing all subpatterns of a given pattern.
+			</p>
+
+			<img src="images/lattice.svg"/>
+
+			<p>
+			The advantage of using a pattern lattice as underlying data structure for neurons is that we do not depend solely on <a href="https://en.wikipedia.org/wiki/Backpropagation" rel="nofollow">backpropagation</a> as training method for new neurons.
+			Now we are able to enumerate all frequent patterns and use them to generate new neurons. Therefore, we do not have to retrain existing neurons and risk losing the conceptual knowledge
+			they have already accumulated. Frequent patterns are also much easier to comprehend for humans than the weights of conventional ANNs. But using an ANN's network
+			topology has some advantages as well. It allows us to build patterns on top of other patterns. For example, the German word "hausboot" can be far easier learned if instead of using the
+			individual characters as inputs, we simply use the already learned concepts "haus" and "boot". This way, we are also able to greatly reduce the size of the pattern lattice. Knowing that
+			complex concepts will be built on top of simpler ones, we do not need to expand the lattice beyond the simpler concepts on which it is built, because complex concepts are generated
+			spontaneously from the addition of inputs that the simpler ones feed back into the lattice.
+			</p>
+
+			<p>
+			Another advantage of using a pattern lattice is that activations can be easily
+			propagated throughout the network. When a new input is fed into the network, we do not have to update all the neurons. It is sufficient to find the
+			'children' within the pattern lattice that get activated by the new input signal. In other words, Aika is event driven, meaning that a single change to the model propagates through
+			it until the whole graph is updated. For each node of the pattern lattice, Aika maintains the frequency of this node within the corpus and a list of activations within the current document.
+			</p>
+
+			<img src="images/network.svg"/>
+
+
+			<h2>Annotations</h2>
+
+				<p>
+				When Aika processes information, it does so by propagating activations through its network. Each activation can be seen as an annotation for a specific text segment within the input text. An activation
+				always belongs to a logic node which is itself part of a neuron. Activations have a start and an end position and are assigned to one of the interpretation options.
+				</p>
+
+
+			<h2>Interpretations</h2>
+			<p>
+				Aika employs <a href="https://en.wikipedia.org/wiki/Non-monotonic_logic" rel="nofollow">non-monotonic logic</a> and is able to derive conclusions that are mutually exclusive. These conclusions are then weighted and only the strongest conclusion
+				is used for further training. Consider the following network as an example, in which the different linguistic concepts are represented by individual neurons.
+			</p>
+			<p>
+				<img src="images/mutual-exclusion.svg"/>
+			</p>
+
+			<p>
+				This network is able to determine whether a name, which has been recognized in a text, is a surname, city name, or profession. In this example network, we have omitted the common knowledge rules for simplicity's sake. If for instance the
+				name "washington" has been recognized in a text, it will trigger further activations in the surname hint neuron and the city name hint neuron. These neurons are just disjunctions and do not yet decide whether this is a surname or a city name.
+				In the next neural layer, however, we have negations that prevent that "washington" is classified as both surname and city. Nevertheless, the hint neurons will propagate their activations to the surname neuron and the city name neuron. But these activations
+				will carry conflicting interpretation options and only one interpretation will be selected as the result later on.
+			</p>
+			<p>
+				To avoid conflicting conclusions, Aika annotates all activations
+				that are emitted by a neuron with a primitive option number. These primitive option numbers are then propagated through the network along with the neuron activations. If such an primitive option number arrives at the
+				input of a negation node, a conflict is generated between the input option number (or the set of input option numbers) and the output option number generated by the current neuron. All activations
+				whose set of option numbers contain such a conflict are then removed from the network.
+			</p>
+
+			<p>
+				The primitive option numbers accumulate while they are propagated through the network. Such a set of primitive option numbers is then called an option.
+				To be able to perform all kinds of set operations on these options, an option lattice is built.
+			</p>
+
+			<p>
+				To determine the best interpretation of a given word, a good starting point is to simply select the option with the highest sum of associated activation weights. However, there might be better interpretations consisting of not just one but several options.
+				These options must not conflict with each other, which makes it difficult to efficiently determine the best interpretation. In order to find the best interpretation, a binary search tree is traversed, in which one child node is an expansion
+				of the so far determined interpretation and the other child node is the conflicting path. The search will retrieve the set of options with the highest weight sum. If no conflicts exists, this will simply be the set of all options. To limit the depth of the
+				search, an upper bound is computed which describes the maximum weight sum which can be gained by following this particular search path.
+			</p>
+
+			<h2>The relational model</h2>
+			<p>
+				In Aika synapses are not only used to propagate some activation value but also to propagate structural information through the network. As mentioned earlier, activations refer to a specific text segment.
+				The range of a given activation is then determined by its input activations and the structural properties of its input synapses.
+			</p>
+
+			<p>
+				Another relational information that is stored within the activations and propagated through the synapses is the relational id (rid).
+				The rid is used to specify the position of an input within a pattern. For example a neuron representing a word pattern might use the rid to
+				identify the letter position within the word.
+			</p>
+
+		</div>
+	</div>
+</body>
+</html>
