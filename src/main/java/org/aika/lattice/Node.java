@@ -33,6 +33,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -43,7 +44,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     public static int minFrequency = 5;
     public static int MAX_RID = 20;
 
-    public static int currentNodeId = 0;
+    public static AtomicInteger currentNodeId = new AtomicInteger(0);
     public int id;
 
     public TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
@@ -191,7 +192,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     public Node(Iteration t, int level) {
         Model m = t.m;
         threads = new ThreadState[m.numberOfThreads];
-        id = currentNodeId++;
+        id = currentNodeId.addAndGet(1);
         this.level = level;
         if(m != null) {
             m.allNodes[t.threadId].add(this);
@@ -823,7 +824,7 @@ public abstract class Node implements Comparable<Node>, Writable {
         if(rsk.pa == null) {
         } else if(rsk.pa instanceof InputNode) {
             InputNode node = (InputNode) rsk.pa;
-            minSyn = node.synapses != null ? node.synapses.get(new SynapseKey(rsk.offset, n)) : null;
+            minSyn = node.getSynapse(new SynapseKey(rsk.offset, n));
             sum = Math.abs(minSyn.w);
         } else {
             AndNode node = (AndNode) rsk.pa;

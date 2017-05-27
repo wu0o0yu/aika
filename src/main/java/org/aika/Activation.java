@@ -230,7 +230,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public boolean filter(Node n, Integer rid, Range r, Range.Relation rr, Option o, Option.Relation or) {
-        return (n != null || key.n == n) && (rid == null || key.rid.intValue() == rid.intValue()) && (r == null || rr == null || (rr.match(key.r, r))) && (o == null || or.compare(key.o, o));
+        return (n != null || key.n == n) && (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) && (r == null || rr == null || (rr.match(key.r, r))) && (o == null || or.compare(key.o, o));
     }
 
 

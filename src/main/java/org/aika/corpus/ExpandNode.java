@@ -182,12 +182,12 @@ public class ExpandNode implements Comparable<ExpandNode> {
         }
         changeState(StateChange.Mode.OLD);
 
-        if(f) {
+//        if(f) {
             child = selectedParent.selectCandidate();
             if(child != null) {
                 child.search(t, selectedParent, this, searchSteps);
             }
-        }
+//        }
     }
 
 

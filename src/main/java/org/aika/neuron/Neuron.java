@@ -31,6 +31,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
@@ -46,8 +47,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
     public Model m;
 
-    public static int currentNeuronId = 0;
-    public int id = currentNeuronId++;
+    public static AtomicInteger currentNeuronId = new AtomicInteger(0);
+    public int id = currentNeuronId.addAndGet(1);
     public String label;
 
     public volatile double bias;

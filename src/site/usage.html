@@ -47,10 +47,228 @@
 		<div class="features">
             <h1>Usage</h1>
 
+            <h2>Named Entity Recognition / Entity Resolution example</h2>
+            This example demonstrates the recognition of the words 'jackson cook' as forename and surname even though each individual word would have been recognized as city or profession respectively.
+            <pre class="prettyprint">
+				<code class="language-java">
+    @Test
+    public void testNamedEntityRecognition() {
+        Model m = new Model();
+        Iteration t = m.startIteration(null, 0);
+
+        Neuron forenameCategory = new Neuron("C-forename");
+        Neuron surnameCategory = new Neuron("C-surname");
+        Neuron suppressingN = new Neuron("SUPPR");
+
+        // The following three neurons are used to assign each word activation
+        // a relational id (rid). Here, the relational id specifies the
+        // word position within the sentence.
+        InputNeuron spaceN = t.createOrLookupInputSignal("SPACE");
+        InputNeuron startSignal = t.createOrLookupInputSignal("START-SIGNAL");
+        Neuron ctNeuron = t.createCycleNeuron(new Neuron("CTN"),
+                spaceN, false,
+                startSignal, true,
+                false
+        );
+
+        // The word input neurons which do not yet possess a relational id.
+        HashMap&lt;String, InputNeuron&gt; inputNeurons = new HashMap<>();
+
+        // The word input neurons with a relational id.
+        HashMap&lt;String, Neuron&gt; relNeurons = new HashMap<>();
+
+
+        String[] words = new String[] {
+                "mr.", "jackson", "cook", "was", "born", "in", "new", "york"
+        };
+        for(String word: words) {
+            InputNeuron in = t.createOrLookupInputSignal("W-" + word);
+            Neuron rn = t.createRelationalNeuron(
+                    new Neuron("WR-" + word),
+                    ctNeuron,
+                    in, false
+            );
+
+            inputNeurons.put(word, in);
+            relNeurons.put(word, rn);
+        }
+
+        // The entity neurons represent the concrete meanings of the input words.
+        // The helper function 'createAndNeuron' computes he required bias for a
+        // conjunction of the inputs.
+        Neuron cookProfessionEntity = t.createAndNeuron(
+                new Neuron("E-cook (profession)"),
+                0.1,
+                new Input()
+                        .setNeuron(relNeurons.get("cook"))
+                        .setWeight(12.0)
+                        .setMinInput(0.9)
+                        .setRecurrent(false),
+                new Input()
+                        .setNeuron(suppressingN)
+                        .setWeight(-20.0)
+                        .setMinInput(1.0)
+                        .setRecurrent(true)
+        );
+
+        Neuron cookSurnameEntity = t.createAndNeuron(
+                new Neuron("E-cook (surname)"),
+                0.8,
+                new Input() // Requires the word to be recognized
+                        .setNeuron(relNeurons.get("cook"))
+                        .setWeight(10.0)
+                        .setMinInput(0.9)
+                        .setRelativeRid(0)
+                        .setRecurrent(false),
+                new Input() // The previous word needs to be a forename
+                        .setNeuron(forenameCategory)
+                        .setWeight(5.0)
+                        .setMinInput(0.9)
+                        .setRelativeRid(-1) // previous word
+                        .setRecurrent(true)
+                        .setMatchRange(false) // ignore the range when matching this input
+                        // The range of this input should have no effect on the range of the output
+                        .setStartVisibility(Synapse.RangeVisibility.NONE)
+                        .setEndVisibility(Synapse.RangeVisibility.NONE),
+
+                // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
+                // self suppression taking place even though 'E-cook (surname)' is also contained
+                // in the suppressingN.
+                new Input()
+                        .setNeuron(suppressingN)
+                        .setWeight(-20.0)
+                        .setMinInput(1.0)
+                        .setRecurrent(true)
+        );
+
+        Neuron jacksonForenameEntity = t.createAndNeuron(
+                new Neuron("E-jackson (forename)"),
+                0.8,
+                new Input()
+                        .setNeuron(relNeurons.get("jackson"))
+                        .setWeight(10.0)
+                        .setMinInput(0.9)
+                        .setRelativeRid(0)
+                        .setRecurrent(false),
+                new Input()
+                        .setNeuron(surnameCategory)
+                        .setWeight(5.0)
+                        .setMinInput(0.9)
+                        .setRelativeRid(1)
+                        .setRecurrent(true)
+                        .setMatchRange(false)
+                        .setStartVisibility(Synapse.RangeVisibility.NONE)
+                        .setEndVisibility(Synapse.RangeVisibility.NONE),
+                new Input()
+                        .setNeuron(suppressingN)
+                        .setWeight(-20.0)
+                        .setMinInput(1.0)
+                        .setRecurrent(true)
+        );
+
+        Neuron jacksonCityEntity = t.createAndNeuron(
+                new Neuron("E-jackson (city)"),
+                0.1,
+                new Input()
+                        .setNeuron(relNeurons.get("jackson"))
+                        .setWeight(12.0)
+                        .setMinInput(0.9)
+                        .setRecurrent(false),
+                new Input()
+                        .setNeuron(suppressingN)
+                        .setWeight(-20.0)
+                        .setMinInput(1.0)
+                        .setRecurrent(true)
+        );
+
+        t.createOrNeuron(forenameCategory,
+                new Input() // In this example there is only one forename considered.
+                        .setNeuron(jacksonForenameEntity)
+                        .setWeight(10.0)
+                        .setRelativeRid(0)
+        );
+        t.createOrNeuron(surnameCategory,
+                new Input()
+                        .setNeuron(cookSurnameEntity)
+                        .setWeight(10.0)
+                        .setRelativeRid(0)
+        );
+
+        t.createOrNeuron(suppressingN,
+                new Input().setNeuron(cookProfessionEntity).setWeight(10.0),
+                new Input().setNeuron(cookSurnameEntity).setWeight(10.0),
+                new Input().setNeuron(jacksonCityEntity).setWeight(10.0),
+                new Input().setNeuron(jacksonForenameEntity).setWeight(10.0)
+        );
+
+        // Now that the model is complete, start processing an actual text.
+
+        Document doc = Document.create("mr. jackson cook was born in new york ");
+        t = m.startIteration(doc, 0);
+
+        // The start signal is used as a starting point for relational id counter.
+        startSignal.addInput(t, 0, 1, 0);  // iteration, begin, end, relational id
+
+        int i = 0;
+        for(String w: doc.getContent().split(" ")) {
+            int j = i + w.length();
+            // The space is used as a clock signal to increase the relational id.
+            spaceN.addInput(t, j, j + 1);
+
+            // Feed the individual words as inputs into the network.
+            inputNeurons.get(w).addInput(t, i, j);
+            i = j + 1;
+        }
+
+        // Search for the best interpretation of this text.
+        t.process();
+
+        System.out.println(t.networkStateToString(true, true));
+        System.out.println();
+
+        System.out.println("Selected Option: " + t.doc.selectedOption.toString());
+    }
+                </code>
+			</pre>
+            <pre class="prettyprint">
+				<code class="language-java">
+    // Range - Option - Node ID, Neuron Label - Relational Id
+    //  - final Activation Value, final Weight, final Norm
+
+    ...
+    (4,11) - () - 14 W-jackson - Rid:null - FV:1.0 FW:0.0 FN:0.0
+    (4,12) - (4[(3)]) - 51 E-jackson (city) - Rid:null - FV:0.0 FW:0.0 FN:2.277       <-- Suppressed
+    (4,12) - (6[(5),(4)]) - 57 SUPPR - Rid:null - FV:1.0 FW:0.0 FN:0.0
+    (4,12) - (2[(0)]) - 2 CTN - Rid:1 - FV:0.952 FW:3.712 FN:3.712
+    (4,12) - (3[(2)]) - 15 WR-jackson - Rid:1 - FV:1.0 FW:0.0 FN:0.0
+    (4,12) - (5[(3)]) - 48 E-jackson (forename) - Rid:1 - FV:0.988 FW:5.098 FN:5.098  <-- Selected
+    (4,12) - (7[(5)]) - 53 C-forename - Rid:1 - FV:1.0 FW:0.0 FN:0.0
+    (12,16) - () - 18 W-cook - Rid:null - FV:1.0 FW:0.0 FN:0.0
+    (12,17) - (10[(9)]) - 42 E-cook (profession) - Rid:null - FV:0.0 FW:0.0 FN:2.277  <-- Suppressed
+    (12,17) - (12[(10),(11)]) - 57 SUPPR - Rid:null - FV:1.0 FW:0.0 FN:0.0
+    (12,17) - (8[(2)]) - 2 CTN - Rid:2 - FV:0.948 FW:3.619 FN:3.619
+    (12,17) - (9[(8)]) - 19 WR-cook - Rid:2 - FV:1.0 FW:0.0 FN:0.0
+    (12,17) - (11[(9)]) - 45 E-cook (surname) - Rid:2 - FV:0.988 FW:5.097 FN:5.097    <-- Selected
+    (12,17) - (13[(11)]) - 55 C-surname - Rid:2 - FV:1.0 FW:0.0 FN:0.0
+    ...
+
+    WeightSum:W:39.34979542135759 N:43.903870825250465 NW:0.8962716653841446
+
+    // The selected options set consist of a comma separated list of options which them self may
+    // consist of a disjunction of lower level options (i.e. the rectangular brackets).
+    Selected Option: (0[()],1[(0)],2[(0)],3[(2)],5[(3)],6[(5),(4)],7[(5)],8[(2)],9[(8)],
+                    11[(9)],12[(10),(11)],13[(11)],14[(8)],15[(14)],16[(14)],17[(16)],
+                    18[(16)],19[(18)],20[(18)],21[(20)],22[(20)],23[(22)])
+
+                </code>
+			</pre>
+
+            <br/>
+            <br/>
+
             <h2>Mutual exclusion example</h2>
 			<pre class="prettyprint">
 				<code class="language-java">
-
 
    /**
      *     |----------------------------|
