@@ -49,58 +49,57 @@
 
 			<h2>Artificial neural networks vs. frequent pattern mining</h2>
 			<p>
-			So how do an <a href="https://en.wikipedia.org/wiki/Artificial_neural_network" rel="nofollow">artificial neural network</a> and a <a href="http://www.charuaggarwal.net/freqbook.pdf" rel="nofollow">frequent pattern mining</a> algorithm fit together? Well, ANNs basically consist of neurons that compute an output value based on the weighted sum of their inputs.
-			These neurons can be reformulated as a set of boolean operations.
+				So how do an <a href="https://en.wikipedia.org/wiki/Artificial_neural_network" rel="nofollow">artificial neural network</a> and a <a href="http://www.charuaggarwal.net/freqbook.pdf" rel="nofollow">frequent pattern mining</a> algorithm fit together? Well, ANNs basically consist of neurons that compute an output value based on the weighted sum of their inputs.
+				These neurons can be reformulated as a set of boolean operations.
 
-			For example, the following <a href="https://en.wikipedia.org/wiki/Artificial_neuron" rel="nofollow">neuron</a> utilizing the <a href="https://de.wikipedia.org/wiki/Heaviside-Funktion" rel="nofollow">heaviside transfer function</a>
+				For example, the following <a href="https://en.wikipedia.org/wiki/Artificial_neuron" rel="nofollow">neuron</a> utilizing the <a href="https://de.wikipedia.org/wiki/Heaviside-Funktion" rel="nofollow">heaviside transfer function</a> (1 if x > 0 otherwise 0)
 			</p>
 			<img src="images/equ-1.svg"/>
 			<img src="images/equ-2.svg"/>
 			<p>
-			can also be written as boolean equation
+				can also be written as boolean equation
 			</p>
 			<img src="images/equ-3.svg"/>
 
 			<p>
-			So it is easy to see that the neuron's weighted sum can be reformulated as a <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form" rel="nofollow">disjunctive normal form</a> boolean equation, meaning that we always
-			get a set of conjunctions that are connected by a disjunction. Now, the trick to bring the two machine learning approaches together is to store these conjunctions as nodes within a <a href="https://en.wikipedia.org/wiki/Lattice_(order)" rel="nofollow">pattern lattice</a>. A
-			pattern lattice is a directed acyclic graph containing all subpatterns of a given pattern.
+				So it is easy to see that the neuron's weighted sum can be reformulated as a <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form" rel="nofollow">disjunctive normal form</a> boolean equation, meaning that we always
+				get a set of conjunctions that are connected by a disjunction. Now, the trick to bring the two machine learning approaches together is to store these conjunctions as nodes within a <a href="https://en.wikipedia.org/wiki/Lattice_(order)" rel="nofollow">pattern lattice</a>. A
+				pattern lattice is a directed acyclic graph containing all subpatterns of a given pattern.
 			</p>
 
 			<img src="images/lattice.svg"/>
 
 			<p>
-			The advantage of using a pattern lattice as underlying data structure for neurons is that we do not depend solely on <a href="https://en.wikipedia.org/wiki/Backpropagation" rel="nofollow">backpropagation</a> as training method for new neurons.
-			Now we are able to enumerate all frequent patterns and use them to generate new neurons. Therefore, we do not have to retrain existing neurons and risk losing the conceptual knowledge
-			they have already accumulated. Frequent patterns are also much easier to comprehend for humans than the weights of conventional ANNs. But using an ANN's network
-			topology has some advantages as well. It allows us to build patterns on top of other patterns. For example, the German word "hausboot" can be far easier learned if instead of using the
-			individual characters as inputs, we simply use the already learned concepts "haus" and "boot". This way, we are also able to greatly reduce the size of the pattern lattice. Knowing that
-			complex concepts will be built on top of simpler ones, we do not need to expand the lattice beyond the simpler concepts on which it is built, because complex concepts are generated
-			spontaneously from the addition of inputs that the simpler ones feed back into the lattice.
-			</p>
-
-			<p>
-			Another advantage of using a pattern lattice is that activations can be easily
-			propagated throughout the network. When a new input is fed into the network, we do not have to update all the neurons. It is sufficient to find the
-			'children' within the pattern lattice that get activated by the new input signal. In other words, Aika is event driven, meaning that a single change to the model propagates through
-			it until the whole graph is updated. For each node of the pattern lattice, Aika maintains the frequency of this node within the corpus and a list of activations within the current document.
+				An advantage of this representation is that it greatly reduces the computational costs. In a classical
+				neural network the weighted sums of all neurons would have to be computed. This requires
+				a lot of computational power if the network is large. Aika on the other hand does not even touch a neuron if it
+				has no chance of being activated. Activations must first pass a few layers of logic nodes within the
+				pattern lattice before the activation of a neuron output is even considered. Each layer filters out activations that
+				are unable to activate a neuron output. Though the depth of the pattern
+				lattice is limited. Otherwise there would be combinatorial too many logic nodes.
 			</p>
 
 			<img src="images/network.svg"/>
 
-
-			<h2>Annotations</h2>
-
-				<p>
-				When Aika processes information, it does so by propagating activations through its network. Each activation can be seen as an annotation for a specific text segment within the input text. An activation
-				always belongs to a logic node which is itself part of a neuron. Activations have a start and an end position and are assigned to one of the interpretation options.
-				</p>
-
+			<h2>Activations</h2>
+			<p>
+				Another advantage of having a discrete representation of a neural network is that we are able to assign
+				a specific text segment, a word position (relational id) and a
+				specific interpretation option to each activation and propagate them along through the network. This accommodates for the
+				fact that processing text is an inherently relational task. Words,
+				phrases and sentences are in a relation to each other through their sequential order. The assignment of text
+				ranges and word positions to activations is a simple yet powerful representation of the relational structure of text and avoids
+				some of the shortcomings of other representations such as bag of words or sliding window. In Aika the
+				synapses are able to manipulate the text range and the word position while the activation is passed on to the next neuron.
+			</p>
 
 			<h2>Interpretations</h2>
 			<p>
-				Aika employs <a href="https://en.wikipedia.org/wiki/Non-monotonic_logic" rel="nofollow">non-monotonic logic</a> and is able to derive conclusions that are mutually exclusive. These conclusions are then weighted and only the strongest conclusion
-				is used for further training. Consider the following network as an example, in which the different linguistic concepts are represented by individual neurons.
+				One common problem when processing text is that of cyclic dependencies. In the example 'jackson cook' it is impossible
+				to decide which word has to be resolved first, the forename or the surname, since both depend on each other.
+				To tackle this problem Aika employs <a href="https://en.wikipedia.org/wiki/Non-monotonic_logic" rel="nofollow">non-monotonic logic</a> and
+				is therefore able to derive conclusions that are mutually exclusive. These conclusions are then weighted and only the strongest conclusion
+				is returned as the result. Consider the following network as an example, in which the different linguistic concepts are represented by individual neurons.
 			</p>
 			<p>
 				<img src="images/mutual-exclusion.svg"/>
@@ -127,20 +126,21 @@
 			<p>
 				To determine the best interpretation of a given word, a good starting point is to simply select the option with the highest sum of associated activation weights. However, there might be better interpretations consisting of not just one but several options.
 				These options must not conflict with each other, which makes it difficult to efficiently determine the best interpretation. In order to find the best interpretation, a binary search tree is traversed, in which one child node is an expansion
-				of the so far determined interpretation and the other child node is the conflicting path. The search will retrieve the set of options with the highest weight sum. If no conflicts exists, this will simply be the set of all options. To limit the depth of the
-				search, an upper bound is computed which describes the maximum weight sum which can be gained by following this particular search path.
+				of the so far determined interpretation and the other child node is the conflicting path. The search will retrieve the set of options with the highest weight sum. If no conflicts exists, this will simply be the set of all options.
 			</p>
 
-			<h2>The relational model</h2>
-			<p>
-				In Aika synapses are not only used to propagate some activation value but also to propagate structural information through the network. As mentioned earlier, activations refer to a specific text segment.
-				The range of a given activation is then determined by its input activations and the structural properties of its input synapses.
-			</p>
 
+			<h2>Training</h2>
 			<p>
-				Another relational information that is stored within the activations and propagated through the synapses is the relational id (rid).
-				The rid is used to specify the position of an input within a pattern. For example a neuron representing a word pattern might use the rid to
-				identify the letter position within the word.
+				Currently Aika has only rudimentary support for automatic training. However, the approach that Aika takes allows
+				to implement some learning mechanisms that would be difficult or impossible to implement otherwise.
+				Since Aika is using a pattern lattice as underlying data structure for neurons, we do not depend solely on <a href="https://en.wikipedia.org/wiki/Backpropagation" rel="nofollow">backpropagation</a> as training method for new neurons.
+				Now we are able to enumerate all frequent patterns and use them to generate new neurons. Therefore, we do not have to retrain existing neurons and risk losing the conceptual knowledge
+				they have already accumulated. Frequent patterns are also much easier to comprehend for humans than the weights of conventional ANNs. This is a form of unsupervised learning.
+			</p>
+			<p>
+				Another learning mechanism that can be derived from the interpretations is the following. Since only the strongest interpretation is chosen
+				and all other interpretations are suppressed, we have an convenient way to automatically generate our supervised training data.
 			</p>
 
 		</div>

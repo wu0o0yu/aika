@@ -65,7 +65,7 @@ public class ConcurrencyTest {
         InputNeuron inClock = t.createOrLookupInputSignal("CLOCK");
 
 
-        Neuron ctn = t.createCycleNeuron(new Neuron("CTN"), inClock, false, inStart, true, false);
+        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), inClock, false, inStart, true, false);
 
 
         Document doc0 = Document.create("aaaaaaaaaa");

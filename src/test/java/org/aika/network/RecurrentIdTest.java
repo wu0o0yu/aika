@@ -53,7 +53,7 @@ public class RecurrentIdTest {
         InputNeuron inA = t.createOrLookupInputSignal("A");
         InputNeuron inB = t.createOrLookupInputSignal("B");
 
-        Neuron ctNeuron = t.createCycleNeuron(new Neuron("CTN"), cl, false, start, true, false);
+        Neuron ctNeuron = t.createCounterNeuron(new Neuron("CTN"), cl, false, start, true, false);
 
         Neuron recA = t.createRelationalNeuron(new Neuron("SA"), ctNeuron, inA, false);
         Neuron recB = t.createRelationalNeuron(new Neuron("SB"), ctNeuron, inB, false);
@@ -101,7 +101,7 @@ public class RecurrentIdTest {
         InputNeuron inB = t.createOrLookupInputSignal("B");
         InputNeuron inC = t.createOrLookupInputSignal("C");
 
-        Neuron ctNeuron = t.createCycleNeuron(new Neuron("CTN"), cl, false, start, true, false);
+        Neuron ctNeuron = t.createCounterNeuron(new Neuron("CTN"), cl, false, start, true, false);
 
         Neuron recA = t.createRelationalNeuron(new Neuron("A"), ctNeuron, inA, false);
         Neuron recB = t.createRelationalNeuron(new Neuron("B"), ctNeuron, inB, false);

@@ -626,7 +626,7 @@ public class Iteration {
      * @param direction
      * @return
      */
-    public Neuron createCycleNeuron(Neuron n, Neuron clockSignal, boolean dirCS, Neuron startSignal, boolean dirSS, boolean direction) {
+    public Neuron createCounterNeuron(Neuron n, Neuron clockSignal, boolean dirCS, Neuron startSignal, boolean dirSS, boolean direction) {
         n.m = this.m;
 
         double bias = -44.0;

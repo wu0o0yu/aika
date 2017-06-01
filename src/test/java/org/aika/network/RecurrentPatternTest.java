@@ -55,7 +55,7 @@ public class RecurrentPatternTest {
             chars.put(c, charSN);
         }
 
-        Neuron ctNeuron = t.createCycleNeuron(new Neuron("CTN"), spaceN, false, startSignal, true, false);
+        Neuron ctNeuron = t.createCounterNeuron(new Neuron("CTN"), spaceN, false, startSignal, true, false);
 
         TreeMap<Character, Neuron> recChars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
@@ -149,7 +149,7 @@ public class RecurrentPatternTest {
 
         Neuron ctNeuron = new Neuron("CTN");
 
-        t.createCycleNeuron(ctNeuron, spaceN, false, startSignal, true, false);
+        t.createCounterNeuron(ctNeuron, spaceN, false, startSignal, true, false);
 
         TreeMap<Character, Neuron> recChars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
@@ -228,7 +228,7 @@ public class RecurrentPatternTest {
         InputNeuron clock = t.createOrLookupInputSignal("CLOCK");
         InputNeuron input = t.createOrLookupInputSignal("INPUT");
 
-        Neuron ctn = t.createCycleNeuron(new Neuron("CTN"), clock, false, start, true, false);
+        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), clock, false, start, true, false);
         Neuron rn = t.createRelationalNeuron(new Neuron("RN"), ctn, input, false);
 
         InputNeuron aN = t.createOrLookupInputSignal("A");
@@ -267,7 +267,7 @@ public class RecurrentPatternTest {
         InputNeuron start = t.createOrLookupInputSignal("START");
         InputNeuron clock = t.createOrLookupInputSignal("CLOCK");
 
-        Neuron ctn = t.createCycleNeuron(new Neuron("CTN"), clock, false, start, true, false);
+        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), clock, false, start, true, false);
 
 
         for(int i = 5; i < 30; i += 5) {

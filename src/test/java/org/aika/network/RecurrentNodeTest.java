@@ -47,7 +47,7 @@ public class RecurrentNodeTest {
         InputNeuron cn = t.createOrLookupInputSignal("CLOCK");
         InputNeuron sn = t.createOrLookupInputSignal("START");
 
-        Neuron ctn = t.createCycleNeuron(new Neuron("CTN"), cn, false, sn, true, false);
+        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
 
         Option o0 = Option.addPrimitive(doc);
         Option o1 = Option.addPrimitive(doc);
@@ -108,7 +108,7 @@ public class RecurrentNodeTest {
 
         InputNeuron cn = t.createOrLookupInputSignal("CLOCK");
         InputNeuron sn = t.createOrLookupInputSignal("START");
-        Neuron ctn = t.createCycleNeuron(new Neuron("CTN"), cn, false, sn, true, false);
+        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
 
         t.propagate();
 
@@ -149,7 +149,7 @@ public class RecurrentNodeTest {
 
         InputNeuron cn = t.createOrLookupInputSignal("CLOCK");
         InputNeuron sn = t.createOrLookupInputSignal("START");
-        Neuron ctn = t.createCycleNeuron(new Neuron("CTN"), cn, false, sn, false, true);
+        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), cn, false, sn, false, true);
 
         Option o0 = Option.addPrimitive(doc);
         Option o1 = Option.addPrimitive(doc);
@@ -180,7 +180,7 @@ public class RecurrentNodeTest {
         InputNeuron in = t.createOrLookupInputSignal("INPUT");
         InputNeuron cn = t.createOrLookupInputSignal("CLOCK");
         InputNeuron sn = t.createOrLookupInputSignal("START");
-        Neuron ctn = t.createCycleNeuron(new Neuron("CTN"), cn, false, sn, true, false);
+        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
         Neuron on = t.createRelationalNeuron(new Neuron("ON"), ctn, in, false);
 
         Option o0 = Option.addPrimitive(doc);

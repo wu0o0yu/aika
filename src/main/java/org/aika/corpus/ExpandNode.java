@@ -32,6 +32,11 @@ import org.aika.Activation.Rounds;
  */
 public class ExpandNode implements Comparable<ExpandNode> {
 
+    /**
+     * This optimization may miss some cases and will not always return the best interpretation.
+     */
+    public static boolean INCOMPLETE_OPTIMIZATION = false;
+
     public static int MAX_SEARCH_STEPS = 10000;
 
     public int id;
@@ -182,12 +187,12 @@ public class ExpandNode implements Comparable<ExpandNode> {
         }
         changeState(StateChange.Mode.OLD);
 
-//        if(f) {
+        if(f || !INCOMPLETE_OPTIMIZATION) {
             child = selectedParent.selectCandidate();
             if(child != null) {
                 child.search(t, selectedParent, this, searchSteps);
             }
-//        }
+        }
     }
 
 

@@ -20,15 +20,10 @@ package org.aika.network;
 import org.aika.Iteration;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
-import org.aika.corpus.Range;
-import org.aika.Activation;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.Iteration.Input;
-import org.aika.neuron.Synapse;
-import org.junit.Assert;
-import org.junit.Before;
+import org.aika.neuron.Synapse.RangeVisibility;
 import org.junit.Test;
 
 import java.util.*;
@@ -41,29 +36,40 @@ public class NamedEntityRecognitionTest {
 
 
 
-
+    // This test demonstrates the recognition of the words 'jackson cook' as forename and surname
+    // even though each individual word would have been recognized as city or profession
+    // respectively.
     @Test
     public void testNamedEntityRecognition() {
-        // This test demonstrates the recognition of the words 'jackson cook' as forename and surname
-        // even though each individual word would have been recognized as city or profession
-        // respectively.
+        Model m = new Model(1); // number of threads
 
-        Model m = new Model();
-        Iteration t = m.startIteration(null, 0);
+        // Training iteration without a document
+        Iteration t = m.startIteration(null, 0); // doc, thread id
 
         Neuron forenameCategory = new Neuron("C-forename");
         Neuron surnameCategory = new Neuron("C-surname");
         Neuron suppressingN = new Neuron("SUPPR");
 
+        // The following three neurons are used to assign each word activation
+        // a relational id (rid). Here, the relational id specifies the
+        // word position within the sentence.
         InputNeuron spaceN = t.createOrLookupInputSignal("SPACE");
         InputNeuron startSignal = t.createOrLookupInputSignal("START-SIGNAL");
-        Neuron ctNeuron = t.createCycleNeuron(new Neuron("CTN"),
-                spaceN, false,
-                startSignal, true,
-                false
+        Neuron ctNeuron = t.createCounterNeuron(new Neuron("RID Counter"),
+                spaceN, // clock signal
+                false, // direction of the clock signal (range end counts)
+                startSignal, // start signal
+                true, // direction of the start signal (range begin counts)
+                false // direction of the counting neuron
         );
+        // createCounterNeuron is just a convenience method which creates an ordinary neuron
+        // with some input synapses.
 
+
+        // The word input neurons which do not yet possess a relational id.
         HashMap<String, InputNeuron> inputNeurons = new HashMap<>();
+
+        // The word input neurons with a relational id.
         HashMap<String, Neuron> relNeurons = new HashMap<>();
 
 
@@ -73,9 +79,10 @@ public class NamedEntityRecognitionTest {
         for(String word: words) {
             InputNeuron in = t.createOrLookupInputSignal("W-" + word);
             Neuron rn = t.createRelationalNeuron(
-                    new Neuron("W-" + word + "-RN"),
-                    ctNeuron,
-                    in, false
+                    new Neuron("WR-" + word),
+                    ctNeuron, // RID Counting neuron
+                    in, // Input neuron
+                    false // Direction of the input neuron
             );
 
             inputNeurons.put(word, in);
@@ -83,44 +90,48 @@ public class NamedEntityRecognitionTest {
         }
 
         // The entity neurons represent the concrete meanings of the input words.
-        Neuron cookProfessionEntity = t.createAndNeuron(
-                new Neuron("E-cook (profession)"),
-                0.1,
-                new Input()
-                        .setNeuron(relNeurons.get("cook"))
-                        .setWeight(12.0)
-                        .setMinInput(0.9)
-                        .setRecurrent(false),
-                new Input()
-                        .setNeuron(suppressingN)
-                        .setWeight(-20.0)
-                        .setMinInput(1.0)
-                        .setRecurrent(true)
-        );
-
+        // The helper function 'createAndNeuron' computes the required bias for a
+        // conjunction of the inputs.
         Neuron cookSurnameEntity = t.createAndNeuron(
                 new Neuron("E-cook (surname)"),
-                0.8,
+                0.5, // adjusts the bias
                 new Input() // Requires the word to be recognized
                         .setNeuron(relNeurons.get("cook"))
                         .setWeight(10.0)
+                        // This input requires the input activation to have an
+                        // activation value of at least 0.9
                         .setMinInput(0.9)
-                        .setRelativeRid(0)
+                        .setRelativeRid(0) // references the current word
                         .setRecurrent(false),
                 new Input() // The previous word needs to be a forename
                         .setNeuron(forenameCategory)
-                        .setWeight(5.0)
+                        .setWeight(10.0)
                         .setMinInput(0.9)
-                        .setRelativeRid(-1) // previous word
-                        .setRecurrent(true)
+                        .setRelativeRid(-1) // references the previous word
+                        .setRecurrent(true) // this input is a positive feedback loop
                         .setMatchRange(false) // ignore the range when matching this input
                         // The range of this input should have no effect on the range of the output
-                        .setStartVisibility(Synapse.RangeVisibility.NONE)
-                        .setEndVisibility(Synapse.RangeVisibility.NONE),
+                        .setStartVisibility(RangeVisibility.NONE)
+                        .setEndVisibility(RangeVisibility.NONE),
 
                 // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
                 // self suppression taking place even though 'E-cook (surname)' is also contained
                 // in the suppressingN.
+                new Input()
+                        .setNeuron(suppressingN)
+                        .setWeight(-20.0)
+                        .setMinInput(1.0)
+                        .setRecurrent(true) // this input is a negative feedback loop
+        );
+
+        Neuron cookProfessionEntity = t.createAndNeuron(
+                new Neuron("E-cook (profession)"),
+                0.2,
+                new Input()
+                        .setNeuron(relNeurons.get("cook"))
+                        .setWeight(15.0)
+                        .setMinInput(0.9)
+                        .setRecurrent(false),
                 new Input()
                         .setNeuron(suppressingN)
                         .setWeight(-20.0)
@@ -130,7 +141,7 @@ public class NamedEntityRecognitionTest {
 
         Neuron jacksonForenameEntity = t.createAndNeuron(
                 new Neuron("E-jackson (forename)"),
-                0.8,
+                0.5,
                 new Input()
                         .setNeuron(relNeurons.get("jackson"))
                         .setWeight(10.0)
@@ -139,13 +150,13 @@ public class NamedEntityRecognitionTest {
                         .setRecurrent(false),
                 new Input()
                         .setNeuron(surnameCategory)
-                        .setWeight(5.0)
+                        .setWeight(10.0)
                         .setMinInput(0.9)
                         .setRelativeRid(1)
                         .setRecurrent(true)
                         .setMatchRange(false)
-                        .setStartVisibility(Synapse.RangeVisibility.NONE)
-                        .setEndVisibility(Synapse.RangeVisibility.NONE),
+                        .setStartVisibility(RangeVisibility.NONE)
+                        .setEndVisibility(RangeVisibility.NONE),
                 new Input()
                         .setNeuron(suppressingN)
                         .setWeight(-20.0)
@@ -155,7 +166,7 @@ public class NamedEntityRecognitionTest {
 
         Neuron jacksonCityEntity = t.createAndNeuron(
                 new Neuron("E-jackson (city)"),
-                0.1,
+                0.2,
                 new Input()
                         .setNeuron(relNeurons.get("jackson"))
                         .setWeight(12.0)
@@ -188,9 +199,13 @@ public class NamedEntityRecognitionTest {
                 new Input().setNeuron(jacksonForenameEntity).setWeight(10.0)
         );
 
-        // Now that the model is complete, start processing an actual text.
 
+        // Now that the model is complete, start processing an actual text.
         Document doc = Document.create("mr. jackson cook was born in new york ");
+
+        // An iteration is used to process a single document using a specified thread id.
+        // Several threads using different thread ids are permitted to process documents
+        // using the same model.
         t = m.startIteration(doc, 0);
 
         // The start signal is used as a starting point for relational id counter.
@@ -214,5 +229,7 @@ public class NamedEntityRecognitionTest {
         System.out.println();
 
         System.out.println("Selected Option: " + t.doc.selectedOption.toString());
+
+        t.clearActivations();
     }
 }

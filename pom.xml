@@ -4,7 +4,7 @@
     <groupId>org.aika-software</groupId>
     <artifactId>aika</artifactId>
     <packaging>jar</packaging>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <name>aika</name>
     <url>http://www.aika-software.org</url>
     <description>The Aika Text Mining Algorithm</description>
@@ -99,7 +99,7 @@
                 </executions>
             </plugin>
 
-<!--
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -114,7 +114,6 @@
                     </execution>
                 </executions>
             </plugin>
--->
         </plugins>
 
         <resources>

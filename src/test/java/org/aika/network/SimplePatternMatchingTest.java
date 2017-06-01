@@ -53,7 +53,7 @@ public class SimplePatternMatchingTest {
 
         InputNeuron startSignal = t.createOrLookupInputSignal("START-SIGNAL");
 
-        Neuron ctNeuron = t.createCycleNeuron(new Neuron("CTN"),
+        Neuron ctNeuron = t.createCounterNeuron(new Neuron("CTN"),
                 inSpace, false,
                 startSignal, true,
                 false
