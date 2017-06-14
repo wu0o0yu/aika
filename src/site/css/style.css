@@ -35,10 +35,20 @@ img {
 	border-bottom: 1px solid #e6e6e6;
 	padding: 27px 0;
 }
-#header > div, #footer > div {
-	width: 980px;
-	margin: 0 auto;
-	padding: 0 20px;
+
+@media (min-width:500px) {
+	#header > div, #footer > div {
+		width: 980px;
+		margin: 0 auto;
+		padding: 0 20px;
+	}
+}
+@media (max-width:499px) {
+	#header > div, #footer > div {
+/*		height: 60%;*/
+		margin: 0 auto;
+		padding: 0 20px;
+	}
 }
 /** Logo **/
 #header .logo {
@@ -70,10 +80,20 @@ img {
 	margin: 0;
 	padding: 0;
 }
-#navigation li {
-	float: left;
-	width: 160px;
-	text-align: center;
+@media (min-width:500px) {
+	#navigation li {
+		float: left;
+		width: 160px;
+		text-align: center;
+	}
+}
+@media (max-width:499px) {
+	#navigation li {
+		float: left;
+		width: 300px;
+		height: 60px;
+		text-align: center;
+	}
 }
 #navigation li a {
 	color: #818181;
@@ -89,12 +109,27 @@ img {
 }
 
 /*------------------------------ CONTENTS ------------------------------*/
-#contents {
-	min-height: 510px;
-	width: 880px;
-	margin: 0 auto;
-	padding: 54px 40px;
+@media (min-width:500px) {
+	#contents {
+		min-height: 510px;
+		width: 880px;
+		margin: 0 auto;
+		padding: 54px 40px;
+	}
 }
+@media (max-width:499px) {
+	#contents {
+		min-height: 510px;
+		width: 80%;
+		margin: 50px auto;
+		padding: 54px 40px;
+	}
+}
+
+.prettyprint-code {
+	width: 810px;
+}
+
 h1 {
 	color: #3e3e3e;
 	font-size: 30px;
@@ -126,9 +161,17 @@ p a {
 	width: 400px;
 	margin: 0 20px;
 }
-#contents .features {
-	width: 810px;
-	margin: 0 auto;
+@media (min-width:500px) {
+	#contents .features {
+		width: 810px;
+		margin: 0 auto;
+	}
+}
+@media (max-width:499px) {
+	#contents .features {
+		width: 80%;
+		margin: 0 auto;
+	}
 }
 .features > div {
 	display: inline-block;
