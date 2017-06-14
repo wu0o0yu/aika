@@ -32,6 +32,8 @@ import org.aika.Activation.State;
 import org.aika.Activation.SynapseActivation;
 import org.aika.neuron.Synapse.RangeSignal;
 import org.aika.neuron.Synapse.RangeVisibility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -40,6 +42,8 @@ import java.util.*;
  * @author Lukas Molzberger
  */
 public class Iteration {
+
+    private static final Logger log = LoggerFactory.getLogger(Iteration.class);
 
     public static boolean APPLY_DEBUG_OUTPUT = false;
     public static boolean OPTIMIZE_DEBUG_OUTPUT = false;
@@ -223,10 +227,9 @@ public class Iteration {
                 n.processChanges(Iteration.this);
 
                 if(APPLY_DEBUG_OUTPUT) {
-                    System.out.println("QueueId:" + n.queueId);
-                    System.out.println(n);
-                    System.out.println();
-                    System.out.println(networkStateToString(false, false));
+                    log.info("QueueId:" + n.queueId);
+                    log.info(n.toString() + "\n");
+                    log.info("\n" + networkStateToString(false, false));
                 }
             }
         }
@@ -333,9 +336,8 @@ public class Iteration {
                 State s = act.key.n.neuron.computeWeight(e.round, act, en);
 
                 if(OPTIMIZE_DEBUG_OUTPUT) {
-                    System.out.println(act.key + " Round:" + round);
-                    System.out.println("Value:" + s.value + "  Weight:" + s.weight.w + "  Norm:" + s.weight.n);
-                    System.out.println();
+                    log.info(act.key + " Round:" + round);
+                    log.info("Value:" + s.value + "  Weight:" + s.weight.w + "  Norm:" + s.weight.n + "\n");
                 }
 
                 if(round == 0 || !act.rounds.get(round).equalsWithWeights(s)) {
@@ -458,6 +460,8 @@ public class Iteration {
      */
     public Neuron createAndNeuron(Neuron n, double threshold, Collection<Input> inputs) {
         n.m = this.m;
+        if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
+
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
 
         double bias = 0.0;
@@ -540,6 +544,7 @@ public class Iteration {
      */
     public Neuron createOrNeuron(Neuron n, Set<Input> inputs) {
         n.m = this.m;
+        if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
 
@@ -566,6 +571,7 @@ public class Iteration {
      */
     public Neuron createRelationalNeuron(Neuron n, Neuron ctn, Neuron inputSignal, boolean dirIS) {
         n.m = this.m;
+        if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
         double bias = -30.0;
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
@@ -628,6 +634,8 @@ public class Iteration {
      */
     public Neuron createCounterNeuron(Neuron n, Neuron clockSignal, boolean dirCS, Neuron startSignal, boolean dirSS, boolean direction) {
         n.m = this.m;
+
+        if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
         double bias = -44.0;
         double negRecSum = -20.0;
@@ -799,6 +807,8 @@ public class Iteration {
         public boolean matchRange = true;
         public RangeVisibility startVisibility = RangeVisibility.MAX_OUTPUT;
         public RangeVisibility endVisibility = RangeVisibility.MAX_OUTPUT;
+        public RangeSignal startSignal = RangeSignal.START;
+        public RangeSignal endSignal = RangeSignal.END;
 
         public Integer relativeRid;
         public Integer absoluteRid;
@@ -930,6 +940,20 @@ public class Iteration {
             return this;
         }
 
+
+        public Input setStartSignal(RangeSignal startSignal) {
+            this.startSignal = startSignal;
+            return this;
+        }
+
+
+        public Input setEndSignal(RangeSignal endSignal) {
+            this.endSignal = endSignal;
+            return this;
+        }
+
+
+
         @Override
         public int compareTo(Input in) {
             int r = Double.compare(weight, in.weight);
@@ -949,6 +973,10 @@ public class Iteration {
             r = Utils.compareInteger(startVisibility.ordinal(), in.startVisibility.ordinal());
             if (r != 0) return r;
             r = Utils.compareInteger(endVisibility.ordinal(), in.endVisibility.ordinal());
+            if (r != 0) return r;
+            r = Utils.compareInteger(startSignal.ordinal(), in.startSignal.ordinal());
+            if (r != 0) return r;
+            r = Utils.compareInteger(endSignal.ordinal(), in.endSignal.ordinal());
             return r;
         }
     }

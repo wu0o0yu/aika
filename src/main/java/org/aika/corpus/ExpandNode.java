@@ -25,12 +25,16 @@ import org.aika.Iteration;
 import org.aika.corpus.Conflicts.Conflict;
 import org.aika.Activation;
 import org.aika.Activation.Rounds;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The <code>ExpandNode</code> class represents a node in the search tree that is used to find the optimal
  * interpretation for a given document.
  */
 public class ExpandNode implements Comparable<ExpandNode> {
+
+    private static final Logger log = LoggerFactory.getLogger(ExpandNode.class);
 
     /**
      * This optimization may miss some cases and will not always return the best interpretation.
@@ -98,7 +102,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
             weightDelta = t.vQueue.adjustWeight(this, rootRefs);
 
             if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
-                System.out.println("Root ExpandNode:" + toString());
+                log.info("Root ExpandNode:" + toString());
             }
 
             doc.selectedExpandNode = doc.root;
@@ -120,7 +124,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
                 doc.selectedExpandNode.reconstructSelectedResult(t);
                 doc.selectedExpandNode.collectResults(results);
 
-                System.out.println("Selected ExandNode ID: " + doc.selectedExpandNode.id);
+                log.info("Selected ExandNode ID: " + doc.selectedExpandNode.id);
             }
         } catch(ExpandNodeException e) {
             System.err.println("Too many search steps!");
@@ -155,8 +159,8 @@ public class ExpandNode implements Comparable<ExpandNode> {
         markExcluded(null, visited, refinement);
 
         if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
-            System.out.println("Search Step: " + id);
-            System.out.println(toString());
+            log.info("Search Step: " + id);
+            log.info(toString());
         }
 
         boolean f = doc.selectedMark == -1 || refinement.markedSelected != doc.selectedMark;
@@ -164,8 +168,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
         changeState(StateChange.Mode.NEW);
 
         if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
-            System.out.println(t.networkStateToString(true, true));
-            System.out.println();
+            log.info(t.networkStateToString(true, true) + "\n");
         }
 
         double accNW = computeAccumulatedWeight().getNormWeight();
@@ -210,10 +213,8 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
             c.weightDelta = t.vQueue.adjustWeight(c, changed);
             if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
-                System.out.println("Search Step: " + c.id + "  Candidate Weight Delta: " + c.weightDelta);
-
-                System.out.println(t.networkStateToString(true, true));
-                System.out.println();
+                log.info("Search Step: " + c.id + "  Candidate Weight Delta: " + c.weightDelta);
+                log.info(t.networkStateToString(true, true) + "\n");
             }
 
             c.changeState(StateChange.Mode.OLD);
@@ -432,9 +433,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
         cand.markExcluded(changed, cand.visited, cand.refinement);
 
         if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
-            System.out.println();
-            System.out.println();
-            System.out.println("Generate Candidate: " + cand.refinement.toString());
+            log.info("\n \n Generate Candidate: " + cand.refinement.toString());
         }
 
         return cand;

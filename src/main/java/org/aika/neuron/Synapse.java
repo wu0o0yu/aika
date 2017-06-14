@@ -221,6 +221,9 @@ public class Synapse implements Writable {
 
 
     public static class Key implements Comparable<Key>, Writable {
+        public static final Key MIN_KEY = new Key();
+        public static final Key MAX_KEY = new Key();
+
         public boolean isNeg;
         public boolean isRecurrent;
         public Integer relativeRid;
@@ -292,6 +295,11 @@ public class Synapse implements Writable {
 
         @Override
         public int compareTo(Key k) {
+            if(this == MIN_KEY && k != MIN_KEY) return -1;
+            else if(this != MIN_KEY && k == MIN_KEY) return 1;
+            if(this == MAX_KEY && k != MAX_KEY) return 1;
+            else if(this != MAX_KEY && k == MAX_KEY) return -1;
+
             int r = Boolean.compare(isNeg, k.isNeg);
             if(r != 0) return r;
             r = Boolean.compare(isRecurrent, k.isRecurrent);

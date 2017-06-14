@@ -19,6 +19,7 @@ package org.aika.lattice;
 
 import org.aika.*;
 import org.aika.corpus.Conflicts;
+import org.aika.corpus.ExpandNode;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
 import org.aika.neuron.*;
@@ -28,6 +29,8 @@ import org.aika.neuron.Synapse.RangeVisibility;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.lattice.OrNode.OrEntry;
 import org.aika.lattice.InputNode.SynapseKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -43,6 +46,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class Node implements Comparable<Node>, Writable {
     public static int minFrequency = 5;
     public static int MAX_RID = 20;
+
+    private static final Logger log = LoggerFactory.getLogger(Node.class);
 
     public static AtomicInteger currentNodeId = new AtomicInteger(0);
     public int id;
@@ -359,7 +364,29 @@ public abstract class Node implements Comparable<Node>, Writable {
         for(int dir = 0; dir < (passive ? 1 : 2); dir++) {
             ArrayList<Activation> recNegTmp = new ArrayList<>();
             neuron.lock.acquireReadLock();
-            for (Synapse s : (dir == 0 ? neuron.inputSynapses : neuron.outputSynapses)) {
+            TreeSet<Synapse> syns = (dir == 0 ? neuron.inputSynapses : neuron.outputSynapses);
+
+            // Optimization in case the set of synapses is very large
+/*            if(syns.size() > 10 && t.activatedNeurons.size() * 20 < syns.size()) {
+                TreeSet<Synapse> newSyns = new TreeSet<>();
+                Synapse lk = new Synapse(null, Synapse.Key.MIN_KEY);
+                Synapse uk = new Synapse(null, Synapse.Key.MAX_KEY);
+
+                for(Neuron n: t.activatedNeurons) {
+                    if(dir == 0) {
+                        lk.input = n;
+                        uk.input = n;
+                    } else {
+                        lk.output = n;
+                        uk.output = n;
+                    }
+                    newSyns.addAll(syns.subSet(lk, true, uk, true));
+                }
+
+                syns = newSyns;
+            }
+*/
+            for (Synapse s : syns) {
                 Node n = (dir == 0 ? s.input : s.output).node;
                 ThreadState th = n.getThreadState(t);
                 if(th.activations.isEmpty()) continue;
@@ -540,7 +567,7 @@ public abstract class Node implements Comparable<Node>, Writable {
         Key nak = new Key(this, r, ak.rid, ak.o);
 
         if (Iteration.APPLY_DEBUG_OUTPUT) {
-            System.out.println("add: " + nak + " - " + nak.n);
+            log.info("add: " + nak + " - " + nak.n);
         }
 
         addActivationInternal(t, nak, inputActs, false);
@@ -571,7 +598,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     public void processRemovedActivation(Iteration t, Activation act, Collection<Activation> inputActs) {
 
         if(Iteration.APPLY_DEBUG_OUTPUT) {
-            System.out.println("remove: " + act.key + " - " + act.key.n);
+            log.info("remove: " + act.key + " - " + act.key.n);
         }
 
         if(removeActivationInternal(t, act, inputActs)) {

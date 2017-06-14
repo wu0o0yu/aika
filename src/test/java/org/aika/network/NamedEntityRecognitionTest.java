@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Activation;
 import org.aika.Iteration;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -229,6 +230,18 @@ public class NamedEntityRecognitionTest {
         System.out.println();
 
         System.out.println("Selected Option: " + t.doc.selectedOption.toString());
+        System.out.println();
+
+        System.out.println("Activations of the Surname Category:");
+        for(Activation act: surnameCategory.node.getActivations(t)) {
+            if(act.finalState.value > 0.0) {
+                System.out.print(act.key.r + " ");
+                System.out.print(act.key.rid + " ");
+                System.out.print(act.key.o + " ");
+                System.out.print(act.key.n.neuron.label + " ");
+                System.out.print(act.finalState.value);
+            }
+        }
 
         t.clearActivations();
     }

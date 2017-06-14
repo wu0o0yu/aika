@@ -26,6 +26,8 @@ import org.aika.lattice.*;
 import org.aika.neuron.Synapse.Key;
 import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.Activation.SynapseActivation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -39,6 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Neuron implements Comparable<Neuron>, Writable {
 
+    private static final Logger log = LoggerFactory.getLogger(Neuron.class);
 
     public final static double LEARN_RATE = 0.01;
     public static final double WEIGHT_TOLERANCE= 0.001;
@@ -332,13 +335,13 @@ public class Neuron implements Comparable<Neuron>, Writable {
         }
 
         if(Iteration.TRAIN_DEBUG_OUTPUT) {
-            System.out.println("Debug discover:");
+            log.info("Debug discover:");
 
-            System.out.println("Old Synapses:");
+            log.info("Old Synapses:");
             for(Synapse s: inputSynapses) {
-                System.out.println("S:" + s.input + " RID:" + s.key.relativeRid + " W:" + s.w);
+                log.info("S:" + s.input + " RID:" + s.key.relativeRid + " W:" + s.w);
             }
-            System.out.println();
+            log.info("");
         }
 
         for(SynapseActivation sa: act.neuronInputs) {
@@ -351,7 +354,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
         }
 
         if(Iteration.TRAIN_DEBUG_OUTPUT) {
-            System.out.println();
+            log.info("");
         }
 
         Node.adjust(t, this, act.errorSignal > 0.0 ? 1 : -1);
@@ -396,7 +399,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
             s.w -= deltaW;
 
             if(Iteration.TRAIN_DEBUG_OUTPUT) {
-                System.out.println("S:" + s.input + " RID:" + s.key.relativeRid + " OldW:" + oldW + " NewW:" + s.w);
+                log.info("S:" + s.input + " RID:" + s.key.relativeRid + " OldW:" + oldW + " NewW:" + s.w);
             }
             inputSynapses.add(s);
         }
