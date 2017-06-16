@@ -34,7 +34,6 @@ import org.junit.Test;
  *
  * @author Lukas Molzberger
  */
-@Ignore
 public class RecurrentNodeTest {
 
 
