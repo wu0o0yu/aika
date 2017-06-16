@@ -17,12 +17,12 @@
 package org.aika.network;
 
 
+import org.aika.Activation;
 import org.aika.Iteration;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
-import org.aika.Activation;
-import org.aika.lattice.Node;
 import org.aika.lattice.InputNode;
+import org.aika.lattice.Node;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 

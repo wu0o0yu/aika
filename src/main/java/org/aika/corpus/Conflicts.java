@@ -17,11 +17,13 @@
 package org.aika.corpus;
 
 
-
-import org.aika.Iteration;
 import org.aika.Activation;
+import org.aika.Iteration;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 
 public class Conflicts {

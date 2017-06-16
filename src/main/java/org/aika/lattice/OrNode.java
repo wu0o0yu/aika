@@ -18,13 +18,12 @@ package org.aika.lattice;
 
 
 import org.aika.*;
+import org.aika.Activation.Key;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
-import org.aika.Activation.Key;
+import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-import org.aika.lattice.AndNode.Refinement;
-
 
 import java.io.DataInput;
 import java.io.DataOutput;

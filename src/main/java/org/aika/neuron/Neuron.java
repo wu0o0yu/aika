@@ -18,14 +18,16 @@ package org.aika.neuron;
 
 
 import org.aika.*;
+import org.aika.Activation.State;
+import org.aika.Activation.SynapseActivation;
 import org.aika.corpus.ExpandNode;
 import org.aika.corpus.Option;
-import org.aika.Activation.State;
 import org.aika.corpus.Range;
-import org.aika.lattice.*;
-import org.aika.neuron.Synapse.Key;
+import org.aika.lattice.InputNode;
 import org.aika.lattice.InputNode.SynapseKey;
-import org.aika.Activation.SynapseActivation;
+import org.aika.lattice.Node;
+import org.aika.lattice.OrNode;
+import org.aika.neuron.Synapse.Key;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

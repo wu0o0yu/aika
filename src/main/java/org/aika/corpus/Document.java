@@ -17,7 +17,7 @@
 package org.aika.corpus;
 
 
-import java.util.*;
+import java.util.HashSet;
 
 /**
  * The <code>Document</code> class represents a single document which may be either used as processing input or

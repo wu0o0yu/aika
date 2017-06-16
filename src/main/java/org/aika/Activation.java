@@ -18,12 +18,12 @@ package org.aika;
 
 
 import org.aika.corpus.Document;
+import org.aika.corpus.ExpandNode.StateChange;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
+import org.aika.lattice.Node;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron.NormWeight;
-import org.aika.corpus.ExpandNode.StateChange;
-import org.aika.lattice.Node;
 import org.aika.neuron.Synapse;
 
 import java.util.*;

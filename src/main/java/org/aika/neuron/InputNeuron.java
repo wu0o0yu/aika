@@ -18,14 +18,14 @@ package org.aika.neuron;
 
 
 import org.aika.Activation;
+import org.aika.Activation.State;
+import org.aika.Iteration;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
-import org.aika.Iteration;
 import org.aika.lattice.InputNode;
-import org.aika.Activation.State;
-import org.aika.neuron.Synapse.RangeSignal;
-import org.aika.neuron.Synapse.Key;
 import org.aika.lattice.Node;
+import org.aika.neuron.Synapse.Key;
+import org.aika.neuron.Synapse.RangeSignal;
 
 import java.util.Collections;
 

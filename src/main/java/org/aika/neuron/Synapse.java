@@ -18,10 +18,10 @@ package org.aika.neuron;
 
 
 import org.aika.Iteration;
+import org.aika.Utils;
 import org.aika.Writable;
 import org.aika.corpus.Range;
 import org.aika.lattice.InputNode;
-import org.aika.Utils;
 
 import java.io.DataInput;
 import java.io.DataOutput;

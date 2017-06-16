@@ -17,10 +17,10 @@
 package org.aika.corpus;
 
 
-import org.aika.Iteration;
-import org.aika.lattice.Node;
 import org.aika.Activation;
 import org.aika.Activation.Key;
+import org.aika.Iteration;
+import org.aika.lattice.Node;
 
 import java.util.*;
 

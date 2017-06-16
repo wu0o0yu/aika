@@ -18,21 +18,23 @@ package org.aika.lattice;
 
 
 import org.aika.Activation;
-import org.aika.corpus.Option;
-import org.aika.corpus.Range;
 import org.aika.Iteration;
 import org.aika.Model;
-import org.aika.neuron.*;
-import org.aika.neuron.Synapse.Key;
-import org.aika.neuron.Synapse.RangeVisibility;
-import org.aika.neuron.Synapse.RangeSignal;
+import org.aika.Utils;
+import org.aika.corpus.Option;
+import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
+import org.aika.neuron.InputNeuron;
+import org.aika.neuron.Neuron;
+import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.Key;
+import org.aika.neuron.Synapse.RangeSignal;
+import org.aika.neuron.Synapse.RangeVisibility;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
-import org.aika.Utils;
 
 /**
  *

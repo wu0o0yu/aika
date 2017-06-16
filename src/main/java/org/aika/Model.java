@@ -19,10 +19,9 @@ package org.aika;
 
 import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
-import org.aika.neuron.Neuron;
 import org.aika.lattice.Node;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-
 
 import java.io.DataInput;
 import java.io.DataOutput;

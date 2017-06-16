@@ -17,15 +17,18 @@
 package org.aika.lattice;
 
 
-import org.aika.*;
+import org.aika.Activation;
+import org.aika.Activation.Key;
+import org.aika.Iteration;
+import org.aika.Model;
+import org.aika.Utils;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
-import org.aika.Activation.Key;
+import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.RangeVisibility;
 import org.apache.commons.math3.distribution.BinomialDistribution;
-import org.aika.lattice.InputNode.SynapseKey;
 
 import java.io.DataInput;
 import java.io.DataOutput;

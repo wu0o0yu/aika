@@ -18,8 +18,8 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Activation.SynapseActivation;
 import org.aika.Activation.Key;
+import org.aika.Activation.SynapseActivation;
 import org.aika.Iteration;
 import org.aika.Model;
 import org.aika.corpus.Document;

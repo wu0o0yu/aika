@@ -18,8 +18,8 @@ package org.aika.corpus;
 
 
 import org.aika.Iteration;
-import org.aika.Model;
 import org.aika.Iteration.Input;
+import org.aika.Model;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;

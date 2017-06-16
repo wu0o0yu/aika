@@ -18,16 +18,17 @@ package org.aika.lattice;
 
 
 import org.aika.*;
+import org.aika.Activation.Key;
+import org.aika.Activation.SynapseActivation;
 import org.aika.corpus.Conflicts;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
-import org.aika.neuron.*;
-import org.aika.Activation.Key;
-import org.aika.Activation.SynapseActivation;
-import org.aika.neuron.Synapse.RangeVisibility;
 import org.aika.lattice.AndNode.Refinement;
-import org.aika.lattice.OrNode.OrEntry;
 import org.aika.lattice.InputNode.SynapseKey;
+import org.aika.lattice.OrNode.OrEntry;
+import org.aika.neuron.Neuron;
+import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeVisibility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

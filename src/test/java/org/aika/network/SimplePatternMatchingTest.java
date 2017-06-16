@@ -17,13 +17,13 @@
 package org.aika.network;
 
 
+import org.aika.Activation;
 import org.aika.Iteration;
+import org.aika.Iteration.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.Activation;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
-import org.aika.Iteration.Input;
 import org.junit.Assert;
 import org.junit.Test;
 

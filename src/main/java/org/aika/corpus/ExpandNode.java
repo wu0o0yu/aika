@@ -17,16 +17,18 @@
 package org.aika.corpus;
 
 
-
-import java.util.*;
-
-import org.aika.neuron.Neuron.NormWeight;
-import org.aika.Iteration;
-import org.aika.corpus.Conflicts.Conflict;
 import org.aika.Activation;
 import org.aika.Activation.Rounds;
+import org.aika.Iteration;
+import org.aika.corpus.Conflicts.Conflict;
+import org.aika.neuron.Neuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
 
 /**
  * The <code>ExpandNode</code> class represents a node in the search tree that is used to find the optimal
