@@ -19,7 +19,6 @@ package org.aika.lattice;
 
 import org.aika.*;
 import org.aika.corpus.Conflicts;
-import org.aika.corpus.ExpandNode;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
 import org.aika.neuron.*;

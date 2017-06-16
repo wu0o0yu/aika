@@ -376,7 +376,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
     private void markExcluded(List<Option> changed, long v, Option n) {
         List<Option> conflicting = new ArrayList<>();
-        n.conflicts.collectAllConflicting(conflicting, n, Option.visitedCounter++);
+        Conflicts.collectAllConflicting(conflicting, n, Option.visitedCounter++);
         for(Option cn: conflicting) {
             markExcludedRecursiveStep(changed, v, cn);
         }
@@ -413,6 +413,8 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
 
     public static class ExpandNodeException extends RuntimeException {
+
+        private static final long serialVersionUID = -9084467053069262753L;
 
     }
 

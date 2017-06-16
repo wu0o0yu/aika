@@ -18,15 +18,9 @@ package org.aika;
 
 
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
-import org.aika.corpus.Range;
 import org.aika.lattice.AndNode;
-import org.aika.lattice.InputNode;
-import org.aika.neuron.Neuron.NormWeight;
 import org.aika.neuron.Neuron;
 import org.aika.lattice.Node;
-import org.aika.Activation.State;
-import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.Synapse;
 
 

@@ -72,15 +72,15 @@ public class OrOptionsTest {
 
         Option o0 = Option.addPrimitive(doc);
         Range r = new Range(0, 10);
-        Node.addActivationAndPropagate(t, new Activation.Key(inA.node, r, 0, o0), Collections.EMPTY_SET);
+        Node.addActivationAndPropagate(t, new Activation.Key(inA.node, r, 0, o0), Collections.emptySet());
         t.propagate();
 
         Option o1 = Option.addPrimitive(doc);
-        Node.addActivationAndPropagate(t, new Activation.Key(inA.node, r, 0, o1), Collections.EMPTY_SET);
+        Node.addActivationAndPropagate(t, new Activation.Key(inA.node, r, 0, o1), Collections.emptySet());
         t.propagate();
 
         Option o2 = Option.addPrimitive(doc);
-        Node.addActivationAndPropagate(t, new Activation.Key(inA.node, r, 0, o2), Collections.EMPTY_SET);
+        Node.addActivationAndPropagate(t, new Activation.Key(inA.node, r, 0, o2), Collections.emptySet());
         t.propagate();
 
 
