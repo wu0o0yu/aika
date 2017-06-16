@@ -104,15 +104,15 @@ public class ActivationsTest {
         Neuron in = t.createOrLookupInputSignal("A");
         InputNode inNode = (InputNode) in.node;
 
-        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.EMPTY_LIST, false);
+        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
-        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.EMPTY_LIST, false);
+        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
-        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.EMPTY_LIST, false);
+        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
-        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.EMPTY_LIST, false);
+        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
-        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.EMPTY_LIST, false);
+        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
  //       Assert.assertEquals(1, Activation.get(t, inNode, new Range(0, 1), doc.bottom).key.fired);
     }

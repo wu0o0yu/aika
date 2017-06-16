@@ -37,7 +37,7 @@ public class TestHelper {
 
 
     public static Activation addActivationAndPropagate(Iteration t, Activation.Key ak) {
-        return addActivationAndPropagate(t, ak, Collections.EMPTY_SET);
+        return addActivationAndPropagate(t, ak, Collections.emptySet());
     }
 
 

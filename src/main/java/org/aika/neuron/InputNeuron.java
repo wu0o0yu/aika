@@ -98,7 +98,7 @@ public class InputNeuron extends Neuron {
 
 
     public void addInput(Iteration t, int begin, int end, Integer rid, Option o) {
-        Node.addActivationAndPropagate(t, new Activation.Key(node, new Range(begin, end), rid, o), Collections.EMPTY_SET);
+        Node.addActivationAndPropagate(t, new Activation.Key(node, new Range(begin, end), rid, o), Collections.emptySet());
 
         t.propagate();
     }
@@ -122,7 +122,7 @@ public class InputNeuron extends Neuron {
     public void removeInput(Iteration t, int begin, int end, Integer rid, Option o) {
         Range r = new Range(begin, end);
         Activation act = Activation.get(t, node, rid, r, Range.Relation.EQUALS, o, Option.Relation.EQUALS);
-        Node.removeActivationAndPropagate(t, act, Collections.EMPTY_SET);
+        Node.removeActivationAndPropagate(t, act, Collections.emptySet());
 
         t.propagate();
     }

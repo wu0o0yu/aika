@@ -189,11 +189,11 @@ public class Activation implements Comparable<Activation> {
         Node.ThreadState th = n.getThreadState(t);
         int s = th.activations.size();
 
-        if(s == 0) return Collections.EMPTY_LIST;
+        if(s == 0) return Collections.emptyList();
         else if(s == 1) {
             Activation act = th.activations.firstEntry().getValue();
             if (act.filter(n, rid, r, rr, o, or)) return Collections.singletonList(act);
-            else return Collections.EMPTY_LIST;
+            else return Collections.emptyList();
         }
 
         List<Activation> results = new ArrayList<>();

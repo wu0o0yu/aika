@@ -18,6 +18,7 @@ package org.aika.corpus;
 
 
 import org.aika.Iteration;
+import org.aika.lattice.Node;
 import org.aika.Activation;
 import org.aika.Activation.Key;
 
@@ -246,7 +247,7 @@ public class Option implements Comparable<Option> {
 
         for (Activation act : getActivations()) {
             if (act.key.o.contains(conflict, false)) {
-                act.key.n.removeActivationAndPropagate(t, act, act.inputs.values());
+                Node.removeActivationAndPropagate(t, act, act.inputs.values());
             }
         }
 
@@ -261,12 +262,12 @@ public class Option implements Comparable<Option> {
 
 
     public Collection<Activation> getActivations() {
-        return activations != null ? activations.values() : Collections.EMPTY_SET;
+        return activations != null ? activations.values() : Collections.emptySet();
     }
 
 
     public Collection<Activation> getNeuronActivations() {
-        return neuronActivations != null ? neuronActivations : Collections.EMPTY_SET;
+        return neuronActivations != null ? neuronActivations : Collections.emptySet();
     }
 
 

@@ -64,10 +64,10 @@ public class SynapseRangeRelationTest {
         s.output = on;
         s.link(t);
 
-        Activation iAct0 = in.node.addActivationInternal(t, new Key(in.node, new Range(1, 4), null, t.doc.bottom), Collections.EMPTY_LIST, false);
-        Activation iAct1 = in.node.addActivationInternal(t, new Key(in.node, new Range(6, 7), null, t.doc.bottom), Collections.EMPTY_LIST, false);
-        Activation iAct2 = in.node.addActivationInternal(t, new Key(in.node, new Range(10, 18), null, t.doc.bottom), Collections.EMPTY_LIST, false);
-        Activation oAct = on.node.addActivationInternal(t, new Key(on.node, new Range(6, 7), null, t.doc.bottom), Collections.EMPTY_LIST, false);
+        Activation iAct0 = in.node.addActivationInternal(t, new Key(in.node, new Range(1, 4), null, t.doc.bottom), Collections.emptyList(), false);
+        Activation iAct1 = in.node.addActivationInternal(t, new Key(in.node, new Range(6, 7), null, t.doc.bottom), Collections.emptyList(), false);
+        Activation iAct2 = in.node.addActivationInternal(t, new Key(in.node, new Range(10, 18), null, t.doc.bottom), Collections.emptyList(), false);
+        Activation oAct = on.node.addActivationInternal(t, new Key(on.node, new Range(6, 7), null, t.doc.bottom), Collections.emptyList(), false);
 
         Assert.assertTrue(oAct.neuronInputs.contains(new SynapseActivation(s, iAct1, oAct)));
     }

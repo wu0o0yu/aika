@@ -20,7 +20,6 @@ package org.aika.lattice;
 import org.aika.*;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
-import org.aika.Iteration.Input;
 import org.aika.Activation.Key;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
