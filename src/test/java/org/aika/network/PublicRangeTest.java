@@ -29,6 +29,7 @@ import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -38,6 +39,7 @@ import org.junit.Test;
 public class PublicRangeTest {
 
 
+    @Ignore
     @Test
     public void testPublicRange() {
         Model m = new Model();

@@ -27,12 +27,14 @@ import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  *
  * @author Lukas Molzberger
  */
+@Ignore
 public class RecurrentNodeTest {
 
 
