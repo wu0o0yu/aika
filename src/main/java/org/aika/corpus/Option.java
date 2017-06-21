@@ -148,7 +148,9 @@ public class Option implements Comparable<Option> {
         }
         long vMin = Option.visitedCounter++;
         List<Option> results = new ArrayList<>();
-        largestCommonSubset.computeLargestCommonSubsetRecursiveStep(results, Option.visitedCounter++, vMin, 2, 0);
+        if(largestCommonSubset != null) {
+            largestCommonSubset.computeLargestCommonSubsetRecursiveStep(results, Option.visitedCounter++, vMin, 2, 0);
+        }
         no.computeLargestCommonSubsetRecursiveStep(results, Option.visitedCounter++, vMin, 2, 0);
         setLCS(Option.add(doc, true, results));
     }
