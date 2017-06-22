@@ -51,7 +51,7 @@
             <h2>Named Entity Recognition / Entity Resolution example</h2>
             This example demonstrates the recognition of the words 'jackson cook' as forename and surname.
             If these words would have occurred independently, they would have been recognized as city or
-            profession respectively by the example code. The complete code for this example can be found in the class <a href="https://github.com/aika-algorithm/aika/blob/master/src/test/java/org/aika/network/NamedEntityRecognitionTest.java">NamedEntityRecognitionTest</a>.
+            profession based on the example code. The complete code for this example can be found in the class <a href="https://github.com/aika-algorithm/aika/blob/master/src/test/java/org/aika/network/NamedEntityRecognitionTest.java">NamedEntityRecognitionTest</a>.
             <br/>
             Now, the first step is to create an empty model and an <i>Iteration</i> object. Usually the <i>Iteration</i> object is used to process a document with a given model, but since we want to add the neurons and synapses manually, we do not need a document yet and simply hand over <i>null</i>.
             <div class="prettyprint-code">
@@ -128,7 +128,7 @@
 			</pre>
             </div>
 
-            Now, the following code snipped is the crucial section of this example. It shows how the first entity neuron is created and connected by its input synapses.
+            Now, the following code snippet is the crucial section of this example. It shows how the first entity neuron is created and connected by its input synapses.
 The entity neurons represent the concrete meanings of the input words. As can be seen here the individual inputs have a few more properties than we are used to from other
 neural networks. The reason for this is that Aika not only propagates the input activation value to the next neuron but also the text range, the word position and the interpretation option.
 To avoid having to compute the neurons bias manually, we can use the <i>createAndNeuron</i> helper function for that. But in order to compute the bias it needs to know the
@@ -177,7 +177,7 @@ required minimum input activation (<i>setMinInput</i>) of each input.
 			</pre>
             </div>
 
-            The category neurons in this example only have input. For a real application there would be a long list inputs.
+            The category neurons in this example only have input. For a real application there would be a long list of inputs.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
@@ -259,7 +259,7 @@ Feed the individual words as inputs into the network.
 			</pre>
             </div>
 
-The output of this example looks as following. Each line in the table represents a neuron activation. The first column specifies the text range this activation relates to. The second one specifies the interpretation option. These can be interpreted as follows. First there is the option id emmited by the current neuron. Behind that in rectangular brackets follows a list of or linked options that current option depends on.
+The output of this example looks as following. Each line in the table represents a neuron activation. The first column specifies the text range this activation relates to. The second one specifies the interpretation option. These can be interpreted as follows. First there is the option id emmited by the current neuron. Behind that in rectangular brackets follows a list of linked options the current option depends on.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">

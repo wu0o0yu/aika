@@ -50,8 +50,8 @@
 				<h2>Aika as a programming language for NLP tasks</h2>
 				<p>
 					Aika is a very general algorithm that can be applied to all kinds of natural language processing related tasks.
-					All that has to be done is to formulate a given task as network of neurons and synapses. At first this might
-					not sound like an programming task, but it works pretty well to model linguistic concepts as neurons. Unlike
+					All that has to be done is to formulate a given task as a network of neurons and synapses. At first this might
+					not sound like a programming task, but it works pretty well to model linguistic concepts as neurons. Unlike
 					conventional neural networks, synapses in Aika allow to manipulate the text range and the word positions of
 					the neuron activations. This allows for a great deal of freedom.
 					<br/>
@@ -64,12 +64,12 @@
 				</p>
 				<h2>Aika as a self learning system</h2>
 				<p>
-					Currently, Aika has only rudimentary support for automated training. Aika's architecture, however, is well
+					Currently, Aika has only rudimentary support for automated training. Aikas architecture, however, is well
 					suited as a foundation for a self learning system. Since Aika is based on an artificial neural network, it
 					should be easy to use the usual training methods for training a neural network such as back propagation.
 					<br/>
 					But there are also other
-					ways that Aika could be trained with as well. Since Aika selects one interpretation of a text and suppresses all
+					ways that Aika could be trained. Since Aika selects one interpretation of a text and suppresses all
 					others, we have an easy way of generating our supervised training data by labeling the suppressed options as negative examples.
 					<br/>
 					Another training mechanism that
@@ -79,8 +79,7 @@
 					<br/>
 					It should also
 					be possible to apply <a href="http://adios.tau.ac.il/algorithm.html">grammar induction</a> methods. For instance if there are several significant patterns
-					in the pattern lattice that share a common unsignificant parent pattern, then a new neuron could be
-					introduced that consists of a disjunction of the original patterns. This way not only conjunctions like patterns could be
+					in the pattern lattice that share a common unsignificant parent pattern. In this case a new neuron that consists of a disjunction of the original patterns could be introduced. This way not only conjunctions like patterns could be
 					trained but also disjunctions.
 				</p>
 				<h2>Further optimizations to the Aika core algorithm</h2>

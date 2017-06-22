@@ -49,16 +49,16 @@
 			<div>
 				<p>
 					<b>
-					Aika is a Java library that automatically extracts and annotates semantic information in text.
-					In case this information is ambiguous, Aika will generate several hypothetical interpretations about the meaning of this text and retrieve the most likely one.
+					Aika is a Java library that automatically extracts and annotates semantic information into text.
+					In case this information is ambiguous, Aika will generate several hypothetical interpretations concerning the meaning of the text and pick the most likely one.
 					The Aika algorithm is based on various ideas and approaches from the field of AI such as artificial neural networks, frequent pattern mining and
-					logic based expert systems and can be applied to a broad spectrum of text analysis tasks. It combines these concepts in a single algorithm.
+					logic based expert systems. It can be applied to a broad spectrum of text analysis task and combines these concepts in a single algorithm.
 					</b>
 					<br/>
 					Aika is based on non-monotonic logic, meaning that it first draws tentative conclusions only.
 					In other words, Aika is able to generate multiple mutually exclusive interpretations of a word, phrase, or sentence,
 					and select the most likely interpretation.
-					It does so by propagating activations through a neural network. These activations can be seen as some kind of
+					It does so by propagating activations through a neural network. These activations can be seen as a kind of
 					text annotation since they refer to a specific text segment and a given interpretation.
 					<br/>
 					Aika consists of two layers. The neural layer, containing all the neurons and continuously weighted synapses and underneath that the discrete logic layer,
@@ -67,14 +67,14 @@
 				<img src="images/example.svg"/>
 				<p>
 					One of the first use cases implemented with Aika is
-					named entity recognition (NER). For this, lists of forenames, surnames, cities, professions, company names and common words have been translated into a weighted neural network.
-					These lists are partially overlapping because many surnames are also city names, professions or common words. In addition there were
-					also some common knowledge rules added, like forenames often precede surnames or articles rarely precede city names in German (e.g. 'die Halle' does not mean the city Halle, but the noun 'Halle').
-					These rules can arbitrarily depend on each other and thus form a network through which activations can be propagated. Aika allows to accurately recognize
+					named entity recognition (NER). For this case, lists of forenames, surnames, cities, professions, company names and common words have been translated into a weighted neural network.
+					These lists are partially overlapping because many surnames are also city names, professions or common words. In addition some
+					common knowledge rules were added, such as forenames often precede surnames or articles rarely precede city names in German (e.g. 'die Halle' does not mean the city Halle, but the noun 'Halle').
+					These rules can arbitrarily depend on each other and thus form a network through which activations can be propagated. Aika is able to accurately recognize
 					named entities within texts and predict the correct meaning of the name.
 				</p>
 				<p>
-					Aika is implemented in Java and made available as open source free software library under the Apache 2 license.
+					Aika is implemented in Java and made available as an open source free software library under the Apache 2 license.
 				</p>
 			</div>
 		</div>

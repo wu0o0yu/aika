@@ -77,7 +77,7 @@
 				has no chance of being activated. Activations must first pass a few layers of logic nodes within the
 				pattern lattice before the activation of a neuron output is even considered. Each layer filters out activations that
 				are unable to activate a neuron output. Though the depth of the pattern
-				lattice is limited. Otherwise there would be combinatorial too many logic nodes.
+				lattice is limited. Otherwise too many logic nodes would be generated.
 			</p>
 
 			<img src="images/network.svg"/>
@@ -98,7 +98,7 @@
 			<p>
 				One common problem when processing text is that of cyclic dependencies. In the example 'jackson cook' it is impossible
 				to decide which word has to be resolved first, the forename or the surname, since both depend on each other. The word
-				jackson can be recongnized as a forename when the next word is a surname and the word cook can be recognized as a surname when the
+				jackson can be recognized as a forename when the next word is a surname and the word cook can be recognized as a surname when the
 				previous word is a forename.
 				To tackle this problem Aika employs <a href="https://en.wikipedia.org/wiki/Non-monotonic_logic" rel="nofollow">non-monotonic logic</a> and
 				is therefore able to derive interpretations that are mutually exclusive. These interpretations are then weighted and only the strongest interpretation
@@ -125,21 +125,21 @@
 			<p>
 				The primitive option numbers accumulate while they are propagated through the network. Such a set of primitive option numbers is then called an option. To determine the best interpretation of a given word, a good starting point is to simply select the option with the highest sum of associated activation weights. However, there might be better interpretations consisting of not just one but several options.
 				These options must not conflict with each other, which makes it difficult to efficiently determine the best interpretation. In order to find the best interpretation, a binary search tree is traversed, in which one child node is an expansion
-				of the so far determined interpretation and the other child node is the conflicting path. The search will retrieve the set of options with the highest weight sum. If no conflicts exists, this will simply be the set of all options.
+				of the so far determined interpretation and the other child node is the conflicting path. The search will retrieve the set of options with the highest weight sum. If no conflicts exist, this will simply be the set of all options.
 			</p>
 
 
 			<h2>Training</h2>
 			<p>
-				Currently Aika has only rudimentary support for automatic training. However, the approach that Aika takes allows
+				Currently Aika only has rudimentary support for automatic training. However, the approach that Aika takes allows
 				to implement some learning mechanisms that would be difficult or impossible to implement otherwise.
-				Since Aika is using a pattern lattice as underlying data structure for neurons, we do not depend solely on <a href="https://en.wikipedia.org/wiki/Backpropagation" rel="nofollow">backpropagation</a> as training method for new neurons.
+				Since Aika is using a pattern lattice as underlying data structure for neurons, we do not depend solely on <a href="https://en.wikipedia.org/wiki/Backpropagation" rel="nofollow">backpropagation</a> as a training method for new neurons.
 				Now we are able to enumerate all frequent patterns and use them to generate new neurons. Therefore, we do not have to retrain existing neurons and risk losing the conceptual knowledge
 				they have already accumulated. Frequent patterns are also much easier to comprehend for humans than the weights of conventional ANNs. This is a form of unsupervised learning.
 			</p>
 			<p>
 				Another learning mechanism that can be derived from the interpretations is the following. Since only the strongest interpretation is chosen
-				and all other interpretations are suppressed, we have an convenient way to automatically generate our supervised training data.
+				and all other interpretations are suppressed, we have a convenient way to automatically generate our supervised training data.
 			</p>
 
 		</div>
