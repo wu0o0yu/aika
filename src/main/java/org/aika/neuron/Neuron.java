@@ -61,6 +61,9 @@ public class Neuron implements Comparable<Neuron>, Writable {
     public volatile double negRecSum;
     public volatile double posRecSum;
 
+    public volatile double maxRecurrentSum = 0.0;
+
+
     public TreeSet<Synapse> outputSynapses = new TreeSet<>(Synapse.OUTPUT_SYNAPSE_COMP);
     public TreeSet<Synapse> inputSynapses = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
 
@@ -203,15 +206,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
     public State computeWeight(int round, Activation act, ExpandNode en) {
         double directSum = bias - (negDirSum + negRecSum);
         double recurrentSum = 0.0;
-        double maxRecurrentSum = 0.0;
 
         int fired = -1;
-
-        for (Synapse s : inputSynapses) {
-            if (s.key.isRecurrent) {
-                maxRecurrentSum += Math.abs(s.w);
-            }
-        }
 
         if(round == 0) {
             recurrentSum += posRecSum;

@@ -69,6 +69,7 @@ public class Option implements Comparable<Option> {
     public long markedConflict = -1;
     private long visitedComputeParents = -1;
     private long visitedNumberInnerInputs = -1;
+    public long visitedHasUnsatisfiedPosFeedbackLinks = -1;
 
     private int numberInnerInputs = 0;
 

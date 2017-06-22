@@ -19,6 +19,7 @@ package org.aika.corpus;
 
 import org.aika.Activation;
 import org.aika.Activation.Rounds;
+import org.aika.Activation.SynapseActivation;
 import org.aika.Iteration;
 import org.aika.corpus.Conflicts.Conflict;
 import org.aika.neuron.Neuron.NormWeight;
@@ -41,7 +42,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
     /**
      * This optimization may miss some cases and will not always return the best interpretation.
      */
-    public static boolean INCOMPLETE_OPTIMIZATION = false;
+    public static boolean INCOMPLETE_OPTIMIZATION = true;
 
     public static int MAX_SEARCH_STEPS = 10000;
 
@@ -192,12 +193,31 @@ public class ExpandNode implements Comparable<ExpandNode> {
         }
         changeState(StateChange.Mode.OLD);
 
-        if(f || !INCOMPLETE_OPTIMIZATION) {
+        do {
             child = selectedParent.selectCandidate();
-            if(child != null) {
-                child.search(t, selectedParent, this, searchSteps);
+        } while(child != null && !f && INCOMPLETE_OPTIMIZATION && !hasUnsatisfiedPositiveFeedbackLink(child.refinement, Option.visitedCounter++));
+
+        if(child != null) {
+            child.search(t, selectedParent, this, searchSteps);
+        }
+    }
+
+
+    private boolean hasUnsatisfiedPositiveFeedbackLink(Option n, long v) {
+        if(n.visitedHasUnsatisfiedPosFeedbackLinks == v) return false;
+        n.visitedHasUnsatisfiedPosFeedbackLinks = v;
+
+        for(Activation act: n.getNeuronActivations()) {
+            for(SynapseActivation sa: act.neuronOutputs) {
+                if(sa.s.key.isRecurrent && sa.s.w > 0.0 && !isCovered(sa.output.key.o.markedCovered)) return true;
             }
         }
+
+        for(Option pn: n.parents) {
+            if(hasUnsatisfiedPositiveFeedbackLink(pn, v)) return true;
+        }
+
+        return false;
     }
 
 

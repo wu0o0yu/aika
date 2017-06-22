@@ -754,6 +754,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
         if(neuron.inputSynapses.isEmpty()) return false;
 
+        neuron.maxRecurrentSum = 0.0;
         for(Synapse s: neuron.inputSynapses) {
             s.input.lock.acquireWriteLock(t.threadId);
 
@@ -761,6 +762,10 @@ public abstract class Node implements Comparable<Node>, Writable {
                 s.inputNode = InputNode.add(t, s.key.createInputNodeKey(), s.input);
                 s.inputNode.isBlocked = s.input.isBlocked;
                 s.inputNode.setSynapse(t, new SynapseKey(s.key.relativeRid, neuron), s);
+            }
+
+            if (s.key.isRecurrent) {
+                neuron.maxRecurrentSum += Math.abs(s.w);
             }
             s.input.lock.releaseWriteLock();
         }
