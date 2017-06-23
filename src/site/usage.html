@@ -63,22 +63,12 @@
 			</pre>
             </div>
 
-            This map is used as a dictionary to look up the individual word input neurons.
+            This map is used as a dictionary to look up the individual word input neurons. 
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-
-    // The word input neurons that do not yet possess a relational id.
     HashMap&lt;String, InputNeuron&gt; inputNeurons = new HashMap<>();
-                </code>
-			</pre>
-            </div>
 
-            The following loop now fills these maps with newly created input neurons.
-            The method <i>createRelationalNeuron</i> is used to transfer the word position (rid) from the counter neuron to the word neuron.
-            <div class="prettyprint-code">
-            <pre class="prettyprint">
-				<code class="language-java">
     for(String word: new String[] {"jackson", "cook"}) {
         InputNeuron in = t.createOrLookupInputSignal("W-" + word);
 
