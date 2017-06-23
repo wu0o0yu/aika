@@ -36,13 +36,193 @@ import java.util.HashMap;
  */
 public class NamedEntityRecognitionTest {
 
+    // This test demonstrates the recognition of the words 'jackson cook' as forename and surname
+    // even though each individual word would have been recognized as city or profession
+    // respectively.
+    @Test
+    public void testNamedEntityRecognitionWithoutCounterNeuron() {
+        Model m = new Model(1); // number of threads
+
+        // Training iteration without a document
+        Iteration t = m.startIteration(null, 0); // doc, thread id
+
+        Neuron forenameCategory = new Neuron("C-forename");
+        Neuron surnameCategory = new Neuron("C-surname");
+        Neuron suppressingN = new Neuron("SUPPR");
+
+
+        // The word input neurons which do not yet possess a relational id.
+        HashMap<String, InputNeuron> inputNeurons = new HashMap<>();
+
+        String[] words = new String[] {
+                "mr.", "jackson", "cook", "was", "born", "in", "new", "york"
+        };
+        for(String word: words) {
+            InputNeuron in = t.createOrLookupInputSignal("W-" + word);
+
+            inputNeurons.put(word, in);
+        }
+
+        // The entity neurons represent the concrete meanings of the input words.
+        // The helper function 'createAndNeuron' computes the required bias for a
+        // conjunction of the inputs.
+        Neuron cookSurnameEntity = t.createAndNeuron(
+                new Neuron("E-cook (surname)"),
+                0.5, // adjusts the bias
+                new Input() // Requires the word to be recognized
+                        .setNeuron(inputNeurons.get("cook"))
+                        .setWeight(10.0)
+                        // This input requires the input activation to have an
+                        // activation value of at least 0.9
+                        .setMinInput(0.9)
+                        .setRelativeRid(0) // references the current word
+                        .setRecurrent(false),
+                new Input() // The previous word needs to be a forename
+                        .setNeuron(forenameCategory)
+                        .setWeight(10.0)
+                        .setMinInput(0.9)
+                        .setRelativeRid(-1) // references the previous word
+                        .setRecurrent(true) // this input is a positive feedback loop
+                        .setMatchRange(false) // ignore the range when matching this input
+                        // The range of this input should have no effect on the range of the output
+                        .setStartVisibility(RangeVisibility.NONE)
+                        .setEndVisibility(RangeVisibility.NONE),
+
+                // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
+                // self suppression taking place even though 'E-cook (surname)' is also contained
+                // in the suppressingN.
+                new Input()
+                        .setNeuron(suppressingN)
+                        .setWeight(-20.0)
+                        .setMinInput(1.0)
+                        .setRecurrent(true) // this input is a negative feedback loop
+        );
+
+        Neuron cookProfessionEntity = t.createAndNeuron(
+                new Neuron("E-cook (profession)"),
+                0.2,
+                new Input()
+                        .setNeuron(inputNeurons.get("cook"))
+                        .setWeight(15.0)
+                        .setMinInput(0.9)
+                        .setRecurrent(false),
+                new Input()
+                        .setNeuron(suppressingN)
+                        .setWeight(-20.0)
+                        .setMinInput(1.0)
+                        .setRecurrent(true)
+        );
+
+        Neuron jacksonForenameEntity = t.createAndNeuron(
+                new Neuron("E-jackson (forename)"),
+                0.5,
+                new Input()
+                        .setNeuron(inputNeurons.get("jackson"))
+                        .setWeight(10.0)
+                        .setMinInput(0.9)
+                        .setRelativeRid(0)
+                        .setRecurrent(false),
+                new Input()
+                        .setNeuron(surnameCategory)
+                        .setWeight(10.0)
+                        .setMinInput(0.9)
+                        .setRelativeRid(1)
+                        .setRecurrent(true)
+                        .setMatchRange(false)
+                        .setStartVisibility(RangeVisibility.NONE)
+                        .setEndVisibility(RangeVisibility.NONE),
+                new Input()
+                        .setNeuron(suppressingN)
+                        .setWeight(-20.0)
+                        .setMinInput(1.0)
+                        .setRecurrent(true)
+        );
+
+        Neuron jacksonCityEntity = t.createAndNeuron(
+                new Neuron("E-jackson (city)"),
+                0.2,
+                new Input()
+                        .setNeuron(inputNeurons.get("jackson"))
+                        .setWeight(12.0)
+                        .setMinInput(0.9)
+                        .setRecurrent(false),
+                new Input()
+                        .setNeuron(suppressingN)
+                        .setWeight(-20.0)
+                        .setMinInput(1.0)
+                        .setRecurrent(true)
+        );
+
+        t.createOrNeuron(forenameCategory,
+                new Input() // In this example there is only one forename considered.
+                        .setNeuron(jacksonForenameEntity)
+                        .setWeight(10.0)
+                        .setRelativeRid(0)
+        );
+        t.createOrNeuron(surnameCategory,
+                new Input()
+                        .setNeuron(cookSurnameEntity)
+                        .setWeight(10.0)
+                        .setRelativeRid(0)
+        );
+
+        t.createOrNeuron(suppressingN,
+                new Input().setNeuron(cookProfessionEntity).setWeight(10.0),
+                new Input().setNeuron(cookSurnameEntity).setWeight(10.0),
+                new Input().setNeuron(jacksonCityEntity).setWeight(10.0),
+                new Input().setNeuron(jacksonForenameEntity).setWeight(10.0)
+        );
+
+
+        // Now that the model is complete, start processing an actual text.
+        Document doc = Document.create("mr. jackson cook was born in new york ");
+
+        // An iteration is used to process a single document using a specified thread id.
+        // Several threads using different thread ids are permitted to process documents
+        // using the same model.
+        t = m.startIteration(doc, 0);
+
+        int i = 0;
+        int wordPos = 0;
+        for(String w: doc.getContent().split(" ")) {
+            int j = i + w.length();
+
+            // Feed the individual words as inputs into the network.
+            inputNeurons.get(w).addInput(t, i, j, wordPos);
+            i = j + 1;
+            wordPos++;
+        }
+
+        // Search for the best interpretation of this text.
+        ExpandNode.INCOMPLETE_OPTIMIZATION = true;
+        t.process();
+
+        System.out.println(t.networkStateToString(true, true));
+        System.out.println();
+
+        System.out.println("Selected Option: " + t.doc.selectedOption.toString());
+        System.out.println();
+
+        System.out.println("Activations of the Surname Category:");
+        for(Activation act: surnameCategory.node.getActivations(t)) {
+            if(act.finalState.value > 0.0) {
+                System.out.print(act.key.r + " ");
+                System.out.print(act.key.rid + " ");
+                System.out.print(act.key.o + " ");
+                System.out.print(act.key.n.neuron.label + " ");
+                System.out.print(act.finalState.value);
+            }
+        }
+
+        t.clearActivations();
+    }
 
 
     // This test demonstrates the recognition of the words 'jackson cook' as forename and surname
     // even though each individual word would have been recognized as city or profession
     // respectively.
     @Test
-    public void testNamedEntityRecognition() {
+    public void testNamedEntityRecognitionWithCounterNeuron() {
         Model m = new Model(1); // number of threads
 
         // Training iteration without a document
@@ -225,6 +405,7 @@ public class NamedEntityRecognitionTest {
         }
 
         // Search for the best interpretation of this text.
+        ExpandNode.INCOMPLETE_OPTIMIZATION = true;
         t.process();
 
         System.out.println(t.networkStateToString(true, true));

@@ -62,36 +62,14 @@
                 </code>
 			</pre>
             </div>
-            The following three neurons are used to assign each word activation a relational id (rid). In this example, the relational id only specifies the word position within the sentence.
-            <i>createCounterNeuron</i> is just a convenience method which creates an ordinary neuron
-            with two input synapses. The first one is the start signal and the second one is the clock signal for the counter.
 
-            <div class="prettyprint-code">
-            <pre class="prettyprint">
-				<code class="language-java">
-    InputNeuron spaceN = t.createOrLookupInputSignal("SPACE");
-    InputNeuron startSignal = t.createOrLookupInputSignal("START-SIGNAL");
-    Neuron ctNeuron = t.createCounterNeuron(new Neuron("RID Counter"),
-            spaceN, // clock signal
-            false, // direction of the clock signal (range end counts)
-            startSignal, // start signal
-            true, // direction of the start signal (range begin counts)
-            false // direction of the counting neuron
-    );
-                </code>
-			</pre>
-            </div>
-
-            The next two maps are used as a dictionary to look up the individual word input neurons.
+            This map is used as a dictionary to look up the individual word input neurons.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
 
     // The word input neurons that do not yet possess a relational id.
     HashMap&lt;String, InputNeuron&gt; inputNeurons = new HashMap<>();
-
-    // The word input neurons that possess a relational id.
-    HashMap&lt;String, Neuron&gt; relNeurons = new HashMap<>();
                 </code>
 			</pre>
             </div>
@@ -103,15 +81,8 @@
 				<code class="language-java">
     for(String word: new String[] {"jackson", "cook"}) {
         InputNeuron in = t.createOrLookupInputSignal("W-" + word);
-        Neuron rn = t.createRelationalNeuron(
-                new Neuron("WR-" + word),
-                ctNeuron, // RID Counting neuron
-                in, // Input neuron
-                false // Direction of the input neuron
-        );
 
         inputNeurons.put(word, in);
-        relNeurons.put(word, rn);
     }
                 </code>
 			</pre>
@@ -146,7 +117,7 @@ required minimum input activation (<i>setMinInput</i>) of each input.
             new Neuron("E-cook (surname)"),
             0.5, // adjusts the bias
             new Input() // Requires the word to be recognized
-                    .setNeuron(relNeurons.get("cook"))
+                    .setNeuron(inputNeurons.get("cook"))
                     .setWeight(10.0)
                  // This input requires the input activation to have an
                  // activation value of at least 0.9
@@ -220,24 +191,16 @@ For this we create a new document and use it to create an iteration object.
 				<code class="language-java">
     Document doc = Document.create("mr. jackson cook was born in new york ");
     t = m.startIteration(doc, 0);
-    startSignal.addInput(t, 0, 1, 0);  // iteration, begin, end, relational id
-                </code>
-			</pre>
-            </div>
 
-The space is used as a clock signal to increase the relational id.
-Feed the individual words as inputs into the network.
-
-            <div class="prettyprint-code">
-            <pre class="prettyprint">
-				<code class="language-java">
     int i = 0;
+    int wordPos = 0;
     for(String w: doc.getContent().split(" ")) {
         int j = i + w.length();
-        spaceN.addInput(t, j, j + 1);
 
-        inputNeurons.get(w).addInput(t, i, j);
+        inputNeurons.get(w).addInput(t, i, j, wordPos);
+
         i = j + 1;
+        wordPos++;
     }
 
     // Search for the best interpretation of this text.
@@ -266,25 +229,21 @@ The output of this example looks as following. Each line in the table represents
     // Range - Option - Neuron Label - Relat. Id - final Activation Value, final Weight, final Norm
 
     ...
-    (4,11)  - ()              - W-jackson            - Rid:null - FV:1.0  FW:0.0  FN:0.0
-    (4,12)  - (4[(3)])        - E-jackson (city)     - Rid:1    - FV:0.0  FW:0.0  FN:3.35
-    (4,12)  - (6[(5),(4)])    - SUPPR                - Rid:null - FV:1.0  FW:0.0  FN:0.0
-    (4,12)  - (2[(0)])        - RID Counter          - Rid:1    - FV:0.95 FW:3.71 FN:3.71
-    (4,12)  - (3[(2)])        - WR-jackson           - Rid:1    - FV:1.0  FW:0.0  FN:0.0
-    (4,12)  - (5[(3)])        - E-jackson (forename) - Rid:1    - FV:0.99 FW:6.49 FN:6.49
-    (4,12)  - (7[(5)])        - C-forename           - Rid:1    - FV:1.0  FW:0.0  FN:0.0
-    (12,16) - ()              - W-cook               - Rid:null - FV:1.0  FW:0.0  FN:0.0
-    (12,17) - (10[(9)])       - E-cook (profession)  - Rid:2    - FV:0.0  FW:0.0  FN:4.19
-    (12,17) - (12[(11),(10)]) - SUPPR                - Rid:null - FV:1.0  FW:0.0  FN:0.0
-    (12,17) - (8[(2)])        - RID Counter          - Rid:2    - FV:0.94 FW:3.61 FN:3.61
-    (12,17) - (9[(8)])        - WR-cook              - Rid:2    - FV:1.0  FW:0.0  FN:0.0
-    (12,17) - (11[(9)])       - E-cook (surname)     - Rid:2    - FV:0.99 FW:6.49 FN:6.49
-    (12,17) - (13[(11)])      - C-surname            - Rid:2    - FV:1.0  FW:0.0  FN:0.0
+    (4,11) - (0[()])       - E-jackson (city)     - Rid:1    - FV:0.0  FW:0.0  FN:3.36 <-- suppressed
+    (4,11) - (2[(1),(0)])  - SUPPR                - Rid:null - FV:1.0  FW:0.0  FN:0.0
+    (4,11) - ()            - W-jackson            - Rid:1    - FV:1.0  FW:0.0  FN:0.0
+    (4,11) - (1[()])       - E-jackson (forename) - Rid:1    - FV:0.99 FW:6.5  FN:6.5  <-- active
+    (4,11) - (3[(1)])      - C-forename           - Rid:1    - FV:1.0  FW:0.0  FN:0.0
+    (12,16) - (4[()])      - E-cook (profession)  - Rid:2    - FV:0.0  FW:0.0  FN:4.2  <-- suppressed
+    (12,16) - (6[(5),(4)]) - SUPPR                - Rid:null - FV:1.0  FW:0.0  FN:0.0
+    (12,16) - ()           - W-cook               - Rid:2    - FV:1.0  FW:0.0  FN:0.0
+    (12,16) - (5[()])      - E-cook (surname)     - Rid:2    - FV:0.99 FW:6.5  FN:6.5  <-- active
+    (12,16) - (7[(5)])     - C-surname            - Rid:2    - FV:1.0  FW:0.0  FN:0.0
     ...
 
-    WeightSum:W:42.149 N:49.703 NW:0.848
+    WeightSum:W:13.0 N:20.56 NW:0.632
 
-    Final Interpretation: (... ,2,3,5,6,7,8,9,11,12,13, ...)
+    Final Interpretation: (1,2,3,5,6,7)
                 </code>
 			</pre>
             </div>
@@ -526,9 +485,9 @@ The output of this example looks as following. Each line in the table represents
 
         InputNeuron startSignal = t.createOrLookupInputSignal("START-SIGNAL");
 
-        // The Cycle Neuron is used to assign each pattern component an relational id (RID).
+        // The Counter Neuron is used to assign each pattern component an relational id (RID).
         // It is a counter that increases the Rid after each space char.
-        // The createCycleNeuron method is simply a helper method which generates an
+        // The createCounterNeuron method is simply a helper method which generates an
         // ordinary neuron with some input synapses.
         Neuron ctNeuron = t.createCounterNeuron(new Neuron("CTN"),
                 inSpace, false,
