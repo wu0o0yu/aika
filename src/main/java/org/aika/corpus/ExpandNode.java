@@ -44,7 +44,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
      */
     public static boolean INCOMPLETE_OPTIMIZATION = true;
 
-    public static int MAX_SEARCH_STEPS = 10000;
+    public static int MAX_SEARCH_STEPS = 100000;
 
     public int id;
 
@@ -321,7 +321,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
         if (n.refByOrOption != null) {
             for (Option on : n.refByOrOption) {
-                if(!on.conflicts.hasConflicts()) {
+                if(!on.conflicts.hasConflicts() && !isCovered(on.markedCovered)) {
                     results.add(on);
                 }
             }
