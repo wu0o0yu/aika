@@ -845,6 +845,7 @@ public class Iteration {
          * @return
          */
         public Input setNeuron(Neuron neuron) {
+            assert neuron != null;
             this.neuron = neuron;
             return this;
         }
