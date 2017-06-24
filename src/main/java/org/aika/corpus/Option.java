@@ -57,7 +57,6 @@ public class Option implements Comparable<Option> {
     public long visitedMarkCovered;
     public long markedCovered = -1;
     public long markedExcluded = -1;
-    public long markedSelected;
     private long visitedIsConflicting;
     public long visitedCollectAllConflicting = -1;
     private long visitedStoreFinalWeight = -1;
@@ -639,16 +638,6 @@ public class Option implements Comparable<Option> {
                 conflicts.add(n);
             }
             n.collectConflicts(conflicts, v);
-        }
-    }
-
-
-    public void markSelected(long v) {
-        if(markedSelected == v) return;
-        markedSelected = v;
-
-        for(Option p: parents) {
-            p.markSelected(v);
         }
     }
 

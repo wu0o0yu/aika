@@ -54,6 +54,8 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
     long visited;
     Option refinement;
+    RefMarker marker;
+
     NormWeight weightDelta = NormWeight.ZERO_WEIGHT;
 
     public List<StateChange> modifiedActs = new ArrayList<>();
@@ -72,9 +74,10 @@ public class ExpandNode implements Comparable<ExpandNode> {
     }
 
 
-    // TODO: mark also selected nodes that consist of several expand nodes.
     private void markSelected(long v) {
-        refinement.markSelected(v);
+        if(marker != null) {
+            marker.markedSelected = v;
+        }
         if(selectedParent != null) selectedParent.markSelected(v);
     }
 
@@ -82,7 +85,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
     public static ExpandNode createInitialExpandNode(Document doc) {
         List<Option> changed = new ArrayList<>();
         changed.add(doc.bottom);
-        return createCandidate(doc, changed, null, null, null, doc.bottom);
+        return createCandidate(doc, changed, null, null, null, doc.bottom, null);
     }
 
 
@@ -166,7 +169,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
             log.info(toString());
         }
 
-        boolean f = doc.selectedMark == -1 || refinement.markedSelected != doc.selectedMark;
+        boolean f = doc.selectedMark == -1 || marker.markedSelected != doc.selectedMark;
 
         changeState(StateChange.Mode.NEW);
 
@@ -179,12 +182,22 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
         generateNextLevelCandidates(t, selectedParent, excludedParent);
 
-        if(candidates.size() == 0 && accNW > selectedAccNW) {
-            doc.selectedExpandNode = this;
-            doc.selectedMark = Option.visitedCounter++;
-            markSelected(doc.selectedMark);
+        if(candidates.size() == 0) {
+            ExpandNode en = this;
+            while(en != null) {
+                if(en.marker != null && !en.marker.complete) {
+                    en.marker.complete = !hasUnsatisfiedPositiveFeedbackLink(en.refinement, Option.visitedCounter++);
+                }
+                en = en.selectedParent;
+            }
 
-            doc.bottom.storeFinalWeight(Option.visitedCounter++);
+            if (accNW > selectedAccNW) {
+                doc.selectedExpandNode = this;
+                doc.selectedMark = Option.visitedCounter++;
+                markSelected(doc.selectedMark);
+
+                doc.bottom.storeFinalWeight(Option.visitedCounter++);
+            }
         }
 
         ExpandNode child = selectCandidate();
@@ -195,7 +208,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
         do {
             child = selectedParent.selectCandidate();
-        } while(child != null && !f && INCOMPLETE_OPTIMIZATION && !hasUnsatisfiedPositiveFeedbackLink(child.refinement, Option.visitedCounter++));
+        } while(child != null && !f && INCOMPLETE_OPTIMIZATION && child.marker.complete);
 
         if(child != null) {
             child.search(t, selectedParent, this, searchSteps);
@@ -231,7 +244,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
         candidates = new TreeSet<>();
         for(Option cn: collectConflicts(t.doc)) {
             List<Option> changed = new ArrayList<>();
-            ExpandNode c = createCandidate(t.doc, changed, this, this, null, cn);
+            ExpandNode c = createCandidate(t.doc, changed, this, this, null, cn, new RefMarker());
 
             c.weightDelta = t.vQueue.adjustWeight(c, changed);
             if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
@@ -252,7 +265,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
         for(ExpandNode pc: selectedParent.candidates) {
             if(!isCovered(pc.refinement.markedCovered) && !checkExcluded(pc.refinement, Option.visitedCounter++) && !pc.refinement.contains(refinement, false)) {
                 List<Option> changed = new ArrayList<>();
-                ExpandNode c = createCandidate(t.doc, changed, this, this, excludedParent, pc.refinement);
+                ExpandNode c = createCandidate(t.doc, changed, this, this, excludedParent, pc.refinement, pc.marker);
 
                 c.weightDelta = t.vQueue.adjustWeight(c, changed);
                 c.changeState(StateChange.Mode.OLD);
@@ -446,7 +459,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
     }
 
 
-    public static ExpandNode createCandidate(Document doc, List<Option> changed, ExpandNode parent, ExpandNode selectedParent, ExpandNode excludedParent, Option ref) {
+    public static ExpandNode createCandidate(Document doc, List<Option> changed, ExpandNode parent, ExpandNode selectedParent, ExpandNode excludedParent, Option ref, RefMarker marker) {
         ExpandNode cand = new ExpandNode(parent);
         cand.id = doc.expandNodeIdCounter++;
         cand.visited = Option.visitedCounter++;
@@ -455,6 +468,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
         cand.refinement = cand.expandRefinement(ref);
         cand.markCovered(changed, cand.visited, cand.refinement);
         cand.markExcluded(changed, cand.visited, cand.refinement);
+        cand.marker = marker;
 
         if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("\n \n Generate Candidate: " + cand.refinement.toString());
@@ -510,5 +524,11 @@ public class ExpandNode implements Comparable<ExpandNode> {
         public void restoreState(Mode m) {
             act.rounds = (m == Mode.OLD ? oldRounds : newRounds).copy();
         }
+    }
+
+
+    public static class RefMarker {
+        public long markedSelected;
+        public boolean complete;
     }
 }
