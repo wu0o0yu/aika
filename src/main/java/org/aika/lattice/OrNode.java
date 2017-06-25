@@ -38,7 +38,8 @@ import java.util.*;
 public class OrNode extends Node {
 
 
-    public TreeSet<OrEntry> parents = new TreeSet<>();
+    public TreeSet<Node> nullRidParents = new TreeSet<>();
+    public TreeMap<Integer, TreeSet<Node>> parents = new TreeMap<>();
 
 
     public OrNode() {}
@@ -94,14 +95,14 @@ public class OrNode extends Node {
     public void updateActivation(Iteration t, Range inputR, Integer rid) {
         List<Activation> inputs = new ArrayList<>();
         Range r = null;
-        for(OrEntry oe: parents) {
-            for(Activation iAct: Activation.select(t, oe.node, Utils.nullSafeAdd(rid, true, oe.ridOffset, false), inputR, Range.Relation.OVERLAPS, null, null)) {
-                if(!iAct.isRemoved && !checkSelfReferencing(t, iAct)) {
-                    inputs.add(iAct);
-                    r = r == null ? iAct.key.r : new Range(Math.min(r.begin, iAct.key.r.begin), Math.max(r.end, iAct.key.r.end));
-                }
-            }
+
+        for (Map.Entry<Integer, TreeSet<Node>> me : parents.entrySet()) {
+            r = extractRange(t, inputR, rid, inputs, r, me.getKey(), me.getValue());
         }
+        if (!nullRidParents.isEmpty()) {
+            r = extractRange(t, inputR, rid, inputs, r, null, nullRidParents);
+        }
+
 
         for(Activation oAct: Activation.select(t, this, rid, inputR, Range.Relation.OVERLAPS, null, null)) {
             for (Iterator<Activation> it = oAct.inputs.values().iterator(); it.hasNext(); ) {
@@ -139,6 +140,30 @@ public class OrNode extends Node {
                 nak,
                 inputs
         );
+    }
+
+
+    private Range extractRange(Iteration t, Range inputR, Integer rid, List<Activation> inputs, Range r, Integer pRidOffset, TreeSet<Node> parents) {
+        // Optimization the number of parents can get very large, thus we need to avoid iterating over all of them.
+        if(parents.size() > 10) {
+            return extractRange(t, null, inputR, rid, inputs, r, pRidOffset, parents);
+        } else {
+            for(Node pn: parents) {
+                r = extractRange(t, pn, inputR, rid, inputs, r, pRidOffset, parents);
+            }
+            return r;
+        }
+    }
+
+
+    private Range extractRange(Iteration t, Node n, Range inputR, Integer rid, List<Activation> inputs, Range r, Integer pRidOffset, TreeSet<Node> parents) {
+        for(Activation iAct: Activation.select(t, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, Range.Relation.OVERLAPS, null, null)) {
+            if(!iAct.isRemoved && parents.contains(iAct.key.n) && !checkSelfReferencing(t, iAct)) {
+                inputs.add(iAct);
+                r = r == null ? iAct.key.r : new Range(Math.min(r.begin, iAct.key.r.begin), Math.max(r.end, iAct.key.r.end));
+            }
+        }
+        return r;
     }
 
 
@@ -257,25 +282,42 @@ public class OrNode extends Node {
         in.changeNumberOfNeuronRefs(t, Node.visitedCounter++, 1);
         in.addOrChild(t, new OrEntry(ridOffset, this));
         lock.acquireWriteLock(t.threadId);
-        parents.add(new OrEntry(ridOffset, in));
+        TreeSet<Node> pn = ridOffset != null ? parents.get(ridOffset) : nullRidParents;
+        if(pn == null) {
+            pn = new TreeSet();
+            parents.put(ridOffset, pn);
+        }
+        pn.add(in);
         lock.releaseWriteLock();
     }
 
 
-    public void removeInput(Iteration t, int ridOffset, Node in) {
+    public void removeInput(Iteration t, Integer ridOffset, Node in) {
         in.changeNumberOfNeuronRefs(t, Node.visitedCounter++, -1);
         in.removeOrChild(t, new OrEntry(ridOffset, this));
         lock.acquireWriteLock(t.threadId);
-        parents.remove(new OrEntry(ridOffset, in));
+        TreeSet<Node> pn = ridOffset != null ? parents.get(ridOffset) : nullRidParents;
+        if(pn != null) {
+            pn.remove(in);
+            if(pn.isEmpty() && ridOffset != null) {
+                parents.remove(ridOffset);
+            }
+        }
         lock.releaseWriteLock();
     }
 
 
     public void removeAllInputs(Iteration t) {
         lock.acquireWriteLock(t.threadId);
-        for(OrEntry oe: parents) {
-            oe.node.changeNumberOfNeuronRefs(t, Node.visitedCounter++, -1);
-            oe.node.removeOrChild(t, new OrEntry(oe.ridOffset, this));
+        for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
+            for(Node pn: me.getValue()) {
+                pn.changeNumberOfNeuronRefs(t, Node.visitedCounter++, -1);
+                pn.removeOrChild(t, new OrEntry(me.getKey(), this));
+            }
+        }
+        for(Node pn: nullRidParents) {
+            pn.changeNumberOfNeuronRefs(t, Node.visitedCounter++, -1);
+            pn.removeOrChild(t, new OrEntry(null, this));
         }
         parents.clear();
         lock.releaseWriteLock();
@@ -286,8 +328,13 @@ public class OrNode extends Node {
         super.remove(t);
 
         lock.acquireReadLock();
-        for(OrEntry oe: parents) {
-            oe.node.removeOrChild(t, new OrEntry(oe.ridOffset, this));
+        for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
+            for(Node pn: me.getValue()) {
+                pn.removeOrChild(t, new OrEntry(me.getKey(), this));
+            }
+        }
+        for(Node pn: nullRidParents) {
+            pn.removeOrChild(t, new OrEntry(null, this));
         }
         lock.releaseReadLock();
     }
@@ -298,17 +345,33 @@ public class OrNode extends Node {
         sb.append("OR[");
         boolean first = true;
         int i = 0;
-        for(OrEntry oe: parents) {
+        for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
+            for (Node pn : me.getValue()) {
+                if (!first) {
+                    sb.append(",");
+                }
+                first = false;
+                sb.append(me.getKey());
+                sb.append(":");
+                sb.append(pn.logicToString());
+                if (i > 10) {
+                    sb.append(",...");
+                    break;
+                }
+
+                i++;
+            }
+        }
+
+        for(Node pn: nullRidParents) {
             if (!first) {
                 sb.append(",");
             }
             first = false;
-            if(oe.ridOffset != null) {
-                sb.append(oe.ridOffset);
-                sb.append(":");
-            }
-            sb.append(oe.node.logicToString());
-            if(i > 10) {
+            sb.append("null");
+            sb.append(":");
+            sb.append(pn.logicToString());
+            if (i > 10) {
                 sb.append(",...");
                 break;
             }
@@ -326,8 +389,16 @@ public class OrNode extends Node {
         super.write(out);
 
         out.writeInt(parents.size());
-        for(OrEntry oe: parents) {
-            oe.write(out);
+        for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
+            out.writeInt(me.getKey());
+            out.writeInt(me.getValue().size());
+            for(Node pn: me.getValue()) {
+                out.writeInt(pn.id);
+            }
+        }
+        out.writeInt(nullRidParents.size());
+        for(Node pn: nullRidParents) {
+            out.writeInt(pn.id);
         }
     }
 
@@ -338,9 +409,23 @@ public class OrNode extends Node {
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
-            OrEntry oe = OrEntry.read(in, t);
-            parents.add(oe);
-            oe.node.addOrChild(t, new OrEntry(oe.ridOffset, this));
+            TreeSet<Node> ridParents = new TreeSet<>();
+            Integer ridOffset = in.readInt();
+            parents.put(ridOffset, ridParents);
+
+            int sa = in.readInt();
+            for(int j = 0; j < sa; j++) {
+                Node pn = t.m.initialNodes.get(in.readInt());
+                pn.addOrChild(t, new OrEntry(ridOffset, this));
+                ridParents.add(pn);
+            }
+        }
+
+        int sa = in.readInt();
+        for(int j = 0; j < sa; j++) {
+            Node pn = t.m.initialNodes.get(in.readInt());
+            pn.addOrChild(t, new OrEntry(null, this));
+            nullRidParents.add(pn);
         }
     }
 

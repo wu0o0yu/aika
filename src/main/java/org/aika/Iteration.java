@@ -17,6 +17,7 @@
 package org.aika;
 
 
+import org.aika.Activation.Key;
 import org.aika.Activation.State;
 import org.aika.Activation.SynapseActivation;
 import org.aika.corpus.Document;
@@ -68,6 +69,14 @@ public class Iteration {
     public TreeSet<Neuron> activatedNeurons = new TreeSet<>();
     public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
     public TreeSet<Activation> inputNodeActivations = new TreeSet<>();
+    public TreeMap<Key, Activation> activationsByRid = new TreeMap<>(new Comparator<Key>() {
+        @Override
+        public int compare(Key act1, Key act2) {
+            int r = Integer.compare(act1.rid, act2.rid);
+            if(r != 0) return r;
+            return act1.compareTo(act2);
+        }
+    });
     public TreeSet<Node> addedNodes = new TreeSet<>();
 
     public static int numberOfPositionsDelta;

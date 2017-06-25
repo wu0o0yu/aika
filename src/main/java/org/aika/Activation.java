@@ -22,6 +22,7 @@ import org.aika.corpus.ExpandNode.StateChange;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
 import org.aika.lattice.Node;
+import org.aika.lattice.Node.ThreadState;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron.NormWeight;
 import org.aika.neuron.Synapse;
@@ -106,7 +107,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public void register(Iteration t) {
-        Node.ThreadState th = key.n.getThreadState(t);
+        ThreadState th = key.n.getThreadState(t);
         if (th.activations.isEmpty()) {
             (isTrainingAct ? t.activatedNodesForTraining : t.activatedNodes).add(key.n);
         }
@@ -128,6 +129,10 @@ public class Activation implements Comparable<Activation> {
                 key.o.neuronActivations = new TreeSet<>();
             }
             key.o.neuronActivations.add(this);
+        }
+
+        if(key.rid != null) {
+            t.activationsByRid.put(key, this);
         }
     }
 
@@ -152,6 +157,10 @@ public class Activation implements Comparable<Activation> {
         key.o.activations.remove(key);
         if(key.n.neuron != null) {
             key.o.neuronActivations.remove(this);
+        }
+
+        if(key.rid != null) {
+            t.activationsByRid.remove(key);
         }
     }
 
@@ -184,21 +193,19 @@ public class Activation implements Comparable<Activation> {
 
 
     public static List<Activation> select(Iteration t, Node n, Integer rid, Range r, Range.Relation rr, Option o, Option.Relation or) {
-        assert n != null;
-
-        Node.ThreadState th = n.getThreadState(t);
-        int s = th.activations.size();
-
-        if(s == 0) return Collections.emptyList();
-        else if(s == 1) {
-            Activation act = th.activations.firstEntry().getValue();
-            if (act.filter(n, rid, r, rr, o, or)) return Collections.singletonList(act);
-            else return Collections.emptyList();
-        }
-
-        List<Activation> results = new ArrayList<>();
-
         if(n != null) {
+            ThreadState th = n.getThreadState(t);
+            int s = th.activations.size();
+
+            if(s == 0) return Collections.emptyList();
+            else if(s == 1) {
+                Activation act = th.activations.firstEntry().getValue();
+                if (act.filter(n, rid, r, rr, o, or)) return Collections.singletonList(act);
+                else return Collections.emptyList();
+            }
+
+            List<Activation> results = new ArrayList<>();
+
             if(rid != null) {
                 Key bk = new Key(n, Range.MIN, rid, Option.MIN);
                 Key ek = new Key(n, Range.MAX, rid, Option.MAX);
@@ -221,16 +228,36 @@ public class Activation implements Comparable<Activation> {
                     rr.getActivations(results, t, n, rid, r, o, or);
                 }
             }
-        } else {
-            assert false;
-        }
 
-        return results;
+            return results;
+        } else {
+            List<Activation> results = new ArrayList<>();
+            if(rid != null) {
+                Key bk = new Key(Node.MIN_NODE, Range.MIN, rid, Option.MIN);
+                Key ek = new Key(Node.MAX_NODE, Range.MAX, rid, Option.MAX);
+                for(Activation act: t.activationsByRid.subMap(bk, true, ek, true).values()) {
+                    if (act.filter(n, rid, r, rr, o, or)) {
+                        results.add(act);
+                    }
+                }
+            } else {
+                for(Node node: t.activatedNodes) {
+                    ThreadState th = node.getThreadState(t);
+                    for (Activation act : th.activations.values()) {
+                        if (act.filter(n, rid, r, rr, o, or)) {
+                            results.add(act);
+                        }
+                    }
+                }
+            }
+
+            return results;
+        }
     }
 
 
     public boolean filter(Node n, Integer rid, Range r, Range.Relation rr, Option o, Option.Relation or) {
-        return (n != null || key.n == n) && (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) && (r == null || rr == null || (rr.match(key.r, r))) && (o == null || or.compare(key.o, o));
+        return (n == null || key.n == n) && (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) && (r == null || rr == null || (rr.match(key.r, r))) && (o == null || or.compare(key.o, o));
     }
 
 

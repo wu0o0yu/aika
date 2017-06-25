@@ -47,6 +47,9 @@ public abstract class Node implements Comparable<Node>, Writable {
     public static int minFrequency = 5;
     public static int MAX_RID = 20;
 
+    public static final DummyNode MIN_NODE = new DummyNode(Integer.MIN_VALUE);
+    public static final DummyNode MAX_NODE = new DummyNode(Integer.MAX_VALUE);
+
     private static final Logger log = LoggerFactory.getLogger(Node.class);
 
     public static AtomicInteger currentNodeId = new AtomicInteger(0);
@@ -1081,7 +1084,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     private static class DummyNode extends InputNode {
 
         public DummyNode(int id) {
-            super(null, null);
+            super();
             this.id = id;
         }
 
@@ -1153,4 +1156,5 @@ public abstract class Node implements Comparable<Node>, Writable {
             return Boolean.compare(dir, rar.dir);
         }
     }
+
 }
