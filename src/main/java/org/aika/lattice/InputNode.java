@@ -104,6 +104,7 @@ public class InputNode extends Node {
             t.inputNeuronActivations.add(act);
 
             if(getThreadState(t).activations.isEmpty()) {
+                t.activatedNeurons.add(neuron);
                 t.activatedInputNeurons.add(neuron);
             }
         } else if(!isBlocked) {
@@ -118,7 +119,8 @@ public class InputNode extends Node {
             t.inputNeuronActivations.remove(act);
 
             if(getThreadState(t).activations.isEmpty()) {
-                t.activatedInputNeurons.add(neuron);
+                t.activatedNeurons.remove(neuron);
+                t.activatedInputNeurons.remove(neuron);
             }
         } else if(!isBlocked) {
             t.inputNodeActivations.remove(act);

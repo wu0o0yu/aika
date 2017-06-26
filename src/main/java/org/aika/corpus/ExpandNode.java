@@ -148,7 +148,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
         for(StateChange sc : modifiedActs) {
             Activation act = sc.act;
             if(act.finalState != null && act.finalState.value > 0.0) {
-                t.activatedNeurons.add(act.key.n.neuron);
+                t.finallyActivatedNeurons.add(act.key.n.neuron);
             }
         }
     }

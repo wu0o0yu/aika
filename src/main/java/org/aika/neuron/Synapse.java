@@ -34,12 +34,22 @@ import java.util.Comparator;
  */
 public class Synapse implements Writable {
 
-    public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = new Comparator<Synapse>() {
+    public static final Comparator<Synapse> INPUT_SYNAPSE_BY_WEIGHTS_COMP = new Comparator<Synapse>() {
         @Override
         public int compare(Synapse s1, Synapse s2) {
             int r = compareWeights(s1.w, s2.w, 0.00001);
             if (r != 0) return r;
             r = s1.input.compareTo(s2.input);
+            if (r != 0) return r;
+            return s1.key.compareTo(s2.key);
+        }
+    };
+
+
+    public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = new Comparator<Synapse>() {
+        @Override
+        public int compare(Synapse s1, Synapse s2) {
+            int r = s1.input.compareTo(s2.input);
             if (r != 0) return r;
             return s1.key.compareTo(s2.key);
         }
@@ -95,6 +105,7 @@ public class Synapse implements Writable {
 
         input.outputSynapses.add(this);
         output.inputSynapses.add(this);
+        output.inputSynapsesByWeight.add(this);
 
         (dir ? input : output).lock.releaseWriteLock();
         (dir ? output : input).lock.releaseWriteLock();

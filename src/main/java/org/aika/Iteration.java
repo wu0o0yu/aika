@@ -67,6 +67,7 @@ public class Iteration {
     public TreeSet<Node> activatedNodesForTraining = new TreeSet<>();
     public TreeSet<Neuron> activatedInputNeurons = new TreeSet<>();
     public TreeSet<Neuron> activatedNeurons = new TreeSet<>();
+    public TreeSet<Neuron> finallyActivatedNeurons = new TreeSet<>();
     public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
     public TreeSet<Activation> inputNodeActivations = new TreeSet<>();
     public TreeMap<Key, Activation> activationsByRid = new TreeMap<>(new Comparator<Key>() {
@@ -127,7 +128,7 @@ public class Iteration {
             n.count(this);
         }
 
-        for(Neuron n: activatedNeurons) {
+        for(Neuron n: finallyActivatedNeurons) {
             n.count(this);
         }
     }
@@ -169,7 +170,7 @@ public class Iteration {
 
         bQueue.backpropagtion();
 
-        for(Neuron n: activatedNeurons) {
+        for(Neuron n: finallyActivatedNeurons) {
             if(!n.noTraining) {
                 for (Activation act : n.node.getThreadState(this).activations.values()) {
                     n.train(this, act);
@@ -471,7 +472,7 @@ public class Iteration {
         n.m = this.m;
         if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
-        Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
+        Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         double bias = 0.0;
         double negDirSum = 0.0;
@@ -512,7 +513,7 @@ public class Iteration {
 
     public Neuron createNeuron(Neuron n, double bias, Collection<Input> inputs) {
         n.m = this.m;
-        Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
+        Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         double negDirSum = 0.0;
         double negRecSum = 0.0;
@@ -555,7 +556,7 @@ public class Iteration {
         n.m = this.m;
         if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
-        Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
+        Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         double bias = -0.001;
         for(Input ni: inputs) {
@@ -583,7 +584,7 @@ public class Iteration {
         if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
         double bias = -30.0;
-        Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
+        Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         if(inputSignal != null) {
             Synapse iss = new Synapse(
@@ -648,7 +649,7 @@ public class Iteration {
 
         double bias = -44.0;
         double negRecSum = -20.0;
-        Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
+        Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         if(clockSignal != null) {
             Synapse css = new Synapse(

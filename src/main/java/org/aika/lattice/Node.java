@@ -47,6 +47,8 @@ public abstract class Node implements Comparable<Node>, Writable {
     public static int minFrequency = 5;
     public static int MAX_RID = 20;
 
+    public static boolean LINK_NEURON_RELATIONS_OPTIMIZATION = true;
+
     public static final DummyNode MIN_NODE = new DummyNode(Integer.MIN_VALUE);
     public static final DummyNode MAX_NODE = new DummyNode(Integer.MAX_VALUE);
 
@@ -370,13 +372,13 @@ public abstract class Node implements Comparable<Node>, Writable {
             TreeSet<Synapse> syns = (dir == 0 ? neuron.inputSynapses : neuron.outputSynapses);
 
             // Optimization in case the set of synapses is very large
-/*            if(syns.size() > 10 && t.activatedNeurons.size() * 20 < syns.size()) {
-                TreeSet<Synapse> newSyns = new TreeSet<>();
+            if (LINK_NEURON_RELATIONS_OPTIMIZATION && syns.size() > 10 && t.activatedNeurons.size() * 20 < syns.size()) {
+                TreeSet<Synapse> newSyns = new TreeSet<>(dir == 0 ? Synapse.INPUT_SYNAPSE_COMP : Synapse.OUTPUT_SYNAPSE_COMP);
                 Synapse lk = new Synapse(null, Synapse.Key.MIN_KEY);
                 Synapse uk = new Synapse(null, Synapse.Key.MAX_KEY);
 
-                for(Neuron n: t.activatedNeurons) {
-                    if(dir == 0) {
+                for (Neuron n : t.activatedNeurons) {
+                    if (dir == 0) {
                         lk.input = n;
                         uk.input = n;
                     } else {
@@ -388,7 +390,8 @@ public abstract class Node implements Comparable<Node>, Writable {
 
                 syns = newSyns;
             }
-*/
+
+
             for (Synapse s : syns) {
                 Node n = (dir == 0 ? s.input : s.output).node;
                 ThreadState th = n.getThreadState(t);
@@ -755,10 +758,10 @@ public abstract class Node implements Comparable<Node>, Writable {
         long v = visitedCounter++;
         OrNode outputNode = (OrNode) neuron.node;
 
-        if(neuron.inputSynapses.isEmpty()) return false;
+        if(neuron.inputSynapsesByWeight.isEmpty()) return false;
 
         neuron.maxRecurrentSum = 0.0;
-        for(Synapse s: neuron.inputSynapses) {
+        for(Synapse s: neuron.inputSynapsesByWeight) {
             s.input.lock.acquireWriteLock(t.threadId);
 
             if (s.inputNode == null) {
@@ -866,14 +869,14 @@ public abstract class Node implements Comparable<Node>, Writable {
 
             for(Refinement ref: node.parents.keySet()) {
                 Synapse s = ref.getSynapse(rsk.offset, n);
-                if(minSyn == null || Synapse.INPUT_SYNAPSE_COMP.compare(minSyn, s) > 0) {
+                if(minSyn == null || Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP.compare(minSyn, s) > 0) {
                     minSyn = s;
                 }
                 sum += Math.abs(s.w);
             }
         }
 
-        for(Synapse s: (minSyn != null ? n.inputSynapses.headSet(minSyn, false) : n.inputSynapses)) {
+        for(Synapse s: (minSyn != null ? n.inputSynapsesByWeight.headSet(minSyn, false) : n.inputSynapsesByWeight)) {
             if(n.bias - (n.negDirSum + n.negRecSum) + n.posRecSum + sum + Math.abs(s.w) + s.maxLowerWeightsSum > 0.0 && !s.key.isNeg && !s.key.isRecurrent) {
                 Node nln = rsk.pa == null ?
                         s.inputNode :

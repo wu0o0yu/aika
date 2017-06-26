@@ -199,7 +199,9 @@ public class Model implements Writable {
             Neuron n = t.m.neurons.get(in.readInt());
 
             while(in.readBoolean()) {
-                n.inputSynapses.add(Synapse.read(in, t));
+                Synapse syn = Synapse.read(in, t);
+                n.inputSynapses.add(syn);
+                n.inputSynapsesByWeight.add(syn);
             }
         }
     }

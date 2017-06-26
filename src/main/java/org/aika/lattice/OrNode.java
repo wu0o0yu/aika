@@ -84,11 +84,18 @@ public class OrNode extends Node {
                 }
             }
         }
+
+        if(getThreadState(t).activations.isEmpty()) {
+            t.activatedNeurons.add(neuron);
+        }
     }
 
 
     @Override
     public void deleteActivation(Iteration t, Activation act) {
+        if(getThreadState(t).activations.isEmpty()) {
+            t.activatedNeurons.remove(neuron);
+        }
     }
 
 

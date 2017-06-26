@@ -66,6 +66,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
     public TreeSet<Synapse> outputSynapses = new TreeSet<>(Synapse.OUTPUT_SYNAPSE_COMP);
     public TreeSet<Synapse> inputSynapses = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
+    public TreeSet<Synapse> inputSynapsesByWeight = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
     public TreeMap<Key, InputNode> outputNodes = new TreeMap<>();
 
@@ -158,6 +159,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
         for(Synapse s: outputSynapses) {
             s.output.lock.acquireWriteLock(t.threadId);
             s.output.inputSynapses.remove(s);
+            s.output.inputSynapsesByWeight.remove(s);
             s.output.lock.releaseWriteLock();
         }
     }
@@ -336,7 +338,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
             log.info("Debug discover:");
 
             log.info("Old Synapses:");
-            for(Synapse s: inputSynapses) {
+            for(Synapse s: inputSynapsesByWeight) {
                 log.info("S:" + s.input + " RID:" + s.key.relativeRid + " W:" + s.w);
             }
             log.info("");
@@ -392,6 +394,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
             }
 
             inputSynapses.remove(s);
+            inputSynapsesByWeight.remove(s);
 
             double oldW = s.w;
             s.w -= deltaW;
@@ -400,6 +403,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
                 log.info("S:" + s.input + " RID:" + s.key.relativeRid + " OldW:" + oldW + " NewW:" + s.w);
             }
             inputSynapses.add(s);
+            inputSynapsesByWeight.add(s);
         }
     }
 
@@ -539,7 +543,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
             }
         });
 
-        is.addAll(inputSynapses);
+        is.addAll(inputSynapsesByWeight);
 
         StringBuilder sb = new StringBuilder();
         sb.append(toString());
