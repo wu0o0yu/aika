@@ -92,13 +92,8 @@ public class RecurrentNodeTest {
     }
 
 
-    private Activation getAct(Iteration t, Node n, Integer rid, Range r, Option o) {
-        for(Activation act: Activation.select(t, n, rid, r, Range.Relation.EQUALS, null, null)) {
-            if(o == null || act.key.o == o) {
-                return act;
-            }
-        }
-        return null;
+    private Activation getAct(Iteration t, Node n, Integer rid, Range r, final Option o) {
+        return Activation.select(t, n, rid, r, Range.Relation.EQUALS, null, null).filter(act -> o == null || act.key.o == o).findFirst().orElse(null);
     }
 
 

@@ -189,13 +189,13 @@ public class InputNode extends Node {
         Activation.Key ak = act.key;
         if(neuron == null && (key.startSignal == Synapse.RangeSignal.NONE || key.endSignal == Synapse.RangeSignal.NONE)) {
             boolean dir = key.startSignal == Synapse.RangeSignal.NONE;
-            for(Activation cAct: Activation.select(t, this, ak.rid, new Range(ak.r.getBegin(dir), dir ? Integer.MAX_VALUE : Integer.MIN_VALUE).invert(!dir), dir ? Range.Relation.BEGINS_WITH : Range.Relation.ENDS_WITH, ak.o, Option.Relation.CONTAINS)) {
+            Activation.select(t, this, ak.rid, new Range(ak.r.getBegin(dir), dir ? Integer.MAX_VALUE : Integer.MIN_VALUE).invert(!dir), dir ? Range.Relation.BEGINS_WITH : Range.Relation.ENDS_WITH, ak.o, Option.Relation.CONTAINS).forEach(cAct -> {
                 Activation.Key cak = cAct.key;
                 processAddedActivation(t, new Activation.Key(cak.n, new Range(dir ? Integer.MIN_VALUE : cak.r.begin, dir ? cak.r.end : Integer.MAX_VALUE), cak.rid, cak.o), cAct.inputs.values());
                 cAct.removedId = Activation.removedIdCounter++;
                 cAct.isRemoved = true;
                 removeActivationInternal(t, cAct, cAct.inputs.values());
-            }
+            });
         }
     }
 
@@ -283,7 +283,8 @@ public class InputNode extends Node {
         Activation.Key ak = act.key;
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
 
-        for (Activation secondAct : Activation.select(t, secondNode, secondRid, ak.r, new Range.BeginEndMatcher(ak.n.matchRange, secondNode.matchRange), null, null)) {
+        Activation.select(t, secondNode, secondRid, ak.r, new Range.BeginEndMatcher(ak.n.matchRange, secondNode.matchRange), null, null)
+                .forEach(secondAct -> {
             if(!secondAct.isRemoved) {
                 Option o = Option.add(t.doc, true, ak.o, secondAct.key.o);
                 if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
@@ -298,7 +299,7 @@ public class InputNode extends Node {
                     );
                 }
             }
-        }
+        });
     }
 
 

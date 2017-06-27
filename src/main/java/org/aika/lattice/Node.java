@@ -37,6 +37,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 
 /**
@@ -403,7 +404,7 @@ public abstract class Node implements Comparable<Node>, Writable {
                 } else {
                     rid = Utils.nullSafeSub(act.key.rid, false, s.key.relativeRid, false);
                 }
-                List<Activation> tmp = Activation.select(
+                Stream<Activation> tmp = Activation.select(
                         t,
                         n,
                         rid,
@@ -413,9 +414,10 @@ public abstract class Node implements Comparable<Node>, Writable {
                         null
                 );
 
-                for (Activation rAct : tmp) {
-                    Activation oAct = (dir == 0 ? act : rAct);
-                    Activation iAct = (dir == 0 ? rAct : act);
+                final int d = dir;
+                tmp.forEach(rAct -> {
+                    Activation oAct = (d == 0 ? act : rAct);
+                    Activation iAct = (d == 0 ? rAct : act);
 
                     SynapseActivation sa = new SynapseActivation(s, iAct, oAct);
                     oAct.neuronInputs.add(sa);
@@ -424,7 +426,7 @@ public abstract class Node implements Comparable<Node>, Writable {
                     if(s.key.isNeg && s.key.isRecurrent) {
                         recNegTmp.add(rAct);
                     }
-                }
+                });
             }
             neuron.lock.releaseReadLock();
 

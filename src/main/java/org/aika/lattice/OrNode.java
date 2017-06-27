@@ -29,6 +29,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -78,9 +79,10 @@ public class OrNode extends Node {
     public void initActivation(Iteration t, Activation act) {
         for(Synapse s: neuron.inputSynapses) {
             if(s.key.isNeg || s.key.isRecurrent) {
-                for (Activation iAct : Activation.select(t, s.inputNode, Utils.nullSafeAdd(act.key.rid, false, s.key.relativeRid, false), act.key.r, Range.Relation.OVERLAPS, null, null)) {
+                Activation.select(t, s.inputNode, Utils.nullSafeAdd(act.key.rid, false, s.key.relativeRid, false), act.key.r, Range.Relation.OVERLAPS, null, null)
+                        .forEach(iAct -> {
                     iAct.outputs.put(act.key, act);
-                }
+                });
             }
         }
 
@@ -106,12 +108,12 @@ public class OrNode extends Node {
             r = extractRange(t, inputR, rid, inputs, r, me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, me.getValue());
         }
 
-
-        for(Activation oAct: Activation.select(t, this, rid, inputR, Range.Relation.OVERLAPS, null, null)) {
+        final Range fr = r;
+        Activation.select(t, this, rid, inputR, Range.Relation.OVERLAPS, null, null).forEach(oAct -> {
             for (Iterator<Activation> it = oAct.inputs.values().iterator(); it.hasNext(); ) {
                 Activation iAct = it.next();
 
-                if(r == null || Range.compare(r, oAct.key.r) != 0) {
+                if(fr == null || Range.compare(fr, oAct.key.r) != 0) {
                     oAct.isReplaced = true;
                     oAct.key.o.removeOrOption(iAct, iAct.key.o);
                     removeActivationAndPropagate(t, oAct, oAct.inputs.values());
@@ -121,7 +123,7 @@ public class OrNode extends Node {
                     it.remove();
                 }
             }
-        }
+        });
 
         if(inputs.isEmpty()) return;
 
@@ -160,7 +162,8 @@ public class OrNode extends Node {
 
 
     private Range extractRange(Iteration t, Node n, Range inputR, Integer rid, List<Activation> inputs, Range r, Integer pRidOffset, TreeSet<Node> parents) {
-        for(Activation iAct: Activation.select(t, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, Range.Relation.OVERLAPS, null, null)) {
+        for(Activation iAct: Activation.select(t, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, Range.Relation.OVERLAPS, null, null)
+                .collect(Collectors.toList())) {
             if(!iAct.isRemoved && parents.contains(iAct.key.n) && !checkSelfReferencing(t, iAct)) {
                 inputs.add(iAct);
                 r = r == null ? iAct.key.r : new Range(Math.min(r.begin, iAct.key.r.begin), Math.max(r.end, iAct.key.r.end));
@@ -258,7 +261,11 @@ public class OrNode extends Node {
 
     // TODO: RID
     public Option lookupOrOption(Iteration t, Range r, boolean create) {
-        for(Activation act: Activation.select(t, this, null, r, Range.Relation.CONTAINS, null, null)) {
+        Activation act = Activation.select(t, this, null, r, Range.Relation.CONTAINS, null, null)
+                .findFirst()
+                .orElse(null);
+
+        if(act != null) {
             return act.key.o;
         }
         for(Key ak: getThreadState(t).added.keySet()) {

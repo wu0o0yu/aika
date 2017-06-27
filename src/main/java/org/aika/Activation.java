@@ -28,6 +28,7 @@ import org.aika.neuron.Neuron.NormWeight;
 import org.aika.neuron.Synapse;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  *
@@ -166,10 +167,9 @@ public class Activation implements Comparable<Activation> {
 
 
     public static Activation get(Iteration t, Node n, Integer rid, Range r, Range.Relation rr, Option o, Option.Relation or) {
-        for(Activation act: select(t, n, rid, r, rr, o, or)) {
-            return act;
-        }
-        return null;
+        return select(t, n, rid, r, rr, o, or)
+                .findFirst()
+                .orElse(null);
     }
 
 
@@ -192,67 +192,48 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public static List<Activation> select(Iteration t, Node n, Integer rid, Range r, Range.Relation rr, Option o, Option.Relation or) {
+    public static Stream<Activation> select(Iteration t, Node n, Integer rid, Range r, Range.Relation rr, Option o, Option.Relation or) {
+        Stream<Activation> results;
         if(n != null) {
             ThreadState th = n.getThreadState(t);
             int s = th.activations.size();
 
-            if(s == 0) return Collections.emptyList();
+            if(s == 0) return Stream.empty();
             else if(s == 1) {
-                Activation act = th.activations.firstEntry().getValue();
-                if (act.filter(n, rid, r, rr, o, or)) return Collections.singletonList(act);
-                else return Collections.emptyList();
-            }
-
-            List<Activation> results = new ArrayList<>();
-
-            if(rid != null) {
+                results = th.activations
+                        .values()
+                        .stream();
+            } else if(rid != null) {
                 Key bk = new Key(n, Range.MIN, rid, Option.MIN);
                 Key ek = new Key(n, Range.MAX, rid, Option.MAX);
 
-                for (Activation act : th.activationsRid.subMap(bk, true, ek, true).values()) {
-                    if (act.filter(n, rid, r, rr, o, or)) {
-                        results.add(act);
-                    }
-                }
+                results = th.activationsRid.subMap(bk, true, ek, true)
+                        .values()
+                        .stream();
             } else {
-                boolean returnFirstOnly = false;
                 if(rr == null) {
-                    for (Activation act : th.activations.values()) {
-                        if (act.filter(n, rid, r, rr, o, or)) {
-                            results.add(act);
-                        }
-                        if(returnFirstOnly) break;
-                    }
+                    results = th.activations.values()
+                            .stream();
                 } else {
-                    rr.getActivations(results, t, n, rid, r, o, or);
+                    return rr.getActivations(t, n, rid, r, o, or);
                 }
             }
-
-            return results;
         } else {
-            List<Activation> results = new ArrayList<>();
             if(rid != null) {
                 Key bk = new Key(Node.MIN_NODE, Range.MIN, rid, Option.MIN);
                 Key ek = new Key(Node.MAX_NODE, Range.MAX, rid, Option.MAX);
-                for(Activation act: t.activationsByRid.subMap(bk, true, ek, true).values()) {
-                    if (act.filter(n, rid, r, rr, o, or)) {
-                        results.add(act);
-                    }
-                }
-            } else {
-                for(Node node: t.activatedNodes) {
-                    ThreadState th = node.getThreadState(t);
-                    for (Activation act : th.activations.values()) {
-                        if (act.filter(n, rid, r, rr, o, or)) {
-                            results.add(act);
-                        }
-                    }
-                }
-            }
 
-            return results;
+                results = t.activationsByRid.subMap(bk, true, ek, true)
+                        .values()
+                        .stream();
+            } else {
+                results = t.activatedNodes
+                        .stream()
+                        .flatMap(node -> node.getThreadState(t).activations.values().stream());
+            }
         }
+
+        return results.filter(act -> act.filter(n, rid, r, rr, o, or));
     }
 
 

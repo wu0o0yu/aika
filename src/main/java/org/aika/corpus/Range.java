@@ -27,6 +27,7 @@ import org.aika.neuron.Synapse.RangeVisibility;
 
 import java.util.List;
 import java.util.NavigableMap;
+import java.util.stream.Stream;
 
 /**
  *
@@ -48,12 +49,11 @@ public class Range {
                 return Range.compare(ra, rb, false) == 0;
             }
 
-            public void getActivations(List<Activation> results, Iteration t, Node n, Integer rid, Range r, Option o, Option.Relation or) {
-                for (Activation act : n.getThreadState(t).activations.subMap(new Activation.Key(n, r, null, Option.MIN), true, new Activation.Key(n, r, Integer.MAX_VALUE, Option.MAX), true).values()) {
-                    if (act.filter(n, rid, r, this, o, or)) {
-                        results.add(act);
-                    }
-                }
+            public Stream getActivations(Iteration t, Node n, Integer rid, Range r, Option o, Option.Relation or) {
+                return n.getThreadState(t).activations.subMap(new Activation.Key(n, r, null, Option.MIN), true, new Activation.Key(n, r, Integer.MAX_VALUE, Option.MAX), true)
+                        .values()
+                        .stream()
+                        .filter(act -> act.filter(n, rid, r, this, o, or));
             }
         };
 
@@ -87,12 +87,10 @@ public class Range {
 
         public abstract boolean match(Range ra, Range rb);
 
-        public void getActivations(List<Activation> results, Iteration t, Node n, Integer rid, Range r, Option o, Option.Relation or) {
-            for (Activation act : n.getThreadState(t).activations.values()) {
-                if (act.filter(n, rid, r, this, o, or)) {
-                    results.add(act);
-                }
-            }
+        public Stream<Activation> getActivations(Iteration t, Node n, Integer rid, Range r, Option o, Option.Relation or) {
+            return n.getThreadState(t).activations.values()
+                    .stream()
+                    .filter(act -> act.filter(n, rid, r, this, o, or));
         }
     }
 
@@ -235,7 +233,7 @@ public class Range {
         }
 
         @Override
-        public void getActivations(List<Activation> results, Iteration t, Node n, Integer rid, Range r, Option o, Option.Relation or) {
+        public Stream<Activation> getActivations(Iteration t, Node n, Integer rid, Range r, Option o, Option.Relation or) {
             Node.ThreadState th = n.getThreadState(t);
             boolean x = getDirection();
             int y = getSignal() ? r.end : r.begin;
@@ -244,11 +242,10 @@ public class Range {
                     new Activation.Key(n, x ? new Range(Integer.MAX_VALUE, y) : new Range(y, Integer.MAX_VALUE), Integer.MAX_VALUE, Option.MAX), true
             );
 
-            for (Activation act : tmp.values()) {
-                if (act.filter(n, rid, r, this, o, or)) {
-                    results.add(act);
-                }
-            }
+            return tmp
+                    .values()
+                    .stream()
+                    .filter(act -> act.filter(n, rid, r, this, o, or));
         }
     }
 
@@ -279,7 +276,7 @@ public class Range {
         }
 
         @Override
-        public void getActivations(List<Activation> results, Iteration t, Node n, Integer rid, Range r, Option o, Option.Relation or) {
+        public Stream<Activation> getActivations(Iteration t, Node n, Integer rid, Range r, Option o, Option.Relation or) {
             NavigableMap<Key, Activation> tmp;
             boolean flag = false;
             Node.ThreadState th = n.getThreadState(t);
@@ -308,12 +305,12 @@ public class Range {
             } else {
                 tmp = th.activations;
             }
-            for (Activation act : tmp.values()) {
-                if (act.filter(n, rid, r, this, o, or)) {
-                    results.add(act);
-                    if(flag) break;
-                }
-            }
+
+            Stream<Activation> s = tmp
+                    .values()
+                    .stream()
+                    .filter(act -> act.filter(n, rid, r, this, o, or));
+            return !flag ? s : s.limit(1);
         }
     }
 }
