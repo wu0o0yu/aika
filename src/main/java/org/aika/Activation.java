@@ -207,9 +207,11 @@ public class Activation implements Comparable<Activation> {
                 Key bk = new Key(n, Range.MIN, rid, Option.MIN);
                 Key ek = new Key(n, Range.MAX, rid, Option.MAX);
 
-                results = th.activationsRid.subMap(bk, true, ek, true)
-                        .values()
-                        .stream();
+                if(th.activationsRid != null) {
+                    results = th.activationsRid.subMap(bk, true, ek, true)
+                            .values()
+                            .stream();
+                } else return Stream.empty();
             } else {
                 if(rr == null) {
                     results = th.activations.values()
