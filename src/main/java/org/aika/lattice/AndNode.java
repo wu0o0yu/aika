@@ -253,15 +253,17 @@ public class AndNode extends Node {
             Node pn = pAct.key.n;
             pn.lock.acquireReadLock();
             Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n, act.key.rid, pAct.key.rid));
-            for(Activation secondAct: pAct.outputs.values()) {
-                if(act != secondAct && !secondAct.isRemoved) {
-                    Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n, secondAct.key.rid, pAct.key.rid));
-                    if(secondRef != null) {
-                        Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
+            if(ref != null) {
+                for (Activation secondAct : pAct.outputs.values()) {
+                    if (act != secondAct && !secondAct.isRemoved) {
+                        Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n, secondAct.key.rid, pAct.key.rid));
+                        if (secondRef != null) {
+                            Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
-                        AndNode nlp = getAndChild(nRef);
-                        if (nlp != null) {
-                            addNextLevelActivation(t, act, secondAct, nlp, removedConflict);
+                            AndNode nlp = getAndChild(nRef);
+                            if (nlp != null) {
+                                addNextLevelActivation(t, act, secondAct, nlp, removedConflict);
+                            }
                         }
                     }
                 }
