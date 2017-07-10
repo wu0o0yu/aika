@@ -95,48 +95,49 @@ public class ExpandNode implements Comparable<ExpandNode> {
         ArrayList<Option> results = new ArrayList<>();
         results.add(doc.bottom);
 
-        try {
-            doc.selectedExpandNode = null;
-            int[] searchSteps = new int[1];
+        doc.selectedExpandNode = null;
+        int[] searchSteps = new int[1];
 
-            List<Option> rootRefs = expandRootRefinement(doc);
-            refinement = expandRefinement(Option.add(doc, false, rootRefs.toArray(new Option[rootRefs.size()])));
+        List<Option> rootRefs = expandRootRefinement(doc);
+        refinement = expandRefinement(Option.add(doc, false, rootRefs.toArray(new Option[rootRefs.size()])));
 
-            markCovered(null, visited, refinement);
-            markExcluded(null, visited, refinement);
+        markCovered(null, visited, refinement);
+        markExcluded(null, visited, refinement);
 
-            weightDelta = t.vQueue.adjustWeight(this, rootRefs);
+        weightDelta = t.vQueue.adjustWeight(this, rootRefs);
 
-            if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
-                log.info("Root ExpandNode:" + toString());
-            }
+        if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
+            log.info("Root ExpandNode:" + toString());
+        }
 
-            doc.selectedExpandNode = doc.root;
-            doc.selectedMark = Option.visitedCounter++;
-            markSelected(doc.selectedMark);
+        t.interrupted = false;
+        doc.selectedExpandNode = doc.root;
+        doc.selectedMark = Option.visitedCounter++;
+        markSelected(doc.selectedMark);
 
-            doc.bottom.storeFinalWeight(Option.visitedCounter++);
+        doc.bottom.storeFinalWeight(Option.visitedCounter++);
 
 
-            generateInitialCandidates(t);
+        generateInitialCandidates(t);
 
-            ExpandNode child = doc.root.selectCandidate();
+        ExpandNode child = doc.root.selectCandidate();
 
-            if(child != null) {
-                child.search(t, doc.root, null, searchSteps);
-            }
+        if(child != null) {
+            child.search(t, doc.root, null, searchSteps);
+        }
 
-            if (doc.selectedExpandNode != null) {
-                doc.selectedExpandNode.reconstructSelectedResult(t);
-                doc.selectedExpandNode.collectResults(results);
+        if (doc.selectedExpandNode != null) {
+            doc.selectedExpandNode.reconstructSelectedResult(t);
+            doc.selectedExpandNode.collectResults(results);
 
-                log.info("Selected ExandNode ID: " + doc.selectedExpandNode.id);
-            }
-        } catch(ExpandNodeException e) {
-            System.err.println("Too many search steps!");
+            log.info("Selected ExandNode ID: " + doc.selectedExpandNode.id);
         }
 
         doc.selectedOption = Option.add(doc, true, results.toArray(new Option[results.size()]));
+
+        if(t.interrupted) {
+            log.warn("The search for the best interpretation has been interrupted. Too many search steps!");
+        }
     }
 
 
@@ -157,7 +158,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
     private void search(Iteration t, ExpandNode selectedParent, ExpandNode excludedParent, int[] searchSteps) {
         Document doc = t.doc;
         if(searchSteps[0] > MAX_SEARCH_STEPS) {
-            throw new ExpandNodeException();
+            t.interrupted = true;
         }
         searchSteps[0]++;
 
@@ -205,6 +206,10 @@ public class ExpandNode implements Comparable<ExpandNode> {
             child.search(t, this, excludedParent, searchSteps);
         }
         changeState(StateChange.Mode.OLD);
+
+        if(t.interrupted) {
+            return;
+        }
 
         do {
             child = selectedParent.selectCandidate();
@@ -444,13 +449,6 @@ public class ExpandNode implements Comparable<ExpandNode> {
             if(p.markedCovered != v && !isCovered(p.markedCovered)) return false;
         }
         return true;
-    }
-
-
-    public static class ExpandNodeException extends RuntimeException {
-
-        private static final long serialVersionUID = -9084467053069262753L;
-
     }
 
 

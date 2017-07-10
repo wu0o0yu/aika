@@ -57,6 +57,8 @@ public class Iteration {
     public Model m;
     public int threadId;
     public long iterationId;
+    public boolean interrupted;
+
 
     public Queue queue = new Queue();
     public ValueQueue vQueue = new ValueQueue();
