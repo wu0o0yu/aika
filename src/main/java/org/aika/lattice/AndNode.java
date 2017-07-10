@@ -339,10 +339,24 @@ public class AndNode extends Node {
             if(n == ref.input && ref.rid == 0) return null;
         } else {
             AndNode an = (AndNode) n;
-            an.lock.acquireReadLock();
-            boolean flag = an.parents.containsKey(ref);
-            an.lock.releaseReadLock();
-            if(flag) return null;
+
+            // Check if this refinement is already present in this and-node.
+            if(ref.rid == null || ref.rid >= 0) {
+                boolean flag = false;
+                an.lock.acquireReadLock();
+                if(ref.rid == null || ref.rid > 0) {
+                    flag = an.parents.containsKey(ref);
+                } else if(ref.rid == 0) {
+                    for(Refinement pRef: an.parents.keySet()) {
+                        if(pRef.rid < 0 && pRef.input == ref.input) {
+                            flag = true;
+                            break;
+                        }
+                    }
+                }
+                an.lock.releaseReadLock();
+                if (flag) return null;
+            }
         }
 
         SortedMap<Refinement, Node> parents = computeNextLevelParents(t, n, ref, discoverPatterns);
