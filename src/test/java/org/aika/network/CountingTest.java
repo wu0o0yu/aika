@@ -44,8 +44,8 @@ public class CountingTest {
         Document doc = Document.create("aaaaaaaaaa");
         Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron inA = t.createOrLookupInputSignal("inA");
-        Neuron outA = t.createAndNeuron(new Neuron("nA"), 0.5,
+        InputNeuron inA = m.createOrLookupInputSignal("inA");
+        Neuron outA = m.createAndNeuron(new Neuron("nA"), 0.5,
                 new Input()
                         .setMinInput(0.95)
                         .setWeight(100.0)

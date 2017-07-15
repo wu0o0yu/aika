@@ -44,21 +44,18 @@ public class RecurrentIdTest {
     @Test
     public void testABPattern() {
         Model m = new Model();
-        Document doc = Document.create("aaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
 
+        InputNeuron cl = m.createOrLookupInputSignal("Clock");
+        InputNeuron start = m.createOrLookupInputSignal("Start");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inB = m.createOrLookupInputSignal("B");
 
-        InputNeuron cl = t.createOrLookupInputSignal("Clock");
-        InputNeuron start = t.createOrLookupInputSignal("Start");
-        InputNeuron inA = t.createOrLookupInputSignal("A");
-        InputNeuron inB = t.createOrLookupInputSignal("B");
+        Neuron ctNeuron = m.createCounterNeuron(new Neuron("CTN"), cl, false, start, true, false);
 
-        Neuron ctNeuron = t.createCounterNeuron(new Neuron("CTN"), cl, false, start, true, false);
+        Neuron recA = m.createRelationalNeuron(new Neuron("SA"), ctNeuron, inA, false);
+        Neuron recB = m.createRelationalNeuron(new Neuron("SB"), ctNeuron, inB, false);
 
-        Neuron recA = t.createRelationalNeuron(new Neuron("SA"), ctNeuron, inA, false);
-        Neuron recB = t.createRelationalNeuron(new Neuron("SB"), ctNeuron, inB, false);
-
-        Node outCNode = t.createAndNeuron(new Neuron("C", true, true),
+        Node outCNode = m.createAndNeuron(new Neuron("C", true, true),
                 0.001,
                 new Input()
                         .setNeuron(recA)
@@ -73,6 +70,10 @@ public class RecurrentIdTest {
                         .setMinInput(1.0)
                         .setRelativeRid(1)
         ).node;
+
+
+        Document doc = Document.create("aaaaaaaaaa");
+        Iteration t = m.startIteration(doc, 0);
 
         InputNode outANode = TestHelper.addOutputNode(t, recA, 0, null);
         InputNode outBNode = TestHelper.addOutputNode(t, recB, 0, null);
@@ -92,22 +93,20 @@ public class RecurrentIdTest {
     @Test
     public void testABCPattern() {
         Model m = new Model();
-        Document doc = Document.create("aaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron cl = t.createOrLookupInputSignal("Clock");
-        InputNeuron start = t.createOrLookupInputSignal("Start");
-        InputNeuron inA = t.createOrLookupInputSignal("A");
-        InputNeuron inB = t.createOrLookupInputSignal("B");
-        InputNeuron inC = t.createOrLookupInputSignal("C");
+        InputNeuron cl = m.createOrLookupInputSignal("Clock");
+        InputNeuron start = m.createOrLookupInputSignal("Start");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inC = m.createOrLookupInputSignal("C");
 
-        Neuron ctNeuron = t.createCounterNeuron(new Neuron("CTN"), cl, false, start, true, false);
+        Neuron ctNeuron = m.createCounterNeuron(new Neuron("CTN"), cl, false, start, true, false);
 
-        Neuron recA = t.createRelationalNeuron(new Neuron("A"), ctNeuron, inA, false);
-        Neuron recB = t.createRelationalNeuron(new Neuron("B"), ctNeuron, inB, false);
-        Neuron recC = t.createRelationalNeuron(new Neuron("C"), ctNeuron, inC, false);
+        Neuron recA = m.createRelationalNeuron(new Neuron("A"), ctNeuron, inA, false);
+        Neuron recB = m.createRelationalNeuron(new Neuron("B"), ctNeuron, inB, false);
+        Neuron recC = m.createRelationalNeuron(new Neuron("C"), ctNeuron, inC, false);
 
-        Node outDNode = t.createAndNeuron(new Neuron("D", true, true),
+        Node outDNode = m.createAndNeuron(new Neuron("D", true, true),
                 0.001,
                 new Input()
                         .setNeuron(recA)
@@ -128,6 +127,9 @@ public class RecurrentIdTest {
                         .setMinInput(1.0)
                         .setRelativeRid(6)
         ).node;
+
+        Document doc = Document.create("aaaaaaaaaa");
+        Iteration t = m.startIteration(doc, 0);
 
         InputNode outANode = TestHelper.addOutputNode(t, recA, 0, null);
         InputNode outBNode = TestHelper.addOutputNode(t, recB, 0, null);
@@ -150,12 +152,10 @@ public class RecurrentIdTest {
     @Test
     public void testHuettenheim() {
         Model m = new Model();
-        Document doc = Document.create("abc Hüttenheim cba");
-        Iteration t = m.startIteration(doc, 0);
 
         HashMap<Character, InputNeuron> chars = new HashMap<>();
         for (char c = 'a'; c <= 'z'; c++) {
-            InputNeuron rec = t.createOrLookupInputSignal("IN-" + c);
+            InputNeuron rec = m.createOrLookupInputSignal("IN-" + c);
             chars.put(c, rec);
         }
 
@@ -179,9 +179,12 @@ public class RecurrentIdTest {
                 }
             }
 
-            Neuron n = t.createAndNeuron(new Neuron("PATTERN"), 0.5, inputs);
+            Neuron n = m.createAndNeuron(new Neuron("PATTERN"), 0.5, inputs);
 
             System.out.println(n.node.logicToString());
+
+            Document doc = Document.create("abc Hüttenheim cba");
+            Iteration t = m.startIteration(doc, 0);
 
             for (int i = 0; i < doc.length(); i++) {
                 char c = doc.getContent().toLowerCase().charAt(i);

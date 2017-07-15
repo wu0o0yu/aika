@@ -38,15 +38,14 @@ public class OptionalAndTest {
         Document doc1 = Document.create("Essen");
         Document doc2 = Document.create("essen");
 
-        Iteration t = m.startIteration(null, 0);
-        InputNeuron wordEssen = t.createOrLookupInputSignal("word:essen");
-        InputNeuron wordHamburg = t.createOrLookupInputSignal("word:hamburg");
-        InputNeuron wordGehen = t.createOrLookupInputSignal("word:gehen");
-        InputNeuron upperCase = t.createOrLookupInputSignal("upper case");
+        InputNeuron wordEssen = m.createOrLookupInputSignal("word:essen");
+        InputNeuron wordHamburg = m.createOrLookupInputSignal("word:hamburg");
+        InputNeuron wordGehen = m.createOrLookupInputSignal("word:gehen");
+        InputNeuron upperCase = m.createOrLookupInputSignal("upper case");
 
         Neuron suppr = new Neuron("SUPPRESS");
 
-        Neuron hintNoun = t.createOrNeuron(new Neuron("HINT-NOUN"),
+        Neuron hintNoun = m.createOrNeuron(new Neuron("HINT-NOUN"),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
@@ -60,7 +59,7 @@ public class OptionalAndTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
         );
-        Neuron hintVerb = t.createOrNeuron(new Neuron("HINT-VERB"),
+        Neuron hintVerb = m.createOrNeuron(new Neuron("HINT-VERB"),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
@@ -76,7 +75,7 @@ public class OptionalAndTest {
         );
 
 
-        Neuron noun = t.createAndNeuron(new Neuron("NOUN"),
+        Neuron noun = m.createAndNeuron(new Neuron("NOUN"),
                 0.001,
                 new Input()
                         .setOptional(false)
@@ -100,7 +99,7 @@ public class OptionalAndTest {
                         .setMinInput(1.0)
         );
 
-        Neuron verb = t.createAndNeuron(new Neuron("VERB"),
+        Neuron verb = m.createAndNeuron(new Neuron("VERB"),
                 0.001,
                 new Input()
                         .setOptional(false)
@@ -117,7 +116,7 @@ public class OptionalAndTest {
                         .setMinInput(1.0)
         );
 
-        t.createOrNeuron(suppr,
+        m.createOrNeuron(suppr,
                 new Input()
                         .setOptional(false)
                         .setNeuron(noun)
@@ -133,7 +132,7 @@ public class OptionalAndTest {
         );
 
         for(Document doc: new Document[] {doc1, doc2}) {
-            t = m.startIteration(doc, 0);
+            Iteration t = m.startIteration(doc, 0);
 
             String txt = doc.getContent();
             int begin = txt.toLowerCase().indexOf("essen");

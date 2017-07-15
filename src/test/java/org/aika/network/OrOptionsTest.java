@@ -41,18 +41,16 @@ public class OrOptionsTest {
     @Test
     public void testOrOptions() {
         Model m = new Model();
-        Document doc = Document.create("aaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
 
         AndNode.minFrequency = 5;
 
-        InputNeuron inA = t.createOrLookupInputSignal("A");
-        InputNeuron inB = t.createOrLookupInputSignal("B");
-        InputNeuron inC = t.createOrLookupInputSignal("C");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inC = m.createOrLookupInputSignal("C");
 
         Neuron pD = new Neuron("D");
 
-        t.createOrNeuron(pD,
+        m.createOrNeuron(pD,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -69,6 +67,9 @@ public class OrOptionsTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
         );
+
+        Document doc = Document.create("aaaaaaaaaa");
+        Iteration t = m.startIteration(doc, 0);
 
         Option o0 = Option.addPrimitive(doc);
         Range r = new Range(0, 10);

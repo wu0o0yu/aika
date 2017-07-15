@@ -44,12 +44,13 @@ public class RecurrentNodeTest {
         System.out.println("Start =====================");
         Model m = new Model();
         Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
+        InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
+        InputNeuron sn = m.createOrLookupInputSignal("START");
+
+        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
+
         Iteration t = m.startIteration(doc, 0);
-
-        InputNeuron cn = t.createOrLookupInputSignal("CLOCK");
-        InputNeuron sn = t.createOrLookupInputSignal("START");
-
-        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
 
         Option o0 = Option.addPrimitive(doc);
         Option o1 = Option.addPrimitive(doc);
@@ -101,11 +102,12 @@ public class RecurrentNodeTest {
     public void testE() {
         Model m = new Model();
         Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron cn = t.createOrLookupInputSignal("CLOCK");
-        InputNeuron sn = t.createOrLookupInputSignal("START");
-        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
+        InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
+        InputNeuron sn = m.createOrLookupInputSignal("START");
+        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
+
+        Iteration t = m.startIteration(doc, 0);
 
         t.propagate();
 
@@ -142,11 +144,12 @@ public class RecurrentNodeTest {
     public void testReverseDirection() {
         Model m = new Model();
         Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron cn = t.createOrLookupInputSignal("CLOCK");
-        InputNeuron sn = t.createOrLookupInputSignal("START");
-        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), cn, false, sn, false, true);
+        InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
+        InputNeuron sn = m.createOrLookupInputSignal("START");
+        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, false, true);
+
+        Iteration t = m.startIteration(doc, 0);
 
         Option o0 = Option.addPrimitive(doc);
         Option o1 = Option.addPrimitive(doc);
@@ -171,14 +174,15 @@ public class RecurrentNodeTest {
     public void testOutputNode() {
         Model m = new Model();
         Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
+        InputNeuron in = m.createOrLookupInputSignal("INPUT");
+        InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
+        InputNeuron sn = m.createOrLookupInputSignal("START");
+        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
+        Neuron on = m.createRelationalNeuron(new Neuron("ON"), ctn, in, false);
+
         Iteration t = m.startIteration(doc, 0);
 
-
-        InputNeuron in = t.createOrLookupInputSignal("INPUT");
-        InputNeuron cn = t.createOrLookupInputSignal("CLOCK");
-        InputNeuron sn = t.createOrLookupInputSignal("START");
-        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
-        Neuron on = t.createRelationalNeuron(new Neuron("ON"), ctn, in, false);
 
         Option o0 = Option.addPrimitive(doc);
         Option o1 = Option.addPrimitive(doc);
@@ -224,15 +228,17 @@ public class RecurrentNodeTest {
     public void testOutputNodeRD() {
         Model m = new Model();
         Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron in = t.createOrLookupInputSignal("INPUT"); //new InputNode(m, false);
-        InputNeuron cn = t.createOrLookupInputSignal("CLOCK"); //new ControlNode(m, Type.CLOCK, false);
+        InputNeuron in = m.createOrLookupInputSignal("INPUT"); //new InputNode(m, false);
+        InputNeuron cn = m.createOrLookupInputSignal("CLOCK"); //new ControlNode(m, Type.CLOCK, false);
         Neuron ctn = null; //new CycleNode(m, true, Integer.MAX_VALUE);
 //        m.clockTerminationNodes.add(ctn);
-        InputNeuron sn = t.createOrLookupInputSignal("START"); //new ControlNode(m, Type.START, false);
-        InputNeuron tn = t.createOrLookupInputSignal("TERMINATION"); //new ControlNode(m, Type.TERMINATION, false);
+        InputNeuron sn = m.createOrLookupInputSignal("START"); //new ControlNode(m, Type.START, false);
+        InputNeuron tn = m.createOrLookupInputSignal("TERMINATION"); //new ControlNode(m, Type.TERMINATION, false);
         Neuron on = null; //new OutputNode(m, false);
+
+
+        Iteration t = m.startIteration(doc, 0);
 /*
         on.direction = true;
 
@@ -295,15 +301,17 @@ public class RecurrentNodeTest {
         Model m = new Model();
 
         Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron in = t.createOrLookupInputSignal("INPUT"); //new InputNode(m, false);
-        InputNeuron cn = t.createOrLookupInputSignal("CLOCK"); //ControlNode(m, ControlNode.Type.CLOCK, false);
+        InputNeuron in = m.createOrLookupInputSignal("INPUT"); //new InputNode(m, false);
+        InputNeuron cn = m.createOrLookupInputSignal("CLOCK"); //ControlNode(m, ControlNode.Type.CLOCK, false);
         Neuron ctn = null; //new CycleNode(m, false, Integer.MAX_VALUE);
 //        m.clockTerminationNodes.add(ctn);
-        InputNeuron sn = t.createOrLookupInputSignal("START"); //ControlNode(m, Type.START, true);
-        InputNeuron tn = t.createOrLookupInputSignal("TERMINATION"); //new ControlNode(m, Type.TERMINATION, false);
+        InputNeuron sn = m.createOrLookupInputSignal("START"); //ControlNode(m, Type.START, true);
+        InputNeuron tn = m.createOrLookupInputSignal("TERMINATION"); //new ControlNode(m, Type.TERMINATION, false);
         Neuron on = null; //new OutputNode(m, false);
+
+
+        Iteration t = m.startIteration(doc, 0);
 /*
         in.outputNodes.put(ctn, on);
 
@@ -356,13 +364,14 @@ public class RecurrentNodeTest {
         Model m = new Model();
 
         Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron cn = t.createOrLookupInputSignal("CLOCK"); //new ControlNode(m, Type.CLOCK, false);
+        InputNeuron cn = m.createOrLookupInputSignal("CLOCK"); //new ControlNode(m, Type.CLOCK, false);
         Neuron ctn = null; //new CycleNode(m, false, Integer.MAX_VALUE);
 //        m.clockTerminationNodes.add(ctn);
-        InputNeuron sn = t.createOrLookupInputSignal("START"); //new ControlNode(m, Type.START, true);
-        InputNeuron tn = t.createOrLookupInputSignal("TERMINATION"); //new ControlNode(m, Type.TERMINATION, false);
+        InputNeuron sn = m.createOrLookupInputSignal("START"); //new ControlNode(m, Type.START, true);
+        InputNeuron tn = m.createOrLookupInputSignal("TERMINATION"); //new ControlNode(m, Type.TERMINATION, false);
+
+        Iteration t = m.startIteration(doc, 0);
 
 /*
         cn.ctNodes.put(sn, ctn);

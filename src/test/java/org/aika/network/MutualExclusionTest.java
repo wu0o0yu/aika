@@ -63,15 +63,15 @@ public class MutualExclusionTest {
         Iteration t = m.startIteration(doc, 0);
 
         // Create the input neurons for the network.
-        InputNeuron inA = t.createOrLookupInputSignal("IN-A");
-        InputNeuron inB = t.createOrLookupInputSignal("IN-B");
-        InputNeuron inC = t.createOrLookupInputSignal("IN-C");
+        InputNeuron inA = m.createOrLookupInputSignal("IN-A");
+        InputNeuron inB = m.createOrLookupInputSignal("IN-B");
+        InputNeuron inC = m.createOrLookupInputSignal("IN-C");
 
         // Instantiate the suppressing neuron. Its inputs will be added later on.
         Neuron pSuppr = new Neuron("SUPPRESS");
 
         // Create three neurons that might be suppressed by the suppressing neuron.
-        Neuron pA = t.createAndNeuron(
+        Neuron pA = m.createAndNeuron(
                 new Neuron("A"),
                 0.001,
                 new Input()
@@ -87,7 +87,7 @@ public class MutualExclusionTest {
                         .setMinInput(1.0)     // This input is negated
         );
 
-        Neuron pB = t.createAndNeuron(
+        Neuron pB = m.createAndNeuron(
                 new Neuron("B"),
                 0.001,
                 new Input()
@@ -103,7 +103,7 @@ public class MutualExclusionTest {
                         .setMinInput(1.0)
         );
 
-        Neuron pC = t.createAndNeuron(
+        Neuron pC = m.createAndNeuron(
                 new Neuron("C"),
                 0.001,
                 new Input()
@@ -120,7 +120,7 @@ public class MutualExclusionTest {
         );
 
         // Finally addInput all the inputs to the suppressing neuron.
-        t.createOrNeuron(
+        m.createOrNeuron(
                 pSuppr,
                 new Input()
                         .setNeuron(pA)
@@ -139,7 +139,7 @@ public class MutualExclusionTest {
                         .setMinInput(1.0)
         );
 
-        Neuron outN = t.createOrNeuron(new Neuron("OUT"),
+        Neuron outN = m.createOrNeuron(new Neuron("OUT"),
                 new Input()
                         .setNeuron(pB)
                         .setWeight(1.0)

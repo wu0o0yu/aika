@@ -35,11 +35,11 @@ public class SimpleWeightsTest {
         Model m = new Model();
 
         Iteration t = m.startIteration(null, 0);
-        InputNeuron inA = t.createOrLookupInputSignal("A");
-        InputNeuron inB = t.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inB = m.createOrLookupInputSignal("B");
 
         Neuron pC = new Neuron("C");
-        t.createOrNeuron(pC,
+        m.createOrNeuron(pC,
                 new Input()
                         .setOptional(false)
                         .setNeuron(inA)
@@ -89,11 +89,11 @@ public class SimpleWeightsTest {
         Model m = new Model();
 
         Iteration t = m.startIteration(null, 0);
-        InputNeuron inA = t.createOrLookupInputSignal("A");
-        InputNeuron inB = t.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inB = m.createOrLookupInputSignal("B");
 
         Neuron pC = new Neuron("C");
-        t.createAndNeuron(pC,
+        m.createAndNeuron(pC,
                 0.001,
                 new Input()
                         .setNeuron(inA)

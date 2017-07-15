@@ -56,10 +56,10 @@ public class ActivationOutputsTest {
 
         m.numberOfPositions = 10;
 
-        InputNeuron inA = t.createOrLookupInputSignal("A");
-        InputNeuron inB = t.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inB = m.createOrLookupInputSignal("B");
 
-        Neuron pAB = t.createAndNeuron(new Neuron("pAB"),
+        Neuron pAB = m.createAndNeuron(new Neuron("pAB"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -142,10 +142,10 @@ public class ActivationOutputsTest {
 
         Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron inA = t.createOrLookupInputSignal("A");
-        InputNeuron inB = t.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inB = m.createOrLookupInputSignal("B");
 
-        Neuron pAB = t.createAndNeuron(new Neuron("B-NA", true, false),
+        Neuron pAB = m.createAndNeuron(new Neuron("B-NA", true, false),
                 0.5,
                 new Input()
                         .setNeuron(inA)
@@ -182,9 +182,9 @@ public class ActivationOutputsTest {
 
         Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron inA = t.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
 
-        Node outBNode = t.createAndNeuron(new Neuron("B", true, false), 0.001,
+        Node outBNode = m.createAndNeuron(new Neuron("B", true, false), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -209,9 +209,9 @@ public class ActivationOutputsTest {
 
         Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron inA = t.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
 
-        Node outBNode = t.createAndNeuron(new Neuron("B", true, false), 0.001,
+        Node outBNode = m.createAndNeuron(new Neuron("B", true, false), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -236,9 +236,9 @@ public class ActivationOutputsTest {
 
         Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron inA = t.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
 
-        OrNode outBNode = (OrNode) t.createAndNeuron(new Neuron("B", true, false), 0.001,
+        OrNode outBNode = (OrNode) m.createAndNeuron(new Neuron("B", true, false), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)

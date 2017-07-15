@@ -42,14 +42,14 @@ public class EntityResolutionTest {
         Document doc = new Document("jaguar puma ");
         Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron wJaguar = t.createOrLookupInputSignal("W-Jaguar");
-        InputNeuron wPuma = t.createOrLookupInputSignal("W-Puma");
+        InputNeuron wJaguar = m.createOrLookupInputSignal("W-Jaguar");
+        InputNeuron wPuma = m.createOrLookupInputSignal("W-Puma");
 
         Neuron eJaguar = new Neuron("E-Jaguar");
         Neuron ePuma = new Neuron("E-Puma");
 
 
-        t.createAndNeuron(eJaguar, 0.9,
+        m.createAndNeuron(eJaguar, 0.9,
                 new Input()
                         .setNeuron(wJaguar)
                         .setMatchRange(true)
@@ -66,7 +66,7 @@ public class EntityResolutionTest {
                         .setEndVisibility(Synapse.RangeVisibility.NONE)
         );
 
-        t.createAndNeuron(ePuma, 0.9,
+        m.createAndNeuron(ePuma, 0.9,
                 new Input()
                         .setNeuron(wPuma)
                         .setMatchRange(true)
@@ -121,9 +121,9 @@ public class EntityResolutionTest {
         Document doc = new Document("jaguar puma ");
         Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron wJaguar = t.createOrLookupInputSignal("W-Jaguar");
-        InputNeuron wPuma = t.createOrLookupInputSignal("W-Puma");
-        InputNeuron wLeopard = t.createOrLookupInputSignal("W-Leopard");
+        InputNeuron wJaguar = m.createOrLookupInputSignal("W-Jaguar");
+        InputNeuron wPuma = m.createOrLookupInputSignal("W-Puma");
+        InputNeuron wLeopard = m.createOrLookupInputSignal("W-Leopard");
 
         Neuron eJaguar = new Neuron("E-Jaguar");
         Neuron ePuma = new Neuron("E-Puma");
@@ -134,7 +134,7 @@ public class EntityResolutionTest {
         Neuron chKatzenOhnePuma = new Neuron("CH-Katzen/Puma");
         Neuron chKatzenOhneLeopard = new Neuron("CH-Katzen/Leopard");
 
-        t.createAndNeuron(eJaguar, 0.9,
+        m.createAndNeuron(eJaguar, 0.9,
                 new Input()
                         .setNeuron(wJaguar)
                         .setMatchRange(true)
@@ -151,7 +151,7 @@ public class EntityResolutionTest {
                         .setEndVisibility(Synapse.RangeVisibility.NONE)
         );
 
-        t.createAndNeuron(ePuma, 0.9,
+        m.createAndNeuron(ePuma, 0.9,
                 new Input()
                         .setNeuron(wPuma)
                         .setMatchRange(true)
@@ -169,7 +169,7 @@ public class EntityResolutionTest {
         );
 
 
-        t.createAndNeuron(eLeopard, 0.9,
+        m.createAndNeuron(eLeopard, 0.9,
                 new Input()
                         .setNeuron(wLeopard)
                         .setMatchRange(true)
@@ -186,7 +186,7 @@ public class EntityResolutionTest {
                         .setEndVisibility(Synapse.RangeVisibility.NONE)
         );
 
-        t.createOrNeuron(cKatzen,
+        m.createOrNeuron(cKatzen,
                 new Input()
                         .setNeuron(eJaguar)
                         .setWeight(10.0)
@@ -201,7 +201,7 @@ public class EntityResolutionTest {
                         .setRecurrent(false)
         );
 
-        t.createAndNeuron(chKatzenOhneJaguar, 0.5,
+        m.createAndNeuron(chKatzenOhneJaguar, 0.5,
                 new Input()
                         .setNeuron(cKatzen)
                         .setWeight(10.0)
@@ -224,7 +224,7 @@ public class EntityResolutionTest {
                         .setMatchRange(true)
         );
 
-        t.createAndNeuron(chKatzenOhnePuma, 0.5,
+        m.createAndNeuron(chKatzenOhnePuma, 0.5,
                 new Input()
                         .setNeuron(cKatzen)
                         .setWeight(10.0)
@@ -247,7 +247,7 @@ public class EntityResolutionTest {
                         .setMatchRange(true)
         );
 
-        t.createAndNeuron(chKatzenOhneLeopard, 0.5,
+        m.createAndNeuron(chKatzenOhneLeopard, 0.5,
                 new Input()
                         .setNeuron(cKatzen)
                         .setWeight(10.0)

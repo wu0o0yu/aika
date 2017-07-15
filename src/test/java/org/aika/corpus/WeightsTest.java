@@ -46,17 +46,16 @@ public class WeightsTest {
     @Test
     public void testAndWithMultipleIO() {
         Model m = new Model();
-        Iteration t = m.startIteration(null, 0);
         AndNode.minFrequency = 5;
 
         Neuron pSuppr = new Neuron("SUPPR");
 
-        inAA = t.createOrLookupInputSignal("AA");
-        inBA = t.createOrLookupInputSignal("BA");
-        inCA = t.createOrLookupInputSignal("CA");
+        inAA = m.createOrLookupInputSignal("AA");
+        inBA = m.createOrLookupInputSignal("BA");
+        inCA = m.createOrLookupInputSignal("CA");
 
         Neuron pOrA = new Neuron("pOrA");
-        t.createOrNeuron(pOrA,
+        m.createOrNeuron(pOrA,
                 new Input()
                         .setNeuron(inAA)
                         .setWeight(3.0)
@@ -71,7 +70,7 @@ public class WeightsTest {
 
         pDA = new Neuron("DA");
 
-        t.createAndNeuron(pDA,
+        m.createAndNeuron(pDA,
                 0.001,
                 new Input()
                         .setNeuron(pOrA)
@@ -92,12 +91,12 @@ public class WeightsTest {
         );
 
 
-        inAB = t.createOrLookupInputSignal("AB");
-        inBB = t.createOrLookupInputSignal("BB");
-        inCB = t.createOrLookupInputSignal("CB");
+        inAB = m.createOrLookupInputSignal("AB");
+        inBB = m.createOrLookupInputSignal("BB");
+        inCB = m.createOrLookupInputSignal("CB");
 
         Neuron pOrB = new Neuron("pOrB");
-        t.createOrNeuron(pOrB,
+        m.createOrNeuron(pOrB,
                 new Input()
                         .setNeuron(inAB)
                         .setWeight(2.0)
@@ -111,7 +110,7 @@ public class WeightsTest {
         );
 
         pDB = new Neuron("DB");
-        t.createAndNeuron(pDB,
+        m.createAndNeuron(pDB,
                 0.001,
                 new Input()
                         .setNeuron(pOrB)
@@ -131,7 +130,7 @@ public class WeightsTest {
         );
 
 
-        t.createOrNeuron(pSuppr,
+        m.createOrNeuron(pSuppr,
                 new Input()
                         .setNeuron(pDA)
                         .setWeight(1.0)

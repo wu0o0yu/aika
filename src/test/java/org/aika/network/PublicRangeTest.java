@@ -45,14 +45,13 @@ public class PublicRangeTest {
         Model m = new Model();
         AndNode.minFrequency = 5;
 
-        Iteration t = m.startIteration(null, 0);
-        InputNeuron inA = t.createOrLookupInputSignal("A");
-        InputNeuron inB = t.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inB = m.createOrLookupInputSignal("B");
 
         Neuron pC = new Neuron("C");
         Neuron pD = new Neuron("D");
 
-        t.createAndNeuron(pC,
+        m.createAndNeuron(pC,
                 0.001,
                 new Input().setNeuron(inA)
                         .setWeight(1.0)
@@ -74,7 +73,7 @@ public class PublicRangeTest {
         );
         OrNode pCNode = (OrNode) pC.node;
 
-        t.createAndNeuron(pD,
+        m.createAndNeuron(pD,
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -95,7 +94,7 @@ public class PublicRangeTest {
 
         {
             Document doc = Document.create("aaaaaaaaaa");
-            t = m.startIteration(doc, 0);
+            Iteration t = m.startIteration(doc, 0);
 
             inA.addInput(t, 2, 8, 0);
             inB.addInput(t, 4, 6, 0);
@@ -107,7 +106,7 @@ public class PublicRangeTest {
         }
         {
             Document doc = Document.create("aaaaaaaaaa");
-            t = m.startIteration(doc, 0);
+            Iteration t = m.startIteration(doc, 0);
 
             inB.addInput(t, 4, 6);
             inA.addInput(t, 2, 8);

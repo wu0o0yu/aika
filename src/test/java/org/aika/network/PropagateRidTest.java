@@ -43,8 +43,8 @@ public class PropagateRidTest {
         Document doc = Document.create("aaaaaaaaaa");
         Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron inA = t.createOrLookupInputSignal("A");
-        Neuron pA = t.createAndNeuron(new Neuron("pA"),
+        InputNeuron inA = m.createOrLookupInputSignal("A");
+        Neuron pA = m.createAndNeuron(new Neuron("pA"),
                 0.001,
                 new Input()
                         .setNeuron(inA)

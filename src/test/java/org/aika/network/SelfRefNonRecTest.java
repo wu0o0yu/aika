@@ -37,20 +37,18 @@ public class SelfRefNonRecTest {
     public void testSelfReferencingNonRecurrentSynapses() {
 
         Model m = new Model();
-        Document doc = new Document("aaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron inA = t.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
 
         Neuron bN = new Neuron("B");
-        Neuron cN = t.createOrNeuron(new Neuron("C"),
+        Neuron cN = m.createOrNeuron(new Neuron("C"),
                 new Input()
                         .setNeuron(bN)
                         .setWeight(5.0)
                         .setMaxLowerWeightsSum(0.0)
         );
 
-        t.createOrNeuron(bN,
+        m.createOrNeuron(bN,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(5.0)
@@ -60,6 +58,11 @@ public class SelfRefNonRecTest {
                         .setWeight(5.0)
                         .setMaxLowerWeightsSum(0.0)
         );
+
+
+        Document doc = new Document("aaaaaaaaaa");
+        Iteration t = m.startIteration(doc, 0);
+
 
         Iteration.APPLY_DEBUG_OUTPUT = true;
 

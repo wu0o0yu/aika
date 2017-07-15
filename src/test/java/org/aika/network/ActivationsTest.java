@@ -45,20 +45,23 @@ public class ActivationsTest {
     public void addActivationsTest() {
         Model m = new Model();
         AndNode.minFrequency = 1;
-        Document doc = Document.create("aaaaaaaaaa");
 
-        Iteration t = m.startIteration(doc, 0);
+        InputNeuron inA = m.createOrLookupInputSignal("A");
 
-        InputNeuron inA = t.createOrLookupInputSignal("A");
-
-        t.createAndNeuron(new Neuron("pA"), 0.001,
+        m.createAndNeuron(new Neuron("pA"), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
         );
+
+        Document doc = Document.create("aaaaaaaaaa");
+
+        Iteration t = m.startIteration(doc, 0);
+
         InputNode pANode = TestHelper.addOutputNode(t, inA, null, 0, true, Synapse.RangeSignal.START, Synapse.RangeVisibility.MATCH_INPUT, Synapse.RangeSignal.END, Synapse.RangeVisibility.MATCH_INPUT);
+
 
         inA.addInput(t, 0, 1, 0);
         inA.addInput(t, 2, 3, 0);
@@ -73,9 +76,9 @@ public class ActivationsTest {
         Assert.assertEquals(Activation.get(t, pANode, null, new Range(1, 2), Range.Relation.EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(t, pANode, new Range(1, 2), doc.bottom));
         Assert.assertEquals(Activation.get(t, pANode, null, new Range(2, 3), Range.Relation.EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(t, pANode, new Range(2, 3), doc.bottom));
 
-        InputNeuron inB = t.createOrLookupInputSignal("B");
+        InputNeuron inB = m.createOrLookupInputSignal("B");
 
-        t.createAndNeuron(new Neuron("pB"), 0.001,
+        m.createAndNeuron(new Neuron("pB"), 0.001,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0)
@@ -99,10 +102,11 @@ public class ActivationsTest {
         AndNode.minFrequency = 1;
         Document doc = Document.create("aaaaaaaaaa");
 
-        Iteration t = m.startIteration(doc, 0);
 
-        Neuron in = t.createOrLookupInputSignal("A");
+        Neuron in = m.createOrLookupInputSignal("A");
         InputNode inNode = (InputNode) in.node;
+
+        Iteration t = m.startIteration(doc, 0);
 
         inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 

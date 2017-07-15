@@ -42,28 +42,26 @@ public class RecurrentPatternTest {
         String txt = "A B C D E F G H.";
 
         Model m = new Model();
-        Document doc = new Document(txt);
-        Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron startSignal = t.createOrLookupInputSignal("START-SIGNAL");
-        InputNeuron spaceN = t.createOrLookupInputSignal("SPACE");
+        InputNeuron startSignal = m.createOrLookupInputSignal("START-SIGNAL");
+        InputNeuron spaceN = m.createOrLookupInputSignal("SPACE");
 
 
         TreeMap<Character, InputNeuron> chars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
-            InputNeuron charSN = t.createOrLookupInputSignal("" + c);
+            InputNeuron charSN = m.createOrLookupInputSignal("" + c);
             chars.put(c, charSN);
         }
 
-        Neuron ctNeuron = t.createCounterNeuron(new Neuron("CTN"), spaceN, false, startSignal, true, false);
+        Neuron ctNeuron = m.createCounterNeuron(new Neuron("CTN"), spaceN, false, startSignal, true, false);
 
         TreeMap<Character, Neuron> recChars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
             InputNeuron charSN = chars.get(c);
-            recChars.put(c, t.createRelationalNeuron(new Neuron("RN-" + c), ctNeuron, charSN, false));
+            recChars.put(c, m.createRelationalNeuron(new Neuron("RN-" + c), ctNeuron, charSN, false));
         }
 
-        Neuron patternN = t.createAndNeuron(new Neuron("PATTERN"),
+        Neuron patternN = m.createAndNeuron(new Neuron("PATTERN"),
                 0.001,
                 new Input()
                         .setNeuron(recChars.get('C'))
@@ -95,6 +93,8 @@ public class RecurrentPatternTest {
                         .setMatchRange(false)
         );
 
+        Document doc = new Document(txt);
+        Iteration t = m.startIteration(doc, 0);
 
         startSignal.addInput(t, 0, 1, 0);
         for(int i = 0; i < doc.length(); i++) {
@@ -135,29 +135,27 @@ public class RecurrentPatternTest {
         String txt = "A B C D E F G H.";
 
         Model m = new Model();
-        Document doc = new Document(txt);
-        Iteration t = m.startIteration(doc, 0);
 
-        InputNeuron startSignal = t.createOrLookupInputSignal("START-SIGNAL");
-        InputNeuron spaceN = t.createOrLookupInputSignal("SPACE");
+        InputNeuron startSignal = m.createOrLookupInputSignal("START-SIGNAL");
+        InputNeuron spaceN = m.createOrLookupInputSignal("SPACE");
 
         TreeMap<Character, InputNeuron> chars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
-            InputNeuron charSN = t.createOrLookupInputSignal("" + c);
+            InputNeuron charSN = m.createOrLookupInputSignal("" + c);
             chars.put(c, charSN);
         }
 
         Neuron ctNeuron = new Neuron("CTN");
 
-        t.createCounterNeuron(ctNeuron, spaceN, false, startSignal, true, false);
+        m.createCounterNeuron(ctNeuron, spaceN, false, startSignal, true, false);
 
         TreeMap<Character, Neuron> recChars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
             InputNeuron charSN = chars.get(c);
-            recChars.put(c, t.createRelationalNeuron(new Neuron("RN-" + c), ctNeuron, charSN, false));
+            recChars.put(c, m.createRelationalNeuron(new Neuron("RN-" + c), ctNeuron, charSN, false));
         }
 
-        Neuron patternN = t.createAndNeuron(new Neuron("PATTERN"),
+        Neuron patternN = m.createAndNeuron(new Neuron("PATTERN"),
                 0.001,
                 new Input()
                         .setNeuron(recChars.get('C'))
@@ -189,6 +187,9 @@ public class RecurrentPatternTest {
                         .setMatchRange(false)
         );
 
+
+        Document doc = new Document(txt);
+        Iteration t = m.startIteration(doc, 0);
 
         startSignal.addInput(t, 0, 1, 0);
         for(int i = 0; i < doc.length(); i++) {
@@ -222,20 +223,19 @@ public class RecurrentPatternTest {
     @Test
     public void testAndWithRid() {
         Model m = new Model();
-        Iteration t = m.startIteration(null, 0);
 
-        InputNeuron start = t.createOrLookupInputSignal("START");
-        InputNeuron clock = t.createOrLookupInputSignal("CLOCK");
-        InputNeuron input = t.createOrLookupInputSignal("INPUT");
+        InputNeuron start = m.createOrLookupInputSignal("START");
+        InputNeuron clock = m.createOrLookupInputSignal("CLOCK");
+        InputNeuron input = m.createOrLookupInputSignal("INPUT");
 
-        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), clock, false, start, true, false);
-        Neuron rn = t.createRelationalNeuron(new Neuron("RN"), ctn, input, false);
+        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), clock, false, start, true, false);
+        Neuron rn = m.createRelationalNeuron(new Neuron("RN"), ctn, input, false);
 
-        InputNeuron aN = t.createOrLookupInputSignal("A");
-        InputNeuron bN = t.createOrLookupInputSignal("B");
-        InputNeuron cN = t.createOrLookupInputSignal("C");
+        InputNeuron aN = m.createOrLookupInputSignal("A");
+        InputNeuron bN = m.createOrLookupInputSignal("B");
+        InputNeuron cN = m.createOrLookupInputSignal("C");
 
-        Neuron result = t.createAndNeuron(new Neuron("RESULT"),
+        Neuron result = m.createAndNeuron(new Neuron("RESULT"),
                 0.001,
                 new Input()
                         .setNeuron(ctn)
@@ -261,14 +261,15 @@ public class RecurrentPatternTest {
     @Test
     public void testCTNeuron() {
         Model m = new Model();
+
+        InputNeuron start = m.createOrLookupInputSignal("START");
+        InputNeuron clock = m.createOrLookupInputSignal("CLOCK");
+
+        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), clock, false, start, true, false);
+
+
         Document doc = Document.create("                                                  ");
         Iteration t = m.startIteration(doc, 0);
-
-        InputNeuron start = t.createOrLookupInputSignal("START");
-        InputNeuron clock = t.createOrLookupInputSignal("CLOCK");
-
-        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), clock, false, start, true, false);
-
 
         for(int i = 5; i < 30; i += 5) {
             clock.addInput(t, i - 1, i);

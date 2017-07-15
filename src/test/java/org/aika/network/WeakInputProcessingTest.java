@@ -38,18 +38,17 @@ public class WeakInputProcessingTest {
         Model m = new Model();
 
         Document doc = Document.create("a ");
-        Iteration t = m.startIteration(doc, 0);
 
 
-        InputNeuron strongInput = t.createOrLookupInputSignal("Strong Input");
+        InputNeuron strongInput = m.createOrLookupInputSignal("Strong Input");
 
-        InputNeuron weakInputA = t.createOrLookupInputSignal("Weak Input A");
-        InputNeuron weakInputB = t.createOrLookupInputSignal("Weak Input B");
-        InputNeuron weakInputC = t.createOrLookupInputSignal("Weak Input C");
+        InputNeuron weakInputA = m.createOrLookupInputSignal("Weak Input A");
+        InputNeuron weakInputB = m.createOrLookupInputSignal("Weak Input B");
+        InputNeuron weakInputC = m.createOrLookupInputSignal("Weak Input C");
 
         Neuron suppr = new Neuron("suppr");
 
-        Neuron patternA = t.createAndNeuron(
+        Neuron patternA = m.createAndNeuron(
                 new Neuron("Pattern A"),
                 0.4,
                 new Input()
@@ -73,7 +72,7 @@ public class WeakInputProcessingTest {
                         .setMatchRange(false)
         );
 
-        Neuron patternB = t.createAndNeuron(
+        Neuron patternB = m.createAndNeuron(
                 new Neuron("Pattern B"),
                 0.4,
                 new Input()
@@ -97,7 +96,7 @@ public class WeakInputProcessingTest {
                         .setMatchRange(false)
         );
 
-        Neuron patternC = t.createAndNeuron(
+        Neuron patternC = m.createAndNeuron(
                 new Neuron("Pattern C"),
                 0.4,
                 new Input()
@@ -122,7 +121,7 @@ public class WeakInputProcessingTest {
         );
 
 
-        t.createOrNeuron(suppr,
+        m.createOrNeuron(suppr,
                 new Input()
                         .setNeuron(patternA)
                         .setWeight(10.0)
@@ -139,6 +138,8 @@ public class WeakInputProcessingTest {
                         .setRecurrent(false)
                         .setMatchRange(false)
         );
+
+        Iteration t = m.startIteration(doc, 0);
 
         strongInput.addInput(t,0,1);
 

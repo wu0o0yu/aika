@@ -49,12 +49,12 @@ public class OverlappingOrTest {
         Map<Character, Neuron> relNeurons = new HashMap<>();
 
         // The space neuron will be used as clock signal for the recurrent neurons.
-        InputNeuron inSpace = t.createOrLookupInputSignal("SPACE");
+        InputNeuron inSpace = m.createOrLookupInputSignal("SPACE");
         inputNeurons.put(' ', inSpace);
 
-        InputNeuron startSignal = t.createOrLookupInputSignal("START-SIGNAL");
+        InputNeuron startSignal = m.createOrLookupInputSignal("START-SIGNAL");
 
-        Neuron ctNeuron = t.createCounterNeuron(new Neuron("CTN"),
+        Neuron ctNeuron = m.createCounterNeuron(new Neuron("CTN"),
                 inSpace, false,
                 startSignal, true,
                 false
@@ -62,8 +62,8 @@ public class OverlappingOrTest {
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            InputNeuron in = t.createOrLookupInputSignal(c + "");
-            Neuron rn = t.createRelationalNeuron(
+            InputNeuron in = m.createOrLookupInputSignal(c + "");
+            Neuron rn = m.createRelationalNeuron(
                     new Neuron(c + "-RN"),
                     ctNeuron,
                     in, false
@@ -77,7 +77,7 @@ public class OverlappingOrTest {
         // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
         // of the inputs relative to each other. The following flag specifies whether this relativeRid is
         // relative or absolute.
-        Neuron pattern = t.createAndNeuron(
+        Neuron pattern = m.createAndNeuron(
                 new Neuron("BCD"),
                 0.4,
                 new Input()

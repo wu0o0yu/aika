@@ -39,12 +39,11 @@ public class ConcurrencyTest {
         Model m = new Model(8);
         AndNode.minFrequency = 1;
 
-        Iteration t = m.startIteration(null, 0);
 
-        InputNeuron inA = t.createOrLookupInputSignal("A");
-        InputNeuron inB = t.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inB = m.createOrLookupInputSignal("B");
 
-        Neuron pC = t.createAndNeuron(new Neuron("pC"),
+        Neuron pC = m.createAndNeuron(new Neuron("pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -61,11 +60,11 @@ public class ConcurrencyTest {
         );
 
 
-        InputNeuron inStart = t.createOrLookupInputSignal("START");
-        InputNeuron inClock = t.createOrLookupInputSignal("CLOCK");
+        InputNeuron inStart = m.createOrLookupInputSignal("START");
+        InputNeuron inClock = m.createOrLookupInputSignal("CLOCK");
 
 
-        Neuron ctn = t.createCounterNeuron(new Neuron("CTN"), inClock, false, inStart, true, false);
+        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), inClock, false, inStart, true, false);
 
 
         Document doc0 = Document.create("aaaaaaaaaa");
@@ -128,12 +127,10 @@ public class ConcurrencyTest {
         final Model m = new Model();
         AndNode.minFrequency = 1;
 
-        Iteration t = m.startIteration(null, 0);
+        final InputNeuron inA = m.createOrLookupInputSignal("A");
+        final InputNeuron inB = m.createOrLookupInputSignal("B");
 
-        final InputNeuron inA = t.createOrLookupInputSignal("A");
-        final InputNeuron inB = t.createOrLookupInputSignal("B");
-
-        final Neuron pC = t.createAndNeuron(new Neuron("pC"),
+        final Neuron pC = m.createAndNeuron(new Neuron("pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)

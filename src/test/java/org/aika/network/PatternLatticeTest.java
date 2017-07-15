@@ -41,14 +41,13 @@ public class PatternLatticeTest {
     @Test
     public void testPredefinedPatterns() {
         Model m = new Model();
-        Iteration t = m.startIteration(null, 0);
-        InputNeuron inA = t.createOrLookupInputSignal("A");
-        InputNeuron inB = t.createOrLookupInputSignal("B");
-        InputNeuron inC = t.createOrLookupInputSignal("C");
-        InputNeuron inD = t.createOrLookupInputSignal("D");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inC = m.createOrLookupInputSignal("C");
+        InputNeuron inD = m.createOrLookupInputSignal("D");
 
         {
-            t.createAndNeuron(new Neuron("ABC"),
+            m.createAndNeuron(new Neuron("ABC"),
                     0.001,
                     new Input()
                             .setNeuron(inA)
@@ -66,6 +65,9 @@ public class PatternLatticeTest {
                             .setRecurrent(false)
                             .setMinInput(1.0)
             );
+
+            Iteration t = m.startIteration(null, 0);
+
 
             InputNode pA = TestHelper.addOutputNode(t, inA, null, null);
             InputNode pB = TestHelper.addOutputNode(t, inB, null, null);
@@ -94,7 +96,7 @@ public class PatternLatticeTest {
             Assert.assertEquals(pBC, pABC.parents.get(new Refinement(null, TestHelper.addOutputNode(t, inA, null, null))));
         }
         {
-            t.createAndNeuron(new Neuron("BCD"),
+            m.createAndNeuron(new Neuron("BCD"),
                     0.001,
                     new Input()
                             .setNeuron(inB)
@@ -112,6 +114,8 @@ public class PatternLatticeTest {
                             .setRecurrent(false)
                             .setMinInput(1.0)
             );
+
+            Iteration t = m.startIteration(null, 0);
 
             InputNode pA = TestHelper.addOutputNode(t, inA, null, null);
             InputNode pB = TestHelper.addOutputNode(t, inB, null, null);
@@ -150,7 +154,7 @@ public class PatternLatticeTest {
             Assert.assertEquals(pCD, pBCD.parents.get(new Refinement(null, TestHelper.addOutputNode(t, inB, null, null))));
         }
         {
-            t.createAndNeuron(new Neuron("ABCD"),
+            m.createAndNeuron(new Neuron("ABCD"),
                     0.001,
                     new Input()
                             .setNeuron(inA)
@@ -173,6 +177,8 @@ public class PatternLatticeTest {
                             .setRecurrent(false)
                             .setMinInput(1.0)
             );
+
+            Iteration t = m.startIteration(null, 0);
 
             InputNode pA = TestHelper.addOutputNode(t, inA, null, null);
             InputNode pB = TestHelper.addOutputNode(t, inB, null, null);
@@ -233,14 +239,16 @@ public class PatternLatticeTest {
         AndNode.minFrequency = 1;
         m.numberOfPositions = 100;
 
+
+        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inC = m.createOrLookupInputSignal("C");
+        InputNeuron inD = m.createOrLookupInputSignal("D");
+
+
         Document doc = Document.create("aaaaaaaaaa");
 
         Iteration t = m.startIteration(doc, 0);
-
-        InputNeuron inA = t.createOrLookupInputSignal("A");
-        InputNeuron inB = t.createOrLookupInputSignal("B");
-        InputNeuron inC = t.createOrLookupInputSignal("C");
-        InputNeuron inD = t.createOrLookupInputSignal("D");
 
 
         InputNode pANode = TestHelper.addOutputNode(t, inA, 0, null);
@@ -627,27 +635,28 @@ public class PatternLatticeTest {
     @Test
     public void testMultipleActivation() {
         Model m = new Model();
-        Document doc = Document.create("aaaaaaaaaa");
-
-        Iteration t = m.startIteration(doc, 0);
-
         AndNode.minFrequency = 10;
 
-        InputNeuron inA = t.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputSignal("A");
         Node inANode = inA.node;
 
-        InputNeuron inB = t.createOrLookupInputSignal("B");
+        InputNeuron inB = m.createOrLookupInputSignal("B");
         Node inBNode = inB.node;
 
-        InputNeuron inC = t.createOrLookupInputSignal("C");
+        InputNeuron inC = m.createOrLookupInputSignal("C");
         Node inCNode = inC.node;
 
-        t.createAndNeuron(new Neuron("ABC"),
+        m.createAndNeuron(new Neuron("ABC"),
                 0.001,
                 new Input().setNeuron(inA).setWeight(1.0).setRecurrent(false).setMinInput(1.0),
                 new Input().setNeuron(inB).setWeight(1.0).setRecurrent(false).setMinInput(1.0),
                 new Input().setNeuron(inC).setWeight(1.0).setRecurrent(false).setMinInput(1.0)
         );
+
+        Document doc = Document.create("aaaaaaaaaa");
+
+        Iteration t = m.startIteration(doc, 0);
+
 
         InputNode pANode = TestHelper.addOutputNode(t, inA, null, null);
         InputNode pBNode = TestHelper.addOutputNode(t, inB, null, null);

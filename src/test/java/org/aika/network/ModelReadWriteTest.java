@@ -52,17 +52,13 @@ public class ModelReadWriteTest {
         {
             Model m = new Model();
 
-            // Now, feed the inputs into the network.
-            Iteration t = m.startIteration(null, 0);
-
-
             // The space neuron will be used as clock signal for the recurrent neurons.
-            InputNeuron inSpace = t.createOrLookupInputSignal("SPACE");
+            InputNeuron inSpace = m.createOrLookupInputSignal("SPACE");
             inputNeurons.put(' ', inSpace.id);
 
-            startSignal = t.createOrLookupInputSignal("START-SIGNAL").id;
+            startSignal = m.createOrLookupInputSignal("START-SIGNAL").id;
 
-            Neuron ctNeuron = t.createCounterNeuron(new Neuron("CTN"),
+            Neuron ctNeuron = m.createCounterNeuron(new Neuron("CTN"),
                     inSpace, false,
                     m.neurons.get(startSignal), true,
                     false
@@ -70,8 +66,8 @@ public class ModelReadWriteTest {
 
             // Create an input neuron and a recurrent neuron for every letter in this example.
             for (char c : new char[]{'a', 'b', 'c', 'd', 'e'}) {
-                InputNeuron in = t.createOrLookupInputSignal(c + "");
-                Neuron rn = t.createRelationalNeuron(
+                InputNeuron in = m.createOrLookupInputSignal(c + "");
+                Neuron rn = m.createRelationalNeuron(
                         new Neuron(c + "-RN"),
                         ctNeuron,
                         in, false
@@ -85,7 +81,7 @@ public class ModelReadWriteTest {
             // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
             // of the inputs relative to each other. The following flag specifies whether this relativeRid is
             // relative or absolute.
-            pattern = t.createAndNeuron(
+            pattern = m.createAndNeuron(
                     new Neuron("BCD"),
                     0.4,
                     new Input()

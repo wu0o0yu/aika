@@ -40,20 +40,16 @@ public class SimplePatternMatchingTest {
     public void testPatternMatching() {
         Model m = new Model();
 
-        // Create a simple text document.
-        Document doc = Document.create("a b c d e ");
-
-        Iteration t = m.startIteration(doc, 0);
 
         Map<Character, InputNeuron> inputNeurons = new HashMap<>();
         Map<Character, Neuron> relNeurons = new HashMap<>();
 
         // The space neuron will be used as clock signal for the recurrent neurons.
-        InputNeuron inSpace = t.createOrLookupInputSignal("SPACE");
+        InputNeuron inSpace = m.createOrLookupInputSignal("SPACE");
 
-        InputNeuron startSignal = t.createOrLookupInputSignal("START-SIGNAL");
+        InputNeuron startSignal = m.createOrLookupInputSignal("START-SIGNAL");
 
-        Neuron ctNeuron = t.createCounterNeuron(new Neuron("CTN"),
+        Neuron ctNeuron = m.createCounterNeuron(new Neuron("CTN"),
                 inSpace, false,
                 startSignal, true,
                 false
@@ -61,8 +57,8 @@ public class SimplePatternMatchingTest {
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            InputNeuron in = t.createOrLookupInputSignal(c + "");
-            Neuron rn = t.createRelationalNeuron(
+            InputNeuron in = m.createOrLookupInputSignal(c + "");
+            Neuron rn = m.createRelationalNeuron(
                     new Neuron(c + "-RN"),
                     ctNeuron,
                     in, false
@@ -76,7 +72,7 @@ public class SimplePatternMatchingTest {
         // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
         // of the inputs relative to each other. The following flag specifies whether this relativeRid
         // is relative or absolute.
-        Neuron pattern = t.createAndNeuron(
+        Neuron pattern = m.createAndNeuron(
                 new Neuron("BCD"),
                 0.4,
                 new Input()
@@ -102,6 +98,11 @@ public class SimplePatternMatchingTest {
                         .setMatchRange(false)
         );
 
+
+        // Create a simple text document.
+        Document doc = Document.create("a b c d e ");
+
+        Iteration t = m.startIteration(doc, 0);
 
         startSignal.addInput(t, 0, 1, 0);  // iteration, begin, end, relational id
 

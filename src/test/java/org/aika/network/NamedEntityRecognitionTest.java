@@ -58,7 +58,7 @@ public class NamedEntityRecognitionTest {
                 "mr.", "jackson", "cook", "was", "born", "in", "new", "york"
         };
         for(String word: words) {
-            InputNeuron in = t.createOrLookupInputSignal("W-" + word);
+            InputNeuron in = m.createOrLookupInputSignal("W-" + word);
 
             inputNeurons.put(word, in);
         }
@@ -66,7 +66,7 @@ public class NamedEntityRecognitionTest {
         // The entity neurons represent the concrete meanings of the input words.
         // The helper function 'createAndNeuron' computes the required bias for a
         // conjunction of the inputs.
-        Neuron cookSurnameEntity = t.createAndNeuron(
+        Neuron cookSurnameEntity = m.createAndNeuron(
                 new Neuron("E-cook (surname)"),
                 0.5, // adjusts the bias
                 new Input() // Requires the word to be recognized
@@ -98,7 +98,7 @@ public class NamedEntityRecognitionTest {
                         .setRecurrent(true) // this input is a negative feedback loop
         );
 
-        Neuron cookProfessionEntity = t.createAndNeuron(
+        Neuron cookProfessionEntity = m.createAndNeuron(
                 new Neuron("E-cook (profession)"),
                 0.2,
                 new Input()
@@ -113,7 +113,7 @@ public class NamedEntityRecognitionTest {
                         .setRecurrent(true)
         );
 
-        Neuron jacksonForenameEntity = t.createAndNeuron(
+        Neuron jacksonForenameEntity = m.createAndNeuron(
                 new Neuron("E-jackson (forename)"),
                 0.5,
                 new Input()
@@ -138,7 +138,7 @@ public class NamedEntityRecognitionTest {
                         .setRecurrent(true)
         );
 
-        Neuron jacksonCityEntity = t.createAndNeuron(
+        Neuron jacksonCityEntity = m.createAndNeuron(
                 new Neuron("E-jackson (city)"),
                 0.2,
                 new Input()
@@ -153,20 +153,20 @@ public class NamedEntityRecognitionTest {
                         .setRecurrent(true)
         );
 
-        t.createOrNeuron(forenameCategory,
+        m.createOrNeuron(forenameCategory,
                 new Input() // In this example there is only one forename considered.
                         .setNeuron(jacksonForenameEntity)
                         .setWeight(10.0)
                         .setRelativeRid(0)
         );
-        t.createOrNeuron(surnameCategory,
+        m.createOrNeuron(surnameCategory,
                 new Input()
                         .setNeuron(cookSurnameEntity)
                         .setWeight(10.0)
                         .setRelativeRid(0)
         );
 
-        t.createOrNeuron(suppressingN,
+        m.createOrNeuron(suppressingN,
                 new Input().setNeuron(cookProfessionEntity).setWeight(10.0),
                 new Input().setNeuron(cookSurnameEntity).setWeight(10.0),
                 new Input().setNeuron(jacksonCityEntity).setWeight(10.0),
@@ -235,9 +235,9 @@ public class NamedEntityRecognitionTest {
         // The following three neurons are used to assign each word activation
         // a relational id (rid). Here, the relational id specifies the
         // word position within the sentence.
-        InputNeuron spaceN = t.createOrLookupInputSignal("SPACE");
-        InputNeuron startSignal = t.createOrLookupInputSignal("START-SIGNAL");
-        Neuron ctNeuron = t.createCounterNeuron(new Neuron("RID Counter"),
+        InputNeuron spaceN = m.createOrLookupInputSignal("SPACE");
+        InputNeuron startSignal = m.createOrLookupInputSignal("START-SIGNAL");
+        Neuron ctNeuron = m.createCounterNeuron(new Neuron("RID Counter"),
                 spaceN, // clock signal
                 false, // direction of the clock signal (range end counts)
                 startSignal, // start signal
@@ -259,8 +259,8 @@ public class NamedEntityRecognitionTest {
                 "mr.", "jackson", "cook", "was", "born", "in", "new", "york"
         };
         for(String word: words) {
-            InputNeuron in = t.createOrLookupInputSignal("W-" + word);
-            Neuron rn = t.createRelationalNeuron(
+            InputNeuron in = m.createOrLookupInputSignal("W-" + word);
+            Neuron rn = m.createRelationalNeuron(
                     new Neuron("WR-" + word),
                     ctNeuron, // RID Counting neuron
                     in, // Input neuron
@@ -274,7 +274,7 @@ public class NamedEntityRecognitionTest {
         // The entity neurons represent the concrete meanings of the input words.
         // The helper function 'createAndNeuron' computes the required bias for a
         // conjunction of the inputs.
-        Neuron cookSurnameEntity = t.createAndNeuron(
+        Neuron cookSurnameEntity = m.createAndNeuron(
                 new Neuron("E-cook (surname)"),
                 0.5, // adjusts the bias
                 new Input() // Requires the word to be recognized
@@ -306,7 +306,7 @@ public class NamedEntityRecognitionTest {
                         .setRecurrent(true) // this input is a negative feedback loop
         );
 
-        Neuron cookProfessionEntity = t.createAndNeuron(
+        Neuron cookProfessionEntity = m.createAndNeuron(
                 new Neuron("E-cook (profession)"),
                 0.2,
                 new Input()
@@ -321,7 +321,7 @@ public class NamedEntityRecognitionTest {
                         .setRecurrent(true)
         );
 
-        Neuron jacksonForenameEntity = t.createAndNeuron(
+        Neuron jacksonForenameEntity = m.createAndNeuron(
                 new Neuron("E-jackson (forename)"),
                 0.5,
                 new Input()
@@ -346,7 +346,7 @@ public class NamedEntityRecognitionTest {
                         .setRecurrent(true)
         );
 
-        Neuron jacksonCityEntity = t.createAndNeuron(
+        Neuron jacksonCityEntity = m.createAndNeuron(
                 new Neuron("E-jackson (city)"),
                 0.2,
                 new Input()
@@ -361,20 +361,20 @@ public class NamedEntityRecognitionTest {
                         .setRecurrent(true)
         );
 
-        t.createOrNeuron(forenameCategory,
+        m.createOrNeuron(forenameCategory,
                 new Input() // In this example there is only one forename considered.
                         .setNeuron(jacksonForenameEntity)
                         .setWeight(10.0)
                         .setRelativeRid(0)
         );
-        t.createOrNeuron(surnameCategory,
+        m.createOrNeuron(surnameCategory,
                 new Input()
                         .setNeuron(cookSurnameEntity)
                         .setWeight(10.0)
                         .setRelativeRid(0)
         );
 
-        t.createOrNeuron(suppressingN,
+        m.createOrNeuron(suppressingN,
                 new Input().setNeuron(cookProfessionEntity).setWeight(10.0),
                 new Input().setNeuron(cookSurnameEntity).setWeight(10.0),
                 new Input().setNeuron(jacksonCityEntity).setWeight(10.0),
