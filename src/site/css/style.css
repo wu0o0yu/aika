@@ -83,7 +83,8 @@ img {
 @media (min-width:500px) {
 	#navigation li {
 		float: left;
-		width: 160px;
+		padding-left: 15px;
+		padding-right: 15px;
 		text-align: center;
 	}
 }
@@ -108,6 +109,31 @@ img {
 	color: #f99600;
 }
 
+.parse-button {
+	position: absolute;
+	margin-top: 15px;
+	padding: 10px;
+	font-size: 10pt;
+}
+
+.text-form {
+	width: auto;
+}
+
+.text-field {
+	width: auto;
+}
+
+.text-input {
+	width: 100%;
+	height: 100px;
+	font-size: 12pt;
+}
+
+.v-spacer {
+	padding-top: 6%;
+}
+
 /*------------------------------ CONTENTS ------------------------------*/
 @media (min-width:500px) {
 	#contents {
@@ -122,7 +148,7 @@ img {
 		min-height: 510px;
 		width: 80%;
 		margin: 50px auto;
-		padding: 54px 40px;
+		padding: 54px auto;
 	}
 }
 
