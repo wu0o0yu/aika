@@ -19,7 +19,7 @@ package org.aika.network;
 
 import org.aika.Activation;
 import org.aika.Iteration;
-import org.aika.Iteration.Input;
+import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Option;

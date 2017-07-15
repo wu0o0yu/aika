@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Input;
 import org.aika.Iteration;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -45,7 +46,7 @@ public class CountingTest {
 
         InputNeuron inA = t.createOrLookupInputSignal("inA");
         Neuron outA = t.createAndNeuron(new Neuron("nA"), 0.5,
-                new Iteration.Input()
+                new Input()
                         .setMinInput(0.95)
                         .setWeight(100.0)
                         .setNeuron(inA)

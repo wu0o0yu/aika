@@ -18,7 +18,7 @@ package org.aika.corpus;
 
 
 import org.aika.Iteration;
-import org.aika.Iteration.Input;
+import org.aika.Input;
 import org.aika.Model;
 import org.aika.lattice.AndNode;
 import org.aika.neuron.InputNeuron;
