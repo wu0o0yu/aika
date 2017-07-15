@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -68,23 +67,22 @@ public class OrOptionsTest {
                         .setMinInput(1.0)
         );
 
-        Document doc = Document.create("aaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaa", 0);
 
         Option o0 = Option.addPrimitive(doc);
         Range r = new Range(0, 10);
-        Node.addActivationAndPropagate(t, new Activation.Key(inA.node, r, 0, o0), Collections.emptySet());
-        t.propagate();
+        Node.addActivationAndPropagate(doc, new Activation.Key(inA.node, r, 0, o0), Collections.emptySet());
+        doc.propagate();
 
         Option o1 = Option.addPrimitive(doc);
-        Node.addActivationAndPropagate(t, new Activation.Key(inA.node, r, 0, o1), Collections.emptySet());
-        t.propagate();
+        Node.addActivationAndPropagate(doc, new Activation.Key(inA.node, r, 0, o1), Collections.emptySet());
+        doc.propagate();
 
         Option o2 = Option.addPrimitive(doc);
-        Node.addActivationAndPropagate(t, new Activation.Key(inA.node, r, 0, o2), Collections.emptySet());
-        t.propagate();
+        Node.addActivationAndPropagate(doc, new Activation.Key(inA.node, r, 0, o2), Collections.emptySet());
+        doc.propagate();
 
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
     }
 }

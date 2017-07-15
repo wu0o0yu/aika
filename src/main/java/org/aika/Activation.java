@@ -107,10 +107,10 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public void register(Iteration t) {
-        ThreadState th = key.n.getThreadState(t);
+    public void register(Document doc) {
+        ThreadState th = key.n.getThreadState(doc);
         if (th.activations.isEmpty()) {
-            (isTrainingAct ? t.activatedNodesForTraining : t.activatedNodes).add(key.n);
+            (isTrainingAct ? doc.activatedNodesForTraining : doc.activatedNodes).add(key.n);
         }
         th.activations.put(key, this);
 
@@ -133,15 +133,15 @@ public class Activation implements Comparable<Activation> {
         }
 
         if(key.rid != null) {
-            t.activationsByRid.put(key, this);
+            doc.activationsByRid.put(key, this);
         }
     }
 
 
-    public void unregister(Iteration t) {
+    public void unregister(Document doc) {
         assert !key.o.activations.isEmpty();
 
-        Node.ThreadState th = key.n.getThreadState(t);
+        Node.ThreadState th = key.n.getThreadState(doc);
 
         th.activations.remove(key);
 
@@ -152,7 +152,7 @@ public class Activation implements Comparable<Activation> {
         if(actRid != null) actRid.remove(key);
 
         if(th.activations.isEmpty()) {
-            (isTrainingAct ? t.activatedNodesForTraining : t.activatedNodes).remove(key.n);
+            (isTrainingAct ? doc.activatedNodesForTraining : doc.activatedNodes).remove(key.n);
         }
 
         key.o.activations.remove(key);
@@ -161,25 +161,25 @@ public class Activation implements Comparable<Activation> {
         }
 
         if(key.rid != null) {
-            t.activationsByRid.remove(key);
+            doc.activationsByRid.remove(key);
         }
     }
 
 
-    public static Activation get(Iteration t, Node n, Integer rid, Range r, Range.Relation rr, Option o, Option.Relation or) {
-        return select(t, n, rid, r, rr, o, or)
+    public static Activation get(Document doc, Node n, Integer rid, Range r, Range.Relation rr, Option o, Option.Relation or) {
+        return select(doc, n, rid, r, rr, o, or)
                 .findFirst()
                 .orElse(null);
     }
 
 
-    public static Activation get(Iteration t, Node n, Key ak) {
-        return get(t, n, ak.rid, ak.r, Range.Relation.EQUALS, ak.o, Option.Relation.EQUALS);
+    public static Activation get(Document doc, Node n, Key ak) {
+        return get(doc, n, ak.rid, ak.r, Range.Relation.EQUALS, ak.o, Option.Relation.EQUALS);
     }
 
 
-    public static Activation getNextSignal(Node n, Iteration t, int from, Integer rid, Option o, boolean dir, boolean inv) {
-        Node.ThreadState th = n.getThreadState(t);
+    public static Activation getNextSignal(Node n, Document doc, int from, Integer rid, Option o, boolean dir, boolean inv) {
+        Node.ThreadState th = n.getThreadState(doc);
         Key bk = new Key(null, new Range(from, dir ? Integer.MIN_VALUE : Integer.MAX_VALUE).invert(inv), rid, o);
         NavigableMap<Key, Activation> tmp = (inv ? th.activationsEnd : th.activations);
         tmp = dir ? tmp.descendingMap() : tmp;
@@ -192,10 +192,10 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public static Stream<Activation> select(Iteration t, Node n, Integer rid, Range r, Range.Relation rr, Option o, Option.Relation or) {
+    public static Stream<Activation> select(Document doc, Node n, Integer rid, Range r, Range.Relation rr, Option o, Option.Relation or) {
         Stream<Activation> results;
         if(n != null) {
-            ThreadState th = n.getThreadState(t);
+            ThreadState th = n.getThreadState(doc);
             int s = th.activations.size();
 
             if(s == 0) return Stream.empty();
@@ -217,7 +217,7 @@ public class Activation implements Comparable<Activation> {
                     results = th.activations.values()
                             .stream();
                 } else {
-                    return rr.getActivations(t, n, rid, r, o, or);
+                    return rr.getActivations(doc, n, rid, r, o, or);
                 }
             }
         } else {
@@ -225,13 +225,13 @@ public class Activation implements Comparable<Activation> {
                 Key bk = new Key(Node.MIN_NODE, Range.MIN, rid, Option.MIN);
                 Key ek = new Key(Node.MAX_NODE, Range.MAX, rid, Option.MAX);
 
-                results = t.activationsByRid.subMap(bk, true, ek, true)
+                results = doc.activationsByRid.subMap(bk, true, ek, true)
                         .values()
                         .stream();
             } else {
-                results = t.activatedNodes
+                results = doc.activatedNodes
                         .stream()
-                        .flatMap(node -> node.getThreadState(t).activations.values().stream());
+                        .flatMap(node -> node.getThreadState(doc).activations.values().stream());
             }
         }
 
@@ -353,7 +353,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public static class Rounds {
-        TreeMap<Integer, State> rounds = new TreeMap<>();
+        public TreeMap<Integer, State> rounds = new TreeMap<>();
 
         public boolean set(int r, State s) {
             State lr = get(r - 1);

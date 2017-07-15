@@ -17,7 +17,6 @@
 package org.aika.corpus;
 
 
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.neuron.InputNeuron;
@@ -34,7 +33,6 @@ public class SimpleWeightsTest {
     public void testWeightsOR() {
         Model m = new Model();
 
-        Iteration t = m.startIteration(null, 0);
         InputNeuron inA = m.createOrLookupInputSignal("A");
         InputNeuron inB = m.createOrLookupInputSignal("B");
 
@@ -55,31 +53,29 @@ public class SimpleWeightsTest {
         );
 
         {
-            Document doc = Document.create("aaaaaaaaaa");
-            t = m.startIteration(doc, 0);
+            Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.addInput(t, 0, 6);
+            inA.addInput(doc, 0, 6);
 
-            t.process();
+            doc.process();
 
             System.out.println(doc.selectedOptionsToString());
-            System.out.println(t.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true));
 
-            t.clearActivations();
+            doc.clearActivations();
         }
         {
-            Document doc = Document.create("aaaaaaaaaa");
-            t = m.startIteration(doc, 0);
+            Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.addInput(t, 0, 6);
-            inB.addInput(t, 0, 6);
+            inA.addInput(doc, 0, 6);
+            inB.addInput(doc, 0, 6);
 
-            t.process();
+            doc.process();
 
             System.out.println(doc.selectedOptionsToString());
-            System.out.println(t.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true));
 
-            t.clearActivations();
+            doc.clearActivations();
         }
     }
 
@@ -88,7 +84,6 @@ public class SimpleWeightsTest {
     public void testWeightsAND() {
         Model m = new Model();
 
-        Iteration t = m.startIteration(null, 0);
         InputNeuron inA = m.createOrLookupInputSignal("A");
         InputNeuron inB = m.createOrLookupInputSignal("B");
 
@@ -108,18 +103,17 @@ public class SimpleWeightsTest {
         );
 
         {
-            Document doc = Document.create("aaaaaaaaaa");
-            t = m.startIteration(doc, 0);
+            Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.addInput(t, 0, 6);
-            inB.addInput(t, 0, 6);
+            inA.addInput(doc, 0, 6);
+            inB.addInput(doc, 0, 6);
 
-            t.process();
+            doc.process();
 
             System.out.println(doc.selectedOptionsToString());
-            System.out.println(t.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true));
 
-            t.clearActivations();
+            doc.clearActivations();
         }
     }
 }

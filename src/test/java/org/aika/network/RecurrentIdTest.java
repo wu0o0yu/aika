@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -72,19 +71,18 @@ public class RecurrentIdTest {
         ).node;
 
 
-        Document doc = Document.create("aaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNode outANode = TestHelper.addOutputNode(t, recA, 0, null);
-        InputNode outBNode = TestHelper.addOutputNode(t, recB, 0, null);
+        InputNode outANode = TestHelper.addOutputNode(doc, recA, 0, null);
+        InputNode outBNode = TestHelper.addOutputNode(doc, recB, 0, null);
 
 
-        TestHelper.addActivation(outANode, t, new Activation(outANode, new Range(0, 1), 20, doc.bottom));
-        TestHelper.addActivation(outBNode, t, new Activation(outBNode, new Range(0, 1), 21, doc.bottom));
+        TestHelper.addActivation(outANode, doc, new Activation(outANode, new Range(0, 1), 20, doc.bottom));
+        TestHelper.addActivation(outBNode, doc, new Activation(outBNode, new Range(0, 1), 21, doc.bottom));
 
-        Activation outC1 = Activation.get(t, outCNode, 20, new Range(0, 1), Range.Relation.OVERLAPS, null, null);
+        Activation outC1 = Activation.get(doc, outCNode, 20, new Range(0, 1), Range.Relation.OVERLAPS, null, null);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
         Assert.assertNotNull(outC1);
     }
@@ -128,22 +126,21 @@ public class RecurrentIdTest {
                         .setRelativeRid(6)
         ).node;
 
-        Document doc = Document.create("aaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNode outANode = TestHelper.addOutputNode(t, recA, 0, null);
-        InputNode outBNode = TestHelper.addOutputNode(t, recB, 0, null);
-        InputNode outCNode = TestHelper.addOutputNode(t, recC, 0, null);
+        InputNode outANode = TestHelper.addOutputNode(doc, recA, 0, null);
+        InputNode outBNode = TestHelper.addOutputNode(doc, recB, 0, null);
+        InputNode outCNode = TestHelper.addOutputNode(doc, recC, 0, null);
 
         outANode.inputNeuron = new Neuron();
         outBNode.inputNeuron = new Neuron();
         outCNode.inputNeuron = new Neuron();
 
-        TestHelper.addActivation(outANode, t, new Activation(outANode, new Range(0, 1), 13, doc.bottom));
-        TestHelper.addActivation(outBNode, t, new Activation(outBNode, new Range(0, 1), 10, doc.bottom));
-        TestHelper.addActivation(outCNode, t, new Activation(outCNode, new Range(0, 1), 16, doc.bottom));
+        TestHelper.addActivation(outANode, doc, new Activation(outANode, new Range(0, 1), 13, doc.bottom));
+        TestHelper.addActivation(outBNode, doc, new Activation(outBNode, new Range(0, 1), 10, doc.bottom));
+        TestHelper.addActivation(outCNode, doc, new Activation(outCNode, new Range(0, 1), 16, doc.bottom));
 
-        Activation outD1 = Activation.get(t, outDNode, 10, new Range(0, 1), Range.Relation.OVERLAPS, null, null);
+        Activation outD1 = Activation.get(doc, outDNode, 10, new Range(0, 1), Range.Relation.OVERLAPS, null, null);
 
         Assert.assertNotNull(outD1);
     }
@@ -183,8 +180,7 @@ public class RecurrentIdTest {
 
             System.out.println(n.node.logicToString());
 
-            Document doc = Document.create("abc Hüttenheim cba");
-            Iteration t = m.startIteration(doc, 0);
+            Document doc = m.createDocument("abc Hüttenheim cba", 0);
 
             for (int i = 0; i < doc.length(); i++) {
                 char c = doc.getContent().toLowerCase().charAt(i);
@@ -193,11 +189,11 @@ public class RecurrentIdTest {
                 if (rec != null) {
                     Range r = new Range(i, doc.length());
 
-                    rec.addInput(t, r.begin, r.end, i, doc.bottom);
+                    rec.addInput(doc, r.begin, r.end, i, doc.bottom);
                 }
             }
 
-            assert n.node.getActivations(t).size() >= 1;
+            assert n.node.getActivations(doc).size() >= 1;
         }
     }
 }

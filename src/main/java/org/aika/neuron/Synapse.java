@@ -17,9 +17,9 @@
 package org.aika.neuron;
 
 
-import org.aika.Iteration;
 import org.aika.Utils;
 import org.aika.Writable;
+import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.lattice.InputNode;
 
@@ -97,11 +97,11 @@ public class Synapse implements Writable {
     }
 
 
-    public void link(Iteration t) {
+    public void link(Document doc) {
         boolean dir = input.id < output.id;
 
-        (dir ? input : output).lock.acquireWriteLock(t.threadId);
-        (dir ? output : input).lock.acquireWriteLock(t.threadId);
+        (dir ? input : output).lock.acquireWriteLock(doc.threadId);
+        (dir ? output : input).lock.acquireWriteLock(doc.threadId);
 
         input.outputSynapses.add(this);
         output.inputSynapses.add(this);
@@ -145,24 +145,24 @@ public class Synapse implements Writable {
 
 
     @Override
-    public void readFields(DataInput in, Iteration t) throws IOException {
-        input = t.m.neurons.get(in.readInt());
-        output = t.m.neurons.get(in.readInt());
-        inputNode = (InputNode) t.m.initialNodes.get(in.readInt());
+    public void readFields(DataInput in, Document doc) throws IOException {
+        input = doc.m.neurons.get(in.readInt());
+        output = doc.m.neurons.get(in.readInt());
+        inputNode = (InputNode) doc.m.initialNodes.get(in.readInt());
 
-        key = Key.read(in, t);
+        key = Key.read(in, doc);
 
         w = in.readDouble();
         maxLowerWeightsSum = in.readDouble();
 
         input.outputSynapses.add(this);
-        inputNode.setSynapse(t, new InputNode.SynapseKey(key.relativeRid, output), this);
+        inputNode.setSynapse(doc, new InputNode.SynapseKey(key.relativeRid, output), this);
     }
 
 
-    public static Synapse read(DataInput in, Iteration t) throws IOException {
+    public static Synapse read(DataInput in, Document doc) throws IOException {
         Synapse k = new Synapse();
-        k.readFields(in, t);
+        k.readFields(in, doc);
         return k;
     }
 
@@ -284,7 +284,7 @@ public class Synapse implements Writable {
 
 
         @Override
-        public void readFields(DataInput in, Iteration t) throws IOException {
+        public void readFields(DataInput in, Document doc) throws IOException {
             isNeg = in.readBoolean();
             isRecurrent = in.readBoolean();
             if(in.readBoolean()) relativeRid = in.readInt();
@@ -297,9 +297,9 @@ public class Synapse implements Writable {
         }
 
 
-        public static Key read(DataInput in, Iteration t) throws IOException {
+        public static Key read(DataInput in, Document doc) throws IOException {
             Key k = new Key();
-            k.readFields(in, t);
+            k.readFields(in, doc);
             return k;
         }
 

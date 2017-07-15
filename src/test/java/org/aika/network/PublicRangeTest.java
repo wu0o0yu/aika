@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -93,27 +92,25 @@ public class PublicRangeTest {
         OrNode pDNode = (OrNode) pD.node;
 
         {
-            Document doc = Document.create("aaaaaaaaaa");
-            Iteration t = m.startIteration(doc, 0);
+            Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.addInput(t, 2, 8, 0);
-            inB.addInput(t, 4, 6, 0);
+            inA.addInput(doc, 2, 8, 0);
+            inB.addInput(doc, 4, 6, 0);
 
-            Assert.assertNotNull(Activation.get(t, pCNode, 0, new Range(4, 6), Range.Relation.EQUALS, null, null));
+            Assert.assertNotNull(Activation.get(doc, pCNode, 0, new Range(4, 6), Range.Relation.EQUALS, null, null));
 //            Assert.assertNotNull(Activation.get(t, pDNode, 0, new Range(2, 8), Range.Relation.EQUALS, null, null));
 
-            t.clearActivations();
+            doc.clearActivations();
         }
         {
-            Document doc = Document.create("aaaaaaaaaa");
-            Iteration t = m.startIteration(doc, 0);
+            Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inB.addInput(t, 4, 6);
-            inA.addInput(t, 2, 8);
+            inB.addInput(doc, 4, 6);
+            inA.addInput(doc, 2, 8);
 
-            Assert.assertNotNull(Activation.get(t, pCNode, 0, new Range(4, 6), Range.Relation.EQUALS, null, null));
+            Assert.assertNotNull(Activation.get(doc, pCNode, 0, new Range(4, 6), Range.Relation.EQUALS, null, null));
 //            Assert.assertNotNull(Activation.get(t, pDNode, 0, new Range(2, 8), Range.Relation.EQUALS, null, null));
-            t.clearActivations();
+            doc.clearActivations();
         }
     }
 

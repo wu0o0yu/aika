@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -69,27 +68,26 @@ public class NegationTest {
                         .setMinInput(1.0)
         );
 
-        Document doc = Document.create("aaaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        inA.addInput(t, 0, 11);
+        inA.addInput(doc, 0, 11);
 
-        System.out.println(t.networkStateToString(true, true));
-        Assert.assertNotNull(Activation.get(t, abcN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null));
+        System.out.println(doc.networkStateToString(true, true));
+        Assert.assertNotNull(Activation.get(doc, abcN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null));
 
         Option o1 = Option.addPrimitive(doc);
 
-        inB.addInput(t, 2, 7, o1);
+        inB.addInput(doc, 2, 7, o1);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
         Option o2 = Option.addPrimitive(doc);
 
-        inC.addInput(t, 4, 9, o2);
+        inC.addInput(doc, 4, 9, o2);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        Assert.assertNotNull(Activation.get(t, abcN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null));
+        Assert.assertNotNull(Activation.get(doc, abcN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null));
     }
 
 
@@ -136,34 +134,33 @@ public class NegationTest {
                         .setMinInput(1.0)
         );
 
-        Document doc = Document.create("aaaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        inA.addInput(t, 0, 11);
+        inA.addInput(doc, 0, 11);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
         Option ob = Option.addPrimitive(doc);
-        inB.addInput(t, 2, 7, ob);
+        inB.addInput(doc, 2, 7, ob);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
         Option oc = Option.addPrimitive(doc);
-        inC.addInput(t, 4, 9, oc);
+        inC.addInput(doc, 4, 9, oc);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
 //        Assert.assertNull(Activation.get(t, outN.node, 0, new Range(0, 11), Range.Relation.EQUALS, null, null, null));
 
-        inB.removeInput(t, 2, 7, ob);
+        inB.removeInput(doc, 2, 7, ob);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        inC.removeInput(t, 4, 9, oc);
+        inC.removeInput(doc, 4, 9, oc);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        Assert.assertNotNull(Activation.get(t, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null));
+        Assert.assertNotNull(Activation.get(doc, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null));
     }
 
 
@@ -204,33 +201,32 @@ public class NegationTest {
                         .setMatchRange(false)
         );
 
-        Document doc = Document.create("aaaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
         Option o = Option.addPrimitive(doc);
 
-        inS.addInput(t, 3, 8, o);
+        inS.addInput(doc, 3, 8, o);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        inA.addInput(t, 0, 11);
+        inA.addInput(doc, 0, 11);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        Assert.assertNotNull(Activation.get(t, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null));
-        Assert.assertFalse(Activation.get(t, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
+        Assert.assertNotNull(Activation.get(doc, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null));
+        Assert.assertFalse(Activation.get(doc, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
-        inS.removeInput(t, 3, 8, o);
+        inS.removeInput(doc, 3, 8, o);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        Assert.assertTrue(Activation.get(t, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
+        Assert.assertTrue(Activation.get(doc, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
-        inA.removeInput(t, 0, 11);
+        inA.removeInput(doc, 0, 11);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        t.clearActivations();
+        doc.clearActivations();
     }
 
 
@@ -271,29 +267,28 @@ public class NegationTest {
                         .setMatchRange(false)
         );
 
-        Document doc = Document.create("aaaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
         Option o = Option.addPrimitive(doc);
 
-        inS.addInput(t, 3, 8, o);
+        inS.addInput(doc, 3, 8, o);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        inA.addInput(t, 0, 11);
+        inA.addInput(doc, 0, 11);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        Assert.assertNotNull(Activation.get(t, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null));
-        Assert.assertFalse(Activation.get(t, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
+        Assert.assertNotNull(Activation.get(doc, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null));
+        Assert.assertFalse(Activation.get(doc, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
-        inA.removeInput(t, 0, 11);
+        inA.removeInput(doc, 0, 11);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        inS.removeInput(t, 3, 8, o);
+        inS.removeInput(doc, 3, 8, o);
 
-        t.clearActivations();
+        doc.clearActivations();
     }
 
 
@@ -334,33 +329,32 @@ public class NegationTest {
                         .setMatchRange(false)
         );
 
-        Document doc = Document.create("aaaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
         Option o = Option.addPrimitive(doc);
 
-        inA.addInput(t, 0, 11);
+        inA.addInput(doc, 0, 11);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        inS.addInput(t, 3, 8, o);
+        inS.addInput(doc, 3, 8, o);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        Assert.assertNotNull(Activation.get(t, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null));
-        Assert.assertFalse(Activation.get(t, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
+        Assert.assertNotNull(Activation.get(doc, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null));
+        Assert.assertFalse(Activation.get(doc, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
-        inS.removeInput(t, 3, 8, o);
+        inS.removeInput(doc, 3, 8, o);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        Assert.assertTrue(Activation.get(t, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
+        Assert.assertTrue(Activation.get(doc, outN.node, null, new Range(0, 11), Range.Relation.EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
-        inA.removeInput(t, 0, 11);
+        inA.removeInput(doc, 0, 11);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        t.clearActivations();
+        doc.clearActivations();
     }
 
 
@@ -434,39 +428,37 @@ public class NegationTest {
         );
 
         {
-            Document doc = Document.create("aaaaaaaaaa");
-            Iteration t = m.startIteration(doc, 0);
+            Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.addInput(t, 0, 6);
-            System.out.println(t.networkStateToString(true, true));
+            inA.addInput(doc, 0, 6);
+            System.out.println(doc.networkStateToString(true, true));
 
-            inB.addInput(t, 0, 6);
+            inB.addInput(doc, 0, 6);
 
-            System.out.println(t.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true));
 
-            Assert.assertNotNull(Activation.get(t, inS.node, null, new Range(0, 6), Range.Relation.EQUALS, null, null));
-            Assert.assertEquals(2, Activation.get(t, inS.node, null, new Range(0, 6), Range.Relation.EQUALS, null, null).key.o.orOptions.size());
+            Assert.assertNotNull(Activation.get(doc, inS.node, null, new Range(0, 6), Range.Relation.EQUALS, null, null));
+            Assert.assertEquals(2, Activation.get(doc, inS.node, null, new Range(0, 6), Range.Relation.EQUALS, null, null).key.o.orOptions.size());
 
-            t.clearActivations();
+            doc.clearActivations();
         }
 
         {
-            Document doc = Document.create("aaaaaaaaaa");
-            Iteration t = m.startIteration(doc, 0);
+            Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.addInput(t, 0, 6);
-            System.out.println(t.networkStateToString(true, true));
+            inA.addInput(doc, 0, 6);
+            System.out.println(doc.networkStateToString(true, true));
 
-            inB.addInput(t, 3, 9);
+            inB.addInput(doc, 3, 9);
 
-            System.out.println(t.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true));
 
 //            Assert.assertNotNull(Activation.get(t, inS.node, 0, new Range(0, 6), Range.Relation.EQUALS, null, null, null));
-            Assert.assertNotNull(Activation.get(t, inS.node, null, new Range(0, 9), Range.Relation.EQUALS, null, null));
+            Assert.assertNotNull(Activation.get(doc, inS.node, null, new Range(0, 9), Range.Relation.EQUALS, null, null));
 //            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), Range.Relation.EQUALS, null, null, null).key.o.orOptions.size());
-            Assert.assertEquals(2, Activation.get(t, inS.node, null, new Range(0, 9), Range.Relation.EQUALS, null, null).key.o.orOptions.size());
+            Assert.assertEquals(2, Activation.get(doc, inS.node, null, new Range(0, 9), Range.Relation.EQUALS, null, null).key.o.orOptions.size());
 
-            t.clearActivations();
+            doc.clearActivations();
         }
     }
 
@@ -583,8 +575,7 @@ public class NegationTest {
                         .setMinInput(1.0)
         );
 
-        Document doc = Document.create("aaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaa", 0);
 
 
 //        asN.node.weight = 0.45;
@@ -593,21 +584,21 @@ public class NegationTest {
 //        bsN.node.weight = 0.5;
 
 
-        inA.addInput(t, 0, 6);
+        inA.addInput(doc, 0, 6);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        inB.addInput(t, 0, 6);
+        inB.addInput(doc, 0, 6);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        inC.addInput(t, 0, 6);
+        inC.addInput(doc, 0, 6);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        t.process();
+        doc.process();
 
-        System.out.println(t.networkStateToString(false, true));
+        System.out.println(doc.networkStateToString(false, true));
     }
 
 
@@ -703,17 +694,16 @@ public class NegationTest {
                         .setMinInput(1.0)
         );
 
-        Document doc = Document.create("aaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inA.addInput(t, 0, 1);
-        inB.addInput(t, 0, 1);
-        inG.addInput(t, 0, 1);
+        inA.addInput(doc, 0, 1);
+        inB.addInput(doc, 0, 1);
+        inG.addInput(doc, 0, 1);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        Assert.assertNotNull(pC.node.getFirstActivation(t));
-        Assert.assertNotNull(pD.node.getFirstActivation(t));
+        Assert.assertNotNull(pC.node.getFirstActivation(doc));
+        Assert.assertNotNull(pD.node.getFirstActivation(doc));
 
         // Die Optionen 0 und 2 stehen in Konflikt. Da sie aber jetzt in Oder Optionen eingebettet sind, werden sie nicht mehr ausgefiltert.
 //        Assert.assertNull(pH.node.getFirstActivation(t));

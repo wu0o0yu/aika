@@ -17,7 +17,6 @@
 package org.aika.network;
 
 
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -60,11 +59,10 @@ public class SelfRefNonRecTest {
         );
 
 
-        Document doc = new Document("aaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
+        Document t = m.createDocument("aaaaaaaaaa", 0);
 
 
-        Iteration.APPLY_DEBUG_OUTPUT = true;
+        Document.APPLY_DEBUG_OUTPUT = true;
 
         inA.addInput(t, 0, 1);
 

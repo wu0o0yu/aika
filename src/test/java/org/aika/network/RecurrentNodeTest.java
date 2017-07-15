@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Option;
@@ -43,14 +42,13 @@ public class RecurrentNodeTest {
 
         System.out.println("Start =====================");
         Model m = new Model();
-        Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
         InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
         InputNeuron sn = m.createOrLookupInputSignal("START");
 
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
 
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
         Option o0 = Option.addPrimitive(doc);
         Option o1 = Option.addPrimitive(doc);
@@ -58,58 +56,57 @@ public class RecurrentNodeTest {
         Option o01 = Option.add(doc, false, o0, o1);
         Option o012 = Option.add(doc, false, o01, o2);
 
-        sn.addInput(t, 0, 1, doc.bottom);
-        cn.addInput(t, 9, 10, o012);
-        cn.addInput(t, 24, 25, o01);
+        sn.addInput(doc, 0, 1, doc.bottom);
+        cn.addInput(doc, 9, 10, o012);
+        cn.addInput(doc, 24, 25, o01);
 //        sn.addInput(t, 0, 1, doc.bottom);
 
-        System.out.println(t.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false));
 
-        Assert.assertNotNull(getAct(t, ctn.node, 0, new Range(0, 10), null));
-        Assert.assertNotNull(getAct(t, ctn.node, 0, new Range(0, 25), null));
-        Assert.assertNotNull(getAct(t, ctn.node, 1, new Range(10, 25), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 10), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 25), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(10, 25), null));
 
-        cn.addInput(t, 4, 5, o0);
-        System.out.println(t.networkStateToString(true, false));
+        cn.addInput(doc, 4, 5, o0);
+        System.out.println(doc.networkStateToString(true, false));
 
-        Assert.assertNotNull(getAct(t, ctn.node, 0, new Range(0, 5), null));
-        Assert.assertNotNull(getAct(t, ctn.node, 1, new Range(5, 10), null));
-        Assert.assertNotNull(getAct(t, ctn.node, 1, new Range(5, 25), null));
-        Assert.assertNotNull(getAct(t, ctn.node, 2, new Range(10, 25), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 5), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(5, 10), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(5, 25), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 2, new Range(10, 25), null));
 
-        cn.removeInput(t, 4, 5, o0);
-        System.out.println(t.networkStateToString(true, false));
+        cn.removeInput(doc, 4, 5, o0);
+        System.out.println(doc.networkStateToString(true, false));
 
-        Assert.assertNotNull(getAct(t, ctn.node, 0, new Range(0, 10), null));
-        Assert.assertNotNull(getAct(t, ctn.node, 0, new Range(0, 25), null));
-        Assert.assertNotNull(getAct(t, ctn.node, 1, new Range(10, 25), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 10), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 25), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(10, 25), null));
 
-        cn.removeInput(t, 24, 25, o01);
-        System.out.println(t.networkStateToString(true, false));
+        cn.removeInput(doc, 24, 25, o01);
+        System.out.println(doc.networkStateToString(true, false));
 
-        Assert.assertNotNull(getAct(t, ctn.node, 0, new Range(0, 10), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 10), null));
 
         System.out.println();
     }
 
 
-    private Activation getAct(Iteration t, Node n, Integer rid, Range r, final Option o) {
-        return Activation.select(t, n, rid, r, Range.Relation.EQUALS, null, null).filter(act -> o == null || act.key.o == o).findFirst().orElse(null);
+    private Activation getAct(Document doc, Node n, Integer rid, Range r, final Option o) {
+        return Activation.select(doc, n, rid, r, Range.Relation.EQUALS, null, null).filter(act -> o == null || act.key.o == o).findFirst().orElse(null);
     }
 
 
     @Test
     public void testE() {
         Model m = new Model();
-        Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
         InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
         InputNeuron sn = m.createOrLookupInputSignal("START");
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
 
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
-        t.propagate();
+        doc.propagate();
 
         Option o0 = Option.addPrimitive(doc);
         Option o1 = Option.addPrimitive(doc);
@@ -118,23 +115,23 @@ public class RecurrentNodeTest {
         Option o012 = Option.add(doc, false, o01, o2);
 
 
-        sn.addInput(t, 0, 1, doc.bottom);
+        sn.addInput(doc, 0, 1, doc.bottom);
 
-        cn.addInput(t, 5, 6, o0);
-        cn.addInput(t, 20, 21, o0);
-        cn.addInput(t, 10, 11, o012);
-        cn.addInput(t, 15, 16, o01);
+        cn.addInput(doc, 5, 6, o0);
+        cn.addInput(doc, 20, 21, o0);
+        cn.addInput(doc, 10, 11, o012);
+        cn.addInput(doc, 15, 16, o01);
 
-        System.out.println(t.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false));
 
-        Assert.assertNotNull(getAct(t, ctn.node, 0, new Range(0, 6), null));
-        Assert.assertNotNull(getAct(t, ctn.node, 1, new Range(6, 21), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 6), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(6, 21), null));
 
-        Assert.assertNotNull(getAct(t, ctn.node, 1, new Range(6, 11), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(6, 11), null));
 
-        Assert.assertNotNull(getAct(t, ctn.node, 2, new Range(11, 16), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 2, new Range(11, 16), null));
 
-        Assert.assertNotNull(getAct(t, ctn.node, 2, new Range(16, 21), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 2, new Range(16, 21), null));
 
         System.out.println();
     }
@@ -143,13 +140,12 @@ public class RecurrentNodeTest {
     @Test
     public void testReverseDirection() {
         Model m = new Model();
-        Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
         InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
         InputNeuron sn = m.createOrLookupInputSignal("START");
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, false, true);
 
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
         Option o0 = Option.addPrimitive(doc);
         Option o1 = Option.addPrimitive(doc);
@@ -157,14 +153,14 @@ public class RecurrentNodeTest {
         Option o01 = Option.add(doc, false, o0, o1);
         Option o012 = Option.add(doc, false, o01, o2);
 
-        sn.addInput(t, doc.length() - 1, doc.length(), doc.bottom);
-        cn.addInput(t, 19, 20, o0);
-        cn.addInput(t, 4, 5, o0);
-        cn.addInput(t, 14, 15, o012);
+        sn.addInput(doc, doc.length() - 1, doc.length(), doc.bottom);
+        cn.addInput(doc, 19, 20, o0);
+        cn.addInput(doc, 4, 5, o0);
+        cn.addInput(doc, 14, 15, o012);
 
 
-        Assert.assertNotNull(getAct(t, ctn.node, 2, new Range(5, 15), o012));
-        Assert.assertNotNull(getAct(t, ctn.node, 3, new Range(0, 5), o012));
+        Assert.assertNotNull(getAct(doc, ctn.node, 2, new Range(5, 15), o012));
+        Assert.assertNotNull(getAct(doc, ctn.node, 3, new Range(0, 5), o012));
 
         System.out.println();
     }
@@ -173,7 +169,6 @@ public class RecurrentNodeTest {
     @Test
     public void testOutputNode() {
         Model m = new Model();
-        Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
         InputNeuron in = m.createOrLookupInputSignal("INPUT");
         InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
@@ -181,7 +176,7 @@ public class RecurrentNodeTest {
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
         Neuron on = m.createRelationalNeuron(new Neuron("ON"), ctn, in, false);
 
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
 
         Option o0 = Option.addPrimitive(doc);
@@ -190,44 +185,43 @@ public class RecurrentNodeTest {
         Option o01 = Option.add(doc, false, o0, o1);
         Option o012 = Option.add(doc, false, o01, o2);
 
-        sn.addInput(t, 0, 1, doc.bottom);
-        cn.addInput(t, 4, 5, o0);
-        cn.addInput(t, 19, 20, o0);
-        in.addInput(t, 0, 5, o0);
+        sn.addInput(doc, 0, 1, doc.bottom);
+        cn.addInput(doc, 4, 5, o0);
+        cn.addInput(doc, 19, 20, o0);
+        in.addInput(doc, 0, 5, o0);
 
-        System.out.println(t.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false));
 
 
-        Assert.assertNotNull(getAct(t, on.node, 0, new Range(0, 5), null));
-        Assert.assertNotNull(getAct(t, on.node, 1, new Range(5, 20), null));
+        Assert.assertNotNull(getAct(doc, on.node, 0, new Range(0, 5), null));
+        Assert.assertNotNull(getAct(doc, on.node, 1, new Range(5, 20), null));
 
-        cn.addInput(t, 9, 10, o012);
+        cn.addInput(doc, 9, 10, o012);
 
-        System.out.println(t.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false));
 
-        Assert.assertNotNull(getAct(t, on.node, 0, new Range(0, 5), null));
-        Assert.assertNotNull(getAct(t, on.node, 1, new Range(5, 10), null));
-        Assert.assertNotNull(getAct(t, on.node, 1, new Range(5, 20), null));
-        Assert.assertNotNull(getAct(t, on.node, 2, new Range(10, 20), null));
+        Assert.assertNotNull(getAct(doc, on.node, 0, new Range(0, 5), null));
+        Assert.assertNotNull(getAct(doc, on.node, 1, new Range(5, 10), null));
+        Assert.assertNotNull(getAct(doc, on.node, 1, new Range(5, 20), null));
+        Assert.assertNotNull(getAct(doc, on.node, 2, new Range(10, 20), null));
 
-        sn.addInput(t, 15, 16, o01);
+        sn.addInput(doc, 15, 16, o01);
 
-        System.out.println(t.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false));
 
-        Assert.assertNotNull(getAct(t, ctn.node, 0, new Range(15, 20), null));
+        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(15, 20), null));
 
-        sn.removeInput(t, 15, 16, o01);
+        sn.removeInput(doc, 15, 16, o01);
 
-        System.out.println(t.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false));
 
-        Assert.assertNull(getAct(t, ctn.node, 0, new Range(15, 20), null));
+        Assert.assertNull(getAct(doc, ctn.node, 0, new Range(15, 20), null));
     }
 
 
     @Test
     public void testOutputNodeRD() {
         Model m = new Model();
-        Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
         InputNeuron in = m.createOrLookupInputSignal("INPUT"); //new InputNode(m, false);
         InputNeuron cn = m.createOrLookupInputSignal("CLOCK"); //new ControlNode(m, Type.CLOCK, false);
@@ -238,7 +232,7 @@ public class RecurrentNodeTest {
         Neuron on = null; //new OutputNode(m, false);
 
 
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 /*
         on.direction = true;
 
@@ -258,7 +252,7 @@ public class RecurrentNodeTest {
         on.inputNode = in;
 */
 
-        t.propagate();
+        doc.propagate();
 
         Option o0 = Option.addPrimitive(doc);
         Option o1 = Option.addPrimitive(doc);
@@ -266,41 +260,39 @@ public class RecurrentNodeTest {
         Option o01 = Option.add(doc, false, o0, o1);
         Option o012 = Option.add(doc, false, o01, o2);
 
-        sn.addInput(t, doc.length() - 1, doc.length(), doc.bottom);
+        sn.addInput(doc, doc.length() - 1, doc.length(), doc.bottom);
 
-        cn.addInput(t, 19, 20, o0);
-        cn.addInput(t, 4, 5, o0);
-        in.addInput(t, 20, 50, o0);
+        cn.addInput(doc, 19, 20, o0);
+        cn.addInput(doc, 4, 5, o0);
+        in.addInput(doc, 20, 50, o0);
 
-        Assert.assertNotNull(Activation.get(t, on.node, 0, new Range(0, 50), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 50), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
 
-        cn.addInput(t, 14, 15, o012);
+        cn.addInput(doc, 14, 15, o012);
 
 
-        Assert.assertNotNull(Activation.get(t, on.node, 0, new Range(15, 50), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(t, on.node, 0, new Range(0, 15), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(t, on.node, 0, new Range(0, 15), Range.Relation.EQUALS, o012, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(15, 50), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 15), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 15), Range.Relation.EQUALS, o012, Option.Relation.CONTAINS));
 
-        sn.addInput(t, 9, 10, o01);
+        sn.addInput(doc, 9, 10, o01);
 
-        Assert.assertNotNull(Activation.get(t, on.node, 0, new Range(15, 50), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(t, on.node, 0, new Range(10, 15), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(t, on.node, 0, new Range(10, 15), Range.Relation.EQUALS, o012, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(t, on.node, 0, new Range(0, 10), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(15, 50), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(10, 15), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(10, 15), Range.Relation.EQUALS, o012, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 10), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
 
-        sn.removeInput(t, 9, 10, o01);
+        sn.removeInput(doc, 9, 10, o01);
 
-        Assert.assertNotNull(Activation.get(t, on.node, 0, new Range(15, 50), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(t, on.node, 0, new Range(0, 15), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(t, on.node, 0, new Range(0, 15), Range.Relation.EQUALS, o012, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(15, 50), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 15), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 15), Range.Relation.EQUALS, o012, Option.Relation.CONTAINS));
     }
 
 
     @Test
     public void testOverlappingClockAndTermSignals() {
         Model m = new Model();
-
-        Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
         InputNeuron in = m.createOrLookupInputSignal("INPUT"); //new InputNode(m, false);
         InputNeuron cn = m.createOrLookupInputSignal("CLOCK"); //ControlNode(m, ControlNode.Type.CLOCK, false);
@@ -311,7 +303,7 @@ public class RecurrentNodeTest {
         Neuron on = null; //new OutputNode(m, false);
 
 
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 /*
         in.outputNodes.put(ctn, on);
 
@@ -330,32 +322,32 @@ public class RecurrentNodeTest {
 */
 
 
-        t.propagate();
+        doc.propagate();
 
         Option o0 = Option.addPrimitive(doc);
         Option o1 = Option.addPrimitive(doc);
         Option o01 = Option.add(doc, false, o0, o1);
 
-        sn.addInput(t, 0, 1, doc.bottom);
-        tn.addInput(t, 9, 10, o01);
-        cn.addInput(t, 9, 10, o0);
+        sn.addInput(doc, 0, 1, doc.bottom);
+        tn.addInput(doc, 9, 10, o01);
+        cn.addInput(doc, 9, 10, o0);
 
 
         // Es reicht wenn o5 mit o0 in Konflikt steht, da es damit automatisch auch mit o01 in Konflikt ist.
 
-        Assert.assertNotNull(getAct(t, ctn.node, 0, new Range(0, 10), doc.bottom));
-        Assert.assertNotNull(getAct(t, ctn.node, 0, new Range(10, 50), doc.bottom));
-        Assert.assertNotNull(getAct(t, ctn.node, 0, new Range(10, 50), o01));
-        Assert.assertNotNull(getAct(t, ctn.node, 1, new Range(10, 50), o0));
+        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 10), doc.bottom));
+        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(10, 50), doc.bottom));
+        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(10, 50), o01));
+        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(10, 50), o0));
 
-        cn.addInput(t, 4, 5, doc.bottom);
+        cn.addInput(doc, 4, 5, doc.bottom);
 
 
-        Assert.assertNotNull(getAct(t, ctn.node, 0, new Range(0, 5), doc.bottom));
-        Assert.assertNotNull(getAct(t, ctn.node, 1, new Range(5, 10), doc.bottom));
-        Assert.assertNotNull(getAct(t, ctn.node, 1, new Range(10, 50), doc.bottom));
-        Assert.assertNotNull(getAct(t, ctn.node, 0, new Range(10, 50), o01));
-        Assert.assertNotNull(getAct(t, ctn.node, 2, new Range(10, 50), o0));
+        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 5), doc.bottom));
+        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(5, 10), doc.bottom));
+        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(10, 50), doc.bottom));
+        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(10, 50), o01));
+        Assert.assertNotNull(getAct(doc, ctn.node, 2, new Range(10, 50), o0));
     }
 
 
@@ -363,15 +355,13 @@ public class RecurrentNodeTest {
     public void testStartNode() {
         Model m = new Model();
 
-        Document doc = Document.create("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-
         InputNeuron cn = m.createOrLookupInputSignal("CLOCK"); //new ControlNode(m, Type.CLOCK, false);
         Neuron ctn = null; //new CycleNode(m, false, Integer.MAX_VALUE);
 //        m.clockTerminationNodes.add(ctn);
         InputNeuron sn = m.createOrLookupInputSignal("START"); //new ControlNode(m, Type.START, true);
         InputNeuron tn = m.createOrLookupInputSignal("TERMINATION"); //new ControlNode(m, Type.TERMINATION, false);
 
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
 /*
         cn.ctNodes.put(sn, ctn);
@@ -385,20 +375,20 @@ public class RecurrentNodeTest {
 */
 
 
-        t.propagate();
+        doc.propagate();
 
 
-        sn.addInput(t, 0, 5, doc.bottom);
-        cn.addInput(t, 4, 5, doc.bottom);
-        cn.addInput(t, 9, 10, doc.bottom);
-        cn.addInput(t, 14, 15, doc.bottom);
-        cn.addInput(t, 19, 20, doc.bottom);
-        cn.addInput(t, 24, 25, doc.bottom);
-        tn.addInput(t, 24, 25, doc.bottom);
-        sn.addInput(t, 15, 20, doc.bottom);
+        sn.addInput(doc, 0, 5, doc.bottom);
+        cn.addInput(doc, 4, 5, doc.bottom);
+        cn.addInput(doc, 9, 10, doc.bottom);
+        cn.addInput(doc, 14, 15, doc.bottom);
+        cn.addInput(doc, 19, 20, doc.bottom);
+        cn.addInput(doc, 24, 25, doc.bottom);
+        tn.addInput(doc, 24, 25, doc.bottom);
+        sn.addInput(doc, 15, 20, doc.bottom);
 
         System.out.println();
 
-        Assert.assertEquals(7, ctn.node.getActivations(t).size());
+        Assert.assertEquals(7, ctn.node.getActivations(doc).size());
     }
 }

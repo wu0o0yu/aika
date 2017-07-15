@@ -19,9 +19,9 @@ package org.aika.lattice;
 
 import org.aika.Activation;
 import org.aika.Activation.Key;
-import org.aika.Iteration;
 import org.aika.Model;
 import org.aika.Utils;
+import org.aika.corpus.Document;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
 import org.aika.lattice.InputNode.SynapseKey;
@@ -57,11 +57,11 @@ public class AndNode extends Node {
     public AndNode() {}
 
 
-    public AndNode(Iteration t, int level, SortedMap<Refinement, Node> parents) {
-        super(t, level);
+    public AndNode(Document doc, int level, SortedMap<Refinement, Node> parents) {
+        super(doc, level);
         this.parents = parents;
 
-        Model m = t.m;
+        Model m = doc.m;
         m.stat.nodes++;
         m.stat.nodesPerLevel[level]++;
 
@@ -92,19 +92,19 @@ public class AndNode extends Node {
 
 
     @Override
-    public boolean isAllowedOption(Iteration t, Option n, Activation act, long v) {
-        ThreadState th = getThreadState(t);
+    public boolean isAllowedOption(Document doc, Option n, Activation act, long v) {
+        ThreadState th = getThreadState(doc);
         if(th.visitedAllowedOption == v) return false;
         th.visitedAllowedOption = v;
 
         for(Activation pAct: act.inputs.values()) {
-            if(pAct.key.n.isAllowedOption(t, n, pAct, v)) return true;
+            if(pAct.key.n.isAllowedOption(doc, n, pAct, v)) return true;
         }
         return false;
     }
 
 
-    protected Range preProcessAddedActivation(Iteration t, Key ak, Collection<Activation> inputActs) {
+    protected Range preProcessAddedActivation(Document doc, Key ak, Collection<Activation> inputActs) {
         for(Activation iAct: inputActs) {
             if(iAct.isRemoved) return null;
         }
@@ -112,27 +112,27 @@ public class AndNode extends Node {
     }
 
 
-    public void addActivation(Iteration t, Key ak, Collection<Activation> directInputActs) {
-        Node.addActivationAndPropagate(t, ak, directInputActs);
+    public void addActivation(Document doc, Key ak, Collection<Activation> directInputActs) {
+        Node.addActivationAndPropagate(doc, ak, directInputActs);
     }
 
 
-    protected static void removeActivation(Iteration t, Activation iAct) {
+    protected static void removeActivation(Document doc, Activation iAct) {
         for(Activation act: iAct.outputs.values()) {
             if(act.key.n instanceof AndNode) {
-                Node.removeActivationAndPropagate(t, act, Collections.singleton(iAct));
+                Node.removeActivationAndPropagate(doc, act, Collections.singleton(iAct));
             }
         }
     }
 
 
-    public void propagateAddedActivation(Iteration t, Activation act, Option removedConflict) {
-        apply(t, act, removedConflict);
+    public void propagateAddedActivation(Document doc, Activation act, Option removedConflict) {
+        apply(doc, act, removedConflict);
     }
 
 
-    public void propagateRemovedActivation(Iteration t, Activation act) {
-        removeFromNextLevel(t, act);
+    public void propagateRemovedActivation(Document doc, Activation act) {
+        removeFromNextLevel(doc, act);
     }
 
 
@@ -174,9 +174,9 @@ public class AndNode extends Node {
 
 
 
-    public void updateWeight(Iteration t, long v) {
-        ThreadState th = getThreadState(t);
-        Model m = t.m;
+    public void updateWeight(Document doc, long v) {
+        ThreadState th = getThreadState(doc);
+        Model m = doc.m;
         if(isBlocked ||
                 (m.numberOfPositions - nOffset) == 0 ||
                 frequency < Node.minFrequency ||
@@ -191,9 +191,9 @@ public class AndNode extends Node {
         double avgSize = sizeSum / instanceSum;
         double n = (double) (m.numberOfPositions - nOffset) / avgSize;
 
-        t.m.numberOfPositionsQueue.remove(this);
+        doc.m.numberOfPositionsQueue.remove(this);
         numberOfPositionsNotify = computeNotify(n) + m.numberOfPositions;
-        t.m.numberOfPositionsQueue.add(this);
+        doc.m.numberOfPositionsQueue.add(this);
 
         BinomialDistribution binDist = new BinomialDistribution(null, (int)Math.round(n), nullHypFreq / n);
 
@@ -230,19 +230,19 @@ public class AndNode extends Node {
 
 
     @Override
-    public void cleanup(Iteration t) {
+    public void cleanup(Document doc) {
         if(!isRemoved && !isFrequent() && !isRequired()) {
-            remove(t);
+            remove(doc);
 
             for(Node p: parents.values()) {
-                p.cleanup(t);
+                p.cleanup(doc);
             }
         }
     }
 
 
     @Override
-    public void apply(Iteration t, Activation act, Option removedConflict) {
+    public void apply(Document doc, Activation act, Option removedConflict) {
 
         // Check if the activation has been deleted in the meantime.
         if(act.isRemoved) {
@@ -262,7 +262,7 @@ public class AndNode extends Node {
 
                             AndNode nlp = getAndChild(nRef);
                             if (nlp != null) {
-                                addNextLevelActivation(t, act, secondAct, nlp, removedConflict);
+                                addNextLevelActivation(doc, act, secondAct, nlp, removedConflict);
                             }
                         }
                     }
@@ -272,13 +272,13 @@ public class AndNode extends Node {
         }
 
         if(removedConflict == null) {
-            OrNode.processCandidate(t, this, act, false);
+            OrNode.processCandidate(doc, this, act, false);
         }
     }
 
 
     @Override
-    public void discover(Iteration t, Activation act) {
+    public void discover(Document doc, Activation act) {
         if(!isExpandable(true)) return;
 
         for(Activation pAct: act.inputs.values()) {
@@ -297,7 +297,7 @@ public class AndNode extends Node {
                         Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n, secondAct.key.rid, pAct.key.rid));
                         Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
-                        createNextLevelNode(t, this, nRef, true);
+                        createNextLevelNode(doc, this, nRef, true);
                     }
                 }
             }
@@ -329,7 +329,7 @@ public class AndNode extends Node {
     }
 
 
-    public static AndNode createNextLevelNode(Iteration t, Node n, Refinement ref, boolean discoverPatterns) {
+    public static AndNode createNextLevelNode(Document doc, Node n, Refinement ref, boolean discoverPatterns) {
         AndNode nln = n.getAndChild(ref);
         if(nln != null) {
             return nln;
@@ -359,17 +359,17 @@ public class AndNode extends Node {
             }
         }
 
-        SortedMap<Refinement, Node> parents = computeNextLevelParents(t, n, ref, discoverPatterns);
+        SortedMap<Refinement, Node> parents = computeNextLevelParents(doc, n, ref, discoverPatterns);
 
         if (parents != null && (!discoverPatterns || checkRidRange(parents))) {
             // Locking needs to take place in a predefined order.
             TreeSet<Node> parentsForLocking = new TreeSet<>(parents.values());
             for(Node pn: parentsForLocking) {
-                pn.lock.acquireWriteLock(t.threadId);
+                pn.lock.acquireWriteLock(doc.threadId);
             }
 
             if(n.andChildren == null || !n.andChildren.containsKey(ref)) {
-                nln = new AndNode(t, n.level + 1, parents);
+                nln = new AndNode(doc, n.level + 1, parents);
                 nln.isBlocked = n.isBlocked || ref.input.isBlocked;
             }
 
@@ -378,20 +378,20 @@ public class AndNode extends Node {
             }
 
             if(discoverPatterns) {
-                t.addedNodes.add(nln);
+                doc.addedNodes.add(nln);
             }
         }
         return nln;
     }
 
 
-    public static void addNextLevelActivation(Iteration t, Activation act, Activation secondAct, AndNode nlp, Option conflict) {
+    public static void addNextLevelActivation(Document doc, Activation act, Activation secondAct, AndNode nlp, Option conflict) {
         // TODO: check if the activation already exists
         Key ak = act.key;
-        Option o = Option.add(t.doc, true, ak.o, secondAct.key.o);
+        Option o = Option.add(doc, true, ak.o, secondAct.key.o);
         if (o != null && (conflict == null || o.contains(conflict, false))) {
             nlp.addActivation(
-                    t,
+                    doc,
                     new Key(
                             nlp,
                             Range.applyVisibility(ak.r, ak.n.rangeVisibility, secondAct.key.r, secondAct.key.n.rangeVisibility),
@@ -412,7 +412,7 @@ public class AndNode extends Node {
     }
 
 
-    public static SortedMap<Refinement, Node> computeNextLevelParents(Iteration t, Node pa, Refinement ref, boolean discoverPatterns) {
+    public static SortedMap<Refinement, Node> computeNextLevelParents(Document doc, Node pa, Refinement ref, boolean discoverPatterns) {
         Collection<Refinement> refinements = pa.collectNodeAndRefinements(ref);
 
         long v = visitedCounter++;
@@ -421,7 +421,7 @@ public class AndNode extends Node {
         for(Refinement pRef: refinements) {
             SortedSet<Refinement> childInputs = new TreeSet<>(refinements);
             childInputs.remove(pRef);
-            if(!pRef.input.computeAndParents(t, pRef.getRelativePosition(), childInputs, parents, discoverPatterns, v)) {
+            if(!pRef.input.computeAndParents(doc, pRef.getRelativePosition(), childInputs, parents, discoverPatterns, v)) {
                 return null;
             }
         }
@@ -455,22 +455,22 @@ public class AndNode extends Node {
 
 
     @Override
-    protected void changeNumberOfNeuronRefs(Iteration t, long v, int d) {
-        ThreadState th = getThreadState(t);
+    protected void changeNumberOfNeuronRefs(Document doc, long v, int d) {
+        ThreadState th = getThreadState(doc);
         if(th.visitedNeuronRefsChange == v) return;
         th.visitedNeuronRefsChange = v;
         numberOfNeuronRefs += d;
 
         for(Node n: parents.values()) {
-            n.changeNumberOfNeuronRefs(t, v, d);
+            n.changeNumberOfNeuronRefs(doc, v, d);
         }
     }
 
 
     @Override
-    public boolean isCovered(Iteration t, Integer offset, long v) {
+    public boolean isCovered(Document doc, Integer offset, long v) {
         for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
-            RidVisited nv = me.getValue().getThreadState(t).lookupVisited(Utils.nullSafeSub(offset, true, me.getKey().getOffset(), false));
+            RidVisited nv = me.getValue().getThreadState(doc).lookupVisited(Utils.nullSafeSub(offset, true, me.getKey().getOffset(), false));
             if(nv.outputNode == v) return true;
         }
         return false;
@@ -489,22 +489,22 @@ public class AndNode extends Node {
 
 
     @Override
-    public void initActivation(Iteration t, Activation act) {
+    public void initActivation(Document doc, Activation act) {
     }
 
 
     @Override
-    public void deleteActivation(Iteration t, Activation act) {
+    public void deleteActivation(Document doc, Activation act) {
     }
 
 
     @Override
-    public void remove(Iteration t) {
-        super.remove(t);
+    public void remove(Document doc) {
+        super.remove(doc);
 
         for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
             Node pn = me.getValue();
-            pn.lock.acquireWriteLock(t.threadId);
+            pn.lock.acquireWriteLock(doc.threadId);
             pn.removeAndChild(me.getKey());
             pn.lock.releaseWriteLock();
         }
@@ -556,8 +556,8 @@ public class AndNode extends Node {
 
 
     @Override
-    public void readFields(DataInput in, Iteration t) throws IOException {
-        super.readFields(in, t);
+    public void readFields(DataInput in, Document doc) throws IOException {
+        super.readFields(in, doc);
 
         numberOfPositionsNotify = in.readInt();
         frequencyNotify = in.readInt();
@@ -566,8 +566,8 @@ public class AndNode extends Node {
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
-            Refinement ref = Refinement.read(in, t);
-            Node pn = t.m.initialNodes.get(in.readInt());
+            Refinement ref = Refinement.read(in, doc);
+            Node pn = doc.m.initialNodes.get(in.readInt());
             parents.put(ref, pn);
             pn.addAndChild(ref, this);
         }
@@ -626,17 +626,17 @@ public class AndNode extends Node {
         }
 
 
-        public void readFields(DataInput in, Iteration t) throws IOException {
+        public void readFields(DataInput in, Document doc) throws IOException {
             if(in.readBoolean()) {
                 rid = in.readInt();
             }
-            input = (InputNode) t.m.initialNodes.get(in.readInt());
+            input = (InputNode) doc.m.initialNodes.get(in.readInt());
         }
 
 
-        public static Refinement read(DataInput in, Iteration t) throws IOException {
+        public static Refinement read(DataInput in, Document doc) throws IOException {
             Refinement k = new Refinement();
-            k.readFields(in, t);
+            k.readFields(in, doc);
             return k;
         }
 

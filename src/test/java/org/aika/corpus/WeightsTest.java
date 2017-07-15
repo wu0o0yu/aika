@@ -17,7 +17,6 @@
 package org.aika.corpus;
 
 
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.lattice.AndNode;
@@ -153,35 +152,34 @@ public class WeightsTest {
 
 
     private void testVariant(Model m, int i) {
-        Document doc = Document.create("aaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaa", 0);
 
         if(getBit(i, 0)) {
-            inAA.addInput(t, 0, 6);
+            inAA.addInput(doc, 0, 6);
         }
 
         if(getBit(i, 1)) {
-            inBA.addInput(t, 0, 6);
+            inBA.addInput(doc, 0, 6);
         }
 
         if(getBit(i, 2)) {
-            inCA.addInput(t, 0, 6);
+            inCA.addInput(doc, 0, 6);
         }
 
 
         if(getBit(i, 3)) {
-            inAB.addInput(t, 0, 6);
+            inAB.addInput(doc, 0, 6);
         }
 
         if(getBit(i, 4)) {
-            inBB.addInput(t, 0, 6);
+            inBB.addInput(doc, 0, 6);
         }
 
-        inCB.addInput(t, 0, 6);
+        inCB.addInput(doc, 0, 6);
 
-        t.process();
+        doc.process();
 
-        t.clearActivations();
+        doc.clearActivations();
     }
 
 

@@ -19,7 +19,6 @@ package org.aika.corpus;
 
 import org.aika.Activation;
 import org.aika.Activation.Key;
-import org.aika.Iteration;
 import org.aika.lattice.Node;
 import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.RangeSignal;
@@ -49,8 +48,8 @@ public class Range {
                 return Range.compare(ra, rb, false) == 0;
             }
 
-            public Stream getActivations(Iteration t, Node n, Integer rid, Range r, Option o, Option.Relation or) {
-                return n.getThreadState(t).activations.subMap(new Activation.Key(n, r, null, Option.MIN), true, new Activation.Key(n, r, Integer.MAX_VALUE, Option.MAX), true)
+            public Stream getActivations(Document doc, Node n, Integer rid, Range r, Option o, Option.Relation or) {
+                return n.getThreadState(doc).activations.subMap(new Activation.Key(n, r, null, Option.MIN), true, new Activation.Key(n, r, Integer.MAX_VALUE, Option.MAX), true)
                         .values()
                         .stream()
                         .filter(act -> act.filter(n, rid, r, this, o, or));
@@ -87,8 +86,8 @@ public class Range {
 
         public abstract boolean match(Range ra, Range rb);
 
-        public Stream<Activation> getActivations(Iteration t, Node n, Integer rid, Range r, Option o, Option.Relation or) {
-            return n.getThreadState(t).activations.values()
+        public Stream<Activation> getActivations(Document doc, Node n, Integer rid, Range r, Option o, Option.Relation or) {
+            return n.getThreadState(doc).activations.values()
                     .stream()
                     .filter(act -> act.filter(n, rid, r, this, o, or));
         }
@@ -233,8 +232,8 @@ public class Range {
         }
 
         @Override
-        public Stream<Activation> getActivations(Iteration t, Node n, Integer rid, Range r, Option o, Option.Relation or) {
-            Node.ThreadState th = n.getThreadState(t);
+        public Stream<Activation> getActivations(Document doc, Node n, Integer rid, Range r, Option o, Option.Relation or) {
+            Node.ThreadState th = n.getThreadState(doc);
             boolean x = getDirection();
             int y = getSignal() ? r.end : r.begin;
             NavigableMap<Key, Activation> tmp = (x ? th.activationsEnd : th.activations).subMap(
@@ -276,10 +275,10 @@ public class Range {
         }
 
         @Override
-        public Stream<Activation> getActivations(Iteration t, Node n, Integer rid, Range r, Option o, Option.Relation or) {
+        public Stream<Activation> getActivations(Document doc, Node n, Integer rid, Range r, Option o, Option.Relation or) {
             NavigableMap<Key, Activation> tmp;
             boolean flag = false;
-            Node.ThreadState th = n.getThreadState(t);
+            Node.ThreadState th = n.getThreadState(doc);
             if(mra[0] && mrb[0]) {
                 tmp = th.activations.subMap(
                         new Key(n, new Range(r.begin, Integer.MIN_VALUE), null, Option.MIN), true,

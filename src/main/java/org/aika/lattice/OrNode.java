@@ -19,6 +19,7 @@ package org.aika.lattice;
 
 import org.aika.*;
 import org.aika.Activation.Key;
+import org.aika.corpus.Document;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
@@ -45,9 +46,9 @@ public class OrNode extends Node {
     public OrNode() {}
 
 
-    public OrNode(Iteration t) {
-        super(t, -1); // Or Node Activations always need to be processed first!
-        Model m = t.m;
+    public OrNode(Document doc) {
+        super(doc, -1); // Or Node Activations always need to be processed first!
+        Model m = doc.m;
 
         m.stat.nodes++;
         m.stat.orNodes++;
@@ -70,53 +71,53 @@ public class OrNode extends Node {
 
 
     @Override
-    public boolean isAllowedOption(Iteration t, Option n, Activation act, long v) {
+    public boolean isAllowedOption(Document doc, Option n, Activation act, long v) {
         return false;
     }
 
 
     @Override
-    public void initActivation(Iteration t, Activation act) {
+    public void initActivation(Document doc, Activation act) {
         for(Synapse s: neuron.inputSynapses) {
             if(s.key.isNeg || s.key.isRecurrent) {
-                Activation.select(t, s.inputNode, Utils.nullSafeAdd(act.key.rid, false, s.key.relativeRid, false), act.key.r, Range.Relation.OVERLAPS, null, null)
+                Activation.select(doc, s.inputNode, Utils.nullSafeAdd(act.key.rid, false, s.key.relativeRid, false), act.key.r, Range.Relation.OVERLAPS, null, null)
                         .forEach(iAct -> {
                     iAct.outputs.put(act.key, act);
                 });
             }
         }
 
-        if(getThreadState(t).activations.isEmpty()) {
-            t.activatedNeurons.add(neuron);
+        if(getThreadState(doc).activations.isEmpty()) {
+            doc.activatedNeurons.add(neuron);
         }
     }
 
 
     @Override
-    public void deleteActivation(Iteration t, Activation act) {
-        if(getThreadState(t).activations.isEmpty()) {
-            t.activatedNeurons.remove(neuron);
+    public void deleteActivation(Document doc, Activation act) {
+        if(getThreadState(doc).activations.isEmpty()) {
+            doc.activatedNeurons.remove(neuron);
         }
     }
 
 
-    public void updateActivation(Iteration t, Range inputR, Integer rid) {
+    public void updateActivation(Document doc, Range inputR, Integer rid) {
         List<Activation> inputs = new ArrayList<>();
         Range r = null;
 
         for (Map.Entry<Integer, TreeSet<Node>> me : parents.entrySet()) {
-            r = extractRange(t, inputR, rid, inputs, r, me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, me.getValue());
+            r = extractRange(doc, inputR, rid, inputs, r, me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, me.getValue());
         }
 
         final Range fr = r;
-        Activation.select(t, this, rid, inputR, Range.Relation.OVERLAPS, null, null).forEach(oAct -> {
+        Activation.select(doc, this, rid, inputR, Range.Relation.OVERLAPS, null, null).forEach(oAct -> {
             for (Iterator<Activation> it = oAct.inputs.values().iterator(); it.hasNext(); ) {
                 Activation iAct = it.next();
 
                 if(fr == null || Range.compare(fr, oAct.key.r) != 0) {
                     oAct.isReplaced = true;
                     oAct.key.o.removeOrOption(iAct, iAct.key.o);
-                    removeActivationAndPropagate(t, oAct, oAct.inputs.values());
+                    removeActivationAndPropagate(doc, oAct, oAct.inputs.values());
                 }
                 if(iAct.isRemoved) {
                     oAct.key.o.removeOrOption(iAct, iAct.key.o);
@@ -127,7 +128,7 @@ public class OrNode extends Node {
 
         if(inputs.isEmpty()) return;
 
-        Option no = lookupOrOption(t, r, true);
+        Option no = lookupOrOption(doc, r, true);
 
         for(Activation iAct: inputs) {
             no.addOrOption(iAct, iAct.key.o);
@@ -141,30 +142,30 @@ public class OrNode extends Node {
         );
 
         addActivationAndPropagate(
-                t,
+                doc,
                 nak,
                 inputs
         );
     }
 
 
-    private Range extractRange(Iteration t, Range inputR, Integer rid, List<Activation> inputs, Range r, Integer pRidOffset, TreeSet<Node> parents) {
+    private Range extractRange(Document doc, Range inputR, Integer rid, List<Activation> inputs, Range r, Integer pRidOffset, TreeSet<Node> parents) {
         // Optimization the number of parents can get very large, thus we need to avoid iterating over all of them.
         if(parents.size() > 10) {
-            return extractRange(t, null, inputR, rid, inputs, r, pRidOffset, parents);
+            return extractRange(doc, null, inputR, rid, inputs, r, pRidOffset, parents);
         } else {
             for(Node pn: parents) {
-                r = extractRange(t, pn, inputR, rid, inputs, r, pRidOffset, parents);
+                r = extractRange(doc, pn, inputR, rid, inputs, r, pRidOffset, parents);
             }
             return r;
         }
     }
 
 
-    private Range extractRange(Iteration t, Node n, Range inputR, Integer rid, List<Activation> inputs, Range r, Integer pRidOffset, TreeSet<Node> parents) {
-        for(Activation iAct: Activation.select(t, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, Range.Relation.OVERLAPS, null, null)
+    private Range extractRange(Document doc, Node n, Range inputR, Integer rid, List<Activation> inputs, Range r, Integer pRidOffset, TreeSet<Node> parents) {
+        for(Activation iAct: Activation.select(doc, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, Range.Relation.OVERLAPS, null, null)
                 .collect(Collectors.toList())) {
-            if(!iAct.isRemoved && parents.contains(iAct.key.n) && !checkSelfReferencing(t, iAct)) {
+            if(!iAct.isRemoved && parents.contains(iAct.key.n) && !checkSelfReferencing(doc, iAct)) {
                 inputs.add(iAct);
                 r = r == null ? iAct.key.r : new Range(Math.min(r.begin, iAct.key.r.begin), Math.max(r.end, iAct.key.r.end));
             }
@@ -173,38 +174,38 @@ public class OrNode extends Node {
     }
 
 
-    public void addActivation(Iteration t, Integer ridOffset, Activation inputAct) {
-        if(checkSelfReferencing(t, inputAct)) return;
+    public void addActivation(Document doc, Integer ridOffset, Activation inputAct) {
+        if(checkSelfReferencing(doc, inputAct)) return;
 
         Key ak = inputAct.key;
-        updateActivation(t, ak.r, Utils.nullSafeSub(ak.rid, true, ridOffset, false));
+        updateActivation(doc, ak.r, Utils.nullSafeSub(ak.rid, true, ridOffset, false));
     }
 
 
-    public void removeActivation(Iteration t, Integer ridOffset, Activation inputAct) {
-        if(checkSelfReferencing(t, inputAct)) return;
+    public void removeActivation(Document doc, Integer ridOffset, Activation inputAct) {
+        if(checkSelfReferencing(doc, inputAct)) return;
 
         Key ak = inputAct.key;
-        updateActivation(t, ak.r, Utils.nullSafeSub(ak.rid, true, ridOffset, false));
+        updateActivation(doc, ak.r, Utils.nullSafeSub(ak.rid, true, ridOffset, false));
     }
 
 
-    private boolean checkSelfReferencing(Iteration t, Activation inputAct) {
-        Option o = lookupOrOption(t, inputAct.key.r, false);
+    private boolean checkSelfReferencing(Document doc, Activation inputAct) {
+        Option o = lookupOrOption(doc, inputAct.key.r, false);
         if(o == null) return false;
         return inputAct.key.o.contains(o, true);
     }
 
 
-    public void propagateAddedActivation(Iteration t, Activation act, Option removedConflict) {
+    public void propagateAddedActivation(Document doc, Activation act, Option removedConflict) {
         if(removedConflict == null) {
-            neuron.propagateAddedActivation(t, act);
+            neuron.propagateAddedActivation(doc, act);
         }
     }
 
 
-    public void propagateRemovedActivation(Iteration t, Activation act) {
-        neuron.propagateRemovedActivation(t, act);
+    public void propagateRemovedActivation(Document doc, Activation act) {
+        neuron.propagateRemovedActivation(doc, act);
     }
 
 
@@ -215,7 +216,7 @@ public class OrNode extends Node {
 
 
     @Override
-    public void cleanup(Iteration t) {
+    public void cleanup(Document doc) {
 
     }
 
@@ -233,25 +234,25 @@ public class OrNode extends Node {
 
 
     @Override
-    public void apply(Iteration t, Activation act, Option conflict) {
+    public void apply(Document doc, Activation act, Option conflict) {
         if(conflict == null) {
-            OrNode.processCandidate(t, this, act, false);
+            OrNode.processCandidate(doc, this, act, false);
         }
     }
 
 
     @Override
-    public void discover(Iteration t, Activation act) {
+    public void discover(Document doc, Activation act) {
     }
 
 
-    public static void processCandidate(Iteration t, Node parentNode, Activation inputAct, boolean train) {
+    public static void processCandidate(Document doc, Node parentNode, Activation inputAct, boolean train) {
         Key ak = inputAct.key;
         parentNode.lock.acquireReadLock();
         if(parentNode.orChildren != null) {
             for (OrEntry oe : parentNode.orChildren) {
                 if (!ak.o.isConflicting(Option.visitedCounter++)) {
-                    ((OrNode) oe.node).addActivation(t, oe.ridOffset, inputAct);
+                    ((OrNode) oe.node).addActivation(doc, oe.ridOffset, inputAct);
                 }
             }
         }
@@ -260,20 +261,20 @@ public class OrNode extends Node {
 
 
     // TODO: RID
-    public Option lookupOrOption(Iteration t, Range r, boolean create) {
-        Activation act = Activation.select(t, this, null, r, Range.Relation.CONTAINS, null, null)
+    public Option lookupOrOption(Document doc, Range r, boolean create) {
+        Activation act = Activation.select(doc, this, null, r, Range.Relation.CONTAINS, null, null)
                 .findFirst()
                 .orElse(null);
 
         if(act != null) {
             return act.key.o;
         }
-        for(Key ak: getThreadState(t).added.keySet()) {
+        for(Key ak: getThreadState(doc).added.keySet()) {
             if(Range.compare(ak.r, r) == 0) {
                 return ak.o;
             }
         }
-        return create ? Option.addPrimitive(t.doc) : null;
+        return create ? Option.addPrimitive(doc) : null;
     }
 
 
@@ -283,15 +284,15 @@ public class OrNode extends Node {
     }
 
     @Override
-    protected void changeNumberOfNeuronRefs(Iteration t, long v, int d) {
+    protected void changeNumberOfNeuronRefs(Document doc, long v, int d) {
         throw new UnsupportedOperationException();
     }
 
 
-    public void addInput(Iteration t, Integer ridOffset, Node in) {
-        in.changeNumberOfNeuronRefs(t, Node.visitedCounter++, 1);
-        in.addOrChild(t, new OrEntry(ridOffset, this));
-        lock.acquireWriteLock(t.threadId);
+    public void addInput(Document doc, Integer ridOffset, Node in) {
+        in.changeNumberOfNeuronRefs(doc, Node.visitedCounter++, 1);
+        in.addOrChild(doc, new OrEntry(ridOffset, this));
+        lock.acquireWriteLock(doc.threadId);
         Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
         TreeSet<Node> pn = parents.get(key);
         if(pn == null) {
@@ -303,10 +304,10 @@ public class OrNode extends Node {
     }
 
 
-    public void removeInput(Iteration t, Integer ridOffset, Node in) {
-        in.changeNumberOfNeuronRefs(t, Node.visitedCounter++, -1);
-        in.removeOrChild(t, new OrEntry(ridOffset, this));
-        lock.acquireWriteLock(t.threadId);
+    public void removeInput(Document doc, Integer ridOffset, Node in) {
+        in.changeNumberOfNeuronRefs(doc, Node.visitedCounter++, -1);
+        in.removeOrChild(doc, new OrEntry(ridOffset, this));
+        lock.acquireWriteLock(doc.threadId);
         Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
         TreeSet<Node> pn = parents.get(key);
         if(pn != null) {
@@ -319,12 +320,12 @@ public class OrNode extends Node {
     }
 
 
-    public void removeAllInputs(Iteration t) {
-        lock.acquireWriteLock(t.threadId);
+    public void removeAllInputs(Document doc) {
+        lock.acquireWriteLock(doc.threadId);
         for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
             for(Node pn: me.getValue()) {
-                pn.changeNumberOfNeuronRefs(t, Node.visitedCounter++, -1);
-                pn.removeOrChild(t, new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, this));
+                pn.changeNumberOfNeuronRefs(doc, Node.visitedCounter++, -1);
+                pn.removeOrChild(doc, new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, this));
             }
         }
         parents.clear();
@@ -332,13 +333,13 @@ public class OrNode extends Node {
     }
 
 
-    public void remove(Iteration t) {
-        super.remove(t);
+    public void remove(Document doc) {
+        super.remove(doc);
 
         lock.acquireReadLock();
         for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
             for(Node pn: me.getValue()) {
-                pn.removeOrChild(t, new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, this));
+                pn.removeOrChild(doc, new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, this));
             }
         }
         lock.releaseReadLock();
@@ -390,8 +391,8 @@ public class OrNode extends Node {
 
 
     @Override
-    public void readFields(DataInput in, Iteration t) throws IOException {
-        super.readFields(in, t);
+    public void readFields(DataInput in, Document doc) throws IOException {
+        super.readFields(in, doc);
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
@@ -401,8 +402,8 @@ public class OrNode extends Node {
 
             int sa = in.readInt();
             for(int j = 0; j < sa; j++) {
-                Node pn = t.m.initialNodes.get(in.readInt());
-                pn.addOrChild(t, new OrEntry(ridOffset, this));
+                Node pn = doc.m.initialNodes.get(in.readInt());
+                pn.addOrChild(doc, new OrEntry(ridOffset, this));
                 ridParents.add(pn);
             }
         }
@@ -434,17 +435,17 @@ public class OrNode extends Node {
 
 
         @Override
-        public void readFields(DataInput in, Iteration t) throws IOException {
+        public void readFields(DataInput in, Document doc) throws IOException {
             if(in.readBoolean()) {
                 ridOffset = in.readInt();
             }
-            node = t.m.initialNodes.get(in.readInt());
+            node = doc.m.initialNodes.get(in.readInt());
         }
 
 
-        public static OrEntry read(DataInput in, Iteration t) throws IOException {
+        public static OrEntry read(DataInput in, Document doc) throws IOException {
             OrEntry n = new OrEntry();
-            n.readFields(in, t);
+            n.readFields(in, doc);
             return n;
         }
 

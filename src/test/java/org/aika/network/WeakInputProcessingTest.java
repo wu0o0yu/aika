@@ -17,7 +17,6 @@
 package org.aika.network;
 
 
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -36,9 +35,6 @@ public class WeakInputProcessingTest {
     @Test
     public void testWeakInputProcessing() {
         Model m = new Model();
-
-        Document doc = Document.create("a ");
-
 
         InputNeuron strongInput = m.createOrLookupInputSignal("Strong Input");
 
@@ -139,20 +135,20 @@ public class WeakInputProcessingTest {
                         .setMatchRange(false)
         );
 
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("a ");
 
-        strongInput.addInput(t,0,1);
+        strongInput.addInput(doc,0,1);
 
-        weakInputB.addInput(t, 0, 1);
+        weakInputB.addInput(doc, 0, 1);
 
-        Iteration.APPLY_DEBUG_OUTPUT = true;
-        t.process();
+        Document.APPLY_DEBUG_OUTPUT = true;
+        doc.process();
 
-        System.out.println(t.networkStateToString(true,true));
+        System.out.println(doc.networkStateToString(true,true));
 
-        Assert.assertTrue(TestHelper.get(t, patternA.node, null, null).finalState.value < 0.5);
-        Assert.assertTrue(TestHelper.get(t, patternB.node, null, null).finalState.value > 0.5);
-        Assert.assertTrue(TestHelper.get(t, patternC.node, null, null).finalState.value < 0.5);
+        Assert.assertTrue(TestHelper.get(doc, patternA.node, null, null).finalState.value < 0.5);
+        Assert.assertTrue(TestHelper.get(doc, patternB.node, null, null).finalState.value > 0.5);
+        Assert.assertTrue(TestHelper.get(doc, patternC.node, null, null).finalState.value < 0.5);
     }
 
 }

@@ -17,7 +17,6 @@
 package org.aika.network;
 
 
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -34,9 +33,6 @@ public class OptionalAndTest {
     @Test
     public void testOptionalAnd() {
         Model m = new Model();
-
-        Document doc1 = Document.create("Essen");
-        Document doc2 = Document.create("essen");
 
         InputNeuron wordEssen = m.createOrLookupInputSignal("word:essen");
         InputNeuron wordHamburg = m.createOrLookupInputSignal("word:hamburg");
@@ -131,26 +127,28 @@ public class OptionalAndTest {
                         .setMinInput(1.0)
         );
 
-        for(Document doc: new Document[] {doc1, doc2}) {
-            Iteration t = m.startIteration(doc, 0);
 
+        Document doc1 = m.createDocument("Essen");
+        Document doc2 = m.createDocument("essen");
+
+        for(Document doc: new Document[] {doc1, doc2}) {
             String txt = doc.getContent();
             int begin = txt.toLowerCase().indexOf("essen");
             int end = begin + 5;
-            wordEssen.addInput(t, begin, end);
+            wordEssen.addInput(doc, begin, end);
 
             if(Character.isUpperCase(txt.charAt(begin))) {
-                upperCase.addInput(t, begin, end);
+                upperCase.addInput(doc, begin, end);
             }
 
-            t.process();
+            doc.process();
 
-            System.out.println(t.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true));
             System.out.println();
 
-            System.out.println(t.networkStateToString(false, true));
+            System.out.println(doc.networkStateToString(false, true));
 
-            t.clearActivations();
+            doc.clearActivations();
         }
     }
 }

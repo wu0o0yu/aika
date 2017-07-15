@@ -17,7 +17,6 @@
 package org.aika.network;
 
 
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -39,8 +38,6 @@ public class EntityResolutionTest {
     public void testSimpleERExample() {
 
         Model m = new Model();
-        Document doc = new Document("jaguar puma ");
-        Iteration t = m.startIteration(doc, 0);
 
         InputNeuron wJaguar = m.createOrLookupInputSignal("W-Jaguar");
         InputNeuron wPuma = m.createOrLookupInputSignal("W-Puma");
@@ -84,31 +81,33 @@ public class EntityResolutionTest {
         );
 
 
-        wJaguar.addInput(t, 0, 6);
+        Document doc = m.createDocument("jaguar puma ", 0);
 
-        System.out.println(t.networkStateToString(true, true));
+        wJaguar.addInput(doc, 0, 6);
 
-        wPuma.addInput(t, 7, 11);
+        System.out.println(doc.networkStateToString(true, true));
 
-        System.out.println(t.networkStateToString(true, true));
+        wPuma.addInput(doc, 7, 11);
+
+        System.out.println(doc.networkStateToString(true, true));
 
         System.out.println("Process");
-        t.process();
+        doc.process();
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
 
-        Assert.assertNotNull(eJaguar.node.getFirstActivation(t));
-        Assert.assertNotNull(ePuma.node.getFirstActivation(t));
+        Assert.assertNotNull(eJaguar.node.getFirstActivation(doc));
+        Assert.assertNotNull(ePuma.node.getFirstActivation(doc));
 
-        Assert.assertEquals(0, eJaguar.node.getFirstActivation(t).key.o.primId);
-        Assert.assertEquals(1, ePuma.node.getFirstActivation(t).key.o.primId);
+        Assert.assertEquals(0, eJaguar.node.getFirstActivation(doc).key.o.primId);
+        Assert.assertEquals(1, ePuma.node.getFirstActivation(doc).key.o.primId);
 
-        Assert.assertEquals(doc.bottom, eJaguar.node.getFirstActivation(t).key.o.orOptions.values().iterator().next());
-        Assert.assertEquals(doc.bottom, ePuma.node.getFirstActivation(t).key.o.orOptions.values().iterator().next());
+        Assert.assertEquals(doc.bottom, eJaguar.node.getFirstActivation(doc).key.o.orOptions.values().iterator().next());
+        Assert.assertEquals(doc.bottom, ePuma.node.getFirstActivation(doc).key.o.orOptions.values().iterator().next());
 
-        Assert.assertEquals(1, eJaguar.node.getFirstActivation(t).key.o.orOptions.size());
-        Assert.assertEquals(1, ePuma.node.getFirstActivation(t).key.o.orOptions.size());
+        Assert.assertEquals(1, eJaguar.node.getFirstActivation(doc).key.o.orOptions.size());
+        Assert.assertEquals(1, ePuma.node.getFirstActivation(doc).key.o.orOptions.size());
     }
 
 
@@ -118,8 +117,6 @@ public class EntityResolutionTest {
     public void testERExampleWithCategories() {
 
         Model m = new Model();
-        Document doc = new Document("jaguar puma ");
-        Iteration t = m.startIteration(doc, 0);
 
         InputNeuron wJaguar = m.createOrLookupInputSignal("W-Jaguar");
         InputNeuron wPuma = m.createOrLookupInputSignal("W-Puma");
@@ -273,33 +270,34 @@ public class EntityResolutionTest {
 
 
 
+        Document doc = m.createDocument("jaguar puma ", 0);
 
-        wJaguar.addInput(t, 0, 6);
+        wJaguar.addInput(doc, 0, 6);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
-        wPuma.addInput(t, 7, 11);
+        wPuma.addInput(doc, 7, 11);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
         System.out.println("Process");
-        Iteration.OPTIMIZE_DEBUG_OUTPUT = true;
-        t.process();
+        Document.OPTIMIZE_DEBUG_OUTPUT = true;
+        doc.process();
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
 
-        Assert.assertNotNull(eJaguar.node.getFirstActivation(t));
-        Assert.assertNotNull(ePuma.node.getFirstActivation(t));
+        Assert.assertNotNull(eJaguar.node.getFirstActivation(doc));
+        Assert.assertNotNull(ePuma.node.getFirstActivation(doc));
 
-        Assert.assertEquals(0, eJaguar.node.getFirstActivation(t).key.o.primId);
-        Assert.assertEquals(3, ePuma.node.getFirstActivation(t).key.o.primId);
+        Assert.assertEquals(0, eJaguar.node.getFirstActivation(doc).key.o.primId);
+        Assert.assertEquals(3, ePuma.node.getFirstActivation(doc).key.o.primId);
 
-        Assert.assertEquals(doc.bottom, eJaguar.node.getFirstActivation(t).key.o.orOptions.values().iterator().next());
-        Assert.assertEquals(doc.bottom, ePuma.node.getFirstActivation(t).key.o.orOptions.values().iterator().next());
+        Assert.assertEquals(doc.bottom, eJaguar.node.getFirstActivation(doc).key.o.orOptions.values().iterator().next());
+        Assert.assertEquals(doc.bottom, ePuma.node.getFirstActivation(doc).key.o.orOptions.values().iterator().next());
 
-        Assert.assertEquals(1, eJaguar.node.getFirstActivation(t).key.o.orOptions.size());
-        Assert.assertEquals(1, ePuma.node.getFirstActivation(t).key.o.orOptions.size());
+        Assert.assertEquals(1, eJaguar.node.getFirstActivation(doc).key.o.orOptions.size());
+        Assert.assertEquals(1, ePuma.node.getFirstActivation(doc).key.o.orOptions.size());
     }
 
 

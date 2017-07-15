@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -116,39 +115,38 @@ public class ModelReadWriteTest {
             ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
             Model m = Model.read(new DataInputStream(bais));
 
-            Document doc = Document.create("a b c d e ");
-            Iteration t = m.startIteration(doc, 0);
+            Document doc = m.createDocument("a b c d e ", 0);
 
-            ((InputNeuron) m.neurons.get(startSignal)).addInput(t, 0, 1, 0);
+            ((InputNeuron) m.neurons.get(startSignal)).addInput(doc, 0, 1, 0);
 
-            System.out.println(t.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true));
 
             for (int i = 0; i < doc.length(); i++) {
 //            Iteration.APPLY_DEBUG_OUTPUT = true;
                 char c = doc.getContent().charAt(i);
                 if (c == ' ')
-                    ((InputNeuron) m.neurons.get(inputNeurons.get(c))).addInput(t, i, i + 1);
+                    ((InputNeuron) m.neurons.get(inputNeurons.get(c))).addInput(doc, i, i + 1);
 
-                System.out.println(t.networkStateToString(true, true));
+                System.out.println(doc.networkStateToString(true, true));
             }
 
             for (int i = 0; i < doc.length(); i++) {
 //            Iteration.APPLY_DEBUG_OUTPUT = true;
                 char c = doc.getContent().charAt(i);
                 if (c != ' ') {
-                    ((InputNeuron) m.neurons.get(inputNeurons.get(c))).addInput(t, i, i + 1);
+                    ((InputNeuron) m.neurons.get(inputNeurons.get(c))).addInput(doc, i, i + 1);
                 }
-                System.out.println(t.networkStateToString(true, true));
+                System.out.println(doc.networkStateToString(true, true));
             }
 
             // Computes the selected option
-            t.process();
+            doc.process();
 
-            Assert.assertEquals(1, m.neurons.get(pattern).node.getThreadState(t).activations.size());
+            Assert.assertEquals(1, m.neurons.get(pattern).node.getThreadState(doc).activations.size());
 
 
             System.out.println("Output activation:");
-            for (Activation act : m.neurons.get(pattern).node.getActivations(t)) {
+            for (Activation act : m.neurons.get(pattern).node.getActivations(doc)) {
                 System.out.println("Text Range: " + act.key.r);
                 System.out.println("Option: " + act.key.o);
                 System.out.println("Node: " + act.key.n);
@@ -158,10 +156,10 @@ public class ModelReadWriteTest {
             }
 
             System.out.println("All activations:");
-            System.out.println(t.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true));
             System.out.println();
 
-            t.clearActivations();
+            doc.clearActivations();
         }
     }
 

@@ -19,7 +19,6 @@ package org.aika.corpus;
 
 import org.aika.Activation;
 import org.aika.Activation.Key;
-import org.aika.Iteration;
 import org.aika.lattice.Node;
 
 import java.util.*;
@@ -229,34 +228,34 @@ public class Option implements Comparable<Option> {
     }
 
 
-    void expandActivationsRecursiveStep(Iteration t, Option conflict, long v) {
+    void expandActivationsRecursiveStep(Document doc, Option conflict, long v) {
         if (v == visitedExpandActivations) return;
         visitedExpandActivations = v;
 
         for (Activation act : getActivations()) {
-            act.key.n.propagateAddedActivation(t, act, conflict);
+            act.key.n.propagateAddedActivation(doc, act, conflict);
         }
 
         for (Option p : parents) {
-            p.expandActivationsRecursiveStep(t, conflict, v);
+            p.expandActivationsRecursiveStep(doc, conflict, v);
         }
     }
 
 
-    void removeActivationsRecursiveStep(Iteration t, Option conflict, long v) {
+    void removeActivationsRecursiveStep(Document doc, Option conflict, long v) {
         if (v == visitedRemoveActivations) return;
         visitedRemoveActivations = v;
 
         for (Activation act : getActivations()) {
             if (act.key.o.contains(conflict, false)) {
-                Node.removeActivationAndPropagate(t, act, act.inputs.values());
+                Node.removeActivationAndPropagate(doc, act, act.inputs.values());
             }
         }
 
         if (children != null) {
             for (Option c : children) {
                 if (!c.isRemoved) {
-                    c.removeActivationsRecursiveStep(t, conflict, v);
+                    c.removeActivationsRecursiveStep(doc, conflict, v);
                 }
             }
         }

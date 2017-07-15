@@ -17,7 +17,6 @@
 package org.aika.network;
 
 
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -67,58 +66,49 @@ public class ConcurrencyTest {
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), inClock, false, inStart, true, false);
 
 
-        Document doc0 = Document.create("aaaaaaaaaa");
-        Iteration t0 = m.startIteration(doc0, 0);
-
-        Document doc1 = Document.create("bbbbbbbbbb");
-        Iteration t1 = m.startIteration(doc1, 1);
-
-        Document doc2 = Document.create("cccccccccc");
-        Iteration t2 = m.startIteration(doc2, 2);
-
-        Document doc3 = Document.create("dddddddddd");
-        Iteration t3 = m.startIteration(doc3, 3);
-
-        Document doc4 = Document.create("eeeeeeeeee");
-        Iteration t4 = m.startIteration(doc4, 4);
+        Document doc0 = m.createDocument("aaaaaaaaaa", 0);
+        Document doc1 = m.createDocument("bbbbbbbbbb", 1);
+        Document doc2 = m.createDocument("cccccccccc", 2);
+        Document doc3 = m.createDocument("dddddddddd", 3);
+        Document doc4 = m.createDocument("eeeeeeeeee", 4);
 
 
-        inA.addInput(t2, 0, 4);
-        inB.addInput(t2, 2, 6);
+        inA.addInput(doc2, 0, 4);
+        inB.addInput(doc2, 2, 6);
 
-        Assert.assertEquals(1, pC.node.getActivations(t2).size());
+        Assert.assertEquals(1, pC.node.getActivations(doc2).size());
 
-        inA.addInput(t4, 0, 6);
+        inA.addInput(doc4, 0, 6);
 
-        Assert.assertEquals(0, pC.node.getActivations(t4).size());
+        Assert.assertEquals(0, pC.node.getActivations(doc4).size());
 
-        inB.addInput(t0, 4, 8);
-        inB.addInput(t4, 2, 8);
+        inB.addInput(doc0, 4, 8);
+        inB.addInput(doc4, 2, 8);
 
-        Assert.assertEquals(1, pC.node.getActivations(t4).size());
+        Assert.assertEquals(1, pC.node.getActivations(doc4).size());
 
-        inA.addInput(t0, 0, 6);
+        inA.addInput(doc0, 0, 6);
 
-        inStart.addInput(t3, 0, 1);
-        inClock.addInput(t3, 4, 5);
-        inClock.addInput(t3, 6, 7);
+        inStart.addInput(doc3, 0, 1);
+        inClock.addInput(doc3, 4, 5);
+        inClock.addInput(doc3, 6, 7);
 
-        Assert.assertEquals(2, ctn.node.getThreadState(t3).activations.size());
+        Assert.assertEquals(2, ctn.node.getThreadState(doc3).activations.size());
 
-        inStart.addInput(t1, 0, 1);
-        inClock.addInput(t1, 3, 4);
-        inClock.addInput(t1, 7, 8);
+        inStart.addInput(doc1, 0, 1);
+        inClock.addInput(doc1, 3, 4);
+        inClock.addInput(doc1, 7, 8);
 
-        Assert.assertEquals(2, ctn.node.getThreadState(t1).activations.size());
-        Assert.assertEquals(2, ctn.node.getActivations(t1).size());
+        Assert.assertEquals(2, ctn.node.getThreadState(doc1).activations.size());
+        Assert.assertEquals(2, ctn.node.getActivations(doc1).size());
 
-        Assert.assertEquals(1, pC.node.getActivations(t2).size());
+        Assert.assertEquals(1, pC.node.getActivations(doc2).size());
 
-        inA.removeInput(t2, 0, 4);
+        inA.removeInput(doc2, 0, 4);
 
-        Assert.assertEquals(0, pC.node.getActivations(t2).size());
+        Assert.assertEquals(0, pC.node.getActivations(doc2).size());
 
-        Assert.assertEquals(2, ctn.node.getThreadState(t3).activations.size());
+        Assert.assertEquals(2, ctn.node.getThreadState(doc3).activations.size());
     }
 
 
@@ -151,21 +141,20 @@ public class ConcurrencyTest {
                 @Override
                 public void run() {
                     for (int j = 0; j < 20; j++) {
-                        Document doc = Document.create("          ");
-                        Iteration t = m.startIteration(doc, 0);
+                        Document doc = m.createDocument("          ", 0);
 
-                        inA.addInput(t, 0, 6);
-                        inB.addInput(t, 4, 10);
+                        inA.addInput(doc, 0, 6);
+                        inB.addInput(doc, 4, 10);
 
-                        Assert.assertEquals(1, pC.node.getActivations(t).size());
-                        Assert.assertNotNull(TestHelper.get(t, pC.node, new Range(4, 6), null));
+                        Assert.assertEquals(1, pC.node.getActivations(doc).size());
+                        Assert.assertNotNull(TestHelper.get(doc, pC.node, new Range(4, 6), null));
 
-                        inB.removeInput(t, 4, 10);
-                        Assert.assertEquals(0, pC.node.getActivations(t).size());
+                        inB.removeInput(doc, 4, 10);
+                        Assert.assertEquals(0, pC.node.getActivations(doc).size());
 
-                        t.clearActivations();
+                        doc.clearActivations();
 
-                        Assert.assertEquals(0, inA.node.getActivations(t).size());
+                        Assert.assertEquals(0, inA.node.getActivations(doc).size());
                     }
                 }
             }).run();

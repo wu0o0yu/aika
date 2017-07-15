@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -56,25 +55,23 @@ public class ActivationsTest {
                         .setMinInput(1.0)
         );
 
-        Document doc = Document.create("aaaaaaaaaa");
+        Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        Iteration t = m.startIteration(doc, 0);
-
-        InputNode pANode = TestHelper.addOutputNode(t, inA, null, 0, true, Synapse.RangeSignal.START, Synapse.RangeVisibility.MATCH_INPUT, Synapse.RangeSignal.END, Synapse.RangeVisibility.MATCH_INPUT);
+        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, true, Synapse.RangeSignal.START, Synapse.RangeVisibility.MATCH_INPUT, Synapse.RangeSignal.END, Synapse.RangeVisibility.MATCH_INPUT);
 
 
-        inA.addInput(t, 0, 1, 0);
-        inA.addInput(t, 2, 3, 0);
+        inA.addInput(doc, 0, 1, 0);
+        inA.addInput(doc, 2, 3, 0);
 
-        Assert.assertNotNull(TestHelper.get(t, pANode, new Range(0, 1), null));
-        Assert.assertNull(TestHelper.get(t, pANode, new Range(1, 2), null));
-        Assert.assertNotNull(TestHelper.get(t, pANode, new Range(2, 3), null));
+        Assert.assertNotNull(TestHelper.get(doc, pANode, new Range(0, 1), null));
+        Assert.assertNull(TestHelper.get(doc, pANode, new Range(1, 2), null));
+        Assert.assertNotNull(TestHelper.get(doc, pANode, new Range(2, 3), null));
 
-        inA.addInput(t, 1, 2);
+        inA.addInput(doc, 1, 2);
 
-        Assert.assertEquals(Activation.get(t, pANode, null, new Range(0, 1), Range.Relation.EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(t, pANode, new Range(0, 1), doc.bottom));
-        Assert.assertEquals(Activation.get(t, pANode, null, new Range(1, 2), Range.Relation.EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(t, pANode, new Range(1, 2), doc.bottom));
-        Assert.assertEquals(Activation.get(t, pANode, null, new Range(2, 3), Range.Relation.EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(t, pANode, new Range(2, 3), doc.bottom));
+        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(0, 1), Range.Relation.EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(0, 1), doc.bottom));
+        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(1, 2), Range.Relation.EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
+        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(2, 3), Range.Relation.EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
 
         InputNeuron inB = m.createOrLookupInputSignal("B");
 
@@ -85,14 +82,14 @@ public class ActivationsTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
         );
-        InputNode pBNode = TestHelper.addOutputNode(t, inB, null, 0, true, Synapse.RangeSignal.START, Synapse.RangeVisibility.MATCH_INPUT, Synapse.RangeSignal.END, Synapse.RangeVisibility.MATCH_INPUT);
+        InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, true, Synapse.RangeSignal.START, Synapse.RangeVisibility.MATCH_INPUT, Synapse.RangeSignal.END, Synapse.RangeVisibility.MATCH_INPUT);
 
-        inB.addInput(t, 0, 1);
-        inB.addInput(t, 1, 2);
+        inB.addInput(doc, 0, 1);
+        inB.addInput(doc, 1, 2);
 
-        inB.removeInput(t, 1, 2);
+        inB.removeInput(doc, 1, 2);
 
-        Assert.assertNull(TestHelper.get(t, pBNode, new Range(1, 2), null));
+        Assert.assertNull(TestHelper.get(doc, pBNode, new Range(1, 2), null));
     }
 
 
@@ -100,23 +97,22 @@ public class ActivationsTest {
     public void testGetActivationReturnsFirstFired() {
         Model m = new Model();
         AndNode.minFrequency = 1;
-        Document doc = Document.create("aaaaaaaaaa");
 
 
         Neuron in = m.createOrLookupInputSignal("A");
         InputNode inNode = (InputNode) in.node;
 
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.addActivationInternal(doc, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
-        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.addActivationInternal(doc, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
-        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.addActivationInternal(doc, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
-        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.addActivationInternal(doc, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
-        inNode.addActivationInternal(t, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.addActivationInternal(doc, new Activation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
  //       Assert.assertEquals(1, Activation.get(t, inNode, new Range(0, 1), doc.bottom).key.fired);
     }

@@ -20,7 +20,6 @@ package org.aika.corpus;
 import org.aika.Activation;
 import org.aika.Activation.Rounds;
 import org.aika.Activation.SynapseActivation;
-import org.aika.Iteration;
 import org.aika.corpus.Conflicts.Conflict;
 import org.aika.neuron.Neuron.NormWeight;
 import org.slf4j.Logger;
@@ -89,9 +88,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
     }
 
 
-    public void computeSelectedOption(Iteration t) {
-        Document doc = t.doc;
-
+    public void computeSelectedOption(Document doc) {
         ArrayList<Option> results = new ArrayList<>();
         results.add(doc.bottom);
 
@@ -104,13 +101,13 @@ public class ExpandNode implements Comparable<ExpandNode> {
         markCovered(null, visited, refinement);
         markExcluded(null, visited, refinement);
 
-        weightDelta = t.vQueue.adjustWeight(this, rootRefs);
+        weightDelta = doc.vQueue.adjustWeight(this, rootRefs);
 
-        if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
+        if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Root ExpandNode:" + toString());
         }
 
-        t.interrupted = false;
+        doc.interrupted = false;
         doc.selectedExpandNode = doc.root;
         doc.selectedMark = Option.visitedCounter++;
         markSelected(doc.selectedMark);
@@ -118,16 +115,16 @@ public class ExpandNode implements Comparable<ExpandNode> {
         doc.bottom.storeFinalWeight(Option.visitedCounter++);
 
 
-        generateInitialCandidates(t);
+        generateInitialCandidates(doc);
 
         ExpandNode child = doc.root.selectCandidate();
 
         if(child != null) {
-            child.search(t, doc.root, null, searchSteps);
+            child.search(doc, doc.root, null, searchSteps);
         }
 
         if (doc.selectedExpandNode != null) {
-            doc.selectedExpandNode.reconstructSelectedResult(t);
+            doc.selectedExpandNode.reconstructSelectedResult(doc);
             doc.selectedExpandNode.collectResults(results);
 
             log.info("Selected ExandNode ID: " + doc.selectedExpandNode.id);
@@ -135,37 +132,36 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
         doc.selectedOption = Option.add(doc, true, results.toArray(new Option[results.size()]));
 
-        if(t.interrupted) {
+        if(doc.interrupted) {
             log.warn("The search for the best interpretation has been interrupted. Too many search steps!");
         }
     }
 
 
-    private void reconstructSelectedResult(Iteration t) {
-        if(selectedParent != null) selectedParent.reconstructSelectedResult(t);
+    private void reconstructSelectedResult(Document doc) {
+        if(selectedParent != null) selectedParent.reconstructSelectedResult(doc);
 
         changeState(StateChange.Mode.NEW);
 
         for(StateChange sc : modifiedActs) {
             Activation act = sc.act;
             if(act.finalState != null && act.finalState.value > 0.0) {
-                t.finallyActivatedNeurons.add(act.key.n.neuron);
+                doc.finallyActivatedNeurons.add(act.key.n.neuron);
             }
         }
     }
 
 
-    private void search(Iteration t, ExpandNode selectedParent, ExpandNode excludedParent, int[] searchSteps) {
-        Document doc = t.doc;
+    private void search(Document doc, ExpandNode selectedParent, ExpandNode excludedParent, int[] searchSteps) {
         if(searchSteps[0] > MAX_SEARCH_STEPS) {
-            t.interrupted = true;
+            doc.interrupted = true;
         }
         searchSteps[0]++;
 
         markCovered(null, visited, refinement);
         markExcluded(null, visited, refinement);
 
-        if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
+        if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Search Step: " + id);
             log.info(toString());
         }
@@ -174,14 +170,14 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
         changeState(StateChange.Mode.NEW);
 
-        if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
-            log.info(t.networkStateToString(true, true) + "\n");
+        if(Document.OPTIMIZE_DEBUG_OUTPUT) {
+            log.info(doc.networkStateToString(true, true) + "\n");
         }
 
         double accNW = computeAccumulatedWeight().getNormWeight();
         double selectedAccNW = doc.selectedExpandNode != null ? doc.selectedExpandNode.computeAccumulatedWeight().getNormWeight() : 0.0;
 
-        generateNextLevelCandidates(t, selectedParent, excludedParent);
+        generateNextLevelCandidates(doc, selectedParent, excludedParent);
 
         if(candidates.size() == 0) {
             ExpandNode en = this;
@@ -203,11 +199,11 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
         ExpandNode child = selectCandidate();
         if(child != null) {
-            child.search(t, this, excludedParent, searchSteps);
+            child.search(doc, this, excludedParent, searchSteps);
         }
         changeState(StateChange.Mode.OLD);
 
-        if(t.interrupted) {
+        if(doc.interrupted) {
             return;
         }
 
@@ -216,7 +212,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
         } while(child != null && !f && INCOMPLETE_OPTIMIZATION && child.marker.complete);
 
         if(child != null) {
-            child.search(t, selectedParent, this, searchSteps);
+            child.search(doc, selectedParent, this, searchSteps);
         }
     }
 
@@ -245,16 +241,16 @@ public class ExpandNode implements Comparable<ExpandNode> {
     }
 
 
-    public void generateInitialCandidates(Iteration t) {
+    public void generateInitialCandidates(Document doc) {
         candidates = new TreeSet<>();
-        for(Option cn: collectConflicts(t.doc)) {
+        for(Option cn: collectConflicts(doc)) {
             List<Option> changed = new ArrayList<>();
-            ExpandNode c = createCandidate(t.doc, changed, this, this, null, cn, new RefMarker());
+            ExpandNode c = createCandidate(doc, changed, this, this, null, cn, new RefMarker());
 
-            c.weightDelta = t.vQueue.adjustWeight(c, changed);
-            if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
+            c.weightDelta = doc.vQueue.adjustWeight(c, changed);
+            if(Document.OPTIMIZE_DEBUG_OUTPUT) {
                 log.info("Search Step: " + c.id + "  Candidate Weight Delta: " + c.weightDelta);
-                log.info(t.networkStateToString(true, true) + "\n");
+                log.info(doc.networkStateToString(true, true) + "\n");
             }
 
             c.changeState(StateChange.Mode.OLD);
@@ -264,15 +260,15 @@ public class ExpandNode implements Comparable<ExpandNode> {
     }
 
 
-    public void generateNextLevelCandidates(Iteration t, ExpandNode selectedParent, ExpandNode excludedParent) {
+    public void generateNextLevelCandidates(Document doc, ExpandNode selectedParent, ExpandNode excludedParent) {
         candidates = new TreeSet<>();
 
         for(ExpandNode pc: selectedParent.candidates) {
             if(!isCovered(pc.refinement.markedCovered) && !checkExcluded(pc.refinement, Option.visitedCounter++) && !pc.refinement.contains(refinement, false)) {
                 List<Option> changed = new ArrayList<>();
-                ExpandNode c = createCandidate(t.doc, changed, this, this, excludedParent, pc.refinement, pc.marker);
+                ExpandNode c = createCandidate(doc, changed, this, this, excludedParent, pc.refinement, pc.marker);
 
-                c.weightDelta = t.vQueue.adjustWeight(c, changed);
+                c.weightDelta = doc.vQueue.adjustWeight(c, changed);
                 c.changeState(StateChange.Mode.OLD);
 
                 candidates.add(c);
@@ -468,7 +464,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
         cand.markExcluded(changed, cand.visited, cand.refinement);
         cand.marker = marker;
 
-        if(Iteration.OPTIMIZE_DEBUG_OUTPUT) {
+        if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("\n \n Generate Candidate: " + cand.refinement.toString());
         }
 

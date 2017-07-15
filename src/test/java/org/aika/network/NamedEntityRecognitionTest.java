@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -42,9 +41,6 @@ public class NamedEntityRecognitionTest {
     @Test
     public void testNamedEntityRecognitionWithoutCounterNeuron() {
         Model m = new Model(1); // number of threads
-
-        // Training iteration without a document
-        Iteration t = m.startIteration(null, 0); // doc, thread id
 
         Neuron forenameCategory = new Neuron("C-forename");
         Neuron surnameCategory = new Neuron("C-surname");
@@ -175,12 +171,7 @@ public class NamedEntityRecognitionTest {
 
 
         // Now that the model is complete, start processing an actual text.
-        Document doc = Document.create("mr. jackson cook was born in new york ");
-
-        // An iteration is used to process a single document using a specified thread id.
-        // Several threads using different thread ids are permitted to process documents
-        // using the same model.
-        t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("mr. jackson cook was born in new york ");
 
         int i = 0;
         int wordPos = 0;
@@ -188,23 +179,23 @@ public class NamedEntityRecognitionTest {
             int j = i + w.length();
 
             // Feed the individual words as inputs into the network.
-            inputNeurons.get(w).addInput(t, i, j, wordPos);
+            inputNeurons.get(w).addInput(doc, i, j, wordPos);
             i = j + 1;
             wordPos++;
         }
 
         // Search for the best interpretation of this text.
         ExpandNode.INCOMPLETE_OPTIMIZATION = true;
-        t.process();
+        doc.process();
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
         System.out.println();
 
-        System.out.println("Selected Option: " + t.doc.selectedOption.toString());
+        System.out.println("Selected Option: " + doc.selectedOption.toString());
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");
-        for(Activation act: surnameCategory.node.getActivations(t)) {
+        for(Activation act: surnameCategory.node.getActivations(doc)) {
             if(act.finalState.value > 0.0) {
                 System.out.print(act.key.r + " ");
                 System.out.print(act.key.rid + " ");
@@ -214,7 +205,7 @@ public class NamedEntityRecognitionTest {
             }
         }
 
-        t.clearActivations();
+        doc.clearActivations();
     }
 
 
@@ -224,9 +215,6 @@ public class NamedEntityRecognitionTest {
     @Test
     public void testNamedEntityRecognitionWithCounterNeuron() {
         Model m = new Model(1); // number of threads
-
-        // Training iteration without a document
-        Iteration t = m.startIteration(null, 0); // doc, thread id
 
         Neuron forenameCategory = new Neuron("C-forename");
         Neuron surnameCategory = new Neuron("C-surname");
@@ -383,39 +371,34 @@ public class NamedEntityRecognitionTest {
 
 
         // Now that the model is complete, start processing an actual text.
-        Document doc = Document.create("mr. jackson cook was born in new york ");
-
-        // An iteration is used to process a single document using a specified thread id.
-        // Several threads using different thread ids are permitted to process documents
-        // using the same model.
-        t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("mr. jackson cook was born in new york ", 0);
 
         // The start signal is used as a starting point for relational id counter.
-        startSignal.addInput(t, 0, 1, 0);  // iteration, begin, end, relational id
+        startSignal.addInput(doc, 0, 1, 0);  // iteration, begin, end, relational id
 
         int i = 0;
         for(String w: doc.getContent().split(" ")) {
             int j = i + w.length();
             // The space is used as a clock signal to increase the relational id.
-            spaceN.addInput(t, j, j + 1);
+            spaceN.addInput(doc, j, j + 1);
 
             // Feed the individual words as inputs into the network.
-            inputNeurons.get(w).addInput(t, i, j);
+            inputNeurons.get(w).addInput(doc, i, j);
             i = j + 1;
         }
 
         // Search for the best interpretation of this text.
         ExpandNode.INCOMPLETE_OPTIMIZATION = true;
-        t.process();
+        doc.process();
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
         System.out.println();
 
-        System.out.println("Selected Option: " + t.doc.selectedOption.toString());
+        System.out.println("Selected Option: " + doc.selectedOption.toString());
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");
-        for(Activation act: surnameCategory.node.getActivations(t)) {
+        for(Activation act: surnameCategory.node.getActivations(doc)) {
             if(act.finalState.value > 0.0) {
                 System.out.print(act.key.r + " ");
                 System.out.print(act.key.rid + " ");
@@ -425,6 +408,6 @@ public class NamedEntityRecognitionTest {
             }
         }
 
-        t.clearActivations();
+        doc.clearActivations();
     }
 }

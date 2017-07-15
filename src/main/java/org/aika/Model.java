@@ -23,8 +23,6 @@ import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-import org.aika.neuron.Neuron;
-import org.aika.neuron.Neuron.NormWeight;
 import org.aika.neuron.Synapse.RangeSignal;
 import org.aika.neuron.Synapse.RangeVisibility;
 
@@ -53,7 +51,7 @@ public class Model implements Writable {
 
     public Statistic stat = new Statistic();
 
-    private Iteration dummyDoc;
+    private Document dummyDoc;
 
     public Set<AndNode> numberOfPositionsQueue = Collections.synchronizedSet(new TreeSet<>(new Comparator<AndNode>() {
         @Override
@@ -84,18 +82,23 @@ public class Model implements Writable {
             allNodes[i] = new TreeSet<>();
         }
 
-        dummyDoc = startIteration(null, 0);
+        dummyDoc = createDocument(null, 0);
     }
 
 
-    public Iteration startIteration(Document doc, int threadId) {
-        Iteration t = new Iteration(doc, this, threadId, iterationCounter[threadId]++);
+    public Document createDocument(String txt) {
+        return createDocument(txt, 0);
+    }
 
-        if(doc != null) {
-            t.changeNumberOfPositions(doc.length());
+
+    public Document createDocument(String txt, int threadId) {
+        Document doc = new Document(txt, this, threadId, iterationCounter[threadId]++);
+
+        if(txt != null) {
+            doc.changeNumberOfPositions(doc.length());
         }
 
-        return t;
+        return doc;
     }
 
 
@@ -479,20 +482,20 @@ public class Model implements Writable {
 
 
     @Override
-    public void readFields(DataInput in, Iteration t) throws IOException {
+    public void readFields(DataInput in, Document doc) throws IOException {
         numberOfThreads = in.readInt();
         numberOfPositions = in.readInt();
 
         int s = in.readInt();
         initialNodes = new TreeMap<>();
         for(int i = 0; i < s; i++) {
-            Node n = Node.read(in, t);
+            Node n = Node.read(in, doc);
             initialNodes.put(n.id, n);
         }
 
         s = in.readInt();
         for(int i = 0; i < s; i++) {
-            Neuron n = Neuron.read(in, t);
+            Neuron n = Neuron.read(in, doc);
             neurons.put(n.id, n);
 
             if(n.label != null) {
@@ -502,10 +505,10 @@ public class Model implements Writable {
 
         s = in.readInt();
         for(int i = 0; i < s; i++) {
-            Neuron n = t.m.neurons.get(in.readInt());
+            Neuron n = doc.m.neurons.get(in.readInt());
 
             while(in.readBoolean()) {
-                Synapse syn = Synapse.read(in, t);
+                Synapse syn = Synapse.read(in, doc);
                 n.inputSynapses.add(syn);
                 n.inputSynapsesByWeight.add(syn);
             }
@@ -515,8 +518,8 @@ public class Model implements Writable {
 
     public static Model read(DataInput in) throws IOException {
         Model m = new Model();
-        Iteration t = m.startIteration(null, 0);
-        m.readFields(in, t);
+        Document doc = m.createDocument(null, 0);
+        m.readFields(in, doc);
         return m;
     }
 

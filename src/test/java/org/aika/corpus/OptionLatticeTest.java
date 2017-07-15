@@ -17,6 +17,7 @@
 package org.aika.corpus;
 
 
+import org.aika.Model;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,7 +32,8 @@ public class OptionLatticeTest {
 
     @Test
     public void testAddInternal1() {
-        Document doc = Document.create("aaaaaaaaaa");
+        Model m = new Model();
+        Document doc = m.createDocument("aaaaaaaaaa");
 
         Option[] o = new Option[5];
         for(int i = 0; i < o.length; i++) {
@@ -56,7 +58,8 @@ public class OptionLatticeTest {
 
     @Test
     public void testAddInternal2() {
-        Document doc = Document.create("aaaaaaaaaa");
+        Model m = new Model();
+        Document doc = m.createDocument("aaaaaaaaaa");
 
         Option[] o = new Option[5];
         for(int i = 0; i < o.length; i++) {
@@ -80,7 +83,8 @@ public class OptionLatticeTest {
 
     @Test
     public void testAddInternal3() {
-        Document doc = Document.create("aaaaaaaaaa");
+        Model m = new Model();
+        Document doc = m.createDocument("aaaaaaaaaa");
 
         Option o0 = Option.addPrimitive(doc);
         Option o1 = Option.addPrimitive(doc);
@@ -107,7 +111,8 @@ public class OptionLatticeTest {
 
     @Test
     public void testAddInternal4() {
-        Document doc = Document.create("aaaaaaaaaa");
+        Model m = new Model();
+        Document doc = m.createDocument("aaaaaaaaaa");
 
         Option bottom = Option.add(doc, false, doc.bottom, doc.bottom);
 
@@ -118,7 +123,8 @@ public class OptionLatticeTest {
 
     @Test
     public void testAddPrimitive() {
-        Document doc = Document.create("Bla");
+        Model m = new Model();
+        Document doc = m.createDocument("Bla");
 
         for(int i = 0; i < 10; i++) {
             Option n = Option.addPrimitive(doc);
@@ -129,7 +135,8 @@ public class OptionLatticeTest {
 
     @Test
     public void testMarkContains() {
-        Document doc = Document.create("Bla");
+        Model m = new Model();
+        Document doc = m.createDocument("Bla");
 
         Option[] n = new Option[8];
         for(int i = 0; i < 8; i++) {
@@ -145,7 +152,8 @@ public class OptionLatticeTest {
 
     @Test
     public void testAdd() {
-        Document doc = Document.create("Bla");
+        Model m = new Model();
+        Document doc = m.createDocument("Bla");
 
         Option[] n = new Option[4];
         for(int i = 0; i < 4; i++) {

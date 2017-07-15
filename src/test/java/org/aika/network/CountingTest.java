@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Input;
-import org.aika.Iteration;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
@@ -41,9 +40,6 @@ public class CountingTest {
         Model m = new Model();
         AndNode.minFrequency = 0;
 
-        Document doc = Document.create("aaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
-
         InputNeuron inA = m.createOrLookupInputSignal("inA");
         Neuron outA = m.createAndNeuron(new Neuron("nA"), 0.5,
                 new Input()
@@ -56,17 +52,21 @@ public class CountingTest {
         );
 
 
-        inA.addInput(t, 0, 1);
-        inA.addInput(t, 0, 1);
-        inA.addInput(t, 2, 3);
-        inA.addInput(t, 3, 4);
-        inA.addInput(t, 3, 4);
-        inA.addInput(t, 5, 6);
-        inA.addInput(t, 6, 7);
-        inA.addInput(t, 7, 8);
 
-        t.process();
-        t.train();
+        Document doc = m.createDocument("aaaaaaaaaa", 0);
+
+
+        inA.addInput(doc, 0, 1);
+        inA.addInput(doc, 0, 1);
+        inA.addInput(doc, 2, 3);
+        inA.addInput(doc, 3, 4);
+        inA.addInput(doc, 3, 4);
+        inA.addInput(doc, 5, 6);
+        inA.addInput(doc, 6, 7);
+        inA.addInput(doc, 7, 8);
+
+        doc.process();
+        doc.train();
         Assert.assertEquals(6.0, ((OrNode)outA.node).parents.get(Integer.MIN_VALUE).first().frequency, 0.001);
     }
 }

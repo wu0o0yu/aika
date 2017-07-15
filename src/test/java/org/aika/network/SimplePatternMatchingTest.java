@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -100,17 +99,15 @@ public class SimplePatternMatchingTest {
 
 
         // Create a simple text document.
-        Document doc = Document.create("a b c d e ");
+        Document doc = m.createDocument("a b c d e ", 0);
 
-        Iteration t = m.startIteration(doc, 0);
-
-        startSignal.addInput(t, 0, 1, 0);  // iteration, begin, end, relational id
+        startSignal.addInput(doc, 0, 1, 0);  // iteration, begin, end, relational id
 
         // First add the space seperators
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
-                inSpace.addInput(t, i, i + 1);
+                inSpace.addInput(doc, i, i + 1);
             }
         }
 
@@ -118,18 +115,18 @@ public class SimplePatternMatchingTest {
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).addInput(t, i, i + 1);
+                inputNeurons.get(c).addInput(doc, i, i + 1);
             }
         }
 
         // Computes the selected option
-        t.process();
+        doc.process();
 
-        Assert.assertEquals(1, pattern.node.getThreadState(t).activations.size());
+        Assert.assertEquals(1, pattern.node.getThreadState(doc).activations.size());
 
 
         System.out.println("Output activation:");
-        for(Activation act: pattern.node.getActivations(t)) {
+        for(Activation act: pattern.node.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
             System.out.println("Node: " + act.key.n);
@@ -138,12 +135,12 @@ public class SimplePatternMatchingTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
         System.out.println();
 
 
-        t.train();
+        doc.train();
 
-        t.clearActivations();
+        doc.clearActivations();
     }
 }

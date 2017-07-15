@@ -20,7 +20,6 @@ package org.aika.network;
 import org.aika.Activation;
 import org.aika.Activation.Key;
 import org.aika.Activation.SynapseActivation;
-import org.aika.Iteration;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
@@ -42,15 +41,14 @@ public class SynapseRangeRelationTest {
     @Test
     public void testSynapseRangeRelation() {
         Model m = new Model();
-        Document doc = new Document("                        ");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("                        ", 0);
 
         Neuron in = new Neuron();
-        in.node = new OrNode(t);
+        in.node = new OrNode(doc);
         in.node.neuron = in;
 
         Neuron on = new Neuron();
-        on.node = new OrNode(t);
+        on.node = new OrNode(doc);
         on.node.neuron = on;
 
         Synapse s = new Synapse(in,
@@ -62,12 +60,12 @@ public class SynapseRangeRelationTest {
             )
         );
         s.output = on;
-        s.link(t);
+        s.link(doc);
 
-        Activation iAct0 = in.node.addActivationInternal(t, new Key(in.node, new Range(1, 4), null, t.doc.bottom), Collections.emptyList(), false);
-        Activation iAct1 = in.node.addActivationInternal(t, new Key(in.node, new Range(6, 7), null, t.doc.bottom), Collections.emptyList(), false);
-        Activation iAct2 = in.node.addActivationInternal(t, new Key(in.node, new Range(10, 18), null, t.doc.bottom), Collections.emptyList(), false);
-        Activation oAct = on.node.addActivationInternal(t, new Key(on.node, new Range(6, 7), null, t.doc.bottom), Collections.emptyList(), false);
+        Activation iAct0 = in.node.addActivationInternal(doc, new Key(in.node, new Range(1, 4), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct1 = in.node.addActivationInternal(doc, new Key(in.node, new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct2 = in.node.addActivationInternal(doc, new Key(in.node, new Range(10, 18), null, doc.bottom), Collections.emptyList(), false);
+        Activation oAct = on.node.addActivationInternal(doc, new Key(on.node, new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
 
         Assert.assertTrue(oAct.neuronInputs.contains(new SynapseActivation(s, iAct1, oAct)));
     }

@@ -18,7 +18,7 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
+import org.aika.corpus.Document;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
 import org.aika.lattice.InputNode;
@@ -36,56 +36,56 @@ import java.util.Set;
 public class TestHelper {
 
 
-    public static Activation addActivationAndPropagate(Iteration t, Activation.Key ak) {
-        return addActivationAndPropagate(t, ak, Collections.emptySet());
+    public static Activation addActivationAndPropagate(Document doc, Activation.Key ak) {
+        return addActivationAndPropagate(doc, ak, Collections.emptySet());
     }
 
 
-    public static Activation addActivationAndPropagate(Iteration t, Activation.Key ak, Set<Activation> inputActs) {
-        Node.addActivationAndPropagate(t, ak, inputActs);
-        t.propagate();
-        return Activation.get(t, ak.n, ak.rid, ak.r, Range.Relation.CONTAINS, ak.o, Option.Relation.EQUALS);
+    public static Activation addActivationAndPropagate(Document doc, Activation.Key ak, Set<Activation> inputActs) {
+        Node.addActivationAndPropagate(doc, ak, inputActs);
+        doc.propagate();
+        return Activation.get(doc, ak.n, ak.rid, ak.r, Range.Relation.CONTAINS, ak.o, Option.Relation.EQUALS);
     }
 
 
-    public static void removeActivationAndPropagate(Iteration t, Activation.Key ak) {
-        Activation act = Activation.get(t, ak.n, 0, ak.r, Range.Relation.EQUALS, ak.o, Option.Relation.EQUALS);
-        removeActivationAndPropagate(t, act);
+    public static void removeActivationAndPropagate(Document doc, Activation.Key ak) {
+        Activation act = Activation.get(doc, ak.n, 0, ak.r, Range.Relation.EQUALS, ak.o, Option.Relation.EQUALS);
+        removeActivationAndPropagate(doc, act);
     }
 
 
-    public static void removeActivationAndPropagate(Iteration t, Activation act) {
-        Node.removeActivationAndPropagate(t, act, act.inputs.values());
-        t.propagate();
+    public static void removeActivationAndPropagate(Document doc, Activation act) {
+        Node.removeActivationAndPropagate(doc, act, act.inputs.values());
+        doc.propagate();
     }
 
 
-    public static Activation addActivation(InputNode in, Iteration t, Activation inputAct) {
-        in.addActivation(t, inputAct);
-        t.propagate();
+    public static Activation addActivation(InputNode in, Document doc, Activation inputAct) {
+        in.addActivation(doc, inputAct);
+        doc.propagate();
         if(in instanceof InputNode) {
-            return Activation.get(t, in, inputAct.key.rid, inputAct.key.r, Range.Relation.CONTAINS, inputAct.key.o, Option.Relation.EQUALS);
+            return Activation.get(doc, in, inputAct.key.rid, inputAct.key.r, Range.Relation.CONTAINS, inputAct.key.o, Option.Relation.EQUALS);
         }
         return null;
     }
 
 
-    public static void removeActivation(InputNode in, Iteration t, Activation inputAct) {
-        in.removeActivation(t, inputAct);
-        t.propagate();
+    public static void removeActivation(InputNode in, Document doc, Activation inputAct) {
+        in.removeActivation(doc, inputAct);
+        doc.propagate();
     }
 
 
-    public static InputNode addOutputNode(Iteration t, Neuron n, Integer relativeRid, Integer absoluteRid) {
-        return addOutputNode(t, n, relativeRid, absoluteRid, true, Synapse.RangeSignal.START, Synapse.RangeVisibility.MAX_OUTPUT, Synapse.RangeSignal.END, Synapse.RangeVisibility.MAX_OUTPUT);
+    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid) {
+        return addOutputNode(doc, n, relativeRid, absoluteRid, true, Synapse.RangeSignal.START, Synapse.RangeVisibility.MAX_OUTPUT, Synapse.RangeSignal.END, Synapse.RangeVisibility.MAX_OUTPUT);
     }
 
 
-    public static InputNode addOutputNode(Iteration t, Neuron n, Integer relativeRid, Integer absoluteRid, boolean matchRange, Synapse.RangeSignal startSignal, Synapse.RangeVisibility startVisibility, Synapse.RangeSignal endSignal, Synapse.RangeVisibility endVisibility) {
-        return InputNode.add(t, new Synapse.Key(false, false, relativeRid, absoluteRid, matchRange, startSignal, startVisibility, endSignal, endVisibility), n);
+    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, boolean matchRange, Synapse.RangeSignal startSignal, Synapse.RangeVisibility startVisibility, Synapse.RangeSignal endSignal, Synapse.RangeVisibility endVisibility) {
+        return InputNode.add(doc, new Synapse.Key(false, false, relativeRid, absoluteRid, matchRange, startSignal, startVisibility, endSignal, endVisibility), n);
     }
 
-    public static Activation get(Iteration t, Node n, Range r, Option o) {
-        return Activation.get(t, n, null, r, Range.Relation.OVERLAPS, o, Option.Relation.EQUALS);
+    public static Activation get(Document doc, Node n, Range r, Option o) {
+        return Activation.get(doc, n, null, r, Range.Relation.OVERLAPS, o, Option.Relation.EQUALS);
     }
 }

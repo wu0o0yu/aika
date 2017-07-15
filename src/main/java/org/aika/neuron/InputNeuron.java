@@ -19,7 +19,7 @@ package org.aika.neuron;
 
 import org.aika.Activation;
 import org.aika.Activation.State;
-import org.aika.Iteration;
+import org.aika.corpus.Document;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
 import org.aika.lattice.InputNode;
@@ -50,26 +50,26 @@ public class InputNeuron extends Neuron {
     }
 
 
-    public static InputNeuron create(Iteration t, InputNeuron n) {
-        n.m = t.m;
+    public static InputNeuron create(Document doc, InputNeuron n) {
+        n.m = doc.m;
 
-        InputNode node = InputNode.add(t, new Key(false, false, null, 0, false, RangeSignal.NONE, Synapse.RangeVisibility.MATCH_INPUT, RangeSignal.NONE, Synapse.RangeVisibility.MATCH_INPUT), null);
+        InputNode node = InputNode.add(doc, new Key(false, false, null, 0, false, RangeSignal.NONE, Synapse.RangeVisibility.MATCH_INPUT, RangeSignal.NONE, Synapse.RangeVisibility.MATCH_INPUT), null);
         node.neuron = n;
 
         n.node = node;
-        n.publish(t);
+        n.publish(doc);
 
         n.initialized = true;
         return n;
     }
 
 
-    public void remove(Iteration t) {
-        unpublish(t);
+    public void remove(Document doc) {
+        unpublish(doc);
     }
 
 
-    public void propagateAddedActivation(Iteration t, Activation act) {
+    public void propagateAddedActivation(Document doc, Activation act) {
         State s = new State(1.0, 0, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.finalState = s;
@@ -77,54 +77,54 @@ public class InputNeuron extends Neuron {
         act.lowerBound = 1.0;
 
         for(InputNode out: outputNodes.values()) {
-            out.addActivation(t, act);
+            out.addActivation(doc, act);
         }
     }
 
 
-    public void addInput(Iteration t, int begin, int end) {
-        addInput(t, begin, end, null, t.doc.bottom);
+    public void addInput(Document doc, int begin, int end) {
+        addInput(doc, begin, end, null, doc.bottom);
     }
 
 
-    public void addInput(Iteration t, int begin, int end, Option o) {
-        addInput(t, begin, end, null, o);
+    public void addInput(Document doc, int begin, int end, Option o) {
+        addInput(doc, begin, end, null, o);
     }
 
 
-    public void addInput(Iteration t, int begin, int end, Integer rid) {
-        addInput(t, begin, end, rid, t.doc.bottom);
+    public void addInput(Document doc, int begin, int end, Integer rid) {
+        addInput(doc, begin, end, rid, doc.bottom);
     }
 
 
-    public void addInput(Iteration t, int begin, int end, Integer rid, Option o) {
-        Node.addActivationAndPropagate(t, new Activation.Key(node, new Range(begin, end), rid, o), Collections.emptySet());
+    public void addInput(Document doc, int begin, int end, Integer rid, Option o) {
+        Node.addActivationAndPropagate(doc, new Activation.Key(node, new Range(begin, end), rid, o), Collections.emptySet());
 
-        t.propagate();
+        doc.propagate();
     }
 
 
-    public void removeInput(Iteration t, int begin, int end) {
-        removeInput(t, begin, end, null, t.doc.bottom);
+    public void removeInput(Document doc, int begin, int end) {
+        removeInput(doc, begin, end, null, doc.bottom);
     }
 
 
-    public void removeInput(Iteration t, int begin, int end, Option o) {
-        removeInput(t, begin, end, null, o);
+    public void removeInput(Document doc, int begin, int end, Option o) {
+        removeInput(doc, begin, end, null, o);
     }
 
 
-    public void removeInput(Iteration t, int begin, int end, Integer rid) {
-        removeInput(t, begin, end, rid, t.doc.bottom);
+    public void removeInput(Document doc, int begin, int end, Integer rid) {
+        removeInput(doc, begin, end, rid, doc.bottom);
     }
 
 
-    public void removeInput(Iteration t, int begin, int end, Integer rid, Option o) {
+    public void removeInput(Document doc, int begin, int end, Integer rid, Option o) {
         Range r = new Range(begin, end);
-        Activation act = Activation.get(t, node, rid, r, Range.Relation.EQUALS, o, Option.Relation.EQUALS);
-        Node.removeActivationAndPropagate(t, act, Collections.emptySet());
+        Activation act = Activation.get(doc, node, rid, r, Range.Relation.EQUALS, o, Option.Relation.EQUALS);
+        Node.removeActivationAndPropagate(doc, act, Collections.emptySet());
 
-        t.propagate();
+        doc.propagate();
     }
 
 

@@ -16,6 +16,8 @@
  */
 package org.aika;
 
+import org.aika.corpus.Document;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -40,5 +42,5 @@ public interface Writable {
      * @param in <code>DataInput</code> to deseriablize this object from.
      * @throws IOException
      */
-    void readFields(DataInput in, Iteration t) throws IOException;
+    void readFields(DataInput in, Document doc) throws IOException;
 }

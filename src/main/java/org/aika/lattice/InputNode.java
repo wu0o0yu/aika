@@ -18,9 +18,9 @@ package org.aika.lattice;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Model;
 import org.aika.Utils;
+import org.aika.corpus.Document;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
@@ -52,11 +52,11 @@ public class InputNode extends Node {
 
     public InputNode() {}
 
-    public InputNode(Iteration t, Key key) {
-        super(t, 1);
+    public InputNode(Document doc, Key key) {
+        super(doc, 1);
         this.key = key;
 
-        Model m = t.m;
+        Model m = doc.m;
         if(m != null) {
             m.stat.nodes++;
             m.stat.nodesPerLevel[level]++;
@@ -73,12 +73,12 @@ public class InputNode extends Node {
     }
 
 
-    public static InputNode add(Iteration t, Key key, Neuron input) {
+    public static InputNode add(Document doc, Key key, Neuron input) {
         InputNode in = (input != null ? input.outputNodes.get(key) : null);
         if(in != null) {
             return in;
         }
-        in = new InputNode(t, key);
+        in = new InputNode(doc, key);
 
         if(input != null) {
             in.inputNeuron = input;
@@ -90,8 +90,8 @@ public class InputNode extends Node {
 
 
     @Override
-    protected void changeNumberOfNeuronRefs(Iteration t, long v, int d) {
-        ThreadState th = getThreadState(t);
+    protected void changeNumberOfNeuronRefs(Document doc, long v, int d) {
+        ThreadState th = getThreadState(doc);
         if(th.visitedNeuronRefsChange == v) return;
         th.visitedNeuronRefsChange = v;
         numberOfNeuronRefs += d;
@@ -99,31 +99,31 @@ public class InputNode extends Node {
 
 
     @Override
-    public void initActivation(Iteration t, Activation act) {
+    public void initActivation(Document doc, Activation act) {
         if(neuron instanceof InputNeuron) {
-            t.inputNeuronActivations.add(act);
+            doc.inputNeuronActivations.add(act);
 
-            if(getThreadState(t).activations.isEmpty()) {
-                t.activatedNeurons.add(neuron);
-                t.activatedInputNeurons.add(neuron);
+            if(getThreadState(doc).activations.isEmpty()) {
+                doc.activatedNeurons.add(neuron);
+                doc.activatedInputNeurons.add(neuron);
             }
         } else if(!isBlocked) {
-            t.inputNodeActivations.add(act);
+            doc.inputNodeActivations.add(act);
         }
     }
 
 
     @Override
-    public void deleteActivation(Iteration t, Activation act) {
+    public void deleteActivation(Document doc, Activation act) {
         if(neuron instanceof InputNeuron) {
-            t.inputNeuronActivations.remove(act);
+            doc.inputNeuronActivations.remove(act);
 
-            if(getThreadState(t).activations.isEmpty()) {
-                t.activatedNeurons.remove(neuron);
-                t.activatedInputNeurons.remove(neuron);
+            if(getThreadState(doc).activations.isEmpty()) {
+                doc.activatedNeurons.remove(neuron);
+                doc.activatedInputNeurons.remove(neuron);
             }
         } else if(!isBlocked) {
-            t.inputNodeActivations.remove(act);
+            doc.inputNodeActivations.remove(act);
         }
     }
 
@@ -164,7 +164,7 @@ public class InputNode extends Node {
 
     static int dbc = 0;
 
-    protected Range preProcessAddedActivation(Iteration t, Activation.Key ak, Collection<Activation> inputActs) {
+    protected Range preProcessAddedActivation(Document doc, Activation.Key ak, Collection<Activation> inputActs) {
         dbc++;
         if(neuron == null && (key.startSignal == Synapse.RangeSignal.NONE || key.endSignal == Synapse.RangeSignal.NONE)) {
             boolean dir = key.startSignal == Synapse.RangeSignal.NONE;
@@ -178,68 +178,68 @@ public class InputNode extends Node {
                 removeActivationInternal(t, act, act.inputs.values());
             }
 */
-            Activation cAct = Activation.getNextSignal(this, t, pos, ak.rid, ak.o, dir, dir);
+            Activation cAct = Activation.getNextSignal(this, doc, pos, ak.rid, ak.o, dir, dir);
             return new Range(ak.r.getBegin(dir), cAct != null ? cAct.key.r.getBegin(dir) : (dir ? Integer.MIN_VALUE : Integer.MAX_VALUE)).invert(dir);
         }
         return ak.r;
     }
 
 
-    protected void postProcessRemovedActivation(Iteration t, Activation act, Collection<Activation> inputActs) {
+    protected void postProcessRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {
         Activation.Key ak = act.key;
         if(neuron == null && (key.startSignal == Synapse.RangeSignal.NONE || key.endSignal == Synapse.RangeSignal.NONE)) {
             boolean dir = key.startSignal == Synapse.RangeSignal.NONE;
-            Activation.select(t, this, ak.rid, new Range(ak.r.getBegin(dir), dir ? Integer.MAX_VALUE : Integer.MIN_VALUE).invert(!dir), dir ? Range.Relation.BEGINS_WITH : Range.Relation.ENDS_WITH, ak.o, Option.Relation.CONTAINS).forEach(cAct -> {
+            Activation.select(doc, this, ak.rid, new Range(ak.r.getBegin(dir), dir ? Integer.MAX_VALUE : Integer.MIN_VALUE).invert(!dir), dir ? Range.Relation.BEGINS_WITH : Range.Relation.ENDS_WITH, ak.o, Option.Relation.CONTAINS).forEach(cAct -> {
                 Activation.Key cak = cAct.key;
-                processAddedActivation(t, new Activation.Key(cak.n, new Range(dir ? Integer.MIN_VALUE : cak.r.begin, dir ? cak.r.end : Integer.MAX_VALUE), cak.rid, cak.o), cAct.inputs.values());
+                processAddedActivation(doc, new Activation.Key(cak.n, new Range(dir ? Integer.MIN_VALUE : cak.r.begin, dir ? cak.r.end : Integer.MAX_VALUE), cak.rid, cak.o), cAct.inputs.values());
                 cAct.removedId = Activation.removedIdCounter++;
                 cAct.isRemoved = true;
-                removeActivationInternal(t, cAct, cAct.inputs.values());
+                removeActivationInternal(doc, cAct, cAct.inputs.values());
             });
         }
     }
 
 
-    public void addActivation(Iteration t, Activation inputAct) {
+    public void addActivation(Document doc, Activation inputAct) {
         Activation.Key ak = computeActivationKey(inputAct);
 
         if(ak != null) {
-            addActivationAndPropagate(t, ak, Collections.singleton(inputAct));
+            addActivationAndPropagate(doc, ak, Collections.singleton(inputAct));
         }
     }
 
 
-    public void removeActivation(Iteration t, Activation inputAct) {
+    public void removeActivation(Document doc, Activation inputAct) {
         for(Activation act: inputAct.outputs.values()) {
             if(act.key.n == this) {
-                removeActivationAndPropagate(t, act, Collections.singleton(inputAct));
+                removeActivationAndPropagate(doc, act, Collections.singleton(inputAct));
             }
         }
     }
 
 
-    public void propagateAddedActivation(Iteration t, Activation act, Option removedConflict) {
+    public void propagateAddedActivation(Document doc, Activation act, Option removedConflict) {
         if(neuron instanceof InputNeuron) {
             if(removedConflict == null) {
-                neuron.propagateAddedActivation(t, act);
+                neuron.propagateAddedActivation(doc, act);
             }
         } else if(!key.isNeg && !key.isRecurrent) {
-            apply(t, act, removedConflict);
+            apply(doc, act, removedConflict);
         }
     }
 
 
-    public void propagateRemovedActivation(Iteration t, Activation act) {
+    public void propagateRemovedActivation(Document doc, Activation act) {
         if(neuron instanceof InputNeuron) {
-            neuron.propagateRemovedActivation(t, act);
+            neuron.propagateRemovedActivation(doc, act);
         } else if(!key.isNeg && !key.isRecurrent) {
-            removeFromNextLevel(t, act);
+            removeFromNextLevel(doc, act);
         }
     }
 
 
     @Override
-    public boolean isAllowedOption(Iteration t, Option n, Activation act, long v) {
+    public boolean isAllowedOption(Document doc, Option n, Activation act, long v) {
         return false;
     }
 
@@ -254,12 +254,12 @@ public class InputNode extends Node {
 
     /**
      *
-     * @param t
+     * @param doc
      * @param act
      * @param removedConflict This parameter contains a removed conflict if it is not null. In this case only expand activations that contain this removed conflict.
      */
     @Override
-    public void apply(Iteration t, Activation act, Option removedConflict) {
+    public void apply(Document doc, Activation act, Option removedConflict) {
         // Check if the activation has been deleted in the meantime.
         if(act.isRemoved || passive) {
             return;
@@ -268,27 +268,27 @@ public class InputNode extends Node {
         lock.acquireReadLock();
         if(andChildren != null) {
             for (Map.Entry<Refinement, AndNode> me : andChildren.entrySet()) {
-                addNextLevelActivations(t, me.getKey().input, me.getKey(), me.getValue(), act, removedConflict);
+                addNextLevelActivations(doc, me.getKey().input, me.getKey(), me.getValue(), act, removedConflict);
             }
         }
         lock.releaseReadLock();
 
         if(removedConflict == null) {
-            OrNode.processCandidate(t, this, act, false);
+            OrNode.processCandidate(doc, this, act, false);
         }
     }
 
 
-    private static void addNextLevelActivations(Iteration t, InputNode secondNode, Refinement ref, AndNode nlp, Activation act, Option removedConflict) {
+    private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, AndNode nlp, Activation act, Option removedConflict) {
         Activation.Key ak = act.key;
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
 
-        Activation.select(t, secondNode, secondRid, ak.r, new Range.BeginEndMatcher(ak.n.matchRange, secondNode.matchRange), null, null)
+        Activation.select(doc, secondNode, secondRid, ak.r, new Range.BeginEndMatcher(ak.n.matchRange, secondNode.matchRange), null, null)
                 .forEach(secondAct -> {
             if(!secondAct.isRemoved) {
-                Option o = Option.add(t.doc, true, ak.o, secondAct.key.o);
+                Option o = Option.add(doc, true, ak.o, secondAct.key.o);
                 if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
-                    nlp.addActivation(t,
+                    nlp.addActivation(doc,
                             new Activation.Key(
                                     nlp,
                                     Range.applyVisibility(ak.r, ak.n.rangeVisibility, secondAct.key.r, secondAct.key.n.rangeVisibility),
@@ -304,10 +304,10 @@ public class InputNode extends Node {
 
 
     @Override
-    public void discover(Iteration t, Activation act) {
+    public void discover(Document doc, Activation act) {
         long v = Node.visitedCounter++;
 
-        for(Activation secondAct: t.inputNodeActivations) {
+        for(Activation secondAct: doc.inputNodeActivations) {
             Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (InputNode) secondAct.key.n);
             Range.BeginEndMatcher mr = new Range.BeginEndMatcher(matchRange, ref.input.matchRange);
             Integer ridDelta = Utils.nullSafeSub(act.key.rid, false, secondAct.key.rid, false);
@@ -319,7 +319,7 @@ public class InputNode extends Node {
                     !ref.input.key.isRecurrent &&
                     (mr.match(act.key.r, secondAct.key.r) || (ridDelta != null && ridDelta < AndNode.MAX_RID_RANGE))) {
                 ref.input.visitedTrain = v;
-                AndNode.createNextLevelNode(t, this, ref, true);
+                AndNode.createNextLevelNode(doc, this, ref, true);
             }
         }
     }
@@ -339,8 +339,8 @@ public class InputNode extends Node {
     }
 
 
-    public void setSynapse(Iteration t, SynapseKey sk, Synapse s) {
-        lock.acquireWriteLock(t.threadId);
+    public void setSynapse(Document doc, SynapseKey sk, Synapse s) {
+        lock.acquireWriteLock(doc.threadId);
         if(synapses == null) {
             synapses = new TreeMap<>();
         }
@@ -350,14 +350,14 @@ public class InputNode extends Node {
 
 
     @Override
-    public void cleanup(Iteration t) {
+    public void cleanup(Document doc) {
     }
 
 
     @Override
-    public void remove(Iteration t) {
+    public void remove(Document doc) {
         inputNeuron.outputNodes.remove(key);
-        super.remove(t);
+        super.remove(doc);
     }
 
 
@@ -415,9 +415,9 @@ public class InputNode extends Node {
 
 
     @Override
-    public void readFields(DataInput in, Iteration t) throws IOException {
-        super.readFields(in, t);
-        key = Key.read(in, t);
+    public void readFields(DataInput in, Document doc) throws IOException {
+        super.readFields(in, doc);
+        key = Key.read(in, doc);
     }
 
 

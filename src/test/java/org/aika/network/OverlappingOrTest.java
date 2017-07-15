@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -40,10 +39,6 @@ public class OverlappingOrTest {
     @Test
     public void testOverlappingOr() {
         Model m = new Model();
-
-        // Now, feed the inputs into the network.
-        Document doc = Document.create("a b c d e ");
-        Iteration t = m.startIteration(doc, 0);
 
         Map<Character, InputNeuron> inputNeurons = new HashMap<>();
         Map<Character, Neuron> relNeurons = new HashMap<>();
@@ -103,35 +98,36 @@ public class OverlappingOrTest {
                         .setMatchRange(false)
         );
 
+        Document doc = m.createDocument("a b c d e ", 0);
 
-        startSignal.addInput(t, 0, 1, 0);
+        startSignal.addInput(doc, 0, 1, 0);
 
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
 
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
-                inputNeurons.get(c).addInput(t, i, i + 1);
+                inputNeurons.get(c).addInput(doc, i, i + 1);
             }
-            System.out.println(t.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true));
         }
 
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).addInput(t, i, i + 1);
+                inputNeurons.get(c).addInput(doc, i, i + 1);
             }
 
-            System.out.println(t.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true));
         }
 
         // Computes the selected option
-        t.process();
+        doc.process();
 
-        Assert.assertEquals(1, pattern.node.getThreadState(t).activations.size());
+        Assert.assertEquals(1, pattern.node.getThreadState(doc).activations.size());
 
         System.out.println("Output activation:");
-        for(Activation act: pattern.node.getActivations(t)) {
+        for(Activation act: pattern.node.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
             System.out.println("Node: " + act.key.n);
@@ -141,13 +137,13 @@ public class OverlappingOrTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
         System.out.println();
 
 
-        t.train();
+        doc.train();
 
-        t.clearActivations();
+        doc.clearActivations();
     }
 
 }

@@ -18,7 +18,6 @@ package org.aika.corpus;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 
 import java.util.Collection;
 import java.util.Map;
@@ -56,7 +55,7 @@ public class Conflicts {
     }
 
 
-    public static void add(Iteration t, Activation act, Option primary, Option secondary) {
+    public static void add(Document doc, Activation act, Option primary, Option secondary) {
         Key ck = new Key(secondary, act);
         Conflict c = primary.conflicts.primary.get(ck);
         if(c == null) {
@@ -71,12 +70,12 @@ public class Conflicts {
             primary.conflicts.primary.put(ck, c);
             secondary.conflicts.secondary.put(new Key(primary, act), c);
 
-            c.conflict.removeActivationsRecursiveStep(t, c.conflict, Option.visitedCounter++);
+            c.conflict.removeActivationsRecursiveStep(doc, c.conflict, Option.visitedCounter++);
         }
     }
 
 
-    public static void remove(Iteration t, Activation act, Option primary, Option secondary) {
+    public static void remove(Document doc, Activation act, Option primary, Option secondary) {
         Key ck = new Key(secondary, act);
 
         Conflict c = primary.conflicts.primary.get(ck);
@@ -86,7 +85,7 @@ public class Conflicts {
         secondary.conflicts.secondary.remove(new Key(primary, act));
         c.conflict.isConflict--;
 
-        c.conflict.expandActivationsRecursiveStep(t, c.conflict, Option.visitedCounter++);
+        c.conflict.expandActivationsRecursiveStep(doc, c.conflict, Option.visitedCounter++);
 
         removeInternal(c);
     }

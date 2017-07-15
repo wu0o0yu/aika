@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -40,8 +39,7 @@ public class PropagateRidTest {
     public void simpleTest() {
         Model m = new Model();
         AndNode.minFrequency = 1;
-        Document doc = Document.create("aaaaaaaaaa");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("aaaaaaaaaa", 0);
 
         InputNeuron inA = m.createOrLookupInputSignal("A");
         Neuron pA = m.createAndNeuron(new Neuron("pA"),
@@ -54,9 +52,9 @@ public class PropagateRidTest {
                         .setRelativeRid(5)
         );
 
-        inA.addInput(t, 0, 1, 10, t.doc.bottom);
+        inA.addInput(doc, 0, 1, 10, doc.bottom);
 
-        Assert.assertEquals(5, Activation.get(t, pA.node, null, null, null, null, null).key.rid.intValue());
+        Assert.assertEquals(5, Activation.get(doc, pA.node, null, null, null, null, null).key.rid.intValue());
 
     }
 }

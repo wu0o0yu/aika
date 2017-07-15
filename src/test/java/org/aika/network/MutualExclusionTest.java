@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Conflicts.Conflict;
@@ -58,9 +57,6 @@ public class MutualExclusionTest {
     @Test
     public void testMutualExclusion() {
         Model m = new Model();
-
-        Document doc = Document.create("foobar");
-        Iteration t = m.startIteration(doc, 0);
 
         // Create the input neurons for the network.
         InputNeuron inA = m.createOrLookupInputSignal("IN-A");
@@ -149,14 +145,16 @@ public class MutualExclusionTest {
 
         // Now that the model is complete, apply it to a document.
 
+        Document doc = m.createDocument("foobar", 0);
+
         // Add input activations starting at char 0 and ending at char 1
         // These inputs will be immediately propagated through the network.
-        inA.addInput(t, 0, 1);
-        inB.addInput(t, 0, 1);
-        inC.addInput(t, 0, 1);
+        inA.addInput(doc, 0, 1);
+        inB.addInput(doc, 0, 1);
+        inC.addInput(doc, 0, 1);
 
         // Computes the selected option
-        t.process();
+        doc.process();
 
         System.out.println("Selected Option: " + doc.selectedOption);
         System.out.println();
@@ -168,7 +166,7 @@ public class MutualExclusionTest {
         System.out.println();
 
         System.out.println("Output activation:");
-        for(Activation act: outN.node.getActivations(t)) {
+        for(Activation act: outN.node.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
             System.out.println("Node: " + act.key.n);
@@ -178,12 +176,12 @@ public class MutualExclusionTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
         System.out.println();
 
         System.out.println("Selected activations:");
-        System.out.println(t.networkStateToString(false, true));
+        System.out.println(doc.networkStateToString(false, true));
 
-        t.clearActivations();
+        doc.clearActivations();
     }
 }

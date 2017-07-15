@@ -20,6 +20,7 @@ package org.aika.neuron;
 import org.aika.*;
 import org.aika.Activation.State;
 import org.aika.Activation.SynapseActivation;
+import org.aika.corpus.Document;
 import org.aika.corpus.ExpandNode;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
@@ -103,23 +104,23 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    public static Neuron create(Iteration t, Neuron n, double bias, double negDirSum, double negRecSum, double posRecSum, Set<Synapse> inputs) {
-        n.m = t.m;
+    public static Neuron create(Document doc, Neuron n, double bias, double negDirSum, double negRecSum, double posRecSum, Set<Synapse> inputs) {
+        n.m = doc.m;
         n.m.stat.neurons++;
         n.bias = bias;
         n.negDirSum = negDirSum;
         n.negRecSum = negRecSum;
         n.posRecSum = posRecSum;
 
-        n.lock.acquireWriteLock(t.threadId);
-        n.node = new OrNode(t);
+        n.lock.acquireWriteLock(doc.threadId);
+        n.node = new OrNode(doc);
         n.node.neuron = n;
         n.lock.releaseWriteLock();
 
         double sum = 0.0;
         for(Synapse s: inputs) {
             s.output = n;
-            s.link(t);
+            s.link(doc);
 
             if(s.maxLowerWeightsSum == Double.MAX_VALUE) {
                 s.maxLowerWeightsSum = sum;
@@ -128,36 +129,36 @@ public class Neuron implements Comparable<Neuron>, Writable {
             sum += s.w;
         }
 
-        if(!Node.adjust(t, n, -1)) return null;
+        if(!Node.adjust(doc, n, -1)) return null;
 
-        n.publish(t);
+        n.publish(doc);
 
         n.initialized = true;
         return n;
     }
 
 
-    public void publish(Iteration t) {
+    public void publish(Document doc) {
         m.neurons.put(id, this);
     }
 
 
-    public void unpublish(Iteration t) {
+    public void unpublish(Document doc) {
         m.neurons.remove(this);
     }
 
 
-    public void remove(Iteration t) {
-        unpublish(t);
+    public void remove(Document doc) {
+        unpublish(doc);
 
         for(Synapse s: inputSynapses) {
-            s.input.lock.acquireWriteLock(t.threadId);
+            s.input.lock.acquireWriteLock(doc.threadId);
             s.input.outputSynapses.remove(s);
             s.input.lock.releaseWriteLock();
         }
 
         for(Synapse s: outputSynapses) {
-            s.output.lock.acquireWriteLock(t.threadId);
+            s.output.lock.acquireWriteLock(doc.threadId);
             s.output.inputSynapses.remove(s);
             s.output.inputSynapsesByWeight.remove(s);
             s.output.lock.releaseWriteLock();
@@ -166,14 +167,14 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
 
 
-    public void propagateAddedActivation(Iteration t, Activation act) {
-        t.ubQueue.add(act);
+    public void propagateAddedActivation(Document doc, Activation act) {
+        doc.ubQueue.add(act);
     }
 
 
-    public void propagateRemovedActivation(Iteration t, Activation act) {
+    public void propagateRemovedActivation(Document doc, Activation act) {
         for(InputNode out: outputNodes.values()) {
-            out.removeActivation(t, act);
+            out.removeActivation(doc, act);
         }
     }
 
@@ -303,7 +304,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    public void computeErrorSignal(Iteration t, Activation act) {
+    public void computeErrorSignal(Document doc, Activation act) {
         act.errorSignal = act.initialErrorSignal;
         for(SynapseActivation sa: act.neuronOutputs) {
             Synapse s = sa.s;
@@ -313,28 +314,28 @@ public class Neuron implements Comparable<Neuron>, Writable {
         }
 
         for(SynapseActivation sa: act.neuronInputs) {
-            t.bQueue.add(sa.input);
+            doc.bQueue.add(sa.input);
         }
     }
 
 
-    public void train(Iteration t, Activation act) {
+    public void train(Document doc, Activation act) {
         if(Math.abs(act.errorSignal) < TOLERANCE) return;
 
         long v = Activation.visitedCounter++;
         Range targetRange = null;
         if(act.key.r != null) {
             int s = act.key.r.end - act.key.r.begin;
-            targetRange = new Range(Math.max(0, act.key.r.begin - (s / 2)), Math.min(t.doc.length(), act.key.r.end + (s / 2)));
+            targetRange = new Range(Math.max(0, act.key.r.begin - (s / 2)), Math.min(doc.length(), act.key.r.end + (s / 2)));
         }
         ArrayList<Activation> inputActs = new ArrayList<>();
-        for(Activation iAct: t.inputNodeActivations) {
+        for(Activation iAct: doc.inputNodeActivations) {
             if(Range.overlaps(iAct.key.r, targetRange)) {
                 inputActs.add(iAct);
             }
         }
 
-        if(Iteration.TRAIN_DEBUG_OUTPUT) {
+        if(Document.TRAIN_DEBUG_OUTPUT) {
             log.info("Debug discover:");
 
             log.info("Old Synapses:");
@@ -350,18 +351,18 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
         for(Activation iAct: inputActs) {
             Integer rid = Utils.nullSafeSub(iAct.key.rid, false, act.key.rid, false);
-            train(t, iAct, rid, LEARN_RATE * act.errorSignal, v);
+            train(doc, iAct, rid, LEARN_RATE * act.errorSignal, v);
         }
 
-        if(Iteration.TRAIN_DEBUG_OUTPUT) {
+        if(Document.TRAIN_DEBUG_OUTPUT) {
             log.info("");
         }
 
-        Node.adjust(t, this, act.errorSignal > 0.0 ? 1 : -1);
+        Node.adjust(doc, this, act.errorSignal > 0.0 ? 1 : -1);
     }
 
 
-    public void train(Iteration t, Activation iAct, Integer rid, double x, long v) {
+    public void train(Document doc, Activation iAct, Integer rid, double x, long v) {
         if(iAct.visitedNeuronTrain == v) return;
         iAct.visitedNeuronTrain = v;
 
@@ -389,8 +390,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
                         )
                 );
                 s.output = this;
-                in.setSynapse(t, sk, s);
-                s.link(t);
+                in.setSynapse(doc, sk, s);
+                s.link(doc);
             }
 
             inputSynapses.remove(s);
@@ -399,7 +400,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
             double oldW = s.w;
             s.w -= deltaW;
 
-            if(Iteration.TRAIN_DEBUG_OUTPUT) {
+            if(Document.TRAIN_DEBUG_OUTPUT) {
                 log.info("S:" + s.input + " RID:" + s.key.relativeRid + " OldW:" + oldW + " NewW:" + s.w);
             }
             inputSynapses.add(s);
@@ -433,8 +434,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    public void count(Iteration t) {
-        for(Activation act: node.getThreadState(t).activations.values()) {
+    public void count(Document doc) {
+        for(Activation act: node.getThreadState(doc).activations.values()) {
             if(act.finalState != null && act.finalState.value > 0.0) {
                 activationSum += act.finalState.value;
                 numberOfActivations++;
@@ -475,7 +476,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
 
     @Override
-    public void readFields(DataInput in, Iteration t) throws IOException {
+    public void readFields(DataInput in, Document doc) throws IOException {
         id = in.readInt();
         label = in.readUTF();
 
@@ -486,14 +487,14 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
-            Key k = Key.read(in, t);
-            InputNode n = (InputNode) t.m.initialNodes.get(in.readInt());
+            Key k = Key.read(in, doc);
+            InputNode n = (InputNode) doc.m.initialNodes.get(in.readInt());
             outputNodes.put(k, n);
             n.inputNeuron = this;
         }
 
         if(in.readBoolean()) {
-            node = t.m.initialNodes.get(in.readInt());
+            node = doc.m.initialNodes.get(in.readInt());
             node.neuron = this;
         }
 
@@ -505,9 +506,9 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    public static Neuron read(DataInput in, Iteration t) throws IOException {
+    public static Neuron read(DataInput in, Document doc) throws IOException {
         Neuron n = in.readBoolean() ? new InputNeuron() : new Neuron();
-        n.readFields(in, t);
+        n.readFields(in, doc);
         return n;
     }
 

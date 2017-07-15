@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Activation;
-import org.aika.Iteration;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -93,38 +92,37 @@ public class RecurrentPatternTest {
                         .setMatchRange(false)
         );
 
-        Document doc = new Document(txt);
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument(txt, 0);
 
-        startSignal.addInput(t, 0, 1, 0);
+        startSignal.addInput(doc, 0, 1, 0);
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
-                spaceN.addInput(t, i, i + 1);
+                spaceN.addInput(doc, i, i + 1);
             }
         }
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ' && c != '.') {
-                chars.get(c).addInput(t, i, i + 1);
+                chars.get(c).addInput(doc, i, i + 1);
             }
         }
 
         System.out.println("All activations:");
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
         System.out.println();
 
-        t.process();
+        doc.process();
 
         System.out.println("All activations:");
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
         System.out.println();
 
-        Activation patAct = patternN.node.getFirstActivation(t);
+        Activation patAct = patternN.node.getFirstActivation(doc);
         Assert.assertEquals(4, patAct.key.r.begin);
         Assert.assertEquals(10, patAct.key.r.end);
 
-        t.clearActivations();
+        doc.clearActivations();
 
     }
 
@@ -188,34 +186,33 @@ public class RecurrentPatternTest {
         );
 
 
-        Document doc = new Document(txt);
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument(txt, 0);
 
-        startSignal.addInput(t, 0, 1, 0);
+        startSignal.addInput(doc, 0, 1, 0);
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
-                spaceN.addInput(t, i, i + 1);
+                spaceN.addInput(doc, i, i + 1);
             }
         }
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ' && c != '.') {
-                chars.get(c).addInput(t, i, i + 1);
+                chars.get(c).addInput(doc, i, i + 1);
             }
         }
 
-        t.process();
+        doc.process();
 
         System.out.println("All activations:");
-        System.out.println(t.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true));
         System.out.println();
 
-        Activation patAct = patternN.node.getFirstActivation(t);
+        Activation patAct = patternN.node.getFirstActivation(doc);
         Assert.assertEquals(4, patAct.key.r.begin);
         Assert.assertEquals(10, patAct.key.r.end);
 
-        t.clearActivations();
+        doc.clearActivations();
 
     }
 
@@ -268,19 +265,18 @@ public class RecurrentPatternTest {
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), clock, false, start, true, false);
 
 
-        Document doc = Document.create("                                                  ");
-        Iteration t = m.startIteration(doc, 0);
+        Document doc = m.createDocument("                                                  ", 0);
 
         for(int i = 5; i < 30; i += 5) {
-            clock.addInput(t, i - 1, i);
+            clock.addInput(doc, i - 1, i);
         }
 
-        System.out.println(t.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false));
 
-        start.addInput(t, 0, 1, 0);
+        start.addInput(doc, 0, 1, 0);
 
-        System.out.println(t.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false));
 
-        Assert.assertEquals(2, Activation.get(t, ctn.node, 2, new Range(10, 15), Range.Relation.EQUALS, null, null).key.o.primId);
+        Assert.assertEquals(2, Activation.get(doc, ctn.node, 2, new Range(10, 15), Range.Relation.EQUALS, null, null).key.o.primId);
     }
 }
