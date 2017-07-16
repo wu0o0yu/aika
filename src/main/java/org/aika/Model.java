@@ -43,6 +43,8 @@ public class Model implements Writable {
     public int[] lastCleanup;
     public int[] iterationCounter;
 
+    public Document[] docs;
+
     public Map<String, Neuron> labeledNeurons = Collections.synchronizedMap(new LinkedHashMap<>());
     public Map<Integer, Neuron> neurons = Collections.synchronizedMap(new TreeMap<>());
 
@@ -77,6 +79,7 @@ public class Model implements Writable {
         lastCleanup = new int[numberOfThreads];
         iterationCounter = new int[numberOfThreads];
         allNodes = new Set[numberOfThreads];
+        docs = new Document[numberOfThreads];
 
         for(int i = 0; i < numberOfThreads; i++) {
             allNodes[i] = new TreeSet<>();
@@ -96,6 +99,11 @@ public class Model implements Writable {
 
         if(txt != null) {
             doc.changeNumberOfPositions(doc.length());
+
+            if(docs[threadId] != null) {
+                throw new RuntimeException("Two documents are using the same thread. Call clearActivations() first.");
+            }
+            docs[threadId] = doc;
         }
 
         return doc;

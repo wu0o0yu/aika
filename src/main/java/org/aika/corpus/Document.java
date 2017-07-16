@@ -265,6 +265,8 @@ public class Document implements Comparable<Document> {
                 }
             }
         }
+
+        m.docs[threadId] = null;
     }
 
 
