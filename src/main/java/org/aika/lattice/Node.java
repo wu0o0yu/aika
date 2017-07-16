@@ -40,6 +40,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import static org.aika.corpus.Range.Relation.OVERLAPS;
+
 
 /**
  *
@@ -405,12 +407,23 @@ public abstract class Node implements Comparable<Node>, Writable {
                 } else {
                     rid = Utils.nullSafeSub(act.key.rid, false, s.key.relativeRid, false);
                 }
+
+                Range.Relation rr = null;
+                if(s.key.matchRange) {
+                    if(s.key.startSignal != Synapse.RangeSignal.NONE && s.key.endSignal != Synapse.RangeSignal.NONE) {
+                        rr = OVERLAPS;
+                    } else {
+                        // TODO: rethink and cleanup
+                        rr = new Range.SynapseRangeMatcher(s, dir != 0);
+                    }
+                }
+
                 Stream<Activation> tmp = Activation.select(
                         doc ,
                         n,
                         rid,
                         act.key.r,
-                        s.key.matchRange ? new Range.SynapseRangeMatcher(s, dir != 0) : null,
+                        rr,
                         null,
                         null
                 );

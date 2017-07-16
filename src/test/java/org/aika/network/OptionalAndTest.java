@@ -32,7 +32,7 @@ public class OptionalAndTest {
 
     @Test
     public void testOptionalAnd() {
-        Model m = new Model();
+        Model m = new Model(2);
 
         InputNeuron wordEssen = m.createOrLookupInputSignal("word:essen");
         InputNeuron wordHamburg = m.createOrLookupInputSignal("word:hamburg");
@@ -129,7 +129,7 @@ public class OptionalAndTest {
 
 
         Document doc1 = m.createDocument("Essen");
-        Document doc2 = m.createDocument("essen");
+        Document doc2 = m.createDocument("essen", 1);
 
         for(Document doc: new Document[] {doc1, doc2}) {
             String txt = doc.getContent();
