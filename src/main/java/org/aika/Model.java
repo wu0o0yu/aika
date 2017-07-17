@@ -204,8 +204,10 @@ public class Model implements Writable {
             }
 
             if(!ni.optional) {
-                bias -= Math.abs(ni.weight) * ni.minInput;
-                minWeight = Math.min(minWeight, Math.abs(ni.weight) * ni.minInput);
+                bias -= Math.abs(ni.weight) * (ni.weight >= 0.0 ? ni.minInput : 1.0);
+                if(ni.weight >= 0.0) {
+                    minWeight = Math.min(minWeight, ni.weight * ni.minInput);
+                }
             }
             is.add(s);
         }

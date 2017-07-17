@@ -102,7 +102,7 @@ public class Input implements Comparable<Input> {
 
     /**
      * The minimum activation value that is required for this input. The minInput
-     * value is used to compute the neurons bias.
+     * value is used to compute the neurons bias. It only applied in the createAndNeuron method and only affects inputs with a positive weight.
      *
      * @param minInput
      * @return
