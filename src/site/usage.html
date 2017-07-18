@@ -51,7 +51,33 @@
 		<div class="features">
             <h1>Usage</h1>
 
-            <h2>Named Entity Recognition / Entity Resolution example</h2>
+            <h2>Aika Networks</h2>
+            The Aika Networks project is a preconfigured network for the Aika algorithm. The following code snipped shows how it can be used to process an arbitrary english text.
+            <div class="prettyprint-code">
+            <pre class="prettyprint">
+				<code class="language-java">
+        Parser parser = new Parser();
+        parser.init();
+
+        Document doc = parser.parse("Mr. Jackson Cook was born in New York");
+
+        for(Activation act: parser.personNamesModel.surnameCategory.node.getActivations(doc)) {
+            if(act.finalState != null && act.finalState.value > 0.0) {
+                System.out.println(doc.getText(act.key.r));
+            }
+        }
+
+        System.out.println(doc.networkStateToString(true, true));
+
+        doc.clearActivations();
+                </code>
+			</pre>
+            </div>
+
+
+            <h2>Aika Core Library</h2>
+
+            <h3>Named Entity Recognition / Entity Resolution example</h3>
             This example demonstrates the recognition of the words 'jackson cook' as forename and surname.
             If these words would have occurred independently, they would have been recognized as city or
             profession based on the example code. The complete code for this example can be found in the class <a href="https://github.com/aika-algorithm/aika/blob/master/src/test/java/org/aika/network/NamedEntityRecognitionTest.java">NamedEntityRecognitionTest</a>.
@@ -240,7 +266,7 @@ The output of this example looks as following. Each line in the table represents
             <br/>
             <br/>
 
-            <h2>Mutual exclusion example</h2>
+            <h3>Mutual exclusion example</h3>
             <div class="prettyprint-code">
 			<pre class="prettyprint">
 				<code class="language-java">
@@ -452,7 +478,7 @@ The output of this example looks as following. Each line in the table represents
             <br/>
             <br/>
 
-            <h2>Pattern matching example</h2>
+            <h3>Pattern matching example</h3>
             <div class="prettyprint-code">
 			<pre class="prettyprint">
 				<code class="language-java">
