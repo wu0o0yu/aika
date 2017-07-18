@@ -280,8 +280,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
                 (directSum + negRecSum) < 0.0 ? Math.max(0.0, directSum + negRecSum + maxRecurrentSum) : maxRecurrentSum
         );
 
-        if(doc.debugActId >= 0 && doc.debugActWeight < newWeight.w) {
-            storeDebugOutput(doc, tmp, newWeight);
+        if(doc.debugActId == act.id && doc.debugActWeight < newWeight.w) {
+            storeDebugOutput(doc, tmp, newWeight, round);
         }
 
         return new State(
@@ -292,19 +292,32 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    private void storeDebugOutput(Document doc, List<SynapseActivation> inputs, NormWeight nw) {
+    private void storeDebugOutput(Document doc, List<SynapseActivation> inputs, NormWeight nw, int round) {
         StringBuilder sb = new StringBuilder();
+        sb.append("Activation ID: " + doc.debugActId + "\n");
+        sb.append("Neuron: " + label + "\n");
         sb.append("Bias: " + bias + "\n");
-        sb.append("Positive Recurrent Sum:" + posRecSum + "\n");
-        sb.append("Negative Recurrent Sum:" + negRecSum + "\n");
-        sb.append("Negative Direct Sum:" + negDirSum + "\n");
+        sb.append("Round: " + round + "\n");
+        sb.append("Positive Recurrent Sum: " + posRecSum + "\n");
+        sb.append("Negative Recurrent Sum: " + negRecSum + "\n");
+        sb.append("Negative Direct Sum: " + negDirSum + "\n");
         sb.append("Inputs:\n");
 
         for(SynapseActivation sa: inputs) {
-            sb.append(sa.input.key.n.neuron.label + " SynWeight:" + sa.s.w + " ActValue:" + sa.input.finalState.value);
+            String actValue = "";
+            if(sa.s.key.isRecurrent) {
+                if(round > 0) {
+                    actValue = "" + sa.input.rounds.get(round - 1);
+                }
+            } else {
+                actValue = "" + sa.input.rounds.get(round);
+            }
+
+            sb.append("    " + sa.input.key.n.neuron.label + "  SynWeight: " + sa.s.w + "  ActValue: " + actValue);
+            sb.append("\n");
         }
-        sb.append("Weight:" + nw.w + "\n");
-        sb.append("Norm:" + nw.n +"\n");
+        sb.append("Weight: " + nw.w + "\n");
+        sb.append("Norm: " + nw.n +"\n");
         sb.append("\n");
         doc.debugOutput = sb.toString();
     }
