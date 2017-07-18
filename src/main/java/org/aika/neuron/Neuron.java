@@ -206,7 +206,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    public State computeWeight(int round, Activation act, ExpandNode en) {
+    public State computeWeight(int round, Activation act, ExpandNode en, Document doc) {
         double directSum = bias - (negDirSum + negRecSum);
         double recurrentSum = 0.0;
 
@@ -214,20 +214,6 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
         if(round == 0) {
             recurrentSum += posRecSum;
-        }
-
-        Comparator<Activation> firedComparator = new Comparator<Activation>() {
-            @Override
-            public int compare(Activation act1, Activation act2) {
-                int c = Integer.compare(act1.rounds.get(round).fired, act2.rounds.get(round).fired);
-                if(c != 0) return c;
-                return act1.compareTo(act2);
-            }
-        };
-
-        TreeSet<Activation> inputActs = new TreeSet<>(firedComparator);
-        for(SynapseActivation sa: act.neuronInputs) {
-            inputActs.add(sa.input);
         }
 
         ArrayList<SynapseActivation> tmp = new ArrayList<>();
@@ -247,11 +233,9 @@ public class Neuron implements Comparable<Neuron>, Writable {
             tmp.add(maxSA);
         }
 
-        // Was ist mit den negativen Inputs die nach dem überschreiten des Schwellwerts gefeuert werden?
         for (SynapseActivation sa: tmp) {
             Synapse s = sa.s;
 
-            lastSynapse = s;
             Activation iAct = sa.input;
 
             if (iAct == act || iAct.isRemoved) continue;
@@ -296,11 +280,33 @@ public class Neuron implements Comparable<Neuron>, Writable {
                 (directSum + negRecSum) < 0.0 ? Math.max(0.0, directSum + negRecSum + maxRecurrentSum) : maxRecurrentSum
         );
 
+        if(doc.debugActId >= 0 && doc.debugActWeight < newWeight.w) {
+            storeDebugOutput(doc, tmp, newWeight);
+        }
+
         return new State(
                 covered ? transferFunction(sum) : 0.0,
                 covered ? fired : -1,
                 newWeight
         );
+    }
+
+
+    private void storeDebugOutput(Document doc, List<SynapseActivation> inputs, NormWeight nw) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Bias: " + bias + "\n");
+        sb.append("Positive Recurrent Sum:" + posRecSum + "\n");
+        sb.append("Negative Recurrent Sum:" + negRecSum + "\n");
+        sb.append("Negative Direct Sum:" + negDirSum + "\n");
+        sb.append("Inputs:\n");
+
+        for(SynapseActivation sa: inputs) {
+            sb.append(sa.input.key.n.neuron.label + " SynWeight:" + sa.s.w + " ActValue:" + sa.input.finalState.value);
+        }
+        sb.append("Weight:" + nw.w + "\n");
+        sb.append("Norm:" + nw.n +"\n");
+        sb.append("\n");
+        doc.debugOutput = sb.toString();
     }
 
 

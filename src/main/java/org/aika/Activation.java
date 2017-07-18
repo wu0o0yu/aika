@@ -36,6 +36,8 @@ import java.util.stream.Stream;
  */
 public class Activation implements Comparable<Activation> {
 
+    public int id;
+
     public final Key key;
 
     public boolean isReplaced;
@@ -71,12 +73,14 @@ public class Activation implements Comparable<Activation> {
     public long queueId;
 
 
-    public Activation(Key key) {
+    public Activation(int id, Key key) {
+        this.id = id;
         this.key = key;
     }
 
 
-    public Activation(Node n, Range pos, Integer rid, Option o) {
+    public Activation(int id, Node n, Range pos, Integer rid, Option o) {
+        this.id = id;
         key = new Key(n, pos, rid, o);
     }
 

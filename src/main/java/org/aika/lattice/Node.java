@@ -314,7 +314,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     public Activation addActivationInternal(Document doc, Key ak, Collection<Activation> inputActs, boolean isTrainingAct) {
         Activation act = Activation.get(doc, this, ak);
         if(act == null) {
-            act = new Activation(ak);
+            act = new Activation(doc.activationIdCounter++, ak);
             act.isTrainingAct = isTrainingAct;
 
             if(neuron != null) {

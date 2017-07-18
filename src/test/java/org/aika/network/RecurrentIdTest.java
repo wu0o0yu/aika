@@ -77,8 +77,8 @@ public class RecurrentIdTest {
         InputNode outBNode = TestHelper.addOutputNode(doc, recB, 0, null);
 
 
-        TestHelper.addActivation(outANode, doc, new Activation(outANode, new Range(0, 1), 20, doc.bottom));
-        TestHelper.addActivation(outBNode, doc, new Activation(outBNode, new Range(0, 1), 21, doc.bottom));
+        TestHelper.addActivation(outANode, doc, new Activation(0, outANode, new Range(0, 1), 20, doc.bottom));
+        TestHelper.addActivation(outBNode, doc, new Activation(1, outBNode, new Range(0, 1), 21, doc.bottom));
 
         Activation outC1 = Activation.get(doc, outCNode, 20, new Range(0, 1), Range.Relation.OVERLAPS, null, null);
 
@@ -136,9 +136,9 @@ public class RecurrentIdTest {
         outBNode.inputNeuron = new Neuron();
         outCNode.inputNeuron = new Neuron();
 
-        TestHelper.addActivation(outANode, doc, new Activation(outANode, new Range(0, 1), 13, doc.bottom));
-        TestHelper.addActivation(outBNode, doc, new Activation(outBNode, new Range(0, 1), 10, doc.bottom));
-        TestHelper.addActivation(outCNode, doc, new Activation(outCNode, new Range(0, 1), 16, doc.bottom));
+        TestHelper.addActivation(outANode, doc, new Activation(0, outANode, new Range(0, 1), 13, doc.bottom));
+        TestHelper.addActivation(outBNode, doc, new Activation(1, outBNode, new Range(0, 1), 10, doc.bottom));
+        TestHelper.addActivation(outCNode, doc, new Activation(2, outCNode, new Range(0, 1), 16, doc.bottom));
 
         Activation outD1 = Activation.get(doc, outDNode, 10, new Range(0, 1), Range.Relation.OVERLAPS, null, null);
 

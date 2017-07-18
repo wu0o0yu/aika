@@ -657,15 +657,15 @@ public class PatternLatticeTest {
         InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, null);
         InputNode pCNode = TestHelper.addOutputNode(doc, inC, null, null);
 
-        Activation inA1 = new Activation(inANode, new Range(0, 1), null, doc.bottom);
+        Activation inA1 = new Activation(0, inANode, new Range(0, 1), null, doc.bottom);
 
         TestHelper.addActivation(pANode, doc, inA1);
 
-        Activation inB1 = new Activation(inBNode, new Range(0, 1), null, doc.bottom);
+        Activation inB1 = new Activation(1, inBNode, new Range(0, 1), null, doc.bottom);
 
         TestHelper.addActivation(pBNode, doc, inB1);
 
-        Activation inC1 = new Activation(inCNode, new Range(0, 1), null, doc.bottom);
+        Activation inC1 = new Activation(2, inCNode, new Range(0, 1), null, doc.bottom);
 
         TestHelper.addActivation(pCNode, doc, inC1);
     }

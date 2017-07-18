@@ -42,6 +42,9 @@ public class Document implements Comparable<Document> {
     public final int id = docIdCounter++;
     public static int docIdCounter = 0;
 
+
+    public int activationIdCounter = 0;
+
     private static final Logger log = LoggerFactory.getLogger(Document.class);
 
     public static boolean APPLY_DEBUG_OUTPUT = false;
@@ -92,6 +95,10 @@ public class Document implements Comparable<Document> {
     public TreeSet<Node> addedNodes = new TreeSet<>();
 
     public static int numberOfPositionsDelta;
+
+    public int debugActId = -1;
+    public double debugActWeight = 0.0;
+    public String debugOutput = "";
 
 
     public static Comparator<Activation> ACTIVATIONS_OUTPUT_COMPARATOR = new Comparator<Activation>() {
@@ -304,8 +311,7 @@ public class Document implements Comparable<Document> {
         StringBuilder sb = new StringBuilder();
         Neuron.NormWeight weightSum = Neuron.NormWeight.ZERO_WEIGHT;
         for(Activation act: acts) {
-            if (act.key.n.neuron != null && "SPACE".equals(act.key.n.neuron.label)) continue;
-
+            sb.append(act.id + " ");
             sb.append(act.key.r);
             sb.append(" - ");
 
@@ -488,7 +494,7 @@ public class Document implements Comparable<Document> {
                 int round = e.round;
                 Activation act = e.act;
 
-                Activation.State s = act.key.n.neuron.computeWeight(e.round, act, en);
+                Activation.State s = act.key.n.neuron.computeWeight(e.round, act, en, Document.this);
 
                 if(OPTIMIZE_DEBUG_OUTPUT) {
                     log.info(act.key + " Round:" + round);
