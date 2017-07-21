@@ -103,6 +103,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     public RangeVisibility[] rangeVisibility;
     public boolean[] matchRange;
+    public boolean matchRangeFlag;
 
     public static long visitedCounter = 0;
 

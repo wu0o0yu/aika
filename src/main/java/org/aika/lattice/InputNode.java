@@ -64,11 +64,13 @@ public class InputNode extends Node {
 
         endRequired = false;
         ridRequired = false;
+        matchRangeFlag = false;
         if(key != null) {
             rangeVisibility = new RangeVisibility[] {key.startVisibility, key.endVisibility};
             matchRange = new boolean[] {key.startSignal != RangeSignal.NONE && key.startVisibility == RangeVisibility.MATCH_INPUT, key.endSignal != RangeSignal.NONE && key.endVisibility == RangeVisibility.MATCH_INPUT};
             endRequired = key.startSignal == Synapse.RangeSignal.NONE;
             ridRequired = key.relativeRid != null || key.absoluteRid != null;
+            matchRangeFlag = key.matchRange;
         }
     }
 
@@ -286,17 +288,20 @@ public class InputNode extends Node {
         Activation.select(doc, secondNode, secondRid, ak.r, new Range.BeginEndMatcher(ak.n.matchRange, secondNode.matchRange), null, null)
                 .forEach(secondAct -> {
             if(!secondAct.isRemoved) {
-                Option o = Option.add(doc, true, ak.o, secondAct.key.o);
-                if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
-                    nlp.addActivation(doc,
-                            new Activation.Key(
-                                    nlp,
-                                    Range.applyVisibility(ak.r, ak.n.rangeVisibility, secondAct.key.r, secondAct.key.n.rangeVisibility),
-                                    Utils.nullSafeMin(ak.rid, secondAct.key.rid),
-                                    o
-                            ),
-                            AndNode.prepareInputActs(act, secondAct)
-                    );
+                // TODO: refactor range matching
+                if(!ak.n.matchRangeFlag || !secondNode.matchRangeFlag || Range.Relation.OVERLAPS.match(ak.r, secondAct.key.r)) {
+                    Option o = Option.add(doc, true, ak.o, secondAct.key.o);
+                    if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
+                        nlp.addActivation(doc,
+                                new Activation.Key(
+                                        nlp,
+                                        Range.applyVisibility(ak.r, ak.n.rangeVisibility, secondAct.key.r, secondAct.key.n.rangeVisibility),
+                                        Utils.nullSafeMin(ak.rid, secondAct.key.rid),
+                                        o
+                                ),
+                                AndNode.prepareInputActs(act, secondAct)
+                        );
+                    }
                 }
             }
         });

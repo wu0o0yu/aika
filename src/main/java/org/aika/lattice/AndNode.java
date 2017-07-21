@@ -69,6 +69,7 @@ public class AndNode extends Node {
         matchRange = new boolean[] {false, false};
 
         ridRequired = false;
+        matchRangeFlag = false;
 
         for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
             Refinement ref = me.getKey();

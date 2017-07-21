@@ -281,7 +281,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
         );
 
         if(doc.debugActId == act.id && doc.debugActWeight < newWeight.w) {
-            storeDebugOutput(doc, tmp, newWeight, round);
+            storeDebugOutput(doc, tmp, newWeight, sum, round);
         }
 
         return new State(
@@ -292,10 +292,11 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    private void storeDebugOutput(Document doc, List<SynapseActivation> inputs, NormWeight nw, int round) {
+    private void storeDebugOutput(Document doc, List<SynapseActivation> inputs, NormWeight nw, double sum, int round) {
         StringBuilder sb = new StringBuilder();
         sb.append("Activation ID: " + doc.debugActId + "\n");
         sb.append("Neuron: " + label + "\n");
+        sb.append("Sum: " + sum + "\n");
         sb.append("Bias: " + bias + "\n");
         sb.append("Round: " + round + "\n");
         sb.append("Positive Recurrent Sum: " + posRecSum + "\n");
