@@ -29,12 +29,13 @@ import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.Key;
 import org.aika.neuron.Synapse.RangeSignal;
-import org.aika.neuron.Synapse.RangeVisibility;
+import org.aika.neuron.Synapse.RangeMatch;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
+
 
 /**
  *
@@ -64,13 +65,9 @@ public class InputNode extends Node {
 
         endRequired = false;
         ridRequired = false;
-        matchRangeFlag = false;
         if(key != null) {
-            rangeVisibility = new RangeVisibility[] {key.startVisibility, key.endVisibility};
-            matchRange = new boolean[] {key.startSignal != RangeSignal.NONE && key.startVisibility == RangeVisibility.MATCH_INPUT, key.endSignal != RangeSignal.NONE && key.endVisibility == RangeVisibility.MATCH_INPUT};
             endRequired = key.startSignal == Synapse.RangeSignal.NONE;
             ridRequired = key.relativeRid != null || key.absoluteRid != null;
-            matchRangeFlag = key.matchRange;
         }
     }
 
@@ -136,7 +133,7 @@ public class InputNode extends Node {
 
         return new Activation.Key(
                 this,
-                new Range(key.startSignal.getSignalPos(ak.r, Integer.MIN_VALUE), key.endSignal.getSignalPos(ak.r, Integer.MAX_VALUE)),
+                new Range(key.startSignal.getSignalPos(ak.r), key.endSignal.getSignalPos(ak.r)),
                 key.relativeRid != null ? ak.rid : null,
                 ak.o
         );
@@ -283,28 +280,52 @@ public class InputNode extends Node {
 
     private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, AndNode nlp, Activation act, Option removedConflict) {
         Activation.Key ak = act.key;
+        InputNode firstNode = ((InputNode) ak.n);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
 
-        Activation.select(doc, secondNode, secondRid, ak.r, new Range.BeginEndMatcher(ak.n.matchRange, secondNode.matchRange), null, null)
+        Activation.select(doc, secondNode, secondRid, ak.r, computeRangeRelation(firstNode.key, secondNode.key), null, null)
                 .forEach(secondAct -> {
-            if(!secondAct.isRemoved) {
-                // TODO: refactor range matching
-                if(!ak.n.matchRangeFlag || !secondNode.matchRangeFlag || Range.Relation.OVERLAPS.match(ak.r, secondAct.key.r)) {
-                    Option o = Option.add(doc, true, ak.o, secondAct.key.o);
-                    if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
-                        nlp.addActivation(doc,
-                                new Activation.Key(
-                                        nlp,
-                                        Range.applyVisibility(ak.r, ak.n.rangeVisibility, secondAct.key.r, secondAct.key.n.rangeVisibility),
-                                        Utils.nullSafeMin(ak.rid, secondAct.key.rid),
-                                        o
-                                ),
-                                AndNode.prepareInputActs(act, secondAct)
-                        );
+                    if(!secondAct.isRemoved) {
+                        Option o = Option.add(doc, true, ak.o, secondAct.key.o);
+                        if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
+                            nlp.addActivation(doc,
+                                    new Activation.Key(
+                                            nlp,
+                                            Range.mergeRange(
+                                                    Range.getOutputRange(ak.r, new boolean[]{ firstNode.key.startRangeOutput, firstNode.key.endRangeOutput}),
+                                                    Range.getOutputRange(secondAct.key.r, new boolean[]{ secondNode.key.startRangeOutput, secondNode.key.endRangeOutput})
+                                            ),
+                                            Utils.nullSafeMin(ak.rid, secondAct.key.rid),
+                                            o
+                                    ),
+                                    AndNode.prepareInputActs(act, secondAct)
+                            );
+                        }
                     }
-                }
-            }
-        });
+                });
+    }
+
+
+    private static Range.Relation computeRangeRelation(Key k1, Key k2) {
+        RangeMatch begin = RangeMatch.NONE;
+        if(k1.startRangeOutput && k2.startRangeOutput) {
+            begin = RangeMatch.EQUALS;
+        } else if(k1.startRangeOutput) {
+            begin = RangeMatch.invert(k2.startRangeMatch);
+        } else if(k2.startRangeOutput) {
+            begin = k1.startRangeMatch;
+        }
+
+        RangeMatch end = RangeMatch.NONE;
+        if(k1.endRangeOutput && k2.endRangeOutput) {
+            end = RangeMatch.EQUALS;
+        } else if(k1.endRangeOutput) {
+            end = RangeMatch.invert(k2.endRangeMatch);
+        } else if(k2.endRangeOutput) {
+            end = k1.endRangeMatch;
+        }
+
+        return new Range.RangeMatcher(begin, end);
     }
 
 
@@ -314,7 +335,7 @@ public class InputNode extends Node {
 
         for(Activation secondAct: doc.inputNodeActivations) {
             Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (InputNode) secondAct.key.n);
-            Range.BeginEndMatcher mr = new Range.BeginEndMatcher(matchRange, ref.input.matchRange);
+            Range.Relation mr = computeRangeRelation(key, ref.input.key);
             Integer ridDelta = Utils.nullSafeSub(act.key.rid, false, secondAct.key.rid, false);
 
             if(act != secondAct &&
@@ -370,21 +391,9 @@ public class InputNode extends Node {
         StringBuilder sb = new StringBuilder();
         sb.append(key.isNeg ? "N" : "P");
         sb.append(key.isRecurrent ? "R" : "");
-        if(key.startSignal == RangeSignal.NONE) {
-            sb.append("|");
-        } else if(key.startSignal == RangeSignal.START) {
-            if(key.startVisibility == RangeVisibility.MAX_OUTPUT) {
-                sb.append("<");
-            } else {
-                sb.append("[");
-            }
-        } else if(key.startSignal == RangeSignal.END) {
-            if(key.startVisibility == RangeVisibility.MAX_OUTPUT) {
-                sb.append(">");
-            } else {
-                sb.append("]");
-            }
-        }
+
+        sb.append(getRangeBrackets(key.startRangeOutput, key.startSignal));
+
         if(inputNeuron != null) {
             sb.append(inputNeuron.id);
             if(inputNeuron.label != null) {
@@ -392,22 +401,18 @@ public class InputNode extends Node {
                 sb.append(inputNeuron.label);
             }
         }
-        if(key.endSignal == RangeSignal.NONE) {
-            sb.append("|");
-        } else if(key.endSignal == RangeSignal.START) {
-            if(key.endVisibility == RangeVisibility.MAX_OUTPUT) {
-                sb.append("<");
-            } else {
-                sb.append("[");
-            }
-        } else if(key.endSignal == RangeSignal.END) {
-            if(key.endVisibility == RangeVisibility.MAX_OUTPUT) {
-                sb.append(">");
-            } else {
-                sb.append("]");
-            }
-        }
+
+        sb.append(getRangeBrackets(key.endRangeOutput, key.endSignal));
+
         return sb.toString();
+    }
+
+
+    private String getRangeBrackets(boolean ro, RangeSignal rs) {
+        if(rs == RangeSignal.NONE) return "|";
+        else if(ro) return rs == RangeSignal.START ? "[" : "]";
+        else if(!ro) return rs == RangeSignal.START ? "<" : ">";
+        else return "|";
     }
 
 

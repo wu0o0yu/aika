@@ -27,7 +27,6 @@ import org.aika.corpus.Range;
 import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeVisibility;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 
 import java.io.DataInput;
@@ -65,25 +64,13 @@ public class AndNode extends Node {
         m.stat.nodes++;
         m.stat.nodesPerLevel[level]++;
 
-        rangeVisibility = new RangeVisibility[] {RangeVisibility.MAX_OUTPUT, RangeVisibility.MAX_OUTPUT};
-        matchRange = new boolean[] {false, false};
-
         ridRequired = false;
-        matchRangeFlag = false;
 
         for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
             Refinement ref = me.getKey();
             Node pn = me.getValue();
 
             pn.addAndChild(ref, this);
-
-            if(!ref.input.key.isNeg && !ref.input.key.isRecurrent) {
-                if (ref.input.key.startVisibility == RangeVisibility.MATCH_INPUT) rangeVisibility[0] = RangeVisibility.MATCH_INPUT;
-                if (ref.input.key.endVisibility == RangeVisibility.MATCH_INPUT) rangeVisibility[1] = RangeVisibility.MATCH_INPUT;
-
-                if (ref.input.key.startSignal != Synapse.RangeSignal.NONE && ref.input.key.startVisibility == RangeVisibility.MATCH_INPUT) matchRange[0] = true;
-                if (ref.input.key.endSignal != Synapse.RangeSignal.NONE && ref.input.key.startVisibility == RangeVisibility.MATCH_INPUT) matchRange[1] = true;
-            }
 
             if(ref.rid != null) ridRequired = true;
         }
@@ -395,7 +382,7 @@ public class AndNode extends Node {
                     doc,
                     new Key(
                             nlp,
-                            Range.applyVisibility(ak.r, ak.n.rangeVisibility, secondAct.key.r, secondAct.key.n.rangeVisibility),
+                            Range.mergeRange(ak.r, secondAct.key.r),
                             Utils.nullSafeMin(ak.rid, secondAct.key.rid),
                             o
                     ),

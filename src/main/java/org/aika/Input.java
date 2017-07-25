@@ -16,8 +16,11 @@
  */
 package org.aika;
 
+import org.aika.corpus.Range.Relation;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeSignal;
+import org.aika.neuron.Synapse.RangeMatch;
 
 
 /**
@@ -31,11 +34,12 @@ public class Input implements Comparable<Input> {
     public double weight;
     public double maxLowerWeightsSum = Double.MAX_VALUE;
     public double minInput;
-    public boolean matchRange = true;
-    public Synapse.RangeVisibility startVisibility = Synapse.RangeVisibility.MAX_OUTPUT;
-    public Synapse.RangeVisibility endVisibility = Synapse.RangeVisibility.MAX_OUTPUT;
-    public Synapse.RangeSignal startSignal = Synapse.RangeSignal.START;
-    public Synapse.RangeSignal endSignal = Synapse.RangeSignal.END;
+    public RangeMatch startRangeMatch = RangeMatch.NONE;
+    public RangeMatch endRangeMatch = RangeMatch.NONE;
+    public boolean startRangeOutput;
+    public boolean endRangeOutput;
+    public RangeSignal startSignal = Synapse.RangeSignal.START;
+    public RangeSignal endSignal = Synapse.RangeSignal.END;
 
     public Integer relativeRid;
     public Integer absoluteRid;
@@ -138,48 +142,82 @@ public class Input implements Comparable<Input> {
     /**
      * If set to true then the range of this inputs activation needs to match.
      *
-     * @param matchRange
      * @return
      */
-    public Input setMatchRange(boolean matchRange) {
-        this.matchRange = matchRange;
+    public Input setStartRangeMatch(RangeMatch rm) {
+        this.startRangeMatch = rm;
         return this;
     }
+
+    public Input setEndRangeMatch(RangeMatch rm) {
+        this.endRangeMatch = rm;
+        return this;
+    }
+
+
+    public enum RangeRelation {
+        EQUALS,
+        CONTAINS,
+        CONTAINED_IN,
+        NONE
+    }
+
+
+    public Input setRangeMatch(RangeRelation rr) {
+        switch(rr) {
+            case EQUALS:
+                startRangeMatch = RangeMatch.EQUALS;
+                endRangeMatch = RangeMatch.EQUALS;
+                break;
+            case CONTAINS:
+                startRangeMatch = RangeMatch.LESS_THAN;
+                endRangeMatch = RangeMatch.GREATER_THAN;
+                break;
+            case CONTAINED_IN:
+                startRangeMatch = RangeMatch.GREATER_THAN;
+                endRangeMatch = RangeMatch.LESS_THAN;
+                break;
+            default:
+                startRangeMatch = RangeMatch.NONE;
+                endRangeMatch = RangeMatch.NONE;
+        }
+        return this;
+    }
+
 
     /**
-     * Determines if this input is used to compute the range begin of the output activation.
+     * Determines if this input is used to compute the range of the output activation.
      *
-     * @param rv
+     * @param ro
      * @return
      */
-    public Input setStartVisibility(Synapse.RangeVisibility rv) {
-        this.startVisibility = rv;
+    public Input setRangeOutput(boolean ro) {
+        this.startRangeOutput = ro;
+        this.endRangeOutput = ro;
         return this;
     }
 
-    /**
-     * Determines if this input is used to compute the range end of the output activation.
-     *
-     * @param rv
-     * @return
-     */
-    public Input setEndVisibility(Synapse.RangeVisibility rv) {
-        this.endVisibility = rv;
+    public Input setStartRangeOutput(boolean ro) {
+        this.startRangeOutput = ro;
+        return this;
+    }
+
+    public Input setEndRangeOutput(boolean ro) {
+        this.endRangeOutput = ro;
         return this;
     }
 
 
-    public Input setStartSignal(Synapse.RangeSignal startSignal) {
+    public Input setStartRangeSignal(RangeSignal startSignal) {
         this.startSignal = startSignal;
         return this;
     }
 
 
-    public Input setEndSignal(Synapse.RangeSignal endSignal) {
+    public Input setEndRangeSignal(RangeSignal endSignal) {
         this.endSignal = endSignal;
         return this;
     }
-
 
 
     @Override
@@ -192,15 +230,17 @@ public class Input implements Comparable<Input> {
         if(r != 0) return r;
         r = neuron.compareTo(in.neuron);
         if(r != 0) return r;
-        r = Boolean.compare(matchRange, in.matchRange);
+        r = startRangeMatch.compareTo(in.startRangeMatch);
+        if(r != 0) return r;
+        r = endRangeMatch.compareTo(in.endRangeMatch);
         if(r != 0) return r;
         r = Utils.compareInteger(relativeRid, in.relativeRid);
         if (r != 0) return r;
         r = Utils.compareInteger(absoluteRid, in.absoluteRid);
         if (r != 0) return r;
-        r = Utils.compareInteger(startVisibility.ordinal(), in.startVisibility.ordinal());
+        r = Boolean.compare(startRangeOutput, in.startRangeOutput);
         if (r != 0) return r;
-        r = Utils.compareInteger(endVisibility.ordinal(), in.endVisibility.ordinal());
+        r = Boolean.compare(endRangeOutput, in.endRangeOutput);
         if (r != 0) return r;
         r = Utils.compareInteger(startSignal.ordinal(), in.startSignal.ordinal());
         if (r != 0) return r;

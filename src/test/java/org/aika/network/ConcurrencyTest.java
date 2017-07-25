@@ -49,13 +49,15 @@ public class ConcurrencyTest {
                         .setWeight(1.0)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setEndRangeOutput(true)
         );
 
 
@@ -127,13 +129,15 @@ public class ConcurrencyTest {
                         .setWeight(1.0)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setEndRangeOutput(true)
         );
 
         for (int i = 0; i < 5; i++) {

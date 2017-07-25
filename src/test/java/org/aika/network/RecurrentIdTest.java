@@ -44,41 +44,33 @@ public class RecurrentIdTest {
     public void testABPattern() {
         Model m = new Model();
 
-        InputNeuron cl = m.createOrLookupInputSignal("Clock");
-        InputNeuron start = m.createOrLookupInputSignal("Start");
         InputNeuron inA = m.createOrLookupInputSignal("A");
         InputNeuron inB = m.createOrLookupInputSignal("B");
 
-        Neuron ctNeuron = m.createCounterNeuron(new Neuron("CTN"), cl, false, start, true, false);
-
-        Neuron recA = m.createRelationalNeuron(new Neuron("SA"), ctNeuron, inA, false);
-        Neuron recB = m.createRelationalNeuron(new Neuron("SB"), ctNeuron, inB, false);
 
         Node outCNode = m.createAndNeuron(new Neuron("C", true, true),
                 0.001,
                 new Input()
-                        .setNeuron(recA)
+                        .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
-                        .setRelativeRid(0),
+                        .setRelativeRid(0)
+                        .setRangeOutput(true),
                 new Input()
-                        .setNeuron(recB)
+                        .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(1)
+                        .setRangeOutput(true)
         ).node;
 
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNode outANode = TestHelper.addOutputNode(doc, recA, 0, null);
-        InputNode outBNode = TestHelper.addOutputNode(doc, recB, 0, null);
-
-
-        TestHelper.addActivation(outANode, doc, new Activation(0, outANode, new Range(0, 1), 20, doc.bottom));
-        TestHelper.addActivation(outBNode, doc, new Activation(1, outBNode, new Range(0, 1), 21, doc.bottom));
+        inA.addInput(doc, 0, 1, 20);
+        inB.addInput(doc, 0, 1, 21);
 
         Activation outC1 = Activation.get(doc, outCNode, 20, new Range(0, 1), Range.Relation.OVERLAPS, null, null);
 
@@ -92,53 +84,40 @@ public class RecurrentIdTest {
     public void testABCPattern() {
         Model m = new Model();
 
-        InputNeuron cl = m.createOrLookupInputSignal("Clock");
-        InputNeuron start = m.createOrLookupInputSignal("Start");
         InputNeuron inA = m.createOrLookupInputSignal("A");
         InputNeuron inB = m.createOrLookupInputSignal("B");
         InputNeuron inC = m.createOrLookupInputSignal("C");
 
-        Neuron ctNeuron = m.createCounterNeuron(new Neuron("CTN"), cl, false, start, true, false);
-
-        Neuron recA = m.createRelationalNeuron(new Neuron("A"), ctNeuron, inA, false);
-        Neuron recB = m.createRelationalNeuron(new Neuron("B"), ctNeuron, inB, false);
-        Neuron recC = m.createRelationalNeuron(new Neuron("C"), ctNeuron, inC, false);
-
         Node outDNode = m.createAndNeuron(new Neuron("D", true, true),
                 0.001,
                 new Input()
-                        .setNeuron(recA)
+                        .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
-                        .setRelativeRid(3),
+                        .setRelativeRid(3)
+                        .setRangeOutput(true),
                 new Input()
-                        .setNeuron(recB)
+                        .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
-                        .setRelativeRid(0),
+                        .setRelativeRid(0)
+                        .setRangeOutput(true),
                 new Input()
-                        .setNeuron(recC)
+                        .setNeuron(inC)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(6)
+                        .setRangeOutput(true)
         ).node;
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNode outANode = TestHelper.addOutputNode(doc, recA, 0, null);
-        InputNode outBNode = TestHelper.addOutputNode(doc, recB, 0, null);
-        InputNode outCNode = TestHelper.addOutputNode(doc, recC, 0, null);
-
-        outANode.inputNeuron = new Neuron();
-        outBNode.inputNeuron = new Neuron();
-        outCNode.inputNeuron = new Neuron();
-
-        TestHelper.addActivation(outANode, doc, new Activation(0, outANode, new Range(0, 1), 13, doc.bottom));
-        TestHelper.addActivation(outBNode, doc, new Activation(1, outBNode, new Range(0, 1), 10, doc.bottom));
-        TestHelper.addActivation(outCNode, doc, new Activation(2, outCNode, new Range(0, 1), 16, doc.bottom));
+        inA.addInput(doc, 0, 1, 13);
+        inB.addInput(doc, 0, 1, 10);
+        inC.addInput(doc, 0, 1, 16);
 
         Activation outD1 = Activation.get(doc, outDNode, 10, new Range(0, 1), Range.Relation.OVERLAPS, null, null);
 
@@ -165,13 +144,17 @@ public class RecurrentIdTest {
 
                 InputNeuron rec = chars.get(c);
                 if (rec != null) {
+                    boolean begin = i == 0;
+                    boolean end = i + 1 == word.length();
                     inputs.add(
                             new Input()
                                 .setNeuron(rec)
-                                .setWeight(1.0)
+                                .setWeight(begin || end ? 2.0 : 1.0)
                                 .setRecurrent(false)
                                 .setMinInput(1.0)
                                 .setRelativeRid(i)
+                                .setStartRangeOutput(begin)
+                                .setEndRangeOutput(end)
                     );
                 }
             }

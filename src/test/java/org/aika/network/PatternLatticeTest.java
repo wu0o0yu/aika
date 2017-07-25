@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Activation;
 import org.aika.Input;
+import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
@@ -28,6 +29,7 @@ import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
+import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -52,17 +54,23 @@ public class PatternLatticeTest {
                             .setNeuron(inA)
                             .setWeight(1.0)
                             .setRecurrent(false)
-                            .setMinInput(1.0),
+                            .setMinInput(1.0)
+                            .setRangeMatch(Input.RangeRelation.CONTAINS)
+                            .setRangeOutput(true),
                     new Input()
                             .setNeuron(inB)
                             .setWeight(1.0)
                             .setRecurrent(false)
-                            .setMinInput(1.0),
+                            .setMinInput(1.0)
+                            .setRangeMatch(Input.RangeRelation.CONTAINS)
+                            .setRangeOutput(true),
                     new Input()
                             .setNeuron(inC)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setMinInput(1.0)
+                            .setRangeMatch(Input.RangeRelation.CONTAINS)
+                            .setRangeOutput(true)
             );
 
             Document doc = m.createDocument(null, 0);
@@ -72,27 +80,27 @@ public class PatternLatticeTest {
             InputNode pB = TestHelper.addOutputNode(doc, inB, null, null);
             InputNode pC = TestHelper.addOutputNode(doc, inC, null, null);
 
-            AndNode pAB = pA.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null)));
-            Assert.assertEquals(pAB, pB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null))));
+            AndNode pAB = pA.andChildren.get(new Refinement(null, pB));
+            Assert.assertEquals(pAB, pB.andChildren.get(new Refinement(null, pA)));
 
-            AndNode pAC = pA.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null)));
-            Assert.assertEquals(pAC, pC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null))));
+            AndNode pAC = pA.andChildren.get(new Refinement(null, pC));
+            Assert.assertEquals(pAC, pC.andChildren.get(new Refinement(null, pA)));
 
-            AndNode pBC = pB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null)));
-            Assert.assertEquals(pBC, pC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null))));
+            AndNode pBC = pB.andChildren.get(new Refinement(null, pC));
+            Assert.assertEquals(pBC, pC.andChildren.get(new Refinement(null, pB)));
 
             Assert.assertEquals(1, pAB.andChildren.size());
             Assert.assertEquals(1, pBC.andChildren.size());
             Assert.assertEquals(1, pAC.andChildren.size());
 
-            AndNode pABC = pAB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null)));
-            Assert.assertEquals(pABC, pAC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null))));
-            Assert.assertEquals(pABC, pBC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null))));
+            AndNode pABC = pAB.andChildren.get(new Refinement(null, pC));
+            Assert.assertEquals(pABC, pAC.andChildren.get(new Refinement(null, pB)));
+            Assert.assertEquals(pABC, pBC.andChildren.get(new Refinement(null, pA)));
 
             Assert.assertEquals(3, pABC.parents.size());
-            Assert.assertEquals(pAB, pABC.parents.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null))));
-            Assert.assertEquals(pAC, pABC.parents.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null))));
-            Assert.assertEquals(pBC, pABC.parents.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null))));
+            Assert.assertEquals(pAB, pABC.parents.get(new Refinement(null, pC)));
+            Assert.assertEquals(pAC, pABC.parents.get(new Refinement(null, pB)));
+            Assert.assertEquals(pBC, pABC.parents.get(new Refinement(null, pA)));
         }
         {
             m.createAndNeuron(new Neuron("BCD"),
@@ -101,17 +109,23 @@ public class PatternLatticeTest {
                             .setNeuron(inB)
                             .setWeight(1.0)
                             .setRecurrent(false)
-                            .setMinInput(1.0),
+                            .setMinInput(1.0)
+                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeOutput(true),
                     new Input()
                             .setNeuron(inC)
                             .setWeight(1.0)
                             .setRecurrent(false)
-                            .setMinInput(1.0),
+                            .setMinInput(1.0)
+                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeOutput(true),
                     new Input()
                             .setNeuron(inD)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setMinInput(1.0)
+                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeOutput(true)
             );
 
             Document doc = m.createDocument(null, 0);
@@ -121,20 +135,20 @@ public class PatternLatticeTest {
             InputNode pC = TestHelper.addOutputNode(doc, inC, null, null);
             InputNode pD = TestHelper.addOutputNode(doc, inD, null, null);
 
-            AndNode pAB = pA.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null)));
-            Assert.assertEquals(pAB, pB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null))));
+            AndNode pAB = pA.andChildren.get(new Refinement(null, pB));
+            Assert.assertEquals(pAB, pB.andChildren.get(new Refinement(null, pA)));
 
-            AndNode pAC = pA.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null)));
-            Assert.assertEquals(pAC, pC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null))));
+            AndNode pAC = pA.andChildren.get(new Refinement(null, pC));
+            Assert.assertEquals(pAC, pC.andChildren.get(new Refinement(null, pA)));
 
-            AndNode pBC = pB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null)));
-            Assert.assertEquals(pBC, pC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null))));
+            AndNode pBC = pB.andChildren.get(new Refinement(null, pC));
+            Assert.assertEquals(pBC, pC.andChildren.get(new Refinement(null, pB)));
 
-            AndNode pBD = pB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null)));
-            Assert.assertEquals(pBD, pD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null))));
+            AndNode pBD = pB.andChildren.get(new Refinement(null, pD));
+            Assert.assertEquals(pBD, pD.andChildren.get(new Refinement(null, pB)));
 
-            AndNode pCD = pC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null)));
-            Assert.assertEquals(pCD, pD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null))));
+            AndNode pCD = pC.andChildren.get(new Refinement(null, pD));
+            Assert.assertEquals(pCD, pD.andChildren.get(new Refinement(null, pC)));
 
 
             Assert.assertEquals(1, pAB.andChildren.size());
@@ -143,14 +157,14 @@ public class PatternLatticeTest {
             Assert.assertEquals(1, pBD.andChildren.size());
             Assert.assertEquals(1, pCD.andChildren.size());
 
-            AndNode pBCD = pBC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null)));
-            Assert.assertEquals(pBCD, pBD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null))));
-            Assert.assertEquals(pBCD, pCD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null))));
+            AndNode pBCD = pBC.andChildren.get(new Refinement(null, pD));
+            Assert.assertEquals(pBCD, pBD.andChildren.get(new Refinement(null, pC)));
+            Assert.assertEquals(pBCD, pCD.andChildren.get(new Refinement(null, pB)));
 
             Assert.assertEquals(3, pBCD.parents.size());
-            Assert.assertEquals(pBC, pBCD.parents.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null))));
-            Assert.assertEquals(pBD, pBCD.parents.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null))));
-            Assert.assertEquals(pCD, pBCD.parents.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null))));
+            Assert.assertEquals(pBC, pBCD.parents.get(new Refinement(null, pD)));
+            Assert.assertEquals(pBD, pBCD.parents.get(new Refinement(null, pC)));
+            Assert.assertEquals(pCD, pBCD.parents.get(new Refinement(null, pB)));
         }
         {
             m.createAndNeuron(new Neuron("ABCD"),
@@ -159,22 +173,30 @@ public class PatternLatticeTest {
                             .setNeuron(inA)
                             .setWeight(1.0)
                             .setRecurrent(false)
-                            .setMinInput(1.0),
+                            .setMinInput(1.0)
+                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeOutput(true),
                     new Input()
                             .setNeuron(inB)
                             .setWeight(1.0)
                             .setRecurrent(false)
-                            .setMinInput(1.0),
+                            .setMinInput(1.0)
+                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeOutput(true),
                     new Input()
                             .setNeuron(inC)
                             .setWeight(1.0)
                             .setRecurrent(false)
-                            .setMinInput(1.0),
+                            .setMinInput(1.0)
+                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeOutput(true),
                     new Input()
                             .setNeuron(inD)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setMinInput(1.0)
+                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeOutput(true)
             );
 
             Document doc = m.createDocument(null, 0);

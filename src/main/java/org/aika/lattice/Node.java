@@ -24,12 +24,12 @@ import org.aika.corpus.Conflicts;
 import org.aika.corpus.Document;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
+import org.aika.corpus.Range.Relation;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.lattice.OrNode.OrEntry;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeVisibility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +39,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-
-import static org.aika.corpus.Range.Relation.OVERLAPS;
 
 
 /**
@@ -100,10 +98,6 @@ public abstract class Node implements Comparable<Node>, Writable {
     public long queueId;
 
     public Neuron neuron = null;
-
-    public RangeVisibility[] rangeVisibility;
-    public boolean[] matchRange;
-    public boolean matchRangeFlag;
 
     public static long visitedCounter = 0;
 
@@ -306,7 +300,7 @@ public abstract class Node implements Comparable<Node>, Writable {
             frequency++;
             frequencyHasChanged = true;
 
-            sizeSum += act.key.r.end == Integer.MAX_VALUE ? 1 : Math.max(1, act.key.r.end - act.key.r.begin);
+            sizeSum += act.key.r.end == null || act.key.r.begin == null || act.key.r.end == Integer.MAX_VALUE ? 1 : Math.max(1, act.key.r.end - act.key.r.begin);
             instanceSum++;
         }
     }
@@ -409,14 +403,10 @@ public abstract class Node implements Comparable<Node>, Writable {
                     rid = Utils.nullSafeSub(act.key.rid, false, s.key.relativeRid, false);
                 }
 
-                Range.Relation rr = null;
-                if(s.key.matchRange) {
-                    if(s.key.startSignal != Synapse.RangeSignal.NONE && s.key.endSignal != Synapse.RangeSignal.NONE) {
-                        rr = OVERLAPS;
-                    } else {
-                        // TODO: rethink and cleanup
-                        rr = new Range.SynapseRangeMatcher(s, dir != 0);
-                    }
+
+                Relation rr = new Range.RangeMatcher(s.key.startRangeMatch, s.key.endRangeMatch);
+                if(dir == 0) {
+                    rr = rr.invert();
                 }
 
                 Stream<Activation> tmp = Activation.select(
@@ -1011,18 +1001,6 @@ public abstract class Node implements Comparable<Node>, Writable {
 
         out.writeInt(sizeSum);
         out.writeInt(instanceSum);
-
-        out.writeBoolean(rangeVisibility != null);
-        if(rangeVisibility != null) {
-            out.writeUTF(rangeVisibility[0].name());
-            out.writeUTF(rangeVisibility[1].name());
-        }
-
-        out.writeBoolean(matchRange != null);
-        if(matchRange != null) {
-            out.writeBoolean(matchRange[0]);
-            out.writeBoolean(matchRange[1]);
-        }
     }
 
 
@@ -1047,13 +1025,6 @@ public abstract class Node implements Comparable<Node>, Writable {
 
         sizeSum = in.readInt();
         instanceSum = in.readInt();
-
-        if(in.readBoolean()) {
-            rangeVisibility = new RangeVisibility[]{RangeVisibility.valueOf(in.readUTF()), RangeVisibility.valueOf(in.readUTF())};
-        }
-        if(in.readBoolean()) {
-            matchRange = new boolean[]{in.readBoolean(), in.readBoolean()};
-        }
 
         threads = new ThreadState[doc.m.numberOfThreads];
     }

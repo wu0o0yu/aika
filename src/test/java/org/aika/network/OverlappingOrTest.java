@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Activation;
 import org.aika.Input;
+import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.neuron.InputNeuron;
@@ -28,6 +29,9 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.neuron.Synapse.RangeSignal;
 
 /**
  *
@@ -81,21 +85,23 @@ public class OverlappingOrTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(0.5)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(relNeurons.get('c'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(1)
                         .setMinInput(0.5)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(relNeurons.get('d'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setMinInput(0.5)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setEndRangeOutput(true)
         );
 
         Document doc = m.createDocument("a b c d e ", 0);

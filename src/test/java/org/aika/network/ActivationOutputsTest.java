@@ -31,6 +31,8 @@ import org.aika.lattice.OrNode;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.neuron.Synapse.RangeSignal;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -61,13 +63,15 @@ public class ActivationOutputsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
                         .setMinInput(1.0)
+                        .setEndRangeOutput(true)
         );
 
 
@@ -92,7 +96,7 @@ public class ActivationOutputsTest {
         );
 
 
-        InputNode pC = new InputNode(doc, new Synapse.Key(false, false, 0, null, true, Synapse.RangeSignal.START, Synapse.RangeVisibility.MATCH_INPUT, Synapse.RangeSignal.END, Synapse.RangeVisibility.MATCH_INPUT));
+        InputNode pC = new InputNode(doc, new Synapse.Key(false, false, 0, null, RangeMatch.LESS_THAN, RangeSignal.START, true, RangeMatch.GREATER_THAN, RangeSignal.END, true));
         Activation pC1 = TestHelper.addActivation(pC, doc, TestHelper.get(doc, pAB.node, new Range(0, 1), null));
 
         Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, TestHelper.get(doc, pAB.node, new Range(0, 1), null)));

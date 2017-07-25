@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Activation;
 import org.aika.Input;
+import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Option;
@@ -29,6 +30,9 @@ import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
+import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.neuron.Synapse.RangeSignal;
 
 /**
  *
@@ -191,14 +195,14 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false)
+                        .setRangeMatch(Input.RangeRelation.NONE)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -257,14 +261,14 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.CONTAINS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -319,14 +323,14 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.CONTAINS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -375,14 +379,14 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(absN)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false)
+                        .setRangeOutput(true)
         );
 
         m.createAndNeuron(asN,
@@ -393,14 +397,14 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.CONTAINS)
         );
         m.createAndNeuron(absN,
                 0.001,
@@ -410,21 +414,21 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false),
+                        .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false),
+                        .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.CONTAINS)
         );
 
         {
@@ -481,19 +485,22 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(ascN)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(bsN)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
+                        .setRangeOutput(true)
         );
 
         m.createAndNeuron(asN,
@@ -503,13 +510,15 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
+                        .setRangeOutput(true)
         );
         m.createAndNeuron(ascN,
                 0.001,
@@ -518,20 +527,23 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setOptional(false)
                         .setNeuron(inC)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
+                        .setRangeOutput(true)
         );
 
         m.createAndNeuron(bsN,
@@ -541,13 +553,15 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
+                        .setRangeOutput(true)
         );
 
         Neuron outA = m.createOrNeuron(new Neuron("OUT A"),
@@ -557,6 +571,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
+                        .setRangeOutput(true)
         );
         Neuron outAC = m.createOrNeuron(new Neuron("OUT AC"),
                 new Input()
@@ -565,6 +580,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
+                        .setRangeOutput(true)
         );
         Neuron outB = m.createOrNeuron(new Neuron("OUT B"),
                 new Input()
@@ -573,6 +589,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
+                        .setRangeOutput(true)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

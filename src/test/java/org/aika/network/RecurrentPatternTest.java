@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Activation;
 import org.aika.Input;
+import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
@@ -68,28 +69,30 @@ public class RecurrentPatternTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(0)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(recChars.get('D'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(1)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(recChars.get('E'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(2)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(ctNeuron)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(0)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.NONE)
         );
 
         Document doc = m.createDocument(txt, 0);
@@ -119,8 +122,8 @@ public class RecurrentPatternTest {
         System.out.println();
 
         Activation patAct = patternN.node.getFirstActivation(doc);
-        Assert.assertEquals(4, patAct.key.r.begin);
-        Assert.assertEquals(10, patAct.key.r.end);
+        Assert.assertEquals(4, patAct.key.r.begin.intValue());
+        Assert.assertEquals(10, patAct.key.r.end.intValue());
 
         doc.clearActivations();
 
@@ -161,28 +164,30 @@ public class RecurrentPatternTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(0)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(recChars.get('D'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(1)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(recChars.get('E'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(2)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(ctNeuron)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(0)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.NONE)
         );
 
 
@@ -209,8 +214,8 @@ public class RecurrentPatternTest {
         System.out.println();
 
         Activation patAct = patternN.node.getFirstActivation(doc);
-        Assert.assertEquals(4, patAct.key.r.begin);
-        Assert.assertEquals(10, patAct.key.r.end);
+        Assert.assertEquals(4, patAct.key.r.begin.intValue());
+        Assert.assertEquals(10, patAct.key.r.end.intValue());
 
         doc.clearActivations();
 

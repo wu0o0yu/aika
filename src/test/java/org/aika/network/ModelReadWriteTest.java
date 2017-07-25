@@ -19,12 +19,16 @@ package org.aika.network;
 
 import org.aika.Activation;
 import org.aika.Input;
+import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
+import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.neuron.Synapse.RangeSignal;
 
 import java.io.*;
 import java.util.HashMap;
@@ -40,9 +44,7 @@ public class ModelReadWriteTest {
     public void testPatternMatching() throws IOException {
 
         Map<Character, Integer> inputNeurons = new HashMap<>();
-        Map<Character, Integer> recurrentNeurons = new HashMap<>();
 
-        Integer startSignal;
         Integer pattern;
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -51,29 +53,11 @@ public class ModelReadWriteTest {
         {
             Model m = new Model();
 
-            // The space neuron will be used as clock signal for the recurrent neurons.
-            InputNeuron inSpace = m.createOrLookupInputSignal("SPACE");
-            inputNeurons.put(' ', inSpace.id);
-
-            startSignal = m.createOrLookupInputSignal("START-SIGNAL").id;
-
-            Neuron ctNeuron = m.createCounterNeuron(new Neuron("CTN"),
-                    inSpace, false,
-                    m.neurons.get(startSignal), true,
-                    false
-            );
 
             // Create an input neuron and a recurrent neuron for every letter in this example.
             for (char c : new char[]{'a', 'b', 'c', 'd', 'e'}) {
                 InputNeuron in = m.createOrLookupInputSignal(c + "");
-                Neuron rn = m.createRelationalNeuron(
-                        new Neuron(c + "-RN"),
-                        ctNeuron,
-                        in, false
-                );
-
                 inputNeurons.put(c, in.id);
-                recurrentNeurons.put(c, rn.id);
             }
 
             // Create a pattern neuron with the recurrent neurons as input. The number that are
@@ -84,26 +68,28 @@ public class ModelReadWriteTest {
                     new Neuron("BCD"),
                     0.4,
                     new Input()
-                            .setNeuron(m.neurons.get(recurrentNeurons.get('b')))
+                            .setNeuron(m.neurons.get(inputNeurons.get('b')))
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setRelativeRid(0)
                             .setMinInput(0.9)
-                            .setMatchRange(false),
+                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setStartRangeOutput(true),
                     new Input()
-                            .setNeuron(m.neurons.get(recurrentNeurons.get('c')))
+                            .setNeuron(m.neurons.get(inputNeurons.get('c')))
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setRelativeRid(1)
                             .setMinInput(0.9)
-                            .setMatchRange(false),
+                            .setRangeMatch(RangeRelation.CONTAINS),
                     new Input()
-                            .setNeuron(m.neurons.get(recurrentNeurons.get('d')))
+                            .setNeuron(m.neurons.get(inputNeurons.get('d')))
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setRelativeRid(2)
                             .setMinInput(0.9)
-                            .setMatchRange(false)
+                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setEndRangeOutput(true)
             ).id;
 
 
@@ -117,24 +103,15 @@ public class ModelReadWriteTest {
 
             Document doc = m.createDocument("a b c d e ", 0);
 
-            ((InputNeuron) m.neurons.get(startSignal)).addInput(doc, 0, 1, 0);
-
             System.out.println(doc.networkStateToString(true, true));
 
+            int wordPos = 0;
             for (int i = 0; i < doc.length(); i++) {
-//            Iteration.APPLY_DEBUG_OUTPUT = true;
-                char c = doc.getContent().charAt(i);
-                if (c == ' ')
-                    ((InputNeuron) m.neurons.get(inputNeurons.get(c))).addInput(doc, i, i + 1);
-
-                System.out.println(doc.networkStateToString(true, true));
-            }
-
-            for (int i = 0; i < doc.length(); i++) {
-//            Iteration.APPLY_DEBUG_OUTPUT = true;
                 char c = doc.getContent().charAt(i);
                 if (c != ' ') {
-                    ((InputNeuron) m.neurons.get(inputNeurons.get(c))).addInput(doc, i, i + 1);
+                    ((InputNeuron) m.neurons.get(inputNeurons.get(c))).addInput(doc, i, i + 1, wordPos);
+                } else  {
+                    wordPos++;
                 }
                 System.out.println(doc.networkStateToString(true, true));
             }

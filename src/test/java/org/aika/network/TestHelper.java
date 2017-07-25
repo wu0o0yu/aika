@@ -25,6 +25,8 @@ import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.neuron.Synapse.RangeSignal;
 
 import java.util.Collections;
 import java.util.Set;
@@ -77,12 +79,12 @@ public class TestHelper {
 
 
     public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid) {
-        return addOutputNode(doc, n, relativeRid, absoluteRid, true, Synapse.RangeSignal.START, Synapse.RangeVisibility.MAX_OUTPUT, Synapse.RangeSignal.END, Synapse.RangeVisibility.MAX_OUTPUT);
+        return addOutputNode(doc, n, relativeRid, absoluteRid, RangeMatch.LESS_THAN, Synapse.RangeSignal.START, true, RangeMatch.GREATER_THAN, RangeSignal.END, true);
     }
 
 
-    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, boolean matchRange, Synapse.RangeSignal startSignal, Synapse.RangeVisibility startVisibility, Synapse.RangeSignal endSignal, Synapse.RangeVisibility endVisibility) {
-        return InputNode.add(doc, new Synapse.Key(false, false, relativeRid, absoluteRid, matchRange, startSignal, startVisibility, endSignal, endVisibility), n);
+    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, RangeMatch startRangeMatch, RangeSignal startSignal, boolean startRangeOutput, RangeMatch endRangeMatch, RangeSignal endSignal, boolean endRangeOutput) {
+        return InputNode.add(doc, new Synapse.Key(false, false, relativeRid, absoluteRid, startRangeMatch, startSignal, startRangeOutput, endRangeMatch, endSignal, endRangeOutput), n);
     }
 
     public static Activation get(Document doc, Node n, Range r, Option o) {

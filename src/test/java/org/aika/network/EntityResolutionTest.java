@@ -18,11 +18,14 @@ package org.aika.network;
 
 
 import org.aika.Input;
+import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.neuron.Synapse.RangeSignal;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,35 +52,33 @@ public class EntityResolutionTest {
         m.createAndNeuron(eJaguar, 0.9,
                 new Input()
                         .setNeuron(wJaguar)
-                        .setMatchRange(true)
+                        .setRangeOutput(true)
                         .setRecurrent(false)
                         .setWeight(5.0)
                         .setMinInput(0.95),
                 new Input()
                         .setNeuron(ePuma)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(false)
                         .setRecurrent(true)
                         .setWeight(5.0)
                         .setMinInput(0.95)
-                        .setStartVisibility(Synapse.RangeVisibility.NONE)
-                        .setEndVisibility(Synapse.RangeVisibility.NONE)
         );
 
         m.createAndNeuron(ePuma, 0.9,
                 new Input()
                         .setNeuron(wPuma)
-                        .setMatchRange(true)
+                        .setRangeOutput(true)
                         .setRecurrent(false)
                         .setWeight(5.0)
                         .setMinInput(0.95),
                 new Input()
                         .setNeuron(eJaguar)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(false)
                         .setRecurrent(true)
                         .setWeight(5.0)
                         .setMinInput(0.95)
-                        .setStartVisibility(Synapse.RangeVisibility.NONE)
-                        .setEndVisibility(Synapse.RangeVisibility.NONE)
         );
 
 
@@ -134,67 +135,67 @@ public class EntityResolutionTest {
         m.createAndNeuron(eJaguar, 0.9,
                 new Input()
                         .setNeuron(wJaguar)
-                        .setMatchRange(true)
+                        .setRangeOutput(true)
                         .setRecurrent(false)
                         .setWeight(5.0)
                         .setMinInput(0.95),
                 new Input()
                         .setNeuron(chKatzenOhneJaguar)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(false)
                         .setRecurrent(true)
                         .setWeight(5.0)
                         .setMinInput(0.95)
-                        .setStartVisibility(Synapse.RangeVisibility.NONE)
-                        .setEndVisibility(Synapse.RangeVisibility.NONE)
         );
 
         m.createAndNeuron(ePuma, 0.9,
                 new Input()
                         .setNeuron(wPuma)
-                        .setMatchRange(true)
+                        .setRangeOutput(true)
                         .setRecurrent(false)
                         .setWeight(5.0)
                         .setMinInput(0.95),
                 new Input()
                         .setNeuron(chKatzenOhnePuma)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(false)
                         .setRecurrent(true)
                         .setWeight(5.0)
                         .setMinInput(0.95)
-                        .setStartVisibility(Synapse.RangeVisibility.NONE)
-                        .setEndVisibility(Synapse.RangeVisibility.NONE)
         );
 
 
         m.createAndNeuron(eLeopard, 0.9,
                 new Input()
                         .setNeuron(wLeopard)
-                        .setMatchRange(true)
+                        .setRangeOutput(true)
                         .setRecurrent(false)
                         .setWeight(5.0)
                         .setMinInput(0.95),
                 new Input()
                         .setNeuron(chKatzenOhneLeopard)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(false)
                         .setRecurrent(true)
                         .setWeight(5.0)
                         .setMinInput(0.95)
-                        .setStartVisibility(Synapse.RangeVisibility.NONE)
-                        .setEndVisibility(Synapse.RangeVisibility.NONE)
         );
 
         m.createOrNeuron(cKatzen,
                 new Input()
                         .setNeuron(eJaguar)
                         .setWeight(10.0)
+                        .setRangeOutput(true)
                         .setRecurrent(false),
                 new Input()
                         .setNeuron(ePuma)
                         .setWeight(10.0)
+                        .setRangeOutput(true)
                         .setRecurrent(false),
                 new Input()
                         .setNeuron(eLeopard)
                         .setWeight(10.0)
+                        .setRangeOutput(true)
                         .setRecurrent(false)
         );
 
@@ -204,21 +205,20 @@ public class EntityResolutionTest {
                         .setWeight(10.0)
                         .setMinInput(0.95)
                         .setRecurrent(false)
-                        .setMatchRange(true),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(eJaguar)
                         .setWeight(10.0)
                         .setMinInput(0.95)
                         .setRecurrent(false)
-                        .setMatchRange(false)
-                        .setStartVisibility(Synapse.RangeVisibility.NONE)
-                        .setEndVisibility(Synapse.RangeVisibility.NONE),
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(false),
                 new Input()
                         .setNeuron(eJaguar)
                         .setWeight(-30.0)
                         .setMinInput(0.95)
                         .setRecurrent(false)
-                        .setMatchRange(true)
+                        .setRangeMatch(RangeRelation.EQUALS)
         );
 
         m.createAndNeuron(chKatzenOhnePuma, 0.5,
@@ -227,21 +227,20 @@ public class EntityResolutionTest {
                         .setWeight(10.0)
                         .setMinInput(0.95)
                         .setRecurrent(false)
-                        .setMatchRange(true),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(ePuma)
                         .setWeight(10.0)
                         .setMinInput(0.95)
                         .setRecurrent(false)
-                        .setMatchRange(false)
-                        .setStartVisibility(Synapse.RangeVisibility.NONE)
-                        .setEndVisibility(Synapse.RangeVisibility.NONE),
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(false),
                 new Input()
                         .setNeuron(ePuma)
                         .setWeight(-30.0)
                         .setMinInput(0.95)
                         .setRecurrent(false)
-                        .setMatchRange(true)
+                        .setRangeMatch(RangeRelation.EQUALS)
         );
 
         m.createAndNeuron(chKatzenOhneLeopard, 0.5,
@@ -250,21 +249,20 @@ public class EntityResolutionTest {
                         .setWeight(10.0)
                         .setMinInput(0.95)
                         .setRecurrent(false)
-                        .setMatchRange(true),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(eLeopard)
                         .setWeight(10.0)
                         .setMinInput(0.95)
                         .setRecurrent(false)
-                        .setMatchRange(false)
-                        .setStartVisibility(Synapse.RangeVisibility.NONE)
-                        .setEndVisibility(Synapse.RangeVisibility.NONE),
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(false),
                 new Input()
                         .setNeuron(eLeopard)
                         .setWeight(-30.0)
                         .setMinInput(0.95)
                         .setRecurrent(false)
-                        .setMatchRange(true)
+                        .setRangeMatch(RangeRelation.EQUALS)
         );
 
 

@@ -28,6 +28,9 @@ import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
+import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.neuron.Synapse.RangeSignal;
 
 import java.util.Collections;
 
@@ -52,12 +55,18 @@ public class SynapseRangeRelationTest {
         on.node.neuron = on;
 
         Synapse s = new Synapse(in,
-                new Synapse.Key(false, false, null, null, true,
-                Synapse.RangeSignal.START,
-                Synapse.RangeVisibility.MATCH_INPUT,
-                Synapse.RangeSignal.END,
-                Synapse.RangeVisibility.MATCH_INPUT
-            )
+                new Synapse.Key(
+                        false,
+                        false,
+                        null,
+                        null,
+                        RangeMatch.LESS_THAN,
+                        Synapse.RangeSignal.START,
+                        true,
+                        RangeMatch.GREATER_THAN,
+                        Synapse.RangeSignal.END,
+                        true
+                )
         );
         s.output = on;
         s.link(doc);

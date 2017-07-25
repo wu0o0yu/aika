@@ -19,14 +19,15 @@ package org.aika.corpus;
 
 import org.aika.Activation;
 import org.aika.Activation.Key;
+import org.aika.Utils;
 import org.aika.lattice.Node;
 import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeSignal;
-import org.aika.neuron.Synapse.RangeVisibility;
 
-import java.util.List;
+import java.util.Map;
 import java.util.NavigableMap;
+import java.util.TreeMap;
 import java.util.stream.Stream;
+import org.aika.neuron.Synapse.RangeMatch;
 
 /**
  *
@@ -37,12 +38,22 @@ public class Range {
     public static final Range MIN = new Range(Integer.MIN_VALUE, Integer.MIN_VALUE);
     public static final Range MAX = new Range(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
-    public final int begin;
-    public final int end;
+    public final Integer begin;
+    public final Integer end;
 
 
     public static abstract class Relation {
-        public static Relation EQUALS = new Relation() {
+        public int id;
+
+        public static Map<Integer, Relation> RANGE_RELATIONS = new TreeMap<>();
+
+        public Relation(int id) {
+            this.id = id;
+
+            RANGE_RELATIONS.put(id, this);
+        }
+
+        public static Relation EQUALS = new Relation(0) {
             @Override
             public boolean match(Range ra, Range rb) {
                 return Range.compare(ra, rb, false) == 0;
@@ -54,35 +65,82 @@ public class Range {
                         .stream()
                         .filter(act -> act.filter(n, rid, r, this, o, or));
             }
+
+            public Relation invert() {
+                return EQUALS;
+            }
         };
 
-        public static Relation CONTAINS = new Relation() {
+        public static Relation CONTAINS = new Relation(1) {
             @Override
             public boolean match(Range ra, Range rb) {
                 return contains(ra, rb);
             }
+
+
+            public Relation invert() {
+                return CONTAINED_IN;
+            }
         };
 
-        public static Relation OVERLAPS = new Relation() {
+
+        public static Relation CONTAINED_IN = new Relation(2) {
+            @Override
+            public boolean match(Range ra, Range rb) {
+                return contains(ra, rb);
+            }
+
+
+            public Relation invert() {
+                return CONTAINS;
+            }
+        };
+
+        public static Relation OVERLAPS = new Relation(3) {
             @Override
             public boolean match(Range ra, Range rb) {
                 return overlaps(ra, rb);
             }
+
+            public Relation invert() {
+                return OVERLAPS;
+            }
         };
 
-        public static Relation BEGINS_WITH = new Relation() {
+        public static Relation BEGINS_WITH = new Relation(4) {
             @Override
             public boolean match(Range ra, Range rb) {
                 return ra.begin == rb.begin;
             }
+
+            public Relation invert() {
+                return BEGINS_WITH;
+            }
         };
 
-        public static Relation ENDS_WITH = new Relation() {
+        public static Relation ENDS_WITH = new Relation(5) {
             @Override
             public boolean match(Range ra, Range rb) {
                 return ra.end == rb.end;
             }
+
+            public Relation invert() {
+                return ENDS_WITH;
+            }
         };
+
+        public static Relation NONE = new Relation(6) {
+            @Override
+            public boolean match(Range ra, Range rb) {
+                return true;
+            }
+
+            public Relation invert() {
+                return NONE;
+            }
+        };
+
+        public abstract Relation invert();
 
         public abstract boolean match(Range ra, Range rb);
 
@@ -94,14 +152,64 @@ public class Range {
     }
 
 
-    public Range(int begin, int end) {
+    public static class RangeMatcher extends Relation {
+        public RangeMatch begin;
+        public RangeMatch end;
+
+        public RangeMatcher(RangeMatch begin, RangeMatch end) {
+            super(-1);
+            this.begin = begin;
+            this.end = end;
+        }
+
+
+        @Override
+        public Relation invert() {
+            return new RangeMatcher(RangeMatch.invert(begin), RangeMatch.invert(end));
+        }
+
+        @Override
+        public boolean match(Range ra, Range rb) {
+            return (ra.begin == null || rb.begin == null || begin.compare(ra.begin, rb.begin)) &&
+                   (ra.end == null || rb.end == null || end.compare(ra.end, rb.end));
+        }
+
+        public Stream getActivations(Document doc, Node n, Integer rid, Range r, Option o, Option.Relation or) {
+            if((begin == RangeMatch.GREATER_THAN || begin == RangeMatch.EQUALS) && r.begin != null) {
+                int er = (end == RangeMatch.LESS_THAN || end == RangeMatch.EQUALS) && r.end != null ? r.end : Integer.MAX_VALUE;
+                return n.getThreadState(doc).activations.subMap(new Activation.Key(n, new Range(r.begin, null), null, Option.MIN), true, new Activation.Key(n, new Range(er, Integer.MAX_VALUE), Integer.MAX_VALUE, Option.MAX), true)
+                        .values()
+                        .stream()
+                        .filter(act -> act.filter(n, rid, r, this, o, or));
+            } else {
+                return n.getThreadState(doc).activations.values()
+                        .stream()
+                        .filter(act -> act.filter(n, rid, r, this, o, or));
+            }
+        }
+
+    }
+
+
+    public Range(Integer begin, Integer end) {
         this.begin = begin;
         this.end = end;
     }
 
 
-    public static Range applyVisibility(Range ra, RangeVisibility[] rav, Range rb, RangeVisibility[] rbv) {
-        return new Range(RangeVisibility.apply(ra.begin, rav[0], rb.begin, rbv[0], false), RangeVisibility.apply(ra.end, rav[1], rb.end, rbv[1], true));
+    public static Range mergeRange(Range ra, Range rb) {
+        return new Range(
+                ra.begin != null ? ra.begin : rb.begin,
+                ra.end != null ? ra.end : rb.end
+        );
+    }
+
+
+    public static Range getOutputRange(Range r, boolean[] ro) {
+        return new Range(
+                ro[0] ? r.begin : null,
+                ro[1] ? r.end : null
+        );
     }
 
 
@@ -112,21 +220,21 @@ public class Range {
 
 
     public static boolean contains(Range ra, Range rb) {
-        return ra.begin <= rb.begin && ra.end >= rb.end;
+        return Utils.compareInteger(ra.begin, rb.begin) <= 0 && Utils.compareInteger(ra.end, rb.end) >= 0;
     }
 
 
     public static boolean overlaps(Range ra, Range rb) {
-        return !(ra.end <= rb.begin || rb.end <= ra.begin);
+        return !(Utils.compareInteger(ra.end, rb.begin) <= 0 || Utils.compareInteger(rb.end, ra.begin) <= 0);
     }
 
 
-    public int getBegin(boolean invert) {
+    public Integer getBegin(boolean invert) {
         return invert ? end : begin;
     }
 
 
-    public int getEnd(boolean invert) {
+    public Integer getEnd(boolean invert) {
         return invert ? begin : end;
     }
 
@@ -159,21 +267,21 @@ public class Range {
         if(ra == null && rb != null) return -1;
         if(ra != null && rb == null) return 1;
 
-        int a = Integer.compare(ra.getBegin(inv), rb.getBegin(inv));
+        int a = Utils.compareInteger(ra.getBegin(inv), rb.getBegin(inv));
         if(a != 0) return a;
-        int b = Integer.compare(ra.getEnd(inv), rb.getEnd(inv));
+        int b = Utils.compareInteger(ra.getEnd(inv), rb.getEnd(inv));
         return b;
     }
 
 
     public static int compare(Range ra, Range rb) {
-        int a = Integer.compare(ra.begin, rb.begin);
+        int a = Utils.compareInteger(ra.begin, rb.begin);
         if(a != 0) return a;
-        int b = Integer.compare(ra.end, rb.end);
+        int b = Utils.compareInteger(ra.end, rb.end);
         return b;
     }
 
-
+/*
     public static class SynapseRangeMatcher extends Relation {
         public boolean dir;
         public Synapse s;
@@ -193,17 +301,17 @@ public class Range {
         }
 
         private boolean getDirection() {
-            if(!dir && s.key.startSignal == RangeSignal.START && s.key.startVisibility == RangeVisibility.MATCH_INPUT) {
+            if(!dir && s.key.startSignal == RangeSignal.START && s.key.startRangeOutput == RangeOutput.MATCH_INPUT) {
                 return false;
-            } else if(!dir && s.key.endSignal == RangeSignal.START && s.key.endVisibility == RangeVisibility.MATCH_INPUT) {
+            } else if(!dir && s.key.endSignal == RangeSignal.START && s.key.endRangeOutput == RangeOutput.MATCH_INPUT) {
                 return false;
-            } else if(dir && s.key.startSignal != RangeSignal.NONE && s.key.startVisibility == RangeVisibility.MATCH_INPUT) {
+            } else if(dir && s.key.startSignal != RangeSignal.NONE && s.key.startRangeOutput == RangeOutput.MATCH_INPUT) {
                 return false;
-            } else if(!dir && s.key.startSignal == RangeSignal.END && s.key.startVisibility == RangeVisibility.MATCH_INPUT) {
+            } else if(!dir && s.key.startSignal == RangeSignal.END && s.key.startRangeOutput == RangeOutput.MATCH_INPUT) {
                 return true;
-            } else if(!dir && s.key.endSignal == RangeSignal.END && s.key.endVisibility == RangeVisibility.MATCH_INPUT) {
+            } else if(!dir && s.key.endSignal == RangeSignal.END && s.key.endRangeOutput == RangeOutput.MATCH_INPUT) {
                 return true;
-            } else if(dir &&s.key.endSignal != RangeSignal.NONE && s.key.endVisibility == RangeVisibility.MATCH_INPUT) {
+            } else if(dir &&s.key.endSignal != RangeSignal.NONE && s.key.endRangeOutput == RangeOutput.MATCH_INPUT) {
                 return true;
             }
 
@@ -211,21 +319,21 @@ public class Range {
         }
 
         private boolean getSignal() {
-            if(!dir && s.key.startSignal == RangeSignal.START && s.key.startVisibility == RangeVisibility.MATCH_INPUT) {
+            if(!dir && s.key.startSignal == RangeSignal.START && s.key.startRangeOutput == RangeOutput.MATCH_INPUT) {
                 return false;
-            } else if(!dir && s.key.startSignal == RangeSignal.END && s.key.startVisibility == RangeVisibility.MATCH_INPUT) {
+            } else if(!dir && s.key.startSignal == RangeSignal.END && s.key.startRangeOutput == RangeOutput.MATCH_INPUT) {
                 return false;
-            } else if(dir && s.key.startSignal == RangeSignal.START && s.key.startVisibility == RangeVisibility.MATCH_INPUT) {
+            } else if(dir && s.key.startSignal == RangeSignal.START && s.key.startRangeOutput == RangeOutput.MATCH_INPUT) {
                 return false;
-            } else if(dir && s.key.endSignal == RangeSignal.START && s.key.endVisibility == RangeVisibility.MATCH_INPUT) {
+            } else if(dir && s.key.endSignal == RangeSignal.START && s.key.endRangeOutput == RangeOutput.MATCH_INPUT) {
                 return false;
-            } else if(!dir && s.key.endSignal == RangeSignal.START && s.key.endVisibility == RangeVisibility.MATCH_INPUT) {
+            } else if(!dir && s.key.endSignal == RangeSignal.START && s.key.endRangeOutput == RangeOutput.MATCH_INPUT) {
                 return true;
-            } else if(!dir && s.key.endSignal == RangeSignal.END && s.key.endVisibility == RangeVisibility.MATCH_INPUT) {
+            } else if(!dir && s.key.endSignal == RangeSignal.END && s.key.endRangeOutput == RangeOutput.MATCH_INPUT) {
                 return true;
-            } else if(dir && s.key.startSignal == RangeSignal.END && s.key.startVisibility == RangeVisibility.MATCH_INPUT) {
+            } else if(dir && s.key.startSignal == RangeSignal.END && s.key.startRangeOutput == RangeOutput.MATCH_INPUT) {
                 return true;
-            } else if(dir && s.key.endSignal == RangeSignal.END && s.key.endVisibility == RangeVisibility.MATCH_INPUT) {
+            } else if(dir && s.key.endSignal == RangeSignal.END && s.key.endRangeOutput == RangeOutput.MATCH_INPUT) {
                 return true;
             }
             return false;
@@ -312,4 +420,6 @@ public class Range {
             return !flag ? s : s.limit(1);
         }
     }
+
+    */
 }

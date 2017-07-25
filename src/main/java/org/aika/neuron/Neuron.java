@@ -402,11 +402,12 @@ public class Neuron implements Comparable<Neuron>, Writable {
                                 in.key.isRecurrent,
                                 rid,
                                 null,
-                                in.key.matchRange,
+                                in.key.startRangeMatch,
                                 in.key.startSignal,
-                                in.key.startVisibility,
+                                in.key.startRangeOutput,
+                                in.key.endRangeMatch,
                                 in.key.endSignal,
-                                in.key.endVisibility
+                                in.key.endRangeOutput
                         )
                 );
                 s.output = this;

@@ -28,6 +28,8 @@ import org.aika.lattice.InputNode;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.neuron.Synapse.RangeSignal;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -57,7 +59,7 @@ public class ActivationsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, true, Synapse.RangeSignal.START, Synapse.RangeVisibility.MATCH_INPUT, Synapse.RangeSignal.END, Synapse.RangeVisibility.MATCH_INPUT);
+        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, RangeMatch.LESS_THAN, RangeSignal.START, true, RangeMatch.GREATER_THAN, RangeSignal.END, true);
 
 
         inA.addInput(doc, 0, 1, 0);
@@ -82,7 +84,7 @@ public class ActivationsTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
         );
-        InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, true, Synapse.RangeSignal.START, Synapse.RangeVisibility.MATCH_INPUT, Synapse.RangeSignal.END, Synapse.RangeVisibility.MATCH_INPUT);
+        InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, RangeMatch.LESS_THAN, RangeSignal.START, true, RangeMatch.GREATER_THAN, Synapse.RangeSignal.END, true);
 
         inB.addInput(doc, 0, 1);
         inB.addInput(doc, 1, 2);

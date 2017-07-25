@@ -59,12 +59,14 @@ public class WeightsTest {
                         .setNeuron(inAA)
                         .setWeight(3.0)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(inBA)
                         .setWeight(4.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeOutput(true)
         );
 
         pDA = new Neuron("DA");
@@ -75,13 +77,15 @@ public class WeightsTest {
                         .setNeuron(pOrA)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setMinInput(0.6),
+                        .setMinInput(0.6)
+                        .setRangeOutput(true),
                 new Input()
                         .setOptional(true)
                         .setNeuron(inCA)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-2.0)
@@ -100,12 +104,14 @@ public class WeightsTest {
                         .setNeuron(inAB)
                         .setWeight(2.0)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(inBB)
                         .setWeight(5.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeOutput(true)
         );
 
         pDB = new Neuron("DB");
@@ -115,12 +121,14 @@ public class WeightsTest {
                         .setNeuron(pOrB)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setMinInput(0.6),
+                        .setMinInput(0.6)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(inCB)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-2.0)
@@ -134,12 +142,14 @@ public class WeightsTest {
                         .setNeuron(pDA)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pDB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeOutput(true)
         );
 
         testVariant(m, 9); // 17

@@ -18,10 +18,14 @@ package org.aika.network;
 
 
 import org.aika.Input;
+import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
+import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.neuron.Synapse.RangeSignal;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -52,20 +56,23 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setMinInput(0.9)
-                        .setMatchRange(false)
-                        .setMaxLowerWeightsSum(0.0),
+                        .setMaxLowerWeightsSum(0.0)
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(weakInputA)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setRecurrent(true)
                         .setMinInput(1.0)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(true)
         );
 
         Neuron patternB = m.createAndNeuron(
@@ -76,20 +83,23 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setMinInput(0.9)
-                        .setMatchRange(false)
-                        .setMaxLowerWeightsSum(0.0),
+                        .setMaxLowerWeightsSum(0.0)
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(weakInputB)
                         .setWeight(1.5)
                         .setRecurrent(false)
                         .setMinInput(1.0)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setRecurrent(true)
                         .setMinInput(1.0)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(true)
         );
 
         Neuron patternC = m.createAndNeuron(
@@ -100,20 +110,23 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setMinInput(0.9)
-                        .setMatchRange(false)
-                        .setMaxLowerWeightsSum(0.0),
+                        .setMaxLowerWeightsSum(0.0)
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(weakInputC)
                         .setWeight(0.5)
                         .setRecurrent(false)
                         .setMinInput(1.0)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setRecurrent(true)
                         .setMinInput(1.0)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(true)
         );
 
 
@@ -122,17 +135,20 @@ public class WeakInputProcessingTest {
                         .setNeuron(patternA)
                         .setWeight(10.0)
                         .setRecurrent(false)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(patternB)
                         .setWeight(10.0)
                         .setRecurrent(false)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(patternC)
                         .setWeight(10.0)
                         .setRecurrent(false)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeOutput(true)
         );
 
         Document doc = m.createDocument("a ");

@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Activation;
 import org.aika.Input;
+import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
@@ -30,6 +31,9 @@ import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.neuron.Synapse.RangeSignal;
 
 /**
  *
@@ -57,18 +61,16 @@ public class PublicRangeTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setStartVisibility(Synapse.RangeVisibility.MATCH_INPUT)
-                        .setEndVisibility(Synapse.RangeVisibility.MATCH_INPUT)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.NONE)
+                        .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setStartVisibility(Synapse.RangeVisibility.MATCH_INPUT)
-                        .setEndVisibility(Synapse.RangeVisibility.MATCH_INPUT)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.NONE)
+                        .setEndRangeOutput(true)
         );
         OrNode pCNode = (OrNode) pC.node;
 
@@ -80,14 +82,16 @@ public class PublicRangeTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.NONE)
+                        .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(1.0)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.NONE)
+                        .setStartRangeOutput(true)
         );
         OrNode pDNode = (OrNode) pD.node;
 

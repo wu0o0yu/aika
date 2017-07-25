@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Activation;
 import org.aika.Input;
+import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.neuron.InputNeuron;
@@ -28,6 +29,9 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.neuron.Synapse.RangeSignal;
 
 /**
  *
@@ -37,6 +41,92 @@ public class SimplePatternMatchingTest {
 
     @Test
     public void testPatternMatching() {
+        Model m = new Model();
+
+        Map<Character, InputNeuron> inputNeurons = new HashMap<>();
+
+        // Create an input neuron and a recurrent neuron for every letter in this example.
+        for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
+            InputNeuron in = m.createOrLookupInputSignal(c + "");
+
+            inputNeurons.put(c, in);
+        }
+
+        // Create a pattern neuron with the relational neurons as input. The numbers that are
+        // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
+        // of the inputs relative to each other. The following flag specifies whether this relativeRid
+        // is relative or absolute.
+        Neuron pattern = m.createAndNeuron(
+                new Neuron("BCD"),
+                0.4,
+                new Input()
+                        .setNeuron(inputNeurons.get('b'))
+                        .setWeight(1.0)
+                        .setRecurrent(false)
+                        .setRelativeRid(0)
+                        .setMinInput(0.9)
+                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeOutput(true),
+                new Input()
+                        .setNeuron(inputNeurons.get('c'))
+                        .setWeight(1.0)
+                        .setRecurrent(false)
+                        .setRelativeRid(1)
+                        .setMinInput(0.9)
+                        .setRangeMatch(RangeRelation.CONTAINS),
+                new Input()
+                        .setNeuron(inputNeurons.get('d'))
+                        .setWeight(1.0)
+                        .setRecurrent(false)
+                        .setRelativeRid(2)
+                        .setMinInput(0.9)
+                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setEndRangeOutput(true)
+        );
+
+
+        // Create a simple text document.
+        Document doc = m.createDocument("a b c d e ", 0);
+
+        // Then add the characters
+        int wordPos = 0;
+        for(int i = 0; i < doc.length(); i++) {
+            char c = doc.getContent().charAt(i);
+            if(c != ' ') {
+                inputNeurons.get(c).addInput(doc, i, i + 1, wordPos);
+            } else {
+                wordPos++;
+            }
+        }
+
+        // Computes the selected option
+        doc.process();
+
+        Assert.assertEquals(1, pattern.node.getThreadState(doc).activations.size());
+
+
+        System.out.println("Output activation:");
+        for(Activation act: pattern.node.getActivations(doc)) {
+            System.out.println("Text Range: " + act.key.r);
+            System.out.println("Option: " + act.key.o);
+            System.out.println("Node: " + act.key.n);
+            System.out.println("Rid: " + act.key.rid);
+            System.out.println();
+        }
+
+        System.out.println("All activations:");
+        System.out.println(doc.networkStateToString(true, true));
+        System.out.println();
+
+
+        doc.train();
+
+        doc.clearActivations();
+    }
+
+
+    @Test
+    public void testPatternMatchingWithRelationalNeuron() {
         Model m = new Model();
 
 
@@ -80,21 +170,23 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(0.9)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(relNeurons.get('c'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(1)
                         .setMinInput(0.9)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(relNeurons.get('d'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setMinInput(0.9)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setEndRangeOutput(true)
         );
 
 

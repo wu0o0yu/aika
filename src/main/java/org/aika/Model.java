@@ -24,7 +24,7 @@ import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.RangeSignal;
-import org.aika.neuron.Synapse.RangeVisibility;
+import org.aika.neuron.Synapse.RangeMatch;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -189,7 +189,7 @@ public class Model implements Writable {
         double posRecSum = 0.0;
         double minWeight = Double.MAX_VALUE;
         for(Input ni: inputs) {
-            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.matchRange, Synapse.RangeSignal.START, ni.startVisibility, Synapse.RangeSignal.END, ni.endVisibility));
+            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startSignal, ni.startRangeOutput, ni.endRangeMatch, ni.endSignal, ni.endRangeOutput));
             s.w = ni.weight;
             s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
 
@@ -230,7 +230,7 @@ public class Model implements Writable {
         double negRecSum = 0.0;
         double posRecSum = 0.0;
         for(Input ni: inputs) {
-            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.matchRange, Synapse.RangeSignal.START, ni.startVisibility, Synapse.RangeSignal.END, ni.endVisibility));
+            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startSignal, ni.startRangeOutput, ni.endRangeMatch, ni.endSignal, ni.endRangeOutput));
             s.w = ni.weight;
             s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
 
@@ -271,7 +271,7 @@ public class Model implements Writable {
 
         double bias = -0.001;
         for(Input ni: inputs) {
-            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.matchRange, RangeSignal.START, ni.startVisibility, RangeSignal.END, ni.endVisibility));
+            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startSignal, ni.startRangeOutput, ni.endRangeMatch, ni.endSignal, ni.endRangeOutput));
             s.w = ni.weight;
             s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
             is.add(s);
@@ -305,11 +305,12 @@ public class Model implements Writable {
                             false,
                             null,
                             null,
-                            true,
+                            RangeMatch.LESS_THAN,
                             dirIS ? RangeSignal.END : RangeSignal.START,
-                            RangeVisibility.MATCH_INPUT,
+                            false,
+                            RangeMatch.GREATER_THAN,
                             dirIS ? RangeSignal.START : RangeSignal.END,
-                            RangeVisibility.MAX_OUTPUT
+                            false
                     )
             );
             iss.w = 20.0;
@@ -325,11 +326,12 @@ public class Model implements Writable {
                             false,
                             0,
                             null,
-                            true,
+                            RangeMatch.NONE,
                             RangeSignal.START,
-                            RangeVisibility.MATCH_INPUT,
+                            true,
+                            RangeMatch.NONE,
                             RangeSignal.END,
-                            RangeVisibility.MATCH_INPUT
+                            true
                     )
             );
             ctns.w = 20.0;
@@ -370,11 +372,12 @@ public class Model implements Writable {
                             false,
                             null,
                             null,
-                            true,
+                            RangeMatch.NONE,
                             RangeSignal.NONE,
-                            RangeVisibility.MATCH_INPUT,
+                            false,
+                            RangeMatch.EQUALS,
                             dirCS ? RangeSignal.START : RangeSignal.END,
-                            RangeVisibility.MATCH_INPUT
+                            true
                     )
             );
             css.w = 20.0;
@@ -390,11 +393,12 @@ public class Model implements Writable {
                             false,
                             0,
                             null,
-                            true,
+                            RangeMatch.EQUALS,
                             dirSS ? RangeSignal.START : RangeSignal.END,
-                            RangeVisibility.MATCH_INPUT,
+                            true,
+                            RangeMatch.NONE,
                             RangeSignal.NONE,
-                            RangeVisibility.MATCH_INPUT
+                            false
                     )
             );
             sss.w = 8.0;
@@ -409,11 +413,12 @@ public class Model implements Writable {
                         false,
                         -1,
                         null,
-                        true,
+                        direction ? RangeMatch.NONE : RangeMatch.EQUALS,
                         direction ? RangeSignal.NONE : RangeSignal.END,
-                        RangeVisibility.MATCH_INPUT,
+                        direction ? false : true,
+                        direction ? RangeMatch.EQUALS : RangeMatch.NONE,
                         direction ? RangeSignal.START : RangeSignal.NONE,
-                        RangeVisibility.MATCH_INPUT
+                        direction ? true : false
                 )
         );
         lastCycle.w = 8.0;
@@ -427,11 +432,12 @@ public class Model implements Writable {
                         true,
                         0,
                         null,
-                        true,
+                        RangeMatch.EQUALS,
                         RangeSignal.START,
-                        RangeVisibility.MAX_OUTPUT,
+                        false,
+                        RangeMatch.EQUALS,
                         RangeSignal.END,
-                        RangeVisibility.MAX_OUTPUT
+                        false
                 )
         );
         neg.w = -20.0;

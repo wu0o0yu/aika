@@ -21,6 +21,7 @@ import org.aika.Utils;
 import org.aika.Writable;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
+import org.aika.corpus.Range.Relation;
 import org.aika.lattice.InputNode;
 
 import java.io.DataInput;
@@ -167,13 +168,47 @@ public class Synapse implements Writable {
     }
 
 
+    public enum RangeMatch {
+        EQUALS,
+        LESS_THAN,
+        GREATER_THAN,
+        NONE;
+
+        public boolean compare(Integer a, Integer b) {
+            switch(this) {
+                case EQUALS:
+                    return a == b;
+                case LESS_THAN:
+                    return a <= b;
+                case GREATER_THAN:
+                    return a >= b;
+                default:
+                    return true;
+            }
+        }
+
+        public static RangeMatch invert(RangeMatch rm) {
+            switch(rm) {
+                case EQUALS:
+                    return EQUALS;
+                case LESS_THAN:
+                    return GREATER_THAN;
+                case GREATER_THAN:
+                    return LESS_THAN;
+                default:
+                    return NONE;
+            }
+        }
+    }
+
+
 
     public enum RangeSignal {
         START,
         END,
         NONE;
 
-        public int getSignalPos(Range r, int def) {
+        public Integer getSignalPos(Range r) {
             switch(this) {
                 case START:
                     return r.begin;
@@ -181,7 +216,7 @@ public class Synapse implements Writable {
                     return r.end;
                 case NONE:
                 default:
-                    return def;
+                    return null;
             }
         }
 
@@ -199,37 +234,6 @@ public class Synapse implements Writable {
     }
 
 
-    public enum RangeVisibility {
-        MATCH_INPUT,
-        MAX_OUTPUT,
-        NONE;
-
-        public static int apply(int a, RangeVisibility rva, int b, RangeVisibility rvb, boolean dir) {
-            if(rva == NONE) return b;
-            if(rvb == NONE) return a;
-
-            if((dir && a < b) || (!dir && a >= b)) {
-                if(rva == MATCH_INPUT) {
-                    return a;
-                } else if(rvb == MATCH_INPUT) {
-                    return b;
-                }
-            } else {
-                if(rvb == MATCH_INPUT) {
-                    return b;
-                } else if(rva == MATCH_INPUT) {
-                    return a;
-                }
-            }
-
-            if(dir) {
-                return Math.max(a, b);
-            } else {
-                return Math.min(a, b);
-            }
-        }
-    }
-
 
     public static class Key implements Comparable<Key>, Writable {
         public static final Key MIN_KEY = new Key();
@@ -239,31 +243,32 @@ public class Synapse implements Writable {
         public boolean isRecurrent;
         public Integer relativeRid;
         public Integer absoluteRid;
-        public boolean matchRange;
+        public RangeMatch startRangeMatch;
+        public RangeMatch endRangeMatch;
         public RangeSignal startSignal;
-        public RangeVisibility startVisibility;
         public RangeSignal endSignal;
-        public RangeVisibility endVisibility;
-
+        public boolean startRangeOutput;
+        public boolean endRangeOutput;
 
         public Key() {}
 
 
-        public Key(boolean isNeg, boolean isRecurrent, Integer relativeRid, Integer absoluteRid, boolean matchRange, RangeSignal startSignal, RangeVisibility startVisibility, RangeSignal endSignal, RangeVisibility endVisibility) {
+        public Key(boolean isNeg, boolean isRecurrent, Integer relativeRid, Integer absoluteRid, RangeMatch startRangeMatch, RangeSignal startSignal, boolean startRangeOutput, RangeMatch endRangeMatch, RangeSignal endSignal, boolean endRangeOutput) {
             this.isNeg = isNeg;
             this.isRecurrent = isRecurrent;
             this.relativeRid = relativeRid;
             this.absoluteRid = absoluteRid;
-            this.matchRange = matchRange;
+            this.startRangeMatch = startRangeMatch;
+            this.endRangeMatch = endRangeMatch;
             this.startSignal = startSignal;
-            this.startVisibility = startVisibility;
             this.endSignal = endSignal;
-            this.endVisibility = endVisibility;
+            this.startRangeOutput = startRangeOutput;
+            this.endRangeOutput = endRangeOutput;
         }
 
 
         public Key createInputNodeKey() {
-            return relativeRid != null ? new Key(isNeg, isRecurrent, 0, absoluteRid, matchRange, startSignal, startVisibility, endSignal, endVisibility) : this;
+            return relativeRid != null ? new Key(isNeg, isRecurrent, 0, absoluteRid, startRangeMatch, startSignal, startRangeOutput, endRangeMatch, endSignal, endRangeOutput) : this;
         }
 
 
@@ -275,11 +280,12 @@ public class Synapse implements Writable {
             if(relativeRid != null) out.writeInt(relativeRid);
             out.writeBoolean(absoluteRid != null);
             if(absoluteRid != null) out.writeInt(absoluteRid);
-            out.writeBoolean(matchRange);
+            out.writeUTF(startRangeMatch.name());
+            out.writeUTF(endRangeMatch.name());
             out.writeUTF(startSignal.name());
-            out.writeUTF(startVisibility.name());
             out.writeUTF(endSignal.name());
-            out.writeUTF(endVisibility.name());
+            out.writeBoolean(startRangeOutput);
+            out.writeBoolean(endRangeOutput);
         }
 
 
@@ -289,11 +295,12 @@ public class Synapse implements Writable {
             isRecurrent = in.readBoolean();
             if(in.readBoolean()) relativeRid = in.readInt();
             if(in.readBoolean()) absoluteRid = in.readInt();
-            matchRange = in.readBoolean();
+            startRangeMatch = RangeMatch.valueOf(in.readUTF());
+            endRangeMatch = RangeMatch.valueOf(in.readUTF());
             startSignal = RangeSignal.valueOf(in.readUTF());
-            startVisibility = RangeVisibility.valueOf(in.readUTF());
             endSignal = RangeSignal.valueOf(in.readUTF());
-            endVisibility = RangeVisibility.valueOf(in.readUTF());
+            startRangeOutput = in.readBoolean();
+            endRangeOutput = in.readBoolean();
         }
 
 
@@ -319,15 +326,17 @@ public class Synapse implements Writable {
             if(r != 0) return r;
             r = Utils.compareInteger(absoluteRid, k.absoluteRid);
             if(r != 0) return r;
-            r = Boolean.compare(matchRange, k.matchRange);
+            r = startRangeMatch.compareTo(k.startRangeMatch);
+            if(r != 0) return r;
+            r = endRangeMatch.compareTo(k.endRangeMatch);
             if(r != 0) return r;
             r = startSignal.compareTo(k.startSignal);
             if(r != 0) return r;
-            r = startVisibility.compareTo(k.startVisibility);
-            if(r != 0) return r;
             r = endSignal.compareTo(k.endSignal);
             if(r != 0) return r;
-            return endVisibility.compareTo(k.endVisibility);
+            r = Boolean.compare(startRangeOutput, k.startRangeOutput);
+            if(r != 0) return r;
+            return Boolean.compare(endRangeOutput, k.endRangeOutput);
         }
     }
 }

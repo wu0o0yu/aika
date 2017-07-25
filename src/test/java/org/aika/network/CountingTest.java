@@ -25,6 +25,8 @@ import org.aika.lattice.OrNode;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.neuron.Synapse.RangeSignal;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -46,9 +48,8 @@ public class CountingTest {
                         .setMinInput(0.95)
                         .setWeight(100.0)
                         .setNeuron(inA)
-                        .setStartVisibility(Synapse.RangeVisibility.MAX_OUTPUT)
-                        .setEndVisibility(Synapse.RangeVisibility.MAX_OUTPUT)
-                        .setMatchRange(true)
+                        .setRangeMatch(Input.RangeRelation.CONTAINS)
+                        .setRangeOutput(true)
         );
 
 
