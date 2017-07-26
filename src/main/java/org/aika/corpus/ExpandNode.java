@@ -42,6 +42,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
      * This optimization may miss some cases and will not always return the best interpretation.
      */
     public static boolean INCOMPLETE_OPTIMIZATION = true;
+    public static boolean EXPAND_POSITIVE_FEEDBACK_LINKS = true;
 
     public static int MAX_SEARCH_STEPS = 100000;
 
@@ -183,7 +184,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
             ExpandNode en = this;
             while(en != null) {
                 if(en.marker != null && !en.marker.complete) {
-                    en.marker.complete = !hasUnsatisfiedPositiveFeedbackLink(en.refinement, Option.visitedCounter++);
+                    en.marker.complete = EXPAND_POSITIVE_FEEDBACK_LINKS || !hasUnsatisfiedPositiveFeedbackLink(en.refinement, Option.visitedCounter++);
                 }
                 en = en.selectedParent;
             }
@@ -207,12 +208,21 @@ public class ExpandNode implements Comparable<ExpandNode> {
             return;
         }
 
-        do {
-            child = selectedParent.selectCandidate();
-        } while(child != null && !f && INCOMPLETE_OPTIMIZATION && child.marker.complete);
+        if(EXPAND_POSITIVE_FEEDBACK_LINKS) {
+            if(f || !INCOMPLETE_OPTIMIZATION) {
+                child = selectedParent.selectCandidate();
+                if(child != null) {
+                    child.search(doc, selectedParent, this, searchSteps);
+                }
+            }
+        } else {
+            do {
+                child = selectedParent.selectCandidate();
+            } while (child != null && !f && INCOMPLETE_OPTIMIZATION && child.marker.complete);
 
-        if(child != null) {
-            child.search(doc, selectedParent, this, searchSteps);
+            if (child != null) {
+                child.search(doc, selectedParent, this, searchSteps);
+            }
         }
     }
 
@@ -340,6 +350,14 @@ public class ExpandNode implements Comparable<ExpandNode> {
                 }
             }
         }
+
+        if(EXPAND_POSITIVE_FEEDBACK_LINKS) {
+            for(Activation act: n.getNeuronActivations()) {
+                for(SynapseActivation sa: act.neuronOutputs) {
+                    if(sa.s.key.isRecurrent && sa.s.w > 0.0) results.add(sa.output.key.o);
+                }
+            }
+        }
         for(Option pn: n.parents) {
             expandRefinementRecursiveStep(results, pn, v);
         }
@@ -449,7 +467,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
 
     public String toString() {
-        return (selectedParent != null ? selectedParent.toString() : "") + "->" + refinement.toString() + ":" + computeAccumulatedWeight();
+        return refinement.toString() + " : " + computeAccumulatedWeight();
     }
 
 
