@@ -341,7 +341,9 @@ public class ExpandNode implements Comparable<ExpandNode> {
             }
         }
         for(Option pn: n.parents) {
-            expandRefinementRecursiveStep(results, pn, v);
+            if(!pn.isBottom()) {
+                expandRefinementRecursiveStep(results, pn, v);
+            }
         }
 
         if(n.isBottom()) return;
@@ -372,7 +374,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
 
     public boolean isCovered(long g) {
-        return g == visited || (selectedParent != null && selectedParent.isCovered(g));
+        return g == visited || (selectedParent != null && g < visited && selectedParent.isCovered(g));
     }
 
 
