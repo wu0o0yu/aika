@@ -145,11 +145,13 @@ public class Input implements Comparable<Input> {
      * @return
      */
     public Input setStartRangeMatch(RangeMatch rm) {
+        assert !startRangeOutput || rm == RangeMatch.EQUALS;
         this.startRangeMatch = rm;
         return this;
     }
 
     public Input setEndRangeMatch(RangeMatch rm) {
+        assert !endRangeOutput || rm == RangeMatch.EQUALS;
         this.endRangeMatch = rm;
         return this;
     }
@@ -166,20 +168,20 @@ public class Input implements Comparable<Input> {
     public Input setRangeMatch(RangeRelation rr) {
         switch(rr) {
             case EQUALS:
-                startRangeMatch = RangeMatch.EQUALS;
-                endRangeMatch = RangeMatch.EQUALS;
+                setStartRangeMatch(RangeMatch.EQUALS);
+                setEndRangeMatch(RangeMatch.EQUALS);
                 break;
             case CONTAINS:
-                startRangeMatch = RangeMatch.LESS_THAN;
-                endRangeMatch = RangeMatch.GREATER_THAN;
+                setStartRangeMatch(RangeMatch.LESS_THAN);
+                setEndRangeMatch(RangeMatch.GREATER_THAN);
                 break;
             case CONTAINED_IN:
-                startRangeMatch = RangeMatch.GREATER_THAN;
-                endRangeMatch = RangeMatch.LESS_THAN;
+                setStartRangeMatch(RangeMatch.GREATER_THAN);
+                setEndRangeMatch(RangeMatch.LESS_THAN);
                 break;
             default:
-                startRangeMatch = RangeMatch.NONE;
-                endRangeMatch = RangeMatch.NONE;
+                setStartRangeMatch(RangeMatch.NONE);
+                setEndRangeMatch(RangeMatch.NONE);
         }
         return this;
     }
@@ -192,18 +194,24 @@ public class Input implements Comparable<Input> {
      * @return
      */
     public Input setRangeOutput(boolean ro) {
-        this.startRangeOutput = ro;
-        this.endRangeOutput = ro;
+        setStartRangeOutput(ro);
+        setEndRangeOutput(ro);
         return this;
     }
 
     public Input setStartRangeOutput(boolean ro) {
         this.startRangeOutput = ro;
+        if(ro) {
+            setStartRangeMatch(RangeMatch.EQUALS);
+        }
         return this;
     }
 
     public Input setEndRangeOutput(boolean ro) {
         this.endRangeOutput = ro;
+        if(ro) {
+            setEndRangeMatch(RangeMatch.EQUALS);
+        }
         return this;
     }
 

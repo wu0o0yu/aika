@@ -97,7 +97,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
         int[] searchSteps = new int[1];
 
         List<Option> rootRefs = expandRootRefinement(doc);
-        refinement = expandRefinement(Option.add(doc, false, rootRefs.toArray(new Option[rootRefs.size()])));
+        refinement = expandRefinement(Option.add(doc, false, rootRefs.toArray(new Option[rootRefs.size()])), Option.visitedCounter++);
 
         markCovered(null, visited, refinement);
         markExcluded(null, visited, refinement);
@@ -328,14 +328,14 @@ public class ExpandNode implements Comparable<ExpandNode> {
     }
 
 
-    private Option expandRefinement(Option ref) {
+    private Option expandRefinement(Option ref, long v) {
         ArrayList<Option> tmp = new ArrayList<>();
         tmp.add(ref);
-        expandRefinementRecursiveStep(tmp, ref, Option.visitedCounter++);
+        expandRefinementRecursiveStep(tmp, ref, v);
         Option expRef = Option.add(ref.doc, false, tmp.toArray(new Option[tmp.size()]));
 
         if(ref == expRef) return ref;
-        else return expandRefinement(expRef);
+        else return expandRefinement(expRef, v);
     }
 
 
@@ -477,7 +477,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
         cand.visited = Option.visitedCounter++;
         cand.selectedParent = selectedParent;
         cand.excludedParent = excludedParent;
-        cand.refinement = cand.expandRefinement(ref);
+        cand.refinement = cand.expandRefinement(ref, Option.visitedCounter++);
         cand.markCovered(changed, cand.visited, cand.refinement);
         cand.markExcluded(changed, cand.visited, cand.refinement);
         cand.marker = marker;
