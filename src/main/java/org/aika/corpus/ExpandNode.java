@@ -25,10 +25,7 @@ import org.aika.neuron.Neuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * The <code>ExpandNode</code> class represents a node in the search tree that is used to find the optimal
@@ -52,7 +49,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
     ExpandNode parent;
 
     long visited;
-    Option refinement;
+    List<Option> refinement;
     RefMarker marker;
 
     NormWeight weightDelta = NormWeight.ZERO_WEIGHT;
@@ -68,7 +65,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
 
     private void collectResults(Collection<Option> results) {
-        results.add(refinement);
+        results.addAll(refinement);
         if(selectedParent != null) selectedParent.collectResults(results);
     }
 
@@ -84,7 +81,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
     public static ExpandNode createInitialExpandNode(Document doc) {
         List<Option> changed = new ArrayList<>();
         changed.add(doc.bottom);
-        return createCandidate(doc, changed, null, null, null, doc.bottom, null);
+        return createCandidate(doc, changed, null, null, null, Arrays.asList(doc.bottom), null);
     }
 
 
@@ -96,7 +93,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
         int[] searchSteps = new int[1];
 
         List<Option> rootRefs = expandRootRefinement(doc);
-        refinement = expandRefinement(Option.add(doc, false, rootRefs.toArray(new Option[rootRefs.size()])), Option.visitedCounter++);
+        refinement = expandRefinement(rootRefs, Option.visitedCounter++);
 
         markCovered(null, visited, refinement);
         markExcluded(null, visited, refinement);
@@ -130,7 +127,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
             log.info("Selected ExandNode ID: " + doc.selectedExpandNode.id);
         }
 
-        doc.selectedOption = Option.add(doc, true, results.toArray(new Option[results.size()]));
+        doc.selectedOption = results;
 
         if(doc.interrupted) {
             log.warn("The search for the best interpretation has been interrupted. Too many search steps!");
@@ -217,6 +214,14 @@ public class ExpandNode implements Comparable<ExpandNode> {
     }
 
 
+    private boolean hasUnsatisfiedPositiveFeedbackLink(List<Option> n) {
+        for(Option x: n) {
+            if(hasUnsatisfiedPositiveFeedbackLink(x)) return true;
+        }
+        return false;
+    }
+
+
     private boolean hasUnsatisfiedPositiveFeedbackLink(Option n) {
         if(n.hasUnsatisfiedPosFeedbackLinksCache != null) return n.hasUnsatisfiedPosFeedbackLinksCache;
 
@@ -251,7 +256,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
         candidates = new TreeSet<>();
         for(Option cn: collectConflicts(doc)) {
             List<Option> changed = new ArrayList<>();
-            ExpandNode c = createCandidate(doc, changed, this, this, null, cn, new RefMarker());
+            ExpandNode c = createCandidate(doc, changed, this, this, null, Arrays.asList(cn), new RefMarker());
 
             c.weightDelta = doc.vQueue.adjustWeight(c, changed);
             if(Document.OPTIMIZE_DEBUG_OUTPUT) {
@@ -270,7 +275,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
         candidates = new TreeSet<>();
 
         for(ExpandNode pc: selectedParent.candidates) {
-            if(!isCovered(pc.refinement.markedCovered) && !checkExcluded(pc.refinement, Option.visitedCounter++) && !pc.refinement.contains(refinement, false)) {
+            if(!checkCovered(pc.refinement) && !checkExcluded(pc.refinement, Option.visitedCounter++)) {
                 List<Option> changed = new ArrayList<>();
                 ExpandNode c = createCandidate(doc, changed, this, this, excludedParent, pc.refinement, pc.marker);
 
@@ -280,6 +285,22 @@ public class ExpandNode implements Comparable<ExpandNode> {
                 candidates.add(c);
             }
         }
+    }
+
+
+    private boolean checkCovered(List<Option> n) {
+        for(Option x: n) {
+            if(!isCovered(x.markedCovered)) return false;
+        }
+        return true;
+    }
+
+
+    private boolean checkExcluded(List<Option> n, long v) {
+        for(Option x: n) {
+            if(checkExcluded(x, v)) return true;
+        }
+        return false;
     }
 
 
@@ -324,14 +345,41 @@ public class ExpandNode implements Comparable<ExpandNode> {
     }
 
 
-    private Option expandRefinement(Option ref, long v) {
+    private List<Option> expandRefinement(List<Option> ref, long v) {
         ArrayList<Option> tmp = new ArrayList<>();
-        tmp.add(ref);
-        expandRefinementRecursiveStep(tmp, ref, v);
-        Option expRef = Option.add(ref.doc, false, tmp.toArray(new Option[tmp.size()]));
+        for(Option n: ref) {
+            markExpandRefinement(n, v);
+            tmp.add(n);
+        }
 
-        if(ref == expRef) return ref;
-        else return expandRefinement(expRef, v);
+        for(Option n: ref) {
+            expandRefinementRecursiveStep(tmp, n, v);
+        }
+
+        if(ref.size() == tmp.size()) return tmp;
+        else return expandRefinement(tmp, v);
+    }
+
+
+    private void markExpandRefinement(Option n, long v) {
+        if(n.markedExpandRefinement == v) return;
+        n.markedExpandRefinement = v;
+
+        for(Option pn: n.parents) {
+            markExpandRefinement(pn, v);
+        }
+    }
+
+
+    private boolean hasUncoveredConflicts(Option n) {
+        if(!n.conflicts.hasConflicts()) return false;
+
+        ArrayList<Option> conflicts = new ArrayList<>();
+        Conflicts.collectDirectConflicting(conflicts, n);
+        for(Option cn: conflicts) {
+            if(!isCovered(cn.markedExcluded)) return true;
+        }
+        return false;
     }
 
 
@@ -341,7 +389,8 @@ public class ExpandNode implements Comparable<ExpandNode> {
 
         if (n.refByOrOption != null) {
             for (Option on : n.refByOrOption) {
-                if(!on.conflicts.hasConflicts() && !isCovered(on.markedCovered)) {
+                if(on.markedExpandRefinement != v && !hasUncoveredConflicts(on) && !isCovered(on.markedCovered)) {
+                    markExpandRefinement(on, v);
                     results.add(on);
                 }
             }
@@ -384,6 +433,13 @@ public class ExpandNode implements Comparable<ExpandNode> {
     }
 
 
+    private void markCovered(List<Option> changed, long v, List<Option> n) {
+        for(Option x: n) {
+            markCovered(changed, v, x);
+        }
+    }
+
+
     private boolean markCovered(List<Option> changed, long v, Option n) {
         if(n.visitedMarkCovered == v) return false;
         n.visitedMarkCovered = v;
@@ -415,6 +471,13 @@ public class ExpandNode implements Comparable<ExpandNode> {
         if(changed != null) changed.add(n);
 
         return false;
+    }
+
+
+    private void markExcluded(List<Option> changed, long v, List<Option> n) {
+        for(Option x: n) {
+            markExcluded(changed, v, x);
+        }
     }
 
 
@@ -461,7 +524,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
     }
 
 
-    public static ExpandNode createCandidate(Document doc, List<Option> changed, ExpandNode parent, ExpandNode selectedParent, ExpandNode excludedParent, Option ref, RefMarker marker) {
+    public static ExpandNode createCandidate(Document doc, List<Option> changed, ExpandNode parent, ExpandNode selectedParent, ExpandNode excludedParent, List<Option> ref, RefMarker marker) {
         ExpandNode cand = new ExpandNode(parent);
         cand.id = doc.expandNodeIdCounter++;
         cand.visited = Option.visitedCounter++;
@@ -491,7 +554,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
     public int compareTo(ExpandNode c) {
         int r = Double.compare(c.computeAccumulatedWeight().getNormWeight(), computeAccumulatedWeight().getNormWeight());
         if(r != 0) return r;
-        return refinement.compareTo(c.refinement);
+        return Integer.compare(id, c.id);
     }
 
 

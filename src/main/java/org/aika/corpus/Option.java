@@ -60,6 +60,7 @@ public class Option implements Comparable<Option> {
     public long visitedCollectAllConflicting = -1;
     private long visitedStoreFinalWeight = -1;
     public long visitedExpandRefinementRecursiveStep = -1;
+    public long markedExpandRefinement = -1;
     public long visitedCollectConflicts = -1;
     private long visitedComputeLargestCommonSubset = -1;
     private long visitedComputeLength = -1;

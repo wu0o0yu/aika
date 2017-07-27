@@ -62,7 +62,7 @@ public class Document implements Comparable<Document> {
 
     public ExpandNode root = ExpandNode.createInitialExpandNode(this);
     public ExpandNode selectedExpandNode = null;
-    public Option selectedOption = null;
+    public List<Option> selectedOption = null;
     public long selectedMark = -1;
 
 

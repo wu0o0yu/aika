@@ -78,7 +78,7 @@ public class OrNode extends Node {
 
     @Override
     public void initActivation(Document doc, Activation act) {
-        for(Synapse s: neuron.inputSynapses) {
+/*        for(Synapse s: neuron.inputSynapses) {
             if(s.key.isNeg || s.key.isRecurrent) {
                 Activation.select(doc, s.inputNode, Utils.nullSafeAdd(act.key.rid, false, s.key.relativeRid, false), act.key.r, Range.Relation.OVERLAPS, null, null)
                         .forEach(iAct -> {
@@ -86,7 +86,7 @@ public class OrNode extends Node {
                 });
             }
         }
-
+*/
         if(getThreadState(doc).activations.isEmpty()) {
             doc.activatedNeurons.add(neuron);
         }

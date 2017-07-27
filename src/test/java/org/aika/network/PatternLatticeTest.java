@@ -33,6 +33,8 @@ import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 /**
  *
  * @author Lukas Molzberger
@@ -276,7 +278,7 @@ public class PatternLatticeTest {
         InputNode pDNode = TestHelper.addOutputNode(doc, inD, 0, null);
 
 
-        doc.selectedOption = doc.bottom;
+        doc.selectedOption = Arrays.asList(doc.bottom);
         doc.train();
 
         inA.addInput(doc, 0, 1, 0);
