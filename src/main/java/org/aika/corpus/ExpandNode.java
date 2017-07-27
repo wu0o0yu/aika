@@ -183,7 +183,7 @@ public class ExpandNode implements Comparable<ExpandNode> {
             ExpandNode en = this;
             while(en != null) {
                 if(en.marker != null && !en.marker.complete) {
-                    en.marker.complete = !hasUnsatisfiedPositiveFeedbackLink(en.refinement, Option.visitedCounter++);
+                    en.marker.complete = !hasUnsatisfiedPositiveFeedbackLink(en.refinement);
                 }
                 en = en.selectedParent;
             }
@@ -217,20 +217,26 @@ public class ExpandNode implements Comparable<ExpandNode> {
     }
 
 
-    private boolean hasUnsatisfiedPositiveFeedbackLink(Option n, long v) {
-        if(n.visitedHasUnsatisfiedPosFeedbackLinks == v) return false;
-        n.visitedHasUnsatisfiedPosFeedbackLinks = v;
+    private boolean hasUnsatisfiedPositiveFeedbackLink(Option n) {
+        if(n.hasUnsatisfiedPosFeedbackLinksCache != null) return n.hasUnsatisfiedPosFeedbackLinksCache;
 
         for(Activation act: n.getNeuronActivations()) {
             for(SynapseActivation sa: act.neuronOutputs) {
-                if(sa.s.key.isRecurrent && sa.s.w > 0.0 && !isCovered(sa.output.key.o.markedCovered)) return true;
+                if(sa.s.key.isRecurrent && sa.s.w > 0.0 && !isCovered(sa.output.key.o.markedCovered)) {
+                    n.hasUnsatisfiedPosFeedbackLinksCache = true;
+                    return true;
+                }
             }
         }
 
         for(Option pn: n.parents) {
-            if(hasUnsatisfiedPositiveFeedbackLink(pn, v)) return true;
+            if(hasUnsatisfiedPositiveFeedbackLink(pn)) {
+                n.hasUnsatisfiedPosFeedbackLinksCache = true;
+                return true;
+            }
         }
 
+        n.hasUnsatisfiedPosFeedbackLinksCache = false;
         return false;
     }
 
