@@ -104,6 +104,18 @@ public class InputNeuron extends Neuron {
         doc.propagate();
     }
 
+    public void addInput(Document doc, int begin, int end, Integer rid, Option o, double value) {
+        Range r = new Range(begin, end);
+        Node.addActivationAndPropagate(doc, new Activation.Key(node, r, rid, o), Collections.emptySet());
+
+        doc.propagate();
+
+        Activation act = Activation.get(doc, node, rid, r, Range.Relation.EQUALS, o, Option.Relation.EQUALS);
+        State s = new State(value, 0, NormWeight.ZERO_WEIGHT);
+        act.rounds.set(0, s);
+        act.finalState = s;
+    }
+
 
     public void removeInput(Document doc, int begin, int end) {
         removeInput(doc, begin, end, null, doc.bottom);

@@ -280,7 +280,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
                 (directSum + negRecSum) < 0.0 ? Math.max(0.0, directSum + negRecSum + maxRecurrentSum) : maxRecurrentSum
         );
 
-        if(doc.debugActId == act.id && doc.debugActWeight < newWeight.w) {
+        if(doc.debugActId == act.id && doc.debugActWeight <= newWeight.w) {
             storeDebugOutput(doc, tmp, newWeight, sum, round);
         }
 

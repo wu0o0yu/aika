@@ -336,7 +336,7 @@ public class AndNode extends Node {
                     flag = an.parents.containsKey(ref);
                 } else if(ref.rid == 0) {
                     for(Refinement pRef: an.parents.keySet()) {
-                        if(pRef.rid < 0 && pRef.input == ref.input) {
+                        if((pRef.rid == null || pRef.rid < 0) && pRef.input == ref.input) {
                             flag = true;
                             break;
                         }
