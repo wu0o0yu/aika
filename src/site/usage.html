@@ -61,10 +61,8 @@
 
         Document doc = parser.parse("Mr. Jackson Cook was born in New York");
 
-        for(Activation act: parser.personNamesModel.surnameCategory.node.getActivations(doc)) {
-            if(act.finalState != null && act.finalState.value > 0.0) {
-                System.out.println(doc.getText(act.key.r));
-            }
+        for(Activation act: parser.personNamesModel.surnameCategory.getFinalActivations(doc)) {
+              System.out.println(doc.getText(act.key.r));
         }
 
         System.out.println(doc.networkStateToString(true, true));
@@ -141,17 +139,15 @@ required minimum input activation (<i>setMinInput</i>) of each input.
                  // activation value of at least 0.9
                     .setMinInput(0.9)
                     .setRelativeRid(0) // references the current word
-                    .setRecurrent(false),
+                    .setRecurrent(false)
+                    .setRangeOutput(true), // propagate the range of this input
             new Input() // The previous word needs to be a forename
                     .setNeuron(forenameCategory)
                     .setWeight(10.0)
                     .setMinInput(0.9)
                     .setRelativeRid(-1) // references the previous word
                     .setRecurrent(true) // this input is a positive feedback loop
-                    .setMatchRange(false) // ignore the range when matching this input
-                    // The range of this input should have no effect on the range of the output
-                    .setStartVisibility(RangeVisibility.NONE)
-                    .setEndVisibility(RangeVisibility.NONE),
+                    .setRangeMatch(NONE),
 
             // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
             // self suppression taking place even though 'E-cook (surname)' is also contained
@@ -161,6 +157,7 @@ required minimum input activation (<i>setMinInput</i>) of each input.
                     .setWeight(-20.0)
                     .setMinInput(1.0)
                     .setRecurrent(true) // this input is a negative feedback loop
+                    .setRangeMatch(CONTAINED_IN)
     );
                 </code>
 			</pre>
@@ -175,12 +172,14 @@ required minimum input activation (<i>setMinInput</i>) of each input.
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(10.0)
                     .setRelativeRid(0)
+                    .setRangeOutput(true)
     );
     m.createOrNeuron(surnameCategory,
             new Input()
                     .setNeuron(cookSurnameEntity)
                     .setWeight(10.0)
                     .setRelativeRid(0)
+                    .setRangeOutput(true)
     );
                 </code>
 			</pre>
@@ -191,10 +190,10 @@ required minimum input activation (<i>setMinInput</i>) of each input.
             <pre class="prettyprint">
 				<code class="language-java">
     m.createOrNeuron(suppressingN,
-            new Input().setNeuron(cookProfessionEntity).setWeight(10.0),
-            new Input().setNeuron(cookSurnameEntity).setWeight(10.0),
-            new Input().setNeuron(jacksonCityEntity).setWeight(10.0),
-            new Input().setNeuron(jacksonForenameEntity).setWeight(10.0)
+            new Input().setNeuron(cookProfessionEntity).setWeight(10.0).setRangeOutput(true),
+            new Input().setNeuron(cookSurnameEntity).setWeight(10.0).setRangeOutput(true),
+            new Input().setNeuron(jacksonCityEntity).setWeight(10.0).setRangeOutput(true),
+            new Input().setNeuron(jacksonForenameEntity).setWeight(10.0).setRangeOutput(true)
     );
                 </code>
 			</pre>
@@ -314,12 +313,14 @@ The output of this example looks as following. Each line in the table represents
                         .setWeight(10.5)
                         .setMaxLowerWeightsSum(0.0)
                         .setRecurrent(false)
-                        .setMinInput(0.9),
+                        .setMinInput(0.9)
+                        .setRangeOutput(true),
                 new Input()                     // This input is negated
                         .setNeuron(pSuppr)
                         .setWeight(-10.0)
                         .setRecurrent(true)
                         .setMinInput(1.0)
+                        .setRangeMatch(CONTAINED_IN)
         );
 
         Neuron pB = m.createAndNeuron(
@@ -330,12 +331,14 @@ The output of this example looks as following. Each line in the table represents
                         .setWeight(11.0)
                         .setMaxLowerWeightsSum(0.0)
                         .setRecurrent(false)
-                        .setMinInput(0.9),
+                        .setMinInput(0.9)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0)
                         .setRecurrent(true)
                         .setMinInput(1.0)
+                        .setRangeMatch(CONTAINED_IN)
         );
 
         Neuron pC = m.createAndNeuron(
@@ -346,12 +349,14 @@ The output of this example looks as following. Each line in the table represents
                         .setWeight(10.0)
                         .setMaxLowerWeightsSum(0.0)
                         .setRecurrent(false)
-                        .setMinInput(0.9),
+                        .setMinInput(0.9)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0)
                         .setRecurrent(true)
                         .setMinInput(1.0)
+                        .setRangeMatch(CONTAINED_IN)
         );
 
         // Finally addInput adds all the inputs to the suppressing neuron.
@@ -361,17 +366,20 @@ The output of this example looks as following. Each line in the table represents
                         .setNeuron(pA)
                         .setWeight(10.0)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pB)
                         .setWeight(10.0)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pC)
                         .setWeight(10.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeOutput(true)
         );
 
         Neuron outN = m.createOrNeuron(new Neuron("OUT"),
@@ -380,6 +388,7 @@ The output of this example looks as following. Each line in the table represents
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeOutput(true)
         );
 
         // Now that the model is complete, apply it to a document.
@@ -531,21 +540,23 @@ The output of this example looks as following. Each line in the table represents
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(0.9)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(relNeurons.get('c'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(1)
                         .setMinInput(0.9)
-                        .setMatchRange(false),
+                        .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(relNeurons.get('d'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setMinInput(0.9)
-                        .setMatchRange(false)
+                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setEndRangeOutput(true)
         );
 
         // Create a simple text document.

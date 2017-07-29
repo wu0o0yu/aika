@@ -326,10 +326,10 @@ public class Model implements Writable {
                             false,
                             0,
                             null,
-                            RangeMatch.NONE,
+                            RangeMatch.FIRST,
                             RangeSignal.START,
                             true,
-                            RangeMatch.NONE,
+                            RangeMatch.FIRST,
                             RangeSignal.END,
                             true
                     )

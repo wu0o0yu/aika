@@ -37,6 +37,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -582,6 +583,13 @@ public class Neuron implements Comparable<Neuron>, Writable {
         }
         sb.append(">");
         return sb.toString();
+    }
+
+
+    public Collection<Activation> getFinalActivations(Document doc) {
+        return Activation.select(doc, node, null, null, null, null, null, null)
+                .filter(act -> act.finalState != null && act.finalState.value > 0.0)
+                .collect(Collectors.toList());
     }
 
 

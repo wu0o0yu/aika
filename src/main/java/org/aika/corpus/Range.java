@@ -55,10 +55,10 @@ public class Range {
                     .stream()
                     .filter(act -> act.filter(n, rid, r, begin, end, o, or));
             if(end == FIRST) {
-
+                s = s.limit(1);
             }
         } else if((begin == RangeMatch.LESS_THAN || begin == RangeMatch.EQUALS) && r.begin != null) {
-            return n.getThreadState(doc).activations.descendingMap().subMap(
+            s = n.getThreadState(doc).activations.descendingMap().subMap(
                     new Activation.Key(n, new Range(r.begin, Integer.MAX_VALUE), null, Option.MAX),
                     true,
                     new Activation.Key(n, new Range(0, null), null, Option.MIN),
@@ -67,8 +67,11 @@ public class Range {
                     .values()
                     .stream()
                     .filter(act -> act.filter(n, rid, r, begin, end, o, or));
+            if(end == FIRST) {
+                s = s.limit(1);
+            }
         } else {
-            return n.getThreadState(doc).activations.values()
+            s = n.getThreadState(doc).activations.values()
                     .stream()
                     .filter(act -> act.filter(n, rid, r, begin, end, o, or));
         }
