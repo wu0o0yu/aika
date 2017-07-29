@@ -39,6 +39,9 @@ import org.junit.Test;
 import java.util.Collection;
 import java.util.Set;
 
+import static org.aika.neuron.Synapse.RangeMatch.GREATER_THAN;
+import static org.aika.neuron.Synapse.RangeMatch.LESS_THAN;
+
 /**
  *
  * @author Lukas Molzberger
@@ -96,7 +99,7 @@ public class ActivationOutputsTest {
         );
 
 
-        InputNode pC = new InputNode(doc, new Synapse.Key(false, false, 0, null, RangeMatch.LESS_THAN, RangeSignal.START, true, RangeMatch.GREATER_THAN, RangeSignal.END, true));
+        InputNode pC = new InputNode(doc, new Synapse.Key(false, false, 0, null, LESS_THAN, RangeSignal.START, true, GREATER_THAN, RangeSignal.END, true));
         Activation pC1 = TestHelper.addActivation(pC, doc, TestHelper.get(doc, pAB.node, new Range(0, 1), null));
 
         Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, TestHelper.get(doc, pAB.node, new Range(0, 1), null)));
@@ -194,7 +197,7 @@ public class ActivationOutputsTest {
         Option o1 = Option.addPrimitive(doc);
         inA.addInput(doc, 0, 1, o1);
 
-        Activation outB1 = Activation.get(doc, outBNode, null, new Range(0, 1), Range.Relation.OVERLAPS, null, null);
+        Activation outB1 = Activation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
         Assert.assertTrue(containsOutputActivation(inA.node.getFirstActivation(doc).neuronOutputs, outB1));
     }
 
@@ -218,7 +221,7 @@ public class ActivationOutputsTest {
 
         inA.addInput(doc, 0, 1, Option.addPrimitive(doc));
 
-        Activation outB1 = Activation.get(doc, outBNode, null, new Range(0, 1), Range.Relation.OVERLAPS, null, null);
+        Activation outB1 = Activation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
 
         Assert.assertTrue(containsOutputActivation(inA.node.getFirstActivation(doc).neuronOutputs, outB1));
     }
@@ -238,12 +241,13 @@ public class ActivationOutputsTest {
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeOutput(true)
         ).node;
 
 
         Option o1 = Option.addPrimitive(doc);
         inA.addInput(doc, 0, 1, 0, o1);
-        Activation outB1 = Activation.get(doc, outBNode, null, new Range(0, 1), Range.Relation.OVERLAPS, null, null);
+        Activation outB1 = Activation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
 
         Assert.assertTrue(containsOutputActivation(inA.node.getFirstActivation(doc).neuronOutputs, outB1));
 

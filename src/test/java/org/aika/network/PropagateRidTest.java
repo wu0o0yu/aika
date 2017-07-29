@@ -54,7 +54,7 @@ public class PropagateRidTest {
 
         inA.addInput(doc, 0, 1, 10, doc.bottom);
 
-        Assert.assertEquals(5, Activation.get(doc, pA.node, null, null, null, null, null).key.rid.intValue());
+        Assert.assertEquals(5, Activation.get(doc, pA.node, null, null, null, null, null, null).key.rid.intValue());
 
     }
 }

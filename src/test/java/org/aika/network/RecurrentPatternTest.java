@@ -30,6 +30,8 @@ import org.junit.Test;
 
 import java.util.TreeMap;
 
+import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
+
 
 /**
  *
@@ -282,6 +284,6 @@ public class RecurrentPatternTest {
 
         System.out.println(doc.networkStateToString(true, false));
 
-        Assert.assertEquals(2, Activation.get(doc, ctn.node, 2, new Range(10, 15), Range.Relation.EQUALS, null, null).key.o.primId);
+        Assert.assertEquals(2, Activation.get(doc, ctn.node, 2, new Range(10, 15), EQUALS, EQUALS, null, null).key.o.primId);
     }
 }

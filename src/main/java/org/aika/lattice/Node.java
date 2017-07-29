@@ -24,12 +24,12 @@ import org.aika.corpus.Conflicts;
 import org.aika.corpus.Document;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
-import org.aika.corpus.Range.Relation;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.lattice.OrNode.OrEntry;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -404,9 +404,11 @@ public abstract class Node implements Comparable<Node>, Writable {
                 }
 
 
-                Relation rr = new Range.RangeMatcher(s.key.startRangeMatch, s.key.endRangeMatch);
+                RangeMatch begin = s.key.startRangeMatch;
+                RangeMatch end = s.key.endRangeMatch;
                 if(dir == 0) {
-                    rr = rr.invert();
+                    begin = RangeMatch.invert(begin);
+                    end = RangeMatch.invert(end);
                 }
 
                 Stream<Activation> tmp = Activation.select(
@@ -414,7 +416,8 @@ public abstract class Node implements Comparable<Node>, Writable {
                         n,
                         rid,
                         act.key.r,
-                        rr,
+                        begin,
+                        end,
                         null,
                         null
                 );

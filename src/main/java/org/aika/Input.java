@@ -16,7 +16,6 @@
  */
 package org.aika;
 
-import org.aika.corpus.Range.Relation;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.RangeSignal;
@@ -199,6 +198,7 @@ public class Input implements Comparable<Input> {
         return this;
     }
 
+
     public Input setStartRangeOutput(boolean ro) {
         this.startRangeOutput = ro;
         if(ro) {
@@ -206,6 +206,7 @@ public class Input implements Comparable<Input> {
         }
         return this;
     }
+
 
     public Input setEndRangeOutput(boolean ro) {
         this.endRangeOutput = ro;

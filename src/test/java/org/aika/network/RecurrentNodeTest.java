@@ -29,6 +29,8 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
+
 /**
  *
  * @author Lukas Molzberger
@@ -92,7 +94,7 @@ public class RecurrentNodeTest {
 
 
     private Activation getAct(Document doc, Node n, Integer rid, Range r, final Option o) {
-        return Activation.select(doc, n, rid, r, Range.Relation.EQUALS, null, null).filter(act -> o == null || act.key.o == o).findFirst().orElse(null);
+        return Activation.select(doc, n, rid, r, EQUALS, EQUALS, null, null).filter(act -> o == null || act.key.o == o).findFirst().orElse(null);
     }
 
 
@@ -266,27 +268,27 @@ public class RecurrentNodeTest {
         cn.addInput(doc, 4, 5, o0);
         in.addInput(doc, 20, 50, o0);
 
-        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 50), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 50), EQUALS, EQUALS, o0, Option.Relation.CONTAINS));
 
         cn.addInput(doc, 14, 15, o012);
 
 
-        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(15, 50), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 15), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 15), Range.Relation.EQUALS, o012, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(15, 50), EQUALS, EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 15), EQUALS, EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 15), EQUALS, EQUALS, o012, Option.Relation.CONTAINS));
 
         sn.addInput(doc, 9, 10, o01);
 
-        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(15, 50), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(10, 15), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(10, 15), Range.Relation.EQUALS, o012, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 10), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(15, 50), EQUALS, EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(10, 15), EQUALS, EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(10, 15), EQUALS, EQUALS, o012, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 10), EQUALS, EQUALS, o0, Option.Relation.CONTAINS));
 
         sn.removeInput(doc, 9, 10, o01);
 
-        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(15, 50), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 15), Range.Relation.EQUALS, o0, Option.Relation.CONTAINS));
-        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 15), Range.Relation.EQUALS, o012, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(15, 50), EQUALS, EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 15), EQUALS, EQUALS, o0, Option.Relation.CONTAINS));
+        Assert.assertNotNull(Activation.get(doc, on.node, 0, new Range(0, 15), EQUALS, EQUALS, o012, Option.Relation.CONTAINS));
     }
 
 

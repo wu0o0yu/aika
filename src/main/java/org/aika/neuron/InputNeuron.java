@@ -30,6 +30,8 @@ import org.aika.neuron.Synapse.RangeMatch;
 
 import java.util.Collections;
 
+import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
+
 
 /**
  *
@@ -110,7 +112,7 @@ public class InputNeuron extends Neuron {
 
         doc.propagate();
 
-        Activation act = Activation.get(doc, node, rid, r, Range.Relation.EQUALS, o, Option.Relation.EQUALS);
+        Activation act = Activation.get(doc, node, rid, r, EQUALS, EQUALS, o, Option.Relation.EQUALS);
         State s = new State(value, 0, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.finalState = s;
@@ -134,7 +136,7 @@ public class InputNeuron extends Neuron {
 
     public void removeInput(Document doc, int begin, int end, Integer rid, Option o) {
         Range r = new Range(begin, end);
-        Activation act = Activation.get(doc, node, rid, r, Range.Relation.EQUALS, o, Option.Relation.EQUALS);
+        Activation act = Activation.get(doc, node, rid, r, EQUALS, EQUALS, o, Option.Relation.EQUALS);
         Node.removeActivationAndPropagate(doc, act, Collections.emptySet());
 
         doc.propagate();

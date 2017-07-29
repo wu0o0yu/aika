@@ -26,12 +26,17 @@ import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
+import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
+import static org.aika.neuron.Synapse.RangeMatch.GREATER_THAN;
+import static org.aika.neuron.Synapse.RangeMatch.LESS_THAN;
 
 
 /**
@@ -72,7 +77,7 @@ public class RecurrentIdTest {
         inA.addInput(doc, 0, 1, 20);
         inB.addInput(doc, 0, 1, 21);
 
-        Activation outC1 = Activation.get(doc, outCNode, 20, new Range(0, 1), Range.Relation.OVERLAPS, null, null);
+        Activation outC1 = Activation.get(doc, outCNode, 20, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
 
         System.out.println(doc.networkStateToString(true, true));
 
@@ -119,7 +124,7 @@ public class RecurrentIdTest {
         inB.addInput(doc, 0, 1, 10);
         inC.addInput(doc, 0, 1, 16);
 
-        Activation outD1 = Activation.get(doc, outDNode, 10, new Range(0, 1), Range.Relation.OVERLAPS, null, null);
+        Activation outD1 = Activation.get(doc, outDNode, 10, new Range(0, 1), EQUALS, EQUALS, null, null);
 
         Assert.assertNotNull(outD1);
     }

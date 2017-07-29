@@ -26,6 +26,7 @@ import org.aika.lattice.Node.ThreadState;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron.NormWeight;
 import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -40,7 +41,6 @@ public class Activation implements Comparable<Activation> {
 
     public final Key key;
 
-    public boolean isReplaced;
     public boolean isRemoved;
     public int removedId;
     public long visitedNeuronTrain = -1;
@@ -170,15 +170,15 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public static Activation get(Document doc, Node n, Integer rid, Range r, Range.Relation rr, Option o, Option.Relation or) {
-        return select(doc, n, rid, r, rr, o, or)
+    public static Activation get(Document doc, Node n, Integer rid, Range r, RangeMatch begin, RangeMatch end, Option o, Option.Relation or) {
+        return select(doc, n, rid, r, begin, end, o, or)
                 .findFirst()
                 .orElse(null);
     }
 
 
     public static Activation get(Document doc, Node n, Key ak) {
-        return get(doc, n, ak.rid, ak.r, Range.Relation.EQUALS, ak.o, Option.Relation.EQUALS);
+        return get(doc, n, ak.rid, ak.r, RangeMatch.EQUALS, RangeMatch.EQUALS, ak.o, Option.Relation.EQUALS);
     }
 
 
@@ -188,7 +188,7 @@ public class Activation implements Comparable<Activation> {
         NavigableMap<Key, Activation> tmp = (inv ? th.activationsEnd : th.activations);
         tmp = dir ? tmp.descendingMap() : tmp;
         for(Activation act: tmp.tailMap(bk, false).values()) {
-            if(act.filter(n, rid, null, null, o, Option.Relation.CONTAINED_IN)) {
+            if(act.filter(n, rid, null, null, null, o, Option.Relation.CONTAINED_IN)) {
                 return act;
             }
         }
@@ -196,7 +196,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public static Stream<Activation> select(Document doc, Node n, Integer rid, Range r, Range.Relation rr, Option o, Option.Relation or) {
+    public static Stream<Activation> select(Document doc, Node n, Integer rid, Range r, RangeMatch begin, RangeMatch end, Option o, Option.Relation or) {
         Stream<Activation> results;
         if(n != null) {
             ThreadState th = n.getThreadState(doc);
@@ -217,11 +217,11 @@ public class Activation implements Comparable<Activation> {
                             .stream();
                 } else return Stream.empty();
             } else {
-                if(rr == null) {
+                if(begin == null && end == null) {
                     results = th.activations.values()
                             .stream();
                 } else {
-                    return rr.getActivations(doc, n, rid, r, o, or);
+                    return Range.getActivations(doc, n, rid, r, begin, end, o, or);
                 }
             }
         } else {
@@ -239,12 +239,15 @@ public class Activation implements Comparable<Activation> {
             }
         }
 
-        return results.filter(act -> act.filter(n, rid, r, rr, o, or));
+        return results.filter(act -> act.filter(n, rid, r, begin, end, o, or));
     }
 
 
-    public boolean filter(Node n, Integer rid, Range r, Range.Relation rr, Option o, Option.Relation or) {
-        return (n == null || key.n == n) && (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) && (r == null || rr == null || (rr.match(key.r, r))) && (o == null || or.compare(key.o, o));
+    public boolean filter(Node n, Integer rid, Range r, RangeMatch begin, RangeMatch end, Option o, Option.Relation or) {
+        return (n == null || key.n == n) &&
+                (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) &&
+                (r == null || ((begin == null || begin.compare(key.r.begin, r.begin)) && (end == null || end.compare(key.r.end, r.end)))) &&
+                (o == null || or.compare(key.o, o));
     }
 
 

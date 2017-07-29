@@ -35,6 +35,8 @@ import org.junit.Test;
 
 import java.util.Collections;
 
+import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
+
 /**
  *
  * @author Lukas Molzberger
@@ -71,9 +73,9 @@ public class ActivationsTest {
 
         inA.addInput(doc, 1, 2);
 
-        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(0, 1), Range.Relation.EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(0, 1), doc.bottom));
-        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(1, 2), Range.Relation.EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
-        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(2, 3), Range.Relation.EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
+        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(0, 1), EQUALS, EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(0, 1), doc.bottom));
+        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(1, 2), EQUALS, EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
+        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(2, 3), EQUALS, EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
 
         InputNeuron inB = m.createOrLookupInputSignal("B");
 

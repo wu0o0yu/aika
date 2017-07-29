@@ -188,7 +188,7 @@ public class InputNode extends Node {
         Activation.Key ak = act.key;
         if(neuron == null && (key.startSignal == Synapse.RangeSignal.NONE || key.endSignal == Synapse.RangeSignal.NONE)) {
             boolean dir = key.startSignal == Synapse.RangeSignal.NONE;
-            Activation.select(doc, this, ak.rid, new Range(ak.r.getBegin(dir), dir ? Integer.MAX_VALUE : Integer.MIN_VALUE).invert(!dir), dir ? Range.Relation.BEGINS_WITH : Range.Relation.ENDS_WITH, ak.o, Option.Relation.CONTAINS).forEach(cAct -> {
+            Activation.select(doc, this, ak.rid, new Range(ak.r.getBegin(dir), dir ? Integer.MAX_VALUE : Integer.MIN_VALUE).invert(!dir), dir ? RangeMatch.EQUALS : RangeMatch.NONE, dir ? RangeMatch.NONE : RangeMatch.EQUALS, ak.o, Option.Relation.CONTAINS).forEach(cAct -> {
                 Activation.Key cak = cAct.key;
                 processAddedActivation(doc, new Activation.Key(cak.n, new Range(dir ? Integer.MIN_VALUE : cak.r.begin, dir ? cak.r.end : Integer.MAX_VALUE), cak.rid, cak.o), cAct.inputs.values());
                 cAct.removedId = Activation.removedIdCounter++;
@@ -283,49 +283,58 @@ public class InputNode extends Node {
         InputNode firstNode = ((InputNode) ak.n);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
 
-        Activation.select(doc, secondNode, secondRid, ak.r, computeRangeRelation(firstNode.key, secondNode.key), null, null)
-                .forEach(secondAct -> {
-                    if(!secondAct.isRemoved) {
-                        Option o = Option.add(doc, true, ak.o, secondAct.key.o);
-                        if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
-                            nlp.addActivation(doc,
-                                    new Activation.Key(
-                                            nlp,
-                                            Range.mergeRange(
-                                                    Range.getOutputRange(ak.r, new boolean[]{ firstNode.key.startRangeOutput, firstNode.key.endRangeOutput}),
-                                                    Range.getOutputRange(secondAct.key.r, new boolean[]{ secondNode.key.startRangeOutput, secondNode.key.endRangeOutput})
-                                            ),
-                                            Utils.nullSafeMin(ak.rid, secondAct.key.rid),
-                                            o
+        Activation.select(
+                doc,
+                secondNode,
+                secondRid,
+                ak.r,
+                computeStartRangeMatch(firstNode.key, secondNode.key),
+                computeEndRangeMatch(firstNode.key, secondNode.key),
+                null,
+                null
+        ).forEach(secondAct -> {
+            if(!secondAct.isRemoved) {
+                Option o = Option.add(doc, true, ak.o, secondAct.key.o);
+                if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
+                    nlp.addActivation(doc,
+                            new Activation.Key(
+                                    nlp,
+                                    Range.mergeRange(
+                                            Range.getOutputRange(ak.r, new boolean[]{ firstNode.key.startRangeOutput, firstNode.key.endRangeOutput}),
+                                            Range.getOutputRange(secondAct.key.r, new boolean[]{ secondNode.key.startRangeOutput, secondNode.key.endRangeOutput})
                                     ),
-                                    AndNode.prepareInputActs(act, secondAct)
-                            );
-                        }
-                    }
-                });
+                                    Utils.nullSafeMin(ak.rid, secondAct.key.rid),
+                                    o
+                            ),
+                            AndNode.prepareInputActs(act, secondAct)
+                    );
+                }
+            }
+        });
     }
 
 
-    private static Range.Relation computeRangeRelation(Key k1, Key k2) {
-        RangeMatch begin = RangeMatch.NONE;
+    private static RangeMatch computeStartRangeMatch(Key k1, Key k2) {
         if(k1.startRangeOutput && k2.startRangeOutput) {
-            begin = RangeMatch.EQUALS;
+            return RangeMatch.EQUALS;
         } else if(k1.startRangeOutput) {
-            begin = RangeMatch.invert(k2.startRangeMatch);
+            return RangeMatch.invert(k2.startRangeMatch);
         } else if(k2.startRangeOutput) {
-            begin = k1.startRangeMatch;
+            return k1.startRangeMatch;
         }
+        return RangeMatch.NONE;
+    }
 
-        RangeMatch end = RangeMatch.NONE;
+
+    private static RangeMatch computeEndRangeMatch(Key k1, Key k2) {
         if(k1.endRangeOutput && k2.endRangeOutput) {
-            end = RangeMatch.EQUALS;
+            return RangeMatch.EQUALS;
         } else if(k1.endRangeOutput) {
-            end = RangeMatch.invert(k2.endRangeMatch);
+            return RangeMatch.invert(k2.endRangeMatch);
         } else if(k2.endRangeOutput) {
-            end = k1.endRangeMatch;
+            return k1.endRangeMatch;
         }
-
-        return new Range.RangeMatcher(begin, end);
+        return RangeMatch.NONE;
     }
 
 
@@ -335,15 +344,17 @@ public class InputNode extends Node {
 
         for(Activation secondAct: doc.inputNodeActivations) {
             Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (InputNode) secondAct.key.n);
-            Range.Relation mr = computeRangeRelation(key, ref.input.key);
+            RangeMatch srm = computeStartRangeMatch(key, ref.input.key);
+            RangeMatch erm = computeEndRangeMatch(key, ref.input.key);
             Integer ridDelta = Utils.nullSafeSub(act.key.rid, false, secondAct.key.rid, false);
 
-            if(act != secondAct &&
+            if(     act != secondAct &&
                     this != ref.input &&
                     ref.input.visitedTrain != v &&
                     !ref.input.key.isNeg &&
                     !ref.input.key.isRecurrent &&
-                    (mr.match(act.key.r, secondAct.key.r) || (ridDelta != null && ridDelta < AndNode.MAX_RID_RANGE))) {
+                    ((srm.compare(act.key.r.begin, secondAct.key.r.begin) && erm.compare(act.key.r.end, secondAct.key.r.end)) ||
+                            (ridDelta != null && ridDelta < AndNode.MAX_RID_RANGE))) {
                 ref.input.visitedTrain = v;
                 AndNode.createNextLevelNode(doc, this, ref, true);
             }

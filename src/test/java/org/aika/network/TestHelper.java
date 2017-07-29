@@ -31,6 +31,12 @@ import org.aika.neuron.Synapse.RangeSignal;
 import java.util.Collections;
 import java.util.Set;
 
+import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
+import static org.aika.neuron.Synapse.RangeMatch.GREATER_THAN;
+import static org.aika.neuron.Synapse.RangeMatch.LESS_THAN;
+import static org.aika.neuron.Synapse.RangeSignal.END;
+import static org.aika.neuron.Synapse.RangeSignal.START;
+
 /**
  *
  * @author Lukas Molzberger
@@ -46,12 +52,12 @@ public class TestHelper {
     public static Activation addActivationAndPropagate(Document doc, Activation.Key ak, Set<Activation> inputActs) {
         Node.addActivationAndPropagate(doc, ak, inputActs);
         doc.propagate();
-        return Activation.get(doc, ak.n, ak.rid, ak.r, Range.Relation.CONTAINS, ak.o, Option.Relation.EQUALS);
+        return Activation.get(doc, ak.n, ak.rid, ak.r, LESS_THAN, GREATER_THAN, ak.o, Option.Relation.EQUALS);
     }
 
 
     public static void removeActivationAndPropagate(Document doc, Activation.Key ak) {
-        Activation act = Activation.get(doc, ak.n, 0, ak.r, Range.Relation.EQUALS, ak.o, Option.Relation.EQUALS);
+        Activation act = Activation.get(doc, ak.n, 0, ak.r, EQUALS, EQUALS, ak.o, Option.Relation.EQUALS);
         removeActivationAndPropagate(doc, act);
     }
 
@@ -66,7 +72,7 @@ public class TestHelper {
         in.addActivation(doc, inputAct);
         doc.propagate();
         if(in instanceof InputNode) {
-            return Activation.get(doc, in, inputAct.key.rid, inputAct.key.r, Range.Relation.CONTAINS, inputAct.key.o, Option.Relation.EQUALS);
+            return Activation.get(doc, in, inputAct.key.rid, inputAct.key.r, LESS_THAN, GREATER_THAN, inputAct.key.o, Option.Relation.EQUALS);
         }
         return null;
     }
@@ -79,7 +85,7 @@ public class TestHelper {
 
 
     public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid) {
-        return addOutputNode(doc, n, relativeRid, absoluteRid, RangeMatch.LESS_THAN, Synapse.RangeSignal.START, true, RangeMatch.GREATER_THAN, RangeSignal.END, true);
+        return addOutputNode(doc, n, relativeRid, absoluteRid, LESS_THAN, START, true, GREATER_THAN, END, true);
     }
 
 
@@ -88,6 +94,6 @@ public class TestHelper {
     }
 
     public static Activation get(Document doc, Node n, Range r, Option o) {
-        return Activation.get(doc, n, null, r, Range.Relation.OVERLAPS, o, Option.Relation.EQUALS);
+        return Activation.get(doc, n, null, r, LESS_THAN, GREATER_THAN, o, Option.Relation.EQUALS);
     }
 }

@@ -21,7 +21,6 @@ import org.aika.Utils;
 import org.aika.Writable;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
-import org.aika.corpus.Range.Relation;
 import org.aika.lattice.InputNode;
 
 import java.io.DataInput;
@@ -172,9 +171,11 @@ public class Synapse implements Writable {
         EQUALS,
         LESS_THAN,
         GREATER_THAN,
+        FIRST,
         NONE;
 
         public boolean compare(Integer a, Integer b) {
+            if(a == null || b == null) return true;
             switch(this) {
                 case EQUALS:
                     return a == b;

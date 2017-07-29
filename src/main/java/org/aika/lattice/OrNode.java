@@ -32,6 +32,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
+import static org.aika.neuron.Synapse.RangeMatch.GREATER_THAN;
+import static org.aika.neuron.Synapse.RangeMatch.LESS_THAN;
+
 
 /**
  *
@@ -78,15 +82,6 @@ public class OrNode extends Node {
 
     @Override
     public void initActivation(Document doc, Activation act) {
-/*        for(Synapse s: neuron.inputSynapses) {
-            if(s.key.isNeg || s.key.isRecurrent) {
-                Activation.select(doc, s.inputNode, Utils.nullSafeAdd(act.key.rid, false, s.key.relativeRid, false), act.key.r, Range.Relation.OVERLAPS, null, null)
-                        .forEach(iAct -> {
-                    iAct.outputs.put(act.key, act);
-                });
-            }
-        }
-*/
         if(getThreadState(doc).activations.isEmpty()) {
             doc.activatedNeurons.add(neuron);
         }
@@ -101,30 +96,40 @@ public class OrNode extends Node {
     }
 
 
-    public void updateActivation(Document doc, Range inputR, Integer rid) {
+    private void retrieveInputs(Document doc, Range inputR, Integer rid, List<Activation> inputs, Integer pRidOffset, TreeSet<Node> parents) {
+        // Optimization the number of parents can get very large, thus we need to avoid iterating over all of them.
+        if(parents.size() > 10) {
+            retrieveInputs(doc, null, inputR, rid, inputs, pRidOffset, parents);
+        } else {
+            for(Node pn: parents) {
+                retrieveInputs(doc, pn, inputR, rid, inputs, pRidOffset, parents);
+            }
+        }
+    }
+
+
+    private void retrieveInputs(Document doc, Node n, Range inputR, Integer rid, List<Activation> inputs, Integer pRidOffset, TreeSet<Node> parents) {
+        for(Activation iAct: Activation.select(doc, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null)
+                .collect(Collectors.toList())) {
+            if(!iAct.isRemoved && parents.contains(iAct.key.n) && !checkSelfReferencing(doc, iAct)) {
+                inputs.add(iAct);
+            }
+        }
+    }
+
+
+    public void addActivation(Document doc, Integer ridOffset, Activation inputAct) {
+        if(checkSelfReferencing(doc, inputAct)) return;
+
+        Key ak = inputAct.key;
+        Range r = ak.r;
+        Integer rid = Utils.nullSafeSub(ak.rid, true, ridOffset, false);
+
         List<Activation> inputs = new ArrayList<>();
-        Range r = null;
 
         for (Map.Entry<Integer, TreeSet<Node>> me : parents.entrySet()) {
-            r = extractRange(doc, inputR, rid, inputs, r, me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, me.getValue());
+            retrieveInputs(doc, r, rid, inputs, me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, me.getValue());
         }
-
-        final Range fr = r;
-        Activation.select(doc, this, rid, inputR, Range.Relation.OVERLAPS, null, null).forEach(oAct -> {
-            for (Iterator<Activation> it = oAct.inputs.values().iterator(); it.hasNext(); ) {
-                Activation iAct = it.next();
-
-                if(fr == null || Range.compare(fr, oAct.key.r) != 0) {
-                    oAct.isReplaced = true;
-                    oAct.key.o.removeOrOption(iAct, iAct.key.o);
-                    removeActivationAndPropagate(doc, oAct, oAct.inputs.values());
-                }
-                if(iAct.isRemoved) {
-                    oAct.key.o.removeOrOption(iAct, iAct.key.o);
-                    it.remove();
-                }
-            }
-        });
 
         if(inputs.isEmpty()) return;
 
@@ -149,44 +154,14 @@ public class OrNode extends Node {
     }
 
 
-    private Range extractRange(Document doc, Range inputR, Integer rid, List<Activation> inputs, Range r, Integer pRidOffset, TreeSet<Node> parents) {
-        // Optimization the number of parents can get very large, thus we need to avoid iterating over all of them.
-        if(parents.size() > 10) {
-            return extractRange(doc, null, inputR, rid, inputs, r, pRidOffset, parents);
-        } else {
-            for(Node pn: parents) {
-                r = extractRange(doc, pn, inputR, rid, inputs, r, pRidOffset, parents);
-            }
-            return r;
-        }
-    }
-
-
-    private Range extractRange(Document doc, Node n, Range inputR, Integer rid, List<Activation> inputs, Range r, Integer pRidOffset, TreeSet<Node> parents) {
-        for(Activation iAct: Activation.select(doc, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, Range.Relation.OVERLAPS, null, null)
-                .collect(Collectors.toList())) {
-            if(!iAct.isRemoved && parents.contains(iAct.key.n) && !checkSelfReferencing(doc, iAct)) {
-                inputs.add(iAct);
-                r = r == null ? iAct.key.r : new Range(Math.min(r.begin, iAct.key.r.begin), Math.max(r.end, iAct.key.r.end));
-            }
-        }
-        return r;
-    }
-
-
-    public void addActivation(Document doc, Integer ridOffset, Activation inputAct) {
-        if(checkSelfReferencing(doc, inputAct)) return;
-
-        Key ak = inputAct.key;
-        updateActivation(doc, ak.r, Utils.nullSafeSub(ak.rid, true, ridOffset, false));
-    }
-
-
     public void removeActivation(Document doc, Integer ridOffset, Activation inputAct) {
         if(checkSelfReferencing(doc, inputAct)) return;
 
-        Key ak = inputAct.key;
-        updateActivation(doc, ak.r, Utils.nullSafeSub(ak.rid, true, ridOffset, false));
+        for(Activation oAct: inputAct.outputs.values()) {
+            if(oAct.key.n == this && !oAct.isRemoved && oAct.inputs.size() <= 1) {
+                removeActivationAndPropagate(doc, oAct, oAct.inputs.values());
+            }
+        }
     }
 
 
@@ -223,8 +198,6 @@ public class OrNode extends Node {
 
     @Override
     protected boolean hasSupport(Activation act) {
-        if(act.isReplaced) return false;
-
         for(Activation iAct: act.inputs.values()) {
             if(!iAct.isRemoved) return true;
         }
@@ -262,7 +235,7 @@ public class OrNode extends Node {
 
     // TODO: RID
     public Option lookupOrOption(Document doc, Range r, boolean create) {
-        Activation act = Activation.select(doc, this, null, r, Range.Relation.CONTAINS, null, null)
+        Activation act = Activation.select(doc, this, null, r, EQUALS, EQUALS, null, null)
                 .findFirst()
                 .orElse(null);
 

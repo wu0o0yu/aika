@@ -294,17 +294,17 @@ public class Document implements Comparable<Document> {
 
         if(neuronsOnly) {
             for (Neuron n : m.neurons.values()) {
-                acts.addAll(Activation.select(this, n.node, null, null, null, null, Option.Relation.CONTAINED_IN).collect(Collectors.toList()));
+                acts.addAll(Activation.select(this, n.node, null, null, null, null, null, Option.Relation.CONTAINED_IN).collect(Collectors.toList()));
             }
         } else {
             if(m.initialNodes != null) {
                 for (Node n : m.initialNodes.values()) {
-                    acts.addAll(Activation.select(this, n, null, null, null, null, Option.Relation.CONTAINED_IN).collect(Collectors.toList()));
+                    acts.addAll(Activation.select(this, n, null, null, null, null, null, Option.Relation.CONTAINED_IN).collect(Collectors.toList()));
                 }
             }
             for(int th = 0; th < m.numberOfThreads; th++) {
                 for (Node n : m.allNodes[th]) {
-                    acts.addAll(Activation.select(this, n, null, null, null, null, Option.Relation.CONTAINED_IN).collect(Collectors.toList()));
+                    acts.addAll(Activation.select(this, n, null, null, null, null, null, Option.Relation.CONTAINED_IN).collect(Collectors.toList()));
                 }
             }
         }

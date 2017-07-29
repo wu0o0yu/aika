@@ -35,6 +35,8 @@ import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.RangeMatch;
 import org.aika.neuron.Synapse.RangeSignal;
 
+import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
+
 /**
  *
  * @author Lukas Molzberger
@@ -101,8 +103,8 @@ public class PublicRangeTest {
             inA.addInput(doc, 2, 8, 0);
             inB.addInput(doc, 4, 6, 0);
 
-            Assert.assertNotNull(Activation.get(doc, pCNode, 0, new Range(4, 6), Range.Relation.EQUALS, null, null));
-//            Assert.assertNotNull(Activation.get(t, pDNode, 0, new Range(2, 8), Range.Relation.EQUALS, null, null));
+            Assert.assertNotNull(Activation.get(doc, pCNode, 0, new Range(4, 6), EQUALS, EQUALS, null, null));
+//            Assert.assertNotNull(Activation.get(t, pDNode, 0, new Range(2, 8), EQUALS, EQUALS, null, null));
 
             doc.clearActivations();
         }
@@ -112,8 +114,8 @@ public class PublicRangeTest {
             inB.addInput(doc, 4, 6);
             inA.addInput(doc, 2, 8);
 
-            Assert.assertNotNull(Activation.get(doc, pCNode, 0, new Range(4, 6), Range.Relation.EQUALS, null, null));
-//            Assert.assertNotNull(Activation.get(t, pDNode, 0, new Range(2, 8), Range.Relation.EQUALS, null, null));
+            Assert.assertNotNull(Activation.get(doc, pCNode, 0, new Range(4, 6), EQUALS, EQUALS, null, null));
+//            Assert.assertNotNull(Activation.get(t, pDNode, 0, new Range(2, 8), EQUALS, EQUALS, null, null));
             doc.clearActivations();
         }
     }
