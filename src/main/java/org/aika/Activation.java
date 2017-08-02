@@ -111,7 +111,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public void register(Document doc) {
-        ThreadState th = key.n.getThreadState(doc);
+        ThreadState th = key.n.getThreadState(doc, true);
         if (th.activations.isEmpty()) {
             (isTrainingAct ? doc.activatedNodesForTraining : doc.activatedNodes).add(key.n);
         }
@@ -144,7 +144,7 @@ public class Activation implements Comparable<Activation> {
     public void unregister(Document doc) {
         assert !key.o.activations.isEmpty();
 
-        Node.ThreadState th = key.n.getThreadState(doc);
+        Node.ThreadState th = key.n.getThreadState(doc, true);
 
         th.activations.remove(key);
 
@@ -182,7 +182,9 @@ public class Activation implements Comparable<Activation> {
 
 
     public static Activation getNextSignal(Node n, Document doc, int from, Integer rid, Option o, boolean dir, boolean inv) {
-        Node.ThreadState th = n.getThreadState(doc);
+        ThreadState th = n.getThreadState(doc, false);
+        if(th == null) return null;
+
         Key bk = new Key(null, new Range(from, dir ? Integer.MIN_VALUE : Integer.MAX_VALUE).invert(inv), rid, o);
         NavigableMap<Key, Activation> tmp = (inv ? th.activationsEnd : th.activations);
         tmp = dir ? tmp.descendingMap() : tmp;
@@ -198,7 +200,8 @@ public class Activation implements Comparable<Activation> {
     public static Stream<Activation> select(Document doc, Node n, Integer rid, Range r, RangeMatch begin, RangeMatch end, Option o, Option.Relation or) {
         Stream<Activation> results;
         if(n != null) {
-            ThreadState th = n.getThreadState(doc);
+            ThreadState th = n.getThreadState(doc, false);
+            if(th == null) return Stream.empty();
             int s = th.activations.size();
 
             if(s == 0) return Stream.empty();
@@ -234,11 +237,17 @@ public class Activation implements Comparable<Activation> {
             } else {
                 results = doc.activatedNodes
                         .stream()
-                        .flatMap(node -> node.getThreadState(doc).activations.values().stream());
+                        .flatMap(node -> getActivationsStream(node, doc));
             }
         }
 
         return results.filter(act -> act.filter(n, rid, r, begin, end, o, or));
+    }
+
+
+    private static Stream<Activation> getActivationsStream(Node n, Document doc) {
+        ThreadState th = n.getThreadState(doc, false);
+        return th == null ? Stream.empty() : th.activations.values().stream();
     }
 
 

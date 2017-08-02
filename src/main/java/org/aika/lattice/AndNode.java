@@ -81,7 +81,7 @@ public class AndNode extends Node {
 
     @Override
     public boolean isAllowedOption(Document doc, Option n, Activation act, long v) {
-        ThreadState th = getThreadState(doc);
+        ThreadState th = getThreadState(doc, true);
         if(th.visitedAllowedOption == v) return false;
         th.visitedAllowedOption = v;
 
@@ -163,7 +163,7 @@ public class AndNode extends Node {
 
 
     public void updateWeight(Document doc, long v) {
-        ThreadState th = getThreadState(doc);
+        ThreadState th = getThreadState(doc, true);
         Model m = doc.m;
         if(isBlocked ||
                 (m.numberOfPositions - nOffset) == 0 ||
@@ -444,7 +444,7 @@ public class AndNode extends Node {
 
     @Override
     protected void changeNumberOfNeuronRefs(Document doc, long v, int d) {
-        ThreadState th = getThreadState(doc);
+        ThreadState th = getThreadState(doc, true);
         if(th.visitedNeuronRefsChange == v) return;
         th.visitedNeuronRefsChange = v;
         numberOfNeuronRefs += d;
@@ -458,7 +458,7 @@ public class AndNode extends Node {
     @Override
     public boolean isCovered(Document doc, Integer offset, long v) {
         for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
-            RidVisited nv = me.getValue().getThreadState(doc).lookupVisited(Utils.nullSafeSub(offset, true, me.getKey().getOffset(), false));
+            RidVisited nv = me.getValue().getThreadState(doc, true).lookupVisited(Utils.nullSafeSub(offset, true, me.getKey().getOffset(), false));
             if(nv.outputNode == v) return true;
         }
         return false;

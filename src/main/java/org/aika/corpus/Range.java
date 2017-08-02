@@ -20,6 +20,7 @@ package org.aika.corpus;
 import org.aika.Activation;
 import org.aika.Utils;
 import org.aika.lattice.Node;
+import org.aika.lattice.Node.ThreadState;
 
 import java.util.stream.Stream;
 import org.aika.neuron.Synapse.RangeMatch;
@@ -42,10 +43,13 @@ public class Range {
 
 
     public static Stream getActivations(Document doc, Node n, Integer rid, Range r, RangeMatch begin, RangeMatch end, Option o, Option.Relation or) {
+        ThreadState th = n.getThreadState(doc, false);
+        if(th == null) return Stream.empty();
+
         Stream s;
         if((begin == GREATER_THAN || begin == EQUALS) && r.begin != null) {
             int er = (end == RangeMatch.LESS_THAN || end == RangeMatch.EQUALS) && r.end != null ? r.end : Integer.MAX_VALUE;
-            s = n.getThreadState(doc).activations.subMap(
+            s = th.activations.subMap(
                     new Activation.Key(n, new Range(r.begin, null), null, Option.MIN),
                     true,
                     new Activation.Key(n, new Range(er, Integer.MAX_VALUE), Integer.MAX_VALUE, Option.MAX),
@@ -58,7 +62,7 @@ public class Range {
                 s = s.limit(1);
             }
         } else if((begin == RangeMatch.LESS_THAN || begin == RangeMatch.EQUALS) && r.begin != null) {
-            s = n.getThreadState(doc).activations.descendingMap().subMap(
+            s = th.activations.descendingMap().subMap(
                     new Activation.Key(n, new Range(r.begin, Integer.MAX_VALUE), null, Option.MAX),
                     true,
                     new Activation.Key(n, new Range(0, null), null, Option.MIN),
@@ -71,7 +75,7 @@ public class Range {
                 s = s.limit(1);
             }
         } else {
-            s = n.getThreadState(doc).activations.values()
+            s = th.activations.values()
                     .stream()
                     .filter(act -> act.filter(n, rid, r, begin, end, o, or));
         }

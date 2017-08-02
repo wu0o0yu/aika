@@ -119,7 +119,7 @@ public class ModelReadWriteTest {
             // Computes the selected option
             doc.process();
 
-            Assert.assertEquals(1, m.neurons.get(pattern).node.getThreadState(doc).activations.size());
+            Assert.assertEquals(1, m.neurons.get(pattern).node.getThreadState(doc, true).activations.size());
 
 
             System.out.println("Output activation:");

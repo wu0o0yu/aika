@@ -82,7 +82,8 @@ public class OrNode extends Node {
 
     @Override
     public void initActivation(Document doc, Activation act) {
-        if(getThreadState(doc).activations.isEmpty()) {
+        ThreadState th = getThreadState(doc, false);
+        if(th == null || th.activations.isEmpty()) {
             doc.activatedNeurons.add(neuron);
         }
     }
@@ -90,7 +91,8 @@ public class OrNode extends Node {
 
     @Override
     public void deleteActivation(Document doc, Activation act) {
-        if(getThreadState(doc).activations.isEmpty()) {
+        ThreadState th = getThreadState(doc, false);
+        if(th == null || th.activations.isEmpty()) {
             doc.activatedNeurons.remove(neuron);
         }
     }
@@ -242,9 +244,13 @@ public class OrNode extends Node {
         if(act != null) {
             return act.key.o;
         }
-        for(Key ak: getThreadState(doc).added.keySet()) {
-            if(Range.compare(ak.r, r) == 0) {
-                return ak.o;
+
+        ThreadState th = getThreadState(doc, false);
+        if(th != null) {
+            for (Key ak : th.added.keySet()) {
+                if (Range.compare(ak.r, r) == 0) {
+                    return ak.o;
+                }
             }
         }
         return create ? Option.addPrimitive(doc) : null;

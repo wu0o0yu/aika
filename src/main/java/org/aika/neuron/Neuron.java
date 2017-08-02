@@ -27,6 +27,7 @@ import org.aika.corpus.Range;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.lattice.Node;
+import org.aika.lattice.Node.ThreadState;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.Synapse.Key;
 import org.slf4j.Logger;
@@ -457,7 +458,9 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
 
     public void count(Document doc) {
-        for(Activation act: node.getThreadState(doc).activations.values()) {
+        ThreadState th = node.getThreadState(doc, false);
+        if(th == null) return;
+        for(Activation act: th.activations.values()) {
             if(act.finalState != null && act.finalState.value > 0.0) {
                 activationSum += act.finalState.value;
                 numberOfActivations++;

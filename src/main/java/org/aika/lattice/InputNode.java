@@ -90,7 +90,7 @@ public class InputNode extends Node {
 
     @Override
     protected void changeNumberOfNeuronRefs(Document doc, long v, int d) {
-        ThreadState th = getThreadState(doc);
+        ThreadState th = getThreadState(doc, true);
         if(th.visitedNeuronRefsChange == v) return;
         th.visitedNeuronRefsChange = v;
         numberOfNeuronRefs += d;
@@ -102,7 +102,8 @@ public class InputNode extends Node {
         if(neuron instanceof InputNeuron) {
             doc.inputNeuronActivations.add(act);
 
-            if(getThreadState(doc).activations.isEmpty()) {
+            ThreadState th = getThreadState(doc, false);
+            if(th == null || th.activations.isEmpty()) {
                 doc.activatedNeurons.add(neuron);
                 doc.activatedInputNeurons.add(neuron);
             }
@@ -117,7 +118,8 @@ public class InputNode extends Node {
         if(neuron instanceof InputNeuron) {
             doc.inputNeuronActivations.remove(act);
 
-            if(getThreadState(doc).activations.isEmpty()) {
+            ThreadState th = getThreadState(doc, false);
+            if(th == null || th.activations.isEmpty()) {
                 doc.activatedNeurons.remove(neuron);
                 doc.activatedInputNeurons.remove(neuron);
             }
@@ -161,10 +163,8 @@ public class InputNode extends Node {
         return false;
     }
 
-    static int dbc = 0;
 
     protected Range preProcessAddedActivation(Document doc, Activation.Key ak, Collection<Activation> inputActs) {
-        dbc++;
         if(neuron == null && (key.startSignal == Synapse.RangeSignal.NONE || key.endSignal == Synapse.RangeSignal.NONE)) {
             boolean dir = key.startSignal == Synapse.RangeSignal.NONE;
             int pos = ak.r.getBegin(dir);
@@ -278,11 +278,14 @@ public class InputNode extends Node {
     }
 
 
+    static int dbc = 0;
     private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, AndNode nlp, Activation act, Option removedConflict) {
         Activation.Key ak = act.key;
         InputNode firstNode = ((InputNode) ak.n);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
 
+        dbc++;
+        System.out.println();
         Activation.select(
                 doc,
                 secondNode,

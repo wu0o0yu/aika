@@ -153,9 +153,11 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public ThreadState getThreadState(Document doc) {
+    public ThreadState getThreadState(Document doc, boolean create) {
         ThreadState th = threads[doc.threadId];
         if(th == null) {
+            if(!create) return null;
+
             th = new ThreadState(endRequired, ridRequired);
             threads[doc.threadId] = th;
         }
@@ -296,7 +298,10 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     public void count(Document doc) {
-        for(Activation act: getThreadState(doc).activations.values()) {
+        ThreadState ts = getThreadState(doc, false);
+        if(ts == null) return;
+
+        for(Activation act: ts.activations.values()) {
             frequency++;
             frequencyHasChanged = true;
 
@@ -393,8 +398,8 @@ public abstract class Node implements Comparable<Node>, Writable {
 
             for (Synapse s : syns) {
                 Node n = (dir == 0 ? s.input : s.output).node;
-                ThreadState th = n.getThreadState(doc);
-                if(th.activations.isEmpty()) continue;
+                ThreadState th = n.getThreadState(doc, false);
+                if(th == null || th.activations.isEmpty()) continue;
 
                 Integer rid;
                 if(dir == 0) {
@@ -525,7 +530,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     public void processChanges(Document doc) {
-        ThreadState th = getThreadState(doc);
+        ThreadState th = getThreadState(doc, true);
         NavigableMap<Key, Collection<Activation>> tmpAdded = th.added;
         NavigableMap<Key, RemovedEntry> tmpRemoved = th.removed;
 
@@ -560,7 +565,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     public static void addActivationAndPropagate(Document doc, Key ak, Collection<Activation> inputActs) {
-        ThreadState th = ak.n.getThreadState(doc);
+        ThreadState th = ak.n.getThreadState(doc, true);
         Collection<Activation> iActs = th.added.get(ak);
         if(iActs == null) {
             iActs = new ArrayList<>();
@@ -596,7 +601,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     public static void removeActivationAndPropagate(Document doc, Activation act, Collection<Activation> inputActs) {
         if(act == null || act.isRemoved) return;
 
-        ThreadState th = act.key.n.getThreadState(doc);
+        ThreadState th = act.key.n.getThreadState(doc, true);
         RemovedEntry re = th.removed.get(act.key);
         if(re == null) {
             re = new RemovedEntry();
@@ -625,19 +630,22 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     public Collection<Activation> getActivations(Document doc) {
-        return getThreadState(doc).activations.values();
+        ThreadState th = getThreadState(doc, false);
+        if(th == null) return Collections.EMPTY_LIST;
+        return th.activations.values();
     }
 
 
     public synchronized Activation getFirstActivation(Document doc) {
-        ThreadState th = getThreadState(doc);
-        if(th.activations.isEmpty()) return null;
+        ThreadState th = getThreadState(doc, false);
+        if(th == null || th.activations.isEmpty()) return null;
         return th.activations.firstEntry().getValue();
     }
 
 
     public void clearActivations(Document doc) {
-        ThreadState th = getThreadState(doc);
+        ThreadState th = getThreadState(doc, false);
+        if(th == null) return;
         th.activations.clear();
 
         if(th.activationsEnd != null) th.activationsEnd.clear();
@@ -666,7 +674,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     public boolean computeAndParents(Document doc, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Node> parents, boolean discoverPatterns, long v) {
-        RidVisited nv = getThreadState(doc).lookupVisited(offset);
+        RidVisited nv = getThreadState(doc, true).lookupVisited(offset);
         if(nv.computeParents == v) return true;
         nv.computeParents = v;
 
@@ -832,7 +840,7 @@ public abstract class Node implements Comparable<Node>, Writable {
                                 outputs.add(prsk);
                                 break;
                             case 1:
-                                RidVisited nv = pn.getThreadState(doc).lookupVisited(rsk.offset);
+                                RidVisited nv = pn.getThreadState(doc, true).lookupVisited(rsk.offset);
                                 if(nv.adjust != v) {
                                     nv.adjust = v;
                                     queue.add(prsk);
@@ -903,7 +911,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     protected void prepareResultsForPredefinedNodes(Document doc, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, Neuron n, Synapse s, Integer offset) {
         RSKey rs = new RSKey(this, offset);
-        RidVisited nv = getThreadState(doc).lookupVisited(offset);
+        RidVisited nv = getThreadState(doc, true).lookupVisited(offset);
         // TODO: mindestens einen positiven Knoten mit rein nehmen.
         if(computeSynapseWeightSum(offset, n) + n.posRecSum - (n.negDirSum + n.negRecSum) > 0 || !isExpandable(false) || (Math.abs(s.w) / -n.bias) < 0.1) {
             if(nv.outputNode != v) {

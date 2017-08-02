@@ -102,7 +102,7 @@ public class SimplePatternMatchingTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.node.getThreadState(doc).activations.size());
+        Assert.assertEquals(1, pattern.node.getThreadState(doc, true).activations.size());
 
 
         System.out.println("Output activation:");
@@ -214,7 +214,7 @@ public class SimplePatternMatchingTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.node.getThreadState(doc).activations.size());
+        Assert.assertEquals(1, pattern.node.getThreadState(doc, true).activations.size());
 
 
         System.out.println("Output activation:");

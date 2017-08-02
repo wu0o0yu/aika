@@ -23,6 +23,7 @@ import org.aika.Utils;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
+import org.aika.lattice.Node.ThreadState;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.slf4j.Logger;
@@ -228,8 +229,11 @@ public class Document implements Comparable<Document> {
                     an.updateWeight(this, v);
                 }
 
-                for(Activation act: n.getThreadState(this).activations.values()) {
-                    n.discover(this, act);
+                ThreadState th = n.getThreadState(this, false);
+                if(th != null) {
+                    for (Activation act : th.activations.values()) {
+                        n.discover(this, act);
+                    }
                 }
             }
         }
@@ -246,8 +250,11 @@ public class Document implements Comparable<Document> {
 
         for(Neuron n: finallyActivatedNeurons) {
             if(!n.noTraining) {
-                for (Activation act : n.node.getThreadState(this).activations.values()) {
-                    n.train(this, act);
+                ThreadState th = n.node.getThreadState(this, false);
+                if(th != null) {
+                    for (Activation act : th.activations.values()) {
+                        n.train(this, act);
+                    }
                 }
             }
         }
