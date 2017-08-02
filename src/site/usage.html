@@ -80,19 +80,12 @@
             If these words would have occurred independently, they would have been recognized as city or
             profession based on the example code. The complete code for this example can be found in the class <a href="https://github.com/aika-algorithm/aika/blob/master/src/test/java/org/aika/network/NamedEntityRecognitionTest.java">NamedEntityRecognitionTest</a>.
             <br/>
-            Now, the first step is to create an empty model.
+            Now, the first step is to create an empty model. The following map is used as a dictionary to look up the individual word input neurons.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
     Model m = new Model();
-                </code>
-			</pre>
-            </div>
 
-            This map is used as a dictionary to look up the individual word input neurons.
-            <div class="prettyprint-code">
-            <pre class="prettyprint">
-				<code class="language-java">
     HashMap&lt;String, InputNeuron&gt; inputNeurons = new HashMap<>();
 
     for(String word: new String[] {"jackson", "cook"}) {
@@ -104,7 +97,7 @@
 			</pre>
             </div>
 
-            The following three neurons are just placeholders that will be wired up later on.
+            These three neurons are just placeholders that will be wired up later on.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
