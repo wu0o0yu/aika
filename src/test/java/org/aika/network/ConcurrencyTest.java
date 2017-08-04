@@ -24,6 +24,8 @@ import org.aika.corpus.Range;
 import org.aika.lattice.AndNode;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
+import org.aika.neuron.Synapse;
+import org.aika.neuron.Synapse.RangeMatch;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,6 +52,7 @@ public class ConcurrencyTest {
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setStartRangeMatch(RangeMatch.EQUALS)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
@@ -57,6 +60,7 @@ public class ConcurrencyTest {
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setEndRangeMatch(RangeMatch.EQUALS)
                         .setEndRangeOutput(true)
         );
 
@@ -130,6 +134,7 @@ public class ConcurrencyTest {
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setStartRangeMatch(RangeMatch.EQUALS)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
@@ -137,6 +142,7 @@ public class ConcurrencyTest {
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setEndRangeMatch(RangeMatch.EQUALS)
                         .setEndRangeOutput(true)
         );
 

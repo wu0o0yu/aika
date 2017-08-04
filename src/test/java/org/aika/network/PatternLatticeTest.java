@@ -57,21 +57,21 @@ public class PatternLatticeTest {
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setMinInput(1.0)
-                            .setRangeMatch(Input.RangeRelation.CONTAINS)
+                            .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inB)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setMinInput(1.0)
-                            .setRangeMatch(Input.RangeRelation.CONTAINS)
+                            .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inC)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setMinInput(1.0)
-                            .setRangeMatch(Input.RangeRelation.CONTAINS)
+                            .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true)
             );
 

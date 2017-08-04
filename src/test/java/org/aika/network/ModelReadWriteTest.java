@@ -73,7 +73,8 @@ public class ModelReadWriteTest {
                             .setRecurrent(false)
                             .setRelativeRid(0)
                             .setMinInput(0.9)
-                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setStartRangeMatch(RangeMatch.EQUALS)
+                            .setEndRangeMatch(RangeMatch.LESS_THAN)
                             .setStartRangeOutput(true),
                     new Input()
                             .setNeuron(m.neurons.get(inputNeurons.get('c')))
@@ -88,7 +89,8 @@ public class ModelReadWriteTest {
                             .setRecurrent(false)
                             .setRelativeRid(2)
                             .setMinInput(0.9)
-                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setStartRangeMatch(RangeMatch.GREATER_THAN)
+                            .setEndRangeMatch(RangeMatch.EQUALS)
                             .setEndRangeOutput(true)
             ).id;
 

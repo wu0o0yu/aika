@@ -24,10 +24,9 @@ import org.aika.lattice.Node.ThreadState;
 
 import java.util.stream.Stream;
 import org.aika.neuron.Synapse.RangeMatch;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
-import static org.aika.neuron.Synapse.RangeMatch.FIRST;
-import static org.aika.neuron.Synapse.RangeMatch.GREATER_THAN;
+import static org.aika.neuron.Synapse.RangeMatch.*;
 
 /**
  *
@@ -58,9 +57,6 @@ public class Range {
                     .values()
                     .stream()
                     .filter(act -> act.filter(n, rid, r, begin, end, o, or));
-            if(end == FIRST) {
-                s = s.limit(1);
-            }
         } else if((begin == RangeMatch.LESS_THAN || begin == RangeMatch.EQUALS) && r.begin != null) {
             s = th.activations.descendingMap().subMap(
                     new Activation.Key(n, new Range(r.begin, Integer.MAX_VALUE), null, Option.MAX),
@@ -71,9 +67,18 @@ public class Range {
                     .values()
                     .stream()
                     .filter(act -> act.filter(n, rid, r, begin, end, o, or));
-            if(end == FIRST) {
-                s = s.limit(1);
-            }
+        }  else if(end == LAST) {
+            s = th.activationsEnd.tailMap(
+                    new Activation.Key(n, new Range(null, r.begin), null, Option.MIN),
+                    true
+            )
+                    .values()
+                    .stream()
+                    .filter(act -> act.filter(n, rid, r, begin, end, o, or))
+                    .limit(1);
+        } else if(begin == LAST || begin == FIRST || end == FIRST) {
+            // TODO
+            throw new NotImplementedException();
         } else {
             s = th.activations.values()
                     .stream()
@@ -82,7 +87,6 @@ public class Range {
 
         return s;
     }
-
 
 
     public Range(Integer begin, Integer end) {

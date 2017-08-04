@@ -65,7 +65,8 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(0.9)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeMatch(RangeMatch.EQUALS)
+                        .setEndRangeMatch(RangeMatch.GREATER_THAN)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
@@ -80,7 +81,8 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setMinInput(0.9)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeMatch(RangeMatch.LESS_THAN)
+                        .setEndRangeMatch(RangeMatch.EQUALS)
                         .setEndRangeOutput(true)
         );
 
@@ -170,7 +172,8 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(0.9)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeMatch(RangeMatch.EQUALS)
+                        .setEndRangeMatch(RangeMatch.GREATER_THAN)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(relNeurons.get('c'))
@@ -185,7 +188,8 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setMinInput(0.9)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeMatch(RangeMatch.LESS_THAN)
+                        .setEndRangeMatch(RangeMatch.EQUALS)
                         .setEndRangeOutput(true)
         );
 

@@ -33,6 +33,8 @@ import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.RangeMatch;
 import org.aika.neuron.Synapse.RangeSignal;
 
+import static org.aika.Input.RangeRelation.EQUALS;
+
 /**
  *
  * @author Lukas Molzberger
@@ -85,7 +87,8 @@ public class OverlappingOrTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(0.5)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeMatch(RangeMatch.EQUALS)
+                        .setEndRangeMatch(RangeMatch.LESS_THAN)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(relNeurons.get('c'))
@@ -100,7 +103,8 @@ public class OverlappingOrTest {
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setMinInput(0.5)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeMatch(RangeMatch.GREATER_THAN)
+                        .setEndRangeMatch(RangeMatch.EQUALS)
                         .setEndRangeOutput(true)
         );
 

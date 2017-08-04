@@ -172,17 +172,22 @@ public class Synapse implements Writable {
         LESS_THAN,
         GREATER_THAN,
         FIRST,
+        LAST,
         NONE;
 
-        public boolean compare(Integer a, Integer b) {
-            if(a == null || b == null) return true;
+        public boolean compare(Integer a, Integer b, Integer c, Integer d) {
+            if(a == null || c == null) return true;
             switch(this) {
                 case EQUALS:
-                    return a == b;
+                    return a == c;
                 case LESS_THAN:
-                    return a <= b;
+                    return a <= c;
                 case GREATER_THAN:
-                    return a >= b;
+                    return a >= c;
+                case FIRST:
+                    return d <= b && b < c;
+                case LAST:
+                    return a > d;
                 default:
                     return true;
             }
@@ -196,6 +201,10 @@ public class Synapse implements Writable {
                     return GREATER_THAN;
                 case GREATER_THAN:
                     return LESS_THAN;
+                case FIRST:
+                    return LAST;
+                case LAST:
+                    return FIRST;
                 default:
                     return NONE;
             }

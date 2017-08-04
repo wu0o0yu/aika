@@ -121,6 +121,9 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
         double sum = 0.0;
         for(Synapse s: inputs) {
+            assert !s.key.startRangeOutput || s.key.startRangeMatch == Synapse.RangeMatch.EQUALS || s.key.startRangeMatch == Synapse.RangeMatch.FIRST;
+            assert !s.key.endRangeOutput || s.key.endRangeMatch == Synapse.RangeMatch.EQUALS || s.key.endRangeMatch == Synapse.RangeMatch.FIRST;
+
             s.output = n;
             s.link(doc);
 

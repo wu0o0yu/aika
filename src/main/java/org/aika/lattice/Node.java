@@ -40,6 +40,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import static org.aika.neuron.Synapse.RangeMatch.*;
+import static org.aika.neuron.Synapse.RangeSignal.END;
+import static org.aika.neuron.Synapse.RangeSignal.START;
+
 
 /**
  *
@@ -409,18 +413,27 @@ public abstract class Node implements Comparable<Node>, Writable {
                 }
 
 
-                RangeMatch begin = s.key.startRangeMatch;
-                RangeMatch end = s.key.endRangeMatch;
+                RangeMatch begin = replaceFirstAndLast(s.key.startRangeMatch);
+                RangeMatch end = replaceFirstAndLast(s.key.endRangeMatch);
+                Range r = act.key.r;
                 if(dir == 0) {
-                    begin = RangeMatch.invert(begin);
-                    end = RangeMatch.invert(end);
+                    begin = RangeMatch.invert(s.key.startSignal == START ? begin : (s.key.endSignal == START ? end : NONE));
+                    end = RangeMatch.invert(s.key.endSignal == END ? end : (s.key.startSignal == END ? begin : NONE));
+
+                    if(s.key.startSignal != START || s.key.endSignal != END) {
+                        r = new Range(s.key.endSignal == START ? r.end : (s.key.startSignal == START ? r.begin : null), s.key.startSignal == END ? r.begin : (s.key.endSignal == END ? r.end : null));
+                    }
+                } else {
+                    if(s.key.startSignal != START || s.key.endSignal != END) {
+                        r = new Range(s.key.startSignal == END ? r.end : (s.key.startSignal == START ? r.begin : null), s.key.endSignal == START ? r.begin : (s.key.endSignal == END ? r.end : null));
+                    }
                 }
 
                 Stream<Activation> tmp = Activation.select(
                         doc ,
                         n,
                         rid,
-                        act.key.r,
+                        r,
                         begin,
                         end,
                         null,
@@ -452,6 +465,11 @@ public abstract class Node implements Comparable<Node>, Writable {
                 addConflict(doc, oAct.key.o, iAct.key.o, iAct, Collections.singleton(act), v);
             }
         }
+    }
+
+
+    private RangeMatch replaceFirstAndLast(RangeMatch rm) {
+        return rm == FIRST || rm == LAST ? EQUALS : rm;
     }
 
 

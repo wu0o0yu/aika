@@ -39,6 +39,7 @@ import org.junit.Test;
 import java.util.Collection;
 import java.util.Set;
 
+import static org.aika.Input.RangeRelation.EQUALS;
 import static org.aika.neuron.Synapse.RangeMatch.GREATER_THAN;
 import static org.aika.neuron.Synapse.RangeMatch.LESS_THAN;
 
@@ -67,6 +68,7 @@ public class ActivationOutputsTest {
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
                         .setMinInput(1.0)
+                        .setStartRangeMatch(RangeMatch.EQUALS)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
@@ -74,6 +76,7 @@ public class ActivationOutputsTest {
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
                         .setMinInput(1.0)
+                        .setEndRangeMatch(RangeMatch.EQUALS)
                         .setEndRangeOutput(true)
         );
 
@@ -241,6 +244,7 @@ public class ActivationOutputsTest {
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         ).node;
 

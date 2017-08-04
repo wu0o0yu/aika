@@ -36,6 +36,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
+import static org.aika.neuron.Synapse.RangeMatch.FIRST;
+import static org.aika.neuron.Synapse.RangeMatch.LAST;
+
 
 /**
  *
@@ -278,19 +281,16 @@ public class InputNode extends Node {
     }
 
 
-    static int dbc = 0;
     private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, AndNode nlp, Activation act, Option removedConflict) {
         Activation.Key ak = act.key;
         InputNode firstNode = ((InputNode) ak.n);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
 
-        dbc++;
-        System.out.println();
         Activation.select(
                 doc,
                 secondNode,
                 secondRid,
-                ak.r,
+                firstNode.limitRange(doc, ak),
                 computeStartRangeMatch(firstNode.key, secondNode.key),
                 computeEndRangeMatch(firstNode.key, secondNode.key),
                 null,
@@ -316,26 +316,49 @@ public class InputNode extends Node {
         });
     }
 
+    private Range limitRange(Document doc, Activation.Key ak) {
+        if(key.startRangeMatch != FIRST && key.endRangeMatch != FIRST) return ak.r;
+
+        if(key.startRangeMatch == FIRST) {
+            for(Activation.Key nak: getThreadState(doc, false).activations.headMap(ak, false).keySet()) {
+                if(ak.o.contains(nak.o, true)) {
+                    return new Range(ak.r.begin, nak.r.begin);
+                }
+            }
+            return ak.r;
+        } else if(key.endRangeMatch == FIRST) {
+            for(Activation.Key nak: getThreadState(doc, false).activationsEnd.descendingMap().tailMap(ak, false).keySet()) {
+                if(ak.o.contains(nak.o, true)) {
+                    return new Range(nak.r.end, ak.r.end);
+                }
+            }
+            return ak.r;
+        }
+        return null;
+    }
+
 
     private static RangeMatch computeStartRangeMatch(Key k1, Key k2) {
-        if(k1.startRangeOutput && k2.startRangeOutput) {
-            return RangeMatch.EQUALS;
+        if(k1.startRangeMatch == FIRST || k1.startRangeMatch == LAST) return k1.startRangeMatch;
+        if(k2.startRangeMatch == FIRST || k2.startRangeMatch == LAST) return RangeMatch.invert(k2.startRangeMatch);
+
+        if(k2.startRangeOutput) {
+            return k1.startRangeMatch;
         } else if(k1.startRangeOutput) {
             return RangeMatch.invert(k2.startRangeMatch);
-        } else if(k2.startRangeOutput) {
-            return k1.startRangeMatch;
         }
         return RangeMatch.NONE;
     }
 
 
     private static RangeMatch computeEndRangeMatch(Key k1, Key k2) {
-        if(k1.endRangeOutput && k2.endRangeOutput) {
-            return RangeMatch.EQUALS;
+        if(k1.endRangeMatch == FIRST || k1.endRangeMatch == LAST) return k1.endRangeMatch;
+        if(k2.endRangeMatch == FIRST || k2.endRangeMatch == LAST) return RangeMatch.invert(k2.endRangeMatch);
+
+        if(k2.endRangeOutput) {
+            return k1.endRangeMatch;
         } else if(k1.endRangeOutput) {
             return RangeMatch.invert(k2.endRangeMatch);
-        } else if(k2.endRangeOutput) {
-            return k1.endRangeMatch;
         }
         return RangeMatch.NONE;
     }
@@ -356,7 +379,7 @@ public class InputNode extends Node {
                     ref.input.visitedTrain != v &&
                     !ref.input.key.isNeg &&
                     !ref.input.key.isRecurrent &&
-                    ((srm.compare(act.key.r.begin, secondAct.key.r.begin) && erm.compare(act.key.r.end, secondAct.key.r.end)) ||
+                    ((srm.compare(act.key.r.begin, act.key.r.end, secondAct.key.r.begin, secondAct.key.r.end) && erm.compare(act.key.r.end, act.key.r.begin, secondAct.key.r.end, secondAct.key.r.begin)) ||
                             (ridDelta != null && ridDelta < AndNode.MAX_RID_RANGE))) {
                 ref.input.visitedTrain = v;
                 AndNode.createNextLevelNode(doc, this, ref, true);

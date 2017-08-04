@@ -22,6 +22,7 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
+import org.aika.Input.RangeRelation;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
@@ -34,9 +35,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
-import static org.aika.neuron.Synapse.RangeMatch.GREATER_THAN;
-import static org.aika.neuron.Synapse.RangeMatch.LESS_THAN;
+import static org.aika.neuron.Synapse.RangeMatch.*;
 
 
 /**
@@ -61,6 +60,7 @@ public class RecurrentIdTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(0)
+                        .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
@@ -68,6 +68,7 @@ public class RecurrentIdTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(1)
+                        .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         ).node;
 
@@ -101,6 +102,7 @@ public class RecurrentIdTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(3)
+                        .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
@@ -108,6 +110,7 @@ public class RecurrentIdTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(0)
+                        .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inC)
@@ -115,6 +118,7 @@ public class RecurrentIdTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(6)
+                        .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         ).node;
 
@@ -158,6 +162,8 @@ public class RecurrentIdTest {
                                 .setRecurrent(false)
                                 .setMinInput(1.0)
                                 .setRelativeRid(i)
+                                .setStartRangeMatch(begin ? EQUALS : LESS_THAN)
+                                .setEndRangeMatch(end ? EQUALS : GREATER_THAN)
                                 .setStartRangeOutput(begin)
                                 .setEndRangeOutput(end)
                     );

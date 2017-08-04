@@ -24,6 +24,9 @@ import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
 
+import static org.aika.Input.RangeRelation.CONTAINED_IN;
+import static org.aika.Input.RangeRelation.EQUALS;
+
 /**
  *
  * @author Lukas Molzberger
@@ -60,12 +63,14 @@ public class WeightsTest {
                         .setWeight(3.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inBA)
                         .setWeight(4.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -78,6 +83,7 @@ public class WeightsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(0.6)
+                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setOptional(true)
@@ -85,12 +91,14 @@ public class WeightsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-2.0)
                         .setRecurrent(true)
                         .setMinInput(1.0)
+                        .setRangeMatch(CONTAINED_IN)
         );
 
 
@@ -105,12 +113,14 @@ public class WeightsTest {
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inBB)
                         .setWeight(5.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -122,18 +132,21 @@ public class WeightsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(0.6)
+                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inCB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-2.0)
                         .setRecurrent(true)
                         .setMinInput(1.0)
+                        .setRangeMatch(CONTAINED_IN)
         );
 
 
@@ -143,12 +156,14 @@ public class WeightsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pDB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
 

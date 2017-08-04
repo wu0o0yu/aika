@@ -31,6 +31,8 @@ import org.junit.Test;
 import java.util.TreeMap;
 
 import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
+import static org.aika.neuron.Synapse.RangeMatch.GREATER_THAN;
+import static org.aika.neuron.Synapse.RangeMatch.LESS_THAN;
 
 
 /**
@@ -71,7 +73,8 @@ public class RecurrentPatternTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(0)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeMatch(EQUALS)
+                        .setEndRangeMatch(GREATER_THAN)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(recChars.get('D'))
@@ -86,7 +89,8 @@ public class RecurrentPatternTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(2)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeMatch(LESS_THAN)
+                        .setEndRangeMatch(EQUALS)
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(ctNeuron)
@@ -166,7 +170,8 @@ public class RecurrentPatternTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(0)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeMatch(EQUALS)
+                        .setEndRangeMatch(GREATER_THAN)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(recChars.get('D'))
@@ -181,7 +186,8 @@ public class RecurrentPatternTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
                         .setRelativeRid(2)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setStartRangeMatch(LESS_THAN)
+                        .setEndRangeMatch(EQUALS)
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(ctNeuron)

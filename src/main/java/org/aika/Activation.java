@@ -254,7 +254,7 @@ public class Activation implements Comparable<Activation> {
     public boolean filter(Node n, Integer rid, Range r, RangeMatch begin, RangeMatch end, Option o, Option.Relation or) {
         return (n == null || key.n == n) &&
                 (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) &&
-                (r == null || ((begin == null || begin.compare(key.r.begin, r.begin)) && (end == null || end.compare(key.r.end, r.end)))) &&
+                (r == null || ((begin == null || begin.compare(key.r.begin, key.r.end, r.begin, r.end)) && (end == null || end.compare(key.r.end, key.r.begin, r.end, r.begin)))) &&
                 (o == null || or.compare(key.o, o));
     }
 

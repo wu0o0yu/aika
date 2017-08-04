@@ -23,6 +23,8 @@ import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
 
+import static org.aika.Input.RangeRelation.EQUALS;
+
 /**
  *
  * @author Lukas Molzberger
@@ -95,6 +97,7 @@ public class SimpleWeightsTest {
                         .setWeight(3.0)
                         .setRecurrent(false)
                         .setMinInput(1.0)
+                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inB)

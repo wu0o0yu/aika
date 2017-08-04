@@ -30,6 +30,8 @@ import org.aika.neuron.Synapse.RangeSignal;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.aika.Input.RangeRelation.EQUALS;
+
 /**
  *
  * @author Lukas Molzberger
@@ -48,7 +50,7 @@ public class CountingTest {
                         .setMinInput(0.95)
                         .setWeight(100.0)
                         .setNeuron(inA)
-                        .setRangeMatch(Input.RangeRelation.CONTAINS)
+                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
 

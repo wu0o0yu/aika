@@ -144,13 +144,11 @@ public class Input implements Comparable<Input> {
      * @return
      */
     public Input setStartRangeMatch(RangeMatch rm) {
-        assert !startRangeOutput || rm == RangeMatch.EQUALS;
         this.startRangeMatch = rm;
         return this;
     }
 
     public Input setEndRangeMatch(RangeMatch rm) {
-        assert !endRangeOutput || rm == RangeMatch.EQUALS;
         this.endRangeMatch = rm;
         return this;
     }
@@ -164,6 +162,12 @@ public class Input implements Comparable<Input> {
     }
 
 
+    /**
+     * setRangeMatch is just a convenience function to call both setStartRangeMatch and setEndRangeMatch at the same time.
+     *
+     * @param rr
+     * @return
+     */
     public Input setRangeMatch(RangeRelation rr) {
         switch(rr) {
             case EQUALS:
@@ -187,7 +191,7 @@ public class Input implements Comparable<Input> {
 
 
     /**
-     * Determines if this input is used to compute the range of the output activation.
+     * setRangeOutput is just a convenience function to call setStartRangeOutput and setEndRangeOutput at the same time.
      *
      * @param ro
      * @return
@@ -199,20 +203,26 @@ public class Input implements Comparable<Input> {
     }
 
 
+    /**
+     * Determines if this input is used to compute the range start of the output activation.
+     *
+     * @param ro
+     * @return
+     */
     public Input setStartRangeOutput(boolean ro) {
         this.startRangeOutput = ro;
-        if(ro) {
-            setStartRangeMatch(RangeMatch.EQUALS);
-        }
         return this;
     }
 
 
+    /**
+     * Determines if this input is used to compute the range end of the output activation.
+     *
+     * @param ro
+     * @return
+     */
     public Input setEndRangeOutput(boolean ro) {
         this.endRangeOutput = ro;
-        if(ro) {
-            setEndRangeMatch(RangeMatch.EQUALS);
-        }
         return this;
     }
 
