@@ -112,21 +112,21 @@ public class PatternLatticeTest {
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setMinInput(1.0)
-                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inC)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setMinInput(1.0)
-                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inD)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setMinInput(1.0)
-                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true)
             );
 
@@ -176,28 +176,28 @@ public class PatternLatticeTest {
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setMinInput(1.0)
-                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inB)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setMinInput(1.0)
-                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inC)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setMinInput(1.0)
-                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inD)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setMinInput(1.0)
-                            .setRangeMatch(RangeRelation.CONTAINS)
+                            .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true)
             );
 
