@@ -21,19 +21,17 @@ import org.aika.Activation;
 import org.aika.corpus.Document;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
+import org.aika.corpus.Range.Operator;
+import org.aika.corpus.Range.Signal;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-import org.aika.corpus.Range.Operator;
-import org.aika.corpus.Range.Signal;
 
 import java.util.Collections;
 import java.util.Set;
 
-import static org.aika.corpus.Range.Operator.EQUALS;
-import static org.aika.corpus.Range.Operator.GREATER_THAN;
-import static org.aika.corpus.Range.Operator.LESS_THAN;
+import static org.aika.corpus.Range.Operator.*;
 import static org.aika.corpus.Range.Signal.END;
 import static org.aika.corpus.Range.Signal.START;
 

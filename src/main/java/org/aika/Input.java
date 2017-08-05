@@ -16,9 +16,9 @@
  */
 package org.aika;
 
-import org.aika.neuron.Neuron;
-import org.aika.corpus.Range.Signal;
 import org.aika.corpus.Range.Operator;
+import org.aika.corpus.Range.Signal;
+import org.aika.neuron.Neuron;
 
 
 /**

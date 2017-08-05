@@ -30,9 +30,7 @@ import org.junit.Test;
 
 import java.util.TreeMap;
 
-import static org.aika.corpus.Range.Operator.EQUALS;
-import static org.aika.corpus.Range.Operator.GREATER_THAN;
-import static org.aika.corpus.Range.Operator.LESS_THAN;
+import static org.aika.corpus.Range.Operator.*;
 
 
 /**

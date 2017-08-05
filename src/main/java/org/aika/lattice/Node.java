@@ -24,12 +24,12 @@ import org.aika.corpus.Conflicts;
 import org.aika.corpus.Document;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
+import org.aika.corpus.Range.Operator;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.lattice.OrNode.OrEntry;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-import org.aika.corpus.Range.Operator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

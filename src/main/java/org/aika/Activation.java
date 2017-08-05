@@ -21,18 +21,17 @@ import org.aika.corpus.Document;
 import org.aika.corpus.ExpandNode.StateChange;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
+import org.aika.corpus.Range.Operator;
 import org.aika.lattice.Node;
 import org.aika.lattice.Node.ThreadState;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron.NormWeight;
 import org.aika.neuron.Synapse;
-import org.aika.corpus.Range.Operator;
 
 import java.util.*;
 import java.util.stream.Stream;
 
 import static org.aika.corpus.Range.Operator.*;
-import static org.aika.corpus.Range.Operator.FIRST;
 
 /**
  *

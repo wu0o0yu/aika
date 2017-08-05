@@ -22,6 +22,7 @@ import org.aika.Input;
 import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
+import org.aika.corpus.Range.Operator;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
@@ -29,8 +30,6 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.aika.corpus.Range.Operator;
 
 /**
  *

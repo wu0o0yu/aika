@@ -23,13 +23,13 @@ import org.aika.Utils;
 import org.aika.corpus.Document;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
+import org.aika.corpus.Range.Operator;
+import org.aika.corpus.Range.Signal;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.Key;
-import org.aika.corpus.Range.Signal;
-import org.aika.corpus.Range.Operator;
 
 import java.io.DataInput;
 import java.io.DataOutput;

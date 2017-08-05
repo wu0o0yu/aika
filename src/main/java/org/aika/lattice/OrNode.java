@@ -17,8 +17,11 @@
 package org.aika.lattice;
 
 
-import org.aika.*;
+import org.aika.Activation;
 import org.aika.Activation.Key;
+import org.aika.Model;
+import org.aika.Utils;
+import org.aika.Writable;
 import org.aika.corpus.Document;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
