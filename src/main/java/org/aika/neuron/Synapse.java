@@ -187,7 +187,7 @@ public class Synapse implements Writable {
                 case FIRST:
                     return d <= b && b < c;
                 case LAST:
-                    return a > d;
+                    return b <= d && a > d;
                 default:
                     return true;
             }

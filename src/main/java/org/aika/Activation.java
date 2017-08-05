@@ -31,6 +31,9 @@ import org.aika.neuron.Synapse.RangeMatch;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static org.aika.neuron.Synapse.RangeMatch.*;
+import static org.aika.neuron.Synapse.RangeMatch.FIRST;
+
 /**
  *
  * @author Lukas Molzberger
@@ -223,7 +226,7 @@ public class Activation implements Comparable<Activation> {
                     results = th.activations.values()
                             .stream();
                 } else {
-                    return Range.getActivations(doc, n, rid, r, begin, end, o, or);
+                    return getActivationsByRange(th, n, rid, r, begin, end, o, or);
                 }
             }
         } else {
@@ -242,6 +245,50 @@ public class Activation implements Comparable<Activation> {
         }
 
         return results.filter(act -> act.filter(n, rid, r, begin, end, o, or));
+    }
+
+
+    public static Stream getActivationsByRange(ThreadState th, Node n, Integer rid, Range r, RangeMatch begin, RangeMatch end, Option o, Option.Relation or) {
+        Stream s;
+        if((begin == GREATER_THAN || begin == EQUALS || end == FIRST) && r.begin != null) {
+            int er = (end == RangeMatch.LESS_THAN || end == RangeMatch.EQUALS || end == FIRST) && r.end != null ? r.end : Integer.MAX_VALUE;
+            s = th.activations.subMap(
+                    new Activation.Key(n, new Range(r.begin, null), null, Option.MIN),
+                    true,
+                    new Activation.Key(n, new Range(er, Integer.MAX_VALUE), Integer.MAX_VALUE, Option.MAX),
+                    true
+            )
+                    .values()
+                    .stream()
+                    .filter(act -> act.filter(n, rid, r, begin, end, o, or));
+        } else if((begin == RangeMatch.LESS_THAN || begin == RangeMatch.EQUALS) && r.begin != null) {
+            s = th.activations.descendingMap().subMap(
+                    new Activation.Key(n, new Range(r.begin, Integer.MAX_VALUE), null, Option.MAX),
+                    true,
+                    new Activation.Key(n, new Range(null, null), null, Option.MIN),
+                    true
+            )
+                    .values()
+                    .stream()
+                    .filter(act -> act.filter(n, rid, r, begin, end, o, or));
+        }  else if(end == LAST) {
+            s = th.activationsEnd.tailMap(
+                    new Activation.Key(n, new Range(null, r.begin), null, Option.MIN),
+                    true
+            )
+                    .values()
+                    .stream()
+                    .filter(act -> act.filter(n, rid, r, begin, end, o, or));
+        } else if(begin == LAST || begin == FIRST || end == FIRST) {
+            // TODO
+            throw new RuntimeException("Not implemented yet!");
+        } else {
+            s = th.activations.values()
+                    .stream()
+                    .filter(act -> act.filter(n, rid, r, begin, end, o, or));
+        }
+
+        return s;
     }
 
 

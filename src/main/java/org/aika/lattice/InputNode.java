@@ -35,9 +35,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
-import static org.aika.neuron.Synapse.RangeMatch.FIRST;
-import static org.aika.neuron.Synapse.RangeMatch.LAST;
+import static org.aika.neuron.Synapse.RangeMatch.*;
 
 
 /**
@@ -172,14 +172,24 @@ public class InputNode extends Node {
             boolean dir = key.startSignal == Synapse.RangeSignal.NONE;
             int pos = ak.r.getBegin(dir);
 
-         // TODO: efficient implementation
-/*            for(Activation act: Activation.select(t, this, ak.rid, new Range(pos, pos), Range.Relation.OVERLAPS, ak.o, Option.Relation.CONTAINS)) {
-                addActivationInternal(t, new Activation.Key(this, new Range(act.key.r.getBegin(dir), pos).invert(dir), act.key.rid, act.key.o), act.inputs.values(), false);
+            List<Activation> tmp = Activation.select(
+                    doc,
+                    this,
+                    ak.rid,
+                    new Range(pos, pos),
+                    LESS_THAN,
+                    GREATER_THAN,
+                    ak.o,
+                    Option.Relation.CONTAINS
+            ).collect(Collectors.toList());
+
+            for(Activation act: tmp) {
+                addActivationInternal(doc, new Activation.Key(this, new Range(act.key.r.getBegin(dir), pos).invert(dir), act.key.rid, act.key.o), act.inputs.values(), false);
                 act.removedId = Activation.removedIdCounter++;
                 act.isRemoved = true;
-                removeActivationInternal(t, act, act.inputs.values());
+                removeActivationInternal(doc, act, act.inputs.values());
             }
-*/
+
             Activation cAct = Activation.getNextSignal(this, doc, pos, ak.rid, ak.o, dir, dir);
             return new Range(ak.r.getBegin(dir), cAct != null ? cAct.key.r.getBegin(dir) : (dir ? Integer.MIN_VALUE : Integer.MAX_VALUE)).invert(dir);
         }
@@ -191,13 +201,26 @@ public class InputNode extends Node {
         Activation.Key ak = act.key;
         if(neuron == null && (key.startSignal == Synapse.RangeSignal.NONE || key.endSignal == Synapse.RangeSignal.NONE)) {
             boolean dir = key.startSignal == Synapse.RangeSignal.NONE;
-            Activation.select(doc, this, ak.rid, new Range(ak.r.getBegin(dir), dir ? Integer.MAX_VALUE : Integer.MIN_VALUE).invert(!dir), dir ? RangeMatch.EQUALS : RangeMatch.NONE, dir ? RangeMatch.NONE : RangeMatch.EQUALS, ak.o, Option.Relation.CONTAINS).forEach(cAct -> {
+            List<Activation> tmp = Activation.select(
+                    doc,
+                    this,
+                    ak.rid,
+                    new Range(ak.r.getBegin(dir), dir ? Integer.MAX_VALUE : Integer.MIN_VALUE).invert(!dir),
+                    dir ? RangeMatch.EQUALS : NONE,
+                    dir ? NONE : RangeMatch.EQUALS,
+                    ak.o,
+                    Option.Relation.CONTAINS
+            ).collect(Collectors.toList());
+
+            for(Activation cAct: tmp) {
                 Activation.Key cak = cAct.key;
                 processAddedActivation(doc, new Activation.Key(cak.n, new Range(dir ? Integer.MIN_VALUE : cak.r.begin, dir ? cak.r.end : Integer.MAX_VALUE), cak.rid, cak.o), cAct.inputs.values());
-                cAct.removedId = Activation.removedIdCounter++;
-                cAct.isRemoved = true;
-                removeActivationInternal(doc, cAct, cAct.inputs.values());
-            });
+                if(!cAct.isRemoved) {
+                    cAct.removedId = Activation.removedIdCounter++;
+                    cAct.isRemoved = true;
+                    removeActivationInternal(doc, cAct, cAct.inputs.values());
+                }
+            };
         }
     }
 
@@ -290,7 +313,7 @@ public class InputNode extends Node {
                 doc,
                 secondNode,
                 secondRid,
-                firstNode.limitRange(doc, ak),
+                ak.r,
                 computeStartRangeMatch(firstNode.key, secondNode.key),
                 computeEndRangeMatch(firstNode.key, secondNode.key),
                 null,
@@ -316,27 +339,6 @@ public class InputNode extends Node {
         });
     }
 
-    private Range limitRange(Document doc, Activation.Key ak) {
-        if(key.startRangeMatch != FIRST && key.endRangeMatch != FIRST) return ak.r;
-
-        if(key.startRangeMatch == FIRST) {
-            for(Activation.Key nak: getThreadState(doc, false).activations.headMap(ak, false).keySet()) {
-                if(ak.o.contains(nak.o, true)) {
-                    return new Range(ak.r.begin, nak.r.begin);
-                }
-            }
-            return ak.r;
-        } else if(key.endRangeMatch == FIRST) {
-            for(Activation.Key nak: getThreadState(doc, false).activationsEnd.descendingMap().tailMap(ak, false).keySet()) {
-                if(ak.o.contains(nak.o, true)) {
-                    return new Range(nak.r.end, ak.r.end);
-                }
-            }
-            return ak.r;
-        }
-        return null;
-    }
-
 
     private static RangeMatch computeStartRangeMatch(Key k1, Key k2) {
         if(k1.startRangeMatch == FIRST || k1.startRangeMatch == LAST) return k1.startRangeMatch;
@@ -347,7 +349,7 @@ public class InputNode extends Node {
         } else if(k1.startRangeOutput) {
             return RangeMatch.invert(k2.startRangeMatch);
         }
-        return RangeMatch.NONE;
+        return NONE;
     }
 
 
@@ -360,7 +362,7 @@ public class InputNode extends Node {
         } else if(k1.endRangeOutput) {
             return RangeMatch.invert(k2.endRangeMatch);
         }
-        return RangeMatch.NONE;
+        return NONE;
     }
 
 
