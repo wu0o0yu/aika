@@ -25,12 +25,12 @@ import org.aika.corpus.Range;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.Synapse.Key;
-import org.aika.neuron.Synapse.RangeSignal;
-import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.corpus.Range.Signal;
+import org.aika.corpus.Range.Operator;
 
 import java.util.Collections;
 
-import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
+import static org.aika.corpus.Range.Operator.EQUALS;
 
 
 /**
@@ -56,7 +56,7 @@ public class InputNeuron extends Neuron {
     public static InputNeuron create(Document doc, InputNeuron n) {
         n.m = doc.m;
 
-        InputNode node = InputNode.add(doc, new Key(false, false, null, 0, RangeMatch.NONE, RangeSignal.NONE, true, RangeMatch.NONE, RangeSignal.NONE, true), null);
+        InputNode node = InputNode.add(doc, new Key(false, false, null, 0, Operator.NONE, Signal.NONE, true, Operator.NONE, Signal.NONE, true), null);
         node.neuron = n;
 
         n.node = node;

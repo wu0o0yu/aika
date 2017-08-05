@@ -28,8 +28,8 @@ import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.Key;
-import org.aika.neuron.Synapse.RangeSignal;
-import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.corpus.Range.Signal;
+import org.aika.corpus.Range.Operator;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -37,7 +37,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.aika.neuron.Synapse.RangeMatch.*;
+import static org.aika.corpus.Range.Operator.*;
 
 
 /**
@@ -69,7 +69,7 @@ public class InputNode extends Node {
         endRequired = false;
         ridRequired = false;
         if(key != null) {
-            endRequired = key.startSignal == Synapse.RangeSignal.NONE;
+            endRequired = key.startSignal == Signal.NONE;
             ridRequired = key.relativeRid != null || key.absoluteRid != null;
         }
     }
@@ -168,8 +168,8 @@ public class InputNode extends Node {
 
 
     protected Range preProcessAddedActivation(Document doc, Activation.Key ak, Collection<Activation> inputActs) {
-        if(neuron == null && (key.startSignal == Synapse.RangeSignal.NONE || key.endSignal == Synapse.RangeSignal.NONE)) {
-            boolean dir = key.startSignal == Synapse.RangeSignal.NONE;
+        if(neuron == null && (key.startSignal == Signal.NONE || key.endSignal == Signal.NONE)) {
+            boolean dir = key.startSignal == Signal.NONE;
             int pos = ak.r.getBegin(dir);
 
             List<Activation> tmp = Activation.select(
@@ -199,15 +199,15 @@ public class InputNode extends Node {
 
     protected void postProcessRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {
         Activation.Key ak = act.key;
-        if(neuron == null && (key.startSignal == Synapse.RangeSignal.NONE || key.endSignal == Synapse.RangeSignal.NONE)) {
-            boolean dir = key.startSignal == Synapse.RangeSignal.NONE;
+        if(neuron == null && (key.startSignal == Signal.NONE || key.endSignal == Signal.NONE)) {
+            boolean dir = key.startSignal == Signal.NONE;
             List<Activation> tmp = Activation.select(
                     doc,
                     this,
                     ak.rid,
                     new Range(ak.r.getBegin(dir), dir ? Integer.MAX_VALUE : Integer.MIN_VALUE).invert(!dir),
-                    dir ? RangeMatch.EQUALS : NONE,
-                    dir ? NONE : RangeMatch.EQUALS,
+                    dir ? Operator.EQUALS : NONE,
+                    dir ? NONE : Operator.EQUALS,
                     ak.o,
                     Option.Relation.CONTAINS
             ).collect(Collectors.toList());
@@ -340,27 +340,27 @@ public class InputNode extends Node {
     }
 
 
-    private static RangeMatch computeStartRangeMatch(Key k1, Key k2) {
+    private static Operator computeStartRangeMatch(Key k1, Key k2) {
         if(k1.startRangeMatch == FIRST || k1.startRangeMatch == LAST) return k1.startRangeMatch;
-        if(k2.startRangeMatch == FIRST || k2.startRangeMatch == LAST) return RangeMatch.invert(k2.startRangeMatch);
+        if(k2.startRangeMatch == FIRST || k2.startRangeMatch == LAST) return Operator.invert(k2.startRangeMatch);
 
         if(k2.startRangeOutput) {
             return k1.startRangeMatch;
         } else if(k1.startRangeOutput) {
-            return RangeMatch.invert(k2.startRangeMatch);
+            return Operator.invert(k2.startRangeMatch);
         }
         return NONE;
     }
 
 
-    private static RangeMatch computeEndRangeMatch(Key k1, Key k2) {
+    private static Operator computeEndRangeMatch(Key k1, Key k2) {
         if(k1.endRangeMatch == FIRST || k1.endRangeMatch == LAST) return k1.endRangeMatch;
-        if(k2.endRangeMatch == FIRST || k2.endRangeMatch == LAST) return RangeMatch.invert(k2.endRangeMatch);
+        if(k2.endRangeMatch == FIRST || k2.endRangeMatch == LAST) return Operator.invert(k2.endRangeMatch);
 
         if(k2.endRangeOutput) {
             return k1.endRangeMatch;
         } else if(k1.endRangeOutput) {
-            return RangeMatch.invert(k2.endRangeMatch);
+            return Operator.invert(k2.endRangeMatch);
         }
         return NONE;
     }
@@ -372,8 +372,8 @@ public class InputNode extends Node {
 
         for(Activation secondAct: doc.inputNodeActivations) {
             Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (InputNode) secondAct.key.n);
-            RangeMatch srm = computeStartRangeMatch(key, ref.input.key);
-            RangeMatch erm = computeEndRangeMatch(key, ref.input.key);
+            Operator srm = computeStartRangeMatch(key, ref.input.key);
+            Operator erm = computeEndRangeMatch(key, ref.input.key);
             Integer ridDelta = Utils.nullSafeSub(act.key.rid, false, secondAct.key.rid, false);
 
             if(     act != secondAct &&
@@ -447,10 +447,10 @@ public class InputNode extends Node {
     }
 
 
-    private String getRangeBrackets(boolean ro, RangeSignal rs) {
-        if(rs == RangeSignal.NONE) return "|";
-        else if(ro) return rs == RangeSignal.START ? "[" : "]";
-        else if(!ro) return rs == RangeSignal.START ? "<" : ">";
+    private String getRangeBrackets(boolean ro, Signal rs) {
+        if(rs == Signal.NONE) return "|";
+        else if(ro) return rs == Signal.START ? "[" : "]";
+        else if(!ro) return rs == Signal.START ? "<" : ">";
         else return "|";
     }
 

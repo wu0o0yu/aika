@@ -31,8 +31,8 @@ import org.aika.lattice.OrNode;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeMatch;
-import org.aika.neuron.Synapse.RangeSignal;
+import org.aika.corpus.Range.Operator;
+import org.aika.corpus.Range.Signal;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -40,8 +40,8 @@ import java.util.Collection;
 import java.util.Set;
 
 import static org.aika.Input.RangeRelation.EQUALS;
-import static org.aika.neuron.Synapse.RangeMatch.GREATER_THAN;
-import static org.aika.neuron.Synapse.RangeMatch.LESS_THAN;
+import static org.aika.corpus.Range.Operator.GREATER_THAN;
+import static org.aika.corpus.Range.Operator.LESS_THAN;
 
 /**
  *
@@ -68,7 +68,7 @@ public class ActivationOutputsTest {
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
                         .setMinInput(1.0)
-                        .setStartRangeMatch(RangeMatch.EQUALS)
+                        .setStartRangeMatch(Operator.EQUALS)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
@@ -76,7 +76,7 @@ public class ActivationOutputsTest {
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
                         .setMinInput(1.0)
-                        .setEndRangeMatch(RangeMatch.EQUALS)
+                        .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
 
@@ -102,7 +102,7 @@ public class ActivationOutputsTest {
         );
 
 
-        InputNode pC = new InputNode(doc, new Synapse.Key(false, false, 0, null, LESS_THAN, RangeSignal.START, true, GREATER_THAN, RangeSignal.END, true));
+        InputNode pC = new InputNode(doc, new Synapse.Key(false, false, 0, null, LESS_THAN, Signal.START, true, GREATER_THAN, Signal.END, true));
         Activation pC1 = TestHelper.addActivation(pC, doc, TestHelper.get(doc, pAB.node, new Range(0, 1), null));
 
         Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, TestHelper.get(doc, pAB.node, new Range(0, 1), null)));

@@ -25,17 +25,17 @@ import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeMatch;
-import org.aika.neuron.Synapse.RangeSignal;
+import org.aika.corpus.Range.Operator;
+import org.aika.corpus.Range.Signal;
 
 import java.util.Collections;
 import java.util.Set;
 
-import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
-import static org.aika.neuron.Synapse.RangeMatch.GREATER_THAN;
-import static org.aika.neuron.Synapse.RangeMatch.LESS_THAN;
-import static org.aika.neuron.Synapse.RangeSignal.END;
-import static org.aika.neuron.Synapse.RangeSignal.START;
+import static org.aika.corpus.Range.Operator.EQUALS;
+import static org.aika.corpus.Range.Operator.GREATER_THAN;
+import static org.aika.corpus.Range.Operator.LESS_THAN;
+import static org.aika.corpus.Range.Signal.END;
+import static org.aika.corpus.Range.Signal.START;
 
 /**
  *
@@ -89,7 +89,7 @@ public class TestHelper {
     }
 
 
-    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, RangeMatch startRangeMatch, RangeSignal startSignal, boolean startRangeOutput, RangeMatch endRangeMatch, RangeSignal endSignal, boolean endRangeOutput) {
+    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Signal startSignal, boolean startRangeOutput, Operator endRangeMatch, Signal endSignal, boolean endRangeOutput) {
         return InputNode.add(doc, new Synapse.Key(false, false, relativeRid, absoluteRid, startRangeMatch, startSignal, startRangeOutput, endRangeMatch, endSignal, endRangeOutput), n);
     }
 

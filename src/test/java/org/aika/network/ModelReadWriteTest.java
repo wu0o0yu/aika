@@ -26,9 +26,7 @@ import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
-import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeMatch;
-import org.aika.neuron.Synapse.RangeSignal;
+import org.aika.corpus.Range.Operator;
 
 import java.io.*;
 import java.util.HashMap;
@@ -73,8 +71,8 @@ public class ModelReadWriteTest {
                             .setRecurrent(false)
                             .setRelativeRid(0)
                             .setMinInput(0.9)
-                            .setStartRangeMatch(RangeMatch.EQUALS)
-                            .setEndRangeMatch(RangeMatch.LESS_THAN)
+                            .setStartRangeMatch(Operator.EQUALS)
+                            .setEndRangeMatch(Operator.LESS_THAN)
                             .setStartRangeOutput(true),
                     new Input()
                             .setNeuron(m.neurons.get(inputNeurons.get('c')))
@@ -89,8 +87,8 @@ public class ModelReadWriteTest {
                             .setRecurrent(false)
                             .setRelativeRid(2)
                             .setMinInput(0.9)
-                            .setStartRangeMatch(RangeMatch.GREATER_THAN)
-                            .setEndRangeMatch(RangeMatch.EQUALS)
+                            .setStartRangeMatch(Operator.GREATER_THAN)
+                            .setEndRangeMatch(Operator.EQUALS)
                             .setEndRangeOutput(true)
             ).id;
 

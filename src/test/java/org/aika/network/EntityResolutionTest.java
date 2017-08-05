@@ -18,14 +18,10 @@ package org.aika.network;
 
 
 import org.aika.Input;
-import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
-import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeMatch;
-import org.aika.neuron.Synapse.RangeSignal;
 import org.junit.Assert;
 import org.junit.Test;
 

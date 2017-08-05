@@ -20,7 +20,8 @@ package org.aika.neuron;
 import org.aika.Utils;
 import org.aika.Writable;
 import org.aika.corpus.Document;
-import org.aika.corpus.Range;
+import org.aika.corpus.Range.Operator;
+import org.aika.corpus.Range.Signal;
 import org.aika.lattice.InputNode;
 
 import java.io.DataInput;
@@ -167,84 +168,6 @@ public class Synapse implements Writable {
     }
 
 
-    public enum RangeMatch {
-        EQUALS,
-        LESS_THAN,
-        GREATER_THAN,
-        FIRST,
-        LAST,
-        NONE;
-
-        public boolean compare(Integer a, Integer b, Integer c, Integer d) {
-            if(a == null || c == null) return true;
-            switch(this) {
-                case EQUALS:
-                    return a == c;
-                case LESS_THAN:
-                    return a <= c;
-                case GREATER_THAN:
-                    return a >= c;
-                case FIRST:
-                    return d <= b && b < c;
-                case LAST:
-                    return b <= d && a > d;
-                default:
-                    return true;
-            }
-        }
-
-        public static RangeMatch invert(RangeMatch rm) {
-            switch(rm) {
-                case EQUALS:
-                    return EQUALS;
-                case LESS_THAN:
-                    return GREATER_THAN;
-                case GREATER_THAN:
-                    return LESS_THAN;
-                case FIRST:
-                    return LAST;
-                case LAST:
-                    return FIRST;
-                default:
-                    return NONE;
-            }
-        }
-    }
-
-
-
-    public enum RangeSignal {
-        START,
-        END,
-        NONE;
-
-        public Integer getSignalPos(Range r) {
-            switch(this) {
-                case START:
-                    return r.begin;
-                case END:
-                    return r.end;
-                case NONE:
-                default:
-                    return null;
-            }
-        }
-
-        public String toString() {
-            switch (this) {
-                case START:
-                    return "S";
-                case END:
-                    return "E";
-                case NONE:
-                    return "N";
-            }
-            return "";
-        }
-    }
-
-
-
     public static class Key implements Comparable<Key>, Writable {
         public static final Key MIN_KEY = new Key();
         public static final Key MAX_KEY = new Key();
@@ -253,17 +176,17 @@ public class Synapse implements Writable {
         public boolean isRecurrent;
         public Integer relativeRid;
         public Integer absoluteRid;
-        public RangeMatch startRangeMatch;
-        public RangeMatch endRangeMatch;
-        public RangeSignal startSignal;
-        public RangeSignal endSignal;
+        public Operator startRangeMatch;
+        public Operator endRangeMatch;
+        public Signal startSignal;
+        public Signal endSignal;
         public boolean startRangeOutput;
         public boolean endRangeOutput;
 
         public Key() {}
 
 
-        public Key(boolean isNeg, boolean isRecurrent, Integer relativeRid, Integer absoluteRid, RangeMatch startRangeMatch, RangeSignal startSignal, boolean startRangeOutput, RangeMatch endRangeMatch, RangeSignal endSignal, boolean endRangeOutput) {
+        public Key(boolean isNeg, boolean isRecurrent, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Signal startSignal, boolean startRangeOutput, Operator endRangeMatch, Signal endSignal, boolean endRangeOutput) {
             this.isNeg = isNeg;
             this.isRecurrent = isRecurrent;
             this.relativeRid = relativeRid;
@@ -305,10 +228,10 @@ public class Synapse implements Writable {
             isRecurrent = in.readBoolean();
             if(in.readBoolean()) relativeRid = in.readInt();
             if(in.readBoolean()) absoluteRid = in.readInt();
-            startRangeMatch = RangeMatch.valueOf(in.readUTF());
-            endRangeMatch = RangeMatch.valueOf(in.readUTF());
-            startSignal = RangeSignal.valueOf(in.readUTF());
-            endSignal = RangeSignal.valueOf(in.readUTF());
+            startRangeMatch = Operator.valueOf(in.readUTF());
+            endRangeMatch = Operator.valueOf(in.readUTF());
+            startSignal = Signal.valueOf(in.readUTF());
+            endSignal = Signal.valueOf(in.readUTF());
             startRangeOutput = in.readBoolean();
             endRangeOutput = in.readBoolean();
         }

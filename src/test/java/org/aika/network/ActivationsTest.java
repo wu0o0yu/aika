@@ -27,15 +27,14 @@ import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
-import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeMatch;
-import org.aika.neuron.Synapse.RangeSignal;
+import org.aika.corpus.Range.Operator;
+import org.aika.corpus.Range.Signal;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Collections;
 
-import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
+import static org.aika.corpus.Range.Operator.EQUALS;
 
 /**
  *
@@ -61,7 +60,7 @@ public class ActivationsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, RangeMatch.LESS_THAN, RangeSignal.START, true, RangeMatch.GREATER_THAN, RangeSignal.END, true);
+        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, Operator.LESS_THAN, Signal.START, true, Operator.GREATER_THAN, Signal.END, true);
 
 
         inA.addInput(doc, 0, 1, 0);
@@ -86,7 +85,7 @@ public class ActivationsTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
         );
-        InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, RangeMatch.LESS_THAN, RangeSignal.START, true, RangeMatch.GREATER_THAN, Synapse.RangeSignal.END, true);
+        InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, Operator.LESS_THAN, Signal.START, true, Operator.GREATER_THAN, Signal.END, true);
 
         inB.addInput(doc, 0, 1);
         inB.addInput(doc, 1, 2);

@@ -29,9 +29,8 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeMatch;
-import org.aika.neuron.Synapse.RangeSignal;
+
+import org.aika.corpus.Range.Operator;
 
 /**
  *
@@ -65,8 +64,8 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(0.9)
-                        .setStartRangeMatch(RangeMatch.EQUALS)
-                        .setEndRangeMatch(RangeMatch.GREATER_THAN)
+                        .setStartRangeMatch(Operator.EQUALS)
+                        .setEndRangeMatch(Operator.GREATER_THAN)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
@@ -81,8 +80,8 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setMinInput(0.9)
-                        .setStartRangeMatch(RangeMatch.LESS_THAN)
-                        .setEndRangeMatch(RangeMatch.EQUALS)
+                        .setStartRangeMatch(Operator.LESS_THAN)
+                        .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
 
@@ -172,8 +171,8 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setMinInput(0.9)
-                        .setStartRangeMatch(RangeMatch.EQUALS)
-                        .setEndRangeMatch(RangeMatch.GREATER_THAN)
+                        .setStartRangeMatch(Operator.EQUALS)
+                        .setEndRangeMatch(Operator.GREATER_THAN)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(relNeurons.get('c'))
@@ -188,8 +187,8 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setMinInput(0.9)
-                        .setStartRangeMatch(RangeMatch.LESS_THAN)
-                        .setEndRangeMatch(RangeMatch.EQUALS)
+                        .setStartRangeMatch(Operator.LESS_THAN)
+                        .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
 

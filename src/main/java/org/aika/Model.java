@@ -23,8 +23,8 @@ import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeSignal;
-import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.corpus.Range.Signal;
+import org.aika.corpus.Range.Operator;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -305,11 +305,11 @@ public class Model implements Writable {
                             false,
                             null,
                             null,
-                            RangeMatch.LESS_THAN,
-                            dirIS ? RangeSignal.END : RangeSignal.START,
+                            Operator.LESS_THAN,
+                            dirIS ? Signal.END : Signal.START,
                             false,
-                            RangeMatch.GREATER_THAN,
-                            dirIS ? RangeSignal.START : RangeSignal.END,
+                            Operator.GREATER_THAN,
+                            dirIS ? Signal.START : Signal.END,
                             false
                     )
             );
@@ -326,11 +326,11 @@ public class Model implements Writable {
                             false,
                             0,
                             null,
-                            RangeMatch.EQUALS,
-                            RangeSignal.START,
+                            Operator.EQUALS,
+                            Signal.START,
                             true,
-                            RangeMatch.EQUALS,
-                            RangeSignal.END,
+                            Operator.EQUALS,
+                            Signal.END,
                             true
                     )
             );
@@ -372,11 +372,11 @@ public class Model implements Writable {
                             false,
                             null,
                             null,
-                            RangeMatch.NONE,
-                            RangeSignal.NONE,
+                            Operator.NONE,
+                            Signal.NONE,
                             false,
-                            RangeMatch.FIRST,
-                            dirCS ? RangeSignal.START : RangeSignal.END,
+                            Operator.FIRST,
+                            dirCS ? Signal.START : Signal.END,
                             true
                     )
             );
@@ -393,11 +393,11 @@ public class Model implements Writable {
                             false,
                             0,
                             null,
-                            RangeMatch.EQUALS,
-                            dirSS ? RangeSignal.START : RangeSignal.END,
+                            Operator.EQUALS,
+                            dirSS ? Signal.START : Signal.END,
                             true,
-                            RangeMatch.NONE,
-                            RangeSignal.NONE,
+                            Operator.NONE,
+                            Signal.NONE,
                             false
                     )
             );
@@ -413,11 +413,11 @@ public class Model implements Writable {
                         false,
                         -1,
                         null,
-                        direction ? RangeMatch.NONE : RangeMatch.EQUALS,
-                        direction ? RangeSignal.NONE : RangeSignal.END,
+                        direction ? Operator.NONE : Operator.EQUALS,
+                        direction ? Signal.NONE : Signal.END,
                         direction ? false : true,
-                        direction ? RangeMatch.EQUALS : RangeMatch.NONE,
-                        direction ? RangeSignal.START : RangeSignal.NONE,
+                        direction ? Operator.EQUALS : Operator.NONE,
+                        direction ? Signal.START : Signal.NONE,
                         direction ? true : false
                 )
         );
@@ -432,11 +432,11 @@ public class Model implements Writable {
                         true,
                         0,
                         null,
-                        RangeMatch.EQUALS,
-                        RangeSignal.START,
+                        Operator.EQUALS,
+                        Signal.START,
                         false,
-                        RangeMatch.EQUALS,
-                        RangeSignal.END,
+                        Operator.EQUALS,
+                        Signal.END,
                         false
                 )
         );

@@ -19,15 +19,12 @@ package org.aika.network;
 
 import org.aika.Activation;
 import org.aika.Input;
-import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.ExpandNode;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
-import org.aika.neuron.Synapse.RangeMatch;
-import org.aika.neuron.Synapse.RangeSignal;
 
 import java.util.HashMap;
 

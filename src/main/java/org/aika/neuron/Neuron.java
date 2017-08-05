@@ -24,6 +24,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.ExpandNode;
 import org.aika.corpus.Option;
 import org.aika.corpus.Range;
+import org.aika.corpus.Range.Operator;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.lattice.Node;
@@ -121,8 +122,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
         double sum = 0.0;
         for(Synapse s: inputs) {
-            assert !s.key.startRangeOutput || s.key.startRangeMatch == Synapse.RangeMatch.EQUALS || s.key.startRangeMatch == Synapse.RangeMatch.FIRST;
-            assert !s.key.endRangeOutput || s.key.endRangeMatch == Synapse.RangeMatch.EQUALS || s.key.endRangeMatch == Synapse.RangeMatch.FIRST;
+            assert !s.key.startRangeOutput || s.key.startRangeMatch == Operator.EQUALS || s.key.startRangeMatch == Operator.FIRST;
+            assert !s.key.endRangeOutput || s.key.endRangeMatch == Operator.EQUALS || s.key.endRangeMatch == Operator.FIRST;
 
             s.output = n;
             s.link(doc);

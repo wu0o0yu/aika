@@ -110,4 +110,80 @@ public class Range {
         int b = Utils.compareInteger(ra.end, rb.end);
         return b;
     }
+
+
+    public enum Operator {
+        EQUALS,
+        LESS_THAN,
+        GREATER_THAN,
+        FIRST,
+        LAST,
+        NONE;
+
+        public boolean compare(Integer a, Integer b, Integer c, Integer d) {
+            if(a == null || c == null) return true;
+            switch(this) {
+                case EQUALS:
+                    return a == c;
+                case LESS_THAN:
+                    return a <= c;
+                case GREATER_THAN:
+                    return a >= c;
+                case FIRST:
+                    return d <= b && b < c;
+                case LAST:
+                    return b <= d && a > d;
+                default:
+                    return true;
+            }
+        }
+
+        public static Operator invert(Operator rm) {
+            switch(rm) {
+                case EQUALS:
+                    return EQUALS;
+                case LESS_THAN:
+                    return GREATER_THAN;
+                case GREATER_THAN:
+                    return LESS_THAN;
+                case FIRST:
+                    return LAST;
+                case LAST:
+                    return FIRST;
+                default:
+                    return NONE;
+            }
+        }
+    }
+
+
+    public enum Signal {
+        START,
+        END,
+        NONE;
+
+        public Integer getSignalPos(Range r) {
+            switch(this) {
+                case START:
+                    return r.begin;
+                case END:
+                    return r.end;
+                case NONE:
+                default:
+                    return null;
+            }
+        }
+
+        public String toString() {
+            switch (this) {
+                case START:
+                    return "S";
+                case END:
+                    return "E";
+                case NONE:
+                    return "N";
+            }
+            return "";
+        }
+    }
 }

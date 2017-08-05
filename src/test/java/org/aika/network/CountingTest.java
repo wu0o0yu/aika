@@ -24,9 +24,6 @@ import org.aika.lattice.AndNode;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
-import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeMatch;
-import org.aika.neuron.Synapse.RangeSignal;
 import org.junit.Assert;
 import org.junit.Test;
 

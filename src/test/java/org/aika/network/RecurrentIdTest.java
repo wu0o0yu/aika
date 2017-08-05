@@ -23,11 +23,9 @@ import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.Input.RangeRelation;
-import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
-import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,7 +33,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.aika.neuron.Synapse.RangeMatch.*;
+import static org.aika.corpus.Range.Operator.*;
 
 
 /**

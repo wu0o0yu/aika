@@ -24,7 +24,6 @@ import org.aika.corpus.Option;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.Neuron;
-import org.aika.neuron.Synapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -32,9 +31,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
-import static org.aika.neuron.Synapse.RangeMatch.GREATER_THAN;
-import static org.aika.neuron.Synapse.RangeMatch.LESS_THAN;
+import static org.aika.corpus.Range.Operator.EQUALS;
 
 
 /**

@@ -30,14 +30,9 @@ import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
-import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeMatch;
-import org.aika.neuron.Synapse.RangeSignal;
 
 import static org.aika.Input.RangeRelation.NONE;
-import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
-import static org.aika.neuron.Synapse.RangeMatch.GREATER_THAN;
-import static org.aika.neuron.Synapse.RangeMatch.LESS_THAN;
+import static org.aika.corpus.Range.Operator.EQUALS;
 
 /**
  *

@@ -26,13 +26,13 @@ import org.aika.lattice.Node.ThreadState;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron.NormWeight;
 import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.corpus.Range.Operator;
 
 import java.util.*;
 import java.util.stream.Stream;
 
-import static org.aika.neuron.Synapse.RangeMatch.*;
-import static org.aika.neuron.Synapse.RangeMatch.FIRST;
+import static org.aika.corpus.Range.Operator.*;
+import static org.aika.corpus.Range.Operator.FIRST;
 
 /**
  *
@@ -172,7 +172,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public static Activation get(Document doc, Node n, Integer rid, Range r, RangeMatch begin, RangeMatch end, Option o, Option.Relation or) {
+    public static Activation get(Document doc, Node n, Integer rid, Range r, Operator begin, Operator end, Option o, Option.Relation or) {
         return select(doc, n, rid, r, begin, end, o, or)
                 .findFirst()
                 .orElse(null);
@@ -180,7 +180,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public static Activation get(Document doc, Node n, Key ak) {
-        return get(doc, n, ak.rid, ak.r, RangeMatch.EQUALS, RangeMatch.EQUALS, ak.o, Option.Relation.EQUALS);
+        return get(doc, n, ak.rid, ak.r, Operator.EQUALS, Operator.EQUALS, ak.o, Option.Relation.EQUALS);
     }
 
 
@@ -200,7 +200,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public static Stream<Activation> select(Document doc, Node n, Integer rid, Range r, RangeMatch begin, RangeMatch end, Option o, Option.Relation or) {
+    public static Stream<Activation> select(Document doc, Node n, Integer rid, Range r, Operator begin, Operator end, Option o, Option.Relation or) {
         Stream<Activation> results;
         if(n != null) {
             ThreadState th = n.getThreadState(doc, false);
@@ -248,10 +248,10 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public static Stream getActivationsByRange(ThreadState th, Node n, Integer rid, Range r, RangeMatch begin, RangeMatch end, Option o, Option.Relation or) {
+    public static Stream getActivationsByRange(ThreadState th, Node n, Integer rid, Range r, Operator begin, Operator end, Option o, Option.Relation or) {
         Stream s;
         if((begin == GREATER_THAN || begin == EQUALS || end == FIRST) && r.begin != null) {
-            int er = (end == RangeMatch.LESS_THAN || end == RangeMatch.EQUALS || end == FIRST) && r.end != null ? r.end : Integer.MAX_VALUE;
+            int er = (end == Operator.LESS_THAN || end == Operator.EQUALS || end == FIRST) && r.end != null ? r.end : Integer.MAX_VALUE;
             s = th.activations.subMap(
                     new Activation.Key(n, new Range(r.begin, null), null, Option.MIN),
                     true,
@@ -261,7 +261,7 @@ public class Activation implements Comparable<Activation> {
                     .values()
                     .stream()
                     .filter(act -> act.filter(n, rid, r, begin, end, o, or));
-        } else if((begin == RangeMatch.LESS_THAN || begin == RangeMatch.EQUALS) && r.begin != null) {
+        } else if((begin == Operator.LESS_THAN || begin == Operator.EQUALS) && r.begin != null) {
             s = th.activations.descendingMap().subMap(
                     new Activation.Key(n, new Range(r.begin, Integer.MAX_VALUE), null, Option.MAX),
                     true,
@@ -298,7 +298,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public boolean filter(Node n, Integer rid, Range r, RangeMatch begin, RangeMatch end, Option o, Option.Relation or) {
+    public boolean filter(Node n, Integer rid, Range r, Operator begin, Operator end, Option o, Option.Relation or) {
         return (n == null || key.n == n) &&
                 (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) &&
                 (r == null || ((begin == null || begin.compare(key.r.begin, key.r.end, r.begin, r.end)) && (end == null || end.compare(key.r.end, key.r.begin, r.end, r.begin)))) &&

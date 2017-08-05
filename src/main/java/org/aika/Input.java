@@ -17,9 +17,8 @@
 package org.aika;
 
 import org.aika.neuron.Neuron;
-import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeSignal;
-import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.corpus.Range.Signal;
+import org.aika.corpus.Range.Operator;
 
 
 /**
@@ -33,12 +32,12 @@ public class Input implements Comparable<Input> {
     public double weight;
     public double maxLowerWeightsSum = Double.MAX_VALUE;
     public double minInput;
-    public RangeMatch startRangeMatch = RangeMatch.NONE;
-    public RangeMatch endRangeMatch = RangeMatch.NONE;
+    public Operator startRangeMatch = Operator.NONE;
+    public Operator endRangeMatch = Operator.NONE;
     public boolean startRangeOutput;
     public boolean endRangeOutput;
-    public RangeSignal startSignal = Synapse.RangeSignal.START;
-    public RangeSignal endSignal = Synapse.RangeSignal.END;
+    public Signal startSignal = Signal.START;
+    public Signal endSignal = Signal.END;
 
     public Integer relativeRid;
     public Integer absoluteRid;
@@ -143,12 +142,12 @@ public class Input implements Comparable<Input> {
      *
      * @return
      */
-    public Input setStartRangeMatch(RangeMatch rm) {
+    public Input setStartRangeMatch(Operator rm) {
         this.startRangeMatch = rm;
         return this;
     }
 
-    public Input setEndRangeMatch(RangeMatch rm) {
+    public Input setEndRangeMatch(Operator rm) {
         this.endRangeMatch = rm;
         return this;
     }
@@ -171,20 +170,20 @@ public class Input implements Comparable<Input> {
     public Input setRangeMatch(RangeRelation rr) {
         switch(rr) {
             case EQUALS:
-                setStartRangeMatch(RangeMatch.EQUALS);
-                setEndRangeMatch(RangeMatch.EQUALS);
+                setStartRangeMatch(Operator.EQUALS);
+                setEndRangeMatch(Operator.EQUALS);
                 break;
             case CONTAINS:
-                setStartRangeMatch(RangeMatch.LESS_THAN);
-                setEndRangeMatch(RangeMatch.GREATER_THAN);
+                setStartRangeMatch(Operator.LESS_THAN);
+                setEndRangeMatch(Operator.GREATER_THAN);
                 break;
             case CONTAINED_IN:
-                setStartRangeMatch(RangeMatch.GREATER_THAN);
-                setEndRangeMatch(RangeMatch.LESS_THAN);
+                setStartRangeMatch(Operator.GREATER_THAN);
+                setEndRangeMatch(Operator.LESS_THAN);
                 break;
             default:
-                setStartRangeMatch(RangeMatch.NONE);
-                setEndRangeMatch(RangeMatch.NONE);
+                setStartRangeMatch(Operator.NONE);
+                setEndRangeMatch(Operator.NONE);
         }
         return this;
     }
@@ -227,13 +226,13 @@ public class Input implements Comparable<Input> {
     }
 
 
-    public Input setStartRangeSignal(RangeSignal startSignal) {
+    public Input setStartRangeSignal(Signal startSignal) {
         this.startSignal = startSignal;
         return this;
     }
 
 
-    public Input setEndRangeSignal(RangeSignal endSignal) {
+    public Input setEndRangeSignal(Signal endSignal) {
         this.endSignal = endSignal;
         return this;
     }

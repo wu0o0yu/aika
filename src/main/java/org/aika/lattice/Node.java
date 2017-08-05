@@ -29,7 +29,7 @@ import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.lattice.OrNode.OrEntry;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-import org.aika.neuron.Synapse.RangeMatch;
+import org.aika.corpus.Range.Operator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +40,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import static org.aika.neuron.Synapse.RangeMatch.*;
-import static org.aika.neuron.Synapse.RangeSignal.END;
-import static org.aika.neuron.Synapse.RangeSignal.START;
+import static org.aika.corpus.Range.Operator.*;
+import static org.aika.corpus.Range.Signal.END;
+import static org.aika.corpus.Range.Signal.START;
 
 
 /**
@@ -413,12 +413,12 @@ public abstract class Node implements Comparable<Node>, Writable {
                 }
 
 
-                RangeMatch begin = replaceFirstAndLast(s.key.startRangeMatch);
-                RangeMatch end = replaceFirstAndLast(s.key.endRangeMatch);
+                Operator begin = replaceFirstAndLast(s.key.startRangeMatch);
+                Operator end = replaceFirstAndLast(s.key.endRangeMatch);
                 Range r = act.key.r;
                 if(dir == 0) {
-                    begin = RangeMatch.invert(s.key.startSignal == START ? begin : (s.key.endSignal == START ? end : NONE));
-                    end = RangeMatch.invert(s.key.endSignal == END ? end : (s.key.startSignal == END ? begin : NONE));
+                    begin = Operator.invert(s.key.startSignal == START ? begin : (s.key.endSignal == START ? end : NONE));
+                    end = Operator.invert(s.key.endSignal == END ? end : (s.key.startSignal == END ? begin : NONE));
 
                     if(s.key.startSignal != START || s.key.endSignal != END) {
                         r = new Range(s.key.endSignal == START ? r.end : (s.key.startSignal == START ? r.begin : null), s.key.startSignal == END ? r.begin : (s.key.endSignal == END ? r.end : null));
@@ -468,7 +468,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    private RangeMatch replaceFirstAndLast(RangeMatch rm) {
+    private Operator replaceFirstAndLast(Operator rm) {
         return rm == FIRST || rm == LAST ? EQUALS : rm;
     }
 
