@@ -46,8 +46,8 @@ public class RecurrentIdTest {
     public void testABPattern() {
         Model m = new Model();
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
 
 
         Node outCNode = m.createAndNeuron(new Neuron("C", true, true),
@@ -88,9 +88,9 @@ public class RecurrentIdTest {
     public void testABCPattern() {
         Model m = new Model();
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
-        InputNeuron inC = m.createOrLookupInputSignal("C");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
+        InputNeuron inC = m.createOrLookupInputNeuron("C");
 
         Node outDNode = m.createAndNeuron(new Neuron("D", true, true),
                 0.001,
@@ -138,7 +138,7 @@ public class RecurrentIdTest {
 
         HashMap<Character, InputNeuron> chars = new HashMap<>();
         for (char c = 'a'; c <= 'z'; c++) {
-            InputNeuron rec = m.createOrLookupInputSignal("IN-" + c);
+            InputNeuron rec = m.createOrLookupInputNeuron("IN-" + c);
             chars.put(c, rec);
         }
 

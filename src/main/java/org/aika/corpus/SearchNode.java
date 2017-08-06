@@ -35,7 +35,7 @@ import java.util.*;
  * When the search reaches the maximum depth of the search tree and no further refinements exists, a weight is computed evaluating the current search path.
  * The search path with the highest weight is used to determine the final interpretation.
  *
- * Before the search is started a set of initial refinements is generated from the set of all conflicts.
+ * Before the search is started a set of initial refinements is generated from the conflicts within the document.
  * In other words, if there are no conflicts in a given document, then no search is needed. In this case the final interpretation
  * will simply be the set of all interpretation nodes. The initial refinements are then expanded, meaning all interpretation nodes that are consistent
  * with this refinement are added to the refinement. The initial refinements are then propagated along the search path as refinement candidates.

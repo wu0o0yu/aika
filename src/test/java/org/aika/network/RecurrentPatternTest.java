@@ -45,13 +45,13 @@ public class RecurrentPatternTest {
 
         Model m = new Model();
 
-        InputNeuron startSignal = m.createOrLookupInputSignal("START-SIGNAL");
-        InputNeuron spaceN = m.createOrLookupInputSignal("SPACE");
+        InputNeuron startSignal = m.createOrLookupInputNeuron("START-SIGNAL");
+        InputNeuron spaceN = m.createOrLookupInputNeuron("SPACE");
 
 
         TreeMap<Character, InputNeuron> chars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
-            InputNeuron charSN = m.createOrLookupInputSignal("" + c);
+            InputNeuron charSN = m.createOrLookupInputNeuron("" + c);
             chars.put(c, charSN);
         }
 
@@ -141,12 +141,12 @@ public class RecurrentPatternTest {
 
         Model m = new Model();
 
-        InputNeuron startSignal = m.createOrLookupInputSignal("START-SIGNAL");
-        InputNeuron spaceN = m.createOrLookupInputSignal("SPACE");
+        InputNeuron startSignal = m.createOrLookupInputNeuron("START-SIGNAL");
+        InputNeuron spaceN = m.createOrLookupInputNeuron("SPACE");
 
         TreeMap<Character, InputNeuron> chars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
-            InputNeuron charSN = m.createOrLookupInputSignal("" + c);
+            InputNeuron charSN = m.createOrLookupInputNeuron("" + c);
             chars.put(c, charSN);
         }
 
@@ -232,16 +232,16 @@ public class RecurrentPatternTest {
     public void testAndWithRid() {
         Model m = new Model();
 
-        InputNeuron start = m.createOrLookupInputSignal("START");
-        InputNeuron clock = m.createOrLookupInputSignal("CLOCK");
-        InputNeuron input = m.createOrLookupInputSignal("INPUT");
+        InputNeuron start = m.createOrLookupInputNeuron("START");
+        InputNeuron clock = m.createOrLookupInputNeuron("CLOCK");
+        InputNeuron input = m.createOrLookupInputNeuron("INPUT");
 
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), clock, false, start, true, false);
         Neuron rn = m.createRelationalNeuron(new Neuron("RN"), ctn, input, false);
 
-        InputNeuron aN = m.createOrLookupInputSignal("A");
-        InputNeuron bN = m.createOrLookupInputSignal("B");
-        InputNeuron cN = m.createOrLookupInputSignal("C");
+        InputNeuron aN = m.createOrLookupInputNeuron("A");
+        InputNeuron bN = m.createOrLookupInputNeuron("B");
+        InputNeuron cN = m.createOrLookupInputNeuron("C");
 
         Neuron result = m.createAndNeuron(new Neuron("RESULT"),
                 0.001,
@@ -270,8 +270,8 @@ public class RecurrentPatternTest {
     public void testCTNeuron() {
         Model m = new Model();
 
-        InputNeuron start = m.createOrLookupInputSignal("START");
-        InputNeuron clock = m.createOrLookupInputSignal("CLOCK");
+        InputNeuron start = m.createOrLookupInputNeuron("START");
+        InputNeuron clock = m.createOrLookupInputNeuron("CLOCK");
 
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), clock, false, start, true, false);
 

@@ -16,8 +16,8 @@ public class TestNextWord {
     public void testMatchTheWord() {
         Model m = new Model(1);
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
 
         Neuron abN = m.createAndNeuron(new Neuron("AB"), 0.5,
                 new Input()

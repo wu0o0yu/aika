@@ -41,7 +41,7 @@ public class PropagateRidTest {
         AndNode.minFrequency = 1;
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
         Neuron pA = m.createAndNeuron(new Neuron("pA"),
                 0.001,
                 new Input()

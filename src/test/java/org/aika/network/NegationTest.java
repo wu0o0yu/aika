@@ -44,9 +44,9 @@ public class NegationTest {
     @Test
     public void testTwoNegativeInputs1() {
         Model m = new Model();
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
-        InputNeuron inC = m.createOrLookupInputSignal("C");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
+        InputNeuron inC = m.createOrLookupInputNeuron("C");
 
         Neuron abcN = new Neuron("ABC");
 
@@ -99,11 +99,11 @@ public class NegationTest {
     public void testTwoNegativeInputs2() {
         Model m = new Model();
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
 
-        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
 
-        InputNeuron inC = m.createOrLookupInputSignal("C");
+        InputNeuron inC = m.createOrLookupInputNeuron("C");
 
         Neuron abcN = new Neuron("ABC");
 
@@ -172,11 +172,11 @@ public class NegationTest {
     public void testSimpleNegation1() {
         Model m = new Model();
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
 
         Neuron asN = new Neuron("AS");
 
-        InputNeuron inS = m.createOrLookupInputSignal("S");
+        InputNeuron inS = m.createOrLookupInputNeuron("S");
 
         Neuron outN = m.createOrNeuron(new Neuron("OUT"),
                 new Input()
@@ -239,11 +239,11 @@ public class NegationTest {
     public void testSimpleNegation2() {
         Model m = new Model();
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
 
         Neuron asN = new Neuron("AS");
 
-        InputNeuron inS = m.createOrLookupInputSignal("S");
+        InputNeuron inS = m.createOrLookupInputNeuron("S");
 
         Neuron outN = m.createOrNeuron(new Neuron("OUT"),
                 new Input()
@@ -302,11 +302,11 @@ public class NegationTest {
     public void testSimpleNegation3() {
         Model m = new Model();
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
 
         Neuron asN = new Neuron("AS");
 
-        InputNeuron inS = m.createOrLookupInputSignal("S");
+        InputNeuron inS = m.createOrLookupInputNeuron("S");
 
         Neuron outN = m.createOrNeuron(new Neuron("OUT"),
                 new Input()
@@ -368,8 +368,8 @@ public class NegationTest {
     @Test
     public void testNegation1() {
         Model m = new Model();
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
 
         Neuron asN = new Neuron("AS");
         Neuron absN = new Neuron("ABS");
@@ -480,9 +480,9 @@ public class NegationTest {
     public void testNegation2() {
         Model m = new Model();
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
-        InputNeuron inC = m.createOrLookupInputSignal("C");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
+        InputNeuron inC = m.createOrLookupInputNeuron("C");
 
         Neuron asN = new Neuron("AS");
         Neuron ascN = new Neuron("ASC");
@@ -665,10 +665,10 @@ public class NegationTest {
         Model m = new Model();
         AndNode.minFrequency = 5;
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
         InputNode inANode = (InputNode) inA.node;
 
-        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
         InputNode inBNode = (InputNode) inB.node;
 
 
@@ -708,7 +708,7 @@ public class NegationTest {
         );
 
 
-        InputNeuron inG = m.createOrLookupInputSignal("G");
+        InputNeuron inG = m.createOrLookupInputNeuron("G");
         InputNode inGNode = (InputNode) inG.node;
 
         Neuron pH = m.createAndNeuron(new Neuron("H"),

@@ -57,8 +57,8 @@ public class ActivationOutputsTest {
 
         m.numberOfPositions = 10;
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
 
         Neuron pAB = m.createAndNeuron(new Neuron("pAB"),
                 0.001,
@@ -144,8 +144,8 @@ public class ActivationOutputsTest {
 
         m.numberOfPositions = 10;
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
 
         Neuron pAB = m.createAndNeuron(new Neuron("B-NA", true, false),
                 0.5,
@@ -185,7 +185,7 @@ public class ActivationOutputsTest {
         Model m = new Model();
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
 
         Node outBNode = m.createAndNeuron(new Neuron("B", true, false), 0.001,
                 new Input()
@@ -210,7 +210,7 @@ public class ActivationOutputsTest {
         Model m = new Model();
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
 
         Node outBNode = m.createAndNeuron(new Neuron("B", true, false), 0.001,
                 new Input()
@@ -235,7 +235,7 @@ public class ActivationOutputsTest {
         Model m = new Model();
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
 
         OrNode outBNode = (OrNode) m.createAndNeuron(new Neuron("B", true, false), 0.001,
                 new Input()

@@ -41,7 +41,7 @@ public class CountingTest {
         Model m = new Model();
         AndNode.minFrequency = 0;
 
-        InputNeuron inA = m.createOrLookupInputSignal("inA");
+        InputNeuron inA = m.createOrLookupInputNeuron("inA");
         Neuron outA = m.createAndNeuron(new Neuron("nA"), 0.5,
                 new Input()
                         .setMinInput(0.95)

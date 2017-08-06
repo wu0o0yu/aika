@@ -36,9 +36,9 @@ public class RelationalNeuronTest {
     public void testOutputNode() {
         Model m = new Model();
 
-        InputNeuron in = m.createOrLookupInputSignal("INPUT");
-        InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
-        InputNeuron sn = m.createOrLookupInputSignal("START");
+        InputNeuron in = m.createOrLookupInputNeuron("INPUT");
+        InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
+        InputNeuron sn = m.createOrLookupInputNeuron("START");
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
         Neuron on = m.createRelationalNeuron(new Neuron("ON"), ctn, in, false);
 

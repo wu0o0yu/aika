@@ -41,7 +41,7 @@ public class Model implements Writable {
     public int numberOfThreads = 1;
 
     public int[] lastCleanup;
-    public int[] iterationCounter;
+    public int[] documentCounter;
 
     public Document[] docs;
 
@@ -77,7 +77,7 @@ public class Model implements Writable {
         this.numberOfThreads = numberOfThreads;
 
         lastCleanup = new int[numberOfThreads];
-        iterationCounter = new int[numberOfThreads];
+        documentCounter = new int[numberOfThreads];
         allNodes = new Set[numberOfThreads];
         docs = new Document[numberOfThreads];
 
@@ -95,7 +95,7 @@ public class Model implements Writable {
 
 
     public Document createDocument(String txt, int threadId) {
-        Document doc = new Document(txt, this, threadId, iterationCounter[threadId]++);
+        Document doc = new Document(txt, this, threadId, documentCounter[threadId]++);
 
         if(txt != null) {
             doc.changeNumberOfPositions(doc.length());
@@ -149,12 +149,12 @@ public class Model implements Writable {
 
 
 
-    public InputNeuron createOrLookupInputSignal(String label) {
-        return createOrLookupInputSignal(label, false);
+    public InputNeuron createOrLookupInputNeuron(String label) {
+        return createOrLookupInputNeuron(label, false);
     }
 
 
-    public InputNeuron createOrLookupInputSignal(String label, boolean isBlocked) {
+    public InputNeuron createOrLookupInputNeuron(String label, boolean isBlocked) {
         InputNeuron n = (InputNeuron) labeledNeurons.get(label);
         if(n == null) {
             n = InputNeuron.create(dummyDoc, new InputNeuron(label, isBlocked));

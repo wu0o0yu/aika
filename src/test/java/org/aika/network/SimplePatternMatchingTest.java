@@ -45,7 +45,7 @@ public class SimplePatternMatchingTest {
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            InputNeuron in = m.createOrLookupInputSignal(c + "");
+            InputNeuron in = m.createOrLookupInputNeuron(c + "");
 
             inputNeurons.put(c, in);
         }
@@ -134,9 +134,9 @@ public class SimplePatternMatchingTest {
         Map<Character, Neuron> relNeurons = new HashMap<>();
 
         // The space neuron will be used as clock signal for the recurrent neurons.
-        InputNeuron inSpace = m.createOrLookupInputSignal("SPACE");
+        InputNeuron inSpace = m.createOrLookupInputNeuron("SPACE");
 
-        InputNeuron startSignal = m.createOrLookupInputSignal("START-SIGNAL");
+        InputNeuron startSignal = m.createOrLookupInputNeuron("START-SIGNAL");
 
         Neuron ctNeuron = m.createCounterNeuron(new Neuron("CTN"),
                 inSpace, false,
@@ -146,7 +146,7 @@ public class SimplePatternMatchingTest {
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            InputNeuron in = m.createOrLookupInputSignal(c + "");
+            InputNeuron in = m.createOrLookupInputNeuron(c + "");
             Neuron rn = m.createRelationalNeuron(
                     new Neuron(c + "-RN"),
                     ctNeuron,

@@ -40,8 +40,8 @@ public class EntityResolutionTest {
 
         Model m = new Model();
 
-        InputNeuron wJaguar = m.createOrLookupInputSignal("W-Jaguar");
-        InputNeuron wPuma = m.createOrLookupInputSignal("W-Puma");
+        InputNeuron wJaguar = m.createOrLookupInputNeuron("W-Jaguar");
+        InputNeuron wPuma = m.createOrLookupInputNeuron("W-Puma");
 
         Neuron eJaguar = new Neuron("E-Jaguar");
         Neuron ePuma = new Neuron("E-Puma");
@@ -117,9 +117,9 @@ public class EntityResolutionTest {
 
         Model m = new Model();
 
-        InputNeuron wJaguar = m.createOrLookupInputSignal("W-Jaguar");
-        InputNeuron wPuma = m.createOrLookupInputSignal("W-Puma");
-        InputNeuron wLeopard = m.createOrLookupInputSignal("W-Leopard");
+        InputNeuron wJaguar = m.createOrLookupInputNeuron("W-Jaguar");
+        InputNeuron wPuma = m.createOrLookupInputNeuron("W-Puma");
+        InputNeuron wLeopard = m.createOrLookupInputNeuron("W-Leopard");
 
         Neuron eJaguar = new Neuron("E-Jaguar");
         Neuron ePuma = new Neuron("E-Puma");

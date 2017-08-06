@@ -55,7 +55,7 @@ public class NamedEntityRecognitionTest {
                 "mr.", "jackson", "cook", "was", "born", "in", "new", "york"
         };
         for(String word: words) {
-            InputNeuron in = m.createOrLookupInputSignal("W-" + word);
+            InputNeuron in = m.createOrLookupInputNeuron("W-" + word);
 
             inputNeurons.put(word, in);
         }
@@ -236,8 +236,8 @@ public class NamedEntityRecognitionTest {
         // The following three neurons are used to assign each word activation
         // a relational id (rid). Here, the relational id specifies the
         // word position within the sentence.
-        InputNeuron spaceN = m.createOrLookupInputSignal("SPACE");
-        InputNeuron startSignal = m.createOrLookupInputSignal("START-SIGNAL");
+        InputNeuron spaceN = m.createOrLookupInputNeuron("SPACE");
+        InputNeuron startSignal = m.createOrLookupInputNeuron("START-SIGNAL");
         Neuron ctNeuron = m.createCounterNeuron(new Neuron("RID Counter"),
                 spaceN, // clock signal
                 false, // direction of the clock signal (range end counts)
@@ -260,7 +260,7 @@ public class NamedEntityRecognitionTest {
                 "mr.", "jackson", "cook", "was", "born", "in", "new", "york"
         };
         for(String word: words) {
-            InputNeuron in = m.createOrLookupInputSignal("W-" + word);
+            InputNeuron in = m.createOrLookupInputNeuron("W-" + word);
             Neuron rn = m.createRelationalNeuron(
                     new Neuron("WR-" + word),
                     ctNeuron, // RID Counting neuron

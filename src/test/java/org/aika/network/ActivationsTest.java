@@ -48,7 +48,7 @@ public class ActivationsTest {
         Model m = new Model();
         AndNode.minFrequency = 1;
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
 
         m.createAndNeuron(new Neuron("pA"), 0.001,
                 new Input()
@@ -76,7 +76,7 @@ public class ActivationsTest {
         Assert.assertEquals(Activation.get(doc, pANode, null, new Range(1, 2), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
         Assert.assertEquals(Activation.get(doc, pANode, null, new Range(2, 3), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
 
-        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
 
         m.createAndNeuron(new Neuron("pB"), 0.001,
                 new Input()
@@ -102,7 +102,7 @@ public class ActivationsTest {
         AndNode.minFrequency = 1;
 
 
-        Neuron in = m.createOrLookupInputSignal("A");
+        Neuron in = m.createOrLookupInputNeuron("A");
         InputNode inNode = (InputNode) in.node;
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

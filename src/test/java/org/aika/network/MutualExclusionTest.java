@@ -60,9 +60,9 @@ public class MutualExclusionTest {
         Model m = new Model();
 
         // Create the input neurons for the network.
-        InputNeuron inA = m.createOrLookupInputSignal("IN-A");
-        InputNeuron inB = m.createOrLookupInputSignal("IN-B");
-        InputNeuron inC = m.createOrLookupInputSignal("IN-C");
+        InputNeuron inA = m.createOrLookupInputNeuron("IN-A");
+        InputNeuron inB = m.createOrLookupInputNeuron("IN-B");
+        InputNeuron inC = m.createOrLookupInputNeuron("IN-C");
 
         // Instantiate the suppressing neuron. Its inputs will be added later on.
         Neuron pSuppr = new Neuron("SUPPRESS");

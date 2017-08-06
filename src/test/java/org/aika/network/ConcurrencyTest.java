@@ -40,8 +40,8 @@ public class ConcurrencyTest {
         AndNode.minFrequency = 1;
 
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
 
         Neuron pC = m.createAndNeuron(new Neuron("pC"),
                 0.001,
@@ -64,8 +64,8 @@ public class ConcurrencyTest {
         );
 
 
-        InputNeuron inStart = m.createOrLookupInputSignal("START");
-        InputNeuron inClock = m.createOrLookupInputSignal("CLOCK");
+        InputNeuron inStart = m.createOrLookupInputNeuron("START");
+        InputNeuron inClock = m.createOrLookupInputNeuron("CLOCK");
 
 
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), inClock, false, inStart, true, false);
@@ -122,8 +122,8 @@ public class ConcurrencyTest {
         final Model m = new Model();
         AndNode.minFrequency = 1;
 
-        final InputNeuron inA = m.createOrLookupInputSignal("A");
-        final InputNeuron inB = m.createOrLookupInputSignal("B");
+        final InputNeuron inA = m.createOrLookupInputNeuron("A");
+        final InputNeuron inB = m.createOrLookupInputNeuron("B");
 
         final Neuron pC = m.createAndNeuron(new Neuron("pC"),
                 0.001,

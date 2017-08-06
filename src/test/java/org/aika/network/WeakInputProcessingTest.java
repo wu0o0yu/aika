@@ -37,11 +37,11 @@ public class WeakInputProcessingTest {
     public void testWeakInputProcessing() {
         Model m = new Model();
 
-        InputNeuron strongInput = m.createOrLookupInputSignal("Strong Input");
+        InputNeuron strongInput = m.createOrLookupInputNeuron("Strong Input");
 
-        InputNeuron weakInputA = m.createOrLookupInputSignal("Weak Input A");
-        InputNeuron weakInputB = m.createOrLookupInputSignal("Weak Input B");
-        InputNeuron weakInputC = m.createOrLookupInputSignal("Weak Input C");
+        InputNeuron weakInputA = m.createOrLookupInputNeuron("Weak Input A");
+        InputNeuron weakInputB = m.createOrLookupInputNeuron("Weak Input B");
+        InputNeuron weakInputC = m.createOrLookupInputNeuron("Weak Input C");
 
         Neuron suppr = new Neuron("suppr");
 

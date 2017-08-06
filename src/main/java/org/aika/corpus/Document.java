@@ -36,6 +36,8 @@ import java.util.stream.Collectors;
  * The <code>Document</code> class represents a single document which may be either used for processing a text or as
  * training input. A document consists of the raw text, the interpretations and the activations.
  *
+ * When the document is not needed any more, the method <code>clearActivations<code/> must be called, since Aika only supports a single document per thread and model.
+ *
  * @author Lukas Molzberger
  */
 public class Document implements Comparable<Document> {
@@ -115,8 +117,6 @@ public class Document implements Comparable<Document> {
     };
 
 
-
-
     public Document(String content, Model m, int threadId, long iterationId) {
         this.content = content;
 
@@ -160,17 +160,12 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public String selectedOptionsToString() {
+    public String selectedInterpretationToString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Selected Options:\n");
+        sb.append("Selected Interpretation Nodes:\n");
         sb.append(selectedInterprNode.toString());
         sb.append("\n");
         return sb.toString();
-    }
-
-
-    public boolean contains(Range r) {
-        return r.begin >= 0 && r.end <= length();
     }
 
 
@@ -259,7 +254,9 @@ public class Document implements Comparable<Document> {
         }
     }
 
-
+    /**
+     * Removes the activations of this document from the model again.
+     */
     public void clearActivations() {
         for(Node n: activatedNodes) {
             n.clearActivations(this);
@@ -286,8 +283,6 @@ public class Document implements Comparable<Document> {
     public void changeNumberOfPositions(int delta) {
         numberOfPositionsDelta += delta;
     }
-
-
 
 
     public String networkStateToString(boolean withWeights) {

@@ -37,7 +37,7 @@ public class SelfRefNonRecTest {
 
         Model m = new Model();
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
 
         Neuron bN = new Neuron("B");
         Neuron cN = m.createOrNeuron(new Neuron("C"),

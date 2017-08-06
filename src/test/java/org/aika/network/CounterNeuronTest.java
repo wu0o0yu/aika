@@ -44,8 +44,8 @@ public class CounterNeuronTest {
         System.out.println("Start =====================");
         Model m = new Model();
 
-        InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
-        InputNeuron sn = m.createOrLookupInputSignal("START");
+        InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
+        InputNeuron sn = m.createOrLookupInputNeuron("START");
 
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
 
@@ -96,8 +96,8 @@ public class CounterNeuronTest {
     public void testE() {
         Model m = new Model();
 
-        InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
-        InputNeuron sn = m.createOrLookupInputSignal("START");
+        InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
+        InputNeuron sn = m.createOrLookupInputNeuron("START");
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
@@ -138,8 +138,8 @@ public class CounterNeuronTest {
     public void testReverseDirection() {
         Model m = new Model();
 
-        InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
-        InputNeuron sn = m.createOrLookupInputSignal("START");
+        InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
+        InputNeuron sn = m.createOrLookupInputNeuron("START");
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, false, true);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
@@ -168,8 +168,8 @@ public class CounterNeuronTest {
     public void testStartNode() {
         Model m = new Model();
 
-        InputNeuron sn = m.createOrLookupInputSignal("START");
-        InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
+        InputNeuron sn = m.createOrLookupInputNeuron("START");
+        InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
         Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);

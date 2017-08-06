@@ -34,10 +34,10 @@ public class OptionalAndTest {
     public void testOptionalAnd() {
         Model m = new Model(2);
 
-        InputNeuron wordEssen = m.createOrLookupInputSignal("word:essen");
-        InputNeuron wordHamburg = m.createOrLookupInputSignal("word:hamburg");
-        InputNeuron wordGehen = m.createOrLookupInputSignal("word:gehen");
-        InputNeuron upperCase = m.createOrLookupInputSignal("upper case");
+        InputNeuron wordEssen = m.createOrLookupInputNeuron("word:essen");
+        InputNeuron wordHamburg = m.createOrLookupInputNeuron("word:hamburg");
+        InputNeuron wordGehen = m.createOrLookupInputNeuron("word:gehen");
+        InputNeuron upperCase = m.createOrLookupInputNeuron("upper case");
 
         Neuron suppr = new Neuron("SUPPRESS");
 

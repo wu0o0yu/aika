@@ -54,7 +54,7 @@ public class ModelReadWriteTest {
 
             // Create an input neuron and a recurrent neuron for every letter in this example.
             for (char c : new char[]{'a', 'b', 'c', 'd', 'e'}) {
-                InputNeuron in = m.createOrLookupInputSignal(c + "");
+                InputNeuron in = m.createOrLookupInputNeuron(c + "");
                 inputNeurons.put(c, in.id);
             }
 

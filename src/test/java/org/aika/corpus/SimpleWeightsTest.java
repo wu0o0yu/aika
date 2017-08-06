@@ -35,8 +35,8 @@ public class SimpleWeightsTest {
     public void testWeightsOR() {
         Model m = new Model();
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
 
         Neuron pC = new Neuron("C");
         m.createOrNeuron(pC,
@@ -61,7 +61,7 @@ public class SimpleWeightsTest {
 
             doc.process();
 
-            System.out.println(doc.selectedOptionsToString());
+            System.out.println(doc.selectedInterpretationToString());
             System.out.println(doc.networkStateToString(true, true));
 
             doc.clearActivations();
@@ -74,7 +74,7 @@ public class SimpleWeightsTest {
 
             doc.process();
 
-            System.out.println(doc.selectedOptionsToString());
+            System.out.println(doc.selectedInterpretationToString());
             System.out.println(doc.networkStateToString(true, true));
 
             doc.clearActivations();
@@ -86,8 +86,8 @@ public class SimpleWeightsTest {
     public void testWeightsAND() {
         Model m = new Model();
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
 
         Neuron pC = new Neuron("C");
         m.createAndNeuron(pC,
@@ -114,7 +114,7 @@ public class SimpleWeightsTest {
 
             doc.process();
 
-            System.out.println(doc.selectedOptionsToString());
+            System.out.println(doc.selectedInterpretationToString());
             System.out.println(doc.networkStateToString(true, true));
 
             doc.clearActivations();

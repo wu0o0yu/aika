@@ -43,9 +43,9 @@ public class OrOptionsTest {
 
         AndNode.minFrequency = 5;
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
-        InputNeuron inC = m.createOrLookupInputSignal("C");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
+        InputNeuron inC = m.createOrLookupInputNeuron("C");
 
         Neuron pD = new Neuron("D");
 

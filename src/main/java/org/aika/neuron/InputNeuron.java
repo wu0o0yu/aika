@@ -34,6 +34,7 @@ import static org.aika.corpus.Range.Operator.EQUALS;
 
 
 /**
+ * The <code>InputNeuron</code> class is used to feed information into the neural network. The input neuron has no input synapses. To add or remove input activations simply use the <code>addInput</code> or <code>removeInput</code> methods. An InputNeuron is typically created using the method <code>createOrLookupInputNeuron</code> in the model.
  *
  * @author Lukas Molzberger
  */

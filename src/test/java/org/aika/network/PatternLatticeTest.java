@@ -43,10 +43,10 @@ public class PatternLatticeTest {
     @Test
     public void testPredefinedPatterns() {
         Model m = new Model();
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
-        InputNeuron inC = m.createOrLookupInputSignal("C");
-        InputNeuron inD = m.createOrLookupInputSignal("D");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
+        InputNeuron inC = m.createOrLookupInputNeuron("C");
+        InputNeuron inD = m.createOrLookupInputNeuron("D");
 
         {
             m.createAndNeuron(new Neuron("ABC"),
@@ -262,10 +262,10 @@ public class PatternLatticeTest {
         m.numberOfPositions = 100;
 
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
-        InputNeuron inB = m.createOrLookupInputSignal("B");
-        InputNeuron inC = m.createOrLookupInputSignal("C");
-        InputNeuron inD = m.createOrLookupInputSignal("D");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
+        InputNeuron inC = m.createOrLookupInputNeuron("C");
+        InputNeuron inD = m.createOrLookupInputNeuron("D");
 
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -657,13 +657,13 @@ public class PatternLatticeTest {
         Model m = new Model();
         AndNode.minFrequency = 10;
 
-        InputNeuron inA = m.createOrLookupInputSignal("A");
+        InputNeuron inA = m.createOrLookupInputNeuron("A");
         Node inANode = inA.node;
 
-        InputNeuron inB = m.createOrLookupInputSignal("B");
+        InputNeuron inB = m.createOrLookupInputNeuron("B");
         Node inBNode = inB.node;
 
-        InputNeuron inC = m.createOrLookupInputSignal("C");
+        InputNeuron inC = m.createOrLookupInputNeuron("C");
         Node inCNode = inC.node;
 
         m.createAndNeuron(new Neuron("ABC"),

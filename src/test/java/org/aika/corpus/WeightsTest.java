@@ -52,9 +52,9 @@ public class WeightsTest {
 
         Neuron pSuppr = new Neuron("SUPPR");
 
-        inAA = m.createOrLookupInputSignal("AA");
-        inBA = m.createOrLookupInputSignal("BA");
-        inCA = m.createOrLookupInputSignal("CA");
+        inAA = m.createOrLookupInputNeuron("AA");
+        inBA = m.createOrLookupInputNeuron("BA");
+        inCA = m.createOrLookupInputNeuron("CA");
 
         Neuron pOrA = new Neuron("pOrA");
         m.createOrNeuron(pOrA,
@@ -102,9 +102,9 @@ public class WeightsTest {
         );
 
 
-        inAB = m.createOrLookupInputSignal("AB");
-        inBB = m.createOrLookupInputSignal("BB");
-        inCB = m.createOrLookupInputSignal("CB");
+        inAB = m.createOrLookupInputNeuron("AB");
+        inBB = m.createOrLookupInputNeuron("BB");
+        inCB = m.createOrLookupInputNeuron("CB");
 
         Neuron pOrB = new Neuron("pOrB");
         m.createOrNeuron(pOrB,
