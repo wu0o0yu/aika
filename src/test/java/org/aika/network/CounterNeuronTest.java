@@ -20,7 +20,7 @@ package org.aika.network;
 import org.aika.Activation;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
+import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
@@ -29,13 +29,13 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.aika.neuron.Synapse.RangeMatch.EQUALS;
+import static org.aika.corpus.Range.Operator.EQUALS;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class RecurrentNodeTest {
+public class CounterNeuronTest {
 
 
     @Test
@@ -51,11 +51,11 @@ public class RecurrentNodeTest {
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
-        Option o0 = Option.addPrimitive(doc);
-        Option o1 = Option.addPrimitive(doc);
-        Option o2 = Option.addPrimitive(doc);
-        Option o01 = Option.add(doc, false, o0, o1);
-        Option o012 = Option.add(doc, false, o01, o2);
+        InterprNode o0 = InterprNode.addPrimitive(doc);
+        InterprNode o1 = InterprNode.addPrimitive(doc);
+        InterprNode o2 = InterprNode.addPrimitive(doc);
+        InterprNode o01 = InterprNode.add(doc, false, o0, o1);
+        InterprNode o012 = InterprNode.add(doc, false, o01, o2);
 
         sn.addInput(doc, 0, 1, 0, doc.bottom);
         cn.addInput(doc, 9, 10, o012);
@@ -92,11 +92,6 @@ public class RecurrentNodeTest {
     }
 
 
-    private Activation getAct(Document doc, Node n, Integer rid, Range r, final Option o) {
-        return Activation.select(doc, n, rid, r, EQUALS, EQUALS, null, null).filter(act -> o == null || act.key.o == o).findFirst().orElse(null);
-    }
-
-
     @Test
     public void testE() {
         Model m = new Model();
@@ -109,11 +104,11 @@ public class RecurrentNodeTest {
 
         doc.propagate();
 
-        Option o0 = Option.addPrimitive(doc);
-        Option o1 = Option.addPrimitive(doc);
-        Option o2 = Option.addPrimitive(doc);
-        Option o01 = Option.add(doc, false, o0, o1);
-        Option o012 = Option.add(doc, false, o01, o2);
+        InterprNode o0 = InterprNode.addPrimitive(doc);
+        InterprNode o1 = InterprNode.addPrimitive(doc);
+        InterprNode o2 = InterprNode.addPrimitive(doc);
+        InterprNode o01 = InterprNode.add(doc, false, o0, o1);
+        InterprNode o012 = InterprNode.add(doc, false, o01, o2);
 
 
         sn.addInput(doc, 0, 1, 0, doc.bottom);
@@ -149,11 +144,11 @@ public class RecurrentNodeTest {
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
-        Option o0 = Option.addPrimitive(doc);
-        Option o1 = Option.addPrimitive(doc);
-        Option o2 = Option.addPrimitive(doc);
-        Option o01 = Option.add(doc, false, o0, o1);
-        Option o012 = Option.add(doc, false, o01, o2);
+        InterprNode o0 = InterprNode.addPrimitive(doc);
+        InterprNode o1 = InterprNode.addPrimitive(doc);
+        InterprNode o2 = InterprNode.addPrimitive(doc);
+        InterprNode o01 = InterprNode.add(doc, false, o0, o1);
+        InterprNode o012 = InterprNode.add(doc, false, o01, o2);
 
         sn.addInput(doc, doc.length() - 1, doc.length(), 0, doc.bottom);
         cn.addInput(doc, 19, 20, o0);
@@ -166,59 +161,6 @@ public class RecurrentNodeTest {
         Assert.assertNotNull(getAct(doc, ctn.node, 3, new Range(0, 5), o012));
 
         System.out.println();
-    }
-
-
-    @Test
-    public void testOutputNode() {
-        Model m = new Model();
-
-        InputNeuron in = m.createOrLookupInputSignal("INPUT");
-        InputNeuron cn = m.createOrLookupInputSignal("CLOCK");
-        InputNeuron sn = m.createOrLookupInputSignal("START");
-        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
-        Neuron on = m.createRelationalNeuron(new Neuron("ON"), ctn, in, false);
-
-        Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
-
-
-        Option o0 = Option.addPrimitive(doc);
-        Option o1 = Option.addPrimitive(doc);
-        Option o2 = Option.addPrimitive(doc);
-        Option o01 = Option.add(doc, false, o0, o1);
-        Option o012 = Option.add(doc, false, o01, o2);
-
-        sn.addInput(doc, 0, 1, 0, doc.bottom);
-        cn.addInput(doc, 4, 5, o0);
-        cn.addInput(doc, 19, 20, o0);
-        in.addInput(doc, 10, 11, o0);
-
-        System.out.println(doc.networkStateToString(true, false));
-
-
-        Assert.assertNotNull(getAct(doc, on.node, 1, new Range(5, 20), null));
-
-        cn.addInput(doc, 9, 10, o012);
-
-        System.out.println(doc.networkStateToString(true, false));
-/*
-        Assert.assertNotNull(getAct(doc, on.node, 0, new Range(0, 5), null));
-        Assert.assertNotNull(getAct(doc, on.node, 1, new Range(5, 10), null));
-        Assert.assertNotNull(getAct(doc, on.node, 1, new Range(5, 20), null));
-        Assert.assertNotNull(getAct(doc, on.node, 2, new Range(10, 20), null));
-
-        sn.addInput(doc, 15, 16, o01);
-
-        System.out.println(doc.networkStateToString(true, false));
-
-        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(15, 20), null));
-
-        sn.removeInput(doc, 15, 16, o01);
-
-        System.out.println(doc.networkStateToString(true, false));
-
-        Assert.assertNull(getAct(doc, ctn.node, 0, new Range(15, 20), null));
-*/
     }
 
 
@@ -242,5 +184,10 @@ public class RecurrentNodeTest {
         System.out.println(doc.networkStateToString(true, true));
 
         Assert.assertEquals(5, ctn.node.getActivations(doc).size());
+    }
+
+
+    private Activation getAct(Document doc, Node n, Integer rid, Range r, final InterprNode o) {
+        return Activation.select(doc, n, rid, r, EQUALS, EQUALS, null, null).filter(act -> o == null || act.key.o == o).findFirst().orElse(null);
     }
 }
