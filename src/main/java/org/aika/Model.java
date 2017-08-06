@@ -33,6 +33,11 @@ import java.util.*;
 
 
 /**
+ * The model consists of two layers. The first layer is the actual neural network consisting of neurons and synapses.
+ * The second layer is a pattern lattice containing a boolean logic representation of all the neurons. Whenever the
+ * synapse weights of a neuron are adjusted, then the underlying boolean logic representation of this neuron will be updated too.
+ *
+ * The model supports parallel processing using a fixed number of threads.
  *
  * @author Lukas Molzberger
  */
@@ -67,6 +72,9 @@ public class Model implements Writable {
     public volatile int numberOfPositions;
 
 
+    /**
+     * Creates a model with a single thread.
+     */
     public Model() {
         this(1);
     }

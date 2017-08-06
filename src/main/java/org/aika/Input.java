@@ -22,6 +22,8 @@ import org.aika.neuron.Neuron;
 
 
 /**
+ * The <code>Input</code> class is just a helper class which is used to initialize a neuron. Most of the parameters of this class
+ * will be mapped to a input synapse for this neuron.
  *
  * @author Lukas Molzberger
  */
@@ -138,7 +140,7 @@ public class Input implements Comparable<Input> {
     }
 
     /**
-     * If set to true then the range of this inputs activation needs to match.
+     * If set to true then the range begin of this inputs activation needs to match.
      *
      * @return
      */
@@ -147,6 +149,11 @@ public class Input implements Comparable<Input> {
         return this;
     }
 
+    /**
+     * If set to true then the range end of this inputs activation needs to match.
+     *
+     * @return
+     */
     public Input setEndRangeMatch(Operator rm) {
         this.endRangeMatch = rm;
         return this;
@@ -162,7 +169,7 @@ public class Input implements Comparable<Input> {
 
 
     /**
-     * setRangeMatch is just a convenience function to call both setStartRangeMatch and setEndRangeMatch at the same time.
+     * <code>setRangeMatch</code> is just a convenience function to call both <code>setStartRangeMatch</code> and <code>setEndRangeMatch</code> at the same time.
      *
      * @param rr
      * @return
@@ -190,7 +197,7 @@ public class Input implements Comparable<Input> {
 
 
     /**
-     * setRangeOutput is just a convenience function to call setStartRangeOutput and setEndRangeOutput at the same time.
+     * <code>setRangeOutput</code> is just a convenience function to call <code>setStartRangeOutput</code> and <code>setEndRangeOutput</code> at the same time.
      *
      * @param ro
      * @return
@@ -226,12 +233,28 @@ public class Input implements Comparable<Input> {
     }
 
 
+    /**
+     * Using this method the range end of the input activation might be mapped to the range begin of the
+     * output activation. By default the range begin of the input activation is mapped to the range begin
+     * of the output activation.
+     *
+     * @param startMapping
+     * @return
+     */
     public Input setStartRangeMapping(Mapping startMapping) {
         this.startMapping = startMapping;
         return this;
     }
 
 
+    /**
+     * Using this method the range begin of the input activation might be mapped to the range end of the
+     * output activation. By default the range end of the input activation is mapped to the range end
+     * of the output activation.
+     *
+     * @param endMapping
+     * @return
+     */
     public Input setEndRangeMapping(Mapping endMapping) {
         this.endMapping = endMapping;
         return this;

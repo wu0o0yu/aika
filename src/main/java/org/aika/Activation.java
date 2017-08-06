@@ -75,6 +75,7 @@ public class Activation implements Comparable<Activation> {
     public boolean isQueued = false;
     public long queueId;
 
+
     public Activation(int id, Key key) {
         this.id = id;
         this.key = key;
