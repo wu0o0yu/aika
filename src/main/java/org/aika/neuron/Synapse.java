@@ -30,6 +30,29 @@ import java.io.IOException;
 import java.util.Comparator;
 
 /**
+ * The <code>Synapse</code> class connects two neurons with each other. When propagating an activation signal, the
+ * weight of the synapse is multiplied with the activation value of the input neurons activation. The result is then added
+ * to the output neurons weighted sum to compute the output activation value. In contrast to a conventional neural network
+ * in Aika synapses do not just propagate the activation value from one neuron to the next, but also structural information
+ * like the text range and the relational id (e.g. word position) and also the interpretation to which the input
+ * activation belongs. To determine in which way the structural information should be propagated synapses in Aika posses
+ * a few more properties.
+ *
+ * The properties <code>relativeRid</code> and <code>absoluteRid</code> determine either the relative difference between
+ * the rid of the input activation and the rid of the output activation or require a fixed rid as input.
+ *
+ * The properties range match, range mapping and range output manipulate the ranges. The range match determines whether
+ * the input range begin or end is required to be equal, greater than or less than the range of the output activation.
+ * The range mapping can be used to map for example an input range end to an output range begin. Usually this simply maps
+ * begin to begin and end to end. The range output property is a boolean flag which determines whether the input range
+ * should be propagated to the output activation.
+ *
+ * Furthermore, the property <code>isRecurrent</code> specifies if this synapse is a recurrent feedback link. Recurrent
+ * feedback links can be either negative or positive depending on the weight of the synapse. Recurrent feedback links
+ * kind of allow to use future information as inputs of a current neuron. Aika allows this by making assumptions about
+ * the recurrent input neuron. The class <code>SearchNode</code> modifies these assumptions until the best interpretation
+ * for this document is found.
+ *
  *
  * @author Lukas Molzberger
  */
