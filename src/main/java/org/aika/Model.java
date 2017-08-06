@@ -156,8 +156,12 @@ public class Model implements Writable {
     }
 
 
-
-
+    /**
+     * Creates an <code>InputNeuron</code> with the given label.
+     *
+     * @param label
+     * @return
+     */
     public InputNeuron createOrLookupInputNeuron(String label) {
         return createOrLookupInputNeuron(label, false);
     }
@@ -173,16 +177,26 @@ public class Model implements Writable {
     }
 
 
+    /**
+     * Creates a neuron representing a conjunction of its inputs. This is just a convenience method to automatically
+     * compute the bias.
+     *
+     * @param n
+     * @param threshold A value between 0 and 1, determining how sensitive the resulting neuron will be.
+     * @param inputs
+     * @return
+     */
     public Neuron createAndNeuron(Neuron n, double threshold, Input... inputs) {
         return createAndNeuron(n, threshold, new TreeSet<>(Arrays.asList(inputs)));
     }
 
 
     /**
-     * Creates a neuron representing a conjunction of its inputs.
+     * Creates a neuron representing a conjunction of its inputs. This is just a convenience method to automatically
+     * compute the bias.
      *
      * @param n
-     * @param threshold
+     * @param threshold A value between 0 and 1, determining how sensitive the resulting neuron will be.
      * @param inputs
      * @return
      */
@@ -226,11 +240,27 @@ public class Model implements Writable {
     }
 
 
+    /**
+     * Creates a neuron with the given bias.
+     *
+     * @param n
+     * @param bias
+     * @param inputs
+     * @return
+     */
     public Neuron createNeuron(Neuron n, double bias, Input... inputs) {
         return createNeuron(n, bias, new TreeSet<>(Arrays.asList(inputs)));
     }
 
 
+    /**
+     * Creates a neuron with the given bias.
+     *
+     * @param n
+     * @param bias
+     * @param inputs
+     * @return
+     */
     public Neuron createNeuron(Neuron n, double bias, Collection<Input> inputs) {
         n.m = this;
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
@@ -260,13 +290,22 @@ public class Model implements Writable {
     }
 
 
+    /**
+     * Creates a neuron representing a disjunction of its inputs. This is just a convenience method to automatically
+     * compute the bias.
+     *
+     * @param n
+     * @param inputs
+     * @return
+     */
     public Neuron createOrNeuron(Neuron n, Input... inputs) {
         return createOrNeuron(n, new TreeSet<>(Arrays.asList(inputs)));
     }
 
 
     /**
-     * Creates a neuron representing a disjunction of its inputs.
+     * Creates a neuron representing a disjunction of its inputs. This is just a convenience method to automatically
+     * compute the bias.
      *
      * @param n
      * @param inputs
@@ -291,7 +330,7 @@ public class Model implements Writable {
 
 
     /**
-     * A relational neuron combines the relational id created by a cycle neuron with an input signal.
+     * A relational neuron combines the relational id created by a counter neuron with an input signal.
      *
      * @param n
      * @param ctn

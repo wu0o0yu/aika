@@ -35,6 +35,17 @@ import java.util.stream.Stream;
 import static org.aika.corpus.Range.Operator.*;
 
 /**
+ * The <code>Activation</code> class is the most central class in Aika. On the one hand it stores the activation value
+ * for a given neuron in the <code>State</code> substructure. On the other hand it specifies where this activation is
+ * located within the document and to which interpretation it belongs. The <code>Activation.Key</code> therefore
+ * consists of the logic node to which this activation belongs. If this logic node is an or-node, then this activation
+ * automatically also belongs to the neuron as well. Furthermore, the key contains the char range within the document
+ * and the relational id (rid). The relational id might be used to store the word pos for instance. Lastly, the key
+ * contain the interpretation node of this activation, specifying to which interpretation this activation belongs.
+ *
+ * The activations are linked to each other on two levels. The fields <code>inputs</code> and <code>outputs</code>
+ * contain the activation links within the logic layer. The fields <code>neuronInputs</code> and
+ * <code>neuronOutputs</code> contain the links on the neural layer.
  *
  * @author Lukas Molzberger
  */
