@@ -46,8 +46,11 @@ public class Input implements Comparable<Input> {
 
 
     /**
-     * If recurrent is set to true, then this input will describe an feedback loop.
-     * The input neuron may depend on the output of this neuron.
+     * The property <code>recurrent</code> specifies if input is a recurrent feedback link. Recurrent
+     * feedback links can be either negative or positive depending on the weight of the synapse. Recurrent feedback links
+     * kind of allow to use future information as inputs of a current neuron. Aika allows this by making assumptions about
+     * the recurrent input neuron. The class <code>SearchNode</code> modifies these assumptions until the best interpretation
+     * for this document is found.
      *
      * @param recurrent
      * @return
@@ -59,7 +62,7 @@ public class Input implements Comparable<Input> {
 
     /**
      * If optional is set to true, then this input is an optional part of a conjunction.
-     * This is only used for the method createAndNeuron.
+     * This parameter is only used as input for the method <code>createAndNeuron</code>.
      *
      * @param optional
      * @return

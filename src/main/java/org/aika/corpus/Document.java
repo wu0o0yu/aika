@@ -184,6 +184,9 @@ public class Document implements Comparable<Document> {
     }
 
 
+    /**
+     * The method <code>process</code> needs to be called after all the input activations have been added to the network.
+     */
     public void process() {
         for(Activation act: inputNeuronActivations) {
             vQueue.propagateWeight(0, act, Activation.visitedCounter++);

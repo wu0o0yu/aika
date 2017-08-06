@@ -34,7 +34,13 @@ import static org.aika.corpus.Range.Operator.EQUALS;
 
 
 /**
- * The <code>InputNeuron</code> class is used to feed information into the neural network. The input neuron has no input synapses. To add or remove input activations simply use the <code>addInput</code> or <code>removeInput</code> methods. An InputNeuron is typically created using the method <code>createOrLookupInputNeuron</code> in the model.
+ * The <code>InputNeuron</code> class is used to feed information into the neural network. The input neuron has no
+ * input synapses. To add or remove input activations simply use the <code>addInput</code> or <code>removeInput</code>
+ * methods. An InputNeuron is typically created using the method <code>createOrLookupInputNeuron</code> in the model.
+ * By adding an input activation using <code>addInput</code> further activations will be created for this document
+ * depending on the network topology. In fact a whole network of neuron activations will be created containing activation
+ * objects for all possible interpretations of these inputs. The activations reflect the structure of the activated
+ * part of the neural network.
  *
  * @author Lukas Molzberger
  */
@@ -86,27 +92,70 @@ public class InputNeuron extends Neuron {
     }
 
 
+    /**
+     * Propagate an input activation into the network.
+     *
+     * @param doc The current document
+     * @param begin The range begin
+     * @param end The range end
+     */
     public void addInput(Document doc, int begin, int end) {
         addInput(doc, begin, end, null, doc.bottom);
     }
 
 
+    /**
+     * Propagate an input activation into the network.
+     *
+     * @param doc The current document
+     * @param begin The range begin
+     * @param end The range end
+     * @param o The interpretation node
+     */
     public void addInput(Document doc, int begin, int end, InterprNode o) {
         addInput(doc, begin, end, null, o);
     }
 
 
+    /**
+     * Propagate an input activation into the network.
+     *
+     * @param doc The current document
+     * @param begin The range begin
+     * @param end The range end
+     * @param rid The relational id (e.g. the word position)
+     */
     public void addInput(Document doc, int begin, int end, Integer rid) {
         addInput(doc, begin, end, rid, doc.bottom);
     }
 
 
+    /**
+     * Propagate an input activation into the network.
+     *
+     * @param doc The current document
+     * @param begin The range begin
+     * @param end The range end
+     * @param rid The relational id (e.g. the word position)
+     * @param o The interpretation node
+     */
     public void addInput(Document doc, int begin, int end, Integer rid, InterprNode o) {
         Node.addActivationAndPropagate(doc, new Activation.Key(node, new Range(begin, end), rid, o), Collections.emptySet());
 
         doc.propagate();
     }
 
+
+    /**
+     * Propagate an input activation into the network.
+     *
+     * @param doc The current document
+     * @param begin The range begin
+     * @param end The range end
+     * @param rid The relational id (e.g. the word position)
+     * @param o The interpretation node
+     * @param value The activation value of this input activation
+     */
     public void addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value) {
         Range r = new Range(begin, end);
         Node.addActivationAndPropagate(doc, new Activation.Key(node, r, rid, o), Collections.emptySet());

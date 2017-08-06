@@ -42,6 +42,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
+ * The <code>Neuron</code> class represents a neuron in Aikas neural network and is connected to other neurons through
+ * input synapses and output synapses. The activation value of a neuron is calculated by computing the weighted sum
+ * (input act. value * synapse weight) of the input synapses, adding the bias to it and sending the resulting value
+ * through a transfer function (the upper part of tanh).
+ *
+ * The neuron does not store its activations by itself. The activation objects are stored within the
+ * logic nodes. To access the activations of this neuron simply use the member variable <code>node</code>.
  *
  * @author Lukas Molzberger
  */
