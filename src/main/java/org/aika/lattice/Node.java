@@ -46,6 +46,18 @@ import static org.aika.corpus.Range.Mapping.START;
 
 
 /**
+ * The <code>Node</code> class is the abstract class for all the boolean logic nodes underneath the neural network layer.
+ * These nodes form a boolean representation for all the neurons of the neural network. Whenever changes occur to the
+ * synapse weights in the neural layer, then the structure of the boolean representation needs to be adjusted. Several
+ * neurons, however, might share common substructures in this boolean representation. The <code>InputNode</code> and
+ * the <code>AndNode</code> classes together form a pattern lattice, containing all possible substructures of any
+ * given conjunction. For example if we have the conjunction ABCD where A, B, C, D are the inputs then the
+ * pattern lattice will contain the nodes ABCD, ABC, ABD, ACD, BCD, AB, AC, AD, BC, BD, CD, A, B, C, D. The class
+ * <code>OrNode</code> is a disjunction of either input-nodes or and-nodes. The or-node is connected with one of
+ * the neurons.
+ *
+ * Each logic node has a set of activations. The activations are stored in the thread local data structure
+ * <code>ThreadState</code>.
  *
  * @author Lukas Molzberger
  */

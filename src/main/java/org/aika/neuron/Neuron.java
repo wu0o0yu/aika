@@ -48,7 +48,8 @@ import java.util.stream.Collectors;
  * through a transfer function (the upper part of tanh).
  *
  * The neuron does not store its activations by itself. The activation objects are stored within the
- * logic nodes. To access the activations of this neuron simply use the member variable <code>node</code>.
+ * logic nodes. To access the activations of this neuron simply use the member variable <code>node</code> or use
+ * the method <code>getFinalActivations(Document doc)</code> to ge the final activations of this neuron.
  *
  * @author Lukas Molzberger
  */
@@ -600,6 +601,14 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
+    /**
+     * <code>getFinalActivations</code> is a convenience method to retrieve all activations of the given neuron that
+     * are part of the final interpretation. Before calling this method, the <code>doc.process()</code> needs to
+     * be called first.
+     *
+     * @param doc The current document
+     * @return A collection with all final activations of this neuron.
+     */
     public Collection<Activation> getFinalActivations(Document doc) {
         return Activation.select(doc, node, null, null, null, null, null, null)
                 .filter(act -> act.finalState != null && act.finalState.value > 0.0)
