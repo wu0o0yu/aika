@@ -33,9 +33,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * The <code>Document</code> class represents a single document which may be either used as processing input or
- * training input. The <code>Document</code> class contains the actual text, the option lattice containing
- * all the possible interpretations of this document.
+ * The <code>Document</code> class represents a single document which may be either used for processing a text or as
+ * training input. A document consists of the raw text, the interpretations and the activations.
  *
  * @author Lukas Molzberger
  */
@@ -56,14 +55,14 @@ public class Document implements Comparable<Document> {
 
     private String content;
 
-    public int optionIdCounter = 1;
-    public int expandNodeIdCounter = 0;
+    public int interprIdCounter = 1;
+    public int searchNodeIdCounter = 0;
 
-    public Option bottom = new Option(this, -1, 0, 0);
+    public InterprNode bottom = new InterprNode(this, -1, 0, 0);
 
-    public ExpandNode root = ExpandNode.createInitialExpandNode(this);
-    public ExpandNode selectedExpandNode = null;
-    public List<Option> selectedOption = null;
+    public SearchNode root = SearchNode.createInitialExpandNode(this);
+    public SearchNode selectedSearchNode = null;
+    public List<InterprNode> selectedInterprNode = null;
     public long selectedMark = -1;
 
 
@@ -148,12 +147,12 @@ public class Document implements Comparable<Document> {
 
 
     public String conflictsToString() {
-        HashSet<Option> conflicts = new HashSet<>();
-        bottom.collectConflicts(conflicts, Option.visitedCounter++);
+        HashSet<InterprNode> conflicts = new HashSet<>();
+        bottom.collectConflicts(conflicts, InterprNode.visitedCounter++);
 
         StringBuilder sb = new StringBuilder();
         sb.append("Conflicts:\n");
-        for(Option n: conflicts) {
+        for(InterprNode n: conflicts) {
             sb.append(n.conflicts.primaryToString());
         }
         sb.append("\n");
@@ -164,7 +163,7 @@ public class Document implements Comparable<Document> {
     public String selectedOptionsToString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Selected Options:\n");
-        sb.append(selectedOption.toString());
+        sb.append(selectedInterprNode.toString());
         sb.append("\n");
         return sb.toString();
     }
@@ -301,17 +300,17 @@ public class Document implements Comparable<Document> {
 
         if(neuronsOnly) {
             for (Neuron n : m.neurons.values()) {
-                acts.addAll(Activation.select(this, n.node, null, null, null, null, null, Option.Relation.CONTAINED_IN).collect(Collectors.toList()));
+                acts.addAll(Activation.select(this, n.node, null, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
             }
         } else {
             if(m.initialNodes != null) {
                 for (Node n : m.initialNodes.values()) {
-                    acts.addAll(Activation.select(this, n, null, null, null, null, null, Option.Relation.CONTAINED_IN).collect(Collectors.toList()));
+                    acts.addAll(Activation.select(this, n, null, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
                 }
             }
             for(int th = 0; th < m.numberOfThreads; th++) {
                 for (Node n : m.allNodes[th]) {
-                    acts.addAll(Activation.select(this, n, null, null, null, null, null, Option.Relation.CONTAINED_IN).collect(Collectors.toList()));
+                    acts.addAll(Activation.select(this, n, null, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
                 }
             }
         }
@@ -462,15 +461,15 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public Neuron.NormWeight adjustWeight(ExpandNode cand, List<Option> changed) {
+        public Neuron.NormWeight adjustWeight(SearchNode cand, List<InterprNode> changed) {
             long v = Activation.visitedCounter++;
 
-            for(Option n: changed) {
+            for(InterprNode n: changed) {
                 addAllActs(n.getNeuronActivations(), v);
 
                 // Does not need to be expanded recursively, because the activation will be propagated anyway.
-                if(n.refByOrOption != null) {
-                    for (Option on: n.refByOrOption) {
+                if(n.refByOrInterprNode != null) {
+                    for (InterprNode on: n.refByOrInterprNode) {
                         addAllActs(on.getNeuronActivations(), v);
                     }
                 }
@@ -494,7 +493,7 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public Neuron.NormWeight processChanges(ExpandNode en, long v) {
+        public Neuron.NormWeight processChanges(SearchNode en, long v) {
             Neuron.NormWeight delta = Neuron.NormWeight.ZERO_WEIGHT;
             while(!queue.isEmpty()) {
                 VEntry e = queue.pollFirst();
@@ -509,13 +508,13 @@ public class Document implements Comparable<Document> {
                 }
 
                 if(round == 0 || !act.rounds.get(round).equalsWithWeights(s)) {
-                    ExpandNode.StateChange.saveOldState(en.modifiedActs, act, v);
+                    SearchNode.StateChange.saveOldState(en.modifiedActs, act, v);
 
                     Activation.State oldState = act.rounds.get(round);
 
                     boolean propagate = act.rounds.set(round, s);
 
-                    ExpandNode.StateChange.saveNewState(act);
+                    SearchNode.StateChange.saveNewState(act);
 
                     if(propagate) {
                         propagateWeight(round, act, v);

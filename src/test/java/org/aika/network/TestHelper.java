@@ -19,10 +19,10 @@ package org.aika.network;
 
 import org.aika.Activation;
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
+import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
-import org.aika.corpus.Range.Signal;
+import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.Neuron;
@@ -32,8 +32,8 @@ import java.util.Collections;
 import java.util.Set;
 
 import static org.aika.corpus.Range.Operator.*;
-import static org.aika.corpus.Range.Signal.END;
-import static org.aika.corpus.Range.Signal.START;
+import static org.aika.corpus.Range.Mapping.END;
+import static org.aika.corpus.Range.Mapping.START;
 
 /**
  *
@@ -50,12 +50,12 @@ public class TestHelper {
     public static Activation addActivationAndPropagate(Document doc, Activation.Key ak, Set<Activation> inputActs) {
         Node.addActivationAndPropagate(doc, ak, inputActs);
         doc.propagate();
-        return Activation.get(doc, ak.n, ak.rid, ak.r, LESS_THAN, GREATER_THAN, ak.o, Option.Relation.EQUALS);
+        return Activation.get(doc, ak.n, ak.rid, ak.r, LESS_THAN, GREATER_THAN, ak.o, InterprNode.Relation.EQUALS);
     }
 
 
     public static void removeActivationAndPropagate(Document doc, Activation.Key ak) {
-        Activation act = Activation.get(doc, ak.n, 0, ak.r, EQUALS, EQUALS, ak.o, Option.Relation.EQUALS);
+        Activation act = Activation.get(doc, ak.n, 0, ak.r, EQUALS, EQUALS, ak.o, InterprNode.Relation.EQUALS);
         removeActivationAndPropagate(doc, act);
     }
 
@@ -70,7 +70,7 @@ public class TestHelper {
         in.addActivation(doc, inputAct);
         doc.propagate();
         if(in instanceof InputNode) {
-            return Activation.get(doc, in, inputAct.key.rid, inputAct.key.r, LESS_THAN, GREATER_THAN, inputAct.key.o, Option.Relation.EQUALS);
+            return Activation.get(doc, in, inputAct.key.rid, inputAct.key.r, LESS_THAN, GREATER_THAN, inputAct.key.o, InterprNode.Relation.EQUALS);
         }
         return null;
     }
@@ -87,11 +87,11 @@ public class TestHelper {
     }
 
 
-    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Signal startSignal, boolean startRangeOutput, Operator endRangeMatch, Signal endSignal, boolean endRangeOutput) {
-        return InputNode.add(doc, new Synapse.Key(false, false, relativeRid, absoluteRid, startRangeMatch, startSignal, startRangeOutput, endRangeMatch, endSignal, endRangeOutput), n);
+    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Mapping startMapping, boolean startRangeOutput, Operator endRangeMatch, Mapping endMapping, boolean endRangeOutput) {
+        return InputNode.add(doc, new Synapse.Key(false, false, relativeRid, absoluteRid, startRangeMatch, startMapping, startRangeOutput, endRangeMatch, endMapping, endRangeOutput), n);
     }
 
-    public static Activation get(Document doc, Node n, Range r, Option o) {
-        return Activation.get(doc, n, null, r, LESS_THAN, GREATER_THAN, o, Option.Relation.EQUALS);
+    public static Activation get(Document doc, Node n, Range r, InterprNode o) {
+        return Activation.get(doc, n, null, r, LESS_THAN, GREATER_THAN, o, InterprNode.Relation.EQUALS);
     }
 }

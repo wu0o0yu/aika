@@ -31,7 +31,7 @@ public class Conflicts {
     public Map<Key, Conflict> secondary = new TreeMap<>();
 
 
-    public static void collectDirectConflicting(Collection<Option> results, Option n) {
+    public static void collectDirectConflicting(Collection<InterprNode> results, InterprNode n) {
         for(Conflict c: n.conflicts.primary.values()) {
             results.add(c.secondary);
         }
@@ -41,25 +41,25 @@ public class Conflicts {
     }
 
 
-    public static void collectAllConflicting(Collection<Option> results, Option n, long v) {
+    public static void collectAllConflicting(Collection<InterprNode> results, InterprNode n, long v) {
         if(n.visitedCollectAllConflicting == v) return;
         n.visitedCollectAllConflicting = v;
 
         collectDirectConflicting(results, n);
 
-        for(Option pn: n.parents) {
+        for(InterprNode pn: n.parents) {
             collectAllConflicting(results, pn, v);
         }
 
-        // TODO: consider orOptions.size() == 1
+        // TODO: consider orInterprNodes.size() == 1
     }
 
 
-    public static void add(Document doc, Activation act, Option primary, Option secondary) {
+    public static void add(Document doc, Activation act, InterprNode primary, InterprNode secondary) {
         Key ck = new Key(secondary, act);
         Conflict c = primary.conflicts.primary.get(ck);
         if(c == null) {
-            c = new Conflict(act, primary, secondary, Option.add(primary.doc, false, primary, secondary));
+            c = new Conflict(act, primary, secondary, InterprNode.add(primary.doc, false, primary, secondary));
 
             primary.countRef();
             secondary.countRef();
@@ -70,12 +70,12 @@ public class Conflicts {
             primary.conflicts.primary.put(ck, c);
             secondary.conflicts.secondary.put(new Key(primary, act), c);
 
-            c.conflict.removeActivationsRecursiveStep(doc, c.conflict, Option.visitedCounter++);
+            c.conflict.removeActivationsRecursiveStep(doc, c.conflict, InterprNode.visitedCounter++);
         }
     }
 
 
-    public static void remove(Document doc, Activation act, Option primary, Option secondary) {
+    public static void remove(Document doc, Activation act, InterprNode primary, InterprNode secondary) {
         Key ck = new Key(secondary, act);
 
         Conflict c = primary.conflicts.primary.get(ck);
@@ -85,7 +85,7 @@ public class Conflicts {
         secondary.conflicts.secondary.remove(new Key(primary, act));
         c.conflict.isConflict--;
 
-        c.conflict.expandActivationsRecursiveStep(doc, c.conflict, Option.visitedCounter++);
+        c.conflict.expandActivationsRecursiveStep(doc, c.conflict, InterprNode.visitedCounter++);
 
         removeInternal(c);
     }
@@ -137,12 +137,12 @@ public class Conflicts {
 
     public static class Conflict {
         public Activation act;
-        public Option primary;
-        public Option secondary;
-        public Option conflict;
+        public InterprNode primary;
+        public InterprNode secondary;
+        public InterprNode conflict;
 
 
-        public Conflict(Activation act, Option primary, Option secondary, Option conflict) {
+        public Conflict(Activation act, InterprNode primary, InterprNode secondary, InterprNode conflict) {
             this.act = act;
             this.primary = primary;
             this.secondary = secondary;
@@ -152,10 +152,10 @@ public class Conflicts {
 
 
     public static class Key implements Comparable<Key> {
-        public Option o;
+        public InterprNode o;
         public Activation act;
 
-        public Key(Option o, Activation act) {
+        public Key(InterprNode o, Activation act) {
             this.o = o;
             this.act = act;
         }

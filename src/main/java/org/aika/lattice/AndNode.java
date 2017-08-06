@@ -22,7 +22,7 @@ import org.aika.Activation.Key;
 import org.aika.Model;
 import org.aika.Utils;
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
+import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.neuron.Neuron;
@@ -80,7 +80,7 @@ public class AndNode extends Node {
 
 
     @Override
-    public boolean isAllowedOption(Document doc, Option n, Activation act, long v) {
+    public boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v) {
         ThreadState th = getThreadState(doc, true);
         if(th.visitedAllowedOption == v) return false;
         th.visitedAllowedOption = v;
@@ -114,7 +114,7 @@ public class AndNode extends Node {
     }
 
 
-    public void propagateAddedActivation(Document doc, Activation act, Option removedConflict) {
+    public void propagateAddedActivation(Document doc, Activation act, InterprNode removedConflict) {
         apply(doc, act, removedConflict);
     }
 
@@ -230,7 +230,7 @@ public class AndNode extends Node {
 
 
     @Override
-    public void apply(Document doc, Activation act, Option removedConflict) {
+    public void apply(Document doc, Activation act, InterprNode removedConflict) {
 
         // Check if the activation has been deleted in the meantime.
         if(act.isRemoved) {
@@ -373,10 +373,10 @@ public class AndNode extends Node {
     }
 
 
-    public static void addNextLevelActivation(Document doc, Activation act, Activation secondAct, AndNode nlp, Option conflict) {
+    public static void addNextLevelActivation(Document doc, Activation act, Activation secondAct, AndNode nlp, InterprNode conflict) {
         // TODO: check if the activation already exists
         Key ak = act.key;
-        Option o = Option.add(doc, true, ak.o, secondAct.key.o);
+        InterprNode o = InterprNode.add(doc, true, ak.o, secondAct.key.o);
         if (o != null && (conflict == null || o.contains(conflict, false))) {
             nlp.addActivation(
                     doc,

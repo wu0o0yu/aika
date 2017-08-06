@@ -21,10 +21,10 @@ import org.aika.Activation;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
+import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
-import org.aika.corpus.Range.Signal;
+import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.neuron.InputNeuron;
@@ -60,7 +60,7 @@ public class ActivationsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, Operator.LESS_THAN, Signal.START, true, Operator.GREATER_THAN, Signal.END, true);
+        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, Operator.LESS_THAN, Mapping.START, true, Operator.GREATER_THAN, Mapping.END, true);
 
 
         inA.addInput(doc, 0, 1, 0);
@@ -72,9 +72,9 @@ public class ActivationsTest {
 
         inA.addInput(doc, 1, 2);
 
-        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(0, 1), EQUALS, EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(0, 1), doc.bottom));
-        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(1, 2), EQUALS, EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
-        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(2, 3), EQUALS, EQUALS, doc.bottom, Option.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
+        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(0, 1), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(0, 1), doc.bottom));
+        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(1, 2), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
+        Assert.assertEquals(Activation.get(doc, pANode, null, new Range(2, 3), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
 
         InputNeuron inB = m.createOrLookupInputSignal("B");
 
@@ -85,7 +85,7 @@ public class ActivationsTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
         );
-        InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, Operator.LESS_THAN, Signal.START, true, Operator.GREATER_THAN, Signal.END, true);
+        InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, Operator.LESS_THAN, Mapping.START, true, Operator.GREATER_THAN, Mapping.END, true);
 
         inB.addInput(doc, 0, 1);
         inB.addInput(doc, 1, 2);

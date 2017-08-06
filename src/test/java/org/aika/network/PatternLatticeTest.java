@@ -277,7 +277,7 @@ public class PatternLatticeTest {
         InputNode pDNode = TestHelper.addOutputNode(doc, inD, 0, null);
 
 
-        doc.selectedOption = Arrays.asList(doc.bottom);
+        doc.selectedInterprNode = Arrays.asList(doc.bottom);
         doc.train();
 
         inA.addInput(doc, 0, 1, 0);

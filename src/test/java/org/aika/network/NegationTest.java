@@ -22,7 +22,7 @@ import org.aika.Input;
 import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
+import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
@@ -79,13 +79,13 @@ public class NegationTest {
         System.out.println(doc.networkStateToString(true, true));
         Assert.assertNotNull(Activation.get(doc, abcN.node, null, new Range(0, 11), EQUALS, EQUALS, null, null));
 
-        Option o1 = Option.addPrimitive(doc);
+        InterprNode o1 = InterprNode.addPrimitive(doc);
 
         inB.addInput(doc, 2, 7, o1);
 
         System.out.println(doc.networkStateToString(true, true));
 
-        Option o2 = Option.addPrimitive(doc);
+        InterprNode o2 = InterprNode.addPrimitive(doc);
 
         inC.addInput(doc, 4, 9, o2);
 
@@ -144,12 +144,12 @@ public class NegationTest {
 
         System.out.println(doc.networkStateToString(true, true));
 
-        Option ob = Option.addPrimitive(doc);
+        InterprNode ob = InterprNode.addPrimitive(doc);
         inB.addInput(doc, 2, 7, ob);
 
         System.out.println(doc.networkStateToString(true, true));
 
-        Option oc = Option.addPrimitive(doc);
+        InterprNode oc = InterprNode.addPrimitive(doc);
         inC.addInput(doc, 4, 9, oc);
 
         System.out.println(doc.networkStateToString(true, true));
@@ -208,7 +208,7 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        Option o = Option.addPrimitive(doc);
+        InterprNode o = InterprNode.addPrimitive(doc);
 
         inS.addInput(doc, 3, 8, o);
 
@@ -275,7 +275,7 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        Option o = Option.addPrimitive(doc);
+        InterprNode o = InterprNode.addPrimitive(doc);
 
         inS.addInput(doc, 3, 8, o);
 
@@ -338,7 +338,7 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        Option o = Option.addPrimitive(doc);
+        InterprNode o = InterprNode.addPrimitive(doc);
 
         inA.addInput(doc, 0, 11);
 
@@ -450,7 +450,7 @@ public class NegationTest {
             System.out.println(doc.networkStateToString(true, true));
 
             Assert.assertNotNull(Activation.get(doc, inS.node, null, new Range(0, 6), EQUALS, EQUALS, null, null));
-            Assert.assertEquals(2, Activation.get(doc, inS.node, null, new Range(0, 6), EQUALS, EQUALS, null, null).key.o.orOptions.size());
+            Assert.assertEquals(2, Activation.get(doc, inS.node, null, new Range(0, 6), EQUALS, EQUALS, null, null).key.o.orInterprNodes.size());
 
             doc.clearActivations();
         }
@@ -467,9 +467,9 @@ public class NegationTest {
 
 //            Assert.assertNotNull(Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
             Assert.assertNotNull(Activation.get(doc, inS.node, null, new Range(0, 9), EQUALS, EQUALS, null, null));
-//            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.o.orOptions.size());
-            Assert.assertEquals(1, Activation.get(doc, inS.node, null, new Range(0, 6), EQUALS, EQUALS, null, null).key.o.orOptions.size());
-            Assert.assertEquals(1, Activation.get(doc, inS.node, null, new Range(0, 9), EQUALS, EQUALS, null, null).key.o.orOptions.size());
+//            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.o.orInterprNodes.size());
+            Assert.assertEquals(1, Activation.get(doc, inS.node, null, new Range(0, 6), EQUALS, EQUALS, null, null).key.o.orInterprNodes.size());
+            Assert.assertEquals(1, Activation.get(doc, inS.node, null, new Range(0, 9), EQUALS, EQUALS, null, null).key.o.orInterprNodes.size());
 
             doc.clearActivations();
         }

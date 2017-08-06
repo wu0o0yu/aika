@@ -22,7 +22,7 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Conflicts.Conflict;
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
+import org.aika.corpus.InterprNode;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
@@ -157,11 +157,11 @@ public class MutualExclusionTest {
         // Computes the selected option
         doc.process();
 
-        System.out.println("Selected Option: " + doc.selectedOption);
+        System.out.println("Selected Option: " + doc.selectedInterprNode);
         System.out.println();
 
         System.out.println("Show all conflicts with the selected option:");
-        for(Option so: doc.selectedOption) {
+        for(InterprNode so: doc.selectedInterprNode) {
             for(Conflict c: so.conflicts.primary.values()) {
                 System.out.println(c.conflict);
             }

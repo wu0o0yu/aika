@@ -23,7 +23,7 @@ import org.aika.Model;
 import org.aika.Utils;
 import org.aika.Writable;
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
+import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.Neuron;
@@ -75,7 +75,7 @@ public class OrNode extends Node {
 
 
     @Override
-    public boolean isAllowedOption(Document doc, Option n, Activation act, long v) {
+    public boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v) {
         return false;
     }
 
@@ -135,7 +135,7 @@ public class OrNode extends Node {
 
         if(inputs.isEmpty()) return;
 
-        Option no = lookupOrOption(doc, r, true);
+        InterprNode no = lookupOrOption(doc, r, true);
 
         for(Activation iAct: inputs) {
             no.addOrOption(iAct, iAct.key.o);
@@ -168,13 +168,13 @@ public class OrNode extends Node {
 
 
     private boolean checkSelfReferencing(Document doc, Activation inputAct) {
-        Option o = lookupOrOption(doc, inputAct.key.r, false);
+        InterprNode o = lookupOrOption(doc, inputAct.key.r, false);
         if(o == null) return false;
         return inputAct.key.o.contains(o, true);
     }
 
 
-    public void propagateAddedActivation(Document doc, Activation act, Option removedConflict) {
+    public void propagateAddedActivation(Document doc, Activation act, InterprNode removedConflict) {
         if(removedConflict == null) {
             neuron.propagateAddedActivation(doc, act);
         }
@@ -209,7 +209,7 @@ public class OrNode extends Node {
 
 
     @Override
-    public void apply(Document doc, Activation act, Option conflict) {
+    public void apply(Document doc, Activation act, InterprNode conflict) {
         if(conflict == null) {
             OrNode.processCandidate(doc, this, act, false);
         }
@@ -226,7 +226,7 @@ public class OrNode extends Node {
         parentNode.lock.acquireReadLock();
         if(parentNode.orChildren != null) {
             for (OrEntry oe : parentNode.orChildren) {
-                if (!ak.o.isConflicting(Option.visitedCounter++)) {
+                if (!ak.o.isConflicting(InterprNode.visitedCounter++)) {
                     ((OrNode) oe.node).addActivation(doc, oe.ridOffset, inputAct);
                 }
             }
@@ -236,7 +236,7 @@ public class OrNode extends Node {
 
 
     // TODO: RID
-    public Option lookupOrOption(Document doc, Range r, boolean create) {
+    public InterprNode lookupOrOption(Document doc, Range r, boolean create) {
         Activation act = Activation.select(doc, this, null, r, EQUALS, EQUALS, null, null)
                 .findFirst()
                 .orElse(null);
@@ -253,7 +253,7 @@ public class OrNode extends Node {
                 }
             }
         }
-        return create ? Option.addPrimitive(doc) : null;
+        return create ? InterprNode.addPrimitive(doc) : null;
     }
 
 

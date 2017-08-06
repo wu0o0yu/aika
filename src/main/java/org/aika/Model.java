@@ -19,7 +19,7 @@ package org.aika;
 
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
-import org.aika.corpus.Range.Signal;
+import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
@@ -189,7 +189,7 @@ public class Model implements Writable {
         double posRecSum = 0.0;
         double minWeight = Double.MAX_VALUE;
         for(Input ni: inputs) {
-            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startSignal, ni.startRangeOutput, ni.endRangeMatch, ni.endSignal, ni.endRangeOutput));
+            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startMapping, ni.startRangeOutput, ni.endRangeMatch, ni.endMapping, ni.endRangeOutput));
             s.w = ni.weight;
             s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
 
@@ -230,7 +230,7 @@ public class Model implements Writable {
         double negRecSum = 0.0;
         double posRecSum = 0.0;
         for(Input ni: inputs) {
-            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startSignal, ni.startRangeOutput, ni.endRangeMatch, ni.endSignal, ni.endRangeOutput));
+            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startMapping, ni.startRangeOutput, ni.endRangeMatch, ni.endMapping, ni.endRangeOutput));
             s.w = ni.weight;
             s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
 
@@ -271,7 +271,7 @@ public class Model implements Writable {
 
         double bias = -0.001;
         for(Input ni: inputs) {
-            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startSignal, ni.startRangeOutput, ni.endRangeMatch, ni.endSignal, ni.endRangeOutput));
+            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startMapping, ni.startRangeOutput, ni.endRangeMatch, ni.endMapping, ni.endRangeOutput));
             s.w = ni.weight;
             s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
             is.add(s);
@@ -306,10 +306,10 @@ public class Model implements Writable {
                             null,
                             null,
                             Operator.LESS_THAN,
-                            dirIS ? Signal.END : Signal.START,
+                            dirIS ? Mapping.END : Mapping.START,
                             false,
                             Operator.GREATER_THAN,
-                            dirIS ? Signal.START : Signal.END,
+                            dirIS ? Mapping.START : Mapping.END,
                             false
                     )
             );
@@ -327,10 +327,10 @@ public class Model implements Writable {
                             0,
                             null,
                             Operator.EQUALS,
-                            Signal.START,
+                            Mapping.START,
                             true,
                             Operator.EQUALS,
-                            Signal.END,
+                            Mapping.END,
                             true
                     )
             );
@@ -373,10 +373,10 @@ public class Model implements Writable {
                             null,
                             null,
                             Operator.NONE,
-                            Signal.NONE,
+                            Mapping.NONE,
                             false,
                             Operator.FIRST,
-                            dirCS ? Signal.START : Signal.END,
+                            dirCS ? Mapping.START : Mapping.END,
                             true
                     )
             );
@@ -394,10 +394,10 @@ public class Model implements Writable {
                             0,
                             null,
                             Operator.EQUALS,
-                            dirSS ? Signal.START : Signal.END,
+                            dirSS ? Mapping.START : Mapping.END,
                             true,
                             Operator.NONE,
-                            Signal.NONE,
+                            Mapping.NONE,
                             false
                     )
             );
@@ -414,10 +414,10 @@ public class Model implements Writable {
                         -1,
                         null,
                         direction ? Operator.NONE : Operator.EQUALS,
-                        direction ? Signal.NONE : Signal.END,
+                        direction ? Mapping.NONE : Mapping.END,
                         direction ? false : true,
                         direction ? Operator.EQUALS : Operator.NONE,
-                        direction ? Signal.START : Signal.NONE,
+                        direction ? Mapping.START : Mapping.NONE,
                         direction ? true : false
                 )
         );
@@ -433,10 +433,10 @@ public class Model implements Writable {
                         0,
                         null,
                         Operator.EQUALS,
-                        Signal.START,
+                        Mapping.START,
                         false,
                         Operator.EQUALS,
-                        Signal.END,
+                        Mapping.END,
                         false
                 )
         );

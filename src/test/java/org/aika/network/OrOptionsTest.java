@@ -21,7 +21,7 @@ import org.aika.Activation;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
+import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
@@ -69,16 +69,16 @@ public class OrOptionsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        Option o0 = Option.addPrimitive(doc);
+        InterprNode o0 = InterprNode.addPrimitive(doc);
         Range r = new Range(0, 10);
         Node.addActivationAndPropagate(doc, new Activation.Key(inA.node, r, 0, o0), Collections.emptySet());
         doc.propagate();
 
-        Option o1 = Option.addPrimitive(doc);
+        InterprNode o1 = InterprNode.addPrimitive(doc);
         Node.addActivationAndPropagate(doc, new Activation.Key(inA.node, r, 0, o1), Collections.emptySet());
         doc.propagate();
 
-        Option o2 = Option.addPrimitive(doc);
+        InterprNode o2 = InterprNode.addPrimitive(doc);
         Node.addActivationAndPropagate(doc, new Activation.Key(inA.node, r, 0, o2), Collections.emptySet());
         doc.propagate();
 

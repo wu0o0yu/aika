@@ -21,8 +21,8 @@ import org.aika.*;
 import org.aika.Activation.State;
 import org.aika.Activation.SynapseActivation;
 import org.aika.corpus.Document;
-import org.aika.corpus.ExpandNode;
-import org.aika.corpus.Option;
+import org.aika.corpus.SearchNode;
+import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.InputNode;
@@ -212,7 +212,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    public State computeWeight(int round, Activation act, ExpandNode en, Document doc) {
+    public State computeWeight(int round, Activation act, SearchNode en, Document doc) {
         double directSum = bias - (negDirSum + negRecSum);
         double recurrentSum = 0.0;
 
@@ -409,10 +409,10 @@ public class Neuron implements Comparable<Neuron>, Writable {
                                 rid,
                                 null,
                                 in.key.startRangeMatch,
-                                in.key.startSignal,
+                                in.key.startRangeMapping,
                                 in.key.startRangeOutput,
                                 in.key.endRangeMatch,
-                                in.key.endSignal,
+                                in.key.endRangeMapping,
                                 in.key.endRangeOutput
                         )
                 );
@@ -436,13 +436,13 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    private static boolean checkSelfReferencing(Option nx, Option ny, ExpandNode en, int depth) {
+    private static boolean checkSelfReferencing(InterprNode nx, InterprNode ny, SearchNode en, int depth) {
         if(nx == ny && (en == null || en.isCovered(ny.markedCovered))) return true;
 
         if(depth > MAX_SELF_REFERENCING_DEPTH) return false;
 
-        if(ny.orOptions != null) {
-            for (Option n: ny.orOptions.values()) {
+        if(ny.orInterprNodes != null) {
+            for (InterprNode n: ny.orInterprNodes.values()) {
                 if(checkSelfReferencing(nx, n, en, depth + 1)) return true;
             }
         }

@@ -157,7 +157,7 @@ public class Range {
     }
 
 
-    public enum Signal {
+    public enum Mapping {
         START,
         END,
         NONE;

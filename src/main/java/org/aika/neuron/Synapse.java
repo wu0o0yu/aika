@@ -21,7 +21,7 @@ import org.aika.Utils;
 import org.aika.Writable;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
-import org.aika.corpus.Range.Signal;
+import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
 
 import java.io.DataInput;
@@ -127,7 +127,7 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S " + w + " " + key.relativeRid + " S:" + key.startSignal + " E:" + key.endSignal + " " +  input + "->" + output;
+        return "S " + w + " " + key.relativeRid + " S:" + key.startRangeMapping + " E:" + key.endRangeMapping + " " +  input + "->" + output;
     }
 
 
@@ -178,30 +178,30 @@ public class Synapse implements Writable {
         public Integer absoluteRid;
         public Operator startRangeMatch;
         public Operator endRangeMatch;
-        public Signal startSignal;
-        public Signal endSignal;
+        public Mapping startRangeMapping;
+        public Mapping endRangeMapping;
         public boolean startRangeOutput;
         public boolean endRangeOutput;
 
         public Key() {}
 
 
-        public Key(boolean isNeg, boolean isRecurrent, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Signal startSignal, boolean startRangeOutput, Operator endRangeMatch, Signal endSignal, boolean endRangeOutput) {
+        public Key(boolean isNeg, boolean isRecurrent, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Mapping startRangeMapping, boolean startRangeOutput, Operator endRangeMatch, Mapping endRangeMapping, boolean endRangeOutput) {
             this.isNeg = isNeg;
             this.isRecurrent = isRecurrent;
             this.relativeRid = relativeRid;
             this.absoluteRid = absoluteRid;
             this.startRangeMatch = startRangeMatch;
             this.endRangeMatch = endRangeMatch;
-            this.startSignal = startSignal;
-            this.endSignal = endSignal;
+            this.startRangeMapping = startRangeMapping;
+            this.endRangeMapping = endRangeMapping;
             this.startRangeOutput = startRangeOutput;
             this.endRangeOutput = endRangeOutput;
         }
 
 
         public Key createInputNodeKey() {
-            return relativeRid != null ? new Key(isNeg, isRecurrent, 0, absoluteRid, startRangeMatch, startSignal, startRangeOutput, endRangeMatch, endSignal, endRangeOutput) : this;
+            return relativeRid != null ? new Key(isNeg, isRecurrent, 0, absoluteRid, startRangeMatch, startRangeMapping, startRangeOutput, endRangeMatch, endRangeMapping, endRangeOutput) : this;
         }
 
 
@@ -215,8 +215,8 @@ public class Synapse implements Writable {
             if(absoluteRid != null) out.writeInt(absoluteRid);
             out.writeUTF(startRangeMatch.name());
             out.writeUTF(endRangeMatch.name());
-            out.writeUTF(startSignal.name());
-            out.writeUTF(endSignal.name());
+            out.writeUTF(startRangeMapping.name());
+            out.writeUTF(endRangeMapping.name());
             out.writeBoolean(startRangeOutput);
             out.writeBoolean(endRangeOutput);
         }
@@ -230,8 +230,8 @@ public class Synapse implements Writable {
             if(in.readBoolean()) absoluteRid = in.readInt();
             startRangeMatch = Operator.valueOf(in.readUTF());
             endRangeMatch = Operator.valueOf(in.readUTF());
-            startSignal = Signal.valueOf(in.readUTF());
-            endSignal = Signal.valueOf(in.readUTF());
+            startRangeMapping = Mapping.valueOf(in.readUTF());
+            endRangeMapping = Mapping.valueOf(in.readUTF());
             startRangeOutput = in.readBoolean();
             endRangeOutput = in.readBoolean();
         }
@@ -263,9 +263,9 @@ public class Synapse implements Writable {
             if(r != 0) return r;
             r = endRangeMatch.compareTo(k.endRangeMatch);
             if(r != 0) return r;
-            r = startSignal.compareTo(k.startSignal);
+            r = startRangeMapping.compareTo(k.startRangeMapping);
             if(r != 0) return r;
-            r = endSignal.compareTo(k.endSignal);
+            r = endRangeMapping.compareTo(k.endRangeMapping);
             if(r != 0) return r;
             r = Boolean.compare(startRangeOutput, k.startRangeOutput);
             if(r != 0) return r;

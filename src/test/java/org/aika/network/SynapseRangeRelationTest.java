@@ -24,7 +24,7 @@ import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
-import org.aika.corpus.Range.Signal;
+import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
@@ -60,10 +60,10 @@ public class SynapseRangeRelationTest {
                         null,
                         null,
                         Operator.LESS_THAN,
-                        Signal.START,
+                        Mapping.START,
                         true,
                         Operator.GREATER_THAN,
-                        Signal.END,
+                        Mapping.END,
                         true
                 )
         );

@@ -22,7 +22,7 @@ import org.aika.Activation.Key;
 import org.aika.Activation.SynapseActivation;
 import org.aika.corpus.Conflicts;
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
+import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.AndNode.Refinement;
@@ -41,8 +41,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static org.aika.corpus.Range.Operator.*;
-import static org.aika.corpus.Range.Signal.END;
-import static org.aika.corpus.Range.Signal.START;
+import static org.aika.corpus.Range.Mapping.END;
+import static org.aika.corpus.Range.Mapping.START;
 
 
 /**
@@ -170,11 +170,11 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public abstract void propagateAddedActivation(Document doc, Activation act, Option conflict);
+    public abstract void propagateAddedActivation(Document doc, Activation act, InterprNode conflict);
 
     public abstract void propagateRemovedActivation(Document doc, Activation act);
 
-    public abstract boolean isAllowedOption(Document doc, Option n, Activation act, long v);
+    public abstract boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v);
 
     public abstract void cleanup(Document doc);
 
@@ -186,7 +186,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     public abstract String logicToString();
 
-    public abstract void apply(Document doc, Activation act, Option conflict);
+    public abstract void apply(Document doc, Activation act, InterprNode conflict);
 
     public abstract void discover(Document doc, Activation act);
 
@@ -223,7 +223,7 @@ public abstract class Node implements Comparable<Node>, Writable {
             if(r != 0) return r;
             r = Utils.compareInteger(k1.rid, k2.rid);
             if(r != 0) return r;
-            return Option.compare(k1.o, k2.o);
+            return InterprNode.compare(k1.o, k2.o);
         }
     };
 
@@ -236,7 +236,7 @@ public abstract class Node implements Comparable<Node>, Writable {
             if(r != 0) return r;
             r = Utils.compareInteger(k1.rid, k2.rid);
             if(r != 0) return r;
-            return Option.compare(k1.o, k2.o);
+            return InterprNode.compare(k1.o, k2.o);
         }
     };
 
@@ -249,7 +249,7 @@ public abstract class Node implements Comparable<Node>, Writable {
             if(r != 0) return r;
             r = Range.compare(k1.r, k2.r, false);
             if(r != 0) return r;
-            return Option.compare(k1.o, k2.o);
+            return InterprNode.compare(k1.o, k2.o);
         }
     };
 
@@ -417,15 +417,15 @@ public abstract class Node implements Comparable<Node>, Writable {
                 Operator end = replaceFirstAndLast(s.key.endRangeMatch);
                 Range r = act.key.r;
                 if(dir == 0) {
-                    begin = Operator.invert(s.key.startSignal == START ? begin : (s.key.endSignal == START ? end : NONE));
-                    end = Operator.invert(s.key.endSignal == END ? end : (s.key.startSignal == END ? begin : NONE));
+                    begin = Operator.invert(s.key.startRangeMapping == START ? begin : (s.key.endRangeMapping == START ? end : NONE));
+                    end = Operator.invert(s.key.endRangeMapping == END ? end : (s.key.startRangeMapping == END ? begin : NONE));
 
-                    if(s.key.startSignal != START || s.key.endSignal != END) {
-                        r = new Range(s.key.endSignal == START ? r.end : (s.key.startSignal == START ? r.begin : null), s.key.startSignal == END ? r.begin : (s.key.endSignal == END ? r.end : null));
+                    if(s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
+                        r = new Range(s.key.endRangeMapping == START ? r.end : (s.key.startRangeMapping == START ? r.begin : null), s.key.startRangeMapping == END ? r.begin : (s.key.endRangeMapping == END ? r.end : null));
                     }
                 } else {
-                    if(s.key.startSignal != START || s.key.endSignal != END) {
-                        r = new Range(s.key.startSignal == END ? r.end : (s.key.startSignal == START ? r.begin : null), s.key.endSignal == START ? r.begin : (s.key.endSignal == END ? r.end : null));
+                    if(s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
+                        r = new Range(s.key.startRangeMapping == END ? r.end : (s.key.startRangeMapping == START ? r.begin : null), s.key.endRangeMapping == START ? r.begin : (s.key.endRangeMapping == END ? r.end : null));
                     }
                 }
 
@@ -500,28 +500,28 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public static void addConflict(Document doc, Option io, Option o, Activation act, Collection<Activation> inputActs, long v) {
-        if(o.markedConflict == v || o.orOptions == null) {
+    public static void addConflict(Document doc, InterprNode io, InterprNode o, Activation act, Collection<Activation> inputActs, long v) {
+        if(o.markedConflict == v || o.orInterprNodes == null) {
             if (!isAllowed(doc, io, o, inputActs)) {
                 Conflicts.add(doc, act, io, o);
             }
         } else {
-            for(Option no: o.orOptions.values()) {
+            for(InterprNode no: o.orInterprNodes.values()) {
                 addConflict(doc, io, no, act, inputActs, v);
             }
         }
     }
 
 
-    public static void removeConflict(Document doc, Option io, Option o, Activation act, Activation nAct, long v) {
-        if(o.markedConflict == v || o.orOptions == null) {
+    public static void removeConflict(Document doc, InterprNode io, InterprNode o, Activation act, Activation nAct, long v) {
+        if(o.markedConflict == v || o.orInterprNodes == null) {
             if (!nAct.key.n.isAllowedOption(doc, o, nAct, visitedCounter++)) {
                 assert io != null;
 
                 Conflicts.remove(doc, act, io, o);
             }
         } else {
-            for(Option no: o.orOptions.values()) {
+            for(InterprNode no: o.orInterprNodes.values()) {
                 removeConflict(doc, io, no, act, nAct, v);
             }
         }
@@ -538,7 +538,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    private static boolean isAllowed(Document doc, Option io, Option o, Collection<Activation> inputActs) {
+    private static boolean isAllowed(Document doc, InterprNode io, InterprNode o, Collection<Activation> inputActs) {
         if(io != null && o.contains(io, false)) return true;
         for (Activation act : inputActs) {
             if (act.key.n.isAllowedOption(doc, o, act, visitedCounter++)) return true;
@@ -1109,7 +1109,7 @@ public abstract class Node implements Comparable<Node>, Writable {
         }
 
         @Override
-        public boolean isAllowedOption(Document doc, Option n, Activation act, long v) {
+        public boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v) {
             return false;
         }
 
@@ -1128,7 +1128,7 @@ public abstract class Node implements Comparable<Node>, Writable {
         }
 
         @Override
-        public void propagateAddedActivation(Document doc, Activation act, Option removedConflict) {}
+        public void propagateAddedActivation(Document doc, Activation act, InterprNode removedConflict) {}
 
         @Override
         public void propagateRemovedActivation(Document doc, Activation act) {}
@@ -1139,7 +1139,7 @@ public abstract class Node implements Comparable<Node>, Writable {
         }
 
         @Override
-        public void apply(Document doc, Activation act, Option conflict) {}
+        public void apply(Document doc, Activation act, InterprNode conflict) {}
 
         @Override
         public void discover(Document doc, Activation act) {}

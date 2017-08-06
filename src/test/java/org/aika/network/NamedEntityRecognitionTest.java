@@ -21,7 +21,7 @@ import org.aika.Activation;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.ExpandNode;
+import org.aika.corpus.SearchNode;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
@@ -198,13 +198,13 @@ public class NamedEntityRecognitionTest {
         }
 
         // Search for the best interpretation of this text.
-        ExpandNode.INCOMPLETE_OPTIMIZATION = true;
+        SearchNode.INCOMPLETE_OPTIMIZATION = true;
         doc.process();
 
         System.out.println(doc.networkStateToString(true, true));
         System.out.println();
 
-        System.out.println("Selected Option: " + doc.selectedOption.toString());
+        System.out.println("Selected Option: " + doc.selectedInterprNode.toString());
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");
@@ -412,13 +412,13 @@ public class NamedEntityRecognitionTest {
         }
 
         // Search for the best interpretation of this text.
-        ExpandNode.INCOMPLETE_OPTIMIZATION = true;
+        SearchNode.INCOMPLETE_OPTIMIZATION = true;
         doc.process();
 
         System.out.println(doc.networkStateToString(true, true));
         System.out.println();
 
-        System.out.println("Selected Option: " + doc.selectedOption.toString());
+        System.out.println("Selected Option: " + doc.selectedInterprNode.toString());
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");

@@ -20,10 +20,10 @@ package org.aika.neuron;
 import org.aika.Activation;
 import org.aika.Activation.State;
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
+import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
-import org.aika.corpus.Range.Signal;
+import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.Synapse.Key;
@@ -56,7 +56,7 @@ public class InputNeuron extends Neuron {
     public static InputNeuron create(Document doc, InputNeuron n) {
         n.m = doc.m;
 
-        InputNode node = InputNode.add(doc, new Key(false, false, null, 0, Operator.NONE, Signal.NONE, true, Operator.NONE, Signal.NONE, true), null);
+        InputNode node = InputNode.add(doc, new Key(false, false, null, 0, Operator.NONE, Mapping.NONE, true, Operator.NONE, Mapping.NONE, true), null);
         node.neuron = n;
 
         n.node = node;
@@ -90,7 +90,7 @@ public class InputNeuron extends Neuron {
     }
 
 
-    public void addInput(Document doc, int begin, int end, Option o) {
+    public void addInput(Document doc, int begin, int end, InterprNode o) {
         addInput(doc, begin, end, null, o);
     }
 
@@ -100,19 +100,19 @@ public class InputNeuron extends Neuron {
     }
 
 
-    public void addInput(Document doc, int begin, int end, Integer rid, Option o) {
+    public void addInput(Document doc, int begin, int end, Integer rid, InterprNode o) {
         Node.addActivationAndPropagate(doc, new Activation.Key(node, new Range(begin, end), rid, o), Collections.emptySet());
 
         doc.propagate();
     }
 
-    public void addInput(Document doc, int begin, int end, Integer rid, Option o, double value) {
+    public void addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value) {
         Range r = new Range(begin, end);
         Node.addActivationAndPropagate(doc, new Activation.Key(node, r, rid, o), Collections.emptySet());
 
         doc.propagate();
 
-        Activation act = Activation.get(doc, node, rid, r, EQUALS, EQUALS, o, Option.Relation.EQUALS);
+        Activation act = Activation.get(doc, node, rid, r, EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
         State s = new State(value, 0, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.finalState = s;
@@ -124,7 +124,7 @@ public class InputNeuron extends Neuron {
     }
 
 
-    public void removeInput(Document doc, int begin, int end, Option o) {
+    public void removeInput(Document doc, int begin, int end, InterprNode o) {
         removeInput(doc, begin, end, null, o);
     }
 
@@ -134,9 +134,9 @@ public class InputNeuron extends Neuron {
     }
 
 
-    public void removeInput(Document doc, int begin, int end, Integer rid, Option o) {
+    public void removeInput(Document doc, int begin, int end, Integer rid, InterprNode o) {
         Range r = new Range(begin, end);
-        Activation act = Activation.get(doc, node, rid, r, EQUALS, EQUALS, o, Option.Relation.EQUALS);
+        Activation act = Activation.get(doc, node, rid, r, EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
         Node.removeActivationAndPropagate(doc, act, Collections.emptySet());
 
         doc.propagate();

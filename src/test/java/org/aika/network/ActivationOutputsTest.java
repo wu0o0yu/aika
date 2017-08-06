@@ -22,10 +22,10 @@ import org.aika.Activation.SynapseActivation;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
+import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
-import org.aika.corpus.Range.Signal;
+import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
@@ -102,7 +102,7 @@ public class ActivationOutputsTest {
         );
 
 
-        InputNode pC = new InputNode(doc, new Synapse.Key(false, false, 0, null, LESS_THAN, Signal.START, true, GREATER_THAN, Signal.END, true));
+        InputNode pC = new InputNode(doc, new Synapse.Key(false, false, 0, null, LESS_THAN, Mapping.START, true, GREATER_THAN, Mapping.END, true));
         Activation pC1 = TestHelper.addActivation(pC, doc, TestHelper.get(doc, pAB.node, new Range(0, 1), null));
 
         Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, TestHelper.get(doc, pAB.node, new Range(0, 1), null)));
@@ -170,7 +170,7 @@ public class ActivationOutputsTest {
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
         inB.addInput(doc, 0, 1);
-        inA.addInput(doc, 0, 1, Option.addPrimitive(doc));
+        inA.addInput(doc, 0, 1, InterprNode.addPrimitive(doc));
 
         Activation actAB = TestHelper.get(doc, pABNode, new Range(0, 1), null);
 
@@ -197,7 +197,7 @@ public class ActivationOutputsTest {
         ).node;
 
 
-        Option o1 = Option.addPrimitive(doc);
+        InterprNode o1 = InterprNode.addPrimitive(doc);
         inA.addInput(doc, 0, 1, o1);
 
         Activation outB1 = Activation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
@@ -222,7 +222,7 @@ public class ActivationOutputsTest {
         ).node;
 
 
-        inA.addInput(doc, 0, 1, Option.addPrimitive(doc));
+        inA.addInput(doc, 0, 1, InterprNode.addPrimitive(doc));
 
         Activation outB1 = Activation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
 
@@ -249,7 +249,7 @@ public class ActivationOutputsTest {
         ).node;
 
 
-        Option o1 = Option.addPrimitive(doc);
+        InterprNode o1 = InterprNode.addPrimitive(doc);
         inA.addInput(doc, 0, 1, 0, o1);
         Activation outB1 = Activation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
 

@@ -102,11 +102,11 @@ public class EntityResolutionTest {
         Assert.assertEquals(0, eJaguar.node.getFirstActivation(doc).key.o.primId);
         Assert.assertEquals(1, ePuma.node.getFirstActivation(doc).key.o.primId);
 
-        Assert.assertEquals(doc.bottom, eJaguar.node.getFirstActivation(doc).key.o.orOptions.values().iterator().next());
-        Assert.assertEquals(doc.bottom, ePuma.node.getFirstActivation(doc).key.o.orOptions.values().iterator().next());
+        Assert.assertEquals(doc.bottom, eJaguar.node.getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
+        Assert.assertEquals(doc.bottom, ePuma.node.getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
 
-        Assert.assertEquals(1, eJaguar.node.getFirstActivation(doc).key.o.orOptions.size());
-        Assert.assertEquals(1, ePuma.node.getFirstActivation(doc).key.o.orOptions.size());
+        Assert.assertEquals(1, eJaguar.node.getFirstActivation(doc).key.o.orInterprNodes.size());
+        Assert.assertEquals(1, ePuma.node.getFirstActivation(doc).key.o.orInterprNodes.size());
     }
 
 
@@ -298,11 +298,11 @@ public class EntityResolutionTest {
         Assert.assertEquals(0, eJaguar.node.getFirstActivation(doc).key.o.primId);
         Assert.assertEquals(3, ePuma.node.getFirstActivation(doc).key.o.primId);
 
-        Assert.assertEquals(doc.bottom, eJaguar.node.getFirstActivation(doc).key.o.orOptions.values().iterator().next());
-        Assert.assertEquals(doc.bottom, ePuma.node.getFirstActivation(doc).key.o.orOptions.values().iterator().next());
+        Assert.assertEquals(doc.bottom, eJaguar.node.getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
+        Assert.assertEquals(doc.bottom, ePuma.node.getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
 
-        Assert.assertEquals(1, eJaguar.node.getFirstActivation(doc).key.o.orOptions.size());
-        Assert.assertEquals(1, ePuma.node.getFirstActivation(doc).key.o.orOptions.size());
+        Assert.assertEquals(1, eJaguar.node.getFirstActivation(doc).key.o.orInterprNodes.size());
+        Assert.assertEquals(1, ePuma.node.getFirstActivation(doc).key.o.orInterprNodes.size());
     }
 
 

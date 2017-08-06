@@ -17,7 +17,7 @@
 package org.aika;
 
 import org.aika.corpus.Range.Operator;
-import org.aika.corpus.Range.Signal;
+import org.aika.corpus.Range.Mapping;
 import org.aika.neuron.Neuron;
 
 
@@ -36,8 +36,8 @@ public class Input implements Comparable<Input> {
     public Operator endRangeMatch = Operator.NONE;
     public boolean startRangeOutput;
     public boolean endRangeOutput;
-    public Signal startSignal = Signal.START;
-    public Signal endSignal = Signal.END;
+    public Mapping startMapping = Mapping.START;
+    public Mapping endMapping = Mapping.END;
 
     public Integer relativeRid;
     public Integer absoluteRid;
@@ -226,14 +226,14 @@ public class Input implements Comparable<Input> {
     }
 
 
-    public Input setStartRangeSignal(Signal startSignal) {
-        this.startSignal = startSignal;
+    public Input setStartRangeMapping(Mapping startMapping) {
+        this.startMapping = startMapping;
         return this;
     }
 
 
-    public Input setEndRangeSignal(Signal endSignal) {
-        this.endSignal = endSignal;
+    public Input setEndRangeMapping(Mapping endMapping) {
+        this.endMapping = endMapping;
         return this;
     }
 
@@ -260,9 +260,9 @@ public class Input implements Comparable<Input> {
         if (r != 0) return r;
         r = Boolean.compare(endRangeOutput, in.endRangeOutput);
         if (r != 0) return r;
-        r = Utils.compareInteger(startSignal.ordinal(), in.startSignal.ordinal());
+        r = Utils.compareInteger(startMapping.ordinal(), in.startMapping.ordinal());
         if (r != 0) return r;
-        r = Utils.compareInteger(endSignal.ordinal(), in.endSignal.ordinal());
+        r = Utils.compareInteger(endMapping.ordinal(), in.endMapping.ordinal());
         return r;
     }
 }

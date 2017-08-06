@@ -18,8 +18,9 @@ package org.aika;
 
 
 import org.aika.corpus.Document;
-import org.aika.corpus.ExpandNode.StateChange;
-import org.aika.corpus.Option;
+import org.aika.corpus.SearchNode.StateChange;
+import org.aika.corpus.InterprNode;
+import org.aika.corpus.InterprNode.Relation;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.Node;
@@ -80,7 +81,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public Activation(int id, Node n, Range pos, Integer rid, Option o) {
+    public Activation(int id, Node n, Range pos, Integer rid, InterprNode o) {
         this.id = id;
         key = new Key(n, pos, rid, o);
     }
@@ -171,7 +172,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public static Activation get(Document doc, Node n, Integer rid, Range r, Operator begin, Operator end, Option o, Option.Relation or) {
+    public static Activation get(Document doc, Node n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
         return select(doc, n, rid, r, begin, end, o, or)
                 .findFirst()
                 .orElse(null);
@@ -179,11 +180,11 @@ public class Activation implements Comparable<Activation> {
 
 
     public static Activation get(Document doc, Node n, Key ak) {
-        return get(doc, n, ak.rid, ak.r, Operator.EQUALS, Operator.EQUALS, ak.o, Option.Relation.EQUALS);
+        return get(doc, n, ak.rid, ak.r, Operator.EQUALS, Operator.EQUALS, ak.o, InterprNode.Relation.EQUALS);
     }
 
 
-    public static Activation getNextSignal(Node n, Document doc, int from, Integer rid, Option o, boolean dir, boolean inv) {
+    public static Activation getNextSignal(Node n, Document doc, int from, Integer rid, InterprNode o, boolean dir, boolean inv) {
         ThreadState th = n.getThreadState(doc, false);
         if(th == null) return null;
 
@@ -191,7 +192,7 @@ public class Activation implements Comparable<Activation> {
         NavigableMap<Key, Activation> tmp = (inv ? th.activationsEnd : th.activations);
         tmp = dir ? tmp.descendingMap() : tmp;
         for(Activation act: tmp.tailMap(bk, false).values()) {
-            if(act.filter(n, rid, null, null, null, o, Option.Relation.CONTAINED_IN)) {
+            if(act.filter(n, rid, null, null, null, o, InterprNode.Relation.CONTAINED_IN)) {
                 return act;
             }
         }
@@ -199,7 +200,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public static Stream<Activation> select(Document doc, Node n, Integer rid, Range r, Operator begin, Operator end, Option o, Option.Relation or) {
+    public static Stream<Activation> select(Document doc, Node n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
         Stream<Activation> results;
         if(n != null) {
             ThreadState th = n.getThreadState(doc, false);
@@ -212,8 +213,8 @@ public class Activation implements Comparable<Activation> {
                         .values()
                         .stream();
             } else if(rid != null) {
-                Key bk = new Key(n, Range.MIN, rid, Option.MIN);
-                Key ek = new Key(n, Range.MAX, rid, Option.MAX);
+                Key bk = new Key(n, Range.MIN, rid, InterprNode.MIN);
+                Key ek = new Key(n, Range.MAX, rid, InterprNode.MAX);
 
                 if(th.activationsRid != null) {
                     results = th.activationsRid.subMap(bk, true, ek, true)
@@ -230,8 +231,8 @@ public class Activation implements Comparable<Activation> {
             }
         } else {
             if(rid != null) {
-                Key bk = new Key(Node.MIN_NODE, Range.MIN, rid, Option.MIN);
-                Key ek = new Key(Node.MAX_NODE, Range.MAX, rid, Option.MAX);
+                Key bk = new Key(Node.MIN_NODE, Range.MIN, rid, InterprNode.MIN);
+                Key ek = new Key(Node.MAX_NODE, Range.MAX, rid, InterprNode.MAX);
 
                 results = doc.activationsByRid.subMap(bk, true, ek, true)
                         .values()
@@ -247,14 +248,14 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public static Stream getActivationsByRange(ThreadState th, Node n, Integer rid, Range r, Operator begin, Operator end, Option o, Option.Relation or) {
+    public static Stream getActivationsByRange(ThreadState th, Node n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
         Stream s;
         if((begin == GREATER_THAN || begin == EQUALS || end == FIRST) && r.begin != null) {
             int er = (end == Operator.LESS_THAN || end == Operator.EQUALS || end == FIRST) && r.end != null ? r.end : Integer.MAX_VALUE;
             s = th.activations.subMap(
-                    new Activation.Key(n, new Range(r.begin, null), null, Option.MIN),
+                    new Activation.Key(n, new Range(r.begin, null), null, InterprNode.MIN),
                     true,
-                    new Activation.Key(n, new Range(er, Integer.MAX_VALUE), Integer.MAX_VALUE, Option.MAX),
+                    new Activation.Key(n, new Range(er, Integer.MAX_VALUE), Integer.MAX_VALUE, InterprNode.MAX),
                     true
             )
                     .values()
@@ -262,9 +263,9 @@ public class Activation implements Comparable<Activation> {
                     .filter(act -> act.filter(n, rid, r, begin, end, o, or));
         } else if((begin == Operator.LESS_THAN || begin == Operator.EQUALS) && r.begin != null) {
             s = th.activations.descendingMap().subMap(
-                    new Activation.Key(n, new Range(r.begin, Integer.MAX_VALUE), null, Option.MAX),
+                    new Activation.Key(n, new Range(r.begin, Integer.MAX_VALUE), null, InterprNode.MAX),
                     true,
-                    new Activation.Key(n, new Range(null, null), null, Option.MIN),
+                    new Activation.Key(n, new Range(null, null), null, InterprNode.MIN),
                     true
             )
                     .values()
@@ -272,7 +273,7 @@ public class Activation implements Comparable<Activation> {
                     .filter(act -> act.filter(n, rid, r, begin, end, o, or));
         }  else if(end == LAST) {
             s = th.activationsEnd.tailMap(
-                    new Activation.Key(n, new Range(null, r.begin), null, Option.MIN),
+                    new Activation.Key(n, new Range(null, r.begin), null, InterprNode.MIN),
                     true
             )
                     .values()
@@ -297,7 +298,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public boolean filter(Node n, Integer rid, Range r, Operator begin, Operator end, Option o, Option.Relation or) {
+    public boolean filter(Node n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
         return (n == null || key.n == n) &&
                 (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) &&
                 (r == null || ((begin == null || begin.compare(key.r.begin, key.r.end, r.begin, r.end)) && (end == null || end.compare(key.r.end, key.r.begin, r.end, r.begin)))) &&
@@ -337,12 +338,12 @@ public class Activation implements Comparable<Activation> {
         public final Node n;
         public final Range r;
         public final Integer rid;
-        public final Option o;
+        public final InterprNode o;
 
         private int refCount = 0;
 
 
-        public Key(Node n, Range r, Integer rid, Option o) {
+        public Key(Node n, Range r, Integer rid, InterprNode o) {
             this.n = n;
             this.r = r;
             this.rid = rid;

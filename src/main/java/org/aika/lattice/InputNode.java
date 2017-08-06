@@ -21,10 +21,10 @@ import org.aika.Activation;
 import org.aika.Model;
 import org.aika.Utils;
 import org.aika.corpus.Document;
-import org.aika.corpus.Option;
+import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
-import org.aika.corpus.Range.Signal;
+import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
@@ -69,7 +69,7 @@ public class InputNode extends Node {
         endRequired = false;
         ridRequired = false;
         if(key != null) {
-            endRequired = key.startSignal == Signal.NONE;
+            endRequired = key.startRangeMapping == Mapping.NONE;
             ridRequired = key.relativeRid != null || key.absoluteRid != null;
         }
     }
@@ -134,11 +134,11 @@ public class InputNode extends Node {
 
     private Activation.Key computeActivationKey(Activation iAct) {
         Activation.Key ak = iAct.key;
-        if((key.absoluteRid != null && key.absoluteRid != ak.rid) || ak.o.isConflicting(Option.visitedCounter++)) return null;
+        if((key.absoluteRid != null && key.absoluteRid != ak.rid) || ak.o.isConflicting(InterprNode.visitedCounter++)) return null;
 
         return new Activation.Key(
                 this,
-                new Range(key.startSignal.getSignalPos(ak.r), key.endSignal.getSignalPos(ak.r)),
+                new Range(key.startRangeMapping.getSignalPos(ak.r), key.endRangeMapping.getSignalPos(ak.r)),
                 key.relativeRid != null ? ak.rid : null,
                 ak.o
         );
@@ -168,8 +168,8 @@ public class InputNode extends Node {
 
 
     protected Range preProcessAddedActivation(Document doc, Activation.Key ak, Collection<Activation> inputActs) {
-        if(neuron == null && (key.startSignal == Signal.NONE || key.endSignal == Signal.NONE)) {
-            boolean dir = key.startSignal == Signal.NONE;
+        if(neuron == null && (key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE)) {
+            boolean dir = key.startRangeMapping == Mapping.NONE;
             int pos = ak.r.getBegin(dir);
 
             List<Activation> tmp = Activation.select(
@@ -180,7 +180,7 @@ public class InputNode extends Node {
                     LESS_THAN,
                     GREATER_THAN,
                     ak.o,
-                    Option.Relation.CONTAINS
+                    InterprNode.Relation.CONTAINS
             ).collect(Collectors.toList());
 
             for(Activation act: tmp) {
@@ -199,8 +199,8 @@ public class InputNode extends Node {
 
     protected void postProcessRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {
         Activation.Key ak = act.key;
-        if(neuron == null && (key.startSignal == Signal.NONE || key.endSignal == Signal.NONE)) {
-            boolean dir = key.startSignal == Signal.NONE;
+        if(neuron == null && (key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE)) {
+            boolean dir = key.startRangeMapping == Mapping.NONE;
             List<Activation> tmp = Activation.select(
                     doc,
                     this,
@@ -209,7 +209,7 @@ public class InputNode extends Node {
                     dir ? Operator.EQUALS : NONE,
                     dir ? NONE : Operator.EQUALS,
                     ak.o,
-                    Option.Relation.CONTAINS
+                    InterprNode.Relation.CONTAINS
             ).collect(Collectors.toList());
 
             for(Activation cAct: tmp) {
@@ -243,7 +243,7 @@ public class InputNode extends Node {
     }
 
 
-    public void propagateAddedActivation(Document doc, Activation act, Option removedConflict) {
+    public void propagateAddedActivation(Document doc, Activation act, InterprNode removedConflict) {
         if(neuron instanceof InputNeuron) {
             if(removedConflict == null) {
                 neuron.propagateAddedActivation(doc, act);
@@ -264,7 +264,7 @@ public class InputNode extends Node {
 
 
     @Override
-    public boolean isAllowedOption(Document doc, Option n, Activation act, long v) {
+    public boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v) {
         return false;
     }
 
@@ -284,7 +284,7 @@ public class InputNode extends Node {
      * @param removedConflict This parameter contains a removed conflict if it is not null. In this case only expand activations that contain this removed conflict.
      */
     @Override
-    public void apply(Document doc, Activation act, Option removedConflict) {
+    public void apply(Document doc, Activation act, InterprNode removedConflict) {
         // Check if the activation has been deleted in the meantime.
         if(act.isRemoved || passive) {
             return;
@@ -304,7 +304,7 @@ public class InputNode extends Node {
     }
 
 
-    private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, AndNode nlp, Activation act, Option removedConflict) {
+    private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, AndNode nlp, Activation act, InterprNode removedConflict) {
         Activation.Key ak = act.key;
         InputNode firstNode = ((InputNode) ak.n);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
@@ -320,7 +320,7 @@ public class InputNode extends Node {
                 null
         ).forEach(secondAct -> {
             if(!secondAct.isRemoved) {
-                Option o = Option.add(doc, true, ak.o, secondAct.key.o);
+                InterprNode o = InterprNode.add(doc, true, ak.o, secondAct.key.o);
                 if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
                     nlp.addActivation(doc,
                             new Activation.Key(
@@ -431,7 +431,7 @@ public class InputNode extends Node {
         sb.append(key.isNeg ? "N" : "P");
         sb.append(key.isRecurrent ? "R" : "");
 
-        sb.append(getRangeBrackets(key.startRangeOutput, key.startSignal));
+        sb.append(getRangeBrackets(key.startRangeOutput, key.startRangeMapping));
 
         if(inputNeuron != null) {
             sb.append(inputNeuron.id);
@@ -441,16 +441,16 @@ public class InputNode extends Node {
             }
         }
 
-        sb.append(getRangeBrackets(key.endRangeOutput, key.endSignal));
+        sb.append(getRangeBrackets(key.endRangeOutput, key.endRangeMapping));
 
         return sb.toString();
     }
 
 
-    private String getRangeBrackets(boolean ro, Signal rs) {
-        if(rs == Signal.NONE) return "|";
-        else if(ro) return rs == Signal.START ? "[" : "]";
-        else if(!ro) return rs == Signal.START ? "<" : ">";
+    private String getRangeBrackets(boolean ro, Mapping rs) {
+        if(rs == Mapping.NONE) return "|";
+        else if(ro) return rs == Mapping.START ? "[" : "]";
+        else if(!ro) return rs == Mapping.START ? "<" : ">";
         else return "|";
     }
 

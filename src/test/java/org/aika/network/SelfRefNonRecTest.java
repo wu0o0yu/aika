@@ -68,6 +68,6 @@ public class SelfRefNonRecTest {
 
         System.out.println(t.networkStateToString(true, false));
 
-        Assert.assertEquals(1, bN.node.getFirstActivation(t).key.o.orOptions.size());
+        Assert.assertEquals(1, bN.node.getFirstActivation(t).key.o.orInterprNodes.size());
     }
 }
