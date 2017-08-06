@@ -35,6 +35,11 @@ import java.io.IOException;
 import java.util.*;
 
 /**
+ * The <code>InputNode</code> and the <code>AndNode</code> classes together form a pattern lattice, containing all
+ * possible substructures of any given conjunction. For example if we have the conjunction ABCD where A, B, C, D are
+ * the inputs then the pattern lattice will contain the nodes ABCD, ABC, ABD, ACD, BCD, AB, AC, AD, BC, BD, CD,
+ * A, B, C, D. The layers within the pattern lattice are connected trough refinements. For example the and-node
+ * ABD on layer 3 is connected to the and-node ABCD on layer 4 via the refinement C.
  *
  * @author Lukas Molzberger
  */

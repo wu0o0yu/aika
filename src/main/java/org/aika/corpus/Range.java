@@ -19,6 +19,7 @@ package org.aika.corpus;
 import org.aika.Utils;
 
 /**
+ * The class <code>Range</code> specifies a text range (begin char pos, end char pos) within a given document.
  *
  * @author Lukas Molzberger
  */

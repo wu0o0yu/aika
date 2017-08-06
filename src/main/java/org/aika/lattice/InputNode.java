@@ -41,6 +41,9 @@ import static org.aika.corpus.Range.Operator.*;
 
 
 /**
+ * The <code>InputNode</code> class is the input layer for the boolean logic. The input-node has two sources of
+ * activations. First, it might be underlying logic node of an <code>InputNeuron</code> in which case the input
+ * activations come from the outside. The second option is that the activation come from the output of another neuron.
  *
  * @author Lukas Molzberger
  */

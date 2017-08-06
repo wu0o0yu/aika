@@ -24,7 +24,10 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-
+/**
+ *
+ * @author Lukas Molzberger
+ */
 public class Conflicts {
 
     public SortedMap<Key, Conflict> primary = new TreeMap<>();
