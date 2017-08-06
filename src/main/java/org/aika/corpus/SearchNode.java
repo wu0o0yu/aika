@@ -29,7 +29,7 @@ import java.util.*;
 
 /**
  * The <code>SearchNode</code> class represents a node in the binary search tree that is used to find the optimal
- * interpretation for a given document. Each search node posses a refinement (simply a set of interpretation nodes).
+ * interpretation for a given document. Each search node possess a refinement (simply a set of interpretation nodes).
  * The two options that this search node examines are that the refinement will either part of the final interpretation or not.
  * During each search step the activation values in all the neuron activations adjusted such that they reflect the interpretation of the current search path.
  * When the search reaches the maximum depth of the search tree and no further refinements exists, a weight is computed evaluating the current search path.
