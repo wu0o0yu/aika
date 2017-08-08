@@ -570,7 +570,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     /**
-     * The <code>StateChange</code> class is used to store the state change of an activation that occurs in each node of
+     * The {@code StateChange} class is used to store the state change of an activation that occurs in each node of
      * the binary search tree. When a candidate refinement is selected during the search, then the activation values of
      * all affected activation objects are adjusted. The changes to the activation values are also propagated through
      * the network. The old state needs to be stored here in order for the search to be able to restore the old network
