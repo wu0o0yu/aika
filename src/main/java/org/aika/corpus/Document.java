@@ -63,8 +63,8 @@ public class Document implements Comparable<Document> {
 
     public InterprNode bottom = new InterprNode(this, -1, 0, 0);
 
-    public SearchTreeNode root = SearchTreeNode.createInitialExpandNode(this);
-    public SearchTreeNode selectedSearchTreeNode = null;
+    public SearchNode root = SearchNode.createInitialExpandNode(this);
+    public SearchNode selectedSearchNode = null;
     public List<InterprNode> selectedInterprNode = null;
     public long selectedMark = -1;
 
@@ -460,7 +460,7 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public Neuron.NormWeight adjustWeight(SearchTreeNode cand, List<InterprNode> changed) {
+        public Neuron.NormWeight adjustWeight(SearchNode cand, List<InterprNode> changed) {
             long v = Activation.visitedCounter++;
 
             for(InterprNode n: changed) {
@@ -492,7 +492,7 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public Neuron.NormWeight processChanges(SearchTreeNode en, long v) {
+        public Neuron.NormWeight processChanges(SearchNode en, long v) {
             Neuron.NormWeight delta = Neuron.NormWeight.ZERO_WEIGHT;
             while(!queue.isEmpty()) {
                 VEntry e = queue.pollFirst();
@@ -507,13 +507,13 @@ public class Document implements Comparable<Document> {
                 }
 
                 if(round == 0 || !act.rounds.get(round).equalsWithWeights(s)) {
-                    SearchTreeNode.StateChange.saveOldState(en.modifiedActs, act, v);
+                    SearchNode.StateChange.saveOldState(en.modifiedActs, act, v);
 
                     Activation.State oldState = act.rounds.get(round);
 
                     boolean propagate = act.rounds.set(round, s);
 
-                    SearchTreeNode.StateChange.saveNewState(act);
+                    SearchNode.StateChange.saveNewState(act);
 
                     if(propagate) {
                         propagateWeight(round, act, v);
