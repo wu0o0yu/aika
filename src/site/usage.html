@@ -186,10 +186,26 @@ required minimum input activation (<i>setMinInput</i>) of each input.
             <pre class="prettyprint">
 				<code class="language-java">
     m.createOrNeuron(suppressingN,
-            new Input().setNeuron(cookProfessionEntity).setWeight(10.0).setRangeMatch(EQUALS).setRangeOutput(true),
-            new Input().setNeuron(cookSurnameEntity).setWeight(10.0).setRangeMatch(EQUALS).setRangeOutput(true),
-            new Input().setNeuron(jacksonCityEntity).setWeight(10.0).setRangeMatch(EQUALS).setRangeOutput(true),
-            new Input().setNeuron(jacksonForenameEntity).setWeight(10.0).setRangeMatch(EQUALS).setRangeOutput(true)
+            new Input()
+                    .setNeuron(cookProfessionEntity)
+                    .setWeight(10.0)
+                    .setRangeMatch(EQUALS)
+                    .setRangeOutput(true),
+            new Input()
+                    .setNeuron(cookSurnameEntity)
+                    .setWeight(10.0)
+                    .setRangeMatch(EQUALS)
+                    .setRangeOutput(true),
+            new Input()
+                    .setNeuron(jacksonCityEntity)
+                    .setWeight(10.0)
+                    .setRangeMatch(EQUALS)
+                    .setRangeOutput(true),
+            new Input()
+                    .setNeuron(jacksonForenameEntity)
+                    .setWeight(10.0)
+                    .setRangeMatch(EQUALS)
+                    .setRangeOutput(true)
     );
                 </code>
 			</pre>
