@@ -193,6 +193,13 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
+    /**
+     * Propagate an activation to the next node or the next neuron that is depending on the current node.
+     *
+     * @param doc
+     * @param act
+     * @param conflict
+     */
     public abstract void propagateAddedActivation(Document doc, Activation act, InterprNode conflict);
 
     public abstract void propagateRemovedActivation(Document doc, Activation act);
