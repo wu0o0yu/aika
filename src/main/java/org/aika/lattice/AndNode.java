@@ -86,7 +86,7 @@ public class AndNode extends Node {
 
 
     @Override
-    public boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v) {
+    protected boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v) {
         ThreadState th = getThreadState(doc, true);
         if(th.visitedAllowedOption == v) return false;
         th.visitedAllowedOption = v;

@@ -197,7 +197,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     public abstract void propagateRemovedActivation(Document doc, Activation act);
 
-    public abstract boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v);
+    protected abstract boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v);
 
     public abstract void cleanup(Document doc);
 
@@ -678,8 +678,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     protected void postProcessRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {}
 
 
-    public void processRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {
-
+    private void processRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {
         if(Document.APPLY_DEBUG_OUTPUT) {
             log.info("remove: " + act.key + " - " + act.key.n);
         }
@@ -688,7 +687,6 @@ public abstract class Node implements Comparable<Node>, Writable {
             postProcessRemovedActivation(doc, act, inputActs);
         }
     }
-
 
 
     public Collection<Activation> getActivations(Document doc) {
@@ -735,7 +733,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public boolean computeAndParents(Document doc, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Node> parents, boolean discoverPatterns, long v) {
+    boolean computeAndParents(Document doc, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Node> parents, boolean discoverPatterns, long v) {
         RidVisited nv = getThreadState(doc, true).lookupVisited(offset);
         if(nv.computeParents == v) return true;
         nv.computeParents = v;
@@ -769,7 +767,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public void removeFromNextLevel(Document doc, Activation iAct) {
+    void removeFromNextLevel(Document doc, Activation iAct) {
         AndNode.removeActivation(doc, iAct);
 
         if(orChildren != null) {
@@ -806,7 +804,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public AndNode getAndChild(Refinement ref) {
+    AndNode getAndChild(Refinement ref) {
         lock.acquireReadLock();
         AndNode result = andChildren != null ? andChildren.get(ref) : null;
         lock.releaseReadLock();
@@ -834,6 +832,14 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
+    /**
+     * Translates the synapse weights of a neuron into logic nodes.
+     *
+     * @param doc
+     * @param neuron
+     * @param dir
+     * @return
+     */
     public static boolean adjust(Document doc, Neuron neuron, final int dir) {
         long v = visitedCounter++;
         OrNode outputNode = (OrNode) neuron.node;
@@ -935,7 +941,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public static void computeRefinements(Document doc, TreeSet<RSKey> queue, Neuron n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup) {
+    private static void computeRefinements(Document doc, TreeSet<RSKey> queue, Neuron n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup) {
         n.lock.acquireWriteLock(doc.threadId);
         Synapse minSyn = null;
         double sum = 0.0;
