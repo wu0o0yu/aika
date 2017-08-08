@@ -21,7 +21,7 @@ import org.aika.Activation;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.SearchNode;
+import org.aika.corpus.SearchTreeNode;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
@@ -198,7 +198,7 @@ public class NamedEntityRecognitionTest {
         }
 
         // Search for the best interpretation of this text.
-        SearchNode.INCOMPLETE_OPTIMIZATION = true;
+        SearchTreeNode.INCOMPLETE_OPTIMIZATION = true;
         doc.process();
 
         System.out.println(doc.networkStateToString(true, true));
@@ -412,7 +412,7 @@ public class NamedEntityRecognitionTest {
         }
 
         // Search for the best interpretation of this text.
-        SearchNode.INCOMPLETE_OPTIMIZATION = true;
+        SearchTreeNode.INCOMPLETE_OPTIMIZATION = true;
         doc.process();
 
         System.out.println(doc.networkStateToString(true, true));

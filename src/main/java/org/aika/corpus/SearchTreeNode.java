@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * The {@code SearchNode} class represents a node in the binary search tree that is used to find the optimal
+ * The {@code SearchTreeNode} class represents a node in the binary search tree that is used to find the optimal
  * interpretation for a given document. Each search node possess a refinement (simply a set of interpretation nodes).
  * The two options that this search node examines are that the refinement will either part of the final interpretation or not.
  * During each search step the activation values in all the neuron activations adjusted such that they reflect the interpretation of the current search path.
@@ -42,9 +42,9 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-public class SearchNode implements Comparable<SearchNode> {
+public class SearchTreeNode implements Comparable<SearchTreeNode> {
 
-    private static final Logger log = LoggerFactory.getLogger(SearchNode.class);
+    private static final Logger log = LoggerFactory.getLogger(SearchTreeNode.class);
 
     /**
      * This optimization may miss some cases and will not always return the best interpretation.
@@ -55,9 +55,9 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public int id;
 
-    SearchNode excludedParent;
-    SearchNode selectedParent;
-    SearchNode parent;
+    SearchTreeNode excludedParent;
+    SearchTreeNode selectedParent;
+    SearchTreeNode parent;
 
     long visited;
     List<InterprNode> refinement;
@@ -67,10 +67,10 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public List<StateChange> modifiedActs = new ArrayList<>();
 
-    public TreeSet<SearchNode> candidates = new TreeSet<>();
+    public TreeSet<SearchTreeNode> candidates = new TreeSet<>();
 
 
-    public SearchNode(SearchNode parent) {
+    public SearchTreeNode(SearchTreeNode parent) {
         this.parent = parent;
     }
 
@@ -89,7 +89,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public static SearchNode createInitialExpandNode(Document doc) {
+    public static SearchTreeNode createInitialExpandNode(Document doc) {
         List<InterprNode> changed = new ArrayList<>();
         changed.add(doc.bottom);
         return createCandidate(doc, changed, null, null, null, Arrays.asList(doc.bottom), null);
@@ -100,7 +100,7 @@ public class SearchNode implements Comparable<SearchNode> {
         ArrayList<InterprNode> results = new ArrayList<>();
         results.add(doc.bottom);
 
-        doc.selectedSearchNode = null;
+        doc.selectedSearchTreeNode = null;
         int[] searchSteps = new int[1];
 
         List<InterprNode> rootRefs = expandRootRefinement(doc);
@@ -116,7 +116,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         doc.interrupted = false;
-        doc.selectedSearchNode = doc.root;
+        doc.selectedSearchTreeNode = doc.root;
         doc.selectedMark = InterprNode.visitedCounter++;
         markSelected(doc.selectedMark);
 
@@ -125,17 +125,17 @@ public class SearchNode implements Comparable<SearchNode> {
 
         generateInitialCandidates(doc);
 
-        SearchNode child = doc.root.selectCandidate();
+        SearchTreeNode child = doc.root.selectCandidate();
 
         if(child != null) {
             child.search(doc, doc.root, null, searchSteps);
         }
 
-        if (doc.selectedSearchNode != null) {
-            doc.selectedSearchNode.reconstructSelectedResult(doc);
-            doc.selectedSearchNode.collectResults(results);
+        if (doc.selectedSearchTreeNode != null) {
+            doc.selectedSearchTreeNode.reconstructSelectedResult(doc);
+            doc.selectedSearchTreeNode.collectResults(results);
 
-            log.info("Selected SearchNode ID: " + doc.selectedSearchNode.id);
+            log.info("Selected SearchNode ID: " + doc.selectedSearchTreeNode.id);
         }
 
         doc.selectedInterprNode = results;
@@ -160,7 +160,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void search(Document doc, SearchNode selectedParent, SearchNode excludedParent, int[] searchSteps) {
+    private void search(Document doc, SearchTreeNode selectedParent, SearchTreeNode excludedParent, int[] searchSteps) {
         if(searchSteps[0] > MAX_SEARCH_STEPS) {
             doc.interrupted = true;
         }
@@ -183,12 +183,12 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         double accNW = computeAccumulatedWeight().getNormWeight();
-        double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.computeAccumulatedWeight().getNormWeight() : 0.0;
+        double selectedAccNW = doc.selectedSearchTreeNode != null ? doc.selectedSearchTreeNode.computeAccumulatedWeight().getNormWeight() : 0.0;
 
         generateNextLevelCandidates(doc, selectedParent, excludedParent);
 
         if(candidates.size() == 0) {
-            SearchNode en = this;
+            SearchTreeNode en = this;
             while(en != null) {
                 if(en.marker != null && !en.marker.complete) {
                     en.marker.complete = !hasUnsatisfiedPositiveFeedbackLink(en.refinement);
@@ -197,7 +197,7 @@ public class SearchNode implements Comparable<SearchNode> {
             }
 
             if (accNW > selectedAccNW) {
-                doc.selectedSearchNode = this;
+                doc.selectedSearchTreeNode = this;
                 doc.selectedMark = InterprNode.visitedCounter++;
                 markSelected(doc.selectedMark);
 
@@ -205,7 +205,7 @@ public class SearchNode implements Comparable<SearchNode> {
             }
         }
 
-        SearchNode child = selectCandidate();
+        SearchTreeNode child = selectCandidate();
         if(child != null) {
             child.search(doc, this, excludedParent, searchSteps);
         }
@@ -257,7 +257,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private SearchNode selectCandidate() {
+    private SearchTreeNode selectCandidate() {
         if(candidates.isEmpty()) return null;
         return candidates.pollFirst();
     }
@@ -267,7 +267,7 @@ public class SearchNode implements Comparable<SearchNode> {
         candidates = new TreeSet<>();
         for(InterprNode cn: collectConflicts(doc)) {
             List<InterprNode> changed = new ArrayList<>();
-            SearchNode c = createCandidate(doc, changed, this, this, null, Arrays.asList(cn), new RefMarker());
+            SearchTreeNode c = createCandidate(doc, changed, this, this, null, Arrays.asList(cn), new RefMarker());
 
             c.weightDelta = doc.vQueue.adjustWeight(c, changed);
             if(Document.OPTIMIZE_DEBUG_OUTPUT) {
@@ -282,13 +282,13 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public void generateNextLevelCandidates(Document doc, SearchNode selectedParent, SearchNode excludedParent) {
+    public void generateNextLevelCandidates(Document doc, SearchTreeNode selectedParent, SearchTreeNode excludedParent) {
         candidates = new TreeSet<>();
 
-        for(SearchNode pc: selectedParent.candidates) {
+        for(SearchTreeNode pc: selectedParent.candidates) {
             if(!checkCovered(pc.refinement) && !checkExcluded(pc.refinement, InterprNode.visitedCounter++)) {
                 List<InterprNode> changed = new ArrayList<>();
-                SearchNode c = createCandidate(doc, changed, this, this, excludedParent, pc.refinement, pc.marker);
+                SearchTreeNode c = createCandidate(doc, changed, this, this, excludedParent, pc.refinement, pc.marker);
 
                 c.weightDelta = doc.vQueue.adjustWeight(c, changed);
                 c.changeState(StateChange.Mode.OLD);
@@ -535,8 +535,8 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public static SearchNode createCandidate(Document doc, List<InterprNode> changed, SearchNode parent, SearchNode selectedParent, SearchNode excludedParent, List<InterprNode> ref, RefMarker marker) {
-        SearchNode cand = new SearchNode(parent);
+    public static SearchTreeNode createCandidate(Document doc, List<InterprNode> changed, SearchTreeNode parent, SearchTreeNode selectedParent, SearchTreeNode excludedParent, List<InterprNode> ref, RefMarker marker) {
+        SearchTreeNode cand = new SearchTreeNode(parent);
         cand.id = doc.searchNodeIdCounter++;
         cand.visited = InterprNode.visitedCounter++;
         cand.selectedParent = selectedParent;
@@ -562,7 +562,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     @Override
-    public int compareTo(SearchNode c) {
+    public int compareTo(SearchTreeNode c) {
         int r = Double.compare(c.computeAccumulatedWeight().getNormWeight(), computeAccumulatedWeight().getNormWeight());
         if(r != 0) return r;
         return Integer.compare(id, c.id);

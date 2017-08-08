@@ -65,22 +65,25 @@ public class InterprNode implements Comparable<InterprNode> {
     private long visitedCollect;
     private long visitedExpandActivations;
     private long visitedRemoveActivations;
-    public long visitedMarkCovered;
-    public long markedCovered = -1;
-    public long markedExcluded = -1;
     private long visitedIsConflicting;
-    public long visitedCollectAllConflicting = -1;
-    private long visitedStoreFinalWeight = -1;
-    public long visitedExpandRefinementRecursiveStep = -1;
-    public long markedExpandRefinement = -1;
-    public long visitedCollectConflicts = -1;
-    private long visitedComputeLargestCommonSubset = -1;
-    private long visitedComputeLength = -1;
-    public long visitedCheckExcluded = -1;
-    public long markedConflict = -1;
-    private long visitedComputeParents = -1;
-    private long visitedNumberInnerInputs = -1;
-    public Boolean hasUnsatisfiedPosFeedbackLinksCache;
+    private long visitedStoreFinalWeight;
+    private long visitedComputeLargestCommonSubset;
+    private long visitedComputeLength;
+    private long visitedComputeParents;
+    private long visitedNumberInnerInputs;
+
+    long visitedMarkCovered;
+    long visitedCollectAllConflicting;
+    long visitedExpandRefinementRecursiveStep;
+    long markedExpandRefinement;
+    long visitedCollectConflicts;
+    long visitedCheckExcluded;
+
+    public long markedConflict;
+    public long markedCovered;
+    public long markedExcluded;
+
+    Boolean hasUnsatisfiedPosFeedbackLinksCache;
 
     private int numberInnerInputs = 0;
 
@@ -91,9 +94,9 @@ public class InterprNode implements Comparable<InterprNode> {
 
     public final Document doc;
 
-    public boolean isRemoved;
-    public int removedId;
-    public static int removedIdCounter = 1;
+    boolean isRemoved;
+    int removedId;
+    static int removedIdCounter = 1;
 
     public InterprNode[] parents;
     public InterprNode[] children;
