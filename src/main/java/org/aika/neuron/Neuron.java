@@ -21,7 +21,7 @@ import org.aika.*;
 import org.aika.Activation.State;
 import org.aika.Activation.SynapseActivation;
 import org.aika.corpus.Document;
-import org.aika.corpus.SearchTreeNode;
+import org.aika.corpus.SearchNode;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
@@ -220,7 +220,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    public State computeWeight(int round, Activation act, SearchTreeNode en, Document doc) {
+    public State computeWeight(int round, Activation act, SearchNode en, Document doc) {
         double directSum = bias - (negDirSum + negRecSum);
         double recurrentSum = 0.0;
 
@@ -444,7 +444,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    private static boolean checkSelfReferencing(InterprNode nx, InterprNode ny, SearchTreeNode en, int depth) {
+    private static boolean checkSelfReferencing(InterprNode nx, InterprNode ny, SearchNode en, int depth) {
         if(nx == ny && (en == null || en.isCovered(ny.markedCovered))) return true;
 
         if(depth > MAX_SELF_REFERENCING_DEPTH) return false;

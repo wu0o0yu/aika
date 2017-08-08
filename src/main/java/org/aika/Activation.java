@@ -18,7 +18,7 @@ package org.aika;
 
 
 import org.aika.corpus.Document;
-import org.aika.corpus.SearchTreeNode.StateChange;
+import org.aika.corpus.SearchNode.StateChange;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.InterprNode.Relation;
 import org.aika.corpus.Range;
