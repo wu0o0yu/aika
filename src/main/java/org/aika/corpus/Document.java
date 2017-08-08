@@ -33,10 +33,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * The <code>Document</code> class represents a single document which may be either used for processing a text or as
+ * The {@code Document} class represents a single document which may be either used for processing a text or as
  * training input. A document consists of the raw text, the interpretations and the activations.
  *
- * When the document is not needed any more, the method <code>clearActivations<code/> must be called, since Aika only supports a single document per thread and model.
+ * <p>When the document is not needed any more, the method {@code clearActivations} must be called, since Aika only supports a single document per thread and model.
  *
  * @author Lukas Molzberger
  */
@@ -534,7 +534,7 @@ public class Document implements Comparable<Document> {
         }
     }
 
-    public static class VEntry implements Comparable<VEntry> {
+    private static class VEntry implements Comparable<VEntry> {
         public int round;
         public Activation act;
 

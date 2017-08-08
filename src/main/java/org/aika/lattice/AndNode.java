@@ -35,10 +35,11 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * The <code>InputNode</code> and the <code>AndNode</code> classes together form a pattern lattice, containing all
+ * The {@code InputNode} and the {@code AndNode} classes together form a pattern lattice, containing all
  * possible substructures of any given conjunction. For example if we have the conjunction ABCD where A, B, C, D are
- * the inputs then the pattern lattice will contain the nodes ABCD, ABC, ABD, ACD, BCD, AB, AC, AD, BC, BD, CD,
- * A, B, C, D. The layers within the pattern lattice are connected trough refinements. For example the and-node
+ * the inputs, then the pattern lattice will contain the nodes ABCD, ABC, ABD, ACD, BCD, AB, AC, AD, BC, BD, CD,
+ * A, B, C, D. The pattern lattice is organized in layers, where each layer only contains conjunctions/patterns of the
+ * same size. These layers are connected through refinements. For example the and-node
  * ABD on layer 3 is connected to the and-node ABCD on layer 4 via the refinement C.
  *
  * @author Lukas Molzberger
@@ -166,7 +167,6 @@ public class AndNode extends Node {
     }
 
 
-
     public void updateWeight(Document doc, long v) {
         ThreadState th = getThreadState(doc, true);
         Model m = doc.m;
@@ -203,22 +203,6 @@ public class AndNode extends Node {
 
     public int computeNotify(double x) {
         return 1 + (int) Math.floor(Math.pow(x, 1.15) - x);
-    }
-
-
-
-    public double computeFMeasure(Similarity sim, Neuron n) {
-        double fPattern = frequency - sim.nodeFreqOffset;
-        double fNeuron = n.node.frequency - sim.neuronFreqOffset;
-
-        double recall = sim.frequency / fPattern;
-        double precision = sim.frequency / fNeuron;
-
-        if(recall > 1.0 || precision > 1.0) {
-            assert false;
-        }
-
-        return (2 * precision * recall) / (precision + recall);
     }
 
 
@@ -567,7 +551,10 @@ public class AndNode extends Node {
     }
 
 
-    public static class Refinement implements Comparable<Refinement> {
+    /**
+     *
+     */
+    static class Refinement implements Comparable<Refinement> {
         public static Refinement MIN = new Refinement(null, null);
         public static Refinement MAX = new Refinement(null, null);
 

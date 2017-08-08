@@ -42,14 +42,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
- * The <code>Neuron</code> class represents a neuron in Aikas neural network and is connected to other neurons through
+ * The {@code Neuron} class represents a neuron in Aikas neural network and is connected to other neurons through
  * input synapses and output synapses. The activation value of a neuron is calculated by computing the weighted sum
  * (input act. value * synapse weight) of the input synapses, adding the bias to it and sending the resulting value
  * through a transfer function (the upper part of tanh).
  *
  * The neuron does not store its activations by itself. The activation objects are stored within the
- * logic nodes. To access the activations of this neuron simply use the member variable <code>node</code> or use
- * the method <code>getFinalActivations(Document doc)</code> to ge the final activations of this neuron.
+ * logic nodes. To access the activations of this neuron simply use the member variable {@code node} or use
+ * the method {@code getFinalActivations(Document doc)} to ge the final activations of this neuron.
  *
  * @author Lukas Molzberger
  */
@@ -602,8 +602,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
 
     /**
-     * <code>getFinalActivations</code> is a convenience method to retrieve all activations of the given neuron that
-     * are part of the final interpretation. Before calling this method, the <code>doc.process()</code> needs to
+     * {@code getFinalActivations} is a convenience method to retrieve all activations of the given neuron that
+     * are part of the final interpretation. Before calling this method, the {@code doc.process()} needs to
      * be called first.
      *
      * @param doc The current document

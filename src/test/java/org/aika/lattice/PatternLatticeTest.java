@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aika.network;
+package org.aika.lattice;
 
 
 import org.aika.Activation;
@@ -27,6 +27,7 @@ import org.aika.lattice.AndNode;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
+import org.aika.network.TestHelper;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;

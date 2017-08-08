@@ -22,27 +22,28 @@ import org.aika.neuron.Neuron;
 
 
 /**
- * The <code>Input</code> class is just a helper class which is used to initialize a neuron. Most of the parameters of this class
+ * The {@code Input} class is just a helper class which is used to initialize a neuron. Most of the parameters of this class
  * will be mapped to a input synapse for this neuron.
  *
  * @author Lukas Molzberger
  */
 public class Input implements Comparable<Input> {
-    public boolean recurrent;
-    public boolean optional;
-    public Neuron neuron;
-    public double weight;
-    public double maxLowerWeightsSum = Double.MAX_VALUE;
-    public double minInput;
-    public Operator startRangeMatch = Operator.NONE;
-    public Operator endRangeMatch = Operator.NONE;
-    public boolean startRangeOutput;
-    public boolean endRangeOutput;
-    public Mapping startMapping = Mapping.START;
-    public Mapping endMapping = Mapping.END;
+    boolean recurrent;
+    boolean optional;
+    Neuron neuron;
+    double weight;
+    double maxLowerWeightsSum = Double.MAX_VALUE;
+    double minInput;
 
-    public Integer relativeRid;
-    public Integer absoluteRid;
+    Operator startRangeMatch = Operator.NONE;
+    Operator endRangeMatch = Operator.NONE;
+    boolean startRangeOutput;
+    boolean endRangeOutput;
+    Mapping startMapping = Mapping.START;
+    Mapping endMapping = Mapping.END;
+
+    Integer relativeRid;
+    Integer absoluteRid;
 
 
     /**

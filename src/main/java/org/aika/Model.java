@@ -38,7 +38,7 @@ import java.util.*;
  * synapse weights of a neuron are adjusted, then the underlying boolean logic representation of this neuron will be
  * updated too.
  *
- * The model supports parallel processing using a fixed number of threads.
+ * <p>The model supports parallel processing using a fixed number of threads.
  *
  * @author Lukas Molzberger
  */
@@ -157,7 +157,7 @@ public class Model implements Writable {
 
 
     /**
-     * Creates an <code>InputNeuron</code> with the given label.
+     * Creates an {@code InputNeuron} with the given label.
      *
      * @param label
      * @return

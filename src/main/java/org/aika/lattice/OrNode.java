@@ -38,6 +38,9 @@ import static org.aika.corpus.Range.Operator.EQUALS;
 
 
 /**
+ * While several neurons might share a the same input-node or and-node, there is always a always a one-to-one relation
+ * between or-nodes and neurons. The only exceptions are the input neurons which have a one-to-one relation with the
+ * input-node. The or-nodes form a disjunction of one or more input-nodes or and-nodes.
  *
  * @author Lukas Molzberger
  */
@@ -51,7 +54,7 @@ public class OrNode extends Node {
 
 
     public OrNode(Document doc) {
-        super(doc, -1); // Or Node Activations always need to be processed first!
+        super(doc, -1); // Or-node activations always need to be processed first!
         Model m = doc.m;
 
         m.stat.nodes++;
@@ -389,7 +392,7 @@ public class OrNode extends Node {
     }
 
 
-    public static class OrEntry implements Comparable<OrEntry>, Writable {
+    static class OrEntry implements Comparable<OrEntry>, Writable {
         public Integer ridOffset;
         public Node node;
 

@@ -46,18 +46,18 @@ import static org.aika.corpus.Range.Mapping.START;
 
 
 /**
- * The <code>Node</code> class is the abstract class for all the boolean logic nodes underneath the neural network layer.
+ * The {@code Node} class is the abstract class for all the boolean logic nodes underneath the neural network layer.
  * These nodes form a boolean representation for all the neurons of the neural network. Whenever changes occur to the
  * synapse weights in the neural layer, then the structure of the boolean representation needs to be adjusted. Several
- * neurons, however, might share common substructures in this boolean representation. The <code>InputNode</code> and
- * the <code>AndNode</code> classes together form a pattern lattice, containing all possible substructures of any
+ * neurons, however, might share common substructures in this boolean representation. The {@code InputNode} and
+ * the {@code AndNode} classes together form a pattern lattice, containing all possible substructures of any
  * given conjunction. For example if we have the conjunction ABCD where A, B, C, D are the inputs then the
  * pattern lattice will contain the nodes ABCD, ABC, ABD, ACD, BCD, AB, AC, AD, BC, BD, CD, A, B, C, D. The class
- * <code>OrNode</code> is a disjunction of either input-nodes or and-nodes. The or-node is connected with one of
+ * {@code OrNode} is a disjunction of either input-nodes or and-nodes. The or-node is connected with one of
  * the neurons.
  *
- * Each logic node has a set of activations. The activations are stored in the thread local data structure
- * <code>ThreadState</code>.
+ * <p>Each logic node has a set of activations. The activations are stored in the thread local data structure
+ * {@code ThreadState}.
  *
  * @author Lukas Molzberger
  */
@@ -67,8 +67,8 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     public static boolean LINK_NEURON_RELATIONS_OPTIMIZATION = true;
 
-    public static final DummyNode MIN_NODE = new DummyNode(Integer.MIN_VALUE);
-    public static final DummyNode MAX_NODE = new DummyNode(Integer.MAX_VALUE);
+    public static final Node MIN_NODE = new DummyNode(Integer.MIN_VALUE);
+    public static final Node MAX_NODE = new DummyNode(Integer.MAX_VALUE);
 
     private static final Logger log = LoggerFactory.getLogger(Node.class);
 
@@ -119,6 +119,11 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     public ThreadState[] threads;
 
+
+    /**
+     * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
+     * a specific logic node.
+     */
     public static class ThreadState {
         public long lastUsed;
 
@@ -162,7 +167,13 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     }
 
-    public static class RidVisited {
+
+    /**
+     * Aika extensively uses graph coloring techniques. When traversing the logic node lattice, nodes will be
+     * marked in order to avoid having to visit the same node twice. To avoid having to reset each mark Aika uses the
+     * counter {@code Node.visitedCounter} to set a new mark each time.
+     */
+    static class RidVisited {
         public long computeParents = -1;
         public long outputNode = -1;
         public long adjust = -1;
@@ -384,6 +395,12 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
+    /**
+     * Sets the incoming and outgoing links between neuron activations.
+     *
+     * @param doc
+     * @param act
+     */
     private void linkNeuronRelations(Document doc, Activation act) {
         long v = visitedCounter++;
         for(int dir = 0; dir < (passive ? 1 : 2); dir++) {
@@ -559,6 +576,11 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
+    /**
+     * Process all added or removed activation for this logic node.
+     *
+     * @param doc
+     */
     public void processChanges(Document doc) {
         ThreadState th = getThreadState(doc, true);
         NavigableMap<Key, Collection<Activation>> tmpAdded = th.added;
@@ -594,6 +616,16 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
+    /**
+     * Add a new activation to this logic node and further propagate this activation through the network.
+     * This activation, however, will not be added immediately. This method only adds a request to the activations
+     * queue in the document. The activation will be added when the method {@code Node.processChanges(Document doc)}
+     * is called.
+     *
+     * @param doc
+     * @param ak
+     * @param inputActs
+     */
     public static void addActivationAndPropagate(Document doc, Key ak, Collection<Activation> inputActs) {
         ThreadState th = ak.n.getThreadState(doc, true);
         Collection<Activation> iActs = th.added.get(ak);
@@ -961,7 +993,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public static class RSKey implements Comparable<RSKey> {
+    private static class RSKey implements Comparable<RSKey> {
         Node pa;
         Integer offset;
 
@@ -1165,14 +1197,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public static class Similarity {
-        volatile public int frequency;
-        public int neuronFreqOffset;
-        public int nodeFreqOffset;
-    }
-
-
-    public static class ReverseAndRefinement implements Comparable<ReverseAndRefinement> {
+    static class ReverseAndRefinement implements Comparable<ReverseAndRefinement> {
         boolean dir;
         Node node;
 

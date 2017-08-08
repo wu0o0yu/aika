@@ -28,14 +28,14 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * The <code>SearchNode</code> class represents a node in the binary search tree that is used to find the optimal
- * interpretation for a given document. Each search node posses a refinement (simply a set of interpretation nodes).
+ * The {@code SearchNode} class represents a node in the binary search tree that is used to find the optimal
+ * interpretation for a given document. Each search node possess a refinement (simply a set of interpretation nodes).
  * The two options that this search node examines are that the refinement will either part of the final interpretation or not.
  * During each search step the activation values in all the neuron activations adjusted such that they reflect the interpretation of the current search path.
  * When the search reaches the maximum depth of the search tree and no further refinements exists, a weight is computed evaluating the current search path.
  * The search path with the highest weight is used to determine the final interpretation.
  *
- * Before the search is started a set of initial refinements is generated from the conflicts within the document.
+ * <p> Before the search is started a set of initial refinements is generated from the conflicts within the document.
  * In other words, if there are no conflicts in a given document, then no search is needed. In this case the final interpretation
  * will simply be the set of all interpretation nodes. The initial refinements are then expanded, meaning all interpretation nodes that are consistent
  * with this refinement are added to the refinement. The initial refinements are then propagated along the search path as refinement candidates.
@@ -569,6 +569,14 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
+    /**
+     * The <code>StateChange</code> class is used to store the state change of an activation that occurs in each node of
+     * the binary search tree. When a candidate refinement is selected during the search, then the activation values of
+     * all affected activation objects are adjusted. The changes to the activation values are also propagated through
+     * the network. The old state needs to be stored here in order for the search to be able to restore the old network
+     * state before following the alternative search branch.
+     *
+     */
     public static class StateChange {
         public Activation act;
 
@@ -603,7 +611,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public static class RefMarker {
+    private static class RefMarker {
         public long markedSelected;
         public boolean complete;
     }

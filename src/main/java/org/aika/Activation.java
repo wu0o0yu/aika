@@ -35,17 +35,17 @@ import java.util.stream.Stream;
 import static org.aika.corpus.Range.Operator.*;
 
 /**
- * The <code>Activation</code> class is the most central class in Aika. On the one hand it stores the activation value
- * for a given neuron in the <code>State</code> substructure. On the other hand it specifies where this activation is
- * located within the document and to which interpretation it belongs. The <code>Activation.Key</code> therefore
+ * The {@code Activation} class is the most central class in Aika. On the one hand it stores the activation value
+ * for a given neuron in the {@code State} substructure. On the other hand it specifies where this activation is
+ * located within the document and to which interpretation it belongs. The {@code Activation.Key} therefore
  * consists of the logic node to which this activation belongs. If this logic node is an or-node, then this activation
  * automatically also belongs to the neuron as well. Furthermore, the key contains the char range within the document
  * and the relational id (rid). The relational id might be used to store the word pos for instance. Lastly, the key
  * contain the interpretation node of this activation, specifying to which interpretation this activation belongs.
  *
- * The activations are linked to each other on two levels. The fields <code>inputs</code> and <code>outputs</code>
- * contain the activation links within the logic layer. The fields <code>neuronInputs</code> and
- * <code>neuronOutputs</code> contain the links on the neural layer.
+ * <p>The activations are linked to each other on two levels. The fields {@code inputs} and {@code outputs}
+ * contain the activation links within the logic layer. The fields {@code neuronInputs} and
+ * {@code neuronOutputs} contain the links on the neural layer.
  *
  * @author Lukas Molzberger
  */
@@ -399,6 +399,11 @@ public class Activation implements Comparable<Activation> {
     }
 
 
+    /**
+     * A <code>State</code> object contains the activation value of an activation object that belongs to a neuron.
+     * It furthermore contains a weight that is used to evaluate the interpretations during the search for the best
+     * interpretation.
+     */
     public static class State {
         public final double value;
         public final int fired;
@@ -426,6 +431,12 @@ public class Activation implements Comparable<Activation> {
     }
 
 
+    /**
+     * Since Aika is a recurrent neural network, it is necessary to compute several rounds of activation values. The
+     * computation stops if no further changes occur to the state. Only the recurrent synapses depend on the previous
+     * round.
+     *
+     */
     public static class Rounds {
         public TreeMap<Integer, State> rounds = new TreeMap<>();
 
@@ -470,6 +481,9 @@ public class Activation implements Comparable<Activation> {
     }
 
 
+    /**
+     * The {@code SynapseActivation} mirror the synapse link in the network of activations.
+     */
     public static class SynapseActivation {
         public final Synapse s;
         public final Activation input;
