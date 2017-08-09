@@ -188,7 +188,7 @@ public abstract class Node implements Comparable<Node>, Writable {
             th = new ThreadState(endRequired, ridRequired);
             threads[doc.threadId] = th;
         }
-        th.lastUsed = doc.iterationId;
+        th.lastUsed = doc.id;
         return th;
     }
 
@@ -216,7 +216,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     public abstract String logicToString();
 
-    public abstract void apply(Document doc, Activation act, InterprNode conflict);
+    protected abstract void apply(Document doc, Activation act, InterprNode conflict);
 
     public abstract void discover(Document doc, Activation act);
 
@@ -228,7 +228,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     public abstract void computeNullHyp(Model m);
 
-    public abstract boolean isExpandable(boolean checkFrequency);
+    protected abstract boolean isExpandable(boolean checkFrequency);
 
 
     protected Node() {}
@@ -1196,7 +1196,7 @@ public abstract class Node implements Comparable<Node>, Writable {
         }
 
         @Override
-        public void apply(Document doc, Activation act, InterprNode conflict) {}
+        protected void apply(Document doc, Activation act, InterprNode conflict) {}
 
         @Override
         public void discover(Document doc, Activation act) {}

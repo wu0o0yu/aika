@@ -61,7 +61,7 @@ public class SimpleWeightsTest {
 
             doc.process();
 
-            System.out.println(doc.selectedInterpretationToString());
+            System.out.println(doc.bestInterpretationToString());
             System.out.println(doc.networkStateToString(true, true));
 
             doc.clearActivations();
@@ -74,7 +74,7 @@ public class SimpleWeightsTest {
 
             doc.process();
 
-            System.out.println(doc.selectedInterpretationToString());
+            System.out.println(doc.bestInterpretationToString());
             System.out.println(doc.networkStateToString(true, true));
 
             doc.clearActivations();
@@ -114,7 +114,7 @@ public class SimpleWeightsTest {
 
             doc.process();
 
-            System.out.println(doc.selectedInterpretationToString());
+            System.out.println(doc.bestInterpretationToString());
             System.out.println(doc.networkStateToString(true, true));
 
             doc.clearActivations();

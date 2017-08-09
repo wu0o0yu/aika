@@ -63,15 +63,14 @@ public class Document implements Comparable<Document> {
 
     public InterprNode bottom = new InterprNode(this, -1, 0, 0);
 
-    public SearchNode root = SearchNode.createInitialExpandNode(this);
+    public SearchNode root = SearchNode.createRootSearchNode(this);
     public SearchNode selectedSearchNode = null;
-    public List<InterprNode> selectedInterprNode = null;
+    public List<InterprNode> bestInterpretation = null;
     public long selectedMark = -1;
 
 
     public Model m;
     public int threadId;
-    public long iterationId;
     public boolean interrupted;
 
     public Queue queue = new Queue();
@@ -118,12 +117,11 @@ public class Document implements Comparable<Document> {
     };
 
 
-    public Document(String content, Model m, int threadId, long iterationId) {
+    public Document(String content, Model m, int threadId) {
         this.content = content;
 
         this.m = m;
         this.threadId = threadId;
-        this.iterationId = iterationId;
     }
 
 
@@ -147,24 +145,10 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public String conflictsToString() {
-        HashSet<InterprNode> conflicts = new HashSet<>();
-        bottom.collectConflicts(conflicts, InterprNode.visitedCounter++);
-
+    public String bestInterpretationToString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Conflicts:\n");
-        for(InterprNode n: conflicts) {
-            sb.append(n.conflicts.primaryToString());
-        }
-        sb.append("\n");
-        return sb.toString();
-    }
-
-
-    public String selectedInterpretationToString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Selected Interpretation Nodes:\n");
-        sb.append(selectedInterprNode.toString());
+        sb.append("Best Interpretation:\n");
+        sb.append(bestInterpretation.toString());
         sb.append("\n");
         return sb.toString();
     }
@@ -186,13 +170,14 @@ public class Document implements Comparable<Document> {
 
 
     /**
-     * The method <code>process</code> needs to be called after all the input activations have been added to the network.
+     * The method <code>process</code> needs to be called after all the input activations have been added to the
+     * network. It performs the search for the best interpretation.
      */
     public void process() {
         for(Activation act: inputNeuronActivations) {
             vQueue.propagateWeight(0, act, Activation.visitedCounter++);
         }
-        root.computeSelectedOption(this);
+        root.computeBestInterpretation(this);
     }
 
 
@@ -271,10 +256,10 @@ public class Document implements Comparable<Document> {
         activatedNodes.clear();
         addedNodes.clear();
 
-        if(m.lastCleanup[threadId] + CLEANUP_INTERVAL < iterationId) {
+        if(m.lastCleanup[threadId] + CLEANUP_INTERVAL < id) {
             for (Node n : m.allNodes[threadId]) {
                 Node.ThreadState th = n.threads[threadId];
-                if (th != null && th.lastUsed + CLEANUP_INTERVAL < iterationId) {
+                if (th != null && th.lastUsed + CLEANUP_INTERVAL < id) {
                     n.threads[threadId] = null;
                 }
             }
@@ -329,12 +314,6 @@ public class Document implements Comparable<Document> {
             sb.append(" - UB:");
             sb.append(Utils.round(act.upperBound));
             if (withWeights) {
-                if(act.key.n instanceof AndNode) {
-                    AndNode an = (AndNode) act.key.n;
-                    sb.append(" - BW:");
-                    sb.append(an.weight);
-                }
-
                 sb.append(" - ");
                 for(Map.Entry<Integer, Activation.State> me: act.rounds.rounds.entrySet()) {
                     Activation.State s = me.getValue();

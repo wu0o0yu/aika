@@ -72,7 +72,7 @@ public class OrNode extends Node {
 
 
     @Override
-    public boolean isExpandable(boolean checkFrequency) {
+    protected boolean isExpandable(boolean checkFrequency) {
         return false;
     }
 

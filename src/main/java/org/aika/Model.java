@@ -47,7 +47,6 @@ public class Model implements Writable {
     public int numberOfThreads = 1;
 
     public int[] lastCleanup;
-    public int[] documentCounter;
 
     public Document[] docs;
 
@@ -86,7 +85,6 @@ public class Model implements Writable {
         this.numberOfThreads = numberOfThreads;
 
         lastCleanup = new int[numberOfThreads];
-        documentCounter = new int[numberOfThreads];
         allNodes = new Set[numberOfThreads];
         docs = new Document[numberOfThreads];
 
@@ -104,13 +102,13 @@ public class Model implements Writable {
 
 
     public Document createDocument(String txt, int threadId) {
-        Document doc = new Document(txt, this, threadId, documentCounter[threadId]++);
+        Document doc = new Document(txt, this, threadId);
 
         if(txt != null) {
             doc.changeNumberOfPositions(doc.length());
 
             if(docs[threadId] != null) {
-                throw new RuntimeException("Two documents are using the same thread. Call clearActivations() first.");
+                throw new RuntimeException("Two documents are using the same thread. Call clearActivations() first, before processing the next document.");
             }
             docs[threadId] = doc;
         }
@@ -263,6 +261,8 @@ public class Model implements Writable {
      */
     public Neuron createNeuron(Neuron n, double bias, Collection<Input> inputs) {
         n.m = this;
+        if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
+
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         double negDirSum = 0.0;
@@ -405,7 +405,6 @@ public class Model implements Writable {
      */
     public Neuron createCounterNeuron(Neuron n, Neuron clockSignal, boolean dirCS, Neuron startSignal, boolean dirSS, boolean direction) {
         n.m = this;
-
         if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
         double bias = -44.0;

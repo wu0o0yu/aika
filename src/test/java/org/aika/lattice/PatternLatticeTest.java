@@ -23,10 +23,7 @@ import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
-import org.aika.lattice.AndNode;
 import org.aika.lattice.AndNode.Refinement;
-import org.aika.lattice.InputNode;
-import org.aika.lattice.Node;
 import org.aika.network.TestHelper;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
@@ -278,7 +275,7 @@ public class PatternLatticeTest {
         InputNode pDNode = TestHelper.addOutputNode(doc, inD, 0, null);
 
 
-        doc.selectedInterprNode = Arrays.asList(doc.bottom);
+        doc.bestInterpretation = Arrays.asList(doc.bottom);
         doc.train();
 
         inA.addInput(doc, 0, 1, 0);

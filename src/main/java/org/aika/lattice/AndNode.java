@@ -46,17 +46,17 @@ import java.util.*;
  */
 public class AndNode extends Node {
 
-    public static double SIGNIFICANCE_THRESHOLD = 0.98;
+    private static double SIGNIFICANCE_THRESHOLD = 0.98;
     public static int MAX_POS_NODES = 4;
     public static int MAX_RID_RANGE = 5;
 
-    public SortedMap<Refinement, Node> parents = new TreeMap<>();
+    SortedMap<Refinement, Node> parents = new TreeMap<>();
 
 
     public volatile int numberOfPositionsNotify;
-    public volatile int frequencyNotify;
+    private volatile int frequencyNotify;
 
-    public double weight = -1;
+    private double weight = -1;
 
 
     public AndNode() {}
@@ -106,12 +106,12 @@ public class AndNode extends Node {
     }
 
 
-    public void addActivation(Document doc, Key ak, Collection<Activation> directInputActs) {
+    void addActivation(Document doc, Key ak, Collection<Activation> directInputActs) {
         Node.addActivationAndPropagate(doc, ak, directInputActs);
     }
 
 
-    protected static void removeActivation(Document doc, Activation iAct) {
+    static void removeActivation(Document doc, Activation iAct) {
         for(Activation act: iAct.outputs.values()) {
             if(act.key.n instanceof AndNode) {
                 Node.removeActivationAndPropagate(doc, act, Collections.singleton(iAct));
@@ -219,7 +219,7 @@ public class AndNode extends Node {
 
 
     @Override
-    public void apply(Document doc, Activation act, InterprNode removedConflict) {
+    protected void apply(Document doc, Activation act, InterprNode removedConflict) {
 
         // Check if the activation has been deleted in the meantime.
         if(act.isRemoved) {
@@ -283,7 +283,7 @@ public class AndNode extends Node {
     }
 
 
-    public boolean isExpandable(boolean checkFrequency) {
+    protected boolean isExpandable(boolean checkFrequency) {
         if(checkFrequency && !isFrequent()) return false;
 
         int numPosNodes = 0;
@@ -306,7 +306,7 @@ public class AndNode extends Node {
     }
 
 
-    public static AndNode createNextLevelNode(Document doc, Node n, Refinement ref, boolean discoverPatterns) {
+    static AndNode createNextLevelNode(Document doc, Node n, Refinement ref, boolean discoverPatterns) {
         AndNode nln = n.getAndChild(ref);
         if(nln != null) {
             return nln;

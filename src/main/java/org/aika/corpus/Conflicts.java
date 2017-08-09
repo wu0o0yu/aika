@@ -34,7 +34,7 @@ public class Conflicts {
     public Map<Key, Conflict> secondary = new TreeMap<>();
 
 
-    public static void collectDirectConflicting(Collection<InterprNode> results, InterprNode n) {
+    static void collectDirectConflicting(Collection<InterprNode> results, InterprNode n) {
         for(Conflict c: n.conflicts.primary.values()) {
             results.add(c.secondary);
         }
@@ -44,7 +44,7 @@ public class Conflicts {
     }
 
 
-    public static void collectAllConflicting(Collection<InterprNode> results, InterprNode n, long v) {
+    static void collectAllConflicting(Collection<InterprNode> results, InterprNode n, long v) {
         if(n.visitedCollectAllConflicting == v) return;
         n.visitedCollectAllConflicting = v;
 
@@ -121,20 +121,6 @@ public class Conflicts {
 
     public boolean hasConflicts() {
         return !primary.isEmpty() || !secondary.isEmpty();
-    }
-
-
-    public String primaryToString() {
-        StringBuilder sb = new StringBuilder();
-        for (Conflict c: primary.values()) {
-            sb.append(c.act.toString());
-            sb.append(" : ");
-            sb.append(c.primary.toString());
-            sb.append(" : ");
-            sb.append(c.secondary.toString());
-            sb.append("\n");
-        }
-        return sb.toString();
     }
 
 

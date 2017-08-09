@@ -157,11 +157,11 @@ public class MutualExclusionTest {
         // Computes the selected option
         doc.process();
 
-        System.out.println("Selected Option: " + doc.selectedInterprNode);
+        System.out.println("Selected Option: " + doc.bestInterpretation);
         System.out.println();
 
         System.out.println("Show all conflicts with the selected option:");
-        for(InterprNode so: doc.selectedInterprNode) {
+        for(InterprNode so: doc.bestInterpretation) {
             for(Conflict c: so.conflicts.primary.values()) {
                 System.out.println(c.conflict);
             }

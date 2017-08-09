@@ -145,7 +145,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public void computeLargestCommonSubset() {
+    private void computeLargestCommonSubset() {
         int s = orInterprNodes.size();
         long vMin = InterprNode.visitedCounter++;
         List<InterprNode> results = new ArrayList<>();
@@ -156,7 +156,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public void computeLargestCommonSubsetIncremental(InterprNode no) {
+    private void computeLargestCommonSubsetIncremental(InterprNode no) {
         if (orInterprNodes.size() == 0) {
             setLCS(no);
             return;
@@ -359,7 +359,7 @@ public class InterprNode implements Comparable<InterprNode> {
     };
 
 
-    public static void computeRelations(List<InterprNode> parentsResults, List<InterprNode> childrenResults, List<InterprNode> inputs) {
+    private static void computeRelations(List<InterprNode> parentsResults, List<InterprNode> childrenResults, List<InterprNode> inputs) {
         if (inputs.isEmpty()) return;
         long v = InterprNode.visitedCounter++;
         int i = 0;
@@ -494,13 +494,13 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public static void addLink(InterprNode a, InterprNode b) {
+    private static void addLink(InterprNode a, InterprNode b) {
         a.children = addToArray(a.children, b);
         b.parents = addToArray(b.parents, a);
     }
 
 
-    public static void removeLink(InterprNode a, InterprNode b) {
+    private static void removeLink(InterprNode a, InterprNode b) {
         a.children = removeToArray(a.children, b);
         b.parents = removeToArray(b.parents, a);
     }
@@ -644,19 +644,6 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public void collectConflicts(Set<InterprNode> conflicts, long v) {
-        if(visitedCollectConflicts == v) return;
-        visitedCollectConflicts = v;
-
-        for(InterprNode n: children) {
-            if(isConflict >= 0) {
-                conflicts.add(n);
-            }
-            n.collectConflicts(conflicts, v);
-        }
-    }
-
-
     public boolean isConflicting(long v) {
         if (isConflict >= 0) {
             return true;
@@ -674,12 +661,12 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public boolean conflictsAllowed() {
+    private boolean conflictsAllowed() {
         return activations == null || activations.isEmpty();
     }
 
 
-    public void storeFinalWeight(long v) {
+    void storeFinalWeight(long v) {
         if(visitedStoreFinalWeight == v) return;
         visitedStoreFinalWeight = v;
 

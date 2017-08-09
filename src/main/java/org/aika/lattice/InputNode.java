@@ -155,7 +155,7 @@ public class InputNode extends Node {
 
 
     @Override
-    public boolean isExpandable(boolean checkFrequency) {
+    protected boolean isExpandable(boolean checkFrequency) {
         return true;
     }
 
@@ -287,7 +287,7 @@ public class InputNode extends Node {
      * @param removedConflict This parameter contains a removed conflict if it is not null. In this case only expand activations that contain this removed conflict.
      */
     @Override
-    public void apply(Document doc, Activation act, InterprNode removedConflict) {
+    protected void apply(Document doc, Activation act, InterprNode removedConflict) {
         // Check if the activation has been deleted in the meantime.
         if(act.isRemoved || passive) {
             return;

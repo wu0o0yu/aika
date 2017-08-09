@@ -204,7 +204,7 @@ public class NamedEntityRecognitionTest {
         System.out.println(doc.networkStateToString(true, true));
         System.out.println();
 
-        System.out.println("Selected Option: " + doc.selectedInterprNode.toString());
+        System.out.println("Selected Option: " + doc.bestInterpretation.toString());
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");
@@ -418,7 +418,7 @@ public class NamedEntityRecognitionTest {
         System.out.println(doc.networkStateToString(true, true));
         System.out.println();
 
-        System.out.println("Selected Option: " + doc.selectedInterprNode.toString());
+        System.out.println("Selected Option: " + doc.bestInterpretation.toString());
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");

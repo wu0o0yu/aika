@@ -89,14 +89,14 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public static SearchNode createInitialExpandNode(Document doc) {
+    public static SearchNode createRootSearchNode(Document doc) {
         List<InterprNode> changed = new ArrayList<>();
         changed.add(doc.bottom);
         return createCandidate(doc, changed, null, null, null, Arrays.asList(doc.bottom), null);
     }
 
 
-    public void computeSelectedOption(Document doc) {
+    public void computeBestInterpretation(Document doc) {
         ArrayList<InterprNode> results = new ArrayList<>();
         results.add(doc.bottom);
 
@@ -112,7 +112,7 @@ public class SearchNode implements Comparable<SearchNode> {
         weightDelta = doc.vQueue.adjustWeight(this, rootRefs);
 
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
-            log.info("Root ExpandNode:" + toString());
+            log.info("Root SearchNode:" + toString());
         }
 
         doc.interrupted = false;
@@ -138,7 +138,7 @@ public class SearchNode implements Comparable<SearchNode> {
             log.info("Selected SearchNode ID: " + doc.selectedSearchNode.id);
         }
 
-        doc.selectedInterprNode = results;
+        doc.bestInterpretation = results;
 
         if(doc.interrupted) {
             log.warn("The search for the best interpretation has been interrupted. Too many search steps!");
