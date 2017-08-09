@@ -422,7 +422,7 @@ public class InputNode extends Node {
 
 
     @Override
-    public void remove(Document doc) {
+    protected void remove(Document doc) {
         inputNeuron.outputNodes.remove(key);
         super.remove(doc);
     }

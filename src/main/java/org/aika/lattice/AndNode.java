@@ -476,7 +476,7 @@ public class AndNode extends Node {
 
 
     @Override
-    public void remove(Document doc) {
+    protected void remove(Document doc) {
         super.remove(doc);
 
         for(Map.Entry<Refinement, Node> me: parents.entrySet()) {

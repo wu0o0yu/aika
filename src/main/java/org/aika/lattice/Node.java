@@ -72,12 +72,12 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Node.class);
 
-    public static AtomicInteger currentNodeId = new AtomicInteger(0);
+    private static AtomicInteger currentNodeId = new AtomicInteger(0);
     public int id;
 
-    TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
-    TreeMap<Refinement, AndNode> andChildren;
-    TreeSet<OrEntry> orChildren;
+    protected TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
+    protected TreeMap<Refinement, AndNode> andChildren;
+    protected TreeSet<OrEntry> orChildren;
 
     public int level;
 
@@ -203,11 +203,11 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     protected abstract boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v);
 
-    public abstract void cleanup(Document doc);
+    protected abstract void cleanup(Document doc);
 
-    public abstract void initActivation(Document doc, Activation act);
+    protected abstract void initActivation(Document doc, Activation act);
 
-    public abstract void deleteActivation(Document doc, Activation act);
+    protected abstract void deleteActivation(Document doc, Activation act);
 
     public abstract double computeSynapseWeightSum(Integer offset, Neuron n);
 
@@ -281,7 +281,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     };
 
 
-    public void addOrChild(Document doc, OrEntry oe) {
+    protected void addOrChild(Document doc, OrEntry oe) {
         lock.acquireWriteLock(doc.threadId);
         if(orChildren == null) {
             orChildren = new TreeSet<>();
@@ -291,7 +291,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public void removeOrChild(Document doc, OrEntry oe) {
+    protected void removeOrChild(Document doc, OrEntry oe) {
         lock.acquireWriteLock(doc.threadId);
         if(orChildren != null) {
             orChildren.remove(oe);
@@ -303,7 +303,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public void addAndChild(Refinement ref, AndNode child) {
+    protected void addAndChild(Refinement ref, AndNode child) {
         if(andChildren == null) {
             andChildren = new TreeMap<>();
             reverseAndChildren = new TreeMap<>();
@@ -315,7 +315,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public void removeAndChild(Refinement ref) {
+    protected void removeAndChild(Refinement ref) {
         if(andChildren != null) {
             andChildren.remove(ref);
             reverseAndChildren.remove(new ReverseAndRefinement(this, ref.rid, 0));
@@ -342,7 +342,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public Activation addActivationInternal(Document doc, Key ak, Collection<Activation> inputActs, boolean isTrainingAct) {
+    Activation addActivationInternal(Document doc, Key ak, Collection<Activation> inputActs, boolean isTrainingAct) {
         Activation act = Activation.get(doc, this, ak);
         if(act == null) {
             act = new Activation(doc.activationIdCounter++, ak);
@@ -376,7 +376,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public boolean removeActivationInternal(Document doc, Activation act, Collection<Activation> inputActs) {
+    boolean removeActivationInternal(Document doc, Activation act, Collection<Activation> inputActs) {
         boolean flag = false;
         if(act.isRemoved) {
             act.unregister(doc);
@@ -533,7 +533,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public static void addConflict(Document doc, InterprNode io, InterprNode o, Activation act, Collection<Activation> inputActs, long v) {
+    private static void addConflict(Document doc, InterprNode io, InterprNode o, Activation act, Collection<Activation> inputActs, long v) {
         if(o.markedConflict == v || o.orInterprNodes == null) {
             if (!isAllowed(doc, io, o, inputActs)) {
                 Conflicts.add(doc, act, io, o);
@@ -546,7 +546,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public static void removeConflict(Document doc, InterprNode io, InterprNode o, Activation act, Activation nAct, long v) {
+    private static void removeConflict(Document doc, InterprNode io, InterprNode o, Activation act, Activation nAct, long v) {
         if(o.markedConflict == v || o.orInterprNodes == null) {
             if (!nAct.key.n.isAllowedOption(doc, o, nAct, visitedCounter++)) {
                 assert io != null;
@@ -647,7 +647,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public void processAddedActivation(Document doc, Key ak, Collection<Activation> inputActs) {
+    protected void processAddedActivation(Document doc, Key ak, Collection<Activation> inputActs) {
         Range r = preProcessAddedActivation(doc, ak, inputActs);
         if(r == null) return;
 
@@ -737,7 +737,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    boolean computeAndParents(Document doc, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Node> parents, boolean discoverPatterns, long v) {
+    protected boolean computeAndParents(Document doc, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Node> parents, boolean discoverPatterns, long v) {
         RidVisited nv = getThreadState(doc, true).lookupVisited(offset);
         if(nv.computeParents == v) return true;
         nv.computeParents = v;
@@ -771,7 +771,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    void removeFromNextLevel(Document doc, Activation iAct) {
+    protected void removeFromNextLevel(Document doc, Activation iAct) {
         AndNode.removeActivation(doc, iAct);
 
         if(orChildren != null) {
@@ -782,7 +782,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    public void remove(Document doc) {
+    protected void remove(Document doc) {
         assert !isRemoved;
 
         if(neuron != null) {

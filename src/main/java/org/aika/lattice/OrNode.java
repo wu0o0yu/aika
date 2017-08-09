@@ -271,7 +271,7 @@ public class OrNode extends Node {
     }
 
 
-    public void addInput(Document doc, Integer ridOffset, Node in) {
+    void addInput(Document doc, Integer ridOffset, Node in) {
         in.changeNumberOfNeuronRefs(doc, Node.visitedCounter++, 1);
         in.addOrChild(doc, new OrEntry(ridOffset, this));
         lock.acquireWriteLock(doc.threadId);
@@ -286,7 +286,7 @@ public class OrNode extends Node {
     }
 
 
-    public void removeInput(Document doc, Integer ridOffset, Node in) {
+    void removeInput(Document doc, Integer ridOffset, Node in) {
         in.changeNumberOfNeuronRefs(doc, Node.visitedCounter++, -1);
         in.removeOrChild(doc, new OrEntry(ridOffset, this));
         lock.acquireWriteLock(doc.threadId);
@@ -302,7 +302,7 @@ public class OrNode extends Node {
     }
 
 
-    public void removeAllInputs(Document doc) {
+    void removeAllInputs(Document doc) {
         lock.acquireWriteLock(doc.threadId);
         for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
             for(Node pn: me.getValue()) {
@@ -315,7 +315,7 @@ public class OrNode extends Node {
     }
 
 
-    public void remove(Document doc) {
+    protected void remove(Document doc) {
         super.remove(doc);
 
         lock.acquireReadLock();
