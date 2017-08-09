@@ -87,7 +87,6 @@ public class InputNode extends Node {
 
         if(input != null) {
             in.inputNeuron = input;
-            in.passive = input.node != null && input.node.passive;
             input.outputNodes.put(key, in);
         }
         return in;
@@ -289,7 +288,7 @@ public class InputNode extends Node {
     @Override
     protected void apply(Document doc, Activation act, InterprNode removedConflict) {
         // Check if the activation has been deleted in the meantime.
-        if(act.isRemoved || passive) {
+        if(act.isRemoved) {
             return;
         }
 

@@ -75,14 +75,11 @@ public abstract class Node implements Comparable<Node>, Writable {
     public static AtomicInteger currentNodeId = new AtomicInteger(0);
     public int id;
 
-    public TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
-    public TreeMap<Refinement, AndNode> andChildren;
-    public TreeSet<OrEntry> orChildren;
+    TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
+    TreeMap<Refinement, AndNode> andChildren;
+    TreeSet<OrEntry> orChildren;
 
     public int level;
-
-    // Temporary fix for a performance problem
-    public boolean passive;
 
     public volatile int frequency;
     public volatile double nullHypFreq;
@@ -95,9 +92,9 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     public int numberOfNeuronRefs = 0;
-    public volatile boolean isRemoved;
-    public volatile int isRemovedId;
-    public static int isRemovedIdCounter = 0;
+    protected volatile boolean isRemoved;
+    protected volatile int isRemovedId;
+    protected static int isRemovedIdCounter = 0;
 
     public volatile boolean frequencyHasChanged = true;
     public volatile int nOffset;
@@ -410,7 +407,7 @@ public abstract class Node implements Comparable<Node>, Writable {
      */
     private void linkNeuronRelations(Document doc, Activation act) {
         long v = visitedCounter++;
-        for(int dir = 0; dir < (passive ? 1 : 2); dir++) {
+        for(int dir = 0; dir < 2; dir++) {
             ArrayList<Activation> recNegTmp = new ArrayList<>();
             neuron.lock.acquireReadLock();
             TreeSet<Synapse> syns = (dir == 0 ? neuron.inputSynapses : neuron.outputSynapses);
@@ -1070,7 +1067,6 @@ public abstract class Node implements Comparable<Node>, Writable {
     public void write(DataOutput out) throws IOException {
         out.writeInt(id);
         out.writeInt(level);
-        out.writeBoolean(passive);
 
         out.writeInt(frequency);
         out.writeDouble(nullHypFreq);
@@ -1094,7 +1090,6 @@ public abstract class Node implements Comparable<Node>, Writable {
     public void readFields(DataInput in, Document doc) throws IOException {
         id = in.readInt();
         level = in.readInt();
-        passive = in.readBoolean();
 
         frequency = in.readInt();
         nullHypFreq = in.readDouble();

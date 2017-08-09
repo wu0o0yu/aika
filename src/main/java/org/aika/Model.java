@@ -491,9 +491,7 @@ public class Model implements Writable {
         neg.maxLowerWeightsSum = 28.0;
         is.add(neg);
 
-        Neuron neuron = Neuron.create(dummyDoc, n, bias, 0.0, negRecSum, 0.0, is);
-        neuron.node.passive = true;
-        return neuron;
+        return Neuron.create(dummyDoc, n, bias, 0.0, negRecSum, 0.0, is);
     }
 
 
