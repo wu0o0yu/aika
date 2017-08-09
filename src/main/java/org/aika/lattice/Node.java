@@ -75,9 +75,9 @@ public abstract class Node implements Comparable<Node>, Writable {
     private static AtomicInteger currentNodeId = new AtomicInteger(0);
     public int id;
 
-    protected TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
-    protected TreeMap<Refinement, AndNode> andChildren;
-    protected TreeSet<OrEntry> orChildren;
+    TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
+    TreeMap<Refinement, AndNode> andChildren;
+    TreeSet<OrEntry> orChildren;
 
     public int level;
 
@@ -92,9 +92,9 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     public int numberOfNeuronRefs = 0;
-    protected volatile boolean isRemoved;
-    protected volatile int isRemovedId;
-    protected static int isRemovedIdCounter = 0;
+    volatile boolean isRemoved;
+    volatile int isRemovedId;
+    static int isRemovedIdCounter = 0;
 
     public volatile boolean frequencyHasChanged = true;
     public volatile int nOffset;
@@ -130,7 +130,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
         public NavigableMap<Key, Collection<Activation>> added;
         public NavigableMap<Key, RemovedEntry> removed;
-        protected long visitedNeuronRefsChange = -1;
+        long visitedNeuronRefsChange = -1;
         public long visitedAllowedOption = -1;
         public long visitedComputeWeight = -1;
 
@@ -201,31 +201,31 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     public abstract void propagateRemovedActivation(Document doc, Activation act);
 
-    protected abstract boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v);
+    abstract boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v);
 
-    protected abstract void cleanup(Document doc);
+    abstract void cleanup(Document doc);
 
-    protected abstract void initActivation(Document doc, Activation act);
+    abstract void initActivation(Document doc, Activation act);
 
-    protected abstract void deleteActivation(Document doc, Activation act);
+    abstract void deleteActivation(Document doc, Activation act);
 
     public abstract double computeSynapseWeightSum(Integer offset, Neuron n);
 
     public abstract String logicToString();
 
-    protected abstract void apply(Document doc, Activation act, InterprNode conflict);
+    abstract void apply(Document doc, Activation act, InterprNode conflict);
 
     public abstract void discover(Document doc, Activation act);
 
-    protected abstract Collection<Refinement> collectNodeAndRefinements(Refinement newRef);
+    abstract Collection<Refinement> collectNodeAndRefinements(Refinement newRef);
 
-    protected abstract void changeNumberOfNeuronRefs(Document doc, long v, int d);
+    abstract void changeNumberOfNeuronRefs(Document doc, long v, int d);
 
-    protected abstract boolean hasSupport(Activation act);
+    abstract boolean hasSupport(Activation act);
 
     public abstract void computeNullHyp(Model m);
 
-    protected abstract boolean isExpandable(boolean checkFrequency);
+    abstract boolean isExpandable(boolean checkFrequency);
 
 
     protected Node() {}
@@ -281,7 +281,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     };
 
 
-    protected void addOrChild(Document doc, OrEntry oe) {
+    void addOrChild(Document doc, OrEntry oe) {
         lock.acquireWriteLock(doc.threadId);
         if(orChildren == null) {
             orChildren = new TreeSet<>();
@@ -291,7 +291,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    protected void removeOrChild(Document doc, OrEntry oe) {
+    void removeOrChild(Document doc, OrEntry oe) {
         lock.acquireWriteLock(doc.threadId);
         if(orChildren != null) {
             orChildren.remove(oe);
@@ -303,7 +303,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    protected void addAndChild(Refinement ref, AndNode child) {
+    void addAndChild(Refinement ref, AndNode child) {
         if(andChildren == null) {
             andChildren = new TreeMap<>();
             reverseAndChildren = new TreeMap<>();
@@ -315,7 +315,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    protected void removeAndChild(Refinement ref) {
+    void removeAndChild(Refinement ref) {
         if(andChildren != null) {
             andChildren.remove(ref);
             reverseAndChildren.remove(new ReverseAndRefinement(this, ref.rid, 0));
@@ -642,12 +642,12 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    protected Range preProcessAddedActivation(Document doc, Key ak, Collection<Activation> inputActs) {
+    Range preProcessAddedActivation(Document doc, Key ak, Collection<Activation> inputActs) {
         return ak.r;
     }
 
 
-    protected void processAddedActivation(Document doc, Key ak, Collection<Activation> inputActs) {
+    void processAddedActivation(Document doc, Key ak, Collection<Activation> inputActs) {
         Range r = preProcessAddedActivation(doc, ak, inputActs);
         if(r == null) return;
 
@@ -679,7 +679,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    protected void postProcessRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {}
+    void postProcessRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {}
 
 
     private void processRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {
@@ -737,7 +737,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    protected boolean computeAndParents(Document doc, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Node> parents, boolean discoverPatterns, long v) {
+    boolean computeAndParents(Document doc, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Node> parents, boolean discoverPatterns, long v) {
         RidVisited nv = getThreadState(doc, true).lookupVisited(offset);
         if(nv.computeParents == v) return true;
         nv.computeParents = v;
@@ -771,7 +771,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    protected void removeFromNextLevel(Document doc, Activation iAct) {
+    void removeFromNextLevel(Document doc, Activation iAct) {
         AndNode.removeActivation(doc, iAct);
 
         if(orChildren != null) {
@@ -782,7 +782,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    protected void remove(Document doc) {
+    void remove(Document doc) {
         assert !isRemoved;
 
         if(neuron != null) {
@@ -981,7 +981,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    protected void prepareResultsForPredefinedNodes(Document doc, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, Neuron n, Synapse s, Integer offset) {
+    void prepareResultsForPredefinedNodes(Document doc, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, Neuron n, Synapse s, Integer offset) {
         RSKey rs = new RSKey(this, offset);
         RidVisited nv = getThreadState(doc, true).lookupVisited(offset);
         // TODO: mindestens einen positiven Knoten mit rein nehmen.

@@ -53,7 +53,7 @@ public class InputNode extends Node {
     public Neuron inputNeuron;
 
     // Key: Output Neuron
-    public Map<SynapseKey, Synapse> synapses;
+    Map<SynapseKey, Synapse> synapses;
 
     private long visitedTrain = -1;
 
@@ -94,7 +94,7 @@ public class InputNode extends Node {
 
 
     @Override
-    protected void changeNumberOfNeuronRefs(Document doc, long v, int d) {
+    void changeNumberOfNeuronRefs(Document doc, long v, int d) {
         ThreadState th = getThreadState(doc, true);
         if(th.visitedNeuronRefsChange == v) return;
         th.visitedNeuronRefsChange = v;
@@ -154,13 +154,13 @@ public class InputNode extends Node {
 
 
     @Override
-    protected boolean isExpandable(boolean checkFrequency) {
+    boolean isExpandable(boolean checkFrequency) {
         return true;
     }
 
 
     @Override
-    protected boolean hasSupport(Activation act) {
+    boolean hasSupport(Activation act) {
         for(Activation iAct: act.inputs.values()) {
             if(!iAct.isRemoved && iAct.upperBound > 0.0) return true;
         }
@@ -169,7 +169,7 @@ public class InputNode extends Node {
     }
 
 
-    protected Range preProcessAddedActivation(Document doc, Activation.Key ak, Collection<Activation> inputActs) {
+    Range preProcessAddedActivation(Document doc, Activation.Key ak, Collection<Activation> inputActs) {
         if(neuron == null && (key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE)) {
             boolean dir = key.startRangeMapping == Mapping.NONE;
             int pos = ak.r.getBegin(dir);
@@ -199,7 +199,7 @@ public class InputNode extends Node {
     }
 
 
-    protected void postProcessRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {
+    void postProcessRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {
         Activation.Key ak = act.key;
         if(neuron == null && (key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE)) {
             boolean dir = key.startRangeMapping == Mapping.NONE;
@@ -272,7 +272,7 @@ public class InputNode extends Node {
 
 
     @Override
-    protected Collection<Refinement> collectNodeAndRefinements(Refinement newRef) {
+    Collection<Refinement> collectNodeAndRefinements(Refinement newRef) {
         List<Refinement> result = new ArrayList<>(2);
         result.add(new Refinement(key.relativeRid, newRef.rid, this));
         result.add(newRef);
@@ -286,7 +286,7 @@ public class InputNode extends Node {
      * @param removedConflict This parameter contains a removed conflict if it is not null. In this case only expand activations that contain this removed conflict.
      */
     @Override
-    protected void apply(Document doc, Activation act, InterprNode removedConflict) {
+    void apply(Document doc, Activation act, InterprNode removedConflict) {
         // Check if the activation has been deleted in the meantime.
         if(act.isRemoved) {
             return;
@@ -422,7 +422,7 @@ public class InputNode extends Node {
 
 
     @Override
-    protected void remove(Document doc) {
+    void remove(Document doc) {
         inputNeuron.outputNodes.remove(key);
         super.remove(doc);
     }

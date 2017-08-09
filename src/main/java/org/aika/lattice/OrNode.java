@@ -72,7 +72,7 @@ public class OrNode extends Node {
 
 
     @Override
-    protected boolean isExpandable(boolean checkFrequency) {
+    boolean isExpandable(boolean checkFrequency) {
         return false;
     }
 
@@ -202,7 +202,7 @@ public class OrNode extends Node {
 
 
     @Override
-    protected boolean hasSupport(Activation act) {
+    boolean hasSupport(Activation act) {
         for(Activation iAct: act.inputs.values()) {
             if(!iAct.isRemoved) return true;
         }
@@ -261,12 +261,12 @@ public class OrNode extends Node {
 
 
     @Override
-    protected Set<Refinement> collectNodeAndRefinements(Refinement newRef) {
+    Set<Refinement> collectNodeAndRefinements(Refinement newRef) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    protected void changeNumberOfNeuronRefs(Document doc, long v, int d) {
+    void changeNumberOfNeuronRefs(Document doc, long v, int d) {
         throw new UnsupportedOperationException();
     }
 
@@ -315,7 +315,7 @@ public class OrNode extends Node {
     }
 
 
-    protected void remove(Document doc) {
+    void remove(Document doc) {
         super.remove(doc);
 
         lock.acquireReadLock();

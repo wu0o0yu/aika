@@ -86,7 +86,7 @@ public class AndNode extends Node {
 
 
     @Override
-    protected boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v) {
+    boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v) {
         ThreadState th = getThreadState(doc, true);
         if(th.visitedAllowedOption == v) return false;
         th.visitedAllowedOption = v;
@@ -98,7 +98,7 @@ public class AndNode extends Node {
     }
 
 
-    protected Range preProcessAddedActivation(Document doc, Key ak, Collection<Activation> inputActs) {
+    Range preProcessAddedActivation(Document doc, Key ak, Collection<Activation> inputActs) {
         for(Activation iAct: inputActs) {
             if(iAct.isRemoved) return null;
         }
@@ -131,7 +131,7 @@ public class AndNode extends Node {
 
 
     @Override
-    protected boolean hasSupport(Activation act) {
+    boolean hasSupport(Activation act) {
         int expected = parents.size();
 
         int support = 0;
@@ -219,7 +219,7 @@ public class AndNode extends Node {
 
 
     @Override
-    protected void apply(Document doc, Activation act, InterprNode removedConflict) {
+    void apply(Document doc, Activation act, InterprNode removedConflict) {
 
         // Check if the activation has been deleted in the meantime.
         if(act.isRemoved) {
@@ -283,7 +283,7 @@ public class AndNode extends Node {
     }
 
 
-    protected boolean isExpandable(boolean checkFrequency) {
+    boolean isExpandable(boolean checkFrequency) {
         if(checkFrequency && !isFrequent()) return false;
 
         int numPosNodes = 0;
@@ -408,7 +408,7 @@ public class AndNode extends Node {
 
 
     @Override
-    protected Collection<Refinement> collectNodeAndRefinements(Refinement newRef) {
+    Collection<Refinement> collectNodeAndRefinements(Refinement newRef) {
         List<Refinement> inputs = new ArrayList<>(parents.size() + 1);
         inputs.add(newRef);
 
@@ -432,7 +432,7 @@ public class AndNode extends Node {
 
 
     @Override
-    protected void changeNumberOfNeuronRefs(Document doc, long v, int d) {
+    void changeNumberOfNeuronRefs(Document doc, long v, int d) {
         ThreadState th = getThreadState(doc, true);
         if(th.visitedNeuronRefsChange == v) return;
         th.visitedNeuronRefsChange = v;
@@ -476,7 +476,7 @@ public class AndNode extends Node {
 
 
     @Override
-    protected void remove(Document doc) {
+    void remove(Document doc) {
         super.remove(doc);
 
         for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
