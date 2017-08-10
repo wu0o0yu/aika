@@ -485,10 +485,10 @@ public class Document implements Comparable<Document> {
                     log.info("Value:" + s.value + "  Weight:" + s.weight.w + "  Norm:" + s.weight.n + "\n");
                 }
 
-                if(round == 0 || !act.rounds.get(round).equalsWithWeights(s)) {
+                if(round == 0 || !act.rounds.get(round, false).equalsWithWeights(s)) {
                     SearchNode.StateChange.saveOldState(en.modifiedActs, act, v);
 
-                    Activation.State oldState = act.rounds.get(round);
+                    Activation.State oldState = act.rounds.get(round, false);
 
                     boolean propagate = act.rounds.set(round, s);
 

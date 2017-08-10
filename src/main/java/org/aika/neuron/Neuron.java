@@ -230,56 +230,27 @@ public class Neuron implements Comparable<Neuron>, Writable {
             recurrentSum += posRecSum;
         }
 
-        ArrayList<SynapseActivation> tmp = new ArrayList<>();
-        Synapse lastSynapse = null;
-        SynapseActivation maxSA = null;
-        for (SynapseActivation sa: act.neuronInputs) {
-            if(lastSynapse != null && lastSynapse != sa.s) {
-                tmp.add(maxSA);
-                maxSA = null;
-            }
-            if(maxSA == null || maxSA.input.rounds.get(sa.s.key.isRecurrent ? round - 1 : round).value < sa.input.rounds.get(sa.s.key.isRecurrent ? round - 1 : round).value) {
-                maxSA = sa;
-            }
-            lastSynapse = sa.s;
-        }
-        if(maxSA != null) {
-            tmp.add(maxSA);
-        }
-
-        for (SynapseActivation sa: tmp) {
+        for (SynapseActivation sa: getInputSAs(act, round)) {
             Synapse s = sa.s;
 
             Activation iAct = sa.input;
 
             if (iAct == act || iAct.isRemoved) continue;
 
-            if (s.key.isNeg && s.key.isRecurrent) {
-                if (!checkSelfReferencing(act.key.o, iAct.key.o, en, 0)) {
-                    if (round == 0) {
-                        if (en.isCovered(iAct.key.o.markedCovered)) {
-                            recurrentSum += s.w;
-                        }
-                    } else {
-                        State is = iAct.rounds.get(round - 1);
-
-                        recurrentSum += is.value * s.w;
-                    }
+            if (s.key.isRecurrent) {
+                if (!s.key.isNeg || !checkSelfReferencing(act.key.o, iAct.key.o, en, 0)) {
+                    State is = iAct.rounds.get(
+                            round - 1,
+                            round == 0 && (s.key.isNeg ? en.isCovered(iAct.key.o.markedCovered) : !en.isCovered(iAct.key.o.markedExcluded))
+                    );
+                    recurrentSum += is.value * s.w;
                 }
-            } else if (s.key.isNeg && !s.key.isRecurrent) {
-                State is = iAct.rounds.get(round);
+            } else {
+                State is = iAct.rounds.get(round, false);
                 directSum += is.value * s.w;
 
-            } else if (!s.key.isNeg && s.key.isRecurrent) {
-                State is = iAct.rounds.get(round - 1);
-                recurrentSum += is.value * s.w;
-
-            } else if (!s.key.isNeg && !s.key.isRecurrent) {
-                State is = iAct.rounds.get(round);
-                directSum += is.value * s.w;
-
-                if (directSum + recurrentSum >= 0.0 && fired < 0) {
-                    fired = iAct.rounds.get(round).fired + 1;
+                if (!s.key.isNeg && directSum + recurrentSum >= 0.0 && fired < 0) {
+                    fired = iAct.rounds.get(round, false).fired + 1;
                 }
             }
         }
@@ -295,7 +266,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
         );
 
         if(doc.debugActId == act.id && doc.debugActWeight <= newWeight.w) {
-            storeDebugOutput(doc, tmp, newWeight, sum, round);
+            storeDebugOutput(doc, act, newWeight, sum, round);
         }
 
         return new State(
@@ -306,7 +277,29 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    private void storeDebugOutput(Document doc, List<SynapseActivation> inputs, NormWeight nw, double sum, int round) {
+    private List<SynapseActivation> getInputSAs(Activation act, int round) {
+        ArrayList<SynapseActivation> tmp = new ArrayList<>();
+        Synapse lastSynapse = null;
+        SynapseActivation maxSA = null;
+        for (SynapseActivation sa: act.neuronInputs) {
+            if(lastSynapse != null && lastSynapse != sa.s) {
+                tmp.add(maxSA);
+                maxSA = null;
+            }
+            if(maxSA == null || maxSA.input.rounds.get(sa.s.key.isRecurrent ? round - 1 : round, false).value < sa.input.rounds.get(sa.s.key.isRecurrent ? round - 1 : round, false).value) {
+                maxSA = sa;
+            }
+            lastSynapse = sa.s;
+        }
+        if(maxSA != null) {
+            tmp.add(maxSA);
+        }
+
+        return tmp;
+    }
+
+
+    private void storeDebugOutput(Document doc, Activation act, NormWeight nw, double sum, int round) {
         StringBuilder sb = new StringBuilder();
         sb.append("Activation ID: " + doc.debugActId + "\n");
         sb.append("Neuron: " + label + "\n");
@@ -318,14 +311,14 @@ public class Neuron implements Comparable<Neuron>, Writable {
         sb.append("Negative Direct Sum: " + negDirSum + "\n");
         sb.append("Inputs:\n");
 
-        for(SynapseActivation sa: inputs) {
+        for(SynapseActivation sa: getInputSAs(act, round)) {
             String actValue = "";
             if(sa.s.key.isRecurrent) {
                 if(round > 0) {
-                    actValue = "" + sa.input.rounds.get(round - 1);
+                    actValue = "" + sa.input.rounds.get(round - 1, false);
                 }
             } else {
-                actValue = "" + sa.input.rounds.get(round);
+                actValue = "" + sa.input.rounds.get(round, false);
             }
 
             sb.append("    " + sa.input.key.n.neuron.label + "  SynWeight: " + sa.s.w + "  ActValue: " + actValue);

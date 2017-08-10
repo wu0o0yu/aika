@@ -410,6 +410,7 @@ public class Activation implements Comparable<Activation> {
         public final NormWeight weight;
 
         public static final State ZERO = new State(0.0, -1, NormWeight.ZERO_WEIGHT);
+        public static final State ONE = new State(1.0, -1, NormWeight.ZERO_WEIGHT);
 
         public State(double value, int fired, NormWeight weight) {
             this.value = value;
@@ -441,7 +442,7 @@ public class Activation implements Comparable<Activation> {
         public TreeMap<Integer, State> rounds = new TreeMap<>();
 
         public boolean set(int r, State s) {
-            State lr = get(r - 1);
+            State lr = get(r - 1, false);
             if(lr != null && lr.equalsWithWeights(s)) {
                 State or = rounds.get(r);
                 if(or != null) {
@@ -460,9 +461,9 @@ public class Activation implements Comparable<Activation> {
             }
         }
 
-        public State get(int r) {
+        public State get(int r, boolean defaultValue) {
             Map.Entry<Integer, State> me = rounds.floorEntry(r);
-            return me != null ? me.getValue() : State.ZERO;
+            return me != null ? me.getValue() : (defaultValue ? State.ONE : State.ZERO);
         }
 
         public Rounds copy() {

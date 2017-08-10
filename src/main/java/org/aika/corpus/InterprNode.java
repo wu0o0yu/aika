@@ -630,7 +630,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    private void collectPrimitiveNodes(Set<InterprNode> results, long v) {
+    void collectPrimitiveNodes(Set<InterprNode> results, long v) {
         if(v == visitedCollect) return;
         visitedCollect = v;
 
