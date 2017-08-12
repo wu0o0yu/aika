@@ -342,7 +342,7 @@ public class OrNode extends Node {
                 sb.append(me.getKey() != Integer.MIN_VALUE ? me.getKey() : "X");
                 sb.append(":");
                 sb.append(pn.logicToString());
-                if (i > 10) {
+                if (i > 2) {
                     sb.append(",...");
                     break;
                 }
