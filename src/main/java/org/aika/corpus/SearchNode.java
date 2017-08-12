@@ -64,6 +64,7 @@ public class SearchNode implements Comparable<SearchNode> {
     RefMarker marker;
 
     NormWeight[] weightDelta = new NormWeight[] {NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT};
+    NormWeight[] accumulatedWeight = new NormWeight[2];
 
     public List<StateChange> modifiedActs = new ArrayList<>();
 
@@ -97,6 +98,7 @@ public class SearchNode implements Comparable<SearchNode> {
         markExcluded(null, visited, refinement);
 
         weightDelta = doc.vQueue.adjustWeight(this, rootRefs);
+        accumulatedWeight = weightDelta;
 
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Root SearchNode:" + toString());
@@ -179,8 +181,8 @@ public class SearchNode implements Comparable<SearchNode> {
                 en = en.selectedParent;
             }
 
-            double accNW = computeAccumulatedWeight()[0].getNormWeight();
-            double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.computeAccumulatedWeight()[0].getNormWeight() : 0.0;
+            double accNW = accumulatedWeight[0].getNormWeight();
+            double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight[0].getNormWeight() : 0.0;
 
             if (accNW > selectedAccNW) {
 //                log.info("+ " + pathToString(doc));
@@ -267,6 +269,8 @@ public class SearchNode implements Comparable<SearchNode> {
             SearchNode c = createCandidate(doc, changed, this, null, Arrays.asList(cn), new RefMarker());
 
             c.weightDelta = doc.vQueue.adjustWeight(c, changed);
+            c.computeAccumulatedWeight();
+
             if(Document.OPTIMIZE_DEBUG_OUTPUT) {
                 log.info("Search Step: " + c.id + "  Candidate Weight Delta: " + c.weightDelta);
                 log.info(doc.networkStateToString(true, true) + "\n");
@@ -288,6 +292,8 @@ public class SearchNode implements Comparable<SearchNode> {
                 SearchNode c = createCandidate(doc, changed, this, excludedParent, pc.refinement, pc.marker);
 
                 c.weightDelta = doc.vQueue.adjustWeight(c, changed);
+                c.computeAccumulatedWeight();
+
                 c.changeState(StateChange.Mode.OLD);
 
                 candidates.add(c);
@@ -431,17 +437,9 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public NormWeight[] computeAccumulatedWeight() {
-        if(selectedParent != null) {
-            NormWeight[] pwd = selectedParent.computeAccumulatedWeight();
-
-            NormWeight[] awd = new NormWeight[2];
-            for(int i = 0; i < 2; i++) {
-                awd[i] = weightDelta[i].add(pwd[i]);
-            }
-            return awd;
-        } else {
-            return weightDelta;
+    private void computeAccumulatedWeight() {
+        for(int i = 0; i < 2; i++) {
+            accumulatedWeight[i] = weightDelta[i].add(selectedParent.accumulatedWeight[i]);
         }
     }
 
@@ -586,7 +584,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
     @Override
     public int compareTo(SearchNode c) {
-        int r = Double.compare(c.computeAccumulatedWeight()[0].getNormWeight(), computeAccumulatedWeight()[0].getNormWeight());
+        int r = Double.compare(c.accumulatedWeight[0].getNormWeight(), accumulatedWeight[0].getNormWeight());
         if(r != 0) return r;
         return Integer.compare(id, c.id);
     }
