@@ -20,7 +20,6 @@ package org.aika.corpus;
 import org.aika.Activation;
 import org.aika.Activation.Rounds;
 import org.aika.Activation.SynapseActivation;
-import org.aika.Utils;
 import org.aika.corpus.Conflicts.Conflict;
 import org.aika.neuron.Neuron.NormWeight;
 import org.slf4j.Logger;
@@ -71,6 +70,32 @@ public class SearchNode implements Comparable<SearchNode> {
     public TreeSet<SearchNode> candidates = new TreeSet<>();
 
 
+    private SearchNode(Document doc, List<InterprNode> changed, SearchNode selParent, SearchNode exclParent, List<InterprNode> ref, RefMarker m) {
+        id = doc.searchNodeIdCounter++;
+        visited = InterprNode.visitedCounter++;
+        selectedParent = selParent;
+        excludedParent = exclParent;
+        refinement = expandRefinement(ref, InterprNode.visitedCounter++);
+        markCovered(changed, visited, refinement);
+        markExcluded(changed, visited, refinement);
+        marker = m;
+        weightDelta = doc.vQueue.adjustWeight(this, changed);
+
+        if(selectedParent != null) {
+            for (int i = 0; i < 2; i++) {
+                accumulatedWeight[i] = weightDelta[i].add(selectedParent.accumulatedWeight[i]);
+            }
+        }
+
+        if(Document.OPTIMIZE_DEBUG_OUTPUT) {
+            log.info("Search Step: " + id + "  Candidate Weight Delta: " + weightDelta);
+            log.info(doc.networkStateToString(true, true) + "\n");
+        }
+
+        changeState(StateChange.Mode.OLD);
+    }
+
+
     private void collectResults(Collection<InterprNode> results) {
         results.addAll(refinement);
         if(selectedParent != null) selectedParent.collectResults(results);
@@ -80,7 +105,7 @@ public class SearchNode implements Comparable<SearchNode> {
     public static SearchNode createRootSearchNode(Document doc) {
         List<InterprNode> changed = new ArrayList<>();
         changed.add(doc.bottom);
-        return createCandidate(doc, changed, null, null, Arrays.asList(doc.bottom), null);
+        return new SearchNode(doc, changed, null, null, Arrays.asList(doc.bottom), null);
     }
 
 
@@ -105,17 +130,17 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         doc.interrupted = false;
-        doc.selectedSearchNode = doc.root;
+        doc.selectedSearchNode = this;
 
         doc.bottom.storeFinalWeight(InterprNode.visitedCounter++);
 
 
         generateInitialCandidates(doc);
 
-        SearchNode child = doc.root.selectCandidate();
+        SearchNode child = this.selectCandidate();
 
         if(child != null) {
-            child.search(doc, doc.root, null, searchSteps);
+            child.search(doc, this, null, searchSteps);
         }
 
         if (doc.selectedSearchNode != null) {
@@ -266,37 +291,17 @@ public class SearchNode implements Comparable<SearchNode> {
         candidates = new TreeSet<>();
         for(InterprNode cn: collectConflicts(doc)) {
             List<InterprNode> changed = new ArrayList<>();
-            SearchNode c = createCandidate(doc, changed, this, null, Arrays.asList(cn), new RefMarker());
-
-            c.weightDelta = doc.vQueue.adjustWeight(c, changed);
-            c.computeAccumulatedWeight();
-
-            if(Document.OPTIMIZE_DEBUG_OUTPUT) {
-                log.info("Search Step: " + c.id + "  Candidate Weight Delta: " + c.weightDelta);
-                log.info(doc.networkStateToString(true, true) + "\n");
-            }
-
-            c.changeState(StateChange.Mode.OLD);
-
-            candidates.add(c);
+            candidates.add(new SearchNode(doc, changed, this, null, Arrays.asList(cn), new RefMarker()));
         }
     }
 
 
     public void generateNextLevelCandidates(Document doc, SearchNode selectedParent, SearchNode excludedParent) {
         candidates = new TreeSet<>();
-
         for(SearchNode pc: selectedParent.candidates) {
             if(!checkCovered(pc.refinement) && !checkExcluded(pc.refinement, InterprNode.visitedCounter++)) {
                 List<InterprNode> changed = new ArrayList<>();
-                SearchNode c = createCandidate(doc, changed, this, excludedParent, pc.refinement, pc.marker);
-
-                c.weightDelta = doc.vQueue.adjustWeight(c, changed);
-                c.computeAccumulatedWeight();
-
-                c.changeState(StateChange.Mode.OLD);
-
-                candidates.add(c);
+                candidates.add(new SearchNode(doc, changed, this, excludedParent, pc.refinement, pc.marker));
             }
         }
     }
@@ -437,13 +442,6 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void computeAccumulatedWeight() {
-        for(int i = 0; i < 2; i++) {
-            accumulatedWeight[i] = weightDelta[i].add(selectedParent.accumulatedWeight[i]);
-        }
-    }
-
-
     public boolean isCovered(long g) {
         return g == visited || (selectedParent != null && g < visited && selectedParent.isCovered(g));
     }
@@ -553,25 +551,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
         return sb.toString();
 //        return id + " : " + Utils.round(computeAccumulatedWeight()[0].getNormWeight()) + ", " + Utils.round(computeAccumulatedWeight()[1].getNormWeight())  + " - " + Utils.round(computeAccumulatedWeight()[0].w) + ", " + Utils.round(computeAccumulatedWeight()[1].w);
-    }
-
-
-    public static SearchNode createCandidate(Document doc, List<InterprNode> changed, SearchNode selectedParent, SearchNode excludedParent, List<InterprNode> ref, RefMarker marker) {
-        SearchNode cand = new SearchNode();
-        cand.id = doc.searchNodeIdCounter++;
-        cand.visited = InterprNode.visitedCounter++;
-        cand.selectedParent = selectedParent;
-        cand.excludedParent = excludedParent;
-        cand.refinement = cand.expandRefinement(ref, InterprNode.visitedCounter++);
-        cand.markCovered(changed, cand.visited, cand.refinement);
-        cand.markExcluded(changed, cand.visited, cand.refinement);
-        cand.marker = marker;
-
-        if(Document.OPTIMIZE_DEBUG_OUTPUT) {
-            log.info("\n \n Generate Candidate: " + cand.refinement.toString());
-        }
-
-        return cand;
     }
 
 

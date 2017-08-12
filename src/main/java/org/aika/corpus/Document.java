@@ -65,7 +65,6 @@ public class Document implements Comparable<Document> {
 
     public InterprNode bottom = new InterprNode(this, -1, 0, 0);
 
-    public SearchNode root = SearchNode.createRootSearchNode(this);
     public SearchNode selectedSearchNode = null;
     public List<InterprNode> bestInterpretation = null;
 
@@ -176,7 +175,7 @@ public class Document implements Comparable<Document> {
         for(Activation act: inputNeuronActivations) {
             vQueue.propagateWeight(0, act, Activation.visitedCounter++);
         }
-        root.computeBestInterpretation(this);
+        SearchNode.createRootSearchNode(this).computeBestInterpretation(this);
     }
 
 
