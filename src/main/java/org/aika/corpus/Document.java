@@ -175,7 +175,10 @@ public class Document implements Comparable<Document> {
         for(Activation act: inputNeuronActivations) {
             vQueue.propagateWeight(0, act, Activation.visitedCounter++);
         }
-        SearchNode.createRootSearchNode(this).computeBestInterpretation(this);
+        interrupted = false;
+        SearchNode root = SearchNode.createRootSearchNode(this);
+        selectedSearchNode = root;
+        root.computeBestInterpretation(this);
     }
 
 

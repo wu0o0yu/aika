@@ -129,9 +129,6 @@ public class SearchNode implements Comparable<SearchNode> {
             log.info("Root SearchNode:" + toString());
         }
 
-        doc.interrupted = false;
-        doc.selectedSearchNode = this;
-
         doc.bottom.storeFinalWeight(InterprNode.visitedCounter++);
 
 
