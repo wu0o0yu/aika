@@ -76,14 +76,6 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void markSelected(long v) {
-        if(marker != null) {
-            marker.markedSelected = v;
-        }
-        if(selectedParent != null) selectedParent.markSelected(v);
-    }
-
-
     public static SearchNode createRootSearchNode(Document doc) {
         List<InterprNode> changed = new ArrayList<>();
         changed.add(doc.bottom);
@@ -112,8 +104,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
         doc.interrupted = false;
         doc.selectedSearchNode = doc.root;
-        doc.selectedMark = InterprNode.visitedCounter++;
-        markSelected(doc.selectedMark);
 
         doc.bottom.storeFinalWeight(InterprNode.visitedCounter++);
 
@@ -155,7 +145,10 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void search(Document doc, SearchNode selectedParent, SearchNode excludedParent, int[] searchSteps) {
+    private double search(Document doc, SearchNode selectedParent, SearchNode excludedParent, int[] searchSteps) {
+        double selectedWeight = 0.0;
+        double excludedWeight = 0.0;
+
         if(searchSteps[0] > MAX_SEARCH_STEPS) {
             doc.interrupted = true;
         }
@@ -169,16 +162,11 @@ public class SearchNode implements Comparable<SearchNode> {
             log.info(toString());
         }
 
-        boolean f = doc.selectedMark == -1 || marker.markedSelected != doc.selectedMark;
-
         changeState(StateChange.Mode.NEW);
 
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info(doc.networkStateToString(true, true) + "\n");
         }
-
-        double accNW = computeAccumulatedWeight()[0].getNormWeight();
-        double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.computeAccumulatedWeight()[0].getNormWeight() : 0.0;
 
         generateNextLevelCandidates(doc, selectedParent, excludedParent);
 
@@ -191,35 +179,45 @@ public class SearchNode implements Comparable<SearchNode> {
                 en = en.selectedParent;
             }
 
+            double accNW = computeAccumulatedWeight()[0].getNormWeight();
+            double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.computeAccumulatedWeight()[0].getNormWeight() : 0.0;
+
             if (accNW > selectedAccNW) {
-                log.info("+ " + pathToString(doc));
+//                log.info("+ " + pathToString(doc));
 
                 doc.selectedSearchNode = this;
-                doc.selectedMark = InterprNode.visitedCounter++;
-                markSelected(doc.selectedMark);
-
                 doc.bottom.storeFinalWeight(InterprNode.visitedCounter++);
-            } else {
+            } /* else {
                 log.info("- " + pathToString(doc));
-            }
+            }*/
+
+            return accNW;
         }
 
         SearchNode child = selectCandidate();
-        if(child != null) {
-            child.search(doc, this, excludedParent, searchSteps);
+        if(child != null && !(marker.excluded && marker.complete && INCOMPLETE_OPTIMIZATION)) {
+            selectedWeight = child.search(doc, this, excludedParent, searchSteps);
         }
         changeState(StateChange.Mode.OLD);
 
         if(doc.interrupted) {
-            return;
+            return 0.0;
         }
 
         do {
             child = selectedParent.selectCandidate();
-        } while(child != null && !f && INCOMPLETE_OPTIMIZATION && child.marker.complete);
+        } while(child != null && marker.selected && child.marker.complete && INCOMPLETE_OPTIMIZATION);
 
         if(child != null) {
-            child.search(doc, selectedParent, this, searchSteps);
+            excludedWeight = child.search(doc, selectedParent, this, searchSteps);
+        }
+
+        if(selectedWeight >= excludedWeight) {
+            marker.selected = true;
+            return selectedWeight;
+        } else {
+            marker.excluded = true;
+            return excludedWeight;
         }
     }
 
@@ -637,7 +635,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private static class RefMarker {
-        public long markedSelected;
+        public boolean selected;
+        public boolean excluded;
         public boolean complete;
     }
 }

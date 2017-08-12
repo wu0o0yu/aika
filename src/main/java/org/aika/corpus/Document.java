@@ -68,8 +68,6 @@ public class Document implements Comparable<Document> {
     public SearchNode root = SearchNode.createRootSearchNode(this);
     public SearchNode selectedSearchNode = null;
     public List<InterprNode> bestInterpretation = null;
-    public long selectedMark = -1;
-
 
     public Model m;
     public int threadId;
