@@ -18,6 +18,7 @@ package org.aika.corpus;
 
 
 import org.aika.Activation;
+import org.aika.Activation.State;
 import org.aika.Model;
 import org.aika.Utils;
 import org.aika.lattice.AndNode;
@@ -26,6 +27,7 @@ import org.aika.lattice.Node;
 import org.aika.lattice.Node.ThreadState;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
+import org.aika.neuron.Neuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +103,6 @@ public class Document implements Comparable<Document> {
     public int debugActId = -1;
     public double debugActWeight = 0.0;
     public String debugOutput = "";
-
 
     public static Comparator<Activation> ACTIVATIONS_OUTPUT_COMPARATOR = new Comparator<Activation>() {
         @Override
@@ -439,7 +440,7 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public Neuron.NormWeight adjustWeight(SearchNode cand, List<InterprNode> changed) {
+        public NormWeight[] adjustWeight(SearchNode cand, List<InterprNode> changed) {
             long v = Activation.visitedCounter++;
 
             for(InterprNode n: changed) {
@@ -471,14 +472,14 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public Neuron.NormWeight processChanges(SearchNode en, long v) {
-            Neuron.NormWeight delta = Neuron.NormWeight.ZERO_WEIGHT;
+        public Neuron.NormWeight[] processChanges(SearchNode en, long v) {
+            NormWeight[] delta = new NormWeight[] {NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT};
             while(!queue.isEmpty()) {
                 VEntry e = queue.pollFirst();
                 int round = e.round;
                 Activation act = e.act;
 
-                Activation.State s = act.key.n.neuron.computeWeight(e.round, act, en, Document.this);
+                State s = act.key.n.neuron.computeWeight(e.round, act, en, Document.this);
 
                 if(OPTIMIZE_DEBUG_OUTPUT) {
                     log.info(act.key + " Round:" + round);
@@ -488,7 +489,7 @@ public class Document implements Comparable<Document> {
                 if(round == 0 || !act.rounds.get(round, false).equalsWithWeights(s)) {
                     SearchNode.StateChange.saveOldState(en.modifiedActs, act, v);
 
-                    Activation.State oldState = act.rounds.get(round, false);
+                    State oldState = act.rounds.get(round, false);
 
                     boolean propagate = act.rounds.set(round, s);
 
@@ -504,10 +505,10 @@ public class Document implements Comparable<Document> {
                     }
 
                     if(act.rounds.getLastRound() != null && round >= act.rounds.getLastRound()) { // Consider only the final round.
-                        Neuron.NormWeight oldWeight = oldState.weight;
-                        delta = delta.add(s.weight.sub(oldWeight));
+                        for(int i = 0; i < 2; i++) {
+                            delta[i] = delta[i].add(s.getWeight(i).sub(oldState.getWeight(i)));
+                        }
                     }
-
                 }
             }
             return delta;

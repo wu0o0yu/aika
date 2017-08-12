@@ -406,20 +406,31 @@ public class Activation implements Comparable<Activation> {
      */
     public static class State {
         public final double value;
+        public final double ub;
+        public final double lb;
+
         public final int fired;
         public final NormWeight weight;
+        public final NormWeight weightUB;
 
-        public static final State ZERO = new State(0.0, -1, NormWeight.ZERO_WEIGHT);
-        public static final State ONE = new State(1.0, -1, NormWeight.ZERO_WEIGHT);
+        public static final State ZERO = new State(0.0, 0.0, 0.0, -1, NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT);
+        public static final State ONE = new State(1.0, 1.0, 1.0, -1, NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT);
 
-        public State(double value, int fired, NormWeight weight) {
+        public State(double value, double ub, double lb, int fired, NormWeight weight, NormWeight weightUB) {
             this.value = value;
+            this.ub = ub;
+            this.lb = lb;
             this.fired = fired;
             this.weight = weight;
+            this.weightUB = weightUB;
+        }
+
+        public NormWeight getWeight(int t) {
+            return t == 0 ? weight : weightUB;
         }
 
         public boolean equals(State s) {
-            return Math.abs(value - s.value) <= Neuron.WEIGHT_TOLERANCE;
+            return Math.abs(value - s.value) <= Neuron.WEIGHT_TOLERANCE || Math.abs(ub - s.ub) <= Neuron.WEIGHT_TOLERANCE || Math.abs(lb - s.lb) <= Neuron.WEIGHT_TOLERANCE;
         }
 
         public boolean equalsWithWeights(State s) {

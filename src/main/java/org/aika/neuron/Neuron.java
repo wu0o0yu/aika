@@ -220,15 +220,17 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
+    static final int V = 0;
+    static final int UB = 1;
+    static final int LB = 2;
+    static final int DIR = 0;
+    static final int REC = 1;
+
     public State computeWeight(int round, Activation act, SearchNode en, Document doc) {
-        double directSum = bias - (negDirSum + negRecSum);
-        double recurrentSum = 0.0;
+        double st = bias - (negDirSum + negRecSum);
+        double[][] sum = {{st, st, st}, {0.0, 0.0, 0.0}};
 
         int fired = -1;
-
-        if(round == 0) {
-            recurrentSum += posRecSum;
-        }
 
         for (SynapseActivation sa: getInputSAs(act, round)) {
             Synapse s = sa.s;
@@ -237,42 +239,56 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
             if (iAct == act || iAct.isRemoved) continue;
 
+            State is = State.ZERO;
             if (s.key.isRecurrent) {
                 if (!s.key.isNeg || !checkSelfReferencing(act.key.o, iAct.key.o, en, 0)) {
-                    State is = iAct.rounds.get(
+                    is = iAct.rounds.get(
                             round - 1,
                             round == 0 && (s.key.isNeg ? en.isCovered(iAct.key.o.markedCovered) : !en.isCovered(iAct.key.o.markedExcluded))
                     );
-                    recurrentSum += is.value * s.w;
                 }
             } else {
-                State is = iAct.rounds.get(round, false);
-                directSum += is.value * s.w;
+                is = iAct.rounds.get(round, false);
+            }
 
-                if (!s.key.isNeg && directSum + recurrentSum >= 0.0 && fired < 0) {
-                    fired = iAct.rounds.get(round, false).fired + 1;
-                }
+            int t = s.key.isRecurrent ? REC : DIR;
+            sum[t][V] += is.value * s.w;
+            sum[t][UB] += (s.key.isNeg ? is.lb : is.ub) * s.w;
+            sum[t][LB] += (s.key.isNeg ? is.ub : is.lb) * s.w;
+
+            if (!s.key.isRecurrent && !s.key.isNeg && sum[DIR][V] + sum[REC][V] >= 0.0 && fired < 0) {
+                fired = iAct.rounds.get(round, false).fired + 1;
             }
         }
 
         boolean covered = en.isCovered(act.key.o.markedCovered);
+        boolean excluded = en.isCovered(act.key.o.markedExcluded);
 
-        double sum = directSum + recurrentSum;
+        double drSum = sum[DIR][V] + sum[REC][V];
+        double drSumUB = sum[DIR][UB] + sum[REC][UB];
+        double drSumLB = sum[DIR][LB] + sum[REC][LB];
 
         // Compute only the recurrent part is above the threshold.
         NormWeight newWeight = NormWeight.create(
-                covered ? (directSum + negRecSum) < 0.0 ? Math.max(0.0, sum) : recurrentSum - negRecSum : 0.0,
-                (directSum + negRecSum) < 0.0 ? Math.max(0.0, directSum + negRecSum + maxRecurrentSum) : maxRecurrentSum
+                covered ? (sum[DIR][V] + negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC][V] - negRecSum : 0.0,
+                (sum[DIR][V] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR][V] + negRecSum + maxRecurrentSum) : maxRecurrentSum
+        );
+        NormWeight newWeightUB = NormWeight.create(
+                !excluded ? (sum[DIR][UB] + negRecSum) < 0.0 ? Math.max(0.0, drSumUB) : sum[REC][UB] - negRecSum : 0.0,
+                (sum[DIR][UB] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR][UB] + negRecSum + maxRecurrentSum) : maxRecurrentSum
         );
 
         if(doc.debugActId == act.id && doc.debugActWeight <= newWeight.w) {
-            storeDebugOutput(doc, act, newWeight, sum, round);
+            storeDebugOutput(doc, act, newWeight, drSum, round);
         }
 
         return new State(
-                covered ? transferFunction(sum) : 0.0,
+                covered ? transferFunction(drSum) : 0.0,
+                excluded ? 0.0 : transferFunction(drSumUB),
+                covered ? transferFunction(drSumLB) : 0.0,
                 covered ? fired : -1,
-                newWeight
+                newWeight,
+                newWeightUB
         );
     }
 

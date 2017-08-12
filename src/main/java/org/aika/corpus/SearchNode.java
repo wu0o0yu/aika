@@ -20,6 +20,7 @@ package org.aika.corpus;
 import org.aika.Activation;
 import org.aika.Activation.Rounds;
 import org.aika.Activation.SynapseActivation;
+import org.aika.Utils;
 import org.aika.corpus.Conflicts.Conflict;
 import org.aika.neuron.Neuron.NormWeight;
 import org.slf4j.Logger;
@@ -57,22 +58,16 @@ public class SearchNode implements Comparable<SearchNode> {
 
     SearchNode excludedParent;
     SearchNode selectedParent;
-    SearchNode parent;
 
     long visited;
     List<InterprNode> refinement;
     RefMarker marker;
 
-    NormWeight weightDelta = NormWeight.ZERO_WEIGHT;
+    NormWeight[] weightDelta = new NormWeight[] {NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT};
 
     public List<StateChange> modifiedActs = new ArrayList<>();
 
     public TreeSet<SearchNode> candidates = new TreeSet<>();
-
-
-    public SearchNode(SearchNode parent) {
-        this.parent = parent;
-    }
 
 
     private void collectResults(Collection<InterprNode> results) {
@@ -92,7 +87,7 @@ public class SearchNode implements Comparable<SearchNode> {
     public static SearchNode createRootSearchNode(Document doc) {
         List<InterprNode> changed = new ArrayList<>();
         changed.add(doc.bottom);
-        return createCandidate(doc, changed, null, null, null, Arrays.asList(doc.bottom), null);
+        return createCandidate(doc, changed, null, null, Arrays.asList(doc.bottom), null);
     }
 
 
@@ -182,8 +177,8 @@ public class SearchNode implements Comparable<SearchNode> {
             log.info(doc.networkStateToString(true, true) + "\n");
         }
 
-        double accNW = computeAccumulatedWeight().getNormWeight();
-        double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.computeAccumulatedWeight().getNormWeight() : 0.0;
+        double accNW = computeAccumulatedWeight()[0].getNormWeight();
+        double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.computeAccumulatedWeight()[0].getNormWeight() : 0.0;
 
         generateNextLevelCandidates(doc, selectedParent, excludedParent);
 
@@ -197,11 +192,15 @@ public class SearchNode implements Comparable<SearchNode> {
             }
 
             if (accNW > selectedAccNW) {
+                log.info("+ " + pathToString(doc));
+
                 doc.selectedSearchNode = this;
                 doc.selectedMark = InterprNode.visitedCounter++;
                 markSelected(doc.selectedMark);
 
                 doc.bottom.storeFinalWeight(InterprNode.visitedCounter++);
+            } else {
+                log.info("- " + pathToString(doc));
             }
         }
 
@@ -267,7 +266,7 @@ public class SearchNode implements Comparable<SearchNode> {
         candidates = new TreeSet<>();
         for(InterprNode cn: collectConflicts(doc)) {
             List<InterprNode> changed = new ArrayList<>();
-            SearchNode c = createCandidate(doc, changed, this, this, null, Arrays.asList(cn), new RefMarker());
+            SearchNode c = createCandidate(doc, changed, this, null, Arrays.asList(cn), new RefMarker());
 
             c.weightDelta = doc.vQueue.adjustWeight(c, changed);
             if(Document.OPTIMIZE_DEBUG_OUTPUT) {
@@ -288,7 +287,7 @@ public class SearchNode implements Comparable<SearchNode> {
         for(SearchNode pc: selectedParent.candidates) {
             if(!checkCovered(pc.refinement) && !checkExcluded(pc.refinement, InterprNode.visitedCounter++)) {
                 List<InterprNode> changed = new ArrayList<>();
-                SearchNode c = createCandidate(doc, changed, this, this, excludedParent, pc.refinement, pc.marker);
+                SearchNode c = createCandidate(doc, changed, this, excludedParent, pc.refinement, pc.marker);
 
                 c.weightDelta = doc.vQueue.adjustWeight(c, changed);
                 c.changeState(StateChange.Mode.OLD);
@@ -434,8 +433,18 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public NormWeight computeAccumulatedWeight() {
-        return (selectedParent != null ? weightDelta.add(selectedParent.computeAccumulatedWeight()) : weightDelta);
+    public NormWeight[] computeAccumulatedWeight() {
+        if(selectedParent != null) {
+            NormWeight[] pwd = selectedParent.computeAccumulatedWeight();
+
+            NormWeight[] awd = new NormWeight[2];
+            for(int i = 0; i < 2; i++) {
+                awd[i] = weightDelta[i].add(pwd[i]);
+            }
+            return awd;
+        } else {
+            return weightDelta;
+        }
     }
 
 
@@ -530,13 +539,29 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public String toString() {
-        return refinement.toString() + " : " + computeAccumulatedWeight();
+    public String pathToString(Document doc) {
+        return (selectedParent != null ? selectedParent.pathToString(doc) : "") + " - " + toString(doc);
     }
 
 
-    public static SearchNode createCandidate(Document doc, List<InterprNode> changed, SearchNode parent, SearchNode selectedParent, SearchNode excludedParent, List<InterprNode> ref, RefMarker marker) {
-        SearchNode cand = new SearchNode(parent);
+    public String toString(Document doc) {
+        TreeSet<InterprNode> tmp = new TreeSet<>();
+        for(InterprNode n: refinement) {
+            n.collectPrimitiveNodes(tmp, doc.interprIdCounter++);
+        }
+        StringBuilder sb = new StringBuilder();
+        for(InterprNode n: tmp) {
+            sb.append(n.primId);
+            sb.append(", ");
+        }
+
+        return sb.toString();
+//        return id + " : " + Utils.round(computeAccumulatedWeight()[0].getNormWeight()) + ", " + Utils.round(computeAccumulatedWeight()[1].getNormWeight())  + " - " + Utils.round(computeAccumulatedWeight()[0].w) + ", " + Utils.round(computeAccumulatedWeight()[1].w);
+    }
+
+
+    public static SearchNode createCandidate(Document doc, List<InterprNode> changed, SearchNode selectedParent, SearchNode excludedParent, List<InterprNode> ref, RefMarker marker) {
+        SearchNode cand = new SearchNode();
         cand.id = doc.searchNodeIdCounter++;
         cand.visited = InterprNode.visitedCounter++;
         cand.selectedParent = selectedParent;
@@ -563,7 +588,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
     @Override
     public int compareTo(SearchNode c) {
-        int r = Double.compare(c.computeAccumulatedWeight().getNormWeight(), computeAccumulatedWeight().getNormWeight());
+        int r = Double.compare(c.computeAccumulatedWeight()[0].getNormWeight(), computeAccumulatedWeight()[0].getNormWeight());
         if(r != 0) return r;
         return Integer.compare(id, c.id);
     }

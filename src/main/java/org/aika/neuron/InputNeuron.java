@@ -80,7 +80,7 @@ public class InputNeuron extends Neuron {
 
 
     public void propagateAddedActivation(Document doc, Activation act) {
-        State s = new State(1.0, 0, NormWeight.ZERO_WEIGHT);
+        State s = new State(1.0, 1.0, 1.0, 0, NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.finalState = s;
         act.upperBound = 1.0;
@@ -163,7 +163,7 @@ public class InputNeuron extends Neuron {
         doc.propagate();
 
         Activation act = Activation.get(doc, node, rid, r, EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
-        State s = new State(value, 0, NormWeight.ZERO_WEIGHT);
+        State s = new State(value, value, value, 0, NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.finalState = s;
     }
