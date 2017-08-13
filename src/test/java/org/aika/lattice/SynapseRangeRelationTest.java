@@ -46,11 +46,11 @@ public class SynapseRangeRelationTest {
         Document doc = m.createDocument("                        ", 0);
 
         Neuron in = new Neuron();
-        in.node = new OrNode(doc);
+        in.node = new OrNode(doc.m, doc.threadId);
         in.node.neuron = in;
 
         Neuron on = new Neuron();
-        on.node = new OrNode(doc);
+        on.node = new OrNode(doc.m, doc.threadId);
         on.node.neuron = on;
 
         Synapse s = new Synapse(in,
@@ -68,7 +68,7 @@ public class SynapseRangeRelationTest {
                 )
         );
         s.output = on;
-        s.link(doc);
+        s.link(doc.threadId);
 
         Activation iAct0 = in.node.addActivationInternal(doc, new Key(in.node, new Range(1, 4), null, doc.bottom), Collections.emptyList(), false);
         Activation iAct1 = in.node.addActivationInternal(doc, new Key(in.node, new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);

@@ -53,9 +53,8 @@ public class OrNode extends Node {
     public OrNode() {}
 
 
-    public OrNode(Document doc) {
-        super(doc, -1); // Or-node activations always need to be processed first!
-        Model m = doc.m;
+    public OrNode(Model m, int threadId) {
+        super(m, threadId, -1); // Or-node activations always need to be processed first!
 
         m.stat.nodes++;
         m.stat.orNodes++;
@@ -78,14 +77,14 @@ public class OrNode extends Node {
 
 
     @Override
-    public boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v) {
+    public boolean isAllowedOption(int threadId, InterprNode n, Activation act, long v) {
         return false;
     }
 
 
     @Override
     public void initActivation(Document doc, Activation act) {
-        ThreadState th = getThreadState(doc, false);
+        ThreadState th = getThreadState(doc.threadId, false);
         if(th == null || th.activations.isEmpty()) {
             doc.activatedNeurons.add(neuron);
         }
@@ -94,7 +93,7 @@ public class OrNode extends Node {
 
     @Override
     public void deleteActivation(Document doc, Activation act) {
-        ThreadState th = getThreadState(doc, false);
+        ThreadState th = getThreadState(doc.threadId, false);
         if(th == null || th.activations.isEmpty()) {
             doc.activatedNeurons.remove(neuron);
         }
@@ -196,7 +195,7 @@ public class OrNode extends Node {
 
 
     @Override
-    public void cleanup(Document doc) {
+    public void cleanup(Model m, int threadId) {
 
     }
 
@@ -248,7 +247,7 @@ public class OrNode extends Node {
             return act.key.o;
         }
 
-        ThreadState th = getThreadState(doc, false);
+        ThreadState th = getThreadState(doc.threadId, false);
         if(th != null) {
             for (Key ak : th.added.keySet()) {
                 if (Range.compare(ak.r, r) == 0) {
@@ -266,15 +265,15 @@ public class OrNode extends Node {
     }
 
     @Override
-    void changeNumberOfNeuronRefs(Document doc, long v, int d) {
+    void changeNumberOfNeuronRefs(int threadId, long v, int d) {
         throw new UnsupportedOperationException();
     }
 
 
-    void addInput(Document doc, Integer ridOffset, Node in) {
-        in.changeNumberOfNeuronRefs(doc, Node.visitedCounter++, 1);
-        in.addOrChild(doc, new OrEntry(ridOffset, this));
-        lock.acquireWriteLock(doc.threadId);
+    void addInput(int threadId, Integer ridOffset, Node in) {
+        in.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, 1);
+        in.addOrChild(threadId, new OrEntry(ridOffset, this));
+        lock.acquireWriteLock(threadId);
         Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
         TreeSet<Node> pn = parents.get(key);
         if(pn == null) {
@@ -286,10 +285,10 @@ public class OrNode extends Node {
     }
 
 
-    void removeInput(Document doc, Integer ridOffset, Node in) {
-        in.changeNumberOfNeuronRefs(doc, Node.visitedCounter++, -1);
-        in.removeOrChild(doc, new OrEntry(ridOffset, this));
-        lock.acquireWriteLock(doc.threadId);
+    void removeInput(int threadId, Integer ridOffset, Node in) {
+        in.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, -1);
+        in.removeOrChild(threadId, new OrEntry(ridOffset, this));
+        lock.acquireWriteLock(threadId);
         Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
         TreeSet<Node> pn = parents.get(key);
         if(pn != null) {
@@ -302,12 +301,12 @@ public class OrNode extends Node {
     }
 
 
-    void removeAllInputs(Document doc) {
-        lock.acquireWriteLock(doc.threadId);
+    void removeAllInputs(int threadId) {
+        lock.acquireWriteLock(threadId);
         for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
             for(Node pn: me.getValue()) {
-                pn.changeNumberOfNeuronRefs(doc, Node.visitedCounter++, -1);
-                pn.removeOrChild(doc, new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, this));
+                pn.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, -1);
+                pn.removeOrChild(threadId, new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, this));
             }
         }
         parents.clear();
@@ -315,13 +314,13 @@ public class OrNode extends Node {
     }
 
 
-    void remove(Document doc) {
-        super.remove(doc);
+    void remove(Model m, int threadId) {
+        super.remove(m, threadId);
 
         lock.acquireReadLock();
         for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
             for(Node pn: me.getValue()) {
-                pn.removeOrChild(doc, new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, this));
+                pn.removeOrChild(threadId, new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, this));
             }
         }
         lock.releaseReadLock();
@@ -373,8 +372,8 @@ public class OrNode extends Node {
 
 
     @Override
-    public void readFields(DataInput in, Document doc) throws IOException {
-        super.readFields(in, doc);
+    public void readFields(DataInput in, Model m) throws IOException {
+        super.readFields(in, m);
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
@@ -384,8 +383,8 @@ public class OrNode extends Node {
 
             int sa = in.readInt();
             for(int j = 0; j < sa; j++) {
-                Node pn = doc.m.initialNodes.get(in.readInt());
-                pn.addOrChild(doc, new OrEntry(ridOffset, this));
+                Node pn = m.initialNodes.get(in.readInt());
+                pn.addOrChild(m.defaultThreadId, new OrEntry(ridOffset, this));
                 ridParents.add(pn);
             }
         }
@@ -417,17 +416,17 @@ public class OrNode extends Node {
 
 
         @Override
-        public void readFields(DataInput in, Document doc) throws IOException {
+        public void readFields(DataInput in, Model m) throws IOException {
             if(in.readBoolean()) {
                 ridOffset = in.readInt();
             }
-            node = doc.m.initialNodes.get(in.readInt());
+            node = m.initialNodes.get(in.readInt());
         }
 
 
-        public static OrEntry read(DataInput in, Document doc) throws IOException {
+        public static OrEntry read(DataInput in, Model m) throws IOException {
             OrEntry n = new OrEntry();
-            n.readFields(in, doc);
+            n.readFields(in, m);
             return n;
         }
 

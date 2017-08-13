@@ -128,11 +128,11 @@ public class Synapse implements Writable {
     }
 
 
-    public void link(Document doc) {
+    public void link(int threadId) {
         boolean dir = input.id < output.id;
 
-        (dir ? input : output).lock.acquireWriteLock(doc.threadId);
-        (dir ? output : input).lock.acquireWriteLock(doc.threadId);
+        (dir ? input : output).lock.acquireWriteLock(threadId);
+        (dir ? output : input).lock.acquireWriteLock(threadId);
 
         input.outputSynapses.add(this);
         output.inputSynapses.add(this);
@@ -189,7 +189,7 @@ public class Synapse implements Writable {
         maxLowerWeightsSum = in.readDouble();
 
         input.outputSynapses.add(this);
-        inputNode.setSynapse(m.dummyDoc.threadId, new InputNode.SynapseKey(key.relativeRid, output), this);
+        inputNode.setSynapse(m.defaultThreadId, new InputNode.SynapseKey(key.relativeRid, output), this);
     }
 
 

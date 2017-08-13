@@ -61,22 +61,22 @@ public class InputNeuron extends Neuron {
     }
 
 
-    public static InputNeuron create(Document doc, InputNeuron n) {
-        n.m = doc.m;
+    public static InputNeuron create(Model m, int threadId, InputNeuron n) {
+        n.m = m;
 
-        InputNode node = InputNode.add(doc, new Key(false, false, null, 0, Operator.NONE, Mapping.NONE, true, Operator.NONE, Mapping.NONE, true), null);
+        InputNode node = InputNode.add(m, threadId, new Key(false, false, null, 0, Operator.NONE, Mapping.NONE, true, Operator.NONE, Mapping.NONE, true), null);
         node.setNeuron(n);
 
         n.setNode(node);
-        n.publish(doc);
+        n.publish(threadId);
 
         n.initialized = true;
         return n;
     }
 
 
-    public void remove(Document doc) {
-        unpublish(doc);
+    public void remove(Model m, int threadId) {
+        unpublish(threadId);
     }
 
 

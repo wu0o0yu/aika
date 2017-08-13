@@ -85,13 +85,13 @@ public class AndNode extends Node {
 
 
     @Override
-    boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v) {
-        ThreadState th = getThreadState(doc, true);
+    boolean isAllowedOption(int threadId, InterprNode n, Activation act, long v) {
+        ThreadState th = getThreadState(threadId, true);
         if(th.visitedAllowedOption == v) return false;
         th.visitedAllowedOption = v;
 
         for(Activation pAct: act.inputs.values()) {
-            if(pAct.key.n.isAllowedOption(doc, n, pAct, v)) return true;
+            if(pAct.key.n.isAllowedOption(threadId, n, pAct, v)) return true;
         }
         return false;
     }
@@ -167,7 +167,7 @@ public class AndNode extends Node {
 
 
     public void updateWeight(Document doc, long v) {
-        ThreadState th = getThreadState(doc, true);
+        ThreadState th = getThreadState(doc.threadId, true);
         Model m = doc.m;
         if(isBlocked ||
                 (m.numberOfPositions - nOffset) == 0 ||
@@ -206,12 +206,12 @@ public class AndNode extends Node {
 
 
     @Override
-    public void cleanup(Document doc) {
+    public void cleanup(Model m, int threadId) {
         if(!isRemoved && !isFrequent() && !isRequired()) {
-            remove(doc);
+            remove(m, threadId);
 
             for(Node p: parents.values()) {
-                p.cleanup(doc);
+                p.cleanup(m, threadId);
             }
         }
     }
@@ -273,7 +273,10 @@ public class AndNode extends Node {
                         Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n, secondAct.key.rid, pAct.key.rid));
                         Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
-                        createNextLevelNode(doc, this, nRef, true);
+                        AndNode nln = createNextLevelNode(doc.m, doc.threadId, this, nRef, true);
+                        if(nln != null) {
+                            doc.addedNodes.add(nln);
+                        }
                     }
                 }
             }
@@ -305,10 +308,10 @@ public class AndNode extends Node {
     }
 
 
-    static AndNode createNextLevelNode(Document doc, Node n, Refinement ref, boolean discoverPatterns) {
+    static AndNode createNextLevelNode(Model m, int threadId, Node n, Refinement ref, boolean discoverPatterns) {
         AndNode nln = n.getAndChild(ref);
         if(nln != null) {
-            return nln;
+            return discoverPatterns ? null : nln;
         }
 
         if(n instanceof InputNode) {
@@ -335,26 +338,22 @@ public class AndNode extends Node {
             }
         }
 
-        SortedMap<Refinement, Node> parents = computeNextLevelParents(doc, n, ref, discoverPatterns);
+        SortedMap<Refinement, Node> parents = computeNextLevelParents(m, threadId, n, ref, discoverPatterns);
 
         if (parents != null && (!discoverPatterns || checkRidRange(parents))) {
             // Locking needs to take place in a predefined order.
             TreeSet<Node> parentsForLocking = new TreeSet<>(parents.values());
             for(Node pn: parentsForLocking) {
-                pn.lock.acquireWriteLock(doc.threadId);
+                pn.lock.acquireWriteLock(threadId);
             }
 
             if(n.andChildren == null || !n.andChildren.containsKey(ref)) {
-                nln = new AndNode(doc.m, doc.threadId, n.level + 1, parents);
+                nln = new AndNode(m, threadId, n.level + 1, parents);
                 nln.isBlocked = n.isBlocked || ref.input.isBlocked;
             }
 
             for(Node pn: parentsForLocking) {
                 pn.lock.releaseWriteLock();
-            }
-
-            if(discoverPatterns) {
-                doc.addedNodes.add(nln);
             }
         }
         return nln;
@@ -388,7 +387,7 @@ public class AndNode extends Node {
     }
 
 
-    public static SortedMap<Refinement, Node> computeNextLevelParents(Document doc, Node pa, Refinement ref, boolean discoverPatterns) {
+    public static SortedMap<Refinement, Node> computeNextLevelParents(Model m, int threadId, Node pa, Refinement ref, boolean discoverPatterns) {
         Collection<Refinement> refinements = pa.collectNodeAndRefinements(ref);
 
         long v = visitedCounter++;
@@ -397,7 +396,7 @@ public class AndNode extends Node {
         for(Refinement pRef: refinements) {
             SortedSet<Refinement> childInputs = new TreeSet<>(refinements);
             childInputs.remove(pRef);
-            if(!pRef.input.computeAndParents(doc, pRef.getRelativePosition(), childInputs, parents, discoverPatterns, v)) {
+            if(!pRef.input.computeAndParents(m, threadId, pRef.getRelativePosition(), childInputs, parents, discoverPatterns, v)) {
                 return null;
             }
         }
@@ -431,22 +430,22 @@ public class AndNode extends Node {
 
 
     @Override
-    void changeNumberOfNeuronRefs(Document doc, long v, int d) {
-        ThreadState th = getThreadState(doc, true);
+    void changeNumberOfNeuronRefs(int threadId, long v, int d) {
+        ThreadState th = getThreadState(threadId, true);
         if(th.visitedNeuronRefsChange == v) return;
         th.visitedNeuronRefsChange = v;
         numberOfNeuronRefs += d;
 
         for(Node n: parents.values()) {
-            n.changeNumberOfNeuronRefs(doc, v, d);
+            n.changeNumberOfNeuronRefs(threadId, v, d);
         }
     }
 
 
     @Override
-    public boolean isCovered(Document doc, Integer offset, long v) {
+    public boolean isCovered(int threadId, Integer offset, long v) {
         for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
-            RidVisited nv = me.getValue().getThreadState(doc, true).lookupVisited(Utils.nullSafeSub(offset, true, me.getKey().getOffset(), false));
+            RidVisited nv = me.getValue().getThreadState(threadId, true).lookupVisited(Utils.nullSafeSub(offset, true, me.getKey().getOffset(), false));
             if(nv.outputNode == v) return true;
         }
         return false;
@@ -475,12 +474,12 @@ public class AndNode extends Node {
 
 
     @Override
-    void remove(Document doc) {
-        super.remove(doc);
+    void remove(Model m, int threadId) {
+        super.remove(m, threadId);
 
         for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
             Node pn = me.getValue();
-            pn.lock.acquireWriteLock(doc.threadId);
+            pn.lock.acquireWriteLock(threadId);
             pn.removeAndChild(me.getKey());
             pn.lock.releaseWriteLock();
         }

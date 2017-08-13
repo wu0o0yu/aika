@@ -126,7 +126,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public void register(Document doc) {
-        ThreadState th = key.n.getThreadState(doc, true);
+        ThreadState th = key.n.getThreadState(doc.threadId, true);
         if (th.activations.isEmpty()) {
             (isTrainingAct ? doc.activatedNodesForTraining : doc.activatedNodes).add(key.n);
         }
@@ -159,7 +159,7 @@ public class Activation implements Comparable<Activation> {
     public void unregister(Document doc) {
         assert !key.o.activations.isEmpty();
 
-        Node.ThreadState th = key.n.getThreadState(doc, true);
+        Node.ThreadState th = key.n.getThreadState(doc.threadId, true);
 
         th.activations.remove(key);
 
@@ -197,7 +197,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public static Activation getNextSignal(Node n, Document doc, int from, Integer rid, InterprNode o, boolean dir, boolean inv) {
-        ThreadState th = n.getThreadState(doc, false);
+        ThreadState th = n.getThreadState(doc.threadId, false);
         if(th == null) return null;
 
         Key bk = new Key(null, new Range(from, dir ? Integer.MIN_VALUE : Integer.MAX_VALUE).invert(inv), rid, o);
@@ -215,7 +215,7 @@ public class Activation implements Comparable<Activation> {
     public static Stream<Activation> select(Document doc, Node n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
         Stream<Activation> results;
         if(n != null) {
-            ThreadState th = n.getThreadState(doc, false);
+            ThreadState th = n.getThreadState(doc.threadId, false);
             if(th == null) return Stream.empty();
             int s = th.activations.size();
 
@@ -305,7 +305,7 @@ public class Activation implements Comparable<Activation> {
 
 
     private static Stream<Activation> getActivationsStream(Node n, Document doc) {
-        ThreadState th = n.getThreadState(doc, false);
+        ThreadState th = n.getThreadState(doc.threadId, false);
         return th == null ? Stream.empty() : th.activations.values().stream();
     }
 

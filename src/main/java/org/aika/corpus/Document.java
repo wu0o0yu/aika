@@ -184,7 +184,7 @@ public class Document implements Comparable<Document> {
 
     public void count() {
         for(Node n: activatedNodes) {
-            n.count(this);
+            n.count(threadId);
         }
 
         for(Neuron n: finallyActivatedNeurons) {
@@ -213,7 +213,7 @@ public class Document implements Comparable<Document> {
                     an.updateWeight(this, v);
                 }
 
-                ThreadState th = n.getThreadState(this, false);
+                ThreadState th = n.getThreadState(threadId, false);
                 if(th != null) {
                     for (Activation act : th.activations.values()) {
                         n.discover(this, act);
@@ -234,7 +234,7 @@ public class Document implements Comparable<Document> {
 
         for(Neuron n: finallyActivatedNeurons) {
             if(!n.noTraining) {
-                ThreadState th = n.node.getThreadState(this, false);
+                ThreadState th = n.node.getThreadState(threadId, false);
                 if(th != null) {
                     for (Activation act : th.activations.values()) {
                         n.train(this, act);

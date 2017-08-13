@@ -77,12 +77,12 @@ public class InputNode extends Node {
     }
 
 
-    public static InputNode add(Document doc, Key key, Neuron input) {
+    public static InputNode add(Model m, int threadId, Key key, Neuron input) {
         InputNode in = (input != null ? input.outputNodes.get(key) : null);
         if(in != null) {
             return in;
         }
-        in = new InputNode(doc.m, doc.threadId, key);
+        in = new InputNode(m, threadId, key);
 
         if(input != null) {
             in.inputNeuron = input;
@@ -93,8 +93,8 @@ public class InputNode extends Node {
 
 
     @Override
-    void changeNumberOfNeuronRefs(Document doc, long v, int d) {
-        ThreadState th = getThreadState(doc, true);
+    void changeNumberOfNeuronRefs(int threadId, long v, int d) {
+        ThreadState th = getThreadState(threadId, true);
         if(th.visitedNeuronRefsChange == v) return;
         th.visitedNeuronRefsChange = v;
         numberOfNeuronRefs += d;
@@ -106,7 +106,7 @@ public class InputNode extends Node {
         if(neuron instanceof InputNeuron) {
             doc.inputNeuronActivations.add(act);
 
-            ThreadState th = getThreadState(doc, false);
+            ThreadState th = getThreadState(doc.threadId, false);
             if(th == null || th.activations.isEmpty()) {
                 doc.activatedNeurons.add(neuron);
                 doc.activatedInputNeurons.add(neuron);
@@ -122,7 +122,7 @@ public class InputNode extends Node {
         if(neuron instanceof InputNeuron) {
             doc.inputNeuronActivations.remove(act);
 
-            ThreadState th = getThreadState(doc, false);
+            ThreadState th = getThreadState(doc.threadId, false);
             if(th == null || th.activations.isEmpty()) {
                 doc.activatedNeurons.remove(neuron);
                 doc.activatedInputNeurons.remove(neuron);
@@ -265,7 +265,7 @@ public class InputNode extends Node {
 
 
     @Override
-    public boolean isAllowedOption(Document doc, InterprNode n, Activation act, long v) {
+    public boolean isAllowedOption(int threadId, InterprNode n, Activation act, long v) {
         return false;
     }
 
@@ -385,7 +385,7 @@ public class InputNode extends Node {
                     ((srm.compare(act.key.r.begin, act.key.r.end, secondAct.key.r.begin, secondAct.key.r.end) && erm.compare(act.key.r.end, act.key.r.begin, secondAct.key.r.end, secondAct.key.r.begin)) ||
                             (ridDelta != null && ridDelta < AndNode.MAX_RID_RANGE))) {
                 ref.input.visitedTrain = v;
-                AndNode.createNextLevelNode(doc, this, ref, true);
+                AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, true);
             }
         }
     }
@@ -416,14 +416,14 @@ public class InputNode extends Node {
 
 
     @Override
-    public void cleanup(Document doc) {
+    public void cleanup(Model m, int threadId) {
     }
 
 
     @Override
-    void remove(Document doc) {
+    void remove(Model m, int threadId) {
         inputNeuron.outputNodes.remove(key);
-        super.remove(doc);
+        super.remove(m, threadId);
     }
 
 

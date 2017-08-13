@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Model;
 import org.aika.SuspensionHook;
+import org.aika.corpus.Document;
 import org.aika.neuron.InputNeuron;
 import org.junit.Test;
 
@@ -40,6 +41,10 @@ public class SuspensionTest {
         InputNeuron n = m.createOrLookupInputNeuron("A");
         n.suspend(m);
 
+        n = m.createOrLookupInputNeuron("A");
+
+        Document doc = m.createDocument("Bla");
+        n.addInput(doc, 0, 1);
     }
 
 

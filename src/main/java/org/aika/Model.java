@@ -62,7 +62,7 @@ public class Model implements Writable {
 
     public Statistic stat = new Statistic();
 
-    public Document dummyDoc;
+    public int defaultThreadId = 0;
 
     public Set<AndNode> numberOfPositionsQueue = Collections.synchronizedSet(new TreeSet<>(new Comparator<AndNode>() {
         @Override
@@ -95,8 +95,6 @@ public class Model implements Writable {
         for(int i = 0; i < numberOfThreads; i++) {
             allNodes[i] = new TreeSet<>();
         }
-
-        dummyDoc = createDocument(null, 0);
     }
 
 
@@ -179,7 +177,7 @@ public class Model implements Writable {
         }
 
         if(n == null) {
-            n = InputNeuron.create(dummyDoc, new InputNeuron(label, isBlocked));
+            n = InputNeuron.create(this, defaultThreadId, new InputNeuron(label, isBlocked));
             inputNeurons.put(label, n);
         }
         return n;
@@ -245,7 +243,7 @@ public class Model implements Writable {
         }
         bias += minWeight * threshold;
 
-        return Neuron.create(dummyDoc, n, bias, negDirSum, negRecSum, posRecSum, is);
+        return Neuron.create(this, defaultThreadId, n, bias, negDirSum, negRecSum, posRecSum, is);
     }
 
 
@@ -297,7 +295,7 @@ public class Model implements Writable {
             is.add(s);
         }
 
-        return Neuron.create(dummyDoc, n, bias, negDirSum, negRecSum, posRecSum, is);
+        return Neuron.create(this, defaultThreadId, n, bias, negDirSum, negRecSum, posRecSum, is);
     }
 
 
@@ -336,7 +334,7 @@ public class Model implements Writable {
             is.add(s);
         }
 
-        return Neuron.create(dummyDoc, n, bias, 0.0, 0.0, 0.0, is);
+        return Neuron.create(this, defaultThreadId, n, bias, 0.0, 0.0, 0.0, is);
     }
 
 
@@ -398,7 +396,7 @@ public class Model implements Writable {
             is.add(ctns);
         }
 
-        return Neuron.create(dummyDoc, n, bias, 0.0, 0.0, 0.0, is);
+        return Neuron.create(this, defaultThreadId, n, bias, 0.0, 0.0, 0.0, is);
     }
 
 
@@ -502,7 +500,7 @@ public class Model implements Writable {
         neg.maxLowerWeightsSum = 28.0;
         is.add(neg);
 
-        return Neuron.create(dummyDoc, n, bias, 0.0, negRecSum, 0.0, is);
+        return Neuron.create(this, defaultThreadId, n, bias, 0.0, negRecSum, 0.0, is);
     }
 
 

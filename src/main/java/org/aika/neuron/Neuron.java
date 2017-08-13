@@ -121,16 +121,16 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    public static Neuron create(Document doc, Neuron n, double bias, double negDirSum, double negRecSum, double posRecSum, Set<Synapse> inputs) {
-        n.m = doc.m;
+    public static Neuron create(Model m, int threadId, Neuron n, double bias, double negDirSum, double negRecSum, double posRecSum, Set<Synapse> inputs) {
+        n.m = m;
         n.m.stat.neurons++;
         n.bias = bias;
         n.negDirSum = negDirSum;
         n.negRecSum = negRecSum;
         n.posRecSum = posRecSum;
 
-        n.lock.acquireWriteLock(doc.threadId);
-        n.setNode(new OrNode(doc));
+        n.lock.acquireWriteLock(threadId);
+        n.setNode(new OrNode(m, threadId));
         n.node.setNeuron(n);
         n.lock.releaseWriteLock();
 
@@ -141,7 +141,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
             s.output = n;
             s.outputId = n.id;
-            s.link(doc);
+            s.link(threadId);
 
             if(s.maxLowerWeightsSum == Double.MAX_VALUE) {
                 s.maxLowerWeightsSum = sum;
@@ -150,36 +150,36 @@ public class Neuron implements Comparable<Neuron>, Writable {
             sum += s.w;
         }
 
-        if(!Node.adjust(doc, n, -1)) return null;
+        if(!Node.adjust(m, threadId, n, -1)) return null;
 
-        n.publish(doc);
+        n.publish(threadId);
 
         n.initialized = true;
         return n;
     }
 
 
-    public void publish(Document doc) {
+    public void publish(int threadId) {
         m.neurons.put(id, this);
     }
 
 
-    public void unpublish(Document doc) {
+    public void unpublish(int threadId) {
         m.neurons.remove(this);
     }
 
 
-    public void remove(Document doc) {
-        unpublish(doc);
+    public void remove(int threadId) {
+        unpublish(threadId);
 
         for(Synapse s: inputSynapses) {
-            s.input.lock.acquireWriteLock(doc.threadId);
+            s.input.lock.acquireWriteLock(threadId);
             s.input.outputSynapses.remove(s);
             s.input.lock.releaseWriteLock();
         }
 
         for(Synapse s: outputSynapses) {
-            s.output.lock.acquireWriteLock(doc.threadId);
+            s.output.lock.acquireWriteLock(threadId);
             s.output.inputSynapses.remove(s);
             s.output.inputSynapsesByWeight.remove(s);
             s.output.lock.releaseWriteLock();
@@ -408,7 +408,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
             log.info("");
         }
 
-        Node.adjust(doc, this, act.errorSignal > 0.0 ? 1 : -1);
+        Node.adjust(doc.m, doc.threadId, this, act.errorSignal > 0.0 ? 1 : -1);
     }
 
 
@@ -443,7 +443,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
                 s.output = this;
                 s.outputId = id;
                 in.setSynapse(doc.threadId, sk, s);
-                s.link(doc);
+                s.link(doc.threadId);
             }
 
             inputSynapses.remove(s);
@@ -487,7 +487,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
 
     public void count(Document doc) {
-        ThreadState th = node.getThreadState(doc, false);
+        ThreadState th = node.getThreadState(doc.threadId, false);
         if(th == null) return;
         for(Activation act: th.activations.values()) {
             if(act.finalState != null && act.finalState.value > 0.0) {

@@ -98,13 +98,13 @@ public class ConcurrencyTest {
         inClock.addInput(doc3, 4, 5);
         inClock.addInput(doc3, 6, 7);
 
-        Assert.assertEquals(2, ctn.node.getThreadState(doc3, true).activations.size());
+        Assert.assertEquals(2, ctn.node.getThreadState(doc3.threadId, true).activations.size());
 
         inStart.addInput(doc1, 0, 1);
         inClock.addInput(doc1, 3, 4);
         inClock.addInput(doc1, 7, 8);
 
-        Assert.assertEquals(2, ctn.node.getThreadState(doc1, true).activations.size());
+        Assert.assertEquals(2, ctn.node.getThreadState(doc1.threadId, true).activations.size());
         Assert.assertEquals(2, ctn.node.getActivations(doc1).size());
 
         Assert.assertEquals(1, pC.node.getActivations(doc2).size());
@@ -113,7 +113,7 @@ public class ConcurrencyTest {
 
         Assert.assertEquals(0, pC.node.getActivations(doc2).size());
 
-        Assert.assertEquals(2, ctn.node.getThreadState(doc3, true).activations.size());
+        Assert.assertEquals(2, ctn.node.getThreadState(doc3.threadId, true).activations.size());
     }
 
 
