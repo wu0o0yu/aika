@@ -28,6 +28,7 @@ import org.aika.corpus.Range.Operator;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.lattice.OrNode.OrEntry;
+import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.slf4j.Logger;
@@ -77,8 +78,8 @@ public abstract class Node implements Comparable<Node>, Writable {
     TreeMap<Refinement, AndNode> andChildren;
     TreeSet<OrEntry> orChildren;
 
-    TreeMap<Refinement, Long> suspendedAndChildren;
-    TreeSet<Long> suspendedOrChildren;
+    TreeMap<Refinement, Integer> suspendedAndChildren;
+    TreeSet<Integer> suspendedOrChildren;
 
     public int level;
 
@@ -319,6 +320,18 @@ public abstract class Node implements Comparable<Node>, Writable {
         AndNode n = andChildren.put(ref, child);
         assert n == null;
         reverseAndChildren.put(new ReverseAndRefinement(child, ref.rid, 0), ref);
+    }
+
+
+
+    void addSuspendedAndChild(Refinement ref, Integer id) {
+        if(suspendedAndChildren == null) {
+            suspendedAndChildren = new TreeMap<>();
+//            reverseAndChildren = new TreeMap<>();
+        }
+
+        suspendedAndChildren.put(ref, id);
+//        reverseAndChildren.put(new ReverseAndRefinement(child, ref.rid, 0), ref);
     }
 
 
@@ -1083,6 +1096,42 @@ public abstract class Node implements Comparable<Node>, Writable {
             throw new RuntimeException(e);
         }
     }
+
+
+    public void suspend(Model m) {
+        assert m.suspensionHook != null;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+
+        try {
+            write(dos);
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        m.suspensionHook.store(id, SuspensionHook.Type.NODE, baos.toByteArray());
+
+        for(AndNode n: andChildren.values()) {
+            n.suspend(m);
+        }
+
+        if(neuron != null) {
+            neuron.node = null;
+        }
+
+        if(this instanceof AndNode) {
+            AndNode n = (AndNode) this;
+            for(Map.Entry<Refinement, Node> me: n.parents.entrySet()) {
+                Refinement ref = me.getKey();
+                Node pn = me.getValue();
+
+                pn.removeAndChild(ref);
+                pn.addSuspendedAndChild(ref, n.id);
+            }
+        }
+    }
+
 
 
     @Override

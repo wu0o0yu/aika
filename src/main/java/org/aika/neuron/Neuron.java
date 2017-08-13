@@ -525,6 +525,19 @@ public class Neuron implements Comparable<Neuron>, Writable {
         }
 
         m.suspensionHook.store(id, SuspensionHook.Type.NEURON, baos.toByteArray());
+
+        if(this instanceof InputNeuron) {
+            node.suspend(m);
+        }
+
+        node.neuron = null;
+
+        for(Synapse s: inputSynapses) {
+            s.output = null;
+        }
+        for(Synapse s: outputSynapses) {
+            s.input = null;
+        }
     }
 
 
