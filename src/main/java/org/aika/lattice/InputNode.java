@@ -59,11 +59,10 @@ public class InputNode extends Node {
 
     public InputNode() {}
 
-    public InputNode(Document doc, Key key) {
-        super(doc, 1);
-        this.key = key;
+    public InputNode(Model m, int threadId, Key key) {
+        super(m, threadId, 1);
+        this.key = Synapse.lookupKey(key);
 
-        Model m = doc.m;
         if(m != null) {
             m.stat.nodes++;
             m.stat.nodesPerLevel[level]++;
@@ -83,7 +82,7 @@ public class InputNode extends Node {
         if(in != null) {
             return in;
         }
-        in = new InputNode(doc, key);
+        in = new InputNode(doc.m, doc.threadId, key);
 
         if(input != null) {
             in.inputNeuron = input;
@@ -406,8 +405,8 @@ public class InputNode extends Node {
     }
 
 
-    public void setSynapse(Document doc, SynapseKey sk, Synapse s) {
-        lock.acquireWriteLock(doc.threadId);
+    public void setSynapse(int threadId, SynapseKey sk, Synapse s) {
+        lock.acquireWriteLock(threadId);
         if(synapses == null) {
             synapses = new TreeMap<>();
         }
@@ -466,9 +465,9 @@ public class InputNode extends Node {
 
 
     @Override
-    public void readFields(DataInput in, Document doc) throws IOException {
-        super.readFields(in, doc);
-        key = Key.read(in, doc);
+    public void readFields(DataInput in, Model m) throws IOException {
+        super.readFields(in, m);
+        key = Synapse.lookupKey(Key.read(in, m));
     }
 
 

@@ -33,9 +33,7 @@ import org.aika.neuron.Synapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -79,6 +77,9 @@ public abstract class Node implements Comparable<Node>, Writable {
     TreeMap<Refinement, AndNode> andChildren;
     TreeSet<OrEntry> orChildren;
 
+    TreeMap<Refinement, Long> suspendedAndChildren;
+    TreeSet<Long> suspendedOrChildren;
+
     public int level;
 
     public volatile int frequency;
@@ -111,6 +112,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     public long queueId;
 
     public Neuron neuron = null;
+    public Integer neuronId = null;
 
     public static long visitedCounter = 0;
 
@@ -231,13 +233,12 @@ public abstract class Node implements Comparable<Node>, Writable {
     protected Node() {}
 
 
-    public Node(Document doc, int level) {
-        Model m = doc.m;
+    public Node(Model m, int threadId, int level) {
         threads = new ThreadState[m.numberOfThreads];
         id = currentNodeId.addAndGet(1);
         this.level = level;
         if(m != null) {
-            m.allNodes[doc.threadId].add(this);
+            m.allNodes[threadId].add(this);
             nOffset = m.numberOfPositions;
         }
     }
@@ -279,6 +280,12 @@ public abstract class Node implements Comparable<Node>, Writable {
             return InterprNode.compare(k1.o, k2.o);
         }
     };
+
+
+    public void setNeuron(Neuron n) {
+        neuron = n;
+        neuronId = n.id;
+    }
 
 
     void addOrChild(Document doc, OrEntry oe) {
@@ -857,7 +864,7 @@ public abstract class Node implements Comparable<Node>, Writable {
             if (s.inputNode == null) {
                 s.inputNode = InputNode.add(doc, s.key.createInputNodeKey(), s.input);
                 s.inputNode.isBlocked = s.input.isBlocked;
-                s.inputNode.setSynapse(doc, new SynapseKey(s.key.relativeRid, neuron), s);
+                s.inputNode.setSynapse(doc.threadId, new SynapseKey(s.key.relativeRid, neuron), s);
             }
 
             if (s.key.isRecurrent) {
@@ -1063,6 +1070,21 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
+
+    public static Node reactivate(Model m, Integer id) {
+        assert m.suspensionHook != null;
+
+        byte[] nData = m.suspensionHook.retrieve(id, SuspensionHook.Type.NODE);
+        ByteArrayInputStream bais = new ByteArrayInputStream(nData);
+        DataInputStream dis = new DataInputStream(bais);
+        try {
+            return read(dis, m);
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeInt(id);
@@ -1087,7 +1109,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     @Override
-    public void readFields(DataInput in, Document doc) throws IOException {
+    public void readFields(DataInput in, Model m) throws IOException {
         id = in.readInt();
         level = in.readInt();
 
@@ -1107,11 +1129,11 @@ public abstract class Node implements Comparable<Node>, Writable {
         sizeSum = in.readInt();
         instanceSum = in.readInt();
 
-        threads = new ThreadState[doc.m.numberOfThreads];
+        threads = new ThreadState[m.numberOfThreads];
     }
 
 
-    public static Node read(DataInput in, Document doc) throws IOException {
+    public static Node read(DataInput in, Model m) throws IOException {
         String type = in.readUTF();
         Node n = null;
         switch(type) {
@@ -1125,7 +1147,7 @@ public abstract class Node implements Comparable<Node>, Writable {
                 n = new OrNode();
                 break;
         }
-        n.readFields(in, doc);
+        n.readFields(in, m);
         return n;
     }
 

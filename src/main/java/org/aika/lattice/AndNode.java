@@ -62,11 +62,10 @@ public class AndNode extends Node {
     public AndNode() {}
 
 
-    public AndNode(Document doc, int level, SortedMap<Refinement, Node> parents) {
-        super(doc, level);
+    public AndNode(Model m, int threadId, int level, SortedMap<Refinement, Node> parents) {
+        super(m, threadId, level);
         this.parents = parents;
 
-        Model m = doc.m;
         m.stat.nodes++;
         m.stat.nodesPerLevel[level]++;
 
@@ -346,7 +345,7 @@ public class AndNode extends Node {
             }
 
             if(n.andChildren == null || !n.andChildren.containsKey(ref)) {
-                nln = new AndNode(doc, n.level + 1, parents);
+                nln = new AndNode(doc.m, doc.threadId, n.level + 1, parents);
                 nln.isBlocked = n.isBlocked || ref.input.isBlocked;
             }
 
@@ -533,8 +532,8 @@ public class AndNode extends Node {
 
 
     @Override
-    public void readFields(DataInput in, Document doc) throws IOException {
-        super.readFields(in, doc);
+    public void readFields(DataInput in, Model m) throws IOException {
+        super.readFields(in, m);
 
         numberOfPositionsNotify = in.readInt();
         frequencyNotify = in.readInt();
@@ -543,8 +542,8 @@ public class AndNode extends Node {
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
-            Refinement ref = Refinement.read(in, doc);
-            Node pn = doc.m.initialNodes.get(in.readInt());
+            Refinement ref = Refinement.read(in, m);
+            Node pn = m.initialNodes.get(in.readInt());
             parents.put(ref, pn);
             pn.addAndChild(ref, this);
         }
@@ -606,17 +605,17 @@ public class AndNode extends Node {
         }
 
 
-        public void readFields(DataInput in, Document doc) throws IOException {
+        public void readFields(DataInput in, Model m) throws IOException {
             if(in.readBoolean()) {
                 rid = in.readInt();
             }
-            input = (InputNode) doc.m.initialNodes.get(in.readInt());
+            input = (InputNode) m.initialNodes.get(in.readInt());
         }
 
 
-        public static Refinement read(DataInput in, Document doc) throws IOException {
+        public static Refinement read(DataInput in, Model m) throws IOException {
             Refinement k = new Refinement();
-            k.readFields(in, doc);
+            k.readFields(in, m);
             return k;
         }
 

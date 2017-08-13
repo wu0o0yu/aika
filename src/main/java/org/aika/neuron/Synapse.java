@@ -17,6 +17,7 @@
 package org.aika.neuron;
 
 
+import org.aika.Model;
 import org.aika.Utils;
 import org.aika.Writable;
 import org.aika.corpus.Document;
@@ -28,6 +29,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * The {@code Synapse} class connects two neurons with each other. When propagating an activation signal, the
@@ -91,6 +94,8 @@ public class Synapse implements Writable {
 
     public Neuron input;
     public Neuron output;
+    public int inputId;
+    public int outputId;
 
     public InputNode inputNode;
 
@@ -110,12 +115,14 @@ public class Synapse implements Writable {
 
     public Synapse(Neuron input) {
         this.input = input;
+        this.inputId = input.id;
     }
 
 
     public Synapse(Neuron input, Key key) {
         this.input = input;
-        this.key = key;
+        this.inputId = input.id;
+        this.key = lookupKey(key);
 
         assert (w >= 0.0 && !key.isNeg) || (w <= 0.0 && key.isNeg);
     }
@@ -169,25 +176,39 @@ public class Synapse implements Writable {
 
 
     @Override
-    public void readFields(DataInput in, Document doc) throws IOException {
-        input = doc.m.neurons.get(in.readInt());
-        output = doc.m.neurons.get(in.readInt());
-        inputNode = (InputNode) doc.m.initialNodes.get(in.readInt());
+    public void readFields(DataInput in, Model m) throws IOException {
+        input = m.neurons.get(in.readInt());
+        inputId = input.id;
+        output = m.neurons.get(in.readInt());
+        outputId = output.id;
+        inputNode = (InputNode) m.initialNodes.get(in.readInt());
 
-        key = Key.read(in, doc);
+        key = lookupKey(Key.read(in, m));
 
         w = in.readDouble();
         maxLowerWeightsSum = in.readDouble();
 
         input.outputSynapses.add(this);
-        inputNode.setSynapse(doc, new InputNode.SynapseKey(key.relativeRid, output), this);
+        inputNode.setSynapse(m.dummyDoc.threadId, new InputNode.SynapseKey(key.relativeRid, output), this);
     }
 
 
-    public static Synapse read(DataInput in, Document doc) throws IOException {
+    public static Synapse read(DataInput in, Model m) throws IOException {
         Synapse k = new Synapse();
-        k.readFields(in, doc);
+        k.readFields(in, m);
         return k;
+    }
+
+
+    static Map<Key, Key> keyMap = new TreeMap<>();
+
+    public static Key lookupKey(Key k) {
+        Key rk = keyMap.get(k);
+        if(rk == null) {
+            keyMap.put(k, k);
+            rk = k;
+        }
+        return rk;
     }
 
 
@@ -246,7 +267,7 @@ public class Synapse implements Writable {
 
 
         @Override
-        public void readFields(DataInput in, Document doc) throws IOException {
+        public void readFields(DataInput in, Model m) throws IOException {
             isNeg = in.readBoolean();
             isRecurrent = in.readBoolean();
             if(in.readBoolean()) relativeRid = in.readInt();
@@ -260,9 +281,9 @@ public class Synapse implements Writable {
         }
 
 
-        public static Key read(DataInput in, Document doc) throws IOException {
+        public static Key read(DataInput in, Model m) throws IOException {
             Key k = new Key();
-            k.readFields(in, doc);
+            k.readFields(in, m);
             return k;
         }
 

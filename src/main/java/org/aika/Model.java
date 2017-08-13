@@ -50,7 +50,11 @@ public class Model implements Writable {
 
     public Document[] docs;
 
-    public Map<String, Neuron> labeledNeurons = Collections.synchronizedMap(new LinkedHashMap<>());
+    public SuspensionHook suspensionHook;
+
+    public Map<String, InputNeuron> inputNeurons = Collections.synchronizedMap(new LinkedHashMap<>());
+    public Map<String, Integer> suspendedInputNeurons = Collections.synchronizedMap(new LinkedHashMap<>());
+
     public Map<Integer, Neuron> neurons = Collections.synchronizedMap(new TreeMap<>());
 
     public Map<Integer, Node> initialNodes;
@@ -58,7 +62,7 @@ public class Model implements Writable {
 
     public Statistic stat = new Statistic();
 
-    private Document dummyDoc;
+    public Document dummyDoc;
 
     public Set<AndNode> numberOfPositionsQueue = Collections.synchronizedSet(new TreeSet<>(new Comparator<AndNode>() {
         @Override
@@ -128,7 +132,7 @@ public class Model implements Writable {
 
 
     public void reset() {
-        labeledNeurons.clear();
+        inputNeurons.clear();
         neurons.clear();
     }
 
@@ -166,10 +170,17 @@ public class Model implements Writable {
 
 
     public InputNeuron createOrLookupInputNeuron(String label, boolean isBlocked) {
-        InputNeuron n = (InputNeuron) labeledNeurons.get(label);
+        InputNeuron n = inputNeurons.get(label);
+        if(n == null) {
+            Integer sId = suspendedInputNeurons.get(label);
+            if(sId != null) {
+                n = (InputNeuron) Neuron.reactivate(this, sId);
+            }
+        }
+
         if(n == null) {
             n = InputNeuron.create(dummyDoc, new InputNeuron(label, isBlocked));
-            labeledNeurons.put(label, n);
+            inputNeurons.put(label, n);
         }
         return n;
     }
@@ -527,51 +538,28 @@ public class Model implements Writable {
         for(Neuron n: neurons.values()) {
             n.write(out);
         }
-
-        out.writeInt(neurons.size());
-        for(Neuron n: neurons.values()) {
-            out.writeInt(n.id);
-            for(Synapse s: n.inputSynapses) {
-                if(s.input != null && s.input.initialized && s.output != null && s.output.initialized) {
-                    out.writeBoolean(true);
-                    s.write(out);
-                }
-            }
-            out.writeBoolean(false);
-        }
     }
 
 
     @Override
-    public void readFields(DataInput in, Document doc) throws IOException {
+    public void readFields(DataInput in, Model m) throws IOException {
         numberOfThreads = in.readInt();
         numberOfPositions = in.readInt();
 
         int s = in.readInt();
         initialNodes = new TreeMap<>();
         for(int i = 0; i < s; i++) {
-            Node n = Node.read(in, doc);
+            Node n = Node.read(in, m);
             initialNodes.put(n.id, n);
         }
 
         s = in.readInt();
         for(int i = 0; i < s; i++) {
-            Neuron n = Neuron.read(in, doc);
+            Neuron n = Neuron.read(in, m);
             neurons.put(n.id, n);
 
-            if(n.label != null) {
-                labeledNeurons.put(n.label, n);
-            }
-        }
-
-        s = in.readInt();
-        for(int i = 0; i < s; i++) {
-            Neuron n = doc.m.neurons.get(in.readInt());
-
-            while(in.readBoolean()) {
-                Synapse syn = Synapse.read(in, doc);
-                n.inputSynapses.add(syn);
-                n.inputSynapsesByWeight.add(syn);
+            if(n instanceof InputNeuron) {
+                inputNeurons.put(n.label, (InputNeuron) n);
             }
         }
     }
@@ -580,7 +568,7 @@ public class Model implements Writable {
     public static Model read(DataInput in) throws IOException {
         Model m = new Model();
         Document doc = m.createDocument(null, 0);
-        m.readFields(in, doc);
+        m.readFields(in, m);
         return m;
     }
 
@@ -588,7 +576,6 @@ public class Model implements Writable {
     public static class Statistic {
         public volatile int synapses;
         public volatile int neurons;
-        public volatile int neuronFromPattern;
         public volatile int nodes;
         public volatile int[] nodesPerLevel = new int[AndNode.MAX_POS_NODES + 1];
         public volatile int orNodes;

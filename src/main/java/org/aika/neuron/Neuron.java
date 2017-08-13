@@ -34,9 +34,7 @@ import org.aika.neuron.Synapse.Key;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -83,6 +81,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
     public TreeMap<Key, InputNode> outputNodes = new TreeMap<>();
 
     public Node node;
+    public int nodeId;
+
     public boolean initialized = false;
 
     public boolean isBlocked;
@@ -110,6 +110,12 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
+    public void setNode(Node n) {
+        node = n;
+        nodeId = n.id;
+    }
+
+
     public double avgActivation() {
         return numberOfActivations > 0.0 ? activationSum / numberOfActivations : 1.0;
     }
@@ -124,8 +130,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
         n.posRecSum = posRecSum;
 
         n.lock.acquireWriteLock(doc.threadId);
-        n.node = new OrNode(doc);
-        n.node.neuron = n;
+        n.setNode(new OrNode(doc));
+        n.node.setNeuron(n);
         n.lock.releaseWriteLock();
 
         double sum = 0.0;
@@ -134,6 +140,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
             assert !s.key.endRangeOutput || s.key.endRangeMatch == Operator.EQUALS || s.key.endRangeMatch == Operator.FIRST;
 
             s.output = n;
+            s.outputId = n.id;
             s.link(doc);
 
             if(s.maxLowerWeightsSum == Double.MAX_VALUE) {
@@ -434,7 +441,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
                         )
                 );
                 s.output = this;
-                in.setSynapse(doc, sk, s);
+                s.outputId = id;
+                in.setSynapse(doc.threadId, sk, s);
                 s.link(doc);
             }
 
@@ -490,6 +498,36 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
+    public static Neuron reactivate(Model m, Integer id) {
+        assert m.suspensionHook != null;
+
+        byte[] data = m.suspensionHook.retrieve(id, SuspensionHook.Type.NEURON);
+        ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        DataInputStream dis = new DataInputStream(bais);
+        try {
+            return read(dis, m);
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public void suspend(Model m) {
+        assert m.suspensionHook != null;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+
+        try {
+            write(dos);
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        m.suspensionHook.store(id, SuspensionHook.Type.NEURON, baos.toByteArray());
+    }
+
+
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeBoolean(this instanceof InputNeuron);
@@ -522,7 +560,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
 
     @Override
-    public void readFields(DataInput in, Document doc) throws IOException {
+    public void readFields(DataInput in, Model m) throws IOException {
         id = in.readInt();
         label = in.readUTF();
 
@@ -533,15 +571,15 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
-            Key k = Key.read(in, doc);
-            InputNode n = (InputNode) doc.m.initialNodes.get(in.readInt());
+            Key k = Key.read(in, m);
+            InputNode n = (InputNode) m.initialNodes.get(in.readInt());
             outputNodes.put(k, n);
             n.inputNeuron = this;
         }
 
         if(in.readBoolean()) {
-            node = doc.m.initialNodes.get(in.readInt());
-            node.neuron = this;
+            setNode(m.initialNodes.get(in.readInt()));
+            node.setNeuron(this);
         }
 
         isBlocked = in.readBoolean();
@@ -552,9 +590,9 @@ public class Neuron implements Comparable<Neuron>, Writable {
     }
 
 
-    public static Neuron read(DataInput in, Document doc) throws IOException {
+    public static Neuron read(DataInput in, Model m) throws IOException {
         Neuron n = in.readBoolean() ? new InputNeuron() : new Neuron();
-        n.readFields(in, doc);
+        n.readFields(in, m);
         return n;
     }
 
