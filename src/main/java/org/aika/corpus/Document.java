@@ -285,7 +285,7 @@ public class Document implements Comparable<Document> {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         if(neuronsOnly) {
-            for (Neuron n : m.neurons.values()) {
+            for (Neuron n : activatedNeurons) {
                 acts.addAll(Activation.select(this, n.node, null, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
             }
         } else {
