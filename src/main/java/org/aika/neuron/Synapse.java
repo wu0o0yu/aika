@@ -114,14 +114,15 @@ public class Synapse implements Writable {
 
 
     public Synapse(Neuron input) {
-        this.input = input;
-        this.inputId = input.id;
+        if(input != null) {
+            this.input = input;
+            this.inputId = input.id;
+        }
     }
 
 
     public Synapse(Neuron input, Key key) {
-        this.input = input;
-        this.inputId = input.id;
+        this(input);
         this.key = lookupKey(key);
 
         assert (w >= 0.0 && !key.isNeg) || (w <= 0.0 && key.isNeg);
