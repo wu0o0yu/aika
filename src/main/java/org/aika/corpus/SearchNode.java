@@ -58,7 +58,7 @@ public class SearchNode implements Comparable<SearchNode> {
     SearchNode excludedParent;
     SearchNode selectedParent;
 
-    long visited;
+    int visited;
     List<InterprNode> refinement;
     RefMarker marker;
 
@@ -72,10 +72,10 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private SearchNode(Document doc, List<InterprNode> changed, SearchNode selParent, SearchNode exclParent, List<InterprNode> ref, RefMarker m) {
         id = doc.searchNodeIdCounter++;
-        visited = InterprNode.visitedCounter++;
+        visited = doc.visitedCounter++;
         selectedParent = selParent;
         excludedParent = exclParent;
-        refinement = expandRefinement(ref, InterprNode.visitedCounter++);
+        refinement = expandRefinement(ref, doc.visitedCounter++);
         markCovered(changed, visited, refinement);
         markExcluded(changed, visited, refinement);
         marker = m;
@@ -117,7 +117,7 @@ public class SearchNode implements Comparable<SearchNode> {
         int[] searchSteps = new int[1];
 
         List<InterprNode> rootRefs = expandRootRefinement(doc);
-        refinement = expandRefinement(rootRefs, InterprNode.visitedCounter++);
+        refinement = expandRefinement(rootRefs, doc.visitedCounter++);
 
         markCovered(null, visited, refinement);
         markExcluded(null, visited, refinement);
@@ -129,7 +129,7 @@ public class SearchNode implements Comparable<SearchNode> {
             log.info("Root SearchNode:" + toString());
         }
 
-        doc.bottom.storeFinalWeight(InterprNode.visitedCounter++);
+        doc.bottom.storeFinalWeight(doc.visitedCounter++);
 
 
         generateInitialCandidates(doc);
@@ -210,7 +210,7 @@ public class SearchNode implements Comparable<SearchNode> {
 //                log.info("+ " + pathToString(doc));
 
                 doc.selectedSearchNode = this;
-                doc.bottom.storeFinalWeight(InterprNode.visitedCounter++);
+                doc.bottom.storeFinalWeight(doc.visitedCounter++);
             } /* else {
                 log.info("- " + pathToString(doc));
             }*/
@@ -296,7 +296,7 @@ public class SearchNode implements Comparable<SearchNode> {
     public void generateNextLevelCandidates(Document doc, SearchNode selectedParent, SearchNode excludedParent) {
         candidates = new TreeSet<>();
         for(SearchNode pc: selectedParent.candidates) {
-            if(!checkCovered(pc.refinement) && !checkExcluded(pc.refinement, InterprNode.visitedCounter++)) {
+            if(!checkCovered(pc.refinement) && !checkExcluded(pc.refinement, doc.visitedCounter++)) {
                 List<InterprNode> changed = new ArrayList<>();
                 candidates.add(new SearchNode(doc, changed, this, excludedParent, pc.refinement, pc.marker));
             }
@@ -312,7 +312,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean checkExcluded(List<InterprNode> n, long v) {
+    private boolean checkExcluded(List<InterprNode> n, int v) {
         for(InterprNode x: n) {
             if(checkExcluded(x, v)) return true;
         }
@@ -320,7 +320,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean checkExcluded(InterprNode ref, long v) {
+    private boolean checkExcluded(InterprNode ref, int v) {
         if(ref.visitedCheckExcluded == v) return false;
         ref.visitedCheckExcluded = v;
 
@@ -336,7 +336,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public static List<InterprNode> collectConflicts(Document doc) {
         List<InterprNode> results = new ArrayList<>();
-        long v = InterprNode.visitedCounter++;
+        int v = doc.visitedCounter++;
         for(InterprNode n: doc.bottom.children) {
             for(Conflict c: n.conflicts.primary.values()) {
                 if(c.secondary.visitedCollectConflicts != v) {
@@ -361,7 +361,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private List<InterprNode> expandRefinement(List<InterprNode> ref, long v) {
+    private List<InterprNode> expandRefinement(List<InterprNode> ref, int v) {
         ArrayList<InterprNode> tmp = new ArrayList<>();
         for(InterprNode n: ref) {
             markExpandRefinement(n, v);
@@ -377,7 +377,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void markExpandRefinement(InterprNode n, long v) {
+    private void markExpandRefinement(InterprNode n, int v) {
         if(n.markedExpandRefinement == v) return;
         n.markedExpandRefinement = v;
 
@@ -399,7 +399,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void expandRefinementRecursiveStep(Collection<InterprNode> results, InterprNode n, long v) {
+    private void expandRefinementRecursiveStep(Collection<InterprNode> results, InterprNode n, int v) {
         if(n.visitedExpandRefinementRecursiveStep == v) return;
         n.visitedExpandRefinementRecursiveStep = v;
 
@@ -439,19 +439,19 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public boolean isCovered(long g) {
+    public boolean isCovered(int g) {
         return g == visited || (selectedParent != null && g < visited && selectedParent.isCovered(g));
     }
 
 
-    private void markCovered(List<InterprNode> changed, long v, List<InterprNode> n) {
+    private void markCovered(List<InterprNode> changed, int v, List<InterprNode> n) {
         for(InterprNode x: n) {
             markCovered(changed, v, x);
         }
     }
 
 
-    private boolean markCovered(List<InterprNode> changed, long v, InterprNode n) {
+    private boolean markCovered(List<InterprNode> changed, int v, InterprNode n) {
         if(n.visitedMarkCovered == v) return false;
         n.visitedMarkCovered = v;
 
@@ -472,7 +472,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
             if(!containedInSelectedBranch(v, c)) continue;
 
-            if(c.isConflicting(InterprNode.visitedCounter++)) return true;
+            if(c.isConflicting(n.doc.visitedCounter++)) return true;
 
             c.markedCovered = v;
 
@@ -485,23 +485,23 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void markExcluded(List<InterprNode> changed, long v, List<InterprNode> n) {
+    private void markExcluded(List<InterprNode> changed, int v, List<InterprNode> n) {
         for(InterprNode x: n) {
             markExcluded(changed, v, x);
         }
     }
 
 
-    private void markExcluded(List<InterprNode> changed, long v, InterprNode n) {
+    private void markExcluded(List<InterprNode> changed, int v, InterprNode n) {
         List<InterprNode> conflicting = new ArrayList<>();
-        Conflicts.collectAllConflicting(conflicting, n, InterprNode.visitedCounter++);
+        Conflicts.collectAllConflicting(conflicting, n, n.doc.visitedCounter++);
         for(InterprNode cn: conflicting) {
             markExcludedRecursiveStep(changed, v, cn);
         }
     }
 
 
-    private void markExcludedRecursiveStep(List<InterprNode> changed, long v, InterprNode n) {
+    private void markExcludedRecursiveStep(List<InterprNode> changed, int v, InterprNode n) {
         if(n.markedExcluded == v || isCovered(n.markedExcluded)) return;
         n.markedExcluded = v;
 
@@ -522,7 +522,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public boolean containedInSelectedBranch(long v, InterprNode n) {
+    public boolean containedInSelectedBranch(int v, InterprNode n) {
         for(InterprNode p: n.parents) {
             if(p.markedCovered != v && !isCovered(p.markedCovered)) return false;
         }

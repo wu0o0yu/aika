@@ -228,7 +228,7 @@ public class OrNode extends Node {
         parentNode.lock.acquireReadLock();
         if(parentNode.orChildren != null) {
             for (OrEntry oe : parentNode.orChildren) {
-                if (!ak.o.isConflicting(InterprNode.visitedCounter++)) {
+                if (!ak.o.isConflicting(doc.visitedCounter++)) {
                     ((OrNode) oe.node).addActivation(doc, oe.ridOffset, inputAct);
                 }
             }

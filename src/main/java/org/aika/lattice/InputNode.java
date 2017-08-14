@@ -135,7 +135,7 @@ public class InputNode extends Node {
 
     private Activation.Key computeActivationKey(Activation iAct) {
         Activation.Key ak = iAct.key;
-        if((key.absoluteRid != null && key.absoluteRid != ak.rid) || ak.o.isConflicting(InterprNode.visitedCounter++)) return null;
+        if((key.absoluteRid != null && key.absoluteRid != ak.rid) || ak.o.isConflicting(ak.o.doc.visitedCounter++)) return null;
 
         return new Activation.Key(
                 this,

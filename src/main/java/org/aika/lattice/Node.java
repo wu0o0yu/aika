@@ -426,7 +426,7 @@ public abstract class Node implements Comparable<Node>, Writable {
      * @param act
      */
     private void linkNeuronRelations(Document doc, Activation act) {
-        long v = visitedCounter++;
+        int v = doc.visitedCounter++;
         for(int dir = 0; dir < 2; dir++) {
             ArrayList<Activation> recNegTmp = new ArrayList<>();
             neuron.lock.acquireReadLock();
@@ -527,7 +527,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     private void unlinkNeuronRelations(Document doc, Activation act) {
-        long v = visitedCounter++;
+        int v = doc.visitedCounter++;
         for(int dir = 0; dir < 2; dir++) {
             for (SynapseActivation sa: (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
                 Synapse s = sa.s;
@@ -581,7 +581,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    private void markConflicts(Activation iAct, Activation oAct, long v) {
+    private void markConflicts(Activation iAct, Activation oAct, int v) {
         oAct.key.o.markedConflict = v;
         for(SynapseActivation sa: iAct.neuronOutputs) {
             if(sa.s.key.isRecurrent && sa.s.key.isNeg) {
@@ -1113,8 +1113,10 @@ public abstract class Node implements Comparable<Node>, Writable {
 
         m.suspensionHook.store(id, SuspensionHook.Type.NODE, baos.toByteArray());
 
-        for(AndNode n: andChildren.values()) {
-            n.suspend(m);
+        if(andChildren != null) {
+            for (AndNode n : andChildren.values()) {
+                n.suspend(m);
+            }
         }
 
         if(neuron != null) {

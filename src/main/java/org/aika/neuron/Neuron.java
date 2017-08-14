@@ -530,7 +530,9 @@ public class Neuron implements Comparable<Neuron>, Writable {
             node.suspend(m);
         }
 
-        node.neuron = null;
+        if(node != null) {
+            node.neuron = null;
+        }
 
         for(Synapse s: inputSynapses) {
             s.output = null;
@@ -538,6 +540,9 @@ public class Neuron implements Comparable<Neuron>, Writable {
         for(Synapse s: outputSynapses) {
             s.input = null;
         }
+
+        m.inputNeurons.remove(label);
+        m.suspendedInputNeurons.put(label, id);
     }
 
 
@@ -591,8 +596,14 @@ public class Neuron implements Comparable<Neuron>, Writable {
         }
 
         if(in.readBoolean()) {
-            setNode(m.initialNodes.get(in.readInt()));
-            node.setNeuron(this);
+            Integer nId = in.readInt();
+            if(m.initialNodes != null) {
+                Node n = m.initialNodes.get(nId);
+                if(n != null) {
+                    setNode(n);
+                    node.setNeuron(this);
+                }
+            }
         }
 
         isBlocked = in.readBoolean();

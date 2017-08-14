@@ -44,7 +44,7 @@ public class Conflicts {
     }
 
 
-    static void collectAllConflicting(Collection<InterprNode> results, InterprNode n, long v) {
+    static void collectAllConflicting(Collection<InterprNode> results, InterprNode n, int v) {
         if(n.visitedCollectAllConflicting == v) return;
         n.visitedCollectAllConflicting = v;
 
@@ -73,7 +73,7 @@ public class Conflicts {
             primary.conflicts.primary.put(ck, c);
             secondary.conflicts.secondary.put(new Key(primary, act), c);
 
-            c.conflict.removeActivationsRecursiveStep(doc, c.conflict, InterprNode.visitedCounter++);
+            c.conflict.removeActivationsRecursiveStep(doc, c.conflict, doc.visitedCounter++);
         }
     }
 
@@ -88,7 +88,7 @@ public class Conflicts {
         secondary.conflicts.secondary.remove(new Key(primary, act));
         c.conflict.isConflict--;
 
-        c.conflict.expandActivationsRecursiveStep(doc, c.conflict, InterprNode.visitedCounter++);
+        c.conflict.expandActivationsRecursiveStep(doc, c.conflict, doc.visitedCounter++);
 
         removeInternal(c);
     }

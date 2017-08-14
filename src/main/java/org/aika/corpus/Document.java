@@ -60,6 +60,7 @@ public class Document implements Comparable<Document> {
 
     private String content;
 
+    public int visitedCounter = 1;
     public int interprIdCounter = 1;
     public int searchNodeIdCounter = 0;
 
@@ -173,7 +174,7 @@ public class Document implements Comparable<Document> {
      */
     public void process() {
         for(Activation act: inputNeuronActivations) {
-            vQueue.propagateWeight(0, act, Activation.visitedCounter++);
+            vQueue.propagateWeight(0, act);
         }
         interrupted = false;
         SearchNode root = SearchNode.createRootSearchNode(this);
@@ -430,12 +431,12 @@ public class Document implements Comparable<Document> {
 
 
     public class ValueQueue {
-        public final TreeSet<VEntry> queue = new TreeSet<>();
+        public final ArrayList<ArrayDeque<Activation>> queue = new ArrayList<>();
 
-        public void propagateWeight(int round, Activation act, long v)  {
+        public void propagateWeight(int round, Activation act)  {
             for(Activation.SynapseActivation sa: act.neuronOutputs) {
                 int r = sa.s.key.isRecurrent ? round + 1 : round;
-                add(r, sa.output, v);
+                add(r, sa.output);
             }
         }
 
@@ -444,12 +445,12 @@ public class Document implements Comparable<Document> {
             long v = Activation.visitedCounter++;
 
             for(InterprNode n: changed) {
-                addAllActs(n.getNeuronActivations(), v);
+                addAllActs(n.getNeuronActivations());
 
                 // Does not need to be expanded recursively, because the activation will be propagated anyway.
                 if(n.refByOrInterprNode != null) {
                     for (InterprNode on: n.refByOrInterprNode) {
-                        addAllActs(on.getNeuronActivations(), v);
+                        addAllActs(on.getNeuronActivations());
                     }
                 }
             }
@@ -458,55 +459,68 @@ public class Document implements Comparable<Document> {
         }
 
 
-        private void addAllActs(Collection<Activation> acts, long v) {
+        private void addAllActs(Collection<Activation> acts) {
             for(Activation act: acts) {
                 if(!(act.key.n.neuron instanceof InputNeuron)) {
-                    add(0, act, v);
+                    add(0, act);
                 }
             }
         }
 
 
-        public void add(int round, Activation act, long v) {
-            queue.add(new VEntry(round, act));
+        public void add(int round, Activation act) {
+            if(act.rounds.isQueued(round)) return;
+
+            ArrayDeque<Activation> q;
+            if(round < queue.size()) {
+                q = queue.get(round);
+            } else {
+                assert round == queue.size();
+                q = new ArrayDeque<>();
+                queue.add(q);
+            }
+
+            act.rounds.setQueued(round, true);
+            q.addLast(act);
         }
 
 
         public Neuron.NormWeight[] processChanges(SearchNode en, long v) {
             NormWeight[] delta = new NormWeight[] {NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT};
-            while(!queue.isEmpty()) {
-                VEntry e = queue.pollFirst();
-                int round = e.round;
-                Activation act = e.act;
+            for(int round = 0; round < queue.size(); round++) {
+                ArrayDeque<Activation> q = queue.get(round);
+                while (!q.isEmpty()) {
+                    Activation act = q.pollLast();
 
-                State s = act.key.n.neuron.computeWeight(e.round, act, en, Document.this);
+                    State s = act.key.n.neuron.computeWeight(round, act, en, Document.this);
 
-                if(OPTIMIZE_DEBUG_OUTPUT) {
-                    log.info(act.key + " Round:" + round);
-                    log.info("Value:" + s.value + "  Weight:" + s.weight.w + "  Norm:" + s.weight.n + "\n");
-                }
-
-                if(round == 0 || !act.rounds.get(round, false).equalsWithWeights(s)) {
-                    SearchNode.StateChange.saveOldState(en.modifiedActs, act, v);
-
-                    State oldState = act.rounds.get(round, false);
-
-                    boolean propagate = act.rounds.set(round, s);
-
-                    SearchNode.StateChange.saveNewState(act);
-
-                    if(propagate) {
-                        propagateWeight(round, act, v);
+                    if (OPTIMIZE_DEBUG_OUTPUT) {
+                        log.info(act.key + " Round:" + round);
+                        log.info("Value:" + s.value + "  Weight:" + s.weight.w + "  Norm:" + s.weight.n + "\n");
                     }
 
-                    if(round == 0) {
-                        // In case that there is a positive feedback loop.
-                        add(1, act, v);
-                    }
+                    if (round == 0 || !act.rounds.get(round, false).equalsWithWeights(s)) {
+                        SearchNode.StateChange.saveOldState(en.modifiedActs, act, v);
 
-                    if(act.rounds.getLastRound() != null && round >= act.rounds.getLastRound()) { // Consider only the final round.
-                        for(int i = 0; i < 2; i++) {
-                            delta[i] = delta[i].add(s.getWeight(i).sub(oldState.getWeight(i)));
+                        State oldState = act.rounds.get(round, false);
+
+                        boolean propagate = act.rounds.set(round, s);
+
+                        SearchNode.StateChange.saveNewState(act);
+
+                        if (propagate) {
+                            propagateWeight(round, act);
+                        }
+
+                        if (round == 0) {
+                            // In case that there is a positive feedback loop.
+                            add(1, act);
+                        }
+
+                        if (act.rounds.getLastRound() != null && round >= act.rounds.getLastRound()) { // Consider only the final round.
+                            for (int i = 0; i < 2; i++) {
+                                delta[i] = delta[i].add(s.getWeight(i).sub(oldState.getWeight(i)));
+                            }
                         }
                     }
                 }

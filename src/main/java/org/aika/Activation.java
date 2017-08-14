@@ -450,6 +450,8 @@ public class Activation implements Comparable<Activation> {
      *
      */
     public static class Rounds {
+        private boolean[] isQueued = new boolean[3];
+
         public TreeMap<Integer, State> rounds = new TreeMap<>();
 
         public boolean set(int r, State s) {
@@ -489,6 +491,17 @@ public class Activation implements Comparable<Activation> {
 
         public State getLast() {
             return !rounds.isEmpty() ? rounds.lastEntry().getValue() : null;
+        }
+
+        public void setQueued(int r, boolean v) {
+            if(r >= isQueued.length) {
+                isQueued = Arrays.copyOf(isQueued, isQueued.length * 2);
+            }
+            isQueued[r] = v;
+        }
+
+        public boolean isQueued(int r) {
+            return r < isQueued.length ? isQueued[r] : false;
         }
     }
 
