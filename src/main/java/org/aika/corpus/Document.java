@@ -491,6 +491,7 @@ public class Document implements Comparable<Document> {
                 ArrayDeque<Activation> q = queue.get(round);
                 while (!q.isEmpty()) {
                     Activation act = q.pollLast();
+                    act.rounds.setQueued(round, false);
 
                     State s = act.key.n.neuron.computeWeight(round, act, en, Document.this);
 
