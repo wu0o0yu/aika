@@ -291,6 +291,8 @@ public class Synapse implements Writable {
 
         @Override
         public int compareTo(Key k) {
+            if(this == k) return 0;
+
             if(this == MIN_KEY && k != MIN_KEY) return -1;
             else if(this != MIN_KEY && k == MIN_KEY) return 1;
             if(this == MAX_KEY && k != MAX_KEY) return 1;
