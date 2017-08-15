@@ -443,11 +443,11 @@ public class SearchNode implements Comparable<SearchNode> {
         SearchNode n = this;
         do {
             if(g == n.visited) return true;
+            else if(g > n.visited) return false;
             n = n.selectedParent;
-        } while(n != null && g < n.visited);
+        } while(n != null);
         return false;
     }
-
 
     private void markCovered(List<InterprNode> changed, int v, List<InterprNode> n) {
         for(InterprNode x: n) {
@@ -507,8 +507,10 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private void markExcludedRecursiveStep(List<InterprNode> changed, int v, InterprNode n) {
-        if(n.markedExcluded == v || isCovered(n.markedExcluded)) return;
+        if(n.markedExcluded == v) return;
         n.markedExcluded = v;
+
+        if(isCovered(n.markedExcluded)) return;
 
         for(InterprNode c: n.children) {
             markExcludedRecursiveStep(changed, v, c);
