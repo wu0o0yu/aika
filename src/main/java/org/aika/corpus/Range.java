@@ -125,7 +125,7 @@ public class Range {
             if(a == null || c == null) return true;
             switch(this) {
                 case EQUALS:
-                    return a == c;
+                    return a.intValue() == c.intValue();
                 case LESS_THAN:
                     return a <= c;
                 case GREATER_THAN:
