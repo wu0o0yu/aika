@@ -443,7 +443,7 @@ public class SearchNode implements Comparable<SearchNode> {
         SearchNode n = this;
         do {
             if(g == n.visited) return true;
-            n = selectedParent;
+            n = n.selectedParent;
         } while(n != null && g < n.visited);
         return false;
     }
