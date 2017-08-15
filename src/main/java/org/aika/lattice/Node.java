@@ -427,97 +427,111 @@ public abstract class Node implements Comparable<Node>, Writable {
      */
     private void linkNeuronRelations(Document doc, Activation act) {
         int v = doc.visitedCounter++;
-        for(int dir = 0; dir < 2; dir++) {
-            ArrayList<Activation> recNegTmp = new ArrayList<>();
-            neuron.lock.acquireReadLock();
-            TreeSet<Synapse> syns = (dir == 0 ? neuron.inputSynapses : neuron.outputSynapses);
+        neuron.lock.acquireReadLock();
+        linkNeuronActs(doc, act, v, 0);
+        linkNeuronActs(doc, act, v, 1);
+        neuron.lock.releaseReadLock();
+    }
 
-            // Optimization in case the set of synapses is very large
-            if (LINK_NEURON_RELATIONS_OPTIMIZATION && syns.size() > 10 && doc.activatedNeurons.size() * 20 < syns.size()) {
-                TreeSet<Synapse> newSyns = new TreeSet<>(dir == 0 ? Synapse.INPUT_SYNAPSE_COMP : Synapse.OUTPUT_SYNAPSE_COMP);
-                Synapse lk = new Synapse(null, Synapse.Key.MIN_KEY);
-                Synapse uk = new Synapse(null, Synapse.Key.MAX_KEY);
 
-                for (Neuron n : doc.activatedNeurons) {
-                    if (dir == 0) {
-                        lk.input = n;
-                        uk.input = n;
-                    } else {
-                        lk.output = n;
-                        uk.output = n;
-                    }
-                    newSyns.addAll(syns.subSet(lk, true, uk, true));
-                }
+    private void linkNeuronActs(Document doc, Activation act, int v, int dir) {
+        ArrayList<Activation> recNegTmp = new ArrayList<>();
+        TreeSet<Synapse> syns = (dir == 0 ? neuron.inputSynapses : neuron.outputSynapses);
 
-                syns = newSyns;
+        // Optimization in case the set of synapses is very large
+        Collection<Synapse> synsTmp = LINK_NEURON_RELATIONS_OPTIMIZATION && syns.size() > 10 && doc.activatedNeurons.size() * 20 < syns.size() ?
+                getActiveSynapses(doc, dir, syns) :
+                syns;
+
+        for (Synapse s : synsTmp) {
+            linkActSyn(doc, act, dir, recNegTmp, s);
+        }
+
+        for(Activation rAct: recNegTmp) {
+            Activation oAct = (dir == 0 ? act : rAct);
+            Activation iAct = (dir == 0 ? rAct : act);
+
+            markConflicts(iAct, oAct, v);
+
+            addConflict(doc, oAct.key.o, iAct.key.o, iAct, Collections.singleton(act), v);
+        }
+    }
+
+
+    private void linkActSyn(Document doc, Activation act, int dir, ArrayList<Activation> recNegTmp, Synapse s) {
+        Node n = (dir == 0 ? s.input : s.output).node;
+        ThreadState th = n.getThreadState(doc.threadId, false);
+        if(th == null || th.activations.isEmpty()) return;
+
+        Integer rid;
+        if(dir == 0) {
+            rid = s.key.absoluteRid != null ? s.key.absoluteRid : Utils.nullSafeAdd(act.key.rid, false, s.key.relativeRid, false);
+        } else {
+            rid = Utils.nullSafeSub(act.key.rid, false, s.key.relativeRid, false);
+        }
+
+
+        Operator begin = replaceFirstAndLast(s.key.startRangeMatch);
+        Operator end = replaceFirstAndLast(s.key.endRangeMatch);
+        Range r = act.key.r;
+        if(dir == 0) {
+            begin = Operator.invert(s.key.startRangeMapping == START ? begin : (s.key.endRangeMapping == START ? end : NONE));
+            end = Operator.invert(s.key.endRangeMapping == END ? end : (s.key.startRangeMapping == END ? begin : NONE));
+
+            if(s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
+                r = new Range(s.key.endRangeMapping == START ? r.end : (s.key.startRangeMapping == START ? r.begin : null), s.key.startRangeMapping == END ? r.begin : (s.key.endRangeMapping == END ? r.end : null));
             }
-
-
-            for (Synapse s : syns) {
-                Node n = (dir == 0 ? s.input : s.output).node;
-                ThreadState th = n.getThreadState(doc.threadId, false);
-                if(th == null || th.activations.isEmpty()) continue;
-
-                Integer rid;
-                if(dir == 0) {
-                    rid = s.key.absoluteRid != null ? s.key.absoluteRid : Utils.nullSafeAdd(act.key.rid, false, s.key.relativeRid, false);
-                } else {
-                    rid = Utils.nullSafeSub(act.key.rid, false, s.key.relativeRid, false);
-                }
-
-
-                Operator begin = replaceFirstAndLast(s.key.startRangeMatch);
-                Operator end = replaceFirstAndLast(s.key.endRangeMatch);
-                Range r = act.key.r;
-                if(dir == 0) {
-                    begin = Operator.invert(s.key.startRangeMapping == START ? begin : (s.key.endRangeMapping == START ? end : NONE));
-                    end = Operator.invert(s.key.endRangeMapping == END ? end : (s.key.startRangeMapping == END ? begin : NONE));
-
-                    if(s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
-                        r = new Range(s.key.endRangeMapping == START ? r.end : (s.key.startRangeMapping == START ? r.begin : null), s.key.startRangeMapping == END ? r.begin : (s.key.endRangeMapping == END ? r.end : null));
-                    }
-                } else {
-                    if(s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
-                        r = new Range(s.key.startRangeMapping == END ? r.end : (s.key.startRangeMapping == START ? r.begin : null), s.key.endRangeMapping == START ? r.begin : (s.key.endRangeMapping == END ? r.end : null));
-                    }
-                }
-
-                Stream<Activation> tmp = Activation.select(
-                        doc ,
-                        n,
-                        rid,
-                        r,
-                        begin,
-                        end,
-                        null,
-                        null
-                );
-
-                final int d = dir;
-                tmp.forEach(rAct -> {
-                    Activation oAct = (d == 0 ? act : rAct);
-                    Activation iAct = (d == 0 ? rAct : act);
-
-                    SynapseActivation sa = new SynapseActivation(s, iAct, oAct);
-                    oAct.neuronInputs.add(sa);
-                    iAct.neuronOutputs.add(sa);
-
-                    if(s.key.isNeg && s.key.isRecurrent) {
-                        recNegTmp.add(rAct);
-                    }
-                });
-            }
-            neuron.lock.releaseReadLock();
-
-            for(Activation rAct: recNegTmp) {
-                Activation oAct = (dir == 0 ? act : rAct);
-                Activation iAct = (dir == 0 ? rAct : act);
-
-                markConflicts(iAct, oAct, v);
-
-                addConflict(doc, oAct.key.o, iAct.key.o, iAct, Collections.singleton(act), v);
+        } else {
+            if(s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
+                r = new Range(s.key.startRangeMapping == END ? r.end : (s.key.startRangeMapping == START ? r.begin : null), s.key.endRangeMapping == START ? r.begin : (s.key.endRangeMapping == END ? r.end : null));
             }
         }
+
+        Stream<Activation> tmp = Activation.select(
+                doc ,
+                n,
+                rid,
+                r,
+                begin,
+                end,
+                null,
+                null
+        );
+
+        final int d = dir;
+        tmp.forEach(rAct -> {
+            Activation oAct = (d == 0 ? act : rAct);
+            Activation iAct = (d == 0 ? rAct : act);
+
+            SynapseActivation sa = new SynapseActivation(s, iAct, oAct);
+            oAct.neuronInputs.add(sa);
+            iAct.neuronOutputs.add(sa);
+
+            if(s.key.isNeg && s.key.isRecurrent) {
+                recNegTmp.add(rAct);
+            }
+        });
+    }
+
+
+    private Collection<Synapse> getActiveSynapses(Document doc, int dir, TreeSet<Synapse> syns) {
+        Collection<Synapse> synsTmp;ArrayList<Synapse> newSyns = new ArrayList<>();
+        Synapse lk = new Synapse(null, Synapse.Key.MIN_KEY);
+        Synapse uk = new Synapse(null, Synapse.Key.MAX_KEY);
+
+        for (Neuron n : doc.activatedNeurons) {
+            if (dir == 0) {
+                lk.input = n;
+                uk.input = n;
+            } else {
+                lk.output = n;
+                uk.output = n;
+            }
+            newSyns.addAll(syns.subSet(lk, true, uk, true));
+        }
+
+        synsTmp = newSyns;
+        return synsTmp;
     }
 
 
