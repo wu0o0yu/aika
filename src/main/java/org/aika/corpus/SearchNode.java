@@ -440,7 +440,12 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public boolean isCovered(int g) {
-        return g == visited || (selectedParent != null && g < visited && selectedParent.isCovered(g));
+        SearchNode n = this;
+        do {
+            if(g == n.visited) return true;
+            n = selectedParent;
+        } while(n != null && g < n.visited);
+        return false;
     }
 
 
