@@ -17,11 +17,36 @@
 package org.aika;
 
 
+import org.aika.corpus.InterprNode;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 /**
  *
  * @author Lukas Molzberger
  */
 public class Utils {
+
+
+    public static <T> T[] addToArray(T[] in, T n) {
+        T[] r = Arrays.copyOf(in, in.length + 1);
+        r[in.length] = n;
+        return r;
+    }
+
+
+    public static <T> T[] removeToArray(T[] in, T n) {
+        T[] r = (T[]) Array.newInstance(n.getClass(), in.length - 1);
+        int i = 0;
+        for(T x: in) {
+            if(x != n) {
+                r[i++] = x;
+            }
+        }
+
+        return r;
+    }
 
 
     public static boolean compareNullSafe(Integer a, Integer b) {

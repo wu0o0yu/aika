@@ -56,14 +56,14 @@ public class RelationalNeuronTest {
         cn.addInput(doc, 19, 20, o0);
         in.addInput(doc, 10, 11, o0);
 
-        System.out.println(doc.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false, false, true));
 
 
         Assert.assertNotNull(getAct(doc, on.node, 1, new Range(5, 20), null));
 
         cn.addInput(doc, 9, 10, o012);
 
-        System.out.println(doc.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false, false, true));
 /*
         Assert.assertNotNull(getAct(doc, on.node, 0, new Range(0, 5), null));
         Assert.assertNotNull(getAct(doc, on.node, 1, new Range(5, 10), null));

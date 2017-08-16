@@ -143,10 +143,10 @@ public class OptionalAndTest {
 
             doc.process();
 
-            System.out.println(doc.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true, false, true));
             System.out.println();
 
-            System.out.println(doc.networkStateToString(false, true));
+            System.out.println(doc.networkStateToString(false, true, false, true));
 
             doc.clearActivations();
         }

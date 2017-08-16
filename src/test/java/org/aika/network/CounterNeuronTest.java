@@ -62,14 +62,14 @@ public class CounterNeuronTest {
         cn.addInput(doc, 24, 25, o01);
 //        sn.addInput(t, 0, 1, doc.bottom);
 
-        System.out.println(doc.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 10), null));
         Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 25), null));
         Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(10, 25), null));
 
         cn.addInput(doc, 4, 5, o0);
-        System.out.println(doc.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 5), null));
         Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(5, 10), null));
@@ -77,14 +77,14 @@ public class CounterNeuronTest {
         Assert.assertNotNull(getAct(doc, ctn.node, 2, new Range(10, 25), null));
 
         cn.removeInput(doc, 4, 5, o0);
-        System.out.println(doc.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 10), null));
         Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 25), null));
         Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(10, 25), null));
 
         cn.removeInput(doc, 24, 25, o01);
-        System.out.println(doc.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 10), null));
 
@@ -118,7 +118,7 @@ public class CounterNeuronTest {
         cn.addInput(doc, 10, 11, o012);
         cn.addInput(doc, 15, 16, o01);
 
-        System.out.println(doc.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 6), null));
         Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(6, 21), null));
@@ -155,7 +155,7 @@ public class CounterNeuronTest {
         cn.addInput(doc, 4, 5, o0);
         cn.addInput(doc, 14, 15, o012);
 
-        System.out.println(doc.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.node, 2, new Range(5, 15), o012));
         Assert.assertNotNull(getAct(doc, ctn.node, 3, new Range(0, 5), o012));
@@ -181,7 +181,7 @@ public class CounterNeuronTest {
         cn.addInput(doc, 19, 20, doc.bottom);
         cn.addInput(doc, 24, 25, doc.bottom);
 
-        System.out.println(doc.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true, false, true));
 
         Assert.assertEquals(5, ctn.node.getActivations(doc).size());
     }

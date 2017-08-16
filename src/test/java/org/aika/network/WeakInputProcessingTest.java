@@ -157,7 +157,7 @@ public class WeakInputProcessingTest {
         Document.APPLY_DEBUG_OUTPUT = true;
         doc.process();
 
-        System.out.println(doc.networkStateToString(true,true));
+        System.out.println(doc.networkStateToString(true,true, false, true));
 
         Assert.assertTrue(TestHelper.get(doc, patternA.node, null, null).finalState.value < 0.5);
         Assert.assertTrue(TestHelper.get(doc, patternB.node, null, null).finalState.value > 0.5);

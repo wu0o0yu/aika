@@ -19,6 +19,7 @@ package org.aika.corpus;
 
 import org.aika.Activation;
 import org.aika.Activation.Key;
+import org.aika.Utils;
 import org.aika.lattice.Node;
 
 import java.util.*;
@@ -94,8 +95,9 @@ public class InterprNode implements Comparable<InterprNode> {
     int removedId;
     static int removedIdCounter = 1;
 
-    public InterprNode[] parents;
-    public InterprNode[] children;
+    private static InterprNode[] EMPTY_INTR_RELS = new InterprNode[0];
+    public InterprNode[] parents = EMPTY_INTR_RELS;
+    public InterprNode[] children = EMPTY_INTR_RELS;
 
     public int isConflict = -1;
     public Conflicts conflicts = new Conflicts();
@@ -136,8 +138,6 @@ public class InterprNode implements Comparable<InterprNode> {
         this.doc = doc;
         this.primId = primId;
         this.id = id;
-        parents = new InterprNode[0];
-        children = new InterprNode[0];
     }
 
 
@@ -491,34 +491,14 @@ public class InterprNode implements Comparable<InterprNode> {
 
 
     private static void addLink(InterprNode a, InterprNode b) {
-        a.children = addToArray(a.children, b);
-        b.parents = addToArray(b.parents, a);
+        a.children = Utils.addToArray(a.children, b);
+        b.parents = Utils.addToArray(b.parents, a);
     }
 
 
     private static void removeLink(InterprNode a, InterprNode b) {
-        a.children = removeToArray(a.children, b);
-        b.parents = removeToArray(b.parents, a);
-    }
-
-
-    private static InterprNode[] addToArray(InterprNode[] in, InterprNode n) {
-        InterprNode[] r = Arrays.copyOf(in, in.length + 1);
-        r[in.length] = n;
-        return r;
-    }
-
-
-    private static InterprNode[] removeToArray(InterprNode[] in, InterprNode n) {
-        InterprNode[] r = new InterprNode[in.length - 1];
-        int i = 0;
-        for(InterprNode x: in) {
-            if(x != n) {
-                r[i++] = x;
-            }
-        }
-
-        return r;
+        a.children = Utils.removeToArray(a.children, b);
+        b.parents = Utils.removeToArray(b.parents, a);
     }
 
 
@@ -543,10 +523,10 @@ public class InterprNode implements Comparable<InterprNode> {
         removedId = removedIdCounter++;
 
         for (InterprNode p : parents) {
-            p.children = removeToArray(p.children, this);
+            p.children = Utils.removeToArray(p.children, this);
         }
         for (InterprNode c : children) {
-            c.parents = removeToArray(c.parents, this);
+            c.parents = Utils.removeToArray(c.parents, this);
         }
         for (InterprNode p : parents) {
             for (InterprNode c : children) {

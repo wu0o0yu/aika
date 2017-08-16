@@ -103,7 +103,7 @@ public class ModelReadWriteTest {
 
             Document doc = m.createDocument("a b c d e ", 0);
 
-            System.out.println(doc.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true, false, true));
 
             int wordPos = 0;
             for (int i = 0; i < doc.length(); i++) {
@@ -113,7 +113,7 @@ public class ModelReadWriteTest {
                 } else  {
                     wordPos++;
                 }
-                System.out.println(doc.networkStateToString(true, true));
+                System.out.println(doc.networkStateToString(true, true, false, true));
             }
 
             // Computes the selected option
@@ -133,7 +133,7 @@ public class ModelReadWriteTest {
             }
 
             System.out.println("All activations:");
-            System.out.println(doc.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true, false, true));
             System.out.println();
 
             doc.clearActivations();

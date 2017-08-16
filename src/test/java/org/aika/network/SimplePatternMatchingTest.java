@@ -115,7 +115,7 @@ public class SimplePatternMatchingTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true, false, true));
         System.out.println();
 
 
@@ -229,7 +229,7 @@ public class SimplePatternMatchingTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true, false, true));
         System.out.println();
 
 

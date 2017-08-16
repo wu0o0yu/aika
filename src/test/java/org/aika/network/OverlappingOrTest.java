@@ -108,14 +108,14 @@ public class OverlappingOrTest {
 
         startSignal.addInput(doc, 0, 1, 0);
 
-        System.out.println(doc.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true, false, true));
 
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
                 inputNeurons.get(c).addInput(doc, i, i + 1);
             }
-            System.out.println(doc.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true, false, true));
         }
 
         for(int i = 0; i < doc.length(); i++) {
@@ -124,7 +124,7 @@ public class OverlappingOrTest {
                 inputNeurons.get(c).addInput(doc, i, i + 1);
             }
 
-            System.out.println(doc.networkStateToString(true, true));
+            System.out.println(doc.networkStateToString(true, true, false, true));
         }
 
         // Computes the selected option
@@ -143,7 +143,7 @@ public class OverlappingOrTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true, false, true));
         System.out.println();
 
 

@@ -64,8 +64,6 @@ public abstract class Node implements Comparable<Node>, Writable {
     public static int minFrequency = 5;
     public static int MAX_RID = 20;
 
-    public static boolean LINK_NEURON_RELATIONS_OPTIMIZATION = true;
-
     public static final Node MIN_NODE = new DummyNode(Integer.MIN_VALUE);
     public static final Node MAX_NODE = new DummyNode(Integer.MAX_VALUE);
 
@@ -368,11 +366,6 @@ public abstract class Node implements Comparable<Node>, Writable {
             act = new Activation(doc.activationIdCounter++, ak);
             act.isTrainingAct = isTrainingAct;
 
-            if(neuron != null) {
-                act.neuronInputs = new TreeSet<>(SynapseActivation.INPUT_COMP);
-                act.neuronOutputs = new TreeSet<>(SynapseActivation.OUTPUT_COMP);
-            }
-
             initActivation(doc, act);
             act.register(doc);
 
@@ -438,13 +431,12 @@ public abstract class Node implements Comparable<Node>, Writable {
         ArrayList<Activation> recNegTmp = new ArrayList<>();
         TreeSet<Synapse> syns = (dir == 0 ? neuron.inputSynapses : neuron.outputSynapses);
 
-        // Optimization in case the set of synapses is very large
-        Collection<Synapse> synsTmp = LINK_NEURON_RELATIONS_OPTIMIZATION && syns.size() > 10 && doc.activatedNeurons.size() * 20 < syns.size() ?
-                getActiveSynapses(doc, dir, syns) :
-                syns;
+        for (Synapse s : getActiveSynapses(doc, dir, syns)) {
+            Node n = (dir == 0 ? s.input : s.output).node;
+            ThreadState th = n.getThreadState(doc.threadId, false);
+            if(th == null || th.activations.isEmpty()) continue;
 
-        for (Synapse s : synsTmp) {
-            linkActSyn(doc, act, dir, recNegTmp, s);
+            linkActSyn(n, doc, act, dir, recNegTmp, s);
         }
 
         for(Activation rAct: recNegTmp) {
@@ -458,11 +450,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    private void linkActSyn(Document doc, Activation act, int dir, ArrayList<Activation> recNegTmp, Synapse s) {
-        Node n = (dir == 0 ? s.input : s.output).node;
-        ThreadState th = n.getThreadState(doc.threadId, false);
-        if(th == null || th.activations.isEmpty()) return;
-
+    private void linkActSyn(Node n, Document doc, Activation act, int dir, ArrayList<Activation> recNegTmp, Synapse s) {
         Integer rid;
         if(dir == 0) {
             rid = s.key.absoluteRid != null ? s.key.absoluteRid : Utils.nullSafeAdd(act.key.rid, false, s.key.relativeRid, false);
@@ -504,8 +492,8 @@ public abstract class Node implements Comparable<Node>, Writable {
             Activation iAct = (d == 0 ? rAct : act);
 
             SynapseActivation sa = new SynapseActivation(s, iAct, oAct);
-            oAct.neuronInputs.add(sa);
-            iAct.neuronOutputs.add(sa);
+            iAct.addSynapseActivation(0, sa);
+            oAct.addSynapseActivation(1, sa);
 
             if(s.key.isNeg && s.key.isRecurrent) {
                 recNegTmp.add(rAct);
@@ -515,6 +503,11 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     private Collection<Synapse> getActiveSynapses(Document doc, int dir, TreeSet<Synapse> syns) {
+        // Optimization in case the set of synapses is very large
+        if(syns.size() < 10 || doc.activatedNeurons.size() * 20 > syns.size()) {
+            return syns;
+        }
+
         Collection<Synapse> synsTmp;ArrayList<Synapse> newSyns = new ArrayList<>();
         Synapse lk = new Synapse(null, Synapse.Key.MIN_KEY);
         Synapse uk = new Synapse(null, Synapse.Key.MAX_KEY);
@@ -527,7 +520,11 @@ public abstract class Node implements Comparable<Node>, Writable {
                 lk.output = n;
                 uk.output = n;
             }
-            newSyns.addAll(syns.subSet(lk, true, uk, true));
+
+            // Using addAll is not efficient here.
+            for(Synapse s: syns.subSet(lk, true, uk, true)) {
+                newSyns.add(s);
+            }
         }
 
         synsTmp = newSyns;
@@ -561,7 +558,7 @@ public abstract class Node implements Comparable<Node>, Writable {
         for(int dir = 0; dir < 2; dir++) {
             for (SynapseActivation sa: (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
                 Activation rAct = dir == 0 ? sa.input : sa.output;
-                (dir == 0 ? rAct.neuronOutputs : rAct.neuronInputs).remove(sa);
+                rAct.removeSynapseActivation(dir, sa);
             }
         }
     }

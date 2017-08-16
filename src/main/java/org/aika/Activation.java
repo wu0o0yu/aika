@@ -79,8 +79,11 @@ public class Activation implements Comparable<Activation> {
 
     public TreeMap<Key, Activation> inputs = new TreeMap<>();
     public TreeMap<Key, Activation> outputs = new TreeMap<>();
-    public TreeSet<SynapseActivation> neuronInputs;
-    public TreeSet<SynapseActivation> neuronOutputs;
+
+    static final SynapseActivation[] EMPTY_SYN_ACTS = new SynapseActivation[0];
+    public SynapseActivation[] neuronInputs = EMPTY_SYN_ACTS;
+    public SynapseActivation[] neuronOutputs = EMPTY_SYN_ACTS;
+
 
     public boolean ubQueued = false;
     public boolean isQueued = false;
@@ -217,30 +220,7 @@ public class Activation implements Comparable<Activation> {
         if(n != null) {
             ThreadState th = n.getThreadState(doc.threadId, false);
             if(th == null) return Stream.empty();
-            int s = th.activations.size();
-
-            if(s == 0) return Stream.empty();
-            else if(s == 1) {
-                results = th.activations
-                        .values()
-                        .stream();
-            } else if(rid != null) {
-                Key bk = new Key(n, Range.MIN, rid, InterprNode.MIN);
-                Key ek = new Key(n, Range.MAX, rid, InterprNode.MAX);
-
-                if(th.activationsRid != null) {
-                    results = th.activationsRid.subMap(bk, true, ek, true)
-                            .values()
-                            .stream();
-                } else return Stream.empty();
-            } else {
-                if(begin == null && end == null) {
-                    results = th.activations.values()
-                            .stream();
-                } else {
-                    return getActivationsByRange(th, n, rid, r, begin, end, o, or);
-                }
-            }
+            return select(th, n, rid, r, begin, end, o, or);
         } else {
             if(rid != null) {
                 Key bk = new Key(Node.MIN_NODE, Range.MIN, rid, InterprNode.MIN);
@@ -253,6 +233,37 @@ public class Activation implements Comparable<Activation> {
                 results = doc.activatedNodes
                         .stream()
                         .flatMap(node -> getActivationsStream(node, doc));
+            }
+
+            return results.filter(act -> act.filter(n, rid, r, begin, end, o, or));
+        }
+    }
+
+
+    public static Stream<Activation> select(ThreadState th, Node n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
+        Stream<Activation> results;
+        int s = th.activations.size();
+
+        if(s == 0) return Stream.empty();
+        else if(s == 1) {
+            results = th.activations
+                    .values()
+                    .stream();
+        } else if(rid != null) {
+            Key bk = new Key(n, Range.MIN, rid, InterprNode.MIN);
+            Key ek = new Key(n, Range.MAX, rid, InterprNode.MAX);
+
+            if(th.activationsRid != null) {
+                results = th.activationsRid.subMap(bk, true, ek, true)
+                        .values()
+                        .stream();
+            } else return Stream.empty();
+        } else {
+            if(begin == null && end == null) {
+                results = th.activations.values()
+                        .stream();
+            } else {
+                return getActivationsByRange(th, n, rid, r, begin, end, o, or);
             }
         }
 
@@ -503,6 +514,24 @@ public class Activation implements Comparable<Activation> {
         public boolean isQueued(int r) {
             return r < isQueued.length ? isQueued[r] : false;
         }
+    }
+
+
+    public void addSynapseActivation(int dir, SynapseActivation sa) {
+        if(dir == 0) {
+            neuronOutputs = Utils.addToArray(neuronOutputs, sa);
+        } else {
+            neuronInputs = Utils.addToArray(neuronInputs, sa);
+        }
+    }
+
+
+    public void removeSynapseActivation(int dir, SynapseActivation sa) {
+        if(dir == 0) {
+            neuronOutputs = Utils.removeToArray(neuronOutputs, sa);
+        } else {
+            neuronInputs = Utils.removeToArray(neuronInputs, sa);
+        };
     }
 
 

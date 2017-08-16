@@ -78,7 +78,7 @@ public class RecurrentIdTest {
 
         Activation outC1 = Activation.get(doc, outCNode, 20, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
 
-        System.out.println(doc.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true, false, true));
 
         Assert.assertNotNull(outC1);
     }

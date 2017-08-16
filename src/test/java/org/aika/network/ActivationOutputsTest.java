@@ -119,7 +119,7 @@ public class ActivationOutputsTest {
     }
 
 
-    private Activation selectInputActivation(Collection<SynapseActivation> acts, Node n) {
+    private Activation selectInputActivation(SynapseActivation[] acts, Node n) {
         for(SynapseActivation sa: acts) {
             if(sa.input.key.n.compareTo(n) == 0) {
                 return sa.input;
@@ -129,7 +129,7 @@ public class ActivationOutputsTest {
     }
 
 
-    public boolean containsOutputActivation(Set<SynapseActivation> outputActivations, Activation oAct) {
+    public boolean containsOutputActivation(SynapseActivation[] outputActivations, Activation oAct) {
         for(SynapseActivation sa: outputActivations) {
             if(sa.output == oAct) return true;
         }
@@ -174,7 +174,7 @@ public class ActivationOutputsTest {
 
         Activation actAB = TestHelper.get(doc, pABNode, new Range(0, 1), null);
 
-        System.out.println(doc.networkStateToString(true, false));
+        System.out.println(doc.networkStateToString(true, false, false, true));
 
         Assert.assertTrue(!actAB.key.o.conflicts.primary.isEmpty());
     }

@@ -36,6 +36,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.aika.corpus.Range.Operator.*;
 
@@ -310,8 +311,11 @@ public class InputNode extends Node {
         InputNode firstNode = ((InputNode) ak.n);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
 
+        ThreadState th = secondNode.getThreadState(doc.threadId, false);
+        if(th == null || th.activations.isEmpty()) return;
+
         Activation.select(
-                doc,
+                th,
                 secondNode,
                 secondRid,
                 ak.r,

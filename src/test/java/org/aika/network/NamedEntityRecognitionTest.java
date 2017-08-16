@@ -201,7 +201,7 @@ public class NamedEntityRecognitionTest {
         SearchNode.INCOMPLETE_OPTIMIZATION = true;
         doc.process();
 
-        System.out.println(doc.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true, false, true));
         System.out.println();
 
         System.out.println("Selected Option: " + doc.bestInterpretation.toString());
@@ -415,7 +415,7 @@ public class NamedEntityRecognitionTest {
         SearchNode.INCOMPLETE_OPTIMIZATION = true;
         doc.process();
 
-        System.out.println(doc.networkStateToString(true, true));
+        System.out.println(doc.networkStateToString(true, true, false, true));
         System.out.println();
 
         System.out.println("Selected Option: " + doc.bestInterpretation.toString());

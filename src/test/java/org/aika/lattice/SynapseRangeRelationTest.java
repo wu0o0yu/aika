@@ -33,6 +33,8 @@ import org.junit.Test;
 
 import java.util.Collections;
 
+import static org.aika.Activation.SynapseActivation.INPUT_COMP;
+
 /**
  *
  * @author Lukas Molzberger
@@ -75,7 +77,12 @@ public class SynapseRangeRelationTest {
         Activation iAct2 = in.node.addActivationInternal(doc, new Key(in.node, new Range(10, 18), null, doc.bottom), Collections.emptyList(), false);
         Activation oAct = on.node.addActivationInternal(doc, new Key(on.node, new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
 
-        Assert.assertTrue(oAct.neuronInputs.contains(new SynapseActivation(s, iAct1, oAct)));
+        boolean f = false;
+        for(SynapseActivation sa: oAct.neuronInputs) {
+            if(INPUT_COMP.compare(sa, new SynapseActivation(s, iAct1, oAct)) == 0) f = true;
+        }
+
+        Assert.assertTrue(f);
     }
 
 }

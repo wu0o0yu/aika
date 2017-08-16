@@ -89,7 +89,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Search Step: " + id + "  Candidate Weight Delta: " + weightDelta);
-            log.info(doc.networkStateToString(true, true) + "\n");
+            log.info(doc.networkStateToString(true, true, true, false) + "\n");
         }
 
         changeState(StateChange.Mode.OLD);
@@ -189,7 +189,7 @@ public class SearchNode implements Comparable<SearchNode> {
         changeState(StateChange.Mode.NEW);
 
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
-            log.info(doc.networkStateToString(true, true) + "\n");
+            log.info(doc.networkStateToString(true, true, true, false) + "\n");
         }
 
         generateNextLevelCandidates(doc, selectedParent, excludedParent);

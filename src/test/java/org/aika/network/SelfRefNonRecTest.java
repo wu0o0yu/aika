@@ -66,7 +66,7 @@ public class SelfRefNonRecTest {
 
         inA.addInput(t, 0, 1);
 
-        System.out.println(t.networkStateToString(true, false));
+        System.out.println(t.networkStateToString(true, false, false, true));
 
         Assert.assertEquals(1, bN.node.getFirstActivation(t).key.o.orInterprNodes.size());
     }

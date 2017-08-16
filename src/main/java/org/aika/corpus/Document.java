@@ -277,11 +277,11 @@ public class Document implements Comparable<Document> {
 
 
     public String networkStateToString(boolean withWeights) {
-        return networkStateToString(true, withWeights);
+        return networkStateToString(true, withWeights, false, false);
     }
 
 
-    public String networkStateToString(boolean neuronsOnly, boolean withWeights) {
+    public String networkStateToString(boolean neuronsOnly, boolean withWeights, boolean withTextSnipped, boolean withLogic) {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         if(neuronsOnly) {
@@ -305,12 +305,16 @@ public class Document implements Comparable<Document> {
         for(Activation act: acts) {
             sb.append(act.id + " ");
             sb.append(act.key.r);
+            if(withTextSnipped && act.key.r.begin != null && act.key.r.end != null) {
+                sb.append(" ");
+                sb.append(collapseText(getText(act.key.r)));
+            }
             sb.append(" - ");
 
             sb.append(act.key.o);
             sb.append(" - ");
 
-            sb.append(act.key.n);
+            sb.append(withLogic ? act.key.n.toString() : act.key.n.toSimpleString());
             sb.append(" - Rid:");
             sb.append(act.key.rid);
             sb.append(" - UB:");
@@ -340,6 +344,15 @@ public class Document implements Comparable<Document> {
         }
         sb.append("\nWeightSum:" + weightSum.toString() + "\n");
         return sb.toString();
+    }
+
+
+    private String collapseText(String txt) {
+        if (txt.length() <= 10) {
+            return txt;
+        } else {
+            return txt.substring(0, 5) + "..." + txt.substring(txt.length() - 5);
+        }
     }
 
 
@@ -376,7 +389,7 @@ public class Document implements Comparable<Document> {
                 if(APPLY_DEBUG_OUTPUT) {
                     log.info("QueueId:" + n.queueId);
                     log.info(n.toString() + "\n");
-                    log.info("\n" + networkStateToString(false, false));
+                    log.info("\n" + networkStateToString(false, false, true, false));
                 }
             }
         }
