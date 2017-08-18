@@ -85,9 +85,10 @@ public class Range {
     }
 
 
-    public static boolean contains(Range ra, Range rb) {
-        return ra.begin <= rb.begin && ra.end >= rb.end;
+    public boolean contains(Range r) {
+        return begin <= r.begin && r.end <= end ;
     }
+
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
