@@ -71,8 +71,8 @@ public class InterprNode implements Comparable<InterprNode> {
     private int visitedComputeLength;
     private int visitedComputeParents;
     private int visitedNumberInnerInputs;
+    public int visitedConsistencyCheck;
 
-    int visitedMarkCovered;
     int visitedCollectAllConflicting;
     int visitedExpandRefinementRecursiveStep;
     int markedExpandRefinement;
@@ -80,8 +80,9 @@ public class InterprNode implements Comparable<InterprNode> {
     int visitedCheckExcluded;
 
     public int markedConflict;
-    public int markedCovered;
+    public int markedSelected;
     public int markedExcluded;
+    public int markedHasCandidate;
 
     Boolean hasUnsatisfiedPosFeedbackLinksCache;
 

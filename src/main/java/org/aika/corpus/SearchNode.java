@@ -50,15 +50,16 @@ public class SearchNode implements Comparable<SearchNode> {
      * This optimization may miss some cases and will not always return the best interpretation.
      */
     public static boolean INCOMPLETE_OPTIMIZATION = true;
+    public static boolean CONSISTENCY_CHECK = true;
 
     public static int MAX_SEARCH_STEPS = 100000;
 
     public int id;
 
-    SearchNode excludedParent;
-    SearchNode selectedParent;
+    public SearchNode excludedParent;
+    public SearchNode selectedParent;
 
-    int visited;
+    public int visited;
     List<InterprNode> refinement;
     RefMarker marker;
 
@@ -76,8 +77,8 @@ public class SearchNode implements Comparable<SearchNode> {
         selectedParent = selParent;
         excludedParent = exclParent;
         refinement = expandRefinement(ref, doc.visitedCounter++);
-        markCovered(changed, visited, refinement);
-        markExcluded(changed, visited, refinement);
+        markSelected(changed, refinement);
+        markExcluded(changed, refinement);
         marker = m;
         weightDelta = doc.vQueue.adjustWeight(this, changed);
 
@@ -119,8 +120,10 @@ public class SearchNode implements Comparable<SearchNode> {
         List<InterprNode> rootRefs = expandRootRefinement(doc);
         refinement = expandRefinement(rootRefs, doc.visitedCounter++);
 
-        markCovered(null, visited, refinement);
-        markExcluded(null, visited, refinement);
+        // Mark all interpretation nodes as candidates
+        markCandidatesRecursiveStep(doc.bottom, true);
+        markSelected(null, refinement);
+        markExcluded(null, refinement);
 
         weightDelta = doc.vQueue.adjustWeight(this, rootRefs);
         accumulatedWeight = weightDelta;
@@ -178,8 +181,9 @@ public class SearchNode implements Comparable<SearchNode> {
         }
         searchSteps[0]++;
 
-        markCovered(null, visited, refinement);
-        markExcluded(null, visited, refinement);
+        markCandidates(selectedParent.candidates);
+        markSelected(null, refinement);
+        markExcluded(null, refinement);
 
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Search Step: " + id);
@@ -195,6 +199,10 @@ public class SearchNode implements Comparable<SearchNode> {
         generateNextLevelCandidates(doc, selectedParent, excludedParent);
 
         if(candidates.size() == 0) {
+            if(CONSISTENCY_CHECK) {
+                consistencyCheck(doc.bottom, doc.visitedCounter++);
+            }
+
             SearchNode en = this;
             while(en != null) {
                 if(en.marker != null && !en.marker.complete) {
@@ -207,13 +215,13 @@ public class SearchNode implements Comparable<SearchNode> {
             double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight[0].getNormWeight() : 0.0;
 
             if (accNW > selectedAccNW) {
-//                log.info("+ " + pathToString(doc));
+                log.info("+ " + pathToString(doc));
 
                 doc.selectedSearchNode = this;
                 doc.bottom.storeFinalWeight(doc.visitedCounter++);
-            } /* else {
+            } else {
                 log.info("- " + pathToString(doc));
-            }*/
+            }
 
             return accNW;
         }
@@ -254,12 +262,26 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
+    private void consistencyCheck(InterprNode n, int v) {
+        if(n.visitedConsistencyCheck == v) return;
+        n.visitedConsistencyCheck = v;
+
+        if(!(n.isBottom() || isCovered(n.markedSelected) || isCovered(n.markedExcluded) || n.isConflicting(n.doc.visitedCounter++) || (selectedParent != null && n.markedHasCandidate != selectedParent.visited))) {
+            assert false;
+        }
+
+        for(InterprNode cn: n.children) {
+            consistencyCheck(cn, v);
+        }
+    }
+
+
     private boolean hasUnsatisfiedPositiveFeedbackLink(InterprNode n) {
         if(n.hasUnsatisfiedPosFeedbackLinksCache != null) return n.hasUnsatisfiedPosFeedbackLinksCache;
 
         for(Activation act: n.getNeuronActivations()) {
             for(SynapseActivation sa: act.neuronOutputs) {
-                if(sa.s.key.isRecurrent && sa.s.w > 0.0 && !isCovered(sa.output.key.o.markedCovered)) {
+                if(sa.s.key.isRecurrent && sa.s.w > 0.0 && !isCovered(sa.output.key.o.markedSelected)) {
                     n.hasUnsatisfiedPosFeedbackLinksCache = true;
                     return true;
                 }
@@ -296,7 +318,7 @@ public class SearchNode implements Comparable<SearchNode> {
     public void generateNextLevelCandidates(Document doc, SearchNode selectedParent, SearchNode excludedParent) {
         candidates = new TreeSet<>();
         for(SearchNode pc: selectedParent.candidates) {
-            if(!checkCovered(pc.refinement) && !checkExcluded(pc.refinement, doc.visitedCounter++)) {
+            if(!checkSelected(pc.refinement) && !checkExcluded(pc.refinement, doc.visitedCounter++)) {
                 List<InterprNode> changed = new ArrayList<>();
                 candidates.add(new SearchNode(doc, changed, this, excludedParent, pc.refinement, pc.marker));
             }
@@ -304,9 +326,9 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean checkCovered(List<InterprNode> n) {
+    private boolean checkSelected(List<InterprNode> n) {
         for(InterprNode x: n) {
-            if(!isCovered(x.markedCovered)) return false;
+            if(!isCovered(x.markedSelected)) return false;
         }
         return true;
     }
@@ -405,7 +427,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if (n.refByOrInterprNode != null) {
             for (InterprNode on : n.refByOrInterprNode) {
-                if(on.markedExpandRefinement != v && !hasUncoveredConflicts(on) && !isCovered(on.markedCovered)) {
+                if(on.markedExpandRefinement != v && !hasUncoveredConflicts(on) && !isCovered(on.markedSelected)) {
                     markExpandRefinement(on, v);
                     results.add(on);
                 }
@@ -426,7 +448,7 @@ public class SearchNode implements Comparable<SearchNode> {
             // Check if all parents are either contained in this refinement or an earlier refinement.
             boolean covered = true;
             for(InterprNode cnp: cn.parents) {
-                if(cnp.visitedExpandRefinementRecursiveStep != v && !isCovered(cnp.markedCovered)) {
+                if(cnp.visitedExpandRefinementRecursiveStep != v && !isCovered(cnp.markedSelected)) {
                     covered = false;
                     break;
                 }
@@ -449,39 +471,33 @@ public class SearchNode implements Comparable<SearchNode> {
         return false;
     }
 
-    private void markCovered(List<InterprNode> changed, int v, List<InterprNode> n) {
+
+    private void markSelected(List<InterprNode> changed, List<InterprNode> n) {
         for(InterprNode x: n) {
-            markCovered(changed, v, x);
+            markSelected(changed, x);
         }
     }
 
 
-    private boolean markCovered(List<InterprNode> changed, int v, InterprNode n) {
-        if(n.visitedMarkCovered == v) return false;
-        n.visitedMarkCovered = v;
-
-        if(isCovered(n.markedCovered)) return false;
-
-        n.markedCovered = v;
+    private boolean markSelected(List<InterprNode> changed, InterprNode n) {
+        if(n.markedSelected == visited || isCovered(n.markedSelected)) return false;
+        n.markedSelected = visited;
 
         if(n.isBottom()) {
             return false;
         }
 
         for(InterprNode p: n.parents) {
-            if(markCovered(changed, v, p)) return true;
+            if(markSelected(changed, p)) return true;
         }
 
         for(InterprNode c: n.children) {
-            if(c.visitedMarkCovered == v) continue;
-
-            if(!containedInSelectedBranch(v, c)) continue;
-
+            if(c.markedSelected == visited || !containedInSelectedBranch(visited, c)) continue;
             if(c.isConflicting(n.doc.visitedCounter++)) return true;
 
-            c.markedCovered = v;
+            c.markedSelected = visited;
 
-            if(markCovered(changed, v, c)) return true;
+            if(markSelected(changed, c)) return true;
         }
 
         if(changed != null) changed.add(n);
@@ -490,36 +506,36 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void markExcluded(List<InterprNode> changed, int v, List<InterprNode> n) {
+    private void markExcluded(List<InterprNode> changed, List<InterprNode> n) {
         for(InterprNode x: n) {
-            markExcluded(changed, v, x);
+            markExcluded(changed, x);
         }
     }
 
 
-    private void markExcluded(List<InterprNode> changed, int v, InterprNode n) {
+    private void markExcluded(List<InterprNode> changed, InterprNode n) {
         List<InterprNode> conflicting = new ArrayList<>();
         Conflicts.collectAllConflicting(conflicting, n, n.doc.visitedCounter++);
         for(InterprNode cn: conflicting) {
-            markExcludedRecursiveStep(changed, v, cn);
+            markExcludedRecursiveStep(changed, cn);
         }
     }
 
 
-    private void markExcludedRecursiveStep(List<InterprNode> changed, int v, InterprNode n) {
-        if(n.markedExcluded == v) return;
-        n.markedExcluded = v;
-
-        if(isCovered(n.markedExcluded)) return;
+    private void markExcludedRecursiveStep(List<InterprNode> changed, InterprNode n) {
+        if(n.markedExcluded == visited || isCovered(n.markedExcluded)) return;
+        n.markedExcluded = visited;
 
         for(InterprNode c: n.children) {
-            markExcludedRecursiveStep(changed, v, c);
+            markExcludedRecursiveStep(changed, c);
         }
 
         // If the or option has two input options and one of them is already excluded, then when the other one is excluded we also have to exclude the or option.
         if(n.linkedByLCS != null) {
             for(InterprNode c: n.linkedByLCS) {
-                markExcludedRecursiveStep(changed, v, c);
+                if(checkOrNodeExcluded(c)) {
+                    markExcludedRecursiveStep(changed, c);
+                }
             }
         }
 
@@ -529,9 +545,38 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
+    private boolean checkOrNodeExcluded(InterprNode n) {
+        for(InterprNode on: n.orInterprNodes.values()) {
+            if(!isCovered(on.markedExcluded)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    private void markCandidates(Collection<SearchNode> candidates) {
+        for(SearchNode sn: candidates) {
+            for(InterprNode ref: sn.refinement) {
+                markCandidatesRecursiveStep(ref, false);
+            }
+        }
+    }
+
+
+    private void markCandidatesRecursiveStep(InterprNode n, boolean dir) {
+        if(n.markedHasCandidate == visited) return;
+        n.markedHasCandidate = visited;
+
+        for(InterprNode pn: dir ? n.children : n.parents) {
+            if(!pn.isBottom()) markCandidatesRecursiveStep(pn, dir);
+        }
+    }
+
+
     public boolean containedInSelectedBranch(int v, InterprNode n) {
         for(InterprNode p: n.parents) {
-            if(p.markedCovered != v && !isCovered(p.markedCovered)) return false;
+            if(p.markedSelected != v && !isCovered(p.markedSelected)) return false;
         }
         return true;
     }

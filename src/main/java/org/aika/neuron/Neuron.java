@@ -233,7 +233,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
     static final int DIR = 0;
     static final int REC = 1;
 
-    public State computeWeight(int round, Activation act, SearchNode en, Document doc) {
+    public State computeWeight(int round, Activation act, SearchNode sn, Document doc) {
+        InterprNode o = act.key.o;
         double st = bias - (negDirSum + negRecSum);
         double[][] sum = {{st, st, st}, {0.0, 0.0, 0.0}};
 
@@ -243,15 +244,16 @@ public class Neuron implements Comparable<Neuron>, Writable {
             Synapse s = sa.s;
 
             Activation iAct = sa.input;
+            InterprNode io = iAct.key.o;
 
             if (iAct == act || iAct.isRemoved) continue;
 
             State is = State.ZERO;
             if (s.key.isRecurrent) {
-                if (!s.key.isNeg || !checkSelfReferencing(act.key.o, iAct.key.o, en, 0)) {
+                if (!s.key.isNeg || !checkSelfReferencing(o, io, sn, 0)) {
                     is = iAct.rounds.get(
                             round - 1,
-                            round == 0 && (s.key.isNeg ? en.isCovered(iAct.key.o.markedCovered) : !en.isCovered(iAct.key.o.markedExcluded))
+                            round == 0 && (s.key.isNeg ? sn.isCovered(io.markedSelected) : !sn.isCovered(io.markedExcluded))
                     );
                 }
             } else {
@@ -268,8 +270,9 @@ public class Neuron implements Comparable<Neuron>, Writable {
             }
         }
 
-        boolean covered = en.isCovered(act.key.o.markedCovered);
-        boolean excluded = en.isCovered(act.key.o.markedExcluded);
+        boolean hasNoCandidate = sn.selectedParent != null && o.markedHasCandidate != sn.selectedParent.visited;
+        boolean selected = sn.isCovered(o.markedSelected);
+        boolean excluded = (!selected && hasNoCandidate) || sn.isCovered(o.markedExcluded);
 
         double drSum = sum[DIR][V] + sum[REC][V];
         double drSumUB = sum[DIR][UB] + sum[REC][UB];
@@ -277,7 +280,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
         // Compute only the recurrent part is above the threshold.
         NormWeight newWeight = NormWeight.create(
-                covered ? (sum[DIR][V] + negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC][V] - negRecSum : 0.0,
+                selected ? (sum[DIR][V] + negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC][V] - negRecSum : 0.0,
                 (sum[DIR][V] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR][V] + negRecSum + maxRecurrentSum) : maxRecurrentSum
         );
         NormWeight newWeightUB = NormWeight.create(
@@ -290,10 +293,10 @@ public class Neuron implements Comparable<Neuron>, Writable {
         }
 
         return new State(
-                covered ? transferFunction(drSum) : 0.0,
+                selected ? transferFunction(drSum) : 0.0,
                 excluded ? 0.0 : transferFunction(drSumUB),
-                covered ? transferFunction(drSumLB) : 0.0,
-                covered ? fired : -1,
+                selected ? transferFunction(drSumLB) : 0.0,
+                selected ? fired : -1,
                 newWeight,
                 newWeightUB
         );
@@ -462,7 +465,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
 
     private static boolean checkSelfReferencing(InterprNode nx, InterprNode ny, SearchNode en, int depth) {
-        if(nx == ny && (en == null || en.isCovered(ny.markedCovered))) return true;
+        if(nx == ny && (en == null || en.isCovered(ny.markedSelected))) return true;
 
         if(depth > MAX_SELF_REFERENCING_DEPTH) return false;
 
