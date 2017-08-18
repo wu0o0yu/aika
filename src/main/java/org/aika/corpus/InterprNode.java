@@ -71,7 +71,6 @@ public class InterprNode implements Comparable<InterprNode> {
     private int visitedComputeLength;
     private int visitedComputeParents;
     private int visitedNumberInnerInputs;
-    public int visitedConsistencyCheck;
 
     int visitedCollectAllConflicting;
     int visitedExpandRefinementRecursiveStep;
