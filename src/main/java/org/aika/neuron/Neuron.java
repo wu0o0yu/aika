@@ -253,7 +253,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
                 if (!s.key.isNeg || !checkSelfReferencing(o, io, sn, 0)) {
                     is = iAct.rounds.get(
                             round - 1,
-                            round == 0 && (s.key.isNeg ? sn.isCovered(io.markedSelected) : !sn.isCovered(io.markedExcluded))
+                            round == 0 && (s.key.isNeg ? sn.isCovered(iAct.key.o.markedSelected) : !sn.isCovered(iAct.key.o.markedExcluded))
                     );
                 }
             } else {
@@ -270,9 +270,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
             }
         }
 
-        boolean hasNoCandidate = false; // sn.selectedParent != null && o.markedHasCandidate != sn.selectedParent.visited;
-        boolean selected = sn.isCovered(o.markedSelected);
-        boolean excluded = (!selected && hasNoCandidate) || sn.isCovered(o.markedExcluded);
+        boolean selected = sn.isCovered(act.key.o.markedSelected);
+        boolean excluded = sn.isCovered(act.key.o.markedExcluded);
 
         double drSum = sum[DIR][V] + sum[REC][V];
         double drSumUB = sum[DIR][UB] + sum[REC][UB];

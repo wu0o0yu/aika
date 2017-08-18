@@ -58,6 +58,8 @@ public class Document implements Comparable<Document> {
 
     public static int CLEANUP_INTERVAL = 20;
 
+    public static int MAX_ROUND = 20;
+
     private String content;
 
     public int visitedCounter = 1;
@@ -482,6 +484,11 @@ public class Document implements Comparable<Document> {
 
 
         public void add(int round, Activation act) {
+            if(round > MAX_ROUND) {
+                log.error("Maximum number of rounds reached.");
+                return;
+            }
+
             if(act.rounds.isQueued(round)) return;
 
             ArrayDeque<Activation> q;
@@ -540,24 +547,6 @@ public class Document implements Comparable<Document> {
                 }
             }
             return delta;
-        }
-    }
-
-    private static class VEntry implements Comparable<VEntry> {
-        public int round;
-        public Activation act;
-
-
-        public VEntry(int round, Activation act) {
-            this.round = round;
-            this.act = act;
-        }
-
-        @Override
-        public int compareTo(VEntry ve) {
-            int r = Integer.compare(round, ve.round);
-            if(r != 0) return r;
-            return act.compareTo(ve.act);
         }
     }
 

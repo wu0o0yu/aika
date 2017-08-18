@@ -461,7 +461,11 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean markSelected(List<InterprNode> changed, InterprNode n) {
-        if(n.markedSelected == visited || isCovered(n.markedSelected)) return false;
+        if(n.visitedMarkCovered == visited) return false;
+        n.visitedMarkCovered = visited;
+
+        if(isCovered(n.markedSelected)) return false;
+
         n.markedSelected = visited;
 
         if(n.isBottom()) {
@@ -473,7 +477,10 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         for(InterprNode c: n.children) {
-            if(c.markedSelected == visited || !containedInSelectedBranch(visited, c)) continue;
+            if(c.visitedMarkCovered == visited) continue;
+
+            if(!containedInSelectedBranch(visited, c)) continue;
+
             if(c.isConflicting(n.doc.visitedCounter++)) return true;
 
             c.markedSelected = visited;
@@ -504,8 +511,10 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private void markExcludedRecursiveStep(List<InterprNode> changed, InterprNode n) {
-        if(n.markedExcluded == visited || isCovered(n.markedExcluded)) return;
+        if(n.markedExcluded == visited) return;
         n.markedExcluded = visited;
+
+        if(isCovered(n.markedExcluded)) return;
 
         for(InterprNode c: n.children) {
             markExcludedRecursiveStep(changed, c);
