@@ -50,7 +50,6 @@ public class SearchNode implements Comparable<SearchNode> {
      * This optimization may miss some cases and will not always return the best interpretation.
      */
     public static boolean INCOMPLETE_OPTIMIZATION = true;
-    public static boolean CONSISTENCY_CHECK = true;
 
     public static int MAX_SEARCH_STEPS = 100000;
 
@@ -199,10 +198,6 @@ public class SearchNode implements Comparable<SearchNode> {
         generateNextLevelCandidates(doc, selectedParent, excludedParent);
 
         if(candidates.size() == 0) {
-            if(CONSISTENCY_CHECK) {
-                consistencyCheck(doc.bottom, doc.visitedCounter++);
-            }
-
             SearchNode en = this;
             while(en != null) {
                 if(en.marker != null && !en.marker.complete) {
@@ -215,12 +210,12 @@ public class SearchNode implements Comparable<SearchNode> {
             double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight[0].getNormWeight() : 0.0;
 
             if (accNW > selectedAccNW) {
-                log.info("+ " + pathToString(doc));
+                log.info("+ " + pathToString(doc) + "  -  " + accumulatedWeight[0] + "  " + accumulatedWeight[1]);
 
                 doc.selectedSearchNode = this;
                 doc.bottom.storeFinalWeight(doc.visitedCounter++);
             } else {
-                log.info("- " + pathToString(doc));
+                log.info("- " + pathToString(doc) + "  -  " + accumulatedWeight[0] + "  " + accumulatedWeight[1]);
             }
 
             return accNW;
@@ -259,20 +254,6 @@ public class SearchNode implements Comparable<SearchNode> {
             if(hasUnsatisfiedPositiveFeedbackLink(x)) return true;
         }
         return false;
-    }
-
-
-    private void consistencyCheck(InterprNode n, int v) {
-        if(n.visitedConsistencyCheck == v) return;
-        n.visitedConsistencyCheck = v;
-
-        if(!(n.isBottom() || isCovered(n.markedSelected) || isCovered(n.markedExcluded) || n.isConflicting(n.doc.visitedCounter++) || (selectedParent != null && n.markedHasCandidate != selectedParent.visited))) {
-            assert false;
-        }
-
-        for(InterprNode cn: n.children) {
-            consistencyCheck(cn, v);
-        }
     }
 
 
