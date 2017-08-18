@@ -80,6 +80,15 @@ public class Range {
     }
 
 
+    public int length() {
+        return end - begin;
+    }
+
+
+    public static boolean contains(Range ra, Range rb) {
+        return ra.begin <= rb.begin && ra.end >= rb.end;
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
