@@ -270,7 +270,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
             }
         }
 
-        boolean hasNoCandidate = sn.selectedParent != null && o.markedHasCandidate != sn.selectedParent.visited;
+        boolean hasNoCandidate = false; // sn.selectedParent != null && o.markedHasCandidate != sn.selectedParent.visited;
         boolean selected = sn.isCovered(o.markedSelected);
         boolean excluded = (!selected && hasNoCandidate) || sn.isCovered(o.markedExcluded);
 
