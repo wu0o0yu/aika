@@ -310,7 +310,12 @@ public class SearchNode implements Comparable<SearchNode> {
         for(SearchNode pc: selectedParent.candidates) {
             if(!checkSelected(pc.refinement) && !checkExcluded(pc.refinement, doc.visitedCounter++)) {
                 List<InterprNode> changed = new ArrayList<>();
-                candidates.add(new SearchNode(doc, changed, this, excludedParent, pc.refinement, pc.marker));
+
+                SearchNode c = new SearchNode(doc, changed, this, excludedParent, pc.refinement, pc.marker);
+
+                if(doc.selectedSearchNode == null || doc.selectedSearchNode.accumulatedWeight[0].getNormWeight() < c.accumulatedWeight[1].getNormWeight()) {
+                    candidates.add(c);
+                }
             }
         }
     }
