@@ -21,12 +21,21 @@ import org.aika.corpus.InterprNode;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class Utils {
+
+
+    public static <T> boolean contains(T[] in, T x, Comparator<T> c) {
+        for(T y: in) {
+            if(c.compare(x, y) == 0) return true;
+        }
+        return false;
+    }
 
 
     public static <T> T[] addToArray(T[] in, T n) {

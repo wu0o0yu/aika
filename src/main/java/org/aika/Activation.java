@@ -32,6 +32,8 @@ import org.aika.neuron.Synapse;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static org.aika.Activation.SynapseActivation.INPUT_COMP;
+import static org.aika.Activation.SynapseActivation.OUTPUT_COMP;
 import static org.aika.corpus.Range.Operator.*;
 
 /**
@@ -425,9 +427,10 @@ public class Activation implements Comparable<Activation> {
         public final NormWeight weightUB;
 
         public static final State ZERO = new State(0.0, 0.0, 0.0, -1, NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT);
-        public static final State ONE = new State(1.0, 1.0, 1.0, -1, NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT);
 
         public State(double value, double ub, double lb, int fired, NormWeight weight, NormWeight weightUB) {
+            assert lb <= value && value <= ub;
+            assert weight.w <= weightUB.w && weightUB.n <= weight.n;
             this.value = value;
             this.ub = ub;
             this.lb = lb;
@@ -466,7 +469,7 @@ public class Activation implements Comparable<Activation> {
         public TreeMap<Integer, State> rounds = new TreeMap<>();
 
         public boolean set(int r, State s) {
-            State lr = get(r - 1, false);
+            State lr = get(r - 1);
             if(lr != null && lr.equalsWithWeights(s)) {
                 State or = rounds.get(r);
                 if(or != null) {
@@ -485,9 +488,9 @@ public class Activation implements Comparable<Activation> {
             }
         }
 
-        public State get(int r, boolean defaultValue) {
+        public State get(int r) {
             Map.Entry<Integer, State> me = rounds.floorEntry(r);
-            return me != null ? me.getValue() : (defaultValue ? State.ONE : State.ZERO);
+            return me != null ? me.getValue() : State.ZERO;
         }
 
         public Rounds copy() {
@@ -519,8 +522,10 @@ public class Activation implements Comparable<Activation> {
 
     public void addSynapseActivation(int dir, SynapseActivation sa) {
         if(dir == 0) {
+            if(Utils.contains(neuronOutputs, sa, OUTPUT_COMP)) return;
             neuronOutputs = Utils.addToArray(neuronOutputs, sa);
         } else {
+            if(Utils.contains(neuronInputs, sa, INPUT_COMP)) return;
             neuronInputs = Utils.addToArray(neuronInputs, sa);
         }
     }

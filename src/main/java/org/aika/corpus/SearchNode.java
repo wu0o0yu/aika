@@ -70,6 +70,13 @@ public class SearchNode implements Comparable<SearchNode> {
     public TreeSet<SearchNode> candidates = new TreeSet<>();
 
 
+    public enum Coverage {
+        SELECTED,
+        UNKNOWN,
+        EXCLUDED
+    }
+
+
     private SearchNode(Document doc, List<InterprNode> changed, SearchNode selParent, SearchNode exclParent, List<InterprNode> ref, RefMarker m) {
         id = doc.searchNodeIdCounter++;
         visited = doc.visitedCounter++;
@@ -217,6 +224,8 @@ public class SearchNode implements Comparable<SearchNode> {
             } else {
                 log.info("- " + pathToString(doc) + "  -  " + accumulatedWeight[0] + "  " + accumulatedWeight[1]);
             }
+
+            changeState(StateChange.Mode.OLD);
 
             return accNW;
         }
@@ -442,6 +451,14 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
+    public Coverage getCoverage(InterprNode n) {
+        if(isCovered(n.markedSelected)) return Coverage.SELECTED;
+        if(selectedParent != null && n.markedHasCandidate != selectedParent.visited) return Coverage.EXCLUDED;
+        if(isCovered(n.markedExcluded)) return Coverage.EXCLUDED;
+        return Coverage.UNKNOWN;
+    }
+
+
     public boolean isCovered(int g) {
         SearchNode n = this;
         do {
@@ -461,9 +478,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean markSelected(List<InterprNode> changed, InterprNode n) {
-        if(n.visitedMarkCovered == visited) return false;
-        n.visitedMarkCovered = visited;
-
         if(isCovered(n.markedSelected)) return false;
 
         n.markedSelected = visited;
@@ -477,13 +491,9 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         for(InterprNode c: n.children) {
-            if(c.visitedMarkCovered == visited) continue;
-
-            if(!containedInSelectedBranch(visited, c)) continue;
+            if(isCovered(n.markedSelected) || !containedInSelectedBranch(c)) continue;
 
             if(c.isConflicting(n.doc.visitedCounter++)) return true;
-
-            c.markedSelected = visited;
 
             if(markSelected(changed, c)) return true;
         }
@@ -511,10 +521,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private void markExcludedRecursiveStep(List<InterprNode> changed, InterprNode n) {
-        if(n.markedExcluded == visited) return;
-        n.markedExcluded = visited;
-
         if(isCovered(n.markedExcluded)) return;
+        n.markedExcluded = visited;
 
         for(InterprNode c: n.children) {
             markExcludedRecursiveStep(changed, c);
@@ -564,9 +572,9 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public boolean containedInSelectedBranch(int v, InterprNode n) {
+    public boolean containedInSelectedBranch(InterprNode n) {
         for(InterprNode p: n.parents) {
-            if(p.markedSelected != v && !isCovered(p.markedSelected)) return false;
+            if(!isCovered(p.markedSelected)) return false;
         }
         return true;
     }

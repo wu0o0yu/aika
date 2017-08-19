@@ -77,7 +77,6 @@ public class InterprNode implements Comparable<InterprNode> {
     int markedExpandRefinement;
     int visitedCollectConflicts;
     int visitedCheckExcluded;
-    int visitedMarkCovered;
 
     public int markedConflict;
     public int markedSelected;

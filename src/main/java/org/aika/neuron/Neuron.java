@@ -22,6 +22,7 @@ import org.aika.Activation.State;
 import org.aika.Activation.SynapseActivation;
 import org.aika.corpus.Document;
 import org.aika.corpus.SearchNode;
+import org.aika.corpus.SearchNode.Coverage;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
@@ -251,13 +252,10 @@ public class Neuron implements Comparable<Neuron>, Writable {
             State is = State.ZERO;
             if (s.key.isRecurrent) {
                 if (!s.key.isNeg || !checkSelfReferencing(o, io, sn, 0)) {
-                    is = iAct.rounds.get(
-                            round - 1,
-                            round == 0 && (s.key.isNeg ? sn.isCovered(iAct.key.o.markedSelected) : !sn.isCovered(iAct.key.o.markedExcluded))
-                    );
+                    is = round == 0 ? computeInitialState(s, sn, io) : iAct.rounds.get(round - 1);
                 }
             } else {
-                is = iAct.rounds.get(round, false);
+                is = iAct.rounds.get(round);
             }
 
             int t = s.key.isRecurrent ? REC : DIR;
@@ -266,25 +264,24 @@ public class Neuron implements Comparable<Neuron>, Writable {
             sum[t][LB] += (s.key.isNeg ? is.ub : is.lb) * s.w;
 
             if (!s.key.isRecurrent && !s.key.isNeg && sum[DIR][V] + sum[REC][V] >= 0.0 && fired < 0) {
-                fired = iAct.rounds.get(round, false).fired + 1;
+                fired = iAct.rounds.get(round).fired + 1;
             }
         }
 
-        boolean selected = sn.isCovered(act.key.o.markedSelected);
-        boolean excluded = sn.isCovered(act.key.o.markedExcluded);
 
         double drSum = sum[DIR][V] + sum[REC][V];
         double drSumUB = sum[DIR][UB] + sum[REC][UB];
         double drSumLB = sum[DIR][LB] + sum[REC][LB];
 
+        Coverage c = sn.getCoverage(act.key.o);
         // Compute only the recurrent part is above the threshold.
         NormWeight newWeight = NormWeight.create(
-                selected ? (sum[DIR][V] + negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC][V] - negRecSum : 0.0,
+                c == Coverage.SELECTED ? (sum[DIR][V] + negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC][V] - negRecSum : 0.0,
                 (sum[DIR][V] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR][V] + negRecSum + maxRecurrentSum) : maxRecurrentSum
         );
         NormWeight newWeightUB = NormWeight.create(
-                !excluded ? (sum[DIR][UB] + negRecSum) < 0.0 ? Math.max(0.0, drSumUB) : sum[REC][UB] - negRecSum : 0.0,
-                (sum[DIR][UB] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR][UB] + negRecSum + maxRecurrentSum) : maxRecurrentSum
+                c == Coverage.SELECTED || c == Coverage.UNKNOWN ? (sum[DIR][UB] + negRecSum) < 0.0 ? Math.max(0.0, drSumUB) : sum[REC][UB] - negRecSum : 0.0,
+                (sum[DIR][LB] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR][LB] + negRecSum + maxRecurrentSum) : maxRecurrentSum
         );
 
         if(doc.debugActId == act.id && doc.debugActWeight <= newWeight.w) {
@@ -292,12 +289,25 @@ public class Neuron implements Comparable<Neuron>, Writable {
         }
 
         return new State(
-                selected ? transferFunction(drSum) : 0.0,
-                excluded ? 0.0 : transferFunction(drSumUB),
-                selected ? transferFunction(drSumLB) : 0.0,
-                selected ? fired : -1,
+                c == Coverage.SELECTED ? transferFunction(drSum) : 0.0,
+                c == Coverage.SELECTED || c == Coverage.UNKNOWN ? transferFunction(drSumUB) : 0.0,
+                c == Coverage.SELECTED ? transferFunction(drSumLB) : 0.0,
+                c == Coverage.SELECTED ? fired : -1,
                 newWeight,
                 newWeightUB
+        );
+    }
+
+
+    private State computeInitialState(Synapse s, SearchNode sn, InterprNode io) {
+        Coverage c = sn.getCoverage(io);
+        return new State(
+                c == Coverage.SELECTED || (!s.key.isNeg || c == Coverage.UNKNOWN) ? 1.0 : 0.0,
+                c == Coverage.SELECTED || (!s.key.isNeg || c == Coverage.UNKNOWN) ? 1.0 : 0.0,
+                c == Coverage.SELECTED || (!s.key.isNeg || c == Coverage.UNKNOWN) ? 1.0 : 0.0,
+                0,
+                NormWeight.ZERO_WEIGHT,
+                NormWeight.ZERO_WEIGHT
         );
     }
 
@@ -311,7 +321,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
                 tmp.add(maxSA);
                 maxSA = null;
             }
-            if(maxSA == null || maxSA.input.rounds.get(sa.s.key.isRecurrent ? round - 1 : round, false).value < sa.input.rounds.get(sa.s.key.isRecurrent ? round - 1 : round, false).value) {
+            if(maxSA == null || maxSA.input.rounds.get(sa.s.key.isRecurrent ? round - 1 : round).value < sa.input.rounds.get(sa.s.key.isRecurrent ? round - 1 : round).value) {
                 maxSA = sa;
             }
             lastSynapse = sa.s;
@@ -340,10 +350,10 @@ public class Neuron implements Comparable<Neuron>, Writable {
             String actValue = "";
             if(sa.s.key.isRecurrent) {
                 if(round > 0) {
-                    actValue = "" + sa.input.rounds.get(round - 1, false);
+                    actValue = "" + sa.input.rounds.get(round - 1);
                 }
             } else {
-                actValue = "" + sa.input.rounds.get(round, false);
+                actValue = "" + sa.input.rounds.get(round);
             }
 
             sb.append("    " + sa.input.key.n.neuron.label + "  SynWeight: " + sa.s.w + "  ActValue: " + actValue);
@@ -701,6 +711,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
         }
 
         public static NormWeight create(double w, double n) {
+            assert w >= 0.0 && n >= 0.0;
             if(w == 0.0 && n == 0.0) return ZERO_WEIGHT;
             return new NormWeight(w, n);
         }
