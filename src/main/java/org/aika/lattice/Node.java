@@ -1153,6 +1153,11 @@ public abstract class Node implements Comparable<Node>, Writable {
         out.writeInt(id);
         out.writeInt(level);
 
+        out.writeBoolean(neuronId != null);
+        if(neuronId != null) {
+            out.writeInt(neuronId);
+        }
+
         out.writeInt(frequency);
         out.writeDouble(nullHypFreq);
         out.writeDouble(oldNullHypFreq);
@@ -1175,6 +1180,10 @@ public abstract class Node implements Comparable<Node>, Writable {
     public void readFields(DataInput in, Model m) throws IOException {
         id = in.readInt();
         level = in.readInt();
+
+        if(in.readBoolean()) {
+            neuronId = in.readInt();
+        }
 
         frequency = in.readInt();
         nullHypFreq = in.readDouble();

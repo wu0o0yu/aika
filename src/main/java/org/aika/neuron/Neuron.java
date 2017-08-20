@@ -564,6 +564,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
         out.writeInt(id);
         out.writeUTF(label);
+        out.writeInt(nodeId);
 
         out.writeDouble(bias);
         out.writeDouble(negDirSum);
@@ -593,6 +594,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
     public void readFields(DataInput in, Model m) throws IOException {
         id = in.readInt();
         label = in.readUTF();
+        nodeId = in.readInt();
 
         bias = in.readDouble();
         negDirSum = in.readDouble();
