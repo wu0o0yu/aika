@@ -85,6 +85,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
     public int nodeId;
 
     public boolean initialized = false;
+    public boolean noSuspension = false;
 
     public boolean isBlocked;
     public boolean noTraining;
@@ -587,6 +588,14 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
         out.writeDouble(activationSum);
         out.writeInt(numberOfActivations);
+
+        for(Synapse s: inputSynapses) {
+            if(s.input != null && s.input.initialized && s.output != null && s.output.initialized) {
+                out.writeBoolean(true);
+                s.write(out);
+            }
+        }
+        out.writeBoolean(false);
     }
 
 
@@ -625,6 +634,12 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
         activationSum = in.readDouble();
         numberOfActivations = in.readInt();
+
+        while(in.readBoolean()) {
+            Synapse syn = Synapse.read(in, m);
+            inputSynapses.add(syn);
+            inputSynapsesByWeight.add(syn);
+        }
     }
 
 

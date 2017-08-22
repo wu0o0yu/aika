@@ -98,6 +98,7 @@ public class Synapse implements Writable {
     public int outputId;
 
     public InputNode inputNode;
+    public int inputNodeId;
 
     public Key key;
 
@@ -178,11 +179,12 @@ public class Synapse implements Writable {
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        input = m.neurons.get(in.readInt());
-        inputId = input.id;
-        output = m.neurons.get(in.readInt());
-        outputId = output.id;
-        inputNode = (InputNode) m.initialNodes.get(in.readInt());
+        inputId = in.readInt();
+        input = m.neurons.get(inputId);
+        outputId = in.readInt();
+        output = m.neurons.get(outputId);
+        inputNodeId = in.readInt();
+        inputNode = (InputNode) m.initialNodes.get(inputNodeId);
 
         key = lookupKey(Key.read(in, m));
 

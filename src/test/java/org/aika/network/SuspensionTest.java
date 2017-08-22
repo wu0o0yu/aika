@@ -91,10 +91,11 @@ public class SuspensionTest {
                         .setRangeMatch(Input.RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
+        outD.noSuspension = true;
 
 
-//        inA.suspend(m);
-//        inB.suspend(m);
+        inA.suspend(m);
+        inB.suspend(m);
 
 
         // Reactivate
