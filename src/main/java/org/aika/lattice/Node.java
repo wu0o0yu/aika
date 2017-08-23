@@ -429,7 +429,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     private void linkNeuronActs(Document doc, Activation act, int v, int dir) {
         ArrayList<Activation> recNegTmp = new ArrayList<>();
-        TreeSet<Synapse> syns = (dir == 0 ? neuron.inputSynapses : neuron.outputSynapses);
+        TreeMap<Synapse, Synapse> syns = (dir == 0 ? neuron.inputSynapses : neuron.outputSynapses);
 
         for (Synapse s : getActiveSynapses(doc, dir, syns)) {
             Node n = (dir == 0 ? s.input : s.output).node;
@@ -502,13 +502,14 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    private Collection<Synapse> getActiveSynapses(Document doc, int dir, TreeSet<Synapse> syns) {
+    private Collection<Synapse> getActiveSynapses(Document doc, int dir, TreeMap<Synapse, Synapse> syns) {
         // Optimization in case the set of synapses is very large
         if(syns.size() < 10 || doc.activatedNeurons.size() * 20 > syns.size()) {
-            return syns;
+            return syns.values();
         }
 
-        Collection<Synapse> synsTmp;ArrayList<Synapse> newSyns = new ArrayList<>();
+        Collection<Synapse> synsTmp;
+        ArrayList<Synapse> newSyns = new ArrayList<>();
         Synapse lk = new Synapse(null, Synapse.Key.MIN_KEY);
         Synapse uk = new Synapse(null, Synapse.Key.MAX_KEY);
 
@@ -522,7 +523,7 @@ public abstract class Node implements Comparable<Node>, Writable {
             }
 
             // Using addAll is not efficient here.
-            for(Synapse s: syns.subSet(lk, true, uk, true)) {
+            for(Synapse s: syns.subMap(lk, true, uk, true).values()) {
                 newSyns.add(s);
             }
         }
@@ -1131,6 +1132,8 @@ public abstract class Node implements Comparable<Node>, Writable {
         }
 
         if(neuron != null) {
+            neuron.suspend(m);
+
             neuron.node = null;
         }
 
@@ -1177,7 +1180,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     @Override
-    public void readFields(DataInput in, Model m) throws IOException {
+    public boolean readFields(DataInput in, Model m) throws IOException {
         id = in.readInt();
         level = in.readInt();
 
@@ -1202,6 +1205,7 @@ public abstract class Node implements Comparable<Node>, Writable {
         instanceSum = in.readInt();
 
         threads = new ThreadState[m.numberOfThreads];
+        return true;
     }
 
 

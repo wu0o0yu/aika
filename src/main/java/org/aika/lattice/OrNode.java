@@ -372,7 +372,7 @@ public class OrNode extends Node {
 
 
     @Override
-    public void readFields(DataInput in, Model m) throws IOException {
+    public boolean readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
         int s = in.readInt();
@@ -388,6 +388,7 @@ public class OrNode extends Node {
                 ridParents.add(pn);
             }
         }
+        return true;
     }
 
 
@@ -416,11 +417,12 @@ public class OrNode extends Node {
 
 
         @Override
-        public void readFields(DataInput in, Model m) throws IOException {
+        public boolean readFields(DataInput in, Model m) throws IOException {
             if(in.readBoolean()) {
                 ridOffset = in.readInt();
             }
             node = m.initialNodes.get(in.readInt());
+            return true;
         }
 
 

@@ -469,9 +469,10 @@ public class InputNode extends Node {
 
 
     @Override
-    public void readFields(DataInput in, Model m) throws IOException {
+    public boolean readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
         key = Synapse.lookupKey(Key.read(in, m));
+        return true;
     }
 
 

@@ -136,8 +136,8 @@ public class Synapse implements Writable {
         (dir ? input : output).lock.acquireWriteLock(threadId);
         (dir ? output : input).lock.acquireWriteLock(threadId);
 
-        input.outputSynapses.add(this);
-        output.inputSynapses.add(this);
+        input.outputSynapses.put(this, this);
+        output.inputSynapses.put(this, this);
         output.inputSynapsesByWeight.add(this);
 
         (dir ? input : output).lock.releaseWriteLock();
@@ -178,7 +178,7 @@ public class Synapse implements Writable {
 
 
     @Override
-    public void readFields(DataInput in, Model m) throws IOException {
+    public boolean readFields(DataInput in, Model m) throws IOException {
         inputId = in.readInt();
         input = m.neurons.get(inputId);
         outputId = in.readInt();
@@ -190,9 +190,7 @@ public class Synapse implements Writable {
 
         w = in.readDouble();
         maxLowerWeightsSum = in.readDouble();
-
-        input.outputSynapses.add(this);
-        inputNode.setSynapse(m.defaultThreadId, new InputNode.SynapseKey(key.relativeRid, output), this);
+        return true;
     }
 
 
@@ -270,7 +268,7 @@ public class Synapse implements Writable {
 
 
         @Override
-        public void readFields(DataInput in, Model m) throws IOException {
+        public boolean readFields(DataInput in, Model m) throws IOException {
             isNeg = in.readBoolean();
             isRecurrent = in.readBoolean();
             if(in.readBoolean()) relativeRid = in.readInt();
@@ -281,6 +279,7 @@ public class Synapse implements Writable {
             endRangeMapping = Mapping.valueOf(in.readUTF());
             startRangeOutput = in.readBoolean();
             endRangeOutput = in.readBoolean();
+            return true;
         }
 
 

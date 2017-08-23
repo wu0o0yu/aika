@@ -540,7 +540,7 @@ public class Model implements Writable {
 
 
     @Override
-    public void readFields(DataInput in, Model m) throws IOException {
+    public boolean readFields(DataInput in, Model m) throws IOException {
         numberOfThreads = in.readInt();
         numberOfPositions = in.readInt();
 
@@ -560,6 +560,7 @@ public class Model implements Writable {
                 inputNeurons.put(n.label, (InputNeuron) n);
             }
         }
+        return true;
     }
 
 

@@ -531,7 +531,7 @@ public class AndNode extends Node {
 
 
     @Override
-    public void readFields(DataInput in, Model m) throws IOException {
+    public boolean readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
         numberOfPositionsNotify = in.readInt();
@@ -540,12 +540,22 @@ public class AndNode extends Node {
         weight = in.readDouble();
 
         int s = in.readInt();
+        Map<Refinement, Node> tmp = new TreeMap<>();
         for(int i = 0; i < s; i++) {
             Refinement ref = Refinement.read(in, m);
             Node pn = m.initialNodes.get(in.readInt());
+            if(pn == null) {
+                return false;
+            }
+            tmp.put(ref, pn);
+        }
+        for(Map.Entry<Refinement, Node> me: tmp.entrySet()) {
+            Refinement ref = me.getKey();
+            Node pn = me.getValue();
             parents.put(ref, pn);
             pn.addAndChild(ref, this);
         }
+        return true;
     }
 
 
@@ -604,11 +614,12 @@ public class AndNode extends Node {
         }
 
 
-        public void readFields(DataInput in, Model m) throws IOException {
+        public boolean readFields(DataInput in, Model m) throws IOException {
             if(in.readBoolean()) {
                 rid = in.readInt();
             }
             input = (InputNode) m.initialNodes.get(in.readInt());
+            return true;
         }
 
 

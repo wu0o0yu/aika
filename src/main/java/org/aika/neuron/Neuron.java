@@ -75,8 +75,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
     public volatile double maxRecurrentSum = 0.0;
 
 
-    public TreeSet<Synapse> outputSynapses = new TreeSet<>(Synapse.OUTPUT_SYNAPSE_COMP);
-    public TreeSet<Synapse> inputSynapses = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
+    public TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
+    public TreeMap<Synapse, Synapse> inputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
     public TreeSet<Synapse> inputSynapsesByWeight = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
     public TreeMap<Key, InputNode> outputNodes = new TreeMap<>();
@@ -174,13 +174,13 @@ public class Neuron implements Comparable<Neuron>, Writable {
     public void remove(int threadId) {
         unpublish(threadId);
 
-        for(Synapse s: inputSynapses) {
+        for(Synapse s: inputSynapses.values()) {
             s.input.lock.acquireWriteLock(threadId);
             s.input.outputSynapses.remove(s);
             s.input.lock.releaseWriteLock();
         }
 
-        for(Synapse s: outputSynapses) {
+        for(Synapse s: outputSynapses.values()) {
             s.output.lock.acquireWriteLock(threadId);
             s.output.inputSynapses.remove(s);
             s.output.inputSynapsesByWeight.remove(s);
@@ -468,7 +468,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
             if(Document.TRAIN_DEBUG_OUTPUT) {
                 log.info("S:" + s.input + " RID:" + s.key.relativeRid + " OldW:" + oldW + " NewW:" + s.w);
             }
-            inputSynapses.add(s);
+            inputSynapses.put(s, s);
             inputSynapsesByWeight.add(s);
         }
     }
@@ -547,10 +547,10 @@ public class Neuron implements Comparable<Neuron>, Writable {
             node.neuron = null;
         }
 
-        for(Synapse s: inputSynapses) {
+        for(Synapse s: inputSynapses.values()) {
             s.output = null;
         }
-        for(Synapse s: outputSynapses) {
+        for(Synapse s: outputSynapses.values()) {
             s.input = null;
         }
 
@@ -575,7 +575,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
         out.writeInt(outputNodes.size());
         for(Map.Entry<Key, InputNode> me: outputNodes.entrySet()) {
             me.getKey().write(out);
-            out.writeInt(me.getValue().id);
+            me.getValue().write(out);
         }
 
         out.writeBoolean(node != null);
@@ -589,8 +589,16 @@ public class Neuron implements Comparable<Neuron>, Writable {
         out.writeDouble(activationSum);
         out.writeInt(numberOfActivations);
 
-        for(Synapse s: inputSynapses) {
+        for(Synapse s: inputSynapses.values()) {
             if(s.input != null && s.input.initialized && s.output != null && s.output.initialized) {
+                out.writeBoolean(true);
+                s.write(out);
+            }
+        }
+        out.writeBoolean(false);
+
+        for(Synapse s: outputSynapses.values()) {
+            if(s.output != null && s.input.initialized && s.output != null && s.output.initialized) {
                 out.writeBoolean(true);
                 s.write(out);
             }
@@ -600,8 +608,10 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
 
     @Override
-    public void readFields(DataInput in, Model m) throws IOException {
+    public boolean readFields(DataInput in, Model m) throws IOException {
         id = in.readInt();
+        m.neurons.put(id, this);
+
         label = in.readUTF();
         nodeId = in.readInt();
 
@@ -613,7 +623,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
             Key k = Key.read(in, m);
-            InputNode n = (InputNode) m.initialNodes.get(in.readInt());
+            InputNode n = (InputNode) InputNode.read(in, m);
             outputNodes.put(k, n);
             n.inputNeuron = this;
         }
@@ -637,9 +647,28 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
         while(in.readBoolean()) {
             Synapse syn = Synapse.read(in, m);
-            inputSynapses.add(syn);
+
+            if(syn.input != null) {
+                syn.input.outputSynapses.put(syn, syn);
+                syn.inputNode.setSynapse(m.defaultThreadId, new InputNode.SynapseKey(syn.key.relativeRid, syn.output), syn);
+            }
+
+            inputSynapses.put(syn, syn);
             inputSynapsesByWeight.add(syn);
         }
+
+        while(in.readBoolean()) {
+            Synapse synTmp = Synapse.read(in, m);
+
+            if(synTmp.output != null) {
+                Synapse syn = synTmp.output.inputSynapses.get(synTmp);
+                syn.inputNode.setSynapse(m.defaultThreadId, new InputNode.SynapseKey(syn.key.relativeRid, syn.output), syn);
+
+                outputSynapses.put(syn, syn);
+            }
+        }
+
+        return true;
     }
 
 
