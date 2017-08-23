@@ -1100,14 +1100,25 @@ public abstract class Node implements Comparable<Node>, Writable {
     public static Node reactivate(Model m, Integer id) {
         assert m.suspensionHook != null;
 
+        Node n;
         byte[] nData = m.suspensionHook.retrieve(id, SuspensionHook.Type.NODE);
         ByteArrayInputStream bais = new ByteArrayInputStream(nData);
         DataInputStream dis = new DataInputStream(bais);
         try {
-            return read(dis, m);
+            n = read(dis, m);
         } catch(IOException e) {
             throw new RuntimeException(e);
         }
+
+        if(n == null) return null;
+
+        if(n.suspendedAndChildren != null) {
+            for (Map.Entry<Refinement, Integer> me : n.suspendedAndChildren.entrySet()) {
+                AndNode.reactivate(m, me.getValue());
+            }
+        }
+
+        return n;
     }
 
 
@@ -1223,8 +1234,8 @@ public abstract class Node implements Comparable<Node>, Writable {
                 n = new OrNode();
                 break;
         }
-        n.readFields(in, m);
-        return n;
+
+        return n.readFields(in, m) ? n : null;
     }
 
 
