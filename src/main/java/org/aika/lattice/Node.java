@@ -228,6 +228,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     abstract boolean isExpandable(boolean checkFrequency);
 
+    abstract protected void reactivateIntern(Model m);
 
     protected Node() {}
 
@@ -341,6 +342,17 @@ public abstract class Node implements Comparable<Node>, Writable {
             if(andChildren.isEmpty()) {
                 andChildren = null;
                 reverseAndChildren = null;
+            }
+        }
+    }
+
+
+    void removeSuspendedAndChild(Refinement ref) {
+        if(suspendedAndChildren != null) {
+            suspendedAndChildren.remove(ref);
+
+            if(suspendedAndChildren.isEmpty()) {
+                suspendedAndChildren = null;
             }
         }
     }
@@ -1118,6 +1130,8 @@ public abstract class Node implements Comparable<Node>, Writable {
             }
         }
 
+
+        n.reactivateIntern(m);
         return n;
     }
 
@@ -1146,17 +1160,6 @@ public abstract class Node implements Comparable<Node>, Writable {
             neuron.suspend(m);
 
             neuron.node = null;
-        }
-
-        if(this instanceof AndNode) {
-            AndNode n = (AndNode) this;
-            for(Map.Entry<Refinement, Node> me: n.parents.entrySet()) {
-                Refinement ref = me.getKey();
-                Node pn = me.getValue();
-
-                pn.removeAndChild(ref);
-                pn.addSuspendedAndChild(ref, n.id);
-            }
         }
     }
 

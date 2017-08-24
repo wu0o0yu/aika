@@ -512,6 +512,30 @@ public class AndNode extends Node {
         return sb.toString();
     }
 
+
+    public void suspend(Model m) {
+        super.suspend(m);
+
+        for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
+            Refinement ref = me.getKey();
+            Node pn = me.getValue();
+
+            pn.removeAndChild(ref);
+            pn.addSuspendedAndChild(ref, id);
+        }
+    }
+
+
+    protected void reactivateIntern(Model m) {
+        for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
+            Refinement ref = me.getKey();
+            Node pn = me.getValue();
+
+            pn.removeSuspendedAndChild(ref);
+        }
+    }
+
+
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeUTF("A");

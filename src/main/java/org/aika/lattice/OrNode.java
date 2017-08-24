@@ -355,6 +355,26 @@ public class OrNode extends Node {
     }
 
 
+    public void suspend(Model m) {
+        super.suspend(m);
+
+        for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
+            Integer ridOffset = me.getKey() != Integer.MIN_VALUE ? me.getKey() : null;
+            TreeSet<Node> pNodes = me.getValue();
+
+            for(Node pn: pNodes) {
+                pn.removeOrChild(m.defaultThreadId, new OrEntry(ridOffset, this));
+                pn.suspendedOrChildren.add(id);
+            }
+        }
+    }
+
+
+    protected void reactivateIntern(Model m) {
+
+    }
+
+
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeUTF("O");

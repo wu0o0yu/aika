@@ -460,6 +460,11 @@ public class InputNode extends Node {
     }
 
 
+    protected void reactivateIntern(Model m) {
+
+    }
+
+
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeUTF("I");
