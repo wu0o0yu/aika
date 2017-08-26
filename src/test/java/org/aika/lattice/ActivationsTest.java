@@ -25,8 +25,6 @@ import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
-import org.aika.lattice.AndNode;
-import org.aika.lattice.InputNode;
 import org.aika.network.TestHelper;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
@@ -51,7 +49,7 @@ public class ActivationsTest {
 
         InputNeuron inA = m.createOrLookupInputNeuron("A");
 
-        m.createAndNeuron(new Neuron("pA"), 0.001,
+        m.initAndNeuron(m.createNeuron("pA"), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -79,7 +77,7 @@ public class ActivationsTest {
 
         InputNeuron inB = m.createOrLookupInputNeuron("B");
 
-        m.createAndNeuron(new Neuron("pB"), 0.001,
+        m.initAndNeuron(m.createNeuron("pB"), 0.001,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0)
@@ -104,7 +102,7 @@ public class ActivationsTest {
 
 
         Neuron in = m.createOrLookupInputNeuron("A");
-        InputNode inNode = (InputNode) in.node;
+        InputNode inNode = (InputNode) in.node.get();
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 

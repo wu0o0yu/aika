@@ -20,6 +20,7 @@ package org.aika.neuron;
 import org.aika.Activation;
 import org.aika.Activation.State;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
@@ -61,13 +62,13 @@ public class InputNeuron extends Neuron {
     }
 
 
-    public static InputNeuron create(Model m, int threadId, InputNeuron n) {
+    public static InputNeuron init(Model m, int threadId, InputNeuron n) {
         n.m = m;
 
-        InputNode node = InputNode.add(m, threadId, new Key(false, false, null, 0, Operator.NONE, Mapping.NONE, true, Operator.NONE, Mapping.NONE, true), null);
-        node.setNeuron(n);
+        InputNode node = InputNode.add(m, new Key(false, false, null, 0, Operator.NONE, Mapping.NONE, true, Operator.NONE, Mapping.NONE, true), null);
+        node.neuron = n.provider;
+        n.node = node.provider;
 
-        n.setNode(node);
         n.publish(threadId);
 
         n.initialized = true;
@@ -141,11 +142,7 @@ public class InputNeuron extends Neuron {
      * @param o The interpretation node
      */
     public void addInput(Document doc, int begin, int end, Integer rid, InterprNode o) {
-        if(node == null) {
-            node = Node.reactivate(doc.m, nodeId);
-        }
-
-        Node.addActivationAndPropagate(doc, new Activation.Key(node, new Range(begin, end), rid, o), Collections.emptySet());
+        Node.addActivationAndPropagate(doc, new Activation.Key(node.get(), new Range(begin, end), rid, o), Collections.emptySet());
 
         doc.propagate();
     }
@@ -164,7 +161,7 @@ public class InputNeuron extends Neuron {
     public void addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value) {
         addInput(doc, begin, end, rid, o);
 
-        Activation act = Activation.get(doc, node, rid, new Range(begin, end), EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
+        Activation act = Activation.get(doc, node.get(), rid, new Range(begin, end), EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
         State s = new State(value, value, value, 0, NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.finalState = s;
@@ -187,12 +184,8 @@ public class InputNeuron extends Neuron {
 
 
     public void removeInput(Document doc, int begin, int end, Integer rid, InterprNode o) {
-        if(node == null) {
-            node = Node.reactivate(doc.m, nodeId);
-        }
-
         Range r = new Range(begin, end);
-        Activation act = Activation.get(doc, node, rid, r, EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
+        Activation act = Activation.get(doc, node.get(), rid, r, EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
         Node.removeActivationAndPropagate(doc, act, Collections.emptySet());
 
         doc.propagate();
@@ -202,7 +195,7 @@ public class InputNeuron extends Neuron {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("in(");
-        sb.append(id);
+        sb.append(provider.id);
         if(label != null) {
             sb.append(",");
             sb.append(label);

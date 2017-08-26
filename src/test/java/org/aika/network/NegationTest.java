@@ -48,9 +48,9 @@ public class NegationTest {
         InputNeuron inB = m.createOrLookupInputNeuron("B");
         InputNeuron inC = m.createOrLookupInputNeuron("C");
 
-        Neuron abcN = new Neuron("ABC");
+        Neuron abcN = m.createNeuron("ABC");
 
-        m.createAndNeuron(abcN,
+        m.initAndNeuron(abcN,
                 0.5,
                 new Input()
                         .setNeuron(inA)
@@ -77,7 +77,7 @@ public class NegationTest {
         inA.addInput(doc, 0, 11);
 
         System.out.println(doc.networkStateToString(true, true, false, true));
-        Assert.assertNotNull(Activation.get(doc, abcN.node, null, new Range(0, 11), EQUALS, EQUALS, null, null));
+        Assert.assertNotNull(Activation.get(doc, abcN.node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
 
         InterprNode o1 = InterprNode.addPrimitive(doc);
 
@@ -91,7 +91,7 @@ public class NegationTest {
 
         System.out.println(doc.networkStateToString(true, true, false, true));
 
-        Assert.assertNotNull(Activation.get(doc, abcN.node, null, new Range(0, 11), EQUALS, EQUALS, null, null));
+        Assert.assertNotNull(Activation.get(doc, abcN.node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
     }
 
 
@@ -105,9 +105,9 @@ public class NegationTest {
 
         InputNeuron inC = m.createOrLookupInputNeuron("C");
 
-        Neuron abcN = new Neuron("ABC");
+        Neuron abcN = m.createNeuron("ABC");
 
-        Neuron outN = m.createOrNeuron(new Neuron("OUT"),
+        Neuron outN = m.initOrNeuron(m.createNeuron("OUT"),
                 new Input()
                         .setNeuron(abcN)
                         .setWeight(1.0)
@@ -116,7 +116,7 @@ public class NegationTest {
                         .setMinInput(1.0)
         );
 
-        m.createAndNeuron(abcN,
+        m.initAndNeuron(abcN,
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -164,7 +164,7 @@ public class NegationTest {
 
         System.out.println(doc.networkStateToString(true, true, false, true));
 
-        Assert.assertNotNull(Activation.get(doc, outN.node, null, new Range(0, 11), EQUALS, EQUALS, null, null));
+        Assert.assertNotNull(Activation.get(doc, outN.node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
     }
 
 
@@ -174,11 +174,11 @@ public class NegationTest {
 
         InputNeuron inA = m.createOrLookupInputNeuron("A");
 
-        Neuron asN = new Neuron("AS");
+        Neuron asN = m.createNeuron("AS");
 
         InputNeuron inS = m.createOrLookupInputNeuron("S");
 
-        Neuron outN = m.createOrNeuron(new Neuron("OUT"),
+        Neuron outN = m.initOrNeuron(m.createNeuron("OUT"),
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
@@ -187,7 +187,7 @@ public class NegationTest {
                         .setMinInput(1.0)
         );
 
-        m.createAndNeuron(asN,
+        m.initAndNeuron(asN,
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -218,14 +218,14 @@ public class NegationTest {
 
         System.out.println(doc.networkStateToString(true, true, false, true));
 
-        Assert.assertNotNull(Activation.get(doc, outN.node, null, new Range(0, 11), EQUALS, EQUALS, null, null));
-        Assert.assertFalse(Activation.get(doc, outN.node, null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
+        Assert.assertNotNull(Activation.get(doc, outN.node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
+        Assert.assertFalse(Activation.get(doc, outN.node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
         inS.removeInput(doc, 3, 8, o);
 
         System.out.println(doc.networkStateToString(true, true, false, true));
 
-        Assert.assertTrue(Activation.get(doc, outN.node, null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
+        Assert.assertTrue(Activation.get(doc, outN.node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
         inA.removeInput(doc, 0, 11);
 
@@ -241,11 +241,11 @@ public class NegationTest {
 
         InputNeuron inA = m.createOrLookupInputNeuron("A");
 
-        Neuron asN = new Neuron("AS");
+        Neuron asN = m.createNeuron("AS");
 
         InputNeuron inS = m.createOrLookupInputNeuron("S");
 
-        Neuron outN = m.createOrNeuron(new Neuron("OUT"),
+        Neuron outN = m.initOrNeuron(m.createNeuron("OUT"),
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
@@ -254,7 +254,7 @@ public class NegationTest {
                         .setMinInput(1.0)
         );
 
-        m.createAndNeuron(asN,
+        m.initAndNeuron(asN,
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -285,8 +285,8 @@ public class NegationTest {
 
         System.out.println(doc.networkStateToString(true, true, false, true));
 
-        Assert.assertNotNull(Activation.get(doc, outN.node, null, new Range(0, 11), EQUALS, EQUALS, null, null));
-        Assert.assertFalse(Activation.get(doc, outN.node, null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
+        Assert.assertNotNull(Activation.get(doc, outN.node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
+        Assert.assertFalse(Activation.get(doc, outN.node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
         inA.removeInput(doc, 0, 11);
 
@@ -304,11 +304,11 @@ public class NegationTest {
 
         InputNeuron inA = m.createOrLookupInputNeuron("A");
 
-        Neuron asN = new Neuron("AS");
+        Neuron asN = m.createNeuron("AS");
 
         InputNeuron inS = m.createOrLookupInputNeuron("S");
 
-        Neuron outN = m.createOrNeuron(new Neuron("OUT"),
+        Neuron outN = m.initOrNeuron(m.createNeuron("OUT"),
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
@@ -317,7 +317,7 @@ public class NegationTest {
                         .setMinInput(1.0)
         );
 
-        m.createAndNeuron(asN,
+        m.initAndNeuron(asN,
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -348,14 +348,14 @@ public class NegationTest {
 
         System.out.println(doc.networkStateToString(true, true, false, true));
 
-        Assert.assertNotNull(Activation.get(doc, outN.node, null, new Range(0, 11), EQUALS, EQUALS, null, null));
-        Assert.assertFalse(Activation.get(doc, outN.node, null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
+        Assert.assertNotNull(Activation.get(doc, outN.node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
+        Assert.assertFalse(Activation.get(doc, outN.node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
         inS.removeInput(doc, 3, 8, o);
 
         System.out.println(doc.networkStateToString(true, true, false, true));
 
-        Assert.assertTrue(Activation.get(doc, outN.node, null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
+        Assert.assertTrue(Activation.get(doc, outN.node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
         inA.removeInput(doc, 0, 11);
 
@@ -371,11 +371,11 @@ public class NegationTest {
         InputNeuron inA = m.createOrLookupInputNeuron("A");
         InputNeuron inB = m.createOrLookupInputNeuron("B");
 
-        Neuron asN = new Neuron("AS");
-        Neuron absN = new Neuron("ABS");
-        Neuron bsN = new Neuron("BS");
+        Neuron asN = m.createNeuron("AS");
+        Neuron absN = m.createNeuron("ABS");
+        Neuron bsN = m.createNeuron("BS");
 
-        Neuron inS = m.createOrNeuron(new Neuron("S"),
+        Neuron inS = m.initOrNeuron(m.createNeuron("S"),
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
@@ -394,7 +394,7 @@ public class NegationTest {
                         .setRangeOutput(true)
         );
 
-        m.createAndNeuron(asN,
+        m.initAndNeuron(asN,
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -412,7 +412,7 @@ public class NegationTest {
                         .setMinInput(1.0)
                         .setRangeMatch(RangeRelation.CONTAINS)
         );
-        m.createAndNeuron(absN,
+        m.initAndNeuron(absN,
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -449,8 +449,8 @@ public class NegationTest {
 
             System.out.println(doc.networkStateToString(true, true, false, true));
 
-            Assert.assertNotNull(Activation.get(doc, inS.node, null, new Range(0, 6), EQUALS, EQUALS, null, null));
-            Assert.assertEquals(2, Activation.get(doc, inS.node, null, new Range(0, 6), EQUALS, EQUALS, null, null).key.o.orInterprNodes.size());
+            Assert.assertNotNull(Activation.get(doc, inS.node.get(), null, new Range(0, 6), EQUALS, EQUALS, null, null));
+            Assert.assertEquals(2, Activation.get(doc, inS.node.get(), null, new Range(0, 6), EQUALS, EQUALS, null, null).key.o.orInterprNodes.size());
 
             doc.clearActivations();
         }
@@ -466,10 +466,10 @@ public class NegationTest {
             System.out.println(doc.networkStateToString(true, true, false, true));
 
 //            Assert.assertNotNull(Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
-            Assert.assertNotNull(Activation.get(doc, inS.node, null, new Range(0, 9), EQUALS, EQUALS, null, null));
+            Assert.assertNotNull(Activation.get(doc, inS.node.get(), null, new Range(0, 9), EQUALS, EQUALS, null, null));
 //            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.o.orInterprNodes.size());
-            Assert.assertEquals(1, Activation.get(doc, inS.node, null, new Range(0, 6), EQUALS, EQUALS, null, null).key.o.orInterprNodes.size());
-            Assert.assertEquals(1, Activation.get(doc, inS.node, null, new Range(0, 9), EQUALS, EQUALS, null, null).key.o.orInterprNodes.size());
+            Assert.assertEquals(1, Activation.get(doc, inS.node.get(), null, new Range(0, 6), EQUALS, EQUALS, null, null).key.o.orInterprNodes.size());
+            Assert.assertEquals(1, Activation.get(doc, inS.node.get(), null, new Range(0, 9), EQUALS, EQUALS, null, null).key.o.orInterprNodes.size());
 
             doc.clearActivations();
         }
@@ -484,11 +484,11 @@ public class NegationTest {
         InputNeuron inB = m.createOrLookupInputNeuron("B");
         InputNeuron inC = m.createOrLookupInputNeuron("C");
 
-        Neuron asN = new Neuron("AS");
-        Neuron ascN = new Neuron("ASC");
-        Neuron bsN = new Neuron("BS");
+        Neuron asN = m.createNeuron("AS");
+        Neuron ascN = m.createNeuron("ASC");
+        Neuron bsN = m.createNeuron("BS");
 
-        Neuron inS = m.createOrNeuron(new Neuron("S"),
+        Neuron inS = m.initOrNeuron(m.createNeuron("S"),
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
@@ -515,7 +515,7 @@ public class NegationTest {
                         .setRangeOutput(true)
         );
 
-        m.createAndNeuron(asN,
+        m.initAndNeuron(asN,
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -534,7 +534,7 @@ public class NegationTest {
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
-        m.createAndNeuron(ascN,
+        m.initAndNeuron(ascN,
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -563,7 +563,7 @@ public class NegationTest {
                         .setRangeOutput(true)
         );
 
-        m.createAndNeuron(bsN,
+        m.initAndNeuron(bsN,
                 0.001,
                 new Input()
                         .setNeuron(inB)
@@ -583,7 +583,7 @@ public class NegationTest {
                         .setRangeOutput(true)
         );
 
-        Neuron outA = m.createOrNeuron(new Neuron("OUT A"),
+        Neuron outA = m.initOrNeuron(m.createNeuron("OUT A"),
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
@@ -593,7 +593,7 @@ public class NegationTest {
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
-        Neuron outAC = m.createOrNeuron(new Neuron("OUT AC"),
+        Neuron outAC = m.initOrNeuron(m.createNeuron("OUT AC"),
                 new Input()
                         .setNeuron(ascN)
                         .setWeight(1.0)
@@ -603,7 +603,7 @@ public class NegationTest {
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
-        Neuron outB = m.createOrNeuron(new Neuron("OUT B"),
+        Neuron outB = m.initOrNeuron(m.createNeuron("OUT B"),
                 new Input()
                         .setNeuron(bsN)
                         .setWeight(1.0)
@@ -666,16 +666,16 @@ public class NegationTest {
         AndNode.minFrequency = 5;
 
         InputNeuron inA = m.createOrLookupInputNeuron("A");
-        InputNode inANode = (InputNode) inA.node;
+        InputNode inANode = (InputNode) inA.node.get();
 
         InputNeuron inB = m.createOrLookupInputNeuron("B");
-        InputNode inBNode = (InputNode) inB.node;
+        InputNode inBNode = (InputNode) inB.node.get();
 
 
-        Neuron pC = new Neuron("C");
-        Neuron pD = new Neuron("D");
+        Neuron pC = m.createNeuron("C");
+        Neuron pD = m.createNeuron("D");
 
-        m.createAndNeuron(pC,
+        m.initAndNeuron(pC,
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -691,7 +691,7 @@ public class NegationTest {
                         .setMinInput(1.0)
         );
 
-        m.createAndNeuron(pD,
+        m.initAndNeuron(pD,
                 0.001,
                 new Input()
                         .setNeuron(inB)
@@ -709,9 +709,9 @@ public class NegationTest {
 
 
         InputNeuron inG = m.createOrLookupInputNeuron("G");
-        InputNode inGNode = (InputNode) inG.node;
+        InputNode inGNode = (InputNode) inG.node.get();
 
-        Neuron pH = m.createAndNeuron(new Neuron("H"),
+        Neuron pH = m.initAndNeuron(m.createNeuron("H"),
                 0.001,
                 new Input()
                         .setNeuron(pC)
@@ -741,8 +741,8 @@ public class NegationTest {
 
         System.out.println(doc.networkStateToString(true, true, false, true));
 
-        Assert.assertNotNull(pC.node.getFirstActivation(doc));
-        Assert.assertNotNull(pD.node.getFirstActivation(doc));
+        Assert.assertNotNull(pC.node.get().getFirstActivation(doc));
+        Assert.assertNotNull(pD.node.get().getFirstActivation(doc));
 
         // Die Optionen 0 und 2 stehen in Konflikt. Da sie aber jetzt in Oder Optionen eingebettet sind, werden sie nicht mehr ausgefiltert.
 //        Assert.assertNull(pH.node.getFirstActivation(t));

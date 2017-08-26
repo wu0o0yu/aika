@@ -63,7 +63,7 @@ public class Input implements Comparable<Input> {
 
     /**
      * If optional is set to true, then this input is an optional part of a conjunction.
-     * This parameter is only used as input for the method <code>createAndNeuron</code>.
+     * This parameter is only used as input for the method <code>initAndNeuron</code>.
      *
      * @param optional
      * @return
@@ -110,7 +110,7 @@ public class Input implements Comparable<Input> {
 
     /**
      * The minimum activation value that is required for this input. The minInput
-     * value is used to compute the neurons bias. It is only applied in the createAndNeuron method and only affects inputs with a positive weight and the optional flag set to false.
+     * value is used to compute the neurons bias. It is only applied in the initAndNeuron method and only affects inputs with a positive weight and the optional flag set to false.
      *
      * @param minInput
      * @return
@@ -273,7 +273,7 @@ public class Input implements Comparable<Input> {
         if(r != 0) return r;
         r = Boolean.compare(optional, in.optional);
         if(r != 0) return r;
-        r = neuron.compareTo(in.neuron);
+        r = neuron.provider.compareTo(in.neuron.provider);
         if(r != 0) return r;
         r = startRangeMatch.compareTo(in.startRangeMatch);
         if(r != 0) return r;

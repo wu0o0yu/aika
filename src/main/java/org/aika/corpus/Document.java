@@ -20,6 +20,7 @@ package org.aika.corpus;
 import org.aika.Activation;
 import org.aika.Activation.State;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.Utils;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
@@ -205,7 +206,7 @@ public class Document implements Comparable<Document> {
         count();
 
         for(Node n: activatedNodes) {
-            if(n.neuron instanceof InputNeuron) continue;
+            if(n.neuron != null && n.neuron.get() instanceof InputNeuron) continue;
 
             n.computeNullHyp(m);
             if(n.frequencyHasChanged && !n.isBlocked && n.isFrequent()) {
@@ -226,7 +227,7 @@ public class Document implements Comparable<Document> {
         }
 
         while(true) {
-            AndNode n = !m.numberOfPositionsQueue.isEmpty() ? m.numberOfPositionsQueue.iterator().next() : null;
+            AndNode n = !m.numberOfPositionsQueue.isEmpty() ? m.numberOfPositionsQueue.iterator().next().get() : null;
 
             if(n == null || n.numberOfPositionsNotify > m.numberOfPositions) break;
 
@@ -237,7 +238,7 @@ public class Document implements Comparable<Document> {
 
         for(Neuron n: finallyActivatedNeurons) {
             if(!n.noTraining) {
-                ThreadState th = n.node.getThreadState(threadId, false);
+                ThreadState th = n.node.get().getThreadState(threadId, false);
                 if(th != null) {
                     for (Activation act : th.activations.values()) {
                         n.train(this, act);
@@ -261,7 +262,8 @@ public class Document implements Comparable<Document> {
         addedNodes.clear();
 
         if(m.lastCleanup[threadId] + CLEANUP_INTERVAL < id) {
-            for (Node n : m.allNodes[threadId]) {
+            for (Provider<? extends Node> np : m.nodesInMemory.values()) {
+                Node n = np.get();
                 Node.ThreadState th = n.threads[threadId];
                 if (th != null && th.lastUsed + CLEANUP_INTERVAL < id) {
                     n.threads[threadId] = null;
@@ -288,18 +290,11 @@ public class Document implements Comparable<Document> {
 
         if(neuronsOnly) {
             for (Neuron n : activatedNeurons) {
-                acts.addAll(Activation.select(this, n.node, null, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
+                acts.addAll(Activation.select(this, n.node.get(), null, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
             }
         } else {
-            if(m.initialNodes != null) {
-                for (Node n : m.initialNodes.values()) {
-                    acts.addAll(Activation.select(this, n, null, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
-                }
-            }
-            for(int th = 0; th < m.numberOfThreads; th++) {
-                for (Node n : m.allNodes[th]) {
-                    acts.addAll(Activation.select(this, n, null, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
-                }
+            for(Node n: activatedNodes) {
+                acts.addAll(Activation.select(this, n, null, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
             }
         }
         StringBuilder sb = new StringBuilder();
@@ -419,7 +414,7 @@ public class Document implements Comparable<Document> {
 
                 double oldUpperBound = act.upperBound;
 
-                Neuron n = act.key.n.neuron;
+                Neuron n = act.key.n.neuron.get();
 
                 n.computeBounds(act);
 
@@ -476,7 +471,7 @@ public class Document implements Comparable<Document> {
 
         private void addAllActs(Collection<Activation> acts) {
             for(Activation act: acts) {
-                if(!(act.key.n.neuron instanceof InputNeuron)) {
+                if(!(act.key.n.neuron.get() instanceof InputNeuron)) {
                     add(0, act);
                 }
             }
@@ -513,7 +508,7 @@ public class Document implements Comparable<Document> {
                     Activation act = q.pollLast();
                     act.rounds.setQueued(round, false);
 
-                    State s = act.key.n.neuron.computeWeight(round, act, en, Document.this);
+                    State s = act.key.n.neuron.get().computeWeight(round, act, en, Document.this);
 
                     if (OPTIMIZE_DEBUG_OUTPUT) {
                         log.info(act.key + " Round:" + round);
@@ -574,7 +569,7 @@ public class Document implements Comparable<Document> {
 
 
         public void add(Activation act) {
-            if(!act.isQueued && !act.key.n.neuron.noTraining) {
+            if(!act.isQueued && !act.key.n.neuron.get().noTraining) {
                 act.isQueued = true;
                 act.queueId = queueIdCounter++;
                 queue.add(act);
@@ -587,7 +582,7 @@ public class Document implements Comparable<Document> {
                 Activation act = queue.pollFirst();
 
                 act.isQueued = false;
-                act.key.n.neuron.computeErrorSignal(Document.this, act);
+                act.key.n.neuron.get().computeErrorSignal(Document.this, act);
             }
         }
     }

@@ -19,6 +19,7 @@ package org.aika.lattice;
 
 import org.aika.Activation;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.Utils;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
@@ -48,7 +49,7 @@ import static org.aika.corpus.Range.Operator.*;
  *
  * @author Lukas Molzberger
  */
-public class InputNode extends Node {
+public class InputNode extends Node<InputNode> {
 
     public Key key;
     public Neuron inputNeuron;
@@ -60,8 +61,8 @@ public class InputNode extends Node {
 
     public InputNode() {}
 
-    public InputNode(Model m, int threadId, Key key) {
-        super(m, threadId, 1);
+    public InputNode(Model m, Key key) {
+        super(m, 1);
         this.key = Synapse.lookupKey(key);
 
         if(m != null) {
@@ -78,12 +79,12 @@ public class InputNode extends Node {
     }
 
 
-    public static InputNode add(Model m, int threadId, Key key, Neuron input) {
+    public static InputNode add(Model m, Key key, Neuron input) {
         InputNode in = (input != null ? input.outputNodes.get(key) : null);
         if(in != null) {
             return in;
         }
-        in = new InputNode(m, threadId, key);
+        in = new InputNode(m, key);
 
         if(input != null) {
             in.inputNeuron = input;
@@ -104,13 +105,14 @@ public class InputNode extends Node {
 
     @Override
     public void initActivation(Document doc, Activation act) {
-        if(neuron instanceof InputNeuron) {
+        Neuron n = neuron != null ? neuron.get() : null;
+        if(n instanceof InputNeuron) {
             doc.inputNeuronActivations.add(act);
 
             ThreadState th = getThreadState(doc.threadId, false);
             if(th == null || th.activations.isEmpty()) {
-                doc.activatedNeurons.add(neuron);
-                doc.activatedInputNeurons.add(neuron);
+                doc.activatedNeurons.add(n);
+                doc.activatedInputNeurons.add(n);
             }
         } else if(!isBlocked) {
             doc.inputNodeActivations.add(act);
@@ -120,13 +122,14 @@ public class InputNode extends Node {
 
     @Override
     public void deleteActivation(Document doc, Activation act) {
-        if(neuron instanceof InputNeuron) {
+        Neuron n = neuron != null ? neuron.get() : null;
+        if(n instanceof InputNeuron) {
             doc.inputNeuronActivations.remove(act);
 
             ThreadState th = getThreadState(doc.threadId, false);
             if(th == null || th.activations.isEmpty()) {
-                doc.activatedNeurons.remove(neuron);
-                doc.activatedInputNeurons.remove(neuron);
+                doc.activatedNeurons.remove(n);
+                doc.activatedInputNeurons.remove(n);
             }
         } else if(!isBlocked) {
             doc.inputNodeActivations.remove(act);
@@ -246,9 +249,10 @@ public class InputNode extends Node {
 
 
     public void propagateAddedActivation(Document doc, Activation act, InterprNode removedConflict) {
-        if(neuron instanceof InputNeuron) {
+        Neuron n = neuron != null ? neuron.get() : null;
+        if(n instanceof InputNeuron) {
             if(removedConflict == null) {
-                neuron.propagateAddedActivation(doc, act);
+                n.propagateAddedActivation(doc, act);
             }
         } else if(!key.isNeg && !key.isRecurrent) {
             apply(doc, act, removedConflict);
@@ -257,8 +261,10 @@ public class InputNode extends Node {
 
 
     public void propagateRemovedActivation(Document doc, Activation act) {
-        if(neuron instanceof InputNeuron) {
-            neuron.propagateRemovedActivation(doc, act);
+        Neuron n = neuron != null ? neuron.get() : null;
+
+        if(n instanceof InputNeuron) {
+            n.propagateRemovedActivation(doc, act);
         } else if(!key.isNeg && !key.isRecurrent) {
             removeFromNextLevel(doc, act);
         }
@@ -274,7 +280,7 @@ public class InputNode extends Node {
     @Override
     Collection<Refinement> collectNodeAndRefinements(Refinement newRef) {
         List<Refinement> result = new ArrayList<>(2);
-        result.add(new Refinement(key.relativeRid, newRef.rid, this));
+        result.add(new Refinement(key.relativeRid, newRef.rid, provider));
         result.add(newRef);
         return result;
     }
@@ -295,7 +301,7 @@ public class InputNode extends Node {
         lock.acquireReadLock();
         if(andChildren != null) {
             for (Map.Entry<Refinement, AndNode> me : andChildren.entrySet()) {
-                addNextLevelActivations(doc, me.getKey().input, me.getKey(), me.getValue(), act, removedConflict);
+                addNextLevelActivations(doc, me.getKey().input.get(), me.getKey(), me.getValue(), act, removedConflict);
             }
         }
         lock.releaseReadLock();
@@ -376,19 +382,20 @@ public class InputNode extends Node {
         long v = Node.visitedCounter++;
 
         for(Activation secondAct: doc.inputNodeActivations) {
-            Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (InputNode) secondAct.key.n);
-            Operator srm = computeStartRangeMatch(key, ref.input.key);
-            Operator erm = computeEndRangeMatch(key, ref.input.key);
+            Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.n.provider);
+            InputNode in = ref.input.get();
+            Operator srm = computeStartRangeMatch(key, in.key);
+            Operator erm = computeEndRangeMatch(key, in.key);
             Integer ridDelta = Utils.nullSafeSub(act.key.rid, false, secondAct.key.rid, false);
 
             if(     act != secondAct &&
-                    this != ref.input &&
-                    ref.input.visitedTrain != v &&
-                    !ref.input.key.isNeg &&
-                    !ref.input.key.isRecurrent &&
+                    this != in &&
+                    in.visitedTrain != v &&
+                    !in.key.isNeg &&
+                    !in.key.isRecurrent &&
                     ((srm.compare(act.key.r.begin, act.key.r.end, secondAct.key.r.begin, secondAct.key.r.end) && erm.compare(act.key.r.end, act.key.r.begin, secondAct.key.r.end, secondAct.key.r.begin)) ||
                             (ridDelta != null && ridDelta < AndNode.MAX_RID_RANGE))) {
-                ref.input.visitedTrain = v;
+                in.visitedTrain = v;
                 AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, true);
             }
         }
@@ -439,7 +446,7 @@ public class InputNode extends Node {
         sb.append(getRangeBrackets(key.startRangeOutput, key.startRangeMapping));
 
         if(inputNeuron != null) {
-            sb.append(inputNeuron.id);
+            sb.append(inputNeuron.provider.id);
             if(inputNeuron.label != null) {
                 sb.append(",");
                 sb.append(inputNeuron.label);
@@ -481,14 +488,13 @@ public class InputNode extends Node {
     }
 
 
-
     public static class SynapseKey implements Comparable<SynapseKey> {
         final Integer rid;
-        final Neuron n;
+        final Provider<? extends Neuron> n;
 
         public SynapseKey(Integer rid, Neuron n) {
             this.rid = rid;
-            this.n = n;
+            this.n = n.provider;
         }
 
 

@@ -43,7 +43,7 @@ public class ConcurrencyTest {
         InputNeuron inA = m.createOrLookupInputNeuron("A");
         InputNeuron inB = m.createOrLookupInputNeuron("B");
 
-        Neuron pC = m.createAndNeuron(new Neuron("pC"),
+        Neuron pC = m.initAndNeuron(m.createNeuron("pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -68,7 +68,7 @@ public class ConcurrencyTest {
         InputNeuron inClock = m.createOrLookupInputNeuron("CLOCK");
 
 
-        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), inClock, false, inStart, true, false);
+        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), inClock, false, inStart, true, false);
 
 
         Document doc0 = m.createDocument("aaaaaaaaaa", 0);
@@ -81,16 +81,16 @@ public class ConcurrencyTest {
         inA.addInput(doc2, 0, 4);
         inB.addInput(doc2, 2, 6);
 
-        Assert.assertEquals(1, pC.node.getActivations(doc2).size());
+        Assert.assertEquals(1, pC.node.get().getActivations(doc2).size());
 
         inA.addInput(doc4, 0, 6);
 
-        Assert.assertEquals(0, pC.node.getActivations(doc4).size());
+        Assert.assertEquals(0, pC.node.get().getActivations(doc4).size());
 
         inB.addInput(doc0, 4, 8);
         inB.addInput(doc4, 2, 8);
 
-        Assert.assertEquals(1, pC.node.getActivations(doc4).size());
+        Assert.assertEquals(1, pC.node.get().getActivations(doc4).size());
 
         inA.addInput(doc0, 0, 6);
 
@@ -98,22 +98,22 @@ public class ConcurrencyTest {
         inClock.addInput(doc3, 4, 5);
         inClock.addInput(doc3, 6, 7);
 
-        Assert.assertEquals(2, ctn.node.getThreadState(doc3.threadId, true).activations.size());
+        Assert.assertEquals(2, ctn.node.get().getThreadState(doc3.threadId, true).activations.size());
 
         inStart.addInput(doc1, 0, 1);
         inClock.addInput(doc1, 3, 4);
         inClock.addInput(doc1, 7, 8);
 
-        Assert.assertEquals(2, ctn.node.getThreadState(doc1.threadId, true).activations.size());
-        Assert.assertEquals(2, ctn.node.getActivations(doc1).size());
+        Assert.assertEquals(2, ctn.node.get().getThreadState(doc1.threadId, true).activations.size());
+        Assert.assertEquals(2, ctn.node.get().getActivations(doc1).size());
 
-        Assert.assertEquals(1, pC.node.getActivations(doc2).size());
+        Assert.assertEquals(1, pC.node.get().getActivations(doc2).size());
 
         inA.removeInput(doc2, 0, 4);
 
-        Assert.assertEquals(0, pC.node.getActivations(doc2).size());
+        Assert.assertEquals(0, pC.node.get().getActivations(doc2).size());
 
-        Assert.assertEquals(2, ctn.node.getThreadState(doc3.threadId, true).activations.size());
+        Assert.assertEquals(2, ctn.node.get().getThreadState(doc3.threadId, true).activations.size());
     }
 
 
@@ -125,7 +125,7 @@ public class ConcurrencyTest {
         final InputNeuron inA = m.createOrLookupInputNeuron("A");
         final InputNeuron inB = m.createOrLookupInputNeuron("B");
 
-        final Neuron pC = m.createAndNeuron(new Neuron("pC"),
+        final Neuron pC = m.initAndNeuron(m.createNeuron("pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -155,15 +155,15 @@ public class ConcurrencyTest {
                         inA.addInput(doc, 0, 6);
                         inB.addInput(doc, 4, 10);
 
-                        Assert.assertEquals(1, pC.node.getActivations(doc).size());
-                        Assert.assertNotNull(TestHelper.get(doc, pC.node, new Range(4, 6), null));
+                        Assert.assertEquals(1, pC.node.get().getActivations(doc).size());
+                        Assert.assertNotNull(TestHelper.get(doc, pC.node.get(), new Range(4, 6), null));
 
                         inB.removeInput(doc, 4, 10);
-                        Assert.assertEquals(0, pC.node.getActivations(doc).size());
+                        Assert.assertEquals(0, pC.node.get().getActivations(doc).size());
 
                         doc.clearActivations();
 
-                        Assert.assertEquals(0, inA.node.getActivations(doc).size());
+                        Assert.assertEquals(0, inA.node.get().getActivations(doc).size());
                     }
                 }
             }).run();

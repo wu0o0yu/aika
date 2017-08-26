@@ -172,7 +172,7 @@ public class SearchNode implements Comparable<SearchNode> {
         for(StateChange sc : modifiedActs) {
             Activation act = sc.act;
             if(act.finalState != null && act.finalState.value > 0.0) {
-                doc.finallyActivatedNeurons.add(act.key.n.neuron);
+                doc.finallyActivatedNeurons.add(act.key.n.neuron.get());
             }
         }
     }
@@ -225,21 +225,18 @@ public class SearchNode implements Comparable<SearchNode> {
                 log.info("- " + pathToString(doc) + "  -  " + accumulatedWeight[0] + "  " + accumulatedWeight[1]);
             }
 
-            changeState(StateChange.Mode.OLD);
-
-            return accNW;
-        }
-
-        SearchNode child = selectCandidate();
-        if(child != null && !(marker.excluded && marker.complete && INCOMPLETE_OPTIMIZATION)) {
-            selectedWeight = child.search(doc, this, excludedParent, searchSteps);
+        } else {
+            SearchNode child = selectCandidate();
+            if (child != null && !(marker.excluded && marker.complete && INCOMPLETE_OPTIMIZATION)) {
+                selectedWeight = child.search(doc, this, excludedParent, searchSteps);
+            }
         }
         changeState(StateChange.Mode.OLD);
-
         if(doc.interrupted) {
             return 0.0;
         }
 
+        SearchNode child;
         do {
             child = selectedParent.selectCandidate();
         } while(child != null && marker.selected && child.marker.complete && INCOMPLETE_OPTIMIZATION);

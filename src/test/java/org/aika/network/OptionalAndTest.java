@@ -39,9 +39,9 @@ public class OptionalAndTest {
         InputNeuron wordGehen = m.createOrLookupInputNeuron("word:gehen");
         InputNeuron upperCase = m.createOrLookupInputNeuron("upper case");
 
-        Neuron suppr = new Neuron("SUPPRESS");
+        Neuron suppr = m.createNeuron("SUPPRESS");
 
-        Neuron hintNoun = m.createOrNeuron(new Neuron("HINT-NOUN"),
+        Neuron hintNoun = m.initOrNeuron(m.createNeuron("HINT-NOUN"),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
@@ -55,7 +55,7 @@ public class OptionalAndTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
         );
-        Neuron hintVerb = m.createOrNeuron(new Neuron("HINT-VERB"),
+        Neuron hintVerb = m.initOrNeuron(m.createNeuron("HINT-VERB"),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
@@ -71,7 +71,7 @@ public class OptionalAndTest {
         );
 
 
-        Neuron noun = m.createAndNeuron(new Neuron("NOUN"),
+        Neuron noun = m.initAndNeuron(m.createNeuron("NOUN"),
                 0.001,
                 new Input()
                         .setOptional(false)
@@ -95,7 +95,7 @@ public class OptionalAndTest {
                         .setMinInput(1.0)
         );
 
-        Neuron verb = m.createAndNeuron(new Neuron("VERB"),
+        Neuron verb = m.initAndNeuron(m.createNeuron("VERB"),
                 0.001,
                 new Input()
                         .setOptional(false)
@@ -112,7 +112,7 @@ public class OptionalAndTest {
                         .setMinInput(1.0)
         );
 
-        m.createOrNeuron(suppr,
+        m.initOrNeuron(suppr,
                 new Input()
                         .setOptional(false)
                         .setNeuron(noun)

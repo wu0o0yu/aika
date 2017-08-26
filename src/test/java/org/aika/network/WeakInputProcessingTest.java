@@ -43,10 +43,10 @@ public class WeakInputProcessingTest {
         InputNeuron weakInputB = m.createOrLookupInputNeuron("Weak Input B");
         InputNeuron weakInputC = m.createOrLookupInputNeuron("Weak Input C");
 
-        Neuron suppr = new Neuron("suppr");
+        Neuron suppr = m.createNeuron("suppr");
 
-        Neuron patternA = m.createAndNeuron(
-                new Neuron("Pattern A"),
+        Neuron patternA = m.initAndNeuron(
+                m.createNeuron("Pattern A"),
                 0.4,
                 new Input()
                         .setNeuron(strongInput)
@@ -72,8 +72,8 @@ public class WeakInputProcessingTest {
                         .setRangeOutput(true)
         );
 
-        Neuron patternB = m.createAndNeuron(
-                new Neuron("Pattern B"),
+        Neuron patternB = m.initAndNeuron(
+                m.createNeuron("Pattern B"),
                 0.4,
                 new Input()
                         .setNeuron(strongInput)
@@ -99,8 +99,8 @@ public class WeakInputProcessingTest {
                         .setRangeOutput(true)
         );
 
-        Neuron patternC = m.createAndNeuron(
-                new Neuron("Pattern C"),
+        Neuron patternC = m.initAndNeuron(
+                m.createNeuron("Pattern C"),
                 0.4,
                 new Input()
                         .setNeuron(strongInput)
@@ -127,7 +127,7 @@ public class WeakInputProcessingTest {
         );
 
 
-        m.createOrNeuron(suppr,
+        m.initOrNeuron(suppr,
                 new Input()
                         .setNeuron(patternA)
                         .setWeight(10.0)
@@ -159,9 +159,9 @@ public class WeakInputProcessingTest {
 
         System.out.println(doc.networkStateToString(true,true, false, true));
 
-        Assert.assertTrue(TestHelper.get(doc, patternA.node, null, null).finalState.value < 0.5);
-        Assert.assertTrue(TestHelper.get(doc, patternB.node, null, null).finalState.value > 0.5);
-        Assert.assertTrue(TestHelper.get(doc, patternC.node, null, null).finalState.value < 0.5);
+        Assert.assertTrue(TestHelper.get(doc, patternA.node.get(), null, null).finalState.value < 0.5);
+        Assert.assertTrue(TestHelper.get(doc, patternB.node.get(), null, null).finalState.value > 0.5);
+        Assert.assertTrue(TestHelper.get(doc, patternC.node.get(), null, null).finalState.value < 0.5);
     }
 
 }

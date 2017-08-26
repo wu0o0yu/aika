@@ -26,10 +26,8 @@ import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -42,7 +40,7 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-public class Model implements Writable {
+public class Model {
 
     public int numberOfThreads = 1;
 
@@ -52,22 +50,21 @@ public class Model implements Writable {
 
     public SuspensionHook suspensionHook;
 
-    public Map<String, InputNeuron> inputNeurons = Collections.synchronizedMap(new LinkedHashMap<>());
-    public Map<String, Integer> suspendedInputNeurons = Collections.synchronizedMap(new LinkedHashMap<>());
+    public AtomicInteger currentNeuronId = new AtomicInteger(0);
 
-    public Map<Integer, Neuron> neurons = Collections.synchronizedMap(new TreeMap<>());
+    public Map<String, Provider<InputNeuron>> inputNeurons = Collections.synchronizedMap(new LinkedHashMap<>());
 
-    public Map<Integer, Node> initialNodes;
-    public Set<Node> allNodes[];
+    public Map<Integer, Provider<? extends Neuron>> neuronsInMemory = Collections.synchronizedMap(new WeakHashMap<>());
+    public Map<Integer, Provider<? extends Node>> nodesInMemory = Collections.synchronizedMap(new WeakHashMap<>());
 
     public Statistic stat = new Statistic();
 
     public int defaultThreadId = 0;
 
-    public Set<AndNode> numberOfPositionsQueue = Collections.synchronizedSet(new TreeSet<>(new Comparator<AndNode>() {
+    public Set<Provider<AndNode>> numberOfPositionsQueue = Collections.synchronizedSet(new TreeSet<>(new Comparator<Provider<AndNode>>() {
         @Override
-        public int compare(AndNode n1, AndNode n2) {
-            int r = Integer.compare(n1.numberOfPositionsNotify, n2.numberOfPositionsNotify);
+        public int compare(Provider<AndNode> n1, Provider<AndNode> n2) {
+            int r = Integer.compare(n1.get().numberOfPositionsNotify, n2.get().numberOfPositionsNotify);
             if(r != 0) return r;
             return n1.compareTo(n2);
         }
@@ -89,12 +86,39 @@ public class Model implements Writable {
         this.numberOfThreads = numberOfThreads;
 
         lastCleanup = new int[numberOfThreads];
-        allNodes = new Set[numberOfThreads];
         docs = new Document[numberOfThreads];
+    }
 
-        for(int i = 0; i < numberOfThreads; i++) {
-            allNodes[i] = new TreeSet<>();
-        }
+
+    public Neuron createNeuron() {
+        return createNeuronProvider(new Neuron()).get();
+    }
+
+
+    public Neuron createNeuron(String label) {
+        return createNeuronProvider(new Neuron(label)).get();
+    }
+
+
+    public Neuron createNeuron(String label, boolean isBlocked, boolean noTraining) {
+        return createNeuronProvider(new Neuron(label, isBlocked, noTraining)).get();
+    }
+
+
+    public <T extends Neuron> Provider<T> createNeuronProvider(T n) {
+        int id = currentNeuronId.addAndGet(1);
+        Provider<T> np = new Provider<T>(this, id, n);
+        n.provider = np;
+        neuronsInMemory.put(id, np);
+        return np;
+    }
+
+
+    public <T extends Node> Provider<T> createNodeProvider(T n) {
+        Provider<T> np = new Provider<T>(this, n.id, n);
+        n.provider = np;
+        nodesInMemory.put(n.id, np);
+        return np;
     }
 
 
@@ -119,6 +143,28 @@ public class Model implements Writable {
     }
 
 
+    public Provider<? extends Neuron> lookupNeuronProvider(int id) {
+        Provider<? extends Neuron> np = neuronsInMemory.get(id);
+        if(np == null) {
+            np = new Provider<>(this, id, null);
+            neuronsInMemory.put(id, np);
+
+        }
+        return np;
+    }
+
+
+    public Provider<? extends Node> lookupNodeProvider(int id) {
+        Provider<? extends Node> np = nodesInMemory.get(id);
+        if(np == null) {
+            np = new Provider<>(this, id, null);
+            nodesInMemory.put(id, np);
+
+        }
+        return np;
+    }
+
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Network Weights:\n");
@@ -131,27 +177,28 @@ public class Model implements Writable {
 
     public void reset() {
         inputNeurons.clear();
-        neurons.clear();
     }
 
 
     public void resetFrequency() {
         for(int t = 0; t < numberOfThreads; t++) {
-            for(Node n: allNodes[t]) {
-                n.frequency = 0;
+            for(Provider<? extends Node> n: nodesInMemory.values()) {
+                n.get().frequency = 0;
             }
         }
+
     }
 
 
     public String networkWeightsToString(boolean all) {
         StringBuilder sb = new StringBuilder();
-        for(Neuron n: neurons.values()) {
-            if(all || n.node.frequency > 0) {
+/*        for(Provider<? extends Neuron> pn: neurons.values()) {
+            Neuron n = pn.get();
+            if(all || n.node.get().frequency > 0) {
                 sb.append(n.toStringWithSynapses());
                 sb.append("\n");
             }
-        }
+        }*/
         return sb.toString();
     }
 
@@ -168,19 +215,14 @@ public class Model implements Writable {
 
 
     public InputNeuron createOrLookupInputNeuron(String label, boolean isBlocked) {
-        InputNeuron n = inputNeurons.get(label);
-        if(n == null) {
-            Integer sId = suspendedInputNeurons.get(label);
-            if(sId != null) {
-                n = (InputNeuron) Neuron.reactivate(this, sId);
-            }
-        }
+        Provider<InputNeuron> np = inputNeurons.get(label);
 
-        if(n == null) {
-            n = InputNeuron.create(this, defaultThreadId, new InputNeuron(label, isBlocked));
-            inputNeurons.put(label, n);
+        if(np == null) {
+            np = createNeuronProvider(new InputNeuron(label, isBlocked));
+            InputNeuron.init(this, defaultThreadId, np.get());
+            inputNeurons.put(label, np);
         }
-        return n;
+        return np.get();
     }
 
 
@@ -193,8 +235,8 @@ public class Model implements Writable {
      * @param inputs
      * @return
      */
-    public Neuron createAndNeuron(Neuron n, double threshold, Input... inputs) {
-        return createAndNeuron(n, threshold, new TreeSet<>(Arrays.asList(inputs)));
+    public Neuron initAndNeuron(Neuron n, double threshold, Input... inputs) {
+        return initAndNeuron(n, threshold, new TreeSet<>(Arrays.asList(inputs)));
     }
 
 
@@ -207,7 +249,7 @@ public class Model implements Writable {
      * @param inputs
      * @return
      */
-    public Neuron createAndNeuron(Neuron n, double threshold, Collection<Input> inputs) {
+    public Neuron initAndNeuron(Neuron n, double threshold, Collection<Input> inputs) {
         n.m = this;
         if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
@@ -243,7 +285,7 @@ public class Model implements Writable {
         }
         bias += minWeight * threshold;
 
-        return Neuron.create(this, defaultThreadId, n, bias, negDirSum, negRecSum, posRecSum, is);
+        return Neuron.init(this, defaultThreadId, n, bias, negDirSum, negRecSum, posRecSum, is);
     }
 
 
@@ -255,8 +297,8 @@ public class Model implements Writable {
      * @param inputs
      * @return
      */
-    public Neuron createNeuron(Neuron n, double bias, Input... inputs) {
-        return createNeuron(n, bias, new TreeSet<>(Arrays.asList(inputs)));
+    public Neuron initNeuron(Neuron n, double bias, Input... inputs) {
+        return initNeuron(n, bias, new TreeSet<>(Arrays.asList(inputs)));
     }
 
 
@@ -268,7 +310,7 @@ public class Model implements Writable {
      * @param inputs
      * @return
      */
-    public Neuron createNeuron(Neuron n, double bias, Collection<Input> inputs) {
+    public Neuron initNeuron(Neuron n, double bias, Collection<Input> inputs) {
         n.m = this;
         if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
@@ -295,7 +337,7 @@ public class Model implements Writable {
             is.add(s);
         }
 
-        return Neuron.create(this, defaultThreadId, n, bias, negDirSum, negRecSum, posRecSum, is);
+        return Neuron.init(this, defaultThreadId, n, bias, negDirSum, negRecSum, posRecSum, is);
     }
 
 
@@ -307,8 +349,8 @@ public class Model implements Writable {
      * @param inputs
      * @return
      */
-    public Neuron createOrNeuron(Neuron n, Input... inputs) {
-        return createOrNeuron(n, new TreeSet<>(Arrays.asList(inputs)));
+    public Neuron initOrNeuron(Neuron n, Input... inputs) {
+        return initOrNeuron(n, new TreeSet<>(Arrays.asList(inputs)));
     }
 
 
@@ -320,7 +362,7 @@ public class Model implements Writable {
      * @param inputs
      * @return
      */
-    public Neuron createOrNeuron(Neuron n, Set<Input> inputs) {
+    public Neuron initOrNeuron(Neuron n, Set<Input> inputs) {
         n.m = this;
         if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
@@ -334,7 +376,7 @@ public class Model implements Writable {
             is.add(s);
         }
 
-        return Neuron.create(this, defaultThreadId, n, bias, 0.0, 0.0, 0.0, is);
+        return Neuron.init(this, defaultThreadId, n, bias, 0.0, 0.0, 0.0, is);
     }
 
 
@@ -347,7 +389,7 @@ public class Model implements Writable {
      * @param dirIS
      * @return
      */
-    public Neuron createRelationalNeuron(Neuron n, Neuron ctn, Neuron inputSignal, boolean dirIS) {
+    public Neuron initRelationalNeuron(Neuron n, Neuron ctn, Neuron inputSignal, boolean dirIS) {
         n.m = this;
         if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
@@ -396,7 +438,7 @@ public class Model implements Writable {
             is.add(ctns);
         }
 
-        return Neuron.create(this, defaultThreadId, n, bias, 0.0, 0.0, 0.0, is);
+        return Neuron.init(this, defaultThreadId, n, bias, 0.0, 0.0, 0.0, is);
     }
 
 
@@ -412,7 +454,7 @@ public class Model implements Writable {
      * @param direction
      * @return
      */
-    public Neuron createCounterNeuron(Neuron n, Neuron clockSignal, boolean dirCS, Neuron startSignal, boolean dirSS, boolean direction) {
+    public Neuron initCounterNeuron(Neuron n, Neuron clockSignal, boolean dirCS, Neuron startSignal, boolean dirSS, boolean direction) {
         n.m = this;
         if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
@@ -500,75 +542,7 @@ public class Model implements Writable {
         neg.maxLowerWeightsSum = 28.0;
         is.add(neg);
 
-        return Neuron.create(this, defaultThreadId, n, bias, 0.0, negRecSum, 0.0, is);
-    }
-
-
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        out.writeInt(numberOfThreads);
-        out.writeInt(numberOfPositions);
-        TreeSet<Node> nodes = new TreeSet<>(new Comparator<Node>() {
-            @Override
-            public int compare(Node n1, Node n2) {
-                if(n1.level != -1 && n2.level == -1) return -1;
-                else if(n1.level == -1 && n2.level != -1) return 1;
-                int r = Integer.compare(n1.level, n2.level);
-                if(r != 0) return r;
-                return n1.compareTo(n2);
-            }
-        });
-
-        if(initialNodes != null) {
-            nodes.addAll(initialNodes.values());
-        }
-        for(Set<Node> n: allNodes) {
-            nodes.addAll(n);
-        }
-
-        out.writeInt(nodes.size());
-        for(Node n: nodes) {
-            n.write(out);
-        }
-
-        out.writeInt(neurons.size());
-        for(Neuron n: neurons.values()) {
-            n.write(out);
-        }
-    }
-
-
-    @Override
-    public boolean readFields(DataInput in, Model m) throws IOException {
-        numberOfThreads = in.readInt();
-        numberOfPositions = in.readInt();
-
-        int s = in.readInt();
-        initialNodes = new TreeMap<>();
-        for(int i = 0; i < s; i++) {
-            Node n = Node.read(in, m);
-            initialNodes.put(n.id, n);
-        }
-
-        s = in.readInt();
-        for(int i = 0; i < s; i++) {
-            Neuron n = Neuron.read(in, m);
-            neurons.put(n.id, n);
-
-            if(n instanceof InputNeuron) {
-                inputNeurons.put(n.label, (InputNeuron) n);
-            }
-        }
-        return true;
-    }
-
-
-    public static Model read(DataInput in) throws IOException {
-        Model m = new Model();
-        Document doc = m.createDocument(null, 0);
-        m.readFields(in, m);
-        return m;
+        return Neuron.init(this, defaultThreadId, n, bias, 0.0, negRecSum, 0.0, is);
     }
 
 

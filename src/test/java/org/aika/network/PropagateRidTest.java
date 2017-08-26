@@ -42,7 +42,7 @@ public class PropagateRidTest {
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
         InputNeuron inA = m.createOrLookupInputNeuron("A");
-        Neuron pA = m.createAndNeuron(new Neuron("pA"),
+        Neuron pA = m.initAndNeuron(m.createNeuron("pA"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -54,7 +54,7 @@ public class PropagateRidTest {
 
         inA.addInput(doc, 0, 1, 10, doc.bottom);
 
-        Assert.assertEquals(5, Activation.get(doc, pA.node, null, null, null, null, null, null).key.rid.intValue());
+        Assert.assertEquals(5, Activation.get(doc, pA.node.get(), null, null, null, null, null, null).key.rid.intValue());
 
     }
 }

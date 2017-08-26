@@ -60,7 +60,7 @@ import static org.aika.corpus.Range.Mapping.START;
  *
  * @author Lukas Molzberger
  */
-public abstract class Node implements Comparable<Node>, Writable {
+public abstract class Node<T extends Node> implements Comparable<Node>, Writable {
     public static int minFrequency = 5;
     public static int MAX_RID = 20;
 
@@ -71,13 +71,11 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     private static AtomicInteger currentNodeId = new AtomicInteger(0);
     public int id;
+    public Provider<T> provider;
 
     TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
     TreeMap<Refinement, AndNode> andChildren;
     TreeSet<OrEntry> orChildren;
-
-    TreeMap<Refinement, Integer> suspendedAndChildren;
-    TreeSet<Integer> suspendedOrChildren;
 
     public int level;
 
@@ -110,8 +108,7 @@ public abstract class Node implements Comparable<Node>, Writable {
     public boolean isQueued = false;
     public long queueId;
 
-    public Neuron neuron = null;
-    public Integer neuronId = null;
+    public Provider<? extends Neuron> neuron = null;
 
     public static long visitedCounter = 0;
 
@@ -202,7 +199,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     public abstract void propagateRemovedActivation(Document doc, Activation act);
 
-    abstract boolean isAllowedOption(int threadId, InterprNode n, Activation act, long v);
+    public abstract boolean isAllowedOption(int threadId, InterprNode n, Activation act, long v);
 
     abstract void cleanup(Model m, int threadId);
 
@@ -228,20 +225,19 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     abstract boolean isExpandable(boolean checkFrequency);
 
-    abstract protected void reactivateIntern(Model m);
-
     protected Node() {}
 
 
-    public Node(Model m, int threadId, int level) {
+    public Node(Model m, int level) {
         threads = new ThreadState[m.numberOfThreads];
         id = currentNodeId.addAndGet(1);
+        m.createNodeProvider(this);
         this.level = level;
         if(m != null) {
-            m.allNodes[threadId].add(this);
             nOffset = m.numberOfPositions;
         }
     }
+
 
     public static final Comparator<Activation.Key> BEGIN_COMP = new Comparator<Key>() {
         @Override
@@ -282,12 +278,6 @@ public abstract class Node implements Comparable<Node>, Writable {
     };
 
 
-    public void setNeuron(Neuron n) {
-        neuron = n;
-        neuronId = n.id;
-    }
-
-
     void addOrChild(int threadId, OrEntry oe) {
         lock.acquireWriteLock(threadId);
         if(orChildren == null) {
@@ -322,18 +312,6 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-
-    void addSuspendedAndChild(Refinement ref, Integer id) {
-        if(suspendedAndChildren == null) {
-            suspendedAndChildren = new TreeMap<>();
-//            reverseAndChildren = new TreeMap<>();
-        }
-
-        suspendedAndChildren.put(ref, id);
-//        reverseAndChildren.put(new ReverseAndRefinement(child, ref.rid, 0), ref);
-    }
-
-
     void removeAndChild(Refinement ref) {
         if(andChildren != null) {
             andChildren.remove(ref);
@@ -342,17 +320,6 @@ public abstract class Node implements Comparable<Node>, Writable {
             if(andChildren.isEmpty()) {
                 andChildren = null;
                 reverseAndChildren = null;
-            }
-        }
-    }
-
-
-    void removeSuspendedAndChild(Refinement ref) {
-        if(suspendedAndChildren != null) {
-            suspendedAndChildren.remove(ref);
-
-            if(suspendedAndChildren.isEmpty()) {
-                suspendedAndChildren = null;
             }
         }
     }
@@ -384,7 +351,7 @@ public abstract class Node implements Comparable<Node>, Writable {
             act.link(inputActs);
 
             if(neuron != null) {
-                linkNeuronRelations(doc, act);
+                neuron.get().linkNeuronRelations(doc, act);
             }
 
             if(!isTrainingAct) {
@@ -392,7 +359,7 @@ public abstract class Node implements Comparable<Node>, Writable {
             }
         } else {
             if(neuron != null) {
-                linkNeuronRelations(doc, act);
+                neuron.get().linkNeuronRelations(doc, act);
             }
             act.link(inputActs);
         }
@@ -412,7 +379,7 @@ public abstract class Node implements Comparable<Node>, Writable {
             act.key.releaseRef();
 
             if(neuron != null) {
-                unlinkNeuronRelations(doc, act);
+                neuron.get().unlinkNeuronRelations(doc, act);
             }
             flag = true;
         }
@@ -421,206 +388,6 @@ public abstract class Node implements Comparable<Node>, Writable {
         act.unlink(inputActs);
 
         return flag;
-    }
-
-
-    /**
-     * Sets the incoming and outgoing links between neuron activations.
-     *
-     * @param doc
-     * @param act
-     */
-    private void linkNeuronRelations(Document doc, Activation act) {
-        int v = doc.visitedCounter++;
-        neuron.lock.acquireReadLock();
-        linkNeuronActs(doc, act, v, 0);
-        linkNeuronActs(doc, act, v, 1);
-        neuron.lock.releaseReadLock();
-    }
-
-
-    private void linkNeuronActs(Document doc, Activation act, int v, int dir) {
-        ArrayList<Activation> recNegTmp = new ArrayList<>();
-        TreeMap<Synapse, Synapse> syns = (dir == 0 ? neuron.inputSynapses : neuron.outputSynapses);
-
-        for (Synapse s : getActiveSynapses(doc, dir, syns)) {
-            Node n = (dir == 0 ? s.input : s.output).node;
-            ThreadState th = n.getThreadState(doc.threadId, false);
-            if(th == null || th.activations.isEmpty()) continue;
-
-            linkActSyn(n, doc, act, dir, recNegTmp, s);
-        }
-
-        for(Activation rAct: recNegTmp) {
-            Activation oAct = (dir == 0 ? act : rAct);
-            Activation iAct = (dir == 0 ? rAct : act);
-
-            markConflicts(iAct, oAct, v);
-
-            addConflict(doc, oAct.key.o, iAct.key.o, iAct, Collections.singleton(act), v);
-        }
-    }
-
-
-    private void linkActSyn(Node n, Document doc, Activation act, int dir, ArrayList<Activation> recNegTmp, Synapse s) {
-        Integer rid;
-        if(dir == 0) {
-            rid = s.key.absoluteRid != null ? s.key.absoluteRid : Utils.nullSafeAdd(act.key.rid, false, s.key.relativeRid, false);
-        } else {
-            rid = Utils.nullSafeSub(act.key.rid, false, s.key.relativeRid, false);
-        }
-
-
-        Operator begin = replaceFirstAndLast(s.key.startRangeMatch);
-        Operator end = replaceFirstAndLast(s.key.endRangeMatch);
-        Range r = act.key.r;
-        if(dir == 0) {
-            begin = Operator.invert(s.key.startRangeMapping == START ? begin : (s.key.endRangeMapping == START ? end : NONE));
-            end = Operator.invert(s.key.endRangeMapping == END ? end : (s.key.startRangeMapping == END ? begin : NONE));
-
-            if(s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
-                r = new Range(s.key.endRangeMapping == START ? r.end : (s.key.startRangeMapping == START ? r.begin : null), s.key.startRangeMapping == END ? r.begin : (s.key.endRangeMapping == END ? r.end : null));
-            }
-        } else {
-            if(s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
-                r = new Range(s.key.startRangeMapping == END ? r.end : (s.key.startRangeMapping == START ? r.begin : null), s.key.endRangeMapping == START ? r.begin : (s.key.endRangeMapping == END ? r.end : null));
-            }
-        }
-
-        Stream<Activation> tmp = Activation.select(
-                doc ,
-                n,
-                rid,
-                r,
-                begin,
-                end,
-                null,
-                null
-        );
-
-        final int d = dir;
-        tmp.forEach(rAct -> {
-            Activation oAct = (d == 0 ? act : rAct);
-            Activation iAct = (d == 0 ? rAct : act);
-
-            SynapseActivation sa = new SynapseActivation(s, iAct, oAct);
-            iAct.addSynapseActivation(0, sa);
-            oAct.addSynapseActivation(1, sa);
-
-            if(s.key.isNeg && s.key.isRecurrent) {
-                recNegTmp.add(rAct);
-            }
-        });
-    }
-
-
-    private Collection<Synapse> getActiveSynapses(Document doc, int dir, TreeMap<Synapse, Synapse> syns) {
-        // Optimization in case the set of synapses is very large
-        if(syns.size() < 10 || doc.activatedNeurons.size() * 20 > syns.size()) {
-            return syns.values();
-        }
-
-        Collection<Synapse> synsTmp;
-        ArrayList<Synapse> newSyns = new ArrayList<>();
-        Synapse lk = new Synapse(null, Synapse.Key.MIN_KEY);
-        Synapse uk = new Synapse(null, Synapse.Key.MAX_KEY);
-
-        for (Neuron n : doc.activatedNeurons) {
-            if (dir == 0) {
-                lk.input = n;
-                uk.input = n;
-            } else {
-                lk.output = n;
-                uk.output = n;
-            }
-
-            // Using addAll is not efficient here.
-            for(Synapse s: syns.subMap(lk, true, uk, true).values()) {
-                newSyns.add(s);
-            }
-        }
-
-        synsTmp = newSyns;
-        return synsTmp;
-    }
-
-
-    private Operator replaceFirstAndLast(Operator rm) {
-        return rm == FIRST || rm == LAST ? EQUALS : rm;
-    }
-
-
-    private void unlinkNeuronRelations(Document doc, Activation act) {
-        int v = doc.visitedCounter++;
-        for(int dir = 0; dir < 2; dir++) {
-            for (SynapseActivation sa: (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
-                Synapse s = sa.s;
-                Activation rAct = dir == 0 ? sa.input : sa.output;
-
-                if(s.key.isNeg && s.key.isRecurrent) {
-                    Activation oAct = (dir == 0 ? act : rAct);
-                    Activation iAct = (dir == 0 ? rAct : act);
-
-                    markConflicts(iAct, oAct, v);
-
-                    removeConflict(doc, oAct.key.o, iAct.key.o, iAct, act, v);
-                }
-            }
-        }
-
-        for(int dir = 0; dir < 2; dir++) {
-            for (SynapseActivation sa: (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
-                Activation rAct = dir == 0 ? sa.input : sa.output;
-                rAct.removeSynapseActivation(dir, sa);
-            }
-        }
-    }
-
-
-    private static void addConflict(Document doc, InterprNode io, InterprNode o, Activation act, Collection<Activation> inputActs, long v) {
-        if(o.markedConflict == v || o.orInterprNodes == null) {
-            if (!isAllowed(doc.threadId, io, o, inputActs)) {
-                Conflicts.add(doc, act, io, o);
-            }
-        } else {
-            for(InterprNode no: o.orInterprNodes.values()) {
-                addConflict(doc, io, no, act, inputActs, v);
-            }
-        }
-    }
-
-
-    private static void removeConflict(Document doc, InterprNode io, InterprNode o, Activation act, Activation nAct, long v) {
-        if(o.markedConflict == v || o.orInterprNodes == null) {
-            if (!nAct.key.n.isAllowedOption(doc.threadId, o, nAct, visitedCounter++)) {
-                assert io != null;
-
-                Conflicts.remove(doc, act, io, o);
-            }
-        } else {
-            for(InterprNode no: o.orInterprNodes.values()) {
-                removeConflict(doc, io, no, act, nAct, v);
-            }
-        }
-    }
-
-
-    private void markConflicts(Activation iAct, Activation oAct, int v) {
-        oAct.key.o.markedConflict = v;
-        for(SynapseActivation sa: iAct.neuronOutputs) {
-            if(sa.s.key.isRecurrent && sa.s.key.isNeg) {
-                sa.output.key.o.markedConflict = v;
-            }
-        }
-    }
-
-
-    private static boolean isAllowed(int threadId, InterprNode io, InterprNode o, Collection<Activation> inputActs) {
-        if(io != null && o.contains(io, false)) return true;
-        for (Activation act : inputActs) {
-            if (act.key.n.isAllowedOption(threadId, o, act, visitedCounter++)) return true;
-        }
-        return false;
     }
 
 
@@ -781,13 +548,13 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-    boolean computeAndParents(Model m, int threadId, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Node> parents, boolean discoverPatterns, long v) {
+    boolean computeAndParents(Model m, int threadId, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Provider<? extends Node>> parents, boolean discoverPatterns, long v) {
         RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
         if(nv.computeParents == v) return true;
         nv.computeParents = v;
 
         if(inputs.size() == 1) {
-            parents.put(inputs.first(), this);
+            parents.put(inputs.first(), provider);
             return true;
         }
 
@@ -820,7 +587,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
         if(orChildren != null) {
             for (OrEntry oe : orChildren) {
-                ((OrNode) oe.node).removeActivation(doc, oe.ridOffset, iAct);
+                ((OrNode) oe.node.get()).removeActivation(doc, oe.ridOffset, iAct);
             }
         }
     }
@@ -830,7 +597,7 @@ public abstract class Node implements Comparable<Node>, Writable {
         assert !isRemoved;
 
         if(neuron != null) {
-            neuron.remove(threadId);
+            neuron.get().remove(threadId);
         }
 
         lock.acquireWriteLock(threadId);
@@ -839,7 +606,7 @@ public abstract class Node implements Comparable<Node>, Writable {
         }
 
         while(orChildren != null && !orChildren.isEmpty())  {
-            orChildren.pollFirst().node.remove(m, threadId);
+            orChildren.pollFirst().node.get().remove(m, threadId);
         }
         lock.releaseWriteLock();
 
@@ -861,18 +628,19 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     private static int evaluate(Neuron n, RSKey rsk) {
-        double sum = rsk.pa.computeSynapseWeightSum(rsk.offset, n);
+        Node pa = rsk.pa != null ? rsk.pa.get() : null;
+        double sum = pa.computeSynapseWeightSum(rsk.offset, n);
         if(sum < 0.0) return -1;
-        if(rsk.pa == null) return 0;
+        if(pa == null) return 0;
 
-        if(rsk.pa instanceof AndNode) {
-            AndNode an = (AndNode) rsk.pa;
+        if(pa instanceof AndNode) {
+            AndNode an = (AndNode) pa;
             for(Refinement ref: an.parents.keySet()) {
-                Synapse s = ref.input.getSynapse(new SynapseKey(rsk.offset, n));
+                Synapse s = ref.input.get().getSynapse(new SynapseKey(rsk.offset, n));
                 if(sum - Math.abs(s.w) >= 0.0) return 1;
             }
         } else {
-            InputNode in = (InputNode) rsk.pa;
+            InputNode in = (InputNode) pa;
             Synapse s = in.getSynapse(new SynapseKey(rsk.offset, n));
             if(sum - Math.abs(s.w) >= 0.0) return 1;
         }
@@ -891,24 +659,26 @@ public abstract class Node implements Comparable<Node>, Writable {
      */
     public static boolean adjust(Model m, int threadId, Neuron neuron, final int dir) {
         long v = visitedCounter++;
-        OrNode outputNode = (OrNode) neuron.node;
+        OrNode outputNode = (OrNode) neuron.node.get();
 
         if(neuron.inputSynapsesByWeight.isEmpty()) return false;
 
         neuron.maxRecurrentSum = 0.0;
         for(Synapse s: neuron.inputSynapsesByWeight) {
-            s.input.lock.acquireWriteLock(threadId);
+            Neuron in = s.input.get();
+            in.lock.acquireWriteLock(threadId);
 
             if (s.inputNode == null) {
-                s.inputNode = InputNode.add(m, threadId, s.key.createInputNodeKey(), s.input);
-                s.inputNode.isBlocked = s.input.isBlocked;
-                s.inputNode.setSynapse(threadId, new SynapseKey(s.key.relativeRid, neuron), s);
+                InputNode iNode = InputNode.add(m, s.key.createInputNodeKey(), s.input.get());
+                iNode.isBlocked = in.isBlocked;
+                iNode.setSynapse(threadId, new SynapseKey(s.key.relativeRid, neuron), s);
+                s.inputNode = iNode.provider;
             }
 
             if (s.key.isRecurrent) {
                 neuron.maxRecurrentSum += Math.abs(s.w);
             }
-            s.input.lock.releaseWriteLock();
+            in.lock.releaseWriteLock();
         }
 
 
@@ -919,7 +689,7 @@ public abstract class Node implements Comparable<Node>, Writable {
                 else if(rsk1.pa != null && rsk2.pa == null) return 1;
                 else if(rsk1.pa == null && rsk2.pa == null) return 0;
 
-                int r = Integer.compare(rsk2.pa.level, rsk1.pa.level) * dir;
+                int r = Integer.compare(rsk2.pa.get().level, rsk1.pa.get().level) * dir;
                 if(r != 0) return r;
                 r = rsk1.pa.compareTo(rsk2.pa);
                 if(r != 0) return r;
@@ -939,7 +709,7 @@ public abstract class Node implements Comparable<Node>, Writable {
         List<RSKey> cleanup = new ArrayList<>();
         while(!queue.isEmpty()) {
             RSKey rsk = queue.pollFirst();
-            Node n = rsk.pa;
+            Node n = rsk.pa != null ? rsk.pa.get() : null;
 
             if(dir == -1) {
                 computeRefinements(m, threadId, queue, neuron, rsk, v, outputs, cleanup);
@@ -947,8 +717,8 @@ public abstract class Node implements Comparable<Node>, Writable {
                 if(n instanceof AndNode) {
                     AndNode an = (AndNode) n;
 
-                    for(Map.Entry<Refinement, Node> me: an.parents.entrySet()) {
-                        Node pn = me.getValue();
+                    for(Map.Entry<Refinement, Provider<? extends Node>> me: an.parents.entrySet()) {
+                        Provider<? extends Node> pn = me.getValue();
                         RSKey prsk = new RSKey(pn, me.getKey().getOffset()); // TODO: Prüfen
                         switch(evaluate(neuron, prsk)) {
                             case -1:
@@ -957,7 +727,7 @@ public abstract class Node implements Comparable<Node>, Writable {
                                 outputs.add(prsk);
                                 break;
                             case 1:
-                                RidVisited nv = pn.getThreadState(threadId, true).lookupVisited(rsk.offset);
+                                RidVisited nv = pn.get().getThreadState(threadId, true).lookupVisited(rsk.offset);
                                 if(nv.adjust != v) {
                                     nv.adjust = v;
                                     queue.add(prsk);
@@ -976,14 +746,15 @@ public abstract class Node implements Comparable<Node>, Writable {
         outputNode.removeAllInputs(threadId);
 
         for(RSKey rsk: outputs) {
-            rsk.pa.lock.acquireWriteLock(threadId);
-            outputNode.addInput(threadId, rsk.offset, rsk.pa);
-            rsk.pa.lock.releaseWriteLock();
+            Node pa = rsk.pa.get();
+            pa.lock.acquireWriteLock(threadId);
+            outputNode.addInput(threadId, rsk.offset, pa);
+            pa.lock.releaseWriteLock();
         }
         outputNode.lock.releaseWriteLock();
 
         for(RSKey on: cleanup) {
-            on.pa.cleanup(m, threadId);
+            on.pa.get().cleanup(m, threadId);
         }
 
         return true;
@@ -994,13 +765,14 @@ public abstract class Node implements Comparable<Node>, Writable {
         n.lock.acquireWriteLock(threadId);
         Synapse minSyn = null;
         double sum = 0.0;
-        if(rsk.pa == null) {
-        } else if(rsk.pa instanceof InputNode) {
-            InputNode node = (InputNode) rsk.pa;
+        Node pa = rsk.pa != null ? rsk.pa.get() : null;
+        if(pa == null) {
+        } else if(pa instanceof InputNode) {
+            InputNode node = (InputNode) pa;
             minSyn = node.getSynapse(new SynapseKey(rsk.offset, n));
             sum = Math.abs(minSyn.w);
         } else {
-            AndNode node = (AndNode) rsk.pa;
+            AndNode node = (AndNode) pa;
 
             for(Refinement ref: node.parents.keySet()) {
                 Synapse s = ref.getSynapse(rsk.offset, n);
@@ -1014,8 +786,8 @@ public abstract class Node implements Comparable<Node>, Writable {
         for(Synapse s: (minSyn != null ? n.inputSynapsesByWeight.headSet(minSyn, false) : n.inputSynapsesByWeight)) {
             if(n.bias - (n.negDirSum + n.negRecSum) + n.posRecSum + sum + Math.abs(s.w) + s.maxLowerWeightsSum > 0.0 && !s.key.isNeg && !s.key.isRecurrent) {
                 Node nln = rsk.pa == null ?
-                        s.inputNode :
-                        AndNode.createNextLevelNode(m, threadId, rsk.pa, new Refinement(s.key.relativeRid, rsk.offset, s.inputNode), false);
+                        s.inputNode.get() :
+                        AndNode.createNextLevelNode(m, threadId, pa, new Refinement(s.key.relativeRid, rsk.offset, s.inputNode), false);
 
                 if(nln != null) {
                     nln.prepareResultsForPredefinedNodes(threadId, queue, v, outputs, cleanup, n, s, Utils.nullSafeMin(s.key.relativeRid, rsk.offset));
@@ -1027,7 +799,7 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     void prepareResultsForPredefinedNodes(int threadId, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, Neuron n, Synapse s, Integer offset) {
-        RSKey rs = new RSKey(this, offset);
+        RSKey rs = new RSKey(provider, offset);
         RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
         // TODO: mindestens einen positiven Knoten mit rein nehmen.
         if(computeSynapseWeightSum(offset, n) + n.posRecSum - (n.negDirSum + n.negRecSum) > 0 || !isExpandable(false) || (Math.abs(s.w) / -n.bias) < 0.1) {
@@ -1049,17 +821,17 @@ public abstract class Node implements Comparable<Node>, Writable {
 
 
     private static class RSKey implements Comparable<RSKey> {
-        Node pa;
+        Provider<? extends Node> pa;
         Integer offset;
 
-        public RSKey(Node pa, Integer offset) {
+        public RSKey(Provider<? extends Node> pa, Integer offset) {
             this.pa = pa;
             this.offset = offset;
         }
 
 
         public String toString() {
-            return "Offset:" + offset + " PA:" + pa.logicToString();
+            return "Offset:" + offset + " PA:" + pa.get().logicToString();
         }
 
         @Override
@@ -1095,9 +867,9 @@ public abstract class Node implements Comparable<Node>, Writable {
     public String toSimpleString() {
         StringBuilder sb = new StringBuilder();
         sb.append(id);
-        if(neuron != null && neuron.label != null) {
+        if(neuron != null && neuron.get().label != null) {
             sb.append(" ");
-            sb.append(neuron.label);
+            sb.append(neuron.get().label);
         }
         return sb.toString();
     }
@@ -1108,61 +880,11 @@ public abstract class Node implements Comparable<Node>, Writable {
     }
 
 
-
-    public static Node reactivate(Model m, Integer id) {
-        assert m.suspensionHook != null;
-
-        Node n;
-        byte[] nData = m.suspensionHook.retrieve(id, SuspensionHook.Type.NODE);
-        ByteArrayInputStream bais = new ByteArrayInputStream(nData);
-        DataInputStream dis = new DataInputStream(bais);
-        try {
-            n = read(dis, m);
-        } catch(IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        if(n == null) return null;
-
-        if(n.suspendedAndChildren != null) {
-            for (Map.Entry<Refinement, Integer> me : n.suspendedAndChildren.entrySet()) {
-                AndNode.reactivate(m, me.getValue());
-            }
-        }
-
-
-        n.reactivateIntern(m);
-        return n;
+    public int compareTo(Node n) {
+        if(id < n.id) return -1;
+        else if(id > n.id) return 1;
+        else return 0;
     }
-
-
-    public void suspend(Model m) {
-        assert m.suspensionHook != null;
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
-
-        try {
-            write(dos);
-        } catch(IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        m.suspensionHook.store(id, SuspensionHook.Type.NODE, baos.toByteArray());
-
-        if(andChildren != null) {
-            for (AndNode n : andChildren.values()) {
-                n.suspend(m);
-            }
-        }
-
-        if(neuron != null) {
-            neuron.suspend(m);
-
-            neuron.node = null;
-        }
-    }
-
 
 
     @Override
@@ -1170,9 +892,9 @@ public abstract class Node implements Comparable<Node>, Writable {
         out.writeInt(id);
         out.writeInt(level);
 
-        out.writeBoolean(neuronId != null);
-        if(neuronId != null) {
-            out.writeInt(neuronId);
+        out.writeBoolean(neuron != null);
+        if(neuron != null) {
+            out.writeInt(neuron.id);
         }
 
         out.writeInt(frequency);
@@ -1199,7 +921,7 @@ public abstract class Node implements Comparable<Node>, Writable {
         level = in.readInt();
 
         if(in.readBoolean()) {
-            neuronId = in.readInt();
+            neuron = m.lookupNeuronProvider(in.readInt());
         }
 
         frequency = in.readInt();
@@ -1239,23 +961,6 @@ public abstract class Node implements Comparable<Node>, Writable {
         }
 
         return n.readFields(in, m) ? n : null;
-    }
-
-
-
-    @Override
-    public int compareTo(Node n) {
-        if(id < n.id) return -1;
-        else if(id > n.id) return 1;
-        else return 0;
-    }
-
-
-    public static int compare(Node a, Node b) {
-        if(a == b) return 0;
-        if(a == null && b != null) return -1;
-        if(a != null && b == null) return 1;
-        return a.compareTo(b);
     }
 
 
@@ -1319,10 +1024,10 @@ public abstract class Node implements Comparable<Node>, Writable {
 
     static class ReverseAndRefinement implements Comparable<ReverseAndRefinement> {
         boolean dir;
-        Node node;
+        Provider<? extends Node> node;
 
         public ReverseAndRefinement(Node n, Integer a, Integer b) {
-            this.node = n;
+            this.node = n.provider;
             this.dir = Utils.compareNullSafe(a, b);
         }
 

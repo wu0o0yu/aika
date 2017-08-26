@@ -47,9 +47,9 @@ public class OrOptionsTest {
         InputNeuron inB = m.createOrLookupInputNeuron("B");
         InputNeuron inC = m.createOrLookupInputNeuron("C");
 
-        Neuron pD = new Neuron("D");
+        Neuron pD = m.createNeuron("D");
 
-        m.createOrNeuron(pD,
+        m.initOrNeuron(pD,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -71,15 +71,15 @@ public class OrOptionsTest {
 
         InterprNode o0 = InterprNode.addPrimitive(doc);
         Range r = new Range(0, 10);
-        Node.addActivationAndPropagate(doc, new Activation.Key(inA.node, r, 0, o0), Collections.emptySet());
+        Node.addActivationAndPropagate(doc, new Activation.Key(inA.node.get(), r, 0, o0), Collections.emptySet());
         doc.propagate();
 
         InterprNode o1 = InterprNode.addPrimitive(doc);
-        Node.addActivationAndPropagate(doc, new Activation.Key(inA.node, r, 0, o1), Collections.emptySet());
+        Node.addActivationAndPropagate(doc, new Activation.Key(inA.node.get(), r, 0, o1), Collections.emptySet());
         doc.propagate();
 
         InterprNode o2 = InterprNode.addPrimitive(doc);
-        Node.addActivationAndPropagate(doc, new Activation.Key(inA.node, r, 0, o2), Collections.emptySet());
+        Node.addActivationAndPropagate(doc, new Activation.Key(inA.node.get(), r, 0, o2), Collections.emptySet());
         doc.propagate();
 
 

@@ -43,11 +43,11 @@ public class EntityResolutionTest {
         InputNeuron wJaguar = m.createOrLookupInputNeuron("W-Jaguar");
         InputNeuron wPuma = m.createOrLookupInputNeuron("W-Puma");
 
-        Neuron eJaguar = new Neuron("E-Jaguar");
-        Neuron ePuma = new Neuron("E-Puma");
+        Neuron eJaguar = m.createNeuron("E-Jaguar");
+        Neuron ePuma = m.createNeuron("E-Puma");
 
 
-        m.createAndNeuron(eJaguar, 0.9,
+        m.initAndNeuron(eJaguar, 0.9,
                 new Input()
                         .setNeuron(wJaguar)
                         .setRecurrent(false)
@@ -63,7 +63,7 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
         );
 
-        m.createAndNeuron(ePuma, 0.9,
+        m.initAndNeuron(ePuma, 0.9,
                 new Input()
                         .setNeuron(wPuma)
                         .setRecurrent(false)
@@ -96,17 +96,17 @@ public class EntityResolutionTest {
         System.out.println(doc.networkStateToString(true, true, false, true));
 
 
-        Assert.assertNotNull(eJaguar.node.getFirstActivation(doc));
-        Assert.assertNotNull(ePuma.node.getFirstActivation(doc));
+        Assert.assertNotNull(eJaguar.node.get().getFirstActivation(doc));
+        Assert.assertNotNull(ePuma.node.get().getFirstActivation(doc));
 
-        Assert.assertEquals(0, eJaguar.node.getFirstActivation(doc).key.o.primId);
-        Assert.assertEquals(1, ePuma.node.getFirstActivation(doc).key.o.primId);
+        Assert.assertEquals(0, eJaguar.node.get().getFirstActivation(doc).key.o.primId);
+        Assert.assertEquals(1, ePuma.node.get().getFirstActivation(doc).key.o.primId);
 
-        Assert.assertEquals(doc.bottom, eJaguar.node.getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
-        Assert.assertEquals(doc.bottom, ePuma.node.getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
+        Assert.assertEquals(doc.bottom, eJaguar.node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
+        Assert.assertEquals(doc.bottom, ePuma.node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
 
-        Assert.assertEquals(1, eJaguar.node.getFirstActivation(doc).key.o.orInterprNodes.size());
-        Assert.assertEquals(1, ePuma.node.getFirstActivation(doc).key.o.orInterprNodes.size());
+        Assert.assertEquals(1, eJaguar.node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
+        Assert.assertEquals(1, ePuma.node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
     }
 
 
@@ -121,16 +121,16 @@ public class EntityResolutionTest {
         InputNeuron wPuma = m.createOrLookupInputNeuron("W-Puma");
         InputNeuron wLeopard = m.createOrLookupInputNeuron("W-Leopard");
 
-        Neuron eJaguar = new Neuron("E-Jaguar");
-        Neuron ePuma = new Neuron("E-Puma");
-        Neuron eLeopard = new Neuron("E-Leopard");
+        Neuron eJaguar = m.createNeuron("E-Jaguar");
+        Neuron ePuma = m.createNeuron("E-Puma");
+        Neuron eLeopard = m.createNeuron("E-Leopard");
 
-        Neuron cKatzen = new Neuron("C-Katzen");
-        Neuron chKatzenOhneJaguar = new Neuron("CH-Katzen/Jaguar");
-        Neuron chKatzenOhnePuma = new Neuron("CH-Katzen/Puma");
-        Neuron chKatzenOhneLeopard = new Neuron("CH-Katzen/Leopard");
+        Neuron cKatzen = m.createNeuron("C-Katzen");
+        Neuron chKatzenOhneJaguar = m.createNeuron("CH-Katzen/Jaguar");
+        Neuron chKatzenOhnePuma = m.createNeuron("CH-Katzen/Puma");
+        Neuron chKatzenOhneLeopard = m.createNeuron("CH-Katzen/Leopard");
 
-        m.createAndNeuron(eJaguar, 0.9,
+        m.initAndNeuron(eJaguar, 0.9,
                 new Input()
                         .setNeuron(wJaguar)
                         .setRecurrent(false)
@@ -147,7 +147,7 @@ public class EntityResolutionTest {
                         .setRangeOutput(false)
         );
 
-        m.createAndNeuron(ePuma, 0.9,
+        m.initAndNeuron(ePuma, 0.9,
                 new Input()
                         .setNeuron(wPuma)
                         .setRecurrent(false)
@@ -165,7 +165,7 @@ public class EntityResolutionTest {
         );
 
 
-        m.createAndNeuron(eLeopard, 0.9,
+        m.initAndNeuron(eLeopard, 0.9,
                 new Input()
                         .setNeuron(wLeopard)
                         .setRecurrent(false)
@@ -182,7 +182,7 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
         );
 
-        m.createOrNeuron(cKatzen,
+        m.initOrNeuron(cKatzen,
                 new Input()
                         .setNeuron(eJaguar)
                         .setWeight(10.0)
@@ -203,7 +203,7 @@ public class EntityResolutionTest {
                         .setRangeOutput(true)
         );
 
-        m.createAndNeuron(chKatzenOhneJaguar, 0.5,
+        m.initAndNeuron(chKatzenOhneJaguar, 0.5,
                 new Input()
                         .setNeuron(cKatzen)
                         .setWeight(10.0)
@@ -226,7 +226,7 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
         );
 
-        m.createAndNeuron(chKatzenOhnePuma, 0.5,
+        m.initAndNeuron(chKatzenOhnePuma, 0.5,
                 new Input()
                         .setNeuron(cKatzen)
                         .setWeight(10.0)
@@ -249,7 +249,7 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
         );
 
-        m.createAndNeuron(chKatzenOhneLeopard, 0.5,
+        m.initAndNeuron(chKatzenOhneLeopard, 0.5,
                 new Input()
                         .setNeuron(cKatzen)
                         .setWeight(10.0)
@@ -292,17 +292,17 @@ public class EntityResolutionTest {
         System.out.println(doc.networkStateToString(true, true, false, true));
 
 
-        Assert.assertNotNull(eJaguar.node.getFirstActivation(doc));
-        Assert.assertNotNull(ePuma.node.getFirstActivation(doc));
+        Assert.assertNotNull(eJaguar.node.get().getFirstActivation(doc));
+        Assert.assertNotNull(ePuma.node.get().getFirstActivation(doc));
 
-        Assert.assertEquals(0, eJaguar.node.getFirstActivation(doc).key.o.primId);
-        Assert.assertEquals(3, ePuma.node.getFirstActivation(doc).key.o.primId);
+        Assert.assertEquals(0, eJaguar.node.get().getFirstActivation(doc).key.o.primId);
+        Assert.assertEquals(3, ePuma.node.get().getFirstActivation(doc).key.o.primId);
 
-        Assert.assertEquals(doc.bottom, eJaguar.node.getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
-        Assert.assertEquals(doc.bottom, ePuma.node.getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
+        Assert.assertEquals(doc.bottom, eJaguar.node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
+        Assert.assertEquals(doc.bottom, ePuma.node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
 
-        Assert.assertEquals(1, eJaguar.node.getFirstActivation(doc).key.o.orInterprNodes.size());
-        Assert.assertEquals(1, ePuma.node.getFirstActivation(doc).key.o.orInterprNodes.size());
+        Assert.assertEquals(1, eJaguar.node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
+        Assert.assertEquals(1, ePuma.node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
     }
 
 

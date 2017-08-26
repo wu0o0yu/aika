@@ -18,6 +18,7 @@ package org.aika.neuron;
 
 
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.Utils;
 import org.aika.Writable;
 import org.aika.corpus.Document;
@@ -92,13 +93,10 @@ public class Synapse implements Writable {
         }
     };
 
-    public Neuron input;
-    public Neuron output;
-    public int inputId;
-    public int outputId;
+    public Provider<? extends Neuron> input;
+    public Provider<? extends Neuron> output;
 
-    public InputNode inputNode;
-    public int inputNodeId;
+    public Provider<InputNode> inputNode;
 
     public Key key;
 
@@ -116,8 +114,7 @@ public class Synapse implements Writable {
 
     public Synapse(Neuron input) {
         if(input != null) {
-            this.input = input;
-            this.inputId = input.id;
+            this.input = input.provider;
         }
     }
 
@@ -131,20 +128,23 @@ public class Synapse implements Writable {
 
 
     public void link(int threadId) {
-        boolean dir = input.id < output.id;
+        Neuron in = input.get();
+        Neuron out = output.get();
 
-        (dir ? input : output).lock.acquireWriteLock(threadId);
-        (dir ? output : input).lock.acquireWriteLock(threadId);
+        boolean dir = in.provider.id < out.provider.id;
 
-        input.outputSynapses.put(this, this);
-        output.inputSynapses.put(this, this);
-        output.inputSynapsesByWeight.add(this);
+        (dir ? in : out).lock.acquireWriteLock(threadId);
+        (dir ? out : in).lock.acquireWriteLock(threadId);
 
-        (dir ? input : output).lock.releaseWriteLock();
-        (dir ? output : input).lock.releaseWriteLock();
+        in.outputSynapses.put(this, this);
+        out.inputSynapses.put(this, this);
+        out.inputSynapsesByWeight.add(this);
 
-        if(output.m != null) {
-            output.m.stat.synapses++;
+        (dir ? in : out).lock.releaseWriteLock();
+        (dir ? out : in).lock.releaseWriteLock();
+
+        if(out.m != null) {
+            out.m.stat.synapses++;
         }
     }
 
@@ -179,12 +179,9 @@ public class Synapse implements Writable {
 
     @Override
     public boolean readFields(DataInput in, Model m) throws IOException {
-        inputId = in.readInt();
-        input = m.neurons.get(inputId);
-        outputId = in.readInt();
-        output = m.neurons.get(outputId);
-        inputNodeId = in.readInt();
-        inputNode = (InputNode) m.initialNodes.get(inputNodeId);
+        input = m.lookupNeuronProvider(input.id);
+        output = m.lookupNeuronProvider(output.id);
+        inputNode = (Provider<InputNode>) m.lookupNodeProvider(inputNode.id);
 
         key = lookupKey(Key.read(in, m));
 

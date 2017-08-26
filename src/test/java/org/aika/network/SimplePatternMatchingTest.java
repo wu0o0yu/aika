@@ -23,6 +23,7 @@ import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
+import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
@@ -54,8 +55,8 @@ public class SimplePatternMatchingTest {
         // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
         // of the inputs relative to each other. The following flag specifies whether this relativeRid
         // is relative or absolute.
-        Neuron pattern = m.createAndNeuron(
-                new Neuron("BCD"),
+        Neuron pattern = m.initAndNeuron(
+                m.createNeuron("BCD"),
                 0.4,
                 new Input()
                         .setNeuron(inputNeurons.get('b'))
@@ -102,11 +103,12 @@ public class SimplePatternMatchingTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.node.getThreadState(doc.threadId, true).activations.size());
+        Assert.assertEquals(1, pattern.node.get().getThreadState(doc.threadId, true).activations.size());
 
 
         System.out.println("Output activation:");
-        for(Activation act: pattern.node.getActivations(doc)) {
+        Node<?> n = pattern.node.get();
+        for(Activation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
             System.out.println("Node: " + act.key.n);
@@ -138,7 +140,7 @@ public class SimplePatternMatchingTest {
 
         InputNeuron startSignal = m.createOrLookupInputNeuron("START-SIGNAL");
 
-        Neuron ctNeuron = m.createCounterNeuron(new Neuron("CTN"),
+        Neuron ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"),
                 inSpace, false,
                 startSignal, true,
                 false
@@ -147,8 +149,8 @@ public class SimplePatternMatchingTest {
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
             InputNeuron in = m.createOrLookupInputNeuron(c + "");
-            Neuron rn = m.createRelationalNeuron(
-                    new Neuron(c + "-RN"),
+            Neuron rn = m.initRelationalNeuron(
+                    m.createNeuron(c + "-RN"),
                     ctNeuron,
                     in, false
             );
@@ -161,8 +163,8 @@ public class SimplePatternMatchingTest {
         // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
         // of the inputs relative to each other. The following flag specifies whether this relativeRid
         // is relative or absolute.
-        Neuron pattern = m.createAndNeuron(
-                new Neuron("BCD"),
+        Neuron pattern = m.initAndNeuron(
+                m.createNeuron("BCD"),
                 0.4,
                 new Input()
                         .setNeuron(relNeurons.get('b'))
@@ -216,11 +218,12 @@ public class SimplePatternMatchingTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.node.getThreadState(doc.threadId, true).activations.size());
+        Assert.assertEquals(1, pattern.node.get().getThreadState(doc.threadId, true).activations.size());
 
 
         System.out.println("Output activation:");
-        for(Activation act: pattern.node.getActivations(doc)) {
+        Node<?> n = pattern.node.get();
+        for(Activation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
             System.out.println("Node: " + act.key.n);

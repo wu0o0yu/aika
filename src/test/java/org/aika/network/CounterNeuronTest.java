@@ -47,7 +47,7 @@ public class CounterNeuronTest {
         InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
         InputNeuron sn = m.createOrLookupInputNeuron("START");
 
-        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
+        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
@@ -64,29 +64,29 @@ public class CounterNeuronTest {
 
         System.out.println(doc.networkStateToString(true, false, false, true));
 
-        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 10), null));
-        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 25), null));
-        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(10, 25), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 10), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 25), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 1, new Range(10, 25), null));
 
         cn.addInput(doc, 4, 5, o0);
         System.out.println(doc.networkStateToString(true, false, false, true));
 
-        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 5), null));
-        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(5, 10), null));
-        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(5, 25), null));
-        Assert.assertNotNull(getAct(doc, ctn.node, 2, new Range(10, 25), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 5), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 1, new Range(5, 10), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 1, new Range(5, 25), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 2, new Range(10, 25), null));
 
         cn.removeInput(doc, 4, 5, o0);
         System.out.println(doc.networkStateToString(true, false, false, true));
 
-        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 10), null));
-        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 25), null));
-        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(10, 25), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 10), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 25), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 1, new Range(10, 25), null));
 
         cn.removeInput(doc, 24, 25, o01);
         System.out.println(doc.networkStateToString(true, false, false, true));
 
-        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 10), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 10), null));
 
         System.out.println();
     }
@@ -98,7 +98,7 @@ public class CounterNeuronTest {
 
         InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
         InputNeuron sn = m.createOrLookupInputNeuron("START");
-        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
+        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
@@ -120,14 +120,14 @@ public class CounterNeuronTest {
 
         System.out.println(doc.networkStateToString(true, false, false, true));
 
-        Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(0, 6), null));
-        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(6, 21), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 6), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 1, new Range(6, 21), null));
 
-        Assert.assertNotNull(getAct(doc, ctn.node, 1, new Range(6, 11), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 1, new Range(6, 11), null));
 
-        Assert.assertNotNull(getAct(doc, ctn.node, 2, new Range(11, 16), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 2, new Range(11, 16), null));
 
-        Assert.assertNotNull(getAct(doc, ctn.node, 2, new Range(16, 21), null));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 2, new Range(16, 21), null));
 
         System.out.println();
     }
@@ -140,7 +140,7 @@ public class CounterNeuronTest {
 
         InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
         InputNeuron sn = m.createOrLookupInputNeuron("START");
-        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, false, true);
+        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, false, true);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
@@ -157,8 +157,8 @@ public class CounterNeuronTest {
 
         System.out.println(doc.networkStateToString(true, false, false, true));
 
-        Assert.assertNotNull(getAct(doc, ctn.node, 2, new Range(5, 15), o012));
-        Assert.assertNotNull(getAct(doc, ctn.node, 3, new Range(0, 5), o012));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 2, new Range(5, 15), o012));
+        Assert.assertNotNull(getAct(doc, ctn.node.get(), 3, new Range(0, 5), o012));
 
         System.out.println();
     }
@@ -170,7 +170,7 @@ public class CounterNeuronTest {
 
         InputNeuron sn = m.createOrLookupInputNeuron("START");
         InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
-        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
+        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
@@ -183,7 +183,7 @@ public class CounterNeuronTest {
 
         System.out.println(doc.networkStateToString(true, true, false, true));
 
-        Assert.assertEquals(5, ctn.node.getActivations(doc).size());
+        Assert.assertEquals(5, ctn.node.get().getActivations(doc).size());
     }
 
 

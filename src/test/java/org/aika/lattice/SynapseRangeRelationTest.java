@@ -47,13 +47,13 @@ public class SynapseRangeRelationTest {
         Model m = new Model();
         Document doc = m.createDocument("                        ", 0);
 
-        Neuron in = new Neuron();
-        in.node = new OrNode(doc.m, doc.threadId);
-        in.node.neuron = in;
+        Neuron in = m.createNeuron();
+        in.node = new OrNode(doc.m).provider;
+        in.node.get().neuron = in.provider;
 
-        Neuron on = new Neuron();
-        on.node = new OrNode(doc.m, doc.threadId);
-        on.node.neuron = on;
+        Neuron on = m.createNeuron();
+        on.node = new OrNode(doc.m).provider;
+        on.node.get().neuron = on.provider;
 
         Synapse s = new Synapse(in,
                 new Synapse.Key(
@@ -69,13 +69,13 @@ public class SynapseRangeRelationTest {
                         true
                 )
         );
-        s.output = on;
+        s.output = on.provider;
         s.link(doc.threadId);
 
-        Activation iAct0 = in.node.addActivationInternal(doc, new Key(in.node, new Range(1, 4), null, doc.bottom), Collections.emptyList(), false);
-        Activation iAct1 = in.node.addActivationInternal(doc, new Key(in.node, new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
-        Activation iAct2 = in.node.addActivationInternal(doc, new Key(in.node, new Range(10, 18), null, doc.bottom), Collections.emptyList(), false);
-        Activation oAct = on.node.addActivationInternal(doc, new Key(on.node, new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct0 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(1, 4), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct1 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct2 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(10, 18), null, doc.bottom), Collections.emptyList(), false);
+        Activation oAct = on.node.get().addActivationInternal(doc, new Key(on.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
 
         boolean f = false;
         for(SynapseActivation sa: oAct.neuronInputs) {

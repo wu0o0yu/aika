@@ -39,8 +39,8 @@ public class RelationalNeuronTest {
         InputNeuron in = m.createOrLookupInputNeuron("INPUT");
         InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
         InputNeuron sn = m.createOrLookupInputNeuron("START");
-        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), cn, false, sn, true, false);
-        Neuron on = m.createRelationalNeuron(new Neuron("ON"), ctn, in, false);
+        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
+        Neuron on = m.initRelationalNeuron(m.createNeuron("ON"), ctn, in, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
@@ -59,7 +59,7 @@ public class RelationalNeuronTest {
         System.out.println(doc.networkStateToString(true, false, false, true));
 
 
-        Assert.assertNotNull(getAct(doc, on.node, 1, new Range(5, 20), null));
+        Assert.assertNotNull(getAct(doc, on.node.get(), 1, new Range(5, 20), null));
 
         cn.addInput(doc, 9, 10, o012);
 

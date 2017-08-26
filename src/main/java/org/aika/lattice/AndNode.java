@@ -20,6 +20,7 @@ package org.aika.lattice;
 import org.aika.Activation;
 import org.aika.Activation.Key;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.Utils;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
@@ -44,13 +45,13 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-public class AndNode extends Node {
+public class AndNode extends Node<AndNode> {
 
     private static double SIGNIFICANCE_THRESHOLD = 0.98;
     public static int MAX_POS_NODES = 4;
     public static int MAX_RID_RANGE = 5;
 
-    SortedMap<Refinement, Node> parents = new TreeMap<>();
+    SortedMap<Refinement, Provider<? extends Node>> parents = new TreeMap<>();
 
 
     public volatile int numberOfPositionsNotify;
@@ -62,8 +63,8 @@ public class AndNode extends Node {
     public AndNode() {}
 
 
-    public AndNode(Model m, int threadId, int level, SortedMap<Refinement, Node> parents) {
-        super(m, threadId, level);
+    public AndNode(Model m, int level, SortedMap<Refinement, Provider<? extends Node>> parents) {
+        super(m, level);
         this.parents = parents;
 
         m.stat.nodes++;
@@ -71,9 +72,9 @@ public class AndNode extends Node {
 
         ridRequired = false;
 
-        for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
+        for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
             Refinement ref = me.getKey();
-            Node pn = me.getValue();
+            Node pn = me.getValue().get();
 
             pn.addAndChild(ref, this);
 
@@ -85,7 +86,7 @@ public class AndNode extends Node {
 
 
     @Override
-    boolean isAllowedOption(int threadId, InterprNode n, Activation act, long v) {
+    public boolean isAllowedOption(int threadId, InterprNode n, Activation act, long v) {
         ThreadState th = getThreadState(threadId, true);
         if(th.visitedAllowedOption == v) return false;
         th.visitedAllowedOption = v;
@@ -152,9 +153,9 @@ public class AndNode extends Node {
         double n = (double) (m.numberOfPositions - nOffset) / avgSize;
 
         double nullHyp = 0.0;
-        for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
-            Node pn = me.getValue();
-            InputNode in = me.getKey().input;
+        for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
+            Node pn = me.getValue().get();
+            InputNode in = me.getKey().input.get();
             double inputNA = (double) (m.numberOfPositions - in.nOffset) / avgSize;
             double inputNB = (double) (m.numberOfPositions - pn.nOffset) / avgSize;
 
@@ -183,9 +184,9 @@ public class AndNode extends Node {
         double avgSize = sizeSum / instanceSum;
         double n = (double) (m.numberOfPositions - nOffset) / avgSize;
 
-        doc.m.numberOfPositionsQueue.remove(this);
+        doc.m.numberOfPositionsQueue.remove(provider);
         numberOfPositionsNotify = computeNotify(n) + m.numberOfPositions;
-        doc.m.numberOfPositionsQueue.add(this);
+        doc.m.numberOfPositionsQueue.add(provider);
 
         BinomialDistribution binDist = new BinomialDistribution(null, (int)Math.round(n), nullHypFreq / n);
 
@@ -210,8 +211,8 @@ public class AndNode extends Node {
         if(!isRemoved && !isFrequent() && !isRequired()) {
             remove(m, threadId);
 
-            for(Node p: parents.values()) {
-                p.cleanup(m, threadId);
+            for(Provider<? extends Node> p: parents.values()) {
+                p.get().cleanup(m, threadId);
             }
         }
     }
@@ -226,7 +227,7 @@ public class AndNode extends Node {
         }
 
         for(Activation pAct: act.inputs.values()) {
-            Node pn = pAct.key.n;
+            Node<?> pn = pAct.key.n;
             pn.lock.acquireReadLock();
             Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n, act.key.rid, pAct.key.rid));
             if(ref != null) {
@@ -258,7 +259,7 @@ public class AndNode extends Node {
         if(!isExpandable(true)) return;
 
         for(Activation pAct: act.inputs.values()) {
-            Node pn = pAct.key.n;
+            Node<?> pn = pAct.key.n;
             pn.lock.acquireReadLock();
             Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n, act.key.rid, pAct.key.rid));
             for(Activation secondAct: pAct.outputs.values()) {
@@ -290,14 +291,14 @@ public class AndNode extends Node {
 
         int numPosNodes = 0;
         for(Refinement ref: parents.keySet()) {
-            if(!ref.input.key.isNeg) numPosNodes++;
+            if(!ref.input.get().key.isNeg) numPosNodes++;
         }
 
         return numPosNodes < MAX_POS_NODES;
     }
 
 
-    private static boolean checkRidRange(SortedMap<Refinement, Node> parents) {
+    private static boolean checkRidRange(SortedMap<Refinement, Provider<? extends Node>> parents) {
         int maxRid = 0;
         for(Refinement ref: parents.keySet()) {
             if(ref.rid != null) {
@@ -315,7 +316,7 @@ public class AndNode extends Node {
         }
 
         if(n instanceof InputNode) {
-            if(n == ref.input && ref.rid == 0) return null;
+            if(n == ref.input.get() && ref.rid == 0) return null;
         } else {
             AndNode an = (AndNode) n;
 
@@ -338,22 +339,22 @@ public class AndNode extends Node {
             }
         }
 
-        SortedMap<Refinement, Node> parents = computeNextLevelParents(m, threadId, n, ref, discoverPatterns);
+        SortedMap<Refinement, Provider<? extends Node>> parents = computeNextLevelParents(m, threadId, n, ref, discoverPatterns);
 
         if (parents != null && (!discoverPatterns || checkRidRange(parents))) {
             // Locking needs to take place in a predefined order.
-            TreeSet<Node> parentsForLocking = new TreeSet<>(parents.values());
-            for(Node pn: parentsForLocking) {
-                pn.lock.acquireWriteLock(threadId);
+            TreeSet<? extends Provider<? extends Node>> parentsForLocking = new TreeSet(parents.values());
+            for(Provider<? extends Node> pn: parentsForLocking) {
+                pn.get().lock.acquireWriteLock(threadId);
             }
 
             if(n.andChildren == null || !n.andChildren.containsKey(ref)) {
-                nln = new AndNode(m, threadId, n.level + 1, parents);
-                nln.isBlocked = n.isBlocked || ref.input.isBlocked;
+                nln = new AndNode(m, n.level + 1, parents);
+                nln.isBlocked = n.isBlocked || ref.input.get().isBlocked;
             }
 
-            for(Node pn: parentsForLocking) {
-                pn.lock.releaseWriteLock();
+            for(Provider<? extends Node> pn: parentsForLocking) {
+                pn.get().lock.releaseWriteLock();
             }
         }
         return nln;
@@ -387,16 +388,16 @@ public class AndNode extends Node {
     }
 
 
-    public static SortedMap<Refinement, Node> computeNextLevelParents(Model m, int threadId, Node pa, Refinement ref, boolean discoverPatterns) {
+    public static SortedMap<Refinement, Provider<? extends Node>> computeNextLevelParents(Model m, int threadId, Node pa, Refinement ref, boolean discoverPatterns) {
         Collection<Refinement> refinements = pa.collectNodeAndRefinements(ref);
 
         long v = visitedCounter++;
-        SortedMap<Refinement, Node> parents = new TreeMap<>();
+        SortedMap<Refinement, Provider<? extends Node>> parents = new TreeMap<>();
 
         for(Refinement pRef: refinements) {
             SortedSet<Refinement> childInputs = new TreeSet<>(refinements);
             childInputs.remove(pRef);
-            if(!pRef.input.computeAndParents(m, threadId, pRef.getRelativePosition(), childInputs, parents, discoverPatterns, v)) {
+            if(!pRef.input.get().computeAndParents(m, threadId, pRef.getRelativePosition(), childInputs, parents, discoverPatterns, v)) {
                 return null;
             }
         }
@@ -436,16 +437,16 @@ public class AndNode extends Node {
         th.visitedNeuronRefsChange = v;
         numberOfNeuronRefs += d;
 
-        for(Node n: parents.values()) {
-            n.changeNumberOfNeuronRefs(threadId, v, d);
+        for(Provider<? extends Node> n: parents.values()) {
+            n.get().changeNumberOfNeuronRefs(threadId, v, d);
         }
     }
 
 
     @Override
     public boolean isCovered(int threadId, Integer offset, long v) {
-        for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
-            RidVisited nv = me.getValue().getThreadState(threadId, true).lookupVisited(Utils.nullSafeSub(offset, true, me.getKey().getOffset(), false));
+        for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
+            RidVisited nv = me.getValue().get().getThreadState(threadId, true).lookupVisited(Utils.nullSafeSub(offset, true, me.getKey().getOffset(), false));
             if(nv.outputNode == v) return true;
         }
         return false;
@@ -477,8 +478,8 @@ public class AndNode extends Node {
     void remove(Model m, int threadId) {
         super.remove(m, threadId);
 
-        for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
-            Node pn = me.getValue();
+        for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
+            Node pn = me.getValue().get();
             pn.lock.acquireWriteLock(threadId);
             pn.removeAndChild(me.getKey());
             pn.lock.releaseWriteLock();
@@ -513,29 +514,6 @@ public class AndNode extends Node {
     }
 
 
-    public void suspend(Model m) {
-        super.suspend(m);
-
-        for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
-            Refinement ref = me.getKey();
-            Node pn = me.getValue();
-
-            pn.removeAndChild(ref);
-            pn.addSuspendedAndChild(ref, id);
-        }
-    }
-
-
-    protected void reactivateIntern(Model m) {
-        for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
-            Refinement ref = me.getKey();
-            Node pn = me.getValue();
-
-            pn.removeSuspendedAndChild(ref);
-        }
-    }
-
-
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeUTF("A");
@@ -547,7 +525,7 @@ public class AndNode extends Node {
         out.writeDouble(weight);
 
         out.writeInt(parents.size());
-        for(Map.Entry<Refinement, Node> me: parents.entrySet()) {
+        for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
             me.getKey().write(out);
             out.writeInt(me.getValue().id);
         }
@@ -564,20 +542,20 @@ public class AndNode extends Node {
         weight = in.readDouble();
 
         int s = in.readInt();
-        Map<Refinement, Node> tmp = new TreeMap<>();
+        Map<Refinement, Provider<? extends Node>> tmp = new TreeMap<>();
         for(int i = 0; i < s; i++) {
             Refinement ref = Refinement.read(in, m);
-            Node pn = m.initialNodes.get(in.readInt());
+            Provider<? extends Node> pn = m.lookupNodeProvider(in.readInt());
             if(pn == null) {
                 return false;
             }
             tmp.put(ref, pn);
         }
-        for(Map.Entry<Refinement, Node> me: tmp.entrySet()) {
+        for(Map.Entry<Refinement, Provider<? extends Node>> me: tmp.entrySet()) {
             Refinement ref = me.getKey();
-            Node pn = me.getValue();
+            Provider<? extends Node> pn = me.getValue();
             parents.put(ref, pn);
-            pn.addAndChild(ref, this);
+            pn.get().addAndChild(ref, this);
         }
         return true;
     }
@@ -591,16 +569,16 @@ public class AndNode extends Node {
         public static Refinement MAX = new Refinement(null, null);
 
         public Integer rid;
-        public InputNode input;
+        public Provider<InputNode> input;
 
         private Refinement() {}
 
-        public Refinement(Integer rid, InputNode input) {
+        public Refinement(Integer rid, Provider<InputNode> input) {
             this.rid = rid;
             this.input = input;
         }
 
-        public Refinement(Integer rid, Integer offset, InputNode input) {
+        public Refinement(Integer rid, Integer offset, Provider<InputNode> input) {
             if(offset == null && rid != null) this.rid = 0;
             else if(offset == null || rid == null) this.rid = null;
             else this.rid = rid - offset;
@@ -619,15 +597,16 @@ public class AndNode extends Node {
 
 
         public Synapse getSynapse(Integer offset, Neuron n) {
-            input.lock.acquireReadLock();
-            Synapse s = input.synapses != null ? input.synapses.get(new SynapseKey(Utils.nullSafeAdd(getRelativePosition(), false, offset, false), n)) : null;
-            input.lock.releaseReadLock();
+            InputNode in = input.get();
+            in.lock.acquireReadLock();
+            Synapse s = in.synapses != null ? in.synapses.get(new SynapseKey(Utils.nullSafeAdd(getRelativePosition(), false, offset, false), n)) : null;
+            in.lock.releaseReadLock();
             return s;
         }
 
 
         public String toString() {
-            return "(" + (rid != null ? rid + ":" : "") + input.logicToString() + ")";
+            return "(" + (rid != null ? rid + ":" : "") + input.get().logicToString() + ")";
         }
 
 
@@ -642,7 +621,7 @@ public class AndNode extends Node {
             if(in.readBoolean()) {
                 rid = in.readInt();
             }
-            input = (InputNode) m.initialNodes.get(in.readInt());
+            input = (Provider<InputNode>) m.lookupNodeProvider(in.readInt());
             return true;
         }
 

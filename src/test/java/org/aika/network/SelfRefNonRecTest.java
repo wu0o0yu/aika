@@ -39,15 +39,15 @@ public class SelfRefNonRecTest {
 
         InputNeuron inA = m.createOrLookupInputNeuron("A");
 
-        Neuron bN = new Neuron("B");
-        Neuron cN = m.createOrNeuron(new Neuron("C"),
+        Neuron bN = m.createNeuron("B");
+        Neuron cN = m.initOrNeuron(m.createNeuron("C"),
                 new Input()
                         .setNeuron(bN)
                         .setWeight(5.0)
                         .setMaxLowerWeightsSum(0.0)
         );
 
-        m.createOrNeuron(bN,
+        m.initOrNeuron(bN,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(5.0)
@@ -68,6 +68,6 @@ public class SelfRefNonRecTest {
 
         System.out.println(t.networkStateToString(true, false, false, true));
 
-        Assert.assertEquals(1, bN.node.getFirstActivation(t).key.o.orInterprNodes.size());
+        Assert.assertEquals(1, bN.node.get().getFirstActivation(t).key.o.orInterprNodes.size());
     }
 }

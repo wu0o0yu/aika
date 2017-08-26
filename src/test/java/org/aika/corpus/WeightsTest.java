@@ -50,14 +50,14 @@ public class WeightsTest {
         Model m = new Model();
         AndNode.minFrequency = 5;
 
-        Neuron pSuppr = new Neuron("SUPPR");
+        Neuron pSuppr = m.createNeuron("SUPPR");
 
         inAA = m.createOrLookupInputNeuron("AA");
         inBA = m.createOrLookupInputNeuron("BA");
         inCA = m.createOrLookupInputNeuron("CA");
 
-        Neuron pOrA = new Neuron("pOrA");
-        m.createOrNeuron(pOrA,
+        Neuron pOrA = m.createNeuron("pOrA");
+        m.initOrNeuron(pOrA,
                 new Input()
                         .setNeuron(inAA)
                         .setWeight(3.0)
@@ -74,9 +74,9 @@ public class WeightsTest {
                         .setRangeOutput(true)
         );
 
-        pDA = new Neuron("DA");
+        pDA = m.createNeuron("DA");
 
-        m.createAndNeuron(pDA,
+        m.initAndNeuron(pDA,
                 0.001,
                 new Input()
                         .setNeuron(pOrA)
@@ -106,8 +106,8 @@ public class WeightsTest {
         inBB = m.createOrLookupInputNeuron("BB");
         inCB = m.createOrLookupInputNeuron("CB");
 
-        Neuron pOrB = new Neuron("pOrB");
-        m.createOrNeuron(pOrB,
+        Neuron pOrB = m.createNeuron("pOrB");
+        m.initOrNeuron(pOrB,
                 new Input()
                         .setNeuron(inAB)
                         .setWeight(2.0)
@@ -124,8 +124,8 @@ public class WeightsTest {
                         .setRangeOutput(true)
         );
 
-        pDB = new Neuron("DB");
-        m.createAndNeuron(pDB,
+        pDB = m.createNeuron("DB");
+        m.initAndNeuron(pDB,
                 0.001,
                 new Input()
                         .setNeuron(pOrB)
@@ -150,7 +150,7 @@ public class WeightsTest {
         );
 
 
-        m.createOrNeuron(pSuppr,
+        m.initOrNeuron(pSuppr,
                 new Input()
                         .setNeuron(pDA)
                         .setWeight(1.0)

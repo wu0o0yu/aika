@@ -360,7 +360,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public static final class Key implements Comparable<Key> {
-        public final Node n;
+        public final Node<?> n;
         public final Range r;
         public final Integer rid;
         public final InterprNode o;
@@ -407,7 +407,7 @@ public class Activation implements Comparable<Activation> {
 
 
         public String toString() {
-            return (n != null ? n.id + (n.neuron != null && n.neuron.label != null ? ":" + n.neuron.label : "") + " " : "") + r + " " + rid + " " + o;
+            return (n != null ? n.id + (n.neuron != null && n.neuron.get() != null ? ":" + n.neuron.get().label : "") + " " : "") + r + " " + rid + " " + o;
         }
     }
 

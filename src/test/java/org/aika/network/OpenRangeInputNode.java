@@ -32,7 +32,7 @@ public class OpenRangeInputNode {
         m = new Model();
 
         in = m.createOrLookupInputNeuron("IN");
-        m.createOrNeuron(new Neuron("OUT"),
+        m.initOrNeuron(m.createNeuron("OUT"),
                 new Input()
                         .setNeuron(in)
                         .setWeight(10.0)

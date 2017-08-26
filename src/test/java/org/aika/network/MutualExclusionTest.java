@@ -23,6 +23,7 @@ import org.aika.Model;
 import org.aika.corpus.Conflicts.Conflict;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
+import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
@@ -65,11 +66,11 @@ public class MutualExclusionTest {
         InputNeuron inC = m.createOrLookupInputNeuron("IN-C");
 
         // Instantiate the suppressing neuron. Its inputs will be added later on.
-        Neuron pSuppr = new Neuron("SUPPRESS");
+        Neuron pSuppr = m.createNeuron("SUPPRESS");
 
         // Create three neurons that might be suppressed by the suppressing neuron.
-        Neuron pA = m.createAndNeuron(
-                new Neuron("A"),
+        Neuron pA = m.initAndNeuron(
+                m.createNeuron("A"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -84,8 +85,8 @@ public class MutualExclusionTest {
                         .setMinInput(1.0)     // This input is negated
         );
 
-        Neuron pB = m.createAndNeuron(
-                new Neuron("B"),
+        Neuron pB = m.initAndNeuron(
+                m.createNeuron("B"),
                 0.001,
                 new Input()
                         .setNeuron(inB)
@@ -100,8 +101,8 @@ public class MutualExclusionTest {
                         .setMinInput(1.0)
         );
 
-        Neuron pC = m.createAndNeuron(
-                new Neuron("C"),
+        Neuron pC = m.initAndNeuron(
+                m.createNeuron("C"),
                 0.001,
                 new Input()
                         .setNeuron(inC)
@@ -117,7 +118,7 @@ public class MutualExclusionTest {
         );
 
         // Finally addInput all the inputs to the suppressing neuron.
-        m.createOrNeuron(
+        m.initOrNeuron(
                 pSuppr,
                 new Input()
                         .setNeuron(pA)
@@ -136,7 +137,7 @@ public class MutualExclusionTest {
                         .setMinInput(1.0)
         );
 
-        Neuron outN = m.createOrNeuron(new Neuron("OUT"),
+        Neuron outN = m.initOrNeuron(m.createNeuron("OUT"),
                 new Input()
                         .setNeuron(pB)
                         .setWeight(1.0)
@@ -169,7 +170,8 @@ public class MutualExclusionTest {
         System.out.println();
 
         System.out.println("Output activation:");
-        for(Activation act: outN.node.getActivations(doc)) {
+        Node<?> n = outN.node.get();
+        for(Activation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
             System.out.println("Node: " + act.key.n);

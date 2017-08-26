@@ -55,15 +55,15 @@ public class RecurrentPatternTest {
             chars.put(c, charSN);
         }
 
-        Neuron ctNeuron = m.createCounterNeuron(new Neuron("CTN"), spaceN, false, startSignal, true, false);
+        Neuron ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"), spaceN, false, startSignal, true, false);
 
         TreeMap<Character, Neuron> recChars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
             InputNeuron charSN = chars.get(c);
-            recChars.put(c, m.createRelationalNeuron(new Neuron("RN-" + c), ctNeuron, charSN, false));
+            recChars.put(c, m.initRelationalNeuron(m.createNeuron("RN-" + c), ctNeuron, charSN, false));
         }
 
-        Neuron patternN = m.createAndNeuron(new Neuron("PATTERN"),
+        Neuron patternN = m.initAndNeuron(m.createNeuron("PATTERN"),
                 0.001,
                 new Input()
                         .setNeuron(recChars.get('C'))
@@ -125,7 +125,7 @@ public class RecurrentPatternTest {
         System.out.println(doc.networkStateToString(true, true, false, true));
         System.out.println();
 
-        Activation patAct = patternN.node.getFirstActivation(doc);
+        Activation patAct = patternN.node.get().getFirstActivation(doc);
         Assert.assertEquals(4, patAct.key.r.begin.intValue());
         Assert.assertEquals(10, patAct.key.r.end.intValue());
 
@@ -150,17 +150,17 @@ public class RecurrentPatternTest {
             chars.put(c, charSN);
         }
 
-        Neuron ctNeuron = new Neuron("CTN");
+        Neuron ctNeuron = m.createNeuron("CTN");
 
-        m.createCounterNeuron(ctNeuron, spaceN, false, startSignal, true, false);
+        m.initCounterNeuron(ctNeuron, spaceN, false, startSignal, true, false);
 
         TreeMap<Character, Neuron> recChars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
             InputNeuron charSN = chars.get(c);
-            recChars.put(c, m.createRelationalNeuron(new Neuron("RN-" + c), ctNeuron, charSN, false));
+            recChars.put(c, m.initRelationalNeuron(m.createNeuron("RN-" + c), ctNeuron, charSN, false));
         }
 
-        Neuron patternN = m.createAndNeuron(new Neuron("PATTERN"),
+        Neuron patternN = m.initAndNeuron(m.createNeuron("PATTERN"),
                 0.001,
                 new Input()
                         .setNeuron(recChars.get('C'))
@@ -219,7 +219,7 @@ public class RecurrentPatternTest {
         System.out.println(doc.networkStateToString(true, true, false, true));
         System.out.println();
 
-        Activation patAct = patternN.node.getFirstActivation(doc);
+        Activation patAct = patternN.node.get().getFirstActivation(doc);
         Assert.assertEquals(4, patAct.key.r.begin.intValue());
         Assert.assertEquals(10, patAct.key.r.end.intValue());
 
@@ -236,14 +236,14 @@ public class RecurrentPatternTest {
         InputNeuron clock = m.createOrLookupInputNeuron("CLOCK");
         InputNeuron input = m.createOrLookupInputNeuron("INPUT");
 
-        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), clock, false, start, true, false);
-        Neuron rn = m.createRelationalNeuron(new Neuron("RN"), ctn, input, false);
+        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), clock, false, start, true, false);
+        Neuron rn = m.initRelationalNeuron(m.createNeuron("RN"), ctn, input, false);
 
         InputNeuron aN = m.createOrLookupInputNeuron("A");
         InputNeuron bN = m.createOrLookupInputNeuron("B");
         InputNeuron cN = m.createOrLookupInputNeuron("C");
 
-        Neuron result = m.createAndNeuron(new Neuron("RESULT"),
+        Neuron result = m.initAndNeuron(m.createNeuron("RESULT"),
                 0.001,
                 new Input()
                         .setNeuron(ctn)
@@ -273,7 +273,7 @@ public class RecurrentPatternTest {
         InputNeuron start = m.createOrLookupInputNeuron("START");
         InputNeuron clock = m.createOrLookupInputNeuron("CLOCK");
 
-        Neuron ctn = m.createCounterNeuron(new Neuron("CTN"), clock, false, start, true, false);
+        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), clock, false, start, true, false);
 
 
         Document doc = m.createDocument("                                                  ", 0);
@@ -288,6 +288,6 @@ public class RecurrentPatternTest {
 
         System.out.println(doc.networkStateToString(true, false, false, true));
 
-        Assert.assertEquals(2, Activation.get(doc, ctn.node, 2, new Range(10, 15), EQUALS, EQUALS, null, null).key.o.primId);
+        Assert.assertEquals(2, Activation.get(doc, ctn.node.get(), 2, new Range(10, 15), EQUALS, EQUALS, null, null).key.o.primId);
     }
 }

@@ -42,7 +42,7 @@ public class CountingTest {
         AndNode.minFrequency = 0;
 
         InputNeuron inA = m.createOrLookupInputNeuron("inA");
-        Neuron outA = m.createAndNeuron(new Neuron("nA"), 0.5,
+        Neuron outA = m.initAndNeuron(m.createNeuron("nA"), 0.5,
                 new Input()
                         .setMinInput(0.95)
                         .setWeight(100.0)
@@ -67,6 +67,6 @@ public class CountingTest {
 
         doc.process();
         doc.train();
-        Assert.assertEquals(6.0, ((OrNode)outA.node).parents.get(Integer.MIN_VALUE).first().frequency, 0.001);
+        Assert.assertEquals(6.0, ((OrNode)outA.node.get()).parents.get(Integer.MIN_VALUE).first().frequency, 0.001);
     }
 }

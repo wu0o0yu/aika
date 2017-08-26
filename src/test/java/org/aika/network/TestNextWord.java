@@ -19,7 +19,7 @@ public class TestNextWord {
         InputNeuron inA = m.createOrLookupInputNeuron("A");
         InputNeuron inB = m.createOrLookupInputNeuron("B");
 
-        Neuron abN = m.createAndNeuron(new Neuron("AB"), 0.5,
+        Neuron abN = m.initAndNeuron(m.createNeuron("AB"), 0.5,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(10.0)

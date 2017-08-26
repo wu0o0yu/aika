@@ -50,7 +50,7 @@ public class RecurrentIdTest {
         InputNeuron inB = m.createOrLookupInputNeuron("B");
 
 
-        Node outCNode = m.createAndNeuron(new Neuron("C", true, true),
+        Node outCNode = m.initAndNeuron(m.createNeuron("C", true, true),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -68,7 +68,7 @@ public class RecurrentIdTest {
                         .setRelativeRid(1)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
-        ).node;
+        ).node.get();
 
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -92,7 +92,7 @@ public class RecurrentIdTest {
         InputNeuron inB = m.createOrLookupInputNeuron("B");
         InputNeuron inC = m.createOrLookupInputNeuron("C");
 
-        Node outDNode = m.createAndNeuron(new Neuron("D", true, true),
+        Node outDNode = m.initAndNeuron(m.createNeuron("D", true, true),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -118,7 +118,7 @@ public class RecurrentIdTest {
                         .setRelativeRid(6)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
-        ).node;
+        ).node.get();
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
@@ -168,9 +168,9 @@ public class RecurrentIdTest {
                 }
             }
 
-            Neuron n = m.createAndNeuron(new Neuron("PATTERN"), 0.5, inputs);
+            Neuron n = m.initAndNeuron(m.createNeuron("PATTERN"), 0.5, inputs);
 
-            System.out.println(n.node.logicToString());
+            System.out.println(n.node.get().logicToString());
 
             Document doc = m.createDocument("abc Hüttenheim cba", 0);
 
@@ -185,7 +185,7 @@ public class RecurrentIdTest {
                 }
             }
 
-            assert n.node.getActivations(doc).size() >= 1;
+            assert n.node.get().getActivations(doc).size() >= 1;
         }
     }
 }

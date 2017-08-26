@@ -88,7 +88,7 @@ public class TestHelper {
 
 
     public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Mapping startMapping, boolean startRangeOutput, Operator endRangeMatch, Mapping endMapping, boolean endRangeOutput) {
-        return InputNode.add(doc.m, doc.threadId, new Synapse.Key(false, false, relativeRid, absoluteRid, startRangeMatch, startMapping, startRangeOutput, endRangeMatch, endMapping, endRangeOutput), n);
+        return InputNode.add(doc.m, new Synapse.Key(false, false, relativeRid, absoluteRid, startRangeMatch, startMapping, startRangeOutput, endRangeMatch, endMapping, endRangeOutput), n);
     }
 
     public static Activation get(Document doc, Node n, Range r, InterprNode o) {
