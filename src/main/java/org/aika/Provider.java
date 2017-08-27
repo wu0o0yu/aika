@@ -82,7 +82,7 @@ public class Provider<T extends Writable> implements Comparable<Provider<?>> {
 
 
     public String toString() {
-        return "p(" + id + ":" + obj != null ? obj.toString() : "SUSPENDED" + ")";
+        return "p(" + id + ":" + (obj != null ? obj.toString() : "SUSPENDED") + ")";
     }
 
 
