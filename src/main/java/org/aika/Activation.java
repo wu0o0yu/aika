@@ -153,7 +153,10 @@ public class Activation implements Comparable<Activation> {
                 key.o.neuronActivations = new TreeSet<>();
             }
             key.o.neuronActivations.add(this);
+
+            key.n.neuron.get().lastUsedDocumentId = doc.id;
         }
+        key.n.lastUsedDocumentId = doc.id;
 
         if(key.rid != null) {
             doc.activationsByRid.put(key, this);

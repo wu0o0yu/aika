@@ -169,6 +169,28 @@ public class Model {
     }
 
 
+    /**
+     * Suspend all neurons and logic nodes whose last used document id is lower/older than {@param docId}.
+     * @param docId
+     */
+    public void suspendUnusedNodes(int docId) {
+        for(Provider<? extends Neuron> p: neuronsInMemory.values()) {
+            if(!p.isSuspended()) {
+                if(p.get().lastUsedDocumentId <= docId) {
+                    p.suspend();
+                }
+            }
+        }
+        for(Provider<? extends Node> p: nodesInMemory.values()) {
+            if(!p.isSuspended()) {
+                if(p.get().lastUsedDocumentId <= docId) {
+                    p.suspend();
+                }
+            }
+        }
+    }
+
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Network Weights:\n");

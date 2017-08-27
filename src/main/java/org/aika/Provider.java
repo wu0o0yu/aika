@@ -12,7 +12,8 @@ public class Provider<T extends Writable> implements Comparable<Provider<?>> {
     public final int id;
     public final Type type;
 
-    public T obj;
+    private T obj;
+
 
     public enum Type {
         NEURON,
@@ -25,6 +26,11 @@ public class Provider<T extends Writable> implements Comparable<Provider<?>> {
         this.id = id;
         this.type = t;
         this.obj = obj;
+    }
+
+
+    public synchronized boolean isSuspended() {
+        return obj == null;
     }
 
 

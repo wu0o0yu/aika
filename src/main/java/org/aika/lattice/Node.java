@@ -112,6 +112,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
 
     public ThreadState[] threads;
 
+    public volatile int lastUsedDocumentId = 0;
 
     /**
      * The {@code ThreadState} is a thread local data structure containing the activations of a single document for

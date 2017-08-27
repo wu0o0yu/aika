@@ -96,13 +96,9 @@ public class SuspensionTest {
                         .setRangeOutput(true)
         ).provider;
 
-        for(Provider np: m.nodesInMemory.values()) {
-            np.suspend();
-        }
+        m.suspendUnusedNodes(10);
 
-        for(Provider np: m.neuronsInMemory.values()) {
-            np.suspend();
-        }
+        Assert.assertTrue(outD.isSuspended());
 
         // Reactivate
 

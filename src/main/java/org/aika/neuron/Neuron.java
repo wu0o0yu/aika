@@ -92,6 +92,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
     public ReadWriteLock lock = new ReadWriteLock();
 
+    public volatile int lastUsedDocumentId = 0;
 
     public Neuron() {
     }
@@ -784,11 +785,11 @@ public class Neuron implements Comparable<Neuron>, Writable {
         while(in.readBoolean()) {
             Synapse syn = Synapse.read(in, m);
 
-            if(syn.input != null && syn.input.obj != null) {
+            if(syn.input != null && !syn.input.isSuspended()) {
                 syn.input.get().outputSynapses.put(syn, syn);
             }
 
-            if(syn.inputNode != null && syn.inputNode.obj != null) {
+            if(syn.inputNode != null && !syn.inputNode.isSuspended()) {
                 syn.inputNode.get().setSynapse(m.defaultThreadId, new InputNode.SynapseKey(syn.key.relativeRid, syn.output), syn);
             }
 
@@ -799,7 +800,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
         while(in.readBoolean()) {
             Synapse synTmp = Synapse.read(in, m);
 
-            if(synTmp.output != null && synTmp.output.obj != null) {
+            if(synTmp.output != null && !synTmp.output.isSuspended()) {
                 Synapse syn = synTmp.output.get().inputSynapses.get(synTmp);
 
                 outputSynapses.put(syn, syn);

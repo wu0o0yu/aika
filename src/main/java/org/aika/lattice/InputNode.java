@@ -501,7 +501,7 @@ public class InputNode extends Node<InputNode> {
             SynapseKey sk = SynapseKey.read(in, m);
             Synapse synTmp = Synapse.read(in, m);
 
-            if(synTmp.output != null && synTmp.output.obj != null) {
+            if(synTmp.output != null && !synTmp.output.isSuspended()) {
                 Synapse syn = synTmp.output.get().inputSynapses.get(synTmp);
 
                 if(synapses == null) {
