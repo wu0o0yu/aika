@@ -80,12 +80,9 @@ public class Neuron implements Comparable<Neuron>, Writable {
     public TreeMap<Synapse, Synapse> inputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
     public TreeSet<Synapse> inputSynapsesByWeight = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
-    public TreeMap<Key, InputNode> outputNodes = new TreeMap<>();
+    public TreeMap<Key, Provider<InputNode>> outputNodes = new TreeMap<>();
 
     public Provider<? extends Node> node;
-
-    public boolean initialized = false;
-    public boolean noSuspension = false;
 
     public boolean isBlocked;
     public boolean noTraining;
@@ -152,8 +149,6 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
         n.publish(threadId);
 
-        n.initialized = true;
-
         return np;
     }
 
@@ -193,8 +188,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
 
     public void propagateRemovedActivation(Document doc, Activation act) {
-        for(InputNode out: outputNodes.values()) {
-            out.removeActivation(doc, act);
+        for(Provider<InputNode> out: outputNodes.values()) {
+            out.get().removeActivation(doc, act);
         }
     }
 
@@ -432,7 +427,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
             double deltaW = x * iiAct.finalState.value;
 
-            SynapseKey sk = new SynapseKey(rid, this);
+            SynapseKey sk = new SynapseKey(rid, provider);
             Synapse s = in.getSynapse(sk);
             if(s == null) {
                 s = new Synapse(
@@ -725,9 +720,9 @@ public class Neuron implements Comparable<Neuron>, Writable {
         out.writeDouble(posRecSum);
 
         out.writeInt(outputNodes.size());
-        for(Map.Entry<Key, InputNode> me: outputNodes.entrySet()) {
+        for(Map.Entry<Key, Provider<InputNode>> me: outputNodes.entrySet()) {
             me.getKey().write(out);
-            me.getValue().write(out);
+            out.writeInt(me.getValue().id);
         }
 
         out.writeBoolean(node != null);
@@ -742,7 +737,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
         out.writeInt(numberOfActivations);
 
         for(Synapse s: inputSynapses.values()) {
-            if(s.input != null && s.input.get().initialized && s.output != null && s.output.get().initialized) {
+            if(s.input != null) {
                 out.writeBoolean(true);
                 s.write(out);
             }
@@ -750,7 +745,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
         out.writeBoolean(false);
 
         for(Synapse s: outputSynapses.values()) {
-            if(s.output != null && s.input.get().initialized && s.output != null && s.output.get().initialized) {
+            if(s.output != null) {
                 out.writeBoolean(true);
                 s.write(out);
             }
@@ -760,7 +755,7 @@ public class Neuron implements Comparable<Neuron>, Writable {
 
 
     @Override
-    public boolean readFields(DataInput in, Model m) throws IOException {
+    public void readFields(DataInput in, Model m) throws IOException {
         label = in.readUTF();
 
         bias = in.readDouble();
@@ -771,9 +766,8 @@ public class Neuron implements Comparable<Neuron>, Writable {
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
             Key k = Key.read(in, m);
-            InputNode n = (InputNode) InputNode.read(in, m);
+            Provider<InputNode> n = m.lookupNodeProvider(in.readInt());
             outputNodes.put(k, n);
-            n.inputNeuron = this;
         }
 
         if(in.readBoolean()) {
@@ -790,9 +784,12 @@ public class Neuron implements Comparable<Neuron>, Writable {
         while(in.readBoolean()) {
             Synapse syn = Synapse.read(in, m);
 
-            if(syn.input != null) {
+            if(syn.input != null && syn.input.obj != null) {
                 syn.input.get().outputSynapses.put(syn, syn);
-                syn.inputNode.get().setSynapse(m.defaultThreadId, new InputNode.SynapseKey(syn.key.relativeRid, syn.output.get()), syn);
+            }
+
+            if(syn.inputNode != null && syn.inputNode.obj != null) {
+                syn.inputNode.get().setSynapse(m.defaultThreadId, new InputNode.SynapseKey(syn.key.relativeRid, syn.output), syn);
             }
 
             inputSynapses.put(syn, syn);
@@ -802,21 +799,19 @@ public class Neuron implements Comparable<Neuron>, Writable {
         while(in.readBoolean()) {
             Synapse synTmp = Synapse.read(in, m);
 
-            if(synTmp.output != null) {
+            if(synTmp.output != null && synTmp.output.obj != null) {
                 Synapse syn = synTmp.output.get().inputSynapses.get(synTmp);
-                syn.inputNode.get().setSynapse(m.defaultThreadId, new InputNode.SynapseKey(syn.key.relativeRid, syn.output.get()), syn);
 
                 outputSynapses.put(syn, syn);
             }
         }
-
-        return true;
     }
 
 
-    public static Neuron read(DataInput in, Model m) throws IOException {
+    public static Neuron read(DataInput in, Provider p) throws IOException {
         Neuron n = in.readBoolean() ? new InputNeuron() : new Neuron();
-        n.readFields(in, m);
+        n.provider = p;
+        n.readFields(in, p.m);
         return n;
     }
 

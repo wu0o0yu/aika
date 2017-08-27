@@ -114,7 +114,7 @@ public class Document implements Comparable<Document> {
             if(r != 0) return r;
             r = act1.key.o.compareTo(act2.key.o);
             if(r != 0) return r;
-            return Integer.compare(act1.key.n.id, act2.key.n.id);
+            return act1.key.n.compareTo(act2.key.n);
         }
     };
 
@@ -425,12 +425,12 @@ public class Document implements Comparable<Document> {
                 }
 
                 if(oldUpperBound <= 0.0 && act.upperBound > 0.0) {
-                    for(InputNode out: n.outputNodes.values()) {
-                        out.addActivation(Document.this, act);
+                    for(Provider<InputNode> out: n.outputNodes.values()) {
+                        out.get().addActivation(Document.this, act);
                     }
                 } else if(oldUpperBound > 0.0 && act.upperBound <= 0.0) {
-                    for(InputNode out: n.outputNodes.values()) {
-                        out.removeActivation(Document.this, act);
+                    for(Provider<InputNode> out: n.outputNodes.values()) {
+                        out.get().removeActivation(Document.this, act);
                     }
                 }
             }

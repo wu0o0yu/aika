@@ -64,17 +64,15 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
     public static int minFrequency = 5;
     public static int MAX_RID = 20;
 
-    public static final Node MIN_NODE = new DummyNode(Integer.MIN_VALUE);
-    public static final Node MAX_NODE = new DummyNode(Integer.MAX_VALUE);
+    public static final Node MIN_NODE = new InputNode();
+    public static final Node MAX_NODE = new InputNode();
 
     private static final Logger log = LoggerFactory.getLogger(Node.class);
 
-    private static AtomicInteger currentNodeId = new AtomicInteger(0);
-    public int id;
     public Provider<T> provider;
 
     TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
-    TreeMap<Refinement, AndNode> andChildren;
+    TreeMap<Refinement, Provider<AndNode>> andChildren;
     TreeSet<OrEntry> orChildren;
 
     public int level;
@@ -230,7 +228,6 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
 
     public Node(Model m, int level) {
         threads = new ThreadState[m.numberOfThreads];
-        id = currentNodeId.addAndGet(1);
         m.createNodeProvider(this);
         this.level = level;
         if(m != null) {
@@ -278,13 +275,11 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
     };
 
 
-    void addOrChild(int threadId, OrEntry oe) {
-        lock.acquireWriteLock(threadId);
+    void addOrChild(OrEntry oe) {
         if(orChildren == null) {
             orChildren = new TreeSet<>();
         }
         orChildren.add(oe);
-        lock.releaseWriteLock();
     }
 
 
@@ -300,13 +295,13 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
     }
 
 
-    void addAndChild(Refinement ref, AndNode child) {
+    void addAndChild(Refinement ref, Provider<AndNode> child) {
         if(andChildren == null) {
             andChildren = new TreeMap<>();
             reverseAndChildren = new TreeMap<>();
         }
 
-        AndNode n = andChildren.put(ref, child);
+        Provider<AndNode> n = andChildren.put(ref, child);
         assert n == null;
         reverseAndChildren.put(new ReverseAndRefinement(child, ref.rid, 0), ref);
     }
@@ -314,8 +309,8 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
 
     void removeAndChild(Refinement ref) {
         if(andChildren != null) {
-            andChildren.remove(ref);
-            reverseAndChildren.remove(new ReverseAndRefinement(this, ref.rid, 0));
+            Provider<AndNode> child = andChildren.remove(ref);
+            reverseAndChildren.remove(new ReverseAndRefinement(child, ref.rid, 0));
 
             if(andChildren.isEmpty()) {
                 andChildren = null;
@@ -564,17 +559,17 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
 
             Refinement nRef = new Refinement(ref.getRelativePosition(), offset, ref.input);
             lock.acquireReadLock();
-            AndNode cp = andChildren != null ? andChildren.get(nRef) : null;
+            Provider<AndNode> cp = andChildren != null ? andChildren.get(nRef) : null;
             lock.releaseReadLock();
 
             if(cp == null) {
                 if(discoverPatterns) return false;
-                cp = AndNode.createNextLevelNode(m, threadId, this, nRef, discoverPatterns);
+                cp = AndNode.createNextLevelNode(m, threadId, this, nRef, discoverPatterns).provider;
                 if(cp == null) return false;
             }
 
             Integer nOffset = Utils.nullSafeMin(ref.getRelativePosition(), offset);
-            if(!cp.computeAndParents(m, threadId, nOffset, childInputs, parents, discoverPatterns, v)) {
+            if(!cp.get().computeAndParents(m, threadId, nOffset, childInputs, parents, discoverPatterns, v)) {
                 return false;
             }
         }
@@ -602,7 +597,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
 
         lock.acquireWriteLock(threadId);
         while(andChildren != null && !andChildren.isEmpty()) {
-            andChildren.pollFirstEntry().getValue().remove(m, threadId);
+            andChildren.pollFirstEntry().getValue().get().remove(m, threadId);
         }
 
         while(orChildren != null && !orChildren.isEmpty())  {
@@ -619,9 +614,9 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
     }
 
 
-    AndNode getAndChild(Refinement ref) {
+    Provider<AndNode> getAndChild(Refinement ref) {
         lock.acquireReadLock();
-        AndNode result = andChildren != null ? andChildren.get(ref) : null;
+        Provider<AndNode> result = andChildren != null ? andChildren.get(ref) : null;
         lock.releaseReadLock();
         return result;
     }
@@ -636,12 +631,12 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
         if(pa instanceof AndNode) {
             AndNode an = (AndNode) pa;
             for(Refinement ref: an.parents.keySet()) {
-                Synapse s = ref.input.get().getSynapse(new SynapseKey(rsk.offset, n));
+                Synapse s = ref.input.get().getSynapse(new SynapseKey(rsk.offset, n.provider));
                 if(sum - Math.abs(s.w) >= 0.0) return 1;
             }
         } else {
             InputNode in = (InputNode) pa;
-            Synapse s = in.getSynapse(new SynapseKey(rsk.offset, n));
+            Synapse s = in.getSynapse(new SynapseKey(rsk.offset, n.provider));
             if(sum - Math.abs(s.w) >= 0.0) return 1;
         }
         return 0;
@@ -671,7 +666,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
             if (s.inputNode == null) {
                 InputNode iNode = InputNode.add(m, s.key.createInputNodeKey(), s.input.get());
                 iNode.isBlocked = in.isBlocked;
-                iNode.setSynapse(threadId, new SynapseKey(s.key.relativeRid, neuron), s);
+                iNode.setSynapse(threadId, new SynapseKey(s.key.relativeRid, neuron.provider), s);
                 s.inputNode = iNode.provider;
             }
 
@@ -769,7 +764,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
         if(pa == null) {
         } else if(pa instanceof InputNode) {
             InputNode node = (InputNode) pa;
-            minSyn = node.getSynapse(new SynapseKey(rsk.offset, n));
+            minSyn = node.getSynapse(new SynapseKey(rsk.offset, n.provider));
             sum = Math.abs(minSyn.w);
         } else {
             AndNode node = (AndNode) pa;
@@ -866,7 +861,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
 
     public String toSimpleString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(id);
+        sb.append(provider.id);
         if(neuron != null && neuron.get().label != null) {
             sb.append(" ");
             sb.append(neuron.get().label);
@@ -881,19 +876,22 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
 
 
     public int compareTo(Node n) {
-        if(id < n.id) return -1;
-        else if(id > n.id) return 1;
-        else return 0;
+        if(this == n) return 0;
+        if(this == MIN_NODE) return -1;
+        if(n == MIN_NODE) return 1;
+        if(this == MAX_NODE) return 1;
+        if(n == MAX_NODE) return -1;
+
+        return provider.compareTo(n.provider);
     }
 
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeInt(id);
         out.writeInt(level);
 
         out.writeBoolean(neuron != null);
-        if(neuron != null) {
+        if (neuron != null) {
             out.writeInt(neuron.id);
         }
 
@@ -912,12 +910,30 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
 
         out.writeInt(sizeSum);
         out.writeInt(instanceSum);
+
+        if (andChildren != null) {
+            out.writeInt(andChildren.size());
+            for (Map.Entry<Refinement, Provider<AndNode>> me : andChildren.entrySet()) {
+                me.getKey().write(out);
+                out.writeInt(me.getValue().id);
+            }
+        } else {
+            out.writeInt(0);
+        }
+
+        if(orChildren != null) {
+            out.writeInt(orChildren.size());
+            for (OrEntry oe : orChildren) {
+                oe.write(out);
+            }
+        } else {
+            out.writeInt(0);
+        }
     }
 
 
     @Override
-    public boolean readFields(DataInput in, Model m) throws IOException {
-        id = in.readInt();
+    public void readFields(DataInput in, Model m) throws IOException {
         level = in.readInt();
 
         if(in.readBoolean()) {
@@ -940,12 +956,24 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
         sizeSum = in.readInt();
         instanceSum = in.readInt();
 
+        int s = in.readInt();
+        for(int i = 0; i < s; i++) {
+            addAndChild(Refinement.read(in, m), m.lookupNodeProvider(in.readInt()));
+        }
+
+        s = in.readInt();
+        for(int i = 0; i < s; i++) {
+            if(orChildren == null) {
+                orChildren = new TreeSet<>();
+            }
+            orChildren.add(OrEntry.read(in, m));
+        }
+
         threads = new ThreadState[m.numberOfThreads];
-        return true;
     }
 
 
-    public static Node read(DataInput in, Model m) throws IOException {
+    public static Node read(DataInput in, Provider p) throws IOException {
         String type = in.readUTF();
         Node n = null;
         switch(type) {
@@ -959,8 +987,10 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
                 n = new OrNode();
                 break;
         }
+        n.provider = p;
 
-        return n.readFields(in, m) ? n : null;
+        n.readFields(in, p.m);
+        return n;
     }
 
 
@@ -970,64 +1000,12 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
     }
 
 
-    private static class DummyNode extends InputNode {
-
-        public DummyNode(int id) {
-            super();
-            this.id = id;
-        }
-
-        @Override
-        public boolean isAllowedOption(int threadId, InterprNode n, Activation act, long v) {
-            return false;
-        }
-
-        @Override
-        public void cleanup(Model m, int threadId) {}
-
-        @Override
-        public void initActivation(Document doc, Activation act) {}
-
-        @Override
-        public void deleteActivation(Document doc, Activation act) {}
-
-        @Override
-        public double computeSynapseWeightSum(Integer offset, Neuron n) {
-            return n.bias;
-        }
-
-        @Override
-        public void propagateAddedActivation(Document doc, Activation act, InterprNode removedConflict) {}
-
-        @Override
-        public void propagateRemovedActivation(Document doc, Activation act) {}
-
-        @Override
-        public String logicToString() {
-            return null;
-        }
-
-        @Override
-        protected void apply(Document doc, Activation act, InterprNode conflict) {}
-
-        @Override
-        public void discover(Document doc, Activation act) {}
-
-        @Override
-        protected Set<Refinement> collectNodeAndRefinements(Refinement newRef) { return null; }
-
-        @Override
-        protected void changeNumberOfNeuronRefs(int threadId, long v, int d) {
-        }
-    }
-
-
     static class ReverseAndRefinement implements Comparable<ReverseAndRefinement> {
         boolean dir;
-        Provider<? extends Node> node;
+        Provider node;
 
-        public ReverseAndRefinement(Node n, Integer a, Integer b) {
-            this.node = n.provider;
+        public ReverseAndRefinement(Provider n, Integer a, Integer b) {
+            this.node = n;
             this.dir = Utils.compareNullSafe(a, b);
         }
 
@@ -1038,5 +1016,4 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
             return Boolean.compare(dir, rar.dir);
         }
     }
-
 }

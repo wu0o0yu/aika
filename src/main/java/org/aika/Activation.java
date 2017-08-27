@@ -407,7 +407,7 @@ public class Activation implements Comparable<Activation> {
 
 
         public String toString() {
-            return (n != null ? n.id + (n.neuron != null && n.neuron.get() != null ? ":" + n.neuron.get().label : "") + " " : "") + r + " " + rid + " " + o;
+            return (n != null ? n.provider.id + (n.neuron != null && n.neuron.get() != null ? ":" + n.neuron.get().label : "") + " " : "") + r + " " + rid + " " + o;
         }
     }
 

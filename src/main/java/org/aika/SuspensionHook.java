@@ -23,12 +23,10 @@ package org.aika;
  */
 public interface SuspensionHook {
 
-    enum Type {
-        NEURON,
-        NODE
-    }
 
-    void store(long id, Type t, byte[] data);
+    int getNewId();
 
-    byte[] retrieve(long id, Type t);
+    void store(int id, byte[] data);
+
+    byte[] retrieve(int id);
 }

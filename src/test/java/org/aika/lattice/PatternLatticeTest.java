@@ -79,22 +79,22 @@ public class PatternLatticeTest {
             InputNode pB = TestHelper.addOutputNode(doc, inB, null, null);
             InputNode pC = TestHelper.addOutputNode(doc, inC, null, null);
 
-            AndNode pAB = pA.andChildren.get(new Refinement(null, pB.provider));
-            Assert.assertEquals(pAB, pB.andChildren.get(new Refinement(null, pA.provider)));
+            AndNode pAB = pA.andChildren.get(new Refinement(null, pB.provider)).get();
+            Assert.assertEquals(pAB.provider, pB.andChildren.get(new Refinement(null, pA.provider)));
 
-            AndNode pAC = pA.andChildren.get(new Refinement(null, pC.provider));
-            Assert.assertEquals(pAC, pC.andChildren.get(new Refinement(null, pA.provider)));
+            AndNode pAC = pA.andChildren.get(new Refinement(null, pC.provider)).get();
+            Assert.assertEquals(pAC.provider, pC.andChildren.get(new Refinement(null, pA.provider)));
 
-            AndNode pBC = pB.andChildren.get(new Refinement(null, pC.provider));
-            Assert.assertEquals(pBC, pC.andChildren.get(new Refinement(null, pB.provider)));
+            AndNode pBC = pB.andChildren.get(new Refinement(null, pC.provider)).get();
+            Assert.assertEquals(pBC.provider, pC.andChildren.get(new Refinement(null, pB.provider)));
 
             Assert.assertEquals(1, pAB.andChildren.size());
             Assert.assertEquals(1, pBC.andChildren.size());
             Assert.assertEquals(1, pAC.andChildren.size());
 
-            AndNode pABC = pAB.andChildren.get(new Refinement(null, pC.provider));
-            Assert.assertEquals(pABC, pAC.andChildren.get(new Refinement(null, pB.provider)));
-            Assert.assertEquals(pABC, pBC.andChildren.get(new Refinement(null, pA.provider)));
+            AndNode pABC = pAB.andChildren.get(new Refinement(null, pC.provider)).get();
+            Assert.assertEquals(pABC.provider, pAC.andChildren.get(new Refinement(null, pB.provider)));
+            Assert.assertEquals(pABC.provider, pBC.andChildren.get(new Refinement(null, pA.provider)));
 
             Assert.assertEquals(3, pABC.parents.size());
             Assert.assertEquals(pAB.provider, pABC.parents.get(new Refinement(null, pC.provider)));
@@ -134,20 +134,20 @@ public class PatternLatticeTest {
             InputNode pC = TestHelper.addOutputNode(doc, inC, null, null);
             InputNode pD = TestHelper.addOutputNode(doc, inD, null, null);
 
-            AndNode pAB = pA.andChildren.get(new Refinement(null, pB.provider));
-            Assert.assertEquals(pAB, pB.andChildren.get(new Refinement(null, pA.provider)));
+            AndNode pAB = pA.andChildren.get(new Refinement(null, pB.provider)).get();
+            Assert.assertEquals(pAB.provider, pB.andChildren.get(new Refinement(null, pA.provider)));
 
-            AndNode pAC = pA.andChildren.get(new Refinement(null, pC.provider));
-            Assert.assertEquals(pAC, pC.andChildren.get(new Refinement(null, pA.provider)));
+            AndNode pAC = pA.andChildren.get(new Refinement(null, pC.provider)).get();
+            Assert.assertEquals(pAC.provider, pC.andChildren.get(new Refinement(null, pA.provider)));
 
-            AndNode pBC = pB.andChildren.get(new Refinement(null, pC.provider));
-            Assert.assertEquals(pBC, pC.andChildren.get(new Refinement(null, pB.provider)));
+            AndNode pBC = pB.andChildren.get(new Refinement(null, pC.provider)).get();
+            Assert.assertEquals(pBC.provider, pC.andChildren.get(new Refinement(null, pB.provider)));
 
-            AndNode pBD = pB.andChildren.get(new Refinement(null, pD.provider));
-            Assert.assertEquals(pBD, pD.andChildren.get(new Refinement(null, pB.provider)));
+            AndNode pBD = pB.andChildren.get(new Refinement(null, pD.provider)).get();
+            Assert.assertEquals(pBD.provider, pD.andChildren.get(new Refinement(null, pB.provider)));
 
-            AndNode pCD = pC.andChildren.get(new Refinement(null, pD.provider));
-            Assert.assertEquals(pCD, pD.andChildren.get(new Refinement(null, pC.provider)));
+            AndNode pCD = pC.andChildren.get(new Refinement(null, pD.provider)).get();
+            Assert.assertEquals(pCD.provider, pD.andChildren.get(new Refinement(null, pC.provider)));
 
 
             Assert.assertEquals(1, pAB.andChildren.size());
@@ -156,9 +156,9 @@ public class PatternLatticeTest {
             Assert.assertEquals(1, pBD.andChildren.size());
             Assert.assertEquals(1, pCD.andChildren.size());
 
-            AndNode pBCD = pBC.andChildren.get(new Refinement(null, pD.provider));
-            Assert.assertEquals(pBCD, pBD.andChildren.get(new Refinement(null, pC.provider)));
-            Assert.assertEquals(pBCD, pCD.andChildren.get(new Refinement(null, pB.provider)));
+            AndNode pBCD = pBC.andChildren.get(new Refinement(null, pD.provider)).get();
+            Assert.assertEquals(pBCD.provider, pBD.andChildren.get(new Refinement(null, pC.provider)));
+            Assert.assertEquals(pBCD.provider, pCD.andChildren.get(new Refinement(null, pB.provider)));
 
             Assert.assertEquals(3, pBCD.parents.size());
             Assert.assertEquals(pBC.provider, pBCD.parents.get(new Refinement(null, pD.provider)));
@@ -205,44 +205,44 @@ public class PatternLatticeTest {
             InputNode pC = TestHelper.addOutputNode(doc, inC, null, null);
             InputNode pD = TestHelper.addOutputNode(doc, inD, null, null);
 
-            AndNode pAD = pA.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider));
-            Assert.assertEquals(pAD, pD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
+            AndNode pAD = pA.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider)).get();
+            Assert.assertEquals(pAD.provider, pD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
 
-            AndNode pAB = pA.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider));
-            Assert.assertEquals(pAB, pB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
+            AndNode pAB = pA.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider)).get();
+            Assert.assertEquals(pAB.provider, pB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
 
-            AndNode pAC = pA.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider));
-            Assert.assertEquals(pAC, pC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
+            AndNode pAC = pA.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider)).get();
+            Assert.assertEquals(pAC.provider, pC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
 
-            AndNode pBC = pB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider));
-            Assert.assertEquals(pBC, pC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider)));
+            AndNode pBC = pB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider)).get();
+            Assert.assertEquals(pBC.provider, pC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider)));
 
-            AndNode pBD = pB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider));
-            Assert.assertEquals(pBD, pD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider)));
+            AndNode pBD = pB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider)).get();
+            Assert.assertEquals(pBD.provider, pD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider)));
 
-            AndNode pCD = pC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider));
-            Assert.assertEquals(pCD, pD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider)));
+            AndNode pCD = pC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider)).get();
+            Assert.assertEquals(pCD.provider, pD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider)));
 
-            AndNode pABC = pAB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider));
-            Assert.assertEquals(pABC, pAC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider)));
-            Assert.assertEquals(pABC, pBC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
+            AndNode pABC = pAB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider)).get();
+            Assert.assertEquals(pABC.provider, pAC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider)));
+            Assert.assertEquals(pABC.provider, pBC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
 
-            AndNode pABD = pAB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider));
-            Assert.assertEquals(pABD, pAD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider)));
-            Assert.assertEquals(pABD, pBD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
+            AndNode pABD = pAB.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider)).get();
+            Assert.assertEquals(pABD.provider, pAD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider)));
+            Assert.assertEquals(pABD.provider, pBD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
 
-            AndNode pACD = pAC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider));
-            Assert.assertEquals(pACD, pAD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider)));
-            Assert.assertEquals(pACD, pCD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
+            AndNode pACD = pAC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider)).get();
+            Assert.assertEquals(pACD.provider, pAD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider)));
+            Assert.assertEquals(pACD.provider, pCD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
 
-            AndNode pBCD = pBC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider));
-            Assert.assertEquals(pBCD, pBD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider)));
-            Assert.assertEquals(pBCD, pCD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider)));
+            AndNode pBCD = pBC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider)).get();
+            Assert.assertEquals(pBCD.provider, pBD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider)));
+            Assert.assertEquals(pBCD.provider, pCD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider)));
 
-            AndNode pABCD = pABC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider));
-            Assert.assertEquals(pABCD, pABD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider)));
-            Assert.assertEquals(pABCD, pACD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider)));
-            Assert.assertEquals(pABCD, pBCD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
+            AndNode pABCD = pABC.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inD, null, null).provider)).get();
+            Assert.assertEquals(pABCD.provider, pABD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inC, null, null).provider)));
+            Assert.assertEquals(pABCD.provider, pACD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inB, null, null).provider)));
+            Assert.assertEquals(pABCD.provider, pBCD.andChildren.get(new Refinement(null, TestHelper.addOutputNode(doc, inA, null, null).provider)));
 
             Assert.assertEquals(4, pABCD.parents.size());
             Assert.assertEquals(null, pABCD.andChildren);
@@ -310,8 +310,8 @@ public class PatternLatticeTest {
 
         Assert.assertEquals(2, pBNode.frequency, 0.01);
 
-        AndNode pAB = pANode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider));
-        Assert.assertEquals(pAB, pBNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
+        AndNode pAB = pANode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)).get();
+        Assert.assertEquals(pAB.provider, pBNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
         Assert.assertEquals(1, pAB.frequency, 0.01);
         Assert.assertEquals(2, pAB.parents.size());
@@ -352,8 +352,8 @@ public class PatternLatticeTest {
         Assert.assertEquals(2, pBNode.andChildren.size());
         Assert.assertEquals(1, pCNode.andChildren.size());
 
-        AndNode pBC = pBNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider));
-        Assert.assertEquals(pBC, pCNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
+        AndNode pBC = pBNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider)).get();
+        Assert.assertEquals(pBC.provider, pCNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
 
         Assert.assertEquals(1, pBC.frequency, 0.01);
         Assert.assertEquals(2, pBC.parents.size());
@@ -393,8 +393,8 @@ public class PatternLatticeTest {
         Assert.assertEquals(2, pBNode.andChildren.size());
         Assert.assertEquals(2, pCNode.andChildren.size());
 
-        AndNode pAC = pCNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider));
-        Assert.assertEquals(pAC, pANode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider)));
+        AndNode pAC = pCNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)).get();
+        Assert.assertEquals(pAC.provider, pANode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider)));
 
         Assert.assertEquals(1, pAC.frequency, 0.01);
         Assert.assertEquals(2, pAC.parents.size());
@@ -432,9 +432,9 @@ public class PatternLatticeTest {
         Assert.assertEquals(1, pBC.andChildren.size());
         Assert.assertEquals(1, pAC.andChildren.size());
 
-        AndNode pABC = pAB.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider));
-        Assert.assertEquals(pABC, pAC.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
-        Assert.assertEquals(pABC, pBC.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
+        AndNode pABC = pAB.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider)).get();
+        Assert.assertEquals(pABC.provider, pAC.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
+        Assert.assertEquals(pABC.provider, pBC.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
 //        Assert.assertEquals(1, pABC.frequency, 0.01);
         Assert.assertEquals(3, pABC.parents.size());
@@ -461,11 +461,11 @@ public class PatternLatticeTest {
         Assert.assertEquals(3, pBNode.andChildren.size());
         Assert.assertEquals(3, pDNode.andChildren.size());
 
-        AndNode pAD = pANode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider));
-        Assert.assertEquals(pAD, pDNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
+        AndNode pAD = pANode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider)).get();
+        Assert.assertEquals(pAD.provider, pDNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
-        AndNode pBD = pBNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider));
-        Assert.assertEquals(pBD, pDNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
+        AndNode pBD = pBNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider)).get();
+        Assert.assertEquals(pBD.provider, pDNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
 
         Assert.assertEquals(2, pAD.frequency, 0.01);
         Assert.assertEquals(2, pAD.parents.size());
@@ -473,9 +473,9 @@ public class PatternLatticeTest {
         Assert.assertEquals(2, pBD.frequency, 0.01);
         Assert.assertEquals(2, pBD.parents.size());
 
-        AndNode pABD = pAB.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider));
-        Assert.assertEquals(pABD, pAD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
-        Assert.assertEquals(pABD, pBD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
+        AndNode pABD = pAB.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider)).get();
+        Assert.assertEquals(pABD.provider, pAD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
+        Assert.assertEquals(pABD.provider, pBD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
 //        Assert.assertEquals(2, pABD.frequency, 0.01);
         Assert.assertEquals(3, pABD.parents.size());
@@ -491,11 +491,11 @@ public class PatternLatticeTest {
         Assert.assertEquals(3, pBNode.andChildren.size());
         Assert.assertEquals(3, pDNode.andChildren.size());
 
-        pAD = pANode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider));
-        Assert.assertEquals(pAD, pDNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
+        pAD = pANode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider)).get();
+        Assert.assertEquals(pAD.provider, pDNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
-        pBD = pBNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider));
-        Assert.assertEquals(pBD, pDNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
+        pBD = pBNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider)).get();
+        Assert.assertEquals(pBD.provider, pDNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
 
         Assert.assertEquals(2, pAD.frequency, 0.01);
         Assert.assertEquals(2, pAD.parents.size());
@@ -503,9 +503,9 @@ public class PatternLatticeTest {
         Assert.assertEquals(2, pBD.frequency, 0.01);
         Assert.assertEquals(2, pBD.parents.size());
 
-        pABD = pAB.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider));
-        Assert.assertEquals(pABD, pAD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
-        Assert.assertEquals(pABD, pBD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
+        pABD = pAB.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider)).get();
+        Assert.assertEquals(pABD.provider, pAD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
+        Assert.assertEquals(pABD.provider, pBD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
         Assert.assertEquals(1, pABD.frequency, 0.01);
         Assert.assertEquals(3, pABD.parents.size());
@@ -526,7 +526,7 @@ public class PatternLatticeTest {
         m.resetFrequency();
         doc.train();
 
-        AndNode pACD = pAC.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider));
+        AndNode pACD = pAC.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider)).get();
 
         Assert.assertEquals(3, pAD.frequency, 0.01);
         Assert.assertEquals(2, pAD.parents.size());
@@ -534,29 +534,29 @@ public class PatternLatticeTest {
         Assert.assertEquals(2, pABD.frequency, 0.01);
         Assert.assertEquals(3, pABD.parents.size());
 
-        AndNode pCD = pDNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider));
-        Assert.assertEquals(pCD, pCNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider)));
+        AndNode pCD = pDNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider)).get();
+        Assert.assertEquals(pCD.provider, pCNode.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider)));
 
         Assert.assertEquals(2, pCD.frequency, 0.01);
 
-        pACD = pAC.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider));
-        Assert.assertEquals(pACD, pAD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider)));
-        Assert.assertEquals(pACD, pCD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
+        pACD = pAC.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider)).get();
+        Assert.assertEquals(pACD.provider, pAD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider)));
+        Assert.assertEquals(pACD.provider, pCD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
         Assert.assertEquals(1, pACD.frequency, 0.01);
         Assert.assertEquals(3, pACD.parents.size());
 
-        AndNode pBCD = pBC.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider));
-        Assert.assertEquals(pBCD, pBD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider)));
-        Assert.assertEquals(pBCD, pCD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
+        AndNode pBCD = pBC.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider)).get();
+        Assert.assertEquals(pBCD.provider, pBD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider)));
+        Assert.assertEquals(pBCD.provider, pCD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
 
         Assert.assertEquals(1, pACD.frequency, 0.01);
         Assert.assertEquals(3, pBCD.parents.size());
 
-        AndNode pABCD = pABC.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider));
-        Assert.assertEquals(pABCD, pABD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider)));
-        Assert.assertEquals(pABCD, pACD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
-        Assert.assertEquals(pABCD, pBCD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
+        AndNode pABCD = pABC.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider)).get();
+        Assert.assertEquals(pABCD.provider, pABD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inC, 0, null).provider)));
+        Assert.assertEquals(pABCD.provider, pACD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
+        Assert.assertEquals(pABCD.provider, pBCD.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
         Assert.assertEquals(1, pABCD.frequency, 0.01);
         Assert.assertEquals(4, pABCD.parents.size());

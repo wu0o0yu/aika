@@ -71,7 +71,6 @@ public class InputNeuron extends Neuron {
 
         n.publish(threadId);
 
-        n.initialized = true;
         return n;
     }
 
@@ -88,8 +87,8 @@ public class InputNeuron extends Neuron {
         act.upperBound = 1.0;
         act.lowerBound = 1.0;
 
-        for(InputNode out: outputNodes.values()) {
-            out.addActivation(doc, act);
+        for(Provider<InputNode> out: outputNodes.values()) {
+            out.get().addActivation(doc, act);
         }
     }
 

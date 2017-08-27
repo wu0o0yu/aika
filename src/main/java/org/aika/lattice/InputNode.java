@@ -17,10 +17,7 @@
 package org.aika.lattice;
 
 
-import org.aika.Activation;
-import org.aika.Model;
-import org.aika.Provider;
-import org.aika.Utils;
+import org.aika.*;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
@@ -52,7 +49,7 @@ import static org.aika.corpus.Range.Operator.*;
 public class InputNode extends Node<InputNode> {
 
     public Key key;
-    public Neuron inputNeuron;
+    public Provider<? extends Neuron> inputNeuron;
 
     // Key: Output Neuron
     Map<SynapseKey, Synapse> synapses;
@@ -80,15 +77,15 @@ public class InputNode extends Node<InputNode> {
 
 
     public static InputNode add(Model m, Key key, Neuron input) {
-        InputNode in = (input != null ? input.outputNodes.get(key) : null);
-        if(in != null) {
-            return in;
+        Provider<InputNode> pin = (input != null ? input.outputNodes.get(key) : null);
+        if(pin != null) {
+            return pin.get();
         }
-        in = new InputNode(m, key);
+        InputNode in = new InputNode(m, key);
 
         if(input != null) {
-            in.inputNeuron = input;
-            input.outputNodes.put(key, in);
+            in.inputNeuron = input.provider;
+            input.outputNodes.put(key, in.provider);
         }
         return in;
     }
@@ -300,7 +297,7 @@ public class InputNode extends Node<InputNode> {
 
         lock.acquireReadLock();
         if(andChildren != null) {
-            for (Map.Entry<Refinement, AndNode> me : andChildren.entrySet()) {
+            for (Map.Entry<Refinement, Provider<AndNode>> me : andChildren.entrySet()) {
                 addNextLevelActivations(doc, me.getKey().input.get(), me.getKey(), me.getValue(), act, removedConflict);
             }
         }
@@ -312,7 +309,7 @@ public class InputNode extends Node<InputNode> {
     }
 
 
-    private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, AndNode nlp, Activation act, InterprNode removedConflict) {
+    private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, Provider<AndNode> pnlp, Activation act, InterprNode removedConflict) {
         Activation.Key ak = act.key;
         InputNode firstNode = ((InputNode) ak.n);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
@@ -333,6 +330,7 @@ public class InputNode extends Node<InputNode> {
             if(!secondAct.isRemoved) {
                 InterprNode o = InterprNode.add(doc, true, ak.o, secondAct.key.o);
                 if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
+                    AndNode nlp = pnlp.get();
                     nlp.addActivation(doc,
                             new Activation.Key(
                                     nlp,
@@ -404,7 +402,7 @@ public class InputNode extends Node<InputNode> {
 
     @Override
     public double computeSynapseWeightSum(Integer offset, Neuron n) {
-        return n.bias + Math.abs(getSynapse(new SynapseKey(key.relativeRid == null ? null : offset, n)).w);
+        return n.bias + Math.abs(getSynapse(new SynapseKey(key.relativeRid == null ? null : offset, n.provider)).w);
     }
 
 
@@ -433,7 +431,7 @@ public class InputNode extends Node<InputNode> {
 
     @Override
     void remove(Model m, int threadId) {
-        inputNeuron.outputNodes.remove(key);
+        inputNeuron.get().outputNodes.remove(key);
         super.remove(m, threadId);
     }
 
@@ -446,10 +444,10 @@ public class InputNode extends Node<InputNode> {
         sb.append(getRangeBrackets(key.startRangeOutput, key.startRangeMapping));
 
         if(inputNeuron != null) {
-            sb.append(inputNeuron.provider.id);
-            if(inputNeuron.label != null) {
+            sb.append(inputNeuron.id);
+            if(inputNeuron.get().label != null) {
                 sb.append(",");
-                sb.append(inputNeuron.label);
+                sb.append(inputNeuron.get().label);
             }
         }
 
@@ -467,34 +465,66 @@ public class InputNode extends Node<InputNode> {
     }
 
 
-    protected void reactivateIntern(Model m) {
-
-    }
-
-
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeUTF("I");
         super.write(out);
         key.write(out);
+
+        out.writeBoolean(inputNeuron != null);
+        if(inputNeuron != null) {
+            out.writeInt(inputNeuron.id);
+        }
+
+        if(synapses != null) {
+            for (Map.Entry<SynapseKey, Synapse> me : synapses.entrySet()) {
+                out.writeBoolean(true);
+                me.getKey().write(out);
+                me.getValue().write(out);
+            }
+        }
+        out.writeBoolean(false);
+
     }
 
 
     @Override
-    public boolean readFields(DataInput in, Model m) throws IOException {
+    public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
         key = Synapse.lookupKey(Key.read(in, m));
-        return true;
+
+        if(in.readBoolean()) {
+            inputNeuron = m.lookupNeuronProvider(in.readInt());
+        }
+
+        while(in.readBoolean()) {
+            SynapseKey sk = SynapseKey.read(in, m);
+            Synapse synTmp = Synapse.read(in, m);
+
+            if(synTmp.output != null && synTmp.output.obj != null) {
+                Synapse syn = synTmp.output.get().inputSynapses.get(synTmp);
+
+                if(synapses == null) {
+                    synapses = new TreeMap<>();
+                }
+
+                synapses.put(sk, syn);
+            }
+        }
     }
 
 
-    public static class SynapseKey implements Comparable<SynapseKey> {
-        final Integer rid;
-        final Provider<? extends Neuron> n;
+    public static class SynapseKey implements Writable, Comparable<SynapseKey> {
+        Integer rid;
+        Provider<? extends Neuron> n;
 
-        public SynapseKey(Integer rid, Neuron n) {
+        private SynapseKey() {
+        }
+
+
+        public SynapseKey(Integer rid, Provider<? extends Neuron> n) {
             this.rid = rid;
-            this.n = n.provider;
+            this.n = n;
         }
 
 
@@ -503,6 +533,32 @@ public class InputNode extends Node<InputNode> {
             int r = Utils.compareInteger(rid, sk.rid);
             if(r != 0) return r;
             return n.compareTo(sk.n);
+        }
+
+
+        public static SynapseKey read(DataInput in, Model m) throws IOException {
+            SynapseKey sk = new SynapseKey();
+            sk.readFields(in, m);
+            return sk;
+        }
+
+
+        @Override
+        public void write(DataOutput out) throws IOException {
+            out.writeBoolean(rid != null);
+            if(rid != null) {
+                out.writeInt(rid);
+            }
+            out.writeInt(n.id);
+        }
+
+
+        @Override
+        public void readFields(DataInput in, Model m) throws IOException {
+            if(in.readBoolean()) {
+                rid = in.readInt();
+            }
+            n = m.lookupNeuronProvider(in.readInt());
         }
     }
 }

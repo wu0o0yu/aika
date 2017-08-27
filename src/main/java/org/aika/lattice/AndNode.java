@@ -76,7 +76,7 @@ public class AndNode extends Node<AndNode> {
             Refinement ref = me.getKey();
             Node pn = me.getValue().get();
 
-            pn.addAndChild(ref, this);
+            pn.addAndChild(ref, provider);
 
             if(ref.rid != null) ridRequired = true;
         }
@@ -229,15 +229,15 @@ public class AndNode extends Node<AndNode> {
         for(Activation pAct: act.inputs.values()) {
             Node<?> pn = pAct.key.n;
             pn.lock.acquireReadLock();
-            Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n, act.key.rid, pAct.key.rid));
+            Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n.provider, act.key.rid, pAct.key.rid));
             if(ref != null) {
                 for (Activation secondAct : pAct.outputs.values()) {
                     if (act != secondAct && !secondAct.isRemoved) {
-                        Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n, secondAct.key.rid, pAct.key.rid));
+                        Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n.provider, secondAct.key.rid, pAct.key.rid));
                         if (secondRef != null) {
                             Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
-                            AndNode nlp = getAndChild(nRef);
+                            Provider<AndNode> nlp = getAndChild(nRef);
                             if (nlp != null) {
                                 addNextLevelActivation(doc, act, secondAct, nlp, removedConflict);
                             }
@@ -261,7 +261,7 @@ public class AndNode extends Node<AndNode> {
         for(Activation pAct: act.inputs.values()) {
             Node<?> pn = pAct.key.n;
             pn.lock.acquireReadLock();
-            Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n, act.key.rid, pAct.key.rid));
+            Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n.provider, act.key.rid, pAct.key.rid));
             for(Activation secondAct: pAct.outputs.values()) {
                 if(secondAct.key.n instanceof AndNode) {
                     Node secondNode = secondAct.key.n;
@@ -271,7 +271,7 @@ public class AndNode extends Node<AndNode> {
                             secondNode.isFrequent() &&
                             (ridDelta == null || ridDelta < MAX_RID_RANGE)
                             ) {
-                        Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n, secondAct.key.rid, pAct.key.rid));
+                        Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n.provider, secondAct.key.rid, pAct.key.rid));
                         Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
                         AndNode nln = createNextLevelNode(doc.m, doc.threadId, this, nRef, true);
@@ -310,10 +310,11 @@ public class AndNode extends Node<AndNode> {
 
 
     static AndNode createNextLevelNode(Model m, int threadId, Node n, Refinement ref, boolean discoverPatterns) {
-        AndNode nln = n.getAndChild(ref);
-        if(nln != null) {
-            return discoverPatterns ? null : nln;
+        Provider<AndNode> pnln = n.getAndChild(ref);
+        if(pnln != null) {
+            return discoverPatterns ? null : pnln.get();
         }
+        AndNode nln = null;
 
         if(n instanceof InputNode) {
             if(n == ref.input.get() && ref.rid == 0) return null;
@@ -361,11 +362,12 @@ public class AndNode extends Node<AndNode> {
     }
 
 
-    public static void addNextLevelActivation(Document doc, Activation act, Activation secondAct, AndNode nlp, InterprNode conflict) {
+    public static void addNextLevelActivation(Document doc, Activation act, Activation secondAct, Provider<AndNode> pnlp, InterprNode conflict) {
         // TODO: check if the activation already exists
         Key ak = act.key;
         InterprNode o = InterprNode.add(doc, true, ak.o, secondAct.key.o);
         if (o != null && (conflict == null || o.contains(conflict, false))) {
+            AndNode nlp = pnlp.get();
             nlp.addActivation(
                     doc,
                     new Key(
@@ -533,7 +535,7 @@ public class AndNode extends Node<AndNode> {
 
 
     @Override
-    public boolean readFields(DataInput in, Model m) throws IOException {
+    public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
         numberOfPositionsNotify = in.readInt();
@@ -542,22 +544,11 @@ public class AndNode extends Node<AndNode> {
         weight = in.readDouble();
 
         int s = in.readInt();
-        Map<Refinement, Provider<? extends Node>> tmp = new TreeMap<>();
         for(int i = 0; i < s; i++) {
             Refinement ref = Refinement.read(in, m);
             Provider<? extends Node> pn = m.lookupNodeProvider(in.readInt());
-            if(pn == null) {
-                return false;
-            }
-            tmp.put(ref, pn);
-        }
-        for(Map.Entry<Refinement, Provider<? extends Node>> me: tmp.entrySet()) {
-            Refinement ref = me.getKey();
-            Provider<? extends Node> pn = me.getValue();
             parents.put(ref, pn);
-            pn.get().addAndChild(ref, this);
         }
-        return true;
     }
 
 
@@ -599,7 +590,7 @@ public class AndNode extends Node<AndNode> {
         public Synapse getSynapse(Integer offset, Neuron n) {
             InputNode in = input.get();
             in.lock.acquireReadLock();
-            Synapse s = in.synapses != null ? in.synapses.get(new SynapseKey(Utils.nullSafeAdd(getRelativePosition(), false, offset, false), n)) : null;
+            Synapse s = in.synapses != null ? in.synapses.get(new SynapseKey(Utils.nullSafeAdd(getRelativePosition(), false, offset, false), n.provider)) : null;
             in.lock.releaseReadLock();
             return s;
         }
@@ -621,7 +612,7 @@ public class AndNode extends Node<AndNode> {
             if(in.readBoolean()) {
                 rid = in.readInt();
             }
-            input = (Provider<InputNode>) m.lookupNodeProvider(in.readInt());
+            input = m.lookupNodeProvider(in.readInt());
             return true;
         }
 

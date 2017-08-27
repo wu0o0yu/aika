@@ -269,7 +269,10 @@ public class OrNode extends Node<OrNode> {
 
     void addInput(int threadId, Integer ridOffset, Node in) {
         in.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, 1);
-        in.addOrChild(threadId, new OrEntry(ridOffset, provider));
+        in.lock.acquireWriteLock(threadId);
+        in.addOrChild(new OrEntry(ridOffset, provider));
+        in.lock.releaseWriteLock();
+
         lock.acquireWriteLock(threadId);
         Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
         TreeSet<Node> pn = parents.get(key);
@@ -362,14 +365,14 @@ public class OrNode extends Node<OrNode> {
             out.writeInt(me.getKey());
             out.writeInt(me.getValue().size());
             for(Node pn: me.getValue()) {
-                out.writeInt(pn.id);
+                out.writeInt(pn.provider.id);
             }
         }
     }
 
 
     @Override
-    public boolean readFields(DataInput in, Model m) throws IOException {
+    public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
         int s = in.readInt();
@@ -381,11 +384,10 @@ public class OrNode extends Node<OrNode> {
             int sa = in.readInt();
             for(int j = 0; j < sa; j++) {
                 Node pn = m.lookupNodeProvider(in.readInt()).get();
-                pn.addOrChild(m.defaultThreadId, new OrEntry(ridOffset, provider));
+                pn.addOrChild(new OrEntry(ridOffset, provider));
                 ridParents.add(pn);
             }
         }
-        return true;
     }
 
 
@@ -414,12 +416,11 @@ public class OrNode extends Node<OrNode> {
 
 
         @Override
-        public boolean readFields(DataInput in, Model m) throws IOException {
+        public void readFields(DataInput in, Model m) throws IOException {
             if(in.readBoolean()) {
                 ridOffset = in.readInt();
             }
             node = m.lookupNodeProvider(in.readInt());
-            return true;
         }
 
 

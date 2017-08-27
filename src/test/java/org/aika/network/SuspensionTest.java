@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.SuspensionHook;
 import org.aika.corpus.Document;
 import org.aika.neuron.InputNeuron;
@@ -28,6 +29,7 @@ import org.junit.Test;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.aika.corpus.Range.Operator.EQUALS;
 
@@ -44,7 +46,11 @@ public class SuspensionTest {
         m.suspensionHook = new DummySuspensionHook();
 
         InputNeuron n = m.createOrLookupInputNeuron("A");
+        n.node.suspend();
+        n.provider.suspend();
 
+
+        // Reactivate
         n = m.createOrLookupInputNeuron("A");
 
         Document doc = m.createDocument("Bla");
@@ -80,7 +86,7 @@ public class SuspensionTest {
         );
 
 
-        Neuron outD = m.initAndNeuron(m.createNeuron("D"), 0.5,
+        Provider<? extends Neuron> outD = m.initAndNeuron(m.createNeuron("D"), 0.5,
                 new Input()
                         .setNeuron(nC)
                         .setWeight(10.0)
@@ -88,10 +94,15 @@ public class SuspensionTest {
                         .setRecurrent(false)
                         .setRangeMatch(Input.RangeRelation.EQUALS)
                         .setRangeOutput(true)
-        );
-        outD.noSuspension = true;
+        ).provider;
 
+        for(Provider np: m.nodesInMemory.values()) {
+            np.suspend();
+        }
 
+        for(Provider np: m.neuronsInMemory.values()) {
+            np.suspend();
+        }
 
         // Reactivate
 
@@ -105,41 +116,30 @@ public class SuspensionTest {
 
         doc.process();
 
-        Assert.assertFalse(outD.getFinalActivations(doc).isEmpty());
+        Assert.assertFalse(outD.get().getFinalActivations(doc).isEmpty());
     }
 
 
 
 
     public static class DummySuspensionHook implements SuspensionHook {
+        public AtomicInteger currentId = new AtomicInteger(0);
 
-        Map<Key, byte[]> storage = new TreeMap<>();
+        Map<Integer, byte[]> storage = new TreeMap<>();
 
         @Override
-        public void store(long id, Type t, byte[] data) {
-            storage.put(new Key(id, t), data);
+        public int getNewId() {
+            return currentId.addAndGet(1);
         }
 
         @Override
-        public byte[] retrieve(long id, Type t) {
-            return storage.get(new Key(id, t));
+        public void store(int id, byte[] data) {
+            storage.put(id, data);
         }
 
-        private static class Key implements Comparable<Key> {
-            public Key(long id, Type t) {
-                this.id = id;
-                this.t = t;
-            }
-
-            long id;
-            Type t;
-
-            @Override
-            public int compareTo(Key k) {
-                int r = Long.compare(id, k.id);
-                if(r != 0) return r;
-                return t.compareTo(k.t);
-            }
+        @Override
+        public byte[] retrieve(int id) {
+            return storage.get(id);
         }
     }
 }

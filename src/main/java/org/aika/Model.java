@@ -29,6 +29,9 @@ import org.aika.neuron.Synapse;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.aika.Provider.Type.NEURON;
+import static org.aika.Provider.Type.NODE;
+
 
 /**
  * The model consists of two layers. The first layer is the actual neural network consisting of neurons and synapses.
@@ -50,7 +53,7 @@ public class Model {
 
     public SuspensionHook suspensionHook;
 
-    public AtomicInteger currentNeuronId = new AtomicInteger(0);
+    public AtomicInteger currentId = new AtomicInteger(0);
 
     public Map<String, Provider<InputNeuron>> inputNeurons = Collections.synchronizedMap(new LinkedHashMap<>());
 
@@ -106,8 +109,8 @@ public class Model {
 
 
     public <T extends Neuron> Provider<T> createNeuronProvider(T n) {
-        int id = currentNeuronId.addAndGet(1);
-        Provider<T> np = new Provider<T>(this, id, n);
+        int id = suspensionHook != null ? suspensionHook.getNewId() : currentId.addAndGet(1);
+        Provider<T> np = new Provider<T>(this, id, NEURON, n);
         n.provider = np;
         neuronsInMemory.put(id, np);
         return np;
@@ -115,9 +118,10 @@ public class Model {
 
 
     public <T extends Node> Provider<T> createNodeProvider(T n) {
-        Provider<T> np = new Provider<T>(this, n.id, n);
+        int id = suspensionHook != null ? suspensionHook.getNewId() : currentId.addAndGet(1);
+        Provider<T> np = new Provider<T>(this, id, NODE, n);
         n.provider = np;
-        nodesInMemory.put(n.id, np);
+        nodesInMemory.put(id, np);
         return np;
     }
 
@@ -143,10 +147,10 @@ public class Model {
     }
 
 
-    public Provider<? extends Neuron> lookupNeuronProvider(int id) {
-        Provider<? extends Neuron> np = neuronsInMemory.get(id);
+    public <T extends Neuron> Provider<T> lookupNeuronProvider(int id) {
+        Provider np = neuronsInMemory.get(id);
         if(np == null) {
-            np = new Provider<>(this, id, null);
+            np = new Provider<>(this, id, NEURON, null);
             neuronsInMemory.put(id, np);
 
         }
@@ -154,10 +158,10 @@ public class Model {
     }
 
 
-    public Provider<? extends Node> lookupNodeProvider(int id) {
-        Provider<? extends Node> np = nodesInMemory.get(id);
+    public <T extends Node> Provider<T> lookupNodeProvider(int id) {
+        Provider np = nodesInMemory.get(id);
         if(np == null) {
-            np = new Provider<>(this, id, null);
+            np = new Provider<>(this, id, NODE, null);
             nodesInMemory.put(id, np);
 
         }

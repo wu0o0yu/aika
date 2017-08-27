@@ -167,7 +167,6 @@ public class Synapse implements Writable {
     public void write(DataOutput out) throws IOException {
         out.writeInt(input.id);
         out.writeInt(output.id);
-
         out.writeInt(inputNode.id);
 
         key.write(out);
@@ -178,16 +177,15 @@ public class Synapse implements Writable {
 
 
     @Override
-    public boolean readFields(DataInput in, Model m) throws IOException {
-        input = m.lookupNeuronProvider(input.id);
-        output = m.lookupNeuronProvider(output.id);
-        inputNode = (Provider<InputNode>) m.lookupNodeProvider(inputNode.id);
+    public void readFields(DataInput in, Model m) throws IOException {
+        input = m.lookupNeuronProvider(in.readInt());
+        output = m.lookupNeuronProvider(in.readInt());
+        inputNode = m.lookupNodeProvider(in.readInt());
 
         key = lookupKey(Key.read(in, m));
 
         w = in.readDouble();
         maxLowerWeightsSum = in.readDouble();
-        return true;
     }
 
 
@@ -265,7 +263,7 @@ public class Synapse implements Writable {
 
 
         @Override
-        public boolean readFields(DataInput in, Model m) throws IOException {
+        public void readFields(DataInput in, Model m) throws IOException {
             isNeg = in.readBoolean();
             isRecurrent = in.readBoolean();
             if(in.readBoolean()) relativeRid = in.readInt();
@@ -276,7 +274,6 @@ public class Synapse implements Writable {
             endRangeMapping = Mapping.valueOf(in.readUTF());
             startRangeOutput = in.readBoolean();
             endRangeOutput = in.readBoolean();
-            return true;
         }
 
 

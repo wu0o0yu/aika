@@ -43,7 +43,7 @@ public class OpenRangeInputNode {
                         .setEndRangeOutput(true)
         );
 
-        inputNode = in.outputNodes.firstEntry().getValue();
+        inputNode = in.outputNodes.firstEntry().getValue().get();
     }
 
 
