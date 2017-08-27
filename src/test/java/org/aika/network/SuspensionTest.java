@@ -96,7 +96,7 @@ public class SuspensionTest {
                         .setRangeOutput(true)
         ).provider;
 
-        m.suspendUnusedNodes(10);
+        m.suspendAll();
 
         Assert.assertTrue(outD.isSuspended());
 

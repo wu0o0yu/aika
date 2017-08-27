@@ -191,6 +191,11 @@ public class Model {
     }
 
 
+    public void suspendAll() {
+        suspendUnusedNodes(Integer.MAX_VALUE);
+    }
+
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Network Weights:\n");
