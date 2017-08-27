@@ -152,7 +152,6 @@ public class Model {
         if(np == null) {
             np = new Provider<>(this, id, NEURON, null);
             neuronsInMemory.put(id, np);
-
         }
         return np;
     }
@@ -163,7 +162,6 @@ public class Model {
         if(np == null) {
             np = new Provider<>(this, id, NODE, null);
             nodesInMemory.put(id, np);
-
         }
         return np;
     }
