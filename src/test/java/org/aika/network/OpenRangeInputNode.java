@@ -9,7 +9,6 @@ import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.InputNode;
 import org.aika.neuron.InputNeuron;
-import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

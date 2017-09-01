@@ -2,29 +2,19 @@ package org.aika;
 
 
 import java.io.*;
-import org.aika.lattice.Node;
-import org.aika.neuron.Neuron;
 
 
-public class Provider<T extends Writable> implements Comparable<Provider<?>> {
+public class Provider<T extends AbstractNode> implements Comparable<Provider<?>> {
 
     public Model m;
     public final int id;
-    public final Type type;
 
     private T obj;
 
 
-    public enum Type {
-        NEURON,
-        NODE
-    }
-
-
-    public Provider(Model m, int id, Type t, T obj) {
+    public Provider(Model m, int id, T obj) {
         this.m = m;
         this.id = id;
-        this.type = t;
         this.obj = obj;
     }
 
@@ -67,16 +57,13 @@ public class Provider<T extends Writable> implements Comparable<Provider<?>> {
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         DataInputStream dis = new DataInputStream(bais);
         try {
-            switch(type) {
-                case NEURON:
-                    obj = (T) Neuron.read(dis, this);
-                    break;
-                case NODE:
-                    obj = (T) Node.read(dis, this);
-                    break;
-            }
+            obj = (T) AbstractNode.read(dis, this);
         } catch(IOException e) {
             throw new RuntimeException(e);
+        }
+
+        synchronized (m.providersInMemory) {
+            m.providersInMemory.put(id, this);
         }
     }
 

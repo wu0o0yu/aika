@@ -23,14 +23,12 @@ import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
+import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.aika.Provider.Type.NEURON;
-import static org.aika.Provider.Type.NODE;
 
 
 /**
@@ -57,8 +55,8 @@ public class Model {
 
     public Map<String, Provider<InputNeuron>> inputNeurons = Collections.synchronizedMap(new LinkedHashMap<>());
 
-    public Map<Integer, Provider<? extends Neuron>> neuronsInMemory = Collections.synchronizedMap(new WeakHashMap<>());
-    public Map<Integer, Provider<? extends Node>> nodesInMemory = Collections.synchronizedMap(new WeakHashMap<>());
+    public Map<Integer, Provider<? extends AbstractNode>> providersInMemory = new TreeMap<>();
+    public Map<Integer, Provider<? extends AbstractNode>> providers = new WeakHashMap<>();
 
     public Statistic stat = new Statistic();
 
@@ -94,34 +92,25 @@ public class Model {
 
 
     public Neuron createNeuron() {
-        return createNeuronProvider(new Neuron()).get();
+        return createProvider(new Neuron()).get();
     }
 
 
     public Neuron createNeuron(String label) {
-        return createNeuronProvider(new Neuron(label)).get();
+        return createProvider(new Neuron(label)).get();
     }
 
 
     public Neuron createNeuron(String label, boolean isBlocked, boolean noTraining) {
-        return createNeuronProvider(new Neuron(label, isBlocked, noTraining)).get();
+        return createProvider(new Neuron(label, isBlocked, noTraining)).get();
     }
 
 
-    public <T extends Neuron> Provider<T> createNeuronProvider(T n) {
+    public <T extends AbstractNode> Provider<T> createProvider(T n) {
         int id = suspensionHook != null ? suspensionHook.getNewId() : currentId.addAndGet(1);
-        Provider<T> np = new Provider<T>(this, id, NEURON, n);
+        Provider<T> np = new Provider<T>(this, id, n);
         n.provider = np;
-        neuronsInMemory.put(id, np);
-        return np;
-    }
-
-
-    public <T extends Node> Provider<T> createNodeProvider(T n) {
-        int id = suspensionHook != null ? suspensionHook.getNewId() : currentId.addAndGet(1);
-        Provider<T> np = new Provider<T>(this, id, NODE, n);
-        n.provider = np;
-        nodesInMemory.put(id, np);
+        providersInMemory.put(id, np);
         return np;
     }
 
@@ -147,21 +136,12 @@ public class Model {
     }
 
 
-    public <T extends Neuron> Provider<T> lookupNeuronProvider(int id) {
-        Provider np = neuronsInMemory.get(id);
+    public <T extends AbstractNode> Provider<T> lookupProvider(int id) {
+        Provider np = providersInMemory.get(id);
         if(np == null) {
-            np = new Provider<>(this, id, NEURON, null);
-            neuronsInMemory.put(id, np);
-        }
-        return np;
-    }
+            np = new Provider<>(this, id, null);
+            providersInMemory.put(id, np);
 
-
-    public <T extends Node> Provider<T> lookupNodeProvider(int id) {
-        Provider np = nodesInMemory.get(id);
-        if(np == null) {
-            np = new Provider<>(this, id, NODE, null);
-            nodesInMemory.put(id, np);
         }
         return np;
     }
@@ -172,17 +152,14 @@ public class Model {
      * @param docId
      */
     public void suspendUnusedNodes(int docId) {
-        for(Provider<? extends Neuron> p: neuronsInMemory.values()) {
-            if(!p.isSuspended()) {
-                if(p.get().lastUsedDocumentId <= docId) {
-                    p.suspend();
-                }
-            }
-        }
-        for(Provider<? extends Node> p: nodesInMemory.values()) {
-            if(!p.isSuspended()) {
-                if(p.get().lastUsedDocumentId <= docId) {
-                    p.suspend();
+        synchronized (providersInMemory) {
+            for (Iterator<Provider<? extends AbstractNode>> it = providersInMemory.values().iterator(); it.hasNext(); ) {
+                Provider<? extends AbstractNode> p = it.next();
+                if (!p.isSuspended()) {
+                    if (p.get().lastUsedDocumentId <= docId) {
+                        p.suspend();
+                        it.remove();
+                    }
                 }
             }
         }
@@ -211,8 +188,10 @@ public class Model {
 
     public void resetFrequency() {
         for(int t = 0; t < numberOfThreads; t++) {
-            for(Provider<? extends Node> n: nodesInMemory.values()) {
-                n.get().frequency = 0;
+            for(Provider p: providersInMemory.values()) {
+                if (p.get() instanceof Node) {
+                    ((Node)p.get()).frequency = 0;
+                }
             }
         }
 
@@ -247,7 +226,7 @@ public class Model {
         Provider<InputNeuron> np = inputNeurons.get(label);
 
         if(np == null) {
-            np = createNeuronProvider(new InputNeuron(label, isBlocked));
+            np = createProvider(new InputNeuron(label, isBlocked));
             InputNeuron.init(this, defaultThreadId, np.get());
             inputNeurons.put(label, np);
         }
@@ -418,7 +397,7 @@ public class Model {
      * @param dirIS
      * @return
      */
-    public Neuron initRelationalNeuron(Neuron n, Neuron ctn, Neuron inputSignal, boolean dirIS) {
+    public Neuron initRelationalNeuron(Neuron n, AbstractNeuron ctn, AbstractNeuron inputSignal, boolean dirIS) {
         n.m = this;
         if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
@@ -483,7 +462,7 @@ public class Model {
      * @param direction
      * @return
      */
-    public Neuron initCounterNeuron(Neuron n, Neuron clockSignal, boolean dirCS, Neuron startSignal, boolean dirSS, boolean direction) {
+    public Neuron initCounterNeuron(Neuron n, AbstractNeuron clockSignal, boolean dirCS, AbstractNeuron startSignal, boolean dirSS, boolean direction) {
         n.m = this;
         if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 

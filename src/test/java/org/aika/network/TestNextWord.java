@@ -7,7 +7,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.neuron.InputNeuron;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.AbstractNeuron;
 import org.junit.Test;
 
 public class TestNextWord {
@@ -19,7 +19,7 @@ public class TestNextWord {
         InputNeuron inA = m.createOrLookupInputNeuron("A");
         InputNeuron inB = m.createOrLookupInputNeuron("B");
 
-        Neuron abN = m.initAndNeuron(m.createNeuron("AB"), 0.5,
+        AbstractNeuron abN = m.initAndNeuron(m.createNeuron("AB"), 0.5,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(10.0)

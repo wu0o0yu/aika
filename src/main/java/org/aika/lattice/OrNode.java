@@ -23,7 +23,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.AbstractNeuron;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -186,7 +186,7 @@ public class OrNode extends Node<OrNode> {
 
 
     @Override
-    public double computeSynapseWeightSum(Integer offset, Neuron n) {
+    public double computeSynapseWeightSum(Integer offset, AbstractNeuron n) {
         throw new UnsupportedOperationException();
     }
 
@@ -357,6 +357,7 @@ public class OrNode extends Node<OrNode> {
 
     @Override
     public void write(DataOutput out) throws IOException {
+        out.writeBoolean(false);
         out.writeUTF("O");
         super.write(out);
 
@@ -383,7 +384,8 @@ public class OrNode extends Node<OrNode> {
 
             int sa = in.readInt();
             for(int j = 0; j < sa; j++) {
-                Node pn = m.lookupNodeProvider(in.readInt()).get();
+                Provider<Node> p = m.lookupProvider(in.readInt());
+                Node pn = p.get();
                 pn.addOrChild(new OrEntry(ridOffset, provider));
                 ridParents.add(pn);
             }
@@ -420,7 +422,7 @@ public class OrNode extends Node<OrNode> {
             if(in.readBoolean()) {
                 ridOffset = in.readInt();
             }
-            node = m.lookupNodeProvider(in.readInt());
+            node = m.lookupProvider(in.readInt());
         }
 
 

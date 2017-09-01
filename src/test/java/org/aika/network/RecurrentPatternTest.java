@@ -24,6 +24,7 @@ import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.neuron.InputNeuron;
+import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,7 +58,7 @@ public class RecurrentPatternTest {
 
         Neuron ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"), spaceN, false, startSignal, true, false);
 
-        TreeMap<Character, Neuron> recChars = new TreeMap<>();
+        TreeMap<Character, AbstractNeuron> recChars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
             InputNeuron charSN = chars.get(c);
             recChars.put(c, m.initRelationalNeuron(m.createNeuron("RN-" + c), ctNeuron, charSN, false));
@@ -154,7 +155,7 @@ public class RecurrentPatternTest {
 
         m.initCounterNeuron(ctNeuron, spaceN, false, startSignal, true, false);
 
-        TreeMap<Character, Neuron> recChars = new TreeMap<>();
+        TreeMap<Character, AbstractNeuron> recChars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
             InputNeuron charSN = chars.get(c);
             recChars.put(c, m.initRelationalNeuron(m.createNeuron("RN-" + c), ctNeuron, charSN, false));

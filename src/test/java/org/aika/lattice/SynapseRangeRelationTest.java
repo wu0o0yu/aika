@@ -25,8 +25,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
-import org.aika.lattice.OrNode;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,11 +46,11 @@ public class SynapseRangeRelationTest {
         Model m = new Model();
         Document doc = m.createDocument("                        ", 0);
 
-        Neuron in = m.createNeuron();
+        AbstractNeuron<?> in = m.createNeuron();
         in.node = new OrNode(doc.m).provider;
         in.node.get().neuron = in.provider;
 
-        Neuron on = m.createNeuron();
+        AbstractNeuron<?> on = m.createNeuron();
         on.node = new OrNode(doc.m).provider;
         on.node.get().neuron = on.provider;
 

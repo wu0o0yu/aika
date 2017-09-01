@@ -24,6 +24,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.SearchNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
+import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
 
@@ -254,7 +255,7 @@ public class NamedEntityRecognitionTest {
         HashMap<String, InputNeuron> inputNeurons = new HashMap<>();
 
         // The word input neurons with a relational id.
-        HashMap<String, Neuron> relNeurons = new HashMap<>();
+        HashMap<String, AbstractNeuron> relNeurons = new HashMap<>();
 
 
         String[] words = new String[] {
@@ -262,7 +263,7 @@ public class NamedEntityRecognitionTest {
         };
         for(String word: words) {
             InputNeuron in = m.createOrLookupInputNeuron("W-" + word);
-            Neuron rn = m.initRelationalNeuron(
+            AbstractNeuron rn = m.initRelationalNeuron(
                     m.createNeuron("WR-" + word),
                     ctNeuron, // RID Counting neuron
                     in, // Input neuron
@@ -276,7 +277,7 @@ public class NamedEntityRecognitionTest {
         // The entity neurons represent the concrete meanings of the input words.
         // The helper function 'initAndNeuron' computes the required bias for a
         // conjunction of the inputs.
-        Neuron cookSurnameEntity = m.initAndNeuron(
+        AbstractNeuron cookSurnameEntity = m.initAndNeuron(
                 m.createNeuron("E-cook (surname)"),
                 0.5, // adjusts the bias
                 new Input() // Requires the word to be recognized
@@ -308,7 +309,7 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(CONTAINS)
         );
 
-        Neuron cookProfessionEntity = m.initAndNeuron(
+        AbstractNeuron cookProfessionEntity = m.initAndNeuron(
                 m.createNeuron("E-cook (profession)"),
                 0.2,
                 new Input()
@@ -326,7 +327,7 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(CONTAINS)
         );
 
-        Neuron jacksonForenameEntity = m.initAndNeuron(
+        AbstractNeuron jacksonForenameEntity = m.initAndNeuron(
                 m.createNeuron("E-jackson (forename)"),
                 0.5,
                 new Input()
@@ -352,7 +353,7 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(CONTAINED_IN)
         );
 
-        Neuron jacksonCityEntity = m.initAndNeuron(
+        AbstractNeuron jacksonCityEntity = m.initAndNeuron(
                 m.createNeuron("E-jackson (city)"),
                 0.2,
                 new Input()

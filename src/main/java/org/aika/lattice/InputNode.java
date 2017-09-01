@@ -25,6 +25,7 @@ import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.InputNeuron;
+import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.Key;
@@ -34,7 +35,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.aika.corpus.Range.Operator.*;
 
@@ -49,7 +49,7 @@ import static org.aika.corpus.Range.Operator.*;
 public class InputNode extends Node<InputNode> {
 
     public Key key;
-    public Provider<? extends Neuron> inputNeuron;
+    public Provider<? extends AbstractNeuron> inputNeuron;
 
     // Key: Output Neuron
     Map<SynapseKey, Synapse> synapses;
@@ -76,7 +76,7 @@ public class InputNode extends Node<InputNode> {
     }
 
 
-    public static InputNode add(Model m, Key key, Neuron input) {
+    public static InputNode add(Model m, Key key, AbstractNeuron<?> input) {
         Provider<InputNode> pin = (input != null ? input.outputNodes.get(key) : null);
         if(pin != null) {
             return pin.get();
@@ -102,7 +102,7 @@ public class InputNode extends Node<InputNode> {
 
     @Override
     public void initActivation(Document doc, Activation act) {
-        Neuron n = neuron != null ? neuron.get() : null;
+        AbstractNeuron n = neuron != null ? neuron.get() : null;
         if(n instanceof InputNeuron) {
             doc.inputNeuronActivations.add(act);
 
@@ -119,7 +119,7 @@ public class InputNode extends Node<InputNode> {
 
     @Override
     public void deleteActivation(Document doc, Activation act) {
-        Neuron n = neuron != null ? neuron.get() : null;
+        AbstractNeuron n = neuron != null ? neuron.get() : null;
         if(n instanceof InputNeuron) {
             doc.inputNeuronActivations.remove(act);
 
@@ -246,7 +246,7 @@ public class InputNode extends Node<InputNode> {
 
 
     public void propagateAddedActivation(Document doc, Activation act, InterprNode removedConflict) {
-        Neuron n = neuron != null ? neuron.get() : null;
+        AbstractNeuron n = neuron != null ? neuron.get() : null;
         if(n instanceof InputNeuron) {
             if(removedConflict == null) {
                 n.propagateAddedActivation(doc, act);
@@ -258,7 +258,7 @@ public class InputNode extends Node<InputNode> {
 
 
     public void propagateRemovedActivation(Document doc, Activation act) {
-        Neuron n = neuron != null ? neuron.get() : null;
+        AbstractNeuron n = neuron != null ? neuron.get() : null;
 
         if(n instanceof InputNeuron) {
             n.propagateRemovedActivation(doc, act);
@@ -401,7 +401,7 @@ public class InputNode extends Node<InputNode> {
 
 
     @Override
-    public double computeSynapseWeightSum(Integer offset, Neuron n) {
+    public double computeSynapseWeightSum(Integer offset, AbstractNeuron n) {
         return n.bias + Math.abs(getSynapse(new SynapseKey(key.relativeRid == null ? null : offset, n.provider)).w);
     }
 
@@ -467,6 +467,7 @@ public class InputNode extends Node<InputNode> {
 
     @Override
     public void write(DataOutput out) throws IOException {
+        out.writeBoolean(false);
         out.writeUTF("I");
         super.write(out);
         key.write(out);
@@ -494,7 +495,7 @@ public class InputNode extends Node<InputNode> {
         key = Synapse.lookupKey(Key.read(in, m));
 
         if(in.readBoolean()) {
-            inputNeuron = m.lookupNeuronProvider(in.readInt());
+            inputNeuron = m.lookupProvider(in.readInt());
         }
 
         while(in.readBoolean()) {
@@ -502,7 +503,8 @@ public class InputNode extends Node<InputNode> {
             Synapse synTmp = Synapse.read(in, m);
 
             if(synTmp.output != null && !synTmp.output.isSuspended()) {
-                Synapse syn = synTmp.output.get().inputSynapses.get(synTmp);
+                AbstractNeuron<?> an = synTmp.output.get();
+                Synapse syn = an.inputSynapses.get(synTmp);
 
                 if(synapses == null) {
                     synapses = new TreeMap<>();
@@ -516,13 +518,13 @@ public class InputNode extends Node<InputNode> {
 
     public static class SynapseKey implements Writable, Comparable<SynapseKey> {
         Integer rid;
-        Provider<? extends Neuron> n;
+        Provider<? extends AbstractNeuron> n;
 
         private SynapseKey() {
         }
 
 
-        public SynapseKey(Integer rid, Provider<? extends Neuron> n) {
+        public SynapseKey(Integer rid, Provider<? extends AbstractNeuron> n) {
             this.rid = rid;
             this.n = n;
         }
@@ -558,7 +560,7 @@ public class InputNode extends Node<InputNode> {
             if(in.readBoolean()) {
                 rid = in.readInt();
             }
-            n = m.lookupNeuronProvider(in.readInt());
+            n = m.lookupProvider(in.readInt());
         }
     }
 }

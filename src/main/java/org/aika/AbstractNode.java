@@ -16,31 +16,30 @@
  */
 package org.aika;
 
+import org.aika.lattice.Node;
+import org.aika.neuron.AbstractNeuron;
 
 import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 
+/**
+ *
+ * @author Lukas Molzberger
+ */
+public abstract class AbstractNode<T extends AbstractNode> implements Writable {
 
-public interface Writable {
+    public volatile int lastUsedDocumentId = 0;
 
-    /**
-     * Serialize the fields of this object to <code>out</code>.
-     *
-     * @param out <code>DataOuput</code> to serialize this object into.
-     * @throws IOException
-     */
-    void write(DataOutput out) throws IOException;
+    public Provider<T> provider;
 
-    /**
-     * Deserialize the fields of this object from <code>in</code>.
-     *
-     * <p>For efficiency, implementations should attempt to re-use storage in the
-     * existing object where possible.</p>
-     *
-     * @param in <code>DataInput</code> to deseriablize this object from.
-     * @throws IOException
-     */
-    void readFields(DataInput in, Model m) throws IOException;
+    public static AbstractNode read(DataInput in, Provider p) throws IOException {
+        AbstractNode n;
+        if(in.readBoolean()) {
+            n = AbstractNeuron.read(in, p);
+        } else {
+            n = Node.read(in, p);
+        }
+        return n;
+    }
 
 }

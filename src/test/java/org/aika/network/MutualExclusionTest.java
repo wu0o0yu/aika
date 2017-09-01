@@ -25,6 +25,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
+import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
 

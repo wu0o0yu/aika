@@ -46,7 +46,7 @@ import static org.aika.corpus.Range.Operator.EQUALS;
  *
  * @author Lukas Molzberger
  */
-public class InputNeuron extends Neuron {
+public class InputNeuron extends AbstractNeuron<InputNeuron> {
 
 
     public InputNeuron() {}

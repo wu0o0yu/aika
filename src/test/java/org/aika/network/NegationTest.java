@@ -27,6 +27,7 @@ import org.aika.corpus.Range;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.neuron.InputNeuron;
+import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -583,7 +584,7 @@ public class NegationTest {
                         .setRangeOutput(true)
         );
 
-        Neuron outA = m.initOrNeuron(m.createNeuron("OUT A"),
+        AbstractNeuron outA = m.initOrNeuron(m.createNeuron("OUT A"),
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
@@ -593,7 +594,7 @@ public class NegationTest {
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
-        Neuron outAC = m.initOrNeuron(m.createNeuron("OUT AC"),
+        AbstractNeuron outAC = m.initOrNeuron(m.createNeuron("OUT AC"),
                 new Input()
                         .setNeuron(ascN)
                         .setWeight(1.0)
@@ -603,7 +604,7 @@ public class NegationTest {
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
-        Neuron outB = m.initOrNeuron(m.createNeuron("OUT B"),
+        AbstractNeuron outB = m.initOrNeuron(m.createNeuron("OUT B"),
                 new Input()
                         .setNeuron(bsN)
                         .setWeight(1.0)
@@ -711,7 +712,7 @@ public class NegationTest {
         InputNeuron inG = m.createOrLookupInputNeuron("G");
         InputNode inGNode = (InputNode) inG.node.get();
 
-        Neuron pH = m.initAndNeuron(m.createNeuron("H"),
+        AbstractNeuron pH = m.initAndNeuron(m.createNeuron("H"),
                 0.001,
                 new Input()
                         .setNeuron(pC)

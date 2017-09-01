@@ -22,6 +22,7 @@ import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.neuron.InputNeuron;
+import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,7 +46,7 @@ public class WeakInputProcessingTest {
 
         Neuron suppr = m.createNeuron("suppr");
 
-        Neuron patternA = m.initAndNeuron(
+        AbstractNeuron<?> patternA = m.initAndNeuron(
                 m.createNeuron("Pattern A"),
                 0.4,
                 new Input()

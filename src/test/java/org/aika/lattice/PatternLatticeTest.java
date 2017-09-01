@@ -26,7 +26,6 @@ import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.network.TestHelper;
 import org.aika.neuron.InputNeuron;
-import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
 

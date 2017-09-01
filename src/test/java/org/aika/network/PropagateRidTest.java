@@ -23,6 +23,7 @@ import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
 import org.aika.neuron.InputNeuron;
+import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;

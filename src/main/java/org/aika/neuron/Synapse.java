@@ -21,7 +21,6 @@ import org.aika.Model;
 import org.aika.Provider;
 import org.aika.Utils;
 import org.aika.Writable;
-import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
@@ -93,8 +92,8 @@ public class Synapse implements Writable {
         }
     };
 
-    public Provider<? extends Neuron> input;
-    public Provider<? extends Neuron> output;
+    public Provider<? extends AbstractNeuron> input;
+    public Provider<? extends AbstractNeuron> output;
 
     public Provider<InputNode> inputNode;
 
@@ -112,14 +111,14 @@ public class Synapse implements Writable {
     public Synapse() {}
 
 
-    public Synapse(Neuron input) {
+    public Synapse(AbstractNeuron input) {
         if(input != null) {
             this.input = input.provider;
         }
     }
 
 
-    public Synapse(Neuron input, Key key) {
+    public Synapse(AbstractNeuron input, Key key) {
         this(input);
         this.key = lookupKey(key);
 
@@ -128,8 +127,8 @@ public class Synapse implements Writable {
 
 
     public void link(int threadId) {
-        Neuron in = input.get();
-        Neuron out = output.get();
+        AbstractNeuron in = input.get();
+        AbstractNeuron out = output.get();
 
         boolean dir = in.provider.id < out.provider.id;
 
@@ -178,9 +177,9 @@ public class Synapse implements Writable {
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        input = m.lookupNeuronProvider(in.readInt());
-        output = m.lookupNeuronProvider(in.readInt());
-        inputNode = m.lookupNodeProvider(in.readInt());
+        input = m.lookupProvider(in.readInt());
+        output = m.lookupProvider(in.readInt());
+        inputNode = m.lookupProvider(in.readInt());
 
         key = lookupKey(Key.read(in, m));
 

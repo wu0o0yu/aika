@@ -25,8 +25,8 @@ import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.Node;
 import org.aika.lattice.Node.ThreadState;
-import org.aika.neuron.Neuron;
-import org.aika.neuron.Neuron.NormWeight;
+import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.AbstractNeuron.NormWeight;
 import org.aika.neuron.Synapse;
 
 import java.util.*;
@@ -447,7 +447,7 @@ public class Activation implements Comparable<Activation> {
         }
 
         public boolean equals(State s) {
-            return Math.abs(value - s.value) <= Neuron.WEIGHT_TOLERANCE || Math.abs(ub - s.ub) <= Neuron.WEIGHT_TOLERANCE || Math.abs(lb - s.lb) <= Neuron.WEIGHT_TOLERANCE;
+            return Math.abs(value - s.value) <= AbstractNeuron.WEIGHT_TOLERANCE || Math.abs(ub - s.ub) <= AbstractNeuron.WEIGHT_TOLERANCE || Math.abs(lb - s.lb) <= AbstractNeuron.WEIGHT_TOLERANCE;
         }
 
         public boolean equalsWithWeights(State s) {

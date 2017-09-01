@@ -26,7 +26,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.InputNode.SynapseKey;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Synapse;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 
@@ -456,7 +456,7 @@ public class AndNode extends Node<AndNode> {
 
 
     @Override
-    public double computeSynapseWeightSum(Integer offset, Neuron n) {
+    public double computeSynapseWeightSum(Integer offset, AbstractNeuron n) {
         double sum = n.bias;
         for(Refinement ref: parents.keySet()) {
             Synapse s = ref.getSynapse(offset, n);
@@ -518,6 +518,7 @@ public class AndNode extends Node<AndNode> {
 
     @Override
     public void write(DataOutput out) throws IOException {
+        out.writeBoolean(false);
         out.writeUTF("A");
         super.write(out);
 
@@ -546,7 +547,7 @@ public class AndNode extends Node<AndNode> {
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
             Refinement ref = Refinement.read(in, m);
-            Provider<? extends Node> pn = m.lookupNodeProvider(in.readInt());
+            Provider<? extends Node> pn = m.lookupProvider(in.readInt());
             parents.put(ref, pn);
         }
     }
@@ -587,7 +588,7 @@ public class AndNode extends Node<AndNode> {
         }
 
 
-        public Synapse getSynapse(Integer offset, Neuron n) {
+        public Synapse getSynapse(Integer offset, AbstractNeuron n) {
             InputNode in = input.get();
             in.lock.acquireReadLock();
             Synapse s = in.synapses != null ? in.synapses.get(new SynapseKey(Utils.nullSafeAdd(getRelativePosition(), false, offset, false), n.provider)) : null;
@@ -612,7 +613,7 @@ public class AndNode extends Node<AndNode> {
             if(in.readBoolean()) {
                 rid = in.readInt();
             }
-            input = m.lookupNodeProvider(in.readInt());
+            input = m.lookupProvider(in.readInt());
             return true;
         }
 

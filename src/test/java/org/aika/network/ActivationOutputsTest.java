@@ -31,6 +31,7 @@ import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.InputNeuron;
+import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;

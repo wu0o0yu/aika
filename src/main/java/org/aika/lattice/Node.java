@@ -19,29 +19,19 @@ package org.aika.lattice;
 
 import org.aika.*;
 import org.aika.Activation.Key;
-import org.aika.Activation.SynapseActivation;
-import org.aika.corpus.Conflicts;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
-import org.aika.corpus.Range.Operator;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.lattice.OrNode.OrEntry;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Synapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
-
-import static org.aika.corpus.Range.Operator.*;
-import static org.aika.corpus.Range.Mapping.END;
-import static org.aika.corpus.Range.Mapping.START;
 
 
 /**
@@ -60,7 +50,7 @@ import static org.aika.corpus.Range.Mapping.START;
  *
  * @author Lukas Molzberger
  */
-public abstract class Node<T extends Node> implements Comparable<Node>, Writable {
+public abstract class Node<T extends Node> extends AbstractNode<T> implements Comparable<Node> {
     public static int minFrequency = 5;
     public static int MAX_RID = 20;
 
@@ -68,8 +58,6 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
     public static final Node MAX_NODE = new InputNode();
 
     private static final Logger log = LoggerFactory.getLogger(Node.class);
-
-    public Provider<T> provider;
 
     TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
     TreeMap<Refinement, Provider<AndNode>> andChildren;
@@ -106,13 +94,11 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
     public boolean isQueued = false;
     public long queueId;
 
-    public Provider<? extends Neuron> neuron = null;
+    public Provider<? extends AbstractNeuron> neuron = null;
 
     public static long visitedCounter = 0;
 
     public ThreadState[] threads;
-
-    public volatile int lastUsedDocumentId = 0;
 
     /**
      * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
@@ -206,7 +192,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
 
     abstract void deleteActivation(Document doc, Activation act);
 
-    public abstract double computeSynapseWeightSum(Integer offset, Neuron n);
+    public abstract double computeSynapseWeightSum(Integer offset, AbstractNeuron n);
 
     public abstract String logicToString();
 
@@ -229,7 +215,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
 
     public Node(Model m, int level) {
         threads = new ThreadState[m.numberOfThreads];
-        m.createNodeProvider(this);
+        m.createProvider(this);
         this.level = level;
         if(m != null) {
             nOffset = m.numberOfPositions;
@@ -623,7 +609,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
     }
 
 
-    private static int evaluate(Neuron n, RSKey rsk) {
+    private static int evaluate(AbstractNeuron n, RSKey rsk) {
         Node pa = rsk.pa != null ? rsk.pa.get() : null;
         double sum = pa.computeSynapseWeightSum(rsk.offset, n);
         if(sum < 0.0) return -1;
@@ -653,7 +639,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
      * @param dir
      * @return
      */
-    public static boolean adjust(Model m, int threadId, Neuron neuron, final int dir) {
+    public static boolean adjust(Model m, int threadId, AbstractNeuron<?> neuron, final int dir) {
         long v = visitedCounter++;
         OrNode outputNode = (OrNode) neuron.node.get();
 
@@ -661,7 +647,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
 
         neuron.maxRecurrentSum = 0.0;
         for(Synapse s: neuron.inputSynapsesByWeight) {
-            Neuron in = s.input.get();
+            AbstractNeuron in = s.input.get();
             in.lock.acquireWriteLock(threadId);
 
             if (s.inputNode == null) {
@@ -757,7 +743,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
     }
 
 
-    private static void computeRefinements(Model m, int threadId, TreeSet<RSKey> queue, Neuron n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup) {
+    private static void computeRefinements(Model m, int threadId, TreeSet<RSKey> queue, AbstractNeuron<?> n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup) {
         n.lock.acquireWriteLock(threadId);
         Synapse minSyn = null;
         double sum = 0.0;
@@ -794,7 +780,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
     }
 
 
-    void prepareResultsForPredefinedNodes(int threadId, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, Neuron n, Synapse s, Integer offset) {
+    void prepareResultsForPredefinedNodes(int threadId, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, AbstractNeuron n, Synapse s, Integer offset) {
         RSKey rs = new RSKey(provider, offset);
         RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
         // TODO: mindestens einen positiven Knoten mit rein nehmen.
@@ -938,7 +924,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
         level = in.readInt();
 
         if(in.readBoolean()) {
-            neuron = m.lookupNeuronProvider(in.readInt());
+            neuron = m.lookupProvider(in.readInt());
         }
 
         frequency = in.readInt();
@@ -959,7 +945,7 @@ public abstract class Node<T extends Node> implements Comparable<Node>, Writable
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
-            addAndChild(Refinement.read(in, m), m.lookupNodeProvider(in.readInt()));
+            addAndChild(Refinement.read(in, m), m.lookupProvider(in.readInt()));
         }
 
         s = in.readInt();

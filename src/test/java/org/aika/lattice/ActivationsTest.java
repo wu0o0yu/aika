@@ -27,7 +27,7 @@ import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.network.TestHelper;
 import org.aika.neuron.InputNeuron;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.AbstractNeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -101,7 +101,7 @@ public class ActivationsTest {
         AndNode.minFrequency = 1;
 
 
-        Neuron in = m.createOrLookupInputNeuron("A");
+        AbstractNeuron in = m.createOrLookupInputNeuron("A");
         InputNode inNode = (InputNode) in.node.get();
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

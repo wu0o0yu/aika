@@ -23,7 +23,7 @@ import org.aika.Provider;
 import org.aika.SuspensionHook;
 import org.aika.corpus.Document;
 import org.aika.neuron.InputNeuron;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.AbstractNeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -66,7 +66,7 @@ public class SuspensionTest {
         InputNeuron inA = m.createOrLookupInputNeuron("A");
         InputNeuron inB = m.createOrLookupInputNeuron("B");
 
-        Neuron nC = m.initAndNeuron(m.createNeuron("C"), 0.5,
+        AbstractNeuron nC = m.initAndNeuron(m.createNeuron("C"), 0.5,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0)
@@ -86,7 +86,7 @@ public class SuspensionTest {
         );
 
 
-        Provider<? extends Neuron> outD = m.initAndNeuron(m.createNeuron("D"), 0.5,
+        Provider<? extends AbstractNeuron> outD = m.initAndNeuron(m.createNeuron("D"), 0.5,
                 new Input()
                         .setNeuron(nC)
                         .setWeight(10.0)

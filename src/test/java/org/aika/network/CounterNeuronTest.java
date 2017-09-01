@@ -24,6 +24,7 @@ import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.Node;
 import org.aika.neuron.InputNeuron;
+import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -46,6 +47,7 @@ public class CounterNeuronTest {
 
         InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
         InputNeuron sn = m.createOrLookupInputNeuron("START");
+
 
         Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
 
