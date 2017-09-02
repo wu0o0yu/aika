@@ -17,16 +17,13 @@
 package org.aika.network;
 
 
-import org.aika.Activation;
 import org.aika.Input;
 import org.aika.Model;
-import org.aika.NeuronActivation;
+import org.aika.neuron.Activation;
 import org.aika.corpus.Conflicts.Conflict;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
-import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
 
@@ -173,7 +170,7 @@ public class MutualExclusionTest {
 
         System.out.println("Output activation:");
         OrNode n = outN.node.get();
-        for(NeuronActivation act: n.getActivations(doc)) {
+        for(Activation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
             System.out.println("Node: " + act.key.n);

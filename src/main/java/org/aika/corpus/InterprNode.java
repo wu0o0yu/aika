@@ -17,12 +17,11 @@
 package org.aika.corpus;
 
 
-import org.aika.Activation;
-import org.aika.Activation.Key;
-import org.aika.NeuronActivation;
+import org.aika.lattice.NodeActivation;
+import org.aika.lattice.NodeActivation.Key;
+import org.aika.neuron.Activation;
 import org.aika.Utils;
 import org.aika.lattice.Node;
-import org.aika.lattice.OrNode;
 
 import java.util.*;
 
@@ -52,7 +51,7 @@ public class InterprNode implements Comparable<InterprNode> {
     public final int id;
     public int length;
 
-    public Map<Activation, InterprNode> orInterprNodes;
+    public Map<NodeActivation, InterprNode> orInterprNodes;
     public Set<InterprNode> refByOrInterprNode;
     public InterprNode largestCommonSubset;
     public Set<InterprNode> linkedByLCS;
@@ -104,8 +103,8 @@ public class InterprNode implements Comparable<InterprNode> {
     public int isConflict = -1;
     public Conflicts conflicts = new Conflicts();
 
-    public NavigableMap<Key, Activation> activations;
-    public NavigableSet<NeuronActivation> neuronActivations;
+    public NavigableMap<Key, NodeActivation> activations;
+    public NavigableSet<Activation> neuronActivations;
 
 
     public int refCount = 0;
@@ -206,7 +205,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public void addOrOption(Activation inputAct, InterprNode n) {
+    public void addOrOption(NodeActivation inputAct, InterprNode n) {
         if (orInterprNodes == null) {
             orInterprNodes = new TreeMap<>();
         }
@@ -219,7 +218,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public void removeOrOption(Activation inputAct, InterprNode n) {
+    public void removeOrOption(NodeActivation inputAct, InterprNode n) {
         orInterprNodes.remove(inputAct);
         n.refByOrInterprNode.remove(this);
         computeLargestCommonSubset();
@@ -246,7 +245,7 @@ public class InterprNode implements Comparable<InterprNode> {
         if (v == visitedExpandActivations) return;
         visitedExpandActivations = v;
 
-        for (Activation act : getActivations()) {
+        for (NodeActivation act : getActivations()) {
             act.key.n.propagateAddedActivation(doc, act, conflict);
         }
 
@@ -260,7 +259,7 @@ public class InterprNode implements Comparable<InterprNode> {
         if (v == visitedRemoveActivations) return;
         visitedRemoveActivations = v;
 
-        for (Activation act : getActivations()) {
+        for (NodeActivation act : getActivations()) {
             if (act.key.o.contains(conflict, false)) {
                 Node.removeActivationAndPropagate(doc, act, act.inputs.values());
             }
@@ -276,12 +275,12 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public Collection<Activation> getActivations() {
+    public Collection<NodeActivation> getActivations() {
         return activations != null ? activations.values() : Collections.emptySet();
     }
 
 
-    public Collection<NeuronActivation> getNeuronActivations() {
+    public Collection<Activation> getNeuronActivations() {
         return neuronActivations != null ? neuronActivations : Collections.emptySet();
     }
 
@@ -648,7 +647,7 @@ public class InterprNode implements Comparable<InterprNode> {
         if(visitedStoreFinalWeight == v) return;
         visitedStoreFinalWeight = v;
 
-        for(NeuronActivation act: getNeuronActivations()) {
+        for(Activation act: getNeuronActivations()) {
             act.finalState = act.rounds.getLast();
         }
 

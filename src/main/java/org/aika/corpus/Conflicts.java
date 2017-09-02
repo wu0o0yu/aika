@@ -17,7 +17,7 @@
 package org.aika.corpus;
 
 
-import org.aika.Activation;
+import org.aika.lattice.NodeActivation;
 
 import java.util.Collection;
 import java.util.Map;
@@ -58,7 +58,7 @@ public class Conflicts {
     }
 
 
-    public static void add(Document doc, Activation act, InterprNode primary, InterprNode secondary) {
+    public static void add(Document doc, NodeActivation act, InterprNode primary, InterprNode secondary) {
         Key ck = new Key(secondary, act);
         Conflict c = primary.conflicts.primary.get(ck);
         if(c == null) {
@@ -78,7 +78,7 @@ public class Conflicts {
     }
 
 
-    public static void remove(Document doc, Activation act, InterprNode primary, InterprNode secondary) {
+    public static void remove(Document doc, NodeActivation act, InterprNode primary, InterprNode secondary) {
         Key ck = new Key(secondary, act);
 
         Conflict c = primary.conflicts.primary.get(ck);
@@ -125,13 +125,13 @@ public class Conflicts {
 
 
     public static class Conflict {
-        public Activation act;
+        public NodeActivation act;
         public InterprNode primary;
         public InterprNode secondary;
         public InterprNode conflict;
 
 
-        public Conflict(Activation act, InterprNode primary, InterprNode secondary, InterprNode conflict) {
+        public Conflict(NodeActivation act, InterprNode primary, InterprNode secondary, InterprNode conflict) {
             this.act = act;
             this.primary = primary;
             this.secondary = secondary;
@@ -142,9 +142,9 @@ public class Conflicts {
 
     public static class Key implements Comparable<Key> {
         public InterprNode o;
-        public Activation act;
+        public NodeActivation act;
 
-        public Key(InterprNode o, Activation act) {
+        public Key(InterprNode o, NodeActivation act) {
             this.o = o;
             this.act = act;
         }
@@ -153,7 +153,7 @@ public class Conflicts {
         public int compareTo(Key k) {
             int r = o.compareTo(k.o);
             if(r != 0) return r;
-            return Activation.compare(act, k.act);
+            return NodeActivation.compare(act, k.act);
         }
     }
 }

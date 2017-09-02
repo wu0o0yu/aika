@@ -17,12 +17,10 @@
 package org.aika.corpus;
 
 
-import org.aika.Activation;
-import org.aika.NeuronActivation.Rounds;
-import org.aika.NeuronActivation.SynapseActivation;
-import org.aika.NeuronActivation;
+import org.aika.neuron.Activation.Rounds;
+import org.aika.neuron.Activation.SynapseActivation;
+import org.aika.neuron.Activation;
 import org.aika.corpus.Conflicts.Conflict;
-import org.aika.lattice.OrNode;
 import org.aika.neuron.Neuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,7 +170,7 @@ public class SearchNode implements Comparable<SearchNode> {
         changeState(StateChange.Mode.NEW);
 
         for(StateChange sc : modifiedActs) {
-            NeuronActivation act = sc.act;
+            Activation act = sc.act;
             if(act.finalState != null && act.finalState.value > 0.0) {
                 doc.finallyActivatedNeurons.add(act.key.n.neuron.get());
             }
@@ -268,7 +266,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private boolean hasUnsatisfiedPositiveFeedbackLink(InterprNode n) {
         if(n.hasUnsatisfiedPosFeedbackLinksCache != null) return n.hasUnsatisfiedPosFeedbackLinksCache;
 
-        for(NeuronActivation act: n.getNeuronActivations()) {
+        for(Activation act: n.getNeuronActivations()) {
             for(SynapseActivation sa: act.neuronOutputs) {
                 if(sa.s.key.isRecurrent && sa.s.w > 0.0 && !isCovered(sa.output.key.o.markedSelected)) {
                     n.hasUnsatisfiedPosFeedbackLinksCache = true;
@@ -629,14 +627,14 @@ public class SearchNode implements Comparable<SearchNode> {
      *
      */
     public static class StateChange {
-        public NeuronActivation act;
+        public Activation act;
 
         public Rounds oldRounds;
         public Rounds newRounds;
 
         public enum Mode { OLD, NEW }
 
-        public static void saveOldState(List<StateChange> changes, NeuronActivation act, long v) {
+        public static void saveOldState(List<StateChange> changes, Activation act, long v) {
             StateChange sc = act.currentStateChange;
             if(sc == null || act.currentStateV != v) {
                 sc = new StateChange();
@@ -650,7 +648,7 @@ public class SearchNode implements Comparable<SearchNode> {
             }
         }
 
-        public static void saveNewState(NeuronActivation act) {
+        public static void saveNewState(Activation act) {
             StateChange sc = act.currentStateChange;
 
             sc.newRounds = act.rounds;

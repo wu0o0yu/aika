@@ -24,6 +24,7 @@ import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode.Refinement;
+import org.aika.neuron.Activation;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.Key;
@@ -45,7 +46,7 @@ import static org.aika.corpus.Range.Operator.*;
  *
  * @author Lukas Molzberger
  */
-public class InputNode extends Node<InputNode, Activation<InputNode>> {
+public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     public Key key;
     public Provider<? extends Neuron> inputNeuron;
@@ -100,7 +101,7 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
 
 
     @Override
-    public void initActivation(Document doc, Activation act) {
+    public void initActivation(Document doc, NodeActivation act) {
         if(!isBlocked) {
             doc.inputNodeActivations.add(act);
         }
@@ -108,18 +109,18 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
 
 
     @Override
-    public void deleteActivation(Document doc, Activation act) {
+    public void deleteActivation(Document doc, NodeActivation act) {
         if(!isBlocked) {
             doc.inputNodeActivations.remove(act);
         }
     }
 
 
-    private Activation.Key computeActivationKey(Activation iAct) {
-        Activation.Key ak = iAct.key;
+    private NodeActivation.Key computeActivationKey(NodeActivation iAct) {
+        NodeActivation.Key ak = iAct.key;
         if((key.absoluteRid != null && key.absoluteRid != ak.rid) || ak.o.isConflicting(ak.o.doc.visitedCounter++)) return null;
 
-        return new Activation.Key(
+        return new NodeActivation.Key(
                 this,
                 new Range(key.startRangeMapping.getSignalPos(ak.r), key.endRangeMapping.getSignalPos(ak.r)),
                 key.relativeRid != null ? ak.rid : null,
@@ -128,8 +129,8 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
     }
 
     @Override
-    protected Activation<InputNode> createNewActivation(int id, Activation.Key ak) {
-        return new Activation<>(id, ak);
+    protected NodeActivation<InputNode> createNewActivation(int id, NodeActivation.Key ak) {
+        return new NodeActivation<>(id, ak);
     }
 
 
@@ -146,9 +147,9 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
 
 
     @Override
-    boolean hasSupport(Activation<InputNode> act) {
-        for(Activation iAct: act.inputs.values()) {
-            NeuronActivation iNAct = (NeuronActivation) iAct;
+    boolean hasSupport(NodeActivation<InputNode> act) {
+        for(NodeActivation iAct: act.inputs.values()) {
+            Activation iNAct = (Activation) iAct;
             if(!iAct.isRemoved && iNAct.upperBound > 0.0) return true;
         }
 
@@ -156,12 +157,12 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
     }
 
 
-    Range preProcessAddedActivation(Document doc, Activation.Key<InputNode> ak, Collection<Activation> inputActs) {
+    Range preProcessAddedActivation(Document doc, NodeActivation.Key<InputNode> ak, Collection<NodeActivation> inputActs) {
         if(key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE) {
             boolean dir = key.startRangeMapping == Mapping.NONE;
             int pos = ak.r.getBegin(dir);
 
-            List<Activation> tmp = Activation.select(
+            List<NodeActivation> tmp = NodeActivation.select(
                     doc,
                     this,
                     ak.rid,
@@ -172,25 +173,25 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
                     InterprNode.Relation.CONTAINS
             ).collect(Collectors.toList());
 
-            for(Activation act: tmp) {
-                addActivationInternal(doc, new Activation.Key(this, new Range(act.key.r.getBegin(dir), pos).invert(dir), act.key.rid, act.key.o), act.inputs.values(), false);
-                act.removedId = Activation.removedIdCounter++;
+            for(NodeActivation act: tmp) {
+                addActivationInternal(doc, new NodeActivation.Key(this, new Range(act.key.r.getBegin(dir), pos).invert(dir), act.key.rid, act.key.o), act.inputs.values(), false);
+                act.removedId = NodeActivation.removedIdCounter++;
                 act.isRemoved = true;
                 removeActivationInternal(doc, act, act.inputs.values());
             }
 
-            Activation cAct = Activation.getNextSignal(this, doc, pos, ak.rid, ak.o, dir, dir);
+            NodeActivation cAct = NodeActivation.getNextSignal(this, doc, pos, ak.rid, ak.o, dir, dir);
             return new Range(ak.r.getBegin(dir), cAct != null ? cAct.key.r.getBegin(dir) : (dir ? Integer.MIN_VALUE : Integer.MAX_VALUE)).invert(dir);
         }
         return ak.r;
     }
 
 
-    void postProcessRemovedActivation(Document doc, Activation<InputNode> act, Collection<Activation> inputActs) {
-        Activation.Key ak = act.key;
+    void postProcessRemovedActivation(Document doc, NodeActivation<InputNode> act, Collection<NodeActivation> inputActs) {
+        NodeActivation.Key ak = act.key;
         if(key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE) {
             boolean dir = key.startRangeMapping == Mapping.NONE;
-            List<Activation> tmp = Activation.select(
+            List<NodeActivation> tmp = NodeActivation.select(
                     doc,
                     this,
                     ak.rid,
@@ -201,11 +202,11 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
                     InterprNode.Relation.CONTAINS
             ).collect(Collectors.toList());
 
-            for(Activation cAct: tmp) {
-                Activation.Key cak = cAct.key;
-                processAddedActivation(doc, new Activation.Key(cak.n, new Range(dir ? Integer.MIN_VALUE : cak.r.begin, dir ? cak.r.end : Integer.MAX_VALUE), cak.rid, cak.o), cAct.inputs.values());
+            for(NodeActivation cAct: tmp) {
+                NodeActivation.Key cak = cAct.key;
+                processAddedActivation(doc, new NodeActivation.Key(cak.n, new Range(dir ? Integer.MIN_VALUE : cak.r.begin, dir ? cak.r.end : Integer.MAX_VALUE), cak.rid, cak.o), cAct.inputs.values());
                 if(!cAct.isRemoved) {
-                    cAct.removedId = Activation.removedIdCounter++;
+                    cAct.removedId = NodeActivation.removedIdCounter++;
                     cAct.isRemoved = true;
                     removeActivationInternal(doc, cAct, cAct.inputs.values());
                 }
@@ -214,8 +215,8 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
     }
 
 
-    public void addActivation(Document doc, Activation inputAct) {
-        Activation.Key ak = computeActivationKey(inputAct);
+    public void addActivation(Document doc, NodeActivation inputAct) {
+        NodeActivation.Key ak = computeActivationKey(inputAct);
 
         if(ak != null) {
             addActivationAndPropagate(doc, ak, Collections.singleton(inputAct));
@@ -223,8 +224,8 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
     }
 
 
-    public void removeActivation(Document doc, Activation<?> inputAct) {
-        for(Activation act: inputAct.outputs.values()) {
+    public void removeActivation(Document doc, NodeActivation<?> inputAct) {
+        for(NodeActivation act: inputAct.outputs.values()) {
             if(act.key.n == this) {
                 removeActivationAndPropagate(doc, act, Collections.singleton(inputAct));
             }
@@ -232,14 +233,14 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
     }
 
 
-    public void propagateAddedActivation(Document doc, Activation act, InterprNode removedConflict) {
+    public void propagateAddedActivation(Document doc, NodeActivation act, InterprNode removedConflict) {
         if(!key.isNeg && !key.isRecurrent) {
             apply(doc, act, removedConflict);
         }
     }
 
 
-    public void propagateRemovedActivation(Document doc, Activation act) {
+    public void propagateRemovedActivation(Document doc, NodeActivation act) {
         if(!key.isNeg && !key.isRecurrent) {
             removeFromNextLevel(doc, act);
         }
@@ -247,7 +248,7 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
 
 
     @Override
-    public boolean isAllowedOption(int threadId, InterprNode n, Activation act, long v) {
+    public boolean isAllowedOption(int threadId, InterprNode n, NodeActivation act, long v) {
         return false;
     }
 
@@ -267,7 +268,7 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
      * @param removedConflict This parameter contains a removed conflict if it is not null. In this case only expand activations that contain this removed conflict.
      */
     @Override
-    void apply(Document doc, Activation act, InterprNode removedConflict) {
+    void apply(Document doc, NodeActivation act, InterprNode removedConflict) {
         // Check if the activation has been deleted in the meantime.
         if(act.isRemoved) {
             return;
@@ -287,15 +288,15 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
     }
 
 
-    private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, Provider<AndNode> pnlp, Activation act, InterprNode removedConflict) {
-        Activation.Key ak = act.key;
+    private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, Provider<AndNode> pnlp, NodeActivation act, InterprNode removedConflict) {
+        NodeActivation.Key ak = act.key;
         InputNode firstNode = ((InputNode) ak.n);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
 
         ThreadState th = secondNode.getThreadState(doc.threadId, false);
         if(th == null || th.activations.isEmpty()) return;
 
-        Stream<Activation<InputNode>> s = Activation.select(
+        Stream<NodeActivation<InputNode>> s = NodeActivation.select(
                 th,
                 secondNode,
                 secondRid,
@@ -312,7 +313,7 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
                 if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
                     AndNode nlp = pnlp.get();
                     nlp.addActivation(doc,
-                            new Activation.Key(
+                            new NodeActivation.Key(
                                     nlp,
                                     Range.mergeRange(
                                             Range.getOutputRange(ak.r, new boolean[]{ firstNode.key.startRangeOutput, firstNode.key.endRangeOutput}),
@@ -356,10 +357,10 @@ public class InputNode extends Node<InputNode, Activation<InputNode>> {
 
 
     @Override
-    public void discover(Document doc, Activation<InputNode> act) {
+    public void discover(Document doc, NodeActivation<InputNode> act) {
         long v = Node.visitedCounter++;
 
-        for(Activation secondAct: doc.inputNodeActivations) {
+        for(NodeActivation secondAct: doc.inputNodeActivations) {
             Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.n.provider);
             InputNode in = ref.input.get();
             Operator srm = computeStartRangeMatch(key, in.key);

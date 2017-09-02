@@ -17,13 +17,12 @@
 package org.aika.network;
 
 
-import org.aika.Activation;
+import org.aika.lattice.NodeActivation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.Node;
-import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -85,7 +84,7 @@ public class RelationalNeuronTest {
     }
 
     
-    private <T extends Node, A extends Activation<T>> Activation getAct(Document doc, T n, Integer rid, Range r, final InterprNode o) {
-        return Activation.select(doc, n, rid, r, EQUALS, EQUALS, null, null).filter(act -> o == null || act.key.o == o).findFirst().orElse(null);
+    private <T extends Node, A extends NodeActivation<T>> NodeActivation getAct(Document doc, T n, Integer rid, Range r, final InterprNode o) {
+        return NodeActivation.select(doc, n, rid, r, EQUALS, EQUALS, null, null).filter(act -> o == null || act.key.o == o).findFirst().orElse(null);
     }
 }

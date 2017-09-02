@@ -1,7 +1,7 @@
 package org.aika.network;
 
 
-import org.aika.Activation;
+import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -56,9 +56,9 @@ public class OpenRangeInputNode {
 
         System.out.println(doc.nodeActivationsToString(false, true));
 
-        Assert.assertFalse(Activation.select(doc, inputNode, null, new Range(null, 4), Operator.NONE, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
-        Assert.assertFalse(Activation.select(doc, inputNode, null, new Range(4, 7), Operator.EQUALS, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
-        Assert.assertFalse(Activation.select(doc, inputNode, null, new Range(7, 11), Operator.EQUALS, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
+        Assert.assertFalse(NodeActivation.select(doc, inputNode, null, new Range(null, 4), Operator.NONE, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
+        Assert.assertFalse(NodeActivation.select(doc, inputNode, null, new Range(4, 7), Operator.EQUALS, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
+        Assert.assertFalse(NodeActivation.select(doc, inputNode, null, new Range(7, 11), Operator.EQUALS, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
         doc.clearActivations();
     }
 
@@ -73,9 +73,9 @@ public class OpenRangeInputNode {
 
         System.out.println(doc.nodeActivationsToString(false, true));
 
-        Assert.assertFalse(Activation.select(doc, inputNode, null, new Range(null, 4), Operator.NONE, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
-        Assert.assertFalse(Activation.select(doc, inputNode, null, new Range(4, 7), Operator.EQUALS, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
-        Assert.assertFalse(Activation.select(doc, inputNode, null, new Range(7, 11), Operator.EQUALS, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
+        Assert.assertFalse(NodeActivation.select(doc, inputNode, null, new Range(null, 4), Operator.NONE, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
+        Assert.assertFalse(NodeActivation.select(doc, inputNode, null, new Range(4, 7), Operator.EQUALS, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
+        Assert.assertFalse(NodeActivation.select(doc, inputNode, null, new Range(7, 11), Operator.EQUALS, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
         doc.clearActivations();
     }
 

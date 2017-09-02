@@ -17,15 +17,11 @@
 package org.aika.network;
 
 
-import org.aika.Activation;
 import org.aika.Input;
 import org.aika.Model;
-import org.aika.NeuronActivation;
+import org.aika.neuron.Activation;
 import org.aika.corpus.Document;
 import org.aika.corpus.SearchNode;
-import org.aika.lattice.Node;
-import org.aika.lattice.OrNode;
-import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
 
@@ -210,7 +206,7 @@ public class NamedEntityRecognitionTest {
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");
-        for(NeuronActivation act: surnameCategory.getFinalActivations(doc)) {
+        for(Activation act: surnameCategory.getFinalActivations(doc)) {
             System.out.print(act.key.r + " ");
             System.out.print(act.key.rid + " ");
             System.out.print(act.key.o + " ");
@@ -422,7 +418,7 @@ public class NamedEntityRecognitionTest {
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");
-        for(NeuronActivation act: surnameCategory.getFinalActivations(doc)) {
+        for(Activation act: surnameCategory.getFinalActivations(doc)) {
             System.out.print(act.key.r + " ");
             System.out.print(act.key.rid + " ");
             System.out.print(act.key.o + " ");

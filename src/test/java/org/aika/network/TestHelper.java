@@ -17,7 +17,7 @@
 package org.aika.network;
 
 
-import org.aika.Activation;
+import org.aika.lattice.NodeActivation;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
@@ -27,9 +27,6 @@ import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-
-import java.util.Collections;
-import java.util.Set;
 
 import static org.aika.corpus.Range.Operator.*;
 import static org.aika.corpus.Range.Mapping.END;
@@ -42,11 +39,11 @@ import static org.aika.corpus.Range.Mapping.START;
 public class TestHelper {
 
 
-    public static Activation addActivation(InputNode in, Document doc, Activation inputAct) {
+    public static NodeActivation addActivation(InputNode in, Document doc, NodeActivation inputAct) {
         in.addActivation(doc, inputAct);
         doc.propagate();
         if(in instanceof InputNode) {
-            return Activation.get(doc, in, inputAct.key.rid, inputAct.key.r, LESS_THAN, GREATER_THAN, inputAct.key.o, InterprNode.Relation.EQUALS);
+            return NodeActivation.get(doc, in, inputAct.key.rid, inputAct.key.r, LESS_THAN, GREATER_THAN, inputAct.key.o, InterprNode.Relation.EQUALS);
         }
         return null;
     }
@@ -61,7 +58,7 @@ public class TestHelper {
         return InputNode.add(doc.m, new Synapse.Key(false, false, relativeRid, absoluteRid, startRangeMatch, startMapping, startRangeOutput, endRangeMatch, endMapping, endRangeOutput), n);
     }
 
-    public static <T extends Node, A extends Activation<T>> A get(Document doc, T n, Range r, InterprNode o) {
-        return Activation.get(doc, n, null, r, LESS_THAN, GREATER_THAN, o, InterprNode.Relation.EQUALS);
+    public static <T extends Node, A extends NodeActivation<T>> A get(Document doc, T n, Range r, InterprNode o) {
+        return NodeActivation.get(doc, n, null, r, LESS_THAN, GREATER_THAN, o, InterprNode.Relation.EQUALS);
     }
 }

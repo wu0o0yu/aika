@@ -17,8 +17,7 @@
 package org.aika.lattice;
 
 
-import org.aika.Activation;
-import org.aika.Activation.Key;
+import org.aika.lattice.NodeActivation.Key;
 import org.aika.Model;
 import org.aika.Provider;
 import org.aika.Utils;
@@ -45,7 +44,7 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-public class AndNode extends Node<AndNode, Activation<AndNode>> {
+public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
     private static double SIGNIFICANCE_THRESHOLD = 0.98;
     public static int MAX_POS_NODES = 4;
@@ -86,33 +85,33 @@ public class AndNode extends Node<AndNode, Activation<AndNode>> {
 
 
     @Override
-    public boolean isAllowedOption(int threadId, InterprNode n, Activation<?> act, long v) {
+    public boolean isAllowedOption(int threadId, InterprNode n, NodeActivation<?> act, long v) {
         ThreadState th = getThreadState(threadId, true);
         if(th.visitedAllowedOption == v) return false;
         th.visitedAllowedOption = v;
 
-        for(Activation pAct: act.inputs.values()) {
+        for(NodeActivation pAct: act.inputs.values()) {
             if(pAct.key.n.isAllowedOption(threadId, n, pAct, v)) return true;
         }
         return false;
     }
 
 
-    Range preProcessAddedActivation(Document doc, Key<AndNode> ak, Collection<Activation> inputActs) {
-        for(Activation iAct: inputActs) {
+    Range preProcessAddedActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs) {
+        for(NodeActivation iAct: inputActs) {
             if(iAct.isRemoved) return null;
         }
         return ak.r;
     }
 
 
-    void addActivation(Document doc, Key ak, Collection<Activation<?>> directInputActs) {
+    void addActivation(Document doc, Key ak, Collection<NodeActivation<?>> directInputActs) {
         Node.addActivationAndPropagate(doc, ak, directInputActs);
     }
 
 
-    static void removeActivation(Document doc, Activation<?> iAct) {
-        for(Activation act: iAct.outputs.values()) {
+    static void removeActivation(Document doc, NodeActivation<?> iAct) {
+        for(NodeActivation act: iAct.outputs.values()) {
             if(act.key.n instanceof AndNode) {
                 Node.removeActivationAndPropagate(doc, act, Collections.singleton(iAct));
             }
@@ -120,23 +119,23 @@ public class AndNode extends Node<AndNode, Activation<AndNode>> {
     }
 
 
-    public void propagateAddedActivation(Document doc, Activation act, InterprNode removedConflict) {
+    public void propagateAddedActivation(Document doc, NodeActivation act, InterprNode removedConflict) {
         apply(doc, act, removedConflict);
     }
 
 
-    public void propagateRemovedActivation(Document doc, Activation act) {
+    public void propagateRemovedActivation(Document doc, NodeActivation act) {
         removeFromNextLevel(doc, act);
     }
 
 
     @Override
-    boolean hasSupport(Activation<AndNode> act) {
+    boolean hasSupport(NodeActivation<AndNode> act) {
         int expected = parents.size();
 
         int support = 0;
-        Activation lastAct = null;
-        for(Activation iAct: act.inputs.values()) {
+        NodeActivation lastAct = null;
+        for(NodeActivation iAct: act.inputs.values()) {
             if(!iAct.isRemoved && (lastAct == null || lastAct.key.n != iAct.key.n)) {
                 support++;
             }
@@ -219,19 +218,19 @@ public class AndNode extends Node<AndNode, Activation<AndNode>> {
 
 
     @Override
-    void apply(Document doc, Activation<AndNode> act, InterprNode removedConflict) {
+    void apply(Document doc, NodeActivation<AndNode> act, InterprNode removedConflict) {
 
         // Check if the activation has been deleted in the meantime.
         if(act.isRemoved) {
             return;
         }
 
-        for(Activation<?> pAct: act.inputs.values()) {
-            Node<?, Activation<?>> pn = pAct.key.n;
+        for(NodeActivation<?> pAct: act.inputs.values()) {
+            Node<?, NodeActivation<?>> pn = pAct.key.n;
             pn.lock.acquireReadLock();
             Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n.provider, act.key.rid, pAct.key.rid));
             if(ref != null) {
-                for (Activation secondAct : pAct.outputs.values()) {
+                for (NodeActivation secondAct : pAct.outputs.values()) {
                     if (act != secondAct && !secondAct.isRemoved) {
                         Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n.provider, secondAct.key.rid, pAct.key.rid));
                         if (secondRef != null) {
@@ -255,14 +254,14 @@ public class AndNode extends Node<AndNode, Activation<AndNode>> {
 
 
     @Override
-    public void discover(Document doc, Activation<AndNode> act) {
+    public void discover(Document doc, NodeActivation<AndNode> act) {
         if(!isExpandable(true)) return;
 
-        for(Activation<?> pAct: act.inputs.values()) {
-            Node<?, Activation<?>> pn = pAct.key.n;
+        for(NodeActivation<?> pAct: act.inputs.values()) {
+            Node<?, NodeActivation<?>> pn = pAct.key.n;
             pn.lock.acquireReadLock();
             Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n.provider, act.key.rid, pAct.key.rid));
-            for(Activation secondAct: pAct.outputs.values()) {
+            for(NodeActivation secondAct: pAct.outputs.values()) {
                 if(secondAct.key.n instanceof AndNode) {
                     Node secondNode = secondAct.key.n;
                     Integer ridDelta = Utils.nullSafeSub(act.key.rid, false, secondAct.key.rid, false);
@@ -299,8 +298,8 @@ public class AndNode extends Node<AndNode, Activation<AndNode>> {
 
 
     @Override
-    protected Activation<AndNode> createNewActivation(int id, Key ak) {
-        return new Activation<>(id, ak);
+    protected NodeActivation<AndNode> createNewActivation(int id, Key ak) {
+        return new NodeActivation<>(id, ak);
     }
 
 
@@ -368,7 +367,7 @@ public class AndNode extends Node<AndNode, Activation<AndNode>> {
     }
 
 
-    public static void addNextLevelActivation(Document doc, Activation<AndNode> act, Activation<AndNode> secondAct, Provider<AndNode> pnlp, InterprNode conflict) {
+    public static void addNextLevelActivation(Document doc, NodeActivation<AndNode> act, NodeActivation<AndNode> secondAct, Provider<AndNode> pnlp, InterprNode conflict) {
         // TODO: check if the activation already exists
         Key ak = act.key;
         InterprNode o = InterprNode.add(doc, true, ak.o, secondAct.key.o);
@@ -388,8 +387,8 @@ public class AndNode extends Node<AndNode, Activation<AndNode>> {
     }
 
 
-    public static Collection<Activation<?>> prepareInputActs(Activation<?> firstAct, Activation<?> secondAct) {
-        List<Activation<?>> inputActs = new ArrayList<>(2);
+    public static Collection<NodeActivation<?>> prepareInputActs(NodeActivation<?> firstAct, NodeActivation<?> secondAct) {
+        List<NodeActivation<?>> inputActs = new ArrayList<>(2);
         inputActs.add(firstAct);
         inputActs.add(secondAct);
         return inputActs;
@@ -474,12 +473,12 @@ public class AndNode extends Node<AndNode, Activation<AndNode>> {
 
 
     @Override
-    public void initActivation(Document doc, Activation act) {
+    public void initActivation(Document doc, NodeActivation act) {
     }
 
 
     @Override
-    public void deleteActivation(Document doc, Activation act) {
+    public void deleteActivation(Document doc, NodeActivation act) {
     }
 
 

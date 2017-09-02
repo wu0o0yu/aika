@@ -18,8 +18,8 @@ package org.aika.neuron;
 
 
 import org.aika.*;
-import org.aika.NeuronActivation.State;
-import org.aika.NeuronActivation.SynapseActivation;
+import org.aika.neuron.Activation.State;
+import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.corpus.*;
 import org.aika.corpus.SearchNode.Coverage;
 import org.aika.corpus.Range.Operator;
@@ -27,6 +27,7 @@ import org.aika.lattice.InputNode;
 import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.lattice.Node;
 import org.aika.lattice.Node.ThreadState;
+import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.Synapse.Key;
 import org.slf4j.Logger;
@@ -127,7 +128,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
      * @param begin The range begin
      * @param end The range end
      */
-    public NeuronActivation addInput(Document doc, int begin, int end) {
+    public Activation addInput(Document doc, int begin, int end) {
         return addInput(doc, begin, end, null, doc.bottom);
     }
 
@@ -140,7 +141,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
      * @param end The range end
      * @param o The interpretation node
      */
-    public NeuronActivation addInput(Document doc, int begin, int end, InterprNode o) {
+    public Activation addInput(Document doc, int begin, int end, InterprNode o) {
         return addInput(doc, begin, end, null, o);
     }
 
@@ -153,7 +154,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
      * @param end The range end
      * @param rid The relational id (e.g. the word position)
      */
-    public NeuronActivation addInput(Document doc, int begin, int end, Integer rid) {
+    public Activation addInput(Document doc, int begin, int end, Integer rid) {
         return addInput(doc, begin, end, rid, doc.bottom);
     }
 
@@ -167,7 +168,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
      * @param rid The relational id (e.g. the word position)
      * @param o The interpretation node
      */
-    public NeuronActivation addInput(Document doc, int begin, int end, Integer rid, InterprNode o) {
+    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o) {
         return addInput(doc, begin, end, rid, o, 1.0);
     }
 
@@ -182,12 +183,12 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
      * @param o The interpretation node
      * @param value The activation value of this input activation
      */
-    public NeuronActivation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value) {
-        Node.addActivationAndPropagate(doc, new Activation.Key(node.get(), new Range(begin, end), rid, o), Collections.emptySet());
+    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value) {
+        Node.addActivationAndPropagate(doc, new NodeActivation.Key(node.get(), new Range(begin, end), rid, o), Collections.emptySet());
 
         doc.propagate();
 
-        NeuronActivation act = (NeuronActivation) Activation.get(doc, node.get(), rid, new Range(begin, end), EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
+        Activation act = (Activation) NodeActivation.get(doc, node.get(), rid, new Range(begin, end), EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
         State s = new State(value, value, value, 0, NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.finalState = s;
@@ -221,7 +222,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
 
     public void removeInput(Document doc, int begin, int end, Integer rid, InterprNode o) {
         Range r = new Range(begin, end);
-        Activation act = Activation.get(doc, node.get(), rid, r, EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
+        NodeActivation act = NodeActivation.get(doc, node.get(), rid, r, EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
         Node.removeActivationAndPropagate(doc, act, Collections.emptySet());
 
         doc.propagate();
@@ -264,25 +265,25 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
 
 
 
-    public void propagateAddedActivation(Document doc, NeuronActivation act) {
+    public void propagateAddedActivation(Document doc, Activation act) {
         doc.ubQueue.add(act);
     }
 
 
-    public void propagateRemovedActivation(Document doc, Activation act) {
+    public void propagateRemovedActivation(Document doc, NodeActivation act) {
         for(Provider<InputNode> out: outputNodes.values()) {
             out.get().removeActivation(doc, act);
         }
     }
 
 
-    public void computeBounds(NeuronActivation act) {
+    public void computeBounds(Activation act) {
         double ub = bias + posRecSum - (negDirSum + negRecSum);
         double lb = bias + posRecSum - (negDirSum + negRecSum);
 
         for (SynapseActivation sa: act.neuronInputs) {
             Synapse s = sa.s;
-            NeuronActivation iAct = sa.input;
+            Activation iAct = sa.input;
 
             if(iAct == act || iAct.isRemoved) continue;
 
@@ -309,7 +310,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     static final int DIR = 0;
     static final int REC = 1;
 
-    public State computeWeight(int round, NeuronActivation act, SearchNode sn, Document doc) {
+    public State computeWeight(int round, Activation act, SearchNode sn, Document doc) {
         InterprNode o = act.key.o;
         double st = bias - (negDirSum + negRecSum);
         double[][] sum = {{st, st, st}, {0.0, 0.0, 0.0}};
@@ -319,7 +320,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
         for (SynapseActivation sa: getInputSAs(act, round)) {
             Synapse s = sa.s;
 
-            NeuronActivation iAct = sa.input;
+            Activation iAct = sa.input;
             InterprNode io = iAct.key.o;
 
             if (iAct == act || iAct.isRemoved) continue;
@@ -387,7 +388,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    private List<SynapseActivation> getInputSAs(NeuronActivation act, int round) {
+    private List<SynapseActivation> getInputSAs(Activation act, int round) {
         ArrayList<SynapseActivation> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
         SynapseActivation maxSA = null;
@@ -409,7 +410,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    private void storeDebugOutput(Document doc, NeuronActivation act, NormWeight nw, double sum, int round) {
+    private void storeDebugOutput(Document doc, Activation act, NormWeight nw, double sum, int round) {
         StringBuilder sb = new StringBuilder();
         sb.append("Activation ID: " + doc.debugActId + "\n");
         sb.append("Neuron: " + label + "\n");
@@ -441,11 +442,11 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    public void computeErrorSignal(Document doc, NeuronActivation act) {
+    public void computeErrorSignal(Document doc, Activation act) {
         act.errorSignal = act.initialErrorSignal;
         for(SynapseActivation sa: act.neuronOutputs) {
             Synapse s = sa.s;
-            NeuronActivation oAct = sa.output;
+            Activation oAct = sa.output;
 
             act.errorSignal += s.w * oAct.errorSignal * (1.0 - act.finalState.value);
         }
@@ -456,17 +457,17 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    public void train(Document doc, NeuronActivation act) {
+    public void train(Document doc, Activation act) {
         if(Math.abs(act.errorSignal) < TOLERANCE) return;
 
-        long v = Activation.visitedCounter++;
+        long v = NodeActivation.visitedCounter++;
         Range targetRange = null;
         if(act.key.r != null) {
             int s = act.key.r.end - act.key.r.begin;
             targetRange = new Range(Math.max(0, act.key.r.begin - (s / 2)), Math.min(doc.length(), act.key.r.end + (s / 2)));
         }
-        ArrayList<Activation> inputActs = new ArrayList<>();
-        for(Activation iAct: doc.inputNodeActivations) {
+        ArrayList<NodeActivation> inputActs = new ArrayList<>();
+        for(NodeActivation iAct: doc.inputNodeActivations) {
             if(Range.overlaps(iAct.key.r, targetRange)) {
                 inputActs.add(iAct);
             }
@@ -486,7 +487,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
             inputActs.add(sa.input);
         }
 
-        for(Activation iAct: inputActs) {
+        for(NodeActivation iAct: inputActs) {
             Integer rid = Utils.nullSafeSub(iAct.key.rid, false, act.key.rid, false);
             train(doc, iAct, rid, LEARN_RATE * act.errorSignal, v);
         }
@@ -499,11 +500,11 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    public void train(Document doc, Activation<?> iAct, Integer rid, double x, long v) {
+    public void train(Document doc, NodeActivation<?> iAct, Integer rid, double x, long v) {
         if(iAct.visitedNeuronTrain == v) return;
         iAct.visitedNeuronTrain = v;
 
-        NeuronActivation iiAct = (NeuronActivation) iAct.inputs.firstEntry().getValue();
+        Activation iiAct = (Activation) iAct.inputs.firstEntry().getValue();
         Neuron n = iiAct.key.n.neuron.get();
         if(n != this && iiAct.finalState != null && iiAct.finalState.value > TOLERANCE) {
             InputNode in = (InputNode) iAct.key.n;
@@ -574,9 +575,9 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
 
 
     public void count(Document doc) {
-        ThreadState<OrNode, NeuronActivation> th = node.get().getThreadState(doc.threadId, false);
+        ThreadState<OrNode, Activation> th = node.get().getThreadState(doc.threadId, false);
         if(th == null) return;
-        for(NeuronActivation act: th.activations.values()) {
+        for(Activation act: th.activations.values()) {
             if(act.finalState != null && act.finalState.value > 0.0) {
                 activationSum += act.finalState.value;
                 numberOfActivations++;
@@ -590,7 +591,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
      * @param doc
      * @param act
      */
-    public void linkNeuronRelations(Document doc, NeuronActivation act) {
+    public void linkNeuronRelations(Document doc, Activation act) {
         int v = doc.visitedCounter++;
         lock.acquireReadLock();
         linkNeuronActs(doc, act, v, 0);
@@ -599,8 +600,8 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    private void linkNeuronActs(Document doc, NeuronActivation act, int v, int dir) {
-        ArrayList<NeuronActivation> recNegTmp = new ArrayList<>();
+    private void linkNeuronActs(Document doc, Activation act, int v, int dir) {
+        ArrayList<Activation> recNegTmp = new ArrayList<>();
         TreeMap<Synapse, Synapse> syns = (dir == 0 ? inputSynapses : outputSynapses);
 
         for (Synapse s : getActiveSynapses(doc, dir, syns)) {
@@ -612,9 +613,9 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
             linkActSyn(n, doc, act, dir, recNegTmp, s);
         }
 
-        for(NeuronActivation rAct: recNegTmp) {
-            NeuronActivation oAct = (dir == 0 ? act : rAct);
-            NeuronActivation iAct = (dir == 0 ? rAct : act);
+        for(Activation rAct: recNegTmp) {
+            Activation oAct = (dir == 0 ? act : rAct);
+            Activation iAct = (dir == 0 ? rAct : act);
 
             markConflicts(iAct, oAct, v);
 
@@ -623,7 +624,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    private static void linkActSyn(OrNode n, Document doc, NeuronActivation act, int dir, ArrayList<NeuronActivation> recNegTmp, Synapse s) {
+    private static void linkActSyn(OrNode n, Document doc, Activation act, int dir, ArrayList<Activation> recNegTmp, Synapse s) {
         Integer rid;
         if(dir == 0) {
             rid = s.key.absoluteRid != null ? s.key.absoluteRid : Utils.nullSafeAdd(act.key.rid, false, s.key.relativeRid, false);
@@ -648,7 +649,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
             }
         }
 
-        Stream<NeuronActivation> tmp = Activation.select(
+        Stream<Activation> tmp = NodeActivation.select(
                 doc ,
                 n,
                 rid,
@@ -661,8 +662,8 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
 
         final int d = dir;
         tmp.forEach(rAct -> {
-            NeuronActivation oAct = (d == 0 ? act : rAct);
-            NeuronActivation iAct = (d == 0 ? rAct : act);
+            Activation oAct = (d == 0 ? act : rAct);
+            Activation iAct = (d == 0 ? rAct : act);
 
             SynapseActivation sa = new SynapseActivation(s, iAct, oAct);
             iAct.addSynapseActivation(0, sa);
@@ -711,16 +712,16 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    public static void unlinkNeuronRelations(Document doc, NeuronActivation act) {
+    public static void unlinkNeuronRelations(Document doc, Activation act) {
         int v = doc.visitedCounter++;
         for(int dir = 0; dir < 2; dir++) {
             for (SynapseActivation sa: (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
                 Synapse s = sa.s;
-                NeuronActivation rAct = dir == 0 ? sa.input : sa.output;
+                Activation rAct = dir == 0 ? sa.input : sa.output;
 
                 if(s.key.isNeg && s.key.isRecurrent) {
-                    NeuronActivation oAct = (dir == 0 ? act : rAct);
-                    NeuronActivation iAct = (dir == 0 ? rAct : act);
+                    Activation oAct = (dir == 0 ? act : rAct);
+                    Activation iAct = (dir == 0 ? rAct : act);
 
                     markConflicts(iAct, oAct, v);
 
@@ -731,14 +732,14 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
 
         for(int dir = 0; dir < 2; dir++) {
             for (SynapseActivation sa: (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
-                NeuronActivation rAct = dir == 0 ? sa.input : sa.output;
+                Activation rAct = dir == 0 ? sa.input : sa.output;
                 rAct.removeSynapseActivation(dir, sa);
             }
         }
     }
 
 
-    private static void addConflict(Document doc, InterprNode io, InterprNode o, Activation act, Collection<Activation> inputActs, long v) {
+    private static void addConflict(Document doc, InterprNode io, InterprNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
         if(o.markedConflict == v || o.orInterprNodes == null) {
             if (!isAllowed(doc.threadId, io, o, inputActs)) {
                 Conflicts.add(doc, act, io, o);
@@ -751,16 +752,16 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    private static boolean isAllowed(int threadId, InterprNode io, InterprNode o, Collection<Activation> inputActs) {
+    private static boolean isAllowed(int threadId, InterprNode io, InterprNode o, Collection<NodeActivation> inputActs) {
         if(io != null && o.contains(io, false)) return true;
-        for (Activation act : inputActs) {
+        for (NodeActivation act : inputActs) {
             if (act.key.n.isAllowedOption(threadId, o, act, Node.visitedCounter++)) return true;
         }
         return false;
     }
 
 
-    private static void removeConflict(Document doc, InterprNode io, InterprNode o, Activation act, Activation nAct, long v) {
+    private static void removeConflict(Document doc, InterprNode io, InterprNode o, NodeActivation act, NodeActivation nAct, long v) {
         if(o.markedConflict == v || o.orInterprNodes == null) {
             if (!nAct.key.n.isAllowedOption(doc.threadId, o, nAct, Node.visitedCounter++)) {
                 assert io != null;
@@ -775,7 +776,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    private static void markConflicts(NeuronActivation iAct, NeuronActivation oAct, int v) {
+    private static void markConflicts(Activation iAct, Activation oAct, int v) {
         oAct.key.o.markedConflict = v;
         for(SynapseActivation sa: iAct.neuronOutputs) {
             if(sa.s.key.isRecurrent && sa.s.key.isNeg) {
@@ -984,8 +985,8 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
      * @param doc The current document
      * @return A collection with all final activations of this neuron.
      */
-    public Collection<NeuronActivation> getFinalActivations(Document doc) {
-        Stream<NeuronActivation> s = Activation.select(doc, node.get(), null, null, null, null, null, null);
+    public Collection<Activation> getFinalActivations(Document doc) {
+        Stream<Activation> s = NodeActivation.select(doc, node.get(), null, null, null, null, null, null);
         return s.filter(act -> act.finalState != null && act.finalState.value > 0.0)
                 .collect(Collectors.toList());
     }

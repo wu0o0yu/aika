@@ -20,9 +20,8 @@ package org.aika.network;
 import org.aika.Input;
 import org.aika.Input.RangeRelation;
 import org.aika.Model;
-import org.aika.NeuronActivation;
+import org.aika.neuron.Activation;
 import org.aika.corpus.Document;
-import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -160,7 +159,7 @@ public class WeakInputProcessingTest {
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        NeuronActivation act = TestHelper.get(doc, patternA.node.get(), null, null);
+        Activation act = TestHelper.get(doc, patternA.node.get(), null, null);
         Assert.assertTrue(act.finalState.value < 0.5);
 
         act = TestHelper.get(doc, patternB.node.get(), null, null);

@@ -17,15 +17,13 @@
 package org.aika.network;
 
 
-import org.aika.Activation;
+import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
-import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -109,7 +107,7 @@ public class SimplePatternMatchingTest {
 
         System.out.println("Output activation:");
         OrNode n = pattern.node.get();
-        for(Activation act: n.getActivations(doc)) {
+        for(NodeActivation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
             System.out.println("Node: " + act.key.n);
@@ -224,7 +222,7 @@ public class SimplePatternMatchingTest {
 
         System.out.println("Output activation:");
         OrNode n = pattern.node.get();
-        for(Activation act: n.getActivations(doc)) {
+        for(NodeActivation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
             System.out.println("Node: " + act.key.n);

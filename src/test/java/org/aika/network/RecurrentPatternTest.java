@@ -17,13 +17,12 @@
 package org.aika.network;
 
 
-import org.aika.Activation;
+import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
-import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -125,7 +124,7 @@ public class RecurrentPatternTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
-        Activation patAct = patternN.node.get().getFirstActivation(doc);
+        NodeActivation patAct = patternN.node.get().getFirstActivation(doc);
         Assert.assertEquals(4, patAct.key.r.begin.intValue());
         Assert.assertEquals(10, patAct.key.r.end.intValue());
 
@@ -219,7 +218,7 @@ public class RecurrentPatternTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
-        Activation patAct = patternN.node.get().getFirstActivation(doc);
+        NodeActivation patAct = patternN.node.get().getFirstActivation(doc);
         Assert.assertEquals(4, patAct.key.r.begin.intValue());
         Assert.assertEquals(10, patAct.key.r.end.intValue());
 
@@ -288,6 +287,6 @@ public class RecurrentPatternTest {
 
         System.out.println(doc.neuronActivationsToString(false, false, true));
 
-        Assert.assertEquals(2, Activation.get(doc, ctn.node.get(), 2, new Range(10, 15), EQUALS, EQUALS, null, null).key.o.primId);
+        Assert.assertEquals(2, NodeActivation.get(doc, ctn.node.get(), 2, new Range(10, 15), EQUALS, EQUALS, null, null).key.o.primId);
     }
 }

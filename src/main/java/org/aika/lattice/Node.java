@@ -18,7 +18,7 @@ package org.aika.lattice;
 
 
 import org.aika.*;
-import org.aika.Activation.Key;
+import org.aika.lattice.NodeActivation.Key;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
@@ -50,7 +50,7 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-public abstract class Node<T extends Node, A extends Activation<T>> extends AbstractNode<T> implements Comparable<Node> {
+public abstract class Node<T extends Node, A extends NodeActivation<T>> extends AbstractNode<T> implements Comparable<Node> {
     public static int minFrequency = 5;
     public static int MAX_RID = 20;
 
@@ -102,14 +102,14 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
      * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
      * a specific logic node.
      */
-    public static class ThreadState<T extends Node, A extends Activation<T>> {
+    public static class ThreadState<T extends Node, A extends NodeActivation<T>> {
         public long lastUsed;
 
         public TreeMap<Key, A> activations;
         public TreeMap<Key, A> activationsEnd;
         public TreeMap<Key, A> activationsRid;
 
-        public NavigableMap<Key, Collection<Activation<?>>> added;
+        public NavigableMap<Key, Collection<NodeActivation<?>>> added;
         public NavigableMap<Key, RemovedEntry> removed;
         long visitedNeuronRefsChange = -1;
         public long visitedAllowedOption = -1;
@@ -180,15 +180,15 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
      */
     public abstract void propagateAddedActivation(Document doc, A act, InterprNode conflict);
 
-    public abstract void propagateRemovedActivation(Document doc, Activation act);
+    public abstract void propagateRemovedActivation(Document doc, NodeActivation act);
 
-    public abstract boolean isAllowedOption(int threadId, InterprNode n, Activation<?> act, long v);
+    public abstract boolean isAllowedOption(int threadId, InterprNode n, NodeActivation<?> act, long v);
 
     abstract void cleanup(Model m, int threadId);
 
-    abstract void initActivation(Document doc, Activation act);
+    abstract void initActivation(Document doc, NodeActivation act);
 
-    abstract void deleteActivation(Document doc, Activation act);
+    abstract void deleteActivation(Document doc, NodeActivation act);
 
     public abstract double computeSynapseWeightSum(Integer offset, Neuron n);
 
@@ -196,7 +196,7 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
 
     abstract void apply(Document doc, A act, InterprNode conflict);
 
-    public abstract void discover(Document doc, Activation<T> act);
+    public abstract void discover(Document doc, NodeActivation<T> act);
 
     abstract Collection<Refinement> collectNodeAndRefinements(Refinement newRef);
 
@@ -225,7 +225,7 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
     }
 
 
-    public static final Comparator<Activation.Key> BEGIN_COMP = new Comparator<Key>() {
+    public static final Comparator<NodeActivation.Key> BEGIN_COMP = new Comparator<Key>() {
         @Override
         public int compare(Key k1, Key k2) {
             int r;
@@ -238,7 +238,7 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
     };
 
 
-    public static final Comparator<Activation.Key> END_COMP = new Comparator<Key>() {
+    public static final Comparator<NodeActivation.Key> END_COMP = new Comparator<Key>() {
         @Override
         public int compare(Key k1, Key k2) {
             int r;
@@ -251,7 +251,7 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
     };
 
 
-    public static final Comparator<Activation.Key> RID_COMP = new Comparator<Key>() {
+    public static final Comparator<NodeActivation.Key> RID_COMP = new Comparator<Key>() {
         @Override
         public int compare(Key k1, Key k2) {
             int r;
@@ -313,7 +313,7 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
         ThreadState<T, A> ts = getThreadState(threadId, false);
         if(ts == null) return;
 
-        for(Activation<T> act: ts.activations.values()) {
+        for(NodeActivation<T> act: ts.activations.values()) {
             frequency++;
             frequencyHasChanged = true;
 
@@ -323,8 +323,8 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
     }
 
 
-    A addActivationInternal(Document doc, Key ak, Collection<Activation> inputActs, boolean isTrainingAct) {
-        A act = Activation.get(doc, (T) this, ak);
+    A addActivationInternal(Document doc, Key ak, Collection<NodeActivation> inputActs, boolean isTrainingAct) {
+        A act = NodeActivation.get(doc, (T) this, ak);
         if(act == null) {
             act = createNewActivation(doc.activationIdCounter++, ak);
             act.isTrainingAct = isTrainingAct;
@@ -345,7 +345,7 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
     }
 
 
-    boolean removeActivationInternal(Document doc, A act, Collection<Activation> inputActs) {
+    boolean removeActivationInternal(Document doc, A act, Collection<NodeActivation> inputActs) {
         boolean flag = false;
         if(act.isRemoved) {
             unregister(act, doc);
@@ -375,10 +375,10 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
         }
         th.activations.put(ak, act);
 
-        TreeMap<Key, Activation> actEnd = th.activationsEnd;
+        TreeMap<Key, NodeActivation> actEnd = th.activationsEnd;
         if(actEnd != null) actEnd.put(ak, act);
 
-        TreeMap<Key, Activation> actRid = th.activationsRid;
+        TreeMap<Key, NodeActivation> actRid = th.activationsRid;
         if(actRid != null) actRid.put(ak, act);
 
         if(ak.o.activations == null) {
@@ -403,10 +403,10 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
 
         th.activations.remove(ak);
 
-        TreeMap<Key, Activation> actEnd = th.activationsEnd;
+        TreeMap<Key, NodeActivation> actEnd = th.activationsEnd;
         if(actEnd != null) actEnd.remove(ak);
 
-        TreeMap<Key, Activation> actRid = th.activationsRid;
+        TreeMap<Key, NodeActivation> actRid = th.activationsRid;
         if(actRid != null) actRid.remove(ak);
 
         if(th.activations.isEmpty()) {
@@ -430,7 +430,7 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
      */
     public void processChanges(Document doc) {
         ThreadState th = getThreadState(doc.threadId, true);
-        NavigableMap<Key<T>, Collection<Activation>> tmpAdded = th.added;
+        NavigableMap<Key<T>, Collection<NodeActivation>> tmpAdded = th.added;
         NavigableMap<Key<T>, RemovedEntry> tmpRemoved = th.removed;
 
         th.added = new TreeMap<>();
@@ -448,7 +448,7 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
 
         for(RemovedEntry<T, A> re: tmpRemoved.values()) {
             if(!hasSupport(re.act)) {
-                re.act.removedId = Activation.removedIdCounter++;
+                re.act.removedId = NodeActivation.removedIdCounter++;
                 re.act.isRemoved = true;
             }
         }
@@ -457,7 +457,7 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
             processRemovedActivation(doc, re.act, re.iActs);
         }
 
-        for(Map.Entry<Key<T>, Collection<Activation>> me: tmpAdded.entrySet()) {
+        for(Map.Entry<Key<T>, Collection<NodeActivation>> me: tmpAdded.entrySet()) {
             processAddedActivation(doc, me.getKey(), me.getValue());
         }
     }
@@ -473,9 +473,9 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
      * @param ak
      * @param inputActs
      */
-    public static <T extends Node, A extends Activation<T>> void addActivationAndPropagate(Document doc, Key<T> ak, Collection<Activation<?>> inputActs) {
+    public static <T extends Node, A extends NodeActivation<T>> void addActivationAndPropagate(Document doc, Key<T> ak, Collection<NodeActivation<?>> inputActs) {
         ThreadState<T, A> th = ak.n.getThreadState(doc.threadId, true);
-        Collection<Activation<?>> iActs = th.added.get(ak);
+        Collection<NodeActivation<?>> iActs = th.added.get(ak);
         if(iActs == null) {
             iActs = new ArrayList<>();
             th.added.put(ak, iActs);
@@ -485,12 +485,12 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
     }
 
 
-    Range preProcessAddedActivation(Document doc, Key<T> ak, Collection<Activation> inputActs) {
+    Range preProcessAddedActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs) {
         return ak.r;
     }
 
 
-    A processAddedActivation(Document doc, Key<T> ak, Collection<Activation> inputActs) {
+    A processAddedActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs) {
         Range r = preProcessAddedActivation(doc, ak, inputActs);
         if(r == null) return null;
 
@@ -507,7 +507,7 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
     /*
     First remove the inputs from the given activation. Only if, depending on the node type, insufficient support exists for this activation, then actually remove it.
      */
-    public static <T extends Node, A extends Activation<T>> void removeActivationAndPropagate(Document doc, A act, Collection<Activation<?>> inputActs) {
+    public static <T extends Node, A extends NodeActivation<T>> void removeActivationAndPropagate(Document doc, A act, Collection<NodeActivation<?>> inputActs) {
         if(act == null || act.isRemoved) return;
 
         ThreadState<T, A> th = act.key.n.getThreadState(doc.threadId, true);
@@ -522,10 +522,10 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
     }
 
 
-    void postProcessRemovedActivation(Document doc, A act, Collection<Activation> inputActs) {}
+    void postProcessRemovedActivation(Document doc, A act, Collection<NodeActivation> inputActs) {}
 
 
-    void processRemovedActivation(Document doc, A act, Collection<Activation> inputActs) {
+    void processRemovedActivation(Document doc, A act, Collection<NodeActivation> inputActs) {
         if(Document.APPLY_DEBUG_OUTPUT) {
             log.info("remove: " + act.key + " - " + act.key.n);
         }
@@ -614,7 +614,7 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
     }
 
 
-    void removeFromNextLevel(Document doc, Activation iAct) {
+    void removeFromNextLevel(Document doc, NodeActivation iAct) {
         AndNode.removeActivation(doc, iAct);
 
         if(orChildren != null) {
@@ -1012,9 +1012,9 @@ public abstract class Node<T extends Node, A extends Activation<T>> extends Abst
     }
 
 
-    private static class RemovedEntry<T extends Node, A extends Activation<T>> {
+    private static class RemovedEntry<T extends Node, A extends NodeActivation<T>> {
         A act;
-        Set<Activation> iActs = new TreeSet<>();
+        Set<NodeActivation> iActs = new TreeSet<>();
     }
 
 

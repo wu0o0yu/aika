@@ -17,7 +17,6 @@
 package org.aika.lattice;
 
 
-import org.aika.Activation;
 import org.aika.Input;
 import org.aika.Input.RangeRelation;
 import org.aika.Model;
@@ -677,15 +676,15 @@ public class PatternLatticeTest {
         InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, null);
         InputNode pCNode = TestHelper.addOutputNode(doc, inC, null, null);
 
-        Activation inA1 = new Activation(0, inANode, new Range(0, 1), null, doc.bottom);
+        NodeActivation inA1 = new NodeActivation(0, inANode, new Range(0, 1), null, doc.bottom);
 
         TestHelper.addActivation(pANode, doc, inA1);
 
-        Activation inB1 = new Activation(1, inBNode, new Range(0, 1), null, doc.bottom);
+        NodeActivation inB1 = new NodeActivation(1, inBNode, new Range(0, 1), null, doc.bottom);
 
         TestHelper.addActivation(pBNode, doc, inB1);
 
-        Activation inC1 = new Activation(2, inCNode, new Range(0, 1), null, doc.bottom);
+        NodeActivation inC1 = new NodeActivation(2, inCNode, new Range(0, 1), null, doc.bottom);
 
         TestHelper.addActivation(pCNode, doc, inC1);
     }

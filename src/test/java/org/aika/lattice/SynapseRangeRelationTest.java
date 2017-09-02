@@ -17,10 +17,9 @@
 package org.aika.lattice;
 
 
-import org.aika.Activation;
-import org.aika.Activation.Key;
-import org.aika.NeuronActivation;
-import org.aika.NeuronActivation.SynapseActivation;
+import org.aika.lattice.NodeActivation.Key;
+import org.aika.neuron.Activation;
+import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
@@ -33,7 +32,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 
-import static org.aika.NeuronActivation.SynapseActivation.INPUT_COMP;
+import static org.aika.neuron.Activation.SynapseActivation.INPUT_COMP;
 
 /**
  *
@@ -67,10 +66,10 @@ public class SynapseRangeRelationTest {
         s.output = on.provider;
         s.link(doc.threadId);
 
-        NeuronActivation iAct0 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(1, 4), null, doc.bottom), Collections.emptyList(), false);
-        NeuronActivation iAct1 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
-        NeuronActivation iAct2 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(10, 18), null, doc.bottom), Collections.emptyList(), false);
-        NeuronActivation oAct = on.node.get().addActivationInternal(doc, new Key(on.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct0 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(1, 4), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct1 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct2 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(10, 18), null, doc.bottom), Collections.emptyList(), false);
+        Activation oAct = on.node.get().addActivationInternal(doc, new Key(on.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
 
         on.linkNeuronRelations(doc, oAct);
 

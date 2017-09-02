@@ -17,12 +17,11 @@
 package org.aika.network;
 
 
-import org.aika.Activation;
+import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
-import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -54,7 +53,7 @@ public class PropagateRidTest {
 
         inA.addInput(doc, 0, 1, 10, doc.bottom);
 
-        Assert.assertEquals(5, Activation.get(doc, pA.node.get(), null, null, null, null, null, null).key.rid.intValue());
+        Assert.assertEquals(5, NodeActivation.get(doc, pA.node.get(), null, null, null, null, null, null).key.rid.intValue());
 
     }
 }

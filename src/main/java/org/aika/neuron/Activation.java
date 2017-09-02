@@ -1,17 +1,31 @@
-package org.aika;
+package org.aika.neuron;
 
+import org.aika.Utils;
+import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.Neuron;
-import org.aika.neuron.Synapse;
 
 import java.util.*;
 
-import static org.aika.NeuronActivation.SynapseActivation.INPUT_COMP;
-import static org.aika.NeuronActivation.SynapseActivation.OUTPUT_COMP;
+import static org.aika.neuron.Activation.SynapseActivation.INPUT_COMP;
+import static org.aika.neuron.Activation.SynapseActivation.OUTPUT_COMP;
 
 
-
-public final class NeuronActivation extends Activation<OrNode> {
+/**
+ * The {@code Activation} class is the most central class in Aika. On the one hand it stores the activation value
+ * for a given neuron in the {@code State} substructure. On the other hand it specifies where this activation is
+ * located within the document and to which interpretation it belongs. The {@code Activation.Key} therefore
+ * consists of the logic node to which this activation belongs. If this logic node is an or-node, then this activation
+ * automatically also belongs to the neuron as well. Furthermore, the key contains the char range within the document
+ * and the relational id (rid). The relational id might be used to store the word pos for instance. Lastly, the key
+ * contain the interpretation node of this activation, specifying to which interpretation this activation belongs.
+ *
+ * <p>The activations are linked to each other on two levels. The fields {@code inputs} and {@code outputs}
+ * contain the activation links within the logic layer. The fields {@code neuronInputs} and
+ * {@code neuronOutputs} contain the links on the neural layer.
+ *
+ * @author Lukas Molzberger
+ */
+public final class Activation extends NodeActivation<OrNode> {
 
     static final SynapseActivation[] EMPTY_SYN_ACTS = new SynapseActivation[0];
     public SynapseActivation[] neuronInputs = EMPTY_SYN_ACTS;
@@ -31,7 +45,7 @@ public final class NeuronActivation extends Activation<OrNode> {
     public boolean isInput;
 
 
-    public NeuronActivation(int id, Key key) {
+    public Activation(int id, Key key) {
         super(id, key);
     }
 
@@ -60,8 +74,8 @@ public final class NeuronActivation extends Activation<OrNode> {
      */
     public static class SynapseActivation {
         public final Synapse s;
-        public final NeuronActivation input;
-        public final NeuronActivation output;
+        public final Activation input;
+        public final Activation output;
 
         public static Comparator<SynapseActivation> INPUT_COMP = new Comparator<SynapseActivation>() {
             @Override
@@ -82,7 +96,7 @@ public final class NeuronActivation extends Activation<OrNode> {
         };
 
 
-        public SynapseActivation(Synapse s, NeuronActivation input, NeuronActivation output) {
+        public SynapseActivation(Synapse s, Activation input, Activation output) {
             this.s = s;
             this.input = input;
             this.output = output;
