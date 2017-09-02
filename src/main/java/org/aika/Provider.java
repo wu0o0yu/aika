@@ -9,26 +9,26 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     public Model m;
     public final int id;
 
-    private T obj;
+    private T n;
 
 
-    public Provider(Model m, int id, T obj) {
+    public Provider(Model m, int id, T n) {
         this.m = m;
         this.id = id;
-        this.obj = obj;
+        this.n = n;
     }
 
 
     public synchronized boolean isSuspended() {
-        return obj == null;
+        return n == null;
     }
 
 
     public synchronized T get() {
-        if(obj == null) {
+        if(n == null) {
             reactivate();
         }
-        return obj;
+        return n;
     }
 
 
@@ -39,14 +39,14 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         DataOutputStream dos = new DataOutputStream(baos);
 
         try {
-            obj.write(dos);
+            n.write(dos);
         } catch(IOException e) {
             throw new RuntimeException(e);
         }
 
         m.suspensionHook.store(id, baos.toByteArray());
 
-        obj = null;
+        n = null;
     }
 
 
@@ -57,7 +57,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         DataInputStream dis = new DataInputStream(bais);
         try {
-            obj = (T) AbstractNode.read(dis, this);
+            n = (T) AbstractNode.read(dis, this);
         } catch(IOException e) {
             throw new RuntimeException(e);
         }
@@ -69,7 +69,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
 
     public String toString() {
-        return "p(" + id + ":" + (obj != null ? obj.toString() : "SUSPENDED") + ")";
+        return "p(" + id + ":" + (n != null ? n.toString() : "SUSPENDED") + ")";
     }
 
 

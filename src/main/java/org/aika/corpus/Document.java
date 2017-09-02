@@ -23,9 +23,9 @@ import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.Node.ThreadState;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
-import org.aika.neuron.AbstractNeuron.NormWeight;
+import org.aika.lattice.OrNode;
+import org.aika.neuron.Neuron;
+import org.aika.neuron.Neuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,9 +81,8 @@ public class Document implements Comparable<Document> {
 
     public TreeSet<Node> activatedNodes = new TreeSet<>();
     public TreeSet<Node> activatedNodesForTraining = new TreeSet<>();
-    public TreeSet<AbstractNeuron> activatedInputNeurons = new TreeSet<>();
-    public TreeSet<AbstractNeuron> activatedNeurons = new TreeSet<>();
-    public TreeSet<AbstractNeuron> finallyActivatedNeurons = new TreeSet<>();
+    public TreeSet<Neuron> activatedNeurons = new TreeSet<>();
+    public TreeSet<Neuron> finallyActivatedNeurons = new TreeSet<>();
     public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
     public TreeSet<Activation> inputNodeActivations = new TreeSet<>();
     public TreeMap<Activation.Key, Activation> activationsByRid = new TreeMap<>(new Comparator<Activation.Key>() {
@@ -188,7 +187,7 @@ public class Document implements Comparable<Document> {
             n.count(threadId);
         }
 
-        for(AbstractNeuron n: finallyActivatedNeurons) {
+        for(Neuron n: finallyActivatedNeurons) {
             n.count(this);
         }
     }
@@ -203,8 +202,6 @@ public class Document implements Comparable<Document> {
         count();
 
         for(Node n: activatedNodes) {
-            if(n.neuron != null && n.neuron.get() instanceof InputNeuron) continue;
-
             n.computeNullHyp(m);
             if(n.frequencyHasChanged && !n.isBlocked && n.isFrequent()) {
                 n.frequencyHasChanged = false;
@@ -214,7 +211,7 @@ public class Document implements Comparable<Document> {
                     an.updateWeight(this, v);
                 }
 
-                ThreadState th = n.getThreadState(threadId, false);
+                ThreadState<?> th = n.getThreadState(threadId, false);
                 if(th != null) {
                     for (Activation act : th.activations.values()) {
                         n.discover(this, act);
@@ -233,9 +230,9 @@ public class Document implements Comparable<Document> {
 
         bQueue.backpropagtion();
 
-        for(AbstractNeuron<?> n: finallyActivatedNeurons) {
+        for(Neuron n: finallyActivatedNeurons) {
             if(!n.noTraining) {
-                ThreadState th = n.node.get().getThreadState(threadId, false);
+                ThreadState<?> th = n.node.get().getThreadState(threadId, false);
                 if(th != null) {
                     for (Activation act : th.activations.values()) {
                         n.train(this, act);
@@ -291,16 +288,16 @@ public class Document implements Comparable<Document> {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         if(neuronsOnly) {
-            for (AbstractNeuron<?> n : activatedNeurons) {
+            for (Neuron n : activatedNeurons) {
                 acts.addAll(Activation.select(this, n.node.get(), null, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
             }
         } else {
-            for(Node n: activatedNodes) {
+            for(Node<?> n: activatedNodes) {
                 acts.addAll(Activation.select(this, n, null, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
             }
         }
         StringBuilder sb = new StringBuilder();
-        AbstractNeuron.NormWeight weightSum = AbstractNeuron.NormWeight.ZERO_WEIGHT;
+        Neuron.NormWeight weightSum = Neuron.NormWeight.ZERO_WEIGHT;
         for(Activation act: acts) {
             sb.append(act.id + " ");
             sb.append(act.key.r);
@@ -411,14 +408,16 @@ public class Document implements Comparable<Document> {
             boolean flag = false;
             while(!queue.isEmpty()) {
                 flag = true;
-                Activation act = queue.pollFirst();
+                Activation<OrNode> act = queue.pollFirst();
                 act.ubQueued = false;
 
-                double oldUpperBound = act.upperBound;
+                double oldUpperBound = act.isInput ? 0.0 : act.upperBound;
 
-                AbstractNeuron<?> n = act.key.n.neuron.get();
+                Neuron n = act.key.n.neuron.get();
 
-                n.computeBounds(act);
+                if(!act.isInput) {
+                    n.computeBounds(act);
+                }
 
                 if(Math.abs(act.upperBound - oldUpperBound) > 0.01) {
                     for(Activation.SynapseActivation sa: act.neuronOutputs) {
@@ -443,7 +442,7 @@ public class Document implements Comparable<Document> {
 
 
     public class ValueQueue {
-        public final ArrayList<ArrayDeque<Activation>> queue = new ArrayList<>();
+        public final ArrayList<ArrayDeque<Activation<OrNode>>> queue = new ArrayList<>();
 
         public void propagateWeight(int round, Activation act)  {
             for(Activation.SynapseActivation sa: act.neuronOutputs) {
@@ -471,16 +470,14 @@ public class Document implements Comparable<Document> {
         }
 
 
-        private void addAllActs(Collection<Activation> acts) {
+        private void addAllActs(Collection<Activation<OrNode>> acts) {
             for(Activation act: acts) {
-                if(!(act.key.n.neuron.get() instanceof InputNeuron)) {
-                    add(0, act);
-                }
+                add(0, act);
             }
         }
 
 
-        public void add(int round, Activation act) {
+        public void add(int round, Activation<OrNode> act) {
             if(round > MAX_ROUND) {
                 log.error("Maximum number of rounds reached.");
                 return;
@@ -488,7 +485,7 @@ public class Document implements Comparable<Document> {
 
             if(act.rounds.isQueued(round)) return;
 
-            ArrayDeque<Activation> q;
+            ArrayDeque<Activation<OrNode>> q;
             if(round < queue.size()) {
                 q = queue.get(round);
             } else {
@@ -502,15 +499,15 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public AbstractNeuron.NormWeight[] processChanges(SearchNode en, long v) {
+        public Neuron.NormWeight[] processChanges(SearchNode en, long v) {
             NormWeight[] delta = new NormWeight[] {NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT};
             for(int round = 0; round < queue.size(); round++) {
-                ArrayDeque<Activation> q = queue.get(round);
+                ArrayDeque<Activation<OrNode>> q = queue.get(round);
                 while (!q.isEmpty()) {
-                    Activation act = q.pollLast();
+                    Activation<OrNode> act = q.pollLast();
                     act.rounds.setQueued(round, false);
 
-                    State s = act.key.n.neuron.get().computeWeight(round, act, en, Document.this);
+                    State s = act.isInput ? act.finalState : act.key.n.neuron.get().computeWeight(round, act, en, Document.this);
 
                     if (OPTIMIZE_DEBUG_OUTPUT) {
                         log.info(act.key + " Round:" + round);
@@ -570,7 +567,7 @@ public class Document implements Comparable<Document> {
         private long queueIdCounter = 0;
 
 
-        public void add(Activation act) {
+        public void add(Activation<OrNode> act) {
             if(!act.isQueued && !act.key.n.neuron.get().noTraining) {
                 act.isQueued = true;
                 act.queueId = queueIdCounter++;
@@ -581,7 +578,7 @@ public class Document implements Comparable<Document> {
 
         public void backpropagtion() {
             while(!queue.isEmpty()) {
-                Activation act = queue.pollFirst();
+                Activation<OrNode> act = queue.pollFirst();
 
                 act.isQueued = false;
                 act.key.n.neuron.get().computeErrorSignal(Document.this, act);

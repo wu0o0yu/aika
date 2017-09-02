@@ -20,8 +20,7 @@ package org.aika.network;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,11 +40,11 @@ public class EntityResolutionTest {
 
         Model m = new Model();
 
-        InputNeuron wJaguar = m.createOrLookupInputNeuron("W-Jaguar");
-        InputNeuron wPuma = m.createOrLookupInputNeuron("W-Puma");
+        Neuron wJaguar = new Neuron(m, "W-Jaguar");
+        Neuron wPuma = new Neuron(m, "W-Puma");
 
-        Neuron eJaguar = m.createNeuron("E-Jaguar");
-        Neuron ePuma = m.createNeuron("E-Puma");
+        Neuron eJaguar = new Neuron(m, "E-Jaguar");
+        Neuron ePuma = new Neuron(m, "E-Puma");
 
 
         m.initAndNeuron(eJaguar, 0.9,
@@ -118,18 +117,18 @@ public class EntityResolutionTest {
 
         Model m = new Model();
 
-        InputNeuron wJaguar = m.createOrLookupInputNeuron("W-Jaguar");
-        InputNeuron wPuma = m.createOrLookupInputNeuron("W-Puma");
-        InputNeuron wLeopard = m.createOrLookupInputNeuron("W-Leopard");
+        Neuron wJaguar = new Neuron(m, "W-Jaguar");
+        Neuron wPuma = new Neuron(m, "W-Puma");
+        Neuron wLeopard = new Neuron(m, "W-Leopard");
 
-        Neuron eJaguar = m.createNeuron("E-Jaguar");
-        Neuron ePuma = m.createNeuron("E-Puma");
-        Neuron eLeopard = m.createNeuron("E-Leopard");
+        Neuron eJaguar = new Neuron(m, "E-Jaguar");
+        Neuron ePuma = new Neuron(m, "E-Puma");
+        Neuron eLeopard = new Neuron(m, "E-Leopard");
 
-        Neuron cKatzen = m.createNeuron("C-Katzen");
-        Neuron chKatzenOhneJaguar = m.createNeuron("CH-Katzen/Jaguar");
-        Neuron chKatzenOhnePuma = m.createNeuron("CH-Katzen/Puma");
-        Neuron chKatzenOhneLeopard = m.createNeuron("CH-Katzen/Leopard");
+        Neuron cKatzen = new Neuron(m, "C-Katzen");
+        Neuron chKatzenOhneJaguar = new Neuron(m, "CH-Katzen/Jaguar");
+        Neuron chKatzenOhnePuma = new Neuron(m, "CH-Katzen/Puma");
+        Neuron chKatzenOhneLeopard = new Neuron(m, "CH-Katzen/Leopard");
 
         m.initAndNeuron(eJaguar, 0.9,
                 new Input()

@@ -92,8 +92,8 @@ public class Synapse implements Writable {
         }
     };
 
-    public Provider<? extends AbstractNeuron> input;
-    public Provider<? extends AbstractNeuron> output;
+    public Provider<? extends Neuron> input;
+    public Provider<? extends Neuron> output;
 
     public Provider<InputNode> inputNode;
 
@@ -111,14 +111,14 @@ public class Synapse implements Writable {
     public Synapse() {}
 
 
-    public Synapse(AbstractNeuron input) {
+    public Synapse(Neuron input) {
         if(input != null) {
             this.input = input.provider;
         }
     }
 
 
-    public Synapse(AbstractNeuron input, Key key) {
+    public Synapse(Neuron input, Key key) {
         this(input);
         this.key = lookupKey(key);
 
@@ -127,8 +127,8 @@ public class Synapse implements Writable {
 
 
     public void link(int threadId) {
-        AbstractNeuron in = input.get();
-        AbstractNeuron out = output.get();
+        Neuron in = input.get();
+        Neuron out = output.get();
 
         boolean dir = in.provider.id < out.provider.id;
 

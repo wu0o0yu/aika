@@ -24,8 +24,6 @@ import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode.Refinement;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.Key;
@@ -35,6 +33,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.aika.corpus.Range.Operator.*;
 
@@ -49,7 +48,7 @@ import static org.aika.corpus.Range.Operator.*;
 public class InputNode extends Node<InputNode> {
 
     public Key key;
-    public Provider<? extends AbstractNeuron> inputNeuron;
+    public Provider<? extends Neuron> inputNeuron;
 
     // Key: Output Neuron
     Map<SynapseKey, Synapse> synapses;
@@ -76,7 +75,7 @@ public class InputNode extends Node<InputNode> {
     }
 
 
-    public static InputNode add(Model m, Key key, AbstractNeuron<?> input) {
+    public static InputNode add(Model m, Key key, Neuron input) {
         Provider<InputNode> pin = (input != null ? input.outputNodes.get(key) : null);
         if(pin != null) {
             return pin.get();
@@ -102,16 +101,7 @@ public class InputNode extends Node<InputNode> {
 
     @Override
     public void initActivation(Document doc, Activation act) {
-        AbstractNeuron n = neuron != null ? neuron.get() : null;
-        if(n instanceof InputNeuron) {
-            doc.inputNeuronActivations.add(act);
-
-            ThreadState th = getThreadState(doc.threadId, false);
-            if(th == null || th.activations.isEmpty()) {
-                doc.activatedNeurons.add(n);
-                doc.activatedInputNeurons.add(n);
-            }
-        } else if(!isBlocked) {
+        if(!isBlocked) {
             doc.inputNodeActivations.add(act);
         }
     }
@@ -119,16 +109,7 @@ public class InputNode extends Node<InputNode> {
 
     @Override
     public void deleteActivation(Document doc, Activation act) {
-        AbstractNeuron n = neuron != null ? neuron.get() : null;
-        if(n instanceof InputNeuron) {
-            doc.inputNeuronActivations.remove(act);
-
-            ThreadState th = getThreadState(doc.threadId, false);
-            if(th == null || th.activations.isEmpty()) {
-                doc.activatedNeurons.remove(n);
-                doc.activatedInputNeurons.remove(n);
-            }
-        } else if(!isBlocked) {
+        if(!isBlocked) {
             doc.inputNodeActivations.remove(act);
         }
     }
@@ -160,7 +141,7 @@ public class InputNode extends Node<InputNode> {
 
 
     @Override
-    boolean hasSupport(Activation act) {
+    boolean hasSupport(Activation<?> act) {
         for(Activation iAct: act.inputs.values()) {
             if(!iAct.isRemoved && iAct.upperBound > 0.0) return true;
         }
@@ -169,8 +150,8 @@ public class InputNode extends Node<InputNode> {
     }
 
 
-    Range preProcessAddedActivation(Document doc, Activation.Key ak, Collection<Activation> inputActs) {
-        if(neuron == null && (key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE)) {
+    Range preProcessAddedActivation(Document doc, Activation.Key<InputNode> ak, Collection<Activation> inputActs) {
+        if(key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE) {
             boolean dir = key.startRangeMapping == Mapping.NONE;
             int pos = ak.r.getBegin(dir);
 
@@ -199,9 +180,9 @@ public class InputNode extends Node<InputNode> {
     }
 
 
-    void postProcessRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {
+    void postProcessRemovedActivation(Document doc, Activation<InputNode> act, Collection<Activation> inputActs) {
         Activation.Key ak = act.key;
-        if(neuron == null && (key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE)) {
+        if(key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE) {
             boolean dir = key.startRangeMapping == Mapping.NONE;
             List<Activation> tmp = Activation.select(
                     doc,
@@ -236,7 +217,7 @@ public class InputNode extends Node<InputNode> {
     }
 
 
-    public void removeActivation(Document doc, Activation inputAct) {
+    public void removeActivation(Document doc, Activation<?> inputAct) {
         for(Activation act: inputAct.outputs.values()) {
             if(act.key.n == this) {
                 removeActivationAndPropagate(doc, act, Collections.singleton(inputAct));
@@ -246,23 +227,14 @@ public class InputNode extends Node<InputNode> {
 
 
     public void propagateAddedActivation(Document doc, Activation act, InterprNode removedConflict) {
-        AbstractNeuron n = neuron != null ? neuron.get() : null;
-        if(n instanceof InputNeuron) {
-            if(removedConflict == null) {
-                n.propagateAddedActivation(doc, act);
-            }
-        } else if(!key.isNeg && !key.isRecurrent) {
+        if(!key.isNeg && !key.isRecurrent) {
             apply(doc, act, removedConflict);
         }
     }
 
 
     public void propagateRemovedActivation(Document doc, Activation act) {
-        AbstractNeuron n = neuron != null ? neuron.get() : null;
-
-        if(n instanceof InputNeuron) {
-            n.propagateRemovedActivation(doc, act);
-        } else if(!key.isNeg && !key.isRecurrent) {
+        if(!key.isNeg && !key.isRecurrent) {
             removeFromNextLevel(doc, act);
         }
     }
@@ -317,7 +289,7 @@ public class InputNode extends Node<InputNode> {
         ThreadState th = secondNode.getThreadState(doc.threadId, false);
         if(th == null || th.activations.isEmpty()) return;
 
-        Activation.select(
+        Stream<Activation<InputNode>> s = Activation.select(
                 th,
                 secondNode,
                 secondRid,
@@ -326,7 +298,9 @@ public class InputNode extends Node<InputNode> {
                 computeEndRangeMatch(firstNode.key, secondNode.key),
                 null,
                 null
-        ).forEach(secondAct -> {
+        );
+
+        s.forEach(secondAct -> {
             if(!secondAct.isRemoved) {
                 InterprNode o = InterprNode.add(doc, true, ak.o, secondAct.key.o);
                 if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
@@ -376,7 +350,7 @@ public class InputNode extends Node<InputNode> {
 
 
     @Override
-    public void discover(Document doc, Activation act) {
+    public void discover(Document doc, Activation<InputNode> act) {
         long v = Node.visitedCounter++;
 
         for(Activation secondAct: doc.inputNodeActivations) {
@@ -401,7 +375,7 @@ public class InputNode extends Node<InputNode> {
 
 
     @Override
-    public double computeSynapseWeightSum(Integer offset, AbstractNeuron n) {
+    public double computeSynapseWeightSum(Integer offset, Neuron n) {
         return n.bias + Math.abs(getSynapse(new SynapseKey(key.relativeRid == null ? null : offset, n.provider)).w);
     }
 
@@ -503,7 +477,7 @@ public class InputNode extends Node<InputNode> {
             Synapse synTmp = Synapse.read(in, m);
 
             if(synTmp.output != null && !synTmp.output.isSuspended()) {
-                AbstractNeuron<?> an = synTmp.output.get();
+                Neuron an = synTmp.output.get();
                 Synapse syn = an.inputSynapses.get(synTmp);
 
                 if(synapses == null) {
@@ -518,13 +492,13 @@ public class InputNode extends Node<InputNode> {
 
     public static class SynapseKey implements Writable, Comparable<SynapseKey> {
         Integer rid;
-        Provider<? extends AbstractNeuron> n;
+        Provider<? extends Neuron> n;
 
         private SynapseKey() {
         }
 
 
-        public SynapseKey(Integer rid, Provider<? extends AbstractNeuron> n) {
+        public SynapseKey(Integer rid, Provider<? extends Neuron> n) {
             this.rid = rid;
             this.n = n;
         }

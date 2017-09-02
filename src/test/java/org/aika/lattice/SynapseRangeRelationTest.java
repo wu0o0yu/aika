@@ -25,7 +25,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,13 +46,8 @@ public class SynapseRangeRelationTest {
         Model m = new Model();
         Document doc = m.createDocument("                        ", 0);
 
-        AbstractNeuron<?> in = m.createNeuron();
-        in.node = new OrNode(doc.m).provider;
-        in.node.get().neuron = in.provider;
-
-        AbstractNeuron<?> on = m.createNeuron();
-        on.node = new OrNode(doc.m).provider;
-        on.node.get().neuron = on.provider;
+        Neuron in = new Neuron(m);
+        Neuron on = new Neuron(m);
 
         Synapse s = new Synapse(in,
                 new Synapse.Key(
@@ -75,6 +70,8 @@ public class SynapseRangeRelationTest {
         Activation iAct1 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
         Activation iAct2 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(10, 18), null, doc.bottom), Collections.emptyList(), false);
         Activation oAct = on.node.get().addActivationInternal(doc, new Key(on.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
+
+        on.linkNeuronRelations(doc, oAct);
 
         boolean f = false;
         for(SynapseActivation sa: oAct.neuronInputs) {

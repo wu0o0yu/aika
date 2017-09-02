@@ -23,8 +23,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.AndNode;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,10 +40,10 @@ public class ConcurrencyTest {
         AndNode.minFrequency = 1;
 
 
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
-        InputNeuron inB = m.createOrLookupInputNeuron("B");
+        Neuron inA = new Neuron(m, "A");
+        Neuron inB = new Neuron(m, "B");
 
-        Neuron pC = m.initAndNeuron(m.createNeuron("pC"),
+        Neuron pC = m.initAndNeuron(new Neuron(m, "pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -65,11 +64,11 @@ public class ConcurrencyTest {
         );
 
 
-        InputNeuron inStart = m.createOrLookupInputNeuron("START");
-        InputNeuron inClock = m.createOrLookupInputNeuron("CLOCK");
+        Neuron inStart = new Neuron(m, "START");
+        Neuron inClock = new Neuron(m, "CLOCK");
 
 
-        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), inClock, false, inStart, true, false);
+        Neuron ctn = m.initCounterNeuron(new Neuron(m, "CTN"), inClock, false, inStart, true, false);
 
 
         Document doc0 = m.createDocument("aaaaaaaaaa", 0);
@@ -123,10 +122,10 @@ public class ConcurrencyTest {
         final Model m = new Model();
         AndNode.minFrequency = 1;
 
-        final InputNeuron inA = m.createOrLookupInputNeuron("A");
-        final InputNeuron inB = m.createOrLookupInputNeuron("B");
+        final Neuron inA = new Neuron(m, "A");
+        final Neuron inB = new Neuron(m, "B");
 
-        final Neuron pC = m.initAndNeuron(m.createNeuron("pC"),
+        final Neuron pC = m.initAndNeuron(new Neuron(m, "pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)

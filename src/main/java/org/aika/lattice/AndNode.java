@@ -26,7 +26,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.InputNode.SynapseKey;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 
@@ -86,7 +86,7 @@ public class AndNode extends Node<AndNode> {
 
 
     @Override
-    public boolean isAllowedOption(int threadId, InterprNode n, Activation act, long v) {
+    public boolean isAllowedOption(int threadId, InterprNode n, Activation<?> act, long v) {
         ThreadState th = getThreadState(threadId, true);
         if(th.visitedAllowedOption == v) return false;
         th.visitedAllowedOption = v;
@@ -98,7 +98,7 @@ public class AndNode extends Node<AndNode> {
     }
 
 
-    Range preProcessAddedActivation(Document doc, Key ak, Collection<Activation> inputActs) {
+    Range preProcessAddedActivation(Document doc, Key<AndNode> ak, Collection<Activation> inputActs) {
         for(Activation iAct: inputActs) {
             if(iAct.isRemoved) return null;
         }
@@ -106,12 +106,12 @@ public class AndNode extends Node<AndNode> {
     }
 
 
-    void addActivation(Document doc, Key ak, Collection<Activation> directInputActs) {
+    void addActivation(Document doc, Key ak, Collection<Activation<?>> directInputActs) {
         Node.addActivationAndPropagate(doc, ak, directInputActs);
     }
 
 
-    static void removeActivation(Document doc, Activation iAct) {
+    static void removeActivation(Document doc, Activation<?> iAct) {
         for(Activation act: iAct.outputs.values()) {
             if(act.key.n instanceof AndNode) {
                 Node.removeActivationAndPropagate(doc, act, Collections.singleton(iAct));
@@ -131,7 +131,7 @@ public class AndNode extends Node<AndNode> {
 
 
     @Override
-    boolean hasSupport(Activation act) {
+    boolean hasSupport(Activation<?> act) {
         int expected = parents.size();
 
         int support = 0;
@@ -219,14 +219,14 @@ public class AndNode extends Node<AndNode> {
 
 
     @Override
-    void apply(Document doc, Activation act, InterprNode removedConflict) {
+    void apply(Document doc, Activation<AndNode> act, InterprNode removedConflict) {
 
         // Check if the activation has been deleted in the meantime.
         if(act.isRemoved) {
             return;
         }
 
-        for(Activation pAct: act.inputs.values()) {
+        for(Activation<?> pAct: act.inputs.values()) {
             Node<?> pn = pAct.key.n;
             pn.lock.acquireReadLock();
             Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n.provider, act.key.rid, pAct.key.rid));
@@ -255,10 +255,10 @@ public class AndNode extends Node<AndNode> {
 
 
     @Override
-    public void discover(Document doc, Activation act) {
+    public void discover(Document doc, Activation<AndNode> act) {
         if(!isExpandable(true)) return;
 
-        for(Activation pAct: act.inputs.values()) {
+        for(Activation<?> pAct: act.inputs.values()) {
             Node<?> pn = pAct.key.n;
             pn.lock.acquireReadLock();
             Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n.provider, act.key.rid, pAct.key.rid));
@@ -362,7 +362,7 @@ public class AndNode extends Node<AndNode> {
     }
 
 
-    public static void addNextLevelActivation(Document doc, Activation act, Activation secondAct, Provider<AndNode> pnlp, InterprNode conflict) {
+    public static void addNextLevelActivation(Document doc, Activation<AndNode> act, Activation<AndNode> secondAct, Provider<AndNode> pnlp, InterprNode conflict) {
         // TODO: check if the activation already exists
         Key ak = act.key;
         InterprNode o = InterprNode.add(doc, true, ak.o, secondAct.key.o);
@@ -382,8 +382,8 @@ public class AndNode extends Node<AndNode> {
     }
 
 
-    public static Collection<Activation> prepareInputActs(Activation firstAct, Activation secondAct) {
-        List<Activation> inputActs = new ArrayList<>(2);
+    public static Collection<Activation<?>> prepareInputActs(Activation<?> firstAct, Activation<?> secondAct) {
+        List<Activation<?>> inputActs = new ArrayList<>(2);
         inputActs.add(firstAct);
         inputActs.add(secondAct);
         return inputActs;
@@ -456,7 +456,7 @@ public class AndNode extends Node<AndNode> {
 
 
     @Override
-    public double computeSynapseWeightSum(Integer offset, AbstractNeuron n) {
+    public double computeSynapseWeightSum(Integer offset, Neuron n) {
         double sum = n.bias;
         for(Refinement ref: parents.keySet()) {
             Synapse s = ref.getSynapse(offset, n);
@@ -588,7 +588,7 @@ public class AndNode extends Node<AndNode> {
         }
 
 
-        public Synapse getSynapse(Integer offset, AbstractNeuron n) {
+        public Synapse getSynapse(Integer offset, Neuron n) {
             InputNode in = input.get();
             in.lock.acquireReadLock();
             Synapse s = in.synapses != null ? in.synapses.get(new SynapseKey(Utils.nullSafeAdd(getRelativePosition(), false, offset, false), n.provider)) : null;

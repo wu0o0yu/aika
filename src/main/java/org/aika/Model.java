@@ -22,8 +22,6 @@ import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 
@@ -52,8 +50,6 @@ public class Model {
     public SuspensionHook suspensionHook;
 
     public AtomicInteger currentId = new AtomicInteger(0);
-
-    public Map<String, Provider<InputNeuron>> inputNeurons = Collections.synchronizedMap(new LinkedHashMap<>());
 
     public Map<Integer, Provider<? extends AbstractNode>> providersInMemory = new TreeMap<>();
     public Map<Integer, Provider<? extends AbstractNode>> providers = new WeakHashMap<>();
@@ -91,26 +87,12 @@ public class Model {
     }
 
 
-    public Neuron createNeuron() {
-        return createProvider(new Neuron()).get();
-    }
-
-
-    public Neuron createNeuron(String label) {
-        return createProvider(new Neuron(label)).get();
-    }
-
-
-    public Neuron createNeuron(String label, boolean isBlocked, boolean noTraining) {
-        return createProvider(new Neuron(label, isBlocked, noTraining)).get();
-    }
-
-
     public <T extends AbstractNode> Provider<T> createProvider(T n) {
         int id = suspensionHook != null ? suspensionHook.getNewId() : currentId.addAndGet(1);
         Provider<T> np = new Provider<T>(this, id, n);
         n.provider = np;
         providersInMemory.put(id, np);
+        providers.put(id, np);
         return np;
     }
 
@@ -137,13 +119,18 @@ public class Model {
 
 
     public <T extends AbstractNode> Provider<T> lookupProvider(int id) {
-        Provider np = providersInMemory.get(id);
-        if(np == null) {
-            np = new Provider<>(this, id, null);
-            providersInMemory.put(id, np);
-
+        Provider p = providersInMemory.get(id);
+        if(p != null) {
+            return p;
         }
-        return np;
+        p = providers.get(id);
+        if(p != null) {
+            return p;
+        }
+
+        p = new Provider<>(this, id, null);
+        providersInMemory.put(id, p);
+        return p;
     }
 
 
@@ -181,11 +168,6 @@ public class Model {
     }
 
 
-    public void reset() {
-        inputNeurons.clear();
-    }
-
-
     public void resetFrequency() {
         for(int t = 0; t < numberOfThreads; t++) {
             for(Provider p: providersInMemory.values()) {
@@ -208,29 +190,6 @@ public class Model {
             }
         }*/
         return sb.toString();
-    }
-
-
-    /**
-     * Creates an {@code InputNeuron} with the given label.
-     *
-     * @param label
-     * @return
-     */
-    public InputNeuron createOrLookupInputNeuron(String label) {
-        return createOrLookupInputNeuron(label, false);
-    }
-
-
-    public InputNeuron createOrLookupInputNeuron(String label, boolean isBlocked) {
-        Provider<InputNeuron> np = inputNeurons.get(label);
-
-        if(np == null) {
-            np = createProvider(new InputNeuron(label, isBlocked));
-            InputNeuron.init(this, defaultThreadId, np.get());
-            inputNeurons.put(label, np);
-        }
-        return np.get();
     }
 
 
@@ -259,7 +218,6 @@ public class Model {
      */
     public Neuron initAndNeuron(Neuron n, double threshold, Collection<Input> inputs) {
         n.m = this;
-        if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
 
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
@@ -319,9 +277,6 @@ public class Model {
      * @return
      */
     public Neuron initNeuron(Neuron n, double bias, Collection<Input> inputs) {
-        n.m = this;
-        if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
-
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         double negDirSum = 0.0;
@@ -371,9 +326,6 @@ public class Model {
      * @return
      */
     public Neuron initOrNeuron(Neuron n, Set<Input> inputs) {
-        n.m = this;
-        if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
-
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         double bias = -0.001;
@@ -397,10 +349,7 @@ public class Model {
      * @param dirIS
      * @return
      */
-    public Neuron initRelationalNeuron(Neuron n, AbstractNeuron ctn, AbstractNeuron inputSignal, boolean dirIS) {
-        n.m = this;
-        if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
-
+    public Neuron initRelationalNeuron(Neuron n, Neuron ctn, Neuron inputSignal, boolean dirIS) {
         double bias = -30.0;
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
@@ -462,10 +411,7 @@ public class Model {
      * @param direction
      * @return
      */
-    public Neuron initCounterNeuron(Neuron n, AbstractNeuron clockSignal, boolean dirCS, AbstractNeuron startSignal, boolean dirSS, boolean direction) {
-        n.m = this;
-        if(n.node != null) throw new RuntimeException("This neuron has already been initialized!");
-
+    public Neuron initCounterNeuron(Neuron n, Neuron clockSignal, boolean dirCS, Neuron startSignal, boolean dirSS, boolean direction) {
         double bias = -44.0;
         double negRecSum = -20.0;
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);

@@ -24,8 +24,7 @@ import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.lattice.Node;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,11 +46,11 @@ public class RecurrentIdTest {
     public void testABPattern() {
         Model m = new Model();
 
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
-        InputNeuron inB = m.createOrLookupInputNeuron("B");
+        Neuron inA = new Neuron(m, "A");
+        Neuron inB = new Neuron(m, "B");
 
 
-        Node outCNode = m.initAndNeuron(m.createNeuron("C", true, true),
+        Node outCNode = m.initAndNeuron(new Neuron(m, "C", true, true),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -89,11 +88,11 @@ public class RecurrentIdTest {
     public void testABCPattern() {
         Model m = new Model();
 
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
-        InputNeuron inB = m.createOrLookupInputNeuron("B");
-        InputNeuron inC = m.createOrLookupInputNeuron("C");
+        Neuron inA = new Neuron(m, "A");
+        Neuron inB = new Neuron(m, "B");
+        Neuron inC = new Neuron(m, "C");
 
-        Node outDNode = m.initAndNeuron(m.createNeuron("D", true, true),
+        Node outDNode = m.initAndNeuron(new Neuron(m, "D", true, true),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -137,9 +136,9 @@ public class RecurrentIdTest {
     public void testHuettenheim() {
         Model m = new Model();
 
-        HashMap<Character, InputNeuron> chars = new HashMap<>();
+        HashMap<Character, Neuron> chars = new HashMap<>();
         for (char c = 'a'; c <= 'z'; c++) {
-            InputNeuron rec = m.createOrLookupInputNeuron("IN-" + c);
+            Neuron rec = new Neuron(m, "IN-" + c);
             chars.put(c, rec);
         }
 
@@ -150,7 +149,7 @@ public class RecurrentIdTest {
             for (int i = 0; i < word.length(); i++) {
                 char c = word.toLowerCase().charAt(i);
 
-                InputNeuron rec = chars.get(c);
+                Neuron rec = chars.get(c);
                 if (rec != null) {
                     boolean begin = i == 0;
                     boolean end = i + 1 == word.length();
@@ -169,7 +168,7 @@ public class RecurrentIdTest {
                 }
             }
 
-            Neuron n = m.initAndNeuron(m.createNeuron("PATTERN"), 0.5, inputs);
+            Neuron n = m.initAndNeuron(new Neuron(m, "PATTERN"), 0.5, inputs);
 
             System.out.println(n.node.get().logicToString());
 
@@ -178,7 +177,7 @@ public class RecurrentIdTest {
             for (int i = 0; i < doc.length(); i++) {
                 char c = doc.getContent().toLowerCase().charAt(i);
 
-                InputNeuron rec = chars.get(c);
+                Neuron rec = chars.get(c);
                 if (rec != null) {
                     Range r = new Range(i, doc.length());
 

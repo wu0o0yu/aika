@@ -23,8 +23,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.Node;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -45,11 +44,11 @@ public class CounterNeuronTest {
         System.out.println("Start =====================");
         Model m = new Model();
 
-        InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
-        InputNeuron sn = m.createOrLookupInputNeuron("START");
+        Neuron cn = new Neuron(m, "CLOCK");
+        Neuron sn = new Neuron(m, "START");
 
 
-        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
+        Neuron ctn = m.initCounterNeuron(new Neuron(m, "CTN"), cn, false, sn, true, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
@@ -98,9 +97,9 @@ public class CounterNeuronTest {
     public void testE() {
         Model m = new Model();
 
-        InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
-        InputNeuron sn = m.createOrLookupInputNeuron("START");
-        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
+        Neuron cn = new Neuron(m, "CLOCK");
+        Neuron sn = new Neuron(m, "START");
+        Neuron ctn = m.initCounterNeuron(new Neuron(m, "CTN"), cn, false, sn, true, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
@@ -140,9 +139,9 @@ public class CounterNeuronTest {
     public void testReverseDirection() {
         Model m = new Model();
 
-        InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
-        InputNeuron sn = m.createOrLookupInputNeuron("START");
-        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, false, true);
+        Neuron cn = new Neuron(m, "CLOCK");
+        Neuron sn = new Neuron(m, "START");
+        Neuron ctn = m.initCounterNeuron(new Neuron(m, "CTN"), cn, false, sn, false, true);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
@@ -170,9 +169,9 @@ public class CounterNeuronTest {
     public void testStartNode() {
         Model m = new Model();
 
-        InputNeuron sn = m.createOrLookupInputNeuron("START");
-        InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
-        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
+        Neuron sn = new Neuron(m, "START");
+        Neuron cn = new Neuron(m, "CLOCK");
+        Neuron ctn = m.initCounterNeuron(new Neuron(m, "CTN"), cn, false, sn, true, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 

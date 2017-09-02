@@ -25,7 +25,7 @@ import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 
 import java.util.Collections;
@@ -47,7 +47,7 @@ public class TestHelper {
     }
 
 
-    public static Activation addActivationAndPropagate(Document doc, Activation.Key ak, Set<Activation> inputActs) {
+    public static Activation addActivationAndPropagate(Document doc, Activation.Key ak, Set<Activation<?>> inputActs) {
         Node.addActivationAndPropagate(doc, ak, inputActs);
         doc.propagate();
         return Activation.get(doc, ak.n, ak.rid, ak.r, LESS_THAN, GREATER_THAN, ak.o, InterprNode.Relation.EQUALS);
@@ -82,12 +82,12 @@ public class TestHelper {
     }
 
 
-    public static InputNode addOutputNode(Document doc, AbstractNeuron n, Integer relativeRid, Integer absoluteRid) {
+    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid) {
         return addOutputNode(doc, n, relativeRid, absoluteRid, EQUALS, START, true, EQUALS, END, true);
     }
 
 
-    public static InputNode addOutputNode(Document doc, AbstractNeuron n, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Mapping startMapping, boolean startRangeOutput, Operator endRangeMatch, Mapping endMapping, boolean endRangeOutput) {
+    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Mapping startMapping, boolean startRangeOutput, Operator endRangeMatch, Mapping endMapping, boolean endRangeOutput) {
         return InputNode.add(doc.m, new Synapse.Key(false, false, relativeRid, absoluteRid, startRangeMatch, startMapping, startRangeOutput, endRangeMatch, endMapping, endRangeOutput), n);
     }
 

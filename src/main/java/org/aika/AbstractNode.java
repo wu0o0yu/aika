@@ -17,7 +17,7 @@
 package org.aika;
 
 import org.aika.lattice.Node;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 
 import java.io.DataInput;
 import java.io.IOException;
@@ -35,11 +35,10 @@ public abstract class AbstractNode<T extends AbstractNode> implements Writable {
     public static AbstractNode read(DataInput in, Provider p) throws IOException {
         AbstractNode n;
         if(in.readBoolean()) {
-            n = AbstractNeuron.read(in, p);
+            n = Neuron.read(in, p);
         } else {
             n = Node.read(in, p);
         }
         return n;
     }
-
 }

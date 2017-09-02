@@ -26,8 +26,8 @@ import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.network.TestHelper;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
+import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -47,9 +47,9 @@ public class ActivationsTest {
         Model m = new Model();
         AndNode.minFrequency = 1;
 
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        Neuron inA = new Neuron(m, "A");
 
-        m.initAndNeuron(m.createNeuron("pA"), 0.001,
+        m.initAndNeuron(new Neuron(m, "pA"), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -75,9 +75,9 @@ public class ActivationsTest {
         Assert.assertEquals(Activation.get(doc, pANode, null, new Range(1, 2), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
         Assert.assertEquals(Activation.get(doc, pANode, null, new Range(2, 3), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
 
-        InputNeuron inB = m.createOrLookupInputNeuron("B");
+        Neuron inB = new Neuron(m, "B");
 
-        m.initAndNeuron(m.createNeuron("pB"), 0.001,
+        m.initAndNeuron(new Neuron(m, "pB"), 0.001,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0)
@@ -101,8 +101,8 @@ public class ActivationsTest {
         AndNode.minFrequency = 1;
 
 
-        AbstractNeuron in = m.createOrLookupInputNeuron("A");
-        InputNode inNode = (InputNode) in.node.get();
+        Neuron in = new Neuron(m, "A");
+        Node inNode = in.node.get();
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 

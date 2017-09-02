@@ -23,7 +23,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -46,6 +46,7 @@ public class OrNode extends Node<OrNode> {
     // Hack: Integer.MIN_VALUE represents the null key
     public TreeMap<Integer, TreeSet<Node>> parents = new TreeMap<>();
 
+    public Provider<? extends Neuron> neuron = null;
 
     public OrNode() {}
 
@@ -97,7 +98,7 @@ public class OrNode extends Node<OrNode> {
     }
 
 
-    private void retrieveInputs(Document doc, Range inputR, Integer rid, List<Activation> inputs, Integer pRidOffset, TreeSet<Node> parents) {
+    private void retrieveInputs(Document doc, Range inputR, Integer rid, List<Activation<?>> inputs, Integer pRidOffset, TreeSet<Node> parents) {
         // Optimization the number of parents can get very large, thus we need to avoid iterating over all of them.
         if(parents.size() > 10) {
             retrieveInputs(doc, null, inputR, rid, inputs, pRidOffset, parents);
@@ -109,12 +110,30 @@ public class OrNode extends Node<OrNode> {
     }
 
 
-    private void retrieveInputs(Document doc, Node n, Range inputR, Integer rid, List<Activation> inputs, Integer pRidOffset, TreeSet<Node> parents) {
+    private void retrieveInputs(Document doc, Node<?> n, Range inputR, Integer rid, List<Activation<?>> inputs, Integer pRidOffset, TreeSet<Node> parents) {
         for(Activation iAct: Activation.select(doc, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null)
                 .collect(Collectors.toList())) {
             if(!iAct.isRemoved && parents.contains(iAct.key.n) && !checkSelfReferencing(doc, iAct)) {
                 inputs.add(iAct);
             }
+        }
+    }
+
+
+    Activation processAddedActivation(Document doc, Key<OrNode> ak, Collection<Activation> inputActs) {
+        Activation act = super.processAddedActivation(doc, ak, inputActs);
+        if(act != null) {
+            neuron.get().linkNeuronRelations(doc, act);
+        }
+        return act;
+    }
+
+
+    void processRemovedActivation(Document doc, Activation<OrNode> act, Collection<Activation> inputActs) {
+        super.processRemovedActivation(doc, act, inputActs);
+
+        if(act.isRemoved) {
+            neuron.get().unlinkNeuronRelations(doc, act);
         }
     }
 
@@ -126,7 +145,7 @@ public class OrNode extends Node<OrNode> {
         Range r = ak.r;
         Integer rid = Utils.nullSafeSub(ak.rid, true, ridOffset, false);
 
-        List<Activation> inputs = new ArrayList<>();
+        List<Activation<?>> inputs = new ArrayList<>();
 
         for (Map.Entry<Integer, TreeSet<Node>> me : parents.entrySet()) {
             retrieveInputs(doc, r, rid, inputs, me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, me.getValue());
@@ -155,7 +174,7 @@ public class OrNode extends Node<OrNode> {
     }
 
 
-    public void removeActivation(Document doc, Integer ridOffset, Activation inputAct) {
+    public void removeActivation(Document doc, Integer ridOffset, Activation<?> inputAct) {
         if(checkSelfReferencing(doc, inputAct)) return;
 
         for(Activation oAct: inputAct.outputs.values()) {
@@ -186,7 +205,7 @@ public class OrNode extends Node<OrNode> {
 
 
     @Override
-    public double computeSynapseWeightSum(Integer offset, AbstractNeuron n) {
+    public double computeSynapseWeightSum(Integer offset, Neuron n) {
         throw new UnsupportedOperationException();
     }
 
@@ -198,7 +217,7 @@ public class OrNode extends Node<OrNode> {
 
 
     @Override
-    boolean hasSupport(Activation act) {
+    boolean hasSupport(Activation<?> act) {
         for(Activation iAct: act.inputs.values()) {
             if(!iAct.isRemoved) return true;
         }
@@ -244,9 +263,9 @@ public class OrNode extends Node<OrNode> {
             return act.key.o;
         }
 
-        ThreadState th = getThreadState(doc.threadId, false);
+        ThreadState<OrNode> th = getThreadState(doc.threadId, false);
         if(th != null) {
-            for (Key ak : th.added.keySet()) {
+            for (Key<OrNode> ak : th.added.keySet()) {
                 if (Range.compare(ak.r, r) == 0) {
                     return ak.o;
                 }
@@ -315,6 +334,8 @@ public class OrNode extends Node<OrNode> {
 
 
     void remove(Model m, int threadId) {
+        neuron.get().remove(threadId);
+
         super.remove(m, threadId);
 
         lock.acquireReadLock();
@@ -325,6 +346,29 @@ public class OrNode extends Node<OrNode> {
         }
         lock.releaseReadLock();
     }
+
+
+    public void register(Activation act, Document doc) {
+        super.register(act, doc);
+        Key ak = act.key;
+
+        if(ak.o.neuronActivations == null) {
+            ak.o.neuronActivations = new TreeSet<>();
+        }
+        ak.o.neuronActivations.add(act);
+
+        neuron.get().lastUsedDocumentId = doc.id;
+    }
+
+
+    public void unregister(Activation act, Document doc) {
+        Key ak = act.key;
+
+        super.unregister(act, doc);
+
+        ak.o.neuronActivations.remove(act);
+    }
+
 
 
     public String logicToString() {
@@ -361,6 +405,8 @@ public class OrNode extends Node<OrNode> {
         out.writeUTF("O");
         super.write(out);
 
+        out.writeInt(neuron.id);
+
         out.writeInt(parents.size());
         for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
             out.writeInt(me.getKey());
@@ -376,6 +422,8 @@ public class OrNode extends Node<OrNode> {
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
+        neuron = m.lookupProvider(in.readInt());
+
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
             TreeSet<Node> ridParents = new TreeSet<>();
@@ -390,6 +438,12 @@ public class OrNode extends Node<OrNode> {
                 ridParents.add(pn);
             }
         }
+    }
+
+
+    public String toSimpleString() {
+        String l = neuron.get().label;
+        return super.toSimpleString() + ":" + (l != null ? l : "");
     }
 
 

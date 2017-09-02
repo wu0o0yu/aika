@@ -25,8 +25,9 @@ import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.Node;
 import org.aika.lattice.Node.ThreadState;
-import org.aika.neuron.AbstractNeuron;
-import org.aika.neuron.AbstractNeuron.NormWeight;
+import org.aika.lattice.OrNode;
+import org.aika.neuron.Neuron;
+import org.aika.neuron.Neuron.NormWeight;
 import org.aika.neuron.Synapse;
 
 import java.util.*;
@@ -51,11 +52,11 @@ import static org.aika.corpus.Range.Operator.*;
  *
  * @author Lukas Molzberger
  */
-public class Activation implements Comparable<Activation> {
+public class Activation<T extends Node> implements Comparable<Activation> {
 
     public int id;
 
-    public final Key key;
+    public final Key<T> key;
 
     public boolean isRemoved;
     public int removedId;
@@ -90,6 +91,8 @@ public class Activation implements Comparable<Activation> {
     public boolean ubQueued = false;
     public boolean isQueued = false;
     public long queueId;
+
+    public boolean isInput;
 
 
     public Activation(int id, Key key) {
@@ -130,69 +133,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public void register(Document doc) {
-        ThreadState th = key.n.getThreadState(doc.threadId, true);
-        if (th.activations.isEmpty()) {
-            (isTrainingAct ? doc.activatedNodesForTraining : doc.activatedNodes).add(key.n);
-        }
-        th.activations.put(key, this);
-
-        TreeMap<Key, Activation> actEnd = th.activationsEnd;
-        if(actEnd != null) actEnd.put(key, this);
-
-        TreeMap<Key, Activation> actRid = th.activationsRid;
-        if(actRid != null) actRid.put(key, this);
-
-        if(key.o.activations == null) {
-            key.o.activations = new TreeMap<>();
-        }
-        key.o.activations.put(key, this);
-
-        if(key.n.neuron != null) {
-            if(key.o.neuronActivations == null) {
-                key.o.neuronActivations = new TreeSet<>();
-            }
-            key.o.neuronActivations.add(this);
-
-            key.n.neuron.get().lastUsedDocumentId = doc.id;
-        }
-        key.n.lastUsedDocumentId = doc.id;
-
-        if(key.rid != null) {
-            doc.activationsByRid.put(key, this);
-        }
-    }
-
-
-    public void unregister(Document doc) {
-        assert !key.o.activations.isEmpty();
-
-        Node.ThreadState th = key.n.getThreadState(doc.threadId, true);
-
-        th.activations.remove(key);
-
-        TreeMap<Key, Activation> actEnd = th.activationsEnd;
-        if(actEnd != null) actEnd.remove(key);
-
-        TreeMap<Key, Activation> actRid = th.activationsRid;
-        if(actRid != null) actRid.remove(key);
-
-        if(th.activations.isEmpty()) {
-            (isTrainingAct ? doc.activatedNodesForTraining : doc.activatedNodes).remove(key.n);
-        }
-
-        key.o.activations.remove(key);
-        if(key.n.neuron != null) {
-            key.o.neuronActivations.remove(this);
-        }
-
-        if(key.rid != null) {
-            doc.activationsByRid.remove(key);
-        }
-    }
-
-
-    public static Activation get(Document doc, Node n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
+    public static <T extends Node> Activation<T> get(Document doc, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
         return select(doc, n, rid, r, begin, end, o, or)
                 .findFirst()
                 .orElse(null);
@@ -220,33 +161,35 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public static Stream<Activation> select(Document doc, Node n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
+    public static Stream<Activation> select(Document doc, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
         Stream<Activation> results;
-        if(n != null) {
-            ThreadState th = n.getThreadState(doc.threadId, false);
-            if(th == null) return Stream.empty();
-            return select(th, n, rid, r, begin, end, o, or);
+        if(rid != null) {
+            Key bk = new Key(Node.MIN_NODE, Range.MIN, rid, InterprNode.MIN);
+            Key ek = new Key(Node.MAX_NODE, Range.MAX, rid, InterprNode.MAX);
+
+            results = doc.activationsByRid.subMap(bk, true, ek, true)
+                    .values()
+                    .stream();
         } else {
-            if(rid != null) {
-                Key bk = new Key(Node.MIN_NODE, Range.MIN, rid, InterprNode.MIN);
-                Key ek = new Key(Node.MAX_NODE, Range.MAX, rid, InterprNode.MAX);
-
-                results = doc.activationsByRid.subMap(bk, true, ek, true)
-                        .values()
-                        .stream();
-            } else {
-                results = doc.activatedNodes
-                        .stream()
-                        .flatMap(node -> getActivationsStream(node, doc));
-            }
-
-            return results.filter(act -> act.filter(n, rid, r, begin, end, o, or));
+            results = doc.activatedNodes
+                    .stream()
+                    .flatMap(node -> getActivationsStream(node, doc));
         }
+
+        return results.filter(act -> act.filter(null, rid, r, begin, end, o, or));
     }
 
 
-    public static Stream<Activation> select(ThreadState th, Node n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
-        Stream<Activation> results;
+    public static <T extends Node> Stream<Activation<T>> select(Document doc, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
+        Stream<Activation<T>> results;
+        ThreadState<T> th = n.getThreadState(doc.threadId, false);
+        if(th == null) return Stream.empty();
+        return select(th, n, rid, r, begin, end, o, or);
+    }
+
+
+    public static <T extends Node> Stream<Activation<T>> select(ThreadState<T> th, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
+        Stream<Activation<T>> results;
         int s = th.activations.size();
 
         if(s == 0) return Stream.empty();
@@ -276,8 +219,8 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public static Stream getActivationsByRange(ThreadState th, Node n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
-        Stream s;
+    public static <T extends Node> Stream<Activation<T>> getActivationsByRange(ThreadState<T> th, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
+        Stream<Activation<T>> s;
         if((begin == GREATER_THAN || begin == EQUALS || end == FIRST) && r.begin != null) {
             int er = (end == Operator.LESS_THAN || end == Operator.EQUALS || end == FIRST) && r.end != null ? r.end : Integer.MAX_VALUE;
             s = th.activations.subMap(
@@ -320,13 +263,13 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    private static Stream<Activation> getActivationsStream(Node n, Document doc) {
-        ThreadState th = n.getThreadState(doc.threadId, false);
+    private static <T extends Node> Stream<Activation<T>> getActivationsStream(T n, Document doc) {
+        ThreadState<T> th = n.getThreadState(doc.threadId, false);
         return th == null ? Stream.empty() : th.activations.values().stream();
     }
 
 
-    public boolean filter(Node n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
+    public <T extends Node> boolean filter(T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
         return (n == null || key.n == n) &&
                 (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) &&
                 (r == null || ((begin == null || begin.compare(key.r.begin, key.r.end, r.begin, r.end)) && (end == null || end.compare(key.r.end, key.r.begin, r.end, r.begin)))) &&
@@ -362,8 +305,8 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public static final class Key implements Comparable<Key> {
-        public final Node<?> n;
+    public static final class Key<T extends Node> implements Comparable<Key> {
+        public final T n;
         public final Range r;
         public final Integer rid;
         public final InterprNode o;
@@ -371,7 +314,7 @@ public class Activation implements Comparable<Activation> {
         private int refCount = 0;
 
 
-        public Key(Node n, Range r, Integer rid, InterprNode o) {
+        public Key(T n, Range r, Integer rid, InterprNode o) {
             this.n = n;
             this.r = r;
             this.rid = rid;
@@ -410,7 +353,7 @@ public class Activation implements Comparable<Activation> {
 
 
         public String toString() {
-            return (n != null ? n.provider.id + (n.neuron != null && n.neuron.get() != null ? ":" + n.neuron.get().label : "") + " " : "") + r + " " + rid + " " + o;
+            return (n != null ? n.toSimpleString() : "") + r + " " + rid + " " + o;
         }
     }
 
@@ -447,7 +390,7 @@ public class Activation implements Comparable<Activation> {
         }
 
         public boolean equals(State s) {
-            return Math.abs(value - s.value) <= AbstractNeuron.WEIGHT_TOLERANCE || Math.abs(ub - s.ub) <= AbstractNeuron.WEIGHT_TOLERANCE || Math.abs(lb - s.lb) <= AbstractNeuron.WEIGHT_TOLERANCE;
+            return Math.abs(value - s.value) <= Neuron.WEIGHT_TOLERANCE || Math.abs(ub - s.ub) <= Neuron.WEIGHT_TOLERANCE || Math.abs(lb - s.lb) <= Neuron.WEIGHT_TOLERANCE;
         }
 
         public boolean equalsWithWeights(State s) {
@@ -548,8 +491,8 @@ public class Activation implements Comparable<Activation> {
      */
     public static class SynapseActivation {
         public final Synapse s;
-        public final Activation input;
-        public final Activation output;
+        public final Activation<OrNode> input;
+        public final Activation<OrNode> output;
 
         public static Comparator<SynapseActivation> INPUT_COMP = new Comparator<SynapseActivation>() {
             @Override

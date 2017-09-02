@@ -20,8 +20,7 @@ package org.aika.network;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
 
@@ -35,14 +34,14 @@ public class OptionalAndTest {
     public void testOptionalAnd() {
         Model m = new Model(2);
 
-        InputNeuron wordEssen = m.createOrLookupInputNeuron("word:essen");
-        InputNeuron wordHamburg = m.createOrLookupInputNeuron("word:hamburg");
-        InputNeuron wordGehen = m.createOrLookupInputNeuron("word:gehen");
-        InputNeuron upperCase = m.createOrLookupInputNeuron("upper case");
+        Neuron wordEssen = new Neuron(m, "word:essen");
+        Neuron wordHamburg = new Neuron(m, "word:hamburg");
+        Neuron wordGehen = new Neuron(m, "word:gehen");
+        Neuron upperCase = new Neuron(m, "upper case");
 
-        Neuron suppr = m.createNeuron("SUPPRESS");
+        Neuron suppr = new Neuron(m, "SUPPRESS");
 
-        Neuron hintNoun = m.initOrNeuron(m.createNeuron("HINT-NOUN"),
+        Neuron hintNoun = m.initOrNeuron(new Neuron(m, "HINT-NOUN"),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
@@ -56,7 +55,7 @@ public class OptionalAndTest {
                         .setRecurrent(false)
                         .setMinInput(1.0)
         );
-        Neuron hintVerb = m.initOrNeuron(m.createNeuron("HINT-VERB"),
+        Neuron hintVerb = m.initOrNeuron(new Neuron(m, "HINT-VERB"),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
@@ -72,7 +71,7 @@ public class OptionalAndTest {
         );
 
 
-        Neuron noun = m.initAndNeuron(m.createNeuron("NOUN"),
+        Neuron noun = m.initAndNeuron(new Neuron(m, "NOUN"),
                 0.001,
                 new Input()
                         .setOptional(false)
@@ -96,7 +95,7 @@ public class OptionalAndTest {
                         .setMinInput(1.0)
         );
 
-        Neuron verb = m.initAndNeuron(m.createNeuron("VERB"),
+        Neuron verb = m.initAndNeuron(new Neuron(m, "VERB"),
                 0.001,
                 new Input()
                         .setOptional(false)

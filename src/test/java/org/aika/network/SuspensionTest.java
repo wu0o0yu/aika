@@ -22,8 +22,8 @@ import org.aika.Model;
 import org.aika.Provider;
 import org.aika.SuspensionHook;
 import org.aika.corpus.Document;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
+import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,16 +45,18 @@ public class SuspensionTest {
         Model m = new Model();
         m.suspensionHook = new DummySuspensionHook();
 
-        InputNeuron n = m.createOrLookupInputNeuron("A");
-        n.node.suspend();
-        n.provider.suspend();
+        Provider<Neuron> n = new Neuron(m, "A").provider;
+        n.get().node.suspend();
+        n.suspend();
+
+        int id = n.id;
 
 
         // Reactivate
-        n = m.createOrLookupInputNeuron("A");
+        n = m.lookupProvider(id);
 
         Document doc = m.createDocument("Bla");
-        n.addInput(doc, 0, 1);
+        n.get().addInput(doc, 0, 1);
     }
 
 
@@ -63,12 +65,15 @@ public class SuspensionTest {
         Model m = new Model();
         m.suspensionHook = new DummySuspensionHook();
 
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
-        InputNeuron inB = m.createOrLookupInputNeuron("B");
+        Provider<Neuron> inA = new Neuron(m, "A").provider;
+        Provider<Neuron> inB = new Neuron(m, "B").provider;
 
-        AbstractNeuron nC = m.initAndNeuron(m.createNeuron("C"), 0.5,
+        int idA = inA.id;
+        int idB = inB.id;
+
+        Neuron nC = m.initAndNeuron(new Neuron(m, "C"), 0.5,
                 new Input()
-                        .setNeuron(inA)
+                        .setNeuron(inA.get())
                         .setWeight(10.0)
                         .setMinInput(0.9)
                         .setRelativeRid(0)
@@ -76,7 +81,7 @@ public class SuspensionTest {
                         .setStartRangeMatch(EQUALS)
                         .setStartRangeOutput(true),
                 new Input()
-                        .setNeuron(inB)
+                        .setNeuron(inB.get())
                         .setWeight(10.0)
                         .setMinInput(0.9)
                         .setRelativeRid(null)
@@ -86,7 +91,7 @@ public class SuspensionTest {
         );
 
 
-        Provider<? extends AbstractNeuron> outD = m.initAndNeuron(m.createNeuron("D"), 0.5,
+        Provider<? extends Neuron> outD = m.initAndNeuron(new Neuron(m, "D"), 0.5,
                 new Input()
                         .setNeuron(nC)
                         .setWeight(10.0)
@@ -104,11 +109,11 @@ public class SuspensionTest {
 
         Document doc = m.createDocument("Bla");
 
-        inA = m.createOrLookupInputNeuron("A");
-        inA.addInput(doc, 0, 1, 0);
+        inA = m.lookupProvider(idA);
+        inA.get().addInput(doc, 0, 1, 0);
 
-        inB = m.createOrLookupInputNeuron("B");
-        inB.addInput(doc, 1, 2, 1);
+        inB = m.lookupProvider(idB);
+        inB.get().addInput(doc, 1, 2, 1);
 
         doc.process();
 

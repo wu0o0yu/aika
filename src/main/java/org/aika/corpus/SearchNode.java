@@ -21,7 +21,8 @@ import org.aika.Activation;
 import org.aika.Activation.Rounds;
 import org.aika.Activation.SynapseActivation;
 import org.aika.corpus.Conflicts.Conflict;
-import org.aika.neuron.AbstractNeuron.NormWeight;
+import org.aika.lattice.OrNode;
+import org.aika.neuron.Neuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,7 +171,7 @@ public class SearchNode implements Comparable<SearchNode> {
         changeState(StateChange.Mode.NEW);
 
         for(StateChange sc : modifiedActs) {
-            Activation act = sc.act;
+            Activation<OrNode> act = sc.act;
             if(act.finalState != null && act.finalState.value > 0.0) {
                 doc.finallyActivatedNeurons.add(act.key.n.neuron.get());
             }
@@ -627,7 +628,7 @@ public class SearchNode implements Comparable<SearchNode> {
      *
      */
     public static class StateChange {
-        public Activation act;
+        public Activation<OrNode> act;
 
         public Rounds oldRounds;
         public Rounds newRounds;

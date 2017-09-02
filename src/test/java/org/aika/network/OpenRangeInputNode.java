@@ -8,7 +8,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.InputNode;
-import org.aika.neuron.InputNeuron;
+import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,15 +23,15 @@ import static org.aika.corpus.Range.Mapping.END;
 public class OpenRangeInputNode {
 
     Model m;
-    InputNeuron in;
+    Neuron in;
     InputNode inputNode;
 
     @Before
     public void init() {
         m = new Model();
 
-        in = m.createOrLookupInputNeuron("IN");
-        m.initOrNeuron(m.createNeuron("OUT"),
+        in = new Neuron(m, "IN");
+        m.initOrNeuron(new Neuron(m, "OUT"),
                 new Input()
                         .setNeuron(in)
                         .setWeight(10.0)

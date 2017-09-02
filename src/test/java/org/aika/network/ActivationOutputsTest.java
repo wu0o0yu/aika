@@ -30,8 +30,7 @@ import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
@@ -55,10 +54,10 @@ public class ActivationOutputsTest {
 
         m.numberOfPositions = 10;
 
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
-        InputNeuron inB = m.createOrLookupInputNeuron("B");
+        Neuron inA = new Neuron(m, "A");
+        Neuron inB = new Neuron(m, "B");
 
-        Neuron pAB = m.initAndNeuron(m.createNeuron("pAB"),
+        Neuron pAB = m.initAndNeuron(new Neuron(m, "pAB"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -142,10 +141,10 @@ public class ActivationOutputsTest {
 
         m.numberOfPositions = 10;
 
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
-        InputNeuron inB = m.createOrLookupInputNeuron("B");
+        Neuron inA = new Neuron(m, "A");
+        Neuron inB = new Neuron(m, "B");
 
-        Neuron pAB = m.initAndNeuron(m.createNeuron("B-NA", true, false),
+        Neuron pAB = m.initAndNeuron(new Neuron(m, "B-NA", true, false),
                 0.5,
                 new Input()
                         .setNeuron(inA)
@@ -183,9 +182,9 @@ public class ActivationOutputsTest {
         Model m = new Model();
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        Neuron inA = new Neuron(m, "A");
 
-        Node outBNode = m.initAndNeuron(m.createNeuron("B", true, false), 0.001,
+        Node outBNode = m.initAndNeuron(new Neuron(m, "B", true, false), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -208,9 +207,9 @@ public class ActivationOutputsTest {
         Model m = new Model();
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        Neuron inA = new Neuron(m, "A");
 
-        Node outBNode = m.initAndNeuron(m.createNeuron("B", true, false), 0.001,
+        Node outBNode = m.initAndNeuron(new Neuron(m, "B", true, false), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -233,9 +232,9 @@ public class ActivationOutputsTest {
         Model m = new Model();
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        Neuron inA = new Neuron(m, "A");
 
-        OrNode outBNode = (OrNode) m.initAndNeuron(m.createNeuron("B", true, false), 0.001,
+        OrNode outBNode = (OrNode) m.initAndNeuron(new Neuron(m, "B", true, false), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)

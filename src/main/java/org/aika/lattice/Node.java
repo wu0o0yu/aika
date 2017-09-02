@@ -25,7 +25,7 @@ import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.lattice.OrNode.OrEntry;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,24 +94,22 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
     public boolean isQueued = false;
     public long queueId;
 
-    public Provider<? extends AbstractNeuron> neuron = null;
-
     public static long visitedCounter = 0;
 
-    public ThreadState[] threads;
+    public ThreadState<T>[] threads;
 
     /**
      * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
      * a specific logic node.
      */
-    public static class ThreadState {
+    public static class ThreadState<T extends Node> {
         public long lastUsed;
 
-        public TreeMap<Key, Activation> activations;
-        public TreeMap<Key, Activation> activationsEnd;
-        public TreeMap<Key, Activation> activationsRid;
+        public TreeMap<Key, Activation<T>> activations;
+        public TreeMap<Key, Activation<T>> activationsEnd;
+        public TreeMap<Key, Activation<T>> activationsRid;
 
-        public NavigableMap<Key, Collection<Activation>> added;
+        public NavigableMap<Key, Collection<Activation<?>>> added;
         public NavigableMap<Key, RemovedEntry> removed;
         long visitedNeuronRefsChange = -1;
         public long visitedAllowedOption = -1;
@@ -160,8 +158,8 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
     }
 
 
-    public ThreadState getThreadState(int threadId, boolean create) {
-        ThreadState th = threads[threadId];
+    public ThreadState<T> getThreadState(int threadId, boolean create) {
+        ThreadState<T> th = threads[threadId];
         if(th == null) {
             if(!create) return null;
 
@@ -184,7 +182,7 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
 
     public abstract void propagateRemovedActivation(Document doc, Activation act);
 
-    public abstract boolean isAllowedOption(int threadId, InterprNode n, Activation act, long v);
+    public abstract boolean isAllowedOption(int threadId, InterprNode n, Activation<?> act, long v);
 
     abstract void cleanup(Model m, int threadId);
 
@@ -192,19 +190,19 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
 
     abstract void deleteActivation(Document doc, Activation act);
 
-    public abstract double computeSynapseWeightSum(Integer offset, AbstractNeuron n);
+    public abstract double computeSynapseWeightSum(Integer offset, Neuron n);
 
     public abstract String logicToString();
 
-    abstract void apply(Document doc, Activation act, InterprNode conflict);
+    abstract void apply(Document doc, Activation<T> act, InterprNode conflict);
 
-    public abstract void discover(Document doc, Activation act);
+    public abstract void discover(Document doc, Activation<T> act);
 
     abstract Collection<Refinement> collectNodeAndRefinements(Refinement newRef);
 
     abstract void changeNumberOfNeuronRefs(int threadId, long v, int d);
 
-    abstract boolean hasSupport(Activation act);
+    abstract boolean hasSupport(Activation<?> act);
 
     public abstract void computeNullHyp(Model m);
 
@@ -308,10 +306,10 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
 
 
     public void count(int threadId) {
-        ThreadState ts = getThreadState(threadId, false);
+        ThreadState<T> ts = getThreadState(threadId, false);
         if(ts == null) return;
 
-        for(Activation act: ts.activations.values()) {
+        for(Activation<T> act: ts.activations.values()) {
             frequency++;
             frequencyHasChanged = true;
 
@@ -328,21 +326,14 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
             act.isTrainingAct = isTrainingAct;
 
             initActivation(doc, act);
-            act.register(doc);
+            register(act, doc);
 
             act.link(inputActs);
-
-            if(neuron != null) {
-                neuron.get().linkNeuronRelations(doc, act);
-            }
 
             if(!isTrainingAct) {
                 propagateAddedActivation(doc, act, null);
             }
         } else {
-            if(neuron != null) {
-                neuron.get().linkNeuronRelations(doc, act);
-            }
             act.link(inputActs);
         }
 
@@ -353,16 +344,13 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
     boolean removeActivationInternal(Document doc, Activation act, Collection<Activation> inputActs) {
         boolean flag = false;
         if(act.isRemoved) {
-            act.unregister(doc);
+            unregister(act, doc);
             deleteActivation(doc, act);
 
             propagateRemovedActivation(doc, act);
 
             act.key.releaseRef();
 
-            if(neuron != null) {
-                neuron.get().unlinkNeuronRelations(doc, act);
-            }
             flag = true;
         }
 
@@ -371,6 +359,64 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
 
         return flag;
     }
+
+
+
+    public void register(Activation act, Document doc) {
+        Key ak = act.key;
+
+        ThreadState th = ak.n.getThreadState(doc.threadId, true);
+        if (th.activations.isEmpty()) {
+            (act.isTrainingAct ? doc.activatedNodesForTraining : doc.activatedNodes).add(ak.n);
+        }
+        th.activations.put(ak, act);
+
+        TreeMap<Key, Activation> actEnd = th.activationsEnd;
+        if(actEnd != null) actEnd.put(ak, act);
+
+        TreeMap<Key, Activation> actRid = th.activationsRid;
+        if(actRid != null) actRid.put(ak, act);
+
+        if(ak.o.activations == null) {
+            ak.o.activations = new TreeMap<>();
+        }
+        ak.o.activations.put(ak, act);
+
+        ak.n.lastUsedDocumentId = doc.id;
+
+        if(ak.rid != null) {
+            doc.activationsByRid.put(ak, act);
+        }
+    }
+
+
+    public void unregister(Activation act, Document doc) {
+        Key ak = act.key;
+
+        assert !ak.o.activations.isEmpty();
+
+        Node.ThreadState th = ak.n.getThreadState(doc.threadId, true);
+
+        th.activations.remove(ak);
+
+        TreeMap<Key, Activation> actEnd = th.activationsEnd;
+        if(actEnd != null) actEnd.remove(ak);
+
+        TreeMap<Key, Activation> actRid = th.activationsRid;
+        if(actRid != null) actRid.remove(ak);
+
+        if(th.activations.isEmpty()) {
+            (act.isTrainingAct ? doc.activatedNodesForTraining : doc.activatedNodes).remove(ak.n);
+        }
+
+        ak.o.activations.remove(ak);
+
+        if(ak.rid != null) {
+            doc.activationsByRid.remove(ak);
+        }
+    }
+
+
 
 
     /**
@@ -423,9 +469,9 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
      * @param ak
      * @param inputActs
      */
-    public static void addActivationAndPropagate(Document doc, Key ak, Collection<Activation> inputActs) {
-        ThreadState th = ak.n.getThreadState(doc.threadId, true);
-        Collection<Activation> iActs = th.added.get(ak);
+    public static <T extends Node> void addActivationAndPropagate(Document doc, Key<T> ak, Collection<Activation<?>> inputActs) {
+        ThreadState<T> th = ak.n.getThreadState(doc.threadId, true);
+        Collection<Activation<?>> iActs = th.added.get(ak);
         if(iActs == null) {
             iActs = new ArrayList<>();
             th.added.put(ak, iActs);
@@ -435,32 +481,32 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
     }
 
 
-    Range preProcessAddedActivation(Document doc, Key ak, Collection<Activation> inputActs) {
+    Range preProcessAddedActivation(Document doc, Key<T> ak, Collection<Activation> inputActs) {
         return ak.r;
     }
 
 
-    void processAddedActivation(Document doc, Key ak, Collection<Activation> inputActs) {
+    Activation processAddedActivation(Document doc, Key<T> ak, Collection<Activation> inputActs) {
         Range r = preProcessAddedActivation(doc, ak, inputActs);
-        if(r == null) return;
+        if(r == null) return null;
 
-        Key nak = new Key(this, r, ak.rid, ak.o);
+        Key<T> nak = new Key(this, r, ak.rid, ak.o);
 
         if (Document.APPLY_DEBUG_OUTPUT) {
             log.info("add: " + nak + " - " + nak.n);
         }
 
-        addActivationInternal(doc, nak, inputActs, false);
+        return addActivationInternal(doc, nak, inputActs, false);
     }
 
 
     /*
     First remove the inputs from the given activation. Only if, depending on the node type, insufficient support exists for this activation, then actually remove it.
      */
-    public static void removeActivationAndPropagate(Document doc, Activation act, Collection<Activation> inputActs) {
+    public static <T extends Node> void removeActivationAndPropagate(Document doc, Activation<T> act, Collection<Activation<?>> inputActs) {
         if(act == null || act.isRemoved) return;
 
-        ThreadState th = act.key.n.getThreadState(doc.threadId, true);
+        ThreadState<T> th = act.key.n.getThreadState(doc.threadId, true);
         RemovedEntry re = th.removed.get(act.key);
         if(re == null) {
             re = new RemovedEntry();
@@ -472,10 +518,10 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
     }
 
 
-    void postProcessRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {}
+    void postProcessRemovedActivation(Document doc, Activation<T> act, Collection<Activation> inputActs) {}
 
 
-    private void processRemovedActivation(Document doc, Activation act, Collection<Activation> inputActs) {
+    void processRemovedActivation(Document doc, Activation<T> act, Collection<Activation> inputActs) {
         if(Document.APPLY_DEBUG_OUTPUT) {
             log.info("remove: " + act.key + " - " + act.key.n);
         }
@@ -493,8 +539,8 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
     }
 
 
-    public synchronized Activation getFirstActivation(Document doc) {
-        ThreadState th = getThreadState(doc.threadId, false);
+    public synchronized Activation<T> getFirstActivation(Document doc) {
+        ThreadState<T> th = getThreadState(doc.threadId, false);
         if(th == null || th.activations.isEmpty()) return null;
         return th.activations.firstEntry().getValue();
     }
@@ -578,10 +624,6 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
     void remove(Model m, int threadId) {
         assert !isRemoved;
 
-        if(neuron != null) {
-            neuron.get().remove(threadId);
-        }
-
         lock.acquireWriteLock(threadId);
         while(andChildren != null && !andChildren.isEmpty()) {
             andChildren.pollFirstEntry().getValue().get().remove(m, threadId);
@@ -609,7 +651,7 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
     }
 
 
-    private static int evaluate(AbstractNeuron n, RSKey rsk) {
+    private static int evaluate(Neuron n, RSKey rsk) {
         Node pa = rsk.pa != null ? rsk.pa.get() : null;
         double sum = pa.computeSynapseWeightSum(rsk.offset, n);
         if(sum < 0.0) return -1;
@@ -639,7 +681,7 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
      * @param dir
      * @return
      */
-    public static boolean adjust(Model m, int threadId, AbstractNeuron<?> neuron, final int dir) {
+    public static boolean adjust(Model m, int threadId, Neuron neuron, final int dir) {
         long v = visitedCounter++;
         OrNode outputNode = (OrNode) neuron.node.get();
 
@@ -647,7 +689,7 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
 
         neuron.maxRecurrentSum = 0.0;
         for(Synapse s: neuron.inputSynapsesByWeight) {
-            AbstractNeuron in = s.input.get();
+            Neuron in = s.input.get();
             in.lock.acquireWriteLock(threadId);
 
             if (s.inputNode == null) {
@@ -743,7 +785,7 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
     }
 
 
-    private static void computeRefinements(Model m, int threadId, TreeSet<RSKey> queue, AbstractNeuron<?> n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup) {
+    private static void computeRefinements(Model m, int threadId, TreeSet<RSKey> queue, Neuron n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup) {
         n.lock.acquireWriteLock(threadId);
         Synapse minSyn = null;
         double sum = 0.0;
@@ -780,7 +822,7 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
     }
 
 
-    void prepareResultsForPredefinedNodes(int threadId, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, AbstractNeuron n, Synapse s, Integer offset) {
+    void prepareResultsForPredefinedNodes(int threadId, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, Neuron n, Synapse s, Integer offset) {
         RSKey rs = new RSKey(provider, offset);
         RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
         // TODO: mindestens einen positiven Knoten mit rein nehmen.
@@ -847,13 +889,7 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
 
 
     public String toSimpleString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(provider.id);
-        if(neuron != null && neuron.get().label != null) {
-            sb.append(" ");
-            sb.append(neuron.get().label);
-        }
-        return sb.toString();
+        return "" + provider.id;
     }
 
 
@@ -876,11 +912,6 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeInt(level);
-
-        out.writeBoolean(neuron != null);
-        if (neuron != null) {
-            out.writeInt(neuron.id);
-        }
 
         out.writeInt(frequency);
         out.writeDouble(nullHypFreq);
@@ -922,10 +953,6 @@ public abstract class Node<T extends Node> extends AbstractNode<T> implements Co
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         level = in.readInt();
-
-        if(in.readBoolean()) {
-            neuron = m.lookupProvider(in.readInt());
-        }
 
         frequency = in.readInt();
         nullHypFreq = in.readDouble();

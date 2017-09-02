@@ -23,8 +23,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.Node;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,11 +36,11 @@ public class RelationalNeuronTest {
     public void testOutputNode() {
         Model m = new Model();
 
-        InputNeuron in = m.createOrLookupInputNeuron("INPUT");
-        InputNeuron cn = m.createOrLookupInputNeuron("CLOCK");
-        InputNeuron sn = m.createOrLookupInputNeuron("START");
-        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
-        Neuron on = m.initRelationalNeuron(m.createNeuron("ON"), ctn, in, false);
+        Neuron in = new Neuron(m, "INPUT");
+        Neuron cn = new Neuron(m, "CLOCK");
+        Neuron sn = new Neuron(m, "START");
+        Neuron ctn = m.initCounterNeuron(new Neuron(m, "CTN"), cn, false, sn, true, false);
+        Neuron on = m.initRelationalNeuron(new Neuron(m, "ON"), ctn, in, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 

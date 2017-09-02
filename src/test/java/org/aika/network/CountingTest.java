@@ -22,8 +22,8 @@ import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
+import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,8 +41,8 @@ public class CountingTest {
         Model m = new Model();
         AndNode.minFrequency = 0;
 
-        InputNeuron inA = m.createOrLookupInputNeuron("inA");
-        AbstractNeuron outA = m.initAndNeuron(m.createNeuron("nA"), 0.5,
+        Neuron inA = new Neuron(m, "inA");
+        Neuron outA = m.initAndNeuron(new Neuron(m, "nA"), 0.5,
                 new Input()
                         .setMinInput(0.95)
                         .setWeight(100.0)

@@ -25,8 +25,7 @@ import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
 
@@ -44,11 +43,11 @@ public class OrOptionsTest {
 
         AndNode.minFrequency = 5;
 
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
-        InputNeuron inB = m.createOrLookupInputNeuron("B");
-        InputNeuron inC = m.createOrLookupInputNeuron("C");
+        Neuron inA = new Neuron(m, "A");
+        Neuron inB = new Neuron(m, "B");
+        Neuron inC = new Neuron(m, "C");
 
-        Neuron pD = m.createNeuron("D");
+        Neuron pD = new Neuron(m, "D");
 
         m.initOrNeuron(pD,
                 new Input()

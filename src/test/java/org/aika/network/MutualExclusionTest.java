@@ -24,8 +24,7 @@ import org.aika.corpus.Conflicts.Conflict;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.lattice.Node;
-import org.aika.neuron.InputNeuron;
-import org.aika.neuron.AbstractNeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
 
@@ -62,16 +61,16 @@ public class MutualExclusionTest {
         Model m = new Model();
 
         // Create the input neurons for the network.
-        InputNeuron inA = m.createOrLookupInputNeuron("IN-A");
-        InputNeuron inB = m.createOrLookupInputNeuron("IN-B");
-        InputNeuron inC = m.createOrLookupInputNeuron("IN-C");
+        Neuron inA = new Neuron(m, "IN-A");
+        Neuron inB = new Neuron(m, "IN-B");
+        Neuron inC = new Neuron(m, "IN-C");
 
         // Instantiate the suppressing neuron. Its inputs will be added later on.
-        Neuron pSuppr = m.createNeuron("SUPPRESS");
+        Neuron pSuppr = new Neuron(m, "SUPPRESS");
 
         // Create three neurons that might be suppressed by the suppressing neuron.
         Neuron pA = m.initAndNeuron(
-                m.createNeuron("A"),
+                new Neuron(m, "A"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -87,7 +86,7 @@ public class MutualExclusionTest {
         );
 
         Neuron pB = m.initAndNeuron(
-                m.createNeuron("B"),
+                new Neuron(m, "B"),
                 0.001,
                 new Input()
                         .setNeuron(inB)
@@ -103,7 +102,7 @@ public class MutualExclusionTest {
         );
 
         Neuron pC = m.initAndNeuron(
-                m.createNeuron("C"),
+                new Neuron(m, "C"),
                 0.001,
                 new Input()
                         .setNeuron(inC)
@@ -138,7 +137,7 @@ public class MutualExclusionTest {
                         .setMinInput(1.0)
         );
 
-        Neuron outN = m.initOrNeuron(m.createNeuron("OUT"),
+        Neuron outN = m.initOrNeuron(new Neuron(m, "OUT"),
                 new Input()
                         .setNeuron(pB)
                         .setWeight(1.0)

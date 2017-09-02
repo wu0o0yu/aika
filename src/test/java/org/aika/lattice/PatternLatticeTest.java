@@ -25,7 +25,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.network.TestHelper;
-import org.aika.neuron.InputNeuron;
+import org.aika.neuron.Neuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -40,13 +40,13 @@ public class PatternLatticeTest {
     @Test
     public void testPredefinedPatterns() {
         Model m = new Model();
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
-        InputNeuron inB = m.createOrLookupInputNeuron("B");
-        InputNeuron inC = m.createOrLookupInputNeuron("C");
-        InputNeuron inD = m.createOrLookupInputNeuron("D");
+        Neuron inA = new Neuron(m, "A");
+        Neuron inB = new Neuron(m, "B");
+        Neuron inC = new Neuron(m, "C");
+        Neuron inD = new Neuron(m, "D");
 
         {
-            m.initAndNeuron(m.createNeuron("ABC"),
+            m.initAndNeuron(new Neuron(m, "ABC"),
                     0.001,
                     new Input()
                             .setNeuron(inA)
@@ -101,7 +101,7 @@ public class PatternLatticeTest {
             Assert.assertEquals(pBC.provider, pABC.parents.get(new Refinement(null, pA.provider)));
         }
         {
-            m.initAndNeuron(m.createNeuron("BCD"),
+            m.initAndNeuron(new Neuron(m, "BCD"),
                     0.001,
                     new Input()
                             .setNeuron(inB)
@@ -165,7 +165,7 @@ public class PatternLatticeTest {
             Assert.assertEquals(pCD.provider, pBCD.parents.get(new Refinement(null, pB.provider)));
         }
         {
-            m.initAndNeuron(m.createNeuron("ABCD"),
+            m.initAndNeuron(new Neuron(m, "ABCD"),
                     0.001,
                     new Input()
                             .setNeuron(inA)
@@ -259,10 +259,10 @@ public class PatternLatticeTest {
         m.numberOfPositions = 100;
 
 
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
-        InputNeuron inB = m.createOrLookupInputNeuron("B");
-        InputNeuron inC = m.createOrLookupInputNeuron("C");
-        InputNeuron inD = m.createOrLookupInputNeuron("D");
+        Neuron inA = new Neuron(m, "A");
+        Neuron inB = new Neuron(m, "B");
+        Neuron inC = new Neuron(m, "C");
+        Neuron inD = new Neuron(m, "D");
 
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -654,16 +654,16 @@ public class PatternLatticeTest {
         Model m = new Model();
         AndNode.minFrequency = 10;
 
-        InputNeuron inA = m.createOrLookupInputNeuron("A");
+        Neuron inA = new Neuron(m, "A");
         Node inANode = inA.node.get();
 
-        InputNeuron inB = m.createOrLookupInputNeuron("B");
+        Neuron inB = new Neuron(m, "B");
         Node inBNode = inB.node.get();
 
-        InputNeuron inC = m.createOrLookupInputNeuron("C");
+        Neuron inC = new Neuron(m, "C");
         Node inCNode = inC.node.get();
 
-        m.initAndNeuron(m.createNeuron("ABC"),
+        m.initAndNeuron(new Neuron(m, "ABC"),
                 0.001,
                 new Input().setNeuron(inA).setWeight(1.0).setRecurrent(false).setMinInput(1.0),
                 new Input().setNeuron(inB).setWeight(1.0).setRecurrent(false).setMinInput(1.0),

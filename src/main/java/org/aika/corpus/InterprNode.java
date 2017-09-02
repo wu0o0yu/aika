@@ -21,6 +21,7 @@ import org.aika.Activation;
 import org.aika.Activation.Key;
 import org.aika.Utils;
 import org.aika.lattice.Node;
+import org.aika.lattice.OrNode;
 
 import java.util.*;
 
@@ -103,7 +104,7 @@ public class InterprNode implements Comparable<InterprNode> {
     public Conflicts conflicts = new Conflicts();
 
     public NavigableMap<Key, Activation> activations;
-    public NavigableSet<Activation> neuronActivations;
+    public NavigableSet<Activation<OrNode>> neuronActivations;
 
 
     public int refCount = 0;
@@ -279,7 +280,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public Collection<Activation> getNeuronActivations() {
+    public Collection<Activation<OrNode>> getNeuronActivations() {
         return neuronActivations != null ? neuronActivations : Collections.emptySet();
     }
 
