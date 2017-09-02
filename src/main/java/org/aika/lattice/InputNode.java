@@ -45,7 +45,7 @@ import static org.aika.corpus.Range.Operator.*;
  *
  * @author Lukas Molzberger
  */
-public class InputNode extends Node<InputNode> {
+public class InputNode extends Node<InputNode, Activation<InputNode>> {
 
     public Key key;
     public Provider<? extends Neuron> inputNeuron;
@@ -127,6 +127,11 @@ public class InputNode extends Node<InputNode> {
         );
     }
 
+    @Override
+    protected Activation<InputNode> createNewActivation(int id, Activation.Key ak) {
+        return new Activation<>(id, ak);
+    }
+
 
     @Override
     public void computeNullHyp(Model m) {
@@ -141,9 +146,10 @@ public class InputNode extends Node<InputNode> {
 
 
     @Override
-    boolean hasSupport(Activation<?> act) {
+    boolean hasSupport(Activation<InputNode> act) {
         for(Activation iAct: act.inputs.values()) {
-            if(!iAct.isRemoved && iAct.upperBound > 0.0) return true;
+            NeuronActivation iNAct = (NeuronActivation) iAct;
+            if(!iAct.isRemoved && iNAct.upperBound > 0.0) return true;
         }
 
         return false;

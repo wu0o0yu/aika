@@ -19,6 +19,7 @@ package org.aika.corpus;
 
 import org.aika.Activation;
 import org.aika.Activation.Key;
+import org.aika.NeuronActivation;
 import org.aika.Utils;
 import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
@@ -104,7 +105,7 @@ public class InterprNode implements Comparable<InterprNode> {
     public Conflicts conflicts = new Conflicts();
 
     public NavigableMap<Key, Activation> activations;
-    public NavigableSet<Activation<OrNode>> neuronActivations;
+    public NavigableSet<NeuronActivation> neuronActivations;
 
 
     public int refCount = 0;
@@ -280,7 +281,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public Collection<Activation<OrNode>> getNeuronActivations() {
+    public Collection<NeuronActivation> getNeuronActivations() {
         return neuronActivations != null ? neuronActivations : Collections.emptySet();
     }
 
@@ -647,7 +648,7 @@ public class InterprNode implements Comparable<InterprNode> {
         if(visitedStoreFinalWeight == v) return;
         visitedStoreFinalWeight = v;
 
-        for(Activation act: getNeuronActivations()) {
+        for(NeuronActivation act: getNeuronActivations()) {
             act.finalState = act.rounds.getLast();
         }
 

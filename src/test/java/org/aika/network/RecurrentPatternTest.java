@@ -116,13 +116,13 @@ public class RecurrentPatternTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
         doc.process();
 
         System.out.println("All activations:");
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
         Activation patAct = patternN.node.get().getFirstActivation(doc);
@@ -216,7 +216,7 @@ public class RecurrentPatternTest {
         doc.process();
 
         System.out.println("All activations:");
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
         Activation patAct = patternN.node.get().getFirstActivation(doc);
@@ -282,11 +282,11 @@ public class RecurrentPatternTest {
             clock.addInput(doc, i - 1, i);
         }
 
-        System.out.println(doc.networkStateToString(true, false, false, true));
+        System.out.println(doc.neuronActivationsToString(false, false, true));
 
         start.addInput(doc, 0, 1, 0);
 
-        System.out.println(doc.networkStateToString(true, false, false, true));
+        System.out.println(doc.neuronActivationsToString(false, false, true));
 
         Assert.assertEquals(2, Activation.get(doc, ctn.node.get(), 2, new Range(10, 15), EQUALS, EQUALS, null, null).key.o.primId);
     }

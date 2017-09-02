@@ -29,6 +29,8 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.stream.Stream;
+
 import static org.aika.corpus.Range.Operator.EQUALS;
 
 /**
@@ -63,14 +65,14 @@ public class CounterNeuronTest {
         cn.addInput(doc, 24, 25, o01);
 //        sn.addInput(t, 0, 1, doc.bottom);
 
-        System.out.println(doc.networkStateToString(true, false, false, true));
+        System.out.println(doc.neuronActivationsToString(false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 10), null));
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 25), null));
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 1, new Range(10, 25), null));
 
         cn.addInput(doc, 4, 5, o0);
-        System.out.println(doc.networkStateToString(true, false, false, true));
+        System.out.println(doc.neuronActivationsToString(false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 5), null));
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 1, new Range(5, 10), null));
@@ -78,14 +80,14 @@ public class CounterNeuronTest {
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 2, new Range(10, 25), null));
 
         cn.removeInput(doc, 4, 5, o0);
-        System.out.println(doc.networkStateToString(true, false, false, true));
+        System.out.println(doc.neuronActivationsToString(false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 10), null));
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 25), null));
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 1, new Range(10, 25), null));
 
         cn.removeInput(doc, 24, 25, o01);
-        System.out.println(doc.networkStateToString(true, false, false, true));
+        System.out.println(doc.neuronActivationsToString(false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 10), null));
 
@@ -119,7 +121,7 @@ public class CounterNeuronTest {
         cn.addInput(doc, 10, 11, o012);
         cn.addInput(doc, 15, 16, o01);
 
-        System.out.println(doc.networkStateToString(true, false, false, true));
+        System.out.println(doc.neuronActivationsToString(false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 0, new Range(0, 6), null));
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 1, new Range(6, 21), null));
@@ -156,7 +158,7 @@ public class CounterNeuronTest {
         cn.addInput(doc, 4, 5, o0);
         cn.addInput(doc, 14, 15, o012);
 
-        System.out.println(doc.networkStateToString(true, false, false, true));
+        System.out.println(doc.neuronActivationsToString(false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 2, new Range(5, 15), o012));
         Assert.assertNotNull(getAct(doc, ctn.node.get(), 3, new Range(0, 5), o012));
@@ -182,13 +184,14 @@ public class CounterNeuronTest {
         cn.addInput(doc, 19, 20, doc.bottom);
         cn.addInput(doc, 24, 25, doc.bottom);
 
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
 
         Assert.assertEquals(5, ctn.node.get().getActivations(doc).size());
     }
 
 
-    private Activation getAct(Document doc, Node n, Integer rid, Range r, final InterprNode o) {
-        return Activation.select(doc, n, rid, r, EQUALS, EQUALS, null, null).filter(act -> o == null || act.key.o == o).findFirst().orElse(null);
+    private <T extends Node, A extends Activation<T>> A getAct(Document doc, T n, Integer rid, Range r, final InterprNode o) {
+        Stream<A> s = Activation.select(doc, n, rid, r, EQUALS, EQUALS, null, null);
+        return s.filter(act -> o == null || act.key.o == o).findFirst().orElse(null);
     }
 }

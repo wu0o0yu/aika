@@ -24,6 +24,7 @@ import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.Node;
+import org.aika.lattice.OrNode;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
@@ -109,14 +110,14 @@ public class OverlappingOrTest {
 
         startSignal.addInput(doc, 0, 1, 0);
 
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
 
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
                 inputNeurons.get(c).addInput(doc, i, i + 1);
             }
-            System.out.println(doc.networkStateToString(true, true, false, true));
+            System.out.println(doc.neuronActivationsToString(true, false, true));
         }
 
         for(int i = 0; i < doc.length(); i++) {
@@ -125,7 +126,7 @@ public class OverlappingOrTest {
                 inputNeurons.get(c).addInput(doc, i, i + 1);
             }
 
-            System.out.println(doc.networkStateToString(true, true, false, true));
+            System.out.println(doc.neuronActivationsToString(true, false, true));
         }
 
         // Computes the selected option
@@ -134,7 +135,7 @@ public class OverlappingOrTest {
         Assert.assertEquals(1, pattern.node.get().getThreadState(doc.threadId, true).activations.size());
 
         System.out.println("Output activation:");
-        Node<?> n = pattern.node.get();
+        OrNode n = pattern.node.get();
         for(Activation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
@@ -145,7 +146,7 @@ public class OverlappingOrTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
 

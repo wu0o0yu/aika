@@ -33,8 +33,6 @@ import org.aika.neuron.Synapse;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static org.aika.Activation.SynapseActivation.INPUT_COMP;
-import static org.aika.Activation.SynapseActivation.OUTPUT_COMP;
 import static org.aika.corpus.Range.Operator.*;
 
 /**
@@ -65,12 +63,6 @@ public class Activation<T extends Node> implements Comparable<Activation> {
     public static int removedIdCounter = 1;
     public static long visitedCounter = 1;
 
-    public double upperBound;
-    public double lowerBound;
-
-    public Rounds rounds = new Rounds();
-
-    public State finalState;
 
     public long currentStateV = -1;
     public StateChange currentStateChange;
@@ -83,27 +75,16 @@ public class Activation<T extends Node> implements Comparable<Activation> {
     public TreeMap<Key, Activation> inputs = new TreeMap<>();
     public TreeMap<Key, Activation> outputs = new TreeMap<>();
 
-    static final SynapseActivation[] EMPTY_SYN_ACTS = new SynapseActivation[0];
-    public SynapseActivation[] neuronInputs = EMPTY_SYN_ACTS;
-    public SynapseActivation[] neuronOutputs = EMPTY_SYN_ACTS;
 
-
-    public boolean ubQueued = false;
-    public boolean isQueued = false;
-    public long queueId;
-
-    public boolean isInput;
-
-
-    public Activation(int id, Key key) {
+    public Activation(int id, Key<T> key) {
         this.id = id;
         this.key = key;
     }
 
 
-    public Activation(int id, Node n, Range pos, Integer rid, InterprNode o) {
+    public Activation(int id, T n, Range pos, Integer rid, InterprNode o) {
         this.id = id;
-        key = new Key(n, pos, rid, o);
+        key = new Key<>(n, pos, rid, o);
     }
 
 
@@ -133,14 +114,14 @@ public class Activation<T extends Node> implements Comparable<Activation> {
     }
 
 
-    public static <T extends Node> Activation<T> get(Document doc, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
-        return select(doc, n, rid, r, begin, end, o, or)
-                .findFirst()
+    public static <T extends Node, A extends Activation<T>> A get(Document doc, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
+        Stream<A> s = select(doc, n, rid, r, begin, end, o, or);
+        return s.findFirst()
                 .orElse(null);
     }
 
 
-    public static Activation get(Document doc, Node n, Key ak) {
+    public static <T extends Node, A extends Activation<T>> A get(Document doc, T n, Key ak) {
         return get(doc, n, ak.rid, ak.r, Operator.EQUALS, Operator.EQUALS, ak.o, InterprNode.Relation.EQUALS);
     }
 
@@ -180,16 +161,15 @@ public class Activation<T extends Node> implements Comparable<Activation> {
     }
 
 
-    public static <T extends Node> Stream<Activation<T>> select(Document doc, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
-        Stream<Activation<T>> results;
-        ThreadState<T> th = n.getThreadState(doc.threadId, false);
+    public static <T extends Node, A extends Activation<T>> Stream<A> select(Document doc, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
+        ThreadState<T, A> th = n.getThreadState(doc.threadId, false);
         if(th == null) return Stream.empty();
         return select(th, n, rid, r, begin, end, o, or);
     }
 
 
-    public static <T extends Node> Stream<Activation<T>> select(ThreadState<T> th, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
-        Stream<Activation<T>> results;
+    public static <T extends Node, A extends Activation<T>> Stream<A> select(ThreadState<T, A> th, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
+        Stream<A> results;
         int s = th.activations.size();
 
         if(s == 0) return Stream.empty();
@@ -219,8 +199,8 @@ public class Activation<T extends Node> implements Comparable<Activation> {
     }
 
 
-    public static <T extends Node> Stream<Activation<T>> getActivationsByRange(ThreadState<T> th, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
-        Stream<Activation<T>> s;
+    public static <T extends Node, A extends Activation<T>> Stream<A> getActivationsByRange(ThreadState<T, A> th, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
+        Stream<A> s;
         if((begin == GREATER_THAN || begin == EQUALS || end == FIRST) && r.begin != null) {
             int er = (end == Operator.LESS_THAN || end == Operator.EQUALS || end == FIRST) && r.end != null ? r.end : Integer.MAX_VALUE;
             s = th.activations.subMap(
@@ -263,8 +243,8 @@ public class Activation<T extends Node> implements Comparable<Activation> {
     }
 
 
-    private static <T extends Node> Stream<Activation<T>> getActivationsStream(T n, Document doc) {
-        ThreadState<T> th = n.getThreadState(doc.threadId, false);
+    private static <T extends Node, A extends Activation<T>> Stream<A> getActivationsStream(T n, Document doc) {
+        ThreadState<T, A> th = n.getThreadState(doc.threadId, false);
         return th == null ? Stream.empty() : th.activations.values().stream();
     }
 
@@ -357,167 +337,5 @@ public class Activation<T extends Node> implements Comparable<Activation> {
         }
     }
 
-
-    /**
-     * A <code>State</code> object contains the activation value of an activation object that belongs to a neuron.
-     * It furthermore contains a weight that is used to evaluate the interpretations during the search for the best
-     * interpretation.
-     */
-    public static class State {
-        public final double value;
-        public final double ub;
-        public final double lb;
-
-        public final int fired;
-        public final NormWeight weight;
-        public final NormWeight weightUB;
-
-        public static final State ZERO = new State(0.0, 0.0, 0.0, -1, NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT);
-
-        public State(double value, double ub, double lb, int fired, NormWeight weight, NormWeight weightUB) {
-            assert lb <= value && value <= ub;
-            assert weight.w <= weightUB.w && weightUB.n <= weight.n;
-            this.value = value;
-            this.ub = ub;
-            this.lb = lb;
-            this.fired = fired;
-            this.weight = weight;
-            this.weightUB = weightUB;
-        }
-
-        public NormWeight getWeight(int t) {
-            return t == 0 ? weight : weightUB;
-        }
-
-        public boolean equals(State s) {
-            return Math.abs(value - s.value) <= Neuron.WEIGHT_TOLERANCE || Math.abs(ub - s.ub) <= Neuron.WEIGHT_TOLERANCE || Math.abs(lb - s.lb) <= Neuron.WEIGHT_TOLERANCE;
-        }
-
-        public boolean equalsWithWeights(State s) {
-            return equals(s) && weight.equals(s.weight);
-        }
-
-        public String toString() {
-            return "V:" + value;
-        }
-    }
-
-
-    /**
-     * Since Aika is a recurrent neural network, it is necessary to compute several rounds of activation values. The
-     * computation stops if no further changes occur to the state. Only the recurrent synapses depend on the previous
-     * round.
-     *
-     */
-    public static class Rounds {
-        private boolean[] isQueued = new boolean[3];
-
-        public TreeMap<Integer, State> rounds = new TreeMap<>();
-
-        public boolean set(int r, State s) {
-            State lr = get(r - 1);
-            if(lr != null && lr.equalsWithWeights(s)) {
-                State or = rounds.get(r);
-                if(or != null) {
-                    rounds.remove(r);
-                    return !or.equalsWithWeights(s);
-                }
-                return false;
-            } else {
-                State or = rounds.put(r, s);
-
-                for(Iterator<Map.Entry<Integer, State>> it = rounds.tailMap(r + 1).entrySet().iterator(); it.hasNext(); ) {
-                    Map.Entry<Integer, State> me = it.next();
-                    if(me.getValue().equalsWithWeights(s)) it.remove();
-                }
-                return or == null || !or.equalsWithWeights(s);
-            }
-        }
-
-        public State get(int r) {
-            Map.Entry<Integer, State> me = rounds.floorEntry(r);
-            return me != null ? me.getValue() : State.ZERO;
-        }
-
-        public Rounds copy() {
-            Rounds nr = new Rounds();
-            nr.rounds.putAll(rounds);
-            return nr;
-        }
-
-        public Integer getLastRound() {
-            return !rounds.isEmpty() ? rounds.lastKey() : null;
-        }
-
-        public State getLast() {
-            return !rounds.isEmpty() ? rounds.lastEntry().getValue() : null;
-        }
-
-        public void setQueued(int r, boolean v) {
-            if(r >= isQueued.length) {
-                isQueued = Arrays.copyOf(isQueued, isQueued.length * 2);
-            }
-            isQueued[r] = v;
-        }
-
-        public boolean isQueued(int r) {
-            return r < isQueued.length ? isQueued[r] : false;
-        }
-    }
-
-
-    public void addSynapseActivation(int dir, SynapseActivation sa) {
-        if(dir == 0) {
-            if(Utils.contains(neuronOutputs, sa, OUTPUT_COMP)) return;
-            neuronOutputs = Utils.addToArray(neuronOutputs, sa);
-        } else {
-            if(Utils.contains(neuronInputs, sa, INPUT_COMP)) return;
-            neuronInputs = Utils.addToArray(neuronInputs, sa);
-        }
-    }
-
-
-    public void removeSynapseActivation(int dir, SynapseActivation sa) {
-        if(dir == 0) {
-            neuronOutputs = Utils.removeToArray(neuronOutputs, sa);
-        } else {
-            neuronInputs = Utils.removeToArray(neuronInputs, sa);
-        };
-    }
-
-
-    /**
-     * The {@code SynapseActivation} mirror the synapse link in the network of activations.
-     */
-    public static class SynapseActivation {
-        public final Synapse s;
-        public final Activation<OrNode> input;
-        public final Activation<OrNode> output;
-
-        public static Comparator<SynapseActivation> INPUT_COMP = new Comparator<SynapseActivation>() {
-            @Override
-            public int compare(SynapseActivation sa1, SynapseActivation sa2) {
-                int r = Synapse.INPUT_SYNAPSE_COMP.compare(sa1.s, sa2.s);
-                if(r != 0) return r;
-                return sa1.input.compareTo(sa2.input);
-            }
-        };
-
-        public static Comparator<SynapseActivation> OUTPUT_COMP = new Comparator<SynapseActivation>() {
-            @Override
-            public int compare(SynapseActivation sa1, SynapseActivation sa2) {
-                int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(sa1.s, sa2.s);
-                if(r != 0) return r;
-                return sa1.output.compareTo(sa2.output);
-            }
-        };
-
-
-        public SynapseActivation(Synapse s, Activation input, Activation output) {
-            this.s = s;
-            this.input = input;
-            this.output = output;
-        }
-    }
 
 }

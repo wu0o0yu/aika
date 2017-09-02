@@ -65,7 +65,7 @@
               System.out.println(doc.getText(act.key.r));
         }
 
-        System.out.println(doc.networkStateToString(true, true));
+        System.out.println(doc.neuronActivationsToString(true));
 
         doc.clearActivations();
                 </code>
@@ -238,7 +238,7 @@ Now that the model is complete, we can start processing an actual text.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    System.out.println(doc.networkStateToString(true, true));
+    System.out.println(doc.neuronActivationsToString(true));
     System.out.println();
 
     System.out.println("Final interpretation: " + doc.selectedOption.toString());
@@ -443,7 +443,7 @@ The output of this example looks as following. Each line in the table represents
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.networkStateToString(true, true));
+        System.out.println(doc.neuronActivationsToString(true));
         System.out.println();
 
         System.out.println("Selected activations:");
@@ -614,7 +614,7 @@ The output of this example looks as following. Each line in the table represents
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.networkStateToString(true, true));
+        System.out.println(doc.neuronActivationsToString(true));
         System.out.println();
 
         doc.clearActivations();

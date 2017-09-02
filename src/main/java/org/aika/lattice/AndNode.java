@@ -45,7 +45,7 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-public class AndNode extends Node<AndNode> {
+public class AndNode extends Node<AndNode, Activation<AndNode>> {
 
     private static double SIGNIFICANCE_THRESHOLD = 0.98;
     public static int MAX_POS_NODES = 4;
@@ -131,7 +131,7 @@ public class AndNode extends Node<AndNode> {
 
 
     @Override
-    boolean hasSupport(Activation<?> act) {
+    boolean hasSupport(Activation<AndNode> act) {
         int expected = parents.size();
 
         int support = 0;
@@ -227,7 +227,7 @@ public class AndNode extends Node<AndNode> {
         }
 
         for(Activation<?> pAct: act.inputs.values()) {
-            Node<?> pn = pAct.key.n;
+            Node<?, Activation<?>> pn = pAct.key.n;
             pn.lock.acquireReadLock();
             Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n.provider, act.key.rid, pAct.key.rid));
             if(ref != null) {
@@ -259,7 +259,7 @@ public class AndNode extends Node<AndNode> {
         if(!isExpandable(true)) return;
 
         for(Activation<?> pAct: act.inputs.values()) {
-            Node<?> pn = pAct.key.n;
+            Node<?, Activation<?>> pn = pAct.key.n;
             pn.lock.acquireReadLock();
             Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n.provider, act.key.rid, pAct.key.rid));
             for(Activation secondAct: pAct.outputs.values()) {
@@ -295,6 +295,12 @@ public class AndNode extends Node<AndNode> {
         }
 
         return numPosNodes < MAX_POS_NODES;
+    }
+
+
+    @Override
+    protected Activation<AndNode> createNewActivation(int id, Key ak) {
+        return new Activation<>(id, ak);
     }
 
 
@@ -443,6 +449,7 @@ public class AndNode extends Node<AndNode> {
             n.get().changeNumberOfNeuronRefs(threadId, v, d);
         }
     }
+
 
 
     @Override

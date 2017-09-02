@@ -20,10 +20,12 @@ package org.aika.network;
 import org.aika.Activation;
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.NeuronActivation;
 import org.aika.corpus.Conflicts.Conflict;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.lattice.Node;
+import org.aika.lattice.OrNode;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
@@ -170,8 +172,8 @@ public class MutualExclusionTest {
         System.out.println();
 
         System.out.println("Output activation:");
-        Node<?> n = outN.node.get();
-        for(Activation act: n.getActivations(doc)) {
+        OrNode n = outN.node.get();
+        for(NeuronActivation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
             System.out.println("Node: " + act.key.n);
@@ -181,11 +183,11 @@ public class MutualExclusionTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
         System.out.println("Selected activations:");
-        System.out.println(doc.networkStateToString(false, true, false, true));
+        System.out.println(doc.nodeActivationsToString(false, true));
 
         doc.clearActivations();
     }

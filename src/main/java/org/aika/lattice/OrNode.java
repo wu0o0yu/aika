@@ -41,7 +41,7 @@ import static org.aika.corpus.Range.Operator.EQUALS;
  *
  * @author Lukas Molzberger
  */
-public class OrNode extends Node<OrNode> {
+public class OrNode extends Node<OrNode, NeuronActivation> {
 
     // Hack: Integer.MIN_VALUE represents the null key
     public TreeMap<Integer, TreeSet<Node>> parents = new TreeMap<>();
@@ -71,6 +71,12 @@ public class OrNode extends Node<OrNode> {
     @Override
     boolean isExpandable(boolean checkFrequency) {
         return false;
+    }
+
+
+    @Override
+    protected NeuronActivation createNewActivation(int id, Key ak) {
+        return new NeuronActivation(id, ak);
     }
 
 
@@ -110,7 +116,7 @@ public class OrNode extends Node<OrNode> {
     }
 
 
-    private void retrieveInputs(Document doc, Node<?> n, Range inputR, Integer rid, List<Activation<?>> inputs, Integer pRidOffset, TreeSet<Node> parents) {
+    private void retrieveInputs(Document doc, Node<?, Activation<?>> n, Range inputR, Integer rid, List<Activation<?>> inputs, Integer pRidOffset, TreeSet<Node> parents) {
         for(Activation iAct: Activation.select(doc, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null)
                 .collect(Collectors.toList())) {
             if(!iAct.isRemoved && parents.contains(iAct.key.n) && !checkSelfReferencing(doc, iAct)) {
@@ -120,8 +126,8 @@ public class OrNode extends Node<OrNode> {
     }
 
 
-    Activation processAddedActivation(Document doc, Key<OrNode> ak, Collection<Activation> inputActs) {
-        Activation act = super.processAddedActivation(doc, ak, inputActs);
+    NeuronActivation processAddedActivation(Document doc, Key<OrNode> ak, Collection<Activation> inputActs) {
+        NeuronActivation act = super.processAddedActivation(doc, ak, inputActs);
         if(act != null) {
             neuron.get().linkNeuronRelations(doc, act);
         }
@@ -129,7 +135,7 @@ public class OrNode extends Node<OrNode> {
     }
 
 
-    void processRemovedActivation(Document doc, Activation<OrNode> act, Collection<Activation> inputActs) {
+    void processRemovedActivation(Document doc, NeuronActivation act, Collection<Activation> inputActs) {
         super.processRemovedActivation(doc, act, inputActs);
 
         if(act.isRemoved) {
@@ -192,7 +198,7 @@ public class OrNode extends Node<OrNode> {
     }
 
 
-    public void propagateAddedActivation(Document doc, Activation act, InterprNode removedConflict) {
+    public void propagateAddedActivation(Document doc, NeuronActivation act, InterprNode removedConflict) {
         if(removedConflict == null) {
             neuron.get().propagateAddedActivation(doc, act);
         }
@@ -217,7 +223,7 @@ public class OrNode extends Node<OrNode> {
 
 
     @Override
-    boolean hasSupport(Activation<?> act) {
+    boolean hasSupport(NeuronActivation act) {
         for(Activation iAct: act.inputs.values()) {
             if(!iAct.isRemoved) return true;
         }
@@ -227,7 +233,7 @@ public class OrNode extends Node<OrNode> {
 
 
     @Override
-    public void apply(Document doc, Activation act, InterprNode conflict) {
+    public void apply(Document doc, NeuronActivation act, InterprNode conflict) {
         if(conflict == null) {
             OrNode.processCandidate(doc, this, act, false);
         }
@@ -239,7 +245,7 @@ public class OrNode extends Node<OrNode> {
     }
 
 
-    public static void processCandidate(Document doc, Node<?> parentNode, Activation inputAct, boolean train) {
+    public static void processCandidate(Document doc, Node<?, ? extends Activation<?>> parentNode, Activation inputAct, boolean train) {
         Key ak = inputAct.key;
         parentNode.lock.acquireReadLock();
         if(parentNode.orChildren != null) {
@@ -263,7 +269,7 @@ public class OrNode extends Node<OrNode> {
             return act.key.o;
         }
 
-        ThreadState<OrNode> th = getThreadState(doc.threadId, false);
+        ThreadState<OrNode, NeuronActivation> th = getThreadState(doc.threadId, false);
         if(th != null) {
             for (Key<OrNode> ak : th.added.keySet()) {
                 if (Range.compare(ak.r, r) == 0) {
@@ -348,7 +354,7 @@ public class OrNode extends Node<OrNode> {
     }
 
 
-    public void register(Activation act, Document doc) {
+    public void register(NeuronActivation act, Document doc) {
         super.register(act, doc);
         Key ak = act.key;
 
@@ -361,7 +367,7 @@ public class OrNode extends Node<OrNode> {
     }
 
 
-    public void unregister(Activation act, Document doc) {
+    public void unregister(NeuronActivation act, Document doc) {
         Key ak = act.key;
 
         super.unregister(act, doc);

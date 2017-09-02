@@ -143,10 +143,10 @@ public class OptionalAndTest {
 
             doc.process();
 
-            System.out.println(doc.networkStateToString(true, true, false, true));
+            System.out.println(doc.neuronActivationsToString(true, false, true));
             System.out.println();
 
-            System.out.println(doc.networkStateToString(false, true, false, true));
+            System.out.println(doc.nodeActivationsToString(false, true));
 
             doc.clearActivations();
         }

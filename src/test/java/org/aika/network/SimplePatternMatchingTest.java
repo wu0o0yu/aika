@@ -24,6 +24,7 @@ import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.Node;
+import org.aika.lattice.OrNode;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Assert;
@@ -107,7 +108,7 @@ public class SimplePatternMatchingTest {
 
 
         System.out.println("Output activation:");
-        Node<?> n = pattern.node.get();
+        OrNode n = pattern.node.get();
         for(Activation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
@@ -117,7 +118,7 @@ public class SimplePatternMatchingTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
 
@@ -222,7 +223,7 @@ public class SimplePatternMatchingTest {
 
 
         System.out.println("Output activation:");
-        Node<?> n = pattern.node.get();
+        OrNode n = pattern.node.get();
         for(Activation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
@@ -232,7 +233,7 @@ public class SimplePatternMatchingTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
 

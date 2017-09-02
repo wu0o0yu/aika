@@ -18,8 +18,9 @@ package org.aika.corpus;
 
 
 import org.aika.Activation;
-import org.aika.Activation.Rounds;
-import org.aika.Activation.SynapseActivation;
+import org.aika.NeuronActivation.Rounds;
+import org.aika.NeuronActivation.SynapseActivation;
+import org.aika.NeuronActivation;
 import org.aika.corpus.Conflicts.Conflict;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.Neuron.NormWeight;
@@ -97,7 +98,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Search Step: " + id + "  Candidate Weight Delta: " + weightDelta);
-            log.info(doc.networkStateToString(true, true, true, false) + "\n");
+            log.info(doc.neuronActivationsToString(true, true, false) + "\n");
         }
 
         changeState(StateChange.Mode.OLD);
@@ -171,7 +172,7 @@ public class SearchNode implements Comparable<SearchNode> {
         changeState(StateChange.Mode.NEW);
 
         for(StateChange sc : modifiedActs) {
-            Activation<OrNode> act = sc.act;
+            NeuronActivation act = sc.act;
             if(act.finalState != null && act.finalState.value > 0.0) {
                 doc.finallyActivatedNeurons.add(act.key.n.neuron.get());
             }
@@ -200,7 +201,7 @@ public class SearchNode implements Comparable<SearchNode> {
         changeState(StateChange.Mode.NEW);
 
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
-            log.info(doc.networkStateToString(true, true, true, false) + "\n");
+            log.info(doc.neuronActivationsToString(true, true, false) + "\n");
         }
 
         generateNextLevelCandidates(doc, selectedParent, excludedParent);
@@ -267,7 +268,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private boolean hasUnsatisfiedPositiveFeedbackLink(InterprNode n) {
         if(n.hasUnsatisfiedPosFeedbackLinksCache != null) return n.hasUnsatisfiedPosFeedbackLinksCache;
 
-        for(Activation act: n.getNeuronActivations()) {
+        for(NeuronActivation act: n.getNeuronActivations()) {
             for(SynapseActivation sa: act.neuronOutputs) {
                 if(sa.s.key.isRecurrent && sa.s.w > 0.0 && !isCovered(sa.output.key.o.markedSelected)) {
                     n.hasUnsatisfiedPosFeedbackLinksCache = true;
@@ -628,14 +629,14 @@ public class SearchNode implements Comparable<SearchNode> {
      *
      */
     public static class StateChange {
-        public Activation<OrNode> act;
+        public NeuronActivation act;
 
         public Rounds oldRounds;
         public Rounds newRounds;
 
         public enum Mode { OLD, NEW }
 
-        public static void saveOldState(List<StateChange> changes, Activation act, long v) {
+        public static void saveOldState(List<StateChange> changes, NeuronActivation act, long v) {
             StateChange sc = act.currentStateChange;
             if(sc == null || act.currentStateV != v) {
                 sc = new StateChange();
@@ -649,7 +650,7 @@ public class SearchNode implements Comparable<SearchNode> {
             }
         }
 
-        public static void saveNewState(Activation act) {
+        public static void saveNewState(NeuronActivation act) {
             StateChange sc = act.currentStateChange;
 
             sc.newRounds = act.rounds;

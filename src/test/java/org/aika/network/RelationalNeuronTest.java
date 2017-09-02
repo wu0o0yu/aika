@@ -56,14 +56,14 @@ public class RelationalNeuronTest {
         cn.addInput(doc, 19, 20, o0);
         in.addInput(doc, 10, 11, o0);
 
-        System.out.println(doc.networkStateToString(true, false, false, true));
+        System.out.println(doc.neuronActivationsToString(false, false, true));
 
 
         Assert.assertNotNull(getAct(doc, on.node.get(), 1, new Range(5, 20), null));
 
         cn.addInput(doc, 9, 10, o012);
 
-        System.out.println(doc.networkStateToString(true, false, false, true));
+        System.out.println(doc.neuronActivationsToString(false, false, true));
 /*
         Assert.assertNotNull(getAct(doc, on.node, 0, new Range(0, 5), null));
         Assert.assertNotNull(getAct(doc, on.node, 1, new Range(5, 10), null));
@@ -72,20 +72,20 @@ public class RelationalNeuronTest {
 
         sn.addInput(doc, 15, 16, o01);
 
-        System.out.println(doc.networkStateToString(true, false));
+        System.out.println(doc.neuronActivationsToString(false));
 
         Assert.assertNotNull(getAct(doc, ctn.node, 0, new Range(15, 20), null));
 
         sn.removeInput(doc, 15, 16, o01);
 
-        System.out.println(doc.networkStateToString(true, false));
+        System.out.println(doc.neuronActivationsToString(false));
 
         Assert.assertNull(getAct(doc, ctn.node, 0, new Range(15, 20), null));
 */
     }
 
     
-    private Activation getAct(Document doc, Node n, Integer rid, Range r, final InterprNode o) {
+    private <T extends Node, A extends Activation<T>> Activation getAct(Document doc, T n, Integer rid, Range r, final InterprNode o) {
         return Activation.select(doc, n, rid, r, EQUALS, EQUALS, null, null).filter(act -> o == null || act.key.o == o).findFirst().orElse(null);
     }
 }

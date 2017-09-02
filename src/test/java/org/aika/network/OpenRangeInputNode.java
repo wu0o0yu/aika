@@ -54,7 +54,7 @@ public class OpenRangeInputNode {
         in.addInput(doc, 6, 7);
         in.addInput(doc, 10, 11);
 
-        System.out.println(doc.networkStateToString(false, true, false, true));
+        System.out.println(doc.nodeActivationsToString(false, true));
 
         Assert.assertFalse(Activation.select(doc, inputNode, null, new Range(null, 4), Operator.NONE, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
         Assert.assertFalse(Activation.select(doc, inputNode, null, new Range(4, 7), Operator.EQUALS, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
@@ -71,7 +71,7 @@ public class OpenRangeInputNode {
         in.addInput(doc, 10, 11);
         in.addInput(doc, 6, 7);
 
-        System.out.println(doc.networkStateToString(false, true, false, true));
+        System.out.println(doc.nodeActivationsToString(false, true));
 
         Assert.assertFalse(Activation.select(doc, inputNode, null, new Range(null, 4), Operator.NONE, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
         Assert.assertFalse(Activation.select(doc, inputNode, null, new Range(4, 7), Operator.EQUALS, Operator.EQUALS, null, null).collect(Collectors.toList()).isEmpty());
@@ -94,6 +94,6 @@ public class OpenRangeInputNode {
         in.addInput(doc, 24, 25, o01);
         in.addInput(doc, 4, 5, o0);
 
-        System.out.println(doc.networkStateToString(false, true, false, true));
+        System.out.println(doc.nodeActivationsToString(false, true));
     }
 }

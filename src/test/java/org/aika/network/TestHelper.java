@@ -42,30 +42,6 @@ import static org.aika.corpus.Range.Mapping.START;
 public class TestHelper {
 
 
-    public static Activation addActivationAndPropagate(Document doc, Activation.Key ak) {
-        return addActivationAndPropagate(doc, ak, Collections.emptySet());
-    }
-
-
-    public static Activation addActivationAndPropagate(Document doc, Activation.Key ak, Set<Activation<?>> inputActs) {
-        Node.addActivationAndPropagate(doc, ak, inputActs);
-        doc.propagate();
-        return Activation.get(doc, ak.n, ak.rid, ak.r, LESS_THAN, GREATER_THAN, ak.o, InterprNode.Relation.EQUALS);
-    }
-
-
-    public static void removeActivationAndPropagate(Document doc, Activation.Key ak) {
-        Activation act = Activation.get(doc, ak.n, 0, ak.r, EQUALS, EQUALS, ak.o, InterprNode.Relation.EQUALS);
-        removeActivationAndPropagate(doc, act);
-    }
-
-
-    public static void removeActivationAndPropagate(Document doc, Activation act) {
-        Node.removeActivationAndPropagate(doc, act, act.inputs.values());
-        doc.propagate();
-    }
-
-
     public static Activation addActivation(InputNode in, Document doc, Activation inputAct) {
         in.addActivation(doc, inputAct);
         doc.propagate();
@@ -73,12 +49,6 @@ public class TestHelper {
             return Activation.get(doc, in, inputAct.key.rid, inputAct.key.r, LESS_THAN, GREATER_THAN, inputAct.key.o, InterprNode.Relation.EQUALS);
         }
         return null;
-    }
-
-
-    public static void removeActivation(InputNode in, Document doc, Activation inputAct) {
-        in.removeActivation(doc, inputAct);
-        doc.propagate();
     }
 
 
@@ -91,7 +61,7 @@ public class TestHelper {
         return InputNode.add(doc.m, new Synapse.Key(false, false, relativeRid, absoluteRid, startRangeMatch, startMapping, startRangeOutput, endRangeMatch, endMapping, endRangeOutput), n);
     }
 
-    public static Activation get(Document doc, Node n, Range r, InterprNode o) {
+    public static <T extends Node, A extends Activation<T>> A get(Document doc, T n, Range r, InterprNode o) {
         return Activation.get(doc, n, null, r, LESS_THAN, GREATER_THAN, o, InterprNode.Relation.EQUALS);
     }
 }

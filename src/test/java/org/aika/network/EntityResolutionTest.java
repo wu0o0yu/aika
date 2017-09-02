@@ -84,16 +84,16 @@ public class EntityResolutionTest {
 
         wJaguar.addInput(doc, 0, 6);
 
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
 
         wPuma.addInput(doc, 7, 11);
 
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
 
         System.out.println("Process");
         doc.process();
 
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
 
 
         Assert.assertNotNull(eJaguar.node.get().getFirstActivation(doc));
@@ -279,17 +279,17 @@ public class EntityResolutionTest {
 
         wJaguar.addInput(doc, 0, 6);
 
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
 
         wPuma.addInput(doc, 7, 11);
 
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
 
         System.out.println("Process");
         Document.OPTIMIZE_DEBUG_OUTPUT = true;
         doc.process();
 
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
 
 
         Assert.assertNotNull(eJaguar.node.get().getFirstActivation(doc));

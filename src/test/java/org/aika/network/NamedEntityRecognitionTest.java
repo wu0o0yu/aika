@@ -20,6 +20,7 @@ package org.aika.network;
 import org.aika.Activation;
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.NeuronActivation;
 import org.aika.corpus.Document;
 import org.aika.corpus.SearchNode;
 import org.aika.lattice.Node;
@@ -202,14 +203,14 @@ public class NamedEntityRecognitionTest {
         // Search for the best interpretation of this text.
         doc.process();
 
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
         System.out.println("Selected Option: " + doc.bestInterpretation.toString());
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");
-        for(Activation<OrNode> act: surnameCategory.getFinalActivations(doc)) {
+        for(NeuronActivation act: surnameCategory.getFinalActivations(doc)) {
             System.out.print(act.key.r + " ");
             System.out.print(act.key.rid + " ");
             System.out.print(act.key.o + " ");
@@ -414,14 +415,14 @@ public class NamedEntityRecognitionTest {
         SearchNode.INCOMPLETE_OPTIMIZATION = true;
         doc.process();
 
-        System.out.println(doc.networkStateToString(true, true, false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
         System.out.println("Selected Option: " + doc.bestInterpretation.toString());
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");
-        for(Activation<OrNode> act: surnameCategory.getFinalActivations(doc)) {
+        for(NeuronActivation act: surnameCategory.getFinalActivations(doc)) {
             System.out.print(act.key.r + " ");
             System.out.print(act.key.rid + " ");
             System.out.print(act.key.o + " ");
