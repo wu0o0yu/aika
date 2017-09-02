@@ -100,19 +100,19 @@ public class ActivationsTest {
 
 
         Neuron in = new Neuron(m, "A");
-        Node inNode = in.node.get();
+        OrNode inNode = in.node.get();
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inNode.addActivationInternal(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
-        inNode.addActivationInternal(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
-        inNode.addActivationInternal(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
-        inNode.addActivationInternal(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
-        inNode.addActivationInternal(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
 
  //       Assert.assertEquals(1, Activation.get(t, inNode, new Range(0, 1), doc.bottom).key.fired);
     }

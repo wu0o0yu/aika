@@ -97,11 +97,11 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    Range preProcessAddedActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs) {
+    NodeActivation<AndNode> processAddedActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs, boolean isTrainingAct) {
         for(NodeActivation iAct: inputActs) {
             if(iAct.isRemoved) return null;
         }
-        return ak.r;
+        return super.processAddedActivation(doc, ak, inputActs, isTrainingAct);
     }
 
 

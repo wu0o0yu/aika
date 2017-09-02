@@ -311,9 +311,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public void count(int threadId) {
         ThreadState<T, A> ts = getThreadState(threadId, false);
-        if(ts == null) return;
+        if (ts == null) return;
 
-        for(NodeActivation<T> act: ts.activations.values()) {
+        for (NodeActivation<T> act : ts.activations.values()) {
             frequency++;
             frequencyHasChanged = true;
 
@@ -323,7 +323,11 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    A addActivationInternal(Document doc, Key ak, Collection<NodeActivation> inputActs, boolean isTrainingAct) {
+    A processAddedActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs, boolean isTrainingAct) {
+        if (Document.APPLY_DEBUG_OUTPUT) {
+            log.info("add: " + ak + " - " + ak.n);
+        }
+
         A act = NodeActivation.get(doc, (T) this, ak);
         if(act == null) {
             act = createNewActivation(doc.activationIdCounter++, ak);
@@ -345,8 +349,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    boolean removeActivationInternal(Document doc, A act, Collection<NodeActivation> inputActs) {
-        boolean flag = false;
+    void processRemovedActivation(Document doc, A act, Collection<NodeActivation> inputActs) {
         if(act.isRemoved) {
             unregister(act, doc);
             deleteActivation(doc, act);
@@ -354,14 +357,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             propagateRemovedActivation(doc, act);
 
             act.key.releaseRef();
-
-            flag = true;
         }
 
         // TODO: check unlinkNeuronRelations symmetry
         act.unlink(inputActs);
-
-        return flag;
     }
 
 
@@ -458,7 +457,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         for(Map.Entry<Key<T>, Collection<NodeActivation>> me: tmpAdded.entrySet()) {
-            processAddedActivation(doc, me.getKey(), me.getValue());
+            processAddedActivation(doc, me.getKey(), me.getValue(), false);
         }
     }
 
@@ -484,26 +483,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         doc.queue.add(ak.n);
     }
 
-
-    Range preProcessAddedActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs) {
-        return ak.r;
-    }
-
-
-    A processAddedActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs) {
-        Range r = preProcessAddedActivation(doc, ak, inputActs);
-        if(r == null) return null;
-
-        Key<T> nak = new Key(this, r, ak.rid, ak.o);
-
-        if (Document.APPLY_DEBUG_OUTPUT) {
-            log.info("add: " + nak + " - " + nak.n);
-        }
-
-        return addActivationInternal(doc, nak, inputActs, false);
-    }
-
-
     /*
     First remove the inputs from the given activation. Only if, depending on the node type, insufficient support exists for this activation, then actually remove it.
      */
@@ -519,20 +498,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
         re.iActs.addAll(inputActs);
         doc.queue.add(act.key.n);
-    }
-
-
-    void postProcessRemovedActivation(Document doc, A act, Collection<NodeActivation> inputActs) {}
-
-
-    void processRemovedActivation(Document doc, A act, Collection<NodeActivation> inputActs) {
-        if(Document.APPLY_DEBUG_OUTPUT) {
-            log.info("remove: " + act.key + " - " + act.key.n);
-        }
-
-        if(removeActivationInternal(doc, act, inputActs)) {
-            postProcessRemovedActivation(doc, act, inputActs);
-        }
     }
 
 

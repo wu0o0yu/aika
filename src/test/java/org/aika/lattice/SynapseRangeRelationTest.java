@@ -66,10 +66,10 @@ public class SynapseRangeRelationTest {
         s.output = on.provider;
         s.link(doc.threadId);
 
-        Activation iAct0 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(1, 4), null, doc.bottom), Collections.emptyList(), false);
-        Activation iAct1 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
-        Activation iAct2 = in.node.get().addActivationInternal(doc, new Key(in.node.get(), new Range(10, 18), null, doc.bottom), Collections.emptyList(), false);
-        Activation oAct = on.node.get().addActivationInternal(doc, new Key(on.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct0 = in.node.get().processAddedActivation(doc, new Key(in.node.get(), new Range(1, 4), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct1 = in.node.get().processAddedActivation(doc, new Key(in.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct2 = in.node.get().processAddedActivation(doc, new Key(in.node.get(), new Range(10, 18), null, doc.bottom), Collections.emptyList(), false);
+        Activation oAct = on.node.get().processAddedActivation(doc, new Key(on.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
 
         on.linkNeuronRelations(doc, oAct);
 
