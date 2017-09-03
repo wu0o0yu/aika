@@ -86,10 +86,10 @@
 				<code class="language-java">
     Model m = new Model();
 
-    HashMap&lt;String, InputNeuron&gt; inputNeurons = new HashMap<>();
+    HashMap&lt;String, Neuron&gt; inputNeurons = new HashMap<>();
 
     for(String word: new String[] {"jackson", "cook"}) {
-        InputNeuron in = m.createOrLookupInputSignal("W-" + word);
+        Neuron in = new Neuron(m, "W-" + word);
 
         inputNeurons.put(word, in);
     }
@@ -101,9 +101,9 @@
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    Neuron forenameCategory = new Neuron("C-forename");
-    Neuron surnameCategory = new Neuron("C-surname");
-    Neuron suppressingN = new Neuron("SUPPR");
+    Neuron forenameCategory = new Neuron(m, "C-forename");
+    Neuron surnameCategory = new Neuron(m, "C-surname");
+    Neuron suppressingN = new Neuron(m, "SUPPR");
                 </code>
 			</pre>
             </div>
@@ -122,8 +122,8 @@ required minimum input activation (<i>setMinInput</i>) of each input.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    Neuron cookSurnameEntity = m.createAndNeuron(
-            new Neuron("E-cook (surname)"),
+    Neuron cookSurnameEntity = m.initAndNeuron(
+            new Neuron(m, "E-cook (surname)"),
             0.5, // adjusts the bias
             new Input() // Requires the word to be recognized
                     .setNeuron(inputNeurons.get("cook"))
@@ -161,7 +161,7 @@ required minimum input activation (<i>setMinInput</i>) of each input.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    m.createOrNeuron(forenameCategory,
+    m.initOrNeuron(forenameCategory,
             new Input() // In this example, only one forename is considered.
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(10.0)
@@ -169,7 +169,7 @@ required minimum input activation (<i>setMinInput</i>) of each input.
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
     );
-    m.createOrNeuron(surnameCategory,
+    m.initOrNeuron(surnameCategory,
             new Input()
                     .setNeuron(cookSurnameEntity)
                     .setWeight(10.0)
@@ -185,7 +185,7 @@ required minimum input activation (<i>setMinInput</i>) of each input.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    m.createOrNeuron(suppressingN,
+    m.initOrNeuron(suppressingN,
             new Input()
                     .setNeuron(cookProfessionEntity)
                     .setWeight(10.0)
@@ -307,18 +307,18 @@ The output of this example looks as following. Each line in the table represents
         Model m = new Model();
 
         // Create the input neurons for the network.
-        InputNeuron inA = m.createOrLookupInputSignal("IN-A");
-        InputNeuron inB = m.createOrLookupInputSignal("IN-B");
-        InputNeuron inC = m.createOrLookupInputSignal("IN-C");
+        Neuron inA = new Neuron(m, "IN-A");
+        Neuron inB = new Neuron(m, "IN-B");
+        Neuron inC = new Neuron(m, "IN-C");
 
         // Instantiate the suppressing neuron. Its inputs will be added later on.
-        Neuron pSuppr = new Neuron("SUPPRESS");
+        Neuron pSuppr = new Neuron(m, "SUPPRESS");
 
         // Create three neurons that might be suppressed by the suppressing neuron.
         // createAndNeuron is a helper method which is used set the synapse weights
         // and bias of new neuron.
-        Neuron pA = m.createAndNeuron(
-                new Neuron("A"),
+        Neuron pA = m.initAndNeuron(
+                new Neuron(m, "A"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -336,8 +336,8 @@ The output of this example looks as following. Each line in the table represents
                         .setRangeMatch(CONTAINED_IN)
         );
 
-        Neuron pB = m.createAndNeuron(
-                new Neuron("B"),
+        Neuron pB = m.initAndNeuron(
+                new Neuron(m, "B"),
                 0.001,
                 new Input()
                         .setNeuron(inB)
@@ -355,8 +355,8 @@ The output of this example looks as following. Each line in the table represents
                         .setRangeMatch(CONTAINED_IN)
         );
 
-        Neuron pC = m.createAndNeuron(
-                new Neuron("C"),
+        Neuron pC = m.initAndNeuron(
+                new Neuron(m, "C"),
                 0.001,
                 new Input()
                         .setNeuron(inC)
@@ -375,7 +375,7 @@ The output of this example looks as following. Each line in the table represents
         );
 
         // Finally addInput adds all the inputs to the suppressing neuron.
-        m.createOrNeuron(
+        m.initOrNeuron(
                 pSuppr,
                 new Input()
                         .setNeuron(pA)
@@ -514,31 +514,31 @@ The output of this example looks as following. Each line in the table represents
     public void testPatternMatching() {
         Model m = new Model();
 
-        Map&lt;Character, InputNeuron&gt; inputNeurons = new HashMap<>();
+        Map&lt;Character, Neuron&gt; inputNeurons = new HashMap<>();
         Map&lt;Character, Neuron&gt; relNeurons = new HashMap<>();
 
         // The space neuron will be used as clock signal for the recurrent neurons.
-        InputNeuron inSpace = m.createOrLookupInputSignal("SPACE");
+        Neuron inSpace = new Neuron(m, "SPACE");
 
-        InputNeuron startSignal = m.createOrLookupInputSignal("START-SIGNAL");
+        Neuron startSignal = new Neuron(m, "START-SIGNAL");
 
         // The Counter Neuron is used to assign each pattern component an relational id (RID).
         // It is a counter that increases the Rid after each space char.
         // The createCounterNeuron method is simply a helper method which generates an
         // ordinary neuron with some input synapses.
-        Neuron ctNeuron = m.createCounterNeuron(new Neuron("CTN"),
+        Neuron ctNeuron = m.initCounterNeuron(new Neuron(m, "CTN"),
                 inSpace, false,
                 startSignal, true,
                 false
         );
-        // createCounterNeuron is just a convenience method which creates an ordinary neuron
+        // initCounterNeuron is just a convenience method which creates an ordinary neuron
         // with some input synapses.
 
         // Create an input neuron and a relational neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            InputNeuron in = m.createOrLookupInputSignal(c + "");
-            Neuron rn = m.createRelationalNeuron(
-                    new Neuron(c + "-RN"),
+            Neuron in = new Neuron(m, c + "");
+            Neuron rn = m.initRelationalNeuron(
+                    new Neuron(m, c + "-RN"),
                     ctNeuron,
                     in, false
             );
@@ -550,8 +550,8 @@ The output of this example looks as following. Each line in the table represents
         // Create a pattern neuron with relational neurons as input. The numbers that are
         // given in the inputs are the relational ids (relativeRid) which specify the positions
         // of the inputs relative to each other.
-        Neuron pattern = m.createAndNeuron(
-                new Neuron("BCD"),
+        Neuron pattern = m.initAndNeuron(
+                new Neuron(m, "BCD"),
                 0.4,
                 new Input()
                         .setNeuron(relNeurons.get('b'))
