@@ -1,6 +1,8 @@
 package org.aika.neuron;
 
 import org.aika.Utils;
+import org.aika.corpus.SearchNode;
+import org.aika.corpus.SearchNode.StateChange;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
 
@@ -43,6 +45,12 @@ public final class Activation extends NodeActivation<OrNode> {
     public long queueId;
 
     public boolean isInput;
+
+    public long currentStateV = -1;
+    public StateChange currentStateChange;
+
+    public double initialErrorSignal;
+    public double errorSignal;
 
 
     public Activation(int id, Key key) {

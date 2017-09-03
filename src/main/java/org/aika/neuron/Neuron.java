@@ -466,10 +466,12 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
             int s = act.key.r.end - act.key.r.begin;
             targetRange = new Range(Math.max(0, act.key.r.begin - (s / 2)), Math.min(doc.length(), act.key.r.end + (s / 2)));
         }
-        ArrayList<NodeActivation> inputActs = new ArrayList<>();
-        for(NodeActivation iAct: doc.inputNodeActivations) {
-            if(Range.overlaps(iAct.key.r, targetRange)) {
-                inputActs.add(iAct);
+        ArrayList<Activation> inputActs = new ArrayList<>();
+        for(Neuron n: doc.finallyActivatedNeurons) {
+            for(Activation iAct: n.getFinalActivations(doc)) {
+                if (Range.overlaps(iAct.key.r, targetRange)) {
+                    inputActs.add(iAct);
+                }
             }
         }
 
@@ -487,7 +489,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
             inputActs.add(sa.input);
         }
 
-        for(NodeActivation iAct: inputActs) {
+        for(Activation iAct: inputActs) {
             Integer rid = Utils.nullSafeSub(iAct.key.rid, false, act.key.rid, false);
             train(doc, iAct, rid, LEARN_RATE * act.errorSignal, v);
         }
@@ -500,52 +502,48 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    public void train(Document doc, NodeActivation<?> iAct, Integer rid, double x, long v) {
+    public void train(Document doc, Activation iAct, Integer rid, double x, long v) {
         if(iAct.visitedNeuronTrain == v) return;
         iAct.visitedNeuronTrain = v;
 
-        Activation iiAct = (Activation) iAct.inputs.firstEntry().getValue();
-        Neuron n = iiAct.key.n.neuron.get();
-        if(n != this && iiAct.finalState != null && iiAct.finalState.value > TOLERANCE) {
-            InputNode in = (InputNode) iAct.key.n;
+        Neuron n = iAct.key.n.neuron.get();
+        double deltaW = x * iAct.finalState.value;
 
-            double deltaW = x * iiAct.finalState.value;
-
-            SynapseKey sk = new SynapseKey(rid, provider);
-            Synapse s = in.getSynapse(sk);
-            if(s == null) {
-                s = new Synapse(
-                        n,
-                        new Key(
-                                in.key.isNeg,
-                                in.key.isRecurrent,
-                                rid,
-                                null,
-                                in.key.startRangeMatch,
-                                in.key.startRangeMapping,
-                                in.key.startRangeOutput,
-                                in.key.endRangeMatch,
-                                in.key.endRangeMapping,
-                                in.key.endRangeOutput
-                        )
-                );
-                s.output = provider;
-                in.setSynapse(doc.threadId, sk, s);
-                s.link(doc.threadId);
-            }
-
-            inputSynapses.remove(s);
-            inputSynapsesByWeight.remove(s);
-
-            double oldW = s.w;
-            s.w -= deltaW;
-
-            if(Document.TRAIN_DEBUG_OUTPUT) {
-                log.info("S:" + s.input + " RID:" + s.key.relativeRid + " OldW:" + oldW + " NewW:" + s.w);
-            }
-            inputSynapses.put(s, s);
-            inputSynapsesByWeight.add(s);
+        SynapseKey sk = new SynapseKey(rid, provider);
+/*        Synapse s = in.getSynapse(sk);
+        if(s == null) {
+            s = new Synapse(
+                    n,
+                    new Key(
+                            in.key.isNeg,
+                            in.key.isRecurrent,
+                            rid,
+                            null,
+                            in.key.startRangeMatch,
+                            in.key.startRangeMapping,
+                            in.key.startRangeOutput,
+                            in.key.endRangeMatch,
+                            in.key.endRangeMapping,
+                            in.key.endRangeOutput
+                    )
+            );
+            s.output = provider;
+            in.setSynapse(doc.threadId, sk, s);
+            s.link(doc.threadId);
         }
+
+        inputSynapses.remove(s);
+        inputSynapsesByWeight.remove(s);
+
+        double oldW = s.w;
+        s.w -= deltaW;
+
+        if(Document.TRAIN_DEBUG_OUTPUT) {
+            log.info("S:" + s.input + " RID:" + s.key.relativeRid + " OldW:" + oldW + " NewW:" + s.w);
+        }
+        inputSynapses.put(s, s);
+        inputSynapsesByWeight.add(s);
+        */
     }
 
 

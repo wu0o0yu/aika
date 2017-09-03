@@ -83,7 +83,6 @@ public class Document implements Comparable<Document> {
     public TreeSet<Neuron> activatedNeurons = new TreeSet<>();
     public TreeSet<Neuron> finallyActivatedNeurons = new TreeSet<>();
     public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
-    public TreeSet<NodeActivation> inputNodeActivations = new TreeSet<>();
     public TreeMap<NodeActivation.Key, NodeActivation> activationsByRid = new TreeMap<>(new Comparator<NodeActivation.Key>() {
         @Override
         public int compare(NodeActivation.Key act1, NodeActivation.Key act2) {
