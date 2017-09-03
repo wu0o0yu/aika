@@ -186,9 +186,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     abstract void cleanup(Model m, int threadId);
 
-    abstract void initActivation(Document doc, NodeActivation act);
+    abstract A createActivation(Document doc, Key ak, boolean isTrainingAct);
 
-    abstract void deleteActivation(Document doc, NodeActivation act);
+    abstract void deleteActivation(Document doc, A act);
 
     public abstract double computeSynapseWeightSum(Integer offset, Neuron n);
 
@@ -207,9 +207,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public abstract void computeNullHyp(Model m);
 
     abstract boolean isExpandable(boolean checkFrequency);
-
-    abstract protected A createNewActivation(int id, Key ak);
-
 
 
     protected Node() {}
@@ -330,10 +327,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         A act = NodeActivation.get(doc, (T) this, ak);
         if(act == null) {
-            act = createNewActivation(doc.activationIdCounter++, ak);
-            act.isTrainingAct = isTrainingAct;
+            act = createActivation(doc, ak, isTrainingAct);
 
-            initActivation(doc, act);
             register(act, doc);
 
             act.link(inputActs);

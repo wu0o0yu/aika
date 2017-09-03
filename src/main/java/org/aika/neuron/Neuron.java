@@ -184,11 +184,13 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
      * @param value The activation value of this input activation
      */
     public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value) {
+        if(value <= 0.0) return null;
+
         Node.addActivationAndPropagate(doc, new NodeActivation.Key(node.get(), new Range(begin, end), rid, o), Collections.emptySet());
 
         doc.propagate();
 
-        Activation act = (Activation) NodeActivation.get(doc, node.get(), rid, new Range(begin, end), EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
+        Activation act = NodeActivation.get(doc, node.get(), rid, new Range(begin, end), EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
         State s = new State(value, value, value, 0, NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.finalState = s;
@@ -196,6 +198,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
         act.isInput = true;
 
         doc.inputNeuronActivations.add(act);
+        doc.finallyActivatedNeurons.add(act.key.n.neuron.get());
 
         doc.ubQueue.add(act);
 

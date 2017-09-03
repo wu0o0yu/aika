@@ -297,12 +297,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    @Override
-    protected NodeActivation<AndNode> createNewActivation(int id, Key ak) {
-        return new NodeActivation<>(id, ak);
-    }
-
-
     private static boolean checkRidRange(SortedMap<Refinement, Provider<? extends Node>> parents) {
         int maxRid = 0;
         for(Refinement ref: parents.keySet()) {
@@ -473,7 +467,10 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    public void initActivation(Document doc, NodeActivation act) {
+    protected NodeActivation<AndNode> createActivation(Document doc, NodeActivation.Key ak, boolean isTrainingAct) {
+        NodeActivation<AndNode> act = new NodeActivation<>(doc.activationIdCounter++, ak);
+        act.isTrainingAct = isTrainingAct;
+        return act;
     }
 
 

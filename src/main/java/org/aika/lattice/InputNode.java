@@ -101,18 +101,15 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    public void initActivation(Document doc, NodeActivation act) {
-        if(!isBlocked) {
-            doc.inputNodeActivations.add(act);
-        }
+    protected NodeActivation<InputNode> createActivation(Document doc, NodeActivation.Key ak, boolean isTrainingAct) {
+        NodeActivation<InputNode> act = new NodeActivation<>(doc.activationIdCounter++, ak);
+        act.isTrainingAct = isTrainingAct;
+        return act;
     }
 
 
     @Override
     public void deleteActivation(Document doc, NodeActivation act) {
-        if(!isBlocked) {
-            doc.inputNodeActivations.remove(act);
-        }
     }
 
 
@@ -127,12 +124,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                 ak.o
         );
     }
-
-    @Override
-    protected NodeActivation<InputNode> createNewActivation(int id, NodeActivation.Key ak) {
-        return new NodeActivation<>(id, ak);
-    }
-
 
     @Override
     public void computeNullHyp(Model m) {
@@ -366,22 +357,26 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     public void discover(Document doc, NodeActivation<InputNode> act) {
         long v = Node.visitedCounter++;
 
-        for(NodeActivation secondAct: doc.inputNodeActivations) {
-            Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.n.provider);
-            InputNode in = ref.input.get();
-            Operator srm = computeStartRangeMatch(key, in.key);
-            Operator erm = computeEndRangeMatch(key, in.key);
-            Integer ridDelta = Utils.nullSafeSub(act.key.rid, false, secondAct.key.rid, false);
+        for(Neuron n: doc.finallyActivatedNeurons) {
+            for(Activation secondNAct: n.getFinalActivations(doc)) {
+                for (NodeActivation secondAct : secondNAct.outputs.values()) {
+                    Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.n.provider);
+                    InputNode in = ref.input.get();
+                    Operator srm = computeStartRangeMatch(key, in.key);
+                    Operator erm = computeEndRangeMatch(key, in.key);
+                    Integer ridDelta = Utils.nullSafeSub(act.key.rid, false, secondAct.key.rid, false);
 
-            if(     act != secondAct &&
-                    this != in &&
-                    in.visitedTrain != v &&
-                    !in.key.isNeg &&
-                    !in.key.isRecurrent &&
-                    ((srm.compare(act.key.r.begin, act.key.r.end, secondAct.key.r.begin, secondAct.key.r.end) && erm.compare(act.key.r.end, act.key.r.begin, secondAct.key.r.end, secondAct.key.r.begin)) ||
-                            (ridDelta != null && ridDelta < AndNode.MAX_RID_RANGE))) {
-                in.visitedTrain = v;
-                AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, true);
+                    if (act != secondAct &&
+                            this != in &&
+                            in.visitedTrain != v &&
+                            !in.key.isNeg &&
+                            !in.key.isRecurrent &&
+                            ((srm.compare(act.key.r.begin, act.key.r.end, secondAct.key.r.begin, secondAct.key.r.end) && erm.compare(act.key.r.end, act.key.r.begin, secondAct.key.r.end, secondAct.key.r.begin)) ||
+                                    (ridDelta != null && ridDelta < AndNode.MAX_RID_RANGE))) {
+                        in.visitedTrain = v;
+                        AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, true);
+                    }
+                }
             }
         }
     }

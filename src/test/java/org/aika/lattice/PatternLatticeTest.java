@@ -277,6 +277,7 @@ public class PatternLatticeTest {
         doc.train();
 
         inA.addInput(doc, 0, 1, 0);
+
         doc.train();
 
         Assert.assertEquals(1, pANode.frequency, 0.01);

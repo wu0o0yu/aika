@@ -76,28 +76,25 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    protected Activation createNewActivation(int id, Key ak) {
-        return new Activation(id, ak);
-    }
-
-
-    @Override
     public boolean isAllowedOption(int threadId, InterprNode n, NodeActivation act, long v) {
         return false;
     }
 
 
     @Override
-    public void initActivation(Document doc, NodeActivation act) {
-        ThreadState th = getThreadState(doc.threadId, false);
+    protected Activation createActivation(Document doc, NodeActivation.Key ak, boolean isTrainingAct) {
+        Activation act = new Activation(doc.activationIdCounter++, ak);
+        act.isTrainingAct = isTrainingAct;
+        ThreadState<OrNode, Activation> th = getThreadState(doc.threadId, false);
         if(th == null || th.activations.isEmpty()) {
             doc.activatedNeurons.add(neuron.get());
         }
+        return act;
     }
 
 
     @Override
-    public void deleteActivation(Document doc, NodeActivation act) {
+    public void deleteActivation(Document doc, Activation act) {
         ThreadState th = getThreadState(doc.threadId, false);
         if(th == null || th.activations.isEmpty()) {
             doc.activatedNeurons.remove(neuron.get());
