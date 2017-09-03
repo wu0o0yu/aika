@@ -46,11 +46,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private static final Logger log = LoggerFactory.getLogger(SearchNode.class);
 
-    /**
-     * This optimization may miss some cases and will not always return the best interpretation.
-     */
-    public static boolean INCOMPLETE_OPTIMIZATION = true;
-
     public static int MAX_SEARCH_STEPS = 100000;
 
     public int id;
@@ -152,8 +147,6 @@ public class SearchNode implements Comparable<SearchNode> {
         if (doc.selectedSearchNode != null) {
             doc.selectedSearchNode.reconstructSelectedResult(doc);
             doc.selectedSearchNode.collectResults(results);
-
-            log.info("Selected SearchNode ID: " + doc.selectedSearchNode.id);
         }
 
         doc.bestInterpretation = results;
@@ -217,17 +210,12 @@ public class SearchNode implements Comparable<SearchNode> {
             double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight[0].getNormWeight() : 0.0;
 
             if (accNW > selectedAccNW) {
-                log.info("+ " + pathToString(doc) + "  -  " + accumulatedWeight[0] + "  " + accumulatedWeight[1]);
-
                 doc.selectedSearchNode = this;
                 doc.bottom.storeFinalWeight(doc.visitedCounter++);
-            } else {
-                log.info("- " + pathToString(doc) + "  -  " + accumulatedWeight[0] + "  " + accumulatedWeight[1]);
             }
-
         } else {
             SearchNode child = selectCandidate();
-            if (child != null && !(marker.excluded && marker.complete && INCOMPLETE_OPTIMIZATION)) {
+            if (child != null && !(marker.excluded && marker.complete)) {
                 selectedWeight = child.search(doc, this, excludedParent, searchSteps);
             }
         }
@@ -239,7 +227,7 @@ public class SearchNode implements Comparable<SearchNode> {
         SearchNode child;
         do {
             child = selectedParent.selectCandidate();
-        } while(child != null && marker.selected && child.marker.complete && INCOMPLETE_OPTIMIZATION);
+        } while(child != null && marker.selected && child.marker.complete);
 
         if(child != null) {
             excludedWeight = child.search(doc, selectedParent, this, searchSteps);
