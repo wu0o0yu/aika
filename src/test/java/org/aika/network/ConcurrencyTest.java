@@ -36,7 +36,7 @@ public class ConcurrencyTest {
 
     @Test
     public void testMultipleDocuments() {
-        Model m = new Model(8);
+        Model m = new Model(null, 8);
         AndNode.minFrequency = 1;
 
 

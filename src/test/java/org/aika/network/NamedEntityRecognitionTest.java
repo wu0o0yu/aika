@@ -40,7 +40,7 @@ public class NamedEntityRecognitionTest {
     // respectively.
     @Test
     public void testNamedEntityRecognitionWithoutCounterNeuron() {
-        Model m = new Model(1); // number of threads
+        Model m = new Model(null, 1); // number of threads
 
         Neuron forenameCategory = new Neuron(m, "C-forename");
         Neuron surnameCategory = new Neuron(m, "C-surname");
@@ -223,7 +223,7 @@ public class NamedEntityRecognitionTest {
     // respectively.
     @Test
     public void testNamedEntityRecognitionWithCounterNeuron() {
-        Model m = new Model(1); // number of threads
+        Model m = new Model(null, 1); // number of threads
 
         Neuron forenameCategory = new Neuron(m, "C-forename");
         Neuron surnameCategory = new Neuron(m, "C-surname");

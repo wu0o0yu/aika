@@ -74,16 +74,17 @@ public class Model {
      * Creates a model with a single thread.
      */
     public Model() {
-        this(1);
+        this(null, 1);
     }
 
 
-    public Model(int numberOfThreads) {
+    public Model(SuspensionHook sh, int numberOfThreads) {
         assert numberOfThreads >= 1;
         this.numberOfThreads = numberOfThreads;
 
         lastCleanup = new int[numberOfThreads];
         docs = new Document[numberOfThreads];
+        suspensionHook = sh;
     }
 
 

@@ -32,7 +32,7 @@ public class OptionalAndTest {
 
     @Test
     public void testOptionalAnd() {
-        Model m = new Model(2);
+        Model m = new Model(null, 2);
 
         Neuron wordEssen = new Neuron(m, "word:essen");
         Neuron wordHamburg = new Neuron(m, "word:hamburg");

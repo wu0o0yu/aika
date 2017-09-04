@@ -249,7 +249,7 @@ public class OrNode extends Node<OrNode, Activation> {
         if(parentNode.orChildren != null) {
             for (OrEntry oe : parentNode.orChildren) {
                 if (!ak.o.isConflicting(doc.visitedCounter++)) {
-                    ((OrNode) oe.node.get()).addActivation(doc, oe.ridOffset, inputAct);
+                    oe.node.get().addActivation(doc, oe.ridOffset, inputAct);
                 }
             }
         }
@@ -453,13 +453,13 @@ public class OrNode extends Node<OrNode, Activation> {
 
     static class OrEntry implements Comparable<OrEntry>, Writable {
         public Integer ridOffset;
-        public Provider<? extends Node> node;
+        public Provider<OrNode> node;
 
 
         private OrEntry() {}
 
 
-        public OrEntry(Integer ridOffset, Provider<? extends Node> node) {
+        public OrEntry(Integer ridOffset, Provider<OrNode> node) {
             this.ridOffset = ridOffset;
             this.node = node;
         }
