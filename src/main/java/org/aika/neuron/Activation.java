@@ -1,7 +1,6 @@
 package org.aika.neuron;
 
 import org.aika.Utils;
-import org.aika.corpus.SearchNode;
 import org.aika.corpus.SearchNode.StateChange;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
@@ -181,6 +180,12 @@ public final class Activation extends NodeActivation<OrNode> {
      * interpretation.
      */
     public static class State {
+        public static final int VALUE = 0;
+        public static final int UB = 1;
+        public static final int LB = 2;
+        public static final int DIR = 0;
+        public static final int REC = 1;
+
         public final double value;
         public final double ub;
         public final double lb;
@@ -203,7 +208,7 @@ public final class Activation extends NodeActivation<OrNode> {
         }
 
         public Neuron.NormWeight getWeight(int t) {
-            return t == 0 ? weight : weightUB;
+            return t == VALUE ? weight : weightUB;
         }
 
         public boolean equals(State s) {
@@ -215,7 +220,7 @@ public final class Activation extends NodeActivation<OrNode> {
         }
 
         public String toString() {
-            return "V:" + value;
+            return "VALUE:" + value;
         }
     }
 

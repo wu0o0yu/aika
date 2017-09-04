@@ -314,7 +314,7 @@ public class Document implements Comparable<Document> {
                 for(Map.Entry<Integer, Activation.State> me: act.rounds.rounds.entrySet()) {
                     Activation.State s = me.getValue();
                     sb.append("[R:" + me.getKey());
-                    sb.append(" V:" + Utils.round(s.value));
+                    sb.append(" VALUE:" + Utils.round(s.value));
                     sb.append(" F:" + s.fired);
                     sb.append(" W:" + Utils.round(s.weight.w));
                     sb.append(" N:" + Utils.round(s.weight.n));

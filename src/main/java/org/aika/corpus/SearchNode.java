@@ -27,6 +27,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static org.aika.neuron.Activation.State.UB;
+import static org.aika.neuron.Activation.State.VALUE;
+
 /**
  * The {@code SearchNode} class represents a node in the binary search tree that is used to find the optimal
  * interpretation for a given document. Each search node possess a refinement (simply a set of interpretation nodes).
@@ -298,7 +301,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
                 SearchNode c = new SearchNode(doc, changed, this, excludedParent, pc.refinement, pc.marker);
 
-                if(doc.selectedSearchNode == null || doc.selectedSearchNode.accumulatedWeight[0].getNormWeight() < c.accumulatedWeight[1].getNormWeight()) {
+                if(doc.selectedSearchNode == null || doc.selectedSearchNode.accumulatedWeight[VALUE].getNormWeight() < c.accumulatedWeight[UB].getNormWeight()) {
                     candidates.add(c);
                 }
             }

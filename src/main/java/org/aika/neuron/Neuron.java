@@ -41,6 +41,7 @@ import java.util.stream.Stream;
 import static org.aika.corpus.Range.Mapping.END;
 import static org.aika.corpus.Range.Mapping.START;
 import static org.aika.corpus.Range.Operator.*;
+import static org.aika.neuron.Activation.State.*;
 
 /**
  * The {@code Neuron} class represents a neuron in Aikas neural network and is connected to other neurons through
@@ -307,12 +308,6 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    static final int V = 0;
-    static final int UB = 1;
-    static final int LB = 2;
-    static final int DIR = 0;
-    static final int REC = 1;
-
     public State computeWeight(int round, Activation act, SearchNode sn, Document doc) {
         InterprNode o = act.key.o;
         double st = bias - (negDirSum + negRecSum);
@@ -338,25 +333,25 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
             }
 
             int t = s.key.isRecurrent ? REC : DIR;
-            sum[t][V] += is.value * s.w;
+            sum[t][VALUE] += is.value * s.w;
             sum[t][UB] += (s.key.isNeg ? is.lb : is.ub) * s.w;
             sum[t][LB] += (s.key.isNeg ? is.ub : is.lb) * s.w;
 
-            if (!s.key.isRecurrent && !s.key.isNeg && sum[DIR][V] + sum[REC][V] >= 0.0 && fired < 0) {
+            if (!s.key.isRecurrent && !s.key.isNeg && sum[DIR][VALUE] + sum[REC][VALUE] >= 0.0 && fired < 0) {
                 fired = iAct.rounds.get(round).fired + 1;
             }
         }
 
 
-        double drSum = sum[DIR][V] + sum[REC][V];
+        double drSum = sum[DIR][VALUE] + sum[REC][VALUE];
         double drSumUB = sum[DIR][UB] + sum[REC][UB];
         double drSumLB = sum[DIR][LB] + sum[REC][LB];
 
         Coverage c = sn.getCoverage(act.key.o);
         // Compute only the recurrent part is above the threshold.
         NormWeight newWeight = NormWeight.create(
-                c == Coverage.SELECTED ? (sum[DIR][V] + negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC][V] - negRecSum : 0.0,
-                (sum[DIR][V] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR][V] + negRecSum + maxRecurrentSum) : maxRecurrentSum
+                c == Coverage.SELECTED ? (sum[DIR][VALUE] + negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC][VALUE] - negRecSum : 0.0,
+                (sum[DIR][VALUE] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR][VALUE] + negRecSum + maxRecurrentSum) : maxRecurrentSum
         );
         NormWeight newWeightUB = NormWeight.create(
                 c == Coverage.SELECTED || c == Coverage.UNKNOWN ? (sum[DIR][UB] + negRecSum) < 0.0 ? Math.max(0.0, drSumUB) : sum[REC][UB] - negRecSum : 0.0,
