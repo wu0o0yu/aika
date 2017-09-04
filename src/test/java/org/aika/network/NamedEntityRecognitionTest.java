@@ -408,7 +408,6 @@ public class NamedEntityRecognitionTest {
         }
 
         // Search for the best interpretation of this text.
-        SearchNode.INCOMPLETE_OPTIMIZATION = true;
         doc.process();
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
