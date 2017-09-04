@@ -31,6 +31,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.aika.corpus.Range.Operator.EQUALS;
 
@@ -115,8 +116,10 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     private void retrieveInputs(Document doc, Node<?, NodeActivation<?>> n, Range inputR, Integer rid, List<NodeActivation<?>> inputs, Integer pRidOffset, TreeSet<Node> parents) {
-        for(NodeActivation iAct: NodeActivation.select(doc, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null)
-                .collect(Collectors.toList())) {
+        Stream<NodeActivation> s = n != null ?
+                NodeActivation.select(doc, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null) :
+                NodeActivation.select(doc, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null);
+        for(NodeActivation iAct: s.collect(Collectors.toList())) {
             if(!iAct.isRemoved && parents.contains(iAct.key.n) && !checkSelfReferencing(doc, iAct)) {
                 inputs.add(iAct);
             }

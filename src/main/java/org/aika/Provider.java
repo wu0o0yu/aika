@@ -35,17 +35,18 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     public synchronized void suspend() {
         assert m.suspensionHook != null;
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
+        if(n.modified) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
 
-        try {
-            n.write(dos);
-        } catch(IOException e) {
-            throw new RuntimeException(e);
+            try {
+                n.write(dos);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            m.suspensionHook.store(id, baos.toByteArray());
         }
-
-        m.suspensionHook.store(id, baos.toByteArray());
-
         n = null;
     }
 

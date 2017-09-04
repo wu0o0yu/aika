@@ -647,7 +647,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      */
     public static boolean adjust(Model m, int threadId, Neuron neuron, final int dir) {
         long v = visitedCounter++;
-        OrNode outputNode = (OrNode) neuron.node.get();
+        OrNode outputNode = neuron.node.get();
 
         if(neuron.inputSynapsesByWeight.isEmpty()) return false;
 
@@ -733,6 +733,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         outputNode.lock.acquireWriteLock(threadId);
         outputNode.removeAllInputs(threadId);
 
+        neuron.modified = true;
+        outputNode.modified = true;
+
         for(RSKey rsk: outputs) {
             Node pa = rsk.pa.get();
             pa.lock.acquireWriteLock(threadId);
@@ -754,6 +757,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         Synapse minSyn = null;
         double sum = 0.0;
         Node pa = rsk.pa != null ? rsk.pa.get() : null;
+        pa.modified = true;
+
         if(pa == null) {
         } else if(pa instanceof InputNode) {
             InputNode node = (InputNode) pa;
