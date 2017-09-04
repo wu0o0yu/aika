@@ -757,14 +757,15 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         Synapse minSyn = null;
         double sum = 0.0;
         Node pa = rsk.pa != null ? rsk.pa.get() : null;
-        pa.modified = true;
 
         if(pa == null) {
         } else if(pa instanceof InputNode) {
+            pa.modified = true;
             InputNode node = (InputNode) pa;
             minSyn = node.getSynapse(new SynapseKey(rsk.offset, n.provider));
             sum = Math.abs(minSyn.w);
         } else {
+            pa.modified = true;
             AndNode node = (AndNode) pa;
 
             for(Refinement ref: node.parents.keySet()) {
