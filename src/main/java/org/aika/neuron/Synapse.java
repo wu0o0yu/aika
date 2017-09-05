@@ -138,6 +138,8 @@ public class Synapse implements Writable {
         in.outputSynapses.put(this, this);
         out.inputSynapses.put(this, this);
         out.inputSynapsesByWeight.add(this);
+        in.modified = true;
+        out.modified = true;
 
         (dir ? in : out).lock.releaseWriteLock();
         (dir ? out : in).lock.releaseWriteLock();

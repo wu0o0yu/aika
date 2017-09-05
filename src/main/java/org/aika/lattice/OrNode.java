@@ -300,6 +300,7 @@ public class OrNode extends Node<OrNode, Activation> {
         in.lock.releaseWriteLock();
 
         lock.acquireWriteLock(threadId);
+        modified = true;
         Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
         TreeSet<Node> pn = parents.get(key);
         if(pn == null) {
@@ -315,6 +316,7 @@ public class OrNode extends Node<OrNode, Activation> {
         in.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, -1);
         in.removeOrChild(threadId, new OrEntry(ridOffset, provider));
         lock.acquireWriteLock(threadId);
+        modified = true;
         Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
         TreeSet<Node> pn = parents.get(key);
         if(pn != null) {
