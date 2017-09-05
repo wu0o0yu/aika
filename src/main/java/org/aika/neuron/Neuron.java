@@ -117,7 +117,6 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
         m.createProvider(this);
 
         OrNode node = new OrNode(m);
-        node.modified = true;
 
         node.neuron = provider;
         this.node = node.provider;

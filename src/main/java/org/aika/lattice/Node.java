@@ -219,6 +219,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if(m != null) {
             nOffset = m.numberOfPositions;
         }
+        modified = true;
     }
 
 
@@ -658,6 +659,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
             if (s.inputNode == null) {
                 InputNode iNode = InputNode.add(m, s.key.createInputNodeKey(), s.input.get());
+                iNode.modified = true;
                 iNode.isBlocked = in.isBlocked;
                 iNode.setSynapse(threadId, new SynapseKey(s.key.relativeRid, neuron.provider), s);
                 s.inputNode = iNode.provider;
@@ -733,9 +735,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         outputNode.lock.acquireWriteLock(threadId);
         outputNode.removeAllInputs(threadId);
 
-        neuron.modified = true;
-        outputNode.modified = true;
-
         for(RSKey rsk: outputs) {
             Node pa = rsk.pa.get();
             pa.lock.acquireWriteLock(threadId);
@@ -760,12 +759,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         if(pa == null) {
         } else if(pa instanceof InputNode) {
-            pa.modified = true;
             InputNode node = (InputNode) pa;
             minSyn = node.getSynapse(new SynapseKey(rsk.offset, n.provider));
             sum = Math.abs(minSyn.w);
         } else {
-            pa.modified = true;
             AndNode node = (AndNode) pa;
 
             for(Refinement ref: node.parents.keySet()) {
