@@ -124,12 +124,31 @@ public class Range {
 
 
     public enum Operator {
-        EQUALS,
-        LESS_THAN,
-        GREATER_THAN,
-        FIRST,
-        LAST,
-        NONE;
+        EQUALS(0),
+        LESS_THAN(1),
+        GREATER_THAN(2),
+        FIRST(3),
+        LAST(4),
+        NONE(5);
+
+        Operator(int id) {
+            this.id = (short) id;
+        }
+
+        int id;
+
+        public static Operator getById(int id) {
+            for(Operator o: Operator.values()) {
+                if(o.id == id) return o;
+            }
+            return null;
+        }
+
+
+        public int getId() {
+            return id;
+        }
+
 
         public boolean compare(Integer a, Integer b, Integer c, Integer d) {
             if(a == null || c == null) return true;
@@ -169,9 +188,28 @@ public class Range {
 
 
     public enum Mapping {
-        START,
-        END,
-        NONE;
+        START(0),
+        END(1),
+        NONE(2);
+
+        Mapping(int id) {
+            this.id =  id;
+        }
+
+        int id;
+
+        public static Mapping getById(int id) {
+            for(Mapping m: Mapping.values()) {
+                if(m.id == id) return m;
+            }
+            return null;
+        }
+
+
+        public int getId() {
+            return id;
+        }
+
 
         public Integer getSignalPos(Range r) {
             switch(this) {

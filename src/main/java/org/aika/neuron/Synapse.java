@@ -252,10 +252,10 @@ public class Synapse implements Writable {
             if(relativeRid != null) out.writeInt(relativeRid);
             out.writeBoolean(absoluteRid != null);
             if(absoluteRid != null) out.writeInt(absoluteRid);
-            out.writeUTF(startRangeMatch.name());
-            out.writeUTF(endRangeMatch.name());
-            out.writeUTF(startRangeMapping.name());
-            out.writeUTF(endRangeMapping.name());
+            out.writeByte(startRangeMatch.getId());
+            out.writeByte(endRangeMatch.getId());
+            out.writeByte(startRangeMapping.getId());
+            out.writeByte(endRangeMapping.getId());
             out.writeBoolean(startRangeOutput);
             out.writeBoolean(endRangeOutput);
         }
@@ -267,10 +267,10 @@ public class Synapse implements Writable {
             isRecurrent = in.readBoolean();
             if(in.readBoolean()) relativeRid = in.readInt();
             if(in.readBoolean()) absoluteRid = in.readInt();
-            startRangeMatch = Operator.valueOf(in.readUTF());
-            endRangeMatch = Operator.valueOf(in.readUTF());
-            startRangeMapping = Mapping.valueOf(in.readUTF());
-            endRangeMapping = Mapping.valueOf(in.readUTF());
+            startRangeMatch = Operator.getById(in.readByte());
+            endRangeMatch = Operator.getById(in.readByte());
+            startRangeMapping = Mapping.getById(in.readByte());
+            endRangeMapping = Mapping.getById(in.readByte());
             startRangeOutput = in.readBoolean();
             endRangeOutput = in.readBoolean();
         }

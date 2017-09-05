@@ -2,6 +2,8 @@ package org.aika;
 
 
 import java.io.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 
 public class Provider<T extends AbstractNode> implements Comparable<Provider<?>> {
@@ -25,7 +27,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
 
     public synchronized T get() {
-        if(n == null) {
+        if (n == null) {
             reactivate();
         }
         return n;
@@ -35,11 +37,12 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     public synchronized void suspend() {
         assert m.suspensionHook != null;
 
-        if(n.modified) {
+        if (n.modified) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            DataOutputStream dos = new DataOutputStream(baos);
+            try (
+                    GZIPOutputStream gzipos = new GZIPOutputStream(baos);
+                    DataOutputStream dos = new DataOutputStream(gzipos);) {
 
-            try {
                 n.write(dos);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -56,10 +59,11 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
         byte[] data = m.suspensionHook.retrieve(id);
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
-        DataInputStream dis = new DataInputStream(bais);
-        try {
+        try (
+                GZIPInputStream gzipis = new GZIPInputStream(bais);
+                DataInputStream dis = new DataInputStream(gzipis);) {
             n = (T) AbstractNode.read(dis, this);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -75,8 +79,8 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
 
     public int compareTo(Provider<?> n) {
-        if(id < n.id) return -1;
-        else if(id > n.id) return 1;
+        if (id < n.id) return -1;
+        else if (id > n.id) return 1;
         else return 0;
     }
 }
