@@ -401,6 +401,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         if(synapses == null) {
             synapses = new TreeMap<>();
         }
+        modified = true;
         synapses.put(sk, s);
         lock.releaseWriteLock();
     }
