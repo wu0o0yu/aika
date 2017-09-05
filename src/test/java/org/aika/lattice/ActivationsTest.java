@@ -50,9 +50,9 @@ public class ActivationsTest {
         m.initAndNeuron(new Neuron(m, "pA"), 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -78,9 +78,9 @@ public class ActivationsTest {
         m.initAndNeuron(new Neuron(m, "pB"), 0.001,
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         );
         InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, Operator.LESS_THAN, Mapping.START, true, Operator.GREATER_THAN, Mapping.END, true);
 

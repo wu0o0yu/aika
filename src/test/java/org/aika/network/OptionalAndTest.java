@@ -45,29 +45,29 @@ public class OptionalAndTest {
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0f),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordHamburg)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         );
         Neuron hintVerb = m.initOrNeuron(new Neuron(m, "HINT-VERB"),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0f),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordGehen)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         );
 
 
@@ -76,23 +76,23 @@ public class OptionalAndTest {
                 new Input()
                         .setOptional(false)
                         .setNeuron(hintNoun)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
-                        .setMaxLowerWeightsSum(0.0),
+                        .setMinInput(1.0f)
+                        .setMaxLowerWeightsSum(0.0f),
                 new Input()
                         .setOptional(true)
                         .setNeuron(upperCase)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
-                        .setMaxLowerWeightsSum(0.0),
+                        .setMinInput(1.0f)
+                        .setMaxLowerWeightsSum(0.0f),
                 new Input()
                         .setOptional(false)
                         .setNeuron(suppr)
-                        .setWeight(-1.0)
+                        .setWeight(-1.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         );
 
         Neuron verb = m.initAndNeuron(new Neuron(m, "VERB"),
@@ -100,31 +100,31 @@ public class OptionalAndTest {
                 new Input()
                         .setOptional(false)
                         .setNeuron(hintVerb)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
-                        .setMaxLowerWeightsSum(0.0),
+                        .setMinInput(1.0f)
+                        .setMaxLowerWeightsSum(0.0f),
                 new Input()
                         .setOptional(false)
                         .setNeuron(suppr)
-                        .setWeight(-1.0)
+                        .setWeight(-1.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         );
 
         m.initOrNeuron(suppr,
                 new Input()
                         .setOptional(false)
                         .setNeuron(noun)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0f),
                 new Input()
                         .setOptional(false)
                         .setNeuron(verb)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         );
 
 

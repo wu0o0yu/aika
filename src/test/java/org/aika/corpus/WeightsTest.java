@@ -60,16 +60,16 @@ public class WeightsTest {
         m.initOrNeuron(pOrA,
                 new Input()
                         .setNeuron(inAA)
-                        .setWeight(3.0)
+                        .setWeight(3.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inBA)
-                        .setWeight(4.0)
+                        .setWeight(4.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
@@ -80,24 +80,24 @@ public class WeightsTest {
                 0.001,
                 new Input()
                         .setNeuron(pOrA)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.6)
+                        .setMinInput(0.6f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setOptional(true)
                         .setNeuron(inCA)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-2.0)
+                        .setWeight(-2.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(CONTAINED_IN)
         );
 
@@ -110,16 +110,16 @@ public class WeightsTest {
         m.initOrNeuron(pOrB,
                 new Input()
                         .setNeuron(inAB)
-                        .setWeight(2.0)
+                        .setWeight(2.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inBB)
-                        .setWeight(5.0)
+                        .setWeight(5.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
@@ -129,23 +129,23 @@ public class WeightsTest {
                 0.001,
                 new Input()
                         .setNeuron(pOrB)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.6)
+                        .setMinInput(0.6f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inCB)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-2.0)
+                        .setWeight(-2.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(CONTAINED_IN)
         );
 
@@ -153,16 +153,16 @@ public class WeightsTest {
         m.initOrNeuron(pSuppr,
                 new Input()
                         .setNeuron(pDA)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pDB)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );

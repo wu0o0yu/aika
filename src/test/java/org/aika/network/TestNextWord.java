@@ -22,14 +22,14 @@ public class TestNextWord {
         Neuron abN = m.initAndNeuron(new Neuron(m, "AB"), 0.5,
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(10.0)
-                        .setMinInput(0.95)
+                        .setWeight(10.0f)
+                        .setMinInput(0.95f)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setMinInput(0.95)
+                        .setWeight(10.0f)
+                        .setMinInput(0.95f)
                         .setStartRangeMapping(Mapping.END)
                         .setStartRangeMatch(Operator.EQUALS)
                         .setStartRangeOutput(true)

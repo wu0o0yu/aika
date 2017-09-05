@@ -67,18 +67,18 @@ public class NamedEntityRecognitionTest {
                 0.5, // adjusts the bias
                 new Input() // Requires the word to be recognized
                         .setNeuron(inputNeurons.get("cook"))
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         // This input requires the input activation to have an
                         // activation value of at least 0.9
-                        .setMinInput(0.9)
+                        .setMinInput(0.9f)
                         .setRelativeRid(0) // references the current word
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input() // The previous word needs to be a forename
                         .setNeuron(forenameCategory)
-                        .setWeight(10.0)
-                        .setMinInput(0.9)
+                        .setWeight(10.0f)
+                        .setMinInput(0.9f)
                         .setRelativeRid(-1) // references the previous word
                         .setRecurrent(true) // this input is a positive feedback loop
                         .setRangeMatch(NONE)
@@ -89,8 +89,8 @@ public class NamedEntityRecognitionTest {
                 // in the suppressingN.
                 new Input()
                         .setNeuron(suppressingN)
-                        .setWeight(-20.0)
-                        .setMinInput(1.0)
+                        .setWeight(-20.0f)
+                        .setMinInput(1.0f)
                         .setRecurrent(true) // this input is a negative feedback loop
                         .setRangeMatch(CONTAINS)
         );
@@ -100,15 +100,15 @@ public class NamedEntityRecognitionTest {
                 0.2,
                 new Input()
                         .setNeuron(inputNeurons.get("cook"))
-                        .setWeight(15.0)
-                        .setMinInput(0.9)
+                        .setWeight(15.0f)
+                        .setMinInput(0.9f)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppressingN)
-                        .setWeight(-20.0)
-                        .setMinInput(1.0)
+                        .setWeight(-20.0f)
+                        .setMinInput(1.0f)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINS)
         );
@@ -118,23 +118,23 @@ public class NamedEntityRecognitionTest {
                 0.5,
                 new Input()
                         .setNeuron(inputNeurons.get("jackson"))
-                        .setWeight(10.0)
-                        .setMinInput(0.9)
+                        .setWeight(10.0f)
+                        .setMinInput(0.9f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(surnameCategory)
-                        .setWeight(10.0)
-                        .setMinInput(0.9)
+                        .setWeight(10.0f)
+                        .setMinInput(0.9f)
                         .setRelativeRid(1)
                         .setRecurrent(true)
                         .setRangeMatch(NONE),
                 new Input()
                         .setNeuron(suppressingN)
-                        .setWeight(-20.0)
-                        .setMinInput(1.0)
+                        .setWeight(-20.0f)
+                        .setMinInput(1.0f)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINED_IN)
         );
@@ -144,15 +144,15 @@ public class NamedEntityRecognitionTest {
                 0.2,
                 new Input()
                         .setNeuron(inputNeurons.get("jackson"))
-                        .setWeight(12.0)
-                        .setMinInput(0.9)
+                        .setWeight(12.0f)
+                        .setMinInput(0.9f)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppressingN)
-                        .setWeight(-20.0)
-                        .setMinInput(1.0)
+                        .setWeight(-20.0f)
+                        .setMinInput(1.0f)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINED_IN)
         );
@@ -160,7 +160,7 @@ public class NamedEntityRecognitionTest {
         m.initOrNeuron(forenameCategory,
                 new Input() // In this example there is only one forename considered.
                         .setNeuron(jacksonForenameEntity)
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         .setRelativeRid(0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
@@ -168,17 +168,17 @@ public class NamedEntityRecognitionTest {
         m.initOrNeuron(surnameCategory,
                 new Input()
                         .setNeuron(cookSurnameEntity)
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         .setRelativeRid(0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
 
         m.initOrNeuron(suppressingN,
-                new Input().setNeuron(cookProfessionEntity).setWeight(10.0).setRangeMatch(EQUALS).setRangeOutput(true),
-                new Input().setNeuron(cookSurnameEntity).setWeight(10.0).setRangeMatch(EQUALS).setRangeOutput(true),
-                new Input().setNeuron(jacksonCityEntity).setWeight(10.0).setRangeMatch(EQUALS).setRangeOutput(true),
-                new Input().setNeuron(jacksonForenameEntity).setWeight(10.0).setRangeMatch(EQUALS).setRangeOutput(true)
+                new Input().setNeuron(cookProfessionEntity).setWeight(10.0f).setRangeMatch(EQUALS).setRangeOutput(true),
+                new Input().setNeuron(cookSurnameEntity).setWeight(10.0f).setRangeMatch(EQUALS).setRangeOutput(true),
+                new Input().setNeuron(jacksonCityEntity).setWeight(10.0f).setRangeMatch(EQUALS).setRangeOutput(true),
+                new Input().setNeuron(jacksonForenameEntity).setWeight(10.0f).setRangeMatch(EQUALS).setRangeOutput(true)
         );
 
 
@@ -276,18 +276,18 @@ public class NamedEntityRecognitionTest {
                 0.5, // adjusts the bias
                 new Input() // Requires the word to be recognized
                         .setNeuron(relNeurons.get("cook"))
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         // This input requires the input activation to have an
                         // activation value of at least 0.9
-                        .setMinInput(0.9)
+                        .setMinInput(0.9f)
                         .setRelativeRid(0) // references the current word
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input() // The previous word needs to be a forename
                         .setNeuron(forenameCategory)
-                        .setWeight(10.0)
-                        .setMinInput(0.9)
+                        .setWeight(10.0f)
+                        .setMinInput(0.9f)
                         .setRelativeRid(-1) // references the previous word
                         .setRecurrent(true) // this input is a positive feedback loop
                         .setRangeMatch(NONE),
@@ -297,8 +297,8 @@ public class NamedEntityRecognitionTest {
                 // in the suppressingN.
                 new Input()
                         .setNeuron(suppressingN)
-                        .setWeight(-20.0)
-                        .setMinInput(1.0)
+                        .setWeight(-20.0f)
+                        .setMinInput(1.0f)
                         .setRecurrent(true) // this input is a negative feedback loop
                         .setRangeMatch(CONTAINS)
         );
@@ -308,15 +308,15 @@ public class NamedEntityRecognitionTest {
                 0.2,
                 new Input()
                         .setNeuron(relNeurons.get("cook"))
-                        .setWeight(15.0)
-                        .setMinInput(0.9)
+                        .setWeight(15.0f)
+                        .setMinInput(0.9f)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppressingN)
-                        .setWeight(-20.0)
-                        .setMinInput(1.0)
+                        .setWeight(-20.0f)
+                        .setMinInput(1.0f)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINS)
         );
@@ -326,23 +326,23 @@ public class NamedEntityRecognitionTest {
                 0.5,
                 new Input()
                         .setNeuron(relNeurons.get("jackson"))
-                        .setWeight(10.0)
-                        .setMinInput(0.9)
+                        .setWeight(10.0f)
+                        .setMinInput(0.9f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(surnameCategory)
-                        .setWeight(10.0)
-                        .setMinInput(0.9)
+                        .setWeight(10.0f)
+                        .setMinInput(0.9f)
                         .setRelativeRid(1)
                         .setRecurrent(true)
                         .setRangeMatch(NONE),
                 new Input()
                         .setNeuron(suppressingN)
-                        .setWeight(-20.0)
-                        .setMinInput(1.0)
+                        .setWeight(-20.0f)
+                        .setMinInput(1.0f)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINED_IN)
         );
@@ -352,15 +352,15 @@ public class NamedEntityRecognitionTest {
                 0.2,
                 new Input()
                         .setNeuron(relNeurons.get("jackson"))
-                        .setWeight(12.0)
-                        .setMinInput(0.9)
+                        .setWeight(12.0f)
+                        .setMinInput(0.9f)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppressingN)
-                        .setWeight(-20.0)
-                        .setMinInput(1.0)
+                        .setWeight(-20.0f)
+                        .setMinInput(1.0f)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINED_IN)
         );
@@ -368,7 +368,7 @@ public class NamedEntityRecognitionTest {
         m.initOrNeuron(forenameCategory,
                 new Input() // In this example there is only one forename considered.
                         .setNeuron(jacksonForenameEntity)
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         .setRelativeRid(0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
@@ -376,17 +376,17 @@ public class NamedEntityRecognitionTest {
         m.initOrNeuron(surnameCategory,
                 new Input()
                         .setNeuron(cookSurnameEntity)
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         .setRelativeRid(0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
 
         m.initOrNeuron(suppressingN,
-                new Input().setNeuron(cookProfessionEntity).setWeight(10.0).setRangeMatch(EQUALS).setRangeOutput(true),
-                new Input().setNeuron(cookSurnameEntity).setWeight(10.0).setRangeMatch(EQUALS).setRangeOutput(true),
-                new Input().setNeuron(jacksonCityEntity).setWeight(10.0).setRangeMatch(EQUALS).setRangeOutput(true),
-                new Input().setNeuron(jacksonForenameEntity).setWeight(10.0).setRangeMatch(EQUALS).setRangeOutput(true)
+                new Input().setNeuron(cookProfessionEntity).setWeight(10.0f).setRangeMatch(EQUALS).setRangeOutput(true),
+                new Input().setNeuron(cookSurnameEntity).setWeight(10.0f).setRangeMatch(EQUALS).setRangeOutput(true),
+                new Input().setNeuron(jacksonCityEntity).setWeight(10.0f).setRangeMatch(EQUALS).setRangeOutput(true),
+                new Input().setNeuron(jacksonForenameEntity).setWeight(10.0f).setRangeMatch(EQUALS).setRangeOutput(true)
         );
 
 

@@ -99,13 +99,13 @@ public class Synapse implements Writable {
 
     public Key key;
 
-    public double w;
+    public float w;
 
     /*
     * Max expected sum of neuron input synapses with a weight smaller or equal than this synapse. Used to
     * determine which nodes need to be generated based on this synapse.
     */
-    public double maxLowerWeightsSum = Double.MAX_VALUE;
+    public float maxLowerWeightsSum = Float.MAX_VALUE;
 
 
     public Synapse() {}
@@ -150,7 +150,7 @@ public class Synapse implements Writable {
     }
 
 
-    public static int compareWeights(Double a, Double b, double tolerance) {
+    public static int compareWeights(Float a, Float b, double tolerance) {
         double aAbs = Math.abs(a);
         double bAbs = Math.abs(b);
         if(aAbs + tolerance < bAbs) return -1;
@@ -172,8 +172,8 @@ public class Synapse implements Writable {
 
         key.write(out);
 
-        out.writeDouble(w);
-        out.writeDouble(maxLowerWeightsSum);
+        out.writeFloat(w);
+        out.writeFloat(maxLowerWeightsSum);
     }
 
 
@@ -185,8 +185,8 @@ public class Synapse implements Writable {
 
         key = lookupKey(Key.read(in, m));
 
-        w = in.readDouble();
-        maxLowerWeightsSum = in.readDouble();
+        w = in.readFloat();
+        maxLowerWeightsSum = in.readFloat();
     }
 
 
@@ -251,9 +251,9 @@ public class Synapse implements Writable {
             out.writeBoolean(isNeg);
             out.writeBoolean(isRecurrent);
             out.writeBoolean(relativeRid != null);
-            if(relativeRid != null) out.writeInt(relativeRid);
+            if(relativeRid != null) out.writeByte(relativeRid);
             out.writeBoolean(absoluteRid != null);
-            if(absoluteRid != null) out.writeInt(absoluteRid);
+            if(absoluteRid != null) out.writeByte(absoluteRid);
             out.writeByte(startRangeMatch.getId());
             out.writeByte(endRangeMatch.getId());
             out.writeByte(startRangeMapping.getId());
@@ -267,8 +267,8 @@ public class Synapse implements Writable {
         public void readFields(DataInput in, Model m) throws IOException {
             isNeg = in.readBoolean();
             isRecurrent = in.readBoolean();
-            if(in.readBoolean()) relativeRid = in.readInt();
-            if(in.readBoolean()) absoluteRid = in.readInt();
+            if(in.readBoolean()) relativeRid = (int) in.readByte();
+            if(in.readBoolean()) absoluteRid = (int) in.readByte();
             startRangeMatch = Operator.getById(in.readByte());
             endRangeMatch = Operator.getById(in.readByte());
             startRangeMapping = Mapping.getById(in.readByte());

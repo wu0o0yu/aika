@@ -902,7 +902,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
         n.negRecSum = negRecSum;
         n.posRecSum = posRecSum;
 
-        double sum = 0.0;
+        float sum = 0.0f;
         for(Synapse s: inputs) {
             assert !s.key.startRangeOutput || s.key.startRangeMatch == Range.Operator.EQUALS || s.key.startRangeMatch == Range.Operator.FIRST;
             assert !s.key.endRangeOutput || s.key.endRangeMatch == Range.Operator.EQUALS || s.key.endRangeMatch == Range.Operator.FIRST;
@@ -910,7 +910,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
             s.output = n.provider;
             s.link(threadId);
 
-            if(s.maxLowerWeightsSum == Double.MAX_VALUE) {
+            if(s.maxLowerWeightsSum == Float.MAX_VALUE) {
                 s.maxLowerWeightsSum = sum;
             }
 

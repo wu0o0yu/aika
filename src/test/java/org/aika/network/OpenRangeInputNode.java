@@ -34,7 +34,7 @@ public class OpenRangeInputNode {
         m.initOrNeuron(new Neuron(m, "OUT"),
                 new Input()
                         .setNeuron(in)
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         .setStartRangeMapping(Mapping.NONE)
                         .setEndRangeMapping(END)
                         .setStartRangeMatch(Operator.NONE)

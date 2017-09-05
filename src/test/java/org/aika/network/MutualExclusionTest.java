@@ -73,15 +73,15 @@ public class MutualExclusionTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(10.5)
-                        .setMaxLowerWeightsSum(0.0)
+                        .setWeight(10.5f)
+                        .setMaxLowerWeightsSum(0.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.9),
+                        .setMinInput(0.9f),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0)
+                        .setWeight(-10.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0)     // This input is negated
+                        .setMinInput(1.0f)     // This input is negated
         );
 
         Neuron pB = m.initAndNeuron(
@@ -89,15 +89,15 @@ public class MutualExclusionTest {
                 0.001,
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(11.0)
-                        .setMaxLowerWeightsSum(0.0)
+                        .setWeight(11.0f)
+                        .setMaxLowerWeightsSum(0.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.9),
+                        .setMinInput(0.9f),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0)
+                        .setWeight(-10.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         );
 
         Neuron pC = m.initAndNeuron(
@@ -105,15 +105,15 @@ public class MutualExclusionTest {
                 0.001,
                 new Input()
                         .setNeuron(inC)
-                        .setWeight(10.0)
-                        .setMaxLowerWeightsSum(0.0)
+                        .setWeight(10.0f)
+                        .setMaxLowerWeightsSum(0.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.9),
+                        .setMinInput(0.9f),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0)
+                        .setWeight(-10.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         );
 
         // Finally addInput all the inputs to the suppressing neuron.
@@ -121,27 +121,27 @@ public class MutualExclusionTest {
                 pSuppr,
                 new Input()
                         .setNeuron(pA)
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0f),
                 new Input()
                         .setNeuron(pB)
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0f),
                 new Input()
                         .setNeuron(pC)
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         );
 
         Neuron outN = m.initOrNeuron(new Neuron(m, "OUT"),
                 new Input()
                         .setNeuron(pB)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         );
 
         // Now that the model is complete, apply it to a document.

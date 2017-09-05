@@ -43,15 +43,15 @@ public class SimpleWeightsTest {
                 new Input()
                         .setOptional(false)
                         .setNeuron(inA)
-                        .setWeight(0.3)
+                        .setWeight(0.3f)
                         .setRecurrent(false)
-                        .setMinInput(1.0),
+                        .setMinInput(1.0f),
                 new Input()
                         .setOptional(false)
                         .setNeuron(inB)
-                        .setWeight(0.4)
+                        .setWeight(0.4f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         );
 
         {
@@ -94,16 +94,16 @@ public class SimpleWeightsTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(3.0)
+                        .setWeight(3.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(3.0)
+                        .setWeight(3.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         );
 
         {

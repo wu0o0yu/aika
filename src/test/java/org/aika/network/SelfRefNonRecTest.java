@@ -43,19 +43,19 @@ public class SelfRefNonRecTest {
         Neuron cN = m.initOrNeuron(new Neuron(m, "C"),
                 new Input()
                         .setNeuron(bN)
-                        .setWeight(5.0)
-                        .setMaxLowerWeightsSum(0.0)
+                        .setWeight(5.0f)
+                        .setMaxLowerWeightsSum(0.0f)
         );
 
         m.initOrNeuron(bN,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(5.0)
-                        .setMaxLowerWeightsSum(0.0),
+                        .setWeight(5.0f)
+                        .setMaxLowerWeightsSum(0.0f),
                 new Input()
                         .setNeuron(cN)
-                        .setWeight(5.0)
-                        .setMaxLowerWeightsSum(0.0)
+                        .setWeight(5.0f)
+                        .setMaxLowerWeightsSum(0.0f)
         );
 
 

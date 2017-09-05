@@ -370,8 +370,8 @@ public class Model {
                             false
                     )
             );
-            iss.w = 20.0;
-            iss.maxLowerWeightsSum = 20.0;
+            iss.w = 20.0f;
+            iss.maxLowerWeightsSum = 20.0f;
             is.add(iss);
         }
 
@@ -391,8 +391,8 @@ public class Model {
                             true
                     )
             );
-            ctns.w = 20.0;
-            ctns.maxLowerWeightsSum = 20.0;
+            ctns.w = 20.0f;
+            ctns.maxLowerWeightsSum = 20.0f;
             is.add(ctns);
         }
 
@@ -433,8 +433,8 @@ public class Model {
                             true
                     )
             );
-            css.w = 20.0;
-            css.maxLowerWeightsSum = 8.0;
+            css.w = 20.0f;
+            css.maxLowerWeightsSum = 8.0f;
             is.add(css);
         }
 
@@ -454,8 +454,8 @@ public class Model {
                             false
                     )
             );
-            sss.w = 8.0;
-            sss.maxLowerWeightsSum = 0.0;
+            sss.w = 8.0f;
+            sss.maxLowerWeightsSum = 0.0f;
             is.add(sss);
         }
 
@@ -474,8 +474,8 @@ public class Model {
                         direction ? true : false
                 )
         );
-        lastCycle.w = 8.0;
-        lastCycle.maxLowerWeightsSum = 0.0;
+        lastCycle.w = 8.0f;
+        lastCycle.maxLowerWeightsSum = 0.0f;
         is.add(lastCycle);
 
         Synapse neg = new Synapse(
@@ -493,8 +493,8 @@ public class Model {
                         false
                 )
         );
-        neg.w = -20.0;
-        neg.maxLowerWeightsSum = 28.0;
+        neg.w = -20.0f;
+        neg.maxLowerWeightsSum = 28.0f;
         is.add(neg);
 
         return Neuron.init(this, defaultThreadId, n, bias, 0.0, negRecSum, 0.0, is);

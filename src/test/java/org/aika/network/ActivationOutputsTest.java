@@ -61,18 +61,18 @@ public class ActivationOutputsTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setStartRangeMatch(Operator.EQUALS)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
@@ -154,18 +154,18 @@ public class ActivationOutputsTest {
                 0.5,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(-1.0)
+                        .setWeight(-1.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setMinInput(1.0)
-                        .setMaxLowerWeightsSum(0.0),
+                        .setMinInput(1.0f)
+                        .setMaxLowerWeightsSum(0.0f),
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setMinInput(0.95)
-                        .setMaxLowerWeightsSum(0.0)
+                        .setMinInput(0.95f)
+                        .setMaxLowerWeightsSum(0.0f)
         );
         OrNode pABNode = pAB.node.get();
 
@@ -193,10 +193,10 @@ public class ActivationOutputsTest {
         OrNode outBNode = m.initAndNeuron(new Neuron(m, "B", true, false), 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         ).node.get();
 
 
@@ -218,10 +218,10 @@ public class ActivationOutputsTest {
         OrNode outBNode = m.initAndNeuron(new Neuron(m, "B", true, false), 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
         ).node.get();
 
 
@@ -243,10 +243,10 @@ public class ActivationOutputsTest {
         OrNode outBNode = (OrNode) m.initAndNeuron(new Neuron(m, "B", true, false), 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         ).node.get();

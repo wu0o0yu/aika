@@ -45,9 +45,9 @@ public class PropagateRidTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.5)
+                        .setMinInput(0.5f)
                         .setRelativeRid(5)
         );
 

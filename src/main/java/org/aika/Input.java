@@ -31,9 +31,9 @@ public class Input implements Comparable<Input> {
     boolean recurrent;
     boolean optional;
     Neuron neuron;
-    double weight;
-    double maxLowerWeightsSum = Double.MAX_VALUE;
-    double minInput;
+    float weight;
+    float maxLowerWeightsSum = Float.MAX_VALUE;
+    float minInput;
 
     Operator startRangeMatch = Operator.NONE;
     Operator endRangeMatch = Operator.NONE;
@@ -92,7 +92,7 @@ public class Input implements Comparable<Input> {
      * @param maxLowerWeightsSum
      * @return
      */
-    public Input setMaxLowerWeightsSum(double maxLowerWeightsSum) {
+    public Input setMaxLowerWeightsSum(float maxLowerWeightsSum) {
         this.maxLowerWeightsSum = maxLowerWeightsSum;
         return this;
     }
@@ -103,7 +103,7 @@ public class Input implements Comparable<Input> {
      * @param weight
      * @return
      */
-    public Input setWeight(Double weight) {
+    public Input setWeight(float weight) {
         this.weight = weight;
         return this;
     }
@@ -115,7 +115,7 @@ public class Input implements Comparable<Input> {
      * @param minInput
      * @return
      */
-    public Input setMinInput(double minInput) {
+    public Input setMinInput(float minInput) {
         this.minInput = minInput;
         return this;
     }

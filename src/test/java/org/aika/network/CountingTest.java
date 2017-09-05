@@ -44,8 +44,8 @@ public class CountingTest {
         Neuron inA = new Neuron(m, "inA");
         Neuron outA = m.initAndNeuron(new Neuron(m, "nA"), 0.5,
                 new Input()
-                        .setMinInput(0.95)
-                        .setWeight(100.0)
+                        .setMinInput(0.95f)
+                        .setWeight(100.0f)
                         .setNeuron(inA)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
