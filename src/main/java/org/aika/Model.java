@@ -131,6 +131,7 @@ public class Model {
 
         p = new Provider<>(this, id, null);
         providersInMemory.put(id, p);
+        providers.put(id, p);
         return p;
     }
 
