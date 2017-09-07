@@ -76,6 +76,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             Node pn = me.getValue().get();
 
             pn.addAndChild(ref, provider);
+            pn.provider.setModified();
 
             if(ref.rid != null) ridRequired = true;
         }
@@ -487,6 +488,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             Node pn = me.getValue().get();
             pn.lock.acquireWriteLock(threadId);
             pn.removeAndChild(me.getKey());
+            pn.provider.setModified();
             pn.lock.releaseWriteLock();
         }
     }

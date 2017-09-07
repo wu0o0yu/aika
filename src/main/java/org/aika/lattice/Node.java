@@ -267,7 +267,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             orChildren = new TreeSet<>();
         }
         orChildren.add(oe);
-        provider.setModified();
     }
 
 
@@ -275,7 +274,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         lock.acquireWriteLock(threadId);
         if(orChildren != null) {
             orChildren.remove(oe);
-            provider.setModified();
             if(orChildren.isEmpty()) {
                 orChildren = null;
             }
@@ -289,7 +287,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             andChildren = new TreeMap<>();
             reverseAndChildren = new TreeMap<>();
         }
-        provider.setModified();
 
         Provider<AndNode> n = andChildren.put(ref, child);
         if(n != null) {
@@ -304,7 +301,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if(andChildren != null) {
             Provider<AndNode> child = andChildren.remove(ref);
             reverseAndChildren.remove(new ReverseAndRefinement(child, ref.rid, 0));
-            provider.setModified();
 
             if(andChildren.isEmpty()) {
                 andChildren = null;
