@@ -2,6 +2,7 @@ package org.aika;
 
 
 import java.io.*;
+import java.lang.ref.WeakReference;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -67,8 +68,8 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
             throw new RuntimeException(e);
         }
 
-        synchronized (m.providersInMemory) {
-            m.providersInMemory.put(id, this);
+        synchronized (m.providers) {
+            m.providers.put(id, new WeakReference<>(this));
         }
     }
 
@@ -82,5 +83,10 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         if (id < n.id) return -1;
         else if (id > n.id) return 1;
         else return 0;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
     }
 }

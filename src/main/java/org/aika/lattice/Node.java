@@ -292,6 +292,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         modified = true;
 
         Provider<AndNode> n = andChildren.put(ref, child);
+        if(n != null) {
+            System.out.println();
+        }
         assert n == null;
         reverseAndChildren.put(new ReverseAndRefinement(child, ref.rid, 0), ref);
     }
@@ -594,6 +597,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         assert !isRemoved;
 
         lock.acquireWriteLock(threadId);
+        modified = true;
         while(andChildren != null && !andChildren.isEmpty()) {
             andChildren.pollFirstEntry().getValue().get().remove(m, threadId);
         }

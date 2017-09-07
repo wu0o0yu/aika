@@ -25,6 +25,8 @@ import org.aika.lattice.Node;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -51,8 +53,7 @@ public class Model {
 
     public AtomicInteger currentId = new AtomicInteger(0);
 
-    public Map<Integer, Provider<? extends AbstractNode>> providersInMemory = new TreeMap<>();
-    public Map<Integer, Provider<? extends AbstractNode>> providers = new WeakHashMap<>();
+    public Map<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new TreeMap<>();
 
     public Statistic stat = new Statistic();
 
@@ -92,8 +93,9 @@ public class Model {
         int id = suspensionHook != null ? suspensionHook.getNewId() : currentId.addAndGet(1);
         Provider<T> np = new Provider<T>(this, id, n);
         n.provider = np;
-        providersInMemory.put(id, np);
-        providers.put(id, np);
+        synchronized (providers) {
+            providers.put(id, new WeakReference<>(np));
+        }
         return np;
     }
 
@@ -120,19 +122,19 @@ public class Model {
 
 
     public <T extends AbstractNode> Provider<T> lookupProvider(int id) {
-        Provider p = providersInMemory.get(id);
-        if(p != null) {
-            return p;
-        }
-        p = providers.get(id);
-        if(p != null) {
-            return p;
-        }
+        synchronized (providers) {
+            WeakReference<Provider<? extends AbstractNode>> sp = providers.get(id);
+            if(sp != null) {
+                Provider p = sp.get();
+                if (p != null) {
+                    return p;
+                }
+            }
 
-        p = new Provider<>(this, id, null);
-        providersInMemory.put(id, p);
-        providers.put(id, p);
-        return p;
+            Provider p = new Provider(this, id, null);
+            providers.put(id, new WeakReference(p));
+            return p;
+        }
     }
 
 
@@ -141,10 +143,13 @@ public class Model {
      * @param docId
      */
     public void suspendUnusedNodes(int docId) {
-        synchronized (providersInMemory) {
-            for (Iterator<Provider<? extends AbstractNode>> it = providersInMemory.values().iterator(); it.hasNext(); ) {
-                Provider<? extends AbstractNode> p = it.next();
-                if (!p.isSuspended()) {
+        synchronized (providers) {
+            for (Iterator<WeakReference<Provider<? extends AbstractNode>>> it = providers.values().iterator(); it.hasNext(); ) {
+                WeakReference<Provider<? extends AbstractNode>> sp = it.next();
+                Provider<? extends AbstractNode> p = sp.get();
+                if(p == null) {
+                    it.remove();
+                } else if (!p.isSuspended()) {
                     if (p.get().lastUsedDocumentId <= docId) {
                         p.suspend();
                         it.remove();
@@ -172,9 +177,12 @@ public class Model {
 
     public void resetFrequency() {
         for(int t = 0; t < numberOfThreads; t++) {
-            for(Provider p: providersInMemory.values()) {
-                if (p.get() instanceof Node) {
-                    ((Node)p.get()).frequency = 0;
+            synchronized (providers) {
+                for (WeakReference<Provider<? extends AbstractNode>> sp : providers.values()) {
+                    Provider<? extends AbstractNode> p = sp.get();
+                    if (p != null && p.get() instanceof Node) {
+                        ((Node) p.get()).frequency = 0;
+                    }
                 }
             }
         }

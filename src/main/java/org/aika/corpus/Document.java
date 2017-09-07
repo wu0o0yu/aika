@@ -27,6 +27,7 @@ import org.aika.neuron.Neuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -256,13 +257,16 @@ public class Document implements Comparable<Document> {
         addedNodes.clear();
 
         if(m.lastCleanup[threadId] + CLEANUP_INTERVAL < id) {
-            for (Provider<? extends AbstractNode> np : m.providersInMemory.values()) {
-                AbstractNode an = np.get();
-                if(an instanceof Node) {
-                    Node n = (Node) an;
-                    Node.ThreadState th = n.threads[threadId];
-                    if (th != null && th.lastUsed + CLEANUP_INTERVAL < id) {
-                        n.threads[threadId] = null;
+            for (WeakReference<Provider<? extends AbstractNode>> wnp : m.providers.values()) {
+                Provider<? extends AbstractNode> np = wnp.get();
+                if(np != null) {
+                    AbstractNode an = np.get();
+                    if (an instanceof Node) {
+                        Node n = (Node) an;
+                        Node.ThreadState th = n.threads[threadId];
+                        if (th != null && th.lastUsed + CLEANUP_INTERVAL < id) {
+                            n.threads[threadId] = null;
+                        }
                     }
                 }
             }
