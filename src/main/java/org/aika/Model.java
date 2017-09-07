@@ -25,7 +25,6 @@ import org.aika.lattice.Node;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 
-import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * The second layer is a pattern lattice containing a boolean logic representation of all the neurons. Whenever the
  * synapse weights of a neuron are adjusted, then the underlying boolean logic representation of this neuron will be
  * updated too.
- *
+ * <p>
  * <p>The model supports parallel processing using a fixed number of threads.
  *
  * @author Lukas Molzberger
@@ -53,7 +52,7 @@ public class Model {
 
     public AtomicInteger currentId = new AtomicInteger(0);
 
-    public Map<Integer, Provider<? extends AbstractNode>> modifiedProviders = new TreeMap<>();
+    public Map<Integer, Provider<? extends AbstractNode>> referencedProviders = new TreeMap<>();
     public Map<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new TreeMap<>();
 
     public Statistic stat = new Statistic();
@@ -64,7 +63,7 @@ public class Model {
         @Override
         public int compare(Provider<AndNode> n1, Provider<AndNode> n2) {
             int r = Integer.compare(n1.get().numberOfPositionsNotify, n2.get().numberOfPositionsNotify);
-            if(r != 0) return r;
+            if (r != 0) return r;
             return n1.compareTo(n2);
         }
     }));
@@ -109,10 +108,10 @@ public class Model {
     public Document createDocument(String txt, int threadId) {
         Document doc = new Document(txt, this, threadId);
 
-        if(txt != null) {
+        if (txt != null) {
             doc.changeNumberOfPositions(doc.length());
 
-            if(docs[threadId] != null) {
+            if (docs[threadId] != null) {
                 throw new RuntimeException("Two documents are using the same thread. Call clearActivations() first, before processing the next document.");
             }
             docs[threadId] = doc;
@@ -125,15 +124,17 @@ public class Model {
     public <T extends AbstractNode> Provider<T> lookupProvider(int id) {
         synchronized (providers) {
             WeakReference<Provider<? extends AbstractNode>> sp = providers.get(id);
-            if(sp != null) {
+            if (sp != null) {
                 Provider p = sp.get();
                 if (p != null) {
+                    referencedProviders.put(id, p);
                     return p;
                 }
             }
 
             Provider p = new Provider(this, id, null);
             providers.put(id, new WeakReference(p));
+            referencedProviders.put(id, p);
             return p;
         }
     }
@@ -141,14 +142,15 @@ public class Model {
 
     /**
      * Suspend all neurons and logic nodes whose last used document id is lower/older than {@param docId}.
+     *
      * @param docId
      */
     public void suspendUnusedNodes(int docId) {
         synchronized (providers) {
-            for(Iterator<Provider<? extends AbstractNode>> it = modifiedProviders.values().iterator(); it.hasNext(); ) {
+            for (Iterator<Provider<? extends AbstractNode>> it = referencedProviders.values().iterator(); it.hasNext(); ) {
                 Provider<? extends AbstractNode> p = it.next();
 
-                if(suspend(docId, p)) {
+                if (suspend(docId, p)) {
                     it.remove();
                 }
             }
@@ -156,7 +158,7 @@ public class Model {
             for (Iterator<WeakReference<Provider<? extends AbstractNode>>> it = providers.values().iterator(); it.hasNext(); ) {
                 WeakReference<Provider<? extends AbstractNode>> sp = it.next();
                 Provider<? extends AbstractNode> p = sp.get();
-                if(p == null) {
+                if (p == null) {
                     it.remove();
                 } else {
                     suspend(docId, p);
@@ -167,11 +169,9 @@ public class Model {
 
 
     private boolean suspend(int docId, Provider<? extends AbstractNode> p) {
-        if (!p.isSuspended()) {
-            if (p.get().lastUsedDocumentId <= docId) {
-                p.suspend();
-                return true;
-            }
+        if (!p.isSuspended() && p.get().lastUsedDocumentId <= docId) {
+            p.suspend();
+            return true;
         }
         return false;
     }
@@ -193,7 +193,7 @@ public class Model {
 
 
     public void resetFrequency() {
-        for(int t = 0; t < numberOfThreads; t++) {
+        for (int t = 0; t < numberOfThreads; t++) {
             synchronized (providers) {
                 for (WeakReference<Provider<? extends AbstractNode>> sp : providers.values()) {
                     Provider<? extends AbstractNode> p = sp.get();
@@ -253,24 +253,24 @@ public class Model {
         double negRecSum = 0.0;
         double posRecSum = 0.0;
         double minWeight = Double.MAX_VALUE;
-        for(Input ni: inputs) {
+        for (Input ni : inputs) {
             Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startMapping, ni.startRangeOutput, ni.endRangeMatch, ni.endMapping, ni.endRangeOutput));
             s.w = ni.weight;
             s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
 
-            if(ni.weight < 0.0) {
-                if(!ni.recurrent) {
+            if (ni.weight < 0.0) {
+                if (!ni.recurrent) {
                     negDirSum += ni.weight;
                 } else {
                     negRecSum += ni.weight;
                 }
-            } else if(ni.recurrent) {
+            } else if (ni.recurrent) {
                 posRecSum += ni.weight;
             }
 
-            if(!ni.optional) {
+            if (!ni.optional) {
                 bias -= Math.abs(ni.weight) * (ni.weight >= 0.0 ? ni.minInput : 1.0);
-                if(ni.weight >= 0.0) {
+                if (ni.weight >= 0.0) {
                     minWeight = Math.min(minWeight, ni.weight * ni.minInput);
                 }
             }
@@ -302,13 +302,13 @@ public class Model {
         s.w = input.weight;
         s.maxLowerWeightsSum = input.maxLowerWeightsSum;
 
-        if(input.weight < 0.0) {
-            if(!input.recurrent) {
+        if (input.weight < 0.0) {
+            if (!input.recurrent) {
                 negDirSumDelta += input.weight;
             } else {
                 negRecSumDelta += input.weight;
             }
-        } else if(input.recurrent) {
+        } else if (input.recurrent) {
             posRecSumDelta += input.weight;
         }
         Neuron.addSynapse(this, defaultThreadId, n, biasDelta, negDirSumDelta, negRecSumDelta, posRecSumDelta, s);
@@ -342,18 +342,18 @@ public class Model {
         double negDirSum = 0.0;
         double negRecSum = 0.0;
         double posRecSum = 0.0;
-        for(Input ni: inputs) {
+        for (Input ni : inputs) {
             Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startMapping, ni.startRangeOutput, ni.endRangeMatch, ni.endMapping, ni.endRangeOutput));
             s.w = ni.weight;
             s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
 
-            if(ni.weight < 0.0) {
-                if(!ni.recurrent) {
+            if (ni.weight < 0.0) {
+                if (!ni.recurrent) {
                     negDirSum += ni.weight;
                 } else {
                     negRecSum += ni.weight;
                 }
-            } else if(ni.recurrent) {
+            } else if (ni.recurrent) {
                 posRecSum += ni.weight;
             }
 
@@ -389,7 +389,7 @@ public class Model {
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         double bias = -0.001;
-        for(Input ni: inputs) {
+        for (Input ni : inputs) {
             Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startMapping, ni.startRangeOutput, ni.endRangeMatch, ni.endMapping, ni.endRangeOutput));
             s.w = ni.weight;
             s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
@@ -413,7 +413,7 @@ public class Model {
         double bias = -30.0;
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
-        if(inputSignal != null) {
+        if (inputSignal != null) {
             Synapse iss = new Synapse(
                     inputSignal,
                     new Synapse.Key(
@@ -434,7 +434,7 @@ public class Model {
             is.add(iss);
         }
 
-        if(ctn != null) {
+        if (ctn != null) {
             Synapse ctns = new Synapse(
                     ctn,
                     new Synapse.Key(
@@ -465,9 +465,9 @@ public class Model {
      *
      * @param n
      * @param clockSignal
-     * @param dirCS  The direction of the clock signal.
+     * @param dirCS       The direction of the clock signal.
      * @param startSignal
-     * @param dirSS  The direction of the start signal.
+     * @param dirSS       The direction of the start signal.
      * @param direction
      * @return
      */
@@ -476,7 +476,7 @@ public class Model {
         double negRecSum = -20.0;
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
-        if(clockSignal != null) {
+        if (clockSignal != null) {
             Synapse css = new Synapse(
                     clockSignal,
                     new Synapse.Key(
@@ -497,7 +497,7 @@ public class Model {
             is.add(css);
         }
 
-        if(startSignal != null) {
+        if (startSignal != null) {
             Synapse sss = new Synapse(
                     startSignal,
                     new Synapse.Key(

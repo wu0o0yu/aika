@@ -92,8 +92,8 @@ public class Synapse implements Writable {
         }
     };
 
-    public Provider<? extends Neuron> input;
-    public Provider<? extends Neuron> output;
+    public Provider<Neuron> input;
+    public Provider<Neuron> output;
 
     public Provider<InputNode> inputNode;
 

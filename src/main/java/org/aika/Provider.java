@@ -24,7 +24,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
     public void setModified() {
         n.modified = true;
-        m.modifiedProviders.put(id, this);
+        m.referencedProviders.put(id, this);
     }
 
 
@@ -89,10 +89,5 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         if (id < n.id) return -1;
         else if (id > n.id) return 1;
         else return 0;
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
     }
 }

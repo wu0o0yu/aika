@@ -604,12 +604,15 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
         TreeMap<Synapse, Synapse> syns = (dir == 0 ? inputSynapses : outputSynapses);
 
         for (Synapse s : getActiveSynapses(doc, dir, syns)) {
-            Neuron an =  (dir == 0 ? s.input : s.output).get();
-            OrNode n = an.node.get();
-            ThreadState th = n.getThreadState(doc.threadId, false);
-            if(th == null || th.activations.isEmpty()) continue;
+            Provider<Neuron> p = (dir == 0 ? s.input : s.output);
+            if(!p.isSuspended()) {
+                Neuron an = p.get();
+                OrNode n = an.node.get();
+                ThreadState th = n.getThreadState(doc.threadId, false);
+                if (th == null || th.activations.isEmpty()) continue;
 
-            linkActSyn(n, doc, act, dir, recNegTmp, s);
+                linkActSyn(n, doc, act, dir, recNegTmp, s);
+            }
         }
 
         for(Activation rAct: recNegTmp) {
