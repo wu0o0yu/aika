@@ -282,6 +282,39 @@ public class Model {
     }
 
 
+    public void addSynapse(Neuron n, double biasDelta, Input input) {
+        double negDirSumDelta = 0.0;
+        double negRecSumDelta = 0.0;
+        double posRecSumDelta = 0.0;
+
+        Synapse s = new Synapse(input.neuron, new Synapse.Key(
+                input.weight < 0.0,
+                input.recurrent,
+                input.relativeRid,
+                input.absoluteRid,
+                input.startRangeMatch,
+                input.startMapping,
+                input.startRangeOutput,
+                input.endRangeMatch,
+                input.endMapping,
+                input.endRangeOutput)
+        );
+        s.w = input.weight;
+        s.maxLowerWeightsSum = input.maxLowerWeightsSum;
+
+        if(input.weight < 0.0) {
+            if(!input.recurrent) {
+                negDirSumDelta += input.weight;
+            } else {
+                negRecSumDelta += input.weight;
+            }
+        } else if(input.recurrent) {
+            posRecSumDelta += input.weight;
+        }
+        Neuron.addSynapse(this, defaultThreadId, n, biasDelta, negDirSumDelta, negRecSumDelta, posRecSumDelta, s);
+    }
+
+
     /**
      * Creates a neuron with the given bias.
      *
