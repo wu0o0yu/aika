@@ -274,7 +274,10 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         lock.acquireReadLock();
         if(andChildren != null) {
             for (Map.Entry<Refinement, Provider<AndNode>> me : andChildren.entrySet()) {
-                addNextLevelActivations(doc, me.getKey().input.get(), me.getKey(), me.getValue(), act, removedConflict);
+                Provider<InputNode> refInput = me.getKey().input;
+                if(!refInput.isSuspended()) {
+                    addNextLevelActivations(doc, refInput.get(), me.getKey(), me.getValue(), act, removedConflict);
+                }
             }
         }
         lock.releaseReadLock();
@@ -286,12 +289,12 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, Provider<AndNode> pnlp, NodeActivation act, InterprNode removedConflict) {
+        ThreadState th = secondNode.getThreadState(doc.threadId, false);
+        if(th == null || th.activations.isEmpty()) return;
+
         NodeActivation.Key ak = act.key;
         InputNode firstNode = ((InputNode) ak.n);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
-
-        ThreadState th = secondNode.getThreadState(doc.threadId, false);
-        if(th == null || th.activations.isEmpty()) return;
 
         Stream<NodeActivation<InputNode>> s = NodeActivation.select(
                 th,
