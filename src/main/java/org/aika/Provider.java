@@ -22,6 +22,12 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     }
 
 
+    public void setModified() {
+        n.modified = true;
+        m.modifiedProviders.put(id, this);
+    }
+
+
     public synchronized boolean isSuspended() {
         return n == null;
     }

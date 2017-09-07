@@ -53,6 +53,7 @@ public class Model {
 
     public AtomicInteger currentId = new AtomicInteger(0);
 
+    public Map<Integer, Provider<? extends AbstractNode>> modifiedProviders = new TreeMap<>();
     public Map<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new TreeMap<>();
 
     public Statistic stat = new Statistic();
@@ -144,19 +145,35 @@ public class Model {
      */
     public void suspendUnusedNodes(int docId) {
         synchronized (providers) {
+            for(Iterator<Provider<? extends AbstractNode>> it = modifiedProviders.values().iterator(); it.hasNext(); ) {
+                Provider<? extends AbstractNode> p = it.next();
+
+                if(suspend(docId, p)) {
+                    it.remove();
+                }
+            }
+
             for (Iterator<WeakReference<Provider<? extends AbstractNode>>> it = providers.values().iterator(); it.hasNext(); ) {
                 WeakReference<Provider<? extends AbstractNode>> sp = it.next();
                 Provider<? extends AbstractNode> p = sp.get();
                 if(p == null) {
                     it.remove();
-                } else if (!p.isSuspended()) {
-                    if (p.get().lastUsedDocumentId <= docId) {
-                        p.suspend();
-                        it.remove();
-                    }
+                } else {
+                    suspend(docId, p);
                 }
             }
         }
+    }
+
+
+    private boolean suspend(int docId, Provider<? extends AbstractNode> p) {
+        if (!p.isSuspended()) {
+            if (p.get().lastUsedDocumentId <= docId) {
+                p.suspend();
+                return true;
+            }
+        }
+        return false;
     }
 
 

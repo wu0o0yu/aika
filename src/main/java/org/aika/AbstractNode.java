@@ -30,7 +30,7 @@ public abstract class AbstractNode<T extends AbstractNode> implements Writable {
 
     public volatile int lastUsedDocumentId = 0;
 
-    public volatile boolean modified;
+    volatile boolean modified;
 
     public Provider<T> provider;
 
@@ -43,4 +43,5 @@ public abstract class AbstractNode<T extends AbstractNode> implements Writable {
         }
         return n;
     }
+
 }

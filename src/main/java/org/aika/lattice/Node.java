@@ -219,7 +219,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if(m != null) {
             nOffset = m.numberOfPositions;
         }
-        modified = true;
+        provider.setModified();
     }
 
 
@@ -267,7 +267,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             orChildren = new TreeSet<>();
         }
         orChildren.add(oe);
-        modified = true;
+        provider.setModified();
     }
 
 
@@ -275,7 +275,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         lock.acquireWriteLock(threadId);
         if(orChildren != null) {
             orChildren.remove(oe);
-            modified = true;
+            provider.setModified();
             if(orChildren.isEmpty()) {
                 orChildren = null;
             }
@@ -289,7 +289,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             andChildren = new TreeMap<>();
             reverseAndChildren = new TreeMap<>();
         }
-        modified = true;
+        provider.setModified();
 
         Provider<AndNode> n = andChildren.put(ref, child);
         if(n != null) {
@@ -304,7 +304,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if(andChildren != null) {
             Provider<AndNode> child = andChildren.remove(ref);
             reverseAndChildren.remove(new ReverseAndRefinement(child, ref.rid, 0));
-            modified = true;
+            provider.setModified();
 
             if(andChildren.isEmpty()) {
                 andChildren = null;
@@ -587,7 +587,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         if(orChildren != null) {
             for (OrEntry oe : orChildren) {
-                ((OrNode) oe.node.get()).removeActivation(doc, oe.ridOffset, iAct);
+                oe.node.get().removeActivation(doc, oe.ridOffset, iAct);
             }
         }
     }
@@ -597,7 +597,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         assert !isRemoved;
 
         lock.acquireWriteLock(threadId);
-        modified = true;
+        provider.setModified();
         while(andChildren != null && !andChildren.isEmpty()) {
             andChildren.pollFirstEntry().getValue().get().remove(m, threadId);
         }
@@ -667,7 +667,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
             if (s.inputNode == null) {
                 InputNode iNode = InputNode.add(m, s.key.createInputNodeKey(), s.input.get());
-                iNode.modified = true;
+                iNode.provider.setModified();
                 iNode.isBlocked = in.isBlocked;
                 iNode.setSynapse(threadId, new SynapseKey(s.key.relativeRid, neuron.provider), s);
                 s.inputNode = iNode.provider;
