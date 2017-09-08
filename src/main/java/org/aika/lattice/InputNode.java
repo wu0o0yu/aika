@@ -49,7 +49,7 @@ import static org.aika.corpus.Range.Operator.*;
 public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     public Key key;
-    public Provider<? extends Neuron> inputNeuron;
+    public Provider<Neuron> inputNeuron;
 
     // Key: Output Neuron
     Map<SynapseKey, Synapse> synapses;
@@ -499,13 +499,13 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     public static class SynapseKey implements Writable, Comparable<SynapseKey> {
         Integer rid;
-        Provider<? extends Neuron> n;
+        Provider<Neuron> n;
 
         private SynapseKey() {
         }
 
 
-        public SynapseKey(Integer rid, Provider<? extends Neuron> n) {
+        public SynapseKey(Integer rid, Provider<Neuron> n) {
             this.rid = rid;
             this.n = n;
         }

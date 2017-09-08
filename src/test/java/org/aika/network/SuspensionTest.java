@@ -91,7 +91,7 @@ public class SuspensionTest {
         );
 
 
-        Provider<? extends Neuron> outD = m.initAndNeuron(new Neuron(m, "D"), 0.5,
+        Provider<Neuron> outD = m.initAndNeuron(new Neuron(m, "D"), 0.5,
                 new Input()
                         .setNeuron(nC)
                         .setWeight(10.0f)

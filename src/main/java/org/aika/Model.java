@@ -209,7 +209,7 @@ public class Model {
 
     public String networkWeightsToString(boolean all) {
         StringBuilder sb = new StringBuilder();
-/*        for(Provider<? extends Neuron> pn: neurons.values()) {
+/*        for(Provider<Neuron> pn: neurons.values()) {
             Neuron n = pn.get();
             if(all || n.node.get().frequency > 0) {
                 sb.append(n.toStringWithSynapses());
