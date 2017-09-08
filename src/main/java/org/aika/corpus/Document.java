@@ -308,7 +308,7 @@ public class Document implements Comparable<Document> {
             sb.append(act.key.o);
             sb.append(" - ");
 
-            sb.append(withLogic ? act.key.n.toString() : act.key.n.toSimpleString());
+            sb.append(withLogic ? act.key.n.toString() : act.key.n.getNeuronLabel());
             sb.append(" - Rid:");
             sb.append(act.key.rid);
             sb.append(" - UB:");
