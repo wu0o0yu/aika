@@ -845,7 +845,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    protected String getNeuronLabel() {
+    public String getNeuronLabel() {
         return "";
     }
 
