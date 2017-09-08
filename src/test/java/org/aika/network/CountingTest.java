@@ -67,6 +67,6 @@ public class CountingTest {
 
         doc.process();
         doc.train();
-        Assert.assertEquals(6.0, ((OrNode)outA.node.get()).parents.get(Integer.MIN_VALUE).first().frequency, 0.001);
+        Assert.assertEquals(6.0, ((OrNode)outA.node.get()).parents.get(Integer.MIN_VALUE).first().get().frequency, 0.001);
     }
 }
