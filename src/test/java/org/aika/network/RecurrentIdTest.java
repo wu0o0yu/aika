@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Input.RangeRelation;
@@ -46,11 +47,11 @@ public class RecurrentIdTest {
     public void testABPattern() {
         Model m = new Model();
 
-        Neuron inA = new Neuron(m, "A");
-        Neuron inB = new Neuron(m, "B");
+        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<Neuron> inB = m.createNeuron("B");
 
 
-        OrNode outCNode = m.initAndNeuron(new Neuron(m, "C", true, true),
+        OrNode outCNode = m.initAndNeuron(m.createNeuron("C", true, true),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -68,13 +69,13 @@ public class RecurrentIdTest {
                         .setRelativeRid(1)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
-        ).node.get();
+        ).get().node.get();
 
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inA.addInput(doc, 0, 1, 20);
-        inB.addInput(doc, 0, 1, 21);
+        inA.get().addInput(doc, 0, 1, 20);
+        inB.get().addInput(doc, 0, 1, 21);
 
         Activation outC1 = NodeActivation.get(doc, outCNode, 20, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
 
@@ -88,11 +89,11 @@ public class RecurrentIdTest {
     public void testABCPattern() {
         Model m = new Model();
 
-        Neuron inA = new Neuron(m, "A");
-        Neuron inB = new Neuron(m, "B");
-        Neuron inC = new Neuron(m, "C");
+        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<Neuron> inB = m.createNeuron("B");
+        Provider<Neuron> inC = m.createNeuron("C");
 
-        OrNode outDNode = m.initAndNeuron(new Neuron(m, "D", true, true),
+        OrNode outDNode = m.initAndNeuron(m.createNeuron("D", true, true),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -118,13 +119,13 @@ public class RecurrentIdTest {
                         .setRelativeRid(6)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
-        ).node.get();
+        ).get().node.get();
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inA.addInput(doc, 0, 1, 13);
-        inB.addInput(doc, 0, 1, 10);
-        inC.addInput(doc, 0, 1, 16);
+        inA.get().addInput(doc, 0, 1, 13);
+        inB.get().addInput(doc, 0, 1, 10);
+        inC.get().addInput(doc, 0, 1, 16);
 
         Activation outD1 = NodeActivation.get(doc, outDNode, 10, new Range(0, 1), EQUALS, EQUALS, null, null);
 
@@ -136,9 +137,9 @@ public class RecurrentIdTest {
     public void testHuettenheim() {
         Model m = new Model();
 
-        HashMap<Character, Neuron> chars = new HashMap<>();
+        HashMap<Character, Provider<Neuron>> chars = new HashMap<>();
         for (char c = 'a'; c <= 'z'; c++) {
-            Neuron rec = new Neuron(m, "IN-" + c);
+            Provider<Neuron> rec = m.createNeuron("IN-" + c);
             chars.put(c, rec);
         }
 
@@ -149,7 +150,7 @@ public class RecurrentIdTest {
             for (int i = 0; i < word.length(); i++) {
                 char c = word.toLowerCase().charAt(i);
 
-                Neuron rec = chars.get(c);
+                Provider<Neuron> rec = chars.get(c);
                 if (rec != null) {
                     boolean begin = i == 0;
                     boolean end = i + 1 == word.length();
@@ -168,24 +169,24 @@ public class RecurrentIdTest {
                 }
             }
 
-            Neuron n = m.initAndNeuron(new Neuron(m, "PATTERN"), 0.5, inputs);
+            Provider<Neuron> n = m.initAndNeuron(m.createNeuron("PATTERN"), 0.5, inputs);
 
-            System.out.println(n.node.get().logicToString());
+            System.out.println(n.get().node.get().logicToString());
 
             Document doc = m.createDocument("abc Hüttenheim cba", 0);
 
             for (int i = 0; i < doc.length(); i++) {
                 char c = doc.getContent().toLowerCase().charAt(i);
 
-                Neuron rec = chars.get(c);
+                Provider<Neuron> rec = chars.get(c);
                 if (rec != null) {
                     Range r = new Range(i, doc.length());
 
-                    rec.addInput(doc, r.begin, r.end, i, doc.bottom);
+                    rec.get().addInput(doc, r.begin, r.end, i, doc.bottom);
                 }
             }
 
-            assert n.node.get().getActivations(doc).size() >= 1;
+            assert n.get().node.get().getActivations(doc).size() >= 1;
         }
     }
 }

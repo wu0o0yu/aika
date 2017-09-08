@@ -45,7 +45,7 @@ public class SuspensionTest {
         Model m = new Model();
         m.suspensionHook = new DummySuspensionHook();
 
-        Provider<Neuron> n = new Neuron(m, "A").provider;
+        Provider<Neuron> n = m.createNeuron("A");
         n.get().node.suspend();
         n.suspend();
 
@@ -65,15 +65,15 @@ public class SuspensionTest {
         Model m = new Model();
         m.suspensionHook = new DummySuspensionHook();
 
-        Provider<Neuron> inA = new Neuron(m, "A").provider;
-        Provider<Neuron> inB = new Neuron(m, "B").provider;
+        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<Neuron> inB = m.createNeuron("B");
 
         int idA = inA.id;
         int idB = inB.id;
 
-        Neuron nC = m.initAndNeuron(new Neuron(m, "C"), 0.5,
+        Provider<Neuron> nC = m.initAndNeuron(m.createNeuron("C"), 0.5,
                 new Input()
-                        .setNeuron(inA.get())
+                        .setNeuron(inA)
                         .setWeight(10.0f)
                         .setMinInput(0.9f)
                         .setRelativeRid(0)
@@ -81,7 +81,7 @@ public class SuspensionTest {
                         .setStartRangeMatch(EQUALS)
                         .setStartRangeOutput(true),
                 new Input()
-                        .setNeuron(inB.get())
+                        .setNeuron(inB)
                         .setWeight(10.0f)
                         .setMinInput(0.9f)
                         .setRelativeRid(null)
@@ -91,7 +91,7 @@ public class SuspensionTest {
         );
 
 
-        Provider<Neuron> outD = m.initAndNeuron(new Neuron(m, "D"), 0.5,
+        Provider<Neuron> outD = m.initAndNeuron(m.createNeuron("D"), 0.5,
                 new Input()
                         .setNeuron(nC)
                         .setWeight(10.0f)
@@ -99,7 +99,7 @@ public class SuspensionTest {
                         .setRecurrent(false)
                         .setRangeMatch(Input.RangeRelation.EQUALS)
                         .setRangeOutput(true)
-        ).provider;
+        );
 
         m.suspendAll();
 

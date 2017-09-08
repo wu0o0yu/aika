@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Input.RangeRelation;
@@ -41,11 +42,11 @@ public class SimplePatternMatchingTest {
     public void testPatternMatching() {
         Model m = new Model();
 
-        Map<Character, Neuron> inputNeurons = new HashMap<>();
+        Map<Character, Provider<Neuron>> inputNeurons = new HashMap<>();
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            Neuron in = new Neuron(m, c + "");
+            Provider<Neuron> in = m.createNeuron(c + "");
 
             inputNeurons.put(c, in);
         }
@@ -54,8 +55,8 @@ public class SimplePatternMatchingTest {
         // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
         // of the inputs relative to each other. The following flag specifies whether this relativeRid
         // is relative or absolute.
-        Neuron pattern = m.initAndNeuron(
-                new Neuron(m, "BCD"),
+        Provider<Neuron> pattern = m.initAndNeuron(
+                m.createNeuron("BCD"),
                 0.4,
                 new Input()
                         .setNeuron(inputNeurons.get('b'))
@@ -93,7 +94,7 @@ public class SimplePatternMatchingTest {
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).addInput(doc, i, i + 1, wordPos);
+                inputNeurons.get(c).get().addInput(doc, i, i + 1, wordPos);
             } else {
                 wordPos++;
             }
@@ -102,11 +103,11 @@ public class SimplePatternMatchingTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.node.get().getThreadState(doc.threadId, true).activations.size());
+        Assert.assertEquals(1, pattern.get().node.get().getThreadState(doc.threadId, true).activations.size());
 
 
         System.out.println("Output activation:");
-        OrNode n = pattern.node.get();
+        OrNode n = pattern.get().node.get();
         for(NodeActivation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);
@@ -131,15 +132,15 @@ public class SimplePatternMatchingTest {
         Model m = new Model();
 
 
-        Map<Character, Neuron> inputNeurons = new HashMap<>();
-        Map<Character, Neuron> relNeurons = new HashMap<>();
+        Map<Character, Provider<Neuron>> inputNeurons = new HashMap<>();
+        Map<Character, Provider<Neuron>> relNeurons = new HashMap<>();
 
         // The space neuron will be used as clock signal for the recurrent neurons.
-        Neuron inSpace = new Neuron(m, "SPACE");
+        Provider<Neuron> inSpace = m.createNeuron("SPACE");
 
-        Neuron startSignal = new Neuron(m, "START-SIGNAL");
+        Provider<Neuron> startSignal = m.createNeuron("START-SIGNAL");
 
-        Neuron ctNeuron = m.initCounterNeuron(new Neuron(m, "CTN"),
+        Provider<Neuron> ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"),
                 inSpace, false,
                 startSignal, true,
                 false
@@ -147,9 +148,9 @@ public class SimplePatternMatchingTest {
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            Neuron in = new Neuron(m, c + "");
-            Neuron rn = m.initRelationalNeuron(
-                    new Neuron(m, c + "-RN"),
+            Provider<Neuron> in = m.createNeuron(c + "");
+            Provider<Neuron> rn = m.initRelationalNeuron(
+                    m.createNeuron(c + "-RN"),
                     ctNeuron,
                     in, false
             );
@@ -162,8 +163,8 @@ public class SimplePatternMatchingTest {
         // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
         // of the inputs relative to each other. The following flag specifies whether this relativeRid
         // is relative or absolute.
-        Neuron pattern = m.initAndNeuron(
-                new Neuron(m, "BCD"),
+        Provider<Neuron> pattern = m.initAndNeuron(
+                m.createNeuron("BCD"),
                 0.4,
                 new Input()
                         .setNeuron(relNeurons.get('b'))
@@ -196,13 +197,13 @@ public class SimplePatternMatchingTest {
         // Create a simple text document.
         Document doc = m.createDocument("a b c d e ", 0);
 
-        startSignal.addInput(doc, 0, 1, 0);  // iteration, begin, end, relational id
+        startSignal.get().addInput(doc, 0, 1, 0);  // iteration, begin, end, relational id
 
         // First add the space seperators
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
-                inSpace.addInput(doc, i, i + 1);
+                inSpace.get().addInput(doc, i, i + 1);
             }
         }
 
@@ -210,18 +211,18 @@ public class SimplePatternMatchingTest {
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).addInput(doc, i, i + 1);
+                inputNeurons.get(c).get().addInput(doc, i, i + 1);
             }
         }
 
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.node.get().getThreadState(doc.threadId, true).activations.size());
+        Assert.assertEquals(1, pattern.get().node.get().getThreadState(doc.threadId, true).activations.size());
 
 
         System.out.println("Output activation:");
-        OrNode n = pattern.node.get();
+        OrNode n = pattern.get().node.get();
         for(NodeActivation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.r);
             System.out.println("Option: " + act.key.o);

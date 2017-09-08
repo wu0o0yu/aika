@@ -1,6 +1,7 @@
 package org.aika.network;
 
 
+import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Model;
@@ -23,15 +24,15 @@ import static org.aika.corpus.Range.Mapping.END;
 public class OpenRangeInputNode {
 
     Model m;
-    Neuron in;
+    Provider<Neuron> in;
     InputNode inputNode;
 
     @Before
     public void init() {
         m = new Model();
 
-        in = new Neuron(m, "IN");
-        m.initOrNeuron(new Neuron(m, "OUT"),
+        in = m.createNeuron("IN");
+        m.initOrNeuron(m.createNeuron("OUT"),
                 new Input()
                         .setNeuron(in)
                         .setWeight(10.0f)
@@ -42,7 +43,7 @@ public class OpenRangeInputNode {
                         .setEndRangeOutput(true)
         );
 
-        inputNode = in.outputNodes.firstEntry().getValue().get();
+        inputNode = in.get().outputNodes.firstEntry().getValue().get();
     }
 
 
@@ -50,9 +51,9 @@ public class OpenRangeInputNode {
     public void testOpenRangeInputNode1() {
         Document doc = m.createDocument("                                ");
 
-        in.addInput(doc, 3, 4);
-        in.addInput(doc, 6, 7);
-        in.addInput(doc, 10, 11);
+        in.get().addInput(doc, 3, 4);
+        in.get().addInput(doc, 6, 7);
+        in.get().addInput(doc, 10, 11);
 
         System.out.println(doc.nodeActivationsToString(false, true));
 
@@ -67,9 +68,9 @@ public class OpenRangeInputNode {
     public void testOpenRangeInputNode2() {
         Document doc = m.createDocument("                                ");
 
-        in.addInput(doc, 3, 4);
-        in.addInput(doc, 10, 11);
-        in.addInput(doc, 6, 7);
+        in.get().addInput(doc, 3, 4);
+        in.get().addInput(doc, 10, 11);
+        in.get().addInput(doc, 6, 7);
 
         System.out.println(doc.nodeActivationsToString(false, true));
 
@@ -90,9 +91,9 @@ public class OpenRangeInputNode {
         InterprNode o01 = InterprNode.add(doc, false, o0, o1);
         InterprNode o012 = InterprNode.add(doc, false, o01, o2);
 
-        in.addInput(doc, 9, 10, o012);
-        in.addInput(doc, 24, 25, o01);
-        in.addInput(doc, 4, 5, o0);
+        in.get().addInput(doc, 9, 10, o012);
+        in.get().addInput(doc, 24, 25, o01);
+        in.get().addInput(doc, 4, 5, o0);
 
         System.out.println(doc.nodeActivationsToString(false, true));
     }

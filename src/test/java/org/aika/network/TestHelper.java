@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
@@ -49,13 +50,13 @@ public class TestHelper {
     }
 
 
-    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid) {
+    public static InputNode addOutputNode(Document doc, Provider<Neuron> n, Integer relativeRid, Integer absoluteRid) {
         return addOutputNode(doc, n, relativeRid, absoluteRid, EQUALS, START, true, EQUALS, END, true);
     }
 
 
-    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Mapping startMapping, boolean startRangeOutput, Operator endRangeMatch, Mapping endMapping, boolean endRangeOutput) {
-        return InputNode.add(doc.m, new Synapse.Key(false, false, relativeRid, absoluteRid, startRangeMatch, startMapping, startRangeOutput, endRangeMatch, endMapping, endRangeOutput), n);
+    public static InputNode addOutputNode(Document doc, Provider<Neuron> n, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Mapping startMapping, boolean startRangeOutput, Operator endRangeMatch, Mapping endMapping, boolean endRangeOutput) {
+        return InputNode.add(doc.m, new Synapse.Key(false, false, relativeRid, absoluteRid, startRangeMatch, startMapping, startRangeOutput, endRangeMatch, endMapping, endRangeOutput), n.get());
     }
 
     public static <T extends Node, A extends NodeActivation<T>> A get(Document doc, T n, Range r, InterprNode o) {

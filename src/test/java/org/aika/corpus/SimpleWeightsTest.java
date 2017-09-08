@@ -19,6 +19,7 @@ package org.aika.corpus;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
 import org.junit.Test;
@@ -35,10 +36,10 @@ public class SimpleWeightsTest {
     public void testWeightsOR() {
         Model m = new Model();
 
-        Neuron inA = new Neuron(m, "A");
-        Neuron inB = new Neuron(m, "B");
+        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<Neuron> inB = m.createNeuron("B");
 
-        Neuron pC = new Neuron(m, "C");
+        Provider<Neuron> pC = m.createNeuron("C");
         m.initOrNeuron(pC,
                 new Input()
                         .setOptional(false)
@@ -57,7 +58,7 @@ public class SimpleWeightsTest {
         {
             Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.addInput(doc, 0, 6);
+            inA.get().addInput(doc, 0, 6);
 
             doc.process();
 
@@ -69,8 +70,8 @@ public class SimpleWeightsTest {
         {
             Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.addInput(doc, 0, 6);
-            inB.addInput(doc, 0, 6);
+            inA.get().addInput(doc, 0, 6);
+            inB.get().addInput(doc, 0, 6);
 
             doc.process();
 
@@ -86,10 +87,10 @@ public class SimpleWeightsTest {
     public void testWeightsAND() {
         Model m = new Model();
 
-        Neuron inA = new Neuron(m, "A");
-        Neuron inB = new Neuron(m, "B");
+        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<Neuron> inB = m.createNeuron("B");
 
-        Neuron pC = new Neuron(m, "C");
+        Provider<Neuron> pC = m.createNeuron("C");
         m.initAndNeuron(pC,
                 0.001,
                 new Input()
@@ -109,8 +110,8 @@ public class SimpleWeightsTest {
         {
             Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.addInput(doc, 0, 6);
-            inB.addInput(doc, 0, 6);
+            inA.get().addInput(doc, 0, 6);
+            inB.get().addInput(doc, 0, 6);
 
             doc.process();
 

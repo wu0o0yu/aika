@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
@@ -40,11 +41,11 @@ public class EntityResolutionTest {
 
         Model m = new Model();
 
-        Neuron wJaguar = new Neuron(m, "W-Jaguar");
-        Neuron wPuma = new Neuron(m, "W-Puma");
+        Provider<Neuron> wJaguar = m.createNeuron("W-Jaguar");
+        Provider<Neuron> wPuma = m.createNeuron("W-Puma");
 
-        Neuron eJaguar = new Neuron(m, "E-Jaguar");
-        Neuron ePuma = new Neuron(m, "E-Puma");
+        Provider<Neuron> eJaguar = m.createNeuron("E-Jaguar");
+        Provider<Neuron> ePuma = m.createNeuron("E-Puma");
 
 
         m.initAndNeuron(eJaguar, 0.9,
@@ -82,11 +83,11 @@ public class EntityResolutionTest {
 
         Document doc = m.createDocument("jaguar puma ", 0);
 
-        wJaguar.addInput(doc, 0, 6);
+        wJaguar.get().addInput(doc, 0, 6);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        wPuma.addInput(doc, 7, 11);
+        wPuma.get().addInput(doc, 7, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -96,17 +97,17 @@ public class EntityResolutionTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
 
-        Assert.assertNotNull(eJaguar.node.get().getFirstActivation(doc));
-        Assert.assertNotNull(ePuma.node.get().getFirstActivation(doc));
+        Assert.assertNotNull(eJaguar.get().node.get().getFirstActivation(doc));
+        Assert.assertNotNull(ePuma.get().node.get().getFirstActivation(doc));
 
-        Assert.assertEquals(0, eJaguar.node.get().getFirstActivation(doc).key.o.primId);
-        Assert.assertEquals(1, ePuma.node.get().getFirstActivation(doc).key.o.primId);
+        Assert.assertEquals(0, eJaguar.get().node.get().getFirstActivation(doc).key.o.primId);
+        Assert.assertEquals(1, ePuma.get().node.get().getFirstActivation(doc).key.o.primId);
 
-        Assert.assertEquals(doc.bottom, eJaguar.node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
-        Assert.assertEquals(doc.bottom, ePuma.node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
+        Assert.assertEquals(doc.bottom, eJaguar.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
+        Assert.assertEquals(doc.bottom, ePuma.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
 
-        Assert.assertEquals(1, eJaguar.node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
-        Assert.assertEquals(1, ePuma.node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
+        Assert.assertEquals(1, eJaguar.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
+        Assert.assertEquals(1, ePuma.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
     }
 
 
@@ -117,18 +118,18 @@ public class EntityResolutionTest {
 
         Model m = new Model();
 
-        Neuron wJaguar = new Neuron(m, "W-Jaguar");
-        Neuron wPuma = new Neuron(m, "W-Puma");
-        Neuron wLeopard = new Neuron(m, "W-Leopard");
+        Provider<Neuron> wJaguar = m.createNeuron("W-Jaguar");
+        Provider<Neuron> wPuma = m.createNeuron("W-Puma");
+        Provider<Neuron> wLeopard = m.createNeuron("W-Leopard");
 
-        Neuron eJaguar = new Neuron(m, "E-Jaguar");
-        Neuron ePuma = new Neuron(m, "E-Puma");
-        Neuron eLeopard = new Neuron(m, "E-Leopard");
+        Provider<Neuron> eJaguar = m.createNeuron("E-Jaguar");
+        Provider<Neuron> ePuma = m.createNeuron("E-Puma");
+        Provider<Neuron> eLeopard = m.createNeuron("E-Leopard");
 
-        Neuron cKatzen = new Neuron(m, "C-Katzen");
-        Neuron chKatzenOhneJaguar = new Neuron(m, "CH-Katzen/Jaguar");
-        Neuron chKatzenOhnePuma = new Neuron(m, "CH-Katzen/Puma");
-        Neuron chKatzenOhneLeopard = new Neuron(m, "CH-Katzen/Leopard");
+        Provider<Neuron> cKatzen = m.createNeuron("C-Katzen");
+        Provider<Neuron> chKatzenOhneJaguar = m.createNeuron("CH-Katzen/Jaguar");
+        Provider<Neuron> chKatzenOhnePuma = m.createNeuron("CH-Katzen/Puma");
+        Provider<Neuron> chKatzenOhneLeopard = m.createNeuron("CH-Katzen/Leopard");
 
         m.initAndNeuron(eJaguar, 0.9,
                 new Input()
@@ -277,11 +278,11 @@ public class EntityResolutionTest {
 
         Document doc = m.createDocument("jaguar puma ", 0);
 
-        wJaguar.addInput(doc, 0, 6);
+        wJaguar.get().addInput(doc, 0, 6);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        wPuma.addInput(doc, 7, 11);
+        wPuma.get().addInput(doc, 7, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -292,17 +293,17 @@ public class EntityResolutionTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
 
-        Assert.assertNotNull(eJaguar.node.get().getFirstActivation(doc));
-        Assert.assertNotNull(ePuma.node.get().getFirstActivation(doc));
+        Assert.assertNotNull(eJaguar.get().node.get().getFirstActivation(doc));
+        Assert.assertNotNull(ePuma.get().node.get().getFirstActivation(doc));
 
-        Assert.assertEquals(0, eJaguar.node.get().getFirstActivation(doc).key.o.primId);
-        Assert.assertEquals(3, ePuma.node.get().getFirstActivation(doc).key.o.primId);
+        Assert.assertEquals(0, eJaguar.get().node.get().getFirstActivation(doc).key.o.primId);
+        Assert.assertEquals(3, ePuma.get().node.get().getFirstActivation(doc).key.o.primId);
 
-        Assert.assertEquals(doc.bottom, eJaguar.node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
-        Assert.assertEquals(doc.bottom, ePuma.node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
+        Assert.assertEquals(doc.bottom, eJaguar.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
+        Assert.assertEquals(doc.bottom, ePuma.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
 
-        Assert.assertEquals(1, eJaguar.node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
-        Assert.assertEquals(1, ePuma.node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
+        Assert.assertEquals(1, eJaguar.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
+        Assert.assertEquals(1, ePuma.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
     }
 
 

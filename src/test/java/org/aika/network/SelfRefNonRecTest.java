@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
@@ -37,10 +38,10 @@ public class SelfRefNonRecTest {
 
         Model m = new Model();
 
-        Neuron inA = new Neuron(m, "A");
+        Provider<Neuron> inA = m.createNeuron("A");
 
-        Neuron bN = new Neuron(m, "B");
-        Neuron cN = m.initOrNeuron(new Neuron(m, "C"),
+        Provider<Neuron> bN = m.createNeuron("B");
+        Provider<Neuron> cN = m.initOrNeuron(m.createNeuron("C"),
                 new Input()
                         .setNeuron(bN)
                         .setWeight(5.0f)
@@ -64,10 +65,10 @@ public class SelfRefNonRecTest {
 
         Document.APPLY_DEBUG_OUTPUT = true;
 
-        inA.addInput(t, 0, 1);
+        inA.get().addInput(t, 0, 1);
 
         System.out.println(t.neuronActivationsToString(false, false, true));
 
-        Assert.assertEquals(1, bN.node.get().getFirstActivation(t).key.o.orInterprNodes.size());
+        Assert.assertEquals(1, bN.get().node.get().getFirstActivation(t).key.o.orInterprNodes.size());
     }
 }

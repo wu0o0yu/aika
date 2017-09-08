@@ -100,6 +100,21 @@ public class Model {
     }
 
 
+    public Provider<Neuron> createNeuron() {
+        return new Neuron(this).provider;
+    }
+
+
+    public Provider<Neuron> createNeuron(String label) {
+        return new Neuron(this, label).provider;
+    }
+
+
+    public Provider<Neuron> createNeuron(String label, boolean isBlocked, boolean noTraining) {
+        return new Neuron(this, label, isBlocked, noTraining).provider;
+    }
+
+
     public Document createDocument(String txt) {
         return createDocument(txt, 0);
     }
@@ -229,7 +244,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Neuron initAndNeuron(Neuron n, double threshold, Input... inputs) {
+    public Provider<Neuron> initAndNeuron(Provider<Neuron> n, double threshold, Input... inputs) {
         return initAndNeuron(n, threshold, new TreeSet<>(Arrays.asList(inputs)));
     }
 
@@ -243,7 +258,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Neuron initAndNeuron(Neuron n, double threshold, Collection<Input> inputs) {
+    public Provider<Neuron> initAndNeuron(Provider<Neuron> n, double threshold, Collection<Input> inputs) {
         n.m = this;
 
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
@@ -254,7 +269,21 @@ public class Model {
         double posRecSum = 0.0;
         double minWeight = Double.MAX_VALUE;
         for (Input ni : inputs) {
-            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startMapping, ni.startRangeOutput, ni.endRangeMatch, ni.endMapping, ni.endRangeOutput));
+            Synapse s = new Synapse(
+                    ni.neuron,
+                    new Synapse.Key(
+                            ni.weight < 0.0,
+                            ni.recurrent,
+                            ni.relativeRid,
+                            ni.absoluteRid,
+                            ni.startRangeMatch,
+                            ni.startMapping,
+                            ni.startRangeOutput,
+                            ni.endRangeMatch,
+                            ni.endMapping,
+                            ni.endRangeOutput
+                    )
+            );
             s.w = ni.weight;
             s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
 
@@ -323,7 +352,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Neuron initNeuron(Neuron n, double bias, Input... inputs) {
+    public Provider<Neuron> initNeuron(Provider<Neuron> n, double bias, Input... inputs) {
         return initNeuron(n, bias, new TreeSet<>(Arrays.asList(inputs)));
     }
 
@@ -336,7 +365,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Neuron initNeuron(Neuron n, double bias, Collection<Input> inputs) {
+    public Provider<Neuron> initNeuron(Provider<Neuron> n, double bias, Collection<Input> inputs) {
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         double negDirSum = 0.0;
@@ -372,7 +401,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Neuron initOrNeuron(Neuron n, Input... inputs) {
+    public Provider<Neuron> initOrNeuron(Provider<Neuron> n, Input... inputs) {
         return initOrNeuron(n, new TreeSet<>(Arrays.asList(inputs)));
     }
 
@@ -385,7 +414,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Neuron initOrNeuron(Neuron n, Set<Input> inputs) {
+    public Provider<Neuron> initOrNeuron(Provider<Neuron> n, Set<Input> inputs) {
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         double bias = -0.001;
@@ -409,7 +438,7 @@ public class Model {
      * @param dirIS
      * @return
      */
-    public Neuron initRelationalNeuron(Neuron n, Neuron ctn, Neuron inputSignal, boolean dirIS) {
+    public Provider<Neuron> initRelationalNeuron(Provider<Neuron> n, Provider<Neuron> ctn, Provider<Neuron> inputSignal, boolean dirIS) {
         double bias = -30.0;
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
@@ -471,7 +500,7 @@ public class Model {
      * @param direction
      * @return
      */
-    public Neuron initCounterNeuron(Neuron n, Neuron clockSignal, boolean dirCS, Neuron startSignal, boolean dirSS, boolean direction) {
+    public Provider<Neuron> initCounterNeuron(Provider<Neuron> n, Provider<Neuron> clockSignal, boolean dirCS, Provider<Neuron> startSignal, boolean dirSS, boolean direction) {
         double bias = -44.0;
         double negRecSum = -20.0;
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);

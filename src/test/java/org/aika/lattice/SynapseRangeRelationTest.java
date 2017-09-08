@@ -17,6 +17,7 @@
 package org.aika.lattice;
 
 
+import org.aika.Provider;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.neuron.Activation;
 import org.aika.neuron.Activation.SynapseActivation;
@@ -46,8 +47,8 @@ public class SynapseRangeRelationTest {
         Model m = new Model();
         Document doc = m.createDocument("                        ", 0);
 
-        Neuron in = new Neuron(m);
-        Neuron on = new Neuron(m);
+        Provider<Neuron> in = m.createNeuron();
+        Provider<Neuron> on = m.createNeuron();
 
         Synapse s = new Synapse(in,
                 new Synapse.Key(
@@ -63,15 +64,15 @@ public class SynapseRangeRelationTest {
                         true
                 )
         );
-        s.output = on.provider;
+        s.output = on;
         s.link(doc.threadId);
 
-        Activation iAct0 = in.node.get().processAddedActivation(doc, new Key(in.node.get(), new Range(1, 4), null, doc.bottom), Collections.emptyList(), false);
-        Activation iAct1 = in.node.get().processAddedActivation(doc, new Key(in.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
-        Activation iAct2 = in.node.get().processAddedActivation(doc, new Key(in.node.get(), new Range(10, 18), null, doc.bottom), Collections.emptyList(), false);
-        Activation oAct = on.node.get().processAddedActivation(doc, new Key(on.node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct0 = in.get().node.get().processAddedActivation(doc, new Key(in.get().node.get(), new Range(1, 4), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct1 = in.get().node.get().processAddedActivation(doc, new Key(in.get().node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
+        Activation iAct2 = in.get().node.get().processAddedActivation(doc, new Key(in.get().node.get(), new Range(10, 18), null, doc.bottom), Collections.emptyList(), false);
+        Activation oAct = on.get().node.get().processAddedActivation(doc, new Key(on.get().node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
 
-        on.linkNeuronRelations(doc, oAct);
+        on.get().linkNeuronRelations(doc, oAct);
 
         boolean f = false;
         for(SynapseActivation sa: oAct.neuronInputs) {

@@ -19,6 +19,7 @@ package org.aika.corpus;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.lattice.AndNode;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
@@ -34,15 +35,15 @@ import static org.aika.Input.RangeRelation.EQUALS;
 public class WeightsTest {
 
 
-    Neuron inAA;
-    Neuron inBA;
-    Neuron inCA;
-    Neuron inAB;
-    Neuron inBB;
-    Neuron inCB;
+    Provider<Neuron> inAA;
+    Provider<Neuron> inBA;
+    Provider<Neuron> inCA;
+    Provider<Neuron> inAB;
+    Provider<Neuron> inBB;
+    Provider<Neuron> inCB;
 
-    Neuron pDA;
-    Neuron pDB;
+    Provider<Neuron> pDA;
+    Provider<Neuron> pDB;
 
 
     @Test
@@ -50,13 +51,13 @@ public class WeightsTest {
         Model m = new Model();
         AndNode.minFrequency = 5;
 
-        Neuron pSuppr = new Neuron(m, "SUPPR");
+        Provider<Neuron> pSuppr = m.createNeuron("SUPPR");
 
-        inAA = new Neuron(m, "AA");
-        inBA = new Neuron(m, "BA");
-        inCA = new Neuron(m, "CA");
+        inAA = m.createNeuron("AA");
+        inBA = m.createNeuron("BA");
+        inCA = m.createNeuron("CA");
 
-        Neuron pOrA = new Neuron(m, "pOrA");
+        Provider<Neuron> pOrA = m.createNeuron("pOrA");
         m.initOrNeuron(pOrA,
                 new Input()
                         .setNeuron(inAA)
@@ -74,7 +75,7 @@ public class WeightsTest {
                         .setRangeOutput(true)
         );
 
-        pDA = new Neuron(m, "DA");
+        pDA = m.createNeuron("DA");
 
         m.initAndNeuron(pDA,
                 0.001,
@@ -102,11 +103,11 @@ public class WeightsTest {
         );
 
 
-        inAB = new Neuron(m, "AB");
-        inBB = new Neuron(m, "BB");
-        inCB = new Neuron(m, "CB");
+        inAB = m.createNeuron("AB");
+        inBB = m.createNeuron("BB");
+        inCB = m.createNeuron("CB");
 
-        Neuron pOrB = new Neuron(m, "pOrB");
+        Provider<Neuron> pOrB = m.createNeuron("pOrB");
         m.initOrNeuron(pOrB,
                 new Input()
                         .setNeuron(inAB)
@@ -124,7 +125,7 @@ public class WeightsTest {
                         .setRangeOutput(true)
         );
 
-        pDB = new Neuron(m, "DB");
+        pDB = m.createNeuron("DB");
         m.initAndNeuron(pDB,
                 0.001,
                 new Input()
@@ -180,27 +181,27 @@ public class WeightsTest {
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
         if(getBit(i, 0)) {
-            inAA.addInput(doc, 0, 6);
+            inAA.get().addInput(doc, 0, 6);
         }
 
         if(getBit(i, 1)) {
-            inBA.addInput(doc, 0, 6);
+            inBA.get().addInput(doc, 0, 6);
         }
 
         if(getBit(i, 2)) {
-            inCA.addInput(doc, 0, 6);
+            inCA.get().addInput(doc, 0, 6);
         }
 
 
         if(getBit(i, 3)) {
-            inAB.addInput(doc, 0, 6);
+            inAB.get().addInput(doc, 0, 6);
         }
 
         if(getBit(i, 4)) {
-            inBB.addInput(doc, 0, 6);
+            inBB.get().addInput(doc, 0, 6);
         }
 
-        inCB.addInput(doc, 0, 6);
+        inCB.get().addInput(doc, 0, 6);
 
         doc.process();
 

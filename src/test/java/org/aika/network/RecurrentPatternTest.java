@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Input.RangeRelation;
@@ -44,25 +45,25 @@ public class RecurrentPatternTest {
 
         Model m = new Model();
 
-        Neuron startSignal = new Neuron(m, "START-SIGNAL");
-        Neuron spaceN = new Neuron(m, "SPACE");
+        Provider<Neuron> startSignal = m.createNeuron("START-SIGNAL");
+        Provider<Neuron> spaceN = m.createNeuron("SPACE");
 
 
-        TreeMap<Character, Neuron> chars = new TreeMap<>();
+        TreeMap<Character, Provider<Neuron>> chars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
-            Neuron charSN = new Neuron(m, "" + c);
+            Provider<Neuron> charSN = m.createNeuron("" + c);
             chars.put(c, charSN);
         }
 
-        Neuron ctNeuron = m.initCounterNeuron(new Neuron(m, "CTN"), spaceN, false, startSignal, true, false);
+        Provider<Neuron> ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"), spaceN, false, startSignal, true, false);
 
-        TreeMap<Character, Neuron> recChars = new TreeMap<>();
+        TreeMap<Character, Provider<Neuron>> recChars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
-            Neuron charSN = chars.get(c);
-            recChars.put(c, m.initRelationalNeuron(new Neuron(m, "RN-" + c), ctNeuron, charSN, false));
+            Provider<Neuron> charSN = chars.get(c);
+            recChars.put(c, m.initRelationalNeuron(m.createNeuron("RN-" + c), ctNeuron, charSN, false));
         }
 
-        Neuron patternN = m.initAndNeuron(new Neuron(m, "PATTERN"),
+        Provider<Neuron> patternN = m.initAndNeuron(m.createNeuron("PATTERN"),
                 0.001,
                 new Input()
                         .setNeuron(recChars.get('C'))
@@ -100,17 +101,17 @@ public class RecurrentPatternTest {
 
         Document doc = m.createDocument(txt, 0);
 
-        startSignal.addInput(doc, 0, 1, 0);
+        startSignal.get().addInput(doc, 0, 1, 0);
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
-                spaceN.addInput(doc, i, i + 1);
+                spaceN.get().addInput(doc, i, i + 1);
             }
         }
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ' && c != '.') {
-                chars.get(c).addInput(doc, i, i + 1);
+                chars.get(c).get().addInput(doc, i, i + 1);
             }
         }
 
@@ -124,7 +125,7 @@ public class RecurrentPatternTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
-        NodeActivation patAct = patternN.node.get().getFirstActivation(doc);
+        NodeActivation patAct = patternN.get().node.get().getFirstActivation(doc);
         Assert.assertEquals(4, patAct.key.r.begin.intValue());
         Assert.assertEquals(10, patAct.key.r.end.intValue());
 
@@ -140,26 +141,26 @@ public class RecurrentPatternTest {
 
         Model m = new Model();
 
-        Neuron startSignal = new Neuron(m, "START-SIGNAL");
-        Neuron spaceN = new Neuron(m, "SPACE");
+        Provider<Neuron> startSignal = m.createNeuron("START-SIGNAL");
+        Provider<Neuron> spaceN = m.createNeuron("SPACE");
 
-        TreeMap<Character, Neuron> chars = new TreeMap<>();
+        TreeMap<Character, Provider<Neuron>> chars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
-            Neuron charSN = new Neuron(m, "" + c);
+            Provider<Neuron> charSN = m.createNeuron("" + c);
             chars.put(c, charSN);
         }
 
-        Neuron ctNeuron = new Neuron(m, "CTN");
+        Provider<Neuron> ctNeuron = m.createNeuron("CTN");
 
         m.initCounterNeuron(ctNeuron, spaceN, false, startSignal, true, false);
 
-        TreeMap<Character, Neuron> recChars = new TreeMap<>();
+        TreeMap<Character, Provider<Neuron>> recChars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
-            Neuron charSN = chars.get(c);
-            recChars.put(c, m.initRelationalNeuron(new Neuron(m, "RN-" + c), ctNeuron, charSN, false));
+            Provider<Neuron> charSN = chars.get(c);
+            recChars.put(c, m.initRelationalNeuron(m.createNeuron("RN-" + c), ctNeuron, charSN, false));
         }
 
-        Neuron patternN = m.initAndNeuron(new Neuron(m, "PATTERN"),
+        Provider<Neuron> patternN = m.initAndNeuron(m.createNeuron("PATTERN"),
                 0.001,
                 new Input()
                         .setNeuron(recChars.get('C'))
@@ -198,17 +199,17 @@ public class RecurrentPatternTest {
 
         Document doc = m.createDocument(txt, 0);
 
-        startSignal.addInput(doc, 0, 1, 0);
+        startSignal.get().addInput(doc, 0, 1, 0);
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
-                spaceN.addInput(doc, i, i + 1);
+                spaceN.get().addInput(doc, i, i + 1);
             }
         }
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ' && c != '.') {
-                chars.get(c).addInput(doc, i, i + 1);
+                chars.get(c).get().addInput(doc, i, i + 1);
             }
         }
 
@@ -218,7 +219,7 @@ public class RecurrentPatternTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
-        NodeActivation patAct = patternN.node.get().getFirstActivation(doc);
+        NodeActivation patAct = patternN.get().node.get().getFirstActivation(doc);
         Assert.assertEquals(4, patAct.key.r.begin.intValue());
         Assert.assertEquals(10, patAct.key.r.end.intValue());
 
@@ -231,18 +232,18 @@ public class RecurrentPatternTest {
     public void testAndWithRid() {
         Model m = new Model();
 
-        Neuron start = new Neuron(m, "START");
-        Neuron clock = new Neuron(m, "CLOCK");
-        Neuron input = new Neuron(m, "INPUT");
+        Provider<Neuron> start = m.createNeuron("START");
+        Provider<Neuron> clock = m.createNeuron("CLOCK");
+        Provider<Neuron> input = m.createNeuron("INPUT");
 
-        Neuron ctn = m.initCounterNeuron(new Neuron(m, "CTN"), clock, false, start, true, false);
-        Neuron rn = m.initRelationalNeuron(new Neuron(m, "RN"), ctn, input, false);
+        Provider<Neuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), clock, false, start, true, false);
+        Provider<Neuron> rn = m.initRelationalNeuron(m.createNeuron("RN"), ctn, input, false);
 
-        Neuron aN = new Neuron(m, "A");
-        Neuron bN = new Neuron(m, "B");
-        Neuron cN = new Neuron(m, "C");
+        Provider<Neuron> aN = m.createNeuron("A");
+        Provider<Neuron> bN = m.createNeuron("B");
+        Provider<Neuron> cN = m.createNeuron("C");
 
-        Neuron result = m.initAndNeuron(new Neuron(m, "RESULT"),
+        Provider<Neuron> result = m.initAndNeuron(m.createNeuron("RESULT"),
                 0.001,
                 new Input()
                         .setNeuron(ctn)
@@ -269,24 +270,24 @@ public class RecurrentPatternTest {
     public void testCTNeuron() {
         Model m = new Model();
 
-        Neuron start = new Neuron(m, "START");
-        Neuron clock = new Neuron(m, "CLOCK");
+        Provider<Neuron> start = m.createNeuron("START");
+        Provider<Neuron> clock = m.createNeuron("CLOCK");
 
-        Neuron ctn = m.initCounterNeuron(new Neuron(m, "CTN"), clock, false, start, true, false);
+        Provider<Neuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), clock, false, start, true, false);
 
 
         Document doc = m.createDocument("                                                  ", 0);
 
         for(int i = 5; i < 30; i += 5) {
-            clock.addInput(doc, i - 1, i);
+            clock.get().addInput(doc, i - 1, i);
         }
 
         System.out.println(doc.neuronActivationsToString(false, false, true));
 
-        start.addInput(doc, 0, 1, 0);
+        start.get().addInput(doc, 0, 1, 0);
 
         System.out.println(doc.neuronActivationsToString(false, false, true));
 
-        Assert.assertEquals(2, NodeActivation.get(doc, ctn.node.get(), 2, new Range(10, 15), EQUALS, EQUALS, null, null).key.o.primId);
+        Assert.assertEquals(2, NodeActivation.get(doc, ctn.get().node.get(), 2, new Range(10, 15), EQUALS, EQUALS, null, null).key.o.primId);
     }
 }

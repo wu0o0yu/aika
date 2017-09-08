@@ -111,14 +111,14 @@ public class Synapse implements Writable {
     public Synapse() {}
 
 
-    public Synapse(Neuron input) {
+    public Synapse(Provider<Neuron> input) {
         if(input != null) {
-            this.input = input.provider;
+            this.input = input;
         }
     }
 
 
-    public Synapse(Neuron input, Key key) {
+    public Synapse(Provider<Neuron> input, Key key) {
         this(input);
         this.key = lookupKey(key);
 

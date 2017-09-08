@@ -19,6 +19,7 @@ package org.aika.lattice;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
@@ -45,9 +46,9 @@ public class ActivationsTest {
         Model m = new Model();
         AndNode.minFrequency = 1;
 
-        Neuron inA = new Neuron(m, "A");
+        Provider<Neuron> inA = m.createNeuron("A");
 
-        m.initAndNeuron(new Neuron(m, "pA"), 0.001,
+        m.initAndNeuron(m.createNeuron("pA"), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
@@ -60,22 +61,22 @@ public class ActivationsTest {
         InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, Operator.LESS_THAN, Mapping.START, true, Operator.GREATER_THAN, Mapping.END, true);
 
 
-        inA.addInput(doc, 0, 1, 0);
-        inA.addInput(doc, 2, 3, 0);
+        inA.get().addInput(doc, 0, 1, 0);
+        inA.get().addInput(doc, 2, 3, 0);
 
         Assert.assertNotNull(TestHelper.get(doc, pANode, new Range(0, 1), null));
         Assert.assertNull(TestHelper.get(doc, pANode, new Range(1, 2), null));
         Assert.assertNotNull(TestHelper.get(doc, pANode, new Range(2, 3), null));
 
-        inA.addInput(doc, 1, 2);
+        inA.get().addInput(doc, 1, 2);
 
         Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(0, 1), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(0, 1), doc.bottom));
         Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(1, 2), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
         Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(2, 3), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
 
-        Neuron inB = new Neuron(m, "B");
+        Provider<Neuron> inB = m.createNeuron("B");
 
-        m.initAndNeuron(new Neuron(m, "pB"), 0.001,
+        m.initAndNeuron(m.createNeuron("pB"), 0.001,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0f)
@@ -84,10 +85,10 @@ public class ActivationsTest {
         );
         InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, Operator.LESS_THAN, Mapping.START, true, Operator.GREATER_THAN, Mapping.END, true);
 
-        inB.addInput(doc, 0, 1);
-        inB.addInput(doc, 1, 2);
+        inB.get().addInput(doc, 0, 1);
+        inB.get().addInput(doc, 1, 2);
 
-        inB.removeInput(doc, 1, 2);
+        inB.get().removeInput(doc, 1, 2);
 
         Assert.assertNull(TestHelper.get(doc, pBNode, new Range(1, 2), null));
     }
@@ -99,8 +100,8 @@ public class ActivationsTest {
         AndNode.minFrequency = 1;
 
 
-        Neuron in = new Neuron(m, "A");
-        OrNode inNode = in.node.get();
+        Provider<Neuron> in = m.createNeuron("A");
+        OrNode inNode = in.get().node.get();
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 

@@ -20,6 +20,7 @@ package org.aika.network;
 import org.aika.Input;
 import org.aika.Input.RangeRelation;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.neuron.Activation;
 import org.aika.corpus.Document;
 import org.aika.neuron.Neuron;
@@ -37,16 +38,16 @@ public class WeakInputProcessingTest {
     public void testWeakInputProcessing() {
         Model m = new Model();
 
-        Neuron strongInput = new Neuron(m, "Strong Input");
+        Provider<Neuron> strongInput = m.createNeuron("Strong Input");
 
-        Neuron weakInputA = new Neuron(m, "Weak Input A");
-        Neuron weakInputB = new Neuron(m, "Weak Input B");
-        Neuron weakInputC = new Neuron(m, "Weak Input C");
+        Provider<Neuron> weakInputA = m.createNeuron("Weak Input A");
+        Provider<Neuron> weakInputB = m.createNeuron("Weak Input B");
+        Provider<Neuron> weakInputC = m.createNeuron("Weak Input C");
 
-        Neuron suppr = new Neuron(m, "suppr");
+        Provider<Neuron> suppr = m.createNeuron("suppr");
 
-        Neuron patternA = m.initAndNeuron(
-                new Neuron(m, "Pattern A"),
+        Provider<Neuron> patternA = m.initAndNeuron(
+                m.createNeuron("Pattern A"),
                 0.4,
                 new Input()
                         .setNeuron(strongInput)
@@ -72,8 +73,8 @@ public class WeakInputProcessingTest {
                         .setRangeOutput(true)
         );
 
-        Neuron patternB = m.initAndNeuron(
-                new Neuron(m, "Pattern B"),
+        Provider<Neuron> patternB = m.initAndNeuron(
+                m.createNeuron("Pattern B"),
                 0.4,
                 new Input()
                         .setNeuron(strongInput)
@@ -99,8 +100,8 @@ public class WeakInputProcessingTest {
                         .setRangeOutput(true)
         );
 
-        Neuron patternC = m.initAndNeuron(
-                new Neuron(m, "Pattern C"),
+        Provider<Neuron> patternC = m.initAndNeuron(
+                m.createNeuron("Pattern C"),
                 0.4,
                 new Input()
                         .setNeuron(strongInput)
@@ -150,22 +151,22 @@ public class WeakInputProcessingTest {
 
         Document doc = m.createDocument("a ");
 
-        strongInput.addInput(doc,0,1);
+        strongInput.get().addInput(doc,0,1);
 
-        weakInputB.addInput(doc, 0, 1);
+        weakInputB.get().addInput(doc, 0, 1);
 
         Document.APPLY_DEBUG_OUTPUT = true;
         doc.process();
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        Activation act = TestHelper.get(doc, patternA.node.get(), null, null);
+        Activation act = TestHelper.get(doc, patternA.get().node.get(), null, null);
         Assert.assertTrue(act.finalState.value < 0.5);
 
-        act = TestHelper.get(doc, patternB.node.get(), null, null);
+        act = TestHelper.get(doc, patternB.get().node.get(), null, null);
         Assert.assertTrue(act.finalState.value > 0.5);
 
-        act = TestHelper.get(doc, patternC.node.get(), null, null);
+        act = TestHelper.get(doc, patternC.get().node.get(), null, null);
         Assert.assertTrue(act.finalState.value < 0.5);
     }
 

@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Neuron;
@@ -34,14 +35,14 @@ public class OptionalAndTest {
     public void testOptionalAnd() {
         Model m = new Model(null, 2);
 
-        Neuron wordEssen = new Neuron(m, "word:essen");
-        Neuron wordHamburg = new Neuron(m, "word:hamburg");
-        Neuron wordGehen = new Neuron(m, "word:gehen");
-        Neuron upperCase = new Neuron(m, "upper case");
+        Provider<Neuron> wordEssen = m.createNeuron("word:essen");
+        Provider<Neuron> wordHamburg = m.createNeuron("word:hamburg");
+        Provider<Neuron> wordGehen = m.createNeuron("word:gehen");
+        Provider<Neuron> upperCase = m.createNeuron("upper case");
 
-        Neuron suppr = new Neuron(m, "SUPPRESS");
+        Provider<Neuron> suppr = m.createNeuron("SUPPRESS");
 
-        Neuron hintNoun = m.initOrNeuron(new Neuron(m, "HINT-NOUN"),
+        Provider<Neuron> hintNoun = m.initOrNeuron(m.createNeuron("HINT-NOUN"),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
@@ -55,7 +56,7 @@ public class OptionalAndTest {
                         .setRecurrent(false)
                         .setMinInput(1.0f)
         );
-        Neuron hintVerb = m.initOrNeuron(new Neuron(m, "HINT-VERB"),
+        Provider<Neuron> hintVerb = m.initOrNeuron(m.createNeuron("HINT-VERB"),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
@@ -71,7 +72,7 @@ public class OptionalAndTest {
         );
 
 
-        Neuron noun = m.initAndNeuron(new Neuron(m, "NOUN"),
+        Provider<Neuron> noun = m.initAndNeuron(m.createNeuron("NOUN"),
                 0.001,
                 new Input()
                         .setOptional(false)
@@ -95,7 +96,7 @@ public class OptionalAndTest {
                         .setMinInput(1.0f)
         );
 
-        Neuron verb = m.initAndNeuron(new Neuron(m, "VERB"),
+        Provider<Neuron> verb = m.initAndNeuron(m.createNeuron("VERB"),
                 0.001,
                 new Input()
                         .setOptional(false)
@@ -135,10 +136,10 @@ public class OptionalAndTest {
             String txt = doc.getContent();
             int begin = txt.toLowerCase().indexOf("essen");
             int end = begin + 5;
-            wordEssen.addInput(doc, begin, end);
+            wordEssen.get().addInput(doc, begin, end);
 
             if(Character.isUpperCase(txt.charAt(begin))) {
-                upperCase.addInput(doc, begin, end);
+                upperCase.get().addInput(doc, begin, end);
             }
 
             doc.process();

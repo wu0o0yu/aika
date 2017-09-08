@@ -20,6 +20,7 @@ package org.aika.lattice;
 import org.aika.Input;
 import org.aika.Input.RangeRelation;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
@@ -39,13 +40,13 @@ public class PatternLatticeTest {
     @Test
     public void testPredefinedPatterns() {
         Model m = new Model();
-        Neuron inA = new Neuron(m, "A");
-        Neuron inB = new Neuron(m, "B");
-        Neuron inC = new Neuron(m, "C");
-        Neuron inD = new Neuron(m, "D");
+        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<Neuron> inB = m.createNeuron("B");
+        Provider<Neuron> inC = m.createNeuron("C");
+        Provider<Neuron> inD = m.createNeuron("D");
 
         {
-            m.initAndNeuron(new Neuron(m, "ABC"),
+            m.initAndNeuron(m.createNeuron("ABC"),
                     0.001,
                     new Input()
                             .setNeuron(inA)
@@ -100,7 +101,7 @@ public class PatternLatticeTest {
             Assert.assertEquals(pBC.provider, pABC.parents.get(new Refinement(null, pA.provider)));
         }
         {
-            m.initAndNeuron(new Neuron(m, "BCD"),
+            m.initAndNeuron(m.createNeuron("BCD"),
                     0.001,
                     new Input()
                             .setNeuron(inB)
@@ -164,7 +165,7 @@ public class PatternLatticeTest {
             Assert.assertEquals(pCD.provider, pBCD.parents.get(new Refinement(null, pB.provider)));
         }
         {
-            m.initAndNeuron(new Neuron(m, "ABCD"),
+            m.initAndNeuron(m.createNeuron("ABCD"),
                     0.001,
                     new Input()
                             .setNeuron(inA)
@@ -258,10 +259,10 @@ public class PatternLatticeTest {
         m.numberOfPositions = 100;
 
 
-        Neuron inA = new Neuron(m, "A");
-        Neuron inB = new Neuron(m, "B");
-        Neuron inC = new Neuron(m, "C");
-        Neuron inD = new Neuron(m, "D");
+        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<Neuron> inB = m.createNeuron("B");
+        Provider<Neuron> inC = m.createNeuron("C");
+        Provider<Neuron> inD = m.createNeuron("D");
 
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -276,7 +277,7 @@ public class PatternLatticeTest {
         doc.bestInterpretation = Arrays.asList(doc.bottom);
         doc.train();
 
-        inA.addInput(doc, 0, 1, 0);
+        inA.get().addInput(doc, 0, 1, 0);
 
         doc.train();
 
@@ -284,7 +285,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(null, pANode.andChildren);
 
 
-        inB.addInput(doc, 0, 1, 0);
+        inB.get().addInput(doc, 0, 1, 0);
         m.resetFrequency();
         doc.train();
 
@@ -292,7 +293,7 @@ public class PatternLatticeTest {
 //        Assert.assertEquals(0, pBNode.andChildren.size());
 
 
-        inB.addInput(doc, 2, 3, 1);
+        inB.get().addInput(doc, 2, 3, 1);
         m.resetFrequency();
         doc.train();
 
@@ -300,7 +301,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(1, pBNode.andChildren.size());
 
 
-        inA.addInput(doc, 2, 3, 1);
+        inA.get().addInput(doc, 2, 3, 1);
         m.resetFrequency();
         doc.train();
 
@@ -318,7 +319,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(pBNode.provider, pAB.parents.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
 
-        inC.addInput(doc, 4, 5, 2);
+        inC.get().addInput(doc, 4, 5, 2);
         doc.train();
 
         Assert.assertEquals(1, pCNode.frequency, 0.01);
@@ -327,7 +328,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(2, pAB.parents.size());
 
 
-        inB.addInput(doc, 4, 5, 2);
+        inB.get().addInput(doc, 4, 5, 2);
         m.resetFrequency();
         doc.train();
 
@@ -335,14 +336,14 @@ public class PatternLatticeTest {
         Assert.assertEquals(2, pBNode.andChildren.size());
 
 
-        inB.addInput(doc, 6, 7, 3);
+        inB.get().addInput(doc, 6, 7, 3);
         m.resetFrequency();
         doc.train();
 
         Assert.assertEquals(4, pBNode.frequency, 0.01);
         Assert.assertEquals(2, pBNode.andChildren.size());
 
-        inC.addInput(doc, 6, 7, 3);
+        inC.get().addInput(doc, 6, 7, 3);
         m.resetFrequency();
         doc.train();
 
@@ -360,7 +361,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(pCNode.provider, pBC.parents.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
 
 
-        inA.addInput(doc, 4, 5, 2);
+        inA.get().addInput(doc, 4, 5, 2);
         m.resetFrequency();
         doc.train();
 
@@ -371,7 +372,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(2, pCNode.andChildren.size());
 
 
-        inA.addInput(doc, 8, 9, 4);
+        inA.get().addInput(doc, 8, 9, 4);
         m.resetFrequency();
         doc.train();
 
@@ -381,7 +382,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(2, pBNode.andChildren.size());
         Assert.assertEquals(2, pCNode.andChildren.size());
 
-        inC.addInput(doc, 8, 9, 4);
+        inC.get().addInput(doc, 8, 9, 4);
         m.resetFrequency();
         doc.train();
 
@@ -418,7 +419,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(pCNode.provider, pAC.parents.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
 
-        inB.addInput(doc, 8, 9, 4);
+        inB.get().addInput(doc, 8, 9, 4);
         m.resetFrequency();
         doc.train();
 
@@ -442,18 +443,18 @@ public class PatternLatticeTest {
         Assert.assertEquals(pBC.provider, pABC.parents.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
 
-        inD.addInput(doc, 0, 1, 0);
+        inD.get().addInput(doc, 0, 1, 0);
         m.resetFrequency();
         doc.train();
 
-        inD.addInput(doc, 4, 5, 2);
+        inD.get().addInput(doc, 4, 5, 2);
         m.resetFrequency();
         doc.train();
 
-        inA.addInput(doc, 10, 11, 5);
-        inB.addInput(doc, 10, 11, 5);
-        inC.addInput(doc, 10, 11, 5);
-        inD.addInput(doc, 10, 11, 5);
+        inA.get().addInput(doc, 10, 11, 5);
+        inB.get().addInput(doc, 10, 11, 5);
+        inC.get().addInput(doc, 10, 11, 5);
+        inD.get().addInput(doc, 10, 11, 5);
         m.resetFrequency();
         doc.train();
 
@@ -517,7 +518,7 @@ public class PatternLatticeTest {
 
 
 
-        inD.addInput(doc, 8, 9, 4);
+        inD.get().addInput(doc, 8, 9, 4);
         m.resetFrequency();
         doc.train();
         m.resetFrequency();
@@ -565,7 +566,7 @@ public class PatternLatticeTest {
 
 // ======================================================================
 
-        inB.removeInput(doc, 4, 5, 2);
+        inB.get().removeInput(doc, 4, 5, 2);
 
         m.resetFrequency();
         doc.train();
@@ -628,7 +629,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(3, pACD.parents.size());
 
 
-        inD.removeInput(doc, 0, 1, 0);
+        inD.get().removeInput(doc, 0, 1, 0);
         m.resetFrequency();
         doc.train();
         m.resetFrequency();
@@ -654,16 +655,16 @@ public class PatternLatticeTest {
         Model m = new Model();
         AndNode.minFrequency = 10;
 
-        Neuron inA = new Neuron(m, "A");
-        Node inANode = inA.node.get();
+        Provider<Neuron> inA = m.createNeuron("A");
+        Node inANode = inA.get().node.get();
 
-        Neuron inB = new Neuron(m, "B");
-        Node inBNode = inB.node.get();
+        Provider<Neuron> inB = m.createNeuron("B");
+        Node inBNode = inB.get().node.get();
 
-        Neuron inC = new Neuron(m, "C");
-        Node inCNode = inC.node.get();
+        Provider<Neuron> inC = m.createNeuron("C");
+        Node inCNode = inC.get().node.get();
 
-        m.initAndNeuron(new Neuron(m, "ABC"),
+        m.initAndNeuron(m.createNeuron("ABC"),
                 0.001,
                 new Input().setNeuron(inA).setWeight(1.0f).setRecurrent(false).setMinInput(1.0f),
                 new Input().setNeuron(inB).setWeight(1.0f).setRecurrent(false).setMinInput(1.0f),

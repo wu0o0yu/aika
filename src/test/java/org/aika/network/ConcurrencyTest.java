@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
@@ -40,10 +41,10 @@ public class ConcurrencyTest {
         AndNode.minFrequency = 1;
 
 
-        Neuron inA = new Neuron(m, "A");
-        Neuron inB = new Neuron(m, "B");
+        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<Neuron> inB = m.createNeuron("B");
 
-        Neuron pC = m.initAndNeuron(new Neuron(m, "pC"),
+        Provider<Neuron> pC = m.initAndNeuron(m.createNeuron("pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -64,11 +65,11 @@ public class ConcurrencyTest {
         );
 
 
-        Neuron inStart = new Neuron(m, "START");
-        Neuron inClock = new Neuron(m, "CLOCK");
+        Provider<Neuron> inStart = m.createNeuron("START");
+        Provider<Neuron> inClock = m.createNeuron("CLOCK");
 
 
-        Neuron ctn = m.initCounterNeuron(new Neuron(m, "CTN"), inClock, false, inStart, true, false);
+        Provider<Neuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), inClock, false, inStart, true, false);
 
 
         Document doc0 = m.createDocument("aaaaaaaaaa", 0);
@@ -78,42 +79,42 @@ public class ConcurrencyTest {
         Document doc4 = m.createDocument("eeeeeeeeee", 4);
 
 
-        inA.addInput(doc2, 0, 4);
-        inB.addInput(doc2, 2, 6);
+        inA.get().addInput(doc2, 0, 4);
+        inB.get().addInput(doc2, 2, 6);
 
-        Assert.assertEquals(1, pC.node.get().getActivations(doc2).size());
+        Assert.assertEquals(1, pC.get().node.get().getActivations(doc2).size());
 
-        inA.addInput(doc4, 0, 6);
+        inA.get().addInput(doc4, 0, 6);
 
-        Assert.assertEquals(0, pC.node.get().getActivations(doc4).size());
+        Assert.assertEquals(0, pC.get().node.get().getActivations(doc4).size());
 
-        inB.addInput(doc0, 4, 8);
-        inB.addInput(doc4, 2, 8);
+        inB.get().addInput(doc0, 4, 8);
+        inB.get().addInput(doc4, 2, 8);
 
-        Assert.assertEquals(1, pC.node.get().getActivations(doc4).size());
+        Assert.assertEquals(1, pC.get().node.get().getActivations(doc4).size());
 
-        inA.addInput(doc0, 0, 6);
+        inA.get().addInput(doc0, 0, 6);
 
-        inStart.addInput(doc3, 0, 1);
-        inClock.addInput(doc3, 4, 5);
-        inClock.addInput(doc3, 6, 7);
+        inStart.get().addInput(doc3, 0, 1);
+        inClock.get().addInput(doc3, 4, 5);
+        inClock.get().addInput(doc3, 6, 7);
 
-        Assert.assertEquals(2, ctn.node.get().getThreadState(doc3.threadId, true).activations.size());
+        Assert.assertEquals(2, ctn.get().node.get().getThreadState(doc3.threadId, true).activations.size());
 
-        inStart.addInput(doc1, 0, 1);
-        inClock.addInput(doc1, 3, 4);
-        inClock.addInput(doc1, 7, 8);
+        inStart.get().addInput(doc1, 0, 1);
+        inClock.get().addInput(doc1, 3, 4);
+        inClock.get().addInput(doc1, 7, 8);
 
-        Assert.assertEquals(2, ctn.node.get().getThreadState(doc1.threadId, true).activations.size());
-        Assert.assertEquals(2, ctn.node.get().getActivations(doc1).size());
+        Assert.assertEquals(2, ctn.get().node.get().getThreadState(doc1.threadId, true).activations.size());
+        Assert.assertEquals(2, ctn.get().node.get().getActivations(doc1).size());
 
-        Assert.assertEquals(1, pC.node.get().getActivations(doc2).size());
+        Assert.assertEquals(1, pC.get().node.get().getActivations(doc2).size());
 
-        inA.removeInput(doc2, 0, 4);
+        inA.get().removeInput(doc2, 0, 4);
 
-        Assert.assertEquals(0, pC.node.get().getActivations(doc2).size());
+        Assert.assertEquals(0, pC.get().node.get().getActivations(doc2).size());
 
-        Assert.assertEquals(2, ctn.node.get().getThreadState(doc3.threadId, true).activations.size());
+        Assert.assertEquals(2, ctn.get().node.get().getThreadState(doc3.threadId, true).activations.size());
     }
 
 
@@ -122,10 +123,10 @@ public class ConcurrencyTest {
         final Model m = new Model();
         AndNode.minFrequency = 1;
 
-        final Neuron inA = new Neuron(m, "A");
-        final Neuron inB = new Neuron(m, "B");
+        final Provider<Neuron> inA = m.createNeuron("A");
+        final Provider<Neuron> inB = m.createNeuron("B");
 
-        final Neuron pC = m.initAndNeuron(new Neuron(m, "pC"),
+        final Provider<Neuron> pC = m.initAndNeuron(m.createNeuron("pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -152,18 +153,18 @@ public class ConcurrencyTest {
                     for (int j = 0; j < 20; j++) {
                         Document doc = m.createDocument("          ", 0);
 
-                        inA.addInput(doc, 0, 6);
-                        inB.addInput(doc, 4, 10);
+                        inA.get().addInput(doc, 0, 6);
+                        inB.get().addInput(doc, 4, 10);
 
-                        Assert.assertEquals(1, pC.node.get().getActivations(doc).size());
-                        Assert.assertNotNull(TestHelper.get(doc, pC.node.get(), new Range(4, 6), null));
+                        Assert.assertEquals(1, pC.get().node.get().getActivations(doc).size());
+                        Assert.assertNotNull(TestHelper.get(doc, pC.get().node.get(), new Range(4, 6), null));
 
-                        inB.removeInput(doc, 4, 10);
-                        Assert.assertEquals(0, pC.node.get().getActivations(doc).size());
+                        inB.get().removeInput(doc, 4, 10);
+                        Assert.assertEquals(0, pC.get().node.get().getActivations(doc).size());
 
                         doc.clearActivations();
 
-                        Assert.assertEquals(0, inA.node.get().getActivations(doc).size());
+                        Assert.assertEquals(0, inA.get().node.get().getActivations(doc).size());
                     }
                 }
             }).run();

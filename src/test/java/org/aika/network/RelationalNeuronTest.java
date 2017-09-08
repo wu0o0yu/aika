@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -35,11 +36,11 @@ public class RelationalNeuronTest {
     public void testOutputNode() {
         Model m = new Model();
 
-        Neuron in = new Neuron(m, "INPUT");
-        Neuron cn = new Neuron(m, "CLOCK");
-        Neuron sn = new Neuron(m, "START");
-        Neuron ctn = m.initCounterNeuron(new Neuron(m, "CTN"), cn, false, sn, true, false);
-        Neuron on = m.initRelationalNeuron(new Neuron(m, "ON"), ctn, in, false);
+        Provider<Neuron> in = m.createNeuron("INPUT");
+        Provider<Neuron> cn = m.createNeuron("CLOCK");
+        Provider<Neuron> sn = m.createNeuron("START");
+        Provider<Neuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
+        Provider<Neuron> on = m.initRelationalNeuron(m.createNeuron("ON"), ctn, in, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
@@ -50,17 +51,17 @@ public class RelationalNeuronTest {
         InterprNode o01 = InterprNode.add(doc, false, o0, o1);
         InterprNode o012 = InterprNode.add(doc, false, o01, o2);
 
-        sn.addInput(doc, 0, 1, 0, doc.bottom);
-        cn.addInput(doc, 4, 5, o0);
-        cn.addInput(doc, 19, 20, o0);
-        in.addInput(doc, 10, 11, o0);
+        sn.get().addInput(doc, 0, 1, 0, doc.bottom);
+        cn.get().addInput(doc, 4, 5, o0);
+        cn.get().addInput(doc, 19, 20, o0);
+        in.get().addInput(doc, 10, 11, o0);
 
         System.out.println(doc.neuronActivationsToString(false, false, true));
 
 
-        Assert.assertNotNull(getAct(doc, on.node.get(), 1, new Range(5, 20), null));
+        Assert.assertNotNull(getAct(doc, on.get().node.get(), 1, new Range(5, 20), null));
 
-        cn.addInput(doc, 9, 10, o012);
+        cn.get().addInput(doc, 9, 10, o012);
 
         System.out.println(doc.neuronActivationsToString(false, false, true));
 /*

@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Model;
@@ -42,11 +43,11 @@ public class OrOptionsTest {
 
         AndNode.minFrequency = 5;
 
-        Neuron inA = new Neuron(m, "A");
-        Neuron inB = new Neuron(m, "B");
-        Neuron inC = new Neuron(m, "C");
+        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<Neuron> inB = m.createNeuron("B");
+        Provider<Neuron> inC = m.createNeuron("C");
 
-        Neuron pD = new Neuron(m, "D");
+        Provider<Neuron> pD = m.createNeuron("D");
 
         m.initOrNeuron(pD,
                 new Input()
@@ -70,15 +71,15 @@ public class OrOptionsTest {
 
         InterprNode o0 = InterprNode.addPrimitive(doc);
         Range r = new Range(0, 10);
-        Node.addActivationAndPropagate(doc, new NodeActivation.Key(inA.node.get(), r, 0, o0), Collections.emptySet());
+        Node.addActivationAndPropagate(doc, new NodeActivation.Key(inA.get().node.get(), r, 0, o0), Collections.emptySet());
         doc.propagate();
 
         InterprNode o1 = InterprNode.addPrimitive(doc);
-        Node.addActivationAndPropagate(doc, new NodeActivation.Key(inA.node.get(), r, 0, o1), Collections.emptySet());
+        Node.addActivationAndPropagate(doc, new NodeActivation.Key(inA.get().node.get(), r, 0, o1), Collections.emptySet());
         doc.propagate();
 
         InterprNode o2 = InterprNode.addPrimitive(doc);
-        Node.addActivationAndPropagate(doc, new NodeActivation.Key(inA.node.get(), r, 0, o2), Collections.emptySet());
+        Node.addActivationAndPropagate(doc, new NodeActivation.Key(inA.get().node.get(), r, 0, o2), Collections.emptySet());
         doc.propagate();
 
 

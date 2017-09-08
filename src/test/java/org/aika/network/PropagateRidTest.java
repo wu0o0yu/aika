@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Model;
@@ -40,8 +41,8 @@ public class PropagateRidTest {
         AndNode.minFrequency = 1;
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        Neuron inA = new Neuron(m, "A");
-        Neuron pA = m.initAndNeuron(new Neuron(m, "pA"),
+        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<Neuron> pA = m.initAndNeuron(m.createNeuron("pA"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -51,9 +52,9 @@ public class PropagateRidTest {
                         .setRelativeRid(5)
         );
 
-        inA.addInput(doc, 0, 1, 10, doc.bottom);
+        inA.get().addInput(doc, 0, 1, 10, doc.bottom);
 
-        Assert.assertEquals(5, NodeActivation.get(doc, pA.node.get(), null, null, null, null, null, null).key.rid.intValue());
+        Assert.assertEquals(5, NodeActivation.get(doc, pA.get().node.get(), null, null, null, null, null, null).key.rid.intValue());
 
     }
 }

@@ -257,15 +257,17 @@ public class Document implements Comparable<Document> {
         addedNodes.clear();
 
         if(m.lastCleanup[threadId] + CLEANUP_INTERVAL < id) {
-            for (WeakReference<Provider<? extends AbstractNode>> wnp : m.providers.values()) {
-                Provider<? extends AbstractNode> np = wnp.get();
-                if(np != null) {
-                    AbstractNode an = np.get();
-                    if (an instanceof Node) {
-                        Node n = (Node) an;
-                        Node.ThreadState th = n.threads[threadId];
-                        if (th != null && th.lastUsed + CLEANUP_INTERVAL < id) {
-                            n.threads[threadId] = null;
+            synchronized(m.providers) {
+                for (WeakReference<Provider<? extends AbstractNode>> wnp : m.providers.values()) {
+                    Provider<? extends AbstractNode> np = wnp.get();
+                    if (np != null && !np.isSuspended()) {
+                        AbstractNode an = np.get();
+                        if (an instanceof Node) {
+                            Node n = (Node) an;
+                            Node.ThreadState th = n.threads[threadId];
+                            if (th != null && th.lastUsed + CLEANUP_INTERVAL < id) {
+                                n.threads[threadId] = null;
+                            }
                         }
                     }
                 }

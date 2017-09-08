@@ -883,7 +883,8 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    public static Neuron init(Model m, int threadId, Neuron n, double bias, double negDirSum, double negRecSum, double posRecSum, Set<Synapse> inputs) {
+    public static Provider<Neuron> init(Model m, int threadId, Provider<Neuron> pn, double bias, double negDirSum, double negRecSum, double posRecSum, Set<Synapse> inputs) {
+        Neuron n = pn.get();
         n.m = m;
         n.m.stat.neurons++;
         n.bias = bias;
@@ -910,7 +911,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
 
         n.publish(threadId);
 
-        return n;
+        return n.provider;
     }
 
 
