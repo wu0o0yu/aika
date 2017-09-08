@@ -193,7 +193,23 @@ public class Synapse implements Writable {
     public static Synapse read(DataInput in, Model m) throws IOException {
         Synapse k = new Synapse();
         k.readFields(in, m);
-        return k;
+        return lookupSynapse(k);
+    }
+
+
+    private static Synapse lookupSynapse(Synapse tmpSyn) {
+        if (!tmpSyn.output.isSuspended()) {
+            Neuron n = tmpSyn.output.get();
+            return n.inputSynapses.get(tmpSyn);
+        } else if(!tmpSyn.input.isSuspended()) {
+            Neuron n = tmpSyn.input.get();
+            return n.outputSynapses.get(tmpSyn);
+        } else if(!tmpSyn.inputNode.isSuspended()) {
+            InputNode n = tmpSyn.inputNode.get();
+            return n.getSynapse(new InputNode.SynapseKey(tmpSyn.key.relativeRid, tmpSyn.output));
+        } else {
+            return tmpSyn;
+        }
     }
 
 
@@ -207,6 +223,7 @@ public class Synapse implements Writable {
         }
         return rk;
     }
+
 
 
     public static class Key implements Comparable<Key>, Writable {

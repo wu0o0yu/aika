@@ -46,7 +46,7 @@ import static org.aika.corpus.Range.Operator.EQUALS;
 public class OrNode extends Node<OrNode, Activation> {
 
     // Hack: Integer.MIN_VALUE represents the null key
-    public TreeMap<Integer, TreeSet<Node>> parents = new TreeMap<>();
+    public TreeMap<Integer, TreeSet<Provider<Node>>> parents = new TreeMap<>();
 
     public Provider<? extends Neuron> neuron = null;
 
@@ -103,24 +103,24 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    private void retrieveInputs(Document doc, Range inputR, Integer rid, List<NodeActivation<?>> inputs, Integer pRidOffset, TreeSet<Node> parents) {
+    private void retrieveInputs(Document doc, Range inputR, Integer rid, List<NodeActivation<?>> inputs, Integer pRidOffset, TreeSet<Provider<Node>> parents) {
         // Optimization the number of parents can get very large, thus we need to avoid iterating over all of them.
         if(parents.size() > 10) {
             retrieveInputs(doc, null, inputR, rid, inputs, pRidOffset, parents);
         } else {
-            for(Node pn: parents) {
-                retrieveInputs(doc, pn, inputR, rid, inputs, pRidOffset, parents);
+            for(Provider<Node> pn: parents) {
+                retrieveInputs(doc, pn.get(), inputR, rid, inputs, pRidOffset, parents);
             }
         }
     }
 
 
-    private void retrieveInputs(Document doc, Node<?, NodeActivation<?>> n, Range inputR, Integer rid, List<NodeActivation<?>> inputs, Integer pRidOffset, TreeSet<Node> parents) {
+    private void retrieveInputs(Document doc, Node<?, NodeActivation<?>> n, Range inputR, Integer rid, List<NodeActivation<?>> inputs, Integer pRidOffset, TreeSet<Provider<Node>> parents) {
         Stream<NodeActivation> s = n != null ?
                 NodeActivation.select(doc, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null) :
                 NodeActivation.select(doc, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null);
         for(NodeActivation iAct: s.collect(Collectors.toList())) {
-            if(!iAct.isRemoved && parents.contains(iAct.key.n) && !checkSelfReferencing(doc, iAct)) {
+            if(!iAct.isRemoved && parents.contains(iAct.key.n.provider) && !checkSelfReferencing(doc, iAct)) {
                 inputs.add(iAct);
             }
         }
@@ -154,7 +154,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
         List<NodeActivation<?>> inputs = new ArrayList<>();
 
-        for (Map.Entry<Integer, TreeSet<Node>> me : parents.entrySet()) {
+        for (Map.Entry<Integer, TreeSet<Provider<Node>>> me : parents.entrySet()) {
             retrieveInputs(doc, r, rid, inputs, me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, me.getValue());
         }
 
@@ -303,12 +303,12 @@ public class OrNode extends Node<OrNode, Activation> {
         lock.acquireWriteLock(threadId);
         provider.setModified();
         Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
-        TreeSet<Node> pn = parents.get(key);
+        TreeSet<Provider<Node>> pn = parents.get(key);
         if(pn == null) {
             pn = new TreeSet();
             parents.put(key, pn);
         }
-        pn.add(in);
+        pn.add(in.provider);
         lock.releaseWriteLock();
     }
 
@@ -320,9 +320,9 @@ public class OrNode extends Node<OrNode, Activation> {
         lock.acquireWriteLock(threadId);
         provider.setModified();
         Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
-        TreeSet<Node> pn = parents.get(key);
+        TreeSet<Provider<Node>> pn = parents.get(key);
         if(pn != null) {
-            pn.remove(in);
+            pn.remove(in.provider);
             if(pn.isEmpty() && ridOffset != null) {
                 parents.remove(key);
             }
@@ -333,8 +333,9 @@ public class OrNode extends Node<OrNode, Activation> {
 
     void removeAllInputs(int threadId) {
         lock.acquireWriteLock(threadId);
-        for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
-            for(Node pn: me.getValue()) {
+        for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: parents.entrySet()) {
+            for(Provider<Node> p: me.getValue()) {
+                Node pn = p.get();
                 pn.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, -1);
                 pn.removeOrChild(threadId, new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, provider));
                 pn.provider.setModified();
@@ -351,8 +352,9 @@ public class OrNode extends Node<OrNode, Activation> {
         super.remove(m, threadId);
 
         lock.acquireReadLock();
-        for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
-            for(Node pn: me.getValue()) {
+        for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: parents.entrySet()) {
+            for(Provider<Node> p: me.getValue()) {
+                Node pn = p.get();
                 pn.removeOrChild(threadId, new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, provider));
                 pn.provider.setModified();
             }
@@ -389,15 +391,15 @@ public class OrNode extends Node<OrNode, Activation> {
         sb.append("OR[");
         boolean first = true;
         int i = 0;
-        for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
-            for (Node pn : me.getValue()) {
+        for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: parents.entrySet()) {
+            for (Provider<Node> pn : me.getValue()) {
                 if (!first) {
                     sb.append(",");
                 }
                 first = false;
                 sb.append(me.getKey() != Integer.MIN_VALUE ? me.getKey() : "X");
                 sb.append(":");
-                sb.append(pn.logicToString());
+                sb.append(pn.get().logicToString());
                 if (i > 2) {
                     sb.append(",...");
                     break;
@@ -421,11 +423,11 @@ public class OrNode extends Node<OrNode, Activation> {
         out.writeInt(neuron.id);
 
         out.writeInt(parents.size());
-        for(Map.Entry<Integer, TreeSet<Node>> me: parents.entrySet()) {
+        for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: parents.entrySet()) {
             out.writeInt(me.getKey());
             out.writeInt(me.getValue().size());
-            for(Node pn: me.getValue()) {
-                out.writeInt(pn.provider.id);
+            for(Provider<Node> pn: me.getValue()) {
+                out.writeInt(pn.id);
             }
         }
     }
@@ -439,24 +441,21 @@ public class OrNode extends Node<OrNode, Activation> {
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
-            TreeSet<Node> ridParents = new TreeSet<>();
+            TreeSet<Provider<Node>> ridParents = new TreeSet<>();
             Integer ridOffset = in.readInt();
             parents.put(ridOffset, ridParents);
 
             int sa = in.readInt();
             for(int j = 0; j < sa; j++) {
-                Provider<Node> p = m.lookupProvider(in.readInt());
-                Node pn = p.get();
-                pn.addOrChild(new OrEntry(ridOffset, provider));
-                ridParents.add(pn);
+                ridParents.add(m.lookupProvider(in.readInt()));
             }
         }
     }
 
 
-    public String toSimpleString() {
+    protected String getNeuronLabel() {
         String l = neuron.get().label;
-        return super.toSimpleString() + ":" + (l != null ? l : "");
+        return l != null ? l : "";
     }
 
 

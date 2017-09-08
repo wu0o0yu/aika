@@ -871,27 +871,14 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
         while(in.readBoolean()) {
             Synapse syn = Synapse.read(in, m);
 
-            if(syn.input != null && !syn.input.isSuspended()) {
-                syn.input.get().outputSynapses.put(syn, syn);
-            }
-
-            if(syn.inputNode != null && !syn.inputNode.isSuspended()) {
-                syn.inputNode.get().setSynapse(m.defaultThreadId, new InputNode.SynapseKey(syn.key.relativeRid, syn.output), syn);
-            }
-
             inputSynapses.put(syn, syn);
             inputSynapsesByWeight.add(syn);
         }
 
         while(in.readBoolean()) {
-            Synapse synTmp = Synapse.read(in, m);
+            Synapse syn = Synapse.read(in, m);
 
-            if(synTmp.output != null && !synTmp.output.isSuspended()) {
-                Neuron an = synTmp.output.get();
-                Synapse syn = an.inputSynapses.get(synTmp);
-
-                outputSynapses.put(syn, syn);
-            }
+            outputSynapses.put(syn, syn);
         }
     }
 

@@ -486,18 +486,13 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
         while(in.readBoolean()) {
             SynapseKey sk = SynapseKey.read(in, m);
-            Synapse synTmp = Synapse.read(in, m);
+            Synapse syn = Synapse.read(in, m);
 
-            if(synTmp.output != null && !synTmp.output.isSuspended()) {
-                Neuron an = synTmp.output.get();
-                Synapse syn = an.inputSynapses.get(synTmp);
-
-                if(synapses == null) {
-                    synapses = new TreeMap<>();
-                }
-
-                synapses.put(sk, syn);
+            if(synapses == null) {
+                synapses = new TreeMap<>();
             }
+
+            synapses.put(sk, syn);
         }
     }
 

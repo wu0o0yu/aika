@@ -460,7 +460,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     public double computeSynapseWeightSum(Integer offset, Neuron n) {
         double sum = n.bias;
         for(Refinement ref: parents.keySet()) {
-            Synapse s = ref.getSynapse(offset, n);
+            Synapse s = ref.getSynapse(offset, n.provider);
             sum += Math.abs(s.w);
         }
         return sum;
@@ -593,10 +593,10 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         }
 
 
-        public Synapse getSynapse(Integer offset, Neuron n) {
+        public Synapse getSynapse(Integer offset, Provider<Neuron> n) {
             InputNode in = input.get();
             in.lock.acquireReadLock();
-            Synapse s = in.synapses != null ? in.synapses.get(new SynapseKey(Utils.nullSafeAdd(getRelativePosition(), false, offset, false), n.provider)) : null;
+            Synapse s = in.synapses != null ? in.synapses.get(new SynapseKey(Utils.nullSafeAdd(getRelativePosition(), false, offset, false), n)) : null;
             in.lock.releaseReadLock();
             return s;
         }

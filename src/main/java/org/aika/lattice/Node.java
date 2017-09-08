@@ -289,9 +289,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         Provider<AndNode> n = andChildren.put(ref, child);
-        if(n != null) {
-            System.out.println();
-        }
         assert n == null;
         reverseAndChildren.put(new ReverseAndRefinement(child, ref.rid, 0), ref);
     }
@@ -770,7 +767,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             AndNode node = (AndNode) pa;
 
             for(Refinement ref: node.parents.keySet()) {
-                Synapse s = ref.getSynapse(rsk.offset, n);
+                Synapse s = ref.getSynapse(rsk.offset, n.provider);
                 if(minSyn == null || Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP.compare(minSyn, s) > 0) {
                     minSyn = s;
                 }
@@ -848,19 +845,19 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
+    protected String getNeuronLabel() {
+        return "";
+    }
+
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(toSimpleString());
+        sb.append(getNeuronLabel());
         sb.append(" - ");
         sb.append(logicToString());
         sb.append(" - ");
         sb.append(weightsToString());
         return sb.toString();
-    }
-
-
-    public String toSimpleString() {
-        return "" + provider.id;
     }
 
 
