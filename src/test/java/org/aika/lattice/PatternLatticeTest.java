@@ -20,6 +20,7 @@ package org.aika.lattice;
 import org.aika.Input;
 import org.aika.Input.RangeRelation;
 import org.aika.Model;
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
@@ -40,10 +41,10 @@ public class PatternLatticeTest {
     @Test
     public void testPredefinedPatterns() {
         Model m = new Model();
-        Provider<INeuron> inA = m.createNeuron("A");
-        Provider<INeuron> inB = m.createNeuron("B");
-        Provider<INeuron> inC = m.createNeuron("C");
-        Provider<INeuron> inD = m.createNeuron("D");
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
+        Neuron inC = m.createNeuron("C");
+        Neuron inD = m.createNeuron("D");
 
         {
             m.initAndNeuron(m.createNeuron("ABC"),
@@ -259,10 +260,10 @@ public class PatternLatticeTest {
         m.numberOfPositions = 100;
 
 
-        Provider<INeuron> inA = m.createNeuron("A");
-        Provider<INeuron> inB = m.createNeuron("B");
-        Provider<INeuron> inC = m.createNeuron("C");
-        Provider<INeuron> inD = m.createNeuron("D");
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
+        Neuron inC = m.createNeuron("C");
+        Neuron inD = m.createNeuron("D");
 
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -655,13 +656,13 @@ public class PatternLatticeTest {
         Model m = new Model();
         AndNode.minFrequency = 10;
 
-        Provider<INeuron> inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A");
         Node inANode = inA.get().node.get();
 
-        Provider<INeuron> inB = m.createNeuron("B");
+        Neuron inB = m.createNeuron("B");
         Node inBNode = inB.get().node.get();
 
-        Provider<INeuron> inC = m.createNeuron("C");
+        Neuron inC = m.createNeuron("C");
         Node inCNode = inC.get().node.get();
 
         m.initAndNeuron(m.createNeuron("ABC"),

@@ -111,17 +111,17 @@ public class Model {
     }
 
 
-    public Provider<INeuron> createNeuron() {
+    public Neuron createNeuron() {
         return new INeuron(this).provider;
     }
 
 
-    public Provider<INeuron> createNeuron(String label) {
+    public Neuron createNeuron(String label) {
         return new INeuron(this, label).provider;
     }
 
 
-    public Provider<INeuron> createNeuron(String label, boolean isBlocked, boolean noTraining) {
+    public Neuron createNeuron(String label, boolean isBlocked, boolean noTraining) {
         return new INeuron(this, label, isBlocked, noTraining).provider;
     }
 
@@ -147,21 +147,21 @@ public class Model {
     }
 
 
-    public <T extends AbstractNode> Provider<T> lookupProvider(int id) {
+    public <P extends Provider<? extends AbstractNode>> P lookupProvider(int id) {
         synchronized (providers) {
             WeakReference<Provider<? extends AbstractNode>> sp = providers.get(id);
             if (sp != null) {
                 Provider p = sp.get();
                 if (p != null) {
                     referencedProviders.put(id, p);
-                    return p;
+                    return (P) p;
                 }
             }
 
             Provider p = new Provider(this, id, null);
             providers.put(id, new WeakReference(p));
             referencedProviders.put(id, p);
-            return p;
+            return (P) p;
         }
     }
 
@@ -255,7 +255,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Provider<INeuron> initAndNeuron(Provider<INeuron> n, double threshold, Input... inputs) {
+    public Neuron initAndNeuron(Neuron n, double threshold, Input... inputs) {
         return initAndNeuron(n, threshold, new TreeSet<>(Arrays.asList(inputs)));
     }
 
@@ -269,7 +269,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Provider<INeuron> initAndNeuron(Provider<INeuron> n, double threshold, Collection<Input> inputs) {
+    public Neuron initAndNeuron(Neuron n, double threshold, Collection<Input> inputs) {
         n.m = this;
 
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
@@ -363,7 +363,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Provider<INeuron> initNeuron(Provider<INeuron> n, double bias, Input... inputs) {
+    public Neuron initNeuron(Neuron n, double bias, Input... inputs) {
         return initNeuron(n, bias, new TreeSet<>(Arrays.asList(inputs)));
     }
 
@@ -376,7 +376,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Provider<INeuron> initNeuron(Provider<INeuron> n, double bias, Collection<Input> inputs) {
+    public Neuron initNeuron(Neuron n, double bias, Collection<Input> inputs) {
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         double negDirSum = 0.0;
@@ -412,7 +412,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Provider<INeuron> initOrNeuron(Provider<INeuron> n, Input... inputs) {
+    public Neuron initOrNeuron(Neuron n, Input... inputs) {
         return initOrNeuron(n, new TreeSet<>(Arrays.asList(inputs)));
     }
 
@@ -425,7 +425,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Provider<INeuron> initOrNeuron(Provider<INeuron> n, Set<Input> inputs) {
+    public Neuron initOrNeuron(Neuron n, Set<Input> inputs) {
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         double bias = -0.001;
@@ -449,7 +449,7 @@ public class Model {
      * @param dirIS
      * @return
      */
-    public Provider<INeuron> initRelationalNeuron(Provider<INeuron> n, Provider<INeuron> ctn, Provider<INeuron> inputSignal, boolean dirIS) {
+    public Neuron initRelationalNeuron(Neuron n, Neuron ctn, Neuron inputSignal, boolean dirIS) {
         double bias = -30.0;
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
@@ -511,7 +511,7 @@ public class Model {
      * @param direction
      * @return
      */
-    public Provider<INeuron> initCounterNeuron(Provider<INeuron> n, Provider<INeuron> clockSignal, boolean dirCS, Provider<INeuron> startSignal, boolean dirSS, boolean direction) {
+    public Neuron initCounterNeuron(Neuron n, Neuron clockSignal, boolean dirCS, Neuron startSignal, boolean dirSS, boolean direction) {
         double bias = -44.0;
         double negRecSum = -20.0;
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);

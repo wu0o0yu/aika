@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
@@ -40,8 +41,8 @@ public class CountingTest {
         Model m = new Model();
         AndNode.minFrequency = 0;
 
-        Provider<INeuron> inA = m.createNeuron("inA");
-        Provider<INeuron> outA = m.initAndNeuron(m.createNeuron("nA"), 0.5,
+        Neuron inA = m.createNeuron("inA");
+        Neuron outA = m.initAndNeuron(m.createNeuron("nA"), 0.5,
                 new Input()
                         .setMinInput(0.95f)
                         .setWeight(100.0f)

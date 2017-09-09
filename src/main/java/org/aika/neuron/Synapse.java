@@ -17,10 +17,7 @@
 package org.aika.neuron;
 
 
-import org.aika.Model;
-import org.aika.Provider;
-import org.aika.Utils;
-import org.aika.Writable;
+import org.aika.*;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
@@ -92,8 +89,8 @@ public class Synapse implements Writable {
         }
     };
 
-    public Provider<INeuron> input;
-    public Provider<INeuron> output;
+    public Neuron input;
+    public Neuron output;
 
     public Provider<InputNode> inputNode;
 
@@ -111,14 +108,14 @@ public class Synapse implements Writable {
     public Synapse() {}
 
 
-    public Synapse(Provider<INeuron> input) {
+    public Synapse(Neuron input) {
         if(input != null) {
             this.input = input;
         }
     }
 
 
-    public Synapse(Provider<INeuron> input, Key key) {
+    public Synapse(Neuron input, Key key) {
         this(input);
         this.key = lookupKey(key);
 

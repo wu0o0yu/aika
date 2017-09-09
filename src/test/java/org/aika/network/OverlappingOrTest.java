@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
@@ -43,16 +44,16 @@ public class OverlappingOrTest {
     public void testOverlappingOr() {
         Model m = new Model();
 
-        Map<Character, Provider<INeuron>> inputNeurons = new HashMap<>();
-        Map<Character, Provider<INeuron>> relNeurons = new HashMap<>();
+        Map<Character, Neuron> inputNeurons = new HashMap<>();
+        Map<Character, Neuron> relNeurons = new HashMap<>();
 
         // The space neuron will be used as clock signal for the recurrent neurons.
-        Provider<INeuron> inSpace = m.createNeuron("SPACE");
+        Neuron inSpace = m.createNeuron("SPACE");
         inputNeurons.put(' ', inSpace);
 
-        Provider<INeuron> startSignal = m.createNeuron("START-SIGNAL");
+        Neuron startSignal = m.createNeuron("START-SIGNAL");
 
-        Provider<INeuron> ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"),
+        Neuron ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"),
                 inSpace, false,
                 startSignal, true,
                 false
@@ -60,8 +61,8 @@ public class OverlappingOrTest {
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            Provider<INeuron> in = m.createNeuron(c + "");
-            Provider<INeuron> rn = m.initRelationalNeuron(
+            Neuron in = m.createNeuron(c + "");
+            Neuron rn = m.initRelationalNeuron(
                     m.createNeuron(c + "-RN"),
                     ctNeuron,
                     in, false
@@ -75,7 +76,7 @@ public class OverlappingOrTest {
         // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
         // of the inputs relative to each other. The following flag specifies whether this relativeRid is
         // relative or absolute.
-        Provider<INeuron> pattern = m.initAndNeuron(
+        Neuron pattern = m.initAndNeuron(
                 m.createNeuron("BCD"),
                 0.4,
                 new Input()

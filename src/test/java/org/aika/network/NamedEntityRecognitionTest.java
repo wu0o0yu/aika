@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.neuron.Activation;
 import org.aika.corpus.Document;
@@ -42,19 +43,19 @@ public class NamedEntityRecognitionTest {
     public void testNamedEntityRecognitionWithoutCounterNeuron() {
         Model m = new Model(null, 1); // number of threads
 
-        Provider<INeuron> forenameCategory = m.createNeuron("C-forename");
-        Provider<INeuron> surnameCategory = m.createNeuron("C-surname");
-        Provider<INeuron> suppressingN = m.createNeuron("SUPPR");
+        Neuron forenameCategory = m.createNeuron("C-forename");
+        Neuron surnameCategory = m.createNeuron("C-surname");
+        Neuron suppressingN = m.createNeuron("SUPPR");
 
 
         // The word input neurons which do not yet possess a relational id.
-        HashMap<String, Provider<INeuron>> inputNeurons = new HashMap<>();
+        HashMap<String, Neuron> inputNeurons = new HashMap<>();
 
         String[] words = new String[] {
                 "mr.", "jackson", "cook", "was", "born", "in", "new", "york"
         };
         for(String word: words) {
-            Provider<INeuron> in = m.createNeuron("W-" + word);
+            Neuron in = m.createNeuron("W-" + word);
 
             inputNeurons.put(word, in);
         }
@@ -62,7 +63,7 @@ public class NamedEntityRecognitionTest {
         // The entity neurons represent the concrete meanings of the input words.
         // The helper function 'initAndNeuron' computes the required bias for a
         // conjunction of the inputs.
-        Provider<INeuron> cookSurnameEntity = m.initAndNeuron(
+        Neuron cookSurnameEntity = m.initAndNeuron(
                 m.createNeuron("E-cook (surname)"),
                 0.5, // adjusts the bias
                 new Input() // Requires the word to be recognized
@@ -95,7 +96,7 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(CONTAINS)
         );
 
-        Provider<INeuron> cookProfessionEntity = m.initAndNeuron(
+        Neuron cookProfessionEntity = m.initAndNeuron(
                 m.createNeuron("E-cook (profession)"),
                 0.2,
                 new Input()
@@ -113,7 +114,7 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(CONTAINS)
         );
 
-        Provider<INeuron> jacksonForenameEntity = m.initAndNeuron(
+        Neuron jacksonForenameEntity = m.initAndNeuron(
                 m.createNeuron("E-jackson (forename)"),
                 0.5,
                 new Input()
@@ -139,7 +140,7 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(CONTAINED_IN)
         );
 
-        Provider<INeuron> jacksonCityEntity = m.initAndNeuron(
+        Neuron jacksonCityEntity = m.initAndNeuron(
                 m.createNeuron("E-jackson (city)"),
                 0.2,
                 new Input()
@@ -225,16 +226,16 @@ public class NamedEntityRecognitionTest {
     public void testNamedEntityRecognitionWithCounterNeuron() {
         Model m = new Model(null, 1); // number of threads
 
-        Provider<INeuron> forenameCategory = m.createNeuron("C-forename");
-        Provider<INeuron> surnameCategory = m.createNeuron("C-surname");
-        Provider<INeuron> suppressingN = m.createNeuron("SUPPR");
+        Neuron forenameCategory = m.createNeuron("C-forename");
+        Neuron surnameCategory = m.createNeuron("C-surname");
+        Neuron suppressingN = m.createNeuron("SUPPR");
 
         // The following three neurons are used to assign each word activation
         // a relational id (rid). Here, the relational id specifies the
         // word position within the sentence.
-        Provider<INeuron> spaceN = m.createNeuron("SPACE");
-        Provider<INeuron> startSignal = m.createNeuron("START-SIGNAL");
-        Provider<INeuron> ctNeuron = m.initCounterNeuron(m.createNeuron("RID Counter"),
+        Neuron spaceN = m.createNeuron("SPACE");
+        Neuron startSignal = m.createNeuron("START-SIGNAL");
+        Neuron ctNeuron = m.initCounterNeuron(m.createNeuron("RID Counter"),
                 spaceN, // clock signal
                 false, // direction of the clock signal (range end counts)
                 startSignal, // start signal
@@ -246,18 +247,18 @@ public class NamedEntityRecognitionTest {
 
 
         // The word input neurons which do not yet possess a relational id.
-        HashMap<String, Provider<INeuron>> inputNeurons = new HashMap<>();
+        HashMap<String, Neuron> inputNeurons = new HashMap<>();
 
         // The word input neurons with a relational id.
-        HashMap<String, Provider<INeuron>> relNeurons = new HashMap<>();
+        HashMap<String, Neuron> relNeurons = new HashMap<>();
 
 
         String[] words = new String[] {
                 "mr.", "jackson", "cook", "was", "born", "in", "new", "york"
         };
         for(String word: words) {
-            Provider<INeuron> in = m.createNeuron("W-" + word);
-            Provider<INeuron> rn = m.initRelationalNeuron(
+            Neuron in = m.createNeuron("W-" + word);
+            Neuron rn = m.initRelationalNeuron(
                     m.createNeuron("WR-" + word),
                     ctNeuron, // RID Counting neuron
                     in, // Input neuron
@@ -271,7 +272,7 @@ public class NamedEntityRecognitionTest {
         // The entity neurons represent the concrete meanings of the input words.
         // The helper function 'initAndNeuron' computes the required bias for a
         // conjunction of the inputs.
-        Provider<INeuron> cookSurnameEntity = m.initAndNeuron(
+        Neuron cookSurnameEntity = m.initAndNeuron(
                 m.createNeuron("E-cook (surname)"),
                 0.5, // adjusts the bias
                 new Input() // Requires the word to be recognized
@@ -303,7 +304,7 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(CONTAINS)
         );
 
-        Provider<INeuron> cookProfessionEntity = m.initAndNeuron(
+        Neuron cookProfessionEntity = m.initAndNeuron(
                 m.createNeuron("E-cook (profession)"),
                 0.2,
                 new Input()
@@ -321,7 +322,7 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(CONTAINS)
         );
 
-        Provider<INeuron> jacksonForenameEntity = m.initAndNeuron(
+        Neuron jacksonForenameEntity = m.initAndNeuron(
                 m.createNeuron("E-jackson (forename)"),
                 0.5,
                 new Input()
@@ -347,7 +348,7 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(CONTAINED_IN)
         );
 
-        Provider<INeuron> jacksonCityEntity = m.initAndNeuron(
+        Neuron jacksonCityEntity = m.initAndNeuron(
                 m.createNeuron("E-jackson (city)"),
                 0.2,
                 new Input()

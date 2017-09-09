@@ -30,7 +30,7 @@ import org.aika.neuron.INeuron;
 public class Input implements Comparable<Input> {
     boolean recurrent;
     boolean optional;
-    Provider<INeuron> neuron;
+    Neuron neuron;
     float weight;
     float maxLowerWeightsSum = Float.MAX_VALUE;
     float minInput;
@@ -79,7 +79,7 @@ public class Input implements Comparable<Input> {
      * @param neuron
      * @return
      */
-    public Input setNeuron(Provider<INeuron> neuron) {
+    public Input setNeuron(Neuron neuron) {
         assert neuron != null;
         this.neuron = neuron;
         return this;

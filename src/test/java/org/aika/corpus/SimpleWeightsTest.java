@@ -19,6 +19,7 @@ package org.aika.corpus;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.neuron.INeuron;
 import org.junit.Test;
@@ -35,10 +36,10 @@ public class SimpleWeightsTest {
     public void testWeightsOR() {
         Model m = new Model();
 
-        Provider<INeuron> inA = m.createNeuron("A");
-        Provider<INeuron> inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
 
-        Provider<INeuron> pC = m.createNeuron("C");
+        Neuron pC = m.createNeuron("C");
         m.initOrNeuron(pC,
                 new Input()
                         .setOptional(false)
@@ -86,10 +87,10 @@ public class SimpleWeightsTest {
     public void testWeightsAND() {
         Model m = new Model();
 
-        Provider<INeuron> inA = m.createNeuron("A");
-        Provider<INeuron> inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
 
-        Provider<INeuron> pC = m.createNeuron("C");
+        Neuron pC = m.createNeuron("C");
         m.initAndNeuron(pC,
                 0.001,
                 new Input()

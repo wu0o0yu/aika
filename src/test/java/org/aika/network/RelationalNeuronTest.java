@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Model;
@@ -36,11 +37,11 @@ public class RelationalNeuronTest {
     public void testOutputNode() {
         Model m = new Model();
 
-        Provider<INeuron> in = m.createNeuron("INPUT");
-        Provider<INeuron> cn = m.createNeuron("CLOCK");
-        Provider<INeuron> sn = m.createNeuron("START");
-        Provider<INeuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
-        Provider<INeuron> on = m.initRelationalNeuron(m.createNeuron("ON"), ctn, in, false);
+        Neuron in = m.createNeuron("INPUT");
+        Neuron cn = m.createNeuron("CLOCK");
+        Neuron sn = m.createNeuron("START");
+        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
+        Neuron on = m.initRelationalNeuron(m.createNeuron("ON"), ctn, in, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 

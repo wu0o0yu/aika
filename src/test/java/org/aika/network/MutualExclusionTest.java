@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.neuron.Activation;
 import org.aika.corpus.Conflicts.Conflict;
@@ -61,15 +62,15 @@ public class MutualExclusionTest {
         Model m = new Model();
 
         // Create the input neurons for the network.
-        Provider<INeuron> inA = m.createNeuron("IN-A");
-        Provider<INeuron> inB = m.createNeuron("IN-B");
-        Provider<INeuron> inC = m.createNeuron("IN-C");
+        Neuron inA = m.createNeuron("IN-A");
+        Neuron inB = m.createNeuron("IN-B");
+        Neuron inC = m.createNeuron("IN-C");
 
         // Instantiate the suppressing neuron. Its inputs will be added later on.
-        Provider<INeuron> pSuppr = m.createNeuron("SUPPRESS");
+        Neuron pSuppr = m.createNeuron("SUPPRESS");
 
         // Create three neurons that might be suppressed by the suppressing neuron.
-        Provider<INeuron> pA = m.initAndNeuron(
+        Neuron pA = m.initAndNeuron(
                 m.createNeuron("A"),
                 0.001,
                 new Input()
@@ -85,7 +86,7 @@ public class MutualExclusionTest {
                         .setMinInput(1.0f)     // This input is negated
         );
 
-        Provider<INeuron> pB = m.initAndNeuron(
+        Neuron pB = m.initAndNeuron(
                 m.createNeuron("B"),
                 0.001,
                 new Input()
@@ -101,7 +102,7 @@ public class MutualExclusionTest {
                         .setMinInput(1.0f)
         );
 
-        Provider<INeuron> pC = m.initAndNeuron(
+        Neuron pC = m.initAndNeuron(
                 m.createNeuron("C"),
                 0.001,
                 new Input()
@@ -137,7 +138,7 @@ public class MutualExclusionTest {
                         .setMinInput(1.0f)
         );
 
-        Provider<INeuron> outN = m.initOrNeuron(m.createNeuron("OUT"),
+        Neuron outN = m.initOrNeuron(m.createNeuron("OUT"),
                 new Input()
                         .setNeuron(pB)
                         .setWeight(1.0f)

@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
@@ -45,11 +46,11 @@ public class NegationTest {
     @Test
     public void testTwoNegativeInputs1() {
         Model m = new Model();
-        Provider<INeuron> inA = m.createNeuron("A");
-        Provider<INeuron> inB = m.createNeuron("B");
-        Provider<INeuron> inC = m.createNeuron("C");
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
+        Neuron inC = m.createNeuron("C");
 
-        Provider<INeuron> abcN = m.createNeuron("ABC");
+        Neuron abcN = m.createNeuron("ABC");
 
         m.initAndNeuron(abcN,
                 0.5,
@@ -100,15 +101,15 @@ public class NegationTest {
     public void testTwoNegativeInputs2() {
         Model m = new Model();
 
-        Provider<INeuron> inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A");
 
-        Provider<INeuron> inB = m.createNeuron("B");
+        Neuron inB = m.createNeuron("B");
 
-        Provider<INeuron> inC = m.createNeuron("C");
+        Neuron inC = m.createNeuron("C");
 
-        Provider<INeuron> abcN = m.createNeuron("ABC");
+        Neuron abcN = m.createNeuron("ABC");
 
-        Provider<INeuron> outN = m.initOrNeuron(m.createNeuron("OUT"),
+        Neuron outN = m.initOrNeuron(m.createNeuron("OUT"),
                 new Input()
                         .setNeuron(abcN)
                         .setWeight(1.0f)
@@ -173,13 +174,13 @@ public class NegationTest {
     public void testSimpleNegation1() {
         Model m = new Model();
 
-        Provider<INeuron> inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A");
 
-        Provider<INeuron> asN = m.createNeuron("AS");
+        Neuron asN = m.createNeuron("AS");
 
-        Provider<INeuron> inS = m.createNeuron("S");
+        Neuron inS = m.createNeuron("S");
 
-        Provider<INeuron> outN = m.initOrNeuron(m.createNeuron("OUT"),
+        Neuron outN = m.initOrNeuron(m.createNeuron("OUT"),
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0f)
@@ -240,13 +241,13 @@ public class NegationTest {
     public void testSimpleNegation2() {
         Model m = new Model();
 
-        Provider<INeuron> inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A");
 
-        Provider<INeuron> asN = m.createNeuron("AS");
+        Neuron asN = m.createNeuron("AS");
 
-        Provider<INeuron> inS = m.createNeuron("S");
+        Neuron inS = m.createNeuron("S");
 
-        Provider<INeuron> outN = m.initOrNeuron(m.createNeuron("OUT"),
+        Neuron outN = m.initOrNeuron(m.createNeuron("OUT"),
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0f)
@@ -303,13 +304,13 @@ public class NegationTest {
     public void testSimpleNegation3() {
         Model m = new Model();
 
-        Provider<INeuron> inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A");
 
-        Provider<INeuron> asN = m.createNeuron("AS");
+        Neuron asN = m.createNeuron("AS");
 
-        Provider<INeuron> inS = m.createNeuron("S");
+        Neuron inS = m.createNeuron("S");
 
-        Provider<INeuron> outN = m.initOrNeuron(m.createNeuron("OUT"),
+        Neuron outN = m.initOrNeuron(m.createNeuron("OUT"),
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0f)
@@ -369,14 +370,14 @@ public class NegationTest {
     @Test
     public void testNegation1() {
         Model m = new Model();
-        Provider<INeuron> inA = m.createNeuron("A");
-        Provider<INeuron> inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
 
-        Provider<INeuron> asN = m.createNeuron("AS");
-        Provider<INeuron> absN = m.createNeuron("ABS");
-        Provider<INeuron> bsN = m.createNeuron("BS");
+        Neuron asN = m.createNeuron("AS");
+        Neuron absN = m.createNeuron("ABS");
+        Neuron bsN = m.createNeuron("BS");
 
-        Provider<INeuron> inS = m.initOrNeuron(m.createNeuron("S"),
+        Neuron inS = m.initOrNeuron(m.createNeuron("S"),
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0f)
@@ -481,15 +482,15 @@ public class NegationTest {
     public void testNegation2() {
         Model m = new Model();
 
-        Provider<INeuron> inA = m.createNeuron("A");
-        Provider<INeuron> inB = m.createNeuron("B");
-        Provider<INeuron> inC = m.createNeuron("C");
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
+        Neuron inC = m.createNeuron("C");
 
-        Provider<INeuron> asN = m.createNeuron("AS");
-        Provider<INeuron> ascN = m.createNeuron("ASC");
-        Provider<INeuron> bsN = m.createNeuron("BS");
+        Neuron asN = m.createNeuron("AS");
+        Neuron ascN = m.createNeuron("ASC");
+        Neuron bsN = m.createNeuron("BS");
 
-        Provider<INeuron> inS = m.initOrNeuron(m.createNeuron("S"),
+        Neuron inS = m.initOrNeuron(m.createNeuron("S"),
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0f)
@@ -584,7 +585,7 @@ public class NegationTest {
                         .setRangeOutput(true)
         );
 
-        Provider<INeuron> outA = m.initOrNeuron(m.createNeuron("OUT A"),
+        Neuron outA = m.initOrNeuron(m.createNeuron("OUT A"),
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0f)
@@ -594,7 +595,7 @@ public class NegationTest {
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
-        Provider<INeuron> outAC = m.initOrNeuron(m.createNeuron("OUT AC"),
+        Neuron outAC = m.initOrNeuron(m.createNeuron("OUT AC"),
                 new Input()
                         .setNeuron(ascN)
                         .setWeight(1.0f)
@@ -604,7 +605,7 @@ public class NegationTest {
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
-        Provider<INeuron> outB = m.initOrNeuron(m.createNeuron("OUT B"),
+        Neuron outB = m.initOrNeuron(m.createNeuron("OUT B"),
                 new Input()
                         .setNeuron(bsN)
                         .setWeight(1.0f)
@@ -666,15 +667,15 @@ public class NegationTest {
         Model m = new Model();
         AndNode.minFrequency = 5;
 
-        Provider<INeuron> inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A");
         Node inANode = inA.get().node.get();
 
-        Provider<INeuron> inB = m.createNeuron("B");
+        Neuron inB = m.createNeuron("B");
         Node inBNode = inB.get().node.get();
 
 
-        Provider<INeuron> pC = m.createNeuron("C");
-        Provider<INeuron> pD = m.createNeuron("D");
+        Neuron pC = m.createNeuron("C");
+        Neuron pD = m.createNeuron("D");
 
         m.initAndNeuron(pC,
                 0.001,
@@ -709,10 +710,10 @@ public class NegationTest {
         );
 
 
-        Provider<INeuron> inG = m.createNeuron("G");
+        Neuron inG = m.createNeuron("G");
         OrNode inGNode = inG.get().node.get();
 
-        Provider<INeuron> pH = m.initAndNeuron(m.createNeuron("H"),
+        Neuron pH = m.initAndNeuron(m.createNeuron("H"),
                 0.001,
                 new Input()
                         .setNeuron(pC)

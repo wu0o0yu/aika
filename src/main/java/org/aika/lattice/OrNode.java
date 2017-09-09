@@ -48,7 +48,7 @@ public class OrNode extends Node<OrNode, Activation> {
     // Hack: Integer.MIN_VALUE represents the null key
     public TreeMap<Integer, TreeSet<Provider<Node>>> parents = new TreeMap<>();
 
-    public Provider<INeuron> neuron = null;
+    public Neuron neuron = null;
 
     public OrNode() {}
 

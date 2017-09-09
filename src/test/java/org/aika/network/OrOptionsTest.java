@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
@@ -43,11 +44,11 @@ public class OrOptionsTest {
 
         AndNode.minFrequency = 5;
 
-        Provider<INeuron> inA = m.createNeuron("A");
-        Provider<INeuron> inB = m.createNeuron("B");
-        Provider<INeuron> inC = m.createNeuron("C");
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
+        Neuron inC = m.createNeuron("C");
 
-        Provider<INeuron> pD = m.createNeuron("D");
+        Neuron pD = m.createNeuron("D");
 
         m.initOrNeuron(pD,
                 new Input()

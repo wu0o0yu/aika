@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
@@ -45,25 +46,25 @@ public class RecurrentPatternTest {
 
         Model m = new Model();
 
-        Provider<INeuron> startSignal = m.createNeuron("START-SIGNAL");
-        Provider<INeuron> spaceN = m.createNeuron("SPACE");
+        Neuron startSignal = m.createNeuron("START-SIGNAL");
+        Neuron spaceN = m.createNeuron("SPACE");
 
 
-        TreeMap<Character, Provider<INeuron>> chars = new TreeMap<>();
+        TreeMap<Character, Neuron> chars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
-            Provider<INeuron> charSN = m.createNeuron("" + c);
+            Neuron charSN = m.createNeuron("" + c);
             chars.put(c, charSN);
         }
 
-        Provider<INeuron> ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"), spaceN, false, startSignal, true, false);
+        Neuron ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"), spaceN, false, startSignal, true, false);
 
-        TreeMap<Character, Provider<INeuron>> recChars = new TreeMap<>();
+        TreeMap<Character, Neuron> recChars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
-            Provider<INeuron> charSN = chars.get(c);
+            Neuron charSN = chars.get(c);
             recChars.put(c, m.initRelationalNeuron(m.createNeuron("RN-" + c), ctNeuron, charSN, false));
         }
 
-        Provider<INeuron> patternN = m.initAndNeuron(m.createNeuron("PATTERN"),
+        Neuron patternN = m.initAndNeuron(m.createNeuron("PATTERN"),
                 0.001,
                 new Input()
                         .setNeuron(recChars.get('C'))
@@ -141,26 +142,26 @@ public class RecurrentPatternTest {
 
         Model m = new Model();
 
-        Provider<INeuron> startSignal = m.createNeuron("START-SIGNAL");
-        Provider<INeuron> spaceN = m.createNeuron("SPACE");
+        Neuron startSignal = m.createNeuron("START-SIGNAL");
+        Neuron spaceN = m.createNeuron("SPACE");
 
-        TreeMap<Character, Provider<INeuron>> chars = new TreeMap<>();
+        TreeMap<Character, Neuron> chars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
-            Provider<INeuron> charSN = m.createNeuron("" + c);
+            Neuron charSN = m.createNeuron("" + c);
             chars.put(c, charSN);
         }
 
-        Provider<INeuron> ctNeuron = m.createNeuron("CTN");
+        Neuron ctNeuron = m.createNeuron("CTN");
 
         m.initCounterNeuron(ctNeuron, spaceN, false, startSignal, true, false);
 
-        TreeMap<Character, Provider<INeuron>> recChars = new TreeMap<>();
+        TreeMap<Character, Neuron> recChars = new TreeMap<>();
         for(char c = 'A'; c <= 'Z'; c++) {
-            Provider<INeuron> charSN = chars.get(c);
+            Neuron charSN = chars.get(c);
             recChars.put(c, m.initRelationalNeuron(m.createNeuron("RN-" + c), ctNeuron, charSN, false));
         }
 
-        Provider<INeuron> patternN = m.initAndNeuron(m.createNeuron("PATTERN"),
+        Neuron patternN = m.initAndNeuron(m.createNeuron("PATTERN"),
                 0.001,
                 new Input()
                         .setNeuron(recChars.get('C'))
@@ -232,18 +233,18 @@ public class RecurrentPatternTest {
     public void testAndWithRid() {
         Model m = new Model();
 
-        Provider<INeuron> start = m.createNeuron("START");
-        Provider<INeuron> clock = m.createNeuron("CLOCK");
-        Provider<INeuron> input = m.createNeuron("INPUT");
+        Neuron start = m.createNeuron("START");
+        Neuron clock = m.createNeuron("CLOCK");
+        Neuron input = m.createNeuron("INPUT");
 
-        Provider<INeuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), clock, false, start, true, false);
-        Provider<INeuron> rn = m.initRelationalNeuron(m.createNeuron("RN"), ctn, input, false);
+        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), clock, false, start, true, false);
+        Neuron rn = m.initRelationalNeuron(m.createNeuron("RN"), ctn, input, false);
 
-        Provider<INeuron> aN = m.createNeuron("A");
-        Provider<INeuron> bN = m.createNeuron("B");
-        Provider<INeuron> cN = m.createNeuron("C");
+        Neuron aN = m.createNeuron("A");
+        Neuron bN = m.createNeuron("B");
+        Neuron cN = m.createNeuron("C");
 
-        Provider<INeuron> result = m.initAndNeuron(m.createNeuron("RESULT"),
+        Neuron result = m.initAndNeuron(m.createNeuron("RESULT"),
                 0.001,
                 new Input()
                         .setNeuron(ctn)
@@ -270,10 +271,10 @@ public class RecurrentPatternTest {
     public void testCTNeuron() {
         Model m = new Model();
 
-        Provider<INeuron> start = m.createNeuron("START");
-        Provider<INeuron> clock = m.createNeuron("CLOCK");
+        Neuron start = m.createNeuron("START");
+        Neuron clock = m.createNeuron("CLOCK");
 
-        Provider<INeuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), clock, false, start, true, false);
+        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), clock, false, start, true, false);
 
 
         Document doc = m.createDocument("                                                  ", 0);

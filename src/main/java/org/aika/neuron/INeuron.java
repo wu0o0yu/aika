@@ -604,7 +604,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         TreeMap<Synapse, Synapse> syns = (dir == 0 ? inputSynapses : outputSynapses);
 
         for (Synapse s : getActiveSynapses(doc, dir, syns)) {
-            Provider<INeuron> p = (dir == 0 ? s.input : s.output);
+            Neuron p = (dir == 0 ? s.input : s.output);
             if(!p.isSuspended()) {
                 INeuron an = p.get();
                 OrNode n = an.node.get();
@@ -883,7 +883,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public static Provider<INeuron> init(Model m, int threadId, Provider<INeuron> pn, double bias, double negDirSum, double negRecSum, double posRecSum, Set<Synapse> inputs) {
+    public static Neuron init(Model m, int threadId, Neuron pn, double bias, double negDirSum, double negRecSum, double posRecSum, Set<Synapse> inputs) {
         INeuron n = pn.get();
         n.m = m;
         n.m.stat.neurons++;

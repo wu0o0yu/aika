@@ -19,6 +19,7 @@ package org.aika.lattice;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
@@ -46,7 +47,7 @@ public class ActivationsTest {
         Model m = new Model();
         AndNode.minFrequency = 1;
 
-        Provider<INeuron> inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A");
 
         m.initAndNeuron(m.createNeuron("pA"), 0.001,
                 new Input()
@@ -74,7 +75,7 @@ public class ActivationsTest {
         Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(1, 2), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
         Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(2, 3), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
 
-        Provider<INeuron> inB = m.createNeuron("B");
+        Neuron inB = m.createNeuron("B");
 
         m.initAndNeuron(m.createNeuron("pB"), 0.001,
                 new Input()
@@ -100,7 +101,7 @@ public class ActivationsTest {
         AndNode.minFrequency = 1;
 
 
-        Provider<INeuron> in = m.createNeuron("A");
+        Neuron in = m.createNeuron("A");
         OrNode inNode = in.get().node.get();
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

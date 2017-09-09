@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.neuron.INeuron;
@@ -34,14 +35,14 @@ public class OptionalAndTest {
     public void testOptionalAnd() {
         Model m = new Model(null, 2);
 
-        Provider<INeuron> wordEssen = m.createNeuron("word:essen");
-        Provider<INeuron> wordHamburg = m.createNeuron("word:hamburg");
-        Provider<INeuron> wordGehen = m.createNeuron("word:gehen");
-        Provider<INeuron> upperCase = m.createNeuron("upper case");
+        Neuron wordEssen = m.createNeuron("word:essen");
+        Neuron wordHamburg = m.createNeuron("word:hamburg");
+        Neuron wordGehen = m.createNeuron("word:gehen");
+        Neuron upperCase = m.createNeuron("upper case");
 
-        Provider<INeuron> suppr = m.createNeuron("SUPPRESS");
+        Neuron suppr = m.createNeuron("SUPPRESS");
 
-        Provider<INeuron> hintNoun = m.initOrNeuron(m.createNeuron("HINT-NOUN"),
+        Neuron hintNoun = m.initOrNeuron(m.createNeuron("HINT-NOUN"),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
@@ -55,7 +56,7 @@ public class OptionalAndTest {
                         .setRecurrent(false)
                         .setMinInput(1.0f)
         );
-        Provider<INeuron> hintVerb = m.initOrNeuron(m.createNeuron("HINT-VERB"),
+        Neuron hintVerb = m.initOrNeuron(m.createNeuron("HINT-VERB"),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
@@ -71,7 +72,7 @@ public class OptionalAndTest {
         );
 
 
-        Provider<INeuron> noun = m.initAndNeuron(m.createNeuron("NOUN"),
+        Neuron noun = m.initAndNeuron(m.createNeuron("NOUN"),
                 0.001,
                 new Input()
                         .setOptional(false)
@@ -95,7 +96,7 @@ public class OptionalAndTest {
                         .setMinInput(1.0f)
         );
 
-        Provider<INeuron> verb = m.initAndNeuron(m.createNeuron("VERB"),
+        Neuron verb = m.initAndNeuron(m.createNeuron("VERB"),
                 0.001,
                 new Input()
                         .setOptional(false)

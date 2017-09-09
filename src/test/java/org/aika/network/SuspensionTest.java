@@ -17,10 +17,7 @@
 package org.aika.network;
 
 
-import org.aika.Input;
-import org.aika.Model;
-import org.aika.Provider;
-import org.aika.SuspensionHook;
+import org.aika.*;
 import org.aika.corpus.Document;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
@@ -44,7 +41,7 @@ public class SuspensionTest {
         Model m = new Model();
         m.suspensionHook = new DummySuspensionHook();
 
-        Provider<INeuron> n = m.createNeuron("A");
+        Neuron n = m.createNeuron("A");
         n.get().node.suspend();
         n.suspend();
 
@@ -64,13 +61,13 @@ public class SuspensionTest {
         Model m = new Model();
         m.suspensionHook = new DummySuspensionHook();
 
-        Provider<INeuron> inA = m.createNeuron("A");
-        Provider<INeuron> inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
 
         int idA = inA.id;
         int idB = inB.id;
 
-        Provider<INeuron> nC = m.initAndNeuron(m.createNeuron("C"), 0.5,
+        Neuron nC = m.initAndNeuron(m.createNeuron("C"), 0.5,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0f)
@@ -90,7 +87,7 @@ public class SuspensionTest {
         );
 
 
-        Provider<INeuron> outD = m.initAndNeuron(m.createNeuron("D"), 0.5,
+        Neuron outD = m.initAndNeuron(m.createNeuron("D"), 0.5,
                 new Input()
                         .setNeuron(nC)
                         .setWeight(10.0f)

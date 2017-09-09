@@ -17,6 +17,7 @@
 package org.aika.lattice;
 
 
+import org.aika.Neuron;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.Model;
 import org.aika.Provider;
@@ -593,7 +594,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         }
 
 
-        public Synapse getSynapse(Integer offset, Provider<INeuron> n) {
+        public Synapse getSynapse(Integer offset, Neuron n) {
             InputNode in = input.get();
             in.lock.acquireReadLock();
             Synapse s = in.synapses != null ? in.synapses.get(new SynapseKey(Utils.nullSafeAdd(getRelativePosition(), false, offset, false), n)) : null;

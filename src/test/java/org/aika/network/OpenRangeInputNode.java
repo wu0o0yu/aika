@@ -1,6 +1,7 @@
 package org.aika.network;
 
 
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
@@ -24,7 +25,7 @@ import static org.aika.corpus.Range.Mapping.END;
 public class OpenRangeInputNode {
 
     Model m;
-    Provider<INeuron> in;
+    Neuron in;
     InputNode inputNode;
 
     @Before

@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
@@ -40,10 +41,10 @@ public class ConcurrencyTest {
         AndNode.minFrequency = 1;
 
 
-        Provider<INeuron> inA = m.createNeuron("A");
-        Provider<INeuron> inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
 
-        Provider<INeuron> pC = m.initAndNeuron(m.createNeuron("pC"),
+        Neuron pC = m.initAndNeuron(m.createNeuron("pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -64,11 +65,11 @@ public class ConcurrencyTest {
         );
 
 
-        Provider<INeuron> inStart = m.createNeuron("START");
-        Provider<INeuron> inClock = m.createNeuron("CLOCK");
+        Neuron inStart = m.createNeuron("START");
+        Neuron inClock = m.createNeuron("CLOCK");
 
 
-        Provider<INeuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), inClock, false, inStart, true, false);
+        Neuron ctn = m.initCounterNeuron(m.createNeuron("CTN"), inClock, false, inStart, true, false);
 
 
         Document doc0 = m.createDocument("aaaaaaaaaa", 0);
@@ -122,10 +123,10 @@ public class ConcurrencyTest {
         final Model m = new Model();
         AndNode.minFrequency = 1;
 
-        final Provider<INeuron> inA = m.createNeuron("A");
-        final Provider<INeuron> inB = m.createNeuron("B");
+        final Neuron inA = m.createNeuron("A");
+        final Neuron inB = m.createNeuron("B");
 
-        final Provider<INeuron> pC = m.initAndNeuron(m.createNeuron("pC"),
+        final Neuron pC = m.initAndNeuron(m.createNeuron("pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)

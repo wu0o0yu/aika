@@ -17,6 +17,7 @@
 package org.aika.lattice;
 
 
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.neuron.Activation;
@@ -47,8 +48,8 @@ public class SynapseRangeRelationTest {
         Model m = new Model();
         Document doc = m.createDocument("                        ", 0);
 
-        Provider<INeuron> in = m.createNeuron();
-        Provider<INeuron> on = m.createNeuron();
+        Neuron in = m.createNeuron();
+        Neuron on = m.createNeuron();
 
         Synapse s = new Synapse(in,
                 new Synapse.Key(

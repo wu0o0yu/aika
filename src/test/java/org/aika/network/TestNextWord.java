@@ -3,6 +3,7 @@ package org.aika.network;
 
 import org.aika.Input;
 import org.aika.Model;
+import org.aika.Neuron;
 import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
@@ -16,10 +17,10 @@ public class TestNextWord {
     public void testMatchTheWord() {
         Model m = new Model(null, 1);
 
-        Provider<INeuron> inA = m.createNeuron("A");
-        Provider<INeuron> inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
 
-        Provider<INeuron> abN = m.initAndNeuron(m.createNeuron("AB"), 0.5,
+        Neuron abN = m.initAndNeuron(m.createNeuron("AB"), 0.5,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(10.0f)
