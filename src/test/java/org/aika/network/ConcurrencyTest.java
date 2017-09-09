@@ -24,8 +24,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.AndNode;
-import org.aika.neuron.Neuron;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,10 +40,10 @@ public class ConcurrencyTest {
         AndNode.minFrequency = 1;
 
 
-        Provider<Neuron> inA = m.createNeuron("A");
-        Provider<Neuron> inB = m.createNeuron("B");
+        Provider<INeuron> inA = m.createNeuron("A");
+        Provider<INeuron> inB = m.createNeuron("B");
 
-        Provider<Neuron> pC = m.initAndNeuron(m.createNeuron("pC"),
+        Provider<INeuron> pC = m.initAndNeuron(m.createNeuron("pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -65,11 +64,11 @@ public class ConcurrencyTest {
         );
 
 
-        Provider<Neuron> inStart = m.createNeuron("START");
-        Provider<Neuron> inClock = m.createNeuron("CLOCK");
+        Provider<INeuron> inStart = m.createNeuron("START");
+        Provider<INeuron> inClock = m.createNeuron("CLOCK");
 
 
-        Provider<Neuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), inClock, false, inStart, true, false);
+        Provider<INeuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), inClock, false, inStart, true, false);
 
 
         Document doc0 = m.createDocument("aaaaaaaaaa", 0);
@@ -123,10 +122,10 @@ public class ConcurrencyTest {
         final Model m = new Model();
         AndNode.minFrequency = 1;
 
-        final Provider<Neuron> inA = m.createNeuron("A");
-        final Provider<Neuron> inB = m.createNeuron("B");
+        final Provider<INeuron> inA = m.createNeuron("A");
+        final Provider<INeuron> inB = m.createNeuron("B");
 
-        final Provider<Neuron> pC = m.initAndNeuron(m.createNeuron("pC"),
+        final Provider<INeuron> pC = m.initAndNeuron(m.createNeuron("pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)

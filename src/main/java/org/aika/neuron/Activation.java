@@ -191,12 +191,12 @@ public final class Activation extends NodeActivation<OrNode> {
         public final double lb;
 
         public final int fired;
-        public final Neuron.NormWeight weight;
-        public final Neuron.NormWeight weightUB;
+        public final INeuron.NormWeight weight;
+        public final INeuron.NormWeight weightUB;
 
-        public static final State ZERO = new State(0.0, 0.0, 0.0, -1, Neuron.NormWeight.ZERO_WEIGHT, Neuron.NormWeight.ZERO_WEIGHT);
+        public static final State ZERO = new State(0.0, 0.0, 0.0, -1, INeuron.NormWeight.ZERO_WEIGHT, INeuron.NormWeight.ZERO_WEIGHT);
 
-        public State(double value, double ub, double lb, int fired, Neuron.NormWeight weight, Neuron.NormWeight weightUB) {
+        public State(double value, double ub, double lb, int fired, INeuron.NormWeight weight, INeuron.NormWeight weightUB) {
             assert lb <= value && value <= ub;
             assert weight.w <= weightUB.w && weightUB.n <= weight.n;
             this.value = value;
@@ -207,12 +207,12 @@ public final class Activation extends NodeActivation<OrNode> {
             this.weightUB = weightUB;
         }
 
-        public Neuron.NormWeight getWeight(int t) {
+        public INeuron.NormWeight getWeight(int t) {
             return t == VALUE ? weight : weightUB;
         }
 
         public boolean equals(State s) {
-            return Math.abs(value - s.value) <= Neuron.WEIGHT_TOLERANCE || Math.abs(ub - s.ub) <= Neuron.WEIGHT_TOLERANCE || Math.abs(lb - s.lb) <= Neuron.WEIGHT_TOLERANCE;
+            return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE || Math.abs(ub - s.ub) <= INeuron.WEIGHT_TOLERANCE || Math.abs(lb - s.lb) <= INeuron.WEIGHT_TOLERANCE;
         }
 
         public boolean equalsWithWeights(State s) {

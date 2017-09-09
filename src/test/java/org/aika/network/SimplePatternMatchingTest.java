@@ -25,7 +25,7 @@ import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,11 +42,11 @@ public class SimplePatternMatchingTest {
     public void testPatternMatching() {
         Model m = new Model();
 
-        Map<Character, Provider<Neuron>> inputNeurons = new HashMap<>();
+        Map<Character, Provider<INeuron>> inputNeurons = new HashMap<>();
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            Provider<Neuron> in = m.createNeuron(c + "");
+            Provider<INeuron> in = m.createNeuron(c + "");
 
             inputNeurons.put(c, in);
         }
@@ -55,7 +55,7 @@ public class SimplePatternMatchingTest {
         // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
         // of the inputs relative to each other. The following flag specifies whether this relativeRid
         // is relative or absolute.
-        Provider<Neuron> pattern = m.initAndNeuron(
+        Provider<INeuron> pattern = m.initAndNeuron(
                 m.createNeuron("BCD"),
                 0.4,
                 new Input()
@@ -132,15 +132,15 @@ public class SimplePatternMatchingTest {
         Model m = new Model();
 
 
-        Map<Character, Provider<Neuron>> inputNeurons = new HashMap<>();
-        Map<Character, Provider<Neuron>> relNeurons = new HashMap<>();
+        Map<Character, Provider<INeuron>> inputNeurons = new HashMap<>();
+        Map<Character, Provider<INeuron>> relNeurons = new HashMap<>();
 
         // The space neuron will be used as clock signal for the recurrent neurons.
-        Provider<Neuron> inSpace = m.createNeuron("SPACE");
+        Provider<INeuron> inSpace = m.createNeuron("SPACE");
 
-        Provider<Neuron> startSignal = m.createNeuron("START-SIGNAL");
+        Provider<INeuron> startSignal = m.createNeuron("START-SIGNAL");
 
-        Provider<Neuron> ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"),
+        Provider<INeuron> ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"),
                 inSpace, false,
                 startSignal, true,
                 false
@@ -148,8 +148,8 @@ public class SimplePatternMatchingTest {
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            Provider<Neuron> in = m.createNeuron(c + "");
-            Provider<Neuron> rn = m.initRelationalNeuron(
+            Provider<INeuron> in = m.createNeuron(c + "");
+            Provider<INeuron> rn = m.initRelationalNeuron(
                     m.createNeuron(c + "-RN"),
                     ctNeuron,
                     in, false
@@ -163,7 +163,7 @@ public class SimplePatternMatchingTest {
         // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
         // of the inputs relative to each other. The following flag specifies whether this relativeRid
         // is relative or absolute.
-        Provider<Neuron> pattern = m.initAndNeuron(
+        Provider<INeuron> pattern = m.initAndNeuron(
                 m.createNeuron("BCD"),
                 0.4,
                 new Input()

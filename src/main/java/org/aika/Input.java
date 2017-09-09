@@ -18,7 +18,7 @@ package org.aika;
 
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 
 
 /**
@@ -30,7 +30,7 @@ import org.aika.neuron.Neuron;
 public class Input implements Comparable<Input> {
     boolean recurrent;
     boolean optional;
-    Provider<Neuron> neuron;
+    Provider<INeuron> neuron;
     float weight;
     float maxLowerWeightsSum = Float.MAX_VALUE;
     float minInput;
@@ -79,7 +79,7 @@ public class Input implements Comparable<Input> {
      * @param neuron
      * @return
      */
-    public Input setNeuron(Provider<Neuron> neuron) {
+    public Input setNeuron(Provider<INeuron> neuron) {
         assert neuron != null;
         this.neuron = neuron;
         return this;

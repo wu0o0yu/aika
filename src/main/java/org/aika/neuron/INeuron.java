@@ -55,9 +55,9 @@ import static org.aika.neuron.Activation.State.*;
  *
  * @author Lukas Molzberger
  */
-public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
+public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron> {
 
-    private static final Logger log = LoggerFactory.getLogger(Neuron.class);
+    private static final Logger log = LoggerFactory.getLogger(INeuron.class);
 
     public final static double LEARN_RATE = 0.01;
     public static final double WEIGHT_TOLERANCE= 0.001;
@@ -93,28 +93,28 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     public ReadWriteLock lock = new ReadWriteLock();
 
 
-    private Neuron() {
+    private INeuron() {
     }
 
 
-    public Neuron(Model m) {
+    public INeuron(Model m) {
         this(m, null);
     }
 
 
-    public Neuron(Model m, String label) {
+    public INeuron(Model m, String label) {
         this(m, label, false, false);
     }
 
 
-    public Neuron(Model m, String label, boolean isBlocked, boolean noTraining) {
+    public INeuron(Model m, String label, boolean isBlocked, boolean noTraining) {
         this.label = label;
         this.isBlocked = isBlocked;
         this.noTraining = noTraining;
 
         this.m = m;
 
-        m.createProvider(this);
+        m.createNeuronProvider(this);
 
         OrNode node = new OrNode(m);
 
@@ -255,14 +255,14 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
         unpublish(threadId);
 
         for(Synapse s: inputSynapses.values()) {
-            Neuron in = s.input.get();
+            INeuron in = s.input.get();
             in.lock.acquireWriteLock(threadId);
             in.outputSynapses.remove(s);
             in.lock.releaseWriteLock();
         }
 
         for(Synapse s: outputSynapses.values()) {
-            Neuron out = s.output.get();
+            INeuron out = s.output.get();
             out.lock.acquireWriteLock(threadId);
             out.inputSynapses.remove(s);
             out.inputSynapsesByWeight.remove(s);
@@ -468,7 +468,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
             targetRange = new Range(Math.max(0, act.key.r.begin - (s / 2)), Math.min(doc.length(), act.key.r.end + (s / 2)));
         }
         ArrayList<Activation> inputActs = new ArrayList<>();
-        for(Neuron n: doc.finallyActivatedNeurons) {
+        for(INeuron n: doc.finallyActivatedNeurons) {
             for(Activation iAct: n.getFinalActivations(doc)) {
                 if (Range.overlaps(iAct.key.r, targetRange)) {
                     inputActs.add(iAct);
@@ -507,7 +507,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
         if(iAct.visitedNeuronTrain == v) return;
         iAct.visitedNeuronTrain = v;
 
-        Neuron n = iAct.key.n.neuron.get();
+        INeuron n = iAct.key.n.neuron.get();
         double deltaW = x * iAct.finalState.value;
 
         SynapseKey sk = new SynapseKey(rid, provider);
@@ -604,9 +604,9 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
         TreeMap<Synapse, Synapse> syns = (dir == 0 ? inputSynapses : outputSynapses);
 
         for (Synapse s : getActiveSynapses(doc, dir, syns)) {
-            Provider<Neuron> p = (dir == 0 ? s.input : s.output);
+            Provider<INeuron> p = (dir == 0 ? s.input : s.output);
             if(!p.isSuspended()) {
-                Neuron an = p.get();
+                INeuron an = p.get();
                 OrNode n = an.node.get();
                 ThreadState th = n.getThreadState(doc.threadId, false);
                 if (th == null || th.activations.isEmpty()) continue;
@@ -689,7 +689,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
         Synapse lk = new Synapse(null, Synapse.Key.MIN_KEY);
         Synapse uk = new Synapse(null, Synapse.Key.MAX_KEY);
 
-        for (Neuron n : doc.activatedNeurons) {
+        for (INeuron n : doc.activatedNeurons) {
             if (dir == 0) {
                 lk.input = n.provider;
                 uk.input = n.provider;
@@ -788,7 +788,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    public int compareTo(Neuron n) {
+    public int compareTo(INeuron n) {
         if(provider.id < n.provider.id) return -1;
         else if(provider.id > n.provider.id) return 1;
         else return 0;
@@ -883,8 +883,8 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    public static Provider<Neuron> init(Model m, int threadId, Provider<Neuron> pn, double bias, double negDirSum, double negRecSum, double posRecSum, Set<Synapse> inputs) {
-        Neuron n = pn.get();
+    public static Provider<INeuron> init(Model m, int threadId, Provider<INeuron> pn, double bias, double negDirSum, double negRecSum, double posRecSum, Set<Synapse> inputs) {
+        INeuron n = pn.get();
         n.m = m;
         n.m.stat.neurons++;
         n.bias = bias;
@@ -915,7 +915,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
     }
 
 
-    public static Neuron addSynapse(Model m, int threadId, Neuron n, double biasDelta, double negDirSumDelta, double negRecSumDelta, double posRecSumDelta, Synapse s) {
+    public static INeuron addSynapse(Model m, int threadId, INeuron n, double biasDelta, double negDirSumDelta, double negRecSumDelta, double posRecSumDelta, Synapse s) {
         n.bias += biasDelta;
         n.negDirSum += negDirSumDelta;
         n.negRecSum += negRecSumDelta;
@@ -925,8 +925,8 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
         return n;
     }
 
-    public static Neuron read(DataInput in, Provider p) throws IOException {
-        Neuron n = new Neuron();
+    public static INeuron readNeuron(DataInput in, Neuron p) throws IOException {
+        INeuron n = new INeuron();
         n.provider = p;
         n.readFields(in, p.m);
         return n;
@@ -1024,7 +1024,7 @@ public class Neuron extends AbstractNode<Neuron> implements Comparable<Neuron> {
 
 
         public boolean equals(NormWeight nw) {
-            return (Math.abs(w - nw.w) <= Neuron.WEIGHT_TOLERANCE && Math.abs(n - nw.n) <= Neuron.WEIGHT_TOLERANCE);
+            return (Math.abs(w - nw.w) <= INeuron.WEIGHT_TOLERANCE && Math.abs(n - nw.n) <= INeuron.WEIGHT_TOLERANCE);
         }
 
         public String toString() {

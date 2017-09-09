@@ -21,8 +21,7 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.Provider;
 import org.aika.corpus.Document;
-import org.aika.neuron.Neuron;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 /**
@@ -35,14 +34,14 @@ public class OptionalAndTest {
     public void testOptionalAnd() {
         Model m = new Model(null, 2);
 
-        Provider<Neuron> wordEssen = m.createNeuron("word:essen");
-        Provider<Neuron> wordHamburg = m.createNeuron("word:hamburg");
-        Provider<Neuron> wordGehen = m.createNeuron("word:gehen");
-        Provider<Neuron> upperCase = m.createNeuron("upper case");
+        Provider<INeuron> wordEssen = m.createNeuron("word:essen");
+        Provider<INeuron> wordHamburg = m.createNeuron("word:hamburg");
+        Provider<INeuron> wordGehen = m.createNeuron("word:gehen");
+        Provider<INeuron> upperCase = m.createNeuron("upper case");
 
-        Provider<Neuron> suppr = m.createNeuron("SUPPRESS");
+        Provider<INeuron> suppr = m.createNeuron("SUPPRESS");
 
-        Provider<Neuron> hintNoun = m.initOrNeuron(m.createNeuron("HINT-NOUN"),
+        Provider<INeuron> hintNoun = m.initOrNeuron(m.createNeuron("HINT-NOUN"),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
@@ -56,7 +55,7 @@ public class OptionalAndTest {
                         .setRecurrent(false)
                         .setMinInput(1.0f)
         );
-        Provider<Neuron> hintVerb = m.initOrNeuron(m.createNeuron("HINT-VERB"),
+        Provider<INeuron> hintVerb = m.initOrNeuron(m.createNeuron("HINT-VERB"),
                 new Input()
                         .setOptional(false)
                         .setNeuron(wordEssen)
@@ -72,7 +71,7 @@ public class OptionalAndTest {
         );
 
 
-        Provider<Neuron> noun = m.initAndNeuron(m.createNeuron("NOUN"),
+        Provider<INeuron> noun = m.initAndNeuron(m.createNeuron("NOUN"),
                 0.001,
                 new Input()
                         .setOptional(false)
@@ -96,7 +95,7 @@ public class OptionalAndTest {
                         .setMinInput(1.0f)
         );
 
-        Provider<Neuron> verb = m.initAndNeuron(m.createNeuron("VERB"),
+        Provider<INeuron> verb = m.initAndNeuron(m.createNeuron("VERB"),
                 0.001,
                 new Input()
                         .setOptional(false)

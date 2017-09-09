@@ -22,7 +22,7 @@ import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 
 import java.lang.ref.WeakReference;
@@ -89,7 +89,7 @@ public class Model {
     }
 
 
-    public <T extends AbstractNode> Provider<T> createProvider(T n) {
+    public <T extends Node> Provider<T> createNodeProvider(T n) {
         int id = suspensionHook != null ? suspensionHook.getNewId() : currentId.addAndGet(1);
         Provider<T> np = new Provider<T>(this, id, n);
         n.provider = np;
@@ -100,18 +100,29 @@ public class Model {
     }
 
 
-    public Provider<Neuron> createNeuron() {
-        return new Neuron(this).provider;
+    public Neuron createNeuronProvider(INeuron n) {
+        int id = suspensionHook != null ? suspensionHook.getNewId() : currentId.addAndGet(1);
+        Neuron np = new Neuron(this, id, n);
+        n.provider = np;
+        synchronized (providers) {
+            providers.put(id, new WeakReference<>(np));
+        }
+        return np;
     }
 
 
-    public Provider<Neuron> createNeuron(String label) {
-        return new Neuron(this, label).provider;
+    public Provider<INeuron> createNeuron() {
+        return new INeuron(this).provider;
     }
 
 
-    public Provider<Neuron> createNeuron(String label, boolean isBlocked, boolean noTraining) {
-        return new Neuron(this, label, isBlocked, noTraining).provider;
+    public Provider<INeuron> createNeuron(String label) {
+        return new INeuron(this, label).provider;
+    }
+
+
+    public Provider<INeuron> createNeuron(String label, boolean isBlocked, boolean noTraining) {
+        return new INeuron(this, label, isBlocked, noTraining).provider;
     }
 
 
@@ -244,7 +255,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Provider<Neuron> initAndNeuron(Provider<Neuron> n, double threshold, Input... inputs) {
+    public Provider<INeuron> initAndNeuron(Provider<INeuron> n, double threshold, Input... inputs) {
         return initAndNeuron(n, threshold, new TreeSet<>(Arrays.asList(inputs)));
     }
 
@@ -258,7 +269,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Provider<Neuron> initAndNeuron(Provider<Neuron> n, double threshold, Collection<Input> inputs) {
+    public Provider<INeuron> initAndNeuron(Provider<INeuron> n, double threshold, Collection<Input> inputs) {
         n.m = this;
 
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
@@ -307,11 +318,11 @@ public class Model {
         }
         bias += minWeight * threshold;
 
-        return Neuron.init(this, defaultThreadId, n, bias, negDirSum, negRecSum, posRecSum, is);
+        return INeuron.init(this, defaultThreadId, n, bias, negDirSum, negRecSum, posRecSum, is);
     }
 
 
-    public void addSynapse(Neuron n, double biasDelta, Input input) {
+    public void addSynapse(INeuron n, double biasDelta, Input input) {
         double negDirSumDelta = 0.0;
         double negRecSumDelta = 0.0;
         double posRecSumDelta = 0.0;
@@ -340,7 +351,7 @@ public class Model {
         } else if (input.recurrent) {
             posRecSumDelta += input.weight;
         }
-        Neuron.addSynapse(this, defaultThreadId, n, biasDelta, negDirSumDelta, negRecSumDelta, posRecSumDelta, s);
+        INeuron.addSynapse(this, defaultThreadId, n, biasDelta, negDirSumDelta, negRecSumDelta, posRecSumDelta, s);
     }
 
 
@@ -352,7 +363,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Provider<Neuron> initNeuron(Provider<Neuron> n, double bias, Input... inputs) {
+    public Provider<INeuron> initNeuron(Provider<INeuron> n, double bias, Input... inputs) {
         return initNeuron(n, bias, new TreeSet<>(Arrays.asList(inputs)));
     }
 
@@ -365,7 +376,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Provider<Neuron> initNeuron(Provider<Neuron> n, double bias, Collection<Input> inputs) {
+    public Provider<INeuron> initNeuron(Provider<INeuron> n, double bias, Collection<Input> inputs) {
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         double negDirSum = 0.0;
@@ -389,7 +400,7 @@ public class Model {
             is.add(s);
         }
 
-        return Neuron.init(this, defaultThreadId, n, bias, negDirSum, negRecSum, posRecSum, is);
+        return INeuron.init(this, defaultThreadId, n, bias, negDirSum, negRecSum, posRecSum, is);
     }
 
 
@@ -401,7 +412,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Provider<Neuron> initOrNeuron(Provider<Neuron> n, Input... inputs) {
+    public Provider<INeuron> initOrNeuron(Provider<INeuron> n, Input... inputs) {
         return initOrNeuron(n, new TreeSet<>(Arrays.asList(inputs)));
     }
 
@@ -414,7 +425,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Provider<Neuron> initOrNeuron(Provider<Neuron> n, Set<Input> inputs) {
+    public Provider<INeuron> initOrNeuron(Provider<INeuron> n, Set<Input> inputs) {
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         double bias = -0.001;
@@ -425,7 +436,7 @@ public class Model {
             is.add(s);
         }
 
-        return Neuron.init(this, defaultThreadId, n, bias, 0.0, 0.0, 0.0, is);
+        return INeuron.init(this, defaultThreadId, n, bias, 0.0, 0.0, 0.0, is);
     }
 
 
@@ -438,7 +449,7 @@ public class Model {
      * @param dirIS
      * @return
      */
-    public Provider<Neuron> initRelationalNeuron(Provider<Neuron> n, Provider<Neuron> ctn, Provider<Neuron> inputSignal, boolean dirIS) {
+    public Provider<INeuron> initRelationalNeuron(Provider<INeuron> n, Provider<INeuron> ctn, Provider<INeuron> inputSignal, boolean dirIS) {
         double bias = -30.0;
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
@@ -484,7 +495,7 @@ public class Model {
             is.add(ctns);
         }
 
-        return Neuron.init(this, defaultThreadId, n, bias, 0.0, 0.0, 0.0, is);
+        return INeuron.init(this, defaultThreadId, n, bias, 0.0, 0.0, 0.0, is);
     }
 
 
@@ -500,7 +511,7 @@ public class Model {
      * @param direction
      * @return
      */
-    public Provider<Neuron> initCounterNeuron(Provider<Neuron> n, Provider<Neuron> clockSignal, boolean dirCS, Provider<Neuron> startSignal, boolean dirSS, boolean direction) {
+    public Provider<INeuron> initCounterNeuron(Provider<INeuron> n, Provider<INeuron> clockSignal, boolean dirCS, Provider<INeuron> startSignal, boolean dirSS, boolean direction) {
         double bias = -44.0;
         double negRecSum = -20.0;
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
@@ -585,7 +596,7 @@ public class Model {
         neg.maxLowerWeightsSum = 28.0f;
         is.add(neg);
 
-        return Neuron.init(this, defaultThreadId, n, bias, 0.0, negRecSum, 0.0, is);
+        return INeuron.init(this, defaultThreadId, n, bias, 0.0, negRecSum, 0.0, is);
     }
 
 

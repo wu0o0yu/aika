@@ -25,7 +25,7 @@ import org.aika.corpus.Conflicts.Conflict;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 /**
@@ -61,15 +61,15 @@ public class MutualExclusionTest {
         Model m = new Model();
 
         // Create the input neurons for the network.
-        Provider<Neuron> inA = m.createNeuron("IN-A");
-        Provider<Neuron> inB = m.createNeuron("IN-B");
-        Provider<Neuron> inC = m.createNeuron("IN-C");
+        Provider<INeuron> inA = m.createNeuron("IN-A");
+        Provider<INeuron> inB = m.createNeuron("IN-B");
+        Provider<INeuron> inC = m.createNeuron("IN-C");
 
         // Instantiate the suppressing neuron. Its inputs will be added later on.
-        Provider<Neuron> pSuppr = m.createNeuron("SUPPRESS");
+        Provider<INeuron> pSuppr = m.createNeuron("SUPPRESS");
 
         // Create three neurons that might be suppressed by the suppressing neuron.
-        Provider<Neuron> pA = m.initAndNeuron(
+        Provider<INeuron> pA = m.initAndNeuron(
                 m.createNeuron("A"),
                 0.001,
                 new Input()
@@ -85,7 +85,7 @@ public class MutualExclusionTest {
                         .setMinInput(1.0f)     // This input is negated
         );
 
-        Provider<Neuron> pB = m.initAndNeuron(
+        Provider<INeuron> pB = m.initAndNeuron(
                 m.createNeuron("B"),
                 0.001,
                 new Input()
@@ -101,7 +101,7 @@ public class MutualExclusionTest {
                         .setMinInput(1.0f)
         );
 
-        Provider<Neuron> pC = m.initAndNeuron(
+        Provider<INeuron> pC = m.initAndNeuron(
                 m.createNeuron("C"),
                 0.001,
                 new Input()
@@ -137,7 +137,7 @@ public class MutualExclusionTest {
                         .setMinInput(1.0f)
         );
 
-        Provider<Neuron> outN = m.initOrNeuron(m.createNeuron("OUT"),
+        Provider<INeuron> outN = m.initOrNeuron(m.createNeuron("OUT"),
                 new Input()
                         .setNeuron(pB)
                         .setWeight(1.0f)

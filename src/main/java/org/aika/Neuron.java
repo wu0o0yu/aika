@@ -16,32 +16,17 @@
  */
 package org.aika;
 
-import org.aika.lattice.Node;
-import org.aika.neuron.INeuron;
 
-import java.io.DataInput;
-import java.io.IOException;
+import org.aika.neuron.INeuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> implements Writable {
+public class Neuron extends Provider<INeuron> {
 
-    public volatile int lastUsedDocumentId = 0;
 
-    volatile boolean modified;
-
-    public P provider;
-
-    public static <P extends Provider> AbstractNode read(DataInput in, P p) throws IOException {
-        AbstractNode n;
-        if(in.readBoolean()) {
-            n = INeuron.readNeuron(in, (Neuron) p);
-        } else {
-            n = Node.readNode(in, p);
-        }
-        return n;
+    Neuron(Model m, int id, INeuron n) {
+        super(m, id, n);
     }
-
 }

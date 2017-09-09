@@ -9,7 +9,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.InputNode;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +24,7 @@ import static org.aika.corpus.Range.Mapping.END;
 public class OpenRangeInputNode {
 
     Model m;
-    Provider<Neuron> in;
+    Provider<INeuron> in;
     InputNode inputNode;
 
     @Before

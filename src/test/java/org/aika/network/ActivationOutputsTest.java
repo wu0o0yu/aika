@@ -32,7 +32,7 @@ import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,10 +55,10 @@ public class ActivationOutputsTest {
 
         m.numberOfPositions = 10;
 
-        Provider<Neuron> inA = m.createNeuron("A");
-        Provider<Neuron> inB = m.createNeuron("B");
+        Provider<INeuron> inA = m.createNeuron("A");
+        Provider<INeuron> inB = m.createNeuron("B");
 
-        Provider<Neuron> pAB = m.initAndNeuron(m.createNeuron("pAB"),
+        Provider<INeuron> pAB = m.initAndNeuron(m.createNeuron("pAB"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -148,10 +148,10 @@ public class ActivationOutputsTest {
 
         m.numberOfPositions = 10;
 
-        Provider<Neuron> inA = m.createNeuron("A");
-        Provider<Neuron> inB = m.createNeuron("B");
+        Provider<INeuron> inA = m.createNeuron("A");
+        Provider<INeuron> inB = m.createNeuron("B");
 
-        Provider<Neuron> pAB = m.initAndNeuron(m.createNeuron("B-NA", true, false),
+        Provider<INeuron> pAB = m.initAndNeuron(m.createNeuron("B-NA", true, false),
                 0.5,
                 new Input()
                         .setNeuron(inA)
@@ -189,7 +189,7 @@ public class ActivationOutputsTest {
         Model m = new Model();
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<INeuron> inA = m.createNeuron("A");
 
         OrNode outBNode = m.initAndNeuron(m.createNeuron("B", true, false), 0.001,
                 new Input()
@@ -214,7 +214,7 @@ public class ActivationOutputsTest {
         Model m = new Model();
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<INeuron> inA = m.createNeuron("A");
 
         OrNode outBNode = m.initAndNeuron(m.createNeuron("B", true, false), 0.001,
                 new Input()
@@ -239,7 +239,7 @@ public class ActivationOutputsTest {
         Model m = new Model();
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<INeuron> inA = m.createNeuron("A");
 
         OrNode outBNode = (OrNode) m.initAndNeuron(m.createNeuron("B", true, false), 0.001,
                 new Input()

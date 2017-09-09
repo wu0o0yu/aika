@@ -21,8 +21,7 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.Provider;
 import org.aika.lattice.AndNode;
-import org.aika.neuron.Neuron;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 import static org.aika.Input.RangeRelation.CONTAINED_IN;
@@ -35,15 +34,15 @@ import static org.aika.Input.RangeRelation.EQUALS;
 public class WeightsTest {
 
 
-    Provider<Neuron> inAA;
-    Provider<Neuron> inBA;
-    Provider<Neuron> inCA;
-    Provider<Neuron> inAB;
-    Provider<Neuron> inBB;
-    Provider<Neuron> inCB;
+    Provider<INeuron> inAA;
+    Provider<INeuron> inBA;
+    Provider<INeuron> inCA;
+    Provider<INeuron> inAB;
+    Provider<INeuron> inBB;
+    Provider<INeuron> inCB;
 
-    Provider<Neuron> pDA;
-    Provider<Neuron> pDB;
+    Provider<INeuron> pDA;
+    Provider<INeuron> pDB;
 
 
     @Test
@@ -51,13 +50,13 @@ public class WeightsTest {
         Model m = new Model();
         AndNode.minFrequency = 5;
 
-        Provider<Neuron> pSuppr = m.createNeuron("SUPPR");
+        Provider<INeuron> pSuppr = m.createNeuron("SUPPR");
 
         inAA = m.createNeuron("AA");
         inBA = m.createNeuron("BA");
         inCA = m.createNeuron("CA");
 
-        Provider<Neuron> pOrA = m.createNeuron("pOrA");
+        Provider<INeuron> pOrA = m.createNeuron("pOrA");
         m.initOrNeuron(pOrA,
                 new Input()
                         .setNeuron(inAA)
@@ -107,7 +106,7 @@ public class WeightsTest {
         inBB = m.createNeuron("BB");
         inCB = m.createNeuron("CB");
 
-        Provider<Neuron> pOrB = m.createNeuron("pOrB");
+        Provider<INeuron> pOrB = m.createNeuron("pOrB");
         m.initOrNeuron(pOrB,
                 new Input()
                         .setNeuron(inAB)

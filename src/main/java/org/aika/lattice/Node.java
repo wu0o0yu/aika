@@ -25,7 +25,7 @@ import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.lattice.OrNode.OrEntry;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,7 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-public abstract class Node<T extends Node, A extends NodeActivation<T>> extends AbstractNode<T> implements Comparable<Node> {
+public abstract class Node<T extends Node, A extends NodeActivation<T>> extends AbstractNode<Provider<T>> implements Comparable<Node> {
     public static int minFrequency = 5;
     public static int MAX_RID = 20;
 
@@ -190,7 +190,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     abstract void deleteActivation(Document doc, A act);
 
-    public abstract double computeSynapseWeightSum(Integer offset, Neuron n);
+    public abstract double computeSynapseWeightSum(Integer offset, INeuron n);
 
     public abstract String logicToString();
 
@@ -214,7 +214,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public Node(Model m, int level) {
         threads = new ThreadState[m.numberOfThreads];
-        m.createProvider(this);
+        m.createNodeProvider(this);
         this.level = level;
         if(m != null) {
             nOffset = m.numberOfPositions;
@@ -617,7 +617,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    private static int evaluate(Neuron n, RSKey rsk) {
+    private static int evaluate(INeuron n, RSKey rsk) {
         Node pa = rsk.pa != null ? rsk.pa.get() : null;
         double sum = pa.computeSynapseWeightSum(rsk.offset, n);
         if(sum < 0.0) return -1;
@@ -647,7 +647,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * @param dir
      * @return
      */
-    public static boolean adjust(Model m, int threadId, Neuron neuron, final int dir) {
+    public static boolean adjust(Model m, int threadId, INeuron neuron, final int dir) {
         long v = visitedCounter++;
         OrNode outputNode = neuron.node.get();
 
@@ -655,7 +655,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         neuron.maxRecurrentSum = 0.0;
         for(Synapse s: neuron.inputSynapsesByWeight) {
-            Neuron in = s.input.get();
+            INeuron in = s.input.get();
             in.lock.acquireWriteLock(threadId);
 
             if (s.inputNode == null) {
@@ -752,7 +752,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    private static void computeRefinements(Model m, int threadId, TreeSet<RSKey> queue, Neuron n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup) {
+    private static void computeRefinements(Model m, int threadId, TreeSet<RSKey> queue, INeuron n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup) {
         n.lock.acquireWriteLock(threadId);
         Synapse minSyn = null;
         double sum = 0.0;
@@ -790,7 +790,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void prepareResultsForPredefinedNodes(int threadId, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, Neuron n, Synapse s, Integer offset) {
+    void prepareResultsForPredefinedNodes(int threadId, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, INeuron n, Synapse s, Integer offset) {
         RSKey rs = new RSKey(provider, offset);
         RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
         // TODO: mindestens einen positiven Knoten mit rein nehmen.
@@ -955,7 +955,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public static Node read(DataInput in, Provider p) throws IOException {
+    public static Node readNode(DataInput in, Provider p) throws IOException {
         String type = in.readUTF();
         Node n = null;
         switch(type) {

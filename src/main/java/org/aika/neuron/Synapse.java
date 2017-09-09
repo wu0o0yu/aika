@@ -92,8 +92,8 @@ public class Synapse implements Writable {
         }
     };
 
-    public Provider<Neuron> input;
-    public Provider<Neuron> output;
+    public Provider<INeuron> input;
+    public Provider<INeuron> output;
 
     public Provider<InputNode> inputNode;
 
@@ -111,14 +111,14 @@ public class Synapse implements Writable {
     public Synapse() {}
 
 
-    public Synapse(Provider<Neuron> input) {
+    public Synapse(Provider<INeuron> input) {
         if(input != null) {
             this.input = input;
         }
     }
 
 
-    public Synapse(Provider<Neuron> input, Key key) {
+    public Synapse(Provider<INeuron> input, Key key) {
         this(input);
         this.key = lookupKey(key);
 
@@ -127,8 +127,8 @@ public class Synapse implements Writable {
 
 
     public void link(int threadId) {
-        Neuron in = input.get();
-        Neuron out = output.get();
+        INeuron in = input.get();
+        INeuron out = output.get();
 
         boolean dir = in.provider.id < out.provider.id;
 
@@ -199,10 +199,10 @@ public class Synapse implements Writable {
 
     private static Synapse lookupSynapse(Synapse tmpSyn) {
         if (!tmpSyn.output.isSuspended()) {
-            Neuron n = tmpSyn.output.get();
+            INeuron n = tmpSyn.output.get();
             return n.inputSynapses.get(tmpSyn);
         } else if(!tmpSyn.input.isSuspended()) {
-            Neuron n = tmpSyn.input.get();
+            INeuron n = tmpSyn.input.get();
             return n.outputSynapses.get(tmpSyn);
         } else if(!tmpSyn.inputNode.isSuspended()) {
             InputNode n = tmpSyn.inputNode.get();

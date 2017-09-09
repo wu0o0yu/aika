@@ -21,8 +21,7 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.Provider;
 import org.aika.corpus.Document;
-import org.aika.neuron.Neuron;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,11 +40,11 @@ public class EntityResolutionTest {
 
         Model m = new Model();
 
-        Provider<Neuron> wJaguar = m.createNeuron("W-Jaguar");
-        Provider<Neuron> wPuma = m.createNeuron("W-Puma");
+        Provider<INeuron> wJaguar = m.createNeuron("W-Jaguar");
+        Provider<INeuron> wPuma = m.createNeuron("W-Puma");
 
-        Provider<Neuron> eJaguar = m.createNeuron("E-Jaguar");
-        Provider<Neuron> ePuma = m.createNeuron("E-Puma");
+        Provider<INeuron> eJaguar = m.createNeuron("E-Jaguar");
+        Provider<INeuron> ePuma = m.createNeuron("E-Puma");
 
 
         m.initAndNeuron(eJaguar, 0.9,
@@ -118,18 +117,18 @@ public class EntityResolutionTest {
 
         Model m = new Model();
 
-        Provider<Neuron> wJaguar = m.createNeuron("W-Jaguar");
-        Provider<Neuron> wPuma = m.createNeuron("W-Puma");
-        Provider<Neuron> wLeopard = m.createNeuron("W-Leopard");
+        Provider<INeuron> wJaguar = m.createNeuron("W-Jaguar");
+        Provider<INeuron> wPuma = m.createNeuron("W-Puma");
+        Provider<INeuron> wLeopard = m.createNeuron("W-Leopard");
 
-        Provider<Neuron> eJaguar = m.createNeuron("E-Jaguar");
-        Provider<Neuron> ePuma = m.createNeuron("E-Puma");
-        Provider<Neuron> eLeopard = m.createNeuron("E-Leopard");
+        Provider<INeuron> eJaguar = m.createNeuron("E-Jaguar");
+        Provider<INeuron> ePuma = m.createNeuron("E-Puma");
+        Provider<INeuron> eLeopard = m.createNeuron("E-Leopard");
 
-        Provider<Neuron> cKatzen = m.createNeuron("C-Katzen");
-        Provider<Neuron> chKatzenOhneJaguar = m.createNeuron("CH-Katzen/Jaguar");
-        Provider<Neuron> chKatzenOhnePuma = m.createNeuron("CH-Katzen/Puma");
-        Provider<Neuron> chKatzenOhneLeopard = m.createNeuron("CH-Katzen/Leopard");
+        Provider<INeuron> cKatzen = m.createNeuron("C-Katzen");
+        Provider<INeuron> chKatzenOhneJaguar = m.createNeuron("CH-Katzen/Jaguar");
+        Provider<INeuron> chKatzenOhnePuma = m.createNeuron("CH-Katzen/Puma");
+        Provider<INeuron> chKatzenOhneLeopard = m.createNeuron("CH-Katzen/Leopard");
 
         m.initAndNeuron(eJaguar, 0.9,
                 new Input()

@@ -23,7 +23,7 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,8 +41,8 @@ public class PropagateRidTest {
         AndNode.minFrequency = 1;
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        Provider<Neuron> inA = m.createNeuron("A");
-        Provider<Neuron> pA = m.initAndNeuron(m.createNeuron("pA"),
+        Provider<INeuron> inA = m.createNeuron("A");
+        Provider<INeuron> pA = m.initAndNeuron(m.createNeuron("pA"),
                 0.001,
                 new Input()
                         .setNeuron(inA)

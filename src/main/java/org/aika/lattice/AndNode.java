@@ -25,7 +25,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.InputNode.SynapseKey;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 
@@ -457,7 +457,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    public double computeSynapseWeightSum(Integer offset, Neuron n) {
+    public double computeSynapseWeightSum(Integer offset, INeuron n) {
         double sum = n.bias;
         for(Refinement ref: parents.keySet()) {
             Synapse s = ref.getSynapse(offset, n.provider);
@@ -593,7 +593,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         }
 
 
-        public Synapse getSynapse(Integer offset, Provider<Neuron> n) {
+        public Synapse getSynapse(Integer offset, Provider<INeuron> n) {
             InputNode in = input.get();
             in.lock.acquireReadLock();
             Synapse s = in.synapses != null ? in.synapses.get(new SynapseKey(Utils.nullSafeAdd(getRelativePosition(), false, offset, false), n)) : null;

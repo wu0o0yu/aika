@@ -23,7 +23,7 @@ import org.aika.Model;
 import org.aika.Provider;
 import org.aika.neuron.Activation;
 import org.aika.corpus.Document;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,15 +38,15 @@ public class WeakInputProcessingTest {
     public void testWeakInputProcessing() {
         Model m = new Model();
 
-        Provider<Neuron> strongInput = m.createNeuron("Strong Input");
+        Provider<INeuron> strongInput = m.createNeuron("Strong Input");
 
-        Provider<Neuron> weakInputA = m.createNeuron("Weak Input A");
-        Provider<Neuron> weakInputB = m.createNeuron("Weak Input B");
-        Provider<Neuron> weakInputC = m.createNeuron("Weak Input C");
+        Provider<INeuron> weakInputA = m.createNeuron("Weak Input A");
+        Provider<INeuron> weakInputB = m.createNeuron("Weak Input B");
+        Provider<INeuron> weakInputC = m.createNeuron("Weak Input C");
 
-        Provider<Neuron> suppr = m.createNeuron("suppr");
+        Provider<INeuron> suppr = m.createNeuron("suppr");
 
-        Provider<Neuron> patternA = m.initAndNeuron(
+        Provider<INeuron> patternA = m.initAndNeuron(
                 m.createNeuron("Pattern A"),
                 0.4,
                 new Input()
@@ -73,7 +73,7 @@ public class WeakInputProcessingTest {
                         .setRangeOutput(true)
         );
 
-        Provider<Neuron> patternB = m.initAndNeuron(
+        Provider<INeuron> patternB = m.initAndNeuron(
                 m.createNeuron("Pattern B"),
                 0.4,
                 new Input()
@@ -100,7 +100,7 @@ public class WeakInputProcessingTest {
                         .setRangeOutput(true)
         );
 
-        Provider<Neuron> patternC = m.initAndNeuron(
+        Provider<INeuron> patternC = m.initAndNeuron(
                 m.createNeuron("Pattern C"),
                 0.4,
                 new Input()

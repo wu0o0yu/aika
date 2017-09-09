@@ -7,8 +7,7 @@ import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
-import org.aika.neuron.Neuron;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 public class TestNextWord {
@@ -17,10 +16,10 @@ public class TestNextWord {
     public void testMatchTheWord() {
         Model m = new Model(null, 1);
 
-        Provider<Neuron> inA = m.createNeuron("A");
-        Provider<Neuron> inB = m.createNeuron("B");
+        Provider<INeuron> inA = m.createNeuron("A");
+        Provider<INeuron> inB = m.createNeuron("B");
 
-        Provider<Neuron> abN = m.initAndNeuron(m.createNeuron("AB"), 0.5,
+        Provider<INeuron> abN = m.initAndNeuron(m.createNeuron("AB"), 0.5,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(10.0f)

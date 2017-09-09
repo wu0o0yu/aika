@@ -24,7 +24,7 @@ import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.Activation;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -48,7 +48,7 @@ public class OrNode extends Node<OrNode, Activation> {
     // Hack: Integer.MIN_VALUE represents the null key
     public TreeMap<Integer, TreeSet<Provider<Node>>> parents = new TreeMap<>();
 
-    public Provider<Neuron> neuron = null;
+    public Provider<INeuron> neuron = null;
 
     public OrNode() {}
 
@@ -212,7 +212,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public double computeSynapseWeightSum(Integer offset, Neuron n) {
+    public double computeSynapseWeightSum(Integer offset, INeuron n) {
         throw new UnsupportedOperationException();
     }
 

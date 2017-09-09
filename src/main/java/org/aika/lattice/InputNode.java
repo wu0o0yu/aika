@@ -25,7 +25,7 @@ import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.Activation;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.Key;
 
@@ -49,7 +49,7 @@ import static org.aika.corpus.Range.Operator.*;
 public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     public Key key;
-    public Provider<Neuron> inputNeuron;
+    public Provider<INeuron> inputNeuron;
 
     // Key: Output Neuron
     Map<SynapseKey, Synapse> synapses;
@@ -76,7 +76,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    public static InputNode add(Model m, Key key, Neuron input) {
+    public static InputNode add(Model m, Key key, INeuron input) {
         Provider<InputNode> pin = (input != null ? input.outputNodes.get(key) : null);
         if(pin != null) {
             return pin.get();
@@ -360,7 +360,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     public void discover(Document doc, NodeActivation<InputNode> act) {
         long v = Node.visitedCounter++;
 
-        for(Neuron n: doc.finallyActivatedNeurons) {
+        for(INeuron n: doc.finallyActivatedNeurons) {
             for(Activation secondNAct: n.getFinalActivations(doc)) {
                 for (NodeActivation secondAct : secondNAct.outputs.values()) {
                     Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.n.provider);
@@ -386,7 +386,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    public double computeSynapseWeightSum(Integer offset, Neuron n) {
+    public double computeSynapseWeightSum(Integer offset, INeuron n) {
         return n.bias + Math.abs(getSynapse(new SynapseKey(key.relativeRid == null ? null : offset, n.provider)).w);
     }
 
@@ -499,13 +499,13 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     public static class SynapseKey implements Writable, Comparable<SynapseKey> {
         Integer rid;
-        Provider<Neuron> n;
+        Provider<INeuron> n;
 
         private SynapseKey() {
         }
 
 
-        public SynapseKey(Integer rid, Provider<Neuron> n) {
+        public SynapseKey(Integer rid, Provider<INeuron> n) {
             this.rid = rid;
             this.n = n;
         }

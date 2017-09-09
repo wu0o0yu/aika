@@ -24,7 +24,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.Node;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -46,11 +46,11 @@ public class CounterNeuronTest {
         System.out.println("Start =====================");
         Model m = new Model();
 
-        Provider<Neuron> cn = m.createNeuron("CLOCK");
-        Provider<Neuron> sn = m.createNeuron("START");
+        Provider<INeuron> cn = m.createNeuron("CLOCK");
+        Provider<INeuron> sn = m.createNeuron("START");
 
 
-        Provider<Neuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
+        Provider<INeuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
@@ -99,9 +99,9 @@ public class CounterNeuronTest {
     public void testE() {
         Model m = new Model();
 
-        Provider<Neuron> cn = m.createNeuron("CLOCK");
-        Provider<Neuron> sn = m.createNeuron("START");
-        Provider<Neuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
+        Provider<INeuron> cn = m.createNeuron("CLOCK");
+        Provider<INeuron> sn = m.createNeuron("START");
+        Provider<INeuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
@@ -141,9 +141,9 @@ public class CounterNeuronTest {
     public void testReverseDirection() {
         Model m = new Model();
 
-        Provider<Neuron> cn = m.createNeuron("CLOCK");
-        Provider<Neuron> sn = m.createNeuron("START");
-        Provider<Neuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, false, true);
+        Provider<INeuron> cn = m.createNeuron("CLOCK");
+        Provider<INeuron> sn = m.createNeuron("START");
+        Provider<INeuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, false, true);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
@@ -171,9 +171,9 @@ public class CounterNeuronTest {
     public void testStartNode() {
         Model m = new Model();
 
-        Provider<Neuron> sn = m.createNeuron("START");
-        Provider<Neuron> cn = m.createNeuron("CLOCK");
-        Provider<Neuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
+        Provider<INeuron> sn = m.createNeuron("START");
+        Provider<INeuron> cn = m.createNeuron("CLOCK");
+        Provider<INeuron> ctn = m.initCounterNeuron(m.createNeuron("CTN"), cn, false, sn, true, false);
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 

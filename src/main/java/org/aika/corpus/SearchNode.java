@@ -21,7 +21,7 @@ import org.aika.neuron.Activation.Rounds;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.neuron.Activation;
 import org.aika.corpus.Conflicts.Conflict;
-import org.aika.neuron.Neuron.NormWeight;
+import org.aika.neuron.INeuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

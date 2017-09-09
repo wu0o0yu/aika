@@ -26,7 +26,7 @@ import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.network.TestHelper;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -46,7 +46,7 @@ public class ActivationsTest {
         Model m = new Model();
         AndNode.minFrequency = 1;
 
-        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<INeuron> inA = m.createNeuron("A");
 
         m.initAndNeuron(m.createNeuron("pA"), 0.001,
                 new Input()
@@ -74,7 +74,7 @@ public class ActivationsTest {
         Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(1, 2), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
         Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(2, 3), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
 
-        Provider<Neuron> inB = m.createNeuron("B");
+        Provider<INeuron> inB = m.createNeuron("B");
 
         m.initAndNeuron(m.createNeuron("pB"), 0.001,
                 new Input()
@@ -100,7 +100,7 @@ public class ActivationsTest {
         AndNode.minFrequency = 1;
 
 
-        Provider<Neuron> in = m.createNeuron("A");
+        Provider<INeuron> in = m.createNeuron("A");
         OrNode inNode = in.get().node.get();
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

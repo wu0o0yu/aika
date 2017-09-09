@@ -26,7 +26,7 @@ import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 
 import static org.aika.corpus.Range.Operator.*;
@@ -50,12 +50,12 @@ public class TestHelper {
     }
 
 
-    public static InputNode addOutputNode(Document doc, Provider<Neuron> n, Integer relativeRid, Integer absoluteRid) {
+    public static InputNode addOutputNode(Document doc, Provider<INeuron> n, Integer relativeRid, Integer absoluteRid) {
         return addOutputNode(doc, n, relativeRid, absoluteRid, EQUALS, START, true, EQUALS, END, true);
     }
 
 
-    public static InputNode addOutputNode(Document doc, Provider<Neuron> n, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Mapping startMapping, boolean startRangeOutput, Operator endRangeMatch, Mapping endMapping, boolean endRangeOutput) {
+    public static InputNode addOutputNode(Document doc, Provider<INeuron> n, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Mapping startMapping, boolean startRangeOutput, Operator endRangeMatch, Mapping endMapping, boolean endRangeOutput) {
         return InputNode.add(doc.m, new Synapse.Key(false, false, relativeRid, absoluteRid, startRangeMatch, startMapping, startRangeOutput, endRangeMatch, endMapping, endRangeOutput), n.get());
     }
 

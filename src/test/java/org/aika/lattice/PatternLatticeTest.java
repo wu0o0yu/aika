@@ -25,7 +25,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.network.TestHelper;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -40,10 +40,10 @@ public class PatternLatticeTest {
     @Test
     public void testPredefinedPatterns() {
         Model m = new Model();
-        Provider<Neuron> inA = m.createNeuron("A");
-        Provider<Neuron> inB = m.createNeuron("B");
-        Provider<Neuron> inC = m.createNeuron("C");
-        Provider<Neuron> inD = m.createNeuron("D");
+        Provider<INeuron> inA = m.createNeuron("A");
+        Provider<INeuron> inB = m.createNeuron("B");
+        Provider<INeuron> inC = m.createNeuron("C");
+        Provider<INeuron> inD = m.createNeuron("D");
 
         {
             m.initAndNeuron(m.createNeuron("ABC"),
@@ -259,10 +259,10 @@ public class PatternLatticeTest {
         m.numberOfPositions = 100;
 
 
-        Provider<Neuron> inA = m.createNeuron("A");
-        Provider<Neuron> inB = m.createNeuron("B");
-        Provider<Neuron> inC = m.createNeuron("C");
-        Provider<Neuron> inD = m.createNeuron("D");
+        Provider<INeuron> inA = m.createNeuron("A");
+        Provider<INeuron> inB = m.createNeuron("B");
+        Provider<INeuron> inC = m.createNeuron("C");
+        Provider<INeuron> inD = m.createNeuron("D");
 
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -655,13 +655,13 @@ public class PatternLatticeTest {
         Model m = new Model();
         AndNode.minFrequency = 10;
 
-        Provider<Neuron> inA = m.createNeuron("A");
+        Provider<INeuron> inA = m.createNeuron("A");
         Node inANode = inA.get().node.get();
 
-        Provider<Neuron> inB = m.createNeuron("B");
+        Provider<INeuron> inB = m.createNeuron("B");
         Node inBNode = inB.get().node.get();
 
-        Provider<Neuron> inC = m.createNeuron("C");
+        Provider<INeuron> inC = m.createNeuron("C");
         Node inCNode = inC.get().node.get();
 
         m.initAndNeuron(m.createNeuron("ABC"),
