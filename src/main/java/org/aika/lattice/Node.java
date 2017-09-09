@@ -214,7 +214,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public Node(Model m, int level) {
         threads = new ThreadState[m.numberOfThreads];
-        m.createNodeProvider(this);
+        provider = new Provider(m, this);
         this.level = level;
         if(m != null) {
             nOffset = m.numberOfPositions;
@@ -940,7 +940,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
-            addAndChild(Refinement.read(in, m), m.lookupProvider(in.readInt()));
+            addAndChild(Refinement.read(in, m), m.lookupNodeProvider(in.readInt()));
         }
 
         s = in.readInt();

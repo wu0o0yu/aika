@@ -89,28 +89,6 @@ public class Model {
     }
 
 
-    public <T extends Node> Provider<T> createNodeProvider(T n) {
-        int id = suspensionHook != null ? suspensionHook.getNewId() : currentId.addAndGet(1);
-        Provider<T> np = new Provider<T>(this, id, n);
-        n.provider = np;
-        synchronized (providers) {
-            providers.put(id, new WeakReference<>(np));
-        }
-        return np;
-    }
-
-
-    public Neuron createNeuronProvider(INeuron n) {
-        int id = suspensionHook != null ? suspensionHook.getNewId() : currentId.addAndGet(1);
-        Neuron np = new Neuron(this, id, n);
-        n.provider = np;
-        synchronized (providers) {
-            providers.put(id, new WeakReference<>(np));
-        }
-        return np;
-    }
-
-
     public Neuron createNeuron() {
         return new INeuron(this).provider;
     }
@@ -147,7 +125,7 @@ public class Model {
     }
 
 
-    public <P extends Provider<? extends AbstractNode>> P lookupProvider(int id) {
+    public <P extends Provider<? extends Node>> P lookupNodeProvider(int id) {
         synchronized (providers) {
             WeakReference<Provider<? extends AbstractNode>> sp = providers.get(id);
             if (sp != null) {
@@ -158,10 +136,30 @@ public class Model {
                 }
             }
 
-            Provider p = new Provider(this, id, null);
+            Provider p = new Provider(this, id);
             providers.put(id, new WeakReference(p));
             referencedProviders.put(id, p);
             return (P) p;
+        }
+    }
+
+
+
+    public Neuron lookupNeuron(int id) {
+        synchronized (providers) {
+            WeakReference<Provider<? extends AbstractNode>> sp = providers.get(id);
+            if (sp != null) {
+                Neuron p = (Neuron) sp.get();
+                if (p != null) {
+                    referencedProviders.put(id, p);
+                    return p;
+                }
+            }
+
+            Neuron p = new Neuron(this, id);
+            providers.put(id, new WeakReference(p));
+            referencedProviders.put(id, p);
+            return p;
         }
     }
 

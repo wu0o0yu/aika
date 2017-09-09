@@ -19,7 +19,6 @@ package org.aika.network;
 
 import org.aika.*;
 import org.aika.corpus.Document;
-import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,7 +48,7 @@ public class SuspensionTest {
 
 
         // Reactivate
-        n = m.lookupProvider(id);
+        n = m.lookupNeuron(id);
 
         Document doc = m.createDocument("Bla");
         n.addInput(doc, 0, 1);
@@ -105,10 +104,10 @@ public class SuspensionTest {
 
         Document doc = m.createDocument("Bla");
 
-        inA = m.lookupProvider(idA);
+        inA = m.lookupNeuron(idA);
         inA.addInput(doc, 0, 1, 0);
 
-        inB = m.lookupProvider(idB);
+        inB = m.lookupNeuron(idB);
         inB.addInput(doc, 1, 2, 1);
 
         doc.process();

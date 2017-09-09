@@ -553,7 +553,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
             Refinement ref = Refinement.read(in, m);
-            Provider<? extends Node> pn = m.lookupProvider(in.readInt());
+            Provider<? extends Node> pn = m.lookupNodeProvider(in.readInt());
             parents.put(ref, pn);
         }
     }
@@ -619,7 +619,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             if(in.readBoolean()) {
                 rid = in.readInt();
             }
-            input = m.lookupProvider(in.readInt());
+            input = m.lookupNodeProvider(in.readInt());
             return true;
         }
 

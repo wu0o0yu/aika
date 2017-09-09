@@ -132,7 +132,7 @@ public class Synapse implements Writable {
         (dir ? in : out).lock.acquireWriteLock(threadId);
         (dir ? out : in).lock.acquireWriteLock(threadId);
 
-        in.outputSynapses.put(this, this);
+        in.provider.outputSynapses.put(this, this);
         out.inputSynapses.put(this, this);
         out.inputSynapsesByWeight.add(this);
         in.provider.setModified();
@@ -141,9 +141,7 @@ public class Synapse implements Writable {
         (dir ? in : out).lock.releaseWriteLock();
         (dir ? out : in).lock.releaseWriteLock();
 
-        if(out.m != null) {
-            out.m.stat.synapses++;
-        }
+        out.provider.m.stat.synapses++;
     }
 
 
@@ -176,9 +174,9 @@ public class Synapse implements Writable {
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        input = m.lookupProvider(in.readInt());
-        output = m.lookupProvider(in.readInt());
-        inputNode = m.lookupProvider(in.readInt());
+        input = m.lookupNeuron(in.readInt());
+        output = m.lookupNeuron(in.readInt());
+        inputNode = m.lookupNodeProvider(in.readInt());
 
         key = lookupKey(Key.read(in, m));
 
@@ -188,25 +186,9 @@ public class Synapse implements Writable {
 
 
     public static Synapse read(DataInput in, Model m) throws IOException {
-        Synapse k = new Synapse();
-        k.readFields(in, m);
-        return lookupSynapse(k);
-    }
-
-
-    private static Synapse lookupSynapse(Synapse tmpSyn) {
-        if (!tmpSyn.output.isSuspended()) {
-            INeuron n = tmpSyn.output.get();
-            return n.inputSynapses.get(tmpSyn);
-        } else if(!tmpSyn.input.isSuspended()) {
-            INeuron n = tmpSyn.input.get();
-            return n.outputSynapses.get(tmpSyn);
-        } else if(!tmpSyn.inputNode.isSuspended()) {
-            InputNode n = tmpSyn.inputNode.get();
-            return n.getSynapse(new InputNode.SynapseKey(tmpSyn.key.relativeRid, tmpSyn.output));
-        } else {
-            return tmpSyn;
-        }
+        Synapse s = new Synapse();
+        s.readFields(in, m);
+        return s;
     }
 
 

@@ -64,8 +64,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public static final double TOLERANCE = 0.000001;
     public static final int MAX_SELF_REFERENCING_DEPTH = 5;
 
-    public Model m;
-
     public String label;
 
     public volatile double bias;
@@ -76,7 +74,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public volatile double maxRecurrentSum = 0.0;
 
 
-    public TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
     public TreeMap<Synapse, Synapse> inputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
     public TreeSet<Synapse> inputSynapsesByWeight = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
@@ -112,9 +109,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         this.isBlocked = isBlocked;
         this.noTraining = noTraining;
 
-        this.m = m;
-
-        m.createNeuronProvider(this);
+        provider = new Neuron(m, this);
 
         OrNode node = new OrNode(m);
 
@@ -189,11 +184,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         for(Synapse s: inputSynapses.values()) {
             INeuron in = s.input.get();
             in.lock.acquireWriteLock(threadId);
-            in.outputSynapses.remove(s);
+            in.provider.outputSynapses.remove(s);
             in.lock.releaseWriteLock();
         }
 
-        for(Synapse s: outputSynapses.values()) {
+        for(Synapse s: provider.outputSynapses.values()) {
             INeuron out = s.output.get();
             out.lock.acquireWriteLock(threadId);
             out.inputSynapses.remove(s);
@@ -533,7 +528,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private void linkNeuronActs(Document doc, Activation act, int v, int dir) {
         ArrayList<Activation> recNegTmp = new ArrayList<>();
-        TreeMap<Synapse, Synapse> syns = (dir == 0 ? inputSynapses : outputSynapses);
+        TreeMap<Synapse, Synapse> syns = (dir == 0 ? inputSynapses : provider.outputSynapses);
 
         for (Synapse s : getActiveSynapses(doc, dir, syns)) {
             Neuron p = (dir == 0 ? s.input : s.output);
@@ -762,14 +757,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             }
         }
         out.writeBoolean(false);
-
-        for(Synapse s: outputSynapses.values()) {
-            if(s.output != null) {
-                out.writeBoolean(true);
-                s.write(out);
-            }
-        }
-        out.writeBoolean(false);
     }
 
 
@@ -785,13 +772,13 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
             Key k = Key.read(in, m);
-            Provider<InputNode> n = m.lookupProvider(in.readInt());
+            Provider<InputNode> n = m.lookupNodeProvider(in.readInt());
             outputNodes.put(k, n);
         }
 
         if(in.readBoolean()) {
             Integer nId = in.readInt();
-            node = m.lookupProvider(nId);
+            node = m.lookupNodeProvider(nId);
         }
 
         isBlocked = in.readBoolean();
@@ -806,19 +793,38 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             inputSynapses.put(syn, syn);
             inputSynapsesByWeight.add(syn);
         }
+    }
 
-        while(in.readBoolean()) {
-            Synapse syn = Synapse.read(in, m);
 
-            outputSynapses.put(syn, syn);
+    @Override
+    public void suspend() {
+        for(Synapse s: inputSynapses.values()) {
+            s.input.outputSynapses.remove(s);
+
+            if(!s.inputNode.isSuspended()) {
+                InputNode iNode = s.inputNode.get();
+                iNode.removeSynapse(provider.m.defaultThreadId, new SynapseKey(s.key.relativeRid, s.output));
+            }
+        }
+    }
+
+
+    @Override
+    public void reactivate() {
+        for(Synapse s: inputSynapses.values()) {
+            s.input.outputSynapses.put(s, s);
+
+            if(!s.inputNode.isSuspended()) {
+                InputNode iNode = s.inputNode.get();
+                iNode.setSynapse(provider.m.defaultThreadId, new SynapseKey(s.key.relativeRid, s.output), s);
+            }
         }
     }
 
 
     public static Neuron init(Model m, int threadId, Neuron pn, double bias, double negDirSum, double negRecSum, double posRecSum, Set<Synapse> inputs) {
         INeuron n = pn.get();
-        n.m = m;
-        n.m.stat.neurons++;
+        n.provider.m.stat.neurons++;
         n.bias = bias;
         n.negDirSum = negDirSum;
         n.negRecSum = negRecSum;

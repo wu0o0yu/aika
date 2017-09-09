@@ -10,15 +10,24 @@ import java.util.zip.GZIPOutputStream;
 public class Provider<T extends AbstractNode> implements Comparable<Provider<?>> {
 
     public Model m;
-    public final int id;
+    public int id;
 
     private T n;
 
-
-    public Provider(Model m, int id, T n) {
+    public Provider(Model m, int id) {
         this.m = m;
         this.id = id;
+    }
+
+
+    public Provider(Model m, T n) {
+        this.m = m;
         this.n = n;
+
+        id = m.suspensionHook != null ? m.suspensionHook.getNewId() : m.currentId.addAndGet(1);
+        synchronized (m.providers) {
+            m.providers.put(id, new WeakReference<>(this));
+        }
     }
 
 
@@ -43,6 +52,8 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
     public synchronized void suspend() {
         assert m.suspensionHook != null;
+
+        n.suspend();
 
         if (n.modified) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -73,6 +84,8 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        n.reactivate();
 
         synchronized (m.providers) {
             m.providers.put(id, new WeakReference<>(this));

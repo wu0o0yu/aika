@@ -34,6 +34,10 @@ public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> i
 
     public P provider;
 
+    public void suspend() {}
+
+    public void reactivate() {}
+
     public static <P extends Provider> AbstractNode read(DataInput in, P p) throws IOException {
         AbstractNode n;
         if(in.readBoolean()) {

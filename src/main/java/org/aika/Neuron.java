@@ -21,9 +21,11 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
+import org.aika.neuron.Synapse;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.TreeMap;
 
 /**
  *
@@ -31,11 +33,16 @@ import java.util.Collections;
  */
 public class Neuron extends Provider<INeuron> {
 
+    public TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
 
-    Neuron(Model m, int id, INeuron n) {
-        super(m, id, n);
+
+    public Neuron(Model m, int id) {
+        super(m, id);
     }
 
+    public Neuron(Model m, INeuron n) {
+        super(m, n);
+    }
 
     /**
      * Propagate an input activation into the network.
@@ -135,4 +142,7 @@ public class Neuron extends Provider<INeuron> {
         if(isSuspended()) return Collections.emptyList();
         return get().getFinalActivations(doc);
     }
+
+
+
 }

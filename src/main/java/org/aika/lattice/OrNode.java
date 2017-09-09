@@ -437,7 +437,7 @@ public class OrNode extends Node<OrNode, Activation> {
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
-        neuron = m.lookupProvider(in.readInt());
+        neuron = m.lookupNeuron(in.readInt());
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
@@ -447,7 +447,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
             int sa = in.readInt();
             for(int j = 0; j < sa; j++) {
-                ridParents.add(m.lookupProvider(in.readInt()));
+                ridParents.add(m.lookupNodeProvider(in.readInt()));
             }
         }
     }
@@ -488,7 +488,7 @@ public class OrNode extends Node<OrNode, Activation> {
             if(in.readBoolean()) {
                 ridOffset = in.readInt();
             }
-            node = m.lookupProvider(in.readInt());
+            node = m.lookupNodeProvider(in.readInt());
         }
 
 

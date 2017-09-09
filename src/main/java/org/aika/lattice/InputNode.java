@@ -404,8 +404,14 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         if(synapses == null) {
             synapses = new TreeMap<>();
         }
-        provider.setModified();
         synapses.put(sk, s);
+        lock.releaseWriteLock();
+    }
+
+
+    public void removeSynapse(int threadId, SynapseKey sk) {
+        lock.acquireWriteLock(threadId);
+        synapses.remove(sk);
         lock.releaseWriteLock();
     }
 
@@ -462,16 +468,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         if(inputNeuron != null) {
             out.writeInt(inputNeuron.id);
         }
-
-        if(synapses != null) {
-            for (Map.Entry<SynapseKey, Synapse> me : synapses.entrySet()) {
-                out.writeBoolean(true);
-                me.getKey().write(out);
-                me.getValue().write(out);
-            }
-        }
-        out.writeBoolean(false);
-
     }
 
 
@@ -481,18 +477,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         key = Synapse.lookupKey(Key.read(in, m));
 
         if(in.readBoolean()) {
-            inputNeuron = m.lookupProvider(in.readInt());
-        }
-
-        while(in.readBoolean()) {
-            SynapseKey sk = SynapseKey.read(in, m);
-            Synapse syn = Synapse.read(in, m);
-
-            if(synapses == null) {
-                synapses = new TreeMap<>();
-            }
-
-            synapses.put(sk, syn);
+            inputNeuron = m.lookupNeuron(in.readInt());
         }
     }
 
@@ -541,7 +526,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
             if(in.readBoolean()) {
                 rid = in.readInt();
             }
-            n = m.lookupProvider(in.readInt());
+            n = m.lookupNeuron(in.readInt());
         }
     }
 }
