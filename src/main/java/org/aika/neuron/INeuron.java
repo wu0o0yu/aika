@@ -124,59 +124,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         provider.setModified();
     }
 
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc The current document
-     * @param begin The range begin
-     * @param end The range end
-     */
-    public Activation addInput(Document doc, int begin, int end) {
-        return addInput(doc, begin, end, null, doc.bottom);
-    }
-
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc The current document
-     * @param begin The range begin
-     * @param end The range end
-     * @param o The interpretation node
-     */
-    public Activation addInput(Document doc, int begin, int end, InterprNode o) {
-        return addInput(doc, begin, end, null, o);
-    }
-
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc The current document
-     * @param begin The range begin
-     * @param end The range end
-     * @param rid The relational id (e.g. the word position)
-     */
-    public Activation addInput(Document doc, int begin, int end, Integer rid) {
-        return addInput(doc, begin, end, rid, doc.bottom);
-    }
-
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc The current document
-     * @param begin The range begin
-     * @param end The range end
-     * @param rid The relational id (e.g. the word position)
-     * @param o The interpretation node
-     */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o) {
-        return addInput(doc, begin, end, rid, o, 1.0);
-    }
-
-
     /**
      * Propagate an input activation into the network.
      *
@@ -209,21 +156,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         doc.propagate();
 
         return act;
-    }
-
-
-    public void removeInput(Document doc, int begin, int end) {
-        removeInput(doc, begin, end, null, doc.bottom);
-    }
-
-
-    public void removeInput(Document doc, int begin, int end, InterprNode o) {
-        removeInput(doc, begin, end, null, o);
-    }
-
-
-    public void removeInput(Document doc, int begin, int end, Integer rid) {
-        removeInput(doc, begin, end, rid, doc.bottom);
     }
 
 

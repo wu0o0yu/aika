@@ -102,17 +102,17 @@ public class RecurrentPatternTest {
 
         Document doc = m.createDocument(txt, 0);
 
-        startSignal.get().addInput(doc, 0, 1, 0);
+        startSignal.addInput(doc, 0, 1, 0);
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
-                spaceN.get().addInput(doc, i, i + 1);
+                spaceN.addInput(doc, i, i + 1);
             }
         }
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ' && c != '.') {
-                chars.get(c).get().addInput(doc, i, i + 1);
+                chars.get(c).addInput(doc, i, i + 1);
             }
         }
 
@@ -200,17 +200,17 @@ public class RecurrentPatternTest {
 
         Document doc = m.createDocument(txt, 0);
 
-        startSignal.get().addInput(doc, 0, 1, 0);
+        startSignal.addInput(doc, 0, 1, 0);
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
-                spaceN.get().addInput(doc, i, i + 1);
+                spaceN.addInput(doc, i, i + 1);
             }
         }
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ' && c != '.') {
-                chars.get(c).get().addInput(doc, i, i + 1);
+                chars.get(c).addInput(doc, i, i + 1);
             }
         }
 
@@ -280,12 +280,12 @@ public class RecurrentPatternTest {
         Document doc = m.createDocument("                                                  ", 0);
 
         for(int i = 5; i < 30; i += 5) {
-            clock.get().addInput(doc, i - 1, i);
+            clock.addInput(doc, i - 1, i);
         }
 
         System.out.println(doc.neuronActivationsToString(false, false, true));
 
-        start.get().addInput(doc, 0, 1, 0);
+        start.addInput(doc, 0, 1, 0);
 
         System.out.println(doc.neuronActivationsToString(false, false, true));
 

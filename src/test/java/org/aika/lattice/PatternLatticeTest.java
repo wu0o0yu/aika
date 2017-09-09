@@ -278,7 +278,7 @@ public class PatternLatticeTest {
         doc.bestInterpretation = Arrays.asList(doc.bottom);
         doc.train();
 
-        inA.get().addInput(doc, 0, 1, 0);
+        inA.addInput(doc, 0, 1, 0);
 
         doc.train();
 
@@ -286,7 +286,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(null, pANode.andChildren);
 
 
-        inB.get().addInput(doc, 0, 1, 0);
+        inB.addInput(doc, 0, 1, 0);
         m.resetFrequency();
         doc.train();
 
@@ -294,7 +294,7 @@ public class PatternLatticeTest {
 //        Assert.assertEquals(0, pBNode.andChildren.size());
 
 
-        inB.get().addInput(doc, 2, 3, 1);
+        inB.addInput(doc, 2, 3, 1);
         m.resetFrequency();
         doc.train();
 
@@ -302,7 +302,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(1, pBNode.andChildren.size());
 
 
-        inA.get().addInput(doc, 2, 3, 1);
+        inA.addInput(doc, 2, 3, 1);
         m.resetFrequency();
         doc.train();
 
@@ -320,7 +320,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(pBNode.provider, pAB.parents.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
 
-        inC.get().addInput(doc, 4, 5, 2);
+        inC.addInput(doc, 4, 5, 2);
         doc.train();
 
         Assert.assertEquals(1, pCNode.frequency, 0.01);
@@ -329,7 +329,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(2, pAB.parents.size());
 
 
-        inB.get().addInput(doc, 4, 5, 2);
+        inB.addInput(doc, 4, 5, 2);
         m.resetFrequency();
         doc.train();
 
@@ -337,14 +337,14 @@ public class PatternLatticeTest {
         Assert.assertEquals(2, pBNode.andChildren.size());
 
 
-        inB.get().addInput(doc, 6, 7, 3);
+        inB.addInput(doc, 6, 7, 3);
         m.resetFrequency();
         doc.train();
 
         Assert.assertEquals(4, pBNode.frequency, 0.01);
         Assert.assertEquals(2, pBNode.andChildren.size());
 
-        inC.get().addInput(doc, 6, 7, 3);
+        inC.addInput(doc, 6, 7, 3);
         m.resetFrequency();
         doc.train();
 
@@ -362,7 +362,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(pCNode.provider, pBC.parents.get(new Refinement(0, TestHelper.addOutputNode(doc, inB, 0, null).provider)));
 
 
-        inA.get().addInput(doc, 4, 5, 2);
+        inA.addInput(doc, 4, 5, 2);
         m.resetFrequency();
         doc.train();
 
@@ -373,7 +373,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(2, pCNode.andChildren.size());
 
 
-        inA.get().addInput(doc, 8, 9, 4);
+        inA.addInput(doc, 8, 9, 4);
         m.resetFrequency();
         doc.train();
 
@@ -383,7 +383,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(2, pBNode.andChildren.size());
         Assert.assertEquals(2, pCNode.andChildren.size());
 
-        inC.get().addInput(doc, 8, 9, 4);
+        inC.addInput(doc, 8, 9, 4);
         m.resetFrequency();
         doc.train();
 
@@ -420,7 +420,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(pCNode.provider, pAC.parents.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
 
-        inB.get().addInput(doc, 8, 9, 4);
+        inB.addInput(doc, 8, 9, 4);
         m.resetFrequency();
         doc.train();
 
@@ -444,18 +444,18 @@ public class PatternLatticeTest {
         Assert.assertEquals(pBC.provider, pABC.parents.get(new Refinement(0, TestHelper.addOutputNode(doc, inA, 0, null).provider)));
 
 
-        inD.get().addInput(doc, 0, 1, 0);
+        inD.addInput(doc, 0, 1, 0);
         m.resetFrequency();
         doc.train();
 
-        inD.get().addInput(doc, 4, 5, 2);
+        inD.addInput(doc, 4, 5, 2);
         m.resetFrequency();
         doc.train();
 
-        inA.get().addInput(doc, 10, 11, 5);
-        inB.get().addInput(doc, 10, 11, 5);
-        inC.get().addInput(doc, 10, 11, 5);
-        inD.get().addInput(doc, 10, 11, 5);
+        inA.addInput(doc, 10, 11, 5);
+        inB.addInput(doc, 10, 11, 5);
+        inC.addInput(doc, 10, 11, 5);
+        inD.addInput(doc, 10, 11, 5);
         m.resetFrequency();
         doc.train();
 
@@ -519,7 +519,7 @@ public class PatternLatticeTest {
 
 
 
-        inD.get().addInput(doc, 8, 9, 4);
+        inD.addInput(doc, 8, 9, 4);
         m.resetFrequency();
         doc.train();
         m.resetFrequency();
@@ -567,7 +567,7 @@ public class PatternLatticeTest {
 
 // ======================================================================
 
-        inB.get().removeInput(doc, 4, 5, 2);
+        inB.removeInput(doc, 4, 5, 2);
 
         m.resetFrequency();
         doc.train();
@@ -630,7 +630,7 @@ public class PatternLatticeTest {
         Assert.assertEquals(3, pACD.parents.size());
 
 
-        inD.get().removeInput(doc, 0, 1, 0);
+        inD.removeInput(doc, 0, 1, 0);
         m.resetFrequency();
         doc.train();
         m.resetFrequency();

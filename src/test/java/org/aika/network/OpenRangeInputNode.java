@@ -52,9 +52,9 @@ public class OpenRangeInputNode {
     public void testOpenRangeInputNode1() {
         Document doc = m.createDocument("                                ");
 
-        in.get().addInput(doc, 3, 4);
-        in.get().addInput(doc, 6, 7);
-        in.get().addInput(doc, 10, 11);
+        in.addInput(doc, 3, 4);
+        in.addInput(doc, 6, 7);
+        in.addInput(doc, 10, 11);
 
         System.out.println(doc.nodeActivationsToString(false, true));
 
@@ -69,9 +69,9 @@ public class OpenRangeInputNode {
     public void testOpenRangeInputNode2() {
         Document doc = m.createDocument("                                ");
 
-        in.get().addInput(doc, 3, 4);
-        in.get().addInput(doc, 10, 11);
-        in.get().addInput(doc, 6, 7);
+        in.addInput(doc, 3, 4);
+        in.addInput(doc, 10, 11);
+        in.addInput(doc, 6, 7);
 
         System.out.println(doc.nodeActivationsToString(false, true));
 
@@ -92,9 +92,9 @@ public class OpenRangeInputNode {
         InterprNode o01 = InterprNode.add(doc, false, o0, o1);
         InterprNode o012 = InterprNode.add(doc, false, o01, o2);
 
-        in.get().addInput(doc, 9, 10, o012);
-        in.get().addInput(doc, 24, 25, o01);
-        in.get().addInput(doc, 4, 5, o0);
+        in.addInput(doc, 9, 10, o012);
+        in.addInput(doc, 24, 25, o01);
+        in.addInput(doc, 4, 5, o0);
 
         System.out.println(doc.nodeActivationsToString(false, true));
     }

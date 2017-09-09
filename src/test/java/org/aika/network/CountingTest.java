@@ -56,14 +56,14 @@ public class CountingTest {
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
 
-        inA.get().addInput(doc, 0, 1);
-        inA.get().addInput(doc, 0, 1);
-        inA.get().addInput(doc, 2, 3);
-        inA.get().addInput(doc, 3, 4);
-        inA.get().addInput(doc, 3, 4);
-        inA.get().addInput(doc, 5, 6);
-        inA.get().addInput(doc, 6, 7);
-        inA.get().addInput(doc, 7, 8);
+        inA.addInput(doc, 0, 1);
+        inA.addInput(doc, 0, 1);
+        inA.addInput(doc, 2, 3);
+        inA.addInput(doc, 3, 4);
+        inA.addInput(doc, 3, 4);
+        inA.addInput(doc, 5, 6);
+        inA.addInput(doc, 6, 7);
+        inA.addInput(doc, 7, 8);
 
         doc.process();
         doc.train();

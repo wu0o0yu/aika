@@ -152,9 +152,9 @@ public class MutualExclusionTest {
 
         // Add input activations starting at char 0 and ending at char 1
         // These inputs will be immediately propagated through the network.
-        inA.get().addInput(doc, 0, 1);
-        inB.get().addInput(doc, 0, 1);
-        inC.get().addInput(doc, 0, 1);
+        inA.addInput(doc, 0, 1);
+        inB.addInput(doc, 0, 1);
+        inC.addInput(doc, 0, 1);
 
         // Computes the selected option
         doc.process();

@@ -58,7 +58,7 @@ public class SimpleWeightsTest {
         {
             Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.get().addInput(doc, 0, 6);
+            inA.addInput(doc, 0, 6);
 
             doc.process();
 
@@ -70,8 +70,8 @@ public class SimpleWeightsTest {
         {
             Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.get().addInput(doc, 0, 6);
-            inB.get().addInput(doc, 0, 6);
+            inA.addInput(doc, 0, 6);
+            inB.addInput(doc, 0, 6);
 
             doc.process();
 
@@ -110,8 +110,8 @@ public class SimpleWeightsTest {
         {
             Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.get().addInput(doc, 0, 6);
-            inB.get().addInput(doc, 0, 6);
+            inA.addInput(doc, 0, 6);
+            inB.addInput(doc, 0, 6);
 
             doc.process();
 

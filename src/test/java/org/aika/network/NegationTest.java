@@ -76,20 +76,20 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        inA.get().addInput(doc, 0, 11);
+        inA.addInput(doc, 0, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
         Assert.assertNotNull(NodeActivation.get(doc, abcN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
 
         InterprNode o1 = InterprNode.addPrimitive(doc);
 
-        inB.get().addInput(doc, 2, 7, o1);
+        inB.addInput(doc, 2, 7, o1);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         InterprNode o2 = InterprNode.addPrimitive(doc);
 
-        inC.get().addInput(doc, 4, 9, o2);
+        inC.addInput(doc, 4, 9, o2);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -142,27 +142,27 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        inA.get().addInput(doc, 0, 11);
+        inA.addInput(doc, 0, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         InterprNode ob = InterprNode.addPrimitive(doc);
-        inB.get().addInput(doc, 2, 7, ob);
+        inB.addInput(doc, 2, 7, ob);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         InterprNode oc = InterprNode.addPrimitive(doc);
-        inC.get().addInput(doc, 4, 9, oc);
+        inC.addInput(doc, 4, 9, oc);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
 //        Assert.assertNull(Activation.get(t, outN.node, 0, new Range(0, 11), Range.Relation.EQUALS, null, null, null));
 
-        inB.get().removeInput(doc, 2, 7, ob);
+        inB.removeInput(doc, 2, 7, ob);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        inC.get().removeInput(doc, 4, 9, oc);
+        inC.removeInput(doc, 4, 9, oc);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -212,24 +212,24 @@ public class NegationTest {
 
         InterprNode o = InterprNode.addPrimitive(doc);
 
-        inS.get().addInput(doc, 3, 8, o);
+        inS.addInput(doc, 3, 8, o);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        inA.get().addInput(doc, 0, 11);
+        inA.addInput(doc, 0, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
         Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
-        inS.get().removeInput(doc, 3, 8, o);
+        inS.removeInput(doc, 3, 8, o);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         Assert.assertTrue(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
-        inA.get().removeInput(doc, 0, 11);
+        inA.removeInput(doc, 0, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -279,22 +279,22 @@ public class NegationTest {
 
         InterprNode o = InterprNode.addPrimitive(doc);
 
-        inS.get().addInput(doc, 3, 8, o);
+        inS.addInput(doc, 3, 8, o);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        inA.get().addInput(doc, 0, 11);
+        inA.addInput(doc, 0, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
         Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
-        inA.get().removeInput(doc, 0, 11);
+        inA.removeInput(doc, 0, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        inS.get().removeInput(doc, 3, 8, o);
+        inS.removeInput(doc, 3, 8, o);
 
         doc.clearActivations();
     }
@@ -342,24 +342,24 @@ public class NegationTest {
 
         InterprNode o = InterprNode.addPrimitive(doc);
 
-        inA.get().addInput(doc, 0, 11);
+        inA.addInput(doc, 0, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        inS.get().addInput(doc, 3, 8, o);
+        inS.addInput(doc, 3, 8, o);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
         Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
-        inS.get().removeInput(doc, 3, 8, o);
+        inS.removeInput(doc, 3, 8, o);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         Assert.assertTrue(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
-        inA.get().removeInput(doc, 0, 11);
+        inA.removeInput(doc, 0, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -444,10 +444,10 @@ public class NegationTest {
         {
             Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.get().addInput(doc, 0, 6);
+            inA.addInput(doc, 0, 6);
             System.out.println(doc.neuronActivationsToString(true, false, true));
 
-            inB.get().addInput(doc, 0, 6);
+            inB.addInput(doc, 0, 6);
 
             System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -460,10 +460,10 @@ public class NegationTest {
         {
             Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.get().addInput(doc, 0, 6);
+            inA.addInput(doc, 0, 6);
             System.out.println(doc.neuronActivationsToString(true, false, true));
 
-            inB.get().addInput(doc, 3, 9);
+            inB.addInput(doc, 3, 9);
 
             System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -625,15 +625,15 @@ public class NegationTest {
 //        bsN.node.weight = 0.5;
 
 
-        inA.get().addInput(doc, 0, 6);
+        inA.addInput(doc, 0, 6);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        inB.get().addInput(doc, 0, 6);
+        inB.addInput(doc, 0, 6);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        inC.get().addInput(doc, 0, 6);
+        inC.addInput(doc, 0, 6);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -737,9 +737,9 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inA.get().addInput(doc, 0, 1);
-        inB.get().addInput(doc, 0, 1);
-        inG.get().addInput(doc, 0, 1);
+        inA.addInput(doc, 0, 1);
+        inB.addInput(doc, 0, 1);
+        inG.addInput(doc, 0, 1);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 

@@ -181,27 +181,27 @@ public class WeightsTest {
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
         if(getBit(i, 0)) {
-            inAA.get().addInput(doc, 0, 6);
+            inAA.addInput(doc, 0, 6);
         }
 
         if(getBit(i, 1)) {
-            inBA.get().addInput(doc, 0, 6);
+            inBA.addInput(doc, 0, 6);
         }
 
         if(getBit(i, 2)) {
-            inCA.get().addInput(doc, 0, 6);
+            inCA.addInput(doc, 0, 6);
         }
 
 
         if(getBit(i, 3)) {
-            inAB.get().addInput(doc, 0, 6);
+            inAB.addInput(doc, 0, 6);
         }
 
         if(getBit(i, 4)) {
-            inBB.get().addInput(doc, 0, 6);
+            inBB.addInput(doc, 0, 6);
         }
 
-        inCB.get().addInput(doc, 0, 6);
+        inCB.addInput(doc, 0, 6);
 
         doc.process();
 

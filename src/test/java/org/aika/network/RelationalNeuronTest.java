@@ -52,17 +52,17 @@ public class RelationalNeuronTest {
         InterprNode o01 = InterprNode.add(doc, false, o0, o1);
         InterprNode o012 = InterprNode.add(doc, false, o01, o2);
 
-        sn.get().addInput(doc, 0, 1, 0, doc.bottom);
-        cn.get().addInput(doc, 4, 5, o0);
-        cn.get().addInput(doc, 19, 20, o0);
-        in.get().addInput(doc, 10, 11, o0);
+        sn.addInput(doc, 0, 1, 0, doc.bottom);
+        cn.addInput(doc, 4, 5, o0);
+        cn.addInput(doc, 19, 20, o0);
+        in.addInput(doc, 10, 11, o0);
 
         System.out.println(doc.neuronActivationsToString(false, false, true));
 
 
         Assert.assertNotNull(getAct(doc, on.get().node.get(), 1, new Range(5, 20), null));
 
-        cn.get().addInput(doc, 9, 10, o012);
+        cn.addInput(doc, 9, 10, o012);
 
         System.out.println(doc.neuronActivationsToString(false, false, true));
 /*

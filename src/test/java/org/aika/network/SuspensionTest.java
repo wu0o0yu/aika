@@ -52,7 +52,7 @@ public class SuspensionTest {
         n = m.lookupProvider(id);
 
         Document doc = m.createDocument("Bla");
-        n.get().addInput(doc, 0, 1);
+        n.addInput(doc, 0, 1);
     }
 
 
@@ -106,14 +106,14 @@ public class SuspensionTest {
         Document doc = m.createDocument("Bla");
 
         inA = m.lookupProvider(idA);
-        inA.get().addInput(doc, 0, 1, 0);
+        inA.addInput(doc, 0, 1, 0);
 
         inB = m.lookupProvider(idB);
-        inB.get().addInput(doc, 1, 2, 1);
+        inB.addInput(doc, 1, 2, 1);
 
         doc.process();
 
-        Assert.assertFalse(outD.get().getFinalActivations(doc).isEmpty());
+        Assert.assertFalse(outD.getFinalActivations(doc).isEmpty());
     }
 
 

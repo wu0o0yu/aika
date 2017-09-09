@@ -192,7 +192,7 @@ public class NamedEntityRecognitionTest {
             int j = i + w.length();
 
             // Feed the individual words as inputs into the network.
-            inputNeurons.get(w).get().addInput(doc, i, j, wordPos);
+            inputNeurons.get(w).addInput(doc, i, j, wordPos);
             i = j + 1;
             wordPos++;
         }
@@ -207,7 +207,7 @@ public class NamedEntityRecognitionTest {
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");
-        for(Activation act: surnameCategory.get().getFinalActivations(doc)) {
+        for(Activation act: surnameCategory.getFinalActivations(doc)) {
             System.out.print(act.key.r + " ");
             System.out.print(act.key.rid + " ");
             System.out.print(act.key.o + " ");
@@ -395,16 +395,16 @@ public class NamedEntityRecognitionTest {
         Document doc = m.createDocument("mr. jackson cook was born in new york ", 0);
 
         // The start signal is used as a starting point for relational id counter.
-        startSignal.get().addInput(doc, 0, 1, 0);  // iteration, begin, end, relational id
+        startSignal.addInput(doc, 0, 1, 0);  // iteration, begin, end, relational id
 
         int i = 0;
         for(String w: doc.getContent().split(" ")) {
             int j = i + w.length();
             // The space is used as a clock signal to increase the relational id.
-            spaceN.get().addInput(doc, j, j + 1);
+            spaceN.addInput(doc, j, j + 1);
 
             // Feed the individual words as inputs into the network.
-            inputNeurons.get(w).get().addInput(doc, i, j);
+            inputNeurons.get(w).addInput(doc, i, j);
             i = j + 1;
         }
 
@@ -418,7 +418,7 @@ public class NamedEntityRecognitionTest {
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");
-        for(Activation act: surnameCategory.get().getFinalActivations(doc)) {
+        for(Activation act: surnameCategory.getFinalActivations(doc)) {
             System.out.print(act.key.r + " ");
             System.out.print(act.key.rid + " ");
             System.out.print(act.key.o + " ");

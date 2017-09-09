@@ -108,14 +108,14 @@ public class OverlappingOrTest {
 
         Document doc = m.createDocument("a b c d e ", 0);
 
-        startSignal.get().addInput(doc, 0, 1, 0);
+        startSignal.addInput(doc, 0, 1, 0);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
-                inputNeurons.get(c).get().addInput(doc, i, i + 1);
+                inputNeurons.get(c).addInput(doc, i, i + 1);
             }
             System.out.println(doc.neuronActivationsToString(true, false, true));
         }
@@ -123,7 +123,7 @@ public class OverlappingOrTest {
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).get().addInput(doc, i, i + 1);
+                inputNeurons.get(c).addInput(doc, i, i + 1);
             }
 
             System.out.println(doc.neuronActivationsToString(true, false, true));

@@ -136,10 +136,10 @@ public class OptionalAndTest {
             String txt = doc.getContent();
             int begin = txt.toLowerCase().indexOf("essen");
             int end = begin + 5;
-            wordEssen.get().addInput(doc, begin, end);
+            wordEssen.addInput(doc, begin, end);
 
             if(Character.isUpperCase(txt.charAt(begin))) {
-                upperCase.get().addInput(doc, begin, end);
+                upperCase.addInput(doc, begin, end);
             }
 
             doc.process();

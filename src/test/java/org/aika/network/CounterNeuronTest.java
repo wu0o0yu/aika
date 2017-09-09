@@ -61,9 +61,9 @@ public class CounterNeuronTest {
         InterprNode o01 = InterprNode.add(doc, false, o0, o1);
         InterprNode o012 = InterprNode.add(doc, false, o01, o2);
 
-        sn.get().addInput(doc, 0, 1, 0, doc.bottom);
-        cn.get().addInput(doc, 9, 10, o012);
-        cn.get().addInput(doc, 24, 25, o01);
+        sn.addInput(doc, 0, 1, 0, doc.bottom);
+        cn.addInput(doc, 9, 10, o012);
+        cn.addInput(doc, 24, 25, o01);
 //        sn.addInput(t, 0, 1, doc.bottom);
 
         System.out.println(doc.neuronActivationsToString(false, false, true));
@@ -72,7 +72,7 @@ public class CounterNeuronTest {
         Assert.assertNotNull(getAct(doc, ctn.get().node.get(), 0, new Range(0, 25), null));
         Assert.assertNotNull(getAct(doc, ctn.get().node.get(), 1, new Range(10, 25), null));
 
-        cn.get().addInput(doc, 4, 5, o0);
+        cn.addInput(doc, 4, 5, o0);
         System.out.println(doc.neuronActivationsToString(false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.get().node.get(), 0, new Range(0, 5), null));
@@ -80,14 +80,14 @@ public class CounterNeuronTest {
         Assert.assertNotNull(getAct(doc, ctn.get().node.get(), 1, new Range(5, 25), null));
         Assert.assertNotNull(getAct(doc, ctn.get().node.get(), 2, new Range(10, 25), null));
 
-        cn.get().removeInput(doc, 4, 5, o0);
+        cn.removeInput(doc, 4, 5, o0);
         System.out.println(doc.neuronActivationsToString(false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.get().node.get(), 0, new Range(0, 10), null));
         Assert.assertNotNull(getAct(doc, ctn.get().node.get(), 0, new Range(0, 25), null));
         Assert.assertNotNull(getAct(doc, ctn.get().node.get(), 1, new Range(10, 25), null));
 
-        cn.get().removeInput(doc, 24, 25, o01);
+        cn.removeInput(doc, 24, 25, o01);
         System.out.println(doc.neuronActivationsToString(false, false, true));
 
         Assert.assertNotNull(getAct(doc, ctn.get().node.get(), 0, new Range(0, 10), null));
@@ -115,12 +115,12 @@ public class CounterNeuronTest {
         InterprNode o012 = InterprNode.add(doc, false, o01, o2);
 
 
-        sn.get().addInput(doc, 0, 1, 0, doc.bottom);
+        sn.addInput(doc, 0, 1, 0, doc.bottom);
 
-        cn.get().addInput(doc, 5, 6, o0);
-        cn.get().addInput(doc, 20, 21, o0);
-        cn.get().addInput(doc, 10, 11, o012);
-        cn.get().addInput(doc, 15, 16, o01);
+        cn.addInput(doc, 5, 6, o0);
+        cn.addInput(doc, 20, 21, o0);
+        cn.addInput(doc, 10, 11, o012);
+        cn.addInput(doc, 15, 16, o01);
 
         System.out.println(doc.neuronActivationsToString(false, false, true));
 
@@ -154,10 +154,10 @@ public class CounterNeuronTest {
         InterprNode o01 = InterprNode.add(doc, false, o0, o1);
         InterprNode o012 = InterprNode.add(doc, false, o01, o2);
 
-        sn.get().addInput(doc, doc.length() - 1, doc.length(), 0, doc.bottom);
-        cn.get().addInput(doc, 19, 20, o0);
-        cn.get().addInput(doc, 4, 5, o0);
-        cn.get().addInput(doc, 14, 15, o012);
+        sn.addInput(doc, doc.length() - 1, doc.length(), 0, doc.bottom);
+        cn.addInput(doc, 19, 20, o0);
+        cn.addInput(doc, 4, 5, o0);
+        cn.addInput(doc, 14, 15, o012);
 
         System.out.println(doc.neuronActivationsToString(false, false, true));
 
@@ -178,12 +178,12 @@ public class CounterNeuronTest {
 
         Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0);
 
-        sn.get().addInput(doc, 0, 5, 0, doc.bottom);
-        cn.get().addInput(doc, 4, 5, doc.bottom);
-        cn.get().addInput(doc, 9, 10, doc.bottom);
-        cn.get().addInput(doc, 14, 15, doc.bottom);
-        cn.get().addInput(doc, 19, 20, doc.bottom);
-        cn.get().addInput(doc, 24, 25, doc.bottom);
+        sn.addInput(doc, 0, 5, 0, doc.bottom);
+        cn.addInput(doc, 4, 5, doc.bottom);
+        cn.addInput(doc, 9, 10, doc.bottom);
+        cn.addInput(doc, 14, 15, doc.bottom);
+        cn.addInput(doc, 19, 20, doc.bottom);
+        cn.addInput(doc, 24, 25, doc.bottom);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 

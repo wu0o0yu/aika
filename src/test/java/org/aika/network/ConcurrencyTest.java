@@ -79,38 +79,38 @@ public class ConcurrencyTest {
         Document doc4 = m.createDocument("eeeeeeeeee", 4);
 
 
-        inA.get().addInput(doc2, 0, 4);
-        inB.get().addInput(doc2, 2, 6);
+        inA.addInput(doc2, 0, 4);
+        inB.addInput(doc2, 2, 6);
 
         Assert.assertEquals(1, pC.get().node.get().getActivations(doc2).size());
 
-        inA.get().addInput(doc4, 0, 6);
+        inA.addInput(doc4, 0, 6);
 
         Assert.assertEquals(0, pC.get().node.get().getActivations(doc4).size());
 
-        inB.get().addInput(doc0, 4, 8);
-        inB.get().addInput(doc4, 2, 8);
+        inB.addInput(doc0, 4, 8);
+        inB.addInput(doc4, 2, 8);
 
         Assert.assertEquals(1, pC.get().node.get().getActivations(doc4).size());
 
-        inA.get().addInput(doc0, 0, 6);
+        inA.addInput(doc0, 0, 6);
 
-        inStart.get().addInput(doc3, 0, 1);
-        inClock.get().addInput(doc3, 4, 5);
-        inClock.get().addInput(doc3, 6, 7);
+        inStart.addInput(doc3, 0, 1);
+        inClock.addInput(doc3, 4, 5);
+        inClock.addInput(doc3, 6, 7);
 
         Assert.assertEquals(2, ctn.get().node.get().getThreadState(doc3.threadId, true).activations.size());
 
-        inStart.get().addInput(doc1, 0, 1);
-        inClock.get().addInput(doc1, 3, 4);
-        inClock.get().addInput(doc1, 7, 8);
+        inStart.addInput(doc1, 0, 1);
+        inClock.addInput(doc1, 3, 4);
+        inClock.addInput(doc1, 7, 8);
 
         Assert.assertEquals(2, ctn.get().node.get().getThreadState(doc1.threadId, true).activations.size());
         Assert.assertEquals(2, ctn.get().node.get().getActivations(doc1).size());
 
         Assert.assertEquals(1, pC.get().node.get().getActivations(doc2).size());
 
-        inA.get().removeInput(doc2, 0, 4);
+        inA.removeInput(doc2, 0, 4);
 
         Assert.assertEquals(0, pC.get().node.get().getActivations(doc2).size());
 
@@ -153,13 +153,13 @@ public class ConcurrencyTest {
                     for (int j = 0; j < 20; j++) {
                         Document doc = m.createDocument("          ", 0);
 
-                        inA.get().addInput(doc, 0, 6);
-                        inB.get().addInput(doc, 4, 10);
+                        inA.addInput(doc, 0, 6);
+                        inB.addInput(doc, 4, 10);
 
                         Assert.assertEquals(1, pC.get().node.get().getActivations(doc).size());
                         Assert.assertNotNull(TestHelper.get(doc, pC.get().node.get(), new Range(4, 6), null));
 
-                        inB.get().removeInput(doc, 4, 10);
+                        inB.removeInput(doc, 4, 10);
                         Assert.assertEquals(0, pC.get().node.get().getActivations(doc).size());
 
                         doc.clearActivations();

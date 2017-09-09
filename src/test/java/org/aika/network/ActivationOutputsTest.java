@@ -82,8 +82,8 @@ public class ActivationOutputsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inA.get().addInput(doc, 0, 1, 0);
-        inB.get().addInput(doc, 0, 1, 0);
+        inA.addInput(doc, 0, 1, 0);
+        inB.addInput(doc, 0, 1, 0);
 
         Activation inA1 = TestHelper.get(doc, inA.get().node.get(), new Range(0, 1), doc.bottom);
         Activation inB1 = TestHelper.get(doc, inB.get().node.get(), new Range(0, 1), doc.bottom);
@@ -174,8 +174,8 @@ public class ActivationOutputsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inB.get().addInput(doc, 0, 1);
-        inA.get().addInput(doc, 0, 1, InterprNode.addPrimitive(doc));
+        inB.addInput(doc, 0, 1);
+        inA.addInput(doc, 0, 1, InterprNode.addPrimitive(doc));
 
         NodeActivation actAB = TestHelper.get(doc, pABNode, new Range(0, 1), null);
 
@@ -203,7 +203,7 @@ public class ActivationOutputsTest {
 
 
         InterprNode o1 = InterprNode.addPrimitive(doc);
-        inA.get().addInput(doc, 0, 1, o1);
+        inA.addInput(doc, 0, 1, o1);
 
         Activation outB1 = NodeActivation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
         Assert.assertTrue(containsOutputActivation(inA.get().node.get().getFirstActivation(doc).neuronOutputs, outB1));
@@ -227,7 +227,7 @@ public class ActivationOutputsTest {
         ).get().node.get();
 
 
-        inA.get().addInput(doc, 0, 1, InterprNode.addPrimitive(doc));
+        inA.addInput(doc, 0, 1, InterprNode.addPrimitive(doc));
 
         Activation outB1 = NodeActivation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
 
@@ -255,7 +255,7 @@ public class ActivationOutputsTest {
 
 
         InterprNode o1 = InterprNode.addPrimitive(doc);
-        inA.get().addInput(doc, 0, 1, 0, o1);
+        inA.addInput(doc, 0, 1, 0, o1);
         Activation outB1 = NodeActivation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
 
         Assert.assertTrue(containsOutputActivation(inA.get().node.get().getFirstActivation(doc).neuronOutputs, outB1));

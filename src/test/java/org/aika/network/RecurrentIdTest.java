@@ -75,8 +75,8 @@ public class RecurrentIdTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inA.get().addInput(doc, 0, 1, 20);
-        inB.get().addInput(doc, 0, 1, 21);
+        inA.addInput(doc, 0, 1, 20);
+        inB.addInput(doc, 0, 1, 21);
 
         Activation outC1 = NodeActivation.get(doc, outCNode, 20, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
 
@@ -124,9 +124,9 @@ public class RecurrentIdTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inA.get().addInput(doc, 0, 1, 13);
-        inB.get().addInput(doc, 0, 1, 10);
-        inC.get().addInput(doc, 0, 1, 16);
+        inA.addInput(doc, 0, 1, 13);
+        inB.addInput(doc, 0, 1, 10);
+        inC.addInput(doc, 0, 1, 16);
 
         Activation outD1 = NodeActivation.get(doc, outDNode, 10, new Range(0, 1), EQUALS, EQUALS, null, null);
 
@@ -183,7 +183,7 @@ public class RecurrentIdTest {
                 if (rec != null) {
                     Range r = new Range(i, doc.length());
 
-                    rec.get().addInput(doc, r.begin, r.end, i, doc.bottom);
+                    rec.addInput(doc, r.begin, r.end, i, doc.bottom);
                 }
             }
 

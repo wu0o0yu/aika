@@ -65,7 +65,7 @@ public class SelfRefNonRecTest {
 
         Document.APPLY_DEBUG_OUTPUT = true;
 
-        inA.get().addInput(t, 0, 1);
+        inA.addInput(t, 0, 1);
 
         System.out.println(t.neuronActivationsToString(false, false, true));
 

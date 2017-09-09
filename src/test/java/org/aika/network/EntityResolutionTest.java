@@ -83,11 +83,11 @@ public class EntityResolutionTest {
 
         Document doc = m.createDocument("jaguar puma ", 0);
 
-        wJaguar.get().addInput(doc, 0, 6);
+        wJaguar.addInput(doc, 0, 6);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        wPuma.get().addInput(doc, 7, 11);
+        wPuma.addInput(doc, 7, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -278,11 +278,11 @@ public class EntityResolutionTest {
 
         Document doc = m.createDocument("jaguar puma ", 0);
 
-        wJaguar.get().addInput(doc, 0, 6);
+        wJaguar.addInput(doc, 0, 6);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        wPuma.get().addInput(doc, 7, 11);
+        wPuma.addInput(doc, 7, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 

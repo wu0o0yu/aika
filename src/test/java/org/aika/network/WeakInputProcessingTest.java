@@ -150,9 +150,9 @@ public class WeakInputProcessingTest {
 
         Document doc = m.createDocument("a ");
 
-        strongInput.get().addInput(doc,0,1);
+        strongInput.addInput(doc,0,1);
 
-        weakInputB.get().addInput(doc, 0, 1);
+        weakInputB.addInput(doc, 0, 1);
 
         Document.APPLY_DEBUG_OUTPUT = true;
         doc.process();

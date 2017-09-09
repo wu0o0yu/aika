@@ -95,7 +95,7 @@ public class SimplePatternMatchingTest {
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).get().addInput(doc, i, i + 1, wordPos);
+                inputNeurons.get(c).addInput(doc, i, i + 1, wordPos);
             } else {
                 wordPos++;
             }
@@ -198,13 +198,13 @@ public class SimplePatternMatchingTest {
         // Create a simple text document.
         Document doc = m.createDocument("a b c d e ", 0);
 
-        startSignal.get().addInput(doc, 0, 1, 0);  // iteration, begin, end, relational id
+        startSignal.addInput(doc, 0, 1, 0);  // iteration, begin, end, relational id
 
         // First add the space seperators
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
-                inSpace.get().addInput(doc, i, i + 1);
+                inSpace.addInput(doc, i, i + 1);
             }
         }
 
@@ -212,7 +212,7 @@ public class SimplePatternMatchingTest {
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).get().addInput(doc, i, i + 1);
+                inputNeurons.get(c).addInput(doc, i, i + 1);
             }
         }
 

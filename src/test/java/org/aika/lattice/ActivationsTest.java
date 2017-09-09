@@ -62,14 +62,14 @@ public class ActivationsTest {
         InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, Operator.LESS_THAN, Mapping.START, true, Operator.GREATER_THAN, Mapping.END, true);
 
 
-        inA.get().addInput(doc, 0, 1, 0);
-        inA.get().addInput(doc, 2, 3, 0);
+        inA.addInput(doc, 0, 1, 0);
+        inA.addInput(doc, 2, 3, 0);
 
         Assert.assertNotNull(TestHelper.get(doc, pANode, new Range(0, 1), null));
         Assert.assertNull(TestHelper.get(doc, pANode, new Range(1, 2), null));
         Assert.assertNotNull(TestHelper.get(doc, pANode, new Range(2, 3), null));
 
-        inA.get().addInput(doc, 1, 2);
+        inA.addInput(doc, 1, 2);
 
         Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(0, 1), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(0, 1), doc.bottom));
         Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(1, 2), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
@@ -86,10 +86,10 @@ public class ActivationsTest {
         );
         InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, Operator.LESS_THAN, Mapping.START, true, Operator.GREATER_THAN, Mapping.END, true);
 
-        inB.get().addInput(doc, 0, 1);
-        inB.get().addInput(doc, 1, 2);
+        inB.addInput(doc, 0, 1);
+        inB.addInput(doc, 1, 2);
 
-        inB.get().removeInput(doc, 1, 2);
+        inB.removeInput(doc, 1, 2);
 
         Assert.assertNull(TestHelper.get(doc, pBNode, new Range(1, 2), null));
     }
