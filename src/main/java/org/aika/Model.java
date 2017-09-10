@@ -278,21 +278,8 @@ public class Model {
         double posRecSum = 0.0;
         double minWeight = Double.MAX_VALUE;
         for (Input ni : inputs) {
-            Synapse s = new Synapse(
-                    ni.neuron,
-                    new Synapse.Key(
-                            ni.weight < 0.0,
-                            ni.recurrent,
-                            ni.relativeRid,
-                            ni.absoluteRid,
-                            ni.startRangeMatch,
-                            ni.startMapping,
-                            ni.startRangeOutput,
-                            ni.endRangeMatch,
-                            ni.endMapping,
-                            ni.endRangeOutput
-                    )
-            );
+            Synapse s = ni.getSynapse(n);
+
             s.w = ni.weight;
             s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
 
@@ -320,23 +307,13 @@ public class Model {
     }
 
 
-    public void addSynapse(INeuron n, double biasDelta, Input input) {
+    public void addSynapse(Neuron n, double biasDelta, Input input) {
         double negDirSumDelta = 0.0;
         double negRecSumDelta = 0.0;
         double posRecSumDelta = 0.0;
 
-        Synapse s = new Synapse(input.neuron, new Synapse.Key(
-                input.weight < 0.0,
-                input.recurrent,
-                input.relativeRid,
-                input.absoluteRid,
-                input.startRangeMatch,
-                input.startMapping,
-                input.startRangeOutput,
-                input.endRangeMatch,
-                input.endMapping,
-                input.endRangeOutput)
-        );
+        Synapse s = input.getSynapse(n);
+
         s.w = input.weight;
         s.maxLowerWeightsSum = input.maxLowerWeightsSum;
 
@@ -381,7 +358,8 @@ public class Model {
         double negRecSum = 0.0;
         double posRecSum = 0.0;
         for (Input ni : inputs) {
-            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startMapping, ni.startRangeOutput, ni.endRangeMatch, ni.endMapping, ni.endRangeOutput));
+            Synapse s = ni.getSynapse(n);
+
             s.w = ni.weight;
             s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
 
@@ -428,7 +406,8 @@ public class Model {
 
         double bias = -0.001;
         for (Input ni : inputs) {
-            Synapse s = new Synapse(ni.neuron, new Synapse.Key(ni.weight < 0.0, ni.recurrent, ni.relativeRid, ni.absoluteRid, ni.startRangeMatch, ni.startMapping, ni.startRangeOutput, ni.endRangeMatch, ni.endMapping, ni.endRangeOutput));
+            Synapse s = ni.getSynapse(n);
+
             s.w = ni.weight;
             s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
             is.add(s);
@@ -452,42 +431,46 @@ public class Model {
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         if (inputSignal != null) {
-            Synapse iss = new Synapse(
-                    inputSignal,
-                    new Synapse.Key(
-                            false,
-                            false,
-                            null,
-                            null,
-                            Operator.LESS_THAN,
-                            dirIS ? Mapping.END : Mapping.START,
-                            false,
-                            Operator.GREATER_THAN,
-                            dirIS ? Mapping.START : Mapping.END,
-                            false
+            Synapse iss = n.get().getInputSynapse(new Synapse(
+                            inputSignal,
+                            new Synapse.Key(
+                                    false,
+                                    false,
+                                    null,
+                                    null,
+                                    Operator.LESS_THAN,
+                                    dirIS ? Mapping.END : Mapping.START,
+                                    false,
+                                    Operator.GREATER_THAN,
+                                    dirIS ? Mapping.START : Mapping.END,
+                                    false
+                            )
                     )
             );
+
             iss.w = 20.0f;
             iss.maxLowerWeightsSum = 20.0f;
             is.add(iss);
         }
 
         if (ctn != null) {
-            Synapse ctns = new Synapse(
-                    ctn,
-                    new Synapse.Key(
-                            false,
-                            false,
-                            0,
-                            null,
-                            Operator.EQUALS,
-                            Mapping.START,
-                            true,
-                            Operator.EQUALS,
-                            Mapping.END,
-                            true
+            Synapse ctns = n.get().getInputSynapse(new Synapse(
+                            ctn,
+                            new Synapse.Key(
+                                    false,
+                                    false,
+                                    0,
+                                    null,
+                                    Operator.EQUALS,
+                                    Mapping.START,
+                                    true,
+                                    Operator.EQUALS,
+                                    Mapping.END,
+                                    true
+                            )
                     )
             );
+
             ctns.w = 20.0f;
             ctns.maxLowerWeightsSum = 20.0f;
             is.add(ctns);
@@ -515,81 +498,89 @@ public class Model {
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         if (clockSignal != null) {
-            Synapse css = new Synapse(
-                    clockSignal,
-                    new Synapse.Key(
-                            false,
-                            false,
-                            null,
-                            null,
-                            Operator.NONE,
-                            Mapping.NONE,
-                            false,
-                            Operator.FIRST,
-                            dirCS ? Mapping.START : Mapping.END,
-                            true
+            Synapse css = n.get().getInputSynapse(new Synapse(
+                            clockSignal,
+                            new Synapse.Key(
+                                    false,
+                                    false,
+                                    null,
+                                    null,
+                                    Operator.NONE,
+                                    Mapping.NONE,
+                                    false,
+                                    Operator.FIRST,
+                                    dirCS ? Mapping.START : Mapping.END,
+                                    true
+                            )
                     )
             );
+
             css.w = 20.0f;
             css.maxLowerWeightsSum = 8.0f;
             is.add(css);
         }
 
         if (startSignal != null) {
-            Synapse sss = new Synapse(
-                    startSignal,
-                    new Synapse.Key(
-                            false,
-                            false,
-                            0,
-                            null,
-                            Operator.EQUALS,
-                            dirSS ? Mapping.START : Mapping.END,
-                            true,
-                            Operator.NONE,
-                            Mapping.NONE,
-                            false
+            Synapse sss = n.get().getInputSynapse(new Synapse(
+                            startSignal,
+                            new Synapse.Key(
+                                    false,
+                                    false,
+                                    0,
+                                    null,
+                                    Operator.EQUALS,
+                                    dirSS ? Mapping.START : Mapping.END,
+                                    true,
+                                    Operator.NONE,
+                                    Mapping.NONE,
+                                    false
+                            )
                     )
             );
+
             sss.w = 8.0f;
             sss.maxLowerWeightsSum = 0.0f;
             is.add(sss);
         }
 
-        Synapse lastCycle = new Synapse(
-                n,
-                new Synapse.Key(
-                        false,
-                        false,
-                        -1,
-                        null,
-                        direction ? Operator.NONE : Operator.EQUALS,
-                        direction ? Mapping.NONE : Mapping.END,
-                        direction ? false : true,
-                        direction ? Operator.EQUALS : Operator.NONE,
-                        direction ? Mapping.START : Mapping.NONE,
-                        direction ? true : false
+        Synapse lastCycle = n.get().getInputSynapse(new Synapse(
+                        n,
+                        new Synapse.Key(
+                                false,
+                                false,
+                                -1,
+                                null,
+                                direction ? Operator.NONE : Operator.EQUALS,
+                                direction ? Mapping.NONE : Mapping.END,
+                                direction ? false : true,
+                                direction ? Operator.EQUALS : Operator.NONE,
+                                direction ? Mapping.START : Mapping.NONE,
+                                direction ? true : false
+                        )
                 )
         );
+
         lastCycle.w = 8.0f;
         lastCycle.maxLowerWeightsSum = 0.0f;
         is.add(lastCycle);
 
-        Synapse neg = new Synapse(
-                n,
-                new Synapse.Key(
-                        true,
-                        true,
-                        0,
-                        null,
-                        Operator.EQUALS,
-                        Mapping.START,
-                        false,
-                        Operator.EQUALS,
-                        Mapping.END,
-                        false
-                )
-        );
+        Synapse neg = n.get().getInputSynapse(
+                new Synapse(
+                        n,
+                        new Synapse.Key(
+                                true,
+                                true,
+                                0,
+                                null,
+                                Operator.EQUALS,
+                                Mapping.START,
+                                false,
+                                Operator.EQUALS,
+                                Mapping.END,
+                                false
+                        )
+                ));
+
         neg.w = -20.0f;
         neg.maxLowerWeightsSum = 28.0f;
         is.add(neg);

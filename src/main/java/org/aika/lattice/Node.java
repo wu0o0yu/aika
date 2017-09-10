@@ -108,7 +108,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         public TreeMap<Key, A> activationsEnd;
         public TreeMap<Key, A> activationsRid;
 
-        public NavigableMap<Key, Collection<NodeActivation<?>>> added;
+        public NavigableMap<Key, Set<NodeActivation<?>>> added;
         public NavigableMap<Key, RemovedEntry> removed;
         long visitedNeuronRefsChange = -1;
         public long visitedAllowedOption = -1;
@@ -469,9 +469,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      */
     public static <T extends Node, A extends NodeActivation<T>> void addActivationAndPropagate(Document doc, Key<T> ak, Collection<NodeActivation<?>> inputActs) {
         ThreadState<T, A> th = ak.n.getThreadState(doc.threadId, true);
-        Collection<NodeActivation<?>> iActs = th.added.get(ak);
+        Set<NodeActivation<?>> iActs = th.added.get(ak);
         if(iActs == null) {
-            iActs = new ArrayList<>();
+            iActs = new TreeSet<>();
             th.added.put(ak, iActs);
         }
         iActs.addAll(inputActs);

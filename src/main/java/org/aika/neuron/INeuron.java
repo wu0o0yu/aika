@@ -714,6 +714,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
+    public Synapse getInputSynapse(Synapse s) {
+        return inputSynapses.getOrDefault(s, s);
+    }
+
+
     public int compareTo(INeuron n) {
         if(provider.id < n.provider.id) return -1;
         else if(provider.id > n.provider.id) return 1;
@@ -860,7 +865,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public static INeuron addSynapse(Model m, int threadId, INeuron n, double biasDelta, double negDirSumDelta, double negRecSumDelta, double posRecSumDelta, Synapse s) {
+    public static INeuron addSynapse(Model m, int threadId, Neuron pn, double biasDelta, double negDirSumDelta, double negRecSumDelta, double posRecSumDelta, Synapse s) {
+        INeuron n = pn.get();
         n.bias += biasDelta;
         n.negDirSum += negDirSumDelta;
         n.negRecSum += negRecSumDelta;
@@ -869,6 +875,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         if(!Node.adjust(m, threadId, n, -1)) return null;
         return n;
     }
+
 
     public static INeuron readNeuron(DataInput in, Neuron p) throws IOException {
         INeuron n = new INeuron();

@@ -99,9 +99,14 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     NodeActivation<AndNode> processAddedActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs, boolean isTrainingAct) {
+        int s = 0;
         for(NodeActivation iAct: inputActs) {
-            if(iAct.isRemoved) return null;
+            if(!iAct.isRemoved) s++;
         }
+        if(s != level) {
+            return null;
+        }
+
         return super.processAddedActivation(doc, ak, inputActs, isTrainingAct);
     }
 

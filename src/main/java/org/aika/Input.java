@@ -19,6 +19,7 @@ package org.aika;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.neuron.INeuron;
+import org.aika.neuron.Synapse;
 
 
 /**
@@ -262,6 +263,26 @@ public class Input implements Comparable<Input> {
     public Input setEndRangeMapping(Mapping endMapping) {
         this.endMapping = endMapping;
         return this;
+    }
+
+
+    Synapse getSynapse(Neuron outputNeuron) {
+        return outputNeuron.get().getInputSynapse(new Synapse(
+                        neuron,
+                        new Synapse.Key(
+                                weight < 0.0,
+                                recurrent,
+                                relativeRid,
+                                absoluteRid,
+                                startRangeMatch,
+                                startMapping,
+                                startRangeOutput,
+                                endRangeMatch,
+                                endMapping,
+                                endRangeOutput
+                        )
+                )
+        );
     }
 
 
