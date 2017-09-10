@@ -814,6 +814,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public void reactivate() {
         for(Synapse s: inputSynapses.values()) {
             s.input.inMemoryOutputSynapses.put(s, s);
+            if(!s.input.isSuspended()) {
+                s.output.inMemoryInputSynapses.put(s, s);
+            }
 
             if(!s.inputNode.isSuspended()) {
                 InputNode iNode = s.inputNode.get();
