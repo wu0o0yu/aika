@@ -28,12 +28,15 @@ import java.util.Collections;
 import java.util.TreeMap;
 
 /**
+ * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
+ * Aika uses the provider pattern to store and reload rarely used neurons or logic nodes.
  *
  * @author Lukas Molzberger
  */
 public class Neuron extends Provider<INeuron> {
 
-    public TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
+    public TreeMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
+    public TreeMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
 
 
     public Neuron(Model m, int id) {

@@ -132,10 +132,12 @@ public class Synapse implements Writable {
         (dir ? in : out).lock.acquireWriteLock(threadId);
         (dir ? out : in).lock.acquireWriteLock(threadId);
 
-        in.provider.outputSynapses.put(this, this);
+        in.provider.inMemoryOutputSynapses.put(this, this);
+        out.provider.inMemoryInputSynapses.put(this, this);
+
         out.inputSynapses.put(this, this);
         out.inputSynapsesByWeight.add(this);
-        in.provider.setModified();
+
         out.provider.setModified();
 
         (dir ? in : out).lock.releaseWriteLock();

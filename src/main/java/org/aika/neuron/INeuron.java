@@ -43,7 +43,7 @@ import static org.aika.corpus.Range.Operator.*;
 import static org.aika.neuron.Activation.State.*;
 
 /**
- * The {@code Neuron} class represents a neuron in Aikas neural network and is connected to other neurons through
+ * The {@code INeuron} class represents a internal neuron implementation in Aikas neural network and is connected to other neurons through
  * input synapses and output synapses. The activation value of a neuron is calculated by computing the weighted sum
  * (input act. value * synapse weight) of the input synapses, adding the bias to it and sending the resulting value
  * through a transfer function (the upper part of tanh).
@@ -183,11 +183,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         for(Synapse s: inputSynapses.values()) {
             INeuron in = s.input.get();
             in.lock.acquireWriteLock(threadId);
-            in.provider.outputSynapses.remove(s);
+            in.provider.inMemoryOutputSynapses.remove(s);
             in.lock.releaseWriteLock();
         }
 
-        for(Synapse s: provider.outputSynapses.values()) {
+        for(Synapse s: provider.inMemoryOutputSynapses.values()) {
             INeuron out = s.output.get();
             out.lock.acquireWriteLock(threadId);
             out.inputSynapses.remove(s);
@@ -527,7 +527,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private void linkNeuronActs(Document doc, Activation act, int v, int dir) {
         ArrayList<Activation> recNegTmp = new ArrayList<>();
-        TreeMap<Synapse, Synapse> syns = (dir == 0 ? inputSynapses : provider.outputSynapses);
+        TreeMap<Synapse, Synapse> syns = (dir == 0 ? provider.inMemoryInputSynapses : provider.inMemoryOutputSynapses);
 
         for (Synapse s : getActiveSynapses(doc, dir, syns)) {
             Neuron p = (dir == 0 ? s.input : s.output);
@@ -798,11 +798,14 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     @Override
     public void suspend() {
         for(Synapse s: inputSynapses.values()) {
-            s.input.outputSynapses.remove(s);
+            s.input.inMemoryOutputSynapses.remove(s);
             if(!s.inputNode.isSuspended()) {
                 InputNode iNode = s.inputNode.get();
                 iNode.removeSynapse(provider.m.defaultThreadId, s);
             }
+        }
+        for(Synapse s: provider.inMemoryOutputSynapses.values()) {
+            s.output.inMemoryInputSynapses.remove(s);
         }
     }
 
@@ -810,12 +813,15 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     @Override
     public void reactivate() {
         for(Synapse s: inputSynapses.values()) {
-            s.input.outputSynapses.put(s, s);
+            s.input.inMemoryOutputSynapses.put(s, s);
 
             if(!s.inputNode.isSuspended()) {
                 InputNode iNode = s.inputNode.get();
                 iNode.setSynapse(provider.m.defaultThreadId, s);
             }
+        }
+        for(Synapse s: provider.inMemoryOutputSynapses.values()) {
+            s.output.inMemoryInputSynapses.put(s, s);
         }
     }
 

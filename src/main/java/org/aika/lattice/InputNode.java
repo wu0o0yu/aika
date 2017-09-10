@@ -418,7 +418,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     @Override
     public void reactivate() {
-        inputNeuron.outputSynapses.values().forEach(s -> {
+        inputNeuron.inMemoryOutputSynapses.values().forEach(s -> {
             if(key.compareTo(s.key.createInputNodeKey()) == 0) {
                 setSynapse(provider.m.defaultThreadId, s);
             }
