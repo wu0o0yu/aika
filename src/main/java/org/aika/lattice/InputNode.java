@@ -387,32 +387,42 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     @Override
     public double computeSynapseWeightSum(Integer offset, INeuron n) {
-        return n.bias + Math.abs(getSynapse(new SynapseKey(key.relativeRid == null ? null : offset, n.provider)).w);
+        return n.bias + Math.abs(getSynapse(key.relativeRid == null ? null : offset, n.provider).w);
     }
 
 
-    public Synapse getSynapse(SynapseKey sk) {
+    public Synapse getSynapse(Integer rid, Neuron outputNeuron) {
         lock.acquireReadLock();
-        Synapse s = synapses != null ? synapses.get(sk) : null;
+        Synapse s = synapses != null ? synapses.get(new SynapseKey(rid, outputNeuron)) : null;
         lock.releaseReadLock();
         return s;
     }
 
 
-    public void setSynapse(int threadId, SynapseKey sk, Synapse s) {
+    public void setSynapse(int threadId, Synapse s) {
         lock.acquireWriteLock(threadId);
         if(synapses == null) {
             synapses = new TreeMap<>();
         }
-        synapses.put(sk, s);
+        synapses.put(new SynapseKey(s.key.relativeRid, s.output), s);
         lock.releaseWriteLock();
     }
 
 
-    public void removeSynapse(int threadId, SynapseKey sk) {
+    public void removeSynapse(int threadId, Synapse s) {
         lock.acquireWriteLock(threadId);
-        synapses.remove(sk);
+        synapses.remove(new SynapseKey(s.key.relativeRid, s.output));
         lock.releaseWriteLock();
+    }
+
+
+    @Override
+    public void reactivate() {
+        inputNeuron.outputSynapses.values().forEach(s -> {
+            if(key.compareTo(s.key.createInputNodeKey()) == 0) {
+                setSynapse(provider.m.defaultThreadId, s);
+            }
+        });
     }
 
 
@@ -482,7 +492,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    public static class SynapseKey implements Writable, Comparable<SynapseKey> {
+    private static class SynapseKey implements Writable, Comparable<SynapseKey> {
         Integer rid;
         Neuron n;
 

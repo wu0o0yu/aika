@@ -23,7 +23,6 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
-import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.lattice.OrNode.OrEntry;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
@@ -626,12 +625,12 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if(pa instanceof AndNode) {
             AndNode an = (AndNode) pa;
             for(Refinement ref: an.parents.keySet()) {
-                Synapse s = ref.input.get().getSynapse(new SynapseKey(rsk.offset, n.provider));
+                Synapse s = ref.input.get().getSynapse(rsk.offset, n.provider);
                 if(sum - Math.abs(s.w) >= 0.0) return 1;
             }
         } else {
             InputNode in = (InputNode) pa;
-            Synapse s = in.getSynapse(new SynapseKey(rsk.offset, n.provider));
+            Synapse s = in.getSynapse(rsk.offset, n.provider);
             if(sum - Math.abs(s.w) >= 0.0) return 1;
         }
         return 0;
@@ -662,7 +661,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
                 InputNode iNode = InputNode.add(m, s.key.createInputNodeKey(), s.input.get());
                 iNode.provider.setModified();
                 iNode.isBlocked = in.isBlocked;
-                iNode.setSynapse(threadId, new SynapseKey(s.key.relativeRid, neuron.provider), s);
+                iNode.setSynapse(threadId, s);
                 s.inputNode = iNode.provider;
             }
 
@@ -761,7 +760,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if(pa == null) {
         } else if(pa instanceof InputNode) {
             InputNode node = (InputNode) pa;
-            minSyn = node.getSynapse(new SynapseKey(rsk.offset, n.provider));
+            minSyn = node.getSynapse(rsk.offset, n.provider);
             sum = Math.abs(minSyn.w);
         } else {
             AndNode node = (AndNode) pa;

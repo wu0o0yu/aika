@@ -25,7 +25,6 @@ import org.aika.Utils;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
-import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 import org.apache.commons.math3.distribution.BinomialDistribution;
@@ -595,11 +594,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
         public Synapse getSynapse(Integer offset, Neuron n) {
-            InputNode in = input.get();
-            in.lock.acquireReadLock();
-            Synapse s = in.synapses != null ? in.synapses.get(new SynapseKey(Utils.nullSafeAdd(getRelativePosition(), false, offset, false), n)) : null;
-            in.lock.releaseReadLock();
-            return s;
+            return input.get().getSynapse(Utils.nullSafeAdd(getRelativePosition(), false, offset, false), n);
         }
 
 

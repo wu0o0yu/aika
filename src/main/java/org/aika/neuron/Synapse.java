@@ -238,7 +238,19 @@ public class Synapse implements Writable {
 
 
         public Key createInputNodeKey() {
-            return relativeRid != null ? new Key(isNeg, isRecurrent, 0, absoluteRid, startRangeMatch, startRangeMapping, startRangeOutput, endRangeMatch, endRangeMapping, endRangeOutput) : this;
+            return relativeRid != null ?
+                    new Key(
+                            isNeg,
+                            isRecurrent,
+                            0,
+                            absoluteRid,
+                            startRangeMatch,
+                            startRangeMapping,
+                            startRangeOutput,
+                            endRangeMatch,
+                            endRangeMapping,
+                            endRangeOutput
+                    ) : this;
         }
 
 

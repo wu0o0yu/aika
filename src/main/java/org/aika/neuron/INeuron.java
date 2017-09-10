@@ -24,7 +24,6 @@ import org.aika.corpus.*;
 import org.aika.corpus.SearchNode.Coverage;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.InputNode;
-import org.aika.lattice.InputNode.SynapseKey;
 import org.aika.lattice.Node;
 import org.aika.lattice.Node.ThreadState;
 import org.aika.lattice.NodeActivation;
@@ -437,8 +436,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         INeuron n = iAct.key.n.neuron.get();
         double deltaW = x * iAct.finalState.value;
 
-        SynapseKey sk = new SynapseKey(rid, provider);
-/*        Synapse s = in.getSynapse(sk);
+/*        SynapseKey sk = new SynapseKey(rid, provider);
+        Synapse s = in.getSynapse(sk);
         if(s == null) {
             s = new Synapse(
                     n,
@@ -800,10 +799,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public void suspend() {
         for(Synapse s: inputSynapses.values()) {
             s.input.outputSynapses.remove(s);
-
             if(!s.inputNode.isSuspended()) {
                 InputNode iNode = s.inputNode.get();
-                iNode.removeSynapse(provider.m.defaultThreadId, new SynapseKey(s.key.relativeRid, s.output));
+                iNode.removeSynapse(provider.m.defaultThreadId, s);
             }
         }
     }
@@ -816,7 +814,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
             if(!s.inputNode.isSuspended()) {
                 InputNode iNode = s.inputNode.get();
-                iNode.setSynapse(provider.m.defaultThreadId, new SynapseKey(s.key.relativeRid, s.output), s);
+                iNode.setSynapse(provider.m.defaultThreadId, s);
             }
         }
     }
