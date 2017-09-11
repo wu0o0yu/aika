@@ -19,7 +19,6 @@ package org.aika.lattice;
 
 import org.aika.Utils;
 import org.aika.corpus.Document;
-import org.aika.corpus.SearchNode.StateChange;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.InterprNode.Relation;
 import org.aika.corpus.Range;
