@@ -40,7 +40,7 @@ import java.util.Map;
 public class SimplePatternMatchingTest {
 
     @Test
-    public void testPatternMatching() {
+    public void testPatternMatching3() {
         Model m = new Model();
 
         Map<Character, Neuron> inputNeurons = new HashMap<>();
@@ -80,6 +80,102 @@ public class SimplePatternMatchingTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(2)
+                        .setMinInput(0.9f)
+                        .setStartRangeMatch(Operator.LESS_THAN)
+                        .setEndRangeMatch(Operator.EQUALS)
+                        .setEndRangeOutput(true)
+        );
+
+
+        // Create a simple text document.
+        Document doc = m.createDocument("a b c d e ", 0);
+
+        // Then add the characters
+        int wordPos = 0;
+        for(int i = 0; i < doc.length(); i++) {
+            char c = doc.getContent().charAt(i);
+            if(c != ' ') {
+                inputNeurons.get(c).addInput(doc, i, i + 1, wordPos);
+            } else {
+                wordPos++;
+            }
+        }
+
+        // Computes the selected option
+        doc.process();
+
+        Assert.assertEquals(1, pattern.get().node.get().getThreadState(doc.threadId, true).activations.size());
+
+
+        System.out.println("Output activation:");
+        OrNode n = pattern.get().node.get();
+        for(NodeActivation act: n.getActivations(doc)) {
+            System.out.println("Text Range: " + act.key.r);
+            System.out.println("Option: " + act.key.o);
+            System.out.println("Node: " + act.key.n);
+            System.out.println("Rid: " + act.key.rid);
+            System.out.println();
+        }
+
+        System.out.println("All activations:");
+        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println();
+
+
+        doc.train();
+
+        doc.clearActivations();
+    }
+
+
+    @Test
+    public void testPatternMatching4() {
+        Model m = new Model();
+
+        Map<Character, Neuron> inputNeurons = new HashMap<>();
+
+        // Create an input neuron and a recurrent neuron for every letter in this example.
+        for(char c: new char[] {'a', 'b', 'c', 'd', 'e', 'f'}) {
+            Neuron in = m.createNeuron(c + "");
+
+            inputNeurons.put(c, in);
+        }
+
+        // Create a pattern neuron with the relational neurons as input. The numbers that are
+        // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
+        // of the inputs relative to each other. The following flag specifies whether this relativeRid
+        // is relative or absolute.
+        Neuron pattern = m.initAndNeuron(
+                m.createNeuron("BCDE"),
+                0.4,
+                new Input()
+                        .setNeuron(inputNeurons.get('b'))
+                        .setWeight(1.0f)
+                        .setRecurrent(false)
+                        .setRelativeRid(0)
+                        .setMinInput(0.9f)
+                        .setStartRangeMatch(Operator.EQUALS)
+                        .setEndRangeMatch(Operator.GREATER_THAN)
+                        .setStartRangeOutput(true),
+                new Input()
+                        .setNeuron(inputNeurons.get('c'))
+                        .setWeight(1.0f)
+                        .setRecurrent(false)
+                        .setRelativeRid(1)
+                        .setMinInput(0.9f)
+                        .setRangeMatch(RangeRelation.CONTAINS),
+                new Input()
+                        .setNeuron(inputNeurons.get('d'))
+                        .setWeight(1.0f)
+                        .setRecurrent(false)
+                        .setRelativeRid(2)
+                        .setMinInput(0.9f)
+                        .setRangeMatch(RangeRelation.CONTAINS),
+                new Input()
+                        .setNeuron(inputNeurons.get('e'))
+                        .setWeight(1.0f)
+                        .setRecurrent(false)
+                        .setRelativeRid(3)
                         .setMinInput(0.9f)
                         .setStartRangeMatch(Operator.LESS_THAN)
                         .setEndRangeMatch(Operator.EQUALS)
