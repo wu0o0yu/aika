@@ -667,6 +667,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
             if (s.key.isRecurrent) {
                 neuron.maxRecurrentSum += Math.abs(s.w);
+                neuron.provider.setModified();
             }
             in.lock.releaseWriteLock();
         }

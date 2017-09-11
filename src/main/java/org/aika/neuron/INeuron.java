@@ -736,6 +736,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         out.writeDouble(negDirSum);
         out.writeDouble(negRecSum);
         out.writeDouble(posRecSum);
+        out.writeDouble(maxRecurrentSum);
 
         out.writeInt(outputNodes.size());
         for(Map.Entry<Key, Provider<InputNode>> me: outputNodes.entrySet()) {
@@ -772,6 +773,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         negDirSum = in.readDouble();
         negRecSum = in.readDouble();
         posRecSum = in.readDouble();
+        maxRecurrentSum = in.readDouble();
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
