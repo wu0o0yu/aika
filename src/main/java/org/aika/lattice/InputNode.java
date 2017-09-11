@@ -83,7 +83,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         }
         InputNode in = new InputNode(m, key);
 
-        if(input != null) {
+        if(input != null && in.inputNeuron == null) {
             in.inputNeuron = input.provider;
             input.outputNodes.put(key, in.provider);
             input.provider.setModified();
