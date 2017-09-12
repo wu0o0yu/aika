@@ -688,8 +688,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             }
         });
 
-        collectSeedNodes(queue, neuron.provider, modifiedSynapses);
-
+/*        for(OrEntry oe: outputNode.parents) {
+            queue.add(new Node.RSKey(oe.node, oe.ridOffset));
+        }
+*/
         if(queue.isEmpty()) {
             queue.add(new Node.RSKey(null, null));
         }
@@ -747,40 +749,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         return true;
-    }
-
-
-    private static void collectSeedNodes(TreeSet<RSKey> results, Neuron outputNeuron, Collection<Synapse> modifiedSynapses) {
-        Deque<Provider<? extends Node>> queue = new ArrayDeque<>();
-        for(Synapse s: modifiedSynapses) {
-            queue.add(s.inputNode);
-        }
-
-        while(!queue.isEmpty()) {
-            Provider<? extends Node> p = queue.pollFirst();
-            Node<?, ?> n = p.get();
-            if(n.orChildren != null) {
-                for (OrEntry oe : n.orChildren) {
-                    results.add(new Node.RSKey(p, oe.ridOffset));
-                }
-            }
-
-            if(n.andChildren != null) {
-                x:
-                for (Provider<AndNode> cp : n.andChildren.values()) {
-                    AndNode cn = cp.get();
-
-                    // Check if this and-node belongs to the output neuron.
-                    for (Refinement ref : cn.parents.keySet()) {
-                        if (!ref.input.get().containsSynapse(outputNeuron)) {
-                            continue x;
-                        }
-                    }
-
-                    queue.add(cp);
-                }
-            }
-        }
     }
 
 

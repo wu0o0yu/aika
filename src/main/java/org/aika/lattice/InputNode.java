@@ -410,17 +410,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    public boolean containsSynapse(Neuron outputNeuron) {
-        for(Synapse s: synapses.values()) {
-            if(s.output.compareTo(outputNeuron) == 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-
     public void removeSynapse(int threadId, Synapse s) {
         lock.acquireWriteLock(threadId);
         synapses.remove(new SynapseKey(s.key.relativeRid, s.output));
