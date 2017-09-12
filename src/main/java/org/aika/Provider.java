@@ -88,7 +88,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
         synchronized (m.providers) {
             m.providers.put(id, new WeakReference<>(this));
-            m.activeProviders.put(id, this);
+            m.suspensionManager.register(this);
         }
     }
 

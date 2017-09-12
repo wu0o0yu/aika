@@ -49,10 +49,11 @@ public class Model {
     public Document[] docs;
 
     public SuspensionHook suspensionHook;
+    public SuspensionManager suspensionManager = new SuspensionManager.LastUsedSuspensionStratey();
+
 
     public AtomicInteger currentId = new AtomicInteger(0);
 
-    public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
     public Map<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new TreeMap<>();
 
     public Statistic stat = new Statistic();
@@ -131,14 +132,14 @@ public class Model {
             if (sp != null) {
                 Provider p = sp.get();
                 if (p != null) {
-                    activeProviders.put(id, p);
+                    suspensionManager.register(p);
                     return (P) p;
                 }
             }
 
             Provider p = new Provider(this, id);
             providers.put(id, new WeakReference(p));
-            activeProviders.put(id, p);
+            suspensionManager.register(p);
             return (P) p;
         }
     }
@@ -151,56 +152,27 @@ public class Model {
             if (sp != null) {
                 Neuron p = (Neuron) sp.get();
                 if (p != null) {
-                    activeProviders.put(id, p);
+                    suspensionManager.register(p);
                     return p;
                 }
             }
 
             Neuron p = new Neuron(this, id);
             providers.put(id, new WeakReference(p));
-            activeProviders.put(id, p);
+            suspensionManager.register(p);
             return p;
         }
     }
 
 
-    /**
-     * Suspend all neurons and logic nodes whose last used document id is lower/older than {@param docId}.
-     *
-     * @param docId
-     */
-    public void suspendUnusedNodes(int docId) {
-        synchronized (providers) {
-            for (Iterator<Provider<? extends AbstractNode>> it = activeProviders.values().iterator(); it.hasNext(); ) {
-                Provider<? extends AbstractNode> p = it.next();
-
-                if (suspend(docId, p)) {
-                    it.remove();
-                }
-            }
-
-            for (Iterator<WeakReference<Provider<? extends AbstractNode>>> it = providers.values().iterator(); it.hasNext(); ) {
-                WeakReference<Provider<? extends AbstractNode>> sp = it.next();
-                Provider<? extends AbstractNode> p = sp.get();
-                if (p == null) {
-                    it.remove();
-                }
+    public void cleanupWeakReferences() {
+        for (Iterator<WeakReference<Provider<? extends AbstractNode>>> it = providers.values().iterator(); it.hasNext(); ) {
+            WeakReference<Provider<? extends AbstractNode>> sp = it.next();
+            Provider<? extends AbstractNode> p = sp.get();
+            if (p == null) {
+                it.remove();
             }
         }
-    }
-
-
-    private boolean suspend(int docId, Provider<? extends AbstractNode> p) {
-        if (!p.isSuspended() && p.get().lastUsedDocumentId <= docId) {
-            p.suspend();
-            return true;
-        }
-        return false;
-    }
-
-
-    public void suspendAll() {
-        suspendUnusedNodes(Integer.MAX_VALUE);
     }
 
 
