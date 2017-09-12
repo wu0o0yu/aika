@@ -93,7 +93,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public boolean isQueued = false;
     public long queueId;
 
-    public static long visitedCounter = 0;
+    public static long visitedCounter = 1;
 
     public ThreadState<T, A>[] threads;
 
@@ -646,14 +646,14 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * @param dir
      * @return
      */
-    public static boolean adjust(Model m, int threadId, INeuron neuron, final int dir) {
+    public static boolean adjust(Model m, int threadId, INeuron neuron, final int dir, Collection<Synapse> modifiedSynapses) {
         long v = visitedCounter++;
         OrNode outputNode = neuron.node.get();
 
-        if(neuron.inputSynapsesByWeight.isEmpty()) return false;
+        if(modifiedSynapses.isEmpty()) return false;
 
         neuron.maxRecurrentSum = 0.0;
-        for(Synapse s: neuron.inputSynapsesByWeight) {
+        for(Synapse s: modifiedSynapses) {
             INeuron in = s.input.get();
             in.lock.acquireWriteLock(threadId);
 
@@ -688,10 +688,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             }
         });
 
-/*        for(OrEntry oe: outputNode.parents) {
-            queue.add(new Node.RSKey(oe.node, oe.ridOffset));
-        }
-*/
+        collectSeedNodes(queue, neuron.provider, modifiedSynapses);
+
         if(queue.isEmpty()) {
             queue.add(new Node.RSKey(null, null));
         }
@@ -749,6 +747,40 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         return true;
+    }
+
+
+    private static void collectSeedNodes(TreeSet<RSKey> results, Neuron outputNeuron, Collection<Synapse> modifiedSynapses) {
+        Deque<Provider<? extends Node>> queue = new ArrayDeque<>();
+        for(Synapse s: modifiedSynapses) {
+            queue.add(s.inputNode);
+        }
+
+        while(!queue.isEmpty()) {
+            Provider<? extends Node> p = queue.pollFirst();
+            Node<?, ?> n = p.get();
+            if(n.orChildren != null) {
+                for (OrEntry oe : n.orChildren) {
+                    results.add(new Node.RSKey(p, oe.ridOffset));
+                }
+            }
+
+            if(n.andChildren != null) {
+                x:
+                for (Provider<AndNode> cp : n.andChildren.values()) {
+                    AndNode cn = cp.get();
+
+                    // Check if this and-node belongs to the output neuron.
+                    for (Refinement ref : cn.parents.keySet()) {
+                        if (!ref.input.get().containsSynapse(outputNeuron)) {
+                            continue x;
+                        }
+                    }
+
+                    queue.add(cp);
+                }
+            }
+        }
     }
 
 

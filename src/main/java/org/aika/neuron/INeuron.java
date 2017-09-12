@@ -425,7 +425,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             log.info("");
         }
 
-        Node.adjust(doc.m, doc.threadId, this, act.errorSignal > 0.0 ? 1 : -1);
+        Node.adjust(doc.m, doc.threadId, this, act.errorSignal > 0.0 ? 1 : -1, inputSynapsesByWeight);
     }
 
 
@@ -845,6 +845,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         n.posRecSum = posRecSum;
 
         float sum = 0.0f;
+        ArrayList<Synapse> modifiedSynapses = new ArrayList<>();
         for(Synapse s: inputs) {
             assert !s.key.startRangeOutput || s.key.startRangeMatch == Range.Operator.EQUALS || s.key.startRangeMatch == Range.Operator.FIRST;
             assert !s.key.endRangeOutput || s.key.endRangeMatch == Range.Operator.EQUALS || s.key.endRangeMatch == Range.Operator.FIRST;
@@ -857,9 +858,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             }
 
             sum += s.w;
+            modifiedSynapses.add(s);
         }
 
-        if(!Node.adjust(m, threadId, n, -1)) return null;
+        if(!Node.adjust(m, threadId, n, -1, modifiedSynapses)) return null;
 
         n.publish(threadId);
 
@@ -874,7 +876,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         n.negRecSum += negRecSumDelta;
         n.posRecSum += posRecSumDelta;
 
-        if(!Node.adjust(m, threadId, n, -1)) return null;
+        s.output = n.provider;
+        s.link(threadId);
+
+        if(!Node.adjust(m, threadId, n, -1, Collections.singletonList(s))) return null;
         return n;
     }
 
@@ -888,15 +893,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("n(");
-        sb.append(provider.id);
-        if(label != null) {
-            sb.append(",");
-            sb.append(label);
-        }
-        sb.append(")");
-        return sb.toString();
+        return "n(" + label + ")";
     }
 
 
