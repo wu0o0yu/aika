@@ -17,14 +17,15 @@
 package org.aika;
 
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public interface SuspensionManager {
 
 
     void register(Provider n);
+
+
+    void unregister(Provider n);
 
 
     class LastUsedSuspensionManager implements SuspensionManager {
@@ -36,18 +37,24 @@ public interface SuspensionManager {
             activeProviders.put(p.id, p);
         }
 
+        @Override
+        public synchronized void unregister(Provider p) {
+            activeProviders.remove(p.id);
+        }
+
+
         /**
          * Suspend all neurons and logic nodes whose last used document id is lower/older than {@param docId}.
          *
          * @param docId
          */
-        public synchronized void suspendUnusedNodes(int docId) {
-            for (Iterator<Provider<? extends AbstractNode>> it = activeProviders.values().iterator(); it.hasNext(); ) {
-                Provider<? extends AbstractNode> p = it.next();
-
-                if (suspend(docId, p)) {
-                    it.remove();
-                }
+        public void suspendUnusedNodes(int docId) {
+            List<Provider> tmp;
+            synchronized (this) {
+                tmp = new ArrayList<>(activeProviders.values());
+            }
+            for (Provider p: tmp) {
+                suspend(docId, p);
             }
         }
 
@@ -66,7 +73,7 @@ public interface SuspensionManager {
         }
     }
 
-
+/*
     class FixedSizeSuspensionManager implements SuspensionManager {
 
         @Override
@@ -74,4 +81,5 @@ public interface SuspensionManager {
 
         }
     }
+*/
 }

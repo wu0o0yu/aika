@@ -58,6 +58,8 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
         n.suspend();
 
+        m.suspensionManager.unregister(this);
+
         if (n.modified) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try (
@@ -92,8 +94,8 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
         synchronized (m.providers) {
             m.providers.put(id, new WeakReference<>(this));
-            m.suspensionManager.register(this);
         }
+        m.suspensionManager.register(this);
     }
 
 
