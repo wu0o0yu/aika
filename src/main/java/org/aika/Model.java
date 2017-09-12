@@ -52,7 +52,7 @@ public class Model {
 
     public AtomicInteger currentId = new AtomicInteger(0);
 
-    public Map<Integer, Provider<? extends AbstractNode>> referencedProviders = new TreeMap<>();
+    public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
     public Map<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new TreeMap<>();
 
     public Statistic stat = new Statistic();
@@ -131,14 +131,14 @@ public class Model {
             if (sp != null) {
                 Provider p = sp.get();
                 if (p != null) {
-                    referencedProviders.put(id, p);
+                    activeProviders.put(id, p);
                     return (P) p;
                 }
             }
 
             Provider p = new Provider(this, id);
             providers.put(id, new WeakReference(p));
-            referencedProviders.put(id, p);
+            activeProviders.put(id, p);
             return (P) p;
         }
     }
@@ -151,14 +151,14 @@ public class Model {
             if (sp != null) {
                 Neuron p = (Neuron) sp.get();
                 if (p != null) {
-                    referencedProviders.put(id, p);
+                    activeProviders.put(id, p);
                     return p;
                 }
             }
 
             Neuron p = new Neuron(this, id);
             providers.put(id, new WeakReference(p));
-            referencedProviders.put(id, p);
+            activeProviders.put(id, p);
             return p;
         }
     }
@@ -171,7 +171,7 @@ public class Model {
      */
     public void suspendUnusedNodes(int docId) {
         synchronized (providers) {
-            for (Iterator<Provider<? extends AbstractNode>> it = referencedProviders.values().iterator(); it.hasNext(); ) {
+            for (Iterator<Provider<? extends AbstractNode>> it = activeProviders.values().iterator(); it.hasNext(); ) {
                 Provider<? extends AbstractNode> p = it.next();
 
                 if (suspend(docId, p)) {
@@ -184,8 +184,6 @@ public class Model {
                 Provider<? extends AbstractNode> p = sp.get();
                 if (p == null) {
                     it.remove();
-                } else {
-                    suspend(docId, p);
                 }
             }
         }

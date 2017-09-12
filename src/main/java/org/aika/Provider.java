@@ -33,7 +33,6 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
     public void setModified() {
         n.modified = true;
-        m.referencedProviders.put(id, this);
     }
 
 
@@ -89,6 +88,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
         synchronized (m.providers) {
             m.providers.put(id, new WeakReference<>(this));
+            m.activeProviders.put(id, this);
         }
     }
 
