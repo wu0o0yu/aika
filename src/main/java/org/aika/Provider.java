@@ -97,6 +97,14 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     }
 
 
+    @Override
+    public void finalize() {
+        synchronized(m.providers) {
+            m.providers.remove(id);
+        }
+    }
+
+
     public String toString() {
         return "p(" + id + ":" + (n != null ? n.toString() : "SUSPENDED") + ")";
     }

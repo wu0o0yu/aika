@@ -166,17 +166,6 @@ public class Model {
     }
 
 
-    public void cleanupWeakReferences() {
-        for (Iterator<WeakReference<Provider<? extends AbstractNode>>> it = providers.values().iterator(); it.hasNext(); ) {
-            WeakReference<Provider<? extends AbstractNode>> sp = it.next();
-            Provider<? extends AbstractNode> p = sp.get();
-            if (p == null) {
-                it.remove();
-            }
-        }
-    }
-
-
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Network Weights:\n");
