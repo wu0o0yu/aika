@@ -27,6 +27,10 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         id = m.suspensionHook != null ? m.suspensionHook.getNewId() : m.currentId.addAndGet(1);
         synchronized (m.providers) {
             m.providers.put(id, new WeakReference<>(this));
+
+            if(m.suspensionManager != null) {
+                m.suspensionManager.register(this);
+            }
         }
     }
 

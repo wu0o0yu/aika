@@ -15,7 +15,7 @@ public class TestNextWord {
 
     @Test
     public void testMatchTheWord() {
-        Model m = new Model(null, 1);
+        Model m = new Model(null, null, 1);
 
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");

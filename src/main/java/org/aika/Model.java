@@ -49,7 +49,7 @@ public class Model {
     public Document[] docs;
 
     public SuspensionHook suspensionHook;
-    public SuspensionManager suspensionManager = new SuspensionManager.LastUsedSuspensionStratey();
+    public SuspensionManager suspensionManager;
 
 
     public AtomicInteger currentId = new AtomicInteger(0);
@@ -76,17 +76,18 @@ public class Model {
      * Creates a model with a single thread.
      */
     public Model() {
-        this(null, 1);
+        this(null, null, 1);
     }
 
 
-    public Model(SuspensionHook sh, int numberOfThreads) {
+    public Model(SuspensionHook sh, SuspensionManager sm, int numberOfThreads) {
         assert numberOfThreads >= 1;
         this.numberOfThreads = numberOfThreads;
 
         lastCleanup = new int[numberOfThreads];
         docs = new Document[numberOfThreads];
         suspensionHook = sh;
+        suspensionManager = sm;
     }
 
 

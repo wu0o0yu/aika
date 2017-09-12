@@ -37,8 +37,7 @@ public class SuspensionTest {
 
     @Test
     public void testSuspendInputNeuron() {
-        Model m = new Model();
-        m.suspensionHook = new DummySuspensionHook();
+        Model m = new Model(new DummySuspensionHook(), new SuspensionManager.LastUsedSuspensionManager(), 1);
 
         Neuron n = m.createNeuron("A");
         n.get().node.suspend();
@@ -57,8 +56,8 @@ public class SuspensionTest {
 
     @Test
     public void testSuspendAndNeuron() {
-        Model m = new Model();
-        m.suspensionHook = new DummySuspensionHook();
+        SuspensionManager.LastUsedSuspensionManager sm = new SuspensionManager.LastUsedSuspensionManager();
+        Model m = new Model(new DummySuspensionHook(), sm, 1);
 
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
@@ -96,7 +95,8 @@ public class SuspensionTest {
                         .setRangeOutput(true)
         );
 
-        m.suspendAll();
+        sm.suspendAll();
+        m.cleanupWeakReferences();
 
         Assert.assertTrue(outD.isSuspended());
 

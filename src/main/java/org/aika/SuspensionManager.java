@@ -24,11 +24,10 @@ import java.util.TreeMap;
 public interface SuspensionManager {
 
 
-
     void register(Provider n);
 
 
-    class LastUsedSuspensionStratey implements SuspensionManager {
+    class LastUsedSuspensionManager implements SuspensionManager {
 
         private Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
 
@@ -64,6 +63,15 @@ public interface SuspensionManager {
                 return true;
             }
             return false;
+        }
+    }
+
+
+    class FixedSizeSuspensionManager implements SuspensionManager {
+
+        @Override
+        public void register(Provider n) {
+
         }
     }
 }
