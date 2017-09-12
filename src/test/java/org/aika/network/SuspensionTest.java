@@ -96,7 +96,6 @@ public class SuspensionTest {
         );
 
         sm.suspendAll();
-        m.cleanupWeakReferences();
 
         Assert.assertTrue(outD.isSuspended());
 
