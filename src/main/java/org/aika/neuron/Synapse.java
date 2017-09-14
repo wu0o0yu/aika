@@ -136,7 +136,6 @@ public class Synapse implements Writable {
         out.provider.inMemoryInputSynapses.put(this, this);
 
         out.inputSynapses.put(this, this);
-        out.inputSynapsesByWeight.add(this);
 
         out.provider.setModified();
 

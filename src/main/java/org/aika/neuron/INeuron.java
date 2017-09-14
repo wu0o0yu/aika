@@ -74,7 +74,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public TreeMap<Synapse, Synapse> inputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
-    public TreeSet<Synapse> inputSynapsesByWeight = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
     public TreeMap<Key, Provider<InputNode>> outputNodes = new TreeMap<>();
 
@@ -191,7 +190,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             INeuron out = s.output.get();
             out.lock.acquireWriteLock(threadId);
             out.inputSynapses.remove(s);
-            out.inputSynapsesByWeight.remove(s);
             out.lock.releaseWriteLock();
         }
     }
@@ -406,7 +404,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             log.info("Debug discover:");
 
             log.info("Old Synapses:");
-            for(Synapse s: inputSynapsesByWeight) {
+            for(Synapse s: inputSynapses.values()) {
                 log.info("S:" + s.input + " RID:" + s.key.relativeRid + " W:" + s.w);
             }
             log.info("");
@@ -425,7 +423,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             log.info("");
         }
 
-        Node.adjust(doc.m, doc.threadId, this, act.errorSignal > 0.0 ? 1 : -1, inputSynapsesByWeight);
+        Node.adjust(doc.m, doc.threadId, this, act.errorSignal > 0.0 ? 1 : -1, inputSynapses.values());
     }
 
 
@@ -797,7 +795,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             Synapse syn = Synapse.read(in, m);
 
             inputSynapses.put(syn, syn);
-            inputSynapsesByWeight.add(syn);
         }
     }
 
@@ -907,7 +904,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             }
         });
 
-        is.addAll(inputSynapsesByWeight);
+        is.addAll(inputSynapses.values());
 
         StringBuilder sb = new StringBuilder();
         sb.append(toString());

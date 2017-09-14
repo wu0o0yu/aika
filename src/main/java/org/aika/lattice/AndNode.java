@@ -314,39 +314,40 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
+    @Override
+    boolean contains(Refinement ref) {
+        // Check if this refinement is already present in this and-node.
+        if(ref.rid == null || ref.rid >= 0) {
+            boolean flag = false;
+            lock.acquireReadLock();
+            if(ref.rid == null || ref.rid > 0) {
+                flag = parents.containsKey(ref);
+            } else if(ref.rid == 0) {
+                for(Refinement pRef: parents.keySet()) {
+                    if((pRef.rid == null || pRef.rid <= 0) && pRef.input == ref.input) {
+                        flag = true;
+                        break;
+                    }
+                }
+            }
+            lock.releaseReadLock();
+            return flag;
+        }
+        return false;
+    }
+
+
     static AndNode createNextLevelNode(Model m, int threadId, Node n, Refinement ref, boolean discoverPatterns) {
         Provider<AndNode> pnln = n.getAndChild(ref);
         if(pnln != null) {
             return discoverPatterns ? null : pnln.get();
         }
-        AndNode nln = null;
 
-        if(n instanceof InputNode) {
-            if(n == ref.input.get() && ref.rid == 0) return null;
-        } else {
-            AndNode an = (AndNode) n;
-
-            // Check if this refinement is already present in this and-node.
-            if(ref.rid == null || ref.rid >= 0) {
-                boolean flag = false;
-                an.lock.acquireReadLock();
-                if(ref.rid == null || ref.rid > 0) {
-                    flag = an.parents.containsKey(ref);
-                } else if(ref.rid == 0) {
-                    for(Refinement pRef: an.parents.keySet()) {
-                        if((pRef.rid == null || pRef.rid < 0) && pRef.input == ref.input) {
-                            flag = true;
-                            break;
-                        }
-                    }
-                }
-                an.lock.releaseReadLock();
-                if (flag) return null;
-            }
-        }
+        if(n.contains(ref)) return null;
 
         SortedMap<Refinement, Provider<? extends Node>> parents = computeNextLevelParents(m, threadId, n, ref, discoverPatterns);
 
+        AndNode nln = null;
         if (parents != null && (!discoverPatterns || checkRidRange(parents))) {
             // Locking needs to take place in a predefined order.
             TreeSet<? extends Provider<? extends Node>> parentsForLocking = new TreeSet(parents.values());

@@ -64,6 +64,8 @@ public class AddSynapseTest {
             i++;
         }
 
+        doc.process();
+
         Assert.assertEquals(4, n.getFinalActivations(doc).size());
     }
 }

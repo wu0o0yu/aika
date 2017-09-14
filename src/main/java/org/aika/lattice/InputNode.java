@@ -387,6 +387,12 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
+    boolean contains(Refinement ref) {
+        return this == ref.input.get() && Utils.compareInteger(key.relativeRid, ref.rid) == 0;
+    }
+
+
+    @Override
     public double computeSynapseWeightSum(Integer offset, INeuron n) {
         return n.bias + Math.abs(getSynapse(key.relativeRid == null ? null : offset, n.provider).w);
     }

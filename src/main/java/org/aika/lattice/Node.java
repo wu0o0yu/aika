@@ -207,6 +207,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     abstract boolean isExpandable(boolean checkFrequency);
 
+    abstract boolean contains(Refinement ref);
 
     protected Node() {}
 
@@ -616,27 +617,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    private static int evaluate(INeuron n, RSKey rsk) {
-        Node pa = rsk.pa != null ? rsk.pa.get() : null;
-        double sum = pa.computeSynapseWeightSum(rsk.offset, n);
-        if(sum < 0.0) return -1;
-        if(pa == null) return 0;
-
-        if(pa instanceof AndNode) {
-            AndNode an = (AndNode) pa;
-            for(Refinement ref: an.parents.keySet()) {
-                Synapse s = ref.input.get().getSynapse(rsk.offset, n.provider);
-                if(sum - Math.abs(s.w) >= 0.0) return 1;
-            }
-        } else {
-            InputNode in = (InputNode) pa;
-            Synapse s = in.getSynapse(rsk.offset, n.provider);
-            if(sum - Math.abs(s.w) >= 0.0) return 1;
-        }
-        return 0;
-    }
-
-
     /**
      * Translates the synapse weights of a neuron into logic nodes.
      *
@@ -688,10 +668,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             }
         });
 
-/*        for(OrEntry oe: outputNode.parents) {
-            queue.add(new Node.RSKey(oe.node, oe.ridOffset));
-        }
-*/
         if(queue.isEmpty()) {
             queue.add(new Node.RSKey(null, null));
         }
@@ -700,42 +676,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         List<RSKey> cleanup = new ArrayList<>();
         while(!queue.isEmpty()) {
             RSKey rsk = queue.pollFirst();
-            Node n = rsk.pa != null ? rsk.pa.get() : null;
 
-            if(dir == -1) {
-                computeRefinements(m, threadId, queue, neuron, rsk, v, outputs, cleanup);
-            } else {
-                if(n instanceof AndNode) {
-                    AndNode an = (AndNode) n;
-
-                    for(Map.Entry<Refinement, Provider<? extends Node>> me: an.parents.entrySet()) {
-                        Provider<? extends Node> pn = me.getValue();
-                        RSKey prsk = new RSKey(pn, me.getKey().getOffset()); // TODO: Prüfen
-                        switch(evaluate(neuron, prsk)) {
-                            case -1:
-                                break;
-                            case 0:
-                                outputs.add(prsk);
-                                break;
-                            case 1:
-                                RidVisited nv = pn.get().getThreadState(threadId, true).lookupVisited(rsk.offset);
-                                if(nv.adjust != v) {
-                                    nv.adjust = v;
-                                    queue.add(prsk);
-                                }
-                        }
-                    }
-
-                    cleanup.add(rsk);
-                }
-            }
+            computeRefinements(m, threadId, queue, neuron, rsk, v, outputs, cleanup, modifiedSynapses);
         }
 
         if(outputs.isEmpty()) return false;
 
         outputNode.lock.acquireWriteLock(threadId);
-        outputNode.removeAllInputs(threadId);
-
         for(RSKey rsk: outputs) {
             Node pa = rsk.pa.get();
             pa.lock.acquireWriteLock(threadId);
@@ -752,31 +699,21 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    private static void computeRefinements(Model m, int threadId, TreeSet<RSKey> queue, INeuron n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup) {
+    private static void computeRefinements(Model m, int threadId, TreeSet<RSKey> queue, INeuron n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup, Collection<Synapse> modifiedSynapses) {
         n.lock.acquireWriteLock(threadId);
-        Synapse minSyn = null;
-        double sum = 0.0;
+        double sum = n.posRecSum - (n.negDirSum + n.negRecSum);
         Node pa = rsk.pa != null ? rsk.pa.get() : null;
 
+        Collection<Synapse> tmp;
         if(pa == null) {
-        } else if(pa instanceof InputNode) {
-            InputNode node = (InputNode) pa;
-            minSyn = node.getSynapse(rsk.offset, n.provider);
-            sum = Math.abs(minSyn.w);
+            tmp = modifiedSynapses;
         } else {
-            AndNode node = (AndNode) pa;
-
-            for(Refinement ref: node.parents.keySet()) {
-                Synapse s = ref.getSynapse(rsk.offset, n.provider);
-                if(minSyn == null || Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP.compare(minSyn, s) > 0) {
-                    minSyn = s;
-                }
-                sum += Math.abs(s.w);
-            }
+            sum += pa.computeSynapseWeightSum(rsk.offset, n);
+            tmp = n.inputSynapses.values();
         }
 
-        for(Synapse s: (minSyn != null ? n.inputSynapsesByWeight.headSet(minSyn, false) : n.inputSynapsesByWeight)) {
-            if(n.bias - (n.negDirSum + n.negRecSum) + n.posRecSum + sum + Math.abs(s.w) + s.maxLowerWeightsSum > 0.0 && !s.key.isNeg && !s.key.isRecurrent) {
+        for(Synapse s: tmp) {
+            if(!s.key.isNeg && !s.key.isRecurrent && sum + Math.abs(s.w) + s.maxLowerWeightsSum > 0.0) {
                 Node nln = rsk.pa == null ?
                         s.inputNode.get() :
                         AndNode.createNextLevelNode(m, threadId, pa, new Refinement(s.key.relativeRid, rsk.offset, s.inputNode), false);

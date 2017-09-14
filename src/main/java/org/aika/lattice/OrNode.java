@@ -385,6 +385,11 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
+    @Override
+    boolean contains(Refinement ref) {
+        throw new UnsupportedOperationException();
+    }
+
 
     public String logicToString() {
         StringBuilder sb = new StringBuilder();
