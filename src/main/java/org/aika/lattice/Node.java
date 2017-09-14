@@ -53,6 +53,12 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public static int minFrequency = 5;
     public static int MAX_RID = 20;
 
+    /**
+     * Synapses with a weight smaller than the tolerance relative to the bias are not translated into logic nodes. Otherwise
+     * too many irrelevant would be generated if there are a lot of synapses with small weights.
+     */
+    public static double TOLERANCE = 0.1;
+
     public static final Node MIN_NODE = new InputNode();
     public static final Node MAX_NODE = new InputNode();
 
@@ -632,6 +638,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         if(modifiedSynapses.isEmpty()) return false;
 
+        int numAboveTolerance = 0;
+        double sumBelowTolerance = 0.0;
+
         neuron.maxRecurrentSum = 0.0;
         for(Synapse s: modifiedSynapses) {
             INeuron in = s.input.get();
@@ -650,6 +659,12 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
                 neuron.provider.setModified();
             }
             in.lock.releaseWriteLock();
+
+            if(s.w >= -neuron.bias * TOLERANCE) {
+                numAboveTolerance++;
+            } else {
+                sumBelowTolerance += s.w;
+            }
         }
 
 
@@ -677,7 +692,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         while(!queue.isEmpty()) {
             RSKey rsk = queue.pollFirst();
 
-            computeRefinements(m, threadId, queue, neuron, rsk, v, outputs, cleanup, modifiedSynapses);
+            computeRefinements(m, threadId, queue, neuron, rsk, v, outputs, cleanup, modifiedSynapses, numAboveTolerance, sumBelowTolerance);
         }
 
         if(outputs.isEmpty()) return false;
@@ -699,10 +714,12 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    private static void computeRefinements(Model m, int threadId, TreeSet<RSKey> queue, INeuron n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup, Collection<Synapse> modifiedSynapses) {
+    private static void computeRefinements(Model m, int threadId, TreeSet<RSKey> queue, INeuron n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup, Collection<Synapse> modifiedSynapses, int numAboveTolerance, double sumBelowTolerance) {
         n.lock.acquireWriteLock(threadId);
-        double sum = n.posRecSum - (n.negDirSum + n.negRecSum);
+
         Node pa = rsk.pa != null ? rsk.pa.get() : null;
+        double sum = n.posRecSum - (n.negDirSum + n.negRecSum);
+        double x = sum + (pa != null && pa.level + 1 == numAboveTolerance ? sumBelowTolerance : 0.0);
 
         Collection<Synapse> tmp;
         if(pa == null) {
@@ -713,13 +730,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         for(Synapse s: tmp) {
-            if(!s.key.isNeg && !s.key.isRecurrent && sum + Math.abs(s.w) + s.maxLowerWeightsSum > 0.0) {
+            if(s.w >= -n.bias * TOLERANCE && !s.key.isNeg && !s.key.isRecurrent && sum + Math.abs(s.w) + s.maxLowerWeightsSum > 0.0) {
                 Node nln = rsk.pa == null ?
                         s.inputNode.get() :
                         AndNode.createNextLevelNode(m, threadId, pa, new Refinement(s.key.relativeRid, rsk.offset, s.inputNode), false);
 
-                if(nln != null) {
-                    nln.prepareResultsForPredefinedNodes(threadId, queue, v, outputs, cleanup, n, s, Utils.nullSafeMin(s.key.relativeRid, rsk.offset));
+                if (nln != null) {
+                    nln.prepareResultsForPredefinedNodes(threadId, queue, v, outputs, cleanup, n, s, Utils.nullSafeMin(s.key.relativeRid, rsk.offset), x);
                 }
             }
         }
@@ -727,11 +744,11 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void prepareResultsForPredefinedNodes(int threadId, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, INeuron n, Synapse s, Integer offset) {
+    void prepareResultsForPredefinedNodes(int threadId, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, INeuron n, Synapse s, Integer offset, double x) {
         RSKey rs = new RSKey(provider, offset);
         RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
         // TODO: mindestens einen positiven Knoten mit rein nehmen.
-        if(computeSynapseWeightSum(offset, n) + n.posRecSum - (n.negDirSum + n.negRecSum) > 0 || !isExpandable(false) || (Math.abs(s.w) / -n.bias) < 0.1) {
+        if(computeSynapseWeightSum(offset, n) + x > 0 || !isExpandable(false)) {
             if(nv.outputNode != v) {
                 nv.outputNode = v;
                 if (isCovered(threadId, offset, v)) {

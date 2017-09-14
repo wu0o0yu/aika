@@ -54,6 +54,8 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
 
     public synchronized void suspend() {
+        if(n == null) return;
+
         assert m.suspensionHook != null;
 
         n.suspend();
