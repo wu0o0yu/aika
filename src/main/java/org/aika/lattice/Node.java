@@ -668,7 +668,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
                 }
             }
         }
-
+        assert numAboveTolerance >= 1;
 
         TreeSet<RSKey> queue = new TreeSet<>(new Comparator<RSKey>() {
             @Override
@@ -721,7 +721,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         Node pa = rsk.pa != null ? rsk.pa.get() : null;
         double sum = n.posRecSum - (n.negDirSum + n.negRecSum);
-        double x = sum + (pa != null && pa.level + 1 == numAboveTolerance ? sumBelowTolerance : 0.0);
+        double x = sum + ((pa != null ? pa.level : 0) + 1 == numAboveTolerance ? sumBelowTolerance : 0.0);
 
         Collection<Synapse> tmp;
         if(pa == null) {
