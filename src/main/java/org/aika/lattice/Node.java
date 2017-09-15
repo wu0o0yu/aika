@@ -660,10 +660,12 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             }
             in.lock.releaseWriteLock();
 
-            if(s.w >= -neuron.bias * TOLERANCE) {
-                numAboveTolerance++;
-            } else {
-                sumBelowTolerance += s.w;
+            if(!s.key.isNeg && !s.key.isRecurrent) {
+                if (s.w >= -neuron.bias * TOLERANCE) {
+                    numAboveTolerance++;
+                } else {
+                    sumBelowTolerance += s.w;
+                }
             }
         }
 
