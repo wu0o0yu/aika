@@ -51,7 +51,7 @@ import java.util.*;
  */
 public abstract class Node<T extends Node, A extends NodeActivation<T>> extends AbstractNode<Provider<T>> implements Comparable<Node> {
     public static int minFrequency = 5;
-    public static int MAX_RID = 20;
+    public static int MAX_RID = 25;
 
     /**
      * Synapses with a weight smaller than the tolerance relative to the bias are not translated into logic nodes. Otherwise
@@ -132,7 +132,12 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             removed = new TreeMap<>();
         }
 
-        public RidVisited lookupVisited(Integer offset) {
+        public RidVisited lookupVisited(Integer offset) throws RidOutOfRange {
+            if(offset >= MAX_RID || offset <= -MAX_RID) {
+                log.warn("RID too large:" + offset);
+                throw new RidOutOfRange("RID too large:" + offset);
+            }
+
             if(offset == null) {
                 if(nullRidVisited == null) {
                     nullRidVisited = new RidVisited();
@@ -148,6 +153,11 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             }
         }
 
+        public static class RidOutOfRange extends Exception {
+            public RidOutOfRange(String s) {
+                super(s);
+            }
+        }
     }
 
 
@@ -547,7 +557,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    boolean computeAndParents(Model m, int threadId, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Provider<? extends Node>> parents, boolean discoverPatterns, long v) {
+    boolean computeAndParents(Model m, int threadId, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Provider<? extends Node>> parents, boolean discoverPatterns, long v) throws ThreadState.RidOutOfRange {
         RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
         if(nv.computeParents == v) return true;
         nv.computeParents = v;
@@ -748,22 +758,25 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     void prepareResultsForPredefinedNodes(int threadId, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, INeuron n, Synapse s, Integer offset, double x) {
         RSKey rs = new RSKey(provider, offset);
-        RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
-        // TODO: mindestens einen positiven Knoten mit rein nehmen.
-        if(computeSynapseWeightSum(offset, n) + x > 0 || !isExpandable(false)) {
-            if(nv.outputNode != v) {
-                nv.outputNode = v;
-                if (isCovered(threadId, offset, v)) {
-                    cleanup.add(rs);
-                } else {
-                    outputs.add(rs);
+        try {
+            RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
+
+            if (computeSynapseWeightSum(offset, n) + x > 0 || !isExpandable(false)) {
+                if (nv.outputNode != v) {
+                    nv.outputNode = v;
+                    if (isCovered(threadId, offset, v)) {
+                        cleanup.add(rs);
+                    } else {
+                        outputs.add(rs);
+                    }
+                }
+            } else {
+                if (nv.adjust != v) {
+                    nv.adjust = v;
+                    queue.add(rs);
                 }
             }
-        } else {
-            if(nv.adjust != v) {
-                nv.adjust = v;
-                queue.add(rs);
-            }
+        } catch(ThreadState.RidOutOfRange e) {
         }
     }
 
@@ -791,7 +804,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public boolean isCovered(int threadId, Integer offset, long v) {
+    public boolean isCovered(int threadId, Integer offset, long v) throws ThreadState.RidOutOfRange {
         return false;
     }
 

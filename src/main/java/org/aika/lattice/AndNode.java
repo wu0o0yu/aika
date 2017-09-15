@@ -405,7 +405,11 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         for(Refinement pRef: refinements) {
             SortedSet<Refinement> childInputs = new TreeSet<>(refinements);
             childInputs.remove(pRef);
-            if(!pRef.input.get().computeAndParents(m, threadId, pRef.getRelativePosition(), childInputs, parents, discoverPatterns, v)) {
+            try {
+                if (!pRef.input.get().computeAndParents(m, threadId, pRef.getRelativePosition(), childInputs, parents, discoverPatterns, v)) {
+                    return null;
+                }
+            } catch(ThreadState.RidOutOfRange e) {
                 return null;
             }
         }
@@ -453,7 +457,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    public boolean isCovered(int threadId, Integer offset, long v) {
+    public boolean isCovered(int threadId, Integer offset, long v) throws ThreadState.RidOutOfRange {
         for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
             RidVisited nv = me.getValue().get().getThreadState(threadId, true).lookupVisited(Utils.nullSafeSub(offset, true, me.getKey().getOffset(), false));
             if(nv.outputNode == v) return true;
