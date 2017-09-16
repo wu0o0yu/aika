@@ -25,6 +25,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
+ * The class {@code Conflicts} handles between different interpretation options for a given text.
  *
  * @author Lukas Molzberger
  */

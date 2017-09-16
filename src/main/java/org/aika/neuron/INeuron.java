@@ -303,9 +303,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     private State computeInitialState(Synapse s, SearchNode sn, InterprNode io) {
         Coverage c = sn.getCoverage(io);
         return new State(
-                c == Coverage.SELECTED || (!s.key.isNeg || c == Coverage.UNKNOWN) ? 1.0 : 0.0,
-                c == Coverage.SELECTED || (!s.key.isNeg || c == Coverage.UNKNOWN) ? 1.0 : 0.0,
-                c == Coverage.SELECTED || (!s.key.isNeg || c == Coverage.UNKNOWN) ? 1.0 : 0.0,
+                c == Coverage.SELECTED ? 1.0 : 0.0,
+                c == Coverage.SELECTED || c == Coverage.UNKNOWN ? 1.0 : 0.0,
+                c == Coverage.SELECTED ? 1.0 : 0.0,
                 0,
                 NormWeight.ZERO_WEIGHT,
                 NormWeight.ZERO_WEIGHT

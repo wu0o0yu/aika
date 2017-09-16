@@ -501,6 +501,11 @@ public class Document implements Comparable<Document> {
         private void addAllActs(Collection<Activation> acts) {
             for(Activation act: acts) {
                 add(0, act);
+                for(Activation.SynapseActivation sa: act.neuronOutputs) {
+                    if(sa.s.key.isRecurrent) {
+                        add(0, sa.output);
+                    }
+                }
             }
         }
 
