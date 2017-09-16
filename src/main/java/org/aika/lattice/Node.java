@@ -133,7 +133,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         public RidVisited lookupVisited(Integer offset) throws RidOutOfRange {
-            if(offset >= MAX_RID || offset <= -MAX_RID) {
+            if(offset != null && (offset >= MAX_RID || offset <= -MAX_RID)) {
                 log.warn("RID too large:" + offset);
                 throw new RidOutOfRange("RID too large:" + offset);
             }
