@@ -253,7 +253,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             State is = State.ZERO;
             if (s.key.isRecurrent) {
                 if (!s.key.isNeg || !checkSelfReferencing(o, io, sn, 0)) {
-                    is = round == 0 ? computeInitialState(s, sn, io) : iAct.rounds.get(round - 1);
+                    is = round == 0 ? getInitialState(sn.getCoverage(io)) : iAct.rounds.get(round - 1);
                 }
             } else {
                 is = iAct.rounds.get(round);
@@ -300,8 +300,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private State computeInitialState(Synapse s, SearchNode sn, InterprNode io) {
-        Coverage c = sn.getCoverage(io);
+    private State getInitialState(Coverage c) {
         return new State(
                 c == Coverage.SELECTED ? 1.0 : 0.0,
                 c == Coverage.SELECTED || c == Coverage.UNKNOWN ? 1.0 : 0.0,
