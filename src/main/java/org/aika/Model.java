@@ -53,7 +53,8 @@ public class Model {
 
     public AtomicInteger currentId = new AtomicInteger(0);
 
-    public Map<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new TreeMap<>();
+    // Important: the id field needs to be referenced by the provider!
+    public WeakHashMap<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
     public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
 
     public Statistic stat = new Statistic();
@@ -128,12 +129,11 @@ public class Model {
 
     public <P extends Provider<? extends Node>> P lookupNodeProvider(int id) {
         synchronized (providers) {
-            WeakReference<Provider<? extends AbstractNode>> sp = providers.get(id);
-            if (sp != null) {
-                Provider p = sp.get();
+            WeakReference<Provider<? extends AbstractNode>> wr = providers.get(id);
+            if(wr != null) {
+                P p = (P) wr.get();
                 if (p != null) {
-                    assert !p.deleted;
-                    return (P) p;
+                    return p;
                 }
             }
 
@@ -145,12 +145,11 @@ public class Model {
 
     public Neuron lookupNeuron(int id) {
         synchronized (providers) {
-            WeakReference<Provider<? extends AbstractNode>> sp = providers.get(id);
-            if (sp != null) {
-                Neuron p = (Neuron) sp.get();
-                if (p != null) {
-                    assert !p.deleted;
-                    return p;
+            WeakReference<Provider<? extends AbstractNode>> wr = providers.get(id);
+            if(wr != null) {
+                Neuron n = (Neuron) wr.get();
+                if (n != null) {
+                    return n;
                 }
             }
 

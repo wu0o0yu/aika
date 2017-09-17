@@ -10,9 +10,7 @@ import java.util.zip.GZIPOutputStream;
 public class Provider<T extends AbstractNode> implements Comparable<Provider<?>> {
 
     public Model m;
-    public int id;
-
-    public boolean deleted;
+    public Integer id;
 
     private T n;
 
@@ -21,11 +19,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         this.id = id;
 
         synchronized (m.providers) {
-            WeakReference wr = m.providers.put(id, new WeakReference(this));
-            if(wr != null && wr.get() != null) {
-                System.out.println();
-            }
-            assert wr == null;
+            m.providers.put(this.id, new WeakReference<>(this));
         }
     }
 
@@ -36,8 +30,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
         id = m.suspensionHook != null ? m.suspensionHook.getNewId() : m.currentId.addAndGet(1);
         synchronized (m.providers) {
-            WeakReference wr = m.providers.put(id, new WeakReference<>(this));
-            assert wr == null;
+            m.providers.put(id, new WeakReference<>(this));
 
             if(n != null) {
                 m.register(this);
@@ -110,11 +103,14 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
 
     @Override
-    public void finalize() {
-        deleted = true;
-        synchronized(m.providers) {
-            m.providers.remove(id);
-        }
+    public boolean equals(Object o) {
+        return id == ((Provider<?>) o).id;
+    }
+
+
+    @Override
+    public int hashCode() {
+        return id;
     }
 
 
