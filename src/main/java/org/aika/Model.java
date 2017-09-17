@@ -49,12 +49,12 @@ public class Model {
     public Document[] docs;
 
     public SuspensionHook suspensionHook;
-    public SuspensionManager suspensionManager;
 
 
     public AtomicInteger currentId = new AtomicInteger(0);
 
     public Map<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new TreeMap<>();
+    public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
 
     public Statistic stat = new Statistic();
 
@@ -76,18 +76,17 @@ public class Model {
      * Creates a model with a single thread.
      */
     public Model() {
-        this(null, null, 1);
+        this(null, 1);
     }
 
 
-    public Model(SuspensionHook sh, SuspensionManager sm, int numberOfThreads) {
+    public Model(SuspensionHook sh, int numberOfThreads) {
         assert numberOfThreads >= 1;
         this.numberOfThreads = numberOfThreads;
 
         lastCleanup = new int[numberOfThreads];
         docs = new Document[numberOfThreads];
         suspensionHook = sh;
-        suspensionManager = sm;
     }
 
 
@@ -133,15 +132,11 @@ public class Model {
             if (sp != null) {
                 Provider p = sp.get();
                 if (p != null) {
-                    suspensionManager.register(p);
                     return (P) p;
                 }
             }
 
-            Provider p = new Provider(this, id);
-            providers.put(id, new WeakReference(p));
-            suspensionManager.register(p);
-            return (P) p;
+            return (P) new Provider(this, id);
         }
     }
 
@@ -153,15 +148,11 @@ public class Model {
             if (sp != null) {
                 Neuron p = (Neuron) sp.get();
                 if (p != null) {
-                    suspensionManager.register(p);
                     return p;
                 }
             }
 
-            Neuron p = new Neuron(this, id);
-            providers.put(id, new WeakReference(p));
-            suspensionManager.register(p);
-            return p;
+            return new Neuron(this, id);
         }
     }
 
@@ -188,6 +179,54 @@ public class Model {
             }
         }
 
+    }
+
+
+    public void register(Provider p) {
+        synchronized (activeProviders) {
+            activeProviders.put(p.id, p);
+        }
+    }
+
+
+    public void unregister(Provider p) {
+        synchronized (activeProviders) {
+            activeProviders.remove(p.id);
+        }
+    }
+
+
+    /**
+     * Suspend all neurons and logic nodes whose last used document id is lower/older than {@param docId}.
+     *
+     * @param docId
+     */
+    public void suspendUnusedNodes(int docId) {
+        List<Provider> tmp;
+        synchronized (this) {
+            tmp = new ArrayList<>(activeProviders.values());
+        }
+        for (Provider p: tmp) {
+            suspend(docId, p);
+        }
+    }
+
+
+    /**
+     * Suspend all neurons and logic nodes in memory.
+     *
+     */
+    public void suspendAll() {
+        suspendUnusedNodes(Integer.MAX_VALUE);
+    }
+
+
+    private boolean suspend(int docId, Provider<? extends AbstractNode> p) {
+        if (!p.isSuspended() && p.get().lastUsedDocumentId <= docId) {
+            p.suspend();
+            return true;
+        }
+        return false;
     }
 
 

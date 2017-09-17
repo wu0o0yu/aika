@@ -17,6 +17,14 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     public Provider(Model m, int id) {
         this.m = m;
         this.id = id;
+
+        synchronized (m.providers) {
+            WeakReference wr = m.providers.put(id, new WeakReference(this));
+            if(wr != null) {
+                System.out.println();
+            }
+            assert wr == null;
+        }
     }
 
 
@@ -26,10 +34,11 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
         id = m.suspensionHook != null ? m.suspensionHook.getNewId() : m.currentId.addAndGet(1);
         synchronized (m.providers) {
-            m.providers.put(id, new WeakReference<>(this));
+            WeakReference wr = m.providers.put(id, new WeakReference<>(this));
+            assert wr == null;
 
-            if(m.suspensionManager != null) {
-                m.suspensionManager.register(this);
+            if(n != null) {
+                m.register(this);
             }
         }
     }
@@ -60,7 +69,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
         n.suspend();
 
-        m.suspensionManager.unregister(this);
+        m.unregister(this);
 
         if (n.modified) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -94,10 +103,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
         n.reactivate();
 
-        synchronized (m.providers) {
-            m.providers.put(id, new WeakReference<>(this));
-        }
-        m.suspensionManager.register(this);
+        m.register(this);
     }
 
 

@@ -257,9 +257,8 @@ public class Document implements Comparable<Document> {
         addedNodes.clear();
 
         if(m.lastCleanup[threadId] + CLEANUP_INTERVAL < id) {
-            synchronized(m.providers) {
-                for (WeakReference<Provider<? extends AbstractNode>> wnp : m.providers.values()) {
-                    Provider<? extends AbstractNode> np = wnp.get();
+            synchronized(m.activeProviders) {
+                for (Provider<? extends AbstractNode> np : m.activeProviders.values()) {
                     if (np != null && !np.isSuspended()) {
                         AbstractNode an = np.get();
                         if (an instanceof Node) {

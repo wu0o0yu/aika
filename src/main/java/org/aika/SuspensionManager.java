@@ -19,67 +19,12 @@ package org.aika;
 
 import java.util.*;
 
-public interface SuspensionManager {
+public class SuspensionManager {
 
 
-    void register(Provider n);
 
 
-    void unregister(Provider n);
 
 
-    class LastUsedSuspensionManager implements SuspensionManager {
 
-        private Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
-
-        @Override
-        public synchronized void register(Provider p) {
-            activeProviders.put(p.id, p);
-        }
-
-        @Override
-        public synchronized void unregister(Provider p) {
-            activeProviders.remove(p.id);
-        }
-
-
-        /**
-         * Suspend all neurons and logic nodes whose last used document id is lower/older than {@param docId}.
-         *
-         * @param docId
-         */
-        public void suspendUnusedNodes(int docId) {
-            List<Provider> tmp;
-            synchronized (this) {
-                tmp = new ArrayList<>(activeProviders.values());
-            }
-            for (Provider p: tmp) {
-                suspend(docId, p);
-            }
-        }
-
-
-        public void suspendAll() {
-            suspendUnusedNodes(Integer.MAX_VALUE);
-        }
-
-
-        private boolean suspend(int docId, Provider<? extends AbstractNode> p) {
-            if (!p.isSuspended() && p.get().lastUsedDocumentId <= docId) {
-                p.suspend();
-                return true;
-            }
-            return false;
-        }
-    }
-
-/*
-    class FixedSizeSuspensionManager implements SuspensionManager {
-
-        @Override
-        public void register(Provider n) {
-
-        }
-    }
-*/
 }

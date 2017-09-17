@@ -305,6 +305,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         Provider<AndNode> n = andChildren.put(ref, child);
+        if(n != null) {
+            System.out.println();
+        }
+
         assert n == null;
         reverseAndChildren.put(new ReverseAndRefinement(child, ref.rid, 0), ref);
     }
