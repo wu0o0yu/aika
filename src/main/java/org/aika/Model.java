@@ -132,6 +132,7 @@ public class Model {
             if (sp != null) {
                 Provider p = sp.get();
                 if (p != null) {
+                    assert !p.deleted;
                     return (P) p;
                 }
             }
@@ -148,6 +149,7 @@ public class Model {
             if (sp != null) {
                 Neuron p = (Neuron) sp.get();
                 if (p != null) {
+                    assert !p.deleted;
                     return p;
                 }
             }
@@ -169,16 +171,14 @@ public class Model {
 
     public void resetFrequency() {
         for (int t = 0; t < numberOfThreads; t++) {
-            synchronized (providers) {
-                for (WeakReference<Provider<? extends AbstractNode>> sp : providers.values()) {
-                    Provider<? extends AbstractNode> p = sp.get();
+            synchronized (activeProviders) {
+                for (Provider<? extends AbstractNode> p : activeProviders.values()) {
                     if (p != null && p.get() instanceof Node) {
                         ((Node) p.get()).frequency = 0;
                     }
                 }
             }
         }
-
     }
 
 

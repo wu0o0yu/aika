@@ -12,6 +12,8 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     public Model m;
     public int id;
 
+    public boolean deleted;
+
     private T n;
 
     public Provider(Model m, int id) {
@@ -20,7 +22,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
         synchronized (m.providers) {
             WeakReference wr = m.providers.put(id, new WeakReference(this));
-            if(wr != null) {
+            if(wr != null && wr.get() != null) {
                 System.out.println();
             }
             assert wr == null;
@@ -109,6 +111,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
     @Override
     public void finalize() {
+        deleted = true;
         synchronized(m.providers) {
             m.providers.remove(id);
         }
