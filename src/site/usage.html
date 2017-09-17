@@ -89,7 +89,7 @@
     HashMap&lt;String, Neuron&gt; inputNeurons = new HashMap<>();
 
     for(String word: new String[] {"jackson", "cook"}) {
-        Neuron in = new Neuron(m, "W-" + word);
+        Neuron in = m.createNeuron("W-" + word);
 
         inputNeurons.put(word, in);
     }
@@ -101,9 +101,9 @@
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    Neuron forenameCategory = new Neuron(m, "C-forename");
-    Neuron surnameCategory = new Neuron(m, "C-surname");
-    Neuron suppressingN = new Neuron(m, "SUPPR");
+    Neuron forenameCategory = m.createNeuron("C-forename");
+    Neuron surnameCategory = m.createNeuron("C-surname");
+    Neuron suppressingN = m.createNeuron("SUPPR");
                 </code>
 			</pre>
             </div>
@@ -123,22 +123,22 @@ required minimum input activation (<i>setMinInput</i>) of each input.
             <pre class="prettyprint">
 				<code class="language-java">
     Neuron cookSurnameEntity = m.initAndNeuron(
-            new Neuron(m, "E-cook (surname)"),
+            m.createNeuron("E-cook (surname)"),
             0.5, // adjusts the bias
             new Input() // Requires the word to be recognized
                     .setNeuron(inputNeurons.get("cook"))
-                    .setWeight(10.0)
+                    .setWeight(10.0f)
                  // This input requires the input activation to have an
                  // activation value of at least 0.9
-                    .setMinInput(0.9)
+                    .setMinInput(0.9f)
                     .setRelativeRid(0) // references the current word
                     .setRecurrent(false)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true), // propagate the range of this input
             new Input() // The previous word needs to be a forename
                     .setNeuron(forenameCategory)
-                    .setWeight(10.0)
-                    .setMinInput(0.9)
+                    .setWeight(10.0f)
+                    .setMinInput(0.9f)
                     .setRelativeRid(-1) // references the previous word
                     .setRecurrent(true) // this input is a positive feedback loop
                     .setRangeMatch(NONE),
@@ -148,8 +148,8 @@ required minimum input activation (<i>setMinInput</i>) of each input.
             // in suppressingN.
             new Input()
                     .setNeuron(suppressingN)
-                    .setWeight(-20.0)
-                    .setMinInput(1.0)
+                    .setWeight(-20.0f)
+                    .setMinInput(1.0f)
                     .setRecurrent(true) // this input is a negative feedback loop
                     .setRangeMatch(CONTAINED_IN)
     );
@@ -164,7 +164,7 @@ required minimum input activation (<i>setMinInput</i>) of each input.
     m.initOrNeuron(forenameCategory,
             new Input() // In this example, only one forename is considered.
                     .setNeuron(jacksonForenameEntity)
-                    .setWeight(10.0)
+                    .setWeight(10.0f)
                     .setRelativeRid(0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
@@ -172,7 +172,7 @@ required minimum input activation (<i>setMinInput</i>) of each input.
     m.initOrNeuron(surnameCategory,
             new Input()
                     .setNeuron(cookSurnameEntity)
-                    .setWeight(10.0)
+                    .setWeight(10.0f)
                     .setRelativeRid(0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
@@ -188,22 +188,22 @@ required minimum input activation (<i>setMinInput</i>) of each input.
     m.initOrNeuron(suppressingN,
             new Input()
                     .setNeuron(cookProfessionEntity)
-                    .setWeight(10.0)
+                    .setWeight(10.0f)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Input()
                     .setNeuron(cookSurnameEntity)
-                    .setWeight(10.0)
+                    .setWeight(10.0f)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Input()
                     .setNeuron(jacksonCityEntity)
-                    .setWeight(10.0)
+                    .setWeight(10.0f)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Input()
                     .setNeuron(jacksonForenameEntity)
-                    .setWeight(10.0)
+                    .setWeight(10.0f)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
     );
@@ -307,70 +307,70 @@ The output of this example looks as following. Each line in the table represents
         Model m = new Model();
 
         // Create the input neurons for the network.
-        Neuron inA = new Neuron(m, "IN-A");
-        Neuron inB = new Neuron(m, "IN-B");
-        Neuron inC = new Neuron(m, "IN-C");
+        Neuron inA = m.createNeuron("IN-A");
+        Neuron inB = m.createNeuron("IN-B");
+        Neuron inC = m.createNeuron("IN-C");
 
         // Instantiate the suppressing neuron. Its inputs will be added later on.
-        Neuron pSuppr = new Neuron(m, "SUPPRESS");
+        Neuron pSuppr = m.createNeuron("SUPPRESS");
 
         // Create three neurons that might be suppressed by the suppressing neuron.
         // createAndNeuron is a helper method which is used set the synapse weights
         // and bias of new neuron.
         Neuron pA = m.initAndNeuron(
-                new Neuron(m, "A"),
+                m.createNeuron("A"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(10.5)
+                        .setWeight(10.5f)
                         .setMaxLowerWeightsSum(0.0)
                         .setRecurrent(false)
-                        .setMinInput(0.9)
+                        .setMinInput(0.9f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()                     // This input is negated
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0)
+                        .setWeight(-10.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(CONTAINED_IN)
         );
 
         Neuron pB = m.initAndNeuron(
-                new Neuron(m, "B"),
+                m.createNeuron("B"),
                 0.001,
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(11.0)
+                        .setWeight(11.0f)
                         .setMaxLowerWeightsSum(0.0)
                         .setRecurrent(false)
-                        .setMinInput(0.9)
+                        .setMinInput(0.9f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0)
+                        .setWeight(-10.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(CONTAINED_IN)
         );
 
         Neuron pC = m.initAndNeuron(
-                new Neuron(m, "C"),
+                m.createNeuron("C"),
                 0.001,
                 new Input()
                         .setNeuron(inC)
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         .setMaxLowerWeightsSum(0.0)
                         .setRecurrent(false)
-                        .setMinInput(0.9)
+                        .setMinInput(0.9f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0)
+                        .setWeight(-10.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(CONTAINED_IN)
         );
 
@@ -379,23 +379,23 @@ The output of this example looks as following. Each line in the table represents
                 pSuppr,
                 new Input()
                         .setNeuron(pA)
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pB)
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pC)
-                        .setWeight(10.0)
+                        .setWeight(10.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
@@ -403,9 +403,9 @@ The output of this example looks as following. Each line in the table represents
         Neuron outN = m.createOrNeuron(new Neuron("OUT"),
                 new Input()
                         .setNeuron(pB)
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
+                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
@@ -518,15 +518,15 @@ The output of this example looks as following. Each line in the table represents
         Map&lt;Character, Neuron&gt; relNeurons = new HashMap<>();
 
         // The space neuron will be used as clock signal for the recurrent neurons.
-        Neuron inSpace = new Neuron(m, "SPACE");
+        Neuron inSpace = m.createNeuron("SPACE");
 
-        Neuron startSignal = new Neuron(m, "START-SIGNAL");
+        Neuron startSignal = m.createNeuron("START-SIGNAL");
 
         // The Counter Neuron is used to assign each pattern component an relational id (RID).
         // It is a counter that increases the Rid after each space char.
         // The initCounterNeuron method is simply a helper method which generates an
         // ordinary neuron with some input synapses.
-        Neuron ctNeuron = m.initCounterNeuron(new Neuron(m, "CTN"),
+        Neuron ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"),
                 inSpace, false,
                 startSignal, true,
                 false
@@ -536,9 +536,9 @@ The output of this example looks as following. Each line in the table represents
 
         // Create an input neuron and a relational neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            Neuron in = new Neuron(m, c + "");
+            Neuron in = m.createNeuron(c + "");
             Neuron rn = m.initRelationalNeuron(
-                    new Neuron(m, c + "-RN"),
+                    m.createNeuron(c + "-RN"),
                     ctNeuron,
                     in, false
             );
@@ -551,30 +551,30 @@ The output of this example looks as following. Each line in the table represents
         // given in the inputs are the relational ids (relativeRid) which specify the positions
         // of the inputs relative to each other.
         Neuron pattern = m.initAndNeuron(
-                new Neuron(m, "BCD"),
+                m.createNeuron("BCD"),
                 0.4,
                 new Input()
                         .setNeuron(relNeurons.get('b'))
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setMinInput(0.9)
+                        .setMinInput(0.9f)
                         .setStartRangeMatch(EQUALS)
                         .setEndRangeMatch(GREATER_THAN)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(relNeurons.get('c'))
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(1)
-                        .setMinInput(0.9)
+                        .setMinInput(0.9f)
                         .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(relNeurons.get('d'))
-                        .setWeight(1.0)
+                        .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(2)
-                        .setMinInput(0.9)
+                        .setMinInput(0.9f)
                         .setStartRangeMatch(LESS_THAN)
                         .setEndRangeMatch(EQUALS)
                         .setEndRangeOutput(true)
