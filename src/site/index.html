@@ -57,27 +57,33 @@
 					The Aika algorithm is based on various ideas and approaches from the field of AI such as artificial neural networks, frequent pattern mining and
 					logic based expert systems. It can be applied to a broad spectrum of text analysis task and combines these concepts in a single algorithm.
 					</b>
-					<br/>
+				</p>
+				<p>
 					Aika allows to model linguistic concepts like words, word meanings (entities), categories (e.g. person name, city), grammatical word types and so on as neurons in a neural network.
 					By choosing appropriate synapse weights, these neurons can take on different functions within the network. For
 					instance neurons whose synapse weights are chosen to mimic an logical AND can be used to match an exact phrase.
 					On the other hand neurons with an OR characteristic can be used to connect a large list of word entity neurons to determine a category like 'city' or 'profession'.
-					<br/>
+				</p>
+				<p>
 					Aika is based on non-monotonic logic, meaning that it first draws tentative conclusions only.
 					In other words, Aika is able to generate multiple mutually exclusive interpretations of a word, phrase, or sentence,
 					and select the most likely interpretation.
 					For example a neuron representing a specific meaning of a given word can be linked through a negatively weighted synapse to
-					a neuron representing an alternative meaning of this word. In this case these neurons will exclude each other. Aika weights
-					these different interpretations and chooses the most likely one.
-					<br/>
+					a neuron representing an alternative meaning of this word. In this case these neurons will exclude each other.
+					These synapses might even be cyclic. Aika can resolve such recurrent feedback links by making tentative
+					assumptions and starting a search for the highest ranking interpretation.
+				</p>
+				<p>
 					In contrast to a conventional neural network, Aika propagates activations objects through its network, not just activation values.
 					These activation objects refer to a specific text segment and a given interpretation.
-					<br/>
+				</p>
+				<p>
 					Aika consists of two layers. The neural layer, containing all the neurons and continuously weighted synapses and underneath that the discrete logic layer,
 					containing a boolean representation of all the neurons. The logic layer uses a frequent pattern lattice to efficiently store the individual logic nodes.
 					This architecture allows Aika to process extremely large networks since only neurons that are activated by a logic node need to compute their
 					weighted sum and their activation value. This means that the fast majority of neurons stays inactive during the processing of a given text.
-					<br/>
+				</p>
+				<p>
 					To prevent that the whole network needs to stay in memory during processing, Aika uses the provider pattern to suspend
 					individual neurons or logic nodes to an external storage like a mongo db.
 				</p>
