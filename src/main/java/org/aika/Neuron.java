@@ -136,7 +136,7 @@ public class Neuron extends Provider<INeuron> {
     /**
      * {@code getFinalActivations} is a convenience method to retrieve all activations of the given neuron that
      * are part of the final interpretation. Before calling this method, the {@code doc.process()} needs to
-     * be called first.
+     * be called first. {@code getFinalActivations} requires that the {@code doc.process()} method has been called first.
      *
      * @param doc The current document
      * @return A collection with all final activations of this neuron.
@@ -145,7 +145,4 @@ public class Neuron extends Provider<INeuron> {
         if(isSuspended()) return Collections.emptyList();
         return get().getFinalActivations(doc);
     }
-
-
-
 }
