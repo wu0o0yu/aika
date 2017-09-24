@@ -20,14 +20,12 @@ package org.aika.lattice;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.network.TestHelper;
-import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,12 +47,12 @@ public class ActivationsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        m.initAndNeuron(m.createNeuron("pA"), 0.001,
+        m.initNeuron(m.createNeuron("pA"), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -77,12 +75,12 @@ public class ActivationsTest {
 
         Neuron inB = m.createNeuron("B");
 
-        m.initAndNeuron(m.createNeuron("pB"), 0.001,
+        m.initNeuron(m.createNeuron("pB"), 0.001,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
         );
         InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, Operator.LESS_THAN, Mapping.START, true, Operator.GREATER_THAN, Mapping.END, true);
 

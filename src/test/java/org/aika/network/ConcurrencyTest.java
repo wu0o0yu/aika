@@ -20,12 +20,10 @@ package org.aika.network;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.AndNode;
-import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -44,14 +42,14 @@ public class ConcurrencyTest {
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
 
-        Neuron pC = m.initAndNeuron(m.createNeuron("pC"),
+        Neuron pC = m.initNeuron(m.createNeuron("pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setStartRangeMatch(Operator.EQUALS)
                         .setStartRangeOutput(true),
                 new Input()
@@ -59,7 +57,7 @@ public class ConcurrencyTest {
                         .setWeight(1.0f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
@@ -126,14 +124,14 @@ public class ConcurrencyTest {
         final Neuron inA = m.createNeuron("A");
         final Neuron inB = m.createNeuron("B");
 
-        final Neuron pC = m.initAndNeuron(m.createNeuron("pC"),
+        final Neuron pC = m.initNeuron(m.createNeuron("pC"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setStartRangeMatch(Operator.EQUALS)
                         .setStartRangeOutput(true),
                 new Input()
@@ -141,7 +139,7 @@ public class ConcurrencyTest {
                         .setWeight(1.0f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );

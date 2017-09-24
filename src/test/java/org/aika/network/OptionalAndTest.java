@@ -20,9 +20,7 @@ package org.aika.network;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.corpus.Document;
-import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 /**
@@ -42,90 +40,82 @@ public class OptionalAndTest {
 
         Neuron suppr = m.createNeuron("SUPPRESS");
 
-        Neuron hintNoun = m.initOrNeuron(m.createNeuron("HINT-NOUN"),
+        Neuron hintNoun = m.initNeuron(m.createNeuron("HINT-NOUN"),
+                -0.001,
                 new Input()
-                        .setOptional(false)
                         .setNeuron(wordEssen)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f),
+                        .setBiasDelta(0.0),
                 new Input()
-                        .setOptional(false)
                         .setNeuron(wordHamburg)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
         );
-        Neuron hintVerb = m.initOrNeuron(m.createNeuron("HINT-VERB"),
+        Neuron hintVerb = m.initNeuron(m.createNeuron("HINT-VERB"),
+                -0.001,
                 new Input()
-                        .setOptional(false)
                         .setNeuron(wordEssen)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f),
+                        .setBiasDelta(0.0),
                 new Input()
-                        .setOptional(false)
                         .setNeuron(wordGehen)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
         );
 
 
-        Neuron noun = m.initAndNeuron(m.createNeuron("NOUN"),
+        Neuron noun = m.initNeuron(m.createNeuron("NOUN"),
                 0.001,
                 new Input()
-                        .setOptional(false)
                         .setNeuron(hintNoun)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setMaxLowerWeightsSum(0.0f),
                 new Input()
-                        .setOptional(true)
                         .setNeuron(upperCase)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
                         .setMaxLowerWeightsSum(0.0f),
                 new Input()
-                        .setOptional(false)
                         .setNeuron(suppr)
                         .setWeight(-1.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
         );
 
-        Neuron verb = m.initAndNeuron(m.createNeuron("VERB"),
+        Neuron verb = m.initNeuron(m.createNeuron("VERB"),
                 0.001,
                 new Input()
-                        .setOptional(false)
                         .setNeuron(hintVerb)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setMaxLowerWeightsSum(0.0f),
                 new Input()
-                        .setOptional(false)
                         .setNeuron(suppr)
                         .setWeight(-1.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
         );
 
-        m.initOrNeuron(suppr,
+        m.initNeuron(suppr,
+                -0.001,
                 new Input()
-                        .setOptional(false)
                         .setNeuron(noun)
                         .setWeight(1.0f)
-                        .setRecurrent(false)
-                        .setMinInput(1.0f),
+                        .setBiasDelta(0.0)
+                        .setRecurrent(false),
                 new Input()
-                        .setOptional(false)
                         .setNeuron(verb)
                         .setWeight(1.0f)
+                        .setBiasDelta(0.0)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
         );
 
 

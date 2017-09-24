@@ -20,8 +20,6 @@ package org.aika.corpus;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
-import org.aika.Provider;
-import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 import static org.aika.Input.RangeRelation.EQUALS;
@@ -40,19 +38,18 @@ public class SimpleWeightsTest {
         Neuron inB = m.createNeuron("B");
 
         Neuron pC = m.createNeuron("C");
-        m.initOrNeuron(pC,
+        m.initNeuron(pC,
+                -0.001,
                 new Input()
-                        .setOptional(false)
                         .setNeuron(inA)
                         .setWeight(0.3f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f),
+                        .setBiasDelta(0.0),
                 new Input()
-                        .setOptional(false)
                         .setNeuron(inB)
                         .setWeight(0.4f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
         );
 
         {
@@ -91,20 +88,20 @@ public class SimpleWeightsTest {
         Neuron inB = m.createNeuron("B");
 
         Neuron pC = m.createNeuron("C");
-        m.initAndNeuron(pC,
-                0.001,
+        m.initNeuron(pC,
+                0.01,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(3.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(3.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
         );
 
         {

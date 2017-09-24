@@ -30,11 +30,10 @@ import org.aika.neuron.Synapse;
  */
 public class Input implements Comparable<Input> {
     boolean recurrent;
-    boolean optional;
     Neuron neuron;
     float weight;
     float maxLowerWeightsSum = Float.MAX_VALUE;
-    float minInput;
+    double biasDelta;
 
     Operator startRangeMatch = Operator.NONE;
     Operator endRangeMatch = Operator.NONE;
@@ -62,17 +61,6 @@ public class Input implements Comparable<Input> {
         return this;
     }
 
-    /**
-     * If optional is set to true, then this input is an optional part of a conjunction.
-     * This parameter is only used as input for the method <code>initAndNeuron</code>.
-     *
-     * @param optional
-     * @return
-     */
-    public Input setOptional(boolean optional) {
-        this.optional = optional;
-        return this;
-    }
 
     /**
      * Determines the input neuron.
@@ -113,11 +101,11 @@ public class Input implements Comparable<Input> {
      * The minimum activation value that is required for this input. The minInput
      * value is used to compute the neurons bias. It is only applied in the initAndNeuron method and only affects inputs with a positive weight and the optional flag set to false.
      *
-     * @param minInput
+     * @param biasDelta
      * @return
      */
-    public Input setMinInput(float minInput) {
-        this.minInput = minInput;
+    public Input setBiasDelta(double biasDelta) {
+        this.biasDelta = biasDelta;
         return this;
     }
 
@@ -290,9 +278,7 @@ public class Input implements Comparable<Input> {
     public int compareTo(Input in) {
         int r = Double.compare(weight, in.weight);
         if(r != 0) return r;
-        r = Double.compare(minInput, in.minInput);
-        if(r != 0) return r;
-        r = Boolean.compare(optional, in.optional);
+        r = Double.compare(biasDelta, in.biasDelta);
         if(r != 0) return r;
         r = neuron.compareTo(in.neuron);
         if(r != 0) return r;

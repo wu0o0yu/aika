@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Input.RangeRelation;
@@ -26,7 +25,6 @@ import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -76,7 +74,7 @@ public class OverlappingOrTest {
         // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
         // of the inputs relative to each other. The following flag specifies whether this relativeRid is
         // relative or absolute.
-        Neuron pattern = m.initAndNeuron(
+        Neuron pattern = m.initNeuron(
                 m.createNeuron("BCD"),
                 0.4,
                 new Input()
@@ -84,7 +82,7 @@ public class OverlappingOrTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setMinInput(0.5f)
+                        .setBiasDelta(0.5)
                         .setStartRangeMatch(Operator.EQUALS)
                         .setEndRangeMatch(Operator.LESS_THAN)
                         .setStartRangeOutput(true),
@@ -93,14 +91,14 @@ public class OverlappingOrTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(1)
-                        .setMinInput(0.5f)
+                        .setBiasDelta(0.5)
                         .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(relNeurons.get('d'))
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(2)
-                        .setMinInput(0.5f)
+                        .setBiasDelta(0.5)
                         .setStartRangeMatch(Operator.GREATER_THAN)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)

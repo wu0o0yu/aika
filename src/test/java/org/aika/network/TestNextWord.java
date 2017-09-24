@@ -4,11 +4,9 @@ package org.aika.network;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
-import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 public class TestNextWord {
@@ -20,17 +18,17 @@ public class TestNextWord {
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
 
-        Neuron abN = m.initAndNeuron(m.createNeuron("AB"), 0.5,
+        Neuron abN = m.initNeuron(m.createNeuron("AB"), 5.0,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(10.0f)
-                        .setMinInput(0.95f)
+                        .setBiasDelta(0.95)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0f)
-                        .setMinInput(0.95f)
+                        .setBiasDelta(0.95)
                         .setStartRangeMapping(Mapping.END)
                         .setStartRangeMatch(Operator.EQUALS)
                         .setStartRangeOutput(true)

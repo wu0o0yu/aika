@@ -18,14 +18,12 @@ package org.aika.network;
 
 
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
-import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -64,13 +62,13 @@ public class RecurrentPatternTest {
             recChars.put(c, m.initRelationalNeuron(m.createNeuron("RN-" + c), ctNeuron, charSN, false));
         }
 
-        Neuron patternN = m.initAndNeuron(m.createNeuron("PATTERN"),
+        Neuron patternN = m.initNeuron(m.createNeuron("PATTERN"),
                 0.001,
                 new Input()
                         .setNeuron(recChars.get('C'))
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRelativeRid(0)
                         .setStartRangeMatch(EQUALS)
                         .setEndRangeMatch(GREATER_THAN)
@@ -79,14 +77,14 @@ public class RecurrentPatternTest {
                         .setNeuron(recChars.get('D'))
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRelativeRid(1)
                         .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(recChars.get('E'))
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRelativeRid(2)
                         .setStartRangeMatch(LESS_THAN)
                         .setEndRangeMatch(EQUALS)
@@ -95,7 +93,7 @@ public class RecurrentPatternTest {
                         .setNeuron(ctNeuron)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRelativeRid(0)
                         .setRangeMatch(RangeRelation.NONE)
         );
@@ -161,13 +159,13 @@ public class RecurrentPatternTest {
             recChars.put(c, m.initRelationalNeuron(m.createNeuron("RN-" + c), ctNeuron, charSN, false));
         }
 
-        Neuron patternN = m.initAndNeuron(m.createNeuron("PATTERN"),
+        Neuron patternN = m.initNeuron(m.createNeuron("PATTERN"),
                 0.001,
                 new Input()
                         .setNeuron(recChars.get('C'))
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRelativeRid(0)
                         .setStartRangeMatch(EQUALS)
                         .setEndRangeMatch(GREATER_THAN)
@@ -176,14 +174,14 @@ public class RecurrentPatternTest {
                         .setNeuron(recChars.get('D'))
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRelativeRid(1)
                         .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(recChars.get('E'))
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRelativeRid(2)
                         .setStartRangeMatch(LESS_THAN)
                         .setEndRangeMatch(EQUALS)
@@ -192,7 +190,7 @@ public class RecurrentPatternTest {
                         .setNeuron(ctNeuron)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRelativeRid(0)
                         .setRangeMatch(RangeRelation.NONE)
         );
@@ -244,24 +242,24 @@ public class RecurrentPatternTest {
         Neuron bN = m.createNeuron("B");
         Neuron cN = m.createNeuron("C");
 
-        Neuron result = m.initAndNeuron(m.createNeuron("RESULT"),
+        Neuron result = m.initNeuron(m.createNeuron("RESULT"),
                 0.001,
                 new Input()
                         .setNeuron(ctn)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setAbsoluteRid(1),
                 new Input()
                         .setNeuron(aN)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f),
+                        .setBiasDelta(1.0),
                 new Input()
                         .setNeuron(bN)
                         .setWeight(-1.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setAbsoluteRid(0)
         );
     }

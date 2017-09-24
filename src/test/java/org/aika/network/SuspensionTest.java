@@ -64,11 +64,12 @@ public class SuspensionTest {
         int idA = inA.id;
         int idB = inB.id;
 
-        Neuron nC = m.initAndNeuron(m.createNeuron("C"), 0.5,
+        Neuron nC = m.initNeuron(m.createNeuron("C"),
+                5.0,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0f)
-                        .setMinInput(0.9f)
+                        .setBiasDelta(0.9)
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setStartRangeMatch(EQUALS)
@@ -76,7 +77,7 @@ public class SuspensionTest {
                 new Input()
                         .setNeuron(inB)
                         .setWeight(10.0f)
-                        .setMinInput(0.9f)
+                        .setBiasDelta(0.9)
                         .setRelativeRid(null)
                         .setRecurrent(false)
                         .setEndRangeMatch(EQUALS)
@@ -84,11 +85,12 @@ public class SuspensionTest {
         );
 
 
-        Neuron outD = m.initAndNeuron(m.createNeuron("D"), 0.5,
+        Neuron outD = m.initNeuron(m.createNeuron("D"),
+                5.0,
                 new Input()
                         .setNeuron(nC)
                         .setWeight(10.0f)
-                        .setMinInput(0.9f)
+                        .setBiasDelta(0.9)
                         .setRecurrent(false)
                         .setRangeMatch(Input.RangeRelation.EQUALS)
                         .setRangeOutput(true)

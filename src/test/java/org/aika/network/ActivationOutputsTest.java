@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.neuron.Activation;
 import org.aika.neuron.Activation.SynapseActivation;
@@ -33,7 +32,6 @@ import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
@@ -59,14 +57,14 @@ public class ActivationOutputsTest {
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
 
-        Neuron pAB = m.initAndNeuron(m.createNeuron("pAB"),
+        Neuron pAB = m.initNeuron(m.createNeuron("pAB"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setStartRangeMatch(Operator.EQUALS)
                         .setStartRangeOutput(true),
                 new Input()
@@ -74,7 +72,7 @@ public class ActivationOutputsTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
@@ -152,21 +150,21 @@ public class ActivationOutputsTest {
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
 
-        Neuron pAB = m.initAndNeuron(m.createNeuron("B-NA", true, false),
+        Neuron pAB = m.initNeuron(m.createNeuron("B-NA", true, false),
                 0.5,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(-1.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setMaxLowerWeightsSum(0.0f),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setMinInput(0.95f)
+                        .setBiasDelta(0.95)
                         .setMaxLowerWeightsSum(0.0f)
         );
         OrNode pABNode = pAB.get().node.get();
@@ -192,13 +190,13 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        OrNode outBNode = m.initAndNeuron(m.createNeuron("B", true, false), 0.001,
+        OrNode outBNode = m.initNeuron(m.createNeuron("B", true, false), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
         ).get().node.get();
 
 
@@ -217,13 +215,13 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        OrNode outBNode = m.initAndNeuron(m.createNeuron("B", true, false), 0.001,
+        OrNode outBNode = m.initNeuron(m.createNeuron("B", true, false), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0f)
         ).get().node.get();
 
 
@@ -242,13 +240,13 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        OrNode outBNode = (OrNode) m.initAndNeuron(m.createNeuron("B", true, false), 0.001,
+        OrNode outBNode = m.initNeuron(m.createNeuron("B", true, false), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         ).get().node.get();

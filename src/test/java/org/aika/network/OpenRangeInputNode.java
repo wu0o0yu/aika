@@ -33,10 +33,12 @@ public class OpenRangeInputNode {
         m = new Model();
 
         in = m.createNeuron("IN");
-        m.initOrNeuron(m.createNeuron("OUT"),
+        m.initNeuron(m.createNeuron("OUT"),
+                -0.001,
                 new Input()
                         .setNeuron(in)
                         .setWeight(10.0f)
+                        .setBiasDelta(0.0)
                         .setStartRangeMapping(Mapping.NONE)
                         .setEndRangeMapping(END)
                         .setStartRangeMatch(Operator.NONE)

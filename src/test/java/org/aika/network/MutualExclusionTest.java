@@ -20,13 +20,11 @@ package org.aika.network;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.neuron.Activation;
 import org.aika.corpus.Conflicts.Conflict;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 /**
@@ -70,80 +68,82 @@ public class MutualExclusionTest {
         Neuron pSuppr = m.createNeuron("SUPPRESS");
 
         // Create three neurons that might be suppressed by the suppressing neuron.
-        Neuron pA = m.initAndNeuron(
+        Neuron pA = m.initNeuron(
                 m.createNeuron("A"),
-                0.001,
+                0.01,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.5f)
                         .setMaxLowerWeightsSum(0.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.9f),
+                        .setBiasDelta(0.9),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)     // This input is negated
+                        .setBiasDelta(1.0)     // This input is negated
         );
 
-        Neuron pB = m.initAndNeuron(
+        Neuron pB = m.initNeuron(
                 m.createNeuron("B"),
-                0.001,
+                0.01,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(11.0f)
                         .setMaxLowerWeightsSum(0.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.9f),
+                        .setBiasDelta(0.9),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
         );
 
-        Neuron pC = m.initAndNeuron(
+        Neuron pC = m.initNeuron(
                 m.createNeuron("C"),
-                0.001,
+                0.01,
                 new Input()
                         .setNeuron(inC)
                         .setWeight(10.0f)
                         .setMaxLowerWeightsSum(0.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.9f),
+                        .setBiasDelta(0.9),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
         );
 
         // Finally addInput all the inputs to the suppressing neuron.
-        m.initOrNeuron(
+        m.initNeuron(
                 pSuppr,
+                -0.001,
                 new Input()
                         .setNeuron(pA)
                         .setWeight(10.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f),
+                        .setBiasDelta(0.0),
                 new Input()
                         .setNeuron(pB)
                         .setWeight(10.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f),
+                        .setBiasDelta(0.0),
                 new Input()
                         .setNeuron(pC)
                         .setWeight(10.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
         );
 
-        Neuron outN = m.initOrNeuron(m.createNeuron("OUT"),
+        Neuron outN = m.initNeuron(m.createNeuron("OUT"),
+                -0.001,
                 new Input()
                         .setNeuron(pB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
         );
 
         // Now that the model is complete, apply it to a document.

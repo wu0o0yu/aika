@@ -20,10 +20,8 @@ package org.aika.network;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
-import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,9 +40,9 @@ public class CountingTest {
         AndNode.minFrequency = 0;
 
         Neuron inA = m.createNeuron("inA");
-        Neuron outA = m.initAndNeuron(m.createNeuron("nA"), 0.5,
+        Neuron outA = m.initNeuron(m.createNeuron("nA"), 50.0,
                 new Input()
-                        .setMinInput(0.95f)
+                        .setBiasDelta(0.95)
                         .setWeight(100.0f)
                         .setNeuron(inA)
                         .setRangeMatch(EQUALS)

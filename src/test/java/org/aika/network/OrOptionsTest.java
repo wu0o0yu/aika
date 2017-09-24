@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Model;
@@ -27,7 +26,6 @@ import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
-import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -50,22 +48,23 @@ public class OrOptionsTest {
 
         Neuron pD = m.createNeuron("D");
 
-        m.initOrNeuron(pD,
+        m.initNeuron(pD,
+                -0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f),
+                        .setBiasDelta(0.0),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f),
+                        .setBiasDelta(0.0),
                 new Input()
                         .setNeuron(inC)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

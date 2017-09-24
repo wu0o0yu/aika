@@ -243,69 +243,46 @@ public class Model {
 
 
     /**
-     * Creates a neuron representing a conjunction of its inputs. This is just a convenience method to automatically
-     * compute the bias.
+     * Creates a neuron with the given bias.
      *
      * @param n
-     * @param threshold A value between 0 and 1, determining how sensitive the resulting neuron will be.
+     * @param bias
      * @param inputs
      * @return
      */
-    public Neuron initAndNeuron(Neuron n, double threshold, Input... inputs) {
-        return initAndNeuron(n, threshold, new TreeSet<>(Arrays.asList(inputs)));
-    }
-
-
-    /**
-     * Creates a neuron representing a conjunction of its inputs. This is just a convenience method to automatically
-     * compute the bias.
-     *
-     * @param n
-     * @param threshold A value between 0 and 1, determining how sensitive the resulting neuron will be.
-     * @param inputs
-     * @return
-     */
-    public Neuron initAndNeuron(Neuron n, double threshold, Collection<Input> inputs) {
-        n.m = this;
-
+    public Neuron initNeuron(Neuron n, double bias, Collection<Input> inputs) {
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
-        double bias = 0.0;
         double negDirSum = 0.0;
         double negRecSum = 0.0;
         double posRecSum = 0.0;
-        double minWeight = Double.MAX_VALUE;
-        for (Input ni : inputs) {
-            Synapse s = ni.getSynapse(n);
+        for (Input input : inputs) {
+            Synapse s = input.getSynapse(n);
 
-            s.w = ni.weight;
-            s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
+            s.w = input.weight;
+            s.maxLowerWeightsSum = input.maxLowerWeightsSum;
 
-            if (ni.weight < 0.0) {
-                if (!ni.recurrent) {
-                    negDirSum += ni.weight;
+            if (input.weight < 0.0) {
+                if (!input.recurrent) {
+                    negDirSum += input.weight;
                 } else {
-                    negRecSum += ni.weight;
+                    negRecSum += input.weight;
                 }
-            } else if (ni.recurrent) {
-                posRecSum += ni.weight;
+            } else if (input.recurrent) {
+                posRecSum += input.weight;
             }
 
-            if (!ni.optional) {
-                bias -= Math.abs(ni.weight) * (ni.weight >= 0.0 ? ni.minInput : 1.0);
-                if (ni.weight >= 0.0) {
-                    minWeight = Math.min(minWeight, ni.weight * ni.minInput);
-                }
-            }
+            bias -= Math.abs(input.weight) * input.biasDelta;
             is.add(s);
         }
-        bias += minWeight * threshold;
 
         return INeuron.init(this, defaultThreadId, n, bias, negDirSum, negRecSum, posRecSum, is);
     }
 
 
-    public void addSynapse(Neuron n, double biasDelta, Input input) {
+    public void addSynapse(Neuron n, Input input) {
+        double biasDelta = 0.0;
+
         double negDirSumDelta = 0.0;
         double negRecSumDelta = 0.0;
         double posRecSumDelta = 0.0;
@@ -324,6 +301,9 @@ public class Model {
         } else if (input.recurrent) {
             posRecSumDelta += input.weight;
         }
+
+        biasDelta -= Math.abs(input.weight) * input.biasDelta;
+
         INeuron.addSynapse(this, defaultThreadId, n, biasDelta, negDirSumDelta, negRecSumDelta, posRecSumDelta, s);
     }
 
@@ -338,80 +318,6 @@ public class Model {
      */
     public Neuron initNeuron(Neuron n, double bias, Input... inputs) {
         return initNeuron(n, bias, new TreeSet<>(Arrays.asList(inputs)));
-    }
-
-
-    /**
-     * Creates a neuron with the given bias.
-     *
-     * @param n
-     * @param bias
-     * @param inputs
-     * @return
-     */
-    public Neuron initNeuron(Neuron n, double bias, Collection<Input> inputs) {
-        Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
-
-        double negDirSum = 0.0;
-        double negRecSum = 0.0;
-        double posRecSum = 0.0;
-        for (Input ni : inputs) {
-            Synapse s = ni.getSynapse(n);
-
-            s.w = ni.weight;
-            s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
-
-            if (ni.weight < 0.0) {
-                if (!ni.recurrent) {
-                    negDirSum += ni.weight;
-                } else {
-                    negRecSum += ni.weight;
-                }
-            } else if (ni.recurrent) {
-                posRecSum += ni.weight;
-            }
-
-            is.add(s);
-        }
-
-        return INeuron.init(this, defaultThreadId, n, bias, negDirSum, negRecSum, posRecSum, is);
-    }
-
-
-    /**
-     * Creates a neuron representing a disjunction of its inputs. This is just a convenience method to automatically
-     * compute the bias.
-     *
-     * @param n
-     * @param inputs
-     * @return
-     */
-    public Neuron initOrNeuron(Neuron n, Input... inputs) {
-        return initOrNeuron(n, new TreeSet<>(Arrays.asList(inputs)));
-    }
-
-
-    /**
-     * Creates a neuron representing a disjunction of its inputs. This is just a convenience method to automatically
-     * compute the bias.
-     *
-     * @param n
-     * @param inputs
-     * @return
-     */
-    public Neuron initOrNeuron(Neuron n, Set<Input> inputs) {
-        Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
-
-        double bias = -0.001;
-        for (Input ni : inputs) {
-            Synapse s = ni.getSynapse(n);
-
-            s.w = ni.weight;
-            s.maxLowerWeightsSum = ni.maxLowerWeightsSum;
-            is.add(s);
-        }
-
-        return INeuron.init(this, defaultThreadId, n, bias, 0.0, 0.0, 0.0, is);
     }
 
 

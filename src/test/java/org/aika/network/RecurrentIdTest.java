@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Input.RangeRelation;
@@ -27,7 +26,6 @@ import org.aika.neuron.Activation;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -52,13 +50,13 @@ public class RecurrentIdTest {
         Neuron inB = m.createNeuron("B");
 
 
-        OrNode outCNode = m.initAndNeuron(m.createNeuron("C", true, true),
+        OrNode outCNode = m.initNeuron(m.createNeuron("C", true, true),
                 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRelativeRid(0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
@@ -66,7 +64,7 @@ public class RecurrentIdTest {
                         .setNeuron(inB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRelativeRid(1)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
@@ -94,13 +92,13 @@ public class RecurrentIdTest {
         Neuron inB = m.createNeuron("B");
         Neuron inC = m.createNeuron("C");
 
-        OrNode outDNode = m.initAndNeuron(m.createNeuron("D", true, true),
+        OrNode outDNode = m.initNeuron(m.createNeuron("D", true, true),
                 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0f)
                         .setRelativeRid(3)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
@@ -108,7 +106,7 @@ public class RecurrentIdTest {
                         .setNeuron(inB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0f)
                         .setRelativeRid(0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
@@ -116,7 +114,7 @@ public class RecurrentIdTest {
                         .setNeuron(inC)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0f)
                         .setRelativeRid(6)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
@@ -160,7 +158,7 @@ public class RecurrentIdTest {
                                 .setNeuron(rec)
                                 .setWeight(begin || end ? 2.0f : 1.0f)
                                 .setRecurrent(false)
-                                .setMinInput(1.0f)
+                                .setBiasDelta(1.0f)
                                 .setRelativeRid(i)
                                 .setStartRangeMatch(begin ? EQUALS : LESS_THAN)
                                 .setEndRangeMatch(end ? EQUALS : GREATER_THAN)
@@ -170,7 +168,7 @@ public class RecurrentIdTest {
                 }
             }
 
-            Neuron n = m.initAndNeuron(m.createNeuron("PATTERN"), 0.5, inputs);
+            Neuron n = m.initNeuron(m.createNeuron("PATTERN"), 0.5, inputs);
 
             System.out.println(n.get().node.get().logicToString());
 

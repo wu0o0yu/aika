@@ -45,14 +45,14 @@ public class WeakInputProcessingTest {
 
         Neuron suppr = m.createNeuron("suppr");
 
-        Neuron patternA = m.initAndNeuron(
+        Neuron patternA = m.initNeuron(
                 m.createNeuron("Pattern A"),
                 0.4,
                 new Input()
                         .setNeuron(strongInput)
                         .setWeight(50.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.9f)
+                        .setBiasDelta(0.9)
                         .setMaxLowerWeightsSum(0.0f)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
@@ -60,26 +60,26 @@ public class WeakInputProcessingTest {
                         .setNeuron(weakInputA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-60.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
 
-        Neuron patternB = m.initAndNeuron(
+        Neuron patternB = m.initNeuron(
                 m.createNeuron("Pattern B"),
                 0.4,
                 new Input()
                         .setNeuron(strongInput)
                         .setWeight(50.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.9f)
+                        .setBiasDelta(0.9)
                         .setMaxLowerWeightsSum(0.0f)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
@@ -87,26 +87,26 @@ public class WeakInputProcessingTest {
                         .setNeuron(weakInputB)
                         .setWeight(1.5f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-60.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
 
-        Neuron patternC = m.initAndNeuron(
+        Neuron patternC = m.initNeuron(
                 m.createNeuron("Pattern C"),
                 0.4,
                 new Input()
                         .setNeuron(strongInput)
                         .setWeight(50.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.9f)
+                        .setBiasDelta(0.9)
                         .setMaxLowerWeightsSum(0.0f)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
@@ -114,35 +114,39 @@ public class WeakInputProcessingTest {
                         .setNeuron(weakInputC)
                         .setWeight(0.5f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-60.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
 
 
-        m.initOrNeuron(suppr,
+        m.initNeuron(suppr,
+                -0.001,
                 new Input()
                         .setNeuron(patternA)
                         .setWeight(10.0f)
+                        .setBiasDelta(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(patternB)
                         .setWeight(10.0f)
+                        .setBiasDelta(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(patternC)
                         .setWeight(10.0f)
+                        .setBiasDelta(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)

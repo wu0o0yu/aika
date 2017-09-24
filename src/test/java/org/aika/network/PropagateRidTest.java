@@ -18,13 +18,11 @@ package org.aika.network;
 
 
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
-import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -43,13 +41,13 @@ public class PropagateRidTest {
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
         Neuron inA = m.createNeuron("A");
-        Neuron pA = m.initAndNeuron(m.createNeuron("pA"),
+        Neuron pA = m.initNeuron(m.createNeuron("pA"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.5f)
+                        .setBiasDelta(0.5)
                         .setRelativeRid(5)
         );
 

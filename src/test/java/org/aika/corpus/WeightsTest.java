@@ -20,9 +20,7 @@ package org.aika.corpus;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.lattice.AndNode;
-import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 import static org.aika.Input.RangeRelation.CONTAINED_IN;
@@ -58,47 +56,47 @@ public class WeightsTest {
         inCA = m.createNeuron("CA");
 
         Neuron pOrA = m.createNeuron("pOrA");
-        m.initOrNeuron(pOrA,
+        m.initNeuron(pOrA,
+                -0.001,
                 new Input()
                         .setNeuron(inAA)
                         .setWeight(3.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inBA)
                         .setWeight(4.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
 
         pDA = m.createNeuron("DA");
 
-        m.initAndNeuron(pDA,
+        m.initNeuron(pDA,
                 0.001,
                 new Input()
                         .setNeuron(pOrA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.6f)
+                        .setBiasDelta(0.6)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
-                        .setOptional(true)
                         .setNeuron(inCA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-2.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(CONTAINED_IN)
         );
 
@@ -108,62 +106,64 @@ public class WeightsTest {
         inCB = m.createNeuron("CB");
 
         Neuron pOrB = m.createNeuron("pOrB");
-        m.initOrNeuron(pOrB,
+        m.initNeuron(pOrB,
+                -0.001,
                 new Input()
                         .setNeuron(inAB)
                         .setWeight(2.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inBB)
                         .setWeight(5.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
 
         pDB = m.createNeuron("DB");
-        m.initAndNeuron(pDB,
+        m.initNeuron(pDB,
                 0.001,
                 new Input()
                         .setNeuron(pOrB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(0.6f)
+                        .setBiasDelta(0.6)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inCB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-2.0f)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(CONTAINED_IN)
         );
 
 
-        m.initOrNeuron(pSuppr,
+        m.initNeuron(pSuppr,
+                -0.001,
                 new Input()
                         .setNeuron(pDA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pDB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setBiasDelta(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
