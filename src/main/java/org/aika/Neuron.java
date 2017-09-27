@@ -23,9 +23,7 @@ import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
@@ -35,8 +33,8 @@ import java.util.TreeMap;
  */
 public class Neuron extends Provider<INeuron> {
 
-    public TreeMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
-    public TreeMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
+    public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = Collections.synchronizedNavigableMap(new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP));
+    public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = Collections.synchronizedNavigableMap(new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP));
 
 
     public Neuron(Model m, int id) {

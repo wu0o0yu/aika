@@ -524,7 +524,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private void linkNeuronActs(Document doc, Activation act, int v, int dir) {
         ArrayList<Activation> recNegTmp = new ArrayList<>();
-        TreeMap<Synapse, Synapse> syns = (dir == 0 ? provider.inMemoryInputSynapses : provider.inMemoryOutputSynapses);
+        NavigableMap<Synapse, Synapse> syns = (dir == 0 ? provider.inMemoryInputSynapses : provider.inMemoryOutputSynapses);
 
         for (Synapse s : getActiveSynapses(doc, dir, syns)) {
             Neuron p = (dir == 0 ? s.input : s.output);
@@ -601,7 +601,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private static Collection<Synapse> getActiveSynapses(Document doc, int dir, TreeMap<Synapse, Synapse> syns) {
+    private static Collection<Synapse> getActiveSynapses(Document doc, int dir, NavigableMap<Synapse, Synapse> syns) {
         // Optimization in case the set of synapses is very large
         if(syns.size() < 10 || doc.activatedNeurons.size() * 20 > syns.size()) {
             return syns.values();
