@@ -202,7 +202,7 @@ public class Model {
      */
     public void suspendUnusedNodes(int docId) {
         List<Provider> tmp;
-        synchronized (this) {
+        synchronized (activeProviders) {
             tmp = new ArrayList<>(activeProviders.values());
         }
         for (Provider p: tmp) {
