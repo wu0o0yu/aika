@@ -12,7 +12,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     public Model m;
     public Integer id;
 
-    private T n;
+    private volatile T n;
 
     public Provider(Model m, int id) {
         this.m = m;
@@ -44,7 +44,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     }
 
 
-    public synchronized boolean isSuspended() {
+    public boolean isSuspended() {
         return n == null;
     }
 
