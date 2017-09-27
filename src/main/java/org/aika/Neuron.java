@@ -33,8 +33,10 @@ import java.util.*;
  */
 public class Neuron extends Provider<INeuron> {
 
-    public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = Collections.synchronizedNavigableMap(new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP));
-    public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = Collections.synchronizedNavigableMap(new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP));
+    public ReadWriteLock lock = new ReadWriteLock();
+
+    public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
+    public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
 
 
     public Neuron(Model m, int id) {

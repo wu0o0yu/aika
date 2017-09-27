@@ -295,12 +295,12 @@ public class OrNode extends Node<OrNode, Activation> {
 
     void addInput(int threadId, Integer ridOffset, Node in) {
         in.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, 1);
-        in.lock.acquireWriteLock(threadId);
+        in.lock.acquireWriteLock();
         in.addOrChild(new OrEntry(ridOffset, provider));
         in.provider.setModified();
         in.lock.releaseWriteLock();
 
-        lock.acquireWriteLock(threadId);
+        lock.acquireWriteLock();
         provider.setModified();
         Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
         TreeSet<Provider<Node>> pn = parents.get(key);
@@ -317,7 +317,7 @@ public class OrNode extends Node<OrNode, Activation> {
         in.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, -1);
         in.removeOrChild(threadId, new OrEntry(ridOffset, provider));
         in.provider.setModified();
-        lock.acquireWriteLock(threadId);
+        lock.acquireWriteLock();
         provider.setModified();
         Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
         TreeSet<Provider<Node>> pn = parents.get(key);
@@ -332,7 +332,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     void removeAllInputs(int threadId) {
-        lock.acquireWriteLock(threadId);
+        lock.acquireWriteLock();
         for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: parents.entrySet()) {
             for(Provider<Node> p: me.getValue()) {
                 Node pn = p.get();

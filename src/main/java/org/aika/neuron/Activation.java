@@ -216,7 +216,7 @@ public final class Activation extends NodeActivation<OrNode> {
         }
 
         public boolean equalsWithWeights(State s) {
-            return equals(s) && weight.equals(s.weight);
+            return equals(s) && weight.equals(s.weight) && weightUB.equals(s.weightUB);
         }
 
         public String toString() {

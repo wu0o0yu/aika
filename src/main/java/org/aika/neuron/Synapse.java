@@ -129,8 +129,8 @@ public class Synapse implements Writable {
 
         boolean dir = in.provider.id < out.provider.id;
 
-        (dir ? in : out).lock.acquireWriteLock(threadId);
-        (dir ? out : in).lock.acquireWriteLock(threadId);
+        (dir ? in : out).lock.acquireWriteLock();
+        (dir ? out : in).lock.acquireWriteLock();
 
         in.provider.inMemoryOutputSynapses.put(this, this);
         out.provider.inMemoryInputSynapses.put(this, this);

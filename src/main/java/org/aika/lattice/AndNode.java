@@ -352,7 +352,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             // Locking needs to take place in a predefined order.
             TreeSet<? extends Provider<? extends Node>> parentsForLocking = new TreeSet(parents.values());
             for(Provider<? extends Node> pn: parentsForLocking) {
-                pn.get().lock.acquireWriteLock(threadId);
+                pn.get().lock.acquireWriteLock();
             }
 
             if(n.andChildren == null || !n.andChildren.containsKey(ref)) {
@@ -496,7 +496,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
         for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
             Node pn = me.getValue().get();
-            pn.lock.acquireWriteLock(threadId);
+            pn.lock.acquireWriteLock();
             pn.removeAndChild(me.getKey());
             pn.provider.setModified();
             pn.lock.releaseWriteLock();

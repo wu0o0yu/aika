@@ -47,7 +47,7 @@ import static org.aika.neuron.Activation.State.*;
  * input synapses and output synapses. The activation value of a neuron is calculated by computing the weighted sum
  * (input act. value * synapse weight) of the input synapses, adding the bias to it and sending the resulting value
  * through a transfer function (the upper part of tanh).
- *
+ * <p>
  * <p>The neuron does not store its activations by itself. The activation objects are stored within the
  * logic nodes. To access the activations of this neuron simply use the member variable {@code node} or use
  * the method {@code getFinalActivations(Document doc)} to ge the final activations of this neuron.
@@ -59,7 +59,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     private static final Logger log = LoggerFactory.getLogger(INeuron.class);
 
     public final static double LEARN_RATE = 0.01;
-    public static final double WEIGHT_TOLERANCE= 0.001;
+    public static final double WEIGHT_TOLERANCE = 0.001;
     public static final double TOLERANCE = 0.000001;
     public static final int MAX_SELF_REFERENCING_DEPTH = 5;
 
@@ -120,15 +120,15 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     /**
      * Propagate an input activation into the network.
      *
-     * @param doc The current document
+     * @param doc   The current document
      * @param begin The range begin
-     * @param end The range end
-     * @param rid The relational id (e.g. the word position)
-     * @param o The interpretation node
+     * @param end   The range end
+     * @param rid   The relational id (e.g. the word position)
+     * @param o     The interpretation node
      * @param value The activation value of this input activation
      */
     public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value) {
-        if(value <= 0.0) return null;
+        if (value <= 0.0) return null;
 
         Node.addActivationAndPropagate(doc, new NodeActivation.Key(node.get(), new Range(begin, end), rid, o), Collections.emptySet());
 
@@ -167,7 +167,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-
     public void publish(int threadId) {
     }
 
@@ -179,21 +178,20 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public void remove(int threadId) {
         unpublish(threadId);
 
-        for(Synapse s: inputSynapses.values()) {
+        for (Synapse s : inputSynapses.values()) {
             INeuron in = s.input.get();
-            in.lock.acquireWriteLock(threadId);
+            in.lock.acquireWriteLock();
             in.provider.inMemoryOutputSynapses.remove(s);
             in.lock.releaseWriteLock();
         }
 
-        for(Synapse s: provider.inMemoryOutputSynapses.values()) {
+        for (Synapse s : provider.inMemoryOutputSynapses.values()) {
             INeuron out = s.output.get();
-            out.lock.acquireWriteLock(threadId);
+            out.lock.acquireWriteLock();
             out.inputSynapses.remove(s);
             out.lock.releaseWriteLock();
         }
     }
-
 
 
     public void propagateAddedActivation(Document doc, Activation act) {
@@ -202,7 +200,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public void propagateRemovedActivation(Document doc, NodeActivation act) {
-        for(Provider<InputNode> out: outputNodes.values()) {
+        for (Provider<InputNode> out : outputNodes.values()) {
             out.get().removeActivation(doc, act);
         }
     }
@@ -212,11 +210,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         double ub = bias + posRecSum - (negDirSum + negRecSum);
         double lb = bias + posRecSum - (negDirSum + negRecSum);
 
-        for (SynapseActivation sa: act.neuronInputs) {
+        for (SynapseActivation sa : act.neuronInputs) {
             Synapse s = sa.s;
             Activation iAct = sa.input;
 
-            if(iAct == act || iAct.isRemoved) continue;
+            if (iAct == act || iAct.isRemoved) continue;
 
             if (s.key.isNeg) {
                 if (!checkSelfReferencing(act.key.o, iAct.key.o, null, 0) && act.key.o.contains(iAct.key.o, true)) {
@@ -242,7 +240,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         int fired = -1;
 
-        for (SynapseActivation sa: getInputSAs(act, round)) {
+        for (SynapseActivation sa : getInputSAs(act, round)) {
             Synapse s = sa.s;
 
             Activation iAct = sa.input;
@@ -285,7 +283,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 (sum[DIR][LB] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR][LB] + negRecSum + maxRecurrentSum) : maxRecurrentSum
         );
 
-        if(doc.debugActId == act.id && doc.debugActWeight <= newWeight.w) {
+        if (doc.debugActId == act.id && doc.debugActWeight <= newWeight.w) {
             storeDebugOutput(doc, act, newWeight, drSum, round);
         }
 
@@ -316,17 +314,17 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         ArrayList<SynapseActivation> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
         SynapseActivation maxSA = null;
-        for (SynapseActivation sa: act.neuronInputs) {
-            if(lastSynapse != null && lastSynapse != sa.s) {
+        for (SynapseActivation sa : act.neuronInputs) {
+            if (lastSynapse != null && lastSynapse != sa.s) {
                 tmp.add(maxSA);
                 maxSA = null;
             }
-            if(maxSA == null || maxSA.input.rounds.get(sa.s.key.isRecurrent ? round - 1 : round).value < sa.input.rounds.get(sa.s.key.isRecurrent ? round - 1 : round).value) {
+            if (maxSA == null || maxSA.input.rounds.get(sa.s.key.isRecurrent ? round - 1 : round).value < sa.input.rounds.get(sa.s.key.isRecurrent ? round - 1 : round).value) {
                 maxSA = sa;
             }
             lastSynapse = sa.s;
         }
-        if(maxSA != null) {
+        if (maxSA != null) {
             tmp.add(maxSA);
         }
 
@@ -346,10 +344,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         sb.append("Negative Direct Sum: " + negDirSum + "\n");
         sb.append("Inputs:\n");
 
-        for(SynapseActivation sa: getInputSAs(act, round)) {
+        for (SynapseActivation sa : getInputSAs(act, round)) {
             String actValue = "";
-            if(sa.s.key.isRecurrent) {
-                if(round > 0) {
+            if (sa.s.key.isRecurrent) {
+                if (round > 0) {
                     actValue = "" + sa.input.rounds.get(round - 1);
                 }
             } else {
@@ -360,7 +358,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             sb.append("\n");
         }
         sb.append("Weight: " + nw.w + "\n");
-        sb.append("Norm: " + nw.n +"\n");
+        sb.append("Norm: " + nw.n + "\n");
         sb.append("\n");
         doc.debugOutput = sb.toString();
     }
@@ -368,57 +366,57 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public void computeErrorSignal(Document doc, Activation act) {
         act.errorSignal = act.initialErrorSignal;
-        for(SynapseActivation sa: act.neuronOutputs) {
+        for (SynapseActivation sa : act.neuronOutputs) {
             Synapse s = sa.s;
             Activation oAct = sa.output;
 
             act.errorSignal += s.w * oAct.errorSignal * (1.0 - act.finalState.value);
         }
 
-        for(SynapseActivation sa: act.neuronInputs) {
+        for (SynapseActivation sa : act.neuronInputs) {
             doc.bQueue.add(sa.input);
         }
     }
 
 
     public void train(Document doc, Activation act) {
-        if(Math.abs(act.errorSignal) < TOLERANCE) return;
+        if (Math.abs(act.errorSignal) < TOLERANCE) return;
 
         long v = NodeActivation.visitedCounter++;
         Range targetRange = null;
-        if(act.key.r != null) {
+        if (act.key.r != null) {
             int s = act.key.r.end - act.key.r.begin;
             targetRange = new Range(Math.max(0, act.key.r.begin - (s / 2)), Math.min(doc.length(), act.key.r.end + (s / 2)));
         }
         ArrayList<Activation> inputActs = new ArrayList<>();
-        for(INeuron n: doc.finallyActivatedNeurons) {
-            for(Activation iAct: n.getFinalActivations(doc)) {
+        for (INeuron n : doc.finallyActivatedNeurons) {
+            for (Activation iAct : n.getFinalActivations(doc)) {
                 if (Range.overlaps(iAct.key.r, targetRange)) {
                     inputActs.add(iAct);
                 }
             }
         }
 
-        if(Document.TRAIN_DEBUG_OUTPUT) {
+        if (Document.TRAIN_DEBUG_OUTPUT) {
             log.info("Debug discover:");
 
             log.info("Old Synapses:");
-            for(Synapse s: inputSynapses.values()) {
+            for (Synapse s : inputSynapses.values()) {
                 log.info("S:" + s.input + " RID:" + s.key.relativeRid + " W:" + s.w);
             }
             log.info("");
         }
 
-        for(SynapseActivation sa: act.neuronInputs) {
+        for (SynapseActivation sa : act.neuronInputs) {
             inputActs.add(sa.input);
         }
 
-        for(Activation iAct: inputActs) {
+        for (Activation iAct : inputActs) {
             Integer rid = Utils.nullSafeSub(iAct.key.rid, false, act.key.rid, false);
             train(doc, iAct, rid, LEARN_RATE * act.errorSignal, v);
         }
 
-        if(Document.TRAIN_DEBUG_OUTPUT) {
+        if (Document.TRAIN_DEBUG_OUTPUT) {
             log.info("");
         }
 
@@ -427,7 +425,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public void train(Document doc, Activation iAct, Integer rid, double x, long v) {
-        if(iAct.visitedNeuronTrain == v) return;
+        if (iAct.visitedNeuronTrain == v) return;
         iAct.visitedNeuronTrain = v;
 
         INeuron n = iAct.key.n.neuron.get();
@@ -472,13 +470,13 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private static boolean checkSelfReferencing(InterprNode nx, InterprNode ny, SearchNode en, int depth) {
-        if(nx == ny && (en == null || en.isCovered(ny.markedSelected))) return true;
+        if (nx == ny && (en == null || en.isCovered(ny.markedSelected))) return true;
 
-        if(depth > MAX_SELF_REFERENCING_DEPTH) return false;
+        if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
 
-        if(ny.orInterprNodes != null) {
-            for (InterprNode n: ny.orInterprNodes.values()) {
-                if(checkSelfReferencing(nx, n, en, depth + 1)) return true;
+        if (ny.orInterprNodes != null) {
+            for (InterprNode n : ny.orInterprNodes.values()) {
+                if (checkSelfReferencing(nx, n, en, depth + 1)) return true;
             }
         }
 
@@ -492,15 +490,15 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public static double sigmoid(double x) {
-        return (1/( 1 + Math.pow(Math.E,(-x))));
+        return (1 / (1 + Math.pow(Math.E, (-x))));
     }
 
 
     public void count(Document doc) {
         ThreadState<OrNode, Activation> th = node.get().getThreadState(doc.threadId, false);
-        if(th == null) return;
-        for(Activation act: th.activations.values()) {
-            if(act.finalState != null && act.finalState.value > 0.0) {
+        if (th == null) return;
+        for (Activation act : th.activations.values()) {
+            if (act.finalState != null && act.finalState.value > 0.0) {
                 activationSum += act.finalState.value;
                 numberOfActivations++;
             }
@@ -524,11 +522,13 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private void linkNeuronActs(Document doc, Activation act, int v, int dir) {
         ArrayList<Activation> recNegTmp = new ArrayList<>();
+
+        provider.lock.acquireReadLock();
         NavigableMap<Synapse, Synapse> syns = (dir == 0 ? provider.inMemoryInputSynapses : provider.inMemoryOutputSynapses);
 
         for (Synapse s : getActiveSynapses(doc, dir, syns)) {
             Neuron p = (dir == 0 ? s.input : s.output);
-            if(!p.isSuspended()) {
+            if (!p.isSuspended()) {
                 INeuron an = p.get();
                 OrNode n = an.node.get();
                 ThreadState th = n.getThreadState(doc.threadId, false);
@@ -537,8 +537,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 linkActSyn(n, doc, act, dir, recNegTmp, s);
             }
         }
+        provider.lock.releaseReadLock();
 
-        for(Activation rAct: recNegTmp) {
+        for (Activation rAct : recNegTmp) {
             Activation oAct = (dir == 0 ? act : rAct);
             Activation iAct = (dir == 0 ? rAct : act);
 
@@ -551,7 +552,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private static void linkActSyn(OrNode n, Document doc, Activation act, int dir, ArrayList<Activation> recNegTmp, Synapse s) {
         Integer rid;
-        if(dir == 0) {
+        if (dir == 0) {
             rid = s.key.absoluteRid != null ? s.key.absoluteRid : Utils.nullSafeAdd(act.key.rid, false, s.key.relativeRid, false);
         } else {
             rid = Utils.nullSafeSub(act.key.rid, false, s.key.relativeRid, false);
@@ -561,21 +562,21 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         Operator begin = replaceFirstAndLast(s.key.startRangeMatch);
         Operator end = replaceFirstAndLast(s.key.endRangeMatch);
         Range r = act.key.r;
-        if(dir == 0) {
+        if (dir == 0) {
             begin = Operator.invert(s.key.startRangeMapping == START ? begin : (s.key.endRangeMapping == START ? end : NONE));
             end = Operator.invert(s.key.endRangeMapping == END ? end : (s.key.startRangeMapping == END ? begin : NONE));
 
-            if(s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
+            if (s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
                 r = new Range(s.key.endRangeMapping == START ? r.end : (s.key.startRangeMapping == START ? r.begin : null), s.key.startRangeMapping == END ? r.begin : (s.key.endRangeMapping == END ? r.end : null));
             }
         } else {
-            if(s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
+            if (s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
                 r = new Range(s.key.startRangeMapping == END ? r.end : (s.key.startRangeMapping == START ? r.begin : null), s.key.endRangeMapping == START ? r.begin : (s.key.endRangeMapping == END ? r.end : null));
             }
         }
 
         Stream<Activation> tmp = NodeActivation.select(
-                doc ,
+                doc,
                 n,
                 rid,
                 r,
@@ -594,7 +595,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             iAct.addSynapseActivation(0, sa);
             oAct.addSynapseActivation(1, sa);
 
-            if(s.key.isNeg && s.key.isRecurrent) {
+            if (s.key.isNeg && s.key.isRecurrent) {
                 recNegTmp.add(rAct);
             }
         });
@@ -603,7 +604,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private static Collection<Synapse> getActiveSynapses(Document doc, int dir, NavigableMap<Synapse, Synapse> syns) {
         // Optimization in case the set of synapses is very large
-        if(syns.size() < 10 || doc.activatedNeurons.size() * 20 > syns.size()) {
+        if (syns.size() < 10 || doc.activatedNeurons.size() * 20 > syns.size()) {
             return syns.values();
         }
 
@@ -622,7 +623,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             }
 
             // Using addAll is not efficient here.
-            for(Synapse s: syns.subMap(lk, true, uk, true).values()) {
+            for (Synapse s : syns.subMap(lk, true, uk, true).values()) {
                 newSyns.add(s);
             }
         }
@@ -639,12 +640,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public static void unlinkNeuronRelations(Document doc, Activation act) {
         int v = doc.visitedCounter++;
-        for(int dir = 0; dir < 2; dir++) {
-            for (SynapseActivation sa: (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
+        for (int dir = 0; dir < 2; dir++) {
+            for (SynapseActivation sa : (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
                 Synapse s = sa.s;
                 Activation rAct = dir == 0 ? sa.input : sa.output;
 
-                if(s.key.isNeg && s.key.isRecurrent) {
+                if (s.key.isNeg && s.key.isRecurrent) {
                     Activation oAct = (dir == 0 ? act : rAct);
                     Activation iAct = (dir == 0 ? rAct : act);
 
@@ -655,8 +656,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             }
         }
 
-        for(int dir = 0; dir < 2; dir++) {
-            for (SynapseActivation sa: (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
+        for (int dir = 0; dir < 2; dir++) {
+            for (SynapseActivation sa : (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
                 Activation rAct = dir == 0 ? sa.input : sa.output;
                 rAct.removeSynapseActivation(dir, sa);
             }
@@ -665,12 +666,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private static void addConflict(Document doc, InterprNode io, InterprNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
-        if(o.markedConflict == v || o.orInterprNodes == null) {
+        if (o.markedConflict == v || o.orInterprNodes == null) {
             if (!isAllowed(doc.threadId, io, o, inputActs)) {
                 Conflicts.add(doc, act, io, o);
             }
         } else {
-            for(InterprNode no: o.orInterprNodes.values()) {
+            for (InterprNode no : o.orInterprNodes.values()) {
                 addConflict(doc, io, no, act, inputActs, v);
             }
         }
@@ -678,7 +679,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private static boolean isAllowed(int threadId, InterprNode io, InterprNode o, Collection<NodeActivation> inputActs) {
-        if(io != null && o.contains(io, false)) return true;
+        if (io != null && o.contains(io, false)) return true;
         for (NodeActivation act : inputActs) {
             if (act.key.n.isAllowedOption(threadId, o, act, Node.visitedCounter++)) return true;
         }
@@ -687,14 +688,14 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private static void removeConflict(Document doc, InterprNode io, InterprNode o, NodeActivation act, NodeActivation nAct, long v) {
-        if(o.markedConflict == v || o.orInterprNodes == null) {
+        if (o.markedConflict == v || o.orInterprNodes == null) {
             if (!nAct.key.n.isAllowedOption(doc.threadId, o, nAct, Node.visitedCounter++)) {
                 assert io != null;
 
                 Conflicts.remove(doc, act, io, o);
             }
         } else {
-            for(InterprNode no: o.orInterprNodes.values()) {
+            for (InterprNode no : o.orInterprNodes.values()) {
                 removeConflict(doc, io, no, act, nAct, v);
             }
         }
@@ -703,8 +704,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private static void markConflicts(Activation iAct, Activation oAct, int v) {
         oAct.key.o.markedConflict = v;
-        for(SynapseActivation sa: iAct.neuronOutputs) {
-            if(sa.s.key.isRecurrent && sa.s.key.isNeg) {
+        for (SynapseActivation sa : iAct.neuronOutputs) {
+            if (sa.s.key.isRecurrent && sa.s.key.isNeg) {
                 sa.output.key.o.markedConflict = v;
             }
         }
@@ -717,8 +718,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public int compareTo(INeuron n) {
-        if(provider.id < n.provider.id) return -1;
-        else if(provider.id > n.provider.id) return 1;
+        if (provider.id < n.provider.id) return -1;
+        else if (provider.id > n.provider.id) return 1;
         else return 0;
     }
 
@@ -736,13 +737,13 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         out.writeDouble(maxRecurrentSum);
 
         out.writeInt(outputNodes.size());
-        for(Map.Entry<Key, Provider<InputNode>> me: outputNodes.entrySet()) {
+        for (Map.Entry<Key, Provider<InputNode>> me : outputNodes.entrySet()) {
             me.getKey().write(out);
             out.writeInt(me.getValue().id);
         }
 
         out.writeBoolean(node != null);
-        if(node != null) {
+        if (node != null) {
             out.writeInt(node.id);
         }
 
@@ -752,8 +753,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         out.writeDouble(activationSum);
         out.writeInt(numberOfActivations);
 
-        for(Synapse s: inputSynapses.values()) {
-            if(s.input != null) {
+        for (Synapse s : inputSynapses.values()) {
+            if (s.input != null) {
                 out.writeBoolean(true);
                 s.write(out);
             }
@@ -773,13 +774,13 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         maxRecurrentSum = in.readDouble();
 
         int s = in.readInt();
-        for(int i = 0; i < s; i++) {
+        for (int i = 0; i < s; i++) {
             Key k = Key.read(in, m);
             Provider<InputNode> n = m.lookupNodeProvider(in.readInt());
             outputNodes.put(k, n);
         }
 
-        if(in.readBoolean()) {
+        if (in.readBoolean()) {
             Integer nId = in.readInt();
             node = m.lookupNodeProvider(nId);
         }
@@ -790,7 +791,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         activationSum = in.readDouble();
         numberOfActivations = in.readInt();
 
-        while(in.readBoolean()) {
+        while (in.readBoolean()) {
             Synapse syn = Synapse.read(in, m);
 
             inputSynapses.put(syn, syn);
@@ -800,34 +801,43 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     @Override
     public void suspend() {
-        for(Synapse s: inputSynapses.values()) {
+        for (Synapse s : inputSynapses.values()) {
             s.input.inMemoryOutputSynapses.remove(s);
-            if(!s.inputNode.isSuspended()) {
+            if (!s.inputNode.isSuspended()) {
                 InputNode iNode = s.inputNode.get();
-                iNode.removeSynapse(provider.m.defaultThreadId, s);
+                iNode.removeSynapse(s);
             }
         }
-        for(Synapse s: provider.inMemoryOutputSynapses.values()) {
+        for (Synapse s : provider.inMemoryOutputSynapses.values()) {
+            s.output.lock.acquireWriteLock();
             s.output.inMemoryInputSynapses.remove(s);
+            s.output.lock.releaseWriteLock();
         }
     }
 
 
     @Override
     public void reactivate() {
-        for(Synapse s: inputSynapses.values()) {
+        for (Synapse s : inputSynapses.values()) {
+            s.input.lock.acquireWriteLock();
             s.input.inMemoryOutputSynapses.put(s, s);
-            if(!s.input.isSuspended()) {
+            s.input.lock.releaseWriteLock();
+
+            if (!s.input.isSuspended()) {
+                s.output.lock.acquireWriteLock();
                 s.output.inMemoryInputSynapses.put(s, s);
+                s.output.lock.releaseWriteLock();
             }
 
-            if(!s.inputNode.isSuspended()) {
+            if (!s.inputNode.isSuspended()) {
                 InputNode iNode = s.inputNode.get();
-                iNode.setSynapse(provider.m.defaultThreadId, s);
+                iNode.setSynapse(s);
             }
         }
-        for(Synapse s: provider.inMemoryOutputSynapses.values()) {
+        for (Synapse s : provider.inMemoryOutputSynapses.values()) {
+            s.output.lock.acquireWriteLock();
             s.output.inMemoryInputSynapses.put(s, s);
+            s.output.lock.releaseWriteLock();
         }
     }
 
@@ -842,14 +852,14 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         float sum = 0.0f;
         ArrayList<Synapse> modifiedSynapses = new ArrayList<>();
-        for(Synapse s: inputs) {
+        for (Synapse s : inputs) {
             assert !s.key.startRangeOutput || s.key.startRangeMatch == Range.Operator.EQUALS || s.key.startRangeMatch == Range.Operator.FIRST;
             assert !s.key.endRangeOutput || s.key.endRangeMatch == Range.Operator.EQUALS || s.key.endRangeMatch == Range.Operator.FIRST;
 
             s.output = n.provider;
             s.link(threadId);
 
-            if(s.maxLowerWeightsSum == Float.MAX_VALUE) {
+            if (s.maxLowerWeightsSum == Float.MAX_VALUE) {
                 s.maxLowerWeightsSum = sum;
             }
 
@@ -857,7 +867,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             modifiedSynapses.add(s);
         }
 
-        if(!Node.adjust(m, threadId, n, -1, modifiedSynapses)) return null;
+        if (!Node.adjust(m, threadId, n, -1, modifiedSynapses)) return null;
 
         n.publish(threadId);
 
@@ -875,7 +885,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         s.output = n.provider;
         s.link(threadId);
 
-        if(!Node.adjust(m, threadId, n, -1, Collections.singletonList(s))) return null;
+        if (!Node.adjust(m, threadId, n, -1, Collections.singletonList(s))) return null;
         return n;
     }
 
@@ -898,7 +908,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             @Override
             public int compare(Synapse s1, Synapse s2) {
                 int r = Double.compare(s2.w, s1.w);
-                if(r != 0) return r;
+                if (r != 0) return r;
                 return Integer.compare(s1.input.id, s2.input.id);
             }
         });
@@ -910,7 +920,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         sb.append("<");
         sb.append("B:");
         sb.append(Utils.round(bias));
-        for(Synapse s: is) {
+        for (Synapse s : is) {
             sb.append(", ");
             sb.append(Utils.round(s.w));
             sb.append(":");
@@ -951,17 +961,17 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         public static NormWeight create(double w, double n) {
             assert w >= 0.0 && n >= 0.0;
-            if(w == 0.0 && n == 0.0) return ZERO_WEIGHT;
+            if (w == 0.0 && n == 0.0) return ZERO_WEIGHT;
             return new NormWeight(w, n);
         }
 
         public NormWeight add(NormWeight nw) {
-            if(nw == null || nw == ZERO_WEIGHT) return this;
+            if (nw == null || nw == ZERO_WEIGHT) return this;
             return new NormWeight(w + nw.w, n + nw.n);
         }
 
         public NormWeight sub(NormWeight nw) {
-            if(nw == null || nw == ZERO_WEIGHT) return this;
+            if (nw == null || nw == ZERO_WEIGHT) return this;
             return new NormWeight(w - nw.w, n - nw.n);
         }
 
