@@ -84,8 +84,6 @@ public class InterprNode implements Comparable<InterprNode> {
     public int markedExcluded;
     public int markedHasCandidate;
 
-    Boolean hasUnsatisfiedPosFeedbackLinksCache;
-
     private int numberInnerInputs = 0;
 
     private int largestCommonSubsetCount = 0;

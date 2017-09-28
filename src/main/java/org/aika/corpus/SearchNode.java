@@ -17,6 +17,7 @@
 package org.aika.corpus;
 
 
+import com.sun.glass.ui.EventLoop;
 import org.aika.neuron.Activation.Rounds;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.neuron.Activation;
@@ -176,9 +177,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private double search(Document doc, SearchNode selectedParent, SearchNode excludedParent, int[] searchSteps) {
-        double selectedWeight = 0.0;
-        double excludedWeight = 0.0;
-
         if(searchSteps[0] > MAX_SEARCH_STEPS) {
             doc.interrupted = true;
         }
@@ -199,19 +197,15 @@ public class SearchNode implements Comparable<SearchNode> {
             log.info(doc.neuronActivationsToString(true, true, false) + "\n");
         }
 
+        if(Math.abs(weightDelta[Activation.State.VALUE].getNormWeight() - marker.lastSelectedDelta) > 0.001) {
+            marker.tested = false;
+        }
+
         generateNextLevelCandidates(doc, selectedParent, excludedParent);
 
         if(candidates.size() == 0) {
-            SearchNode en = this;
-            while(en != null) {
-                if(en.marker != null && !en.marker.complete) {
-                    en.marker.complete = !hasUnsatisfiedPositiveFeedbackLink(en.refinement);
-                }
-                en = en.selectedParent;
-            }
-
             double accNW = accumulatedWeight[0].getNormWeight();
-            double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight[0].getNormWeight() : 0.0;
+            double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight[Activation.State.VALUE].getNormWeight() : 0.0;
 
             if (accNW > selectedAccNW) {
                 doc.selectedSearchNode = this;
@@ -219,8 +213,8 @@ public class SearchNode implements Comparable<SearchNode> {
             }
         } else {
             SearchNode child = selectCandidate();
-            if (child != null && !(marker.excluded && marker.complete)) {
-                selectedWeight = child.search(doc, this, excludedParent, searchSteps);
+            if (child != null && (!marker.tested || marker.selectedWeight >= marker.excludedWeight)) {
+                marker.selectedWeight = child.search(doc, this, excludedParent, searchSteps);
             }
         }
         changeState(StateChange.Mode.OLD);
@@ -228,54 +222,16 @@ public class SearchNode implements Comparable<SearchNode> {
             return 0.0;
         }
 
-        SearchNode child;
-        do {
-            child = selectedParent.selectCandidate();
-        } while(child != null && marker.selected && child.marker.complete);
-
-        if(child != null) {
-            excludedWeight = child.search(doc, selectedParent, this, searchSteps);
-        }
-
-        if(selectedWeight >= excludedWeight) {
-            marker.selected = true;
-            return selectedWeight;
-        } else {
-            marker.excluded = true;
-            return excludedWeight;
-        }
-    }
-
-
-    private boolean hasUnsatisfiedPositiveFeedbackLink(List<InterprNode> n) {
-        for(InterprNode x: n) {
-            if(hasUnsatisfiedPositiveFeedbackLink(x)) return true;
-        }
-        return false;
-    }
-
-
-    private boolean hasUnsatisfiedPositiveFeedbackLink(InterprNode n) {
-        if(n.hasUnsatisfiedPosFeedbackLinksCache != null) return n.hasUnsatisfiedPosFeedbackLinksCache;
-
-        for(Activation act: n.getNeuronActivations()) {
-            for(SynapseActivation sa: act.neuronOutputs) {
-                if(sa.s.key.isRecurrent && sa.s.w > 0.0 && !isCovered(sa.output.key.o.markedSelected)) {
-                    n.hasUnsatisfiedPosFeedbackLinksCache = true;
-                    return true;
-                }
+        if(!marker.tested || marker.selectedWeight < marker.excludedWeight) {
+            SearchNode child = selectedParent.selectCandidate();
+            if (child != null) {
+                marker.excludedWeight = child.search(doc, selectedParent, this, searchSteps);
             }
         }
 
-        for(InterprNode pn: n.parents) {
-            if(hasUnsatisfiedPositiveFeedbackLink(pn)) {
-                n.hasUnsatisfiedPosFeedbackLinksCache = true;
-                return true;
-            }
-        }
-
-        n.hasUnsatisfiedPosFeedbackLinksCache = false;
-        return false;
+        marker.tested = true;
+        marker.lastSelectedDelta = weightDelta[Activation.State.VALUE].getNormWeight();
+        return Math.max(marker.selectedWeight, marker.excludedWeight);
     }
 
 
@@ -302,9 +258,9 @@ public class SearchNode implements Comparable<SearchNode> {
 
                 SearchNode c = new SearchNode(doc, changed, this, excludedParent, pc.refinement, pc.marker);
 
-                if(doc.selectedSearchNode == null || doc.selectedSearchNode.accumulatedWeight[VALUE].getNormWeight() < c.accumulatedWeight[UB].getNormWeight()) {
+//                if(doc.selectedSearchNode == null || doc.selectedSearchNode.accumulatedWeight[VALUE].getNormWeight() < c.accumulatedWeight[UB].getNormWeight()) {
                     candidates.add(c);
-                }
+//                }
             }
         }
     }
@@ -653,8 +609,10 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private static class RefMarker {
-        public boolean selected;
-        public boolean excluded;
-        public boolean complete;
+        public boolean tested;
+
+        public double lastSelectedDelta;
+        public double selectedWeight;
+        public double excludedWeight;
     }
 }
