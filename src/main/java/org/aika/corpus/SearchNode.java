@@ -102,17 +102,6 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-
-    public boolean testSN(int interprNode) {
-        for(InterprNode n: refinement) {
-            if(n.primId == interprNode) return true;
-        }
-        if(selectedParent != null && selectedParent.testSN(interprNode)) return true;
-
-        return false;
-    }
-
-
     private void collectResults(Collection<InterprNode> results) {
         results.addAll(refinement);
         if(selectedParent != null) selectedParent.collectResults(results);
@@ -315,14 +304,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
                 if(doc.selectedSearchNode == null || doc.selectedSearchNode.accumulatedWeight[VALUE].getNormWeight() < c.accumulatedWeight[UB].getNormWeight()) {
                     candidates.add(c);
-                } else {
-                    if(c.testSN(482) || c.testSN(476)) {
-                        System.out.println();
-                    }
-                }
-            } else {
-                if(pc.testSN(482) || pc.testSN(476)) {
-                    System.out.println();
                 }
             }
         }

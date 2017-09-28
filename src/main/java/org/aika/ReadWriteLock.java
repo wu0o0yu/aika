@@ -38,8 +38,8 @@ public class ReadWriteLock {
                 }
             }
 
+            long tid = Thread.currentThread().getId();
             synchronized (writeLock) {
-                long tid = Thread.currentThread().getId();
                 if(writerThreadId != tid) {
                     while (writers > 0) {
                         writeLock.wait();
