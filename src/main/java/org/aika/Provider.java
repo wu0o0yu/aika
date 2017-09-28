@@ -49,6 +49,11 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     }
 
 
+    public T getIfNotSuspended() {
+        return n;
+    }
+
+
     public synchronized T get() {
         if (n == null) {
             reactivate();
