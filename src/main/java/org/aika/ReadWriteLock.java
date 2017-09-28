@@ -25,7 +25,7 @@ public class ReadWriteLock {
     private int readers = 0;
     private int writers = 0;
     private int writeRequests = 0;
-    private Thread writerThreadId = null;
+    private long writerThreadId = -1;
 
     private Object writeLock = new Object();
 
@@ -39,12 +39,12 @@ public class ReadWriteLock {
             }
 
             synchronized (writeLock) {
-                Thread t = Thread.currentThread();
-                if(writerThreadId != t) {
+                long tid = Thread.currentThread().getId();
+                if(writerThreadId != tid) {
                     while (writers > 0) {
                         writeLock.wait();
                     }
-                    writerThreadId = t;
+                    writerThreadId = tid;
                 }
                 writers++;
             }
@@ -70,7 +70,7 @@ public class ReadWriteLock {
         synchronized (writeLock) {
             writers--;
             if(writers == 0) {
-                writerThreadId = null;
+                writerThreadId = -1;
                 writeLock.notify();
             }
         }
