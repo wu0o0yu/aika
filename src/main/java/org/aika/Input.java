@@ -105,6 +105,7 @@ public class Input implements Comparable<Input> {
      * @return
      */
     public Input setBiasDelta(double biasDelta) {
+        assert biasDelta >= 0.0 && biasDelta <= 1.0;
         this.biasDelta = biasDelta;
         return this;
     }
