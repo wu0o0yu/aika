@@ -17,7 +17,7 @@
 package org.aika.corpus;
 
 
-import com.sun.glass.ui.EventLoop;
+import org.aika.Utils;
 import org.aika.neuron.Activation.Rounds;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.neuron.Activation;
@@ -27,9 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-
-import static org.aika.neuron.Activation.State.UB;
-import static org.aika.neuron.Activation.State.VALUE;
 
 /**
  * The {@code SearchNode} class represents a node in the binary search tree that is used to find the optimal
@@ -59,14 +56,13 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public int visited;
     List<InterprNode> refinement;
-    RefMarker marker;
+    Candidate candidate;
+    int level;
 
     NormWeight[] weightDelta = new NormWeight[] {NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT};
     NormWeight[] accumulatedWeight = new NormWeight[2];
 
     public List<StateChange> modifiedActs = new ArrayList<>();
-
-    public TreeSet<SearchNode> candidates = new TreeSet<>();
 
 
     public enum Coverage {
@@ -76,43 +72,26 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private SearchNode(Document doc, List<InterprNode> changed, SearchNode selParent, SearchNode exclParent, List<InterprNode> ref, RefMarker m) {
+    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate c, int level) {
         id = doc.searchNodeIdCounter++;
+        this.level = level;
         visited = doc.visitedCounter++;
         selectedParent = selParent;
         excludedParent = exclParent;
-        refinement = expandRefinement(ref, doc.visitedCounter++);
-        markSelected(changed, refinement);
-        markExcluded(changed, refinement);
-        marker = m;
 
-        weightDelta = doc.vQueue.adjustWeight(this, changed);
-
-        if(selectedParent != null) {
-            for (int i = 0; i < 2; i++) {
-                accumulatedWeight[i] = weightDelta[i].add(selectedParent.accumulatedWeight[i]);
-            }
-        }
+        refinement = expandRefinement(Collections.singletonList(c != null ? c.refinement : doc.bottom), doc.visitedCounter++);;
+        candidate = c;
 
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Search Step: " + id + "  Candidate Weight Delta: " + weightDelta);
             log.info(doc.neuronActivationsToString(true, true, false) + "\n");
         }
-
-        changeState(StateChange.Mode.OLD);
     }
 
 
     private void collectResults(Collection<InterprNode> results) {
         results.addAll(refinement);
         if(selectedParent != null) selectedParent.collectResults(results);
-    }
-
-
-    public static SearchNode createRootSearchNode(Document doc) {
-        List<InterprNode> changed = new ArrayList<>();
-        changed.add(doc.bottom);
-        return new SearchNode(doc, changed, null, null, Arrays.asList(doc.bottom), null);
     }
 
 
@@ -126,8 +105,6 @@ public class SearchNode implements Comparable<SearchNode> {
         List<InterprNode> rootRefs = expandRootRefinement(doc);
         refinement = expandRefinement(rootRefs, doc.visitedCounter++);
 
-        // Mark all interpretation nodes as candidates
-        markCandidatesRecursiveStep(doc.bottom, true);
         markSelected(null, refinement);
         markExcluded(null, refinement);
 
@@ -141,12 +118,12 @@ public class SearchNode implements Comparable<SearchNode> {
         doc.bottom.storeFinalWeight(doc.visitedCounter++);
 
 
-        generateInitialCandidates(doc);
+        Candidate[] candidates = generateCandidates(doc);
+        Candidate c = candidates[level + 1];
 
-        SearchNode child = this.selectCandidate();
-
-        if(child != null) {
-            child.search(doc, this, null, searchSteps);
+        if(c != null) {
+            SearchNode child = new SearchNode(doc, this, null, c, level + 1);
+            child.search(doc, searchSteps, candidates);
         }
 
         if (doc.selectedSearchNode != null) {
@@ -176,45 +153,60 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private double search(Document doc, SearchNode selectedParent, SearchNode excludedParent, int[] searchSteps) {
+    private double search(Document doc, int[] searchSteps, Candidate[] candidates) {
+        double selectedWeight = 0.0;
+        double excludedWeight = 0.0;
+
+        boolean alreadySelected = checkSelected(refinement);
+        boolean alreadyExcluded = checkExcluded(refinement, doc.visitedCounter++);
+
         if(searchSteps[0] > MAX_SEARCH_STEPS) {
             doc.interrupted = true;
         }
         searchSteps[0]++;
-
-        markCandidates(selectedParent.candidates);
-        markSelected(null, refinement);
-        markExcluded(null, refinement);
 
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Search Step: " + id);
             log.info(toString());
         }
 
-        changeState(StateChange.Mode.NEW);
-
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info(doc.neuronActivationsToString(true, true, false) + "\n");
         }
 
-        if(Math.abs(weightDelta[Activation.State.VALUE].getNormWeight() - marker.lastSelectedDelta) > 0.001) {
-            marker.tested = false;
+        if(selectedParent != null) {
+            for (int i = 0; i < 2; i++) {
+                accumulatedWeight[i] = selectedParent.accumulatedWeight[i];
+            }
         }
 
-        generateNextLevelCandidates(doc, selectedParent, excludedParent);
+        Boolean cd = !alreadyExcluded && !alreadySelected ? getCachedDecision() : null;
 
-        if(candidates.size() == 0) {
-            double accNW = accumulatedWeight[0].getNormWeight();
-            double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight[Activation.State.VALUE].getNormWeight() : 0.0;
-
-            if (accNW > selectedAccNW) {
-                doc.selectedSearchNode = this;
-                doc.bottom.storeFinalWeight(doc.visitedCounter++);
+        if (!alreadyExcluded) {
+            List<InterprNode> changed = new ArrayList<>();
+            if(level == -1) {
+                changed.add(doc.bottom);
             }
-        } else {
-            SearchNode child = selectCandidate();
-            if (child != null && (!marker.tested || marker.selectedWeight >= marker.excludedWeight)) {
-                marker.selectedWeight = child.search(doc, this, excludedParent, searchSteps);
+
+            markSelected(changed, refinement);
+            markExcluded(changed, refinement);
+
+            weightDelta = doc.vQueue.adjustWeight(this, changed);
+
+            if(selectedParent != null) {
+                for (int i = 0; i < 2; i++) {
+                    accumulatedWeight[i] = weightDelta[i].add(accumulatedWeight[i]);
+                }
+            }
+
+            if (candidates.length == level + 1) {
+                selectedWeight = processResult(doc);
+            } else {
+                if (cd == null || cd) {
+                    Candidate c = candidates[level + 1];
+                    SearchNode child = new SearchNode(doc, this, excludedParent, c, level + 1);
+                    selectedWeight = child.search(doc, searchSteps, candidates);
+                }
             }
         }
         changeState(StateChange.Mode.OLD);
@@ -222,48 +214,46 @@ public class SearchNode implements Comparable<SearchNode> {
             return 0.0;
         }
 
-        if(!marker.tested || marker.selectedWeight < marker.excludedWeight) {
-            SearchNode child = selectedParent.selectCandidate();
-            if (child != null) {
-                marker.excludedWeight = child.search(doc, selectedParent, this, searchSteps);
+        if(!alreadySelected) {
+            if (candidates.length == level + 1) {
+                excludedWeight = processResult(doc);
+            } else {
+                if(cd == null || !cd) {
+                    Candidate c = candidates[level + 1];
+                    SearchNode child = new SearchNode(doc, selectedParent, this, c, level + 1);
+                    excludedWeight = child.search(doc, searchSteps, candidates);
+                }
             }
         }
 
-        marker.tested = true;
-        marker.lastSelectedDelta = weightDelta[Activation.State.VALUE].getNormWeight();
-        return Math.max(marker.selectedWeight, marker.excludedWeight);
+        if(cd == null && !alreadyExcluded && !alreadySelected) {
+            candidate.cache.put(this, selectedWeight >= excludedWeight);
+        }
+        return Math.max(selectedWeight, excludedWeight);
+    }
+
+    private double processResult(Document doc) {
+        double accNW = accumulatedWeight[0].getNormWeight();
+        double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight[Activation.State.VALUE].getNormWeight() : 0.0;
+
+        if (accNW > selectedAccNW) {
+            doc.selectedSearchNode = this;
+            doc.bottom.storeFinalWeight(doc.visitedCounter++);
+        }
+
+        return accNW;
     }
 
 
-    private SearchNode selectCandidate() {
-        if(candidates.isEmpty()) return null;
-        return candidates.pollFirst();
-    }
-
-
-    public void generateInitialCandidates(Document doc) {
-        candidates = new TreeSet<>();
+    public Candidate[] generateCandidates(Document doc) {
+        TreeSet<Candidate> candidates = new TreeSet<>();
+        int i = 0;
         for(InterprNode cn: collectConflicts(doc)) {
-            List<InterprNode> changed = new ArrayList<>();
-            candidates.add(new SearchNode(doc, changed, this, null, Arrays.asList(cn), new RefMarker()));
+            candidates.add(new Candidate(cn, i++));
         }
+        return candidates.toArray(new Candidate[candidates.size()]);
     }
 
-
-    public void generateNextLevelCandidates(Document doc, SearchNode selectedParent, SearchNode excludedParent) {
-        candidates = new TreeSet<>();
-        for(SearchNode pc: selectedParent.candidates) {
-            if(!checkSelected(pc.refinement) && !checkExcluded(pc.refinement, doc.visitedCounter++)) {
-                List<InterprNode> changed = new ArrayList<>();
-
-                SearchNode c = new SearchNode(doc, changed, this, excludedParent, pc.refinement, pc.marker);
-
-//                if(doc.selectedSearchNode == null || doc.selectedSearchNode.accumulatedWeight[VALUE].getNormWeight() < c.accumulatedWeight[UB].getNormWeight()) {
-                    candidates.add(c);
-//                }
-            }
-        }
-    }
 
 
     private boolean checkSelected(List<InterprNode> n) {
@@ -403,7 +393,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public Coverage getCoverage(InterprNode n) {
         if(isCovered(n.markedSelected)) return Coverage.SELECTED;
-        if(selectedParent != null && n.markedHasCandidate != selectedParent.visited) return Coverage.EXCLUDED;
         if(isCovered(n.markedExcluded)) return Coverage.EXCLUDED;
         return Coverage.UNKNOWN;
     }
@@ -503,25 +492,6 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void markCandidates(Collection<SearchNode> candidates) {
-        for(SearchNode sn: candidates) {
-            for(InterprNode ref: sn.refinement) {
-                markCandidatesRecursiveStep(ref, false);
-            }
-        }
-    }
-
-
-    private void markCandidatesRecursiveStep(InterprNode n, boolean dir) {
-        if(n.markedHasCandidate == visited) return;
-        n.markedHasCandidate = visited;
-
-        for(InterprNode pn: dir ? n.children : n.parents) {
-            if(!pn.isBottom()) markCandidatesRecursiveStep(pn, dir);
-        }
-    }
-
-
     public boolean containedInSelectedBranch(InterprNode n) {
         for(InterprNode p: n.parents) {
             if(!isCovered(p.markedSelected)) return false;
@@ -559,10 +529,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     @Override
-    public int compareTo(SearchNode c) {
-        int r = Double.compare(c.accumulatedWeight[0].getNormWeight(), accumulatedWeight[0].getNormWeight());
-        if(r != 0) return r;
-        return Integer.compare(id, c.id);
+    public int compareTo(SearchNode sn) {
+        return Integer.compare(id, sn.id);
     }
 
 
@@ -608,11 +576,74 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private static class RefMarker {
-        public boolean tested;
+    public SearchNode getParent() {
+        return getDecision() ? selectedParent : excludedParent;
+    }
 
-        public double lastSelectedDelta;
-        public double selectedWeight;
-        public double excludedWeight;
+
+    private boolean getDecision() {
+        return excludedParent == null || selectedParent.id > excludedParent.id;
+    }
+
+
+    public Boolean getCachedDecision() {
+        x: for(Map.Entry<SearchNode, Boolean> me: candidate.cache.entrySet()) {
+            SearchNode n = this;
+            SearchNode cn = me.getKey();
+            do {
+                if(n.getDecision() != cn.getDecision()) {
+                    if(affectsUnknown(n.getParent())) {
+                        continue x;
+                    }
+                }
+                n = n.getParent();
+                cn = cn.getParent();
+            } while(n.selectedParent != null);
+
+            return me.getValue();
+        }
+
+        return null;
+    }
+
+
+    public boolean affectsUnknown(SearchNode p) {
+        for(InterprNode n: p.refinement) {
+            if(n.act != null) {
+                for(SynapseActivation sa: n.act.neuronOutputs) {
+                    if(sa.s.key.isRecurrent && !sa.s.key.isNeg) {
+                        if(getCoverage(sa.output.key.o) == Coverage.UNKNOWN) return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private static class Candidate implements Comparable<Candidate> {
+        public TreeMap<SearchNode, Boolean> cache = new TreeMap<>();
+        public InterprNode refinement;
+
+        int id;
+        Integer minBegin;
+        Integer maxEnd;
+
+        public Candidate(InterprNode refinement, int id) {
+            this.refinement = refinement;
+            minBegin = refinement.act.key.r.begin;
+            maxEnd = refinement.act.key.r.end;
+            this.id = id;
+        }
+
+
+        @Override
+        public int compareTo(Candidate c) {
+            int r = Integer.compare(minBegin, c.minBegin);
+            if(r != 0) return r;
+            r = Integer.compare(c.maxEnd - c.minBegin, maxEnd - minBegin);
+            if(r != 0) return r;
+            return Integer.compare(id, c.id);
+        }
     }
 }

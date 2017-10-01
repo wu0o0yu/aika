@@ -175,7 +175,7 @@ public class Document implements Comparable<Document> {
             vQueue.propagateWeight(0, act);
         }
         interrupted = false;
-        SearchNode root = SearchNode.createRootSearchNode(this);
+        SearchNode root = new SearchNode(this, null, null, null, -1);
         selectedSearchNode = root;
         root.computeBestInterpretation(this);
     }

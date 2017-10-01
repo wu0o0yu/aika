@@ -85,6 +85,7 @@ public class OrNode extends Node<OrNode, Activation> {
     @Override
     protected Activation createActivation(Document doc, NodeActivation.Key ak, boolean isTrainingAct) {
         Activation act = new Activation(doc.activationIdCounter++, ak);
+        ak.o.act = act;
         act.isTrainingAct = isTrainingAct;
         ThreadState<OrNode, Activation> th = getThreadState(doc.threadId, false);
         if(th == null || th.activations.isEmpty()) {

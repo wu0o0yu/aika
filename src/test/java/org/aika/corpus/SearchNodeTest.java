@@ -76,17 +76,17 @@ public class SearchNodeTest {
                         .setRangeOutput(false)
         );
 
-        m.initNeuron(eJoergForename, 5.0,
+        m.initNeuron(eJoergForename, 6.0,
                 new Input()
                         .setNeuron(wJoerg)
-                        .setWeight(8.0f)
+                        .setWeight(10.0f)
                         .setBiasDelta(1.0)
                         .setRelativeRid(0)
                         .setRangeMatch(Input.RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(eZimmermannSurname)
-                        .setWeight(8.0f)
+                        .setWeight(10.0f)
                         .setBiasDelta(1.0)
                         .setRelativeRid(1)
                         .setRecurrent(true)
@@ -101,17 +101,17 @@ public class SearchNodeTest {
                         .setRangeOutput(false)
         );
 
-        m.initNeuron(eZimmermannSurname, 5.0,
+        m.initNeuron(eZimmermannSurname, 6.0,
                 new Input()
                         .setNeuron(wZimmermann)
-                        .setWeight(8.0f)
+                        .setWeight(10.0f)
                         .setBiasDelta(1.0)
                         .setRelativeRid(0)
                         .setRangeMatch(Input.RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(eJoergForename)
-                        .setWeight(8.0f)
+                        .setWeight(10.0f)
                         .setBiasDelta(1.0)
                         .setRelativeRid(-1)
                         .setRecurrent(true)
@@ -159,13 +159,32 @@ public class SearchNodeTest {
         wJoerg.addInput(doc, 0, 6, 0);
         wZimmermann.addInput(doc, 6, 16, 1);
 
-
+        Document.OPTIMIZE_DEBUG_OUTPUT = true;
         doc.process();
+
+        System.out.println(doc.neuronActivationsToString(true));
 
         Assert.assertTrue(eZimmermannCompany.getFinalActivations(doc).isEmpty());
         Assert.assertFalse(eZimmermannSurname.getFinalActivations(doc).isEmpty());
 
+        doc.clearActivations();
+
+        doc = m.createDocument("Joerg Zimmermann Joerg Zimmermann");
+
+        wJoerg.addInput(doc, 0, 6, 0);
+        wZimmermann.addInput(doc, 6, 17, 1);
+        wJoerg.addInput(doc, 17, 23, 2);
+        wZimmermann.addInput(doc, 23, 33, 3);
+
+        Document.OPTIMIZE_DEBUG_OUTPUT = true;
+        doc.process();
+
         System.out.println(doc.neuronActivationsToString(true));
+
+        Assert.assertEquals(0, eZimmermannCompany.getFinalActivations(doc).size());
+        Assert.assertEquals(2, eZimmermannSurname.getFinalActivations(doc).size());
+
+        doc.clearActivations();
     }
 
 }
