@@ -119,11 +119,13 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
         Candidate[] candidates = generateCandidates(doc);
-        Candidate c = candidates[level + 1];
+        if(candidates.length > 0) {
+            Candidate c = candidates[level + 1];
 
-        if(c != null) {
-            SearchNode child = new SearchNode(doc, this, null, c, level + 1);
-            child.search(doc, searchSteps, candidates);
+            if (c != null) {
+                SearchNode child = new SearchNode(doc, this, null, c, level + 1);
+                child.search(doc, searchSteps, candidates);
+            }
         }
 
         if (doc.selectedSearchNode != null) {
