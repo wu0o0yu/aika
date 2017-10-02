@@ -261,8 +261,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
             int t = s.key.isRecurrent ? REC : DIR;
             sum[t][VALUE] += is.value * s.w;
-            sum[t][UB] += (s.key.isNeg ? is.lb : is.ub) * s.w;
-            sum[t][LB] += (s.key.isNeg ? is.ub : is.lb) * s.w;
+//            sum[t][UB] += (s.key.isNeg ? is.lb : is.ub) * s.w;
+//            sum[t][LB] += (s.key.isNeg ? is.ub : is.lb) * s.w;
 
             if (!s.key.isRecurrent && !s.key.isNeg && sum[DIR][VALUE] + sum[REC][VALUE] >= 0.0 && fired < 0) {
                 fired = iAct.rounds.get(round).fired + 1;
@@ -271,8 +271,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
         double drSum = sum[DIR][VALUE] + sum[REC][VALUE];
-        double drSumUB = sum[DIR][UB] + sum[REC][UB];
-        double drSumLB = sum[DIR][LB] + sum[REC][LB];
+//        double drSumUB = sum[DIR][UB] + sum[REC][UB];
+//        double drSumLB = sum[DIR][LB] + sum[REC][LB];
 
         Coverage c = sn.getCoverage(act.key.o);
         // Compute only the recurrent part is above the threshold.
@@ -280,22 +280,22 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 c == Coverage.SELECTED ? (sum[DIR][VALUE] + negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC][VALUE] - negRecSum : 0.0,
                 (sum[DIR][VALUE] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR][VALUE] + negRecSum + maxRecurrentSum) : maxRecurrentSum
         );
-        NormWeight newWeightUB = NormWeight.create(
+/*        NormWeight newWeightUB = NormWeight.create(
                 c == Coverage.SELECTED || c == Coverage.UNKNOWN ? (sum[DIR][UB] + negRecSum) < 0.0 ? Math.max(0.0, drSumUB) : sum[REC][UB] - negRecSum : 0.0,
                 (sum[DIR][LB] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR][LB] + negRecSum + maxRecurrentSum) : maxRecurrentSum
         );
-
+*/
         if (doc.debugActId == act.id && doc.debugActWeight <= newWeight.w) {
             storeDebugOutput(doc, act, newWeight, drSum, round);
         }
 
         return new State(
                 c == Coverage.SELECTED ? transferFunction(drSum) : 0.0,
-                c == Coverage.SELECTED || c == Coverage.UNKNOWN ? transferFunction(drSumUB) : 0.0,
-                c == Coverage.SELECTED ? transferFunction(drSumLB) : 0.0,
+                0.0, //c == Coverage.SELECTED || c == Coverage.UNKNOWN ? transferFunction(drSumUB) : 0.0,
+                0.0, //c == Coverage.SELECTED ? transferFunction(drSumLB) : 0.0,
                 c == Coverage.SELECTED ? fired : -1,
                 newWeight,
-                newWeightUB
+                NormWeight.ZERO_WEIGHT //newWeightUB
         );
     }
 
