@@ -553,27 +553,29 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private static void linkActSyn(OrNode n, Document doc, Activation act, int dir, ArrayList<Activation> recNegTmp, Synapse s) {
+        Synapse.Key sk = s.key;
+
         Integer rid;
         if (dir == 0) {
-            rid = s.key.absoluteRid != null ? s.key.absoluteRid : Utils.nullSafeAdd(act.key.rid, false, s.key.relativeRid, false);
+            rid = sk.absoluteRid != null ? sk.absoluteRid : Utils.nullSafeAdd(act.key.rid, false, sk.relativeRid, false);
         } else {
-            rid = Utils.nullSafeSub(act.key.rid, false, s.key.relativeRid, false);
+            rid = Utils.nullSafeSub(act.key.rid, false, sk.relativeRid, false);
         }
 
 
-        Operator begin = replaceFirstAndLast(s.key.startRangeMatch);
-        Operator end = replaceFirstAndLast(s.key.endRangeMatch);
+        Operator begin = replaceFirstAndLast(sk.startRangeMatch);
+        Operator end = replaceFirstAndLast(sk.endRangeMatch);
         Range r = act.key.r;
         if (dir == 0) {
-            begin = Operator.invert(s.key.startRangeMapping == START ? begin : (s.key.endRangeMapping == START ? end : NONE));
-            end = Operator.invert(s.key.endRangeMapping == END ? end : (s.key.startRangeMapping == END ? begin : NONE));
+            begin = Operator.invert(sk.startRangeMapping == START ? begin : (sk.endRangeMapping == START ? end : NONE));
+            end = Operator.invert(sk.endRangeMapping == END ? end : (sk.startRangeMapping == END ? begin : NONE));
 
-            if (s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
-                r = new Range(s.key.endRangeMapping == START ? r.end : (s.key.startRangeMapping == START ? r.begin : null), s.key.startRangeMapping == END ? r.begin : (s.key.endRangeMapping == END ? r.end : null));
+            if (sk.startRangeMapping != START || sk.endRangeMapping != END) {
+                r = new Range(s.key.endRangeMapping == START ? r.end : (sk.startRangeMapping == START ? r.begin : null), sk.startRangeMapping == END ? r.begin : (sk.endRangeMapping == END ? r.end : null));
             }
         } else {
-            if (s.key.startRangeMapping != START || s.key.endRangeMapping != END) {
-                r = new Range(s.key.startRangeMapping == END ? r.end : (s.key.startRangeMapping == START ? r.begin : null), s.key.endRangeMapping == START ? r.begin : (s.key.endRangeMapping == END ? r.end : null));
+            if (sk.startRangeMapping != START || sk.endRangeMapping != END) {
+                r = new Range(sk.startRangeMapping == END ? r.end : (sk.startRangeMapping == START ? r.begin : null), sk.endRangeMapping == START ? r.begin : (sk.endRangeMapping == END ? r.end : null));
             }
         }
 
@@ -597,7 +599,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             iAct.addSynapseActivation(0, sa);
             oAct.addSynapseActivation(1, sa);
 
-            if (s.key.isNeg && s.key.isRecurrent) {
+            if (sk.isNeg && sk.isRecurrent) {
                 recNegTmp.add(rAct);
             }
         });
