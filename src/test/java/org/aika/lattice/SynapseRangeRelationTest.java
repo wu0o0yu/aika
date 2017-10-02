@@ -66,7 +66,7 @@ public class SynapseRangeRelationTest {
                 )
         );
         s.output = on;
-        s.link(doc.threadId);
+        s.link();
 
         Activation iAct0 = in.get().node.get().processAddedActivation(doc, new Key(in.get().node.get(), new Range(1, 4), null, doc.bottom), Collections.emptyList(), false);
         Activation iAct1 = in.get().node.get().processAddedActivation(doc, new Key(in.get().node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), false);
