@@ -180,9 +180,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         for (Synapse s : inputSynapses.values()) {
             INeuron in = s.input.get();
-            in.lock.acquireWriteLock();
+            in.provider.lock.acquireWriteLock();
             in.provider.inMemoryOutputSynapses.remove(s);
-            in.lock.releaseWriteLock();
+            in.provider.lock.releaseWriteLock();
         }
 
         provider.lock.acquireReadLock();
@@ -806,7 +806,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     @Override
     public void suspend() {
         for (Synapse s : inputSynapses.values()) {
+            s.input.lock.acquireWriteLock();
             s.input.inMemoryOutputSynapses.remove(s);
+            s.input.lock.releaseWriteLock();
+
             InputNode iNode = s.inputNode.getIfNotSuspended();
             if (iNode != null) {
                 iNode.removeSynapse(s);
