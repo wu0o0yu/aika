@@ -59,6 +59,14 @@ public class SearchNode implements Comparable<SearchNode> {
     Candidate candidate;
     int level;
 
+    DebugState debugState;
+
+    public enum DebugState {
+        CACHED,
+        LIMITED,
+        EXPLORE
+    }
+
     NormWeight[] weightDelta = new NormWeight[] {NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT};
     NormWeight[] accumulatedWeight = new NormWeight[2];
 
@@ -155,6 +163,16 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
+    public void dumpDebugState() {
+        SearchNode p = getParent();
+        if(p != null && p.level >= 0) {
+            p.dumpDebugState();
+        }
+
+        System.out.println(level + " " + debugState + " " + candidate.refinement.act.key.r + " " + candidate.refinement.act.key.n.neuron.get().label);
+    }
+
+
     private double search(Document doc, int[] searchSteps, Candidate[] candidates) {
         double selectedWeight = 0.0;
         double excludedWeight = 0.0;
@@ -164,6 +182,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if(searchSteps[0] > MAX_SEARCH_STEPS) {
             doc.interrupted = true;
+
+            dumpDebugState();
         }
         searchSteps[0]++;
 
@@ -180,6 +200,12 @@ public class SearchNode implements Comparable<SearchNode> {
             for (int i = 0; i < 2; i++) {
                 accumulatedWeight[i] = selectedParent.accumulatedWeight[i];
             }
+        }
+
+        if(alreadyExcluded || alreadySelected) {
+            debugState = DebugState.LIMITED;
+        } else {
+            debugState = DebugState.EXPLORE;
         }
 
         Boolean cd = !alreadyExcluded && !alreadySelected ? getCachedDecision() : null;
@@ -602,6 +628,7 @@ public class SearchNode implements Comparable<SearchNode> {
                 cn = cn.getParent();
             } while(n.selectedParent != null);
 
+            debugState = DebugState.CACHED;
             return me.getValue();
         }
 
