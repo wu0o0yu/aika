@@ -682,11 +682,11 @@ public class SearchNode implements Comparable<SearchNode> {
 
         @Override
         public int compareTo(Candidate c) {
-            int r = Integer.compare(minBegin, c.minBegin);
+            int r = Utils.compareInteger(minBegin, c.minBegin);
             if(r != 0) return r;
-            r = Integer.compare(c.maxEnd - c.minBegin, maxEnd - minBegin);
+            r = Utils.compareInteger(c.maxEnd - c.minBegin, maxEnd - minBegin);
             if(r != 0) return r;
-            r = Integer.compare(minRid, c.minRid);
+            r = Utils.compareInteger(minRid, c.minRid);
             if(r != 0) return r;
             return Integer.compare(id, c.id);
         }
