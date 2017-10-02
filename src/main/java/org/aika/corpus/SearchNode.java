@@ -18,6 +18,7 @@ package org.aika.corpus;
 
 
 import org.aika.Utils;
+import org.aika.lattice.NodeActivation;
 import org.aika.neuron.Activation.Rounds;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.neuron.Activation;
@@ -657,11 +658,24 @@ public class SearchNode implements Comparable<SearchNode> {
         int id;
         Integer minBegin;
         Integer maxEnd;
+        Integer minRid;
 
         public Candidate(InterprNode refinement, int id) {
             this.refinement = refinement;
-            minBegin = refinement.act.key.r.begin;
-            maxEnd = refinement.act.key.r.end;
+            if(refinement.act != null) {
+                minBegin = refinement.act.key.r.begin;
+                maxEnd = refinement.act.key.r.end;
+                minRid = refinement.act.key.rid;
+            } else {
+                for(NodeActivation act: refinement.getActivations()) {
+                    if(act.key.r != null) {
+                        minBegin = Utils.nullSafeMin(minBegin, act.key.r.begin);
+                        maxEnd = Utils.nullSafeMax(maxEnd, act.key.r.end);
+                    }
+                    minRid = Utils.nullSafeMin(minRid, act.key.rid);
+                }
+            }
+
             this.id = id;
         }
 
@@ -671,6 +685,8 @@ public class SearchNode implements Comparable<SearchNode> {
             int r = Integer.compare(minBegin, c.minBegin);
             if(r != 0) return r;
             r = Integer.compare(c.maxEnd - c.minBegin, maxEnd - minBegin);
+            if(r != 0) return r;
+            r = Integer.compare(minRid, c.minRid);
             if(r != 0) return r;
             return Integer.compare(id, c.id);
         }
