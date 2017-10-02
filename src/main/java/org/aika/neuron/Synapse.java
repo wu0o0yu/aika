@@ -123,7 +123,7 @@ public class Synapse implements Writable {
     }
 
 
-    public void link(int threadId) {
+    public void link() {
         INeuron in = input.get();
         INeuron out = output.get();
 

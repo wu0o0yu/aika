@@ -427,11 +427,13 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     @Override
     public void reactivate() {
+        inputNeuron.lock.acquireReadLock();
         inputNeuron.inMemoryOutputSynapses.values().forEach(s -> {
             if (key.compareTo(s.key.createInputNodeKey()) == 0) {
                 setSynapse(s);
             }
         });
+        inputNeuron.lock.releaseReadLock();
     }
 
 

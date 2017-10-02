@@ -185,12 +185,14 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             in.lock.releaseWriteLock();
         }
 
+        provider.lock.acquireReadLock();
         for (Synapse s : provider.inMemoryOutputSynapses.values()) {
             INeuron out = s.output.get();
             out.lock.acquireWriteLock();
             out.inputSynapses.remove(s);
             out.lock.releaseWriteLock();
         }
+        provider.lock.releaseReadLock();
     }
 
 
@@ -808,11 +810,14 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 iNode.removeSynapse(s);
             }
         }
+
+        provider.lock.acquireReadLock();
         for (Synapse s : provider.inMemoryOutputSynapses.values()) {
             s.output.lock.acquireWriteLock();
             s.output.inMemoryInputSynapses.remove(s);
             s.output.lock.releaseWriteLock();
         }
+        provider.lock.releaseReadLock();
     }
 
 
@@ -834,11 +839,13 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 iNode.setSynapse(s);
             }
         }
+        provider.lock.acquireReadLock();
         for (Synapse s : provider.inMemoryOutputSynapses.values()) {
             s.output.lock.acquireWriteLock();
             s.output.inMemoryInputSynapses.put(s, s);
             s.output.lock.releaseWriteLock();
         }
+        provider.lock.releaseReadLock();
     }
 
 
@@ -857,7 +864,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             assert !s.key.endRangeOutput || s.key.endRangeMatch == Range.Operator.EQUALS || s.key.endRangeMatch == Range.Operator.FIRST;
 
             s.output = n.provider;
-            s.link(threadId);
+            s.link();
 
             if (s.maxLowerWeightsSum == Float.MAX_VALUE) {
                 s.maxLowerWeightsSum = sum;
@@ -883,7 +890,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         n.posRecSum += posRecSumDelta;
 
         s.output = n.provider;
-        s.link(threadId);
+        s.link();
 
         if (!Node.adjust(m, threadId, n, -1, Collections.singletonList(s))) return null;
         return n;
