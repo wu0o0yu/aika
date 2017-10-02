@@ -169,7 +169,7 @@ public class SearchNode implements Comparable<SearchNode> {
             p.dumpDebugState();
         }
 
-        System.out.println(level + " " + debugState + " " + candidate.refinement.act.key.r + " " + candidate.refinement.act.key.n.neuron.get().label);
+        System.out.println(level + " " + debugState + " " + candidate.cache.size() + " " + candidate.refinement.act.key.r + " " + candidate.refinement.act.key.n.neuron.get().label);
     }
 
 
