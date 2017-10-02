@@ -277,8 +277,9 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         if (andChildren != null) {
             for (Map.Entry<Refinement, Provider<AndNode>> me : andChildren.entrySet()) {
                 Provider<InputNode> refInput = me.getKey().input;
-                if (!refInput.isSuspended()) {
-                    addNextLevelActivations(doc, refInput.get(), me.getKey(), me.getValue(), act, removedConflict);
+                InputNode in = refInput.getIfNotSuspended();
+                if (in != null) {
+                    addNextLevelActivations(doc, in, me.getKey(), me.getValue(), act, removedConflict);
                 }
             }
         }

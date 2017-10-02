@@ -142,7 +142,8 @@ public class Neuron extends Provider<INeuron> {
      * @return A collection with all final activations of this neuron.
      */
     public Collection<Activation> getFinalActivations(Document doc) {
-        if(isSuspended()) return Collections.emptyList();
-        return get().getFinalActivations(doc);
+        INeuron n = getIfNotSuspended();
+        if(n == null) return Collections.emptyList();
+        return n.getFinalActivations(doc);
     }
 }

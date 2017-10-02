@@ -528,8 +528,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         for (Synapse s : getActiveSynapses(doc, dir, syns)) {
             Neuron p = (dir == 0 ? s.input : s.output);
-            if (!p.isSuspended()) {
-                INeuron an = p.get();
+            INeuron an = p.getIfNotSuspended();
+            if (an != null) {
                 OrNode n = an.node.get();
                 ThreadState th = n.getThreadState(doc.threadId, false);
                 if (th == null || th.activations.isEmpty()) continue;
@@ -803,8 +803,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public void suspend() {
         for (Synapse s : inputSynapses.values()) {
             s.input.inMemoryOutputSynapses.remove(s);
-            if (!s.inputNode.isSuspended()) {
-                InputNode iNode = s.inputNode.get();
+            InputNode iNode = s.inputNode.getIfNotSuspended();
+            if (iNode != null) {
                 iNode.removeSynapse(s);
             }
         }
@@ -829,8 +829,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 s.output.lock.releaseWriteLock();
             }
 
-            if (!s.inputNode.isSuspended()) {
-                InputNode iNode = s.inputNode.get();
+            InputNode iNode = s.inputNode.getIfNotSuspended();
+            if (iNode != null) {
                 iNode.setSynapse(s);
             }
         }

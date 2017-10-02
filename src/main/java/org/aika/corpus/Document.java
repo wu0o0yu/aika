@@ -263,9 +263,9 @@ public class Document implements Comparable<Document> {
             }
 
             for (Provider<? extends AbstractNode> np : tmp) {
-                if (np != null && !np.isSuspended()) {
-                    AbstractNode an = np.get();
-                    if (an instanceof Node) {
+                if (np != null) {
+                    AbstractNode an = np.getIfNotSuspended();
+                    if (an != null && an instanceof Node) {
                         Node n = (Node) an;
                         Node.ThreadState th = n.threads[threadId];
                         if (th != null && th.lastUsed + CLEANUP_INTERVAL < id) {
