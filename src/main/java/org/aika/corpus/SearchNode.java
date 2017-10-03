@@ -26,7 +26,6 @@ import org.aika.corpus.Conflicts.Conflict;
 import org.aika.neuron.INeuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.Cache;
 
 import java.util.*;
 
@@ -134,8 +133,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
             if (c != null) {
                 SearchNode child = new SearchNode(doc, this, null, c, level + 1);
-                child.search(doc, searchSteps, candidates, false);
-                child.search(doc, searchSteps, candidates, true);
+                child.search(doc, searchSteps, candidates);
             }
         }
 
@@ -185,7 +183,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private double search(Document doc, int[] searchSteps, Candidate[] candidates, boolean complete) {
+    private double search(Document doc, int[] searchSteps, Candidate[] candidates) {
         double selectedWeight = 0.0;
         double excludedWeight = 0.0;
 
@@ -220,11 +218,7 @@ public class SearchNode implements Comparable<SearchNode> {
             debugState = DebugState.EXPLORE;
         }
 
-        CachedValue cv = !alreadyExcluded && !alreadySelected ? getCachedDecision() : null;
-
-        if(cv != null && !complete) {
-            return cv.value;
-        }
+        Boolean cd = !alreadyExcluded && !alreadySelected ? getCachedDecision() : null;
 
         candidate.debugCounts[debugState.ordinal()]++;
 
@@ -249,10 +243,10 @@ public class SearchNode implements Comparable<SearchNode> {
             if (candidates.length == level + 1) {
                 selectedWeight = processResult(doc);
             } else {
-                if (cv == null || cv.decision) {
+                if (cd == null || cd) {
                     Candidate c = candidates[level + 1];
                     SearchNode child = new SearchNode(doc, this, excludedParent, c, level + 1);
-                    selectedWeight = child.search(doc, searchSteps, candidates, complete);
+                    selectedWeight = child.search(doc, searchSteps, candidates);
                 }
             }
         }
@@ -267,24 +261,19 @@ public class SearchNode implements Comparable<SearchNode> {
             if (candidates.length == level + 1) {
                 excludedWeight = processResult(doc);
             } else {
-                if(cv == null || !cv.decision) {
+                if(cd == null || !cd) {
                     Candidate c = candidates[level + 1];
                     SearchNode child = new SearchNode(doc, selectedParent, this, c, level + 1);
-                    excludedWeight = child.search(doc, searchSteps, candidates, complete);
+                    excludedWeight = child.search(doc, searchSteps, candidates);
                 }
             }
         }
 
-        if(cv == null && !alreadyExcluded && !alreadySelected) {
-            cv = new CachedValue();
-            cv.decision = selectedWeight >= excludedWeight;
-            cv.value = cv.decision ? selectedWeight : excludedWeight;
-
-            candidate.cache.put(this, cv);
+        if(cd == null && !alreadyExcluded && !alreadySelected) {
+            candidate.cache.put(this, selectedWeight >= excludedWeight);
         }
         return Math.max(selectedWeight, excludedWeight);
     }
-
 
     private double processResult(Document doc) {
         double accNW = accumulatedWeight[0].getNormWeight();
@@ -638,8 +627,8 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public CachedValue getCachedDecision() {
-        x: for(Map.Entry<SearchNode, CachedValue> me: candidate.cache.entrySet()) {
+    public Boolean getCachedDecision() {
+        x: for(Map.Entry<SearchNode, Boolean> me: candidate.cache.entrySet()) {
             SearchNode n = this;
             SearchNode cn = me.getKey();
             do {
@@ -675,7 +664,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private static class Candidate implements Comparable<Candidate> {
-        public TreeMap<SearchNode, CachedValue> cache = new TreeMap<>();
+        public TreeMap<SearchNode, Boolean> cache = new TreeMap<>();
         public InterprNode refinement;
 
         int[] debugCounts = new int[3];
@@ -716,10 +705,5 @@ public class SearchNode implements Comparable<SearchNode> {
             if(r != 0) return r;
             return Integer.compare(id, c.id);
         }
-    }
-
-    public static class CachedValue {
-        boolean decision;
-        double value;
     }
 }
