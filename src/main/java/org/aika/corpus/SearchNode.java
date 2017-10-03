@@ -26,6 +26,7 @@ import org.aika.corpus.Conflicts.Conflict;
 import org.aika.neuron.INeuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.misc.Cache;
 
 import java.util.*;
 
@@ -108,7 +109,6 @@ public class SearchNode implements Comparable<SearchNode> {
         ArrayList<InterprNode> results = new ArrayList<>();
         results.add(doc.bottom);
 
-        doc.selectedSearchNode = null;
         int[] searchSteps = new int[1];
 
         List<InterprNode> rootRefs = expandRootRefinement(doc);
@@ -125,6 +125,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         doc.bottom.storeFinalWeight(doc.visitedCounter++);
+        doc.selectedSearchNode = this;
 
 
         Candidate[] candidates = generateCandidates(doc);
@@ -133,7 +134,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
             if (c != null) {
                 SearchNode child = new SearchNode(doc, this, null, c, level + 1);
-                child.search(doc, searchSteps, candidates);
+                child.search(doc, searchSteps, candidates, false);
+                child.search(doc, searchSteps, candidates, true);
             }
         }
 
@@ -170,11 +172,20 @@ public class SearchNode implements Comparable<SearchNode> {
             p.dumpDebugState();
         }
 
-        System.out.println(level + " " + debugState + " " + candidate.cache.size() + " " + candidate.refinement.act.key.r + " " + candidate.refinement.act.key.n.neuron.get().label);
+        System.out.println(
+                level + " " +
+                debugState +
+                " CS:" + candidate.cache.size() +
+                " LIMITED:" + candidate.debugCounts[DebugState.LIMITED.ordinal()]  +
+                " CACHED:" + candidate.debugCounts[DebugState.CACHED.ordinal()]  +
+                " EXPLORE:" + candidate.debugCounts[DebugState.EXPLORE.ordinal()]  +
+                " " + candidate.refinement.act.key.r +
+                " " + candidate.refinement.act.key.n.neuron.get().label
+        );
     }
 
 
-    private double search(Document doc, int[] searchSteps, Candidate[] candidates) {
+    private double search(Document doc, int[] searchSteps, Candidate[] candidates, boolean complete) {
         double selectedWeight = 0.0;
         double excludedWeight = 0.0;
 
@@ -209,17 +220,24 @@ public class SearchNode implements Comparable<SearchNode> {
             debugState = DebugState.EXPLORE;
         }
 
-        Boolean cd = !alreadyExcluded && !alreadySelected ? getCachedDecision() : null;
+        CachedValue cv = !alreadyExcluded && !alreadySelected ? getCachedDecision() : null;
+
+        if(cv != null && !complete) {
+            return cv.value;
+        }
+
+        candidate.debugCounts[debugState.ordinal()]++;
+
+        List<InterprNode> changed = new ArrayList<>();
+        if(level == -1) {
+            changed.add(doc.bottom);
+        }
+
+        markSelected(changed, refinement);
+        markExcluded(changed, refinement);
 
         if (!alreadyExcluded) {
-            List<InterprNode> changed = new ArrayList<>();
-            if(level == -1) {
-                changed.add(doc.bottom);
-            }
-
-            markSelected(changed, refinement);
-            markExcluded(changed, refinement);
-
+            candidate.refinement.markedExcludedRefinement = false;
             weightDelta = doc.vQueue.adjustWeight(this, changed);
 
             if(selectedParent != null) {
@@ -231,10 +249,10 @@ public class SearchNode implements Comparable<SearchNode> {
             if (candidates.length == level + 1) {
                 selectedWeight = processResult(doc);
             } else {
-                if (cd == null || cd) {
+                if (cv == null || cv.decision) {
                     Candidate c = candidates[level + 1];
                     SearchNode child = new SearchNode(doc, this, excludedParent, c, level + 1);
-                    selectedWeight = child.search(doc, searchSteps, candidates);
+                    selectedWeight = child.search(doc, searchSteps, candidates, complete);
                 }
             }
         }
@@ -244,22 +262,29 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         if(!alreadySelected) {
+            candidate.refinement.markedExcludedRefinement = true;
+
             if (candidates.length == level + 1) {
                 excludedWeight = processResult(doc);
             } else {
-                if(cd == null || !cd) {
+                if(cv == null || !cv.decision) {
                     Candidate c = candidates[level + 1];
                     SearchNode child = new SearchNode(doc, selectedParent, this, c, level + 1);
-                    excludedWeight = child.search(doc, searchSteps, candidates);
+                    excludedWeight = child.search(doc, searchSteps, candidates, complete);
                 }
             }
         }
 
-        if(cd == null && !alreadyExcluded && !alreadySelected) {
-            candidate.cache.put(this, selectedWeight >= excludedWeight);
+        if(cv == null && !alreadyExcluded && !alreadySelected) {
+            cv = new CachedValue();
+            cv.decision = selectedWeight >= excludedWeight;
+            cv.value = cv.decision ? selectedWeight : excludedWeight;
+
+            candidate.cache.put(this, cv);
         }
         return Math.max(selectedWeight, excludedWeight);
     }
+
 
     private double processResult(Document doc) {
         double accNW = accumulatedWeight[0].getNormWeight();
@@ -319,11 +344,8 @@ public class SearchNode implements Comparable<SearchNode> {
         List<InterprNode> results = new ArrayList<>();
         int v = doc.visitedCounter++;
         for(InterprNode n: doc.bottom.children) {
-            for(Conflict c: n.conflicts.primary.values()) {
-                if(c.secondary.visitedCollectConflicts != v) {
-                    c.secondary.visitedCollectConflicts = v;
-                    results.add(c.secondary);
-                }
+            if(!n.conflicts.primary.isEmpty()) {
+                results.add(n);
             }
         }
         return results;
@@ -421,6 +443,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public Coverage getCoverage(InterprNode n) {
+        if(n.markedExcludedRefinement) return Coverage.EXCLUDED;
         if(isCovered(n.markedSelected)) return Coverage.SELECTED;
         if(isCovered(n.markedExcluded)) return Coverage.EXCLUDED;
         return Coverage.UNKNOWN;
@@ -453,7 +476,7 @@ public class SearchNode implements Comparable<SearchNode> {
         if(n.isBottom()) {
             return false;
         }
-
+/*
         for(InterprNode p: n.parents) {
             if(markSelected(changed, p)) return true;
         }
@@ -465,7 +488,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
             if(markSelected(changed, c)) return true;
         }
-
+*/
         if(changed != null) changed.add(n);
 
         return false;
@@ -615,8 +638,8 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public Boolean getCachedDecision() {
-        x: for(Map.Entry<SearchNode, Boolean> me: candidate.cache.entrySet()) {
+    public CachedValue getCachedDecision() {
+        x: for(Map.Entry<SearchNode, CachedValue> me: candidate.cache.entrySet()) {
             SearchNode n = this;
             SearchNode cn = me.getKey();
             do {
@@ -652,8 +675,11 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private static class Candidate implements Comparable<Candidate> {
-        public TreeMap<SearchNode, Boolean> cache = new TreeMap<>();
+        public TreeMap<SearchNode, CachedValue> cache = new TreeMap<>();
         public InterprNode refinement;
+
+        int[] debugCounts = new int[3];
+
 
         int id;
         Integer minBegin;
@@ -690,5 +716,10 @@ public class SearchNode implements Comparable<SearchNode> {
             if(r != 0) return r;
             return Integer.compare(id, c.id);
         }
+    }
+
+    public static class CachedValue {
+        boolean decision;
+        double value;
     }
 }

@@ -159,7 +159,6 @@ public class SearchNodeTest {
         wJoerg.addInput(doc, 0, 6, 0);
         wZimmermann.addInput(doc, 6, 16, 1);
 
-        Document.OPTIMIZE_DEBUG_OUTPUT = true;
         doc.process();
 
         System.out.println(doc.neuronActivationsToString(true));
@@ -176,7 +175,6 @@ public class SearchNodeTest {
         wJoerg.addInput(doc, 17, 23, 2);
         wZimmermann.addInput(doc, 23, 33, 3);
 
-        Document.OPTIMIZE_DEBUG_OUTPUT = true;
         doc.process();
 
         System.out.println(doc.neuronActivationsToString(true));

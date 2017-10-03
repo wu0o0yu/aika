@@ -82,6 +82,7 @@ public class InterprNode implements Comparable<InterprNode> {
     public int markedConflict;
     public int markedSelected;
     public int markedExcluded;
+    public boolean markedExcludedRefinement;
 
     private int numberInnerInputs = 0;
 

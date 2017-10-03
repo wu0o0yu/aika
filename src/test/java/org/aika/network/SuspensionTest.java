@@ -112,6 +112,8 @@ public class SuspensionTest {
 
         doc.process();
 
+        System.out.println(doc.neuronActivationsToString(true));
+
         Assert.assertFalse(outD.getFinalActivations(doc).isEmpty());
     }
 

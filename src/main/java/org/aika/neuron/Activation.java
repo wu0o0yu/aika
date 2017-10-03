@@ -197,8 +197,8 @@ public final class Activation extends NodeActivation<OrNode> {
         public static final State ZERO = new State(0.0, 0.0, 0.0, -1, INeuron.NormWeight.ZERO_WEIGHT, INeuron.NormWeight.ZERO_WEIGHT);
 
         public State(double value, double ub, double lb, int fired, INeuron.NormWeight weight, INeuron.NormWeight weightUB) {
-            assert lb <= value && value <= ub;
-            assert weight.w <= weightUB.w && weightUB.n <= weight.n;
+//            assert lb <= value && value <= ub;
+//            assert weight.w <= weightUB.w && weightUB.n <= weight.n;
             this.value = value;
             this.ub = ub;
             this.lb = lb;
@@ -212,11 +212,11 @@ public final class Activation extends NodeActivation<OrNode> {
         }
 
         public boolean equals(State s) {
-            return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE || Math.abs(ub - s.ub) <= INeuron.WEIGHT_TOLERANCE || Math.abs(lb - s.lb) <= INeuron.WEIGHT_TOLERANCE;
+            return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE; // && Math.abs(ub - s.ub) <= INeuron.WEIGHT_TOLERANCE && Math.abs(lb - s.lb) <= INeuron.WEIGHT_TOLERANCE;
         }
 
         public boolean equalsWithWeights(State s) {
-            return equals(s) && weight.equals(s.weight) && weightUB.equals(s.weightUB);
+            return equals(s) && weight.equals(s.weight); // && weightUB.equals(s.weightUB);
         }
 
         public String toString() {

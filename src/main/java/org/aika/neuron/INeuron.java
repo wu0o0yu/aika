@@ -833,6 +833,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             s.input.inMemoryOutputSynapses.put(s, s);
             s.input.lock.releaseWriteLock();
 
+            if (!s.input.isSuspended()) {
+                s.output.lock.acquireWriteLock();
+                s.output.inMemoryInputSynapses.put(s, s);
+                s.output.lock.releaseWriteLock();
+            }
+
             InputNode iNode = s.inputNode.getIfNotSuspended();
             if (iNode != null) {
                 iNode.setSynapse(s);

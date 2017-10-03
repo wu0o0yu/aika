@@ -176,7 +176,6 @@ public class Document implements Comparable<Document> {
         }
         interrupted = false;
         SearchNode root = new SearchNode(this, null, null, null, -1);
-        selectedSearchNode = root;
         root.computeBestInterpretation(this);
     }
 
