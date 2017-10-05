@@ -68,8 +68,8 @@ public class SearchNode implements Comparable<SearchNode> {
         EXPLORE
     }
 
-    NormWeight[] weightDelta = new NormWeight[] {NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT};
-    NormWeight[] accumulatedWeight = new NormWeight[2];
+    NormWeight weightDelta = NormWeight.ZERO_WEIGHT;
+    NormWeight accumulatedWeight;
 
     public List<StateChange> modifiedActs = new ArrayList<>();
 
@@ -207,9 +207,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         if(selectedParent != null) {
-            for (int i = 0; i < 2; i++) {
-                accumulatedWeight[i] = selectedParent.accumulatedWeight[i];
-            }
+            accumulatedWeight = selectedParent.accumulatedWeight;
         }
 
         if(alreadyExcluded || alreadySelected) {
@@ -235,9 +233,7 @@ public class SearchNode implements Comparable<SearchNode> {
             weightDelta = doc.vQueue.adjustWeight(this, changed);
 
             if(selectedParent != null) {
-                for (int i = 0; i < 2; i++) {
-                    accumulatedWeight[i] = weightDelta[i].add(accumulatedWeight[i]);
-                }
+                accumulatedWeight = weightDelta.add(accumulatedWeight);
             }
 
             if (candidates.length == level + 1) {
@@ -276,8 +272,8 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
     private double processResult(Document doc) {
-        double accNW = accumulatedWeight[0].getNormWeight();
-        double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight[Activation.State.VALUE].getNormWeight() : 0.0;
+        double accNW = accumulatedWeight.getNormWeight();
+        double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight.getNormWeight() : 0.0;
 
         if (accNW > selectedAccNW) {
             doc.selectedSearchNode = this;

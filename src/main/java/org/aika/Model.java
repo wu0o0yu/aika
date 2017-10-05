@@ -230,6 +230,20 @@ public class Model {
     }
 
 
+    /**
+     * Discards all unsuspended neurons and logic nodes.
+     */
+    public void discardAll() {
+        List<Provider> tmp;
+        synchronized (activeProviders) {
+            tmp = new ArrayList<>(activeProviders.values());
+        }
+        for (Provider p: tmp) {
+            p.discard();
+        }
+    }
+
+
     public String networkWeightsToString(boolean all) {
         StringBuilder sb = new StringBuilder();
 /*        for(Provider<Neuron> pn: neurons.values()) {
