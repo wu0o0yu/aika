@@ -376,7 +376,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         long v = NodeActivation.visitedCounter++;
 
         double x = LEARN_RATE * targetAct.errorSignal;
-        bias -= x;
+        bias += x;
         for (INeuron n : doc.finallyActivatedNeurons) {
             for(Activation iAct: n.getFinalActivations(doc)) {
                 Synapse.Key sk = se.evaluate(iAct, targetAct);
@@ -401,25 +401,25 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         double deltaW = x * iAct.finalState.value;
 
         Provider<InputNode> inp = inputNeuron.outputNodes.get(sk.createInputNodeKey());
-        Synapse s = null;
+        Synapse synapse = null;
         InputNode in = null;
         if(inp != null) {
             in = inp.get();
-            s = in.getSynapse(sk.relativeRid, provider);
+            synapse = in.getSynapse(sk.relativeRid, provider);
         }
 
-        if(s == null) {
-            s = new Synapse(inputNeuron.provider, sk);
-            s.output = provider;
+        if(synapse == null) {
+            synapse = new Synapse(inputNeuron.provider, sk);
+            synapse.output = provider;
 
             if(in == null) {
-                in = InputNode.add(provider.m, sk.createInputNodeKey(), s.input.get());
+                in = InputNode.add(provider.m, sk.createInputNodeKey(), synapse.input.get());
             }
-            in.setSynapse(s);
-            s.link();
+            in.setSynapse(synapse);
+            synapse.link();
         }
 
-        s.w -= deltaW;
+        synapse.w += deltaW;
     }
 
 
