@@ -293,13 +293,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
     boolean isExpandable(boolean checkFrequency) {
         if(checkFrequency && !isFrequent()) return false;
-
-        int numPosNodes = 0;
-        for(Refinement ref: parents.keySet()) {
-//            if(!ref.input.get().key.isNeg) numPosNodes++;  TODO!
-        }
-
-        return numPosNodes < MAX_POS_NODES;
+        return parents.size() < MAX_POS_NODES;
     }
 
 
