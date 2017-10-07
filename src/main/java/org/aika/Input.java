@@ -259,7 +259,6 @@ public class Input implements Comparable<Input> {
         return outputNeuron.get().getInputSynapse(new Synapse(
                         neuron,
                         new Synapse.Key(
-                                weight < 0.0,
                                 recurrent,
                                 relativeRid,
                                 absoluteRid,

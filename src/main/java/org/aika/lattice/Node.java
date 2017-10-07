@@ -670,7 +670,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             }
             in.lock.releaseWriteLock();
 
-            if (!s.key.isNeg && !s.key.isRecurrent) {
+            if (!s.isNegative() && !s.key.isRecurrent) {
                 if (s.w >= -neuron.bias * TOLERANCE) {
                     numAboveTolerance++;
                 } else {
@@ -742,7 +742,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         for (Synapse s : tmp) {
-            if (s.w >= -n.bias * TOLERANCE && !s.key.isNeg && !s.key.isRecurrent && sum + Math.abs(s.w) + s.maxLowerWeightsSum > 0.0) {
+            if (s.w >= -n.bias * TOLERANCE && !s.isNegative() && !s.key.isRecurrent && sum + Math.abs(s.w) + s.maxLowerWeightsSum > 0.0) {
                 Node nln = rsk.pa == null ?
                         s.inputNode.get() :
                         AndNode.createNextLevelNode(m, threadId, pa, new Refinement(s.key.relativeRid, rsk.offset, s.inputNode), false);

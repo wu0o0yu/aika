@@ -49,7 +49,6 @@ public class TrainingTest {
         out.get().train(doc, targetAct,
                 (iAct, oAct) -> new Synapse.Key(
                         false,
-                        false,
                         0,
                         null,
                         Range.Operator.EQUALS,

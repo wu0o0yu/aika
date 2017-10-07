@@ -234,14 +234,14 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     public void propagateAddedActivation(Document doc, NodeActivation act, InterprNode removedConflict) {
-        if (!key.isNeg && !key.isRecurrent) {
+        if (!key.isRecurrent) {
             apply(doc, act, removedConflict);
         }
     }
 
 
     public void propagateRemovedActivation(Document doc, NodeActivation act) {
-        if (!key.isNeg && !key.isRecurrent) {
+        if (!key.isRecurrent) {
             removeFromNextLevel(doc, act);
         }
     }
@@ -375,7 +375,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                     if (act != secondAct &&
                             this != in &&
                             in.visitedTrain != v &&
-                            !in.key.isNeg &&
                             !in.key.isRecurrent &&
                             ((srm.compare(act.key.r.begin, act.key.r.end, secondAct.key.r.begin, secondAct.key.r.end) && erm.compare(act.key.r.end, act.key.r.begin, secondAct.key.r.end, secondAct.key.r.begin)) ||
                                     (ridDelta != null && ridDelta < AndNode.MAX_RID_RANGE))) {
@@ -451,7 +450,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     public String logicToString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(key.isNeg ? "N" : "P");
+        sb.append("I");
         sb.append(key.isRecurrent ? "R" : "");
 
         sb.append(getRangeBrackets(key.startRangeOutput, key.startRangeMapping));

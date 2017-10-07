@@ -216,7 +216,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
             if (iAct == act || iAct.isRemoved) continue;
 
-            if (s.key.isNeg) {
+            if (s.isNegative()) {
                 if (!checkSelfReferencing(act.key.o, iAct.key.o, null, 0) && act.key.o.contains(iAct.key.o, true)) {
                     ub += iAct.lowerBound * s.w;
                 }
@@ -250,7 +250,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
             State is = State.ZERO;
             if (s.key.isRecurrent) {
-                if (!s.key.isNeg || !checkSelfReferencing(o, io, sn, 0)) {
+                if (!s.isNegative() || !checkSelfReferencing(o, io, sn, 0)) {
                     is = round == 0 ? getInitialState(sn.getCoverage(io)) : iAct.rounds.get(round - 1);
                 }
             } else {
@@ -260,7 +260,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             int t = s.key.isRecurrent ? REC : DIR;
             sum[t] += is.value * s.w;
 
-            if (!s.key.isRecurrent && !s.key.isNeg && sum[DIR] + sum[REC] >= 0.0 && fired < 0) {
+            if (!s.key.isRecurrent && s.w > 0.0 && sum[DIR] + sum[REC] >= 0.0 && fired < 0) {
                 fired = iAct.rounds.get(round).fired + 1;
             }
         }
@@ -551,7 +551,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             iAct.addSynapseActivation(0, sa);
             oAct.addSynapseActivation(1, sa);
 
-            if (sk.isNeg && sk.isRecurrent) {
+            if (s.w <= 0.0 && sk.isRecurrent) {
                 recNegTmp.add(rAct);
             }
         });
@@ -601,7 +601,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 Synapse s = sa.s;
                 Activation rAct = dir == 0 ? sa.input : sa.output;
 
-                if (s.key.isNeg && s.key.isRecurrent) {
+                if (s.isNegative() && s.key.isRecurrent) {
                     Activation oAct = (dir == 0 ? act : rAct);
                     Activation iAct = (dir == 0 ? rAct : act);
 
@@ -661,7 +661,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     private static void markConflicts(Activation iAct, Activation oAct, int v) {
         oAct.key.o.markedConflict = v;
         for (SynapseActivation sa : iAct.neuronOutputs) {
-            if (sa.s.key.isRecurrent && sa.s.key.isNeg) {
+            if (sa.s.key.isRecurrent && sa.s.isNegative()) {
                 sa.output.key.o.markedConflict = v;
             }
         }

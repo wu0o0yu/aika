@@ -354,7 +354,6 @@ public class Model {
                             inputSignal,
                             new Synapse.Key(
                                     false,
-                                    false,
                                     null,
                                     null,
                                     Operator.LESS_THAN,
@@ -376,7 +375,6 @@ public class Model {
             Synapse ctns = n.get().getInputSynapse(new Synapse(
                             ctn,
                             new Synapse.Key(
-                                    false,
                                     false,
                                     0,
                                     null,
@@ -421,7 +419,6 @@ public class Model {
                             clockSignal,
                             new Synapse.Key(
                                     false,
-                                    false,
                                     null,
                                     null,
                                     Operator.NONE,
@@ -444,7 +441,6 @@ public class Model {
                             startSignal,
                             new Synapse.Key(
                                     false,
-                                    false,
                                     0,
                                     null,
                                     Operator.EQUALS,
@@ -466,7 +462,6 @@ public class Model {
                         n,
                         new Synapse.Key(
                                 false,
-                                false,
                                 -1,
                                 null,
                                 direction ? Operator.NONE : Operator.EQUALS,
@@ -487,7 +482,6 @@ public class Model {
                 new Synapse(
                         n,
                         new Synapse.Key(
-                                true,
                                 true,
                                 0,
                                 null,

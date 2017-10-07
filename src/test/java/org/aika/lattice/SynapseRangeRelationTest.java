@@ -54,7 +54,6 @@ public class SynapseRangeRelationTest {
         Synapse s = new Synapse(in,
                 new Synapse.Key(
                         false,
-                        false,
                         null,
                         null,
                         Operator.LESS_THAN,

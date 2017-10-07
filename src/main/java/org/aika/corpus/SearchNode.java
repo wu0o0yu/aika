@@ -649,7 +649,7 @@ public class SearchNode implements Comparable<SearchNode> {
         for(InterprNode n: p.refinement) {
             if(n.act != null) {
                 for(SynapseActivation sa: n.act.neuronOutputs) {
-                    if(sa.s.key.isRecurrent && !sa.s.key.isNeg) {
+                    if(sa.s.key.isRecurrent && !sa.s.isNegative()) {
                         if(getCoverage(sa.output.key.o) == Coverage.UNKNOWN) return true;
                     }
                 }

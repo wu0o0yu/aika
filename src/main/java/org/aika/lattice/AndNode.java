@@ -296,7 +296,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
         int numPosNodes = 0;
         for(Refinement ref: parents.keySet()) {
-            if(!ref.input.get().key.isNeg) numPosNodes++;
+//            if(!ref.input.get().key.isNeg) numPosNodes++;  TODO!
         }
 
         return numPosNodes < MAX_POS_NODES;
