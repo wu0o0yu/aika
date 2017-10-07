@@ -97,4 +97,10 @@ public class Utils {
         if(b == null) return a;
         return Math.min(a, b);
     }
+
+    public static Integer nullSafeMax(Integer a, Integer b) {
+        if(a == null) return b;
+        if(b == null) return a;
+        return Math.max(a, b);
+    }
 }

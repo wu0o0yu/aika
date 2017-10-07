@@ -80,10 +80,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public boolean ridRequired;
 
 
-    public int numberOfNeuronRefs = 0;
+    public volatile int numberOfNeuronRefs = 0;
     volatile boolean isRemoved;
     volatile int isRemovedId;
-    static int isRemovedIdCounter = 0;
+    volatile static int isRemovedIdCounter = 0;
 
     public volatile boolean frequencyHasChanged = true;
     public volatile int nOffset;
@@ -199,7 +199,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public abstract boolean isAllowedOption(int threadId, InterprNode n, NodeActivation<?> act, long v);
 
-    abstract void cleanup(Model m, int threadId);
+    abstract void cleanup(Model m);
 
     abstract A createActivation(Document doc, Key ak, boolean isTrainingAct);
 
@@ -287,7 +287,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void removeOrChild(int threadId, OrEntry oe) {
+    void removeOrChild(OrEntry oe) {
         lock.acquireWriteLock();
         if (orChildren != null) {
             orChildren.remove(oe);
@@ -604,21 +604,19 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void remove(Model m, int threadId) {
+    void remove(Model m) {
         assert !isRemoved;
 
         lock.acquireWriteLock();
         provider.setModified();
         while (andChildren != null && !andChildren.isEmpty()) {
-            andChildren.pollFirstEntry().getValue().get().remove(m, threadId);
+            andChildren.firstEntry().getValue().get().remove(m);
         }
 
         while (orChildren != null && !orChildren.isEmpty()) {
-            orChildren.pollFirst().node.get().remove(m, threadId);
+            orChildren.pollFirst().node.get().remove(m);
         }
         lock.releaseWriteLock();
-
-//        m.allNodes.remove(this);
 
         clearActivations(m);
 
@@ -672,7 +670,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             }
             in.lock.releaseWriteLock();
 
-            if (!s.key.isNeg && !s.key.isRecurrent) {
+            if (!s.isNegative() && !s.key.isRecurrent) {
                 if (s.w >= -neuron.bias * TOLERANCE) {
                     numAboveTolerance++;
                 } else {
@@ -721,7 +719,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         outputNode.lock.releaseWriteLock();
 
         for (RSKey on : cleanup) {
-            on.pa.get().cleanup(m, threadId);
+            on.pa.get().cleanup(m);
         }
 
         return true;
@@ -744,7 +742,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         for (Synapse s : tmp) {
-            if (s.w >= -n.bias * TOLERANCE && !s.key.isNeg && !s.key.isRecurrent && sum + Math.abs(s.w) + s.maxLowerWeightsSum > 0.0) {
+            if (s.w >= -n.bias * TOLERANCE && !s.isNegative() && !s.key.isRecurrent && sum + Math.abs(s.w) + s.maxLowerWeightsSum > 0.0) {
                 Node nln = rsk.pa == null ?
                         s.inputNode.get() :
                         AndNode.createNextLevelNode(m, threadId, pa, new Refinement(s.key.relativeRid, rsk.offset, s.inputNode), false);

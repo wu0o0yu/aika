@@ -1,6 +1,7 @@
 package org.aika.neuron;
 
 import org.aika.Utils;
+import org.aika.corpus.Document;
 import org.aika.corpus.SearchNode.StateChange;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
@@ -52,8 +53,8 @@ public final class Activation extends NodeActivation<OrNode> {
     public double errorSignal;
 
 
-    public Activation(int id, Key key) {
-        super(id, key);
+    public Activation(int id, Document doc, Key key) {
+        super(id, doc, key);
     }
 
 
@@ -180,43 +181,29 @@ public final class Activation extends NodeActivation<OrNode> {
      * interpretation.
      */
     public static class State {
-        public static final int VALUE = 0;
-        public static final int UB = 1;
-        public static final int LB = 2;
         public static final int DIR = 0;
         public static final int REC = 1;
 
         public final double value;
-        public final double ub;
-        public final double lb;
 
         public final int fired;
         public final INeuron.NormWeight weight;
-        public final INeuron.NormWeight weightUB;
 
-        public static final State ZERO = new State(0.0, 0.0, 0.0, -1, INeuron.NormWeight.ZERO_WEIGHT, INeuron.NormWeight.ZERO_WEIGHT);
+        public static final State ZERO = new State(0.0, -1, INeuron.NormWeight.ZERO_WEIGHT);
 
-        public State(double value, double ub, double lb, int fired, INeuron.NormWeight weight, INeuron.NormWeight weightUB) {
-            assert lb <= value && value <= ub;
-            assert weight.w <= weightUB.w && weightUB.n <= weight.n;
+        public State(double value, int fired, INeuron.NormWeight weight) {
             this.value = value;
-            this.ub = ub;
-            this.lb = lb;
             this.fired = fired;
             this.weight = weight;
-            this.weightUB = weightUB;
         }
 
-        public INeuron.NormWeight getWeight(int t) {
-            return t == VALUE ? weight : weightUB;
-        }
 
         public boolean equals(State s) {
-            return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE || Math.abs(ub - s.ub) <= INeuron.WEIGHT_TOLERANCE || Math.abs(lb - s.lb) <= INeuron.WEIGHT_TOLERANCE;
+            return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE;
         }
 
         public boolean equalsWithWeights(State s) {
-            return equals(s) && weight.equals(s.weight) && weightUB.equals(s.weightUB);
+            return equals(s) && weight.equals(s.weight);
         }
 
         public String toString() {

@@ -102,7 +102,7 @@ public class ActivationOutputsTest {
         );
 
 
-        InputNode pC = new InputNode(m, new Synapse.Key(false, false, 0, null, LESS_THAN, Mapping.START, true, GREATER_THAN, Mapping.END, true));
+        InputNode pC = new InputNode(m, new Synapse.Key(false, 0, null, LESS_THAN, Mapping.START, true, GREATER_THAN, Mapping.END, true));
         NodeActivation pC1 = TestHelper.addActivation(pC, doc, TestHelper.get(doc, pAB.get().node.get(), new Range(0, 1), null));
 
         Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, TestHelper.get(doc, pAB.get().node.get(), new Range(0, 1), null)));

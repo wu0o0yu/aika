@@ -175,8 +175,7 @@ public class Document implements Comparable<Document> {
             vQueue.propagateWeight(0, act);
         }
         interrupted = false;
-        SearchNode root = SearchNode.createRootSearchNode(this);
-        selectedSearchNode = root;
+        SearchNode root = new SearchNode(this, null, null, null, -1);
         root.computeBestInterpretation(this);
     }
 
@@ -234,7 +233,7 @@ public class Document implements Comparable<Document> {
                 ThreadState<OrNode, Activation> th = n.node.get().getThreadState(threadId, false);
                 if(th != null) {
                     for (Activation act : th.activations.values()) {
-                        n.train(this, act);
+//                        n.train(this, act);
                     }
                 }
             }
@@ -301,6 +300,10 @@ public class Document implements Comparable<Document> {
         StringBuilder sb = new StringBuilder();
         INeuron.NormWeight weightSum = INeuron.NormWeight.ZERO_WEIGHT;
         for(Activation act: acts) {
+            if(act.upperBound <= 0.0) {
+                continue;
+            }
+
             sb.append(act.id + " ");
             sb.append(act.key.r);
             if(withTextSnipped && act.key.r.begin != null && act.key.r.end != null) {
@@ -482,7 +485,7 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public NormWeight[] adjustWeight(SearchNode cand, List<InterprNode> changed) {
+        public NormWeight adjustWeight(SearchNode cand, List<InterprNode> changed) {
             long v = NodeActivation.visitedCounter++;
 
             for(InterprNode n: changed) {
@@ -534,8 +537,8 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public INeuron.NormWeight[] processChanges(SearchNode en, long v) {
-            NormWeight[] delta = new NormWeight[] {NormWeight.ZERO_WEIGHT, NormWeight.ZERO_WEIGHT};
+        public INeuron.NormWeight processChanges(SearchNode en, long v) {
+            NormWeight delta = NormWeight.ZERO_WEIGHT;
             for(int round = 0; round < queue.size(); round++) {
                 ArrayDeque<Activation> q = queue.get(round);
                 while (!q.isEmpty()) {
@@ -568,9 +571,7 @@ public class Document implements Comparable<Document> {
                         }
 
                         if (act.rounds.getLastRound() != null && round >= act.rounds.getLastRound()) { // Consider only the final round.
-                            for (int i = 0; i < 2; i++) {
-                                delta[i] = delta[i].add(s.getWeight(i).sub(oldState.getWeight(i)));
-                            }
+                            delta = delta.add(s.weight.sub(oldState.weight));
                         }
                     }
                 }
