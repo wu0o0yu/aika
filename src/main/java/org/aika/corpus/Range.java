@@ -90,6 +90,11 @@ public class Range {
     }
 
 
+    public boolean equals(Range r) {
+        return begin == r.begin && end == r.end;
+    }
+
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
 

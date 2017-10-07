@@ -58,10 +58,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private static final Logger log = LoggerFactory.getLogger(INeuron.class);
 
-    public final static double LEARN_RATE = 0.01;
-    public static final double WEIGHT_TOLERANCE = 0.001;
-    public static final double TOLERANCE = 0.000001;
-    public static final int MAX_SELF_REFERENCING_DEPTH = 5;
+    public static double LEARN_RATE = 0.01;
+    public static double WEIGHT_TOLERANCE = 0.001;
+    public static double TOLERANCE = 0.000001;
+    public static int MAX_SELF_REFERENCING_DEPTH = 5;
 
     public String label;
 

@@ -300,6 +300,10 @@ public class Document implements Comparable<Document> {
         StringBuilder sb = new StringBuilder();
         INeuron.NormWeight weightSum = INeuron.NormWeight.ZERO_WEIGHT;
         for(Activation act: acts) {
+            if(act.upperBound <= 0.0) {
+                continue;
+            }
+
             sb.append(act.id + " ");
             sb.append(act.key.r);
             if(withTextSnipped && act.key.r.begin != null && act.key.r.end != null) {
