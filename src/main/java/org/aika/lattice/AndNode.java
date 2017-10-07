@@ -212,12 +212,12 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    public void cleanup(Model m, int threadId) {
+    public void cleanup(Model m) {
         if(!isRemoved && !isFrequent() && !isRequired()) {
-            remove(m, threadId);
+            remove(m);
 
             for(Provider<? extends Node> p: parents.values()) {
-                p.get().cleanup(m, threadId);
+                p.get().cleanup(m);
             }
         }
     }
@@ -479,7 +479,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
     @Override
     protected NodeActivation<AndNode> createActivation(Document doc, NodeActivation.Key ak, boolean isTrainingAct) {
-        NodeActivation<AndNode> act = new NodeActivation<>(doc.activationIdCounter++, ak);
+        NodeActivation<AndNode> act = new NodeActivation<>(doc.activationIdCounter++, doc, ak);
         act.isTrainingAct = isTrainingAct;
         return act;
     }
@@ -491,8 +491,8 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    void remove(Model m, int threadId) {
-        super.remove(m, threadId);
+    void remove(Model m) {
+        super.remove(m);
 
         for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
             Node pn = me.getValue().get();

@@ -104,7 +104,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     @Override
     protected NodeActivation<InputNode> createActivation(Document doc, NodeActivation.Key ak, boolean isTrainingAct) {
-        NodeActivation<InputNode> act = new NodeActivation<>(doc.activationIdCounter++, ak);
+        NodeActivation<InputNode> act = new NodeActivation<>(doc.activationIdCounter++, doc, ak);
         act.isTrainingAct = isTrainingAct;
         return act;
     }
@@ -438,14 +438,14 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    public void cleanup(Model m, int threadId) {
+    public void cleanup(Model m) {
     }
 
 
     @Override
-    void remove(Model m, int threadId) {
+    void remove(Model m) {
         inputNeuron.get().outputNodes.remove(key);
-        super.remove(m, threadId);
+        super.remove(m);
     }
 
 

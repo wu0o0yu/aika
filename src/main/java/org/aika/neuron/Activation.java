@@ -1,6 +1,7 @@
 package org.aika.neuron;
 
 import org.aika.Utils;
+import org.aika.corpus.Document;
 import org.aika.corpus.SearchNode.StateChange;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
@@ -52,8 +53,8 @@ public final class Activation extends NodeActivation<OrNode> {
     public double errorSignal;
 
 
-    public Activation(int id, Key key) {
-        super(id, key);
+    public Activation(int id, Document doc, Key key) {
+        super(id, doc, key);
     }
 
 

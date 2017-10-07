@@ -199,7 +199,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public abstract boolean isAllowedOption(int threadId, InterprNode n, NodeActivation<?> act, long v);
 
-    abstract void cleanup(Model m, int threadId);
+    abstract void cleanup(Model m);
 
     abstract A createActivation(Document doc, Key ak, boolean isTrainingAct);
 
@@ -287,7 +287,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void removeOrChild(int threadId, OrEntry oe) {
+    void removeOrChild(OrEntry oe) {
         lock.acquireWriteLock();
         if (orChildren != null) {
             orChildren.remove(oe);
@@ -604,17 +604,17 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void remove(Model m, int threadId) {
+    void remove(Model m) {
         assert !isRemoved;
 
         lock.acquireWriteLock();
         provider.setModified();
         while (andChildren != null && !andChildren.isEmpty()) {
-            andChildren.firstEntry().getValue().get().remove(m, threadId);
+            andChildren.firstEntry().getValue().get().remove(m);
         }
 
         while (orChildren != null && !orChildren.isEmpty()) {
-            orChildren.pollFirst().node.get().remove(m, threadId);
+            orChildren.pollFirst().node.get().remove(m);
         }
         lock.releaseWriteLock();
 
@@ -719,7 +719,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         outputNode.lock.releaseWriteLock();
 
         for (RSKey on : cleanup) {
-            on.pa.get().cleanup(m, threadId);
+            on.pa.get().cleanup(m);
         }
 
         return true;

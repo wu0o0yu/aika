@@ -84,7 +84,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
     @Override
     protected Activation createActivation(Document doc, NodeActivation.Key ak, boolean isTrainingAct) {
-        Activation act = new Activation(doc.activationIdCounter++, ak);
+        Activation act = new Activation(doc.activationIdCounter++, doc, ak);
         ak.o.act = act;
         act.isTrainingAct = isTrainingAct;
         ThreadState<OrNode, Activation> th = getThreadState(doc.threadId, false);
@@ -219,7 +219,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public void cleanup(Model m, int threadId) {
+    public void cleanup(Model m) {
 
     }
 
@@ -316,7 +316,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
     void removeInput(int threadId, Integer ridOffset, Node in) {
         in.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, -1);
-        in.removeOrChild(threadId, new OrEntry(ridOffset, provider));
+        in.removeOrChild(new OrEntry(ridOffset, provider));
         in.provider.setModified();
         lock.acquireWriteLock();
         provider.setModified();
@@ -338,7 +338,7 @@ public class OrNode extends Node<OrNode, Activation> {
             for(Provider<Node> p: me.getValue()) {
                 Node pn = p.get();
                 pn.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, -1);
-                pn.removeOrChild(threadId, new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, provider));
+                pn.removeOrChild(new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, provider));
                 pn.provider.setModified();
             }
         }
@@ -347,16 +347,16 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    void remove(Model m, int threadId) {
-        neuron.get().remove(threadId);
+    void remove(Model m) {
+        neuron.get().remove();
 
-        super.remove(m, threadId);
+        super.remove(m);
 
         lock.acquireReadLock();
         for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: parents.entrySet()) {
             for(Provider<Node> p: me.getValue()) {
                 Node pn = p.get();
-                pn.removeOrChild(threadId, new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, provider));
+                pn.removeOrChild(new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, provider));
                 pn.provider.setModified();
             }
         }
