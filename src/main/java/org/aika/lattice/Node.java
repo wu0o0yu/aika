@@ -80,10 +80,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public boolean ridRequired;
 
 
-    public int numberOfNeuronRefs = 0;
+    public volatile int numberOfNeuronRefs = 0;
     volatile boolean isRemoved;
     volatile int isRemovedId;
-    static int isRemovedIdCounter = 0;
+    volatile static int isRemovedIdCounter = 0;
 
     public volatile boolean frequencyHasChanged = true;
     public volatile int nOffset;
@@ -610,15 +610,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         lock.acquireWriteLock();
         provider.setModified();
         while (andChildren != null && !andChildren.isEmpty()) {
-            andChildren.pollFirstEntry().getValue().get().remove(m, threadId);
+            andChildren.firstEntry().getValue().get().remove(m, threadId);
         }
 
         while (orChildren != null && !orChildren.isEmpty()) {
             orChildren.pollFirst().node.get().remove(m, threadId);
         }
         lock.releaseWriteLock();
-
-//        m.allNodes.remove(this);
 
         clearActivations(m);
 
