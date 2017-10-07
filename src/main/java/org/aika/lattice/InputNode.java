@@ -104,7 +104,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     @Override
     protected NodeActivation<InputNode> createActivation(Document doc, NodeActivation.Key ak, boolean isTrainingAct) {
-        NodeActivation<InputNode> act = new NodeActivation<>(doc.activationIdCounter++, ak);
+        NodeActivation<InputNode> act = new NodeActivation<>(doc.activationIdCounter++, doc, ak);
         act.isTrainingAct = isTrainingAct;
         return act;
     }
@@ -234,14 +234,14 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     public void propagateAddedActivation(Document doc, NodeActivation act, InterprNode removedConflict) {
-        if (!key.isNeg && !key.isRecurrent) {
+        if (!key.isRecurrent) {
             apply(doc, act, removedConflict);
         }
     }
 
 
     public void propagateRemovedActivation(Document doc, NodeActivation act) {
-        if (!key.isNeg && !key.isRecurrent) {
+        if (!key.isRecurrent) {
             removeFromNextLevel(doc, act);
         }
     }
@@ -375,7 +375,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                     if (act != secondAct &&
                             this != in &&
                             in.visitedTrain != v &&
-                            !in.key.isNeg &&
                             !in.key.isRecurrent &&
                             ((srm.compare(act.key.r.begin, act.key.r.end, secondAct.key.r.begin, secondAct.key.r.end) && erm.compare(act.key.r.end, act.key.r.begin, secondAct.key.r.end, secondAct.key.r.begin)) ||
                                     (ridDelta != null && ridDelta < AndNode.MAX_RID_RANGE))) {
@@ -427,29 +426,31 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     @Override
     public void reactivate() {
+        inputNeuron.lock.acquireReadLock();
         inputNeuron.inMemoryOutputSynapses.values().forEach(s -> {
             if (key.compareTo(s.key.createInputNodeKey()) == 0) {
                 setSynapse(s);
             }
         });
+        inputNeuron.lock.releaseReadLock();
     }
 
 
     @Override
-    public void cleanup(Model m, int threadId) {
+    public void cleanup(Model m) {
     }
 
 
     @Override
-    void remove(Model m, int threadId) {
+    void remove(Model m) {
         inputNeuron.get().outputNodes.remove(key);
-        super.remove(m, threadId);
+        super.remove(m);
     }
 
 
     public String logicToString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(key.isNeg ? "N" : "P");
+        sb.append("I");
         sb.append(key.isRecurrent ? "R" : "");
 
         sb.append(getRangeBrackets(key.startRangeOutput, key.startRangeMapping));

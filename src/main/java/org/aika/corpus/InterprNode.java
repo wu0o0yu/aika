@@ -82,15 +82,14 @@ public class InterprNode implements Comparable<InterprNode> {
     public int markedConflict;
     public int markedSelected;
     public int markedExcluded;
-    public int markedHasCandidate;
-
-    Boolean hasUnsatisfiedPosFeedbackLinksCache;
+    public boolean markedExcludedRefinement;
 
     private int numberInnerInputs = 0;
 
     private int largestCommonSubsetCount = 0;
 
     public final Document doc;
+    public Activation act;
 
     boolean isRemoved;
     int removedId;

@@ -118,12 +118,10 @@ public class Synapse implements Writable {
     public Synapse(Neuron input, Key key) {
         this(input);
         this.key = lookupKey(key);
-
-        assert (w >= 0.0 && !key.isNeg) || (w <= 0.0 && key.isNeg);
     }
 
 
-    public void link(int threadId) {
+    public void link() {
         INeuron in = input.get();
         INeuron out = output.get();
 
@@ -132,8 +130,13 @@ public class Synapse implements Writable {
         (dir ? in : out).lock.acquireWriteLock();
         (dir ? out : in).lock.acquireWriteLock();
 
+        in.provider.lock.acquireWriteLock();
         in.provider.inMemoryOutputSynapses.put(this, this);
+        in.provider.lock.releaseWriteLock();
+
+        out.provider.lock.acquireWriteLock();
         out.provider.inMemoryInputSynapses.put(this, this);
+        out.provider.lock.releaseWriteLock();
 
         out.inputSynapses.put(this, this);
 
@@ -152,6 +155,11 @@ public class Synapse implements Writable {
         if(aAbs + tolerance < bAbs) return -1;
         if(aAbs > bAbs + tolerance) return 1;
         return 0;
+    }
+
+
+    public boolean isNegative() {
+        return w <= 0.0;
     }
 
 
@@ -210,7 +218,6 @@ public class Synapse implements Writable {
         public static final Key MIN_KEY = new Key();
         public static final Key MAX_KEY = new Key();
 
-        public boolean isNeg;
         public boolean isRecurrent;
         public Integer relativeRid;
         public Integer absoluteRid;
@@ -224,8 +231,7 @@ public class Synapse implements Writable {
         public Key() {}
 
 
-        public Key(boolean isNeg, boolean isRecurrent, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Mapping startRangeMapping, boolean startRangeOutput, Operator endRangeMatch, Mapping endRangeMapping, boolean endRangeOutput) {
-            this.isNeg = isNeg;
+        public Key(boolean isRecurrent, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Mapping startRangeMapping, boolean startRangeOutput, Operator endRangeMatch, Mapping endRangeMapping, boolean endRangeOutput) {
             this.isRecurrent = isRecurrent;
             this.relativeRid = relativeRid;
             this.absoluteRid = absoluteRid;
@@ -241,7 +247,6 @@ public class Synapse implements Writable {
         public Key createInputNodeKey() {
             return relativeRid != null ?
                     new Key(
-                            isNeg,
                             isRecurrent,
                             0,
                             absoluteRid,
@@ -257,7 +262,6 @@ public class Synapse implements Writable {
 
         @Override
         public void write(DataOutput out) throws IOException {
-            out.writeBoolean(isNeg);
             out.writeBoolean(isRecurrent);
             out.writeBoolean(relativeRid != null);
             if(relativeRid != null) out.writeByte(relativeRid);
@@ -274,7 +278,6 @@ public class Synapse implements Writable {
 
         @Override
         public void readFields(DataInput in, Model m) throws IOException {
-            isNeg = in.readBoolean();
             isRecurrent = in.readBoolean();
             if(in.readBoolean()) relativeRid = (int) in.readByte();
             if(in.readBoolean()) absoluteRid = (int) in.readByte();
@@ -303,9 +306,7 @@ public class Synapse implements Writable {
             if(this == MAX_KEY && k != MAX_KEY) return 1;
             else if(this != MAX_KEY && k == MAX_KEY) return -1;
 
-            int r = Boolean.compare(isNeg, k.isNeg);
-            if(r != 0) return r;
-            r = Boolean.compare(isRecurrent, k.isRecurrent);
+            int r = Boolean.compare(isRecurrent, k.isRecurrent);
             if(r != 0) return r;
             r = Utils.compareInteger(relativeRid, k.relativeRid);
             if(r != 0) return r;
