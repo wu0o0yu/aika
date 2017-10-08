@@ -29,9 +29,8 @@ import static org.aika.neuron.Activation.SynapseActivation.OUTPUT_COMP;
  */
 public final class Activation extends NodeActivation<OrNode> {
 
-    static final SynapseActivation[] EMPTY_SYN_ACTS = new SynapseActivation[0];
-    public SynapseActivation[] neuronInputs = EMPTY_SYN_ACTS;
-    public SynapseActivation[] neuronOutputs = EMPTY_SYN_ACTS;
+    public TreeSet<SynapseActivation> neuronInputs = new TreeSet<>(INPUT_COMP);
+    public TreeSet<SynapseActivation> neuronOutputs = new TreeSet<>(OUTPUT_COMP);
 
     public double upperBound;
     public double lowerBound;
@@ -60,20 +59,18 @@ public final class Activation extends NodeActivation<OrNode> {
 
     public void addSynapseActivation(int dir, SynapseActivation sa) {
         if(dir == 0) {
-            if(Utils.contains(neuronOutputs, sa, OUTPUT_COMP)) return;
-            neuronOutputs = Utils.addToArray(neuronOutputs, sa);
+            neuronOutputs.add(sa);
         } else {
-            if(Utils.contains(neuronInputs, sa, INPUT_COMP)) return;
-            neuronInputs = Utils.addToArray(neuronInputs, sa);
+            neuronInputs.add(sa);
         }
     }
 
 
     public void removeSynapseActivation(int dir, SynapseActivation sa) {
         if(dir == 0) {
-            neuronOutputs = Utils.removeToArray(neuronOutputs, sa);
+            neuronOutputs.remove(sa);
         } else {
-            neuronInputs = Utils.removeToArray(neuronInputs, sa);
+            neuronInputs.remove(sa);
         };
     }
 
