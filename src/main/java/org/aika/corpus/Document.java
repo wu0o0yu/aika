@@ -52,9 +52,8 @@ public class Document implements Comparable<Document> {
 
     public static boolean APPLY_DEBUG_OUTPUT = false;
     public static boolean OPTIMIZE_DEBUG_OUTPUT = false;
-    public static boolean TRAIN_DEBUG_OUTPUT = false;
 
-    public static int CLEANUP_INTERVAL = 20;
+    public static int CLEANUP_INTERVAL = 50;
 
     public static int MAX_ROUND = 20;
 
@@ -256,6 +255,8 @@ public class Document implements Comparable<Document> {
         addedNodes.clear();
 
         if(m.lastCleanup[threadId] + CLEANUP_INTERVAL < id) {
+            m.lastCleanup[threadId] = id;
+
             List<Provider<? extends AbstractNode>> tmp;
             synchronized(m.activeProviders) {
                 tmp = new ArrayList<>(m.activeProviders.values());

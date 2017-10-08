@@ -58,7 +58,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private static final Logger log = LoggerFactory.getLogger(INeuron.class);
 
-    public static double LEARN_RATE = 0.01;
     public static double WEIGHT_TOLERANCE = 0.001;
     public static double TOLERANCE = 0.000001;
     public static int MAX_SELF_REFERENCING_DEPTH = 5;
@@ -370,12 +369,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public void train(Document doc, Activation targetAct, SynapseEvaluation se) {
+    public void train(Document doc, Activation targetAct, double learnRate, SynapseEvaluation se) {
         if (Math.abs(targetAct.errorSignal) < TOLERANCE) return;
 
         long v = NodeActivation.visitedCounter++;
 
-        double x = LEARN_RATE * targetAct.errorSignal;
+        double x = learnRate * targetAct.errorSignal;
         bias += x;
         for (INeuron n : doc.finallyActivatedNeurons) {
             for(Activation iAct: n.getFinalActivations(doc)) {

@@ -46,7 +46,7 @@ public class TrainingTest {
 
         targetAct.errorSignal = 1.0 - targetAct.finalState.value;
 
-        out.get().train(doc, targetAct,
+        out.get().train(doc, targetAct, 0.01,
                 (iAct, oAct) -> new Synapse.Key(
                         false,
                         0,
