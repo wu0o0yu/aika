@@ -530,7 +530,11 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public void clearActivations(Document doc) {
-        ThreadState th = getThreadState(doc.threadId, false);
+        clearActivations(doc.threadId);
+    }
+
+    public void clearActivations(int threadId) {
+        ThreadState th = getThreadState(threadId, false);
         if (th == null) return;
         th.activations.clear();
 
@@ -544,7 +548,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public void clearActivations(Model m) {
         for (int i = 0; i < m.numberOfThreads; i++) {
-            clearActivations(m.createDocument(null, i));
+            clearActivations(i);
         }
     }
 
