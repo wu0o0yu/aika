@@ -17,17 +17,19 @@
 package org.aika.corpus;
 
 
-import org.aika.*;
-import org.aika.neuron.Activation;
-import org.aika.neuron.Activation.State;
+import org.aika.AbstractNode;
+import org.aika.Model;
+import org.aika.Provider;
+import org.aika.Utils;
 import org.aika.lattice.*;
 import org.aika.lattice.Node.ThreadState;
+import org.aika.neuron.Activation;
+import org.aika.neuron.Activation.State;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.INeuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

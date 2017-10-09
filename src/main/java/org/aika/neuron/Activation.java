@@ -1,6 +1,5 @@
 package org.aika.neuron;
 
-import org.aika.Utils;
 import org.aika.corpus.Document;
 import org.aika.corpus.SearchNode.StateChange;
 import org.aika.lattice.NodeActivation;
