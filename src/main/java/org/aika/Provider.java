@@ -88,6 +88,11 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     }
 
 
+    public void discard() {
+        n = null;
+    }
+
+
     private void reactivate() {
         assert m.suspensionHook != null;
 
@@ -129,4 +134,5 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         else if (id > n.id) return 1;
         else return 0;
     }
+
 }

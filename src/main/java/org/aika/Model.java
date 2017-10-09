@@ -230,6 +230,20 @@ public class Model {
     }
 
 
+    /**
+     * Discards all unsuspended neurons and logic nodes.
+     */
+    public void discardAll() {
+        List<Provider> tmp;
+        synchronized (activeProviders) {
+            tmp = new ArrayList<>(activeProviders.values());
+        }
+        for (Provider p: tmp) {
+            p.discard();
+        }
+    }
+
+
     public String networkWeightsToString(boolean all) {
         StringBuilder sb = new StringBuilder();
 /*        for(Provider<Neuron> pn: neurons.values()) {
@@ -340,7 +354,6 @@ public class Model {
                             inputSignal,
                             new Synapse.Key(
                                     false,
-                                    false,
                                     null,
                                     null,
                                     Operator.LESS_THAN,
@@ -362,7 +375,6 @@ public class Model {
             Synapse ctns = n.get().getInputSynapse(new Synapse(
                             ctn,
                             new Synapse.Key(
-                                    false,
                                     false,
                                     0,
                                     null,
@@ -407,7 +419,6 @@ public class Model {
                             clockSignal,
                             new Synapse.Key(
                                     false,
-                                    false,
                                     null,
                                     null,
                                     Operator.NONE,
@@ -430,7 +441,6 @@ public class Model {
                             startSignal,
                             new Synapse.Key(
                                     false,
-                                    false,
                                     0,
                                     null,
                                     Operator.EQUALS,
@@ -452,7 +462,6 @@ public class Model {
                         n,
                         new Synapse.Key(
                                 false,
-                                false,
                                 -1,
                                 null,
                                 direction ? Operator.NONE : Operator.EQUALS,
@@ -473,7 +482,6 @@ public class Model {
                 new Synapse(
                         n,
                         new Synapse.Key(
-                                true,
                                 true,
                                 0,
                                 null,

@@ -36,6 +36,8 @@ import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Set;
+
 import static org.aika.Input.RangeRelation.EQUALS;
 import static org.aika.corpus.Range.Operator.GREATER_THAN;
 import static org.aika.corpus.Range.Operator.LESS_THAN;
@@ -102,7 +104,7 @@ public class ActivationOutputsTest {
         );
 
 
-        InputNode pC = new InputNode(m, new Synapse.Key(false, false, 0, null, LESS_THAN, Mapping.START, true, GREATER_THAN, Mapping.END, true));
+        InputNode pC = new InputNode(m, new Synapse.Key(false, 0, null, LESS_THAN, Mapping.START, true, GREATER_THAN, Mapping.END, true));
         NodeActivation pC1 = TestHelper.addActivation(pC, doc, TestHelper.get(doc, pAB.get().node.get(), new Range(0, 1), null));
 
         Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, TestHelper.get(doc, pAB.get().node.get(), new Range(0, 1), null)));
@@ -122,7 +124,7 @@ public class ActivationOutputsTest {
     }
 
 
-    private Activation selectInputActivation(SynapseActivation[] acts, Node n) {
+    private Activation selectInputActivation(Set<SynapseActivation> acts, Node n) {
         for(SynapseActivation sa: acts) {
             if(sa.input.key.n.compareTo(n) == 0) {
                 return sa.input;
@@ -132,7 +134,7 @@ public class ActivationOutputsTest {
     }
 
 
-    public boolean containsOutputActivation(SynapseActivation[] outputActivations, Activation oAct) {
+    public boolean containsOutputActivation(Set<SynapseActivation> outputActivations, Activation oAct) {
         for(SynapseActivation sa: outputActivations) {
             if(sa.output == oAct) return true;
         }
