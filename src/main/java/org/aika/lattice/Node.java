@@ -181,7 +181,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             th = new ThreadState(endRequired, ridRequired);
             threads[threadId] = th;
         }
-        th.lastUsed = Document.docIdCounter;
+        th.lastUsed = Document.docIdCounter.get();
         return th;
     }
 

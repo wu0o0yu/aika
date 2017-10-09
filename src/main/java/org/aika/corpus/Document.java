@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,9 +45,8 @@ import java.util.stream.Stream;
  * @author Lukas Molzberger
  */
 public class Document implements Comparable<Document> {
-    public final int id = docIdCounter++;
-    public static int docIdCounter = 0;
-
+    public final int id = docIdCounter.addAndGet(1);
+    public static AtomicInteger docIdCounter = new AtomicInteger(0);
 
     public int activationIdCounter = 0;
 
