@@ -17,18 +17,21 @@
 package org.aika.corpus;
 
 
-import org.aika.*;
-import org.aika.neuron.Activation;
-import org.aika.neuron.Activation.State;
+import org.aika.AbstractNode;
+import org.aika.Model;
+import org.aika.Provider;
+import org.aika.Utils;
 import org.aika.lattice.*;
 import org.aika.lattice.Node.ThreadState;
+import org.aika.neuron.Activation;
+import org.aika.neuron.Activation.State;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.INeuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,9 +45,8 @@ import java.util.stream.Stream;
  * @author Lukas Molzberger
  */
 public class Document implements Comparable<Document> {
-    public final int id = docIdCounter++;
-    public static int docIdCounter = 0;
-
+    public final int id = docIdCounter.addAndGet(1);
+    public static AtomicInteger docIdCounter = new AtomicInteger(0);
 
     public int activationIdCounter = 0;
 
