@@ -325,12 +325,15 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public static List<InterprNode> collectConflicts(Document doc) {
-        List<InterprNode> results = new ArrayList<>();
+    public static Set<InterprNode> collectConflicts(Document doc) {
+        Set<InterprNode> results = new TreeSet<>();
         int v = doc.visitedCounter++;
         for(InterprNode n: doc.bottom.children) {
             if(!n.conflicts.primary.isEmpty()) {
                 results.add(n);
+            }
+            for(Conflict c: n.conflicts.secondary.values()) {
+                results.add(c.secondary);
             }
         }
         return results;
