@@ -103,6 +103,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public ThreadState<T, A>[] threads;
 
+    private static int[] NODE_LIMITS = new int[] {
+            50, 20, 20, 20, 10, 5
+    };
+
     /**
      * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
      * a specific logic node.
@@ -705,11 +709,11 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         List<RSKey> outputs = new ArrayList<>();
         List<RSKey> cleanup = new ArrayList<>();
-        int[] nodeCount = new int[] {0, 0, 0, 0};
+        int[] nodeCount = new int[] {0, 0, 0, 0, 0, 0};
         while (!queue.isEmpty()) {
             RSKey rsk = queue.pollFirst();
 
-            computeRefinements(m, threadId, queue, neuron, rsk, v, outputs, cleanup, modifiedSynapses, numAboveTolerance, sumBelowTolerance, nodeCount);
+            nodeCount = computeRefinements(m, threadId, queue, neuron, rsk, v, outputs, cleanup, modifiedSynapses, numAboveTolerance, sumBelowTolerance, nodeCount);
         }
 
         if (outputs.isEmpty()) return false;
@@ -731,7 +735,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    private static void computeRefinements(Model m, int threadId, TreeSet<RSKey> queue, INeuron n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup, Collection<Synapse> modifiedSynapses, int numAboveTolerance, double sumBelowTolerance, int[] nodeCount) {
+    private static int[] computeRefinements(Model m, int threadId, TreeSet<RSKey> queue, INeuron n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup, Collection<Synapse> modifiedSynapses, int numAboveTolerance, double sumBelowTolerance, int[] nodeCount) {
         n.lock.acquireWriteLock();
 
         Node pa = rsk.pa != null ? rsk.pa.get() : null;
@@ -753,19 +757,16 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
                         AndNode.createNextLevelNode(m, threadId, pa, new Refinement(s.key.relativeRid, rsk.offset, s.inputNode), false);
 
                 if (nln != null) {
-                    nln.prepareResultsForPredefinedNodes(threadId, queue, v, outputs, cleanup, n, s, Utils.nullSafeMin(s.key.relativeRid, rsk.offset), x, nodeCount);
+                    nodeCount = nln.prepareResultsForPredefinedNodes(threadId, queue, v, outputs, cleanup, n, s, Utils.nullSafeMin(s.key.relativeRid, rsk.offset), x, nodeCount);
                 }
             }
         }
         n.lock.releaseWriteLock();
+
+        return nodeCount;
     }
 
-
-    private static int[] NODE_LIMITS = new int[] {
-        200, 100, 100, 100
-    };
-
-    void prepareResultsForPredefinedNodes(int threadId, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, INeuron n, Synapse s, Integer offset, double x, int[] nodeCount) {
+    int[] prepareResultsForPredefinedNodes(int threadId, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, INeuron n, Synapse s, Integer offset, double x, int[] nodeCount) {
         RSKey rs = new RSKey(provider, offset);
         try {
             RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
@@ -777,7 +778,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             if (nodeLimitReached || (computeSynapseWeightSum(offset, n) + x > 0 || !isExpandable(false))) {
                 if (nv.outputNode != v) {
                     nv.outputNode = v;
-                    if (isCovered(threadId, offset, v)) {
+                    if (nodeLimitReached || isCovered(threadId, offset, v)) {
                         cleanup.add(rs);
                     } else {
                         outputs.add(rs);
@@ -792,6 +793,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             }
         } catch (ThreadState.RidOutOfRange e) {
         }
+        return nodeCount;
     }
 
 
