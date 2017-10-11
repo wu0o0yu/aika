@@ -518,8 +518,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         Operator end = replaceFirstAndLast(sk.endRangeMatch);
         Range r = act.key.r;
         if (dir == 0) {
-            begin = Operator.invert(sk.startRangeMapping == START ? begin : (sk.endRangeMapping == START ? end : NONE));
-            end = Operator.invert(sk.endRangeMapping == END ? end : (sk.startRangeMapping == END ? begin : NONE));
+            Operator tb = begin;
+            Operator te = end;
+            begin = Operator.invert(sk.startRangeMapping == START ? tb : (sk.endRangeMapping == START ? te : NONE));
+            end = Operator.invert(sk.endRangeMapping == END ? te : (sk.startRangeMapping == END ? tb : NONE));
 
             if (sk.startRangeMapping != START || sk.endRangeMapping != END) {
                 r = new Range(s.key.endRangeMapping == START ? r.end : (sk.startRangeMapping == START ? r.begin : null), sk.startRangeMapping == END ? r.begin : (sk.endRangeMapping == END ? r.end : null));
