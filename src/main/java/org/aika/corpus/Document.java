@@ -139,7 +139,10 @@ public class Document implements Comparable<Document> {
 
 
     public String getText(Range r) {
-        return content.substring(Math.max(0, Math.min(r.begin, length())), Math.max(0, Math.min(r.end, length())));
+        return content.substring(
+                r.begin != null ? Math.max(0, Math.min(r.begin, length())) : 0,
+                r.end != null ? Math.max(0, Math.min(r.end, length())): length()
+        );
     }
 
 
