@@ -522,11 +522,6 @@ public class Document implements Comparable<Document> {
 
 
         public void add(int round, Activation act) {
-            if(round > MAX_ROUND) {
-                log.error("Maximum number of rounds reached.");
-                return;
-            }
-
             if(act.rounds.isQueued(round)) return;
 
             ArrayDeque<Activation> q;
@@ -543,7 +538,7 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public INeuron.NormWeight processChanges(SearchNode en, long v) {
+        public INeuron.NormWeight processChanges(SearchNode sn, long v) {
             NormWeight delta = NormWeight.ZERO_WEIGHT;
             for(int round = 0; round < queue.size(); round++) {
                 ArrayDeque<Activation> q = queue.get(round);
@@ -551,7 +546,7 @@ public class Document implements Comparable<Document> {
                     Activation act = q.pollLast();
                     act.rounds.setQueued(round, false);
 
-                    State s = act.isInput ? act.finalState : act.key.n.neuron.get().computeWeight(round, act, en, Document.this);
+                    State s = act.isInput ? act.finalState : act.key.n.neuron.get().computeWeight(round, act, sn, Document.this);
 
                     if (OPTIMIZE_DEBUG_OUTPUT) {
                         log.info(act.key + " Round:" + round);
@@ -559,7 +554,7 @@ public class Document implements Comparable<Document> {
                     }
 
                     if (round == 0 || !act.rounds.get(round).equalsWithWeights(s)) {
-                        SearchNode.StateChange.saveOldState(en.modifiedActs, act, v);
+                        SearchNode.StateChange.saveOldState(sn.modifiedActs, act, v);
 
                         State oldState = act.rounds.get(round);
 
@@ -568,7 +563,12 @@ public class Document implements Comparable<Document> {
                         SearchNode.StateChange.saveNewState(act);
 
                         if (propagate) {
-                            propagateWeight(round, act);
+                            if(round > MAX_ROUND) {
+                                log.error("Maximum number of rounds reached.");
+                                sn.dumpDebugState();
+                            } else {
+                                propagateWeight(round, act);
+                            }
                         }
 
                         if (round == 0) {
