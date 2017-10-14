@@ -16,6 +16,7 @@
  */
 package org.aika.network;
 
+import org.aika.Converter;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
@@ -30,11 +31,11 @@ import java.util.Arrays;
  *
  * @author Lukas Molzberger
  */
-public class AdjustTest {
+public class ConverterTest {
 
 
     @Test
-    public void testAdjust() {
+    public void testConverter() {
         Model m = new Model();
 
         Neuron inA = m.createNeuron("A");
@@ -85,7 +86,7 @@ public class AdjustTest {
         System.out.println(out.get().node.get().logicToString());
 
         out.get().bias = -8.5;
-        Node.adjust(m, 0, out.get(), -1, out.get().inputSynapses.values());
+        new Converter(m, 0, out.get(), out.get().inputSynapses.values()).convert();
 
         System.out.println(out.get().node.get().logicToString());
 

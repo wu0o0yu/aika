@@ -396,7 +396,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             }
         }
 
-        Node.adjust(doc.m, doc.threadId, this, targetAct.errorSignal > 0.0 ? 1 : -1, inputSynapses.values());
+        new Converter(doc.m, doc.threadId, this, inputSynapses.values()).convert();
     }
 
 
@@ -843,7 +843,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             modifiedSynapses.add(s);
         }
 
-        if (!Node.adjust(m, threadId, n, -1, modifiedSynapses)) return null;
+        if (!new Converter(m, threadId, n, modifiedSynapses).convert()) return null;
 
         n.publish();
 
@@ -861,7 +861,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         s.output = n.provider;
         s.link();
 
-        if (!Node.adjust(m, threadId, n, -1, Collections.singletonList(s))) return null;
+        if (!new Converter(m, threadId, n, Collections.singletonList(s)).convert()) return null;
         return n;
     }
 

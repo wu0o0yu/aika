@@ -94,15 +94,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    void changeNumberOfNeuronRefs(int threadId, long v, int d) {
-        ThreadState th = getThreadState(threadId, true);
-        if (th.visitedNeuronRefsChange == v) return;
-        th.visitedNeuronRefsChange = v;
-        numberOfNeuronRefs += d;
-    }
-
-
-    @Override
     protected NodeActivation<InputNode> createActivation(Document doc, NodeActivation.Key ak, boolean isTrainingAct) {
         NodeActivation<InputNode> act = new NodeActivation<>(doc.activationIdCounter++, doc, ak);
         act.isTrainingAct = isTrainingAct;
@@ -135,7 +126,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    boolean isExpandable(boolean checkFrequency) {
+    public boolean isExpandable(boolean checkFrequency) {
         return true;
     }
 
