@@ -81,7 +81,7 @@ public class Converter {
      */
     public boolean convert() {
         long v = Node.visitedCounter++;
-        OrNode outputNode = neuron.node.get();
+        outputNode = neuron.node.get();
 
         if (modifiedSynapses.isEmpty()) return false;
 
@@ -131,6 +131,7 @@ public class Converter {
         for (Entry e : outputs) {
             Node n = e.node.get();
             outputNode.addInput(e.offset, n, false);
+            outputNode.addInput(e.offset, e.node.get(), true);
         }
 
         for (Entry e : cleanup) {
@@ -145,10 +146,10 @@ public class Converter {
     }
 
 
-    private void computeRefinements(Entry rsk, long v) {
+    private void computeRefinements(Entry e, long v) {
         neuron.lock.acquireWriteLock();
 
-        Node pa = rsk.node != null ? rsk.node.get() : null;
+        Node pa = e.node != null ? e.node.get() : null;
         double sum = neuron.posRecSum - (neuron.negDirSum + neuron.negRecSum);
         double x = sum + ((pa != null ? pa.level : 0) + 1 == numAboveTolerance ? sumBelowTolerance : 0.0);
 
@@ -156,22 +157,50 @@ public class Converter {
         if (pa == null) {
             tmp = modifiedSynapses;
         } else {
-            sum += pa.computeSynapseWeightSum(rsk.offset, neuron);
+            sum += pa.computeSynapseWeightSum(e.offset, neuron);
             tmp = neuron.inputSynapses.values();
         }
 
         for (Synapse s : tmp) {
-            if (s.w >= -neuron.bias * TOLERANCE && !s.isNegative() && !s.key.isRecurrent && sum + Math.abs(s.w) + s.maxLowerWeightsSum > 0.0) {
-                Node nln = rsk.node == null ?
-                        s.inputNode.get() :
-                        AndNode.createNextLevelNode(m, threadId, pa, new AndNode.Refinement(s.key.relativeRid, rsk.offset, s.inputNode), false);
+            if (!s.key.isRecurrent) {
+                Integer offset = Utils.nullSafeMin(s.key.relativeRid, e.offset);
 
-                if (nln != null) {
-                    processEntry(nln, v, Utils.nullSafeMin(s.key.relativeRid, rsk.offset), x);
+                if (isCandidate(sum, s)) {
+                    Node nln = getNextLevelNode(e, pa, s, true);
+
+                    if (nln != null) {
+                        processEntry(nln, v, offset, x);
+                    }
+                } else {
+                    Node nln = getNextLevelNode(e, pa, s, false);
+
+                    if(nln != null && outputNode.hasParent(offset, nln, true)) {
+                        processEntry(nln, v, offset, x);
+                    }
                 }
             }
         }
         neuron.lock.releaseWriteLock();
+    }
+
+
+    private Node getNextLevelNode(Entry rsk, Node pa, Synapse s, boolean create) {
+        if(rsk.node == null) {
+            return s.inputNode.get();
+        } else if(create) {
+            return AndNode.createNextLevelNode(m, threadId, pa, new AndNode.Refinement(s.key.relativeRid, rsk.offset, s.inputNode), false);
+        } else {
+            Provider<AndNode> p = pa.getAndChild(new AndNode.Refinement(s.key.relativeRid, rsk.offset, s.inputNode));
+            if(p != null) {
+                return p.get();
+            }
+        }
+        return null;
+    }
+
+
+    private boolean isCandidate(double sum, Synapse s) {
+        return s.w >= -neuron.bias * TOLERANCE && !s.isNegative() && sum + Math.abs(s.w) + s.maxLowerWeightsSum > 0.0;
     }
 
 
@@ -188,6 +217,10 @@ public class Converter {
                     } else {
                         outputs.add(e);
                     }
+
+                    if(outputNode.hasParent(offset, node, true)) {
+                        queue.add(e);
+                    }
                 }
             } else {
                 if (nv.adjust != v) {
@@ -197,7 +230,7 @@ public class Converter {
                     outputNode.addInput(e.offset, e.node.get(), true);
                 }
             }
-        } catch (Node.ThreadState.RidOutOfRange e) {
+        } catch (Node.ThreadState.RidOutOfRange ex) {
         }
     }
 

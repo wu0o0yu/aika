@@ -311,6 +311,20 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
+    public boolean hasParent(Integer ridOffset, Node in, boolean all) {
+        lock.acquireReadLock();
+        TreeMap<Integer, TreeSet<Provider<Node>>> p = all ? allParents : parents;
+
+        Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
+        TreeSet<Provider<Node>> pn = p.get(key);
+        boolean result = pn != null && pn.contains(in.provider);
+
+        lock.releaseReadLock();
+
+        return result;
+    }
+
+
     public void removeInput(Integer ridOffset, Node in, boolean all) {
         in.removeOrChild(new OrEntry(ridOffset, provider), all);
         in.provider.setModified();

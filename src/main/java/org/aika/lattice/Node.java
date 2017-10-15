@@ -639,7 +639,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    Provider<AndNode> getAndChild(Refinement ref) {
+    public Provider<AndNode> getAndChild(Refinement ref) {
         lock.acquireReadLock();
         Provider<AndNode> result = andChildren != null ? andChildren.get(ref) : null;
         lock.releaseReadLock();
