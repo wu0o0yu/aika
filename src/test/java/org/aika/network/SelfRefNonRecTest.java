@@ -48,7 +48,6 @@ public class SelfRefNonRecTest {
                         .setNeuron(bN)
                         .setWeight(5.0f)
                         .setBiasDelta(0.0)
-                        .setMaxLowerWeightsSum(0.0f)
         );
 
         m.initNeuron(
@@ -57,13 +56,11 @@ public class SelfRefNonRecTest {
                 new Input()
                         .setNeuron(inA)
                         .setWeight(5.0f)
-                        .setBiasDelta(0.0)
-                        .setMaxLowerWeightsSum(0.0f),
+                        .setBiasDelta(0.0),
                 new Input()
                         .setNeuron(cN)
                         .setWeight(5.0f)
                         .setBiasDelta(0.0)
-                        .setMaxLowerWeightsSum(0.0f)
         );
 
 

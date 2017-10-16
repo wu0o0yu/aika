@@ -213,7 +213,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public abstract void computeNullHyp(Model m);
 
-    public abstract boolean isExpandable(boolean checkFrequency);
+    abstract boolean isExpandable(boolean checkFrequency);
 
     abstract boolean contains(Refinement ref);
 
@@ -639,7 +639,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public Provider<AndNode> getAndChild(Refinement ref) {
+    Provider<AndNode> getAndChild(Refinement ref) {
         lock.acquireReadLock();
         Provider<AndNode> result = andChildren != null ? andChildren.get(ref) : null;
         lock.releaseReadLock();
@@ -653,7 +653,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public boolean isRequired() {
-        return allOrChildren != null && !allOrChildren.isEmpty();
+        return !allOrChildren.isEmpty();
     }
 
 

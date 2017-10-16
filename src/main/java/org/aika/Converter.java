@@ -53,6 +53,16 @@ public class Converter {
         }
     });
 
+
+    public static Comparator<Synapse> SYNAPSE_COMP = new Comparator<Synapse>() {
+        @Override
+        public int compare(Synapse s1, Synapse s2) {
+            int r = Double.compare(s2.w, s1.w);
+            if(r != 0) return r;
+            return Synapse.INPUT_SYNAPSE_COMP.compare(s1, s2);
+        }
+    };
+
     private List<Entry> outputs = new ArrayList<>();
     private List<Entry> cleanup = new ArrayList<>();
 
@@ -74,12 +84,86 @@ public class Converter {
     }
 
 
+
+    public Node computeRequiredNode() {
+        double remainingSum = 0.0;
+        double numAboveThreshold = 0;
+        TreeSet<Synapse> tmp = new TreeSet<>(SYNAPSE_COMP);
+        for(Synapse s: neuron.inputSynapses.values()) {
+            if(!s.isNegative() && !s.key.isRecurrent) {
+                if (s.w + neuron.bias > 0.0) {
+                    if (numAboveThreshold > 0) return null;
+                    numAboveThreshold++;
+                }
+                remainingSum += s.w;
+                tmp.add(s);
+            }
+        }
+
+        Integer offset = null;
+        Node requiredNode = null;
+        boolean noFurtherRefinement = false;
+        TreeSet<Synapse> reqSyns = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
+        if(numAboveThreshold <= 1) {
+            int i = 0;
+            double sum = 0.0;
+            for (Synapse s : tmp) {
+                if (sum + neuron.bias > 0.0) {
+                    noFurtherRefinement = true;
+                    break;
+                }
+                if (remainingSum + neuron.bias <= 0.0 || i > AndNode.MAX_POS_NODES) {
+                    break;
+                }
+
+                reqSyns.add(s);
+
+                if (requiredNode == null) {
+                    requiredNode = s.inputNode.get();
+                } else {
+                    requiredNode = AndNode.createNextLevelNode(m, threadId, requiredNode, new AndNode.Refinement(s.key.relativeRid, offset, s.inputNode), false);
+                }
+                offset = Utils.nullSafeMin(s.key.relativeRid, offset);
+                i++;
+
+                remainingSum -= s.w;
+                sum += s.w;
+            }
+        }
+
+        if(requiredNode != outputNode.requiredNode) {
+            outputNode.removeParents(false);
+            outputNode.requiredNode = requiredNode;
+        }
+
+        if(!noFurtherRefinement) {
+            for (Synapse s : modifiedSynapses) {
+                if (!reqSyns.contains(s)) {
+                    Node nln;
+                    if (requiredNode == null) {
+                        nln = s.inputNode.get();
+                    } else {
+                        nln = AndNode.createNextLevelNode(m, threadId, requiredNode, new AndNode.Refinement(s.key.relativeRid, offset, s.inputNode), false);
+                    }
+
+                    Integer nOffset = offset = Utils.nullSafeMin(s.key.relativeRid, offset);;
+                    outputNode.addInput(nOffset, nln, false);
+                }
+            }
+        } else {
+
+        }
+
+        return null;
+    }
+
+
     /**
      * Translates the synapse weights of a neuron into logic nodes.
      *
      * @return
      */
-    public boolean convert() {
+    public boolean convertOld() {
         long v = Node.visitedCounter++;
         outputNode = neuron.node.get();
 
@@ -121,9 +205,8 @@ public class Converter {
         }
 
         while (!queue.isEmpty()) {
-            Entry rsk = queue.pollFirst();
-
-            computeRefinements(rsk, v);
+            Entry e = queue.pollFirst();
+            computeRefinements(e, v);
         }
 
         if (outputs.isEmpty()) return false;
@@ -155,6 +238,7 @@ public class Converter {
 
         Collection<Synapse> tmp;
         if (pa == null) {
+            sum += neuron.bias;
             tmp = modifiedSynapses;
         } else {
             sum += pa.computeSynapseWeightSum(e.offset, neuron);

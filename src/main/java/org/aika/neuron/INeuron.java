@@ -835,10 +835,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             s.output = n.provider;
             s.link();
 
-            if (s.maxLowerWeightsSum == Float.MAX_VALUE) {
-                s.maxLowerWeightsSum = sum;
-            }
-
             sum += s.w;
             modifiedSynapses.add(s);
         }

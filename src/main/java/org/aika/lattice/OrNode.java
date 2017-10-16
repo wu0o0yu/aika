@@ -50,6 +50,7 @@ public class OrNode extends Node<OrNode, Activation> {
     public TreeMap<Integer, TreeSet<Provider<Node>>> allParents = new TreeMap<>();
 
     public Neuron neuron = null;
+    public Node requiredNode;
 
     public OrNode() {}
 
@@ -356,7 +357,7 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    private void removeParents(boolean all) {
+    public void removeParents(boolean all) {
         for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: (all ? allParents : parents).entrySet()) {
             for(Provider<Node> p: me.getValue()) {
                 Node pn = p.get();

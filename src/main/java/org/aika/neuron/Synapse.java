@@ -98,12 +98,6 @@ public class Synapse implements Writable {
 
     public float w;
 
-    /*
-    * Max expected sum of neuron input synapses with a weight smaller or equal than this synapse. Used to
-    * determine which nodes need to be generated based on this synapse.
-    */
-    public float maxLowerWeightsSum = Float.MAX_VALUE;
-
 
     public Synapse() {}
 
@@ -177,7 +171,6 @@ public class Synapse implements Writable {
         key.write(out);
 
         out.writeFloat(w);
-        out.writeFloat(maxLowerWeightsSum);
     }
 
 
@@ -190,7 +183,6 @@ public class Synapse implements Writable {
         key = lookupKey(Key.read(in, m));
 
         w = in.readFloat();
-        maxLowerWeightsSum = in.readFloat();
     }
 
 

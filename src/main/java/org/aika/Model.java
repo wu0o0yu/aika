@@ -275,7 +275,6 @@ public class Model {
             Synapse s = input.getSynapse(n);
 
             s.w = input.weight;
-            s.maxLowerWeightsSum = input.maxLowerWeightsSum;
 
             if (input.weight < 0.0) {
                 if (!input.recurrent) {
@@ -305,7 +304,6 @@ public class Model {
         Synapse s = input.getSynapse(n);
 
         s.w = input.weight;
-        s.maxLowerWeightsSum = input.maxLowerWeightsSum;
 
         if (input.weight < 0.0) {
             if (!input.recurrent) {
@@ -367,7 +365,6 @@ public class Model {
             );
 
             iss.w = 20.0f;
-            iss.maxLowerWeightsSum = 20.0f;
             is.add(iss);
         }
 
@@ -389,7 +386,6 @@ public class Model {
             );
 
             ctns.w = 20.0f;
-            ctns.maxLowerWeightsSum = 20.0f;
             is.add(ctns);
         }
 
@@ -432,7 +428,6 @@ public class Model {
             );
 
             css.w = 20.0f;
-            css.maxLowerWeightsSum = 8.0f;
             is.add(css);
         }
 
@@ -454,7 +449,6 @@ public class Model {
             );
 
             sss.w = 8.0f;
-            sss.maxLowerWeightsSum = 0.0f;
             is.add(sss);
         }
 
@@ -475,7 +469,6 @@ public class Model {
         );
 
         lastCycle.w = 8.0f;
-        lastCycle.maxLowerWeightsSum = 0.0f;
         is.add(lastCycle);
 
         Synapse neg = n.get().getInputSynapse(
@@ -495,7 +488,6 @@ public class Model {
                 ));
 
         neg.w = -20.0f;
-        neg.maxLowerWeightsSum = 28.0f;
         is.add(neg);
 
         return INeuron.init(this, defaultThreadId, n, bias, 0.0, negRecSum, 0.0, is);

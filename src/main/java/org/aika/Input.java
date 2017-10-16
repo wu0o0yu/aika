@@ -32,7 +32,6 @@ public class Input implements Comparable<Input> {
     boolean recurrent;
     Neuron neuron;
     float weight;
-    float maxLowerWeightsSum = Float.MAX_VALUE;
     double biasDelta;
 
     Operator startRangeMatch = Operator.NONE;
@@ -74,17 +73,6 @@ public class Input implements Comparable<Input> {
         return this;
     }
 
-    /**
-     * MaxLowerWeightsSum is the expected sum of all weights smaller then the current weight. It is
-     * used as an hint to compute the boolean representation of this neuron.
-     *
-     * @param maxLowerWeightsSum
-     * @return
-     */
-    public Input setMaxLowerWeightsSum(float maxLowerWeightsSum) {
-        this.maxLowerWeightsSum = maxLowerWeightsSum;
-        return this;
-    }
 
     /**
      * The synapse weight of this input.
