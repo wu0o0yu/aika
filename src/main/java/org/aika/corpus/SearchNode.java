@@ -93,10 +93,9 @@ public class SearchNode implements Comparable<SearchNode> {
 
         weightDelta = doc.vQueue.adjustWeight(this, changed);
 
-        if(selectedParent != null) {
-            accumulatedWeight = weightDelta.add(accumulatedWeight);
+        if(getParent() != null) {
+            accumulatedWeight = weightDelta.add(getParent().accumulatedWeight);
         }
-
 
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Search Step: " + id + "  Candidate Weight Delta: " + weightDelta);
@@ -119,12 +118,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
         List<InterprNode> rootRefs = expandRootRefinement(doc);
         refinement = expandRefinement(rootRefs, doc.visitedCounter++);
-
-        markSelected(null, refinement);
-        markExcluded(null, refinement);
-
-        weightDelta = doc.vQueue.adjustWeight(this, rootRefs);
-        accumulatedWeight = weightDelta;
 
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Root SearchNode:" + toString());
@@ -211,10 +204,6 @@ public class SearchNode implements Comparable<SearchNode> {
             log.info(doc.neuronActivationsToString(true, true, false) + "\n");
         }
 
-        if(selectedParent != null) {
-            accumulatedWeight = selectedParent.accumulatedWeight;
-        }
-
         if(alreadyExcluded || alreadySelected) {
             debugState = DebugState.LIMITED;
         } else {
@@ -229,8 +218,8 @@ public class SearchNode implements Comparable<SearchNode> {
             List<InterprNode> changed = new ArrayList<>();
             changed.add(candidate.refinement);
 
-            markSelected(changed, selectedParent.refinement);
-            markExcluded(changed, selectedParent.refinement);
+            markSelected(changed, refinement);
+            markExcluded(changed, refinement);
 
             if (cd == null || cd) {
                 Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
@@ -238,7 +227,6 @@ public class SearchNode implements Comparable<SearchNode> {
                 selectedWeight = child.search(doc, searchSteps, candidates);
             }
         }
-        changeState(StateChange.Mode.OLD);
         if(doc.interrupted) {
             return 0.0;
         }
@@ -259,6 +247,8 @@ public class SearchNode implements Comparable<SearchNode> {
         if(cd == null && !alreadyExcluded && !alreadySelected) {
             candidate.cache.put(this, selectedWeight >= excludedWeight);
         }
+
+        changeState(StateChange.Mode.OLD);
         return Math.max(selectedWeight, excludedWeight);
     }
 
