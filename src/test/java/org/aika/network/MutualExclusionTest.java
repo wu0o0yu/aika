@@ -70,13 +70,13 @@ public class MutualExclusionTest {
         // Create three neurons that might be suppressed by the suppressing neuron.
         Neuron pA = m.initNeuron(
                 m.createNeuron("A"),
-                0.01,
+                3,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(10.5f)
+                        .setWeight(10.0f)
                         .setMaxLowerWeightsSum(0.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.9),
+                        .setBiasDelta(1.0),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
@@ -86,13 +86,13 @@ public class MutualExclusionTest {
 
         Neuron pB = m.initNeuron(
                 m.createNeuron("B"),
-                0.01,
+                5,
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(11.0f)
+                        .setWeight(10.0f)
                         .setMaxLowerWeightsSum(0.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.9),
+                        .setBiasDelta(1.0),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
@@ -102,13 +102,13 @@ public class MutualExclusionTest {
 
         Neuron pC = m.initNeuron(
                 m.createNeuron("C"),
-                0.01,
+                2,
                 new Input()
                         .setNeuron(inC)
                         .setWeight(10.0f)
                         .setMaxLowerWeightsSum(0.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.9),
+                        .setBiasDelta(1.0),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)

@@ -81,7 +81,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate c, int level) {
+    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate c, int level, List<InterprNode> changed) {
         id = doc.searchNodeIdCounter++;
         this.level = level;
         visited = doc.visitedCounter++;
@@ -90,6 +90,13 @@ public class SearchNode implements Comparable<SearchNode> {
 
         refinement = expandRefinement(Collections.singletonList(c != null ? c.refinement : doc.bottom), doc.visitedCounter++);;
         candidate = c;
+
+        weightDelta = doc.vQueue.adjustWeight(this, changed);
+
+        if(selectedParent != null) {
+            accumulatedWeight = weightDelta.add(accumulatedWeight);
+        }
+
 
         if(Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Search Step: " + id + "  Candidate Weight Delta: " + weightDelta);
@@ -123,19 +130,13 @@ public class SearchNode implements Comparable<SearchNode> {
             log.info("Root SearchNode:" + toString());
         }
 
-        doc.bottom.storeFinalWeight(doc.visitedCounter++);
-        doc.selectedSearchNode = this;
-
 
         Candidate[] candidates = generateCandidates(doc);
-        if(candidates.length > 0) {
-            Candidate c = candidates[level + 1];
 
-            if (c != null) {
-                SearchNode child = new SearchNode(doc, this, null, c, level + 1);
-                child.search(doc, searchSteps, candidates);
-            }
-        }
+        Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
+
+        SearchNode child = new SearchNode(doc, this, null, c, level + 1, Collections.singletonList(doc.bottom));
+        child.search(doc, searchSteps, candidates);
 
         if (doc.selectedSearchNode != null) {
             doc.selectedSearchNode.reconstructSelectedResult(doc);
@@ -184,6 +185,10 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private double search(Document doc, int[] searchSteps, Candidate[] candidates) {
+        if(candidate == null) {
+            return processResult(doc);
+        }
+
         double selectedWeight = 0.0;
         double excludedWeight = 0.0;
 
@@ -220,30 +225,17 @@ public class SearchNode implements Comparable<SearchNode> {
 
         candidate.debugCounts[debugState.ordinal()]++;
 
-        List<InterprNode> changed = new ArrayList<>();
-        if(level == -1) {
-            changed.add(doc.bottom);
-        }
-
-        markSelected(changed, refinement);
-        markExcluded(changed, refinement);
-
         if (!alreadyExcluded) {
-            candidate.refinement.markedExcludedRefinement = false;
-            weightDelta = doc.vQueue.adjustWeight(this, changed);
+            List<InterprNode> changed = new ArrayList<>();
+            changed.add(candidate.refinement);
 
-            if(selectedParent != null) {
-                accumulatedWeight = weightDelta.add(accumulatedWeight);
-            }
+            markSelected(changed, selectedParent.refinement);
+            markExcluded(changed, selectedParent.refinement);
 
-            if (candidates.length == level + 1) {
-                selectedWeight = processResult(doc);
-            } else {
-                if (cd == null || cd) {
-                    Candidate c = candidates[level + 1];
-                    SearchNode child = new SearchNode(doc, this, excludedParent, c, level + 1);
-                    selectedWeight = child.search(doc, searchSteps, candidates);
-                }
+            if (cd == null || cd) {
+                Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
+                SearchNode child = new SearchNode(doc, this, excludedParent, c, level + 1, changed);
+                selectedWeight = child.search(doc, searchSteps, candidates);
             }
         }
         changeState(StateChange.Mode.OLD);
@@ -253,16 +245,15 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if(!alreadySelected) {
             candidate.refinement.markedExcludedRefinement = true;
+            List<InterprNode> changed = Collections.singletonList(candidate.refinement);
 
-            if (candidates.length == level + 1) {
-                excludedWeight = processResult(doc);
-            } else {
-                if(cd == null || !cd) {
-                    Candidate c = candidates[level + 1];
-                    SearchNode child = new SearchNode(doc, selectedParent, this, c, level + 1);
-                    excludedWeight = child.search(doc, searchSteps, candidates);
-                }
+            if (cd == null || !cd) {
+                Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
+                SearchNode child = new SearchNode(doc, selectedParent, this, c, level + 1, changed);
+                excludedWeight = child.search(doc, searchSteps, candidates);
             }
+
+            candidate.refinement.markedExcludedRefinement = false;
         }
 
         if(cd == null && !alreadyExcluded && !alreadySelected) {
