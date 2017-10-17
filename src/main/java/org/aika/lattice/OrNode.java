@@ -365,6 +365,7 @@ public class OrNode extends Node<OrNode, Activation> {
                 pn.provider.setModified();
             }
         }
+        (all ? allParents : parents).clear();
     }
 
 
