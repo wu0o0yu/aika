@@ -53,12 +53,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public static int minFrequency = 5;
     public static int MAX_RID = 25;
 
-    /**
-     * Synapses with a weight smaller than the tolerance relative to the bias are not translated into logic nodes. Otherwise
-     * too many irrelevant would be generated if there are a lot of synapses with small weights.
-     */
-    public static double TOLERANCE = 0.1;
-
     public static final Node MIN_NODE = new InputNode();
     public static final Node MAX_NODE = new InputNode();
 
@@ -67,6 +61,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
     TreeMap<Refinement, Provider<AndNode>> andChildren;
     TreeSet<OrEntry> orChildren;
+    TreeSet<OrEntry> allOrChildren;
 
     public int level;
 
@@ -80,7 +75,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public boolean ridRequired;
 
 
-    public volatile int numberOfNeuronRefs = 0;
     volatile boolean isRemoved;
     volatile int isRemovedId;
     volatile static int isRemovedIdCounter = 0;
@@ -102,10 +96,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public static long visitedCounter = 1;
 
     public ThreadState<T, A>[] threads;
-
-    private static int[] NODE_LIMITS = new int[] {
-            50, 20, 20, 20, 10, 5
-    };
 
     /**
      * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
@@ -170,7 +160,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * marked in order to avoid having to visit the same node twice. To avoid having to reset each mark Aika uses the
      * counter {@code Node.visitedCounter} to set a new mark each time.
      */
-    static class RidVisited {
+    public static class RidVisited {
         public long computeParents = -1;
         public long outputNode = -1;
         public long adjust = -1;
@@ -203,7 +193,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public abstract boolean isAllowedOption(int threadId, InterprNode n, NodeActivation<?> act, long v);
 
-    abstract void cleanup(Model m);
+    public abstract void cleanup(Model m);
 
     abstract A createActivation(Document doc, Key ak, boolean isTrainingAct);
 
@@ -218,8 +208,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public abstract void discover(Document doc, NodeActivation<T> act);
 
     abstract Collection<Refinement> collectNodeAndRefinements(Refinement newRef);
-
-    abstract void changeNumberOfNeuronRefs(int threadId, long v, int d);
 
     abstract boolean hasSupport(A act);
 
@@ -283,20 +271,38 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     };
 
 
-    void addOrChild(OrEntry oe) {
-        if (orChildren == null) {
-            orChildren = new TreeSet<>();
+    void addOrChild(OrEntry oe, boolean all) {
+        lock.acquireWriteLock();
+        if(all) {
+            if (allOrChildren == null) {
+                allOrChildren = new TreeSet<>();
+            }
+            allOrChildren.add(oe);
+        } else {
+            if (orChildren == null) {
+                orChildren = new TreeSet<>();
+            }
+            orChildren.add(oe);
         }
-        orChildren.add(oe);
+        lock.releaseWriteLock();
     }
 
 
-    void removeOrChild(OrEntry oe) {
+    void removeOrChild(OrEntry oe, boolean all) {
         lock.acquireWriteLock();
-        if (orChildren != null) {
-            orChildren.remove(oe);
-            if (orChildren.isEmpty()) {
-                orChildren = null;
+        if(all) {
+            if (allOrChildren != null) {
+                allOrChildren.remove(oe);
+                if (allOrChildren.isEmpty()) {
+                    allOrChildren = null;
+                }
+            }
+        } else {
+            if (orChildren != null) {
+                orChildren.remove(oe);
+                if (orChildren.isEmpty()) {
+                    orChildren = null;
+                }
             }
         }
         lock.releaseWriteLock();
@@ -641,192 +647,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    /**
-     * Translates the synapse weights of a neuron into logic nodes.
-     *
-     * @param m
-     * @param threadId
-     * @param neuron
-     * @param dir
-     * @return
-     */
-    public static boolean adjust(Model m, int threadId, INeuron neuron, final int dir, Collection<Synapse> modifiedSynapses) {
-        long v = visitedCounter++;
-        OrNode outputNode = neuron.node.get();
-
-        if (modifiedSynapses.isEmpty()) return false;
-
-        int numAboveTolerance = 0;
-        double sumBelowTolerance = 0.0;
-
-        neuron.maxRecurrentSum = 0.0;
-        for (Synapse s : modifiedSynapses) {
-            INeuron in = s.input.get();
-            in.lock.acquireWriteLock();
-
-            if (s.inputNode == null) {
-                InputNode iNode = InputNode.add(m, s.key.createInputNodeKey(), s.input.get());
-                iNode.provider.setModified();
-                iNode.isBlocked = in.isBlocked;
-                iNode.setSynapse(s);
-                s.inputNode = iNode.provider;
-            }
-
-            if (s.key.isRecurrent) {
-                neuron.maxRecurrentSum += Math.abs(s.w);
-                neuron.provider.setModified();
-            }
-            in.lock.releaseWriteLock();
-
-            if (!s.isNegative() && !s.key.isRecurrent) {
-                if (s.w >= -neuron.bias * TOLERANCE) {
-                    numAboveTolerance++;
-                } else {
-                    sumBelowTolerance += s.w;
-                }
-            }
-        }
-        assert numAboveTolerance >= 1;
-
-        TreeSet<RSKey> queue = new TreeSet<>(new Comparator<RSKey>() {
-            @Override
-            public int compare(RSKey rsk1, RSKey rsk2) {
-                if (rsk1.pa == null && rsk2.pa != null) return -1;
-                else if (rsk1.pa != null && rsk2.pa == null) return 1;
-                else if (rsk1.pa == null && rsk2.pa == null) return 0;
-
-                int r = Integer.compare(rsk2.pa.get().level, rsk1.pa.get().level) * dir;
-                if (r != 0) return r;
-                r = rsk1.pa.compareTo(rsk2.pa);
-                if (r != 0) return r;
-                return Utils.compareInteger(rsk1.offset, rsk2.offset);
-            }
-        });
-
-        if (queue.isEmpty()) {
-            queue.add(new Node.RSKey(null, null));
-        }
-
-        List<RSKey> outputs = new ArrayList<>();
-        List<RSKey> cleanup = new ArrayList<>();
-        int[] nodeCount = new int[] {0, 0, 0, 0, 0, 0};
-        while (!queue.isEmpty()) {
-            RSKey rsk = queue.pollFirst();
-
-            nodeCount = computeRefinements(m, threadId, queue, neuron, rsk, v, outputs, cleanup, modifiedSynapses, numAboveTolerance, sumBelowTolerance, nodeCount);
-        }
-
-        if (outputs.isEmpty()) return false;
-
-        outputNode.lock.acquireWriteLock();
-        for (RSKey rsk : outputs) {
-            Node pa = rsk.pa.get();
-            pa.lock.acquireWriteLock();
-            outputNode.addInput(threadId, rsk.offset, pa);
-            pa.lock.releaseWriteLock();
-        }
-        outputNode.lock.releaseWriteLock();
-
-        for (RSKey on : cleanup) {
-            on.pa.get().cleanup(m);
-        }
-
-        return true;
-    }
-
-
-    private static int[] computeRefinements(Model m, int threadId, TreeSet<RSKey> queue, INeuron n, RSKey rsk, long v, List<RSKey> outputs, List<RSKey> cleanup, Collection<Synapse> modifiedSynapses, int numAboveTolerance, double sumBelowTolerance, int[] nodeCount) {
-        n.lock.acquireWriteLock();
-
-        Node pa = rsk.pa != null ? rsk.pa.get() : null;
-        double sum = n.posRecSum - (n.negDirSum + n.negRecSum);
-        double x = sum + ((pa != null ? pa.level : 0) + 1 == numAboveTolerance ? sumBelowTolerance : 0.0);
-
-        Collection<Synapse> tmp;
-        if (pa == null) {
-            tmp = modifiedSynapses;
-        } else {
-            sum += pa.computeSynapseWeightSum(rsk.offset, n);
-            tmp = n.inputSynapses.values();
-        }
-
-        for (Synapse s : tmp) {
-            if (s.w >= -n.bias * TOLERANCE && !s.isNegative() && !s.key.isRecurrent && sum + Math.abs(s.w) + s.maxLowerWeightsSum > 0.0) {
-                Node nln = rsk.pa == null ?
-                        s.inputNode.get() :
-                        AndNode.createNextLevelNode(m, threadId, pa, new Refinement(s.key.relativeRid, rsk.offset, s.inputNode), false);
-
-                if (nln != null) {
-                    nodeCount = nln.prepareResultsForPredefinedNodes(threadId, queue, v, outputs, cleanup, n, s, Utils.nullSafeMin(s.key.relativeRid, rsk.offset), x, nodeCount);
-                }
-            }
-        }
-        n.lock.releaseWriteLock();
-
-        return nodeCount;
-    }
-
-    int[] prepareResultsForPredefinedNodes(int threadId, TreeSet<RSKey> queue, long v, List<RSKey> outputs, List<RSKey> cleanup, INeuron n, Synapse s, Integer offset, double x, int[] nodeCount) {
-        RSKey rs = new RSKey(provider, offset);
-        try {
-            RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
-
-            final int level = rs.pa.get().level;
-
-            final boolean nodeLimitReached = level >= NODE_LIMITS.length || nodeCount[level] >= NODE_LIMITS[level];
-
-            if (nodeLimitReached || (computeSynapseWeightSum(offset, n) + x > 0 || !isExpandable(false))) {
-                if (nv.outputNode != v) {
-                    nv.outputNode = v;
-                    if (nodeLimitReached || isCovered(threadId, offset, v)) {
-                        cleanup.add(rs);
-                    } else {
-                        outputs.add(rs);
-                    }
-                }
-            } else {
-                if (nv.adjust != v) {
-                    nv.adjust = v;
-                    nodeCount[level]++;
-                    queue.add(rs);
-                }
-            }
-        } catch (ThreadState.RidOutOfRange e) {
-        }
-        return nodeCount;
-    }
-
-
-    private static class RSKey implements Comparable<RSKey> {
-        Provider<? extends Node> pa;
-        Integer offset;
-
-        public RSKey(Provider<? extends Node> pa, Integer offset) {
-            this.pa = pa;
-            this.offset = offset;
-        }
-
-
-        public String toString() {
-            return "Offset:" + offset + " PA:" + pa.get().logicToString();
-        }
-
-        @Override
-        public int compareTo(RSKey rs) {
-            int r = pa.compareTo(rs.pa);
-            if (r != 0) return r;
-            return Utils.compareInteger(offset, rs.offset);
-        }
-    }
-
-
     public boolean isCovered(int threadId, Integer offset, long v) throws ThreadState.RidOutOfRange {
         return false;
     }
 
 
     public boolean isRequired() {
-        return numberOfNeuronRefs > 0;
+        return !allOrChildren.isEmpty();
     }
 
 
@@ -875,7 +702,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         out.writeBoolean(endRequired);
         out.writeBoolean(ridRequired);
 
-        out.writeInt(numberOfNeuronRefs);
         out.writeBoolean(frequencyHasChanged);
         out.writeInt(nOffset);
 
@@ -916,7 +742,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         endRequired = in.readBoolean();
         ridRequired = in.readBoolean();
 
-        numberOfNeuronRefs = in.readInt();
         frequencyHasChanged = in.readBoolean();
         nOffset = in.readInt();
 

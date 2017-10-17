@@ -74,7 +74,6 @@ public class MutualExclusionTest {
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.5f)
-                        .setMaxLowerWeightsSum(0.0f)
                         .setRecurrent(false)
                         .setBiasDelta(0.9),
                 new Input()
@@ -90,7 +89,6 @@ public class MutualExclusionTest {
                 new Input()
                         .setNeuron(inB)
                         .setWeight(11.0f)
-                        .setMaxLowerWeightsSum(0.0f)
                         .setRecurrent(false)
                         .setBiasDelta(0.9),
                 new Input()
@@ -106,7 +104,6 @@ public class MutualExclusionTest {
                 new Input()
                         .setNeuron(inC)
                         .setWeight(10.0f)
-                        .setMaxLowerWeightsSum(0.0f)
                         .setRecurrent(false)
                         .setBiasDelta(0.9),
                 new Input()

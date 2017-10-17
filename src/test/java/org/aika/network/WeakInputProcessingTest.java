@@ -53,7 +53,6 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0f)
                         .setRecurrent(false)
                         .setBiasDelta(0.9)
-                        .setMaxLowerWeightsSum(0.0f)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
@@ -80,7 +79,6 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0f)
                         .setRecurrent(false)
                         .setBiasDelta(0.9)
-                        .setMaxLowerWeightsSum(0.0f)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
@@ -107,7 +105,6 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0f)
                         .setRecurrent(false)
                         .setBiasDelta(0.9)
-                        .setMaxLowerWeightsSum(0.0f)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()

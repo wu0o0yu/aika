@@ -291,7 +291,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    boolean isExpandable(boolean checkFrequency) {
+    public boolean isExpandable(boolean checkFrequency) {
         if(checkFrequency && !isFrequent()) return false;
         return parents.size() < MAX_POS_NODES;
     }
@@ -331,7 +331,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    static AndNode createNextLevelNode(Model m, int threadId, Node n, Refinement ref, boolean discoverPatterns) {
+    public static AndNode createNextLevelNode(Model m, int threadId, Node n, Refinement ref, boolean discoverPatterns) {
         Provider<AndNode> pnln = n.getAndChild(ref);
         if(pnln != null) {
             return discoverPatterns ? null : pnln.get();
@@ -434,20 +434,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
         return inputs;
     }
-
-
-    @Override
-    void changeNumberOfNeuronRefs(int threadId, long v, int d) {
-        ThreadState th = getThreadState(threadId, true);
-        if(th.visitedNeuronRefsChange == v) return;
-        th.visitedNeuronRefsChange = v;
-        numberOfNeuronRefs += d;
-
-        for(Provider<? extends Node> n: parents.values()) {
-            n.get().changeNumberOfNeuronRefs(threadId, v, d);
-        }
-    }
-
 
 
     @Override
@@ -565,7 +551,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     /**
      *
      */
-    static class Refinement implements Comparable<Refinement> {
+    public static class Refinement implements Comparable<Refinement> {
         public static Refinement MIN = new Refinement(null, null);
         public static Refinement MAX = new Refinement(null, null);
 

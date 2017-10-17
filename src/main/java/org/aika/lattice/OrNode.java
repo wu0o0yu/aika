@@ -47,8 +47,10 @@ public class OrNode extends Node<OrNode, Activation> {
 
     // Hack: Integer.MIN_VALUE represents the null key
     public TreeMap<Integer, TreeSet<Provider<Node>>> parents = new TreeMap<>();
+    public TreeMap<Integer, TreeSet<Provider<Node>>> allParents = new TreeMap<>();
 
     public Neuron neuron = null;
+    public Node requiredNode;
 
     public OrNode() {}
 
@@ -71,7 +73,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    boolean isExpandable(boolean checkFrequency) {
+    public boolean isExpandable(boolean checkFrequency) {
         return false;
     }
 
@@ -288,63 +290,59 @@ public class OrNode extends Node<OrNode, Activation> {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    void changeNumberOfNeuronRefs(int threadId, long v, int d) {
-        throw new UnsupportedOperationException();
-    }
 
-
-    void addInput(int threadId, Integer ridOffset, Node in) {
-        in.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, 1);
+    public void addInput(Integer ridOffset, Node in, boolean all) {
         in.lock.acquireWriteLock();
-        in.addOrChild(new OrEntry(ridOffset, provider));
+        in.addOrChild(new OrEntry(ridOffset, provider), all);
         in.provider.setModified();
         in.lock.releaseWriteLock();
 
         lock.acquireWriteLock();
         provider.setModified();
         Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
-        TreeSet<Provider<Node>> pn = parents.get(key);
+        TreeMap<Integer, TreeSet<Provider<Node>>> p = all ? allParents : parents;
+
+        TreeSet<Provider<Node>> pn = p.get(key);
         if(pn == null) {
             pn = new TreeSet();
-            parents.put(key, pn);
+            p.put(key, pn);
         }
         pn.add(in.provider);
         lock.releaseWriteLock();
     }
 
 
-    void removeInput(int threadId, Integer ridOffset, Node in) {
-        in.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, -1);
-        in.removeOrChild(new OrEntry(ridOffset, provider));
+    public boolean hasParent(Integer ridOffset, Node in, boolean all) {
+        lock.acquireReadLock();
+        TreeMap<Integer, TreeSet<Provider<Node>>> p = all ? allParents : parents;
+
+        Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
+        TreeSet<Provider<Node>> pn = p.get(key);
+        boolean result = pn != null && pn.contains(in.provider);
+
+        lock.releaseReadLock();
+
+        return result;
+    }
+
+
+    public void removeInput(Integer ridOffset, Node in, boolean all) {
+        in.removeOrChild(new OrEntry(ridOffset, provider), all);
         in.provider.setModified();
         lock.acquireWriteLock();
         provider.setModified();
         Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
-        TreeSet<Provider<Node>> pn = parents.get(key);
+        TreeMap<Integer, TreeSet<Provider<Node>>> p = all ? allParents : parents;
+        TreeSet<Provider<Node>> pn = p.get(key);
         if(pn != null) {
             pn.remove(in.provider);
             if(pn.isEmpty() && ridOffset != null) {
-                parents.remove(key);
+                p.remove(key);
             }
         }
         lock.releaseWriteLock();
     }
 
-
-    void removeAllInputs(int threadId) {
-        lock.acquireWriteLock();
-        for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: parents.entrySet()) {
-            for(Provider<Node> p: me.getValue()) {
-                Node pn = p.get();
-                pn.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, -1);
-                pn.removeOrChild(new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, provider));
-                pn.provider.setModified();
-            }
-        }
-        parents.clear();
-        lock.releaseWriteLock();
-    }
 
 
     void remove(Model m) {
@@ -353,14 +351,20 @@ public class OrNode extends Node<OrNode, Activation> {
         super.remove(m);
 
         lock.acquireReadLock();
-        for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: parents.entrySet()) {
+        removeParents(true);
+        removeParents(false);
+        lock.releaseReadLock();
+    }
+
+
+    public void removeParents(boolean all) {
+        for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: (all ? allParents : parents).entrySet()) {
             for(Provider<Node> p: me.getValue()) {
                 Node pn = p.get();
-                pn.removeOrChild(new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, provider));
+                pn.removeOrChild(new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, provider), all);
                 pn.provider.setModified();
             }
         }
-        lock.releaseReadLock();
     }
 
 

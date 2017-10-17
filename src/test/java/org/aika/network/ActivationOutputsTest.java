@@ -159,15 +159,13 @@ public class ActivationOutputsTest {
                         .setWeight(-1.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
-                        .setMaxLowerWeightsSum(0.0f),
+                        .setBiasDelta(1.0),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBiasDelta(0.95)
-                        .setMaxLowerWeightsSum(0.0f)
         );
         OrNode pABNode = pAB.get().node.get();
 

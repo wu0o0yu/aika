@@ -165,21 +165,21 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public void dumpDebugState() {
-        SearchNode p = getParent();
-        if(p != null && p.level >= 0) {
-            p.dumpDebugState();
-        }
+        SearchNode n = this;
+        while(n != null && n.level >= 0) {
+            System.out.println(
+                    n.level + " " +
+                            n.debugState +
+                            " CS:" + n.candidate.cache.size() +
+                            " LIMITED:" + n.candidate.debugCounts[DebugState.LIMITED.ordinal()] +
+                            " CACHED:" + n.candidate.debugCounts[DebugState.CACHED.ordinal()] +
+                            " EXPLORE:" + n.candidate.debugCounts[DebugState.EXPLORE.ordinal()] +
+                            " " + n.candidate.refinement.act.key.r +
+                            " " + n.candidate.refinement.act.key.n.neuron.get().label
+            );
 
-        System.out.println(
-                level + " " +
-                debugState +
-                " CS:" + candidate.cache.size() +
-                " LIMITED:" + candidate.debugCounts[DebugState.LIMITED.ordinal()]  +
-                " CACHED:" + candidate.debugCounts[DebugState.CACHED.ordinal()]  +
-                " EXPLORE:" + candidate.debugCounts[DebugState.EXPLORE.ordinal()]  +
-                " " + candidate.refinement.act.key.r +
-                " " + candidate.refinement.act.key.n.neuron.get().label
-        );
+            n = n.getParent();
+        }
     }
 
 
@@ -325,12 +325,15 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public static List<InterprNode> collectConflicts(Document doc) {
-        List<InterprNode> results = new ArrayList<>();
+    public static Set<InterprNode> collectConflicts(Document doc) {
+        Set<InterprNode> results = new TreeSet<>();
         int v = doc.visitedCounter++;
         for(InterprNode n: doc.bottom.children) {
             if(!n.conflicts.primary.isEmpty()) {
                 results.add(n);
+            }
+            for(Conflict c: n.conflicts.secondary.values()) {
+                results.add(c.secondary);
             }
         }
         return results;
