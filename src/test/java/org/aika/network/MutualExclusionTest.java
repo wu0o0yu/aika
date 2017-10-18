@@ -170,24 +170,7 @@ public class MutualExclusionTest {
         }
         System.out.println();
 
-        System.out.println("Output activation:");
-        OrNode n = outN.get().node.get();
-        for(Activation act: n.getActivations(doc)) {
-            System.out.println("Text Range: " + act.key.r);
-            System.out.println("Option: " + act.key.o);
-            System.out.println("Node: " + act.key.n);
-            System.out.println("Rid: " + act.key.rid);
-            System.out.println("Activation weight: " + act.finalState.value);
-            System.out.println();
-        }
-
-        System.out.println("All activations:");
         System.out.println(doc.neuronActivationsToString(true, false, true));
-        System.out.println();
-
-        System.out.println("Selected activations:");
-        System.out.println(doc.nodeActivationsToString(false, true));
-
         doc.clearActivations();
     }
 }
