@@ -145,7 +145,7 @@ public class ConverterTest {
         );
 
         System.out.println(out.get().node.get().logicToString());
-        Assert.assertEquals(1, out.get().node.get().allParents.firstEntry().getValue().size());
+        Assert.assertEquals(1, out.get().node.get().parents.firstEntry().getValue().size());
     }
 
 
@@ -157,9 +157,10 @@ public class ConverterTest {
         Neuron inB = m.createNeuron("B");
         Neuron inC = m.createNeuron("C");
         Neuron inD = m.createNeuron("D");
+        Neuron inE = m.createNeuron("E");
 
         Neuron out = m.initNeuron(m.createNeuron("ABCD"),
-                0.0,
+                -11.0,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(5.0f)
@@ -180,7 +181,7 @@ public class ConverterTest {
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inC)
-                        .setWeight(5.0f)
+                        .setWeight(2.0f)
                         .setRecurrent(false)
                         .setBiasDelta(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)
@@ -189,7 +190,16 @@ public class ConverterTest {
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inD)
-                        .setWeight(5.0f)
+                        .setWeight(2.0f)
+                        .setRecurrent(false)
+                        .setBiasDelta(0.0)
+                        .setStartRangeMatch(Range.Operator.EQUALS)
+                        .setStartRangeOutput(true)
+                        .setEndRangeMatch(Range.Operator.EQUALS)
+                        .setEndRangeOutput(true),
+                new Input()
+                        .setNeuron(inE)
+                        .setWeight(0.5f)
                         .setRecurrent(false)
                         .setBiasDelta(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)
@@ -200,12 +210,7 @@ public class ConverterTest {
 
         System.out.println(out.get().node.get().logicToString());
 
-        out.get().bias = -6.0;
-        new Converter(m, 0, out.get(), out.get().inputSynapses.values()).convert();
-
-        System.out.println(out.get().node.get().logicToString());
-
-        Assert.assertEquals(1, out.get().node.get().parents.firstEntry().getValue().size());
+        Assert.assertEquals(2, out.get().node.get().parents.firstEntry().getValue().size());
     }
 
 }

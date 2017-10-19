@@ -72,8 +72,8 @@ public class Converter {
     private OrNode outputNode;
     private Collection<Synapse> modifiedSynapses;
 
-    private int numAboveTolerance = 0;
-    private double sumBelowTolerance = 0.0;
+//    private int numAboveTolerance = 0;
+//    private double sumBelowTolerance = 0.0;
 
 
     public Converter(Model m, int threadId, INeuron neuron, Collection<Synapse> modifiedSynapses) {
@@ -105,16 +105,7 @@ public class Converter {
                 neuron.provider.setModified();
             }
             in.lock.releaseWriteLock();
-
-            if (!s.isNegative() && !s.key.isRecurrent) {
-                if (s.w >= -neuron.bias * TOLERANCE) {
-                    numAboveTolerance++;
-                } else {
-                    sumBelowTolerance += s.w;
-                }
-            }
         }
-        assert numAboveTolerance >= 1;
 
 
         double remainingSum = 0.0;
@@ -123,7 +114,7 @@ public class Converter {
         for(Synapse s: neuron.inputSynapses.values()) {
             if(!s.isNegative() && !s.key.isRecurrent) {
                 if (s.w + neuron.bias > 0.0) {
-                    if (numAboveThreshold > 0) return false;
+                    if (numAboveThreshold > 0 && neuron.inputSynapses.size() != modifiedSynapses.size()) break;
                     numAboveThreshold++;
                 }
                 remainingSum += s.w;
@@ -135,59 +126,69 @@ public class Converter {
         Node requiredNode = null;
         boolean noFurtherRefinement = false;
         TreeSet<Synapse> reqSyns = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
-        if(numAboveThreshold == 0) {
+        double sum = 0.0;
+        if(numAboveThreshold == 0 || neuron.inputSynapses.size() == modifiedSynapses.size()) {
             int i = 0;
-            double sum = 0.0;
             for (Synapse s : tmp) {
-
-//                final boolean remainingSumIsTooSmall = remainingSum + neuron.negRecSum + neuron.negDirSum + neuron.posRecSum + neuron.bias <= 0.0;
+                final boolean isOptionalInput = sum + remainingSum - s.w - neuron.negRecSum + neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
                 final boolean maxAndNodesReached = i > AndNode.MAX_POS_NODES;
-//                if (remainingSumIsTooSmall || maxAndNodesReached) {
-                if (maxAndNodesReached) {
+                if (isOptionalInput || maxAndNodesReached) {
                     break;
                 }
 
+                remainingSum -= s.w;
                 reqSyns.add(s);
 
-                requiredNode = getRequiredNode(offset, requiredNode, s);
-
+                requiredNode = getNextLevelNode(offset, requiredNode, s);
                 offset = Utils.nullSafeMin(s.key.relativeRid, offset);
+
                 i++;
 
-                remainingSum -= s.w;
                 sum += s.w;
 
-                final boolean sumOfSynapseWeightsAboveThreshold = sum + neuron.negRecSum + neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
+                final boolean sumOfSynapseWeightsAboveThreshold = sum - neuron.negRecSum + neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
                 if (sumOfSynapseWeightsAboveThreshold) {
                     noFurtherRefinement = true;
                     break;
                 }
             }
-        }
 
-        if(requiredNode != outputNode.requiredNode) {
-            outputNode.removeParents(false);
-            outputNode.requiredNode = requiredNode;
-        }
+            if (requiredNode != outputNode.requiredNode) {
+                outputNode.removeParents(false);
+                outputNode.requiredNode = requiredNode;
+            }
 
-        if(!noFurtherRefinement) {
-            for (Synapse s : modifiedSynapses) {
-                if (!reqSyns.contains(s)) {
-                    Node nln;
-                    nln = getRequiredNode(offset, requiredNode, s);
+            if (!noFurtherRefinement) {
+                for (Synapse s : tmp) {
+                    boolean belowThreshold = sum + s.w + remainingSum - neuron.negRecSum + neuron.negDirSum + neuron.posRecSum + neuron.bias <= 0.0;
+                    if (belowThreshold) {
+                        break;
+                    }
 
-                    Integer nOffset = Utils.nullSafeMin(s.key.relativeRid, offset);;
-                    outputNode.addInput(nOffset, nln, false);
+                    if (!reqSyns.contains(s)) {
+                        Node nln;
+                        nln = getNextLevelNode(offset, requiredNode, s);
+
+                        Integer nOffset = Utils.nullSafeMin(s.key.relativeRid, offset);
+                        outputNode.addInput(nOffset, nln, false);
+                        remainingSum -= s.w;
+                    }
                 }
+            } else {
+                outputNode.addInput(offset, requiredNode, false);
             }
         } else {
-            outputNode.addInput(offset, requiredNode, false);
+            for (Synapse s : modifiedSynapses) {
+                Node nln = s.inputNode.get();
+                offset = s.key.relativeRid;
+                outputNode.addInput(offset, nln, false);
+            }
         }
-
         return true;
     }
 
-    private Node getRequiredNode(Integer offset, Node requiredNode, Synapse s) {
+
+    private Node getNextLevelNode(Integer offset, Node requiredNode, Synapse s) {
         Node nln;
         if (requiredNode == null) {
             nln = s.inputNode.get();
