@@ -153,8 +153,8 @@ public class Converter {
                 }
             }
 
+            outputNode.removeParents(threadId, false);
             if (requiredNode != outputNode.requiredNode) {
-                outputNode.removeParents(threadId, false);
                 outputNode.requiredNode = requiredNode;
             }
 
