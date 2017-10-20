@@ -179,7 +179,7 @@ public class Document implements Comparable<Document> {
             vQueue.propagateWeight(0, act);
         }
         interrupted = false;
-        SearchNode root = new SearchNode(this, null, null, null, -1);
+        SearchNode root = new SearchNode(this, null, null, null, -1, Collections.emptyList());
         root.computeBestInterpretation(this);
     }
 
@@ -304,7 +304,6 @@ public class Document implements Comparable<Document> {
         }
 
         StringBuilder sb = new StringBuilder();
-        INeuron.NormWeight weightSum = INeuron.NormWeight.ZERO_WEIGHT;
         for(Activation act: acts) {
             if(act.upperBound <= 0.0) {
                 continue;
@@ -344,12 +343,12 @@ public class Document implements Comparable<Document> {
                     sb.append(" FN:" + Utils.round(act.finalState.weight.n));
                 }
             }
-            if (act.finalState != null && act.finalState.weight != null) {
-                weightSum = weightSum.add(act.finalState.weight);
-            }
             sb.append("\n");
         }
-        sb.append("\nWeightSum:" + weightSum.toString() + "\n");
+
+        if(selectedSearchNode != null) {
+            sb.append("\n Final SearchNode:" + selectedSearchNode.id + "  WeightSum:" + selectedSearchNode.accumulatedWeight.toString() + "\n");
+        }
         return sb.toString();
     }
 

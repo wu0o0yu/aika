@@ -70,12 +70,12 @@ public class MutualExclusionTest {
         // Create three neurons that might be suppressed by the suppressing neuron.
         Neuron pA = m.initNeuron(
                 m.createNeuron("A"),
-                0.01,
+                3,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.5f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.9),
+                        .setBiasDelta(1.0),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
@@ -85,12 +85,12 @@ public class MutualExclusionTest {
 
         Neuron pB = m.initNeuron(
                 m.createNeuron("B"),
-                0.01,
+                5,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(11.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.9),
+                        .setBiasDelta(1.0),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
@@ -100,12 +100,12 @@ public class MutualExclusionTest {
 
         Neuron pC = m.initNeuron(
                 m.createNeuron("C"),
-                0.01,
+                2,
                 new Input()
                         .setNeuron(inC)
                         .setWeight(10.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.9),
+                        .setBiasDelta(1.0),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
@@ -167,24 +167,7 @@ public class MutualExclusionTest {
         }
         System.out.println();
 
-        System.out.println("Output activation:");
-        OrNode n = outN.get().node.get();
-        for(Activation act: n.getActivations(doc)) {
-            System.out.println("Text Range: " + act.key.r);
-            System.out.println("Option: " + act.key.o);
-            System.out.println("Node: " + act.key.n);
-            System.out.println("Rid: " + act.key.rid);
-            System.out.println("Activation weight: " + act.finalState.value);
-            System.out.println();
-        }
-
-        System.out.println("All activations:");
         System.out.println(doc.neuronActivationsToString(true, false, true));
-        System.out.println();
-
-        System.out.println("Selected activations:");
-        System.out.println(doc.nodeActivationsToString(false, true));
-
         doc.clearActivations();
     }
 }
