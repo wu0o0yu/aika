@@ -382,6 +382,19 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
+    @Override
+    public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
+        ThreadState th = getThreadState(threadId, true);
+        if(th.visitedNeuronRefsChange == v) return;
+        th.visitedNeuronRefsChange = v;
+        numberOfNeuronRefs += d;
+
+        for(Provider<? extends Node> n: parents.values()) {
+            n.get().changeNumberOfNeuronRefs(threadId, v, d);
+        }
+    }
+
+
     public static Collection<NodeActivation<?>> prepareInputActs(NodeActivation<?> firstAct, NodeActivation<?> secondAct) {
         List<NodeActivation<?>> inputActs = new ArrayList<>(2);
         inputActs.add(firstAct);

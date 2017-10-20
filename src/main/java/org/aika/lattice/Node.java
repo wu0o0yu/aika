@@ -75,6 +75,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public boolean ridRequired;
 
 
+    public volatile int numberOfNeuronRefs = 0;
     volatile boolean isRemoved;
     volatile int isRemovedId;
     volatile static int isRemovedIdCounter = 0;
@@ -163,7 +164,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public static class RidVisited {
         public long computeParents = -1;
         public long outputNode = -1;
-        public long adjust = -1;
     }
 
 
@@ -216,6 +216,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     abstract boolean isExpandable(boolean checkFrequency);
 
     abstract boolean contains(Refinement ref);
+
+    public abstract void changeNumberOfNeuronRefs(int threadId, long v, int d);
+
+
 
     protected Node() {
     }
@@ -653,7 +657,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public boolean isRequired() {
-        return !allOrChildren.isEmpty();
+        return numberOfNeuronRefs > 0;
     }
 
 
@@ -702,6 +706,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         out.writeBoolean(endRequired);
         out.writeBoolean(ridRequired);
 
+        out.writeInt(numberOfNeuronRefs);
         out.writeBoolean(frequencyHasChanged);
         out.writeInt(nOffset);
 
@@ -742,6 +747,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         endRequired = in.readBoolean();
         ridRequired = in.readBoolean();
 
+        numberOfNeuronRefs = in.readInt();
         frequencyHasChanged = in.readBoolean();
         nOffset = in.readInt();
 

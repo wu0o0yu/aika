@@ -291,7 +291,8 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    public void addInput(Integer ridOffset, Node in, boolean all) {
+    public void addInput(Integer ridOffset, int threadId, Node in, boolean all) {
+        in.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, 1);
         in.lock.acquireWriteLock();
         in.addOrChild(new OrEntry(ridOffset, provider), all);
         in.provider.setModified();
@@ -326,7 +327,8 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    public void removeInput(Integer ridOffset, Node in, boolean all) {
+    public void removeInput(Integer ridOffset, int threadId, Node in, boolean all) {
+        in.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, -1);
         in.removeOrChild(new OrEntry(ridOffset, provider), all);
         in.provider.setModified();
         lock.acquireWriteLock();
@@ -345,22 +347,23 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
 
-    void remove(Model m) {
+    void remove(Model m, int threadId) {
         neuron.get().remove();
 
         super.remove(m);
 
         lock.acquireReadLock();
-        removeParents(true);
-        removeParents(false);
+        removeParents(threadId, true);
+        removeParents(threadId, false);
         lock.releaseReadLock();
     }
 
 
-    public void removeParents(boolean all) {
+    public void removeParents(int threadId, boolean all) {
         for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: (all ? allParents : parents).entrySet()) {
             for(Provider<Node> p: me.getValue()) {
                 Node pn = p.get();
+                pn.changeNumberOfNeuronRefs(threadId, Node.visitedCounter++, -1);
                 pn.removeOrChild(new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, provider), all);
                 pn.provider.setModified();
             }
@@ -393,6 +396,12 @@ public class OrNode extends Node<OrNode, Activation> {
 
     @Override
     boolean contains(Refinement ref) {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
         throw new UnsupportedOperationException();
     }
 

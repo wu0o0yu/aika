@@ -131,7 +131,7 @@ public class Converter {
             int i = 0;
             for (Synapse s : tmp) {
                 final boolean isOptionalInput = sum + remainingSum - s.w - neuron.negRecSum + neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
-                final boolean maxAndNodesReached = i > AndNode.MAX_POS_NODES;
+                final boolean maxAndNodesReached = i >= AndNode.MAX_POS_NODES;
                 if (isOptionalInput || maxAndNodesReached) {
                     break;
                 }
@@ -154,11 +154,13 @@ public class Converter {
             }
 
             if (requiredNode != outputNode.requiredNode) {
-                outputNode.removeParents(false);
+                outputNode.removeParents(threadId, false);
                 outputNode.requiredNode = requiredNode;
             }
 
-            if (!noFurtherRefinement) {
+            if (noFurtherRefinement || i == AndNode.MAX_POS_NODES) {
+                outputNode.addInput(offset, threadId, requiredNode, false);
+            } else {
                 for (Synapse s : tmp) {
                     boolean belowThreshold = sum + s.w + remainingSum - neuron.negRecSum + neuron.negDirSum + neuron.posRecSum + neuron.bias <= 0.0;
                     if (belowThreshold) {
@@ -170,18 +172,16 @@ public class Converter {
                         nln = getNextLevelNode(offset, requiredNode, s);
 
                         Integer nOffset = Utils.nullSafeMin(s.key.relativeRid, offset);
-                        outputNode.addInput(nOffset, nln, false);
+                        outputNode.addInput(nOffset, threadId, nln, false);
                         remainingSum -= s.w;
                     }
                 }
-            } else {
-                outputNode.addInput(offset, requiredNode, false);
             }
         } else {
             for (Synapse s : modifiedSynapses) {
                 Node nln = s.inputNode.get();
                 offset = s.key.relativeRid;
-                outputNode.addInput(offset, nln, false);
+                outputNode.addInput(offset, threadId, nln, false);
             }
         }
         return true;

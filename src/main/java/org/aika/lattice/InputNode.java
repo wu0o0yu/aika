@@ -439,6 +439,15 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
+    @Override
+    public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
+        ThreadState th = getThreadState(threadId, true);
+        if (th.visitedNeuronRefsChange == v) return;
+        th.visitedNeuronRefsChange = v;
+        numberOfNeuronRefs += d;
+    }
+
+
     public String logicToString() {
         StringBuilder sb = new StringBuilder();
         sb.append("I");
