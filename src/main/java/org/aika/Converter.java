@@ -67,7 +67,6 @@ public class Converter {
             if (s.inputNode == null) {
                 InputNode iNode = InputNode.add(m, s.key.createInputNodeKey(), s.input.get());
                 iNode.provider.setModified();
-                iNode.isBlocked = in.isBlocked;
                 iNode.setSynapse(s);
                 s.inputNode = iNode.provider;
             }
@@ -103,7 +102,7 @@ public class Converter {
             int i = 0;
             for (Synapse s : tmp) {
                 final boolean isOptionalInput = sum + remainingSum - s.w - neuron.negRecSum + neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
-                final boolean maxAndNodesReached = i >= AndNode.MAX_POS_NODES;
+                final boolean maxAndNodesReached = i >= AndNode.MAX_AND_NODE_SIZE;
                 if (isOptionalInput || maxAndNodesReached) {
                     break;
                 }
@@ -130,7 +129,7 @@ public class Converter {
                 outputNode.requiredNode = requiredNode;
             }
 
-            if (noFurtherRefinement || i == AndNode.MAX_POS_NODES) {
+            if (noFurtherRefinement || i == AndNode.MAX_AND_NODE_SIZE) {
                 outputNode.addInput(offset, threadId, requiredNode, false);
             } else {
                 for (Synapse s : tmp) {

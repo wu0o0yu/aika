@@ -40,8 +40,6 @@ public class OrOptionsTest {
     public void testOrOptions() {
         Model m = new Model();
 
-        AndNode.minFrequency = 5;
-
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
         Neuron inC = m.createNeuron("C");

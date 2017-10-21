@@ -126,7 +126,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    public boolean isExpandable(boolean checkFrequency) {
+    public boolean isExpandable() {
         return true;
     }
 
@@ -351,7 +351,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    public void discover(Document doc, NodeActivation<InputNode> act) {
+    public void discover(Document doc, NodeActivation<InputNode> act, TrainConfig trainConfig) {
         long v = Node.visitedCounter++;
 
         for (INeuron n : doc.finallyActivatedNeurons) {

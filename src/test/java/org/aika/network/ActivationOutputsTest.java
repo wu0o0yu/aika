@@ -52,7 +52,6 @@ public class ActivationOutputsTest {
     @Test
     public void addActivationsTest() {
         Model m = new Model();
-        AndNode.minFrequency = 5;
 
         m.numberOfPositions = 10;
 
@@ -145,7 +144,6 @@ public class ActivationOutputsTest {
     @Test
     public void removeActivationsTest() {
         Model m = new Model();
-        AndNode.minFrequency = 10;
 
         m.numberOfPositions = 10;
 

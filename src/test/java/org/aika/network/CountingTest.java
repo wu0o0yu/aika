@@ -20,6 +20,7 @@ package org.aika.network;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
+import org.aika.TrainConfig;
 import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
 import org.junit.Assert;
@@ -37,7 +38,6 @@ public class CountingTest {
     @Test
     public void testActivationCounting() {
         Model m = new Model();
-        AndNode.minFrequency = 0;
 
         Neuron inA = m.createNeuron("inA");
         Neuron outA = m.initNeuron(m.createNeuron("nA"), 50.0,
@@ -64,7 +64,7 @@ public class CountingTest {
         inA.addInput(doc, 7, 8);
 
         doc.process();
-        doc.train();
+        doc.train(new TrainConfig().setPatternEvaluation(n -> false));
         Assert.assertEquals(6.0, outA.get().node.get().parents.get(Integer.MIN_VALUE).first().get().frequency, 0.001);
     }
 }

@@ -43,7 +43,6 @@ public class ActivationsTest {
     @Test
     public void addActivationsTest() {
         Model m = new Model();
-        AndNode.minFrequency = 1;
 
         Neuron inA = m.createNeuron("A");
 
@@ -96,8 +95,6 @@ public class ActivationsTest {
     @Test
     public void testGetActivationReturnsFirstFired() {
         Model m = new Model();
-        AndNode.minFrequency = 1;
-
 
         Neuron in = m.createNeuron("A");
         OrNode inNode = in.get().node.get();

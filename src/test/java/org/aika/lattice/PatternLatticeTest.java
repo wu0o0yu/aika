@@ -22,6 +22,7 @@ import org.aika.Input.RangeRelation;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
+import org.aika.TrainConfig;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.network.TestHelper;
@@ -254,7 +255,7 @@ public class PatternLatticeTest {
         Model m = new Model();
 
         AndNode.MAX_RID_RANGE = 1;
-        AndNode.minFrequency = 1;
+        int minFrequency = 1;
         m.numberOfPositions = 100;
 
 
@@ -272,13 +273,14 @@ public class PatternLatticeTest {
         InputNode pCNode = TestHelper.addOutputNode(doc, inC, 0, null);
         InputNode pDNode = TestHelper.addOutputNode(doc, inD, 0, null);
 
+        TrainConfig trainConfig = new TrainConfig().setPatternEvaluation(n -> n.frequency >= minFrequency);
 
         doc.bestInterpretation = Arrays.asList(doc.bottom);
-        doc.train();
+        doc.train(new TrainConfig());
 
         inA.addInput(doc, 0, 1, 0);
 
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(1, pANode.frequency, 0.01);
         Assert.assertEquals(null, pANode.andChildren);
@@ -286,7 +288,7 @@ public class PatternLatticeTest {
 
         inB.addInput(doc, 0, 1, 0);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(1, pBNode.frequency, 0.01);
 //        Assert.assertEquals(0, pBNode.andChildren.size());
@@ -294,7 +296,7 @@ public class PatternLatticeTest {
 
         inB.addInput(doc, 2, 3, 1);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(2, pBNode.frequency, 0.01);
         Assert.assertEquals(1, pBNode.andChildren.size());
@@ -302,7 +304,7 @@ public class PatternLatticeTest {
 
         inA.addInput(doc, 2, 3, 1);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(1, pANode.andChildren.size());
         Assert.assertEquals(1, pBNode.andChildren.size());
@@ -319,7 +321,7 @@ public class PatternLatticeTest {
 
 
         inC.addInput(doc, 4, 5, 2);
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(1, pCNode.frequency, 0.01);
         Assert.assertEquals(null, pCNode.andChildren);
@@ -329,7 +331,7 @@ public class PatternLatticeTest {
 
         inB.addInput(doc, 4, 5, 2);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(3, pBNode.frequency, 0.01);
         Assert.assertEquals(2, pBNode.andChildren.size());
@@ -337,14 +339,14 @@ public class PatternLatticeTest {
 
         inB.addInput(doc, 6, 7, 3);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(4, pBNode.frequency, 0.01);
         Assert.assertEquals(2, pBNode.andChildren.size());
 
         inC.addInput(doc, 6, 7, 3);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(4, pBNode.frequency, 0.01);
         Assert.assertEquals(2, pCNode.frequency, 0.01);
@@ -362,7 +364,7 @@ public class PatternLatticeTest {
 
         inA.addInput(doc, 4, 5, 2);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(3, pANode.frequency, 0.01);
         Assert.assertEquals(2, pAB.frequency, 0.01);
@@ -373,7 +375,7 @@ public class PatternLatticeTest {
 
         inA.addInput(doc, 8, 9, 4);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(4, pANode.frequency, 0.01);
         Assert.assertEquals(2, pAB.frequency, 0.01);
@@ -383,7 +385,7 @@ public class PatternLatticeTest {
 
         inC.addInput(doc, 8, 9, 4);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(3, pCNode.frequency, 0.01);
         Assert.assertEquals(2, pAB.frequency, 0.01);
@@ -420,7 +422,7 @@ public class PatternLatticeTest {
 
         inB.addInput(doc, 8, 9, 4);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(5, pBNode.frequency, 0.01);
         Assert.assertEquals(2, pANode.andChildren.size());
@@ -444,18 +446,18 @@ public class PatternLatticeTest {
 
         inD.addInput(doc, 0, 1, 0);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         inD.addInput(doc, 4, 5, 2);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         inA.addInput(doc, 10, 11, 5);
         inB.addInput(doc, 10, 11, 5);
         inC.addInput(doc, 10, 11, 5);
         inD.addInput(doc, 10, 11, 5);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(3, pBNode.andChildren.size());
         Assert.assertEquals(3, pDNode.andChildren.size());
@@ -519,11 +521,11 @@ public class PatternLatticeTest {
 
         inD.addInput(doc, 8, 9, 4);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         AndNode pACD = pAC.andChildren.get(new Refinement(0, TestHelper.addOutputNode(doc, inD, 0, null).provider)).get();
 
@@ -570,9 +572,9 @@ public class PatternLatticeTest {
         inB.removeInput(doc, 4, 5, 2);
 
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertNull(TestHelper.get(doc, pABC, new Range(0, 1), doc.bottom));
 
@@ -632,9 +634,9 @@ public class PatternLatticeTest {
 
         inD.removeInput(doc, 0, 1, 0);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
         m.resetFrequency();
-        doc.train();
+        doc.train(trainConfig);
 
         Assert.assertEquals(3, pDNode.andChildren.size());
 
@@ -654,7 +656,6 @@ public class PatternLatticeTest {
     @Test
     public void testMultipleActivation() {
         Model m = new Model();
-        AndNode.minFrequency = 10;
 
         Neuron inA = m.createNeuron("A");
         Node inANode = inA.get().node.get();

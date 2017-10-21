@@ -671,7 +671,6 @@ public class NegationTest {
     @Test
     public void testOptions() {
         Model m = new Model();
-        AndNode.minFrequency = 5;
 
         Neuron inA = m.createNeuron("A");
         Node inANode = inA.get().node.get();

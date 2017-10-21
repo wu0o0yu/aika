@@ -23,6 +23,7 @@ import org.aika.Model;
 import org.aika.Provider;
 import org.aika.Utils;
 import org.aika.corpus.Document;
+import org.aika.TrainConfig;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.neuron.INeuron;
@@ -47,7 +48,8 @@ import java.util.*;
 public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
     private static double SIGNIFICANCE_THRESHOLD = 0.98;
-    public static int MAX_POS_NODES = 4;
+    public static int MAX_AND_NODE_SIZE = 4;
+    public static int MAX_NODES = 4;
     public static int MAX_RID_RANGE = 5;
 
     SortedMap<Refinement, Provider<? extends Node>> parents = new TreeMap<>();
@@ -172,12 +174,11 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public void updateWeight(Document doc, long v) {
+    public void updateWeight(Document doc, TrainConfig trainConfig, long v) {
         ThreadState th = getThreadState(doc.threadId, true);
         Model m = doc.m;
-        if(isBlocked ||
-                (m.numberOfPositions - nOffset) == 0 ||
-                frequency < Node.minFrequency ||
+        if(     (m.numberOfPositions - nOffset) == 0 ||
+                !trainConfig.patternEvaluation.evaluate(this) ||
                 th.visitedComputeWeight == v ||
                 (numberOfPositionsNotify > m.numberOfPositions && frequencyNotify > frequency && Math.abs(nullHypFreq - oldNullHypFreq) < 0.01)
                 ) {
@@ -213,7 +214,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
     @Override
     public void cleanup(Model m) {
-        if(!isRemoved && !isFrequent() && !isRequired()) {
+        if(!isRemoved && !isRequired()) {
             remove(m);
 
             for(Provider<? extends Node> p: parents.values()) {
@@ -260,9 +261,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    public void discover(Document doc, NodeActivation<AndNode> act) {
-        if(!isExpandable(true)) return;
-
+    public void discover(Document doc, NodeActivation<AndNode> act, TrainConfig trainConfig) {
         for(NodeActivation<?> pAct: act.inputs.values()) {
             Node<?, NodeActivation<?>> pn = pAct.key.n;
             pn.lock.acquireReadLock();
@@ -272,8 +271,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                     Node secondNode = secondAct.key.n;
                     Integer ridDelta = Utils.nullSafeSub(act.key.rid, false, secondAct.key.rid, false);
                     if (act != secondAct &&
-                            !secondNode.isBlocked &&
-                            secondNode.isFrequent() &&
+                            trainConfig.patternEvaluation.evaluate(secondNode) &&
                             (ridDelta == null || ridDelta < MAX_RID_RANGE)
                             ) {
                         Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n.provider, secondAct.key.rid, pAct.key.rid));
@@ -281,6 +279,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
                         AndNode nln = createNextLevelNode(doc.m, doc.threadId, this, nRef, true);
                         if(nln != null) {
+                            nln.isDiscovered = true;
                             doc.addedNodes.add(nln);
                         }
                     }
@@ -291,9 +290,8 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public boolean isExpandable(boolean checkFrequency) {
-        if(checkFrequency && !isFrequent()) return false;
-        return parents.size() < MAX_POS_NODES;
+    public boolean isExpandable() {
+        return parents.size() < MAX_AND_NODE_SIZE;
     }
 
 
@@ -351,7 +349,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
             if(n.andChildren == null || !n.andChildren.containsKey(ref)) {
                 nln = new AndNode(m, n.level + 1, parents);
-                nln.isBlocked = n.isBlocked || ref.input.get().isBlocked;
             }
 
             for(Provider<? extends Node> pn: parentsForLocking) {

@@ -37,7 +37,6 @@ public class PropagateRidTest {
     @Test
     public void simpleTest() {
         Model m = new Model();
-        AndNode.minFrequency = 1;
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
         Neuron inA = m.createNeuron("A");

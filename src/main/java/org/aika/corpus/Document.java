@@ -17,10 +17,7 @@
 package org.aika.corpus;
 
 
-import org.aika.AbstractNode;
-import org.aika.Model;
-import org.aika.Provider;
-import org.aika.Utils;
+import org.aika.*;
 import org.aika.lattice.*;
 import org.aika.lattice.Node.ThreadState;
 import org.aika.neuron.Activation;
@@ -195,7 +192,7 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public void train() {
+    public void train(TrainConfig trainConfig) {
         m.numberOfPositions += numberOfPositionsDelta;
         numberOfPositionsDelta = 0;
 
@@ -205,18 +202,20 @@ public class Document implements Comparable<Document> {
 
         for(Node n: activatedNodes) {
             n.computeNullHyp(m);
-            if(n.frequencyHasChanged && !n.isBlocked && n.isFrequent()) {
+            if(n.frequencyHasChanged && trainConfig.patternEvaluation.evaluate(n)) {
                 n.frequencyHasChanged = false;
 
                 if(n instanceof AndNode) {
                     AndNode an = (AndNode) n;
-                    an.updateWeight(this, v);
+                    an.updateWeight(this, trainConfig, v);
                 }
 
                 ThreadState<?, NodeActivation<?>> th = n.getThreadState(threadId, false);
                 if(th != null) {
                     for (NodeActivation act : th.activations.values()) {
-                        n.discover(this, act);
+                        if(trainConfig.patternEvaluation.evaluate(n)) {
+                            n.discover(this, act, trainConfig);
+                        }
                     }
                 }
             }
@@ -227,7 +226,7 @@ public class Document implements Comparable<Document> {
 
             if(n == null || n.numberOfPositionsNotify > m.numberOfPositions) break;
 
-            n.updateWeight(this, v);
+            n.updateWeight(this, trainConfig, v);
         }
 
         bQueue.backpropagtion();
@@ -237,7 +236,7 @@ public class Document implements Comparable<Document> {
                 ThreadState<OrNode, Activation> th = n.node.get().getThreadState(threadId, false);
                 if(th != null) {
                     for (Activation act : th.activations.values()) {
-//                        n.train(this, act);
+                        n.train(this, act, trainConfig.learnRate, trainConfig.synapseEvaluation);
                     }
                 }
             }

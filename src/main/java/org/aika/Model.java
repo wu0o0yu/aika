@@ -498,7 +498,7 @@ public class Model {
         public volatile int synapses;
         public volatile int neurons;
         public volatile int nodes;
-        public volatile int[] nodesPerLevel = new int[AndNode.MAX_POS_NODES + 1];
+        public volatile int[] nodesPerLevel = new int[AndNode.MAX_AND_NODE_SIZE + 1];
         public volatile int orNodes;
     }
 }

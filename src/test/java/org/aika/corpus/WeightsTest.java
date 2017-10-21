@@ -47,7 +47,6 @@ public class WeightsTest {
     @Test
     public void testAndWithMultipleIO() {
         Model m = new Model();
-        AndNode.minFrequency = 5;
 
         Neuron pSuppr = m.createNeuron("SUPPR");
 

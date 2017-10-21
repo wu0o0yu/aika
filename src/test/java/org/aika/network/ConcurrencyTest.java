@@ -36,8 +36,6 @@ public class ConcurrencyTest {
     @Test
     public void testMultipleDocuments() {
         Model m = new Model(null, 8);
-        AndNode.minFrequency = 1;
-
 
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
@@ -119,7 +117,6 @@ public class ConcurrencyTest {
     @Test
     public void testMultithreading() {
         final Model m = new Model();
-        AndNode.minFrequency = 1;
 
         final Neuron inA = m.createNeuron("A");
         final Neuron inB = m.createNeuron("B");

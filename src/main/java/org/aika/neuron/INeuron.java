@@ -375,12 +375,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public interface SynapseEvaluation {
-        Synapse.Key evaluate(Activation iAct, Activation oAct);
-    }
-
-
-    public void train(Document doc, Activation targetAct, double learnRate, SynapseEvaluation se) {
+    public void train(Document doc, Activation targetAct, double learnRate, TrainConfig.SynapseEvaluation se) {
         if (Math.abs(targetAct.errorSignal) < TOLERANCE) return;
 
         long v = NodeActivation.visitedCounter++;

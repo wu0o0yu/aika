@@ -73,7 +73,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public boolean isExpandable(boolean checkFrequency) {
+    public boolean isExpandable() {
         return false;
     }
 
@@ -245,7 +245,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public void discover(Document doc, NodeActivation act) {
+    public void discover(Document doc, NodeActivation act, TrainConfig trainConfig) {
     }
 
 

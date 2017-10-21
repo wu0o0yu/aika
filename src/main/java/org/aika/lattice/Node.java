@@ -50,7 +50,6 @@ import java.util.*;
  * @author Lukas Molzberger
  */
 public abstract class Node<T extends Node, A extends NodeActivation<T>> extends AbstractNode<Provider<T>> implements Comparable<Node> {
-    public static int minFrequency = 5;
     public static int MAX_RID = 25;
 
     public static final Node MIN_NODE = new InputNode();
@@ -69,7 +68,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public volatile double nullHypFreq;
     public volatile double oldNullHypFreq;
 
-    public boolean isBlocked;
+    public boolean isDiscovered;
 
     public boolean endRequired;
     public boolean ridRequired;
@@ -205,7 +204,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     abstract void apply(Document doc, A act, InterprNode conflict);
 
-    public abstract void discover(Document doc, NodeActivation<T> act);
+    public abstract void discover(Document doc, NodeActivation<T> act, TrainConfig trainConfig);
 
     abstract Collection<Refinement> collectNodeAndRefinements(Refinement newRef);
 
@@ -213,7 +212,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public abstract void computeNullHyp(Model m);
 
-    abstract boolean isExpandable(boolean checkFrequency);
+    public abstract boolean isExpandable();
 
     abstract boolean contains(Refinement ref);
 
@@ -567,11 +566,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public boolean isFrequent() {
-        return frequency >= minFrequency;
-    }
-
-
     public boolean isPublic() {
         return this instanceof AndNode && orChildren != null && !orChildren.isEmpty();
     }
@@ -657,7 +651,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public boolean isRequired() {
-        return numberOfNeuronRefs > 0;
+        return numberOfNeuronRefs > 0 || isDiscovered;
     }
 
 
@@ -701,7 +695,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         out.writeDouble(nullHypFreq);
         out.writeDouble(oldNullHypFreq);
 
-        out.writeBoolean(isBlocked);
+        out.writeBoolean(isDiscovered);
 
         out.writeBoolean(endRequired);
         out.writeBoolean(ridRequired);
@@ -742,7 +736,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         nullHypFreq = in.readDouble();
         oldNullHypFreq = in.readDouble();
 
-        isBlocked = in.readBoolean();
+        isDiscovered = in.readBoolean();
 
         endRequired = in.readBoolean();
         ridRequired = in.readBoolean();
