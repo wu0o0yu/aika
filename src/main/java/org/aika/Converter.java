@@ -101,7 +101,7 @@ public class Converter {
         if(numAboveThreshold == 0 || neuron.inputSynapses.size() == modifiedSynapses.size()) {
             int i = 0;
             for (Synapse s : tmp) {
-                final boolean isOptionalInput = sum + remainingSum - s.w - neuron.negRecSum + neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
+                final boolean isOptionalInput = sum + remainingSum - s.w - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
                 final boolean maxAndNodesReached = i >= AndNode.MAX_AND_NODE_SIZE;
                 if (isOptionalInput || maxAndNodesReached) {
                     break;
@@ -117,7 +117,7 @@ public class Converter {
 
                 sum += s.w;
 
-                final boolean sumOfSynapseWeightsAboveThreshold = sum - neuron.negRecSum + neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
+                final boolean sumOfSynapseWeightsAboveThreshold = sum - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
                 if (sumOfSynapseWeightsAboveThreshold) {
                     noFurtherRefinement = true;
                     break;
@@ -133,7 +133,7 @@ public class Converter {
                 outputNode.addInput(offset, threadId, requiredNode, false);
             } else {
                 for (Synapse s : tmp) {
-                    boolean belowThreshold = sum + s.w + remainingSum - neuron.negRecSum + neuron.negDirSum + neuron.posRecSum + neuron.bias <= 0.0;
+                    boolean belowThreshold = sum + s.w + remainingSum - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias <= 0.0;
                     if (belowThreshold) {
                         break;
                     }

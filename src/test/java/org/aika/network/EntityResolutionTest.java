@@ -25,6 +25,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.aika.Input.RangeRelation.EQUALS;
+import static org.aika.Input.RangeRelation.NONE;
 
 /**
  *
@@ -129,60 +130,60 @@ public class EntityResolutionTest {
         Neuron chKatzenOhnePuma = m.createNeuron("CH-Katzen/Puma");
         Neuron chKatzenOhneLeopard = m.createNeuron("CH-Katzen/Leopard");
 
-        m.initNeuron(eJaguar, 2.0,
+        m.initNeuron(eJaguar, 5.0,
                 new Input()
                         .setNeuron(wJaguar)
                         .setRecurrent(false)
-                        .setWeight(5.0f)
-                        .setBiasDelta(0.95)
+                        .setWeight(10.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(chKatzenOhneJaguar)
                         .setRecurrent(true)
-                        .setWeight(5.0f)
-                        .setBiasDelta(0.95)
+                        .setWeight(10.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(false)
         );
 
-        m.initNeuron(ePuma, 2.0,
+        m.initNeuron(ePuma, 5.0,
                 new Input()
                         .setNeuron(wPuma)
                         .setRecurrent(false)
-                        .setWeight(5.0f)
-                        .setBiasDelta(0.95)
+                        .setWeight(10.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(chKatzenOhnePuma)
                         .setRecurrent(true)
-                        .setWeight(5.0f)
-                        .setBiasDelta(0.95)
+                        .setWeight(10.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(false)
         );
 
 
-        m.initNeuron(eLeopard, 2.0,
+        m.initNeuron(eLeopard, 5.0,
                 new Input()
                         .setNeuron(wLeopard)
                         .setRecurrent(false)
-                        .setWeight(5.0f)
-                        .setBiasDelta(0.95)
+                        .setWeight(10.0f)
+                        .setBiasDelta(1.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(chKatzenOhneLeopard)
                         .setRecurrent(true)
-                        .setWeight(5.0f)
-                        .setBiasDelta(0.95)
+                        .setWeight(10.0f)
+                        .setBiasDelta(1.0)
                         .setRangeOutput(false)
                         .setRangeMatch(EQUALS)
         );
 
         m.initNeuron(cKatzen,
-                -0.01,
+                0.0,
                 new Input()
                         .setNeuron(eJaguar)
                         .setWeight(10.0f)
@@ -206,71 +207,71 @@ public class EntityResolutionTest {
                         .setRangeOutput(true)
         );
 
-        m.initNeuron(chKatzenOhneJaguar, 2.0,
+        m.initNeuron(chKatzenOhneJaguar, 5.0,
                 new Input()
                         .setNeuron(cKatzen)
                         .setWeight(10.0f)
-                        .setBiasDelta(0.95)
+                        .setBiasDelta(1.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(eJaguar)
                         .setWeight(10.0f)
-                        .setBiasDelta(0.95)
+                        .setBiasDelta(1.0)
                         .setRecurrent(false)
-                        .setRangeMatch(EQUALS)
+                        .setRangeMatch(NONE)
                         .setRangeOutput(false),
                 new Input()
                         .setNeuron(eJaguar)
                         .setWeight(-30.0f)
-                        .setBiasDelta(0.95)
+                        .setBiasDelta(1.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
         );
 
-        m.initNeuron(chKatzenOhnePuma, 2.0,
+        m.initNeuron(chKatzenOhnePuma, 5.0,
                 new Input()
                         .setNeuron(cKatzen)
                         .setWeight(10.0f)
-                        .setBiasDelta(0.95)
+                        .setBiasDelta(1.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(ePuma)
                         .setWeight(10.0f)
-                        .setBiasDelta(0.95)
+                        .setBiasDelta(1.0)
                         .setRecurrent(false)
-                        .setRangeMatch(EQUALS)
+                        .setRangeMatch(NONE)
                         .setRangeOutput(false),
                 new Input()
                         .setNeuron(ePuma)
                         .setWeight(-30.0f)
-                        .setBiasDelta(0.95)
+                        .setBiasDelta(1.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
         );
 
-        m.initNeuron(chKatzenOhneLeopard, 2.0,
+        m.initNeuron(chKatzenOhneLeopard, 5.0,
                 new Input()
                         .setNeuron(cKatzen)
                         .setWeight(10.0f)
-                        .setBiasDelta(0.95)
+                        .setBiasDelta(1.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(eLeopard)
                         .setWeight(10.0f)
-                        .setBiasDelta(0.95)
+                        .setBiasDelta(1.0)
                         .setRecurrent(false)
-                        .setRangeMatch(EQUALS)
+                        .setRangeMatch(NONE)
                         .setRangeOutput(false),
                 new Input()
                         .setNeuron(eLeopard)
                         .setWeight(-30.0f)
-                        .setBiasDelta(0.95)
+                        .setBiasDelta(1.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
         );
@@ -289,7 +290,6 @@ public class EntityResolutionTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         System.out.println("Process");
-        Document.OPTIMIZE_DEBUG_OUTPUT = true;
         doc.process();
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
@@ -298,14 +298,9 @@ public class EntityResolutionTest {
         Assert.assertNotNull(eJaguar.get().node.get().getFirstActivation(doc));
         Assert.assertNotNull(ePuma.get().node.get().getFirstActivation(doc));
 
-        Assert.assertEquals(0, eJaguar.get().node.get().getFirstActivation(doc).key.o.primId);
-        Assert.assertEquals(3, ePuma.get().node.get().getFirstActivation(doc).key.o.primId);
 
-        Assert.assertEquals(doc.bottom, eJaguar.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
-        Assert.assertEquals(doc.bottom, ePuma.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.values().iterator().next());
-
-        Assert.assertEquals(1, eJaguar.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
-        Assert.assertEquals(1, ePuma.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
+        Assert.assertFalse(eJaguar.getFinalActivations(doc).isEmpty());
+        Assert.assertFalse(ePuma.getFinalActivations(doc).isEmpty());
     }
 
 
