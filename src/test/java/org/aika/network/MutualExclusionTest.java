@@ -73,7 +73,7 @@ public class MutualExclusionTest {
                 3,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(10.5f)
+                        .setWeight(10.0f)
                         .setRecurrent(false)
                         .setBiasDelta(1.0),
                 new Input()
@@ -88,7 +88,7 @@ public class MutualExclusionTest {
                 5,
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(11.0f)
+                        .setWeight(10.0f)
                         .setRecurrent(false)
                         .setBiasDelta(1.0),
                 new Input()
@@ -156,7 +156,7 @@ public class MutualExclusionTest {
         // Computes the selected option
         doc.process();
 
-        System.out.println("Selected Option: " + doc.bestInterpretation);
+        System.out.println("Final Interpretation: " + doc.bestInterpretation);
         System.out.println();
 
         System.out.println("Show all conflicts with the selected option:");

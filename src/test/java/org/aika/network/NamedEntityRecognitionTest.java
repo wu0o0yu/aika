@@ -96,7 +96,7 @@ public class NamedEntityRecognitionTest {
 
         Neuron cookProfessionEntity = m.initNeuron(
                 m.createNeuron("E-cook (profession)"),
-                3,
+                3.0,
                 new Input()
                         .setNeuron(inputNeurons.get("cook"))
                         .setWeight(15.0f)
@@ -114,7 +114,7 @@ public class NamedEntityRecognitionTest {
 
         Neuron jacksonForenameEntity = m.initNeuron(
                 m.createNeuron("E-jackson (forename)"),
-                3,
+                3.0,
                 new Input()
                         .setNeuron(inputNeurons.get("jackson"))
                         .setWeight(10.0f)
@@ -140,7 +140,7 @@ public class NamedEntityRecognitionTest {
 
         Neuron jacksonCityEntity = m.initNeuron(
                 m.createNeuron("E-jackson (city)"),
-                3,
+                3.0,
                 new Input()
                         .setNeuron(inputNeurons.get("jackson"))
                         .setWeight(12.0f)
@@ -158,7 +158,7 @@ public class NamedEntityRecognitionTest {
 
         m.initNeuron(
                 forenameCategory,
-                -0.001,
+                0.0,
                 new Input() // In this example there is only one forename considered.
                         .setNeuron(jacksonForenameEntity)
                         .setWeight(10.0f)
@@ -228,7 +228,7 @@ public class NamedEntityRecognitionTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
-        System.out.println("Selected Option: " + doc.bestInterpretation.toString());
+        System.out.println("Final Interpretation: " + doc.bestInterpretation.toString());
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");

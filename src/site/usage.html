@@ -112,7 +112,7 @@
 The entity neurons represent the concrete meanings of the input words. As can be seen here the individual inputs have a few more properties than we are used to from other
 neural networks. The reason for this is that Aika not only propagates the input activation value to the next neuron but also the text range, the word position and the interpretation option.
 To avoid having to compute the neurons bias manually, we can use the <i>initAndNeuron</i> helper function for that. But in order to compute the bias it needs to know the
-required minimum input activation (<i>setMinInput</i>) of each input.
+required minimum input activation (<i>setBiasDelta</i>) of each input.
             <br/>
             This entity neuron has three inputs. The first one simply checks if the word 'cook' occurred in the text. The second one is a positive feedback loop and checks if the previous word
             was a forename. The last one is a negative feedback loop. It makes sure that only one entity is assigned to each word.
@@ -122,15 +122,15 @@ required minimum input activation (<i>setMinInput</i>) of each input.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    Neuron cookSurnameEntity = m.initAndNeuron(
+    Neuron cookSurnameEntity = m.initNeuron(
             m.createNeuron("E-cook (surname)"),
-            0.5, // adjusts the bias
+            3.0, // adjusts the bias
             new Input() // Requires the word to be recognized
                     .setNeuron(inputNeurons.get("cook"))
                     .setWeight(10.0f)
                  // This input requires the input activation to have an
                  // activation value of at least 0.9
-                    .setMinInput(0.9f)
+                    .setBiasDelta(0.9)
                     .setRelativeRid(0) // references the current word
                     .setRecurrent(false)
                     .setRangeMatch(EQUALS)
@@ -138,7 +138,7 @@ required minimum input activation (<i>setMinInput</i>) of each input.
             new Input() // The previous word needs to be a forename
                     .setNeuron(forenameCategory)
                     .setWeight(10.0f)
-                    .setMinInput(0.9f)
+                    .setBiasDelta(0.9)
                     .setRelativeRid(-1) // references the previous word
                     .setRecurrent(true) // this input is a positive feedback loop
                     .setRangeMatch(NONE),
@@ -149,7 +149,7 @@ required minimum input activation (<i>setMinInput</i>) of each input.
             new Input()
                     .setNeuron(suppressingN)
                     .setWeight(-20.0f)
-                    .setMinInput(1.0f)
+                    .setBiasDelta(1.0)
                     .setRecurrent(true) // this input is a negative feedback loop
                     .setRangeMatch(CONTAINED_IN)
     );
@@ -161,18 +161,20 @@ required minimum input activation (<i>setMinInput</i>) of each input.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    m.initOrNeuron(forenameCategory,
+    m.initNeuron(forenameCategory, 0.0,
             new Input() // In this example, only one forename is considered.
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(10.0f)
+                    .setBiasDelta(0.0)
                     .setRelativeRid(0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
     );
-    m.initOrNeuron(surnameCategory,
+    m.initNeuron(surnameCategory, 0.0,
             new Input()
                     .setNeuron(cookSurnameEntity)
                     .setWeight(10.0f)
+                    .setBiasDelta(0.0)
                     .setRelativeRid(0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
@@ -185,25 +187,29 @@ required minimum input activation (<i>setMinInput</i>) of each input.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    m.initOrNeuron(suppressingN,
+    m.initNeuron(suppressingN, 0.0,
             new Input()
                     .setNeuron(cookProfessionEntity)
                     .setWeight(10.0f)
+                    .setBiasDelta(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Input()
                     .setNeuron(cookSurnameEntity)
                     .setWeight(10.0f)
+                    .setBiasDelta(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Input()
                     .setNeuron(jacksonCityEntity)
                     .setWeight(10.0f)
+                    .setBiasDelta(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Input()
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(10.0f)
+                    .setBiasDelta(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
     );
@@ -241,7 +247,7 @@ Now that the model is complete, we can start processing an actual text.
     System.out.println(doc.neuronActivationsToString(true));
     System.out.println();
 
-    System.out.println("Final interpretation: " + doc.selectedOption.toString());
+    System.out.println("Final interpretation: " + doc.bestInterpretation.toString());
 
     doc.clearActivations();
                 </code>
@@ -317,69 +323,68 @@ The output of this example looks as following. Each line in the table represents
         // Create three neurons that might be suppressed by the suppressing neuron.
         // createAndNeuron is a helper method which is used set the synapse weights
         // and bias of new neuron.
-        Neuron pA = m.initAndNeuron(
+        Neuron pA = m.initNeuron(
                 m.createNeuron("A"),
-                0.001,
+                3.0,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(10.5f)
-                        .setMaxLowerWeightsSum(0.0)
+                        .setWeight(10.0f)
+                        .setBiasDelta(1.0)
                         .setRecurrent(false)
-                        .setMinInput(0.9f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()                     // This input is negated
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
+                        .setBiasDelta(1.0)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)
                         .setRangeMatch(CONTAINED_IN)
         );
 
-        Neuron pB = m.initAndNeuron(
+        Neuron pB = m.initNeuron(
                 m.createNeuron("B"),
-                0.001,
+                5.0,
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(11.0f)
-                        .setMaxLowerWeightsSum(0.0)
+                        .setWeight(10.0f)
+                        .setBiasDelta(1.0)
                         .setRecurrent(false)
-                        .setMinInput(0.9f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
+                        .setBiasDelta(1.0)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)
                         .setRangeMatch(CONTAINED_IN)
         );
 
-        Neuron pC = m.initAndNeuron(
+        Neuron pC = m.initNeuron(
                 m.createNeuron("C"),
-                0.001,
+                2.0,
                 new Input()
                         .setNeuron(inC)
                         .setWeight(10.0f)
-                        .setMaxLowerWeightsSum(0.0)
+                        .setBiasDelta(1.0)
                         .setRecurrent(false)
-                        .setMinInput(0.9f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
+                        .setBiasDelta(1.0)
                         .setRecurrent(true)
-                        .setMinInput(1.0f)
                         .setRangeMatch(CONTAINED_IN)
         );
 
         // Finally addInput adds all the inputs to the suppressing neuron.
-        m.initOrNeuron(
+        m.initNeuron(
                 pSuppr,
+                0.0,
                 new Input()
                         .setNeuron(pA)
                         .setWeight(10.0f)
+                        .setBiasDelta(0.0)
                         .setRecurrent(false)
                         .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
@@ -387,25 +392,25 @@ The output of this example looks as following. Each line in the table represents
                 new Input()
                         .setNeuron(pB)
                         .setWeight(10.0f)
+                        .setBiasDelta(0.0)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pC)
                         .setWeight(10.0f)
+                        .setBiasDelta(0.0)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
 
-        Neuron outN = m.createOrNeuron(new Neuron("OUT"),
+        Neuron outN = m.initNeuron(new Neuron("OUT"), 0.0,
                 new Input()
                         .setNeuron(pB)
                         .setWeight(1.0f)
+                        .setBiasDelta(0.0)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
@@ -423,7 +428,7 @@ The output of this example looks as following. Each line in the table represents
         // Computes the selected option
         doc.process();
 
-        System.out.println("Selected Option: " + doc.selectedOption);
+        System.out.println("Final Interpretation: " + doc.bestInterpretation);
         System.out.println();
 
         System.out.println("Show all conflicts with the selected option:");
@@ -447,7 +452,7 @@ The output of this example looks as following. Each line in the table represents
         System.out.println();
 
         System.out.println("Selected activations:");
-        System.out.println(doc.networkStateToString(false, true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
 
         doc.clearActivations();
     }
@@ -515,93 +520,71 @@ The output of this example looks as following. Each line in the table represents
         Model m = new Model();
 
         Map&lt;Character, Neuron&gt; inputNeurons = new HashMap<>();
-        Map&lt;Character, Neuron&gt; relNeurons = new HashMap<>();
 
-        // The space neuron will be used as clock signal for the recurrent neurons.
-        Neuron inSpace = m.createNeuron("SPACE");
-
-        Neuron startSignal = m.createNeuron("START-SIGNAL");
-
-        // The Counter Neuron is used to assign each pattern component an relational id (RID).
-        // It is a counter that increases the Rid after each space char.
-        // The initCounterNeuron method is simply a helper method which generates an
-        // ordinary neuron with some input synapses.
-        Neuron ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"),
-                inSpace, false,
-                startSignal, true,
-                false
-        );
-        // initCounterNeuron is just a convenience method which creates an ordinary neuron
-        // with some input synapses.
-
-        // Create an input neuron and a relational neuron for every letter in this example.
-        for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
+        // Create an input neuron for every letter in this example.
+        for(char c: new char[] {'a', 'b', 'c', 'd', 'e', 'f'}) {
             Neuron in = m.createNeuron(c + "");
-            Neuron rn = m.initRelationalNeuron(
-                    m.createNeuron(c + "-RN"),
-                    ctNeuron,
-                    in, false
-            );
 
             inputNeurons.put(c, in);
-            relNeurons.put(c, rn);
         }
 
+
         // Create a pattern neuron with relational neurons as input. The numbers that are
-        // given in the inputs are the relational ids (relativeRid) which specify the positions
+        // given in the inputs are the relational ids (relativeRid) which specify the word positions
         // of the inputs relative to each other.
-        Neuron pattern = m.initAndNeuron(
-                m.createNeuron("BCD"),
+        Neuron pattern = m.initNeuron(
+                m.createNeuron("BCDE"),
                 0.4,
                 new Input()
-                        .setNeuron(relNeurons.get('b'))
+                        .setNeuron(inputNeurons.get('b'))
                         .setWeight(1.0f)
+                        .setBiasDelta(0.9)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setMinInput(0.9f)
-                        .setStartRangeMatch(EQUALS)
-                        .setEndRangeMatch(GREATER_THAN)
+                        .setStartRangeMatch(Operator.EQUALS)
+                        .setEndRangeMatch(Operator.GREATER_THAN)
                         .setStartRangeOutput(true),
                 new Input()
-                        .setNeuron(relNeurons.get('c'))
+                        .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0f)
+                        .setBiasDelta(0.9)
                         .setRecurrent(false)
                         .setRelativeRid(1)
-                        .setMinInput(0.9f)
                         .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
-                        .setNeuron(relNeurons.get('d'))
+                        .setNeuron(inputNeurons.get('d'))
                         .setWeight(1.0f)
+                        .setBiasDelta(0.9)
                         .setRecurrent(false)
                         .setRelativeRid(2)
-                        .setMinInput(0.9f)
-                        .setStartRangeMatch(LESS_THAN)
-                        .setEndRangeMatch(EQUALS)
+                        .setRangeMatch(RangeRelation.CONTAINS),
+                new Input()
+                        .setNeuron(inputNeurons.get('e'))
+                        .setWeight(1.0f)
+                        .setBiasDelta(0.9)
+                        .setRecurrent(false)
+                        .setRelativeRid(3)
+                        .setStartRangeMatch(Operator.LESS_THAN)
+                        .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
 
         // Create a simple text document.
         Document doc = m.createDocument("a b c d e ");
 
-        startSignal.addInput(doc, 0, 1, 0);  // Parameters: iteration, begin, end, relational id
-
-        // First add the space seperators
-        for(int i = 0; i < doc.length(); i++) {
-            char c = doc.getContent().charAt(i);
-            if(c == ' ') {
-                inSpace.addInput(doc, i, i + 1);
-            }
-        }
 
         // Then add the characters
+        int wordPos = 0;
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).addInput(doc, i, i + 1);
+                inputNeurons.get(c).addInput(doc, i, i + 1, wordPos);
+            } else {
+                wordPos++;
             }
         }
 
-        // Computes the selected option
+        // Computes the final interpretation
         doc.process();
 
         System.out.println("Output activation:");
@@ -614,7 +597,7 @@ The output of this example looks as following. Each line in the table represents
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.neuronActivationsToString(true));
+        System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
         doc.clearActivations();
