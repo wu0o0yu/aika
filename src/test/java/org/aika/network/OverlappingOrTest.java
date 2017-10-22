@@ -27,6 +27,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.OrNode;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import java.util.Map;
 public class OverlappingOrTest {
 
 
+    @Ignore
     @Test
     public void testOverlappingOr() {
         Model m = new Model();
