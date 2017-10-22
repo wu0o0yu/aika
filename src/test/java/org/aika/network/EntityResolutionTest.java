@@ -117,18 +117,18 @@ public class EntityResolutionTest {
 
         Model m = new Model();
 
-        Neuron wJaguar = m.createNeuron("W-Jaguar");
-        Neuron wPuma = m.createNeuron("W-Puma");
-        Neuron wLeopard = m.createNeuron("W-Leopard");
+        Neuron wJaguar = m.createNeuron("W-Jaguar");   // Word Neuron for Jaguar
+        Neuron wPuma = m.createNeuron("W-Puma");       // Word Neuron for Mountain Lion
+        Neuron wLeopard = m.createNeuron("W-Leopard"); // Word Neuron for Leopard
 
-        Neuron eJaguar = m.createNeuron("E-Jaguar");
+        Neuron eJaguar = m.createNeuron("E-Jaguar");   // Meaning of the word Jaguar as a Cat
         Neuron ePuma = m.createNeuron("E-Puma");
         Neuron eLeopard = m.createNeuron("E-Leopard");
 
-        Neuron cKatzen = m.createNeuron("C-Katzen");
-        Neuron chKatzenOhneJaguar = m.createNeuron("CH-Katzen/Jaguar");
-        Neuron chKatzenOhnePuma = m.createNeuron("CH-Katzen/Puma");
-        Neuron chKatzenOhneLeopard = m.createNeuron("CH-Katzen/Leopard");
+        Neuron cCats = m.createNeuron("C-Katzen");     // Category Cats
+        Neuron chCatsWithoutJaguar = m.createNeuron("CH-Katzen/Jaguar");
+        Neuron chCatsWithoutPuma = m.createNeuron("CH-Katzen/Puma");
+        Neuron chCatsWithoutLeopard = m.createNeuron("CH-Katzen/Leopard");
 
         m.initNeuron(eJaguar, 5.0,
                 new Input()
@@ -139,11 +139,11 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
-                        .setNeuron(chKatzenOhneJaguar)
+                        .setNeuron(chCatsWithoutJaguar)
                         .setRecurrent(true)
                         .setWeight(10.0f)
                         .setBiasDelta(1.0)
-                        .setRangeMatch(EQUALS)
+                        .setRangeMatch(NONE)
                         .setRangeOutput(false)
         );
 
@@ -156,11 +156,11 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
-                        .setNeuron(chKatzenOhnePuma)
+                        .setNeuron(chCatsWithoutPuma)
                         .setRecurrent(true)
                         .setWeight(10.0f)
                         .setBiasDelta(1.0)
-                        .setRangeMatch(EQUALS)
+                        .setRangeMatch(NONE)
                         .setRangeOutput(false)
         );
 
@@ -174,15 +174,15 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
-                        .setNeuron(chKatzenOhneLeopard)
+                        .setNeuron(chCatsWithoutLeopard)
                         .setRecurrent(true)
                         .setWeight(10.0f)
                         .setBiasDelta(1.0)
                         .setRangeOutput(false)
-                        .setRangeMatch(EQUALS)
+                        .setRangeMatch(NONE)
         );
 
-        m.initNeuron(cKatzen,
+        m.initNeuron(cCats,
                 0.0,
                 new Input()
                         .setNeuron(eJaguar)
@@ -207,9 +207,9 @@ public class EntityResolutionTest {
                         .setRangeOutput(true)
         );
 
-        m.initNeuron(chKatzenOhneJaguar, 5.0,
+        m.initNeuron(chCatsWithoutJaguar, 5.0,
                 new Input()
-                        .setNeuron(cKatzen)
+                        .setNeuron(cCats)
                         .setWeight(10.0f)
                         .setBiasDelta(1.0)
                         .setRecurrent(false)
@@ -230,9 +230,9 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
         );
 
-        m.initNeuron(chKatzenOhnePuma, 5.0,
+        m.initNeuron(chCatsWithoutPuma, 5.0,
                 new Input()
-                        .setNeuron(cKatzen)
+                        .setNeuron(cCats)
                         .setWeight(10.0f)
                         .setBiasDelta(1.0)
                         .setRecurrent(false)
@@ -253,9 +253,9 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
         );
 
-        m.initNeuron(chKatzenOhneLeopard, 5.0,
+        m.initNeuron(chCatsWithoutLeopard, 5.0,
                 new Input()
-                        .setNeuron(cKatzen)
+                        .setNeuron(cCats)
                         .setWeight(10.0f)
                         .setBiasDelta(1.0)
                         .setRecurrent(false)
