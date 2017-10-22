@@ -424,7 +424,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             synapse.link();
         }
 
-        synapse.w += deltaW;
+        synapse.nw += deltaW;
     }
 
 
@@ -813,15 +813,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public static Neuron init(Model m, int threadId, Neuron pn, double bias, double negDirSum, double negRecSum, double posRecSum, Set<Synapse> inputs) {
+    public static Neuron init(Model m, int threadId, Neuron pn, double bias, Set<Synapse> inputs) {
         INeuron n = pn.get();
         n.provider.m.stat.neurons++;
         n.bias = bias;
-        n.negDirSum = negDirSum;
-        n.negRecSum = negRecSum;
-        n.posRecSum = posRecSum;
 
-        float sum = 0.0f;
         ArrayList<Synapse> modifiedSynapses = new ArrayList<>();
         for (Synapse s : inputs) {
             assert !s.key.startRangeOutput || s.key.startRangeMatch == Range.Operator.EQUALS || s.key.startRangeMatch == Range.Operator.FIRST;
@@ -830,7 +826,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             s.output = n.provider;
             s.link();
 
-            sum += s.w;
             modifiedSynapses.add(s);
         }
 
@@ -842,12 +837,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public static INeuron addSynapse(Model m, int threadId, Neuron pn, double biasDelta, double negDirSumDelta, double negRecSumDelta, double posRecSumDelta, Synapse s) {
+    public static INeuron addSynapse(Model m, int threadId, Neuron pn, double biasDelta, Synapse s) {
         INeuron n = pn.get();
         n.bias += biasDelta;
-        n.negDirSum += negDirSumDelta;
-        n.negRecSum += negRecSumDelta;
-        n.posRecSum += posRecSumDelta;
 
         s.output = n.provider;
         s.link();

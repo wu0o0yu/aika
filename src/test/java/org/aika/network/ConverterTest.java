@@ -213,7 +213,7 @@ public class ConverterTest {
         Assert.assertEquals(2, out.get().node.get().parents.firstEntry().getValue().size());
 
 
-        inD.inMemoryOutputSynapses.firstEntry().getValue().w = 0.5f;
+        inD.inMemoryOutputSynapses.firstEntry().getValue().nw = 0.5f;
 
         Converter.convert(m, 0, out.get(), out.get().inputSynapses.values());
         System.out.println(out.get().node.get().logicToString());

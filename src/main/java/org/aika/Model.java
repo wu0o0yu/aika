@@ -158,16 +158,6 @@ public class Model {
     }
 
 
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Network Weights:\n");
-        sb.append(networkWeightsToString(false));
-        sb.append("\n\n\n");
-
-        return sb.toString();
-    }
-
-
     public void resetFrequency() {
         for (int t = 0; t < numberOfThreads; t++) {
             synchronized (activeProviders) {
@@ -244,18 +234,6 @@ public class Model {
     }
 
 
-    public String networkWeightsToString(boolean all) {
-        StringBuilder sb = new StringBuilder();
-/*        for(Provider<Neuron> pn: neurons.values()) {
-            Neuron n = pn.get();
-            if(all || n.node.get().frequency > 0) {
-                sb.append(n.toStringWithSynapses());
-                sb.append("\n");
-            }
-        }*/
-        return sb.toString();
-    }
-
 
     /**
      * Creates a neuron with the given bias.
@@ -268,56 +246,27 @@ public class Model {
     public Neuron initNeuron(Neuron n, double bias, Collection<Input> inputs) {
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
-        double negDirSum = 0.0;
-        double negRecSum = 0.0;
-        double posRecSum = 0.0;
         for (Input input : inputs) {
             Synapse s = input.getSynapse(n);
-
-            s.w = input.weight;
-
-            if (input.weight < 0.0) {
-                if (!input.recurrent) {
-                    negDirSum += input.weight;
-                } else {
-                    negRecSum += input.weight;
-                }
-            } else if (input.recurrent) {
-                posRecSum += input.weight;
-            }
-
+            s.nw = input.weight;
             bias -= Math.abs(input.weight) * input.biasDelta;
             is.add(s);
         }
 
-        return INeuron.init(this, defaultThreadId, n, bias, negDirSum, negRecSum, posRecSum, is);
+        return INeuron.init(this, defaultThreadId, n, bias, is);
     }
 
 
     public void addSynapse(Neuron n, Input input) {
         double biasDelta = 0.0;
 
-        double negDirSumDelta = 0.0;
-        double negRecSumDelta = 0.0;
-        double posRecSumDelta = 0.0;
-
         Synapse s = input.getSynapse(n);
 
-        s.w = input.weight;
-
-        if (input.weight < 0.0) {
-            if (!input.recurrent) {
-                negDirSumDelta += input.weight;
-            } else {
-                negRecSumDelta += input.weight;
-            }
-        } else if (input.recurrent) {
-            posRecSumDelta += input.weight;
-        }
+        s.nw = input.weight;
 
         biasDelta -= Math.abs(input.weight) * input.biasDelta;
 
-        INeuron.addSynapse(this, defaultThreadId, n, biasDelta, negDirSumDelta, negRecSumDelta, posRecSumDelta, s);
+        INeuron.addSynapse(this, defaultThreadId, n, biasDelta, s);
     }
 
 
@@ -364,7 +313,7 @@ public class Model {
                     )
             );
 
-            iss.w = 20.0f;
+            iss.nw = 20.0f;
             is.add(iss);
         }
 
@@ -385,11 +334,11 @@ public class Model {
                     )
             );
 
-            ctns.w = 20.0f;
+            ctns.nw = 20.0f;
             is.add(ctns);
         }
 
-        return INeuron.init(this, defaultThreadId, n, bias, 0.0, 0.0, 0.0, is);
+        return INeuron.init(this, defaultThreadId, n, bias, is);
     }
 
 
@@ -407,7 +356,6 @@ public class Model {
      */
     public Neuron initCounterNeuron(Neuron n, Neuron clockSignal, boolean dirCS, Neuron startSignal, boolean dirSS, boolean direction) {
         double bias = -44.0;
-        double negRecSum = -20.0;
         Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
 
         if (clockSignal != null) {
@@ -427,7 +375,7 @@ public class Model {
                     )
             );
 
-            css.w = 20.0f;
+            css.nw = 20.0f;
             is.add(css);
         }
 
@@ -448,7 +396,7 @@ public class Model {
                     )
             );
 
-            sss.w = 8.0f;
+            sss.nw = 8.0f;
             is.add(sss);
         }
 
@@ -468,7 +416,7 @@ public class Model {
                 )
         );
 
-        lastCycle.w = 8.0f;
+        lastCycle.nw = 8.0f;
         is.add(lastCycle);
 
         Synapse neg = n.get().getInputSynapse(
@@ -487,10 +435,10 @@ public class Model {
                         )
                 ));
 
-        neg.w = -20.0f;
+        neg.nw = -20.0f;
         is.add(neg);
 
-        return INeuron.init(this, defaultThreadId, n, bias, 0.0, negRecSum, 0.0, is);
+        return INeuron.init(this, defaultThreadId, n, bias, is);
     }
 
 

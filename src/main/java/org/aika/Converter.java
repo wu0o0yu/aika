@@ -53,6 +53,7 @@ public class Converter {
         return new Converter(m, threadId, neuron, modifiedSynapses).convert();
     }
 
+
     private Converter(Model m, int threadId, INeuron neuron, Collection<Synapse> modifiedSynapses) {
         this.m = m;
         this.neuron = neuron;
@@ -63,6 +64,11 @@ public class Converter {
 
     private boolean convert() {
         outputNode = neuron.node.get();
+
+        double negDirSumDelta = 0.0;
+        double negRecSumDelta = 0.0;
+        double posRecSumDelta = 0.0;
+        double maxRecurrentSumDelta = 0.0;
 
         for (Synapse s : modifiedSynapses) {
             INeuron in = s.input.get();
@@ -76,12 +82,39 @@ public class Converter {
             }
 
             if (s.key.isRecurrent) {
-                neuron.maxRecurrentSum += Math.abs(s.w);
+                maxRecurrentSumDelta += Math.abs(s.nw) - Math.abs(s.w);
                 neuron.provider.setModified();
             }
+
+            if (s.isNegative()) {
+                if (!s.key.isRecurrent) {
+                    negDirSumDelta -= s.w;
+                } else {
+                    negRecSumDelta -= s.w;
+                }
+            } else if (s.key.isRecurrent) {
+                posRecSumDelta -= s.w;
+            }
+
+            if (s.nw <= 0.0) {
+                if (!s.key.isRecurrent) {
+                    negDirSumDelta += s.nw;
+                } else {
+                    negRecSumDelta += s.nw;
+                }
+            } else if (s.key.isRecurrent) {
+                posRecSumDelta += s.nw;
+            }
+
+            s.w = s.nw;
+
             in.lock.releaseWriteLock();
         }
 
+        neuron.maxRecurrentSum += maxRecurrentSumDelta;
+        neuron.negDirSum += negDirSumDelta;
+        neuron.negRecSum += negRecSumDelta;
+        neuron.posRecSum += posRecSumDelta;
 
         double remainingSum = 0.0;
         double numAboveThreshold = 0;

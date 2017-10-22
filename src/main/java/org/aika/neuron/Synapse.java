@@ -96,7 +96,16 @@ public class Synapse implements Writable {
 
     public Key key;
 
+    /**
+     * The weight of this synapse.
+     */
     public float w;
+
+    /**
+     * The new weight of this synapse. The converter will use it to compute few internal
+     * parameters and then transfer it to the weight variable.
+     */
+    public float nw;
 
 
     public Synapse() {}
@@ -182,7 +191,7 @@ public class Synapse implements Writable {
 
         key = lookupKey(Key.read(in, m));
 
-        w = in.readFloat();
+        nw = w = in.readFloat();
     }
 
 
