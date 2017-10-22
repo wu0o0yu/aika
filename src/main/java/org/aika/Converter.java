@@ -49,7 +49,11 @@ public class Converter {
     private Collection<Synapse> modifiedSynapses;
 
 
-    public Converter(Model m, int threadId, INeuron neuron, Collection<Synapse> modifiedSynapses) {
+    public static boolean convert(Model m, int threadId, INeuron neuron, Collection<Synapse> modifiedSynapses) {
+        return new Converter(m, threadId, neuron, modifiedSynapses).convert();
+    }
+
+    private Converter(Model m, int threadId, INeuron neuron, Collection<Synapse> modifiedSynapses) {
         this.m = m;
         this.neuron = neuron;
         this.threadId = threadId;
@@ -57,7 +61,7 @@ public class Converter {
     }
 
 
-    public boolean convert() {
+    private boolean convert() {
         outputNode = neuron.node.get();
 
         for (Synapse s : modifiedSynapses) {

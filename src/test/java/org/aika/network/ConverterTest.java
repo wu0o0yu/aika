@@ -87,7 +87,7 @@ public class ConverterTest {
         Assert.assertEquals(1, out.get().node.get().parents.firstEntry().getValue().size());
 
         out.get().bias = -8.5;
-        new Converter(m, 0, out.get(), out.get().inputSynapses.values()).convert();
+        Converter.convert(m, 0, out.get(), out.get().inputSynapses.values());
 
         System.out.println(out.get().node.get().logicToString());
 
@@ -215,7 +215,7 @@ public class ConverterTest {
 
         inD.inMemoryOutputSynapses.firstEntry().getValue().w = 0.5f;
 
-        new Converter(m, 0, out.get(), out.get().inputSynapses.values()).convert();
+        Converter.convert(m, 0, out.get(), out.get().inputSynapses.values());
         System.out.println(out.get().node.get().logicToString());
         Assert.assertEquals(1, out.get().node.get().parents.firstEntry().getValue().size());
 
