@@ -1,0 +1,151 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>The Aika Algorithm for Text Mining and Information Extraction</title>
+	<link rel="stylesheet" href="css/style.css" type="text/css">
+	<link rel="shortcut icon" href="images/favicon.png" />
+	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-77552310-1', 'auto');
+		ga('send', 'pageview');
+
+	</script>
+</head>
+<body>
+	<div id="header">
+		<div>
+			<div class="logo">
+				<a href="index.html"></a>
+			</div>
+			<ul id="navigation">
+				<li class="active">
+					<a href="index.html">Overall idea</a>
+				</li>
+				<li>
+					<a href="introduction.html">How it works</a>
+				</li>
+				<li>
+					<a href="usage.html">Examples</a>
+				</li>
+				<li>
+					<a href="demo.html">Demo</a>
+				</li>
+				<li>
+					<a href="resources.html">Resources</a>
+				</li>
+				<li>
+					<a href="vision.html">Vision</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div id="contents">
+		<div id="features">
+			<h1>Aika: Ein semantisches neuronales Netzwerk</h1>
+			<p>
+			Wenn es darum geht Informationen aus natürlichsprachigen Texten zu extrahieren, stehen einem verschiedene Möglichkeiten
+			zur Verfügung. Eine der ältesten und wohl auch am häufigsten genutzten Möglichkeiten sind die regulären Ausdrücke. Hier
+			werden exakte Muster definiert und in einem Textstring gematcht. Probleme bereiten diese allerdings, wenn kompliziertere
+			semantische Muster gefunden werden sollen oder wenn verschiedene Muster aufeinander aufbauen oder miteinander interagieren sollen.
+			Gerade das ist aber der Normalfall bei der Verarbeitung von natürlichem Text. Muster hängen voneinander ab, verstärken sich oder
+			unterdrücken sich gegenseitig. <br/>
+			Prädestiniert um solche Beziehungen abzubilden wären eigentlich künstliche neuronale Netze. Diese haben nur das große Manko,
+			dass sie keine strukturierten Informationen verarbeiten können. Neuronale Netze bringen von sich aus keine Möglichkeit
+			mit, die relationalen Beziehungen zwischen Worten oder Phrasen zu verarbeiten. Ein weiteres Problem neuronaler Netze ist die
+			Verarbeitung von Feedback-Schleifen, bei denen einzelne Neuronen von sich selbst abhängig sind. Genau diese
+			Probleme versucht der Aika Algorithmus zu lösen.
+			</p>
+
+			<p>
+			Der Aika Algorithmus ist als Open Source Java-Bibliothek implementiert und dient dazu semantische Informationen in Texten zu erkennen
+			und zu verarbeiten. Da semantische Informationen sehr häufig mehrdeutig sind, erzeugt die Bibliothek für jede dieser Bedeutungen
+			eine eigene Interpretation und wählt zum Schluss die am höchsten gewichtete aus.
+			Aika kombiniert dazu aktuelle Ideen und Konzepte aus den Bereichen des maschinellen Lernens und der künstlichen Intelligenz,
+			wie etwa künstliche neuronale Netze, Frequent Pattern Mining und die auf formaler Logik basierenden Expertensysteme.
+			Aika basiert auf der heute gängigen Architektur eines künstlichen neuronalen Netzwerks (KNN) und nutzt diese,
+			um sprachliche Regeln und semantische Beziehungen abzubilden.
+			</p>
+
+			<h2>Die Knackpunkte: relationale Struktur und zyklische Abhängigkeiten</h2>
+
+			<p>
+			Das erste Problem: Texte haben eine von Grund auf relationale Struktur. Die einzelnen Worte stehen über ihre Reihenfolge
+			in einer ganz bestimmten Beziehung zueinander. Gängige Methoden, um Texte für die Eingabe in ein KNN auszuflachen, sind
+			beispielsweise Bag-of-Words oder Sliding-Window. Mittlerweile haben sich auch rekurrente neuronale Netze etabliert, die
+			das gesamte Netz in einer Schleife für jedes Wort des Textes mehrfach hintereinander schalten. Aika geht hier allerdings
+			einen anderen Weg. Aika propagiert die relationalen Informationen, also den Textbereich und die Wortposition, gemeinsam
+			mit den Aktivierungen durch das Netzwerk. Die gesamte relationale Struktur des Textes bleibt also erhalten und lässt
+			sich jederzeit zur weiteren Verarbeitung nutzen.
+			</p>
+
+			<p>
+			Das zweite Problem ist, dass bei der Verarbeitung von Text häufig nicht klar ist, in welcher Reihenfolge einzelne
+			Informationen verarbeitet werden müssen. Wenn wir beispielsweise den Namen „Ernst Koch“ betrachten, können
+			sowohl der Vor- als auch der Nachname in einem anderen Zusammenhang eine völlig andere Bedeutung annehmen. Ernst könnte
+			sich auch auf das allgemeinsprachliche Wort ‚Ernst der Lage‘ oder auf die Gemeinde Ernst an der Mosel beziehen. Und
+			genauso könnte Koch eben auch den Beruf des Kochs meinen. Einfache Regeln, um hier dennoch den Vor- und den Nachnamen zu
+			erkennen, wären: „Wenn das nachfolgende Wort ein Nachname ist, handelt es sich bei Ernst um einen Vornamen“ und
+			„Wenn das vorherige Wort ein Vorname ist, dann handelt es sich bei Koch um einen Nachnamen“. Das Problem dabei ist nur,
+			dass unsere Regeln nun eine zyklische Abhängigkeit beinhalten. Aber ist das wirklich so schlimm? Aika erlaubt es, genau
+			solche Feedback-Schleifen abzubilden. Wobei die Schleifen sowohl positive, als auch negative Gewichte haben
+			können. Negative rekurrente Synapsen führen dazu, dass zwei sich gegenseitig ausschließende Interpretationen entstehen.
+			Der Trick ist nun zunächst nur Annahmen zu treffen, also etwa dass es sich bei dem Wort „Koch“ um den
+			Beruf handelt und zu schauen wie das Netzwerk auf diese Annahme reagiert. Es bedarf also einer Evaluationsfunktion und
+			einer Suche, die die Annahmen immer weiter variiert, bis schließlich eine optimale Interpretation des Textes gefunden
+			ist. Genau wie schon der Textbereich und die Wortposition werden nun auch die Annahmen gemeinsam mit den Aktivierungen
+			durch das Netzwerk propagiert.
+			</p>
+
+			<h2>Die zwei Ebenen des Aika Algorithmus</h2>
+
+			<p>
+			Aber wie lassen sich diese Informationen mit den Aktivierungen durch das Netzwerk propagieren, wo doch der
+			Aktivierungswert eines Neurons für gewöhnlich nur eine Fließkommazahl ist? Genau hier liegt der Grund, weshalb Aika unter
+			der neuronalen Ebene mit ihren Neuronen und kontinuierlich gewichteten Synapsen noch eine diskrete Ebene besitzt, in
+			der es eine Darstellung aller Neuronen in boolscher Logik gibt. Aika verwendet als Aktivierungsfunktion die obere Hälfte
+			der Tanh-Funktion. Alle negativen Werte werden auf 0 gesetzt und führen zu keiner Aktivierung des Neurons. Es gibt also einen klaren
+			Schwellenwert, der zwischen aktiven und inaktiven Neuronen unterscheidet. Anhand dieses Schwellenwertes lassen sich
+			die Gewichte der einzelnen Synapsen in boolsche Logik übersetzen und entlang der Gatter dieser Logik kann nun ein
+			Aktivierungsobjekt mit den Informationen durch das Netzwerk propagiert werden. So verbindet Aika seine diskrete bzw.
+			symbolische Ebene mit seiner subsymbolischen Ebene aus kontinuierlichen Synapsen-Gewichten.
+			</p>
+
+			<p>
+			Die Logik Ebene in Aika erlaubt außerdem einen enormen Effizienzgewinn im Vergleich zu einem herkömmlichen KNN, da die gewichtete
+			Summe von Neuronen nur noch für solche Neuronen berechnet werden muss, die vorher durch die Logikebene aktiviert wurden. Im
+			Falle eines UND-verknüpfenden Neurons bedeutet das, dass das Aktivierungsobjekt zunächst mehrere Ebenen einer
+			Lattice-Datenstruktur aus UND-Knoten durchlaufen muss, bevor das eigentliche Neuron berechnet und aktiviert werden kann.
+			Diese Lattice-Datenstruktur stammt aus dem Bereich des Frequent Pattern Mining und enthält in einem gerichteten
+			azyklischen Graphen alle Teilmuster eines beliebigen größeren Musters. Ein solches Frequent Pattern Lattice kann in zwei Richtungen
+			betrieben werden. Zum Einen können damit bereits bekannte Muster gematcht werden, und zum Anderen können auch völlig neue
+			Muster damit erzeugt werden.
+			</p>
+
+			<p>
+			Da es schwierig ist Netze mit Millionen von Neuronen im Speicher zu halten, nutzt Aika das Provider
+			Architekturpattern um selten verwendete Neuronen oder Logikknoten in einen externen Datenspeicher (z.B. eine Mongo DB) auszulagern,
+			und bei Bedarf nachzuladen.
+			</p>
+
+			<h2>Fazit</h2>
+			<p>
+			Mit Aika können sehr flexibel umfangreiche semantische Modelle erzeugt und verarbeitet werden. Aus Begriffslisten
+			verschiedener Kategorien, wie etwa:
+			Vor- und Nachnamen, Orten, Berufen, Strassen, grammatikalischen Worttypen usw. können automatisch Neuronen generiert werden.
+			Diese können dann dazu genutzt werden, Worte und Phrasen zu erkennen, einzelnen Begriffen eine Bedeutung zuzuordnen oder
+			die Kategorie eines Begriffs zu bestimmen. Falls in dem zu verarbeitenden Text mehrdeutige Begriffe oder Phrasen auftauchen, kann Aika für
+			diese jeweils eigene Interpretationen erzeugen und gewichten. Die sinnvollste Interpretation wird dann als Ergebnis
+			zurück geliefert.
+			</p>
+		</div>
+	</div>
+</body>
+</html>
