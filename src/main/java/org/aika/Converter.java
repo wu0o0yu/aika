@@ -65,56 +65,7 @@ public class Converter {
     private boolean convert() {
         outputNode = neuron.node.get();
 
-        double negDirSumDelta = 0.0;
-        double negRecSumDelta = 0.0;
-        double posRecSumDelta = 0.0;
-        double maxRecurrentSumDelta = 0.0;
-
-        for (Synapse s : modifiedSynapses) {
-            INeuron in = s.input.get();
-            in.lock.acquireWriteLock();
-
-            if (s.inputNode == null) {
-                InputNode iNode = InputNode.add(m, s.key.createInputNodeKey(), s.input.get());
-                iNode.provider.setModified();
-                iNode.setSynapse(s);
-                s.inputNode = iNode.provider;
-            }
-
-            if (s.key.isRecurrent) {
-                maxRecurrentSumDelta += Math.abs(s.nw) - Math.abs(s.w);
-                neuron.provider.setModified();
-            }
-
-            if (s.isNegative()) {
-                if (!s.key.isRecurrent) {
-                    negDirSumDelta -= s.w;
-                } else {
-                    negRecSumDelta -= s.w;
-                }
-            } else if (s.key.isRecurrent) {
-                posRecSumDelta -= s.w;
-            }
-
-            if (s.nw <= 0.0) {
-                if (!s.key.isRecurrent) {
-                    negDirSumDelta += s.nw;
-                } else {
-                    negRecSumDelta += s.nw;
-                }
-            } else if (s.key.isRecurrent) {
-                posRecSumDelta += s.nw;
-            }
-
-            s.w = s.nw;
-
-            in.lock.releaseWriteLock();
-        }
-
-        neuron.maxRecurrentSum += maxRecurrentSumDelta;
-        neuron.negDirSum += negDirSumDelta;
-        neuron.negRecSum += negRecSumDelta;
-        neuron.posRecSum += posRecSumDelta;
+        initInputNodesAndComputeWeightSums();
 
         double remainingSum = 0.0;
         double numAboveThreshold = 0;
@@ -193,6 +144,60 @@ public class Converter {
             }
         }
         return true;
+    }
+
+
+    private void initInputNodesAndComputeWeightSums() {
+        double negDirSumDelta = 0.0;
+        double negRecSumDelta = 0.0;
+        double posRecSumDelta = 0.0;
+        double maxRecurrentSumDelta = 0.0;
+
+        for (Synapse s : modifiedSynapses) {
+            INeuron in = s.input.get();
+            in.lock.acquireWriteLock();
+
+            if (s.inputNode == null) {
+                InputNode iNode = InputNode.add(m, s.key.createInputNodeKey(), s.input.get());
+                iNode.provider.setModified();
+                iNode.setSynapse(s);
+                s.inputNode = iNode.provider;
+            }
+
+            if (s.key.isRecurrent) {
+                maxRecurrentSumDelta += Math.abs(s.nw) - Math.abs(s.w);
+                neuron.provider.setModified();
+            }
+
+            if (s.isNegative()) {
+                if (!s.key.isRecurrent) {
+                    negDirSumDelta -= s.w;
+                } else {
+                    negRecSumDelta -= s.w;
+                }
+            } else if (s.key.isRecurrent) {
+                posRecSumDelta -= s.w;
+            }
+
+            if (s.nw <= 0.0) {
+                if (!s.key.isRecurrent) {
+                    negDirSumDelta += s.nw;
+                } else {
+                    negRecSumDelta += s.nw;
+                }
+            } else if (s.key.isRecurrent) {
+                posRecSumDelta += s.nw;
+            }
+
+            s.w = s.nw;
+
+            in.lock.releaseWriteLock();
+        }
+
+        neuron.maxRecurrentSum += maxRecurrentSumDelta;
+        neuron.negDirSum += negDirSumDelta;
+        neuron.negRecSum += negRecSumDelta;
+        neuron.posRecSum += posRecSumDelta;
     }
 
 
