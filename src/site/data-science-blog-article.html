@@ -36,9 +36,6 @@
 					<a href="usage.html">Examples</a>
 				</li>
 				<li>
-					<a href="demo.html">Demo</a>
-				</li>
-				<li>
 					<a href="resources.html">Resources</a>
 				</li>
 				<li>
@@ -52,10 +49,10 @@
 			<h1>Aika: Ein semantisches neuronales Netzwerk</h1>
 			<p>
 			Wenn es darum geht Informationen aus natürlichsprachigen Texten zu extrahieren, stehen einem verschiedene Möglichkeiten
-			zur Verfügung. Eine der ältesten und wohl auch am häufigsten genutzten Möglichkeiten sind die regulären Ausdrücke. Hier
+			zur Verfügung. Eine der ältesten und wohl auch am häufigsten genutzten Möglichkeiten ist die der regulären Ausdrücke. Hier
 			werden exakte Muster definiert und in einem Textstring gematcht. Probleme bereiten diese allerdings, wenn kompliziertere
 			semantische Muster gefunden werden sollen oder wenn verschiedene Muster aufeinander aufbauen oder miteinander interagieren sollen.
-			Gerade das ist aber der Normalfall bei der Verarbeitung von natürlichem Text. Muster hängen voneinander ab, verstärken sich oder
+			Gerade das ist aber der Normalfall bei der Verarbeitung von natürlichem Text. Muster hängen voneinander ab, verstärken oder
 			unterdrücken sich gegenseitig. <br/>
 			Prädestiniert um solche Beziehungen abzubilden wären eigentlich künstliche neuronale Netze. Diese haben nur das große Manko,
 			dass sie keine strukturierten Informationen verarbeiten können. Neuronale Netze bringen von sich aus keine Möglichkeit
@@ -88,21 +85,23 @@
 
 			<p>
 			Das zweite Problem ist, dass bei der Verarbeitung von Text häufig nicht klar ist, in welcher Reihenfolge einzelne
-			Informationen verarbeitet werden müssen. Wenn wir beispielsweise den Namen „Ernst Koch“ betrachten, können
-			sowohl der Vor- als auch der Nachname in einem anderen Zusammenhang eine völlig andere Bedeutung annehmen. Ernst könnte
-			sich auch auf das allgemeinsprachliche Wort ‚Ernst der Lage‘ oder auf die Gemeinde Ernst an der Mosel beziehen. Und
-			genauso könnte Koch eben auch den Beruf des Kochs meinen. Einfache Regeln, um hier dennoch den Vor- und den Nachnamen zu
-			erkennen, wären: „Wenn das nachfolgende Wort ein Nachname ist, handelt es sich bei Ernst um einen Vornamen“ und
-			„Wenn das vorherige Wort ein Vorname ist, dann handelt es sich bei Koch um einen Nachnamen“. Das Problem dabei ist nur,
+			Informationen verarbeitet werden müssen. Wenn wir beispielsweise den Namen „August Schneider“ betrachten, können
+			sowohl der Vor- als auch der Nachname in einem anderen Zusammenhang eine völlig andere Bedeutung annehmen. August könnte
+			sich auch auf den Monat beziehen. Und
+			genauso könnte Schneider eben auch den Beruf des Schneiders meinen. Einfache Regeln, um hier dennoch den Vor- und den Nachnamen zu
+			erkennen, wären: „Wenn das nachfolgende Wort ein Nachname ist, handelt es sich bei August um einen Vornamen“ und
+			„Wenn das vorherige Wort ein Vorname ist, dann handelt es sich bei Schneider um einen Nachnamen“. Das Problem dabei ist nur,
 			dass unsere Regeln nun eine zyklische Abhängigkeit beinhalten. Aber ist das wirklich so schlimm? Aika erlaubt es, genau
 			solche Feedback-Schleifen abzubilden. Wobei die Schleifen sowohl positive, als auch negative Gewichte haben
 			können. Negative rekurrente Synapsen führen dazu, dass zwei sich gegenseitig ausschließende Interpretationen entstehen.
-			Der Trick ist nun zunächst nur Annahmen zu treffen, also etwa dass es sich bei dem Wort „Koch“ um den
+			Der Trick ist nun zunächst nur Annahmen zu treffen, also etwa dass es sich bei dem Wort „Schneider“ um den
 			Beruf handelt und zu schauen wie das Netzwerk auf diese Annahme reagiert. Es bedarf also einer Evaluationsfunktion und
 			einer Suche, die die Annahmen immer weiter variiert, bis schließlich eine optimale Interpretation des Textes gefunden
 			ist. Genau wie schon der Textbereich und die Wortposition werden nun auch die Annahmen gemeinsam mit den Aktivierungen
 			durch das Netzwerk propagiert.
 			</p>
+
+			<img src="images/mehrdeutigkeit.svg"/>
 
 			<h2>Die zwei Ebenen des Aika Algorithmus</h2>
 
@@ -134,6 +133,70 @@
 			Architekturpattern um selten verwendete Neuronen oder Logikknoten in einen externen Datenspeicher (z.B. eine Mongo DB) auszulagern,
 			und bei Bedarf nachzuladen.
 			</p>
+
+
+			<h2>Ein Beispielneuron</h2>
+			<p>
+			Hier soll nun noch beispielhaft gezeigt werden wie ein Neuron innerhalb des semantischen Netzes angelegt
+			werden kann. Zu beachten ist, dass Neuronen sowohl UND- als auch ODER-Verknüpfungen abbilden können.
+			Das Verhalten hängt dabei alleine vom gewählten Bias ab. Der ergibt sich in diesem Beispiel aus dem initial
+			übergebenen Bias also 5.0 minus der Summe der jeweiligen BiasDelta Werte multipliziert mit dem absoluten
+			Synapsengewicht der einzelnen Eingabesynapsen. Der Gesamtbias lautet in diesem Beispiel also -55.0.
+			Die beiden positiven Eingabesynapsen müssen also aktiviert werden und die negative Eingabesynapse darf nicht
+			aktiviert werden, damit dieses Neuron selber aktiv werden kann. Läge der Bias bei -40.0, dann würde schon eine
+			einzige positve Eingabeaktivierung ausreichen um das Neuron zu aktivieren. Das Zusammenspiel von Bias und
+			Synpasengewichten ist aber nicht nur für die Aktivierung eines Neurons wichtig, sondern auch für die spätere
+			Auswahl der finalen Interpretation. Je stärker die Aktivierungen innerhalb einer Interpretation aktiv sind,
+			desto höher wird diese Interpretation gewichtet.
+			<br/>
+				Um eine beliebige Graphstruktur abbilden zu können, trennt
+			Aika das Anlegen der Neuronen von der Verknüpfung mit anderen Neuronen. Mit
+			createNeuron("E-Schneider (Nachname)") wird also zunächst einmal ein unverknüpftes Neuron erzeugt, das
+			dann über die initNeuron Funktion mit den Eingabeneuronen wortSchneiderNeuron, kategorieVornameNeuron und
+			unterdrueckendesNeuron verknüpft wird. Über den Parameter RelativeRid wird hier angegeben auf welche
+			relative Wortposition sich die Eingabesynapse bezieht. Die Eingabesynpase zu der Kategorie Vorname bezieht
+			sich also mit -1 auf die vorherige Wortposition. Der Parameter Recurrent gibt an ob es sich bei dieser Synpase
+			um eine Feedback-Schleife handelt. Über den Parameter RangeMatch wird angegeben wie sich der Textbereich,
+			also die Start- und die Endposition zwischen der Eingabe- und der Ausgabeaktivierung verhält. Bei EQUALS
+			sollen die Bereiche also genau übereinstimmen, bei CONTAINED_IN reicht es hingegen wenn der Bereich der
+			Eingabeaktivierung innerhalb des Bereichs der Ausgabeaktivierung liegt. Dann kann noch über den Parameter
+			RangeOutput angegeben werden, dass der Bereich der Eingabeaktivierung an die Ausgabeaktivierung
+			weiterpropagiert werden soll.
+			</p>
+
+			<div class="prettyprint-code">
+            <pre class="prettyprint">
+				<code class="language-java">
+    Neuron entitaetSchneiderNachnameNeuron = m.initNeuron(
+            m.createNeuron("E-Schneider (Nachname)"),
+            5.0,
+            new Input()
+                    .setNeuron(wortSchneiderNeuron)
+                    .setWeight(10.0f)
+                    .setBiasDelta(1.0)
+                    .setRelativeRid(0)
+                    .setRecurrent(false)
+                    .setRangeMatch(EQUALS)
+                    .setRangeOutput(true),
+            new Input()
+                    .setNeuron(kategorieVornameNeuron)
+                    .setWeight(10.0f)
+                    .setBiasDelta(1.0)
+                    .setRelativeRid(-1)
+                    .setRecurrent(true)
+                    .setRangeMatch(NONE),
+            new Input()
+                    .setNeuron(unterdrueckendesNeuron)
+                    .setWeight(-40.0f)
+                    .setBiasDelta(1.0)
+                    .setRecurrent(true)
+                    .setRangeMatch(CONTAINED_IN)
+    );
+                </code>
+			</pre>
+			</div>
+
+
 
 			<h2>Fazit</h2>
 			<p>
