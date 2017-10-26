@@ -231,13 +231,11 @@ public class Document implements Comparable<Document> {
 
         bQueue.backpropagtion();
 
-        for(INeuron n: finallyActivatedNeurons) {
-            if(!n.noTraining) {
-                ThreadState<OrNode, Activation> th = n.node.get().getThreadState(threadId, false);
-                if(th != null) {
-                    for (Activation act : th.activations.values()) {
-                        n.train(this, act, trainConfig.learnRate, trainConfig.synapseEvaluation);
-                    }
+        for (INeuron n : finallyActivatedNeurons) {
+            ThreadState<OrNode, Activation> th = n.node.get().getThreadState(threadId, false);
+            if (th != null) {
+                for (Activation act : th.activations.values()) {
+                    n.train(this, act, trainConfig.learnRate, trainConfig.synapseEvaluation);
                 }
             }
         }
@@ -286,6 +284,20 @@ public class Document implements Comparable<Document> {
 
     public void changeNumberOfPositions(int delta) {
         numberOfPositionsDelta += delta;
+    }
+
+
+    public String generateOutputText() {
+        StringBuilder sb = new StringBuilder();
+        for(INeuron n: finallyActivatedNeurons) {
+            if(n.outputText != null) {
+                for (Activation act : n.getFinalActivations(this)) {
+                    sb.replace(act.key.r.begin, act.key.r.end, n.outputText);
+                }
+            }
+        }
+
+        return sb.toString();
     }
 
 
@@ -608,7 +620,7 @@ public class Document implements Comparable<Document> {
 
 
         public void add(Activation act) {
-            if(!act.isQueued && !act.key.n.neuron.get().noTraining) {
+            if(!act.isQueued) {
                 act.isQueued = true;
                 act.queueId = queueIdCounter++;
                 queue.add(act);

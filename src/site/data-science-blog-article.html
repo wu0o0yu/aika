@@ -139,12 +139,18 @@
 			<p>
 			Hier soll nun noch beispielhaft gezeigt werden wie ein Neuron innerhalb des semantischen Netzes angelegt
 			werden kann. Zu beachten ist, dass Neuronen sowohl UND- als auch ODER-Verknüpfungen abbilden können.
-			Das Verhalten hängt dabei alleine vom gewählten Bias ab. Der ergibt sich in diesem Beispiel aus dem initial
-			übergebenen Bias also 5.0 minus der Summe der jeweiligen BiasDelta Werte multipliziert mit dem absoluten
-			Synapsengewicht der einzelnen Eingabesynapsen. Der Gesamtbias lautet in diesem Beispiel also -55.0.
+			Das Verhalten hängt dabei alleine vom gewählten Bias ab. Liegt der Bias bei 0.0 oder einem nur schwach negativen
+			Wert reicht schon die Aktivierung eines positiven Inputs aus um auch das aktuelle Neuron zu aktivieren.
+			Es handelt sich dann um eine ODER-Verknüpfung. Liegt der Bias hingegen tiefer im negativen Bereich dann müssen
+			mitunter mehrere positive Inputs gleichzeitig aktiviert werden damit das aktuelle Neuron dann auch aktiv wird.
+			Jetzt handelt es sich dann um eine UND-Verknüpfung.
+			Der Bias Wert kann der initNeuron einfach als Parameter übergeben werden. Um jedoch die Berechnung des Bias
+			zu erleichtern bietet Aika bei den Inputs noch den Parameter BiasDelta an. Der Parameter BiasDelta nimmt einen
+			Wert zwischen 0.0 und 1.0 entgegen. Bei 0.0 wirkt sich der Parameter gar nicht aus. Bei einem höheren Wert
+			hingegen wird er mit dem Betrag des Synapsengewichts multipliziert und von dem Bias abgezogen. Der Gesamtbias
+			lautet in diesem Beispiel also -55.0.
 			Die beiden positiven Eingabesynapsen müssen also aktiviert werden und die negative Eingabesynapse darf nicht
-			aktiviert werden, damit dieses Neuron selber aktiv werden kann. Läge der Bias bei -40.0, dann würde schon eine
-			einzige positve Eingabeaktivierung ausreichen um das Neuron zu aktivieren. Das Zusammenspiel von Bias und
+			aktiviert werden, damit dieses Neuron selber aktiv werden kann. Das Zusammenspiel von Bias und
 			Synpasengewichten ist aber nicht nur für die Aktivierung eines Neurons wichtig, sondern auch für die spätere
 			Auswahl der finalen Interpretation. Je stärker die Aktivierungen innerhalb einer Interpretation aktiv sind,
 			desto höher wird diese Interpretation gewichtet.

@@ -169,6 +169,10 @@ public class OrNode extends Node<OrNode, Activation> {
             no.addOrOption(iAct, iAct.key.o);
         }
 
+        if(neuron.get().outputText != null) {
+            r = new Range(r.begin != null ? r.begin : 0, r.end != null ? r.end : r.begin + neuron.get().outputText.length());
+        }
+
         Key nak = new Key(
                 this,
                 r,

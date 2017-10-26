@@ -63,6 +63,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public static int MAX_SELF_REFERENCING_DEPTH = 5;
 
     public String label;
+    public String outputText;
 
     public volatile double bias;
     public volatile double negDirSum;
@@ -77,9 +78,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public TreeMap<Key, Provider<InputNode>> outputNodes = new TreeMap<>();
 
     public Provider<OrNode> node;
-
-    public boolean isBlocked;
-    public boolean noTraining;
 
     public volatile double activationSum;
     public volatile int numberOfActivations;
@@ -97,14 +95,13 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public INeuron(Model m, String label) {
-        this(m, label, false, false);
+        this(m, label, null);
     }
 
 
-    public INeuron(Model m, String label, boolean isBlocked, boolean noTraining) {
+    public INeuron(Model m, String label, String outputText) {
         this.label = label;
-        this.isBlocked = isBlocked;
-        this.noTraining = noTraining;
+        this.outputText = outputText;
 
         provider = new Neuron(m, this);
 
@@ -691,7 +688,16 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public void write(DataOutput out) throws IOException {
         out.writeBoolean(true);
 
-        out.writeUTF(label);
+        out.writeBoolean(label != null);
+        if(label != null) {
+            out.writeUTF(label);
+        }
+
+        out.writeBoolean(outputText != null);
+        if(outputText != null) {
+            out.writeUTF(outputText);
+        }
+
 
         out.writeDouble(bias);
         out.writeDouble(negDirSum);
@@ -710,9 +716,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             out.writeInt(node.id);
         }
 
-        out.writeBoolean(isBlocked);
-        out.writeBoolean(noTraining);
-
         out.writeDouble(activationSum);
         out.writeInt(numberOfActivations);
 
@@ -728,7 +731,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        label = in.readUTF();
+        if(in.readBoolean()) {
+            label = in.readUTF();
+        }
+        if(in.readBoolean()) {
+            outputText = in.readUTF();
+        }
 
         bias = in.readDouble();
         negDirSum = in.readDouble();
@@ -747,9 +755,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             Integer nId = in.readInt();
             node = m.lookupNodeProvider(nId);
         }
-
-        isBlocked = in.readBoolean();
-        noTraining = in.readBoolean();
 
         activationSum = in.readDouble();
         numberOfActivations = in.readInt();

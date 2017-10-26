@@ -50,7 +50,7 @@ public class RecurrentIdTest {
         Neuron inB = m.createNeuron("B");
 
 
-        OrNode outCNode = m.initNeuron(m.createNeuron("C", true, true),
+        OrNode outCNode = m.initNeuron(m.createNeuron("C"),
                 0.001,
                 new Input()
                         .setNeuron(inA)
@@ -92,7 +92,7 @@ public class RecurrentIdTest {
         Neuron inB = m.createNeuron("B");
         Neuron inC = m.createNeuron("C");
 
-        OrNode outDNode = m.initNeuron(m.createNeuron("D", true, true),
+        OrNode outDNode = m.initNeuron(m.createNeuron("D"),
                 0.001,
                 new Input()
                         .setNeuron(inA)

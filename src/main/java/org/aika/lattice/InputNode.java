@@ -54,6 +54,9 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     // Key: Output Neuron
     Map<SynapseKey, Synapse> synapses;
 
+    public ReadWriteLock synapseLock = new ReadWriteLock();
+
+
     private long visitedTrain = -1;
 
     public InputNode() {
@@ -147,7 +150,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         Range r = ak.r;
         if (key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE) {
             boolean dir = key.startRangeMapping == Mapping.NONE;
-            int pos = ak.r.getBegin(dir);
+            Integer pos = ak.r.getBegin(dir);
 
             List<NodeActivation> tmp = NodeActivation.select(
                     doc,
@@ -391,27 +394,27 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     public Synapse getSynapse(Integer rid, Neuron outputNeuron) {
-        lock.acquireReadLock();
+        synapseLock.acquireReadLock();
         Synapse s = synapses != null ? synapses.get(new SynapseKey(rid, outputNeuron)) : null;
-        lock.releaseReadLock();
+        synapseLock.releaseReadLock();
         return s;
     }
 
 
     public void setSynapse(Synapse s) {
-        lock.acquireWriteLock();
+        synapseLock.acquireWriteLock();
         if (synapses == null) {
             synapses = new TreeMap<>();
         }
         synapses.put(new SynapseKey(s.key.relativeRid, s.output), s);
-        lock.releaseWriteLock();
+        synapseLock.releaseWriteLock();
     }
 
 
     public void removeSynapse(Synapse s) {
-        lock.acquireWriteLock();
+        synapseLock.acquireWriteLock();
         synapses.remove(new SynapseKey(s.key.relativeRid, s.output));
-        lock.releaseWriteLock();
+        synapseLock.releaseWriteLock();
     }
 
 

@@ -101,8 +101,8 @@ public class Model {
     }
 
 
-    public Neuron createNeuron(String label, boolean isBlocked, boolean noTraining) {
-        return new INeuron(this, label, isBlocked, noTraining).provider;
+    public Neuron createNeuron(String label, String outputText) {
+        return new INeuron(this, label, outputText).provider;
     }
 
 

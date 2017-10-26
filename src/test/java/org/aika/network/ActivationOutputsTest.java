@@ -150,7 +150,7 @@ public class ActivationOutputsTest {
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
 
-        Neuron pAB = m.initNeuron(m.createNeuron("B-NA", true, false),
+        Neuron pAB = m.initNeuron(m.createNeuron("B-NA"),
                 0.5,
                 new Input()
                         .setNeuron(inA)
@@ -188,7 +188,7 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        OrNode outBNode = m.initNeuron(m.createNeuron("B", true, false), 0.001,
+        OrNode outBNode = m.initNeuron(m.createNeuron("B"), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
@@ -213,7 +213,7 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        OrNode outBNode = m.initNeuron(m.createNeuron("B", true, false), 0.001,
+        OrNode outBNode = m.initNeuron(m.createNeuron("B"), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)
@@ -238,7 +238,7 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        OrNode outBNode = m.initNeuron(m.createNeuron("B", true, false), 0.001,
+        OrNode outBNode = m.initNeuron(m.createNeuron("B"), 0.001,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0f)

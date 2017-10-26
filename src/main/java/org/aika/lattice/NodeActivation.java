@@ -104,7 +104,7 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     }
 
 
-    public static NodeActivation getNextSignal(Node n, Document doc, int from, Integer rid, InterprNode o, boolean dir, boolean inv) {
+    public static NodeActivation getNextSignal(Node n, Document doc, Integer from, Integer rid, InterprNode o, boolean dir, boolean inv) {
         ThreadState th = n.getThreadState(doc.threadId, false);
         if(th == null) return null;
 
