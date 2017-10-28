@@ -18,7 +18,6 @@ package org.aika.lattice;
 
 
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.neuron.Activation;
 import org.aika.neuron.Activation.SynapseActivation;
@@ -27,7 +26,6 @@ import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
-import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
@@ -56,10 +54,10 @@ public class SynapseRangeRelationTest {
                         false,
                         null,
                         null,
-                        Operator.LESS_THAN,
+                        Operator.LESS_THAN_EQUAL,
                         Mapping.START,
                         true,
-                        Operator.GREATER_THAN,
+                        Operator.GREATER_THAN_EQUAL,
                         Mapping.END,
                         true
                 )

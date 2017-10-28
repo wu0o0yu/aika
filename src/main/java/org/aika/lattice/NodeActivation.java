@@ -178,35 +178,29 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
 
 
     public static <T extends Node, A extends NodeActivation<T>> Stream<A> getActivationsByRange(ThreadState<T, A> th, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
-        Stream<A> s;
-        if((begin == GREATER_THAN || begin == EQUALS) && r.begin != Integer.MIN_VALUE) {
-            int er = (end == Operator.LESS_THAN || end == Operator.EQUALS) && r.end != Integer.MAX_VALUE ? r.end : Integer.MAX_VALUE;
+        Collection<A> s;
+        if((begin == GREATER_THAN_EQUAL || begin == EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
+            int er = (end == Operator.LESS_THAN_EQUAL || end == Operator.EQUALS) && r.end != Integer.MAX_VALUE ? r.end : Integer.MAX_VALUE;
             s = th.activations.subMap(
                     new NodeActivation.Key(n, new Range(r.begin, Integer.MIN_VALUE), null, InterprNode.MIN),
                     true,
                     new NodeActivation.Key(n, new Range(er, Integer.MAX_VALUE), Integer.MAX_VALUE, InterprNode.MAX),
                     true
             )
-                    .values()
-                    .stream()
-                    .filter(act -> act.filter(n, rid, r, begin, end, o, or));
-        } else if((begin == Operator.LESS_THAN || begin == Operator.EQUALS) && r.begin != Integer.MIN_VALUE) {
+                    .values();
+        } else if((begin == Operator.LESS_THAN_EQUAL || begin == Operator.EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
             s = th.activations.descendingMap().subMap(
                     new NodeActivation.Key(n, new Range(r.begin, Integer.MAX_VALUE), null, InterprNode.MAX),
                     true,
-                    new NodeActivation.Key(n, new Range(null, null), null, InterprNode.MIN),
+                    new NodeActivation.Key(n, new Range(Integer.MIN_VALUE, Integer.MIN_VALUE), null, InterprNode.MIN),
                     true
             )
-                    .values()
-                    .stream()
-                    .filter(act -> act.filter(n, rid, r, begin, end, o, or));
+                    .values();
         } else {
-            s = th.activations.values()
-                    .stream()
-                    .filter(act -> act.filter(n, rid, r, begin, end, o, or));
+            s = th.activations.values();
         }
 
-        return s;
+        return s.stream().filter(act -> act.filter(n, rid, r, begin, end, o, or));
     }
 
 

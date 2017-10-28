@@ -132,9 +132,11 @@ public class Range {
 
     public enum Operator {
         EQUALS(0),
-        LESS_THAN(1),
-        GREATER_THAN(2),
-        NONE(3);
+        LESS_THAN_EQUAL(1),
+        GREATER_THAN_EQUAL(2),
+        LESS_THAN(3),
+        GREATER_THAN(4),
+        NONE(5);
 
         Operator(int id) {
             this.id = (short) id;
@@ -155,24 +157,32 @@ public class Range {
         }
 
 
-        public boolean compare(Integer a, Integer c) {
-            if(a == null || c == null) return true;
+        public boolean compare(int a, int b) {
             switch(this) {
                 case EQUALS:
-                    return a.intValue() == c.intValue();
+                    return a == b;
+                case LESS_THAN_EQUAL:
+                    return a <= b;
+                case GREATER_THAN_EQUAL:
+                    return a >= b;
                 case LESS_THAN:
-                    return a <= c;
+                    return a < b;
                 case GREATER_THAN:
-                    return a >= c;
+                    return a > b;
                 default:
                     return true;
             }
         }
 
+
         public static Operator invert(Operator rm) {
             switch(rm) {
                 case EQUALS:
                     return EQUALS;
+                case LESS_THAN_EQUAL:
+                    return GREATER_THAN_EQUAL;
+                case GREATER_THAN_EQUAL:
+                    return LESS_THAN_EQUAL;
                 case LESS_THAN:
                     return GREATER_THAN;
                 case GREATER_THAN:

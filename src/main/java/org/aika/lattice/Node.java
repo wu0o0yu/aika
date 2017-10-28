@@ -212,8 +212,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public abstract void computeNullHyp(Model m);
 
-    public abstract boolean isExpandable();
-
     abstract boolean contains(Refinement ref);
 
     public abstract void changeNumberOfNeuronRefs(int threadId, long v, int d);

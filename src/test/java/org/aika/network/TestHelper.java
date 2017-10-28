@@ -18,7 +18,6 @@ package org.aika.network;
 
 
 import org.aika.Neuron;
-import org.aika.Provider;
 import org.aika.lattice.NodeActivation;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
@@ -27,7 +26,6 @@ import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
-import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 
 import static org.aika.corpus.Range.Operator.*;
@@ -45,7 +43,7 @@ public class TestHelper {
         in.addActivation(doc, inputAct);
         doc.propagate();
         if(in instanceof InputNode) {
-            return NodeActivation.get(doc, in, inputAct.key.rid, inputAct.key.r, LESS_THAN, GREATER_THAN, inputAct.key.o, InterprNode.Relation.EQUALS);
+            return NodeActivation.get(doc, in, inputAct.key.rid, inputAct.key.r, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, inputAct.key.o, InterprNode.Relation.EQUALS);
         }
         return null;
     }
@@ -61,6 +59,6 @@ public class TestHelper {
     }
 
     public static <T extends Node, A extends NodeActivation<T>> A get(Document doc, T n, Range r, InterprNode o) {
-        return NodeActivation.get(doc, n, null, r, LESS_THAN, GREATER_THAN, o, InterprNode.Relation.EQUALS);
+        return NodeActivation.get(doc, n, null, r, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, o, InterprNode.Relation.EQUALS);
     }
 }

@@ -73,12 +73,6 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public boolean isExpandable() {
-        return false;
-    }
-
-
-    @Override
     public boolean isAllowedOption(int threadId, InterprNode n, NodeActivation act, long v) {
         return false;
     }
@@ -170,7 +164,9 @@ public class OrNode extends Node<OrNode, Activation> {
         }
 
         if(neuron.get().outputText != null) {
-            r = new Range(r.begin != Integer.MIN_VALUE ? r.begin : 0, r.end != Integer.MAX_VALUE ? r.end : r.begin + neuron.get().outputText.length());
+            int begin = r.begin != Integer.MIN_VALUE ? r.begin : 0;
+            int end = r.end != Integer.MAX_VALUE ? r.end : begin + neuron.get().outputText.length();
+            r = new Range(begin, end);
         }
 
         Key nak = new Key(

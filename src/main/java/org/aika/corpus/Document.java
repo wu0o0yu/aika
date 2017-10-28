@@ -324,7 +324,11 @@ public class Document implements Comparable<Document> {
             sb.append(act.key.r);
             if(withTextSnipped) {
                 sb.append(" ");
-                sb.append(collapseText(getText(act.key.r)));
+                if(act.key.n.neuron.get().outputText != null) {
+                    sb.append(collapseText(act.key.n.neuron.get().outputText));
+                } else {
+                    sb.append(collapseText(getText(act.key.r)));
+                }
             }
             sb.append(" - ");
 

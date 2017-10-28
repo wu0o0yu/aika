@@ -19,10 +19,12 @@ package org.aika.corpus;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 
+import static org.aika.corpus.Range.Mapping.END;
 import static org.aika.corpus.Range.Mapping.NONE;
+import static org.aika.corpus.Range.Mapping.START;
 
 /**
  *
@@ -30,7 +32,6 @@ import static org.aika.corpus.Range.Mapping.NONE;
  */
 public class GenerateTextTest {
 
-    @Ignore
     @Test
     public void testTwoWords() {
         Model m = new Model();
@@ -57,6 +58,11 @@ public class GenerateTextTest {
                         .setNeuron(suppr)
                         .setWeight(-20.0f)
                         .setBiasDelta(1.0)
+                        .setRecurrent(true)
+                        .setStartRangeMapping(END)
+                        .setEndRangeMapping(START)
+                        .setStartRangeMatch(Range.Operator.LESS_THAN)
+                        .setEndRangeMatch(Range.Operator.GREATER_THAN)
         );
 
         m.initNeuron(outB, 5.0,
@@ -70,6 +76,11 @@ public class GenerateTextTest {
                         .setNeuron(suppr)
                         .setWeight(-20.0f)
                         .setBiasDelta(1.0)
+                        .setRecurrent(true)
+                        .setStartRangeMapping(END)
+                        .setEndRangeMapping(START)
+                        .setStartRangeMatch(Range.Operator.LESS_THAN)
+                        .setEndRangeMatch(Range.Operator.GREATER_THAN)
         );
 
         m.initNeuron(outC, 5.0,
@@ -83,6 +94,11 @@ public class GenerateTextTest {
                         .setNeuron(suppr)
                         .setWeight(-20.0f)
                         .setBiasDelta(1.0)
+                        .setRecurrent(true)
+                        .setStartRangeMapping(END)
+                        .setEndRangeMapping(START)
+                        .setStartRangeMatch(Range.Operator.LESS_THAN)
+                        .setEndRangeMatch(Range.Operator.GREATER_THAN)
         );
 
         m.initNeuron(outD, 5.0,
@@ -96,6 +112,11 @@ public class GenerateTextTest {
                         .setNeuron(suppr)
                         .setWeight(-20.0f)
                         .setBiasDelta(1.0)
+                        .setRecurrent(true)
+                        .setStartRangeMapping(END)
+                        .setEndRangeMapping(START)
+                        .setStartRangeMatch(Range.Operator.LESS_THAN)
+                        .setEndRangeMatch(Range.Operator.GREATER_THAN)
         );
 
 
@@ -141,5 +162,7 @@ public class GenerateTextTest {
         System.out.println();
 
         System.out.println(doc.generateOutputText());
+
+        Assert.assertEquals("bbb ddddd ", doc.generateOutputText());
     }
 }

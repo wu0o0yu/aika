@@ -28,7 +28,6 @@ import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
-import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
@@ -39,8 +38,8 @@ import org.junit.Test;
 import java.util.Set;
 
 import static org.aika.Input.RangeRelation.EQUALS;
-import static org.aika.corpus.Range.Operator.GREATER_THAN;
-import static org.aika.corpus.Range.Operator.LESS_THAN;
+import static org.aika.corpus.Range.Operator.GREATER_THAN_EQUAL;
+import static org.aika.corpus.Range.Operator.LESS_THAN_EQUAL;
 
 /**
  *
@@ -103,7 +102,7 @@ public class ActivationOutputsTest {
         );
 
 
-        InputNode pC = new InputNode(m, new Synapse.Key(false, 0, null, LESS_THAN, Mapping.START, true, GREATER_THAN, Mapping.END, true));
+        InputNode pC = new InputNode(m, new Synapse.Key(false, 0, null, LESS_THAN_EQUAL, Mapping.START, true, GREATER_THAN_EQUAL, Mapping.END, true));
         NodeActivation pC1 = TestHelper.addActivation(pC, doc, TestHelper.get(doc, pAB.get().node.get(), new Range(0, 1), null));
 
         Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, TestHelper.get(doc, pAB.get().node.get(), new Range(0, 1), null)));
@@ -201,7 +200,7 @@ public class ActivationOutputsTest {
         InterprNode o1 = InterprNode.addPrimitive(doc);
         inA.addInput(doc, 0, 1, o1);
 
-        Activation outB1 = NodeActivation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
+        Activation outB1 = NodeActivation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN_EQUAL, GREATER_THAN_EQUAL, null, null);
         Assert.assertTrue(containsOutputActivation(inA.get().node.get().getFirstActivation(doc).neuronOutputs, outB1));
     }
 
@@ -225,7 +224,7 @@ public class ActivationOutputsTest {
 
         inA.addInput(doc, 0, 1, InterprNode.addPrimitive(doc));
 
-        Activation outB1 = NodeActivation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
+        Activation outB1 = NodeActivation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN_EQUAL, GREATER_THAN_EQUAL, null, null);
 
         Assert.assertTrue(containsOutputActivation(inA.get().node.get().getFirstActivation(doc).neuronOutputs, outB1));
     }
@@ -252,7 +251,7 @@ public class ActivationOutputsTest {
 
         InterprNode o1 = InterprNode.addPrimitive(doc);
         inA.addInput(doc, 0, 1, 0, o1);
-        Activation outB1 = NodeActivation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
+        Activation outB1 = NodeActivation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN_EQUAL, GREATER_THAN_EQUAL, null, null);
 
         Assert.assertTrue(containsOutputActivation(inA.get().node.get().getFirstActivation(doc).neuronOutputs, outB1));
 

@@ -56,7 +56,7 @@ public class ActivationsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, Operator.LESS_THAN, Mapping.START, true, Operator.GREATER_THAN, Mapping.END, true);
+        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, Operator.LESS_THAN_EQUAL, Mapping.START, true, Operator.GREATER_THAN_EQUAL, Mapping.END, true);
 
 
         inA.addInput(doc, 0, 1, 0);
@@ -81,7 +81,7 @@ public class ActivationsTest {
                         .setRecurrent(false)
                         .setBiasDelta(1.0)
         );
-        InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, Operator.LESS_THAN, Mapping.START, true, Operator.GREATER_THAN, Mapping.END, true);
+        InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, Operator.LESS_THAN_EQUAL, Mapping.START, true, Operator.GREATER_THAN_EQUAL, Mapping.END, true);
 
         inB.addInput(doc, 0, 1);
         inB.addInput(doc, 1, 2);

@@ -18,7 +18,6 @@ package org.aika;
 
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
-import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 
 
@@ -163,12 +162,12 @@ public class Input implements Comparable<Input> {
                 setEndRangeMatch(Operator.EQUALS);
                 break;
             case CONTAINS:
-                setStartRangeMatch(Operator.LESS_THAN);
-                setEndRangeMatch(Operator.GREATER_THAN);
+                setStartRangeMatch(Operator.LESS_THAN_EQUAL);
+                setEndRangeMatch(Operator.GREATER_THAN_EQUAL);
                 break;
             case CONTAINED_IN:
-                setStartRangeMatch(Operator.GREATER_THAN);
-                setEndRangeMatch(Operator.LESS_THAN);
+                setStartRangeMatch(Operator.GREATER_THAN_EQUAL);
+                setEndRangeMatch(Operator.LESS_THAN_EQUAL);
                 break;
             default:
                 setStartRangeMatch(Operator.NONE);

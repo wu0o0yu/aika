@@ -76,7 +76,7 @@ public class RecurrentIdTest {
         inA.addInput(doc, 0, 1, 20);
         inB.addInput(doc, 0, 1, 21);
 
-        Activation outC1 = NodeActivation.get(doc, outCNode, 20, new Range(0, 1), LESS_THAN, GREATER_THAN, null, null);
+        Activation outC1 = NodeActivation.get(doc, outCNode, 20, new Range(0, 1), LESS_THAN_EQUAL, GREATER_THAN_EQUAL, null, null);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -160,8 +160,8 @@ public class RecurrentIdTest {
                                 .setRecurrent(false)
                                 .setBiasDelta(1.0f)
                                 .setRelativeRid(i)
-                                .setStartRangeMatch(begin ? EQUALS : LESS_THAN)
-                                .setEndRangeMatch(end ? EQUALS : GREATER_THAN)
+                                .setStartRangeMatch(begin ? EQUALS : LESS_THAN_EQUAL)
+                                .setEndRangeMatch(end ? EQUALS : GREATER_THAN_EQUAL)
                                 .setStartRangeOutput(begin)
                                 .setEndRangeOutput(end)
                     );

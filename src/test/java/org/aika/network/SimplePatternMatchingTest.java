@@ -65,7 +65,7 @@ public class SimplePatternMatchingTest {
                         .setRelativeRid(0)
                         .setBiasDelta(0.9)
                         .setStartRangeMatch(Operator.EQUALS)
-                        .setEndRangeMatch(Operator.GREATER_THAN)
+                        .setEndRangeMatch(Operator.GREATER_THAN_EQUAL)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
@@ -80,7 +80,7 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setBiasDelta(0.9)
-                        .setStartRangeMatch(Operator.LESS_THAN)
+                        .setStartRangeMatch(Operator.LESS_THAN_EQUAL)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
@@ -154,7 +154,7 @@ public class SimplePatternMatchingTest {
                         .setRelativeRid(0)
                         .setBiasDelta(0.9)
                         .setStartRangeMatch(Operator.EQUALS)
-                        .setEndRangeMatch(Operator.GREATER_THAN)
+                        .setEndRangeMatch(Operator.GREATER_THAN_EQUAL)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
@@ -176,7 +176,7 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(3)
                         .setBiasDelta(0.9)
-                        .setStartRangeMatch(Operator.LESS_THAN)
+                        .setStartRangeMatch(Operator.LESS_THAN_EQUAL)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );

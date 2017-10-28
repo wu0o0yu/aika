@@ -129,12 +129,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    public boolean isExpandable() {
-        return true;
-    }
-
-
-    @Override
     boolean hasSupport(NodeActivation<InputNode> act) {
         for (NodeActivation iAct : act.inputs.values()) {
             Activation iNAct = (Activation) iAct;

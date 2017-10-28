@@ -69,7 +69,7 @@ public class OverlappingOrTest {
                         .setRelativeRid(0)
                         .setBiasDelta(0.5)
                         .setStartRangeMatch(Operator.EQUALS)
-                        .setEndRangeMatch(Operator.LESS_THAN)
+                        .setEndRangeMatch(Operator.LESS_THAN_EQUAL)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
@@ -84,7 +84,7 @@ public class OverlappingOrTest {
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setBiasDelta(0.5)
-                        .setStartRangeMatch(Operator.GREATER_THAN)
+                        .setStartRangeMatch(Operator.GREATER_THAN_EQUAL)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
