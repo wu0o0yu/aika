@@ -179,8 +179,8 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
 
     public static <T extends Node, A extends NodeActivation<T>> Stream<A> getActivationsByRange(ThreadState<T, A> th, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
         Stream<A> s;
-        if((begin == GREATER_THAN || begin == EQUALS || end == FIRST) && r.begin != Integer.MIN_VALUE) {
-            int er = (end == Operator.LESS_THAN || end == Operator.EQUALS || end == FIRST) && r.end != Integer.MAX_VALUE ? r.end : Integer.MAX_VALUE;
+        if((begin == GREATER_THAN || begin == EQUALS) && r.begin != Integer.MIN_VALUE) {
+            int er = (end == Operator.LESS_THAN || end == Operator.EQUALS) && r.end != Integer.MAX_VALUE ? r.end : Integer.MAX_VALUE;
             s = th.activations.subMap(
                     new NodeActivation.Key(n, new Range(r.begin, Integer.MIN_VALUE), null, InterprNode.MIN),
                     true,
@@ -200,17 +200,6 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
                     .values()
                     .stream()
                     .filter(act -> act.filter(n, rid, r, begin, end, o, or));
-        }  else if(end == LAST) {
-            s = th.activationsEnd.tailMap(
-                    new NodeActivation.Key(n, new Range(null, r.begin), null, InterprNode.MIN),
-                    true
-            )
-                    .values()
-                    .stream()
-                    .filter(act -> act.filter(n, rid, r, begin, end, o, or));
-        } else if(begin == LAST || begin == FIRST || end == FIRST) {
-            // TODO
-            throw new RuntimeException("Not implemented yet!");
         } else {
             s = th.activations.values()
                     .stream()
@@ -230,7 +219,7 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     public <T extends Node> boolean filter(T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
         return (n == null || key.n == n) &&
                 (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) &&
-                (r == null || ((begin == null || begin.compare(key.r.begin, key.r.end, r.begin, r.end)) && (end == null || end.compare(key.r.end, key.r.begin, r.end, r.begin)))) &&
+                (r == null || ((begin == null || begin.compare(key.r.begin, r.begin)) && (end == null || end.compare(key.r.end, r.end)))) &&
                 (o == null || or.compare(key.o, o));
     }
 

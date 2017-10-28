@@ -46,31 +46,13 @@ public class OverlappingOrTest {
         Model m = new Model();
 
         Map<Character, Neuron> inputNeurons = new HashMap<>();
-        Map<Character, Neuron> relNeurons = new HashMap<>();
 
-        // The space neuron will be used as clock signal for the recurrent neurons.
-        Neuron inSpace = m.createNeuron("SPACE");
-        inputNeurons.put(' ', inSpace);
-
-        Neuron startSignal = m.createNeuron("START-SIGNAL");
-
-        Neuron ctNeuron = m.initCounterNeuron(m.createNeuron("CTN"),
-                inSpace, false,
-                startSignal, true,
-                false
-        );
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
             Neuron in = m.createNeuron(c + "");
-            Neuron rn = m.initRelationalNeuron(
-                    m.createNeuron(c + "-RN"),
-                    ctNeuron,
-                    in, false
-            );
 
             inputNeurons.put(c, in);
-            relNeurons.put(c, rn);
         }
 
         // Create a pattern neuron with the recurrent neurons as input. The number that are
@@ -81,7 +63,7 @@ public class OverlappingOrTest {
                 m.createNeuron("BCD"),
                 0.4,
                 new Input()
-                        .setNeuron(relNeurons.get('b'))
+                        .setNeuron(inputNeurons.get('b'))
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
@@ -90,14 +72,14 @@ public class OverlappingOrTest {
                         .setEndRangeMatch(Operator.LESS_THAN)
                         .setStartRangeOutput(true),
                 new Input()
-                        .setNeuron(relNeurons.get('c'))
+                        .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(1)
                         .setBiasDelta(0.5)
                         .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
-                        .setNeuron(relNeurons.get('d'))
+                        .setNeuron(inputNeurons.get('d'))
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(2)
@@ -109,14 +91,13 @@ public class OverlappingOrTest {
 
         Document doc = m.createDocument("a b c d e ", 0);
 
-        startSignal.addInput(doc, 0, 1, 0);
-
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
+        int wordPos = 0;
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c == ' ') {
-                inputNeurons.get(c).addInput(doc, i, i + 1);
+                inputNeurons.get(c).addInput(doc, i, i + 1, wordPos++);
             }
             System.out.println(doc.neuronActivationsToString(true, false, true));
         }

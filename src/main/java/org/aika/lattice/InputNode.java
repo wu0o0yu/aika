@@ -145,70 +145,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    @Override
-    NodeActivation<InputNode> processAddedActivation(Document doc, NodeActivation.Key<InputNode> ak, Collection<NodeActivation> inputActs, boolean isTrainingAct) {
-        Range r = ak.r;
-        if (key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE) {
-            boolean dir = key.startRangeMapping == Mapping.NONE;
-            int pos = ak.r.getBegin(dir);
-
-            List<NodeActivation> tmp = NodeActivation.select(
-                    doc,
-                    this,
-                    ak.rid,
-                    new Range(pos, pos),
-                    LESS_THAN,
-                    GREATER_THAN,
-                    ak.o,
-                    InterprNode.Relation.CONTAINS
-            ).collect(Collectors.toList());
-
-            for (NodeActivation act : tmp) {
-                super.processAddedActivation(doc, new NodeActivation.Key(this, new Range(act.key.r.getBegin(dir), pos).invert(dir), act.key.rid, act.key.o), act.inputs.values(), false);
-                act.removedId = NodeActivation.removedIdCounter++;
-                act.isRemoved = true;
-                super.processRemovedActivation(doc, act, act.inputs.values());
-            }
-
-            NodeActivation cAct = NodeActivation.getNextSignal(this, doc, pos, ak.rid, ak.o, dir, dir);
-            r = new Range(ak.r.getBegin(dir), cAct != null ? cAct.key.r.getBegin(dir) : (dir ? Integer.MIN_VALUE : Integer.MAX_VALUE)).invert(dir);
-        }
-        return super.processAddedActivation(doc, new NodeActivation.Key(this, r, ak.rid, ak.o), inputActs, isTrainingAct);
-    }
-
-
-    void processRemovedActivation(Document doc, NodeActivation<InputNode> act, Collection<NodeActivation> inputActs) {
-        super.processRemovedActivation(doc, act, inputActs);
-
-        if (act.isRemoved) {
-            NodeActivation.Key ak = act.key;
-            if (key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE) {
-                boolean dir = key.startRangeMapping == Mapping.NONE;
-                List<NodeActivation> tmp = NodeActivation.select(
-                        doc,
-                        this,
-                        ak.rid,
-                        new Range(ak.r.getBegin(dir), dir ? Integer.MAX_VALUE : Integer.MIN_VALUE).invert(!dir),
-                        dir ? Operator.EQUALS : NONE,
-                        dir ? NONE : Operator.EQUALS,
-                        ak.o,
-                        InterprNode.Relation.CONTAINS
-                ).collect(Collectors.toList());
-
-                for (NodeActivation cAct : tmp) {
-                    NodeActivation.Key cak = cAct.key;
-                    processAddedActivation(doc, new NodeActivation.Key(cak.n, new Range(dir ? Integer.MIN_VALUE : cak.r.begin, dir ? cak.r.end : Integer.MAX_VALUE), cak.rid, cak.o), cAct.inputs.values(), false);
-                    if (!cAct.isRemoved) {
-                        cAct.removedId = NodeActivation.removedIdCounter++;
-                        cAct.isRemoved = true;
-                        super.processRemovedActivation(doc, cAct, cAct.inputs.values());
-                    }
-                }
-            }
-        }
-    }
-
-
     public void addActivation(Document doc, NodeActivation inputAct) {
         NodeActivation.Key ak = computeActivationKey(inputAct);
 
@@ -328,9 +264,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     private static Operator computeStartRangeMatch(Key k1, Key k2) {
-        if (k1.startRangeMatch == FIRST || k1.startRangeMatch == LAST) return k1.startRangeMatch;
-        if (k2.startRangeMatch == FIRST || k2.startRangeMatch == LAST) return Operator.invert(k2.startRangeMatch);
-
         if (k2.startRangeOutput) {
             return k1.startRangeMatch;
         } else if (k1.startRangeOutput) {
@@ -341,9 +274,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     private static Operator computeEndRangeMatch(Key k1, Key k2) {
-        if (k1.endRangeMatch == FIRST || k1.endRangeMatch == LAST) return k1.endRangeMatch;
-        if (k2.endRangeMatch == FIRST || k2.endRangeMatch == LAST) return Operator.invert(k2.endRangeMatch);
-
         if (k2.endRangeOutput) {
             return k1.endRangeMatch;
         } else if (k1.endRangeOutput) {
@@ -370,7 +300,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                             this != in &&
                             in.visitedTrain != v &&
                             !in.key.isRecurrent &&
-                            ((srm.compare(act.key.r.begin, act.key.r.end, secondAct.key.r.begin, secondAct.key.r.end) && erm.compare(act.key.r.end, act.key.r.begin, secondAct.key.r.end, secondAct.key.r.begin)) ||
+                            ((srm.compare(act.key.r.begin, secondAct.key.r.begin) && erm.compare(act.key.r.end, secondAct.key.r.end)) ||
                                     (ridDelta != null && ridDelta < AndNode.MAX_RID_RANGE))) {
                         in.visitedTrain = v;
                         AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, true);

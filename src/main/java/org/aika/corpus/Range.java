@@ -134,9 +134,7 @@ public class Range {
         EQUALS(0),
         LESS_THAN(1),
         GREATER_THAN(2),
-        FIRST(3),
-        LAST(4),
-        NONE(5);
+        NONE(3);
 
         Operator(int id) {
             this.id = (short) id;
@@ -157,7 +155,7 @@ public class Range {
         }
 
 
-        public boolean compare(Integer a, Integer b, Integer c, Integer d) {
+        public boolean compare(Integer a, Integer c) {
             if(a == null || c == null) return true;
             switch(this) {
                 case EQUALS:
@@ -166,10 +164,6 @@ public class Range {
                     return a <= c;
                 case GREATER_THAN:
                     return a >= c;
-                case FIRST:
-                    return d <= b && b < c;
-                case LAST:
-                    return b <= d && a > d;
                 default:
                     return true;
             }
@@ -183,10 +177,6 @@ public class Range {
                     return GREATER_THAN;
                 case GREATER_THAN:
                     return LESS_THAN;
-                case FIRST:
-                    return LAST;
-                case LAST:
-                    return FIRST;
                 default:
                     return NONE;
             }

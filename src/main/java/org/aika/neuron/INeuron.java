@@ -517,8 +517,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
 
-        Operator begin = replaceFirstAndLast(sk.startRangeMatch);
-        Operator end = replaceFirstAndLast(sk.endRangeMatch);
+        Operator begin = sk.startRangeMatch;
+        Operator end = sk.endRangeMatch;
         Range r = act.key.r;
         if (dir == 0) {
             Operator tb = begin;
@@ -596,11 +596,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         synsTmp = newSyns;
         return synsTmp;
-    }
-
-
-    private static Operator replaceFirstAndLast(Operator rm) {
-        return rm == FIRST || rm == LAST ? EQUALS : rm;
     }
 
 
@@ -831,8 +826,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         ArrayList<Synapse> modifiedSynapses = new ArrayList<>();
         for (Synapse s : inputs) {
-            assert !s.key.startRangeOutput || s.key.startRangeMatch == Range.Operator.EQUALS || s.key.startRangeMatch == Range.Operator.FIRST;
-            assert !s.key.endRangeOutput || s.key.endRangeMatch == Range.Operator.EQUALS || s.key.endRangeMatch == Range.Operator.FIRST;
+            assert !s.key.startRangeOutput || s.key.startRangeMatch == Range.Operator.EQUALS;
+            assert !s.key.endRangeOutput || s.key.endRangeMatch == Range.Operator.EQUALS;
 
             s.output = n.provider;
             s.link();
