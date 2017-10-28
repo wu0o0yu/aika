@@ -527,11 +527,17 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             end = Operator.invert(sk.endRangeMapping == END ? te : (sk.startRangeMapping == END ? tb : NONE));
 
             if (sk.startRangeMapping != START || sk.endRangeMapping != END) {
-                r = new Range(s.key.endRangeMapping == START ? r.end : (sk.startRangeMapping == START ? r.begin : null), sk.startRangeMapping == END ? r.begin : (sk.endRangeMapping == END ? r.end : null));
+                r = new Range(
+                        s.key.endRangeMapping == START ? r.end : (sk.startRangeMapping == START ? r.begin : Integer.MIN_VALUE),
+                        sk.startRangeMapping == END ? r.begin : (sk.endRangeMapping == END ? r.end : Integer.MAX_VALUE)
+                );
             }
         } else {
             if (sk.startRangeMapping != START || sk.endRangeMapping != END) {
-                r = new Range(sk.startRangeMapping == END ? r.end : (sk.startRangeMapping == START ? r.begin : null), sk.endRangeMapping == START ? r.begin : (sk.endRangeMapping == END ? r.end : null));
+                r = new Range(
+                        sk.startRangeMapping == END ? r.end : (sk.startRangeMapping == START ? r.begin : Integer.MIN_VALUE),
+                        sk.endRangeMapping == START ? r.begin : (sk.endRangeMapping == END ? r.end : Integer.MAX_VALUE)
+                );
             }
         }
 

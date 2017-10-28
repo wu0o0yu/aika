@@ -137,8 +137,8 @@ public class Document implements Comparable<Document> {
 
     public String getText(Range r) {
         return content.substring(
-                r.begin != null ? Math.max(0, Math.min(r.begin, length())) : 0,
-                r.end != null ? Math.max(0, Math.min(r.end, length())): length()
+                Math.max(0, Math.min(r.begin, length())),
+                Math.max(0, Math.min(r.end, length()))
         );
     }
 
@@ -322,7 +322,7 @@ public class Document implements Comparable<Document> {
 
             sb.append(act.id + " ");
             sb.append(act.key.r);
-            if(withTextSnipped && act.key.r.begin != null && act.key.r.end != null) {
+            if(withTextSnipped) {
                 sb.append(" ");
                 sb.append(collapseText(getText(act.key.r)));
             }
@@ -374,7 +374,7 @@ public class Document implements Comparable<Document> {
         for(NodeActivation act: acts) {
             sb.append(act.id + " ");
             sb.append(act.key.r);
-            if(withTextSnipped && act.key.r.begin != null && act.key.r.end != null) {
+            if(withTextSnipped) {
                 sb.append(" ");
                 sb.append(collapseText(getText(act.key.r)));
             }

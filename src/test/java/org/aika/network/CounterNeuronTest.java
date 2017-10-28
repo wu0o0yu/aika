@@ -41,6 +41,7 @@ import static org.aika.corpus.Range.Operator.EQUALS;
 public class CounterNeuronTest {
 
 
+    @Ignore
     @Test
     public void testFork() {
 

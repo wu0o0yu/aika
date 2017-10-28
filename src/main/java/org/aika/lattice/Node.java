@@ -349,7 +349,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             frequency++;
             frequencyHasChanged = true;
 
-            sizeSum += act.key.r.end == null || act.key.r.begin == null || act.key.r.end == Integer.MAX_VALUE ? 1 : Math.max(1, act.key.r.end - act.key.r.begin);
+            sizeSum += act.key.r.begin == Integer.MIN_VALUE || act.key.r.end == Integer.MAX_VALUE ? 1 : Math.max(1, act.key.r.end - act.key.r.begin);
             instanceSum++;
         }
     }

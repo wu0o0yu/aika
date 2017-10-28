@@ -660,8 +660,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
         int id;
-        Integer minBegin;
-        Integer maxEnd;
+        int minBegin;
+        int maxEnd;
         Integer minRid;
 
         public Candidate(InterprNode refinement, int id) {
@@ -673,8 +673,8 @@ public class SearchNode implements Comparable<SearchNode> {
             } else {
                 for(NodeActivation act: refinement.getActivations()) {
                     if(act.key.r != null) {
-                        minBegin = Utils.nullSafeMin(minBegin, act.key.r.begin);
-                        maxEnd = Utils.nullSafeMax(maxEnd, act.key.r.end);
+                        minBegin= Math.min(minBegin, act.key.r.begin);
+                        maxEnd =  Math.max(maxEnd, act.key.r.end);
                     }
                     minRid = Utils.nullSafeMin(minRid, act.key.rid);
                 }
@@ -686,9 +686,9 @@ public class SearchNode implements Comparable<SearchNode> {
 
         @Override
         public int compareTo(Candidate c) {
-            int r = Utils.compareInteger(minBegin, c.minBegin);
+            int r = Integer.compare(minBegin, c.minBegin);
             if(r != 0) return r;
-            r = Utils.compareInteger(c.maxEnd, maxEnd);
+            r = Integer.compare(c.maxEnd, maxEnd);
             if(r != 0) return r;
             r = Utils.compareInteger(minRid, c.minRid);
             if(r != 0) return r;

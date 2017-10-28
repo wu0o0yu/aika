@@ -125,8 +125,8 @@ public class RecurrentPatternTest {
         System.out.println();
 
         NodeActivation patAct = patternN.get().node.get().getFirstActivation(doc);
-        Assert.assertEquals(4, patAct.key.r.begin.intValue());
-        Assert.assertEquals(10, patAct.key.r.end.intValue());
+        Assert.assertEquals(4, patAct.key.r.begin);
+        Assert.assertEquals(10, patAct.key.r.end);
 
         doc.clearActivations();
 
@@ -219,8 +219,8 @@ public class RecurrentPatternTest {
         System.out.println();
 
         NodeActivation patAct = patternN.get().node.get().getFirstActivation(doc);
-        Assert.assertEquals(4, patAct.key.r.begin.intValue());
-        Assert.assertEquals(10, patAct.key.r.end.intValue());
+        Assert.assertEquals(4, patAct.key.r.begin);
+        Assert.assertEquals(10, patAct.key.r.end);
 
         doc.clearActivations();
 

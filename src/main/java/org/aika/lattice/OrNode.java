@@ -170,7 +170,7 @@ public class OrNode extends Node<OrNode, Activation> {
         }
 
         if(neuron.get().outputText != null) {
-            r = new Range(r.begin != null ? r.begin : 0, r.end != null ? r.end : r.begin + neuron.get().outputText.length());
+            r = new Range(r.begin != Integer.MIN_VALUE ? r.begin : 0, r.end != Integer.MAX_VALUE ? r.end : r.begin + neuron.get().outputText.length());
         }
 
         Key nak = new Key(

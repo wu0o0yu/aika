@@ -28,20 +28,20 @@ public class Range {
     public static final Range MIN = new Range(Integer.MIN_VALUE, Integer.MIN_VALUE);
     public static final Range MAX = new Range(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
-    public final Integer begin;
-    public final Integer end;
+    public final int begin;
+    public final int end;
 
 
     public Range(Integer begin, Integer end) {
-        this.begin = begin;
-        this.end = end;
+        this.begin = begin != null ? begin : Integer.MIN_VALUE;
+        this.end = end != null ? end : Integer.MAX_VALUE;
     }
 
 
     public static Range mergeRange(Range ra, Range rb) {
         return new Range(
-                ra.begin != null ? ra.begin : rb.begin,
-                ra.end != null ? ra.end : rb.end
+                ra.begin != Integer.MIN_VALUE ? ra.begin : rb.begin,
+                ra.end != Integer.MAX_VALUE ? ra.end : rb.end
         );
     }
 
@@ -76,11 +76,13 @@ public class Range {
 
 
     public boolean isEmpty() {
-        return end - begin == 0;
+        return length() == 0;
     }
 
 
     public int length() {
+        if(begin == Integer.MIN_VALUE || end == Integer.MAX_VALUE) return Integer.MAX_VALUE;
+
         return end - begin;
     }
 
@@ -99,9 +101,9 @@ public class Range {
         StringBuilder sb = new StringBuilder();
 
         sb.append("(");
-        sb.append(begin);
+        sb.append(begin != Integer.MIN_VALUE ? begin : "MIN");
         sb.append(",");
-        sb.append(end);
+        sb.append(end != Integer.MAX_VALUE ? end : "MAX");
         sb.append(")");
 
         return sb.toString();

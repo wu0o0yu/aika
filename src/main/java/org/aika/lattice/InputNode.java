@@ -150,7 +150,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         Range r = ak.r;
         if (key.startRangeMapping == Mapping.NONE || key.endRangeMapping == Mapping.NONE) {
             boolean dir = key.startRangeMapping == Mapping.NONE;
-            Integer pos = ak.r.getBegin(dir);
+            int pos = ak.r.getBegin(dir);
 
             List<NodeActivation> tmp = NodeActivation.select(
                     doc,

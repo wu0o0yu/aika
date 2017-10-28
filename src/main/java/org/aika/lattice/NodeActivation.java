@@ -104,7 +104,7 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     }
 
 
-    public static NodeActivation getNextSignal(Node n, Document doc, Integer from, Integer rid, InterprNode o, boolean dir, boolean inv) {
+    public static NodeActivation getNextSignal(Node n, Document doc, int from, Integer rid, InterprNode o, boolean dir, boolean inv) {
         ThreadState th = n.getThreadState(doc.threadId, false);
         if(th == null) return null;
 
@@ -179,10 +179,10 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
 
     public static <T extends Node, A extends NodeActivation<T>> Stream<A> getActivationsByRange(ThreadState<T, A> th, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
         Stream<A> s;
-        if((begin == GREATER_THAN || begin == EQUALS || end == FIRST) && r.begin != null) {
-            int er = (end == Operator.LESS_THAN || end == Operator.EQUALS || end == FIRST) && r.end != null ? r.end : Integer.MAX_VALUE;
+        if((begin == GREATER_THAN || begin == EQUALS || end == FIRST) && r.begin != Integer.MIN_VALUE) {
+            int er = (end == Operator.LESS_THAN || end == Operator.EQUALS || end == FIRST) && r.end != Integer.MAX_VALUE ? r.end : Integer.MAX_VALUE;
             s = th.activations.subMap(
-                    new NodeActivation.Key(n, new Range(r.begin, null), null, InterprNode.MIN),
+                    new NodeActivation.Key(n, new Range(r.begin, Integer.MIN_VALUE), null, InterprNode.MIN),
                     true,
                     new NodeActivation.Key(n, new Range(er, Integer.MAX_VALUE), Integer.MAX_VALUE, InterprNode.MAX),
                     true
@@ -190,7 +190,7 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
                     .values()
                     .stream()
                     .filter(act -> act.filter(n, rid, r, begin, end, o, or));
-        } else if((begin == Operator.LESS_THAN || begin == Operator.EQUALS) && r.begin != null) {
+        } else if((begin == Operator.LESS_THAN || begin == Operator.EQUALS) && r.begin != Integer.MIN_VALUE) {
             s = th.activations.descendingMap().subMap(
                     new NodeActivation.Key(n, new Range(r.begin, Integer.MAX_VALUE), null, InterprNode.MAX),
                     true,
