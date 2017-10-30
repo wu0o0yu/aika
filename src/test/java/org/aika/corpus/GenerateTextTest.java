@@ -36,17 +36,21 @@ public class GenerateTextTest {
     public void testTwoWords() {
         Model m = new Model();
 
+        // The suppressing neuron should prevent that two neurons output overlapping text.
         Neuron suppr = m.createNeuron("SUPPR");
 
+        // Some input neurons
         Neuron inA = m.createNeuron("IN-A");
         Neuron inB = m.createNeuron("IN-B");
 
-
+        // Four test words that should be used to generate a text.
         Neuron outA = m.createNeuron("OUT-A", "aaaaaaa ");
         Neuron outB = m.createNeuron("OUT-B", "bbb ");
         Neuron outC = m.createNeuron("OUT-C", "ccccccccc ");
         Neuron outD = m.createNeuron("OUT-D", "ddddd ");
 
+        // Word aaaaaaa is only added to the resulting text if input a is active and this neuron
+        // is not suppressed by another neuron. Output aaaaaaa may start a text.
         m.initNeuron(outA, 4.0,
                 new Input()
                         .setNeuron(inA)
@@ -59,12 +63,15 @@ public class GenerateTextTest {
                         .setWeight(-20.0f)
                         .setBiasDelta(1.0)
                         .setRecurrent(true)
-                        .setStartRangeMapping(END)
+                        .setStartRangeMapping(END)   // Check if the suppressing activation and the outA activation are overlapping each other.
                         .setEndRangeMapping(START)
                         .setStartRangeMatch(Range.Operator.LESS_THAN)
                         .setEndRangeMatch(Range.Operator.GREATER_THAN)
         );
 
+        // Word bbb is only added to the resulting text if input b is active and this neuron
+        // is not suppressed by another neuron. Output bbb may start a text.
+        // Neuron outB has a slightly higher weight than outA.
         m.initNeuron(outB, 5.0,
                 new Input()
                         .setNeuron(inB)
@@ -83,6 +90,8 @@ public class GenerateTextTest {
                         .setEndRangeMatch(Range.Operator.GREATER_THAN)
         );
 
+
+        // OutC is only activated if the previous word was outA.
         m.initNeuron(outC, 5.0,
                 new Input()
                         .setNeuron(outA)
@@ -101,6 +110,7 @@ public class GenerateTextTest {
                         .setEndRangeMatch(Range.Operator.GREATER_THAN)
         );
 
+        // OutD is only activated if the previous word was outB.
         m.initNeuron(outD, 5.0,
                 new Input()
                         .setNeuron(outB)
@@ -120,6 +130,7 @@ public class GenerateTextTest {
         );
 
 
+        // All outputs suppress each other.
         m.initNeuron(suppr, 0.0,
                 new Input()
                         .setNeuron(outA)
@@ -150,17 +161,20 @@ public class GenerateTextTest {
 
         Document doc = m.createDocument("Bla");
 
+        // Add both input a and input b.
         inA.addInput(doc, 0, 3);
         inB.addInput(doc, 0, 3);
 
         System.out.println(doc.neuronActivationsToString(true, true, true));
 
+        // Search for the best interpretation.
         doc.process();
 
         System.out.println(doc.neuronActivationsToString(true, true, true));
 
         System.out.println();
 
+        // Generate the output text.
         System.out.println(doc.generateOutputText());
 
         Assert.assertEquals("bbb ddddd ", doc.generateOutputText());
