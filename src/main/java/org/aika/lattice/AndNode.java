@@ -48,11 +48,9 @@ import java.util.*;
 public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
     private static double SIGNIFICANCE_THRESHOLD = 0.98;
-    public static int MAX_AND_NODE_SIZE = 4;
-    public static int MAX_NODES = 4;
     public static int MAX_RID_RANGE = 5;
 
-    SortedMap<Refinement, Provider<? extends Node>> parents = new TreeMap<>();
+    public SortedMap<Refinement, Provider<? extends Node>> parents = new TreeMap<>();
 
 
     public volatile int numberOfPositionsNotify;
@@ -67,9 +65,11 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     public AndNode(Model m, int level, SortedMap<Refinement, Provider<? extends Node>> parents) {
         super(m, level);
         this.parents = parents;
+    }
 
-        m.stat.nodes++;
-        m.stat.nodesPerLevel[level]++;
+
+    private void init() {
+        provider.m.stat.nodes++;
 
         ridRequired = false;
 
@@ -178,7 +178,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         ThreadState th = getThreadState(doc.threadId, true);
         Model m = doc.m;
         if(     (m.numberOfPositions - nOffset) == 0 ||
-                !trainConfig.patternEvaluation.evaluate(this) ||
+                !trainConfig.checkValidPattern.evaluate(this) ||
                 th.visitedComputeWeight == v ||
                 (numberOfPositionsNotify > m.numberOfPositions && frequencyNotify > frequency && Math.abs(nullHypFreq - oldNullHypFreq) < 0.01)
                 ) {
@@ -213,12 +213,12 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    public void cleanup(Model m) {
+    public void cleanup() {
         if(!isRemoved && !isRequired()) {
-            remove(m);
+            remove();
 
             for(Provider<? extends Node> p: parents.values()) {
-                p.get().cleanup(m);
+                p.get().cleanup();
             }
         }
     }
@@ -271,13 +271,13 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                     Node secondNode = secondAct.key.n;
                     Integer ridDelta = Utils.nullSafeSub(act.key.rid, false, secondAct.key.rid, false);
                     if (act != secondAct &&
-                            trainConfig.patternEvaluation.evaluate(secondNode) &&
+                            trainConfig.checkExpandable.evaluate(secondNode) &&
                             (ridDelta == null || ridDelta < MAX_RID_RANGE)
                             ) {
                         Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n.provider, secondAct.key.rid, pAct.key.rid));
                         Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
-                        AndNode nln = createNextLevelNode(doc.m, doc.threadId, this, nRef, true);
+                        AndNode nln = createNextLevelNode(doc.m, doc.threadId, this, nRef, trainConfig);
                         if(nln != null) {
                             nln.isDiscovered = true;
                             doc.addedNodes.add(nln);
@@ -287,11 +287,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             }
             pn.lock.releaseReadLock();
         }
-    }
-
-
-    public boolean isExpandable() {
-        return parents.size() < MAX_AND_NODE_SIZE;
     }
 
 
@@ -329,18 +324,18 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public static AndNode createNextLevelNode(Model m, int threadId, Node n, Refinement ref, boolean discoverPatterns) {
+    public static AndNode createNextLevelNode(Model m, int threadId, Node n, Refinement ref, TrainConfig tc) {
         Provider<AndNode> pnln = n.getAndChild(ref);
         if(pnln != null) {
-            return discoverPatterns ? null : pnln.get();
+            return tc != null ? null : pnln.get();
         }
 
         if(n.contains(ref)) return null;
 
-        SortedMap<Refinement, Provider<? extends Node>> parents = computeNextLevelParents(m, threadId, n, ref, discoverPatterns);
+        SortedMap<Refinement, Provider<? extends Node>> parents = computeNextLevelParents(m, threadId, n, ref, tc);
 
         AndNode nln = null;
-        if (parents != null && (!discoverPatterns || checkRidRange(parents))) {
+        if (parents != null && (tc == null || checkRidRange(parents))) {
             // Locking needs to take place in a predefined order.
             TreeSet<? extends Provider<? extends Node>> parentsForLocking = new TreeSet(parents.values());
             for(Provider<? extends Node> pn: parentsForLocking) {
@@ -349,6 +344,12 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
             if(n.andChildren == null || !n.andChildren.containsKey(ref)) {
                 nln = new AndNode(m, n.level + 1, parents);
+
+                if(tc == null || tc.checkValidPattern.evaluate(nln)) {
+                    nln.init();
+                } else {
+                    m.removeProvider(nln.provider);
+                }
             }
 
             for(Provider<? extends Node> pn: parentsForLocking) {
@@ -400,7 +401,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public static SortedMap<Refinement, Provider<? extends Node>> computeNextLevelParents(Model m, int threadId, Node pa, Refinement ref, boolean discoverPatterns) {
+    public static SortedMap<Refinement, Provider<? extends Node>> computeNextLevelParents(Model m, int threadId, Node pa, Refinement ref, TrainConfig trainConfig) {
         Collection<Refinement> refinements = pa.collectNodeAndRefinements(ref);
 
         long v = visitedCounter++;
@@ -410,7 +411,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             SortedSet<Refinement> childInputs = new TreeSet<>(refinements);
             childInputs.remove(pRef);
             try {
-                if (!pRef.input.get().computeAndParents(m, threadId, pRef.getRelativePosition(), childInputs, parents, discoverPatterns, v)) {
+                if (!pRef.input.get().computeAndParents(m, threadId, pRef.getRelativePosition(), childInputs, parents, trainConfig, v)) {
                     return null;
                 }
             } catch(ThreadState.RidOutOfRange e) {
@@ -481,8 +482,8 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    void remove(Model m) {
-        super.remove(m);
+    void remove() {
+        super.remove();
 
         for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
             Node pn = me.getValue().get();

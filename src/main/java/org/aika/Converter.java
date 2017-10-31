@@ -32,6 +32,8 @@ import java.util.*;
  */
 public class Converter {
 
+    public static int MAX_AND_NODE_SIZE = 4;
+
 
     public static Comparator<Synapse> SYNAPSE_COMP = new Comparator<Synapse>() {
         @Override
@@ -90,7 +92,7 @@ public class Converter {
             int i = 0;
             for (Synapse s : tmp) {
                 final boolean isOptionalInput = sum + remainingSum - s.w - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
-                final boolean maxAndNodesReached = i >= AndNode.MAX_AND_NODE_SIZE;
+                final boolean maxAndNodesReached = i >= MAX_AND_NODE_SIZE;
                 if (isOptionalInput || maxAndNodesReached) {
                     break;
                 }
@@ -117,7 +119,7 @@ public class Converter {
                 outputNode.requiredNode = requiredNode;
             }
 
-            if (noFurtherRefinement || i == AndNode.MAX_AND_NODE_SIZE) {
+            if (noFurtherRefinement || i == MAX_AND_NODE_SIZE) {
                 outputNode.addInput(offset, threadId, requiredNode, false);
             } else {
                 for (Synapse s : tmp) {
@@ -206,7 +208,7 @@ public class Converter {
         if (requiredNode == null) {
             nln = s.inputNode.get();
         } else {
-            nln = AndNode.createNextLevelNode(m, threadId, requiredNode, new AndNode.Refinement(s.key.relativeRid, offset, s.inputNode), false);
+            nln = AndNode.createNextLevelNode(m, threadId, requiredNode, new AndNode.Refinement(s.key.relativeRid, offset, s.inputNode), null);
         }
         return nln;
     }

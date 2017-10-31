@@ -110,9 +110,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         public NavigableMap<Key, Set<NodeActivation<?>>> added;
         public NavigableMap<Key, RemovedEntry> removed;
-        long visitedNeuronRefsChange = -1;
-        public long visitedAllowedOption = -1;
-        public long visitedComputeWeight = -1;
+        long visitedNeuronRefsChange;
+        public long visitedAllowedOption;
+        public long visitedComputeWeight;
 
         private RidVisited nullRidVisited;
         private RidVisited[] ridVisited = new RidVisited[2 * MAX_RID];
@@ -192,7 +192,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public abstract boolean isAllowedOption(int threadId, InterprNode n, NodeActivation<?> act, long v);
 
-    public abstract void cleanup(Model m);
+    public abstract void cleanup();
 
     abstract A createActivation(Document doc, Key ak, boolean isTrainingAct);
 
@@ -557,8 +557,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public void clearActivations(Model m) {
-        for (int i = 0; i < m.numberOfThreads; i++) {
+    public void clearActivations() {
+        for (int i = 0; i < provider.m.numberOfThreads; i++) {
             clearActivations(i);
         }
     }
@@ -569,7 +569,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    boolean computeAndParents(Model m, int threadId, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Provider<? extends Node>> parents, boolean discoverPatterns, long v) throws ThreadState.RidOutOfRange {
+    boolean computeAndParents(Model m, int threadId, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Provider<? extends Node>> parents, TrainConfig tc, long v) throws ThreadState.RidOutOfRange {
         RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
         if (nv.computeParents == v) return true;
         nv.computeParents = v;
@@ -589,13 +589,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             lock.releaseReadLock();
 
             if (cp == null) {
-                if (discoverPatterns) return false;
-                cp = AndNode.createNextLevelNode(m, threadId, this, nRef, discoverPatterns).provider;
+                if (tc != null) return false;
+                cp = AndNode.createNextLevelNode(m, threadId, this, nRef, tc).provider;
                 if (cp == null) return false;
             }
 
             Integer nOffset = Utils.nullSafeMin(ref.getRelativePosition(), offset);
-            if (!cp.get().computeAndParents(m, threadId, nOffset, childInputs, parents, discoverPatterns, v)) {
+            if (!cp.get().computeAndParents(m, threadId, nOffset, childInputs, parents, tc, v)) {
                 return false;
             }
         }
@@ -614,21 +614,21 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void remove(Model m) {
+    void remove() {
         assert !isRemoved;
 
         lock.acquireWriteLock();
         provider.setModified();
         while (andChildren != null && !andChildren.isEmpty()) {
-            andChildren.firstEntry().getValue().get().remove(m);
+            andChildren.firstEntry().getValue().get().remove();
         }
 
         while (orChildren != null && !orChildren.isEmpty()) {
-            orChildren.pollFirst().node.get().remove(m);
+            orChildren.pollFirst().node.get().remove();
         }
         lock.releaseWriteLock();
 
-        clearActivations(m);
+        clearActivations();
 
         isRemoved = true;
         isRemovedId = isRemovedIdCounter++;

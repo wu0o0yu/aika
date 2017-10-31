@@ -68,7 +68,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
         if (m != null) {
             m.stat.nodes++;
-            m.stat.nodesPerLevel[level]++;
         }
 
         endRequired = false;
@@ -294,10 +293,17 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                             this != in &&
                             in.visitedTrain != v &&
                             !in.key.isRecurrent &&
+                            !(key.startRangeOutput && in.key.startRangeOutput) &&
+                            !(key.endRangeOutput && in.key.endRangeOutput) &&
                             ((srm.compare(act.key.r.begin, secondAct.key.r.begin) && erm.compare(act.key.r.end, secondAct.key.r.end)) ||
                                     (ridDelta != null && ridDelta < AndNode.MAX_RID_RANGE))) {
                         in.visitedTrain = v;
-                        AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, true);
+                        AndNode nln = AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, trainConfig);
+
+                        if(nln != null) {
+                            nln.isDiscovered = true;
+                            doc.addedNodes.add(nln);
+                        }
                     }
                 }
             }
@@ -355,14 +361,14 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    public void cleanup(Model m) {
+    public void cleanup() {
     }
 
 
     @Override
-    void remove(Model m) {
+    void remove() {
         inputNeuron.get().outputNodes.remove(key);
-        super.remove(m);
+        super.remove();
     }
 
 

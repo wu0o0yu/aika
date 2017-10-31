@@ -49,8 +49,8 @@ public class TestHelper {
     }
 
 
-    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid) {
-        return addOutputNode(doc, n, relativeRid, absoluteRid, EQUALS, START, true, EQUALS, END, true);
+    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, boolean ro) {
+        return addOutputNode(doc, n, relativeRid, absoluteRid, EQUALS, START, ro, EQUALS, END, ro);
     }
 
 

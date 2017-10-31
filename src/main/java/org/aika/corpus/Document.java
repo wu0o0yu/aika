@@ -202,7 +202,7 @@ public class Document implements Comparable<Document> {
 
         for(Node n: activatedNodes) {
             n.computeNullHyp(m);
-            if(n.frequencyHasChanged && trainConfig.patternEvaluation.evaluate(n)) {
+            if(n.frequencyHasChanged && trainConfig.checkExpandable.evaluate(n)) {
                 n.frequencyHasChanged = false;
 
                 if(n instanceof AndNode) {
@@ -213,9 +213,7 @@ public class Document implements Comparable<Document> {
                 ThreadState<?, NodeActivation<?>> th = n.getThreadState(threadId, false);
                 if(th != null) {
                     for (NodeActivation act : th.activations.values()) {
-                        if(trainConfig.patternEvaluation.evaluate(n)) {
-                            n.discover(this, act, trainConfig);
-                        }
+                        n.discover(this, act, trainConfig);
                     }
                 }
             }

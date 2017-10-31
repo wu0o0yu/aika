@@ -25,13 +25,20 @@ import org.aika.neuron.Synapse;
  * @author Lukas Molzberger
  */
 public class TrainConfig {
-    public PatternEvaluation patternEvaluation;
+    public PatternEvaluation checkValidPattern;
+    public PatternEvaluation checkExpandable;
     public SynapseEvaluation synapseEvaluation;
     public double learnRate;
 
 
-    public TrainConfig setPatternEvaluation(PatternEvaluation patternEvaluation) {
-        this.patternEvaluation = patternEvaluation;
+    public TrainConfig setCheckValidPattern(PatternEvaluation checkValidPattern) {
+        this.checkValidPattern = checkValidPattern;
+        return this;
+    }
+
+
+    public TrainConfig setCheckExpandable(PatternEvaluation checkExpandable) {
+        this.checkExpandable = checkExpandable;
         return this;
     }
 

@@ -221,7 +221,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public void cleanup(Model m) {
+    public void cleanup() {
 
     }
 
@@ -347,10 +347,10 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
 
-    void remove(Model m, int threadId) {
+    void remove(int threadId) {
         neuron.get().remove();
 
-        super.remove(m);
+        super.remove();
 
         lock.acquireReadLock();
         removeParents(threadId, true);

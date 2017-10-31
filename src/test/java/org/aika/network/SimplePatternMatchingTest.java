@@ -121,7 +121,7 @@ public class SimplePatternMatchingTest {
         System.out.println();
 
 
-        doc.train(new TrainConfig().setPatternEvaluation(p -> p.frequency >= 5));
+        doc.train(new TrainConfig().setCheckExpandable(p -> p.frequency >= 5));
 
         doc.clearActivations();
     }
@@ -217,7 +217,7 @@ public class SimplePatternMatchingTest {
         System.out.println();
 
 
-        doc.train(new TrainConfig().setPatternEvaluation(p -> p.frequency >= 5));
+        doc.train(new TrainConfig().setCheckExpandable(p -> p.frequency >= 5));
 
         doc.clearActivations();
     }

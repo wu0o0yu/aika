@@ -64,7 +64,7 @@ public class CountingTest {
         inA.addInput(doc, 7, 8);
 
         doc.process();
-        doc.train(new TrainConfig().setPatternEvaluation(n -> false));
+        doc.train(new TrainConfig().setCheckExpandable(n -> false));
         Assert.assertEquals(6.0, outA.get().node.get().parents.get(Integer.MIN_VALUE).first().get().frequency, 0.001);
     }
 }
