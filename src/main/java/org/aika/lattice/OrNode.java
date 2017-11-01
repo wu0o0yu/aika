@@ -428,7 +428,7 @@ public class OrNode extends Node<OrNode, Activation> {
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeBoolean(false);
-        out.writeUTF("O");
+        out.writeChar('O');
         super.write(out);
 
         out.writeInt(neuron.id);

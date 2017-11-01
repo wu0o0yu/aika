@@ -404,7 +404,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeBoolean(false);
-        out.writeUTF("I");
+        out.writeChar('I');
         super.write(out);
         key.write(out);
 

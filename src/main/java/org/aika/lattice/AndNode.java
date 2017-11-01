@@ -445,7 +445,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeBoolean(false);
-        out.writeUTF("A");
+        out.writeChar('A');
         super.write(out);
 
         out.writeInt(parents.size());

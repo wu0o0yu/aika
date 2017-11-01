@@ -733,16 +733,16 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public static Node readNode(DataInput in, Provider p) throws IOException {
-        String type = in.readUTF();
+        char type = in.readChar();
         Node n = null;
         switch (type) {
-            case "I":
+            case 'I':
                 n = new InputNode();
                 break;
-            case "A":
+            case 'A':
                 n = new AndNode();
                 break;
-            case "O":
+            case 'O':
                 n = new OrNode();
                 break;
         }
