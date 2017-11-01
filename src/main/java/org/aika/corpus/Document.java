@@ -197,7 +197,7 @@ public class Document implements Comparable<Document> {
             }
         }
 
-        if(trainConfig.performBackPropagation) {
+        if(trainConfig.performBackpropagation) {
             bQueue.backpropagtion();
         }
 
