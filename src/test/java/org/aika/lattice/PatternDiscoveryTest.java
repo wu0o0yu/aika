@@ -95,8 +95,6 @@ public class PatternDiscoveryTest {
         Model m = new Model();
         m.setNodeStatisticFactory(() -> new NodeStatistic());
 
-        int minFrequency = 1;
-
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
         Neuron inC = m.createNeuron("C");
@@ -109,10 +107,11 @@ public class PatternDiscoveryTest {
         InputNode pCNode = TestHelper.addOutputNode(doc, inC, 0, null, false);
         InputNode pDNode = TestHelper.addOutputNode(doc, inD, 0, null, false);
 
+
         TrainConfig trainConfig = new TrainConfig()
                 .setDiscoverPatterns(true)
                 .setCounter((d, n) -> count(d, n))
-                .setCheckExpandable(n -> ((NodeStatistic) n.statistic).frequency >= minFrequency)
+                .setCheckExpandable(n -> ((NodeStatistic) n.statistic).frequency >= 1)
                 .setCheckValidPattern(n -> checkRidRange(n));
 
         doc.bestInterpretation = Arrays.asList(doc.bottom);
