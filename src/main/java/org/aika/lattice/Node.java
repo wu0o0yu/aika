@@ -101,8 +101,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         public NavigableMap<Key, Set<NodeActivation<?>>> added;
         public NavigableMap<Key, RemovedEntry> removed;
-        long visitedNeuronRefsChange;
-        public long visitedAllowedOption;
+
+        public long visited;
 
         private RidVisited nullRidVisited;
         private RidVisited[] ridVisited = new RidVisited[2 * MAX_RID];
@@ -625,8 +625,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
         ThreadState th = getThreadState(threadId, true);
-        if (th.visitedNeuronRefsChange == v) return;
-        th.visitedNeuronRefsChange = v;
+        if (th.visited == v) return;
+        th.visited = v;
         numberOfNeuronRefs.addAndGet(d);
     }
 

@@ -18,11 +18,9 @@ package org.aika.lattice;
 
 
 import org.aika.*;
-import org.aika.Input.RangeRelation;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
-import org.aika.network.CountingTest;
 import org.aika.network.TestHelper;
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,7 +29,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.SortedMap;
 
 /**
  *

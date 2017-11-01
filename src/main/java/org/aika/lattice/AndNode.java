@@ -78,8 +78,8 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     @Override
     public boolean isAllowedOption(int threadId, InterprNode n, NodeActivation<?> act, long v) {
         ThreadState th = getThreadState(threadId, true);
-        if(th.visitedAllowedOption == v) return false;
-        th.visitedAllowedOption = v;
+        if(th.visited == v) return false;
+        th.visited = v;
 
         for(NodeActivation pAct: act.inputs.values()) {
             if(pAct.key.n.isAllowedOption(threadId, n, pAct, v)) return true;
