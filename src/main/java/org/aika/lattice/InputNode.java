@@ -121,11 +121,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         );
     }
 
-    @Override
-    public void computeNullHyp(Model m) {
-        nullHypFreq = frequency;
-    }
-
 
     @Override
     boolean hasSupport(NodeActivation<InputNode> act) {

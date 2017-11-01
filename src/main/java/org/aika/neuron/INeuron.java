@@ -79,8 +79,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public Provider<OrNode> node;
 
-    public volatile double activationSum;
-    public volatile int numberOfActivations;
 
     public ReadWriteLock lock = new ReadWriteLock();
 
@@ -155,10 +153,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         doc.inputNeuronActivations.remove(act);
     }
 
-
-    public double avgActivation() {
-        return numberOfActivations > 0.0 ? activationSum / numberOfActivations : 1.0;
-    }
 
 
     public void publish() {
@@ -450,16 +444,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public void count(Document doc) {
-        ThreadState<OrNode, Activation> th = node.get().getThreadState(doc.threadId, false);
-        if (th == null) return;
-        for (Activation act : th.activations.values()) {
-            if (act.finalState != null && act.finalState.value > 0.0) {
-                activationSum += act.finalState.value;
-                numberOfActivations++;
-            }
-        }
-    }
 
     /**
      * Sets the incoming and outgoing links between neuron activations.
@@ -699,7 +683,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             out.writeUTF(outputText);
         }
 
-
         out.writeDouble(bias);
         out.writeDouble(negDirSum);
         out.writeDouble(negRecSum);
@@ -716,9 +699,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         if (node != null) {
             out.writeInt(node.id);
         }
-
-        out.writeDouble(activationSum);
-        out.writeInt(numberOfActivations);
 
         for (Synapse s : inputSynapses.values()) {
             if (s.input != null) {
@@ -756,9 +736,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             Integer nId = in.readInt();
             node = m.lookupNodeProvider(nId);
         }
-
-        activationSum = in.readDouble();
-        numberOfActivations = in.readInt();
 
         while (in.readBoolean()) {
             Synapse syn = Synapse.read(in, m);

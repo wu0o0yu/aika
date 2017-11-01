@@ -28,7 +28,6 @@ import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
-import org.apache.commons.math3.distribution.BinomialDistribution;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -151,64 +150,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         }
         assert support <= expected;
         return support == expected;
-    }
-
-
-    @Override
-    public void computeNullHyp(Model m) {
-        double avgSize = sizeSum / instanceSum;
-        double n = (double) (m.numberOfPositions - nOffset) / avgSize;
-
-        double nullHyp = 0.0;
-        for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
-            Node pn = me.getValue().get();
-            InputNode in = me.getKey().input.get();
-            double inputNA = (double) (m.numberOfPositions - in.nOffset) / avgSize;
-            double inputNB = (double) (m.numberOfPositions - pn.nOffset) / avgSize;
-
-            double nh = Math.min(1.0, in.frequency / inputNA) * Math.min(1.0, Math.max(pn.frequency, pn.nullHypFreq) / inputNB);
-            nullHyp = Math.max(nullHyp, nh);
-        }
-
-        nullHypFreq = nullHyp * n;
-    }
-
-
-    public void updateWeight(Document doc, TrainConfig trainConfig, long v) {
-        ThreadState th = getThreadState(doc.threadId, true);
-        Model m = doc.m;
-        if(     (m.numberOfPositions - nOffset) == 0 ||
-                !trainConfig.checkValidPattern.evaluate(this) ||
-                th.visitedComputeWeight == v ||
-                (numberOfPositionsNotify > m.numberOfPositions && frequencyNotify > frequency && Math.abs(nullHypFreq - oldNullHypFreq) < 0.01)
-                ) {
-            return;
-        }
-
-        th.visitedComputeWeight = v;
-
-        double avgSize = sizeSum / instanceSum;
-        double n = (double) (m.numberOfPositions - nOffset) / avgSize;
-
-        doc.m.numberOfPositionsQueue.remove(provider);
-        numberOfPositionsNotify = computeNotify(n) + m.numberOfPositions;
-        doc.m.numberOfPositionsQueue.add(provider);
-
-        BinomialDistribution binDist = new BinomialDistribution(null, (int)Math.round(n), nullHypFreq / n);
-
-        weight = binDist.cumulativeProbability(frequency - 1);
-
-        frequencyNotify = computeNotify(frequency) + frequency;
-        oldNullHypFreq = nullHypFreq;
-
-        if(weight >= SIGNIFICANCE_THRESHOLD) {
-//            checkSignificantPattern(t);
-        }
-    }
-
-
-    public int computeNotify(double x) {
-        return 1 + (int) Math.floor(Math.pow(x, 1.15) - x);
     }
 
 
@@ -507,17 +448,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             sb.append(ref);
         }
         sb.append("]");
-        return sb.toString();
-    }
-
-    public String weightsToString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(" - ");
-        sb.append(" F:");
-        sb.append(frequency);
-        sb.append("  BW:");
-        sb.append(Utils.round(weight));
-
         return sb.toString();
     }
 

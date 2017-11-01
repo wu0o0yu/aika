@@ -17,14 +17,18 @@
 package org.aika.network;
 
 
-import org.aika.Input;
-import org.aika.Model;
-import org.aika.Neuron;
-import org.aika.TrainConfig;
+import org.aika.*;
 import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
+import org.aika.lattice.Node;
+import org.aika.lattice.NodeActivation;
+import org.aika.lattice.PatternDiscoveryTest;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static org.aika.Input.RangeRelation.EQUALS;
 
@@ -35,9 +39,21 @@ import static org.aika.Input.RangeRelation.EQUALS;
 public class CountingTest {
 
 
+    public static class NodeStatistic implements Writable {
+        int frequency = 0;
+
+        @Override
+        public void write(DataOutput out) throws IOException {}
+
+        @Override
+        public void readFields(DataInput in, Model m) throws IOException {}
+    }
+
+
     @Test
     public void testActivationCounting() {
         Model m = new Model();
+        m.setNodeStatisticFactory(() -> new NodeStatistic());
 
         Neuron inA = m.createNeuron("inA");
         Neuron outA = m.initNeuron(m.createNeuron("nA"), 50.0,
@@ -64,7 +80,23 @@ public class CountingTest {
         inA.addInput(doc, 7, 8);
 
         doc.process();
-        doc.train(new TrainConfig().setCheckExpandable(n -> false));
-        Assert.assertEquals(6.0, outA.get().node.get().parents.get(Integer.MIN_VALUE).first().get().frequency, 0.001);
+        doc.train(
+                new TrainConfig()
+                        .setCheckExpandable(n -> false)
+                        .setCounter((d, n) -> count(d, n))
+        );
+        Assert.assertEquals(6.0, ((NodeStatistic) outA.get().node.get().parents.get(Integer.MIN_VALUE).first().get().statistic).frequency, 0.001);
+    }
+
+
+    public void count(Document doc, Node n) {
+        Node.ThreadState<?, NodeActivation<?>> ts = n.getThreadState(doc.threadId, false);
+        if (ts == null) return;
+
+        NodeStatistic stat = ((NodeStatistic) n.statistic);
+
+        for (NodeActivation<?> act : ts.activations.values()) {
+            stat.frequency++;
+        }
     }
 }

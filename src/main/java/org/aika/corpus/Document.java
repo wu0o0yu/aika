@@ -181,35 +181,11 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public void count() {
-        for(Node n: activatedNodes) {
-            n.count(threadId);
-        }
-
-        for(INeuron n: finallyActivatedNeurons) {
-            n.count(this);
-        }
-    }
-
-
     public void train(TrainConfig trainConfig) {
-        m.numberOfPositions += numberOfPositionsDelta;
-        numberOfPositionsDelta = 0;
-
-        long v = Node.visitedCounter++;
-
-        count();
-
         for(Node n: activatedNodes) {
-            n.computeNullHyp(m);
-            if(n.frequencyHasChanged && trainConfig.checkExpandable.evaluate(n)) {
-                n.frequencyHasChanged = false;
+            trainConfig.counter.count(this, n);
 
-                if(n instanceof AndNode) {
-                    AndNode an = (AndNode) n;
-                    an.updateWeight(this, trainConfig, v);
-                }
-
+            if(trainConfig.checkExpandable.evaluate(n)) {
                 ThreadState<?, NodeActivation<?>> th = n.getThreadState(threadId, false);
                 if(th != null) {
                     for (NodeActivation act : th.activations.values()) {
@@ -217,14 +193,6 @@ public class Document implements Comparable<Document> {
                     }
                 }
             }
-        }
-
-        while(true) {
-            AndNode n = !m.numberOfPositionsQueue.isEmpty() ? m.numberOfPositionsQueue.iterator().next().get() : null;
-
-            if(n == null || n.numberOfPositionsNotify > m.numberOfPositions) break;
-
-            n.updateWeight(this, trainConfig, v);
         }
 
         bQueue.backpropagtion();

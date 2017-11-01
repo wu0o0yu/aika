@@ -67,12 +67,6 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public void computeNullHyp(Model m) {
-
-    }
-
-
-    @Override
     public boolean isAllowedOption(int threadId, InterprNode n, NodeActivation act, long v) {
         return false;
     }

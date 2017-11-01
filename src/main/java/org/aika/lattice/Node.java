@@ -64,9 +64,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public int level;
 
-    public volatile int frequency;
-    public volatile double nullHypFreq;
-    public volatile double oldNullHypFreq;
+    public Writable statistic;
 
     public boolean isDiscovered;
 
@@ -78,13 +76,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     volatile boolean isRemoved;
     volatile int isRemovedId;
     volatile static int isRemovedIdCounter = 0;
-
-    public volatile boolean frequencyHasChanged = true;
-    public volatile int nOffset;
-
-    public volatile int sizeSum = 0;
-    public volatile int instanceSum = 0;
-
 
     // Only childrens are locked.
     public ReadWriteLock lock = new ReadWriteLock();
@@ -210,8 +201,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     abstract boolean hasSupport(A act);
 
-    public abstract void computeNullHyp(Model m);
-
     abstract boolean contains(Refinement ref);
 
     public abstract void changeNumberOfNeuronRefs(int threadId, long v, int d);
@@ -226,10 +215,11 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         threads = new ThreadState[m.numberOfThreads];
         provider = new Provider(m, this);
         this.level = level;
-        if (m != null) {
-            nOffset = m.numberOfPositions;
-        }
         provider.setModified();
+
+        if(m.nodeStatisticFactory != null) {
+            statistic = m.nodeStatisticFactory.createNodeStatisticObject();
+        }
     }
 
 
@@ -335,20 +325,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
                 andChildren = null;
                 reverseAndChildren = null;
             }
-        }
-    }
-
-
-    public void count(int threadId) {
-        ThreadState<T, A> ts = getThreadState(threadId, false);
-        if (ts == null) return;
-
-        for (NodeActivation<T> act : ts.activations.values()) {
-            frequency++;
-            frequencyHasChanged = true;
-
-            sizeSum += act.key.r.begin == Integer.MIN_VALUE || act.key.r.end == Integer.MAX_VALUE ? 1 : Math.max(1, act.key.r.end - act.key.r.begin);
-            instanceSum++;
         }
     }
 
@@ -689,9 +665,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void write(DataOutput out) throws IOException {
         out.writeInt(level);
 
-        out.writeInt(frequency);
-        out.writeDouble(nullHypFreq);
-        out.writeDouble(oldNullHypFreq);
+        out.writeBoolean(statistic != null);
+        if(statistic != null) {
+            statistic.write(out);
+        }
 
         out.writeBoolean(isDiscovered);
 
@@ -699,11 +676,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         out.writeBoolean(ridRequired);
 
         out.writeInt(numberOfNeuronRefs);
-        out.writeBoolean(frequencyHasChanged);
-        out.writeInt(nOffset);
-
-        out.writeInt(sizeSum);
-        out.writeInt(instanceSum);
 
         if (andChildren != null) {
             out.writeInt(andChildren.size());
@@ -730,9 +702,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void readFields(DataInput in, Model m) throws IOException {
         level = in.readInt();
 
-        frequency = in.readInt();
-        nullHypFreq = in.readDouble();
-        oldNullHypFreq = in.readDouble();
+        if(in.readBoolean() && m.nodeStatisticFactory != null) {
+            statistic = m.nodeStatisticFactory.createNodeStatisticObject();
+            statistic.readFields(in, m);
+        }
 
         isDiscovered = in.readBoolean();
 
@@ -740,11 +713,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         ridRequired = in.readBoolean();
 
         numberOfNeuronRefs = in.readInt();
-        frequencyHasChanged = in.readBoolean();
-        nOffset = in.readInt();
-
-        sizeSum = in.readInt();
-        instanceSum = in.readInt();
 
         int s = in.readInt();
         for (int i = 0; i < s; i++) {

@@ -52,8 +52,6 @@ public class ActivationOutputsTest {
     public void addActivationsTest() {
         Model m = new Model();
 
-        m.numberOfPositions = 10;
-
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
 
@@ -143,8 +141,6 @@ public class ActivationOutputsTest {
     @Test
     public void removeActivationsTest() {
         Model m = new Model();
-
-        m.numberOfPositions = 10;
 
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");

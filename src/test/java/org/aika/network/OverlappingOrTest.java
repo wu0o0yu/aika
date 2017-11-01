@@ -131,9 +131,6 @@ public class OverlappingOrTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
         System.out.println();
 
-
-        doc.train(new TrainConfig().setCheckExpandable(p -> p.frequency >= 5));
-
         doc.clearActivations();
     }
 

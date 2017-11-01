@@ -16,6 +16,7 @@
  */
 package org.aika;
 
+import org.aika.corpus.Document;
 import org.aika.lattice.Node;
 import org.aika.neuron.Activation;
 import org.aika.neuron.Synapse;
@@ -28,7 +29,9 @@ public class TrainConfig {
     public PatternEvaluation checkValidPattern;
     public PatternEvaluation checkExpandable;
     public SynapseEvaluation synapseEvaluation;
+    public Counter counter;
     public double learnRate;
+    public boolean performBackPropagation;
 
 
     public TrainConfig setCheckValidPattern(PatternEvaluation checkValidPattern) {
@@ -48,8 +51,21 @@ public class TrainConfig {
         return this;
     }
 
+
+    public TrainConfig setCounter(Counter counter) {
+        this.counter = counter;
+        return this;
+    }
+
+
     public TrainConfig setLearnRate(double learnRate) {
         this.learnRate = learnRate;
+        return this;
+    }
+
+
+    public TrainConfig setPerformBackPropagation(boolean performBackPropagation) {
+        this.performBackPropagation = performBackPropagation;
         return this;
     }
 
@@ -83,6 +99,16 @@ public class TrainConfig {
     }
 
 
+    public interface Counter {
+
+        /**
+         * Updates the statistics of this node
+         *
+         * @param n
+         * @return
+         */
+        void count(Document doc, Node n);
+    }
 
 }
 

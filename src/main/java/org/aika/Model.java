@@ -50,6 +50,8 @@ public class Model {
 
     public SuspensionHook suspensionHook;
 
+    public NodeStatisticFactory nodeStatisticFactory;
+
 
     public AtomicInteger currentId = new AtomicInteger(0);
 
@@ -60,17 +62,6 @@ public class Model {
     public Statistic stat = new Statistic();
 
     public int defaultThreadId = 0;
-
-    public Set<Provider<AndNode>> numberOfPositionsQueue = Collections.synchronizedSet(new TreeSet<>(new Comparator<Provider<AndNode>>() {
-        @Override
-        public int compare(Provider<AndNode> n1, Provider<AndNode> n2) {
-            int r = Integer.compare(n1.get().numberOfPositionsNotify, n2.get().numberOfPositionsNotify);
-            if (r != 0) return r;
-            return n1.compareTo(n2);
-        }
-    }));
-
-    public volatile int numberOfPositions;
 
 
     /**
@@ -88,6 +79,26 @@ public class Model {
         lastCleanup = new int[numberOfThreads];
         docs = new Document[numberOfThreads];
         suspensionHook = sh;
+    }
+
+
+    public SuspensionHook getSuspensionHook() {
+        return suspensionHook;
+    }
+
+
+    public void setSuspensionHook(SuspensionHook suspensionHook) {
+        this.suspensionHook = suspensionHook;
+    }
+
+
+    public NodeStatisticFactory getNodeStatisticFactory() {
+        return nodeStatisticFactory;
+    }
+
+
+    public void setNodeStatisticFactory(NodeStatisticFactory nodeStatisticFactory) {
+        this.nodeStatisticFactory = nodeStatisticFactory;
     }
 
 
@@ -154,19 +165,6 @@ public class Model {
             }
 
             return new Neuron(this, id);
-        }
-    }
-
-
-    public void resetFrequency() {
-        for (int t = 0; t < numberOfThreads; t++) {
-            synchronized (activeProviders) {
-                for (Provider<? extends AbstractNode> p : activeProviders.values()) {
-                    if (p != null && p.get() instanceof Node) {
-                        ((Node) p.get()).frequency = 0;
-                    }
-                }
-            }
         }
     }
 
