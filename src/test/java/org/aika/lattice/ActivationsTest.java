@@ -101,15 +101,15 @@ public class ActivationsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList());
 
-        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList());
 
-        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList());
 
-        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList());
 
-        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList(), false);
+        inNode.processAddedActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList());
 
  //       Assert.assertEquals(1, Activation.get(t, inNode, new Range(0, 1), doc.bottom).key.fired);
     }

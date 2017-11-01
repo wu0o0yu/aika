@@ -92,10 +92,8 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    protected NodeActivation<InputNode> createActivation(Document doc, NodeActivation.Key ak, boolean isTrainingAct) {
-        NodeActivation<InputNode> act = new NodeActivation<>(doc.activationIdCounter++, doc, ak);
-        act.isTrainingAct = isTrainingAct;
-        return act;
+    protected NodeActivation<InputNode> createActivation(Document doc, NodeActivation.Key ak) {
+        return new NodeActivation<>(doc.activationIdCounter++, doc, ak);
     }
 
 

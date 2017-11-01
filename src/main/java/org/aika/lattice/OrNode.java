@@ -70,10 +70,9 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    protected Activation createActivation(Document doc, NodeActivation.Key ak, boolean isTrainingAct) {
+    protected Activation createActivation(Document doc, NodeActivation.Key ak) {
         Activation act = new Activation(doc.activationIdCounter++, doc, ak);
         ak.o.act = act;
-        act.isTrainingAct = isTrainingAct;
         ThreadState<OrNode, Activation> th = getThreadState(doc.threadId, false);
         if(th == null || th.activations.isEmpty()) {
             doc.activatedNeurons.add(neuron.get());
@@ -115,8 +114,8 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    Activation processAddedActivation(Document doc, Key<OrNode> ak, Collection<NodeActivation> inputActs, boolean isTrainingAct) {
-        Activation act = super.processAddedActivation(doc, ak, inputActs, isTrainingAct);
+    Activation processAddedActivation(Document doc, Key<OrNode> ak, Collection<NodeActivation> inputActs) {
+        Activation act = super.processAddedActivation(doc, ak, inputActs);
         if(act != null) {
             neuron.get().linkNeuronRelations(doc, act);
         }

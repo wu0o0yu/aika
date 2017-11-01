@@ -186,7 +186,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public abstract void cleanup();
 
-    abstract A createActivation(Document doc, Key ak, boolean isTrainingAct);
+    abstract A createActivation(Document doc, Key ak);
 
     abstract void deleteActivation(Document doc, A act);
 
@@ -330,22 +330,20 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    A processAddedActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs, boolean isTrainingAct) {
+    A processAddedActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs) {
         if (Document.APPLY_DEBUG_OUTPUT) {
             log.info("add: " + ak + " - " + ak.n);
         }
 
         A act = NodeActivation.get(doc, (T) this, ak);
         if (act == null) {
-            act = createActivation(doc, ak, isTrainingAct);
+            act = createActivation(doc, ak);
 
             register(act, doc);
 
             act.link(inputActs);
 
-            if (!isTrainingAct) {
-                propagateAddedActivation(doc, act, null);
-            }
+            propagateAddedActivation(doc, act, null);
         } else {
             act.link(inputActs);
         }
@@ -374,7 +372,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         ThreadState th = ak.n.getThreadState(doc.threadId, true);
         if (th.activations.isEmpty()) {
-            (act.isTrainingAct ? doc.activatedNodesForTraining : doc.activatedNodes).add(ak.n);
+            doc.activatedNodes.add(ak.n);
         }
         th.activations.put(ak, act);
 
@@ -413,7 +411,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if (actRid != null) actRid.remove(ak);
 
         if (th.activations.isEmpty()) {
-            (act.isTrainingAct ? doc.activatedNodesForTraining : doc.activatedNodes).remove(ak.n);
+            doc.activatedNodes.remove(ak.n);
         }
 
         ak.o.activations.remove(ak);
@@ -459,7 +457,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         for (Map.Entry<Key<T>, Collection<NodeActivation>> me : tmpAdded.entrySet()) {
-            processAddedActivation(doc, me.getKey(), me.getValue(), false);
+            processAddedActivation(doc, me.getKey(), me.getValue());
         }
     }
 

@@ -45,8 +45,6 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
 
     public static int removedIdCounter = 1;
 
-    public boolean isTrainingAct;
-
     public TreeMap<Key, NodeActivation> inputs = new TreeMap<>();
     public TreeMap<Key, NodeActivation> outputs = new TreeMap<>();
 

@@ -89,7 +89,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    NodeActivation<AndNode> processAddedActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs, boolean isTrainingAct) {
+    NodeActivation<AndNode> processAddedActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs) {
         int s = 0;
         for(NodeActivation iAct: inputActs) {
             if(!iAct.isRemoved) s++;
@@ -98,7 +98,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             return null;
         }
 
-        return super.processAddedActivation(doc, ak, inputActs, isTrainingAct);
+        return super.processAddedActivation(doc, ak, inputActs);
     }
 
 
@@ -400,10 +400,8 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    protected NodeActivation<AndNode> createActivation(Document doc, NodeActivation.Key ak, boolean isTrainingAct) {
-        NodeActivation<AndNode> act = new NodeActivation<>(doc.activationIdCounter++, doc, ak);
-        act.isTrainingAct = isTrainingAct;
-        return act;
+    protected NodeActivation<AndNode> createActivation(Document doc, NodeActivation.Key ak) {
+        return new NodeActivation<>(doc.activationIdCounter++, doc, ak);
     }
 
 

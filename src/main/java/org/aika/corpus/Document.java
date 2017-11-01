@@ -75,7 +75,6 @@ public class Document implements Comparable<Document> {
 
 
     public TreeSet<Node> activatedNodes = new TreeSet<>();
-    public TreeSet<Node> activatedNodesForTraining = new TreeSet<>();
     public TreeSet<INeuron> activatedNeurons = new TreeSet<>();
     public TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
     public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
@@ -208,9 +207,6 @@ public class Document implements Comparable<Document> {
      */
     public void clearActivations() {
         for(Node n: activatedNodes) {
-            n.clearActivations(this);
-        }
-        for(Node n: activatedNodesForTraining) {
             n.clearActivations(this);
         }
         activatedNodes.clear();
