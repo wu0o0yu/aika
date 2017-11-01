@@ -123,8 +123,6 @@ public class Model {
         Document doc = new Document(txt, this, threadId);
 
         if (txt != null) {
-            doc.changeNumberOfPositions(doc.length());
-
             if (docs[threadId] != null) {
                 throw new RuntimeException("Two documents are using the same thread. Call clearActivations() first, before processing the next document.");
             }

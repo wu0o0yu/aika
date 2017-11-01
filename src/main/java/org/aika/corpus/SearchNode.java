@@ -55,7 +55,7 @@ public class SearchNode implements Comparable<SearchNode> {
     public SearchNode excludedParent;
     public SearchNode selectedParent;
 
-    public int visited;
+    public long visited;
     List<InterprNode> refinement;
     Candidate candidate;
     int level;
@@ -293,7 +293,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean checkExcluded(List<InterprNode> n, int v) {
+    private boolean checkExcluded(List<InterprNode> n, long v) {
         for(InterprNode x: n) {
             if(checkExcluded(x, v)) return true;
         }
@@ -301,7 +301,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean checkExcluded(InterprNode ref, int v) {
+    private boolean checkExcluded(InterprNode ref, long v) {
         if(ref.visitedCheckExcluded == v) return false;
         ref.visitedCheckExcluded = v;
 
@@ -317,7 +317,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public static Set<InterprNode> collectConflicts(Document doc) {
         Set<InterprNode> results = new TreeSet<>();
-        int v = doc.visitedCounter++;
+        long v = doc.visitedCounter++;
         for(InterprNode n: doc.bottom.children) {
             if(!n.conflicts.primary.isEmpty()) {
                 results.add(n);
@@ -342,7 +342,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private List<InterprNode> expandRefinement(List<InterprNode> ref, int v) {
+    private List<InterprNode> expandRefinement(List<InterprNode> ref, long v) {
         ArrayList<InterprNode> tmp = new ArrayList<>();
         for(InterprNode n: ref) {
             markExpandRefinement(n, v);
@@ -358,7 +358,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void markExpandRefinement(InterprNode n, int v) {
+    private void markExpandRefinement(InterprNode n, long v) {
         if(n.markedExpandRefinement == v) return;
         n.markedExpandRefinement = v;
 
@@ -380,7 +380,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void expandRefinementRecursiveStep(Collection<InterprNode> results, InterprNode n, int v) {
+    private void expandRefinementRecursiveStep(Collection<InterprNode> results, InterprNode n, long v) {
         if(n.visitedExpandRefinementRecursiveStep == v) return;
         n.visitedExpandRefinementRecursiveStep = v;
 
@@ -428,7 +428,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public boolean isCovered(int g) {
+    public boolean isCovered(long g) {
         SearchNode n = this;
         do {
             if(g == n.visited) return true;
@@ -538,7 +538,7 @@ public class SearchNode implements Comparable<SearchNode> {
     public String toString(Document doc) {
         TreeSet<InterprNode> tmp = new TreeSet<>();
         for(InterprNode n: refinement) {
-            n.collectPrimitiveNodes(tmp, doc.interprIdCounter++);
+            n.collectPrimitiveNodes(tmp, doc.interpretationIdCounter++);
         }
         StringBuilder sb = new StringBuilder();
         for(InterprNode n: tmp) {

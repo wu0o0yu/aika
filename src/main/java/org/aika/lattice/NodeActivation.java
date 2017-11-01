@@ -44,7 +44,6 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     public long visitedNeuronTrain = -1;
 
     public static int removedIdCounter = 1;
-    public static long visitedCounter = 1;
 
     public boolean isTrainingAct;
 

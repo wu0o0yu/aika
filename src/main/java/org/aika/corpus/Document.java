@@ -52,14 +52,14 @@ public class Document implements Comparable<Document> {
     public static boolean APPLY_DEBUG_OUTPUT = false;
     public static boolean OPTIMIZE_DEBUG_OUTPUT = false;
 
-    public static int CLEANUP_INTERVAL = 50;
+    public static int CLEANUP_INTERVAL = 500;
 
     public static int MAX_ROUND = 20;
 
     private String content;
 
-    public int visitedCounter = 1;
-    public int interprIdCounter = 1;
+    public long visitedCounter = 1;
+    public int interpretationIdCounter = 1;
     public int searchNodeIdCounter = 0;
 
     public InterprNode bottom = new InterprNode(this, -1, 0, 0);
@@ -92,11 +92,6 @@ public class Document implements Comparable<Document> {
     });
     public TreeSet<Node> addedNodes = new TreeSet<>();
 
-    public static int numberOfPositionsDelta;
-
-    public int debugActId = -1;
-    public double debugActWeight = 0.0;
-    public String debugOutput = "";
 
     public static Comparator<NodeActivation> ACTIVATIONS_OUTPUT_COMPARATOR = new Comparator<NodeActivation>() {
         @Override
@@ -247,11 +242,6 @@ public class Document implements Comparable<Document> {
         }
 
         m.docs[threadId] = null;
-    }
-
-
-    public void changeNumberOfPositions(int delta) {
-        numberOfPositionsDelta += delta;
     }
 
 
@@ -474,7 +464,7 @@ public class Document implements Comparable<Document> {
 
 
         public NormWeight adjustWeight(SearchNode cand, List<InterprNode> changed) {
-            long v = NodeActivation.visitedCounter++;
+            long v = visitedCounter++;
 
             for(InterprNode n: changed) {
                 addAllActs(n.getNeuronActivations());

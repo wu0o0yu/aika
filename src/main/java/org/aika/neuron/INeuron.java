@@ -243,10 +243,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 (sum[DIR] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR] + negRecSum + maxRecurrentSum) : maxRecurrentSum
         );
 
-        if (doc.debugActId == act.id && doc.debugActWeight <= newWeight.w) {
-            storeDebugOutput(doc, act, newWeight, drSum, round, sn);
-        }
-
         return new State(
                 c == Coverage.SELECTED ? transferFunction(drSum) : 0.0,
                 c == Coverage.SELECTED ? fired : -1,
@@ -315,31 +311,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private void storeDebugOutput(Document doc, Activation act, NormWeight nw, double sum, int round, SearchNode sn) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Activation ID: " + doc.debugActId + "\n");
-        sb.append("Neuron: " + label + "\n");
-        sb.append("Sum: " + sum + "\n");
-        sb.append("Bias: " + bias + "\n");
-        sb.append("Round: " + round + "\n");
-        sb.append("Positive Recurrent Sum: " + posRecSum + "\n");
-        sb.append("Negative Recurrent Sum: " + negRecSum + "\n");
-        sb.append("Negative Direct Sum: " + negDirSum + "\n");
-        sb.append("Inputs:\n");
-
-        for (InputState is : getInputStates(act, round, sn)) {
-            sb.append("    " + is.sa.input.key.n.neuron.get().label);
-            sb.append("  SynWeight: " + is.sa.s.w);
-            sb.append("  ActValue: " + is.s);
-            sb.append("\n");
-        }
-        sb.append("Weight: " + nw.w + "\n");
-        sb.append("Norm: " + nw.n + "\n");
-        sb.append("\n");
-        doc.debugOutput = sb.toString();
-    }
-
-
     public void computeErrorSignal(Document doc, Activation act) {
         act.errorSignal = act.initialErrorSignal;
         for (SynapseActivation sa : act.neuronOutputs) {
@@ -358,7 +329,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public void train(Document doc, Activation targetAct, double learnRate, TrainConfig.SynapseEvaluation se) {
         if (Math.abs(targetAct.errorSignal) < TOLERANCE) return;
 
-        long v = NodeActivation.visitedCounter++;
+        long v = doc.visitedCounter++;
 
         double x = learnRate * targetAct.errorSignal;
         bias += x;
@@ -441,7 +412,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      * @param act
      */
     public void linkNeuronRelations(Document doc, Activation act) {
-        int v = doc.visitedCounter++;
+        long v = doc.visitedCounter++;
         lock.acquireReadLock();
         linkNeuronActs(doc, act, v, 0);
         linkNeuronActs(doc, act, v, 1);
@@ -449,7 +420,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private void linkNeuronActs(Document doc, Activation act, int v, int dir) {
+    private void linkNeuronActs(Document doc, Activation act, long v, int dir) {
         ArrayList<Activation> recNegTmp = new ArrayList<>();
 
         provider.lock.acquireReadLock();
@@ -573,7 +544,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public static void unlinkNeuronRelations(Document doc, Activation act) {
-        int v = doc.visitedCounter++;
+        long v = doc.visitedCounter++;
         for (int dir = 0; dir < 2; dir++) {
             for (SynapseActivation sa : (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
                 Synapse s = sa.s;
@@ -636,7 +607,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private static void markConflicts(Activation iAct, Activation oAct, int v) {
+    private static void markConflicts(Activation iAct, Activation oAct, long v) {
         oAct.key.o.markedConflict = v;
         for (SynapseActivation sa : iAct.neuronOutputs) {
             if (sa.s.key.isRecurrent && sa.s.isNegative()) {

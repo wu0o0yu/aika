@@ -45,7 +45,7 @@ public class Conflicts {
     }
 
 
-    static void collectAllConflicting(Collection<InterprNode> results, InterprNode n, int v) {
+    static void collectAllConflicting(Collection<InterprNode> results, InterprNode n, long v) {
         if(n.visitedCollectAllConflicting == v) return;
         n.visitedCollectAllConflicting = v;
 

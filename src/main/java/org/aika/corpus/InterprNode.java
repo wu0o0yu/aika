@@ -59,33 +59,36 @@ public class InterprNode implements Comparable<InterprNode> {
     /*
     Aika extensively uses graph coloring techniques. When traversing the interpretation node lattice nodes will be
     marked in order to avoid having to visit the same node twice. To avoid having to reset each mark Aika uses the
-    counter {@code Document.interprIdCounter} to set a new mark each time.
+    counter {@code Document.interpretationIdCounter} to set a new mark each time.
      */
-    private int visitedLinkRelations;
-    private int visitedContains;
-    private int visitedCollect;
-    private int visitedExpandActivations;
-    private int visitedRemoveActivations;
-    private int visitedIsConflicting;
-    private int visitedStoreFinalWeight;
-    private int visitedComputeLargestCommonSubset;
-    private int visitedComputeLength;
-    private int visitedComputeParents;
-    private int visitedNumberInnerInputs;
+    private long visitedLinkRelations;
+    private long visitedContains;
+    private long visitedCollect;
+    private long visitedExpandActivations;
+    private long visitedRemoveActivations;
+    private long visitedIsConflicting;
+    private long visitedStoreFinalWeight;
+    private long visitedComputeLargestCommonSubset;
+    private long visitedComputeLength;
+    private long visitedComputeParents;
+    private long visitedNumberInnerInputs;
+    private long visitedComputeChildren = -1;
 
-    int visitedCollectAllConflicting;
-    int visitedExpandRefinementRecursiveStep;
-    int markedExpandRefinement;
-    int visitedCheckExcluded;
+    long visitedCollectAllConflicting;
+    long visitedExpandRefinementRecursiveStep;
+    long markedExpandRefinement;
+    long visitedCheckExcluded;
 
-    public int markedConflict;
-    public int markedSelected;
-    public int markedExcluded;
+    public long markedConflict;
+    public long markedSelected;
+    public long markedExcluded;
     public boolean markedExcludedRefinement;
 
     private int numberInnerInputs = 0;
 
     private int largestCommonSubsetCount = 0;
+    private int numberOfInputsComputeChildren = 0;
+
 
     public final Document doc;
     public Activation act;
@@ -142,7 +145,7 @@ public class InterprNode implements Comparable<InterprNode> {
 
     private void computeLargestCommonSubset() {
         int s = orInterprNodes.size();
-        int vMin = doc.visitedCounter++;
+        long vMin = doc.visitedCounter++;
         List<InterprNode> results = new ArrayList<>();
         for (InterprNode on : orInterprNodes.values()) {
             on.computeLargestCommonSubsetRecursiveStep(results, doc.visitedCounter++, vMin, s, 0);
@@ -156,7 +159,7 @@ public class InterprNode implements Comparable<InterprNode> {
             setLCS(no);
             return;
         }
-        int vMin = doc.visitedCounter++;
+        long vMin = doc.visitedCounter++;
         List<InterprNode> results = new ArrayList<>();
         if(largestCommonSubset != null) {
             largestCommonSubset.computeLargestCommonSubsetRecursiveStep(results, doc.visitedCounter++, vMin, 2, 0);
@@ -180,7 +183,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    private void computeLargestCommonSubsetRecursiveStep(List<InterprNode> results, int v, int vMin, int s, int depth) {
+    private void computeLargestCommonSubsetRecursiveStep(List<InterprNode> results, long v, long vMin, int s, int depth) {
         if (visitedComputeLargestCommonSubset == v) return;
         if (visitedComputeLargestCommonSubset <= vMin) largestCommonSubsetCount = 0;
         visitedComputeLargestCommonSubset = v;
@@ -239,7 +242,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    void expandActivationsRecursiveStep(Document doc, InterprNode conflict, int v) {
+    void expandActivationsRecursiveStep(Document doc, InterprNode conflict, long v) {
         if (v == visitedExpandActivations) return;
         visitedExpandActivations = v;
 
@@ -253,7 +256,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    void removeActivationsRecursiveStep(Document doc, InterprNode conflict, int v) {
+    void removeActivationsRecursiveStep(Document doc, InterprNode conflict, long v) {
         if (v == visitedRemoveActivations) return;
         visitedRemoveActivations = v;
 
@@ -327,7 +330,7 @@ public class InterprNode implements Comparable<InterprNode> {
             }
         }
 
-        InterprNode n = new InterprNode(doc, -1, doc.interprIdCounter++);
+        InterprNode n = new InterprNode(doc, -1, doc.interpretationIdCounter++);
 
         n.linkRelations(parents, children, doc.visitedCounter++);
 
@@ -356,7 +359,7 @@ public class InterprNode implements Comparable<InterprNode> {
 
     private static void computeRelations(Document doc, List<InterprNode> parentsResults, List<InterprNode> childrenResults, List<InterprNode> inputs) {
         if (inputs.isEmpty()) return;
-        int v = doc.visitedCounter++;
+        long v = doc.visitedCounter++;
         int i = 0;
         int s = inputs.size();
 
@@ -385,7 +388,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    private void computeParents(List<InterprNode> parentResults, int v, int pass) {
+    private void computeParents(List<InterprNode> parentResults, long v, int pass) {
         if (visitedComputeParents == v || length == 0) return;
         visitedComputeParents = v;
 
@@ -415,11 +418,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    private int visitedComputeChildren = -1;
-    private int numberOfInputsComputeChildren = 0;
-
-
-    private void computeChildren(List<InterprNode> childrenResults, int v, int nv, int s, int pass) {
+    private void computeChildren(List<InterprNode> childrenResults, long v, long nv, int s, int pass) {
         if (visitedComputeChildren == v) return;
 
         if (pass == 0) {
@@ -451,7 +450,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    private int computeLength(int v) {
+    private int computeLength(long v) {
         if (visitedComputeLength == v) return 0;
         visitedComputeLength = v;
 
@@ -465,7 +464,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    private void linkRelations(List<InterprNode> pSet, List<InterprNode> cSet, int v) {
+    private void linkRelations(List<InterprNode> pSet, List<InterprNode> cSet, long v) {
         for (InterprNode p : pSet) {
             addLink(p, this);
         }
@@ -504,7 +503,7 @@ public class InterprNode implements Comparable<InterprNode> {
     public static InterprNode addPrimitive(Document doc) {
         assert doc != null;
 
-        InterprNode n = new InterprNode(doc, doc.bottom.children.length, doc.interprIdCounter++, 1);
+        InterprNode n = new InterprNode(doc, doc.bottom.children.length, doc.interpretationIdCounter++, 1);
 
         n.minPrim = n.primId;
         n.maxPrim = n.primId;
@@ -562,7 +561,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    private boolean contains(InterprNode n, boolean followLCS, int v) {
+    private boolean contains(InterprNode n, boolean followLCS, long v) {
         visitedContains = v;
 
         if(this == n || n.isBottom()) {
@@ -586,7 +585,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    private boolean isLinked(InterprNode n, int v) {
+    private boolean isLinked(InterprNode n, long v) {
         assert visitedContains <= v;
         assert !isRemoved;
         assert !n.isRemoved;
@@ -605,7 +604,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    void collectPrimitiveNodes(Set<InterprNode> results, int v) {
+    void collectPrimitiveNodes(Set<InterprNode> results, long v) {
         if(v == visitedCollect) return;
         visitedCollect = v;
 
@@ -619,7 +618,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public boolean isConflicting(int v) {
+    public boolean isConflicting(long v) {
         if (isConflict >= 0) {
             return true;
         } else if(conflictsAllowed()) {
@@ -641,7 +640,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    void storeFinalWeight(int v) {
+    void storeFinalWeight(long v) {
         if(visitedStoreFinalWeight == v) return;
         visitedStoreFinalWeight = v;
 
