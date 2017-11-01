@@ -42,24 +42,21 @@ import java.util.stream.Stream;
  * @author Lukas Molzberger
  */
 public class Document implements Comparable<Document> {
-    public final int id = docIdCounter.addAndGet(1);
-    public static AtomicInteger docIdCounter = new AtomicInteger(0);
-
-    public int activationIdCounter = 0;
-
     private static final Logger log = LoggerFactory.getLogger(Document.class);
 
     public static boolean APPLY_DEBUG_OUTPUT = false;
     public static boolean OPTIMIZE_DEBUG_OUTPUT = false;
-
     public static int CLEANUP_INTERVAL = 500;
-
     public static int MAX_ROUND = 20;
 
     private String content;
 
+    public final int id = docIdCounter.addAndGet(1);
+    public static AtomicInteger docIdCounter = new AtomicInteger(0);
+
     public long visitedCounter = 1;
     public int interpretationIdCounter = 1;
+    public int activationIdCounter = 0;
     public int searchNodeIdCounter = 0;
 
     public InterprNode bottom = new InterprNode(this, -1, 0, 0);

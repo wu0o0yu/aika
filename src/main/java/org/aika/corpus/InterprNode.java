@@ -85,7 +85,6 @@ public class InterprNode implements Comparable<InterprNode> {
     public boolean markedExcludedRefinement;
 
     private int numberInnerInputs = 0;
-
     private int largestCommonSubsetCount = 0;
     private int numberOfInputsComputeChildren = 0;
 

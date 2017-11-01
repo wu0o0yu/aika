@@ -454,19 +454,7 @@ public class SearchNode implements Comparable<SearchNode> {
         if(n.isBottom()) {
             return false;
         }
-/*
-        for(InterprNode p: n.parents) {
-            if(markSelected(changed, p)) return true;
-        }
 
-        for(InterprNode c: n.children) {
-            if(isCovered(n.markedSelected) || !containedInSelectedBranch(c)) continue;
-
-            if(c.isConflicting(n.doc.visitedCounter++)) return true;
-
-            if(markSelected(changed, c)) return true;
-        }
-*/
         if(changed != null) changed.add(n);
 
         return false;
