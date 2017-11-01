@@ -46,7 +46,6 @@ import java.util.*;
  */
 public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
-    public static int MAX_RID_RANGE = 5;
 
     public SortedMap<Refinement, Provider<? extends Node>> parents = new TreeMap<>();
 
@@ -200,11 +199,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             for(NodeActivation secondAct: pAct.outputs.values()) {
                 if(secondAct.key.n instanceof AndNode) {
                     Node secondNode = secondAct.key.n;
-                    Integer ridDelta = Utils.nullSafeSub(act.key.rid, false, secondAct.key.rid, false);
-                    if (act != secondAct &&
-                            trainConfig.checkExpandable.evaluate(secondNode) &&
-                            (ridDelta == null || ridDelta < MAX_RID_RANGE)
-                            ) {
+                    if (act != secondAct && trainConfig.checkExpandable.evaluate(secondNode)) {
                         Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n.provider, secondAct.key.rid, pAct.key.rid));
                         Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
@@ -218,17 +213,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             }
             pn.lock.releaseReadLock();
         }
-    }
-
-
-    private static boolean checkRidRange(SortedMap<Refinement, Provider<? extends Node>> parents) {
-        int maxRid = 0;
-        for(Refinement ref: parents.keySet()) {
-            if(ref.rid != null) {
-                maxRid = Math.max(maxRid, ref.rid);
-            }
-        }
-        return maxRid < MAX_RID_RANGE;
     }
 
 
@@ -266,7 +250,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         SortedMap<Refinement, Provider<? extends Node>> parents = computeNextLevelParents(m, threadId, n, ref, tc);
 
         AndNode nln = null;
-        if (parents != null && (tc == null || checkRidRange(parents))) {
+        if (parents != null) {
             // Locking needs to take place in a predefined order.
             TreeSet<? extends Provider<? extends Node>> parentsForLocking = new TreeSet(parents.values());
             for(Provider<? extends Node> pn: parentsForLocking) {

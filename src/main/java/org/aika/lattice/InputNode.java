@@ -284,8 +284,9 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                             !in.key.isRecurrent &&
                             !(key.startRangeOutput && in.key.startRangeOutput) &&
                             !(key.endRangeOutput && in.key.endRangeOutput) &&
-                            ((srm.compare(act.key.r.begin, secondAct.key.r.begin) && erm.compare(act.key.r.end, secondAct.key.r.end)) ||
-                                    (ridDelta != null && ridDelta < AndNode.MAX_RID_RANGE))) {
+                            srm.compare(act.key.r.begin, secondAct.key.r.begin) &&
+                            erm.compare(act.key.r.end, secondAct.key.r.end)
+                        ) {
                         in.visitedTrain = v;
                         AndNode nln = AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, trainConfig);
 
