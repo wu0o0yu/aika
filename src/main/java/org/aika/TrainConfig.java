@@ -22,6 +22,7 @@ import org.aika.neuron.Activation;
 import org.aika.neuron.Synapse;
 
 /**
+ *  The configuration for the training step.
  *
  * @author Lukas Molzberger
  */
@@ -32,7 +33,7 @@ public class TrainConfig {
     public Counter counter;
     public double learnRate;
     public boolean discoverPatterns;
-    public boolean performBackPropagation;
+    public boolean performBackpropagation;
 
 
     public TrainConfig setCheckValidPattern(PatternEvaluation checkValidPattern) {
@@ -41,18 +42,39 @@ public class TrainConfig {
     }
 
 
+    /**
+     * This callback checks whether the current pattern might be refined to an even larger pattern.
+     * If frequency is the criterion, then infrequent are not expandable.
+     *
+     * @param checkExpandable
+     * @return
+     */
     public TrainConfig setCheckExpandable(PatternEvaluation checkExpandable) {
         this.checkExpandable = checkExpandable;
         return this;
     }
 
 
+    /**
+     * Determines whether a synapse should be created between two neurons during training.
+     *
+     * @param synapseEvaluation
+     * @return
+     */
     public TrainConfig setSynapseEvaluation(SynapseEvaluation synapseEvaluation) {
         this.synapseEvaluation = synapseEvaluation;
         return this;
     }
 
 
+    /**
+     * The counter callback function should implement a customized counting function.
+     * The counting function should modify the custom statistic object stored in the node.
+     * The NodeStatisticFactory is used to instantiate the custom statistic object for a node.
+     *
+     * @param counter
+     * @return
+     */
     public TrainConfig setCounter(Counter counter) {
         this.counter = counter;
         return this;
@@ -65,14 +87,20 @@ public class TrainConfig {
     }
 
 
+    /**
+     * If set to true calling the train method will search for frequent patterns.
+     *
+     * @param discoverPatterns
+     * @return
+     */
     public TrainConfig setDiscoverPatterns(boolean discoverPatterns) {
         this.discoverPatterns = discoverPatterns;
         return this;
     }
 
 
-    public TrainConfig setPerformBackPropagation(boolean performBackPropagation) {
-        this.performBackPropagation = performBackPropagation;
+    public TrainConfig setPerformBackpropagation(boolean performBackpropagation) {
+        this.performBackpropagation = performBackpropagation;
         return this;
     }
 

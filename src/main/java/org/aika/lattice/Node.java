@@ -66,6 +66,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public Writable statistic;
 
+    // Prevents this node from being removed during cleanup.
     public boolean isDiscovered;
 
     public boolean endRequired;
