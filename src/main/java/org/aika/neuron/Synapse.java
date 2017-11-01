@@ -147,8 +147,6 @@ public class Synapse implements Writable {
 
         (dir ? in : out).lock.releaseWriteLock();
         (dir ? out : in).lock.releaseWriteLock();
-
-        out.provider.m.stat.synapses++;
     }
 
 

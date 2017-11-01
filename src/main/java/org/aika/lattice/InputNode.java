@@ -66,10 +66,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         super(m, 1);
         this.key = Synapse.lookupKey(key);
 
-        if (m != null) {
-            m.stat.nodes++;
-        }
-
         endRequired = false;
         ridRequired = false;
         if (key != null) {

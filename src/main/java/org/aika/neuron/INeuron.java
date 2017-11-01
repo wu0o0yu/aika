@@ -798,7 +798,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public static Neuron init(Model m, int threadId, Neuron pn, double bias, Set<Synapse> inputs) {
         INeuron n = pn.get();
-        n.provider.m.stat.neurons++;
         n.bias = bias;
 
         ArrayList<Synapse> modifiedSynapses = new ArrayList<>();

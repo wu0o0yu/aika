@@ -46,17 +46,9 @@ import java.util.*;
  */
 public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
-    private static double SIGNIFICANCE_THRESHOLD = 0.98;
     public static int MAX_RID_RANGE = 5;
 
     public SortedMap<Refinement, Provider<? extends Node>> parents = new TreeMap<>();
-
-
-    public volatile int numberOfPositionsNotify;
-    private volatile int frequencyNotify;
-
-    private double weight = -1;
-
 
     public AndNode() {}
 
@@ -68,8 +60,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     private void init() {
-        provider.m.stat.nodes++;
-
         ridRequired = false;
 
         for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
@@ -458,11 +448,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         out.writeUTF("A");
         super.write(out);
 
-        out.writeInt(numberOfPositionsNotify);
-        out.writeInt(frequencyNotify);
-
-        out.writeDouble(weight);
-
         out.writeInt(parents.size());
         for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
             me.getKey().write(out);
@@ -474,11 +459,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
-
-        numberOfPositionsNotify = in.readInt();
-        frequencyNotify = in.readInt();
-
-        weight = in.readDouble();
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {

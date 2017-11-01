@@ -52,14 +52,11 @@ public class Model {
 
     public NodeStatisticFactory nodeStatisticFactory;
 
-
     public AtomicInteger currentId = new AtomicInteger(0);
 
     // Important: the id field needs to be referenced by the provider!
     public WeakHashMap<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
     public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
-
-    public Statistic stat = new Statistic();
 
     public int defaultThreadId = 0;
 
@@ -285,11 +282,4 @@ public class Model {
         providers.remove(p.id);
     }
 
-
-    public static class Statistic {
-        public volatile int synapses;
-        public volatile int neurons;
-        public volatile int nodes;
-        public volatile int orNodes;
-    }
 }

@@ -58,9 +58,6 @@ public class OrNode extends Node<OrNode, Activation> {
     public OrNode(Model m) {
         super(m, -1); // Or-node activations always need to be processed first!
 
-        m.stat.nodes++;
-        m.stat.orNodes++;
-
         endRequired = true;
         ridRequired = true;
     }
