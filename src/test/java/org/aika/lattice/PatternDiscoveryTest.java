@@ -92,6 +92,7 @@ public class PatternDiscoveryTest {
         InputNode pDNode = TestHelper.addOutputNode(doc, inD, 0, null, false);
 
         TrainConfig trainConfig = new TrainConfig()
+                .setDiscoverPatterns(true)
                 .setCounter((d, n) -> count(d, n))
                 .setCheckExpandable(n -> ((NodeStatistic) n.statistic).frequency >= minFrequency)
                 .setCheckValidPattern(n -> true);

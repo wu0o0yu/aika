@@ -182,20 +182,24 @@ public class Document implements Comparable<Document> {
 
 
     public void train(TrainConfig trainConfig) {
-        for(Node n: activatedNodes) {
-            trainConfig.counter.count(this, n);
+        if(trainConfig.discoverPatterns) {
+            for (Node n : activatedNodes) {
+                trainConfig.counter.count(this, n);
 
-            if(trainConfig.checkExpandable.evaluate(n)) {
-                ThreadState<?, NodeActivation<?>> th = n.getThreadState(threadId, false);
-                if(th != null) {
-                    for (NodeActivation act : th.activations.values()) {
-                        n.discover(this, act, trainConfig);
+                if (trainConfig.checkExpandable.evaluate(n)) {
+                    ThreadState<?, NodeActivation<?>> th = n.getThreadState(threadId, false);
+                    if (th != null) {
+                        for (NodeActivation act : th.activations.values()) {
+                            n.discover(this, act, trainConfig);
+                        }
                     }
                 }
             }
         }
 
-        bQueue.backpropagtion();
+        if(trainConfig.performBackPropagation) {
+            bQueue.backpropagtion();
+        }
 
         for (INeuron n : finallyActivatedNeurons) {
             ThreadState<OrNode, Activation> th = n.node.get().getThreadState(threadId, false);
@@ -210,8 +214,6 @@ public class Document implements Comparable<Document> {
     /**
      * Removes the activations of this document from the model again.
      */
-
-    // TODO: don't use providersInMemory
     public void clearActivations() {
         for(Node n: activatedNodes) {
             n.clearActivations(this);

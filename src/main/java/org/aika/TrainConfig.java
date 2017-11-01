@@ -31,6 +31,7 @@ public class TrainConfig {
     public SynapseEvaluation synapseEvaluation;
     public Counter counter;
     public double learnRate;
+    public boolean discoverPatterns;
     public boolean performBackPropagation;
 
 
@@ -60,6 +61,12 @@ public class TrainConfig {
 
     public TrainConfig setLearnRate(double learnRate) {
         this.learnRate = learnRate;
+        return this;
+    }
+
+
+    public TrainConfig setDiscoverPatterns(boolean discoverPatterns) {
+        this.discoverPatterns = discoverPatterns;
         return this;
     }
 
