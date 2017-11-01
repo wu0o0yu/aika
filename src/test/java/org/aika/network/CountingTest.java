@@ -43,10 +43,14 @@ public class CountingTest {
         int frequency = 0;
 
         @Override
-        public void write(DataOutput out) throws IOException {}
+        public void write(DataOutput out) throws IOException {
+            out.writeInt(frequency);
+        }
 
         @Override
-        public void readFields(DataInput in, Model m) throws IOException {}
+        public void readFields(DataInput in, Model m) throws IOException {
+            frequency = in.readInt();
+        }
     }
 
 
