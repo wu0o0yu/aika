@@ -154,18 +154,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-
-    public void publish() {
-    }
-
-
-    public void unpublish() {
-    }
-
-
     public void remove() {
-        unpublish();
-
         for (Synapse s : inputSynapses.values()) {
             INeuron in = s.input.get();
             in.provider.lock.acquireWriteLock();
@@ -812,8 +801,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         if (!Converter.convert(m, threadId, n, modifiedSynapses)) return null;
-
-        n.publish();
 
         return n.provider;
     }
