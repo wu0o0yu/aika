@@ -28,6 +28,7 @@ import org.aika.neuron.Synapse;
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
@@ -59,6 +60,9 @@ public class Model {
     public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
 
     public int defaultThreadId = 0;
+
+
+    public static AtomicLong visitedCounter = new AtomicLong(1);
 
 
     /**

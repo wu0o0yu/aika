@@ -313,10 +313,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
     @Override
     public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
-        ThreadState th = getThreadState(threadId, true);
-        if(th.visitedNeuronRefsChange == v) return;
-        th.visitedNeuronRefsChange = v;
-        numberOfNeuronRefs += d;
+        super.changeNumberOfNeuronRefs(threadId, v, d);
 
         for(Provider<? extends Node> n: parents.values()) {
             n.get().changeNumberOfNeuronRefs(threadId, v, d);
@@ -335,7 +332,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     public static SortedMap<Refinement, Provider<? extends Node>> computeNextLevelParents(Model m, int threadId, Node pa, Refinement ref, TrainConfig trainConfig) {
         Collection<Refinement> refinements = pa.collectNodeAndRefinements(ref);
 
-        long v = visitedCounter++;
+        long v = m.visitedCounter.addAndGet(1);
         SortedMap<Refinement, Provider<? extends Node>> parents = new TreeMap<>();
 
         for(Refinement pRef: refinements) {

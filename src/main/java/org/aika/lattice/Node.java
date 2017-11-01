@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -73,7 +74,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public boolean ridRequired;
 
 
-    public volatile int numberOfNeuronRefs = 0;
+    public AtomicInteger numberOfNeuronRefs = new AtomicInteger(0);
     volatile boolean isRemoved;
     volatile int isRemovedId;
     volatile static int isRemovedIdCounter = 0;
@@ -84,8 +85,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public boolean isQueued = false;
     public long queueId;
-
-    public static long visitedCounter = 1;
 
     public ThreadState<T, A>[] threads;
 
@@ -104,7 +103,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         public NavigableMap<Key, RemovedEntry> removed;
         long visitedNeuronRefsChange;
         public long visitedAllowedOption;
-        public long visitedComputeWeight;
 
         private RidVisited nullRidVisited;
         private RidVisited[] ridVisited = new RidVisited[2 * MAX_RID];
@@ -203,9 +201,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     abstract boolean hasSupport(A act);
 
     abstract boolean contains(Refinement ref);
-
-    public abstract void changeNumberOfNeuronRefs(int threadId, long v, int d);
-
 
 
     protected Node() {
@@ -624,7 +619,15 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public boolean isRequired() {
-        return numberOfNeuronRefs > 0 || isDiscovered;
+        return numberOfNeuronRefs.get() > 0 || isDiscovered;
+    }
+
+
+    public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
+        ThreadState th = getThreadState(threadId, true);
+        if (th.visitedNeuronRefsChange == v) return;
+        th.visitedNeuronRefsChange = v;
+        numberOfNeuronRefs.addAndGet(d);
     }
 
 
@@ -674,7 +677,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         out.writeBoolean(endRequired);
         out.writeBoolean(ridRequired);
 
-        out.writeInt(numberOfNeuronRefs);
+        out.writeInt(numberOfNeuronRefs.get());
 
         if (andChildren != null) {
             out.writeInt(andChildren.size());
@@ -711,7 +714,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         endRequired = in.readBoolean();
         ridRequired = in.readBoolean();
 
-        numberOfNeuronRefs = in.readInt();
+        numberOfNeuronRefs.set(in.readInt());
 
         int s = in.readInt();
         for (int i = 0; i < s; i++) {

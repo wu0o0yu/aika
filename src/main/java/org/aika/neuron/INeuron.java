@@ -572,7 +572,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private static void addConflict(Document doc, InterprNode io, InterprNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
         if (o.markedConflict == v || o.orInterprNodes == null) {
-            if (!isAllowed(doc.threadId, io, o, inputActs)) {
+            if (!isAllowed(doc, io, o, inputActs)) {
                 Conflicts.add(doc, act, io, o);
             }
         } else {
@@ -583,10 +583,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private static boolean isAllowed(int threadId, InterprNode io, InterprNode o, Collection<NodeActivation> inputActs) {
+    private static boolean isAllowed(Document doc, InterprNode io, InterprNode o, Collection<NodeActivation> inputActs) {
         if (io != null && o.contains(io, false)) return true;
         for (NodeActivation act : inputActs) {
-            if (act.key.n.isAllowedOption(threadId, o, act, Node.visitedCounter++)) return true;
+            if (act.key.n.isAllowedOption(doc.threadId, o, act, doc.visitedCounter++)) return true;
         }
         return false;
     }
@@ -594,7 +594,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private static void removeConflict(Document doc, InterprNode io, InterprNode o, NodeActivation act, NodeActivation nAct, long v) {
         if (o.markedConflict == v || o.orInterprNodes == null) {
-            if (!nAct.key.n.isAllowedOption(doc.threadId, o, nAct, Node.visitedCounter++)) {
+            if (!nAct.key.n.isAllowedOption(doc.threadId, o, nAct, doc.visitedCounter++)) {
                 assert io != null;
 
                 Conflicts.remove(doc, act, io, o);

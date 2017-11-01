@@ -267,7 +267,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     @Override
     public void discover(Document doc, NodeActivation<InputNode> act, TrainConfig trainConfig) {
-        long v = Node.visitedCounter++;
+        long v = provider.m.visitedCounter.addAndGet(1);
 
         for (INeuron n : doc.finallyActivatedNeurons) {
             for (Activation secondNAct : n.getFinalActivations(doc)) {
@@ -358,15 +358,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     void remove() {
         inputNeuron.get().outputNodes.remove(key);
         super.remove();
-    }
-
-
-    @Override
-    public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
-        ThreadState th = getThreadState(threadId, true);
-        if (th.visitedNeuronRefsChange == v) return;
-        th.visitedNeuronRefsChange = v;
-        numberOfNeuronRefs += d;
     }
 
 
