@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -170,22 +169,23 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public void train(TrainConfig trainConfig) {
-        if(trainConfig.discoverPatterns) {
-            for (Node n : activatedNodes) {
-                trainConfig.counter.count(this, n);
+    public void discoverPatterns(TrainConfig trainConfig) {
+        for (Node n : activatedNodes) {
+            trainConfig.counter.count(this, n);
 
-                if (trainConfig.checkExpandable.evaluate(n)) {
-                    ThreadState<?, NodeActivation<?>> th = n.getThreadState(threadId, false);
-                    if (th != null) {
-                        for (NodeActivation act : th.activations.values()) {
-                            n.discover(this, act, trainConfig);
-                        }
+            if (trainConfig.checkExpandable.evaluate(n)) {
+                ThreadState<?, NodeActivation<?>> th = n.getThreadState(threadId, false);
+                if (th != null) {
+                    for (NodeActivation act : th.activations.values()) {
+                        n.discover(this, act, trainConfig);
                     }
                 }
             }
         }
+    }
 
+
+    public void train(TrainConfig trainConfig) {
         if(trainConfig.performBackpropagation) {
             bQueue.backpropagtion();
         }

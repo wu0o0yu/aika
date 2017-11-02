@@ -84,9 +84,8 @@ public class CountingTest {
         inA.addInput(doc, 7, 8);
 
         doc.process();
-        doc.train(
+        doc.discoverPatterns(
                 new TrainConfig()
-                        .setDiscoverPatterns(true)
                         .setCheckExpandable(n -> false)
                         .setCounter((d, n) -> count(d, n))
         );

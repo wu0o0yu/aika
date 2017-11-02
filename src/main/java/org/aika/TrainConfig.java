@@ -32,7 +32,6 @@ public class TrainConfig {
     public SynapseEvaluation synapseEvaluation;
     public Counter counter;
     public double learnRate;
-    public boolean discoverPatterns;
     public boolean performBackpropagation;
 
 
@@ -83,18 +82,6 @@ public class TrainConfig {
 
     public TrainConfig setLearnRate(double learnRate) {
         this.learnRate = learnRate;
-        return this;
-    }
-
-
-    /**
-     * If set to true calling the train method will search for frequent patterns.
-     *
-     * @param discoverPatterns
-     * @return
-     */
-    public TrainConfig setDiscoverPatterns(boolean discoverPatterns) {
-        this.discoverPatterns = discoverPatterns;
         return this;
     }
 
