@@ -25,7 +25,6 @@ import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.lattice.OrNode.OrEntry;
 import org.aika.neuron.INeuron;
-import org.aika.neuron.Synapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Lukas Molzberger
  */
 public abstract class Node<T extends Node, A extends NodeActivation<T>> extends AbstractNode<Provider<T>> implements Comparable<Node> {
-    public static int MAX_RID = 25;
+    public static int MAX_RELATIVE_RID = 25;
 
     public static final Node MIN_NODE = new InputNode();
     public static final Node MAX_NODE = new InputNode();
@@ -76,10 +75,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public AtomicInteger numberOfNeuronRefs = new AtomicInteger(0);
     volatile boolean isRemoved;
-    volatile int isRemovedId;
-    volatile static int isRemovedIdCounter = 0;
 
-    // Only childrens are locked.
+    // Only the children maps are locked.
     public ReadWriteLock lock = new ReadWriteLock();
 
 
@@ -105,7 +102,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         public long visited;
 
         private RidVisited nullRidVisited;
-        private RidVisited[] ridVisited = new RidVisited[2 * MAX_RID];
+        private RidVisited[] ridVisited = new RidVisited[2 * MAX_RELATIVE_RID];
 
         public ThreadState(boolean endRequired, boolean ridRequired) {
             activations = new TreeMap<>(BEGIN_COMP);
@@ -117,7 +114,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         public RidVisited lookupVisited(Integer offset) throws RidOutOfRange {
-            if (offset != null && (offset >= MAX_RID || offset <= -MAX_RID)) {
+            if (offset != null && (offset >= MAX_RELATIVE_RID || offset <= -MAX_RELATIVE_RID)) {
                 log.warn("RID too large:" + offset);
                 throw new RidOutOfRange("RID too large:" + offset);
             }
@@ -128,10 +125,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
                 }
                 return nullRidVisited;
             } else {
-                RidVisited v = ridVisited[offset + MAX_RID];
+                RidVisited v = ridVisited[offset + MAX_RELATIVE_RID];
                 if (v == null) {
                     v = new RidVisited();
-                    ridVisited[offset + MAX_RID] = v;
+                    ridVisited[offset + MAX_RELATIVE_RID] = v;
                 }
                 return v;
             }
@@ -442,7 +439,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         for (RemovedEntry<T, A> re : tmpRemoved.values()) {
             if (!hasSupport(re.act)) {
-                re.act.removedId = NodeActivation.removedIdCounter++;
                 re.act.isRemoved = true;
             }
         }
@@ -601,7 +597,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         clearActivations();
 
         isRemoved = true;
-        isRemovedId = isRemovedIdCounter++;
     }
 
 

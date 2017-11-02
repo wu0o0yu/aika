@@ -40,10 +40,7 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     public Document doc;
 
     public boolean isRemoved;
-    public int removedId;
     public long visitedNeuronTrain = -1;
-
-    public static int removedIdCounter = 1;
 
     public TreeMap<Key, NodeActivation> inputs = new TreeMap<>();
     public TreeMap<Key, NodeActivation> outputs = new TreeMap<>();
