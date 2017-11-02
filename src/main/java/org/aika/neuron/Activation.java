@@ -35,7 +35,6 @@ public final class Activation extends NodeActivation<OrNode> {
     public double lowerBound;
 
     public Rounds rounds = new Rounds();
-
     public State finalState;
 
     public boolean ubQueued = false;
@@ -44,7 +43,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
     public boolean isInput;
 
-    public long currentStateV = -1;
+    public long currentStateV;
     public StateChange currentStateChange;
 
     public double initialErrorSignal;

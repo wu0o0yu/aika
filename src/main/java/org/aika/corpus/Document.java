@@ -49,10 +49,8 @@ public class Document implements Comparable<Document> {
     public static int CLEANUP_INTERVAL = 500;
     public static int MAX_ROUND = 20;
 
-    private String content;
-
-    public final int id = docIdCounter.addAndGet(1);
-    public static AtomicInteger docIdCounter = new AtomicInteger(0);
+    public final int id;
+    private final String content;
 
     public long visitedCounter = 1;
     public int interpretationIdCounter = 1;
@@ -72,7 +70,6 @@ public class Document implements Comparable<Document> {
     public ValueQueue vQueue = new ValueQueue();
     public UpperBoundQueue ubQueue = new UpperBoundQueue();
     public BackPropagationQueue bQueue = new BackPropagationQueue();
-
 
     public TreeSet<Node> activatedNodes = new TreeSet<>();
     public TreeSet<INeuron> activatedNeurons = new TreeSet<>();
@@ -103,7 +100,8 @@ public class Document implements Comparable<Document> {
     };
 
 
-    public Document(String content, Model m, int threadId) {
+    public Document(int id, String content, Model m, int threadId) {
+        this.id = id;
         this.content = content;
 
         this.m = m;

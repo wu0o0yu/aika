@@ -318,7 +318,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    void remove() {
+    public void remove() {
         inputNeuron.get().outputNodes.remove(key);
         super.remove();
     }

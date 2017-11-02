@@ -53,6 +53,7 @@ public class Model {
 
     public NodeStatisticFactory nodeStatisticFactory;
 
+    public AtomicInteger docIdCounter = new AtomicInteger(0);
     public AtomicInteger currentId = new AtomicInteger(0);
 
     // Important: the id field needs to be referenced by the provider!
@@ -124,7 +125,7 @@ public class Model {
 
 
     public Document createDocument(String txt, int threadId) {
-        Document doc = new Document(txt, this, threadId);
+        Document doc = new Document(docIdCounter.addAndGet(1), txt, this, threadId);
 
         if (txt != null) {
             if (docs[threadId] != null) {

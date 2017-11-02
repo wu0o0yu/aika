@@ -348,7 +348,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    void remove() {
+    public void remove() {
         super.remove();
 
         for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {

@@ -33,11 +33,11 @@ import static org.aika.corpus.Range.Operator.*;
 
 public class NodeActivation<T extends Node> implements Comparable<NodeActivation> {
 
-    public int id;
+    public final int id;
 
     public final Key<T> key;
 
-    public Document doc;
+    public final Document doc;
 
     public long visitedNeuronTrain = -1;
 

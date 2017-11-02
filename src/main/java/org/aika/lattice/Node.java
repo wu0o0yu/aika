@@ -160,10 +160,12 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             th = new ThreadState(endRequired, ridRequired);
             threads[threadId] = th;
         }
-        th.lastUsed = Document.docIdCounter.get();
+        th.lastUsed = provider.m.docIdCounter.get();
         return th;
     }
 
+
+    abstract A createActivation(Document doc, Key ak);
 
     /**
      * Propagate an activation to the next node or the next neuron that is depending on the current node.
@@ -176,13 +178,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public abstract boolean isAllowedOption(int threadId, InterprNode n, NodeActivation<?> act, long v);
 
-    public abstract void cleanup();
-
-    abstract A createActivation(Document doc, Key ak);
-
     public abstract double computeSynapseWeightSum(Integer offset, INeuron n);
-
-    public abstract String logicToString();
 
     abstract void apply(Document doc, A act, InterprNode conflict);
 
@@ -191,6 +187,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     abstract Collection<Refinement> collectNodeAndRefinements(Refinement newRef);
 
     abstract boolean contains(Refinement ref);
+
+    public abstract void cleanup();
+
+    public abstract String logicToString();
 
 
     protected Node() {
@@ -481,7 +481,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void remove() {
+    public void remove() {
         assert !isRemoved;
 
         lock.acquireWriteLock();
