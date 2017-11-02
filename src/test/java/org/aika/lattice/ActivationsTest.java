@@ -71,24 +71,6 @@ public class ActivationsTest {
         Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(0, 1), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(0, 1), doc.bottom));
         Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(1, 2), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
         Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(2, 3), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
-
-        Neuron inB = m.createNeuron("B");
-
-        m.initNeuron(m.createNeuron("pB"), 0.001,
-                new Input()
-                        .setNeuron(inB)
-                        .setWeight(1.0f)
-                        .setRecurrent(false)
-                        .setBiasDelta(1.0)
-        );
-        InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, 0, Operator.LESS_THAN_EQUAL, Mapping.START, true, Operator.GREATER_THAN_EQUAL, Mapping.END, true);
-
-        inB.addInput(doc, 0, 1);
-        inB.addInput(doc, 1, 2);
-
-        inB.removeInput(doc, 1, 2);
-
-        Assert.assertNull(TestHelper.get(doc, pBNode, new Range(1, 2), null));
     }
 
 

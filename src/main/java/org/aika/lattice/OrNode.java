@@ -81,15 +81,6 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    @Override
-    public void deleteActivation(Document doc, Activation act) {
-        ThreadState th = getThreadState(doc.threadId, false);
-        if(th == null || th.activations.isEmpty()) {
-            doc.activatedNeurons.remove(neuron.get());
-        }
-    }
-
-
     private void retrieveInputs(Document doc, Range inputR, Integer rid, List<NodeActivation<?>> inputs, Integer pRidOffset, TreeSet<Provider<Node>> parents) {
         // Optimization the number of parents can get very large, thus we need to avoid iterating over all of them.
         if(parents.size() > 10) {
@@ -107,7 +98,7 @@ public class OrNode extends Node<OrNode, Activation> {
                 NodeActivation.select(doc, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null) :
                 NodeActivation.select(doc, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null);
         for(NodeActivation iAct: s.collect(Collectors.toList())) {
-            if(!iAct.isRemoved && parents.contains(iAct.key.n.provider) && !checkSelfReferencing(doc, iAct)) {
+            if(parents.contains(iAct.key.n.provider) && !checkSelfReferencing(doc, iAct)) {
                 inputs.add(iAct);
             }
         }
@@ -120,15 +111,6 @@ public class OrNode extends Node<OrNode, Activation> {
             neuron.get().linkNeuronRelations(doc, act);
         }
         return act;
-    }
-
-
-    void processRemovedActivation(Document doc, Activation act, Collection<NodeActivation> inputActs) {
-        super.processRemovedActivation(doc, act, inputActs);
-
-        if(act.isRemoved) {
-            neuron.get().unlinkNeuronRelations(doc, act);
-        }
     }
 
 
@@ -174,17 +156,6 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    public void removeActivation(Document doc, Integer ridOffset, NodeActivation<?> inputAct) {
-        if(checkSelfReferencing(doc, inputAct)) return;
-
-        for(NodeActivation oAct: inputAct.outputs.values()) {
-            if(oAct.key.n == this && !oAct.isRemoved && oAct.inputs.size() <= 1) {
-                removeActivationAndPropagate(doc, oAct, oAct.inputs.values());
-            }
-        }
-    }
-
-
     private boolean checkSelfReferencing(Document doc, NodeActivation inputAct) {
         InterprNode o = lookupOrOption(doc, inputAct.key.r, false);
         if(o == null) return false;
@@ -199,11 +170,6 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    public void propagateRemovedActivation(Document doc, NodeActivation act) {
-        neuron.get().propagateRemovedActivation(doc, act);
-    }
-
-
     @Override
     public double computeSynapseWeightSum(Integer offset, INeuron n) {
         throw new UnsupportedOperationException();
@@ -213,16 +179,6 @@ public class OrNode extends Node<OrNode, Activation> {
     @Override
     public void cleanup() {
 
-    }
-
-
-    @Override
-    boolean hasSupport(Activation act) {
-        for(NodeActivation iAct: act.inputs.values()) {
-            if(!iAct.isRemoved) return true;
-        }
-
-        return false;
     }
 
 
@@ -372,15 +328,6 @@ public class OrNode extends Node<OrNode, Activation> {
         ak.o.neuronActivations.add(act);
 
         neuron.get().lastUsedDocumentId = doc.id;
-    }
-
-
-    public void unregister(Activation act, Document doc) {
-        Key ak = act.key;
-
-        super.unregister(act, doc);
-
-        ak.o.neuronActivations.remove(act);
     }
 
 

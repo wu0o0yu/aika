@@ -144,16 +144,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public void removeInput(Document doc, int begin, int end, Integer rid, InterprNode o) {
-        Range r = new Range(begin, end);
-        NodeActivation act = NodeActivation.get(doc, node.get(), rid, r, EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
-        Node.removeActivationAndPropagate(doc, act, Collections.emptySet());
-
-        doc.propagate();
-        doc.inputNeuronActivations.remove(act);
-    }
-
-
     public void remove() {
         for (Synapse s : inputSynapses.values()) {
             INeuron in = s.input.get();
@@ -178,12 +168,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public void propagateRemovedActivation(Document doc, NodeActivation act) {
-        for (Provider<InputNode> out : outputNodes.values()) {
-            out.get().removeActivation(doc, act);
-        }
-    }
-
 
     public void computeBounds(Activation act) {
         double ub = bias + posRecSum - (negDirSum + negRecSum);
@@ -193,7 +177,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             Synapse s = sa.s;
             Activation iAct = sa.input;
 
-            if (iAct == act || iAct.isRemoved) continue;
+            if (iAct == act) continue;
 
             if (s.isNegative()) {
                 if (!checkSelfReferencing(act.key.o, iAct.key.o, null, 0) && act.key.o.contains(iAct.key.o, true)) {
@@ -225,7 +209,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             Synapse s = is.sa.s;
             Activation iAct = is.sa.input;
 
-            if (iAct == act || iAct.isRemoved) continue;
+            if (iAct == act) continue;
 
             int t = s.key.isRecurrent ? REC : DIR;
             sum[t] += is.s.value * s.w;
@@ -543,32 +527,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public static void unlinkNeuronRelations(Document doc, Activation act) {
-        long v = doc.visitedCounter++;
-        for (int dir = 0; dir < 2; dir++) {
-            for (SynapseActivation sa : (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
-                Synapse s = sa.s;
-                Activation rAct = dir == 0 ? sa.input : sa.output;
-
-                if (s.isNegative() && s.key.isRecurrent) {
-                    Activation oAct = (dir == 0 ? act : rAct);
-                    Activation iAct = (dir == 0 ? rAct : act);
-
-                    markConflicts(iAct, oAct, v);
-
-                    removeConflict(doc, oAct.key.o, iAct.key.o, iAct, act, v);
-                }
-            }
-        }
-
-        for (int dir = 0; dir < 2; dir++) {
-            for (SynapseActivation sa : (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
-                Activation rAct = dir == 0 ? sa.input : sa.output;
-                rAct.removeSynapseActivation(dir, sa);
-            }
-        }
-    }
-
 
     private static void addConflict(Document doc, InterprNode io, InterprNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
         if (o.markedConflict == v || o.orInterprNodes == null) {
@@ -589,21 +547,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             if (act.key.n.isAllowedOption(doc.threadId, o, act, doc.visitedCounter++)) return true;
         }
         return false;
-    }
-
-
-    private static void removeConflict(Document doc, InterprNode io, InterprNode o, NodeActivation act, NodeActivation nAct, long v) {
-        if (o.markedConflict == v || o.orInterprNodes == null) {
-            if (!nAct.key.n.isAllowedOption(doc.threadId, o, nAct, doc.visitedCounter++)) {
-                assert io != null;
-
-                Conflicts.remove(doc, act, io, o);
-            }
-        } else {
-            for (InterprNode no : o.orInterprNodes.values()) {
-                removeConflict(doc, io, no, act, nAct, v);
-            }
-        }
     }
 
 

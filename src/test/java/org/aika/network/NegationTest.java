@@ -156,16 +156,6 @@ public class NegationTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
 //        Assert.assertNull(Activation.get(t, outN.node, 0, new Range(0, 11), Range.Relation.EQUALS, null, null, null));
-
-        inB.removeInput(doc, 2, 7, ob);
-
-        System.out.println(doc.neuronActivationsToString(true, false, true));
-
-        inC.removeInput(doc, 4, 9, oc);
-
-        System.out.println(doc.neuronActivationsToString(true, false, true));
-
-        Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
     }
 
 
@@ -222,16 +212,6 @@ public class NegationTest {
 
         Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
         Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
-
-        inS.removeInput(doc, 3, 8, o);
-
-        System.out.println(doc.neuronActivationsToString(true, false, true));
-
-        Assert.assertTrue(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
-
-        inA.removeInput(doc, 0, 11);
-
-        System.out.println(doc.neuronActivationsToString(true, false, true));
 
         doc.clearActivations();
     }
@@ -291,12 +271,6 @@ public class NegationTest {
         Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
         Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
 
-        inA.removeInput(doc, 0, 11);
-
-        System.out.println(doc.neuronActivationsToString(true, false, true));
-
-        inS.removeInput(doc, 3, 8, o);
-
         doc.clearActivations();
     }
 
@@ -354,16 +328,6 @@ public class NegationTest {
 
         Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
         Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
-
-        inS.removeInput(doc, 3, 8, o);
-
-        System.out.println(doc.neuronActivationsToString(true, false, true));
-
-        Assert.assertTrue(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
-
-        inA.removeInput(doc, 0, 11);
-
-        System.out.println(doc.neuronActivationsToString(true, false, true));
 
         doc.clearActivations();
     }

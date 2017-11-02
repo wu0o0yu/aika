@@ -33,7 +33,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.aika.corpus.Range.Operator.*;
@@ -57,7 +56,8 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     public ReadWriteLock synapseLock = new ReadWriteLock();
 
 
-    private long visitedTrain = -1;
+    private long visitedDiscover;
+
 
     public InputNode() {
     }
@@ -97,11 +97,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    @Override
-    public void deleteActivation(Document doc, NodeActivation act) {
-    }
-
-
     private NodeActivation.Key computeActivationKey(NodeActivation iAct) {
         NodeActivation.Key ak = iAct.key;
         if ((key.absoluteRid != null && key.absoluteRid != ak.rid) || ak.o.isConflicting(ak.o.doc.visitedCounter++))
@@ -116,17 +111,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    @Override
-    boolean hasSupport(NodeActivation<InputNode> act) {
-        for (NodeActivation iAct : act.inputs.values()) {
-            Activation iNAct = (Activation) iAct;
-            if (!iAct.isRemoved && iNAct.upperBound > 0.0) return true;
-        }
-
-        return false;
-    }
-
-
     public void addActivation(Document doc, NodeActivation inputAct) {
         NodeActivation.Key ak = computeActivationKey(inputAct);
 
@@ -136,25 +120,9 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    public void removeActivation(Document doc, NodeActivation<?> inputAct) {
-        for (NodeActivation act : inputAct.outputs.values()) {
-            if (act.key.n == this) {
-                removeActivationAndPropagate(doc, act, Collections.singleton(inputAct));
-            }
-        }
-    }
-
-
     public void propagateAddedActivation(Document doc, NodeActivation act, InterprNode removedConflict) {
         if (!key.isRecurrent) {
             apply(doc, act, removedConflict);
-        }
-    }
-
-
-    public void propagateRemovedActivation(Document doc, NodeActivation act) {
-        if (!key.isRecurrent) {
-            removeFromNextLevel(doc, act);
         }
     }
 
@@ -180,10 +148,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
      */
     @Override
     void apply(Document doc, NodeActivation act, InterprNode removedConflict) {
-        // Check if the activation has been deleted in the meantime.
-        if (act.isRemoved) {
-            return;
-        }
 
         lock.acquireReadLock();
         if (andChildren != null) {
@@ -223,25 +187,24 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         );
 
         s.forEach(secondAct -> {
-            if (!secondAct.isRemoved) {
-                InterprNode o = InterprNode.add(doc, true, ak.o, secondAct.key.o);
-                if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
-                    AndNode nlp = pnlp.get();
-                    nlp.addActivation(doc,
-                            new NodeActivation.Key(
-                                    nlp,
-                                    Range.mergeRange(
-                                            Range.getOutputRange(ak.r, new boolean[]{firstNode.key.startRangeOutput, firstNode.key.endRangeOutput}),
-                                            Range.getOutputRange(secondAct.key.r, new boolean[]{secondNode.key.startRangeOutput, secondNode.key.endRangeOutput})
-                                    ),
-                                    Utils.nullSafeMin(ak.rid, secondAct.key.rid),
-                                    o
-                            ),
-                            AndNode.prepareInputActs(act, secondAct)
-                    );
+                    InterprNode o = InterprNode.add(doc, true, ak.o, secondAct.key.o);
+                    if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
+                        AndNode nlp = pnlp.get();
+                        nlp.addActivation(doc,
+                                new NodeActivation.Key(
+                                        nlp,
+                                        Range.mergeRange(
+                                                Range.getOutputRange(ak.r, new boolean[]{firstNode.key.startRangeOutput, firstNode.key.endRangeOutput}),
+                                                Range.getOutputRange(secondAct.key.r, new boolean[]{secondNode.key.startRangeOutput, secondNode.key.endRangeOutput})
+                                        ),
+                                        Utils.nullSafeMin(ak.rid, secondAct.key.rid),
+                                        o
+                                ),
+                                AndNode.prepareInputActs(act, secondAct)
+                        );
+                    }
                 }
-            }
-        });
+        );
     }
 
 
@@ -276,18 +239,17 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                     InputNode in = ref.input.get();
                     Operator srm = computeStartRangeMatch(key, in.key);
                     Operator erm = computeEndRangeMatch(key, in.key);
-                    Integer ridDelta = Utils.nullSafeSub(act.key.rid, false, secondAct.key.rid, false);
 
                     if (act != secondAct &&
                             this != in &&
-                            in.visitedTrain != v &&
+                            in.visitedDiscover != v &&
                             !in.key.isRecurrent &&
                             !(key.startRangeOutput && in.key.startRangeOutput) &&
                             !(key.endRangeOutput && in.key.endRangeOutput) &&
                             srm.compare(act.key.r.begin, secondAct.key.r.begin) &&
                             erm.compare(act.key.r.end, secondAct.key.r.end)
                         ) {
-                        in.visitedTrain = v;
+                        in.visitedDiscover = v;
                         AndNode nln = AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, trainConfig);
 
                         if(nln != null) {

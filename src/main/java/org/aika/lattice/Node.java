@@ -97,7 +97,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         public TreeMap<Key, A> activationsRid;
 
         public NavigableMap<Key, Set<NodeActivation<?>>> added;
-        public NavigableMap<Key, RemovedEntry> removed;
 
         public long visited;
 
@@ -110,8 +109,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             activationsRid = ridRequired ? new TreeMap<>(RID_COMP) : null;
 
             added = new TreeMap<>();
-            removed = new TreeMap<>();
         }
+
 
         public RidVisited lookupVisited(Integer offset) throws RidOutOfRange {
             if (offset != null && (offset >= MAX_RELATIVE_RID || offset <= -MAX_RELATIVE_RID)) {
@@ -175,15 +174,11 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      */
     public abstract void propagateAddedActivation(Document doc, A act, InterprNode conflict);
 
-    public abstract void propagateRemovedActivation(Document doc, NodeActivation act);
-
     public abstract boolean isAllowedOption(int threadId, InterprNode n, NodeActivation<?> act, long v);
 
     public abstract void cleanup();
 
     abstract A createActivation(Document doc, Key ak);
-
-    abstract void deleteActivation(Document doc, A act);
 
     public abstract double computeSynapseWeightSum(Integer offset, INeuron n);
 
@@ -194,8 +189,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public abstract void discover(Document doc, NodeActivation<T> act, TrainConfig trainConfig);
 
     abstract Collection<Refinement> collectNodeAndRefinements(Refinement newRef);
-
-    abstract boolean hasSupport(A act);
 
     abstract boolean contains(Refinement ref);
 
@@ -344,21 +337,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void processRemovedActivation(Document doc, A act, Collection<NodeActivation> inputActs) {
-        if (act.isRemoved) {
-            unregister(act, doc);
-            deleteActivation(doc, act);
-
-            propagateRemovedActivation(doc, act);
-
-            act.key.releaseRef();
-        }
-
-        // TODO: check unlinkNeuronRelations symmetry
-        act.unlink(inputActs);
-    }
-
-
     public void register(A act, Document doc) {
         Key ak = act.key;
 
@@ -387,33 +365,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public void unregister(A act, Document doc) {
-        Key ak = act.key;
-
-        assert !ak.o.activations.isEmpty();
-
-        Node.ThreadState th = ak.n.getThreadState(doc.threadId, true);
-
-        th.activations.remove(ak);
-
-        TreeMap<Key, NodeActivation> actEnd = th.activationsEnd;
-        if (actEnd != null) actEnd.remove(ak);
-
-        TreeMap<Key, NodeActivation> actRid = th.activationsRid;
-        if (actRid != null) actRid.remove(ak);
-
-        if (th.activations.isEmpty()) {
-            doc.activatedNodes.remove(ak.n);
-        }
-
-        ak.o.activations.remove(ak);
-
-        if (ak.rid != null) {
-            doc.activationsByRid.remove(ak);
-        }
-    }
-
-
     /**
      * Process all added or removed activation for this logic node.
      *
@@ -422,30 +373,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void processChanges(Document doc) {
         ThreadState th = getThreadState(doc.threadId, true);
         NavigableMap<Key<T>, Collection<NodeActivation>> tmpAdded = th.added;
-        NavigableMap<Key<T>, RemovedEntry> tmpRemoved = th.removed;
 
         th.added = new TreeMap<>();
-        th.removed = new TreeMap<>();
-
-        for (Iterator<Map.Entry<Key<T>, RemovedEntry>> it = tmpRemoved.entrySet().iterator(); it.hasNext(); ) {
-            Key akr = it.next().getKey();
-            boolean remove = false;
-            for (Key aka : tmpAdded.keySet()) {
-                if (aka.o == akr.o && aka.rid == akr.rid && aka.r == akr.r)
-                    remove = true;
-            }
-            if (remove) it.remove();
-        }
-
-        for (RemovedEntry<T, A> re : tmpRemoved.values()) {
-            if (!hasSupport(re.act)) {
-                re.act.isRemoved = true;
-            }
-        }
-
-        for (RemovedEntry<T, A> re : tmpRemoved.values()) {
-            processRemovedActivation(doc, re.act, re.iActs);
-        }
 
         for (Map.Entry<Key<T>, Collection<NodeActivation>> me : tmpAdded.entrySet()) {
             processAddedActivation(doc, me.getKey(), me.getValue());
@@ -474,23 +403,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         doc.queue.add(ak.n);
     }
 
-    /*
-    First remove the inputs from the given activation. Only if, depending on the node type, insufficient support exists for this activation, then actually remove it.
-     */
-    public static <T extends Node, A extends NodeActivation<T>> void removeActivationAndPropagate(Document doc, A act, Collection<NodeActivation<?>> inputActs) {
-        if (act == null || act.isRemoved) return;
-
-        ThreadState<T, A> th = act.key.n.getThreadState(doc.threadId, true);
-        RemovedEntry re = th.removed.get(act.key);
-        if (re == null) {
-            re = new RemovedEntry();
-            re.act = act;
-            th.removed.put(act.key, re);
-        }
-        re.iActs.addAll(inputActs);
-        doc.queue.add(act.key.n);
-    }
-
 
     public Collection<A> getActivations(Document doc) {
         ThreadState<T, A> th = getThreadState(doc.threadId, false);
@@ -510,6 +422,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         clearActivations(doc.threadId);
     }
 
+
     public void clearActivations(int threadId) {
         ThreadState th = getThreadState(threadId, false);
         if (th == null) return;
@@ -519,7 +432,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if (th.activationsRid != null) th.activationsRid.clear();
 
         th.added.clear();
-        th.removed.clear();
     }
 
 
@@ -566,17 +478,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             }
         }
         return true;
-    }
-
-
-    void removeFromNextLevel(Document doc, NodeActivation iAct) {
-        AndNode.removeActivation(doc, iAct);
-
-        if (orChildren != null) {
-            for (OrEntry oe : orChildren) {
-                oe.node.get().removeActivation(doc, oe.ridOffset, iAct);
-            }
-        }
     }
 
 
@@ -746,12 +647,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         n.readFields(in, p.m);
         return n;
-    }
-
-
-    private static class RemovedEntry<T extends Node, A extends NodeActivation<T>> {
-        A act;
-        Set<NodeActivation> iActs = new TreeSet<>();
     }
 
 

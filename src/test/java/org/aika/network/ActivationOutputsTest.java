@@ -250,11 +250,6 @@ public class ActivationOutputsTest {
         Activation outB1 = NodeActivation.get(doc, outBNode, null, new Range(0, 1), LESS_THAN_EQUAL, GREATER_THAN_EQUAL, null, null);
 
         Assert.assertTrue(containsOutputActivation(inA.get().node.get().getFirstActivation(doc).neuronOutputs, outB1));
-
-        inA.get().removeInput(doc, 0, 1, 0, o1);
-
-        Assert.assertNull(inA.get().node.get().getFirstActivation(doc));
-        Assert.assertTrue(outB1.isRemoved);
     }
 
 }

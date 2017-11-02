@@ -65,58 +65,13 @@ public class Conflicts {
         if(c == null) {
             c = new Conflict(act, primary, secondary, InterprNode.add(primary.doc, false, primary, secondary));
 
-            primary.countRef();
-            secondary.countRef();
-            c.conflict.countRef();
-
             c.conflict.isConflict++;
 
             primary.conflicts.primary.put(ck, c);
             secondary.conflicts.secondary.put(new Key(primary, act), c);
 
-            c.conflict.removeActivationsRecursiveStep(doc, c.conflict, doc.visitedCounter++);
+//            c.conflict.removeActivationsRecursiveStep(doc, c.conflict, doc.visitedCounter++);
         }
-    }
-
-
-    public static void remove(Document doc, NodeActivation act, InterprNode primary, InterprNode secondary) {
-        Key ck = new Key(secondary, act);
-
-        Conflict c = primary.conflicts.primary.get(ck);
-        if(c == null) return;
-
-        primary.conflicts.primary.remove(ck);
-        secondary.conflicts.secondary.remove(new Key(primary, act));
-        c.conflict.isConflict--;
-
-        c.conflict.expandActivationsRecursiveStep(doc, c.conflict, doc.visitedCounter++);
-
-        removeInternal(c);
-    }
-
-
-    private static void removeInternal(Conflict c) {
-        c.primary.releaseRef();
-        c.secondary.releaseRef();
-        c.conflict.releaseRef();
-    }
-
-
-    public void removeAll() {
-        if(primary != null) {
-            for(Conflict c: primary.values()) {
-                c.secondary.conflicts.secondary.remove(c.primary);
-                removeInternal(c);
-            }
-        }
-        primary.clear();
-        if(secondary != null) {
-            for(Conflict c: secondary.values()) {
-                c.primary.conflicts.primary.remove(c.secondary);
-                removeInternal(c);
-            }
-        }
-        secondary.clear();
     }
 
 

@@ -49,6 +49,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
     public SortedMap<Refinement, Provider<? extends Node>> parents = new TreeMap<>();
 
+
     public AndNode() {}
 
 
@@ -89,11 +90,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     NodeActivation<AndNode> processAddedActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs) {
-        int s = 0;
-        for(NodeActivation iAct: inputActs) {
-            if(!iAct.isRemoved) s++;
-        }
-        if(s != level) {
+        if(inputActs.size() != level) {
             return null;
         }
 
@@ -106,39 +103,8 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    static void removeActivation(Document doc, NodeActivation<?> iAct) {
-        for(NodeActivation act: iAct.outputs.values()) {
-            if(act.key.n instanceof AndNode) {
-                Node.removeActivationAndPropagate(doc, act, Collections.singleton(iAct));
-            }
-        }
-    }
-
-
     public void propagateAddedActivation(Document doc, NodeActivation act, InterprNode removedConflict) {
         apply(doc, act, removedConflict);
-    }
-
-
-    public void propagateRemovedActivation(Document doc, NodeActivation act) {
-        removeFromNextLevel(doc, act);
-    }
-
-
-    @Override
-    boolean hasSupport(NodeActivation<AndNode> act) {
-        int expected = parents.size();
-
-        int support = 0;
-        NodeActivation lastAct = null;
-        for(NodeActivation iAct: act.inputs.values()) {
-            if(!iAct.isRemoved && (lastAct == null || lastAct.key.n != iAct.key.n)) {
-                support++;
-            }
-            lastAct = iAct;
-        }
-        assert support <= expected;
-        return support == expected;
     }
 
 
@@ -157,18 +123,13 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     @Override
     void apply(Document doc, NodeActivation<AndNode> act, InterprNode removedConflict) {
 
-        // Check if the activation has been deleted in the meantime.
-        if(act.isRemoved) {
-            return;
-        }
-
         for(NodeActivation<?> pAct: act.inputs.values()) {
             Node<?, NodeActivation<?>> pn = pAct.key.n;
             pn.lock.acquireReadLock();
             Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n.provider, act.key.rid, pAct.key.rid));
             if(ref != null) {
                 for (NodeActivation secondAct : pAct.outputs.values()) {
-                    if (act != secondAct && !secondAct.isRemoved) {
+                    if (act != secondAct) {
                         Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n.provider, secondAct.key.rid, pAct.key.rid));
                         if (secondRef != null) {
                             Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
@@ -383,11 +344,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     @Override
     protected NodeActivation<AndNode> createActivation(Document doc, NodeActivation.Key ak) {
         return new NodeActivation<>(doc.activationIdCounter++, doc, ak);
-    }
-
-
-    @Override
-    public void deleteActivation(Document doc, NodeActivation act) {
     }
 
 

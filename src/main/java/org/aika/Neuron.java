@@ -114,25 +114,6 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
-    public void removeInput(Document doc, int begin, int end) {
-        removeInput(doc, begin, end, null, doc.bottom);
-    }
-
-
-    public void removeInput(Document doc, int begin, int end, InterprNode o) {
-        removeInput(doc, begin, end, null, o);
-    }
-
-
-    public void removeInput(Document doc, int begin, int end, Integer rid) {
-        removeInput(doc, begin, end, rid, doc.bottom);
-    }
-
-
-    public void removeInput(Document doc, int begin, int end, Integer rid, InterprNode o) {
-        get().removeInput(doc, begin, end, rid, o);
-    }
-
     /**
      * {@code getFinalActivations} is a convenience method to retrieve all activations of the given neuron that
      * are part of the final interpretation. Before calling this method, the {@code doc.process()} needs to

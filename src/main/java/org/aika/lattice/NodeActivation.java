@@ -39,7 +39,6 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
 
     public Document doc;
 
-    public boolean isRemoved;
     public long visitedNeuronTrain = -1;
 
     public TreeMap<Key, NodeActivation> inputs = new TreeMap<>();
@@ -68,24 +67,6 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     }
 
 
-    public void unlink(Collection<NodeActivation> inputActs) {
-        for (NodeActivation iAct : inputActs) {
-            inputs.remove(iAct.key);
-            iAct.outputs.remove(key);
-        }
-    }
-
-
-    public void unlink() {
-        for (NodeActivation act : inputs.values()) {
-            act.outputs.remove(key);
-        }
-        for (NodeActivation act : outputs.values()) {
-            act.inputs.remove(key);
-        }
-    }
-
-
     public static <T extends Node, A extends NodeActivation<T>> A get(Document doc, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
         Stream<A> s = select(doc, n, rid, r, begin, end, o, or);
         return s.findFirst()
@@ -95,22 +76,6 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
 
     public static <T extends Node, A extends NodeActivation<T>> A get(Document doc, T n, Key ak) {
         return get(doc, n, ak.rid, ak.r, Operator.EQUALS, Operator.EQUALS, ak.o, InterprNode.Relation.EQUALS);
-    }
-
-
-    public static NodeActivation getNextSignal(Node n, Document doc, int from, Integer rid, InterprNode o, boolean dir, boolean inv) {
-        ThreadState th = n.getThreadState(doc.threadId, false);
-        if(th == null) return null;
-
-        Key bk = new Key(null, new Range(from, dir ? Integer.MIN_VALUE : Integer.MAX_VALUE).invert(inv), rid, o);
-        NavigableMap<Key, NodeActivation> tmp = (inv ? th.activationsEnd : th.activations);
-        tmp = dir ? tmp.descendingMap() : tmp;
-        for(NodeActivation act: tmp.tailMap(bk, false).values()) {
-            if(act.filter(n, rid, null, null, null, o, InterprNode.Relation.CONTAINED_IN)) {
-                return act;
-            }
-        }
-        return null;
     }
 
 
@@ -246,32 +211,12 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
         public final Integer rid;
         public final InterprNode o;
 
-        private int refCount = 0;
-
 
         public Key(T n, Range r, Integer rid, InterprNode o) {
             this.n = n;
             this.r = r;
             this.rid = rid;
             this.o = o;
-            countRef();
-            if(o != null) {
-                o.countRef();
-            }
-        }
-
-
-        public void countRef() {
-            refCount++;
-        }
-
-
-        public void releaseRef() {
-            assert refCount > 0;
-            refCount--;
-            if(refCount == 0) {
-                o.releaseRef();
-            }
         }
 
 
@@ -291,6 +236,4 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
             return (n != null ? n.getNeuronLabel() : "") + r + " " + rid + " " + o;
         }
     }
-
-
 }

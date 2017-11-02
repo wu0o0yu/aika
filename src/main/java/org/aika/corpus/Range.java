@@ -60,12 +60,12 @@ public class Range {
     }
 
 
-    public Integer getBegin(boolean invert) {
+    public int getBegin(boolean invert) {
         return invert ? end : begin;
     }
 
 
-    public Integer getEnd(boolean invert) {
+    public int getEnd(boolean invert) {
         return invert ? begin : end;
     }
 
@@ -111,21 +111,17 @@ public class Range {
 
 
     public static int compare(Range ra, Range rb, boolean inv) {
-        if(ra == null && rb == null) return 0;
-        if(ra == null && rb != null) return -1;
-        if(ra != null && rb == null) return 1;
-
-        int a = Utils.compareInteger(ra.getBegin(inv), rb.getBegin(inv));
+        int a = Integer.compare(ra.getBegin(inv), rb.getBegin(inv));
         if(a != 0) return a;
-        int b = Utils.compareInteger(ra.getEnd(inv), rb.getEnd(inv));
+        int b = Integer.compare(ra.getEnd(inv), rb.getEnd(inv));
         return b;
     }
 
 
     public static int compare(Range ra, Range rb) {
-        int a = Utils.compareInteger(ra.begin, rb.begin);
+        int a = Integer.compare(ra.begin, rb.begin);
         if(a != 0) return a;
-        int b = Utils.compareInteger(ra.end, rb.end);
+        int b = Integer.compare(ra.end, rb.end);
         return b;
     }
 

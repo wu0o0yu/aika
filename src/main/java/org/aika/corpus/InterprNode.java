@@ -107,9 +107,6 @@ public class InterprNode implements Comparable<InterprNode> {
     public NavigableSet<Activation> neuronActivations;
 
 
-    public int refCount = 0;
-
-
     public enum Relation {
         EQUALS,
         CONTAINS,
@@ -218,28 +215,6 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public void removeOrOption(NodeActivation inputAct, InterprNode n) {
-        orInterprNodes.remove(inputAct);
-        n.refByOrInterprNode.remove(this);
-        computeLargestCommonSubset();
-    }
-
-
-    public void countRef() {
-        if (isBottom()) return;
-        refCount++;
-    }
-
-
-    public void releaseRef() {
-        if (isBottom()) return;
-        assert refCount > 0;
-        refCount--;
-        if (refCount == 0) {
-            remove();
-        }
-    }
-
 
     void expandActivationsRecursiveStep(Document doc, InterprNode conflict, long v) {
         if (v == visitedExpandActivations) return;
@@ -251,26 +226,6 @@ public class InterprNode implements Comparable<InterprNode> {
 
         for (InterprNode p : parents) {
             p.expandActivationsRecursiveStep(doc, conflict, v);
-        }
-    }
-
-
-    void removeActivationsRecursiveStep(Document doc, InterprNode conflict, long v) {
-        if (v == visitedRemoveActivations) return;
-        visitedRemoveActivations = v;
-
-        for (NodeActivation act : getActivations()) {
-            if (act.key.o.contains(conflict, false)) {
-                Node.removeActivationAndPropagate(doc, act, act.inputs.values());
-            }
-        }
-
-        if (children != null) {
-            for (InterprNode c : children) {
-                if (!c.isRemoved) {
-                    c.removeActivationsRecursiveStep(doc, conflict, v);
-                }
-            }
         }
     }
 
@@ -306,7 +261,6 @@ public class InterprNode implements Comparable<InterprNode> {
         if (inputs.size() == 1 || (inputs.size() == 2 && inputs.get(0) == inputs.get(1))) {
             InterprNode n = inputs.get(0);
             if (nonConflicting && n.isConflicting(doc.visitedCounter++)) return null;
-            n.countRef();
             return n;
         }
 
@@ -317,7 +271,6 @@ public class InterprNode implements Comparable<InterprNode> {
         if (parents.size() == 1) {
             InterprNode n = parents.get(0);
             if (nonConflicting && n.isConflicting(doc.visitedCounter++)) return null;
-            n.countRef();
             return n;
         }
 
@@ -341,8 +294,6 @@ public class InterprNode implements Comparable<InterprNode> {
             n.minPrim = Math.min(n.minPrim, in.minPrim);
             n.maxPrim = Math.max(n.maxPrim, in.maxPrim);
         }
-
-        n.countRef();
 
         return n;
     }
@@ -506,8 +457,6 @@ public class InterprNode implements Comparable<InterprNode> {
 
         n.minPrim = n.primId;
         n.maxPrim = n.primId;
-
-        n.countRef();
 
         addLink(doc.bottom, n);
         return n;
