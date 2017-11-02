@@ -65,7 +65,6 @@ public class InterprNode implements Comparable<InterprNode> {
     private long visitedContains;
     private long visitedCollect;
     private long visitedExpandActivations;
-    private long visitedRemoveActivations;
     private long visitedIsConflicting;
     private long visitedStoreFinalWeight;
     private long visitedComputeLargestCommonSubset;
@@ -91,10 +90,6 @@ public class InterprNode implements Comparable<InterprNode> {
 
     public final Document doc;
     public Activation act;
-
-    boolean isRemoved;
-    int removedId;
-    static int removedIdCounter = 1;
 
     private static InterprNode[] EMPTY_INTR_RELS = new InterprNode[0];
     public InterprNode[] parents = EMPTY_INTR_RELS;
@@ -136,17 +131,6 @@ public class InterprNode implements Comparable<InterprNode> {
         this.doc = doc;
         this.primId = primId;
         this.id = id;
-    }
-
-
-    private void computeLargestCommonSubset() {
-        int s = orInterprNodes.size();
-        long vMin = doc.visitedCounter++;
-        List<InterprNode> results = new ArrayList<>();
-        for (InterprNode on : orInterprNodes.values()) {
-            on.computeLargestCommonSubsetRecursiveStep(results, doc.visitedCounter++, vMin, s, 0);
-        }
-        setLCS(results.isEmpty() ? null : InterprNode.add(doc, true, results));
     }
 
 
@@ -212,21 +196,6 @@ public class InterprNode implements Comparable<InterprNode> {
             n.refByOrInterprNode = new TreeSet<>();
         }
         n.refByOrInterprNode.add(this);
-    }
-
-
-
-    void expandActivationsRecursiveStep(Document doc, InterprNode conflict, long v) {
-        if (v == visitedExpandActivations) return;
-        visitedExpandActivations = v;
-
-        for (NodeActivation act : getActivations()) {
-            act.key.n.propagateAddedActivation(doc, act, conflict);
-        }
-
-        for (InterprNode p : parents) {
-            p.expandActivationsRecursiveStep(doc, conflict, v);
-        }
     }
 
 
@@ -463,31 +432,6 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    private void remove() {
-        assert !isRemoved;
-        isRemoved = true;
-        removedId = removedIdCounter++;
-
-        for (InterprNode p : parents) {
-            p.children = Utils.removeToArray(p.children, this);
-        }
-        for (InterprNode c : children) {
-            c.parents = Utils.removeToArray(c.parents, this);
-        }
-        for (InterprNode p : parents) {
-            for (InterprNode c : children) {
-                if (!c.isLinked(p, doc.visitedCounter++)) {
-                    addLink(p, c);
-                }
-            }
-        }
-
-        parents = null;
-        children = null;
-        conflicts = null;
-    }
-
-
     public boolean isBottom() {
         return length == 0;
     }
@@ -529,25 +473,6 @@ public class InterprNode implements Comparable<InterprNode> {
             if(largestCommonSubset.contains(n, followLCS, v)) return true;
         }
 
-        return false;
-    }
-
-
-    private boolean isLinked(InterprNode n, long v) {
-        assert visitedContains <= v;
-        assert !isRemoved;
-        assert !n.isRemoved;
-
-        if(this == n) {
-            return true;
-        }
-
-        visitedContains = v;
-        if(length < n.length) return false;
-
-        for(InterprNode p: parents) {
-            if(p.visitedContains != v && p.isLinked(n, v)) return true;
-        }
         return false;
     }
 
