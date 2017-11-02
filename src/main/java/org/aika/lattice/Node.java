@@ -293,10 +293,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         Provider<AndNode> n = andChildren.put(ref, child);
-        if (n != null) {
-            System.out.println();
-        }
-
         assert n == null;
         reverseAndChildren.put(new ReverseAndRefinement(child, ref.rid, 0), ref);
     }
@@ -506,11 +502,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         Provider<AndNode> result = andChildren != null ? andChildren.get(ref) : null;
         lock.releaseReadLock();
         return result;
-    }
-
-
-    public boolean isCovered(int threadId, Integer offset, long v) throws ThreadState.RidOutOfRange {
-        return false;
     }
 
 

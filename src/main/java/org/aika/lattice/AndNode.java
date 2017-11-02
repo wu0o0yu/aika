@@ -321,16 +321,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    public boolean isCovered(int threadId, Integer offset, long v) throws ThreadState.RidOutOfRange {
-        for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
-            RidVisited nv = me.getValue().get().getThreadState(threadId, true).lookupVisited(Utils.nullSafeSub(offset, true, me.getKey().getOffset(), false));
-            if(nv.outputNode == v) return true;
-        }
-        return false;
-    }
-
-
-    @Override
     public double computeSynapseWeightSum(Integer offset, INeuron n) {
         double sum = n.bias;
         for(Refinement ref: parents.keySet()) {
