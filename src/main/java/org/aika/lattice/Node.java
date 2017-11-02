@@ -438,11 +438,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public boolean isPublic() {
-        return this instanceof AndNode && orChildren != null && !orChildren.isEmpty();
-    }
-
-
     boolean computeAndParents(Model m, int threadId, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Provider<? extends Node>> parents, TrainConfig tc, long v) throws ThreadState.RidOutOfRange {
         RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
         if (nv.computeParents == v) return true;
