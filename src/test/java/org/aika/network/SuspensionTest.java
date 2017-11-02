@@ -139,5 +139,10 @@ public class SuspensionTest {
         public byte[] retrieve(int id) {
             return storage.get(id);
         }
+
+        @Override
+        public Iterable<Integer> getAllNodeIds() {
+            return storage.keySet();
+        }
     }
 }

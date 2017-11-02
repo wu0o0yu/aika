@@ -284,4 +284,10 @@ public class Model {
         providers.remove(p.id);
     }
 
+
+    public interface NodeStatisticFactory {
+
+        Writable createNodeStatisticObject();
+    }
+
 }
