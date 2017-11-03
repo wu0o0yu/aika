@@ -23,7 +23,7 @@ import org.aika.Model;
 import org.aika.Provider;
 import org.aika.Utils;
 import org.aika.corpus.Document;
-import org.aika.TrainConfig;
+import org.aika.corpus.Document.DiscoveryConfig;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.neuron.INeuron;
@@ -152,7 +152,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    public void discover(Document doc, NodeActivation<AndNode> act, TrainConfig trainConfig) {
+    public void discover(Document doc, NodeActivation<AndNode> act, DiscoveryConfig discoveryConfig) {
         for(NodeActivation<?> pAct: act.inputs.values()) {
             Node<?, NodeActivation<?>> pn = pAct.key.n;
             pn.lock.acquireReadLock();
@@ -160,11 +160,11 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             for(NodeActivation secondAct: pAct.outputs.values()) {
                 if(secondAct.key.n instanceof AndNode) {
                     Node secondNode = secondAct.key.n;
-                    if (act != secondAct && trainConfig.checkExpandable.evaluate(secondNode)) {
+                    if (act != secondAct && discoveryConfig.checkExpandable.evaluate(secondNode)) {
                         Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n.provider, secondAct.key.rid, pAct.key.rid));
                         Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
-                        AndNode nln = createNextLevelNode(doc.m, doc.threadId, this, nRef, trainConfig);
+                        AndNode nln = createNextLevelNode(doc.m, doc.threadId, this, nRef, discoveryConfig);
                         if(nln != null) {
                             nln.isDiscovered = true;
                             doc.addedNodes.add(nln);
@@ -200,15 +200,15 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public static AndNode createNextLevelNode(Model m, int threadId, Node n, Refinement ref, TrainConfig tc) {
+    public static AndNode createNextLevelNode(Model m, int threadId, Node n, Refinement ref, DiscoveryConfig discoveryConfig) {
         Provider<AndNode> pnln = n.getAndChild(ref);
         if(pnln != null) {
-            return tc != null ? null : pnln.get();
+            return discoveryConfig != null ? null : pnln.get();
         }
 
         if(n.contains(ref)) return null;
 
-        SortedMap<Refinement, Provider<? extends Node>> parents = computeNextLevelParents(m, threadId, n, ref, tc);
+        SortedMap<Refinement, Provider<? extends Node>> parents = computeNextLevelParents(m, threadId, n, ref, discoveryConfig);
 
         AndNode nln = null;
         if (parents != null) {
@@ -221,7 +221,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             if(n.andChildren == null || !n.andChildren.containsKey(ref)) {
                 nln = new AndNode(m, n.level + 1, parents);
 
-                if(tc == null || tc.checkValidPattern.evaluate(nln)) {
+                if(discoveryConfig == null || discoveryConfig.checkValidPattern.evaluate(nln)) {
                     nln.init();
                 } else {
                     m.removeProvider(nln.provider);
@@ -274,7 +274,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public static SortedMap<Refinement, Provider<? extends Node>> computeNextLevelParents(Model m, int threadId, Node pa, Refinement ref, TrainConfig trainConfig) {
+    public static SortedMap<Refinement, Provider<? extends Node>> computeNextLevelParents(Model m, int threadId, Node pa, Refinement ref, DiscoveryConfig discoveryConfig) {
         Collection<Refinement> refinements = pa.collectNodeAndRefinements(ref);
 
         long v = m.visitedCounter.addAndGet(1);
@@ -284,7 +284,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             SortedSet<Refinement> childInputs = new TreeSet<>(refinements);
             childInputs.remove(pRef);
             try {
-                if (!pRef.input.get().computeAndParents(m, threadId, pRef.getRelativePosition(), childInputs, parents, trainConfig, v)) {
+                if (!pRef.input.get().computeAndParents(m, threadId, pRef.getRelativePosition(), childInputs, parents, discoveryConfig, v)) {
                     return null;
                 }
             } catch(ThreadState.RidOutOfRange e) {

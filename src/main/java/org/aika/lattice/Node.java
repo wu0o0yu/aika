@@ -20,6 +20,7 @@ package org.aika.lattice;
 import org.aika.*;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.corpus.Document;
+import org.aika.corpus.Document.DiscoveryConfig;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
@@ -182,7 +183,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     abstract void apply(Document doc, A act, InterprNode conflict);
 
-    public abstract void discover(Document doc, NodeActivation<T> act, TrainConfig trainConfig);
+    public abstract void discover(Document doc, NodeActivation<T> act, DiscoveryConfig discoveryConfig);
 
     abstract Collection<Refinement> collectNodeAndRefinements(Refinement newRef);
 
@@ -438,7 +439,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    boolean computeAndParents(Model m, int threadId, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Provider<? extends Node>> parents, TrainConfig tc, long v) throws ThreadState.RidOutOfRange {
+    boolean computeAndParents(Model m, int threadId, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Provider<? extends Node>> parents, DiscoveryConfig discoveryConfig, long v) throws ThreadState.RidOutOfRange {
         RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
         if (nv.computeParents == v) return true;
         nv.computeParents = v;
@@ -458,13 +459,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             lock.releaseReadLock();
 
             if (cp == null) {
-                if (tc != null) return false;
-                cp = AndNode.createNextLevelNode(m, threadId, this, nRef, tc).provider;
+                if (discoveryConfig != null) return false;
+                cp = AndNode.createNextLevelNode(m, threadId, this, nRef, discoveryConfig).provider;
                 if (cp == null) return false;
             }
 
             Integer nOffset = Utils.nullSafeMin(ref.getRelativePosition(), offset);
-            if (!cp.get().computeAndParents(m, threadId, nOffset, childInputs, parents, tc, v)) {
+            if (!cp.get().computeAndParents(m, threadId, nOffset, childInputs, parents, discoveryConfig, v)) {
                 return false;
             }
         }

@@ -168,7 +168,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-
     public void computeBounds(Activation act) {
         double ub = bias + posRecSum - (negDirSum + negRecSum);
         double lb = bias + posRecSum - (negDirSum + negRecSum);
@@ -310,7 +309,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public void train(Document doc, Activation targetAct, double learnRate, TrainConfig.SynapseEvaluation se) {
+    public void train(Document doc, Activation targetAct, double learnRate, Document.SynapseEvaluation se) {
         if (Math.abs(targetAct.errorSignal) < TOLERANCE) return;
 
         long v = doc.visitedCounter++;

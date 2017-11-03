@@ -19,6 +19,7 @@ package org.aika.lattice;
 
 import org.aika.*;
 import org.aika.corpus.Document;
+import org.aika.corpus.Document.DiscoveryConfig;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
@@ -229,7 +230,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    public void discover(Document doc, NodeActivation<InputNode> act, TrainConfig trainConfig) {
+    public void discover(Document doc, NodeActivation<InputNode> act, DiscoveryConfig discoveryConfig) {
         long v = provider.m.visitedCounter.addAndGet(1);
 
         for (INeuron n : doc.finallyActivatedNeurons) {
@@ -250,7 +251,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                             erm.compare(act.key.r.end, secondAct.key.r.end)
                         ) {
                         in.visitedDiscover = v;
-                        AndNode nln = AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, trainConfig);
+                        AndNode nln = AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, discoveryConfig);
 
                         if(nln != null) {
                             nln.isDiscovered = true;

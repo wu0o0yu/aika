@@ -24,6 +24,7 @@ import org.aika.neuron.Activation;
 import org.aika.neuron.Activation.State;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.INeuron.NormWeight;
+import org.aika.neuron.Synapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,18 +170,90 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public void discoverPatterns(TrainConfig trainConfig) {
-        for (Node n : activatedNodes) {
-            trainConfig.counter.count(this, n);
 
-            if (trainConfig.checkExpandable.evaluate(n)) {
+    public static class DiscoveryConfig {
+        public PatternEvaluation checkValidPattern;
+        public PatternEvaluation checkExpandable;
+        public Counter counter;
+
+
+        public DiscoveryConfig setCheckValidPattern(PatternEvaluation checkValidPattern) {
+            this.checkValidPattern = checkValidPattern;
+            return this;
+        }
+
+
+        /**
+         * This callback checks whether the current pattern might be refined to an even larger pattern.
+         * If frequency is the criterion, then infrequent are not expandable.
+         *
+         * @param checkExpandable
+         * @return
+         */
+        public DiscoveryConfig setCheckExpandable(PatternEvaluation checkExpandable) {
+            this.checkExpandable = checkExpandable;
+            return this;
+        }
+
+
+        /**
+         * The counter callback function should implement a customized counting function.
+         * The counting function should modify the custom statistic object stored in the node.
+         * The NodeStatisticFactory is used to instantiate the custom statistic object for a node.
+         *
+         * @param counter
+         * @return
+         */
+        public DiscoveryConfig setCounter(Counter counter) {
+            this.counter = counter;
+            return this;
+        }
+    }
+
+
+    public void discoverPatterns(DiscoveryConfig discoveryConfig) {
+        for (Node n : activatedNodes) {
+            discoveryConfig.counter.count(this, n);
+
+            if (discoveryConfig.checkExpandable.evaluate(n)) {
                 ThreadState<?, NodeActivation<?>> th = n.getThreadState(threadId, false);
                 if (th != null) {
                     for (NodeActivation act : th.activations.values()) {
-                        n.discover(this, act, trainConfig);
+                        n.discover(this, act, discoveryConfig);
                     }
                 }
             }
+        }
+    }
+
+
+    public static class TrainConfig {
+        public SynapseEvaluation synapseEvaluation;
+        public double learnRate;
+        public boolean performBackpropagation;
+
+
+        /**
+         * Determines whether a synapse should be created between two neurons during training.
+         *
+         * @param synapseEvaluation
+         * @return
+         */
+        public TrainConfig setSynapseEvaluation(SynapseEvaluation synapseEvaluation) {
+            this.synapseEvaluation = synapseEvaluation;
+            return this;
+        }
+
+
+        public TrainConfig setLearnRate(double learnRate) {
+            this.learnRate = learnRate;
+            return this;
+        }
+
+
+        public TrainConfig setPerformBackpropagation(boolean performBackpropagation) {
+            this.performBackpropagation = performBackpropagation;
+            return this;
         }
     }
 
@@ -585,5 +658,46 @@ public class Document implements Comparable<Document> {
                 act.key.n.neuron.get().computeErrorSignal(Document.this, act);
             }
         }
+    }
+
+
+    public interface PatternEvaluation {
+
+        /**
+         * Check if <code>n</code> is an interesting pattern that might be considered for further processing.
+         *
+         * This property is required to be monotonic over the size of the pattern. In other words, if a pattern is
+         * interesting, then all its sub patterns also need to be interesting.
+         *
+         * @param n
+         * @return
+         */
+
+        boolean evaluate(Node n);
+    }
+
+
+    public interface SynapseEvaluation {
+
+        /**
+         * Determines whether a synapse should be created between two neurons during training.
+         *
+         * @param iAct
+         * @param oAct
+         * @return
+         */
+        Synapse.Key evaluate(Activation iAct, Activation oAct);
+    }
+
+
+    public interface Counter {
+
+        /**
+         * Updates the statistics of this node
+         *
+         * @param n
+         * @return
+         */
+        void count(Document doc, Node n);
     }
 }
