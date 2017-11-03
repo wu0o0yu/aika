@@ -19,6 +19,7 @@ package org.aika.lattice;
 
 import org.aika.*;
 import org.aika.corpus.Document;
+import org.aika.corpus.Document.DiscoveryConfig;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.network.TestHelper;
@@ -102,17 +103,17 @@ public class PatternDiscoveryTest {
         InputNode pDNode = TestHelper.addOutputNode(doc, inD, 0, null, false);
 
 
-        TrainConfig trainConfig = new TrainConfig()
+        DiscoveryConfig discoveryConfig = new DiscoveryConfig()
                 .setCounter((d, n) -> count(d, n))
                 .setCheckExpandable(n -> ((NodeStatistic) n.statistic).frequency >= 1)
                 .setCheckValidPattern(n -> checkRidRange(n));
 
         doc.bestInterpretation = Arrays.asList(doc.bottom);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         inA.addInput(doc, 0, 1, 0);
 
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         Assert.assertEquals(1, ((NodeStatistic) pANode.statistic).frequency, 0.01);
         Assert.assertEquals(null, pANode.andChildren);
@@ -120,7 +121,7 @@ public class PatternDiscoveryTest {
 
         inB.addInput(doc, 0, 1, 0);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         Assert.assertEquals(1, ((NodeStatistic) pBNode.statistic).frequency, 0.01);
 //        Assert.assertEquals(0, pBNode.andChildren.size());
@@ -128,7 +129,7 @@ public class PatternDiscoveryTest {
 
         inB.addInput(doc, 2, 3, 1);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         Assert.assertEquals(2, ((NodeStatistic) pBNode.statistic).frequency, 0.01);
         Assert.assertEquals(1, pBNode.andChildren.size());
@@ -136,7 +137,7 @@ public class PatternDiscoveryTest {
 
         inA.addInput(doc, 2, 3, 1);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         Assert.assertEquals(1, pANode.andChildren.size());
         Assert.assertEquals(1, pBNode.andChildren.size());
@@ -153,7 +154,7 @@ public class PatternDiscoveryTest {
 
 
         inC.addInput(doc, 4, 5, 2);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         Assert.assertEquals(1, ((NodeStatistic) pCNode.statistic).frequency, 0.01);
         Assert.assertEquals(null, pCNode.andChildren);
@@ -163,7 +164,7 @@ public class PatternDiscoveryTest {
 
         inB.addInput(doc, 4, 5, 2);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         Assert.assertEquals(3, ((NodeStatistic) pBNode.statistic).frequency, 0.01);
         Assert.assertEquals(2, pBNode.andChildren.size());
@@ -171,14 +172,14 @@ public class PatternDiscoveryTest {
 
         inB.addInput(doc, 6, 7, 3);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         Assert.assertEquals(4, ((NodeStatistic) pBNode.statistic).frequency, 0.01);
         Assert.assertEquals(2, pBNode.andChildren.size());
 
         inC.addInput(doc, 6, 7, 3);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         Assert.assertEquals(4, ((NodeStatistic) pBNode.statistic).frequency, 0.01);
         Assert.assertEquals(2, ((NodeStatistic) pCNode.statistic).frequency, 0.01);
@@ -196,7 +197,7 @@ public class PatternDiscoveryTest {
 
         inA.addInput(doc, 4, 5, 2);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         Assert.assertEquals(3, ((NodeStatistic) pANode.statistic).frequency, 0.01);
         Assert.assertEquals(2, ((NodeStatistic) pAB.statistic).frequency, 0.01);
@@ -207,7 +208,7 @@ public class PatternDiscoveryTest {
 
         inA.addInput(doc, 8, 9, 4);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         Assert.assertEquals(4, ((NodeStatistic) pANode.statistic).frequency, 0.01);
         Assert.assertEquals(2, ((NodeStatistic) pAB.statistic).frequency, 0.01);
@@ -217,7 +218,7 @@ public class PatternDiscoveryTest {
 
         inC.addInput(doc, 8, 9, 4);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         Assert.assertEquals(3, ((NodeStatistic) pCNode.statistic).frequency, 0.01);
         Assert.assertEquals(2, ((NodeStatistic) pAB.statistic).frequency, 0.01);
@@ -254,7 +255,7 @@ public class PatternDiscoveryTest {
 
         inB.addInput(doc, 8, 9, 4);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         Assert.assertEquals(5, ((NodeStatistic) pBNode.statistic).frequency, 0.01);
         Assert.assertEquals(2, pANode.andChildren.size());
@@ -278,18 +279,18 @@ public class PatternDiscoveryTest {
 
         inD.addInput(doc, 0, 1, 0);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         inD.addInput(doc, 4, 5, 2);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         inA.addInput(doc, 10, 11, 5);
         inB.addInput(doc, 10, 11, 5);
         inC.addInput(doc, 10, 11, 5);
         inD.addInput(doc, 10, 11, 5);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         Assert.assertEquals(3, pBNode.andChildren.size());
         Assert.assertEquals(3, pDNode.andChildren.size());
@@ -353,11 +354,11 @@ public class PatternDiscoveryTest {
 
         inD.addInput(doc, 8, 9, 4);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
         resetFrequency(m);
-        doc.discoverPatterns(trainConfig);
+        doc.discoverPatterns(discoveryConfig);
 
         AndNode pACD = pAC.andChildren.get(new Refinement(0, pDNode.provider)).get();
 

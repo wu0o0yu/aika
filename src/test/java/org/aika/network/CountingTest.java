@@ -19,10 +19,9 @@ package org.aika.network;
 
 import org.aika.*;
 import org.aika.corpus.Document;
-import org.aika.lattice.AndNode;
+import org.aika.corpus.Document.DiscoveryConfig;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
-import org.aika.lattice.PatternDiscoveryTest;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -85,7 +84,7 @@ public class CountingTest {
 
         doc.process();
         doc.discoverPatterns(
-                new TrainConfig()
+                new DiscoveryConfig()
                         .setCheckExpandable(n -> false)
                         .setCounter((d, n) -> count(d, n))
         );
