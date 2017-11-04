@@ -121,7 +121,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      * @param o     The interpretation node
      * @param value The activation value of this input activation
      */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value) {
+    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, double targetValue) {
         Node.addActivationAndPropagate(doc, new NodeActivation.Key(node.get(), new Range(begin, end), rid, o), Collections.emptySet());
 
         doc.propagate();
@@ -130,6 +130,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         State s = new State(value, 0, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.finalState = s;
+        act.targetValue = targetValue;
         act.upperBound = value;
         act.isInput = true;
 
@@ -137,6 +138,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         doc.finallyActivatedNeurons.add(act.key.n.neuron.get());
 
         doc.ubQueue.add(act);
+
+        if(targetValue != 0.0) {
+            doc.targetActivations.add(act);
+        }
 
         doc.propagate();
 
@@ -294,8 +299,19 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public void computeErrorSignal(Document doc, Activation act) {
-        act.errorSignal = act.initialErrorSignal;
+    public void computeOutputErrorSignal(Document doc, Activation act) {
+        act.errorSignal += act.targetValue - act.finalState.value;
+
+        if(act.errorSignal != 0.0) {
+            doc.errorSignalActivations.add(act);
+        }
+        for (SynapseActivation sa : act.neuronInputs) {
+            doc.bQueue.add(sa.input);
+        }
+    }
+
+
+    public void computeBackpropagationErrorSignal(Document doc, Activation act) {
         for (SynapseActivation sa : act.neuronOutputs) {
             Synapse s = sa.s;
             Activation oAct = sa.output;
@@ -303,6 +319,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             act.errorSignal += s.w * oAct.errorSignal * (1.0 - act.finalState.value);
         }
 
+        if(act.errorSignal != 0.0) {
+            doc.errorSignalActivations.add(act);
+        }
         for (SynapseActivation sa : act.neuronInputs) {
             doc.bQueue.add(sa.input);
         }
@@ -315,7 +334,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         long v = doc.visitedCounter++;
 
         double x = learnRate * targetAct.errorSignal;
-        bias += x;
+        bias = Math.min(0.0, bias + x);
         for (INeuron n : doc.finallyActivatedNeurons) {
             for(Activation iAct: n.getFinalActivations(doc)) {
                 Synapse.Key sk = se.evaluate(iAct, targetAct);

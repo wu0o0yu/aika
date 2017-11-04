@@ -75,6 +75,9 @@ public class Document implements Comparable<Document> {
     public TreeSet<INeuron> activatedNeurons = new TreeSet<>();
     public TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
     public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
+    public TreeSet<Activation> targetActivations = new TreeSet<>();
+    public TreeSet<Activation> errorSignalActivations = new TreeSet<>();
+
     public TreeMap<NodeActivation.Key, NodeActivation> activationsByRid = new TreeMap<>(new Comparator<NodeActivation.Key>() {
         @Override
         public int compare(NodeActivation.Key act1, NodeActivation.Key act2) {
@@ -259,18 +262,18 @@ public class Document implements Comparable<Document> {
 
 
     public void train(TrainConfig trainConfig) {
+        for(Activation tAct: targetActivations) {
+            tAct.key.n.neuron.get().computeOutputErrorSignal(this, tAct);
+        }
+
         if(trainConfig.performBackpropagation) {
             bQueue.backpropagtion();
         }
 
-        for (INeuron n : finallyActivatedNeurons) {
-            ThreadState<OrNode, Activation> th = n.node.get().getThreadState(threadId, false);
-            if (th != null) {
-                for (Activation act : th.activations.values()) {
-                    n.train(this, act, trainConfig.learnRate, trainConfig.synapseEvaluation);
-                }
-            }
+        for (Activation act : errorSignalActivations) {
+            act.key.n.neuron.get().train(this, act, trainConfig.learnRate, trainConfig.synapseEvaluation);
         }
+        errorSignalActivations.clear();
     }
 
     /**
@@ -368,7 +371,6 @@ public class Document implements Comparable<Document> {
                     Activation.State s = me.getValue();
                     sb.append("[R:" + me.getKey());
                     sb.append(" VALUE:" + Utils.round(s.value));
-                    sb.append(" F:" + s.fired);
                     sb.append(" W:" + Utils.round(s.weight.w));
                     sb.append(" N:" + Utils.round(s.weight.n));
                     sb.append("]");
@@ -655,7 +657,7 @@ public class Document implements Comparable<Document> {
                 Activation act = queue.pollFirst();
 
                 act.isQueued = false;
-                act.key.n.neuron.get().computeErrorSignal(Document.this, act);
+                act.key.n.neuron.get().computeBackpropagationErrorSignal(Document.this, act);
             }
         }
     }

@@ -58,6 +58,31 @@ public class Neuron extends Provider<INeuron> {
         return addInput(doc, begin, end, null, doc.bottom);
     }
 
+    /**
+     * Propagate an input activation into the network.
+     *
+     * @param doc   The current document
+     * @param begin The range begin
+     * @param end   The range end
+     * @param value The activation value of this input activation
+     */
+    public Activation addInput(Document doc, int begin, int end, double value) {
+        return addInput(doc, begin, end, null, doc.bottom, value);
+    }
+
+    /**
+     * Propagate an input activation into the network.
+     *
+     * @param doc   The current document
+     * @param begin The range begin
+     * @param end   The range end
+     * @param value The activation value of this input activation
+     * @param targetValue The target activation value for supervised learning
+     */
+    public Activation addInput(Document doc, int begin, int end, double value, double targetValue) {
+        return addInput(doc, begin, end, null, doc.bottom, value, targetValue);
+    }
+
 
     /**
      * Propagate an input activation into the network.
@@ -110,7 +135,22 @@ public class Neuron extends Provider<INeuron> {
      * @param value The activation value of this input activation
      */
     public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value) {
-        return get().addInput(doc, begin, end, rid, o, value);
+        return addInput(doc, begin, end, rid, o, value, 0.0);
+    }
+
+    /**
+     * Propagate an input activation into the network.
+     *
+     * @param doc   The current document
+     * @param begin The range begin
+     * @param end   The range end
+     * @param rid   The relational id (e.g. the word position)
+     * @param o     The interpretation node
+     * @param value The activation value of this input activation
+     * @param targetValue The target activation value for supervised learning
+     */
+    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, double targetValue) {
+        return get().addInput(doc, begin, end, rid, o, value, targetValue);
     }
 
 

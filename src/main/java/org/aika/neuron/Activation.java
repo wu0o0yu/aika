@@ -46,8 +46,8 @@ public final class Activation extends NodeActivation<OrNode> {
     public long currentStateV;
     public StateChange currentStateChange;
 
-    public double initialErrorSignal;
     public double errorSignal;
+    public double targetValue;
 
 
     public Activation(int id, Document doc, Key key) {

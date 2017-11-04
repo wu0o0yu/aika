@@ -23,6 +23,7 @@ import org.aika.corpus.Range;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -64,6 +65,59 @@ public class TrainingTest {
 
         doc = m.createDocument("Bla");
         in.addInput(doc, 0, 3, 0, doc.bottom, 1.0);
+    }
 
+
+    @Test
+    public void testTraining1() {
+        Model m = new Model();
+
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
+
+        Neuron outC = m.createNeuron("C");
+
+        {
+            Document doc = m.createDocument("Bla");
+            inA.addInput(doc, 0, 3, 1.0);
+            inB.addInput(doc, 0, 3, 1.0);
+
+            doc.process();
+
+
+            outC.addInput(doc, 0, 3, 0.0, 1.0);
+
+            doc.train(
+                    new Document.TrainConfig()
+                            .setLearnRate(2.0)
+                            .setPerformBackpropagation(false)
+                            .setSynapseEvaluation((iAct, oAct) -> new Synapse.Key(
+                                    false,
+                                    0,
+                                    null,
+                                    Range.Operator.EQUALS,
+                                    Range.Mapping.START,
+                                    true,
+                                    Range.Operator.EQUALS,
+                                    Range.Mapping.END,
+                                    true
+                            ))
+            );
+
+            doc.clearActivations();
+        }
+
+        {
+            Document doc = m.createDocument("Bla");
+            inA.addInput(doc, 0, 3, 1.0);
+            inB.addInput(doc, 0, 3, 1.0);
+
+            doc.process();
+
+            System.out.println(doc.neuronActivationsToString(true, false, true));
+            Assert.assertFalse(outC.getFinalActivations(doc).isEmpty());
+
+            doc.clearActivations();
+        }
     }
 }
