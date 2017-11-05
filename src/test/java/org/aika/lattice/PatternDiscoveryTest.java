@@ -23,6 +23,7 @@ import org.aika.corpus.Document.DiscoveryConfig;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.network.TestHelper;
+import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -71,7 +72,7 @@ public class PatternDiscoveryTest {
     }
 
 
-    private boolean checkRidRange(Node n) {
+    private boolean checkRidRange(Node n, int x) {
         if(n instanceof InputNode) return true;
         AndNode an = (AndNode) n;
 
@@ -81,7 +82,7 @@ public class PatternDiscoveryTest {
                 maxRid = Math.max(maxRid, ref.rid);
             }
         }
-        return maxRid < 1;
+        return maxRid < x;
     }
 
 
@@ -106,7 +107,7 @@ public class PatternDiscoveryTest {
         DiscoveryConfig discoveryConfig = new DiscoveryConfig()
                 .setCounter((d, n) -> count(d, n))
                 .setCheckExpandable(n -> ((NodeStatistic) n.statistic).frequency >= 1)
-                .setCheckValidPattern(n -> checkRidRange(n));
+                .setCheckValidPattern(n -> checkRidRange(n, 1));
 
         doc.bestInterpretation = Arrays.asList(doc.bottom);
         doc.discoverPatterns(discoveryConfig);
@@ -399,6 +400,80 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(null, pABCD.andChildren);
 
         Assert.assertNull(TestHelper.get(doc, pCNode, new Range(0, 1), doc.bottom));
+
+    }
+
+
+    @Test
+    public void testSimplePattern() {
+        Model m = new Model();
+        m.setNodeStatisticFactory(() -> new NodeStatistic());
+
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
+
+
+        InputNode.add(m,
+                new Synapse.Key(
+                        false,
+                        0,
+                        null,
+                        Range.Operator.EQUALS,
+                        Range.Mapping.START,
+                        true,
+                        Range.Operator.GREATER_THAN_EQUAL,
+                        Range.Mapping.END,
+                        false
+                ),
+                inA.get()
+        );
+
+        InputNode.add(m,
+                new Synapse.Key(
+                        false,
+                        0,
+                        null,
+                        Range.Operator.LESS_THAN_EQUAL,
+                        Range.Mapping.START,
+                        false,
+                        Range.Operator.EQUALS,
+                        Range.Mapping.END,
+                        true
+                ),
+                inB.get()
+        );
+
+        DiscoveryConfig discoveryConfig = new DiscoveryConfig()
+                .setCounter((d, n) -> count(d, n))
+                .setCheckExpandable(n -> ((NodeStatistic) n.statistic).frequency >= 1)
+                .setCheckValidPattern(n -> checkRidRange(n, 2));
+        {
+            Document doc = m.createDocument("ab", 0);
+
+            inA.addInput(doc, 0, 1, 0);
+            inB.addInput(doc, 1, 2, 1);
+
+            doc.process();
+
+            doc.discoverPatterns(discoveryConfig);
+
+            doc.clearActivations();
+        }
+
+        {
+            Document doc = m.createDocument("ab", 0);
+
+            inA.addInput(doc, 0, 1, 0);
+            inB.addInput(doc, 1, 2, 1);
+
+            doc.process();
+
+            System.out.println(doc.nodeActivationsToString(true, true));
+
+            Assert.assertNotNull(inA.get().outputNodes.firstEntry().getValue().get().andChildren.firstEntry().getValue().get().getFirstActivation(doc));
+
+            doc.clearActivations();
+        }
 
     }
 }

@@ -52,7 +52,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     public Neuron inputNeuron;
 
     // Key: Output Neuron
-    Map<SynapseKey, Synapse> synapses;
+    public Map<SynapseKey, Synapse> synapses;
 
     public ReadWriteLock synapseLock = new ReadWriteLock();
 
@@ -121,9 +121,9 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    public void propagateAddedActivation(Document doc, NodeActivation act, InterprNode removedConflict) {
+    public void propagateAddedActivation(Document doc, NodeActivation act) {
         if (!key.isRecurrent) {
-            apply(doc, act, removedConflict);
+            apply(doc, act);
         }
     }
 
@@ -145,10 +145,9 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     /**
      * @param doc
      * @param act
-     * @param removedConflict This parameter contains a removed conflict if it is not null. In this case only expand activations that contain this removed conflict.
      */
     @Override
-    void apply(Document doc, NodeActivation act, InterprNode removedConflict) {
+    void apply(Document doc, NodeActivation act) {
 
         lock.acquireReadLock();
         if (andChildren != null) {
@@ -156,19 +155,17 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                 Provider<InputNode> refInput = me.getKey().input;
                 InputNode in = refInput.getIfNotSuspended();
                 if (in != null) {
-                    addNextLevelActivations(doc, in, me.getKey(), me.getValue(), act, removedConflict);
+                    addNextLevelActivations(doc, in, me.getKey(), me.getValue(), act);
                 }
             }
         }
         lock.releaseReadLock();
 
-        if (removedConflict == null) {
-            OrNode.processCandidate(doc, this, act, false);
-        }
+        OrNode.processCandidate(doc, this, act, false);
     }
 
 
-    private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, Provider<AndNode> pnlp, NodeActivation act, InterprNode removedConflict) {
+    private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, Provider<AndNode> pnlp, NodeActivation act) {
         ThreadState th = secondNode.getThreadState(doc.threadId, false);
         if (th == null || th.activations.isEmpty()) return;
 
@@ -189,7 +186,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
         s.forEach(secondAct -> {
                     InterprNode o = InterprNode.add(doc, true, ak.o, secondAct.key.o);
-                    if (o != null && (removedConflict == null || o.contains(removedConflict, false))) {
+                    if (o != null) {
                         AndNode nlp = pnlp.get();
                         nlp.addActivation(doc,
                                 new NodeActivation.Key(
@@ -247,8 +244,8 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                             !in.key.isRecurrent &&
                             !(key.startRangeOutput && in.key.startRangeOutput) &&
                             !(key.endRangeOutput && in.key.endRangeOutput) &&
-                            srm.compare(act.key.r.begin, secondAct.key.r.begin) &&
-                            erm.compare(act.key.r.end, secondAct.key.r.end)
+                            srm.compare(secondAct.key.r.begin, act.key.r.begin) &&
+                            erm.compare(secondAct.key.r.end, act.key.r.end)
                         ) {
                         in.visitedDiscover = v;
                         AndNode nln = AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, discoveryConfig);

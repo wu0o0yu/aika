@@ -58,17 +58,6 @@ public class Neuron extends Provider<INeuron> {
         return addInput(doc, begin, end, null, doc.bottom);
     }
 
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc   The current document
-     * @param begin The range begin
-     * @param end   The range end
-     * @param value The activation value of this input activation
-     */
-    public Activation addInput(Document doc, int begin, int end, double value) {
-        return addInput(doc, begin, end, null, doc.bottom, value);
-    }
 
     /**
      * Propagate an input activation into the network.

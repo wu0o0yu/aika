@@ -79,8 +79,8 @@ public class TrainingTest {
 
         {
             Document doc = m.createDocument("Bla");
-            inA.addInput(doc, 0, 3, 1.0);
-            inB.addInput(doc, 0, 3, 1.0);
+            inA.addInput(doc, 0, 3, 1.0, 0.0);
+            inB.addInput(doc, 0, 3, 1.0, 0.0);
 
             doc.process();
 
@@ -109,8 +109,8 @@ public class TrainingTest {
 
         {
             Document doc = m.createDocument("Bla");
-            inA.addInput(doc, 0, 3, 1.0);
-            inB.addInput(doc, 0, 3, 1.0);
+            inA.addInput(doc, 0, 3, 1.0, 0.0);
+            inB.addInput(doc, 0, 3, 1.0, 0.0);
 
             doc.process();
 

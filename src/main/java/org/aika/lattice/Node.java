@@ -58,10 +58,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     private static final Logger log = LoggerFactory.getLogger(Node.class);
 
-    TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
-    TreeMap<Refinement, Provider<AndNode>> andChildren;
-    TreeSet<OrEntry> orChildren;
-    TreeSet<OrEntry> allOrChildren;
+    public TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
+    public TreeMap<Refinement, Provider<AndNode>> andChildren;
+    public TreeSet<OrEntry> orChildren;
+    public TreeSet<OrEntry> allOrChildren;
 
     public int level;
 
@@ -173,15 +173,14 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      *
      * @param doc
      * @param act
-     * @param conflict
      */
-    public abstract void propagateAddedActivation(Document doc, A act, InterprNode conflict);
+    public abstract void propagateAddedActivation(Document doc, A act);
 
     public abstract boolean isAllowedOption(int threadId, InterprNode n, NodeActivation<?> act, long v);
 
     public abstract double computeSynapseWeightSum(Integer offset, INeuron n);
 
-    abstract void apply(Document doc, A act, InterprNode conflict);
+    abstract void apply(Document doc, A act);
 
     public abstract void discover(Document doc, NodeActivation<T> act, DiscoveryConfig discoveryConfig);
 
@@ -325,7 +324,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
             act.link(inputActs);
 
-            propagateAddedActivation(doc, act, null);
+            propagateAddedActivation(doc, act);
         } else {
             act.link(inputActs);
         }

@@ -164,10 +164,8 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    public void propagateAddedActivation(Document doc, Activation act, InterprNode removedConflict) {
-        if(removedConflict == null) {
-            neuron.get().propagateAddedActivation(doc, act);
-        }
+    public void propagateAddedActivation(Document doc, Activation act) {
+        neuron.get().propagateAddedActivation(doc, act);
     }
 
 
@@ -184,15 +182,13 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public void apply(Document doc, Activation act, InterprNode conflict) {
-        if(conflict == null) {
-            OrNode.processCandidate(doc, this, act, false);
-        }
+    public void apply(Document doc, Activation act) {
+        OrNode.processCandidate(doc, this, act, false);
     }
 
 
     @Override
-    public void discover(Document doc, NodeActivation act, DiscoveryConfig doscoveryConfig) {
+    public void discover(Document doc, NodeActivation act, DiscoveryConfig discoveryConfig) {
     }
 
 

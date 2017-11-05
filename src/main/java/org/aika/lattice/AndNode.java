@@ -103,8 +103,8 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public void propagateAddedActivation(Document doc, NodeActivation act, InterprNode removedConflict) {
-        apply(doc, act, removedConflict);
+    public void propagateAddedActivation(Document doc, NodeActivation act) {
+        apply(doc, act);
     }
 
 
@@ -121,7 +121,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    void apply(Document doc, NodeActivation<AndNode> act, InterprNode removedConflict) {
+    void apply(Document doc, NodeActivation<AndNode> act) {
 
         for(NodeActivation<?> pAct: act.inputs.values()) {
             Node<?, NodeActivation<?>> pn = pAct.key.n;
@@ -136,7 +136,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
                             Provider<AndNode> nlp = getAndChild(nRef);
                             if (nlp != null) {
-                                addNextLevelActivation(doc, act, secondAct, nlp, removedConflict);
+                                addNextLevelActivation(doc, act, secondAct, nlp);
                             }
                         }
                     }
@@ -145,9 +145,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             pn.lock.releaseReadLock();
         }
 
-        if(removedConflict == null) {
-            OrNode.processCandidate(doc, this, act, false);
-        }
+        OrNode.processCandidate(doc, this, act, false);
     }
 
 
@@ -225,6 +223,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                     nln.init();
                 } else {
                     m.removeProvider(nln.provider);
+                    nln = null;
                 }
             }
 
@@ -236,11 +235,11 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public static void addNextLevelActivation(Document doc, NodeActivation<AndNode> act, NodeActivation<AndNode> secondAct, Provider<AndNode> pnlp, InterprNode conflict) {
+    public static void addNextLevelActivation(Document doc, NodeActivation<AndNode> act, NodeActivation<AndNode> secondAct, Provider<AndNode> pnlp) {
         // TODO: check if the activation already exists
         Key ak = act.key;
         InterprNode o = InterprNode.add(doc, true, ak.o, secondAct.key.o);
-        if (o != null && (conflict == null || o.contains(conflict, false))) {
+        if (o != null) {
             AndNode nlp = pnlp.get();
             nlp.addActivation(
                     doc,
