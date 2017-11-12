@@ -149,10 +149,13 @@ public class Converter {
     }
 
 
+    public static final int DIRECT = 0;
+    public static final int RECURRENT = 1;
+    public static final int POSITIVE = 0;
+    public static final int NEGATIVE = 1;
+
     private void initInputNodesAndComputeWeightSums() {
-        double negDirSumDelta = 0.0;
-        double negRecSumDelta = 0.0;
-        double posRecSumDelta = 0.0;
+        double[][] sumDelta = new double[2][2];
         double maxRecurrentSumDelta = 0.0;
 
         for (Synapse s : modifiedSynapses) {
@@ -171,25 +174,8 @@ public class Converter {
                 neuron.provider.setModified();
             }
 
-            if (s.isNegative()) {
-                if (!s.key.isRecurrent) {
-                    negDirSumDelta -= s.w;
-                } else {
-                    negRecSumDelta -= s.w;
-                }
-            } else if (s.key.isRecurrent) {
-                posRecSumDelta -= s.w;
-            }
-
-            if (s.nw <= 0.0) {
-                if (!s.key.isRecurrent) {
-                    negDirSumDelta += s.nw;
-                } else {
-                    negRecSumDelta += s.nw;
-                }
-            } else if (s.key.isRecurrent) {
-                posRecSumDelta += s.nw;
-            }
+            sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.w;
+            sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.nw <= 0.0 ? NEGATIVE : POSITIVE] += s.nw;
 
             s.w = s.nw;
 
@@ -197,9 +183,10 @@ public class Converter {
         }
 
         neuron.maxRecurrentSum += maxRecurrentSumDelta;
-        neuron.negDirSum += negDirSumDelta;
-        neuron.negRecSum += negRecSumDelta;
-        neuron.posRecSum += posRecSumDelta;
+        neuron.posDirSum += sumDelta[DIRECT][POSITIVE];
+        neuron.negDirSum += sumDelta[DIRECT][NEGATIVE];
+        neuron.negRecSum += sumDelta[RECURRENT][NEGATIVE];
+        neuron.posRecSum += sumDelta[RECURRENT][POSITIVE];
     }
 
 

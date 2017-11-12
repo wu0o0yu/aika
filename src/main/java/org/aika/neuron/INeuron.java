@@ -66,6 +66,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public String outputText;
 
     public volatile double bias;
+    public volatile double posDirSum;
     public volatile double negDirSum;
     public volatile double negRecSum;
     public volatile double posRecSum;
@@ -605,6 +606,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         out.writeDouble(bias);
+        out.writeDouble(posDirSum);
         out.writeDouble(negDirSum);
         out.writeDouble(negRecSum);
         out.writeDouble(posRecSum);
@@ -641,6 +643,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         bias = in.readDouble();
+        posDirSum = in.readDouble();
         negDirSum = in.readDouble();
         negRecSum = in.readDouble();
         posRecSum = in.readDouble();
