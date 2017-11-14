@@ -436,7 +436,10 @@ public class Document implements Comparable<Document> {
             public int compare(Node n1, Node n2) {
                 int r = Integer.compare(n1.level, n2.level);
                 if(r != 0) return r;
-                return Long.compare(n1.queueId, n2.queueId);
+
+                ThreadState th1 = n1.getThreadState(threadId, true);
+                ThreadState th2 = n2.getThreadState(threadId, true);
+                return Long.compare(th1.queueId, th2.queueId);
             }
         });
 
@@ -444,9 +447,11 @@ public class Document implements Comparable<Document> {
 
 
         public void add(Node n) {
-            if(!n.isQueued) {
-                n.isQueued = true;
-                n.queueId = queueIdCounter++;
+            ThreadState th = n.getThreadState(threadId, true);
+
+            if(!th.isQueued) {
+                th.isQueued = true;
+                th.queueId = queueIdCounter++;
                 queue.add(n);
             }
         }
@@ -455,12 +460,13 @@ public class Document implements Comparable<Document> {
         public void processChanges() {
             while(!queue.isEmpty()) {
                 Node n = queue.pollFirst();
+                ThreadState th = n.getThreadState(threadId, true);
 
-                n.isQueued = false;
+                th.isQueued = false;
                 n.processChanges(Document.this);
 
                 if(APPLY_DEBUG_OUTPUT) {
-                    log.info("QueueId:" + n.queueId);
+                    log.info("QueueId:" + th.queueId);
                     log.info(n.toString() + "\n");
                     log.info("\n" + nodeActivationsToString( true, false));
                 }

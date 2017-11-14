@@ -80,10 +80,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     // Only the children maps are locked.
     public ReadWriteLock lock = new ReadWriteLock();
 
-
-    public boolean isQueued = false;
-    public long queueId;
-
     public ThreadState<T, A>[] threads;
 
     /**
@@ -100,6 +96,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         public NavigableMap<Key, Set<NodeActivation<?>>> added;
 
         public long visited;
+
+        public boolean isQueued = false;
+        public long queueId;
 
         private RidVisited nullRidVisited;
         private RidVisited[] ridVisited = new RidVisited[2 * MAX_RELATIVE_RID];
