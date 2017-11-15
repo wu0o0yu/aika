@@ -142,6 +142,8 @@ public class OrNode extends Node<OrNode, Activation> {
             r = new Range(begin, end);
         }
 
+        if(r.begin == Integer.MIN_VALUE || r.end == Integer.MAX_VALUE) return;
+
         Key nak = new Key(
                 this,
                 r,

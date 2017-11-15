@@ -39,7 +39,6 @@ import java.util.Map;
 public class OverlappingOrTest {
 
 
-    @Ignore
     @Test
     public void testOverlappingOr() {
         Model m = new Model();
@@ -60,30 +59,30 @@ public class OverlappingOrTest {
         // relative or absolute.
         Neuron pattern = m.initNeuron(
                 m.createNeuron("BCD"),
-                0.4,
+                2.0,
                 new Input()
                         .setNeuron(inputNeurons.get('b'))
-                        .setWeight(1.0f)
+                        .setWeight(4.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(0.5)
+                        .setBiasDelta(1.0)
                         .setStartRangeMatch(Operator.EQUALS)
-                        .setEndRangeMatch(Operator.LESS_THAN_EQUAL)
+                        .setEndRangeMatch(Operator.GREATER_THAN_EQUAL)
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(1)
-                        .setBiasDelta(0.5)
+                        .setBiasDelta(0.0)
                         .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(inputNeurons.get('d'))
-                        .setWeight(1.0f)
+                        .setWeight(4.0f)
                         .setRecurrent(false)
                         .setRelativeRid(2)
-                        .setBiasDelta(0.5)
-                        .setStartRangeMatch(Operator.GREATER_THAN_EQUAL)
+                        .setBiasDelta(1.0)
+                        .setStartRangeMatch(Operator.LESS_THAN_EQUAL)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
@@ -95,18 +94,9 @@ public class OverlappingOrTest {
         int wordPos = 0;
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
-            if(c == ' ') {
+            if(c != ' ') {
                 inputNeurons.get(c).addInput(doc, i, i + 1, wordPos++);
             }
-            System.out.println(doc.neuronActivationsToString(true, false, true));
-        }
-
-        for(int i = 0; i < doc.length(); i++) {
-            char c = doc.getContent().charAt(i);
-            if(c != ' ') {
-                inputNeurons.get(c).addInput(doc, i, i + 1);
-            }
-
             System.out.println(doc.neuronActivationsToString(true, false, true));
         }
 
