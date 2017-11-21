@@ -185,13 +185,13 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private double search(Document doc, int[] searchSteps, Candidate[] candidates) {
+    private NormWeight search(Document doc, int[] searchSteps, Candidate[] candidates) {
         if(candidate == null) {
             return processResult(doc);
         }
 
-        double selectedWeight = 0.0;
-        double excludedWeight = 0.0;
+        NormWeight selectedWeight = NormWeight.ZERO_WEIGHT;
+        NormWeight excludedWeight = NormWeight.ZERO_WEIGHT;
 
         boolean alreadySelected = checkSelected(refinement);
         boolean alreadyExcluded = checkExcluded(refinement, doc.visitedCounter++);
@@ -218,7 +218,7 @@ public class SearchNode implements Comparable<SearchNode> {
             debugState = DebugState.EXPLORE;
         }
 
-        Boolean cd = !alreadyExcluded && !alreadySelected ? getCachedDecision() : null;
+        CachedEntry cd = !alreadyExcluded && !alreadySelected ? getCachedDecision() : null;
 
         candidate.debugCounts[debugState.ordinal()]++;
 
@@ -229,7 +229,7 @@ public class SearchNode implements Comparable<SearchNode> {
             markSelected(changed, refinement);
             markExcluded(changed, refinement);
 
-            if (cd == null || cd) {
+            if (cd == null || (cd.dir && accumulatedWeight.add(cd.weight).getNormWeight() >= getSelectedAccumulatedWeight(doc))) {
                 Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
                 SearchNode child = new SearchNode(doc, this, excludedParent, c, level + 1, changed);
                 selectedWeight = child.search(doc, searchSteps, candidates);
@@ -237,14 +237,14 @@ public class SearchNode implements Comparable<SearchNode> {
             }
         }
         if(doc.interrupted) {
-            return 0.0;
+            return NormWeight.ZERO_WEIGHT;
         }
 
         if(!alreadySelected) {
             candidate.refinement.markedExcludedRefinement = true;
             List<InterprNode> changed = Collections.singletonList(candidate.refinement);
 
-            if (cd == null || !cd) {
+            if (cd == null || (!cd.dir && accumulatedWeight.add(cd.weight).getNormWeight() >= getSelectedAccumulatedWeight(doc))) {
                 Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
                 SearchNode child = new SearchNode(doc, selectedParent, this, c, level + 1, changed);
                 excludedWeight = child.search(doc, searchSteps, candidates);
@@ -254,23 +254,29 @@ public class SearchNode implements Comparable<SearchNode> {
             candidate.refinement.markedExcludedRefinement = false;
         }
 
+        boolean dir = selectedWeight.getNormWeight() >= excludedWeight.getNormWeight();
         if(cd == null && !alreadyExcluded && !alreadySelected) {
-            candidate.cache.put(this, selectedWeight >= excludedWeight);
+            candidate.cache.put(this, new CachedEntry(dir, dir ? selectedWeight.sub(accumulatedWeight) : excludedWeight.sub(accumulatedWeight)));
         }
 
-        return Math.max(selectedWeight, excludedWeight);
+        return dir ? selectedWeight : excludedWeight;
     }
 
-    private double processResult(Document doc) {
-        double accNW = accumulatedWeight.getNormWeight();
-        double selectedAccNW = doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight.getNormWeight() : -1.0;
 
-        if (accNW > selectedAccNW) {
+    private NormWeight processResult(Document doc) {
+        double accNW = accumulatedWeight.getNormWeight();
+
+        if (accNW > getSelectedAccumulatedWeight(doc)) {
             doc.selectedSearchNode = this;
             doc.bottom.storeFinalWeight(doc.visitedCounter++);
         }
 
-        return accNW;
+        return accumulatedWeight;
+    }
+
+
+    private double getSelectedAccumulatedWeight(Document doc) {
+        return doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight.getNormWeight() : -1.0;
     }
 
 
@@ -604,8 +610,8 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public Boolean getCachedDecision() {
-        x: for(Map.Entry<SearchNode, Boolean> me: candidate.cache.entrySet()) {
+    public CachedEntry getCachedDecision() {
+        x: for(Map.Entry<SearchNode, CachedEntry> me: candidate.cache.entrySet()) {
             SearchNode n = this;
             SearchNode cn = me.getKey();
             do {
@@ -640,8 +646,19 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
+    private static class CachedEntry {
+        boolean dir;
+        NormWeight weight;
+
+        private CachedEntry(boolean dir, NormWeight weight) {
+            this.dir = dir;
+            this.weight = weight;
+        }
+    }
+
+
     private static class Candidate implements Comparable<Candidate> {
-        public TreeMap<SearchNode, Boolean> cache = new TreeMap<>();
+        public TreeMap<SearchNode, CachedEntry> cache = new TreeMap<>();
         public InterprNode refinement;
 
         int[] debugCounts = new int[3];
