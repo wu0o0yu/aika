@@ -133,7 +133,7 @@ public class OrNode extends Node<OrNode, Activation> {
         InterprNode no = lookupOrOption(doc, r, true);
 
         for(NodeActivation iAct: inputs) {
-            no.addOrOption(iAct, iAct.key.o);
+            no.addOrInterpretationNode(iAct.key.o);
         }
 
         if(neuron.get().outputText != null) {

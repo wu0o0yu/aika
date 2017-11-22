@@ -51,7 +51,8 @@ public class InterprNode implements Comparable<InterprNode> {
     public final int id;
     public int length;
 
-    public Map<NodeActivation, InterprNode> orInterprNodes;
+    public Set<InterprNode> orInterprNodes;
+    public Set<InterprNode> selectedOrInterprNodes;
     public Set<InterprNode> refByOrInterprNode;
     public InterprNode largestCommonSubset;
     public Set<InterprNode> linkedByLCS;
@@ -64,7 +65,6 @@ public class InterprNode implements Comparable<InterprNode> {
     private long visitedLinkRelations;
     private long visitedContains;
     private long visitedCollect;
-    private long visitedExpandActivations;
     private long visitedIsConflicting;
     private long visitedStoreFinalWeight;
     private long visitedComputeLargestCommonSubset;
@@ -186,12 +186,12 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public void addOrOption(NodeActivation inputAct, InterprNode n) {
+    public void addOrInterpretationNode(InterprNode n) {
         if (orInterprNodes == null) {
-            orInterprNodes = new TreeMap<>();
+            orInterprNodes = new TreeSet<>();
         }
         computeLargestCommonSubsetIncremental(n);
-        orInterprNodes.put(inputAct, n);
+        orInterprNodes.add(n);
         if (n.refByOrInterprNode == null) {
             n.refByOrInterprNode = new TreeSet<>();
         }
@@ -546,7 +546,7 @@ public class InterprNode implements Comparable<InterprNode> {
             if(!level && n.orInterprNodes != null) {
                 sb.append("[");
                 boolean f2 = true;
-                for(InterprNode on: n.orInterprNodes.values()) {
+                for(InterprNode on: n.orInterprNodes) {
                     if(!f2) sb.append(",");
                     f2 = false;
                     sb.append(on.toString(true));

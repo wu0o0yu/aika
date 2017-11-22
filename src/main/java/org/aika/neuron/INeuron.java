@@ -185,7 +185,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             if (iAct == act) continue;
 
             if (s.isNegative()) {
-                if (!checkSelfReferencing(act.key.o, iAct.key.o, null, 0) && act.key.o.contains(iAct.key.o, true)) {
+                if (!checkSelfReferencing(act.key.o, iAct.key.o, 0) && act.key.o.contains(iAct.key.o, true)) {
                     ub += iAct.lowerBound * s.w;
                 }
 
@@ -254,7 +254,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         State is = State.ZERO;
         if (s.key.isRecurrent) {
-            if (!s.isNegative() || !checkSelfReferencing(o, io, sn, 0)) {
+            if (!s.isNegative() || !checkSelfReferencingForSelected(o, io, 0)) {
                 is = round == 0 ? getInitialState(sn.getCoverage(io)) : iAct.rounds.get(round - 1);
             }
         } else {
@@ -382,14 +382,29 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private static boolean checkSelfReferencing(InterprNode nx, InterprNode ny, SearchNode en, int depth) {
-        if (nx == ny && (en == null || en.isCovered(ny.markedSelected))) return true;
+    private static boolean checkSelfReferencing(InterprNode nx, InterprNode ny, int depth) {
+        if (nx == ny) return true;
 
         if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
 
         if (ny.orInterprNodes != null) {
-            for (InterprNode n : ny.orInterprNodes.values()) {
-                if (checkSelfReferencing(nx, n, en, depth + 1)) return true;
+            for (InterprNode n : ny.orInterprNodes) {
+                if (checkSelfReferencing(nx, n, depth + 1)) return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    private static boolean checkSelfReferencingForSelected(InterprNode nx, InterprNode ny, int depth) {
+        if (nx == ny) return true;
+
+        if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
+
+        if (ny.selectedOrInterprNodes != null) {
+            for (InterprNode n : ny.selectedOrInterprNodes) {
+                if (checkSelfReferencingForSelected(nx, n, depth + 1)) return true;
             }
         }
 
@@ -553,7 +568,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 Conflicts.add(doc, act, io, o);
             }
         } else {
-            for (InterprNode no : o.orInterprNodes.values()) {
+            for (InterprNode no : o.orInterprNodes) {
                 addConflict(doc, io, no, act, inputActs, v);
             }
         }

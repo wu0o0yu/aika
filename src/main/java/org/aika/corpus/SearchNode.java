@@ -139,6 +139,8 @@ public class SearchNode implements Comparable<SearchNode> {
         SearchNode child = new SearchNode(doc, this, null, c, level + 1, changed);
         child.search(doc, searchSteps, candidates);
 
+        markUnselected(refinement);
+
         if (doc.selectedSearchNode != null) {
             doc.selectedSearchNode.reconstructSelectedResult(doc);
             doc.selectedSearchNode.collectResults(results);
@@ -235,6 +237,8 @@ public class SearchNode implements Comparable<SearchNode> {
                 selectedWeight = child.search(doc, searchSteps, candidates);
                 child.changeState(StateChange.Mode.OLD);
             }
+
+            markUnselected(refinement);
         }
         if(doc.interrupted) {
             return NormWeight.ZERO_WEIGHT;
@@ -452,18 +456,40 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean markSelected(List<InterprNode> changed, InterprNode n) {
-        if(isCovered(n.markedSelected)) return false;
+    private void markSelected(List<InterprNode> changed, InterprNode n) {
+        if(isCovered(n.markedSelected)) return;
 
         n.markedSelected = visited;
 
+        if(n.refByOrInterprNode != null) {
+            for (InterprNode ref : n.refByOrInterprNode) {
+                if(ref.selectedOrInterprNodes == null) {
+                    ref.selectedOrInterprNodes = new TreeSet<>();
+                }
+                ref.selectedOrInterprNodes.add(n);
+            }
+        }
+
         if(n.isBottom()) {
-            return false;
+            return;
         }
 
         if(changed != null) changed.add(n);
 
-        return false;
+        return;
+    }
+
+
+    private void markUnselected(List<InterprNode> n) {
+        for(InterprNode x: n) {
+            if(x.markedSelected == visited) {
+                if (x.refByOrInterprNode != null) {
+                    for (InterprNode ref : x.refByOrInterprNode) {
+                        ref.selectedOrInterprNodes.remove(x);
+                    }
+                }
+            }
+        }
     }
 
 
@@ -507,18 +533,10 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean checkOrNodeExcluded(InterprNode n) {
-        for(InterprNode on: n.orInterprNodes.values()) {
+        for(InterprNode on: n.orInterprNodes) {
             if(!isCovered(on.markedExcluded)) {
                 return false;
             }
-        }
-        return true;
-    }
-
-
-    public boolean containedInSelectedBranch(InterprNode n) {
-        for(InterprNode p: n.parents) {
-            if(!isCovered(p.markedSelected)) return false;
         }
         return true;
     }
