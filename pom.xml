@@ -30,7 +30,7 @@
         <url>https://github.com/aika-algorithm/aika</url>
         <connection>scm:git:git://github.com/aika-algorithm/aika.git</connection>
         <developerConnection>scm:git:git@github.com:aika-algorithm/aika.git</developerConnection>
-        <tag>aika-0.10</tag>
+        <tag>aika-0.11</tag>
     </scm>
 
 
