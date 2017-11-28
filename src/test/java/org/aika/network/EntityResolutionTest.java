@@ -99,14 +99,14 @@ public class EntityResolutionTest {
         Assert.assertNotNull(eJaguar.get().node.get().getFirstActivation(doc));
         Assert.assertNotNull(ePuma.get().node.get().getFirstActivation(doc));
 
-        Assert.assertEquals(0, eJaguar.get().node.get().getFirstActivation(doc).key.o.primId);
-        Assert.assertEquals(1, ePuma.get().node.get().getFirstActivation(doc).key.o.primId);
+        Assert.assertEquals(0, eJaguar.get().node.get().getFirstActivation(doc).key.interpretation.primId);
+        Assert.assertEquals(1, ePuma.get().node.get().getFirstActivation(doc).key.interpretation.primId);
 
-        Assert.assertEquals(doc.bottom, eJaguar.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.iterator().next());
-        Assert.assertEquals(doc.bottom, ePuma.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.iterator().next());
+        Assert.assertEquals(doc.bottom, eJaguar.get().node.get().getFirstActivation(doc).key.interpretation.orInterprNodes.iterator().next());
+        Assert.assertEquals(doc.bottom, ePuma.get().node.get().getFirstActivation(doc).key.interpretation.orInterprNodes.iterator().next());
 
-        Assert.assertEquals(1, eJaguar.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
-        Assert.assertEquals(1, ePuma.get().node.get().getFirstActivation(doc).key.o.orInterprNodes.size());
+        Assert.assertEquals(1, eJaguar.get().node.get().getFirstActivation(doc).key.interpretation.orInterprNodes.size());
+        Assert.assertEquals(1, ePuma.get().node.get().getFirstActivation(doc).key.interpretation.orInterprNodes.size());
     }
 
 

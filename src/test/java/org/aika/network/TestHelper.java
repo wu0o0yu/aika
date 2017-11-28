@@ -43,7 +43,7 @@ public class TestHelper {
         in.addActivation(doc, inputAct);
         doc.propagate();
         if(in instanceof InputNode) {
-            return NodeActivation.get(doc, in, inputAct.key.rid, inputAct.key.r, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, inputAct.key.o, InterprNode.Relation.EQUALS);
+            return NodeActivation.get(doc, in, inputAct.key.rid, inputAct.key.range, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, inputAct.key.interpretation, InterprNode.Relation.EQUALS);
         }
         return null;
     }

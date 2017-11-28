@@ -212,11 +212,11 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         @Override
         public int compare(Key k1, Key k2) {
             int r;
-            r = Range.compare(k1.r, k2.r, false);
+            r = Range.compare(k1.range, k2.range, false);
             if (r != 0) return r;
             r = Utils.compareInteger(k1.rid, k2.rid);
             if (r != 0) return r;
-            return InterprNode.compare(k1.o, k2.o);
+            return InterprNode.compare(k1.interpretation, k2.interpretation);
         }
     };
 
@@ -225,11 +225,11 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         @Override
         public int compare(Key k1, Key k2) {
             int r;
-            r = Range.compare(k1.r, k2.r, true);
+            r = Range.compare(k1.range, k2.range, true);
             if (r != 0) return r;
             r = Utils.compareInteger(k1.rid, k2.rid);
             if (r != 0) return r;
-            return InterprNode.compare(k1.o, k2.o);
+            return InterprNode.compare(k1.interpretation, k2.interpretation);
         }
     };
 
@@ -240,9 +240,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             int r;
             r = Utils.compareInteger(k1.rid, k2.rid);
             if (r != 0) return r;
-            r = Range.compare(k1.r, k2.r, false);
+            r = Range.compare(k1.range, k2.range, false);
             if (r != 0) return r;
-            return InterprNode.compare(k1.o, k2.o);
+            return InterprNode.compare(k1.interpretation, k2.interpretation);
         }
     };
 
@@ -312,7 +312,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     A processAddedActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs) {
         if (Document.APPLY_DEBUG_OUTPUT) {
-            log.info("add: " + ak + " - " + ak.n);
+            log.info("add: " + ak + " - " + ak.node);
         }
 
         A act = NodeActivation.get(doc, (T) this, ak);
@@ -335,9 +335,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void register(A act, Document doc) {
         Key ak = act.key;
 
-        ThreadState th = ak.n.getThreadState(doc.threadId, true);
+        ThreadState th = ak.node.getThreadState(doc.threadId, true);
         if (th.activations.isEmpty()) {
-            doc.activatedNodes.add(ak.n);
+            doc.activatedNodes.add(ak.node);
         }
         th.activations.put(ak, act);
 
@@ -347,12 +347,12 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         TreeMap<Key, NodeActivation> actRid = th.activationsRid;
         if (actRid != null) actRid.put(ak, act);
 
-        if (ak.o.activations == null) {
-            ak.o.activations = new TreeMap<>();
+        if (ak.interpretation.activations == null) {
+            ak.interpretation.activations = new TreeMap<>();
         }
-        ak.o.activations.put(ak, act);
+        ak.interpretation.activations.put(ak, act);
 
-        ak.n.lastUsedDocumentId = doc.id;
+        ak.node.lastUsedDocumentId = doc.id;
 
         if (ak.rid != null) {
             doc.activationsByRid.put(ak, act);
@@ -388,14 +388,14 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * @param inputActs
      */
     public static <T extends Node, A extends NodeActivation<T>> void addActivationAndPropagate(Document doc, Key<T> ak, Collection<NodeActivation<?>> inputActs) {
-        ThreadState<T, A> th = ak.n.getThreadState(doc.threadId, true);
+        ThreadState<T, A> th = ak.node.getThreadState(doc.threadId, true);
         Set<NodeActivation<?>> iActs = th.added.get(ak);
         if (iActs == null) {
             iActs = new TreeSet<>();
             th.added.put(ak, iActs);
         }
         iActs.addAll(inputActs);
-        doc.queue.add(ak.n);
+        doc.queue.add(ak.node);
     }
 
 

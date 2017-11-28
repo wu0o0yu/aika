@@ -122,7 +122,7 @@ public class ActivationOutputsTest {
 
     private Activation selectInputActivation(Set<SynapseActivation> acts, Node n) {
         for(SynapseActivation sa: acts) {
-            if(sa.input.key.n.compareTo(n) == 0) {
+            if(sa.input.key.node.compareTo(n) == 0) {
                 return sa.input;
             }
         }
@@ -172,7 +172,7 @@ public class ActivationOutputsTest {
 
         System.out.println(doc.neuronActivationsToString(false, false, true));
 
-        Assert.assertTrue(!actAB.key.o.conflicts.primary.isEmpty());
+        Assert.assertTrue(!actAB.key.interpretation.conflicts.primary.isEmpty());
     }
 
 

@@ -162,7 +162,7 @@ public class SearchNode implements Comparable<SearchNode> {
         for(StateChange sc : modifiedActs) {
             Activation act = sc.act;
             if(act.finalState != null && act.finalState.value > 0.0) {
-                doc.finallyActivatedNeurons.add(act.key.n.neuron.get());
+                doc.finallyActivatedNeurons.add(act.key.node.neuron.get());
             }
         }
     }
@@ -178,8 +178,8 @@ public class SearchNode implements Comparable<SearchNode> {
                             " LIMITED:" + n.candidate.debugCounts[DebugState.LIMITED.ordinal()] +
                             " CACHED:" + n.candidate.debugCounts[DebugState.CACHED.ordinal()] +
                             " EXPLORE:" + n.candidate.debugCounts[DebugState.EXPLORE.ordinal()] +
-                            " " + n.candidate.refinement.act.key.r +
-                            " " + n.candidate.refinement.act.key.n.neuron.get().label
+                            " " + n.candidate.refinement.act.key.range +
+                            " " + n.candidate.refinement.act.key.node.neuron.get().label
             );
 
             n = n.getParent();
@@ -655,7 +655,7 @@ public class SearchNode implements Comparable<SearchNode> {
             if(n.act != null) {
                 for(SynapseActivation sa: n.act.neuronOutputs) {
                     if(sa.s.key.isRecurrent && !sa.s.isNegative()) {
-                        if(getCoverage(sa.output.key.o) == Coverage.UNKNOWN) return true;
+                        if(getCoverage(sa.output.key.interpretation) == Coverage.UNKNOWN) return true;
                     }
                 }
             }
@@ -690,14 +690,14 @@ public class SearchNode implements Comparable<SearchNode> {
         public Candidate(InterprNode refinement, int id) {
             this.refinement = refinement;
             if(refinement.act != null) {
-                minBegin = refinement.act.key.r.begin;
-                maxEnd = refinement.act.key.r.end;
+                minBegin = refinement.act.key.range.begin;
+                maxEnd = refinement.act.key.range.end;
                 minRid = refinement.act.key.rid;
             } else {
                 for(NodeActivation act: refinement.getActivations()) {
-                    if(act.key.r != null) {
-                        minBegin= Math.min(minBegin, act.key.r.begin);
-                        maxEnd =  Math.max(maxEnd, act.key.r.end);
+                    if(act.key.range != null) {
+                        minBegin= Math.min(minBegin, act.key.range.begin);
+                        maxEnd =  Math.max(maxEnd, act.key.range.end);
                     }
                     minRid = Utils.nullSafeMin(minRid, act.key.rid);
                 }

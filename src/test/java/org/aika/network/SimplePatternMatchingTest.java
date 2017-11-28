@@ -108,9 +108,9 @@ public class SimplePatternMatchingTest {
         System.out.println("Output activation:");
         OrNode n = pattern.get().node.get();
         for(NodeActivation act: n.getActivations(doc)) {
-            System.out.println("Text Range: " + act.key.r);
-            System.out.println("Option: " + act.key.o);
-            System.out.println("Node: " + act.key.n);
+            System.out.println("Text Range: " + act.key.range);
+            System.out.println("Option: " + act.key.interpretation);
+            System.out.println("Node: " + act.key.node);
             System.out.println("Rid: " + act.key.rid);
             System.out.println();
         }
@@ -201,9 +201,9 @@ public class SimplePatternMatchingTest {
         System.out.println("Output activation:");
         OrNode n = pattern.get().node.get();
         for(NodeActivation act: n.getActivations(doc)) {
-            System.out.println("Text Range: " + act.key.r);
-            System.out.println("Option: " + act.key.o);
-            System.out.println("Node: " + act.key.n);
+            System.out.println("Text Range: " + act.key.range);
+            System.out.println("Interpretation: " + act.key.interpretation);
+            System.out.println("Node: " + act.key.node);
             System.out.println("Rid: " + act.key.rid);
             System.out.println();
         }

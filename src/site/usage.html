@@ -59,7 +59,7 @@
         Document doc = parser.parse("Mr. Jackson Cook was born in New York");
 
         for(Activation act: parser.personNamesModel.surnameCategory.getFinalActivations(doc)) {
-              System.out.println(doc.getText(act.key.r));
+              System.out.println(doc.getText(act.key.range));
         }
 
         System.out.println(doc.neuronActivationsToString(true));
@@ -436,9 +436,9 @@ The output of this example looks as following. Each line in the table represents
 
         System.out.println("Output activation:");
         for(Activation act: outN.node.getActivations(t)) {
-            System.out.println("Text Range: " + act.key.r);
-            System.out.println("Option: " + act.key.o);
-            System.out.println("Node: " + act.key.n);
+            System.out.println("Text Range: " + act.key.range);
+            System.out.println("Option: " + act.key.interpretation);
+            System.out.println("Node: " + act.key.node);
             System.out.println("Rid: " + act.key.rid);
             System.out.println("Activation weight: " + act.finalState.value);
             System.out.println();
@@ -586,9 +586,9 @@ The output of this example looks as following. Each line in the table represents
 
         System.out.println("Output activation:");
         for(Activation act: pattern.node.getActivations(t)) {
-            System.out.println("Text Range: " + act.key.r);
-            System.out.println("Option: " + act.key.o);
-            System.out.println("Node: " + act.key.n);
+            System.out.println("Text Range: " + act.key.range);
+            System.out.println("Option: " + act.key.interpretation);
+            System.out.println("Node: " + act.key.node);
             System.out.println("Rid: " + act.key.rid);
             System.out.println();
         }

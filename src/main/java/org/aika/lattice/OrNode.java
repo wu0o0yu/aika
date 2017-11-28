@@ -73,7 +73,7 @@ public class OrNode extends Node<OrNode, Activation> {
     @Override
     protected Activation createActivation(Document doc, NodeActivation.Key ak) {
         Activation act = new Activation(doc.activationIdCounter++, doc, ak);
-        ak.o.act = act;
+        ak.interpretation.act = act;
         ThreadState<OrNode, Activation> th = getThreadState(doc.threadId, false);
         if(th == null || th.activations.isEmpty()) {
             doc.activatedNeurons.add(neuron.get());
@@ -99,7 +99,7 @@ public class OrNode extends Node<OrNode, Activation> {
                 NodeActivation.select(doc, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null) :
                 NodeActivation.select(doc, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null);
         for(NodeActivation iAct: s.collect(Collectors.toList())) {
-            if(parents.contains(iAct.key.n.provider) && !checkSelfReferencing(doc, iAct)) {
+            if(parents.contains(iAct.key.node.provider) && !checkSelfReferencing(doc, iAct)) {
                 inputs.add(iAct);
             }
         }
@@ -119,7 +119,7 @@ public class OrNode extends Node<OrNode, Activation> {
         if(checkSelfReferencing(doc, inputAct)) return;
 
         Key ak = inputAct.key;
-        Range r = ak.r;
+        Range r = ak.range;
         Integer rid = Utils.nullSafeSub(ak.rid, true, ridOffset, false);
 
         List<NodeActivation<?>> inputs = new ArrayList<>();
@@ -133,7 +133,7 @@ public class OrNode extends Node<OrNode, Activation> {
         InterprNode no = lookupOrOption(doc, r, true);
 
         for(NodeActivation iAct: inputs) {
-            no.addOrInterpretationNode(iAct.key.o);
+            no.addOrInterpretationNode(iAct.key.interpretation);
         }
 
         if(neuron.get().outputText != null) {
@@ -160,9 +160,9 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     private boolean checkSelfReferencing(Document doc, NodeActivation inputAct) {
-        InterprNode o = lookupOrOption(doc, inputAct.key.r, false);
+        InterprNode o = lookupOrOption(doc, inputAct.key.range, false);
         if(o == null) return false;
-        return inputAct.key.o.contains(o, true);
+        return inputAct.key.interpretation.contains(o, true);
     }
 
 
@@ -199,7 +199,7 @@ public class OrNode extends Node<OrNode, Activation> {
         parentNode.lock.acquireReadLock();
         if(parentNode.orChildren != null) {
             for (OrEntry oe : parentNode.orChildren) {
-                if (!ak.o.isConflicting(doc.visitedCounter++)) {
+                if (!ak.interpretation.isConflicting(doc.visitedCounter++)) {
                     oe.node.get().addActivation(doc, oe.ridOffset, inputAct);
                 }
             }
@@ -215,14 +215,14 @@ public class OrNode extends Node<OrNode, Activation> {
                 .orElse(null);
 
         if(act != null) {
-            return act.key.o;
+            return act.key.interpretation;
         }
 
         ThreadState<OrNode, Activation> th = getThreadState(doc.threadId, false);
         if(th != null) {
             for (Key<OrNode> ak : th.added.keySet()) {
-                if (Range.compare(ak.r, r) == 0) {
-                    return ak.o;
+                if (Range.compare(ak.range, r) == 0) {
+                    return ak.interpretation;
                 }
             }
         }
@@ -321,10 +321,10 @@ public class OrNode extends Node<OrNode, Activation> {
         super.register(act, doc);
         Key ak = act.key;
 
-        if(ak.o.neuronActivations == null) {
-            ak.o.neuronActivations = new TreeSet<>();
+        if(ak.interpretation.neuronActivations == null) {
+            ak.interpretation.neuronActivations = new TreeSet<>();
         }
-        ak.o.neuronActivations.add(act);
+        ak.interpretation.neuronActivations.add(act);
 
         neuron.get().lastUsedDocumentId = doc.id;
     }

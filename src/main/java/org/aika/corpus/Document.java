@@ -92,13 +92,13 @@ public class Document implements Comparable<Document> {
     public static Comparator<NodeActivation> ACTIVATIONS_OUTPUT_COMPARATOR = new Comparator<NodeActivation>() {
         @Override
         public int compare(NodeActivation act1, NodeActivation act2) {
-            int r = Range.compare(act1.key.r, act2.key.r, false);
+            int r = Range.compare(act1.key.range, act2.key.range, false);
             if(r != 0) return r;
             r = Utils.compareInteger(act1.key.rid, act2.key.rid);
             if(r != 0) return r;
-            r = act1.key.o.compareTo(act2.key.o);
+            r = act1.key.interpretation.compareTo(act2.key.interpretation);
             if(r != 0) return r;
-            return act1.key.n.compareTo(act2.key.n);
+            return act1.key.node.compareTo(act2.key.node);
         }
     };
 
@@ -263,7 +263,7 @@ public class Document implements Comparable<Document> {
 
     public void train(TrainConfig trainConfig) {
         for(Activation tAct: targetActivations) {
-            tAct.key.n.neuron.get().computeOutputErrorSignal(this, tAct);
+            tAct.key.node.neuron.get().computeOutputErrorSignal(this, tAct);
         }
 
         if(trainConfig.performBackpropagation) {
@@ -271,7 +271,7 @@ public class Document implements Comparable<Document> {
         }
 
         for (Activation act : errorSignalActivations) {
-            act.key.n.neuron.get().train(this, act, trainConfig.learnRate, trainConfig.synapseEvaluation);
+            act.key.node.neuron.get().train(this, act, trainConfig.learnRate, trainConfig.synapseEvaluation);
         }
         errorSignalActivations.clear();
     }
@@ -317,7 +317,7 @@ public class Document implements Comparable<Document> {
         for(INeuron n: finallyActivatedNeurons) {
             if(n.outputText != null) {
                 for (Activation act : n.getFinalActivations(this)) {
-                    sb.replace(act.key.r.begin, act.key.r.end, n.outputText);
+                    sb.replace(act.key.range.begin, act.key.range.end, n.outputText);
                 }
             }
         }
@@ -341,26 +341,26 @@ public class Document implements Comparable<Document> {
 
         StringBuilder sb = new StringBuilder();
         for(Activation act: acts) {
-            if(act.upperBound <= 0.0) {
+            if(act.upperBound <= 0.0 && act.targetValue <= 0.0) {
                 continue;
             }
 
             sb.append(act.id + " ");
-            sb.append(act.key.r);
+            sb.append(act.key.range);
             if(withTextSnipped) {
                 sb.append(" ");
-                if(act.key.n.neuron.get().outputText != null) {
-                    sb.append(collapseText(act.key.n.neuron.get().outputText));
+                if(act.key.node.neuron.get().outputText != null) {
+                    sb.append(collapseText(act.key.node.neuron.get().outputText));
                 } else {
-                    sb.append(collapseText(getText(act.key.r)));
+                    sb.append(collapseText(getText(act.key.range)));
                 }
             }
             sb.append(" - ");
 
-            sb.append(act.key.o);
+            sb.append(act.key.interpretation);
             sb.append(" - ");
 
-            sb.append(withLogic ? act.key.n.toString() : act.key.n.getNeuronLabel());
+            sb.append(withLogic ? act.key.node.toString() : act.key.node.getNeuronLabel());
             sb.append(" - Rid:");
             sb.append(act.key.rid);
             sb.append(" - UB:");
@@ -381,6 +381,7 @@ public class Document implements Comparable<Document> {
                     sb.append(" FW:" + Utils.round(act.finalState.weight.w));
                     sb.append(" FN:" + Utils.round(act.finalState.weight.n));
                 }
+                sb.append(" - TV:" + Utils.round(act.targetValue));
             }
             sb.append("\n");
         }
@@ -401,17 +402,17 @@ public class Document implements Comparable<Document> {
         StringBuilder sb = new StringBuilder();
         for(NodeActivation act: acts) {
             sb.append(act.id + " ");
-            sb.append(act.key.r);
+            sb.append(act.key.range);
             if(withTextSnipped) {
                 sb.append(" ");
-                sb.append(collapseText(getText(act.key.r)));
+                sb.append(collapseText(getText(act.key.range)));
             }
             sb.append(" - ");
 
-            sb.append(act.key.o);
+            sb.append(act.key.interpretation);
             sb.append(" - ");
 
-            sb.append(withLogic ? act.key.n.toString() : act.key.n.getNeuronLabel());
+            sb.append(withLogic ? act.key.node.toString() : act.key.node.getNeuronLabel());
             sb.append(" - Rid:");
             sb.append(act.key.rid);
             sb.append("\n");
@@ -496,7 +497,7 @@ public class Document implements Comparable<Document> {
 
                 double oldUpperBound = act.isInput ? 0.0 : act.upperBound;
 
-                INeuron n = act.key.n.neuron.get();
+                INeuron n = act.key.node.neuron.get();
 
                 if(!act.isInput) {
                     n.computeBounds(act);
@@ -586,7 +587,7 @@ public class Document implements Comparable<Document> {
                     Activation act = q.pollLast();
                     act.rounds.setQueued(round, false);
 
-                    State s = act.isInput ? act.finalState : act.key.n.neuron.get().computeWeight(round, act, sn, Document.this);
+                    State s = act.isInput ? act.finalState : act.key.node.neuron.get().computeWeight(round, act, sn, Document.this);
 
                     if (OPTIMIZE_DEBUG_OUTPUT) {
                         log.info(act.key + " Round:" + round);
@@ -663,7 +664,7 @@ public class Document implements Comparable<Document> {
                 Activation act = queue.pollFirst();
 
                 act.isQueued = false;
-                act.key.n.neuron.get().computeBackpropagationErrorSignal(Document.this, act);
+                act.key.node.neuron.get().computeBackpropagationErrorSignal(Document.this, act);
             }
         }
     }
@@ -672,7 +673,7 @@ public class Document implements Comparable<Document> {
     public interface PatternEvaluation {
 
         /**
-         * Check if <code>n</code> is an interesting pattern that might be considered for further processing.
+         * Check if <code>node</code> is an interesting pattern that might be considered for further processing.
          *
          * This property is required to be monotonic over the size of the pattern. In other words, if a pattern is
          * interesting, then all its sub patterns also need to be interesting.

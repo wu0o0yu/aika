@@ -83,7 +83,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         th.visited = v;
 
         for(NodeActivation pAct: act.inputs.values()) {
-            if(pAct.key.n.isAllowedOption(threadId, n, pAct, v)) return true;
+            if(pAct.key.node.isAllowedOption(threadId, n, pAct, v)) return true;
         }
         return false;
     }
@@ -124,13 +124,13 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     void apply(Document doc, NodeActivation<AndNode> act) {
 
         for(NodeActivation<?> pAct: act.inputs.values()) {
-            Node<?, NodeActivation<?>> pn = pAct.key.n;
+            Node<?, NodeActivation<?>> pn = pAct.key.node;
             pn.lock.acquireReadLock();
-            Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n.provider, act.key.rid, pAct.key.rid));
+            Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.node.provider, act.key.rid, pAct.key.rid));
             if(ref != null) {
                 for (NodeActivation secondAct : pAct.outputs.values()) {
                     if (act != secondAct) {
-                        Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n.provider, secondAct.key.rid, pAct.key.rid));
+                        Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
                         if (secondRef != null) {
                             Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
@@ -152,14 +152,14 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     @Override
     public void discover(Document doc, NodeActivation<AndNode> act, DiscoveryConfig discoveryConfig) {
         for(NodeActivation<?> pAct: act.inputs.values()) {
-            Node<?, NodeActivation<?>> pn = pAct.key.n;
+            Node<?, NodeActivation<?>> pn = pAct.key.node;
             pn.lock.acquireReadLock();
-            Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.n.provider, act.key.rid, pAct.key.rid));
+            Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.node.provider, act.key.rid, pAct.key.rid));
             for(NodeActivation secondAct: pAct.outputs.values()) {
-                if(secondAct.key.n instanceof AndNode) {
-                    Node secondNode = secondAct.key.n;
+                if(secondAct.key.node instanceof AndNode) {
+                    Node secondNode = secondAct.key.node;
                     if (act != secondAct && discoveryConfig.checkExpandable.evaluate(secondNode)) {
-                        Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.n.provider, secondAct.key.rid, pAct.key.rid));
+                        Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
                         Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
                         AndNode nln = createNextLevelNode(doc.m, doc.threadId, this, nRef, discoveryConfig);
@@ -238,14 +238,14 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     public static void addNextLevelActivation(Document doc, NodeActivation<AndNode> act, NodeActivation<AndNode> secondAct, Provider<AndNode> pnlp) {
         // TODO: check if the activation already exists
         Key ak = act.key;
-        InterprNode o = InterprNode.add(doc, true, ak.o, secondAct.key.o);
+        InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
         if (o != null) {
             AndNode nlp = pnlp.get();
             nlp.addActivation(
                     doc,
                     new Key(
                             nlp,
-                            Range.mergeRange(ak.r, secondAct.key.r),
+                            Range.mergeRange(ak.range, secondAct.key.range),
                             Utils.nullSafeMin(ak.rid, secondAct.key.rid),
                             o
                     ),

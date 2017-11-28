@@ -26,7 +26,6 @@ import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.OrNode;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -108,9 +107,9 @@ public class OverlappingOrTest {
         System.out.println("Output activation:");
         OrNode n = pattern.get().node.get();
         for(NodeActivation act: n.getActivations(doc)) {
-            System.out.println("Text Range: " + act.key.r);
-            System.out.println("Option: " + act.key.o);
-            System.out.println("Node: " + act.key.n);
+            System.out.println("Text Range: " + act.key.range);
+            System.out.println("Option: " + act.key.interpretation);
+            System.out.println("Node: " + act.key.node);
             System.out.println("Rid: " + act.key.rid);
 //            System.out.println("Activation weight: " + act.finalState.value);
             System.out.println();

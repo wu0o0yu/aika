@@ -75,7 +75,7 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
 
 
     public static <T extends Node, A extends NodeActivation<T>> A get(Document doc, T n, Key ak) {
-        return get(doc, n, ak.rid, ak.r, Operator.EQUALS, Operator.EQUALS, ak.o, InterprNode.Relation.EQUALS);
+        return get(doc, n, ak.rid, ak.range, Operator.EQUALS, Operator.EQUALS, ak.interpretation, InterprNode.Relation.EQUALS);
     }
 
 
@@ -170,10 +170,10 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
 
 
     public <T extends Node> boolean filter(T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
-        return (n == null || key.n == n) &&
+        return (n == null || key.node == n) &&
                 (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) &&
-                (r == null || ((begin == null || begin.compare(key.r.begin, r.begin)) && (end == null || end.compare(key.r.end, r.end)))) &&
-                (o == null || or.compare(key.o, o));
+                (r == null || ((begin == null || begin.compare(key.range.begin, r.begin)) && (end == null || end.compare(key.range.end, r.end)))) &&
+                (o == null || or.compare(key.interpretation, o));
     }
 
 
@@ -181,11 +181,11 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
         StringBuilder sb = new StringBuilder();
         sb.append("<ACT ");
         sb.append(",(");
-        sb.append(key.r);
+        sb.append(key.range);
         sb.append("),");
-        sb.append(doc.getContent().substring(Math.max(0, key.r.begin - 3), Math.min(doc.length(), key.r.end + 3)));
+        sb.append(doc.getContent().substring(Math.max(0, key.range.begin - 3), Math.min(doc.length(), key.range.end + 3)));
         sb.append(",");
-        sb.append(key.n);
+        sb.append(key.node);
         sb.append(">");
         return sb.toString();
     }
@@ -206,34 +206,34 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
 
 
     public static final class Key<T extends Node> implements Comparable<Key> {
-        public final T n;
-        public final Range r;
+        public final T node;
+        public final Range range;
         public final Integer rid;
-        public final InterprNode o;
+        public final InterprNode interpretation;
 
 
-        public Key(T n, Range r, Integer rid, InterprNode o) {
-            this.n = n;
-            this.r = r;
+        public Key(T node, Range range, Integer rid, InterprNode interpretation) {
+            this.node = node;
+            this.range = range;
             this.rid = rid;
-            this.o = o;
+            this.interpretation = interpretation;
         }
 
 
         @Override
         public int compareTo(Key k) {
-            int x = n.compareTo(k.n);
+            int x = node.compareTo(k.node);
             if(x != 0) return x;
-            x = Range.compare(r, k.r, false);
+            x = Range.compare(range, k.range, false);
             if(x != 0) return x;
             x = Utils.compareInteger(rid, k.rid);
             if(x != 0) return x;
-            return o.compareTo(k.o);
+            return interpretation.compareTo(k.interpretation);
         }
 
 
         public String toString() {
-            return (n != null ? n.getNeuronLabel() : "") + r + " " + rid + " " + o;
+            return (node != null ? node.getNeuronLabel() : "") + range + " " + rid + " " + interpretation;
         }
     }
 }

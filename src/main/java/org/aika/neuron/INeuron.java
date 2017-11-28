@@ -136,7 +136,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         act.isInput = true;
 
         doc.inputNeuronActivations.add(act);
-        doc.finallyActivatedNeurons.add(act.key.n.neuron.get());
+        doc.finallyActivatedNeurons.add(act.key.node.neuron.get());
 
         doc.ubQueue.add(act);
 
@@ -185,7 +185,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             if (iAct == act) continue;
 
             if (s.isNegative()) {
-                if (!checkSelfReferencing(act.key.o, iAct.key.o, 0) && act.key.o.contains(iAct.key.o, true)) {
+                if (!checkSelfReferencing(act.key.interpretation, iAct.key.interpretation, 0) && act.key.interpretation.contains(iAct.key.interpretation, true)) {
                     ub += iAct.lowerBound * s.w;
                 }
 
@@ -202,7 +202,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public State computeWeight(int round, Activation act, SearchNode sn, Document doc) {
-        Coverage c = sn.getCoverage(act.key.o);
+        Coverage c = sn.getCoverage(act.key.interpretation);
         if(c == Coverage.UNKNOWN) return State.ZERO;
 
         double st = bias - (negDirSum + negRecSum);
@@ -250,7 +250,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private State getInputState(int round, SearchNode sn, InterprNode o, Synapse s, Activation iAct) {
-        InterprNode io = iAct.key.o;
+        InterprNode io = iAct.key.interpretation;
 
         State is = State.ZERO;
         if (s.key.isRecurrent) {
@@ -265,7 +265,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private List<InputState> getInputStates(Activation act, int round, SearchNode sn) {
-        InterprNode o = act.key.o;
+        InterprNode o = act.key.interpretation;
         ArrayList<InputState> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
         InputState maxInputState = null;
@@ -353,7 +353,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         if (iAct.visitedNeuronTrain == v) return;
         iAct.visitedNeuronTrain = v;
 
-        INeuron inputNeuron = iAct.key.n.neuron.get();
+        INeuron inputNeuron = iAct.key.node.neuron.get();
         if(inputNeuron == this) {
             return;
         }
@@ -463,7 +463,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
             markConflicts(iAct, oAct, v);
 
-            addConflict(doc, oAct.key.o, iAct.key.o, iAct, Collections.singleton(act), v);
+            addConflict(doc, oAct.key.interpretation, iAct.key.interpretation, iAct, Collections.singleton(act), v);
         }
     }
 
@@ -481,7 +481,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         Operator begin = sk.startRangeMatch;
         Operator end = sk.endRangeMatch;
-        Range r = act.key.r;
+        Range r = act.key.range;
         if (dir == 0) {
             Operator tb = begin;
             Operator te = end;
@@ -578,17 +578,17 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     private static boolean isAllowed(Document doc, InterprNode io, InterprNode o, Collection<NodeActivation> inputActs) {
         if (io != null && o.contains(io, false)) return true;
         for (NodeActivation act : inputActs) {
-            if (act.key.n.isAllowedOption(doc.threadId, o, act, doc.visitedCounter++)) return true;
+            if (act.key.node.isAllowedOption(doc.threadId, o, act, doc.visitedCounter++)) return true;
         }
         return false;
     }
 
 
     private static void markConflicts(Activation iAct, Activation oAct, long v) {
-        oAct.key.o.markedConflict = v;
+        oAct.key.interpretation.markedConflict = v;
         for (SynapseActivation sa : iAct.neuronOutputs) {
             if (sa.s.key.isRecurrent && sa.s.isNegative()) {
-                sa.output.key.o.markedConflict = v;
+                sa.output.key.interpretation.markedConflict = v;
             }
         }
     }
@@ -777,7 +777,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public String toString() {
-        return "n(" + label + ")";
+        return "node(" + label + ")";
     }
 
 

@@ -233,10 +233,10 @@ public class NamedEntityRecognitionTest {
 
         System.out.println("Activations of the Surname Category:");
         for(Activation act: surnameCategory.getFinalActivations(doc)) {
-            System.out.print(act.key.r + " ");
+            System.out.print(act.key.range + " ");
             System.out.print(act.key.rid + " ");
-            System.out.print(act.key.o + " ");
-            System.out.print(act.key.n.neuron.get().label + " ");
+            System.out.print(act.key.interpretation + " ");
+            System.out.print(act.key.node.neuron.get().label + " ");
             System.out.print(act.finalState.value);
         }
 

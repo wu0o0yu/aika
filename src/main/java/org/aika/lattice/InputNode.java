@@ -100,14 +100,14 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     private NodeActivation.Key computeActivationKey(NodeActivation iAct) {
         NodeActivation.Key ak = iAct.key;
-        if ((key.absoluteRid != null && key.absoluteRid != ak.rid) || ak.o.isConflicting(ak.o.doc.visitedCounter++))
+        if ((key.absoluteRid != null && key.absoluteRid != ak.rid) || ak.interpretation.isConflicting(ak.interpretation.doc.visitedCounter++))
             return null;
 
         return new NodeActivation.Key(
                 this,
-                new Range(key.startRangeMapping.getSignalPos(ak.r), key.endRangeMapping.getSignalPos(ak.r)),
+                new Range(key.startRangeMapping.getSignalPos(ak.range), key.endRangeMapping.getSignalPos(ak.range)),
                 key.relativeRid != null ? ak.rid : null,
-                ak.o
+                ak.interpretation
         );
     }
 
@@ -170,14 +170,14 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         if (th == null || th.activations.isEmpty()) return;
 
         NodeActivation.Key ak = act.key;
-        InputNode firstNode = ((InputNode) ak.n);
+        InputNode firstNode = ((InputNode) ak.node);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
 
         Stream<NodeActivation<InputNode>> s = NodeActivation.select(
                 th,
                 secondNode,
                 secondRid,
-                ak.r,
+                ak.range,
                 computeStartRangeMatch(firstNode.key, secondNode.key),
                 computeEndRangeMatch(firstNode.key, secondNode.key),
                 null,
@@ -185,15 +185,15 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         );
 
         s.forEach(secondAct -> {
-                    InterprNode o = InterprNode.add(doc, true, ak.o, secondAct.key.o);
+                    InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
                     if (o != null) {
                         AndNode nlp = pnlp.get();
                         nlp.addActivation(doc,
                                 new NodeActivation.Key(
                                         nlp,
                                         Range.mergeRange(
-                                                Range.getOutputRange(ak.r, new boolean[]{firstNode.key.startRangeOutput, firstNode.key.endRangeOutput}),
-                                                Range.getOutputRange(secondAct.key.r, new boolean[]{secondNode.key.startRangeOutput, secondNode.key.endRangeOutput})
+                                                Range.getOutputRange(ak.range, new boolean[]{firstNode.key.startRangeOutput, firstNode.key.endRangeOutput}),
+                                                Range.getOutputRange(secondAct.key.range, new boolean[]{secondNode.key.startRangeOutput, secondNode.key.endRangeOutput})
                                         ),
                                         Utils.nullSafeMin(ak.rid, secondAct.key.rid),
                                         o
@@ -233,7 +233,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         for (INeuron n : doc.finallyActivatedNeurons) {
             for (Activation secondNAct : n.getFinalActivations(doc)) {
                 for (NodeActivation secondAct : secondNAct.outputs.values()) {
-                    Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.n.provider);
+                    Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.node.provider);
                     InputNode in = ref.input.get();
                     Operator srm = computeStartRangeMatch(key, in.key);
                     Operator erm = computeEndRangeMatch(key, in.key);
@@ -244,8 +244,8 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                             !in.key.isRecurrent &&
                             !(key.startRangeOutput && in.key.startRangeOutput) &&
                             !(key.endRangeOutput && in.key.endRangeOutput) &&
-                            srm.compare(secondAct.key.r.begin, act.key.r.begin) &&
-                            erm.compare(secondAct.key.r.end, act.key.r.end)
+                            srm.compare(secondAct.key.range.begin, act.key.range.begin) &&
+                            erm.compare(secondAct.key.range.end, act.key.range.end)
                         ) {
                         in.visitedDiscover = v;
                         AndNode nln = AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, discoveryConfig);

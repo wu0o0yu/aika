@@ -25,7 +25,6 @@ import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
-import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
 import org.junit.Assert;
@@ -211,7 +210,7 @@ public class NegationTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
-        Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
+        Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.interpretation.largestCommonSubset.conflicts.primary.isEmpty());
 
         doc.clearActivations();
     }
@@ -269,7 +268,7 @@ public class NegationTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
-        Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
+        Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.interpretation.largestCommonSubset.conflicts.primary.isEmpty());
 
         doc.clearActivations();
     }
@@ -327,7 +326,7 @@ public class NegationTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
-        Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.o.largestCommonSubset.conflicts.primary.isEmpty());
+        Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.interpretation.largestCommonSubset.conflicts.primary.isEmpty());
 
         doc.clearActivations();
     }
@@ -419,7 +418,7 @@ public class NegationTest {
             System.out.println(doc.neuronActivationsToString(true, false, true));
 
             Assert.assertNotNull(NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, EQUALS, null, null));
-            Assert.assertEquals(2, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, EQUALS, null, null).key.o.orInterprNodes.size());
+            Assert.assertEquals(2, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, EQUALS, null, null).key.interpretation.orInterprNodes.size());
 
             doc.clearActivations();
         }
@@ -436,9 +435,9 @@ public class NegationTest {
 
 //            Assert.assertNotNull(Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
             Assert.assertNotNull(NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 9), EQUALS, EQUALS, null, null));
-//            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.o.orInterprNodes.size());
-            Assert.assertEquals(1, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, EQUALS, null, null).key.o.orInterprNodes.size());
-            Assert.assertEquals(1, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 9), EQUALS, EQUALS, null, null).key.o.orInterprNodes.size());
+//            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.interpretation.orInterprNodes.size());
+            Assert.assertEquals(1, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, EQUALS, null, null).key.interpretation.orInterprNodes.size());
+            Assert.assertEquals(1, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 9), EQUALS, EQUALS, null, null).key.interpretation.orInterprNodes.size());
 
             doc.clearActivations();
         }
