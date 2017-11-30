@@ -376,7 +376,7 @@ public class Document implements Comparable<Document> {
                     sb.append("]");
                 }
 
-                if (act.finalState != null && act.finalState.weight != null) {
+                if (act.isFinalActivation()) {
                     sb.append(" - FV:" + Utils.round(act.finalState.value));
                     sb.append(" FW:" + Utils.round(act.finalState.weight.w));
                     sb.append(" FN:" + Utils.round(act.finalState.weight.n));
