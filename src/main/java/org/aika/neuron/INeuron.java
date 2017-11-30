@@ -821,7 +821,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      */
     public Collection<Activation> getFinalActivations(Document doc) {
         Stream<Activation> s = NodeActivation.select(doc, node.get(), null, null, null, null, null, null);
-        return s.filter(act -> act.finalState != null && act.finalState.value > 0.0)
+        return s.filter(act -> act.isFinalActivation())
                 .collect(Collectors.toList());
     }
 

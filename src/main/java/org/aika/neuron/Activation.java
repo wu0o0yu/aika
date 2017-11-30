@@ -72,6 +72,35 @@ public final class Activation extends NodeActivation<OrNode> {
         };
     }
 
+
+    public List<SynapseActivation> getFinalInputActivations() {
+        ArrayList<SynapseActivation> results = new ArrayList<>();
+        for (SynapseActivation inputAct : neuronInputs) {
+            if (inputAct.input.isFinalActivation()) {
+                results.add(inputAct);
+            }
+        }
+        return results;
+    }
+
+
+    public List<SynapseActivation> getFinalOutputActivations() {
+        ArrayList<SynapseActivation> results = new ArrayList<>();
+        for (SynapseActivation inputAct : neuronOutputs) {
+            if (inputAct.output.isFinalActivation()) {
+                results.add(inputAct);
+            }
+        }
+        return results;
+    }
+
+
+    public boolean isFinalActivation() {
+        return finalState != null && finalState.value > 0.0;
+    }
+
+
+
     /**
      * The {@code SynapseActivation} mirror the synapse link in the network of activations.
      */
