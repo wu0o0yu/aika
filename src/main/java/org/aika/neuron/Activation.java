@@ -96,7 +96,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public boolean isFinalActivation() {
-        return finalState != null && finalState.value > 0.0;
+        return (finalState != null && finalState.value > 0.0) || targetValue > 0.0;
     }
 
 

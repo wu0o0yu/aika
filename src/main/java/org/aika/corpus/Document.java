@@ -377,11 +377,13 @@ public class Document implements Comparable<Document> {
                 }
 
                 if (act.isFinalActivation()) {
-                    sb.append(" - FV:" + Utils.round(act.finalState.value));
-                    sb.append(" FW:" + Utils.round(act.finalState.weight.w));
-                    sb.append(" FN:" + Utils.round(act.finalState.weight.n));
+                    if(act.finalState != null) {
+                        sb.append(" - FV:" + Utils.round(act.finalState.value));
+                        sb.append(" FW:" + Utils.round(act.finalState.weight.w));
+                        sb.append(" FN:" + Utils.round(act.finalState.weight.n));
+                    }
+                    sb.append(" - TV:" + Utils.round(act.targetValue));
                 }
-                sb.append(" - TV:" + Utils.round(act.targetValue));
             }
             sb.append("\n");
         }
