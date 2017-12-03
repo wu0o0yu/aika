@@ -70,14 +70,9 @@ public class Converter {
         initInputNodesAndComputeWeightSums();
 
         double remainingSum = 0.0;
-        double numAboveThreshold = 0;
         TreeSet<Synapse> tmp = new TreeSet<>(SYNAPSE_COMP);
         for(Synapse s: neuron.inputSynapses.values()) {
             if(!s.isNegative() && !s.key.isRecurrent) {
-                if (s.w + neuron.bias > 0.0) {
-                    if (numAboveThreshold > 0 && neuron.inputSynapses.size() != modifiedSynapses.size()) break;
-                    numAboveThreshold++;
-                }
                 remainingSum += s.w;
                 tmp.add(s);
             }
@@ -88,7 +83,7 @@ public class Converter {
         boolean noFurtherRefinement = false;
         TreeSet<Synapse> reqSyns = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
         double sum = 0.0;
-        if(numAboveThreshold == 0 || neuron.inputSynapses.size() == modifiedSynapses.size()) {
+        if(remainingSum - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0) {
             int i = 0;
             for (Synapse s : tmp) {
                 final boolean isOptionalInput = sum + remainingSum - s.w - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
@@ -138,13 +133,16 @@ public class Converter {
                     }
                 }
             }
-        } else {
-            for (Synapse s : modifiedSynapses) {
+        }
+
+        for (Synapse s : modifiedSynapses) {
+            if(s.w - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0) {
                 Node nln = s.inputNode.get();
                 offset = s.key.relativeRid;
                 outputNode.addInput(offset, threadId, nln, false);
             }
         }
+
         return true;
     }
 

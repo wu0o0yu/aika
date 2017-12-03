@@ -243,21 +243,29 @@ public class Input implements Comparable<Input> {
 
 
     Synapse getSynapse(Neuron outputNeuron) {
-        return outputNeuron.get().getInputSynapse(new Synapse(
-                        neuron,
-                        new Synapse.Key(
-                                recurrent,
-                                relativeRid,
-                                absoluteRid,
-                                startRangeMatch,
-                                startMapping,
-                                startRangeOutput,
-                                endRangeMatch,
-                                endMapping,
-                                endRangeOutput
-                        )
+        Synapse s = new Synapse(
+                neuron,
+                outputNeuron,
+                new Synapse.Key(
+                        recurrent,
+                        relativeRid,
+                        absoluteRid,
+                        startRangeMatch,
+                        startMapping,
+                        startRangeOutput,
+                        endRangeMatch,
+                        endMapping,
+                        endRangeOutput
                 )
         );
+
+        Synapse os = outputNeuron.get().inputSynapses.get(s);
+        if(os != null) return os;
+
+        os = neuron.get().outputSynapses.get(s);
+        if(os != null) return os;
+
+        return s;
     }
 
 

@@ -49,7 +49,9 @@ public class SynapseRangeRelationTest {
         Neuron in = m.createNeuron();
         Neuron on = m.createNeuron();
 
-        Synapse s = new Synapse(in,
+        Synapse s = new Synapse(
+                in,
+                on,
                 new Synapse.Key(
                         false,
                         null,
@@ -62,7 +64,6 @@ public class SynapseRangeRelationTest {
                         true
                 )
         );
-        s.output = on;
         s.link();
 
         Activation iAct0 = in.get().node.get().processAddedActivation(doc, new Key(in.get().node.get(), new Range(1, 4), null, doc.bottom), Collections.emptyList());

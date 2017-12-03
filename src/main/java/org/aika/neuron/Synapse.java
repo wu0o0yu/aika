@@ -111,15 +111,14 @@ public class Synapse implements Writable {
     public Synapse() {}
 
 
-    public Synapse(Neuron input) {
-        if(input != null) {
-            this.input = input;
-        }
+    public Synapse(Neuron input, Neuron output) {
+        this.input = input;
+        this.output = output;
     }
 
 
-    public Synapse(Neuron input, Key key) {
-        this(input);
+    public Synapse(Neuron input, Neuron output, Key key) {
+        this(input, output);
         this.key = lookupKey(key);
     }
 
@@ -141,7 +140,17 @@ public class Synapse implements Writable {
         out.provider.inMemoryInputSynapses.put(this, this);
         out.provider.lock.releaseWriteLock();
 
-        out.inputSynapses.put(this, this);
+        double s = out.bias + out.posRecSum - out.negRecSum - out.negDirSum;
+        if(w + s <= 0.0) {
+            out.inputSynapses.remove(this);
+        } else {
+            in.outputSynapses.remove(this);
+        }
+        if(nw + s <= 0.0) {
+            out.inputSynapses.put(this, this);
+        } else {
+            in.outputSynapses.put(this, this);
+        }
 
         out.provider.setModified();
 
