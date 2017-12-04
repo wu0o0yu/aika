@@ -18,9 +18,6 @@ package org.aika;
 
 
 import org.aika.corpus.Document;
-import org.aika.corpus.Range.Operator;
-import org.aika.corpus.Range.Mapping;
-import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
@@ -51,7 +48,8 @@ public class Model {
 
     public SuspensionHook suspensionHook;
 
-    public NodeStatisticFactory nodeStatisticFactory;
+    public StatisticFactory nodeStatisticFactory;
+    public StatisticFactory neuronStatisticFactory;
 
     public AtomicInteger docIdCounter = new AtomicInteger(0);
     public AtomicInteger currentId = new AtomicInteger(0);
@@ -94,13 +92,22 @@ public class Model {
     }
 
 
-    public NodeStatisticFactory getNodeStatisticFactory() {
+    public StatisticFactory getNodeStatisticFactory() {
         return nodeStatisticFactory;
     }
 
 
-    public void setNodeStatisticFactory(NodeStatisticFactory nodeStatisticFactory) {
+    public void setNodeStatisticFactory(StatisticFactory nodeStatisticFactory) {
         this.nodeStatisticFactory = nodeStatisticFactory;
+    }
+
+    public StatisticFactory getNeuronStatisticFactory() {
+        return neuronStatisticFactory;
+    }
+
+
+    public void setNeuronStatisticFactory(StatisticFactory neuronStatisticFactory) {
+        this.neuronStatisticFactory = neuronStatisticFactory;
     }
 
 
@@ -286,9 +293,9 @@ public class Model {
     }
 
 
-    public interface NodeStatisticFactory {
+    public interface StatisticFactory {
 
-        Writable createNodeStatisticObject();
+        Writable createStatisticObject();
     }
 
 }

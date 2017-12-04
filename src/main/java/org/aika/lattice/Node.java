@@ -203,7 +203,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         provider.setModified();
 
         if(m.nodeStatisticFactory != null) {
-            statistic = m.nodeStatisticFactory.createNodeStatisticObject();
+            statistic = m.nodeStatisticFactory.createStatisticObject();
         }
     }
 
@@ -586,7 +586,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         level = in.readInt();
 
         if(in.readBoolean() && m.nodeStatisticFactory != null) {
-            statistic = m.nodeStatisticFactory.createNodeStatisticObject();
+            statistic = m.nodeStatisticFactory.createStatisticObject();
             statistic.readFields(in, m);
         }
 

@@ -73,8 +73,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public volatile double maxRecurrentSum = 0.0;
 
+    public Writable statistic;
 
-    // A synapse is stored only in one directtion, depending on the synapse weight.
+
+    // A synapse is stored only in one direction, depending on the synapse weight.
     public TreeMap<Synapse, Synapse> inputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
     public TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
 
@@ -103,6 +105,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public INeuron(Model m, String label, String outputText) {
         this.label = label;
         this.outputText = outputText;
+
+        if(m.neuronStatisticFactory != null) {
+            statistic = m.neuronStatisticFactory.createStatisticObject();
+        }
 
         provider = new Neuron(m, this);
 
@@ -617,6 +623,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             out.writeUTF(outputText);
         }
 
+        out.writeBoolean(statistic != null);
+        if(statistic != null) {
+            statistic.write(out);
+        }
+
         out.writeDouble(bias);
         out.writeDouble(posDirSum);
         out.writeDouble(negDirSum);
@@ -659,6 +670,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
         if(in.readBoolean()) {
             outputText = in.readUTF();
+        }
+
+        if(in.readBoolean() && m.neuronStatisticFactory != null) {
+            statistic = m.neuronStatisticFactory.createStatisticObject();
+            statistic.readFields(in, m);
         }
 
         bias = in.readDouble();
