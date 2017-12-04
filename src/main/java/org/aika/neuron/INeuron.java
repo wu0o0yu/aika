@@ -377,7 +377,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         if(synapse == null) {
-            synapse = new Synapse(inputNeuron.provider, provider, sk);
+            synapse = new Synapse(provider.m, inputNeuron.provider, provider, sk);
 
             if(in == null) {
                 in = InputNode.add(provider.m, sk.createInputNodeKey(), synapse.input.get());
@@ -452,7 +452,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         provider.lock.acquireReadLock();
         NavigableMap<Synapse, Synapse> syns = (dir == 0 ? provider.inMemoryInputSynapses : provider.inMemoryOutputSynapses);
 
-        for (Synapse s : getActiveSynapses(doc, dir, syns)) {
+        for (Synapse s : getActiveSynapses(provider.m, doc, dir, syns)) {
             Neuron p = (dir == 0 ? s.input : s.output);
             INeuron an = p.getIfNotSuspended();
             if (an != null) {
@@ -538,7 +538,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private static Collection<Synapse> getActiveSynapses(Document doc, int dir, NavigableMap<Synapse, Synapse> syns) {
+    private static Collection<Synapse> getActiveSynapses(Model m, Document doc, int dir, NavigableMap<Synapse, Synapse> syns) {
         // Optimization in case the set of synapses is very large
         if (syns.size() < 10 || doc.activatedNeurons.size() * 20 > syns.size()) {
             return syns.values();
@@ -546,8 +546,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         Collection<Synapse> synsTmp;
         ArrayList<Synapse> newSyns = new ArrayList<>();
-        Synapse lk = new Synapse(null, null, Synapse.Key.MIN_KEY);
-        Synapse uk = new Synapse(null, null, Synapse.Key.MAX_KEY);
+        Synapse lk = new Synapse(m, null, null, Synapse.Key.MIN_KEY);
+        Synapse uk = new Synapse(m, null, null, Synapse.Key.MAX_KEY);
 
         for (INeuron n : doc.activatedNeurons) {
             if (dir == 0) {

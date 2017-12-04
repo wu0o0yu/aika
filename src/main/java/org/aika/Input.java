@@ -244,6 +244,7 @@ public class Input implements Comparable<Input> {
 
     Synapse getSynapse(Neuron outputNeuron) {
         Synapse s = new Synapse(
+                neuron.m,
                 neuron,
                 outputNeuron,
                 new Synapse.Key(

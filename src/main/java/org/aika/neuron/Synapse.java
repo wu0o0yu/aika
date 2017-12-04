@@ -107,18 +107,23 @@ public class Synapse implements Writable {
      */
     public float nw;
 
+    public Writable statistic;
+
 
     public Synapse() {}
 
 
-    public Synapse(Neuron input, Neuron output) {
+    public Synapse(Model m, Neuron input, Neuron output) {
         this.input = input;
         this.output = output;
+        if(m.synapseStatisticFactory != null) {
+            this.statistic = m.synapseStatisticFactory.createStatisticObject();
+        }
     }
 
 
-    public Synapse(Neuron input, Neuron output, Key key) {
-        this(input, output);
+    public Synapse(Model m, Neuron input, Neuron output, Key key) {
+        this(m, input, output);
         this.key = lookupKey(key);
     }
 
@@ -187,6 +192,11 @@ public class Synapse implements Writable {
         key.write(out);
 
         out.writeFloat(w);
+
+        out.writeBoolean(statistic != null);
+        if(statistic != null) {
+            statistic.write(out);
+        }
     }
 
 
@@ -199,6 +209,11 @@ public class Synapse implements Writable {
         key = lookupKey(Key.read(in, m));
 
         nw = w = in.readFloat();
+
+        if(in.readBoolean() && m.synapseStatisticFactory != null) {
+            statistic = m.synapseStatisticFactory.createStatisticObject();
+            statistic.readFields(in, m);
+        }
     }
 
 
@@ -281,6 +296,8 @@ public class Synapse implements Writable {
             out.writeByte(endRangeMapping.getId());
             out.writeBoolean(startRangeOutput);
             out.writeBoolean(endRangeOutput);
+
+
         }
 
 

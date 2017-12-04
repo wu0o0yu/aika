@@ -50,6 +50,7 @@ public class Model {
 
     public StatisticFactory nodeStatisticFactory;
     public StatisticFactory neuronStatisticFactory;
+    public StatisticFactory synapseStatisticFactory;
 
     public AtomicInteger docIdCounter = new AtomicInteger(0);
     public AtomicInteger currentId = new AtomicInteger(0);
@@ -108,6 +109,16 @@ public class Model {
 
     public void setNeuronStatisticFactory(StatisticFactory neuronStatisticFactory) {
         this.neuronStatisticFactory = neuronStatisticFactory;
+    }
+
+
+    public StatisticFactory getSynapseStatisticFactory() {
+        return synapseStatisticFactory;
+    }
+
+
+    public void setSynapseStatisticFactory(StatisticFactory synapseStatisticFactory) {
+        this.synapseStatisticFactory = synapseStatisticFactory;
     }
 
 
