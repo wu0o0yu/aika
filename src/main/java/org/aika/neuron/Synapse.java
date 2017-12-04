@@ -296,8 +296,6 @@ public class Synapse implements Writable {
             out.writeByte(endRangeMapping.getId());
             out.writeBoolean(startRangeOutput);
             out.writeBoolean(endRangeOutput);
-
-
         }
 
 
