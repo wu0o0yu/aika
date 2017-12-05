@@ -34,6 +34,10 @@ public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> i
 
     public P provider;
 
+    public void setModified() {
+        modified = true;
+    }
+
     public void suspend() {}
 
     public void reactivate() {}

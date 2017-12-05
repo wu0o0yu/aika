@@ -162,14 +162,13 @@ public class Converter {
 
             if (s.inputNode == null) {
                 InputNode iNode = InputNode.add(m, s.key.createInputNodeKey(), s.input.get());
-                iNode.provider.setModified();
+                iNode.setModified();
                 iNode.setSynapse(s);
                 s.inputNode = iNode.provider;
             }
 
             if (s.key.isRecurrent) {
                 maxRecurrentSumDelta += Math.abs(s.nw) - Math.abs(s.w);
-                neuron.provider.setModified();
             }
 
             sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.w;
@@ -185,6 +184,8 @@ public class Converter {
         neuron.negDirSum += sumDelta[DIRECT][NEGATIVE];
         neuron.negRecSum += sumDelta[RECURRENT][NEGATIVE];
         neuron.posRecSum += sumDelta[RECURRENT][POSITIVE];
+
+        neuron.setModified();
     }
 
 

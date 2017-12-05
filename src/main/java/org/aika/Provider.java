@@ -39,11 +39,6 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     }
 
 
-    public void setModified() {
-        n.modified = true;
-    }
-
-
     public boolean isSuspended() {
         return n == null;
     }
@@ -71,6 +66,12 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
         m.unregister(this);
 
+        save();
+        n = null;
+    }
+
+
+    public void save() {
         if (n.modified) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try (
@@ -84,12 +85,6 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
             m.suspensionHook.store(id, baos.toByteArray());
         }
-        n = null;
-    }
-
-
-    public void discard() {
-        n = null;
     }
 
 

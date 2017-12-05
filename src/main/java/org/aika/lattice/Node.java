@@ -200,7 +200,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         threads = new ThreadState[m.numberOfThreads];
         provider = new Provider(m, this);
         this.level = level;
-        provider.setModified();
+        setModified();
 
         if(m.nodeStatisticFactory != null) {
             statistic = m.nodeStatisticFactory.createStatisticObject();
@@ -475,7 +475,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         assert !isRemoved;
 
         lock.acquireWriteLock();
-        provider.setModified();
+        setModified();
         while (andChildren != null && !andChildren.isEmpty()) {
             andChildren.firstEntry().getValue().get().remove();
         }

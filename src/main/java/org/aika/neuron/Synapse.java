@@ -148,19 +148,23 @@ public class Synapse implements Writable {
         out.provider.lock.releaseWriteLock();
 
         if(isConjunction(false)) {
-            out.inputSynapses.remove(this);
+            if(out.inputSynapses.remove(this) != null) {
+                out.setModified();
+            }
         } else {
-            in.outputSynapses.remove(this);
+            if(in.outputSynapses.remove(this) != null) {
+                in.setModified();
+            }
         }
         if(isConjunction(true)) {
             out.inputSynapses.put(this, this);
             isConjunction = true;
+            out.setModified();
         } else {
             in.outputSynapses.put(this, this);
             isConjunction = false;
+            in.setModified();
         }
-
-        out.provider.setModified();
 
         (dir ? in : out).lock.releaseWriteLock();
         (dir ? out : in).lock.releaseWriteLock();
