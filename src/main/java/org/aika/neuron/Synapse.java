@@ -107,6 +107,8 @@ public class Synapse implements Writable {
      */
     public float nw;
 
+    public boolean isConjunction;
+
     public Writable statistic;
 
 
@@ -145,22 +147,29 @@ public class Synapse implements Writable {
         out.provider.inMemoryInputSynapses.put(this, this);
         out.provider.lock.releaseWriteLock();
 
-        double s = out.bias + out.posRecSum - out.negRecSum - out.negDirSum;
-        if(w + s <= 0.0) {
+        if(isConjunction(false)) {
             out.inputSynapses.remove(this);
         } else {
             in.outputSynapses.remove(this);
         }
-        if(nw + s <= 0.0) {
+        if(isConjunction(true)) {
             out.inputSynapses.put(this, this);
+            isConjunction = true;
         } else {
             in.outputSynapses.put(this, this);
+            isConjunction = false;
         }
 
         out.provider.setModified();
 
         (dir ? in : out).lock.releaseWriteLock();
         (dir ? out : in).lock.releaseWriteLock();
+    }
+
+
+    public boolean isConjunction(boolean v) {
+        INeuron out = output.get();
+        return (v ? nw : w) + out.bias + out.posRecSum - out.negRecSum - out.negDirSum <= 0.0;
     }
 
 
@@ -193,6 +202,8 @@ public class Synapse implements Writable {
 
         out.writeFloat(w);
 
+        out.writeBoolean(isConjunction);
+
         out.writeBoolean(statistic != null);
         if(statistic != null) {
             statistic.write(out);
@@ -209,6 +220,8 @@ public class Synapse implements Writable {
         key = lookupKey(Key.read(in, m));
 
         nw = w = in.readFloat();
+
+        isConjunction = in.readBoolean();
 
         if(in.readBoolean() && m.synapseStatisticFactory != null) {
             statistic = m.synapseStatisticFactory.createStatisticObject();

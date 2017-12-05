@@ -19,6 +19,7 @@ package org.aika;
 
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
+import org.aika.lattice.InputNode;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
@@ -155,5 +156,60 @@ public class Neuron extends Provider<INeuron> {
         INeuron n = getIfNotSuspended();
         if(n == null) return Collections.emptyList();
         return n.getFinalActivations(doc);
+    }
+
+
+    public void addInMemoryInputSynapse(Synapse s) {
+        lock.acquireWriteLock();
+        inMemoryInputSynapses.put(s, s);
+        lock.releaseWriteLock();
+
+        if(!s.input.isSuspended()) {
+            InputNode iNode = s.inputNode.get();
+            if (iNode != null) {
+                iNode.setSynapse(s);
+            }
+        }
+    }
+
+    public void removeInMemoryInputSynapse(Synapse s) {
+        lock.acquireWriteLock();
+        inMemoryInputSynapses.remove(s);
+        lock.releaseWriteLock();
+
+        if(!s.input.isSuspended()) {
+            InputNode iNode = s.inputNode.getIfNotSuspended();
+            if (iNode != null) {
+                iNode.removeSynapse(s);
+            }
+        }
+    }
+
+
+    public void addInMemoryOutputSynapse(Synapse s) {
+        lock.acquireWriteLock();
+        inMemoryOutputSynapses.put(s, s);
+        lock.releaseWriteLock();
+
+        if(!s.output.isSuspended()) {
+            InputNode iNode = s.inputNode.get();
+            if (iNode != null) {
+                iNode.setSynapse(s);
+            }
+        }
+    }
+
+
+    public void removeInMemoryOutputSynapse(Synapse s) {
+        lock.acquireWriteLock();
+        inMemoryOutputSynapses.remove(s);
+        lock.releaseWriteLock();
+
+        if(!s.output.isSuspended()) {
+            InputNode iNode = s.inputNode.getIfNotSuspended();
+            if (iNode != null) {
+                iNode.setSynapse(s);
+            }
+        }
     }
 }

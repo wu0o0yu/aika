@@ -237,6 +237,21 @@ public class Model {
 
 
     /**
+     * Discards all neurons and logic nodes whose last used document id is lower/older than {@param docId}.
+     *
+     * @param docId
+     */
+    public void discardUnusedNodes(int docId) {
+        List<Provider> tmp;
+        synchronized (activeProviders) {
+            tmp = new ArrayList<>(activeProviders.values());
+        }
+        for (Provider p: tmp) {
+            discard(docId, p);
+        }
+    }
+
+    /**
      * Discards all unsuspended neurons and logic nodes.
      */
     public void discardAll() {
@@ -249,6 +264,15 @@ public class Model {
         }
     }
 
+
+    private boolean discard(int docId, Provider<? extends AbstractNode> p) {
+        AbstractNode an = p.getIfNotSuspended();
+        if (an != null && an.lastUsedDocumentId <= docId) {
+            p.discard();
+            return true;
+        }
+        return false;
+    }
 
 
     /**

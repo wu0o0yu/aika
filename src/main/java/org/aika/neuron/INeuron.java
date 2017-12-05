@@ -713,36 +713,22 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     @Override
     public void suspend() {
         for (Synapse s : inputSynapses.values()) {
-            s.input.lock.acquireWriteLock();
-            s.input.inMemoryOutputSynapses.remove(s);
-            s.input.lock.releaseWriteLock();
-
-            InputNode iNode = s.inputNode.getIfNotSuspended();
-            if (iNode != null) {
-                iNode.removeSynapse(s);
-            }
+            s.input.removeInMemoryOutputSynapse(s);
         }
         for (Synapse s : outputSynapses.values()) {
-            s.output.lock.acquireWriteLock();
-            s.output.inMemoryInputSynapses.remove(s);
-            s.output.lock.releaseWriteLock();
-
-            InputNode iNode = s.inputNode.getIfNotSuspended();
-            if (iNode != null) {
-                iNode.removeSynapse(s);
-            }
+            s.output.removeInMemoryInputSynapse(s);
         }
 
         provider.lock.acquireReadLock();
-        for (Synapse s : provider.inMemoryOutputSynapses.values()) {
-            s.output.lock.acquireWriteLock();
-            s.output.inMemoryInputSynapses.remove(s);
-            s.output.lock.releaseWriteLock();
-        }
         for (Synapse s : provider.inMemoryInputSynapses.values()) {
-            s.input.lock.acquireWriteLock();
-            s.input.inMemoryOutputSynapses.remove(s);
-            s.input.lock.releaseWriteLock();
+            if(!s.isConjunction(false)) {
+                s.input.removeInMemoryOutputSynapse(s);
+            }
+        }
+        for (Synapse s : provider.inMemoryOutputSynapses.values()) {
+            if(s.isConjunction(false)) {
+                s.output.removeInMemoryInputSynapse(s);
+            }
         }
         provider.lock.releaseReadLock();
     }
@@ -750,51 +736,31 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     @Override
     public void reactivate() {
-        provider.lock.acquireWriteLock();
-        for (Synapse s : provider.inMemoryOutputSynapses.values()) {
-            s.output.lock.acquireWriteLock();
-            s.output.inMemoryInputSynapses.put(s, s);
-            s.output.lock.releaseWriteLock();
-        }
+        provider.lock.acquireReadLock();
         for (Synapse s : provider.inMemoryInputSynapses.values()) {
-            s.input.lock.acquireWriteLock();
-            s.input.inMemoryOutputSynapses.put(s, s);
-            s.input.lock.releaseWriteLock();
+            if(!s.isConjunction(false)) {
+                s.input.addInMemoryOutputSynapse(s);
+            }
         }
+        for (Synapse s : provider.inMemoryOutputSynapses.values()) {
+            if(s.isConjunction(false)) {
+                s.output.addInMemoryInputSynapse(s);
+            }
+        }
+        provider.lock.releaseReadLock();
 
         for (Synapse s : inputSynapses.values()) {
-            s.input.lock.acquireWriteLock();
-            s.input.inMemoryOutputSynapses.put(s, s);
-            s.input.lock.releaseWriteLock();
-
+            s.input.addInMemoryOutputSynapse(s);
             if (!s.input.isSuspended()) {
-                s.output.lock.acquireWriteLock();
-                s.output.inMemoryInputSynapses.put(s, s);
-                s.output.lock.releaseWriteLock();
-            }
-
-            InputNode iNode = s.inputNode.getIfNotSuspended();
-            if (iNode != null) {
-                iNode.setSynapse(s);
+                s.output.addInMemoryInputSynapse(s);
             }
         }
         for (Synapse s : outputSynapses.values()) {
-            s.output.lock.acquireWriteLock();
-            s.output.inMemoryInputSynapses.put(s, s);
-            s.output.lock.releaseWriteLock();
-
+            s.output.addInMemoryInputSynapse(s);
             if (!s.output.isSuspended()) {
-                s.input.lock.acquireWriteLock();
-                s.input.inMemoryOutputSynapses.put(s, s);
-                s.input.lock.releaseWriteLock();
-            }
-
-            InputNode iNode = s.inputNode.getIfNotSuspended();
-            if (iNode != null) {
-                iNode.setSynapse(s);
+                s.input.addInMemoryOutputSynapse(s);
             }
         }
-        provider.lock.releaseWriteLock();
     }
 
 

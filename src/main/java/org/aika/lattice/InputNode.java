@@ -292,21 +292,11 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     public void removeSynapse(Synapse s) {
-        synapseLock.acquireWriteLock();
-        synapses.remove(new SynapseKey(s.key.relativeRid, s.output));
-        synapseLock.releaseWriteLock();
-    }
-
-
-    @Override
-    public void reactivate() {
-        inputNeuron.lock.acquireReadLock();
-        inputNeuron.inMemoryOutputSynapses.values().forEach(s -> {
-            if (key.compareTo(s.key.createInputNodeKey()) == 0) {
-                setSynapse(s);
-            }
-        });
-        inputNeuron.lock.releaseReadLock();
+        if(synapses != null) {
+            synapseLock.acquireWriteLock();
+            synapses.remove(new SynapseKey(s.key.relativeRid, s.output));
+            synapseLock.releaseWriteLock();
+        }
     }
 
 
