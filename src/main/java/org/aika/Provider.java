@@ -85,6 +85,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
             m.suspensionHook.store(id, baos.toByteArray());
         }
+        n.modified = false;
     }
 
 
