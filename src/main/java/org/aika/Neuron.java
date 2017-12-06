@@ -140,7 +140,7 @@ public class Neuron extends Provider<INeuron> {
      * @param targetValue The target activation value for supervised learning
      */
     public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, double targetValue) {
-        return get().addInput(doc, begin, end, rid, o, value, targetValue);
+        return get(doc).addInput(doc, begin, end, rid, o, value, targetValue);
     }
 
 

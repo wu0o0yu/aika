@@ -187,7 +187,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         s.forEach(secondAct -> {
                     InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
                     if (o != null) {
-                        AndNode nlp = pnlp.get();
+                        AndNode nlp = pnlp.get(doc);
                         nlp.addActivation(doc,
                                 new NodeActivation.Key(
                                         nlp,
@@ -234,7 +234,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
             for (Activation secondNAct : n.getFinalActivations(doc)) {
                 for (NodeActivation secondAct : secondNAct.outputs.values()) {
                     Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.node.provider);
-                    InputNode in = ref.input.get();
+                    InputNode in = ref.input.get(doc);
                     Operator srm = computeStartRangeMatch(key, in.key);
                     Operator erm = computeEndRangeMatch(key, in.key);
 

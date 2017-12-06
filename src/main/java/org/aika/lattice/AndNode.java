@@ -240,7 +240,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         Key ak = act.key;
         InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
         if (o != null) {
-            AndNode nlp = pnlp.get();
+            AndNode nlp = pnlp.get(doc);
             nlp.addActivation(
                     doc,
                     new Key(

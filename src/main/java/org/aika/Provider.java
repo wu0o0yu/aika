@@ -1,6 +1,8 @@
 package org.aika;
 
 
+import org.aika.corpus.Document;
+
 import java.io.*;
 import java.lang.ref.WeakReference;
 import java.util.zip.GZIPInputStream;
@@ -54,6 +56,23 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
             reactivate();
         }
         return n;
+    }
+
+
+    public synchronized T get(int lastUsedDocumentId) {
+        T n = get();
+        n.lastUsedDocumentId = Math.max(n.lastUsedDocumentId, lastUsedDocumentId);
+        return n;
+    }
+
+
+    /**
+     *
+     * @param doc The document is used to remember when this node has been used last.
+     * @return
+     */
+    public T get(Document doc) {
+        return get(doc.id);
     }
 
 

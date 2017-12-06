@@ -263,7 +263,7 @@ public class Document implements Comparable<Document> {
 
     public void train(TrainConfig trainConfig) {
         for(Activation tAct: targetActivations) {
-            tAct.key.node.neuron.get().computeOutputErrorSignal(this, tAct);
+            tAct.key.node.neuron.get(this).computeOutputErrorSignal(this, tAct);
         }
 
         if(trainConfig.performBackpropagation) {
@@ -271,7 +271,7 @@ public class Document implements Comparable<Document> {
         }
 
         for (Activation act : errorSignalActivations) {
-            act.key.node.neuron.get().train(this, act, trainConfig.learnRate, trainConfig.synapseEvaluation);
+            act.key.node.neuron.get(this).train(this, act, trainConfig.learnRate, trainConfig.synapseEvaluation);
         }
         errorSignalActivations.clear();
     }
@@ -499,7 +499,7 @@ public class Document implements Comparable<Document> {
 
                 double oldUpperBound = act.isInput ? 0.0 : act.upperBound;
 
-                INeuron n = act.key.node.neuron.get();
+                INeuron n = act.key.node.neuron.get(Document.this);
 
                 if(!act.isInput) {
                     n.computeBounds(act);
@@ -513,7 +513,7 @@ public class Document implements Comparable<Document> {
 
                 if(oldUpperBound <= 0.0 && act.upperBound > 0.0) {
                     for(Provider<InputNode> out: n.outputNodes.values()) {
-                        out.get().addActivation(Document.this, act);
+                        out.get(Document.this).addActivation(Document.this, act);
                     }
                 }
             }
@@ -589,7 +589,7 @@ public class Document implements Comparable<Document> {
                     Activation act = q.pollLast();
                     act.rounds.setQueued(round, false);
 
-                    State s = act.isInput ? act.finalState : act.key.node.neuron.get().computeWeight(round, act, sn, Document.this);
+                    State s = act.isInput ? act.finalState : act.key.node.neuron.get(Document.this).computeWeight(round, act, sn, Document.this);
 
                     if (OPTIMIZE_DEBUG_OUTPUT) {
                         log.info(act.key + " Round:" + round);
@@ -666,7 +666,7 @@ public class Document implements Comparable<Document> {
                 Activation act = queue.pollFirst();
 
                 act.isQueued = false;
-                act.key.node.neuron.get().computeBackpropagationErrorSignal(Document.this, act);
+                act.key.node.neuron.get(Document.this).computeBackpropagationErrorSignal(Document.this, act);
             }
         }
     }

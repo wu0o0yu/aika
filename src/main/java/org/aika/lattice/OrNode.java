@@ -76,7 +76,7 @@ public class OrNode extends Node<OrNode, Activation> {
         ak.interpretation.act = act;
         ThreadState<OrNode, Activation> th = getThreadState(doc.threadId, false);
         if(th == null || th.activations.isEmpty()) {
-            doc.activatedNeurons.add(neuron.get());
+            doc.activatedNeurons.add(neuron.get(doc));
         }
         return act;
     }
@@ -88,7 +88,7 @@ public class OrNode extends Node<OrNode, Activation> {
             retrieveInputs(doc, null, inputR, rid, inputs, pRidOffset, parents);
         } else {
             for(Provider<Node> pn: parents) {
-                retrieveInputs(doc, pn.get(), inputR, rid, inputs, pRidOffset, parents);
+                retrieveInputs(doc, pn.get(doc), inputR, rid, inputs, pRidOffset, parents);
             }
         }
     }
@@ -109,7 +109,7 @@ public class OrNode extends Node<OrNode, Activation> {
     Activation processAddedActivation(Document doc, Key<OrNode> ak, Collection<NodeActivation> inputActs) {
         Activation act = super.processAddedActivation(doc, ak, inputActs);
         if(act != null) {
-            neuron.get().linkNeuronRelations(doc, act);
+            neuron.get(doc).linkNeuronRelations(doc, act);
         }
         return act;
     }
@@ -136,9 +136,9 @@ public class OrNode extends Node<OrNode, Activation> {
             no.addOrInterpretationNode(iAct.key.interpretation);
         }
 
-        if(neuron.get().outputText != null) {
+        if(neuron.get(doc).outputText != null) {
             int begin = r.begin != Integer.MIN_VALUE ? r.begin : 0;
-            int end = r.end != Integer.MAX_VALUE ? r.end : begin + neuron.get().outputText.length();
+            int end = r.end != Integer.MAX_VALUE ? r.end : begin + neuron.get(doc).outputText.length();
             r = new Range(begin, end);
         }
 
@@ -167,7 +167,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     public void propagateAddedActivation(Document doc, Activation act) {
-        neuron.get().propagateAddedActivation(doc, act);
+        neuron.get(doc).propagateAddedActivation(doc, act);
     }
 
 
@@ -200,7 +200,7 @@ public class OrNode extends Node<OrNode, Activation> {
         if(parentNode.orChildren != null) {
             for (OrEntry oe : parentNode.orChildren) {
                 if (!ak.interpretation.isConflicting(doc.visitedCounter++)) {
-                    oe.node.get().addActivation(doc, oe.ridOffset, inputAct);
+                    oe.node.get(doc).addActivation(doc, oe.ridOffset, inputAct);
                 }
             }
         }
@@ -325,8 +325,6 @@ public class OrNode extends Node<OrNode, Activation> {
             ak.interpretation.neuronActivations = new TreeSet<>();
         }
         ak.interpretation.neuronActivations.add(act);
-
-        neuron.get().lastUsedDocumentId = doc.id;
     }
 
 

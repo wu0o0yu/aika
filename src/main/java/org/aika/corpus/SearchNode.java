@@ -162,7 +162,7 @@ public class SearchNode implements Comparable<SearchNode> {
         for(StateChange sc : modifiedActs) {
             Activation act = sc.act;
             if(act.isFinalActivation()) {
-                doc.finallyActivatedNeurons.add(act.key.node.neuron.get());
+                doc.finallyActivatedNeurons.add(act.key.node.neuron.get(doc));
             }
         }
     }

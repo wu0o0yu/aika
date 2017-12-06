@@ -352,8 +352,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
         ak.interpretation.activations.put(ak, act);
 
-        ak.node.lastUsedDocumentId = doc.id;
-
         if (ak.rid != null) {
             doc.activationsByRid.put(ak, act);
         }

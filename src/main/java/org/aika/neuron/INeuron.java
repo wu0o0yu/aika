@@ -131,11 +131,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      * @param value The activation value of this input activation
      */
     public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, double targetValue) {
-        Node.addActivationAndPropagate(doc, new NodeActivation.Key(node.get(), new Range(begin, end), rid, o), Collections.emptySet());
+        Node.addActivationAndPropagate(doc, new NodeActivation.Key(node.get(doc), new Range(begin, end), rid, o), Collections.emptySet());
 
         doc.propagate();
 
-        Activation act = NodeActivation.get(doc, node.get(), rid, new Range(begin, end), EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
+        Activation act = NodeActivation.get(doc, node.get(doc), rid, new Range(begin, end), EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
         State s = new State(value, 0, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.finalState = s;
@@ -144,7 +144,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         act.isInput = true;
 
         doc.inputNeuronActivations.add(act);
-        doc.finallyActivatedNeurons.add(act.key.node.neuron.get());
+        doc.finallyActivatedNeurons.add(act.key.node.neuron.get(doc));
 
         doc.ubQueue.add(act);
 
@@ -349,7 +349,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             for(Activation iAct: n.getFinalActivations(doc)) {
                 Synapse.Key sk = se.evaluate(iAct, targetAct);
                 if(sk != null) {
-                    trainSynapse(iAct, sk, x, v);
+                    trainSynapse(doc, iAct, sk, x, v);
                 }
             }
         }
@@ -358,11 +358,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private void trainSynapse(Activation iAct, Synapse.Key sk, double x, long v) {
+    private void trainSynapse(Document doc, Activation iAct, Synapse.Key sk, double x, long v) {
         if (iAct.visitedNeuronTrain == v) return;
         iAct.visitedNeuronTrain = v;
 
-        INeuron inputNeuron = iAct.key.node.neuron.get();
+        INeuron inputNeuron = iAct.key.node.neuron.get(doc);
         if(inputNeuron == this) {
             return;
         }
@@ -372,7 +372,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         Synapse synapse = null;
         InputNode in = null;
         if(inp != null) {
-            in = inp.get();
+            in = inp.get(doc);
             synapse = in.getSynapse(sk.relativeRid, provider);
         }
 
@@ -380,7 +380,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             synapse = new Synapse(provider.m, inputNeuron.provider, provider, sk);
 
             if(in == null) {
-                in = InputNode.add(provider.m, sk.createInputNodeKey(), synapse.input.get());
+                in = InputNode.add(provider.m, sk.createInputNodeKey(), synapse.input.get(doc));
             }
             in.setSynapse(synapse);
             synapse.link();
@@ -456,7 +456,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             Neuron p = (dir == 0 ? s.input : s.output);
             INeuron an = p.getIfNotSuspended();
             if (an != null) {
-                OrNode n = an.node.get();
+                OrNode n = an.node.get(doc);
                 ThreadState th = n.getThreadState(doc.threadId, false);
                 if (th == null || th.activations.isEmpty()) continue;
 
@@ -847,7 +847,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      * @return A collection with all final activations of this neuron.
      */
     public Collection<Activation> getFinalActivations(Document doc) {
-        Stream<Activation> s = NodeActivation.select(doc, node.get(), null, null, null, null, null, null);
+        Stream<Activation> s = NodeActivation.select(doc, node.get(doc), null, null, null, null, null, null);
         return s.filter(act -> act.isFinalActivation())
                 .collect(Collectors.toList());
     }
