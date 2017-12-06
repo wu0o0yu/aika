@@ -721,12 +721,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         provider.lock.acquireReadLock();
         for (Synapse s : provider.inMemoryInputSynapses.values()) {
-            if(!s.isConjunction(false)) {
+            if(!s.isConjunction) {
                 s.input.removeInMemoryOutputSynapse(s);
             }
         }
         for (Synapse s : provider.inMemoryOutputSynapses.values()) {
-            if(s.isConjunction(false)) {
+            if(s.isConjunction) {
                 s.output.removeInMemoryInputSynapse(s);
             }
         }
@@ -738,12 +738,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public void reactivate() {
         provider.lock.acquireReadLock();
         for (Synapse s : provider.inMemoryInputSynapses.values()) {
-            if(!s.isConjunction(false)) {
+            if(!s.isConjunction) {
                 s.input.addInMemoryOutputSynapse(s);
             }
         }
         for (Synapse s : provider.inMemoryOutputSynapses.values()) {
-            if(s.isConjunction(false)) {
+            if(s.isConjunction) {
                 s.output.addInMemoryInputSynapse(s);
             }
         }
