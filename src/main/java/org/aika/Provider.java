@@ -86,6 +86,12 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         m.unregister(this);
 
         save();
+
+        discard();
+    }
+
+
+    public synchronized void discard() {
         n = null;
     }
 

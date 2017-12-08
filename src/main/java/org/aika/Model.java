@@ -235,6 +235,19 @@ public class Model {
         return false;
     }
 
+    /**
+     * Discards all unsuspended neurons and logic nodes.
+     */
+    public void discardAll() {
+        List<Provider> tmp;
+        synchronized (activeProviders) {
+            tmp = new ArrayList<>(activeProviders.values());
+        }
+        for (Provider p: tmp) {
+            p.discard();
+        }
+    }
+
 
     /**
      * Creates a neuron with the given bias.
