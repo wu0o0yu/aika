@@ -139,44 +139,6 @@ public class ActivationOutputsTest {
 
 
     @Test
-    public void removeActivationsTest() {
-        Model m = new Model();
-
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
-
-        Neuron pAB = m.initNeuron(m.createNeuron("B-NA"),
-                0.5,
-                new Input()
-                        .setNeuron(inA)
-                        .setWeight(-1.0f)
-                        .setRecurrent(true)
-                        .setRelativeRid(0)
-                        .setBiasDelta(1.0),
-                new Input()
-                        .setNeuron(inB)
-                        .setWeight(1.0f)
-                        .setRecurrent(false)
-                        .setRelativeRid(0)
-                        .setBiasDelta(0.95)
-        );
-        OrNode pABNode = pAB.get().node.get();
-
-
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
-
-        inB.addInput(doc, 0, 1);
-        inA.addInput(doc, 0, 1, InterprNode.addPrimitive(doc));
-
-        NodeActivation actAB = TestHelper.get(doc, pABNode, new Range(0, 1), null);
-
-        System.out.println(doc.neuronActivationsToString(false, false, true));
-
-        Assert.assertTrue(!actAB.key.interpretation.conflicts.primary.isEmpty());
-    }
-
-
-    @Test
     public void simpleAddActivationTest1() {
         Model m = new Model();
         Document doc = m.createDocument("aaaaaaaaaa", 0);

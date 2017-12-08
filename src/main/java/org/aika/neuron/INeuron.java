@@ -476,6 +476,40 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
+    private static void addConflict(Document doc, InterprNode io, InterprNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
+        if (o.markedConflict == v) {
+            if (!isAllowed(doc, io, o, inputActs)) {
+                Conflicts.add(doc, act, io, o);
+            }
+        } else {
+            if(o.orInterprNodes != null) {
+                for (InterprNode no : o.orInterprNodes) {
+                    addConflict(doc, io, no, act, inputActs, v);
+                }
+            }
+        }
+    }
+
+
+    private static boolean isAllowed(Document doc, InterprNode io, InterprNode o, Collection<NodeActivation> inputActs) {
+        if (io != null && o.contains(io, false)) return true;
+        for (NodeActivation act : inputActs) {
+            if (act.key.node.isAllowedOption(doc.threadId, o, act, doc.visitedCounter++)) return true;
+        }
+        return false;
+    }
+
+
+    private static void markConflicts(Activation iAct, Activation oAct, long v) {
+        oAct.key.interpretation.markedConflict = v;
+        for (SynapseActivation sa : iAct.neuronOutputs) {
+            if (sa.s.key.isRecurrent && sa.s.isNegative()) {
+                sa.output.key.interpretation.markedConflict = v;
+            }
+        }
+    }
+
+
     private static void linkActSyn(OrNode n, Document doc, Activation act, int dir, ArrayList<Activation> recNegTmp, Synapse s) {
         Synapse.Key sk = s.key;
 
@@ -566,39 +600,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         synsTmp = newSyns;
         return synsTmp;
-    }
-
-
-
-    private static void addConflict(Document doc, InterprNode io, InterprNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
-        if (o.markedConflict == v || o.orInterprNodes == null) {
-            if (!isAllowed(doc, io, o, inputActs)) {
-                Conflicts.add(doc, act, io, o);
-            }
-        } else {
-            for (InterprNode no : o.orInterprNodes) {
-                addConflict(doc, io, no, act, inputActs, v);
-            }
-        }
-    }
-
-
-    private static boolean isAllowed(Document doc, InterprNode io, InterprNode o, Collection<NodeActivation> inputActs) {
-        if (io != null && o.contains(io, false)) return true;
-        for (NodeActivation act : inputActs) {
-            if (act.key.node.isAllowedOption(doc.threadId, o, act, doc.visitedCounter++)) return true;
-        }
-        return false;
-    }
-
-
-    private static void markConflicts(Activation iAct, Activation oAct, long v) {
-        oAct.key.interpretation.markedConflict = v;
-        for (SynapseActivation sa : iAct.neuronOutputs) {
-            if (sa.s.key.isRecurrent && sa.s.isNegative()) {
-                sa.output.key.interpretation.markedConflict = v;
-            }
-        }
     }
 
 

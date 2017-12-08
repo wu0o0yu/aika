@@ -191,7 +191,7 @@ public class NegationTest {
                 new Input()
                         .setNeuron(inS)
                         .setWeight(-1.0f)
-                        .setRecurrent(true)
+                        .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBiasDelta(1.0)
                         .setRangeMatch(NONE)
@@ -210,7 +210,6 @@ public class NegationTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
-        Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.interpretation.largestCommonSubset.conflicts.primary.isEmpty());
 
         doc.clearActivations();
     }
@@ -249,7 +248,7 @@ public class NegationTest {
                 new Input()
                         .setNeuron(inS)
                         .setWeight(-1.0f)
-                        .setRecurrent(true)
+                        .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBiasDelta(1.0)
                         .setRangeMatch(RangeRelation.CONTAINS)
@@ -268,7 +267,6 @@ public class NegationTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
-        Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.interpretation.largestCommonSubset.conflicts.primary.isEmpty());
 
         doc.clearActivations();
     }
@@ -326,7 +324,6 @@ public class NegationTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
-        Assert.assertFalse(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null).key.interpretation.largestCommonSubset.conflicts.primary.isEmpty());
 
         doc.clearActivations();
     }
