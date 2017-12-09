@@ -113,18 +113,12 @@ public class Synapse implements Writable {
      */
     public boolean isConjunction;
 
-    public Writable statistic;
-
-
     public Synapse() {}
 
 
     public Synapse(Model m, Neuron input, Neuron output) {
         this.input = input;
         this.output = output;
-        if(m.synapseStatisticFactory != null) {
-            this.statistic = m.synapseStatisticFactory.createStatisticObject();
-        }
     }
 
 
@@ -211,11 +205,6 @@ public class Synapse implements Writable {
         out.writeFloat(w);
 
         out.writeBoolean(isConjunction);
-
-        out.writeBoolean(statistic != null);
-        if(statistic != null) {
-            statistic.write(out);
-        }
     }
 
 
@@ -230,11 +219,6 @@ public class Synapse implements Writable {
         nw = w = in.readFloat();
 
         isConjunction = in.readBoolean();
-
-        if(in.readBoolean() && m.synapseStatisticFactory != null) {
-            statistic = m.synapseStatisticFactory.createStatisticObject();
-            statistic.readFields(in, m);
-        }
     }
 
 
