@@ -148,7 +148,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         doc.ubQueue.add(act);
 
-        if(targetValue != 0.0) {
+        if(targetValue != null) {
             doc.targetActivations.add(act);
         }
 
