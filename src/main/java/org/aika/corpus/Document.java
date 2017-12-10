@@ -233,7 +233,7 @@ public class Document implements Comparable<Document> {
 
 
     public void discoverPatterns(DiscoveryConfig discoveryConfig) {
-        for (Node n : activatedNodes) {
+        activatedNodes.forEach(n -> {
             discoveryConfig.counter.count(this, n);
 
             if (discoveryConfig.checkExpandable.evaluate(n)) {
@@ -244,7 +244,7 @@ public class Document implements Comparable<Document> {
                     }
                 }
             }
-        }
+        });
     }
 
 

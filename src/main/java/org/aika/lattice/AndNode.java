@@ -259,9 +259,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
         super.changeNumberOfNeuronRefs(threadId, v, d);
 
-        for(Provider<? extends Node> n: parents.values()) {
-            n.get().changeNumberOfNeuronRefs(threadId, v, d);
-        }
+        parents.values().forEach(n -> n.get().changeNumberOfNeuronRefs(threadId, v, d));
     }
 
 

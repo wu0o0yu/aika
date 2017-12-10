@@ -151,13 +151,12 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
         lock.acquireReadLock();
         if (andChildren != null) {
-            for (Map.Entry<Refinement, Provider<AndNode>> me : andChildren.entrySet()) {
-                Provider<InputNode> refInput = me.getKey().input;
-                InputNode in = refInput.getIfNotSuspended();
+            andChildren.forEach((ref, cn) -> {
+                InputNode in = ref.input.getIfNotSuspended();
                 if (in != null) {
-                    addNextLevelActivations(doc, in, me.getKey(), me.getValue(), act);
+                    addNextLevelActivations(doc, in, ref, cn, act);
                 }
-            }
+            });
         }
         lock.releaseReadLock();
 

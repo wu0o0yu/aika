@@ -369,9 +369,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         th.added = new TreeMap<>();
 
-        for (Map.Entry<Key<T>, Collection<NodeActivation>> me : tmpAdded.entrySet()) {
-            processAddedActivation(doc, me.getKey(), me.getValue());
-        }
+        tmpAdded.forEach((ak, iActs) -> processAddedActivation(doc, ak, iActs));
     }
 
 
