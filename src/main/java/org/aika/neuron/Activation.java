@@ -115,14 +115,14 @@ public final class Activation extends NodeActivation<OrNode> {
      * The {@code SynapseActivation} mirror the synapse link in the network of activations.
      */
     public static class SynapseActivation {
-        public final Synapse s;
+        public final Synapse synapse;
         public final Activation input;
         public final Activation output;
 
         public static Comparator<SynapseActivation> INPUT_COMP = new Comparator<SynapseActivation>() {
             @Override
             public int compare(SynapseActivation sa1, SynapseActivation sa2) {
-                int r = Synapse.INPUT_SYNAPSE_COMP.compare(sa1.s, sa2.s);
+                int r = Synapse.INPUT_SYNAPSE_COMP.compare(sa1.synapse, sa2.synapse);
                 if(r != 0) return r;
                 return sa1.input.compareTo(sa2.input);
             }
@@ -131,7 +131,7 @@ public final class Activation extends NodeActivation<OrNode> {
         public static Comparator<SynapseActivation> OUTPUT_COMP = new Comparator<SynapseActivation>() {
             @Override
             public int compare(SynapseActivation sa1, SynapseActivation sa2) {
-                int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(sa1.s, sa2.s);
+                int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(sa1.synapse, sa2.synapse);
                 if(r != 0) return r;
                 return sa1.output.compareTo(sa2.output);
             }
@@ -139,7 +139,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
         public SynapseActivation(Synapse s, Activation input, Activation output) {
-            this.s = s;
+            this.synapse = s;
             this.input = input;
             this.output = output;
         }

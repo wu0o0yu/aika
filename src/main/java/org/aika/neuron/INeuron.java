@@ -188,7 +188,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         double lb = bias + posRecSum - (negDirSum + negRecSum);
 
         for (SynapseActivation sa : act.neuronInputs) {
-            Synapse s = sa.s;
+            Synapse s = sa.synapse;
             Activation iAct = sa.input;
 
             if (iAct == act) continue;
@@ -220,7 +220,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         int fired = -1;
 
         for (InputState is: getInputStates(act, round, sn)) {
-            Synapse s = is.sa.s;
+            Synapse s = is.sa.synapse;
             Activation iAct = is.sa.input;
 
             if (iAct == act) continue;
@@ -282,16 +282,16 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         Synapse lastSynapse = null;
         InputState maxInputState = null;
         for (SynapseActivation sa : act.neuronInputs) {
-            if (lastSynapse != null && lastSynapse != sa.s) {
+            if (lastSynapse != null && lastSynapse != sa.synapse) {
                 tmp.add(maxInputState);
                 maxInputState = null;
             }
 
-            State s = getInputState(round, sn, o, sa.s, sa.input);
+            State s = getInputState(round, sn, o, sa.synapse, sa.input);
             if (maxInputState == null || maxInputState.s.value < s.value) {
                 maxInputState = new InputState(sa, s);
             }
-            lastSynapse = sa.s;
+            lastSynapse = sa.synapse;
         }
         if (maxInputState != null) {
             tmp.add(maxInputState);
@@ -323,7 +323,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public void computeBackpropagationErrorSignal(Activation act) {
         for (SynapseActivation sa : act.neuronOutputs) {
-            Synapse s = sa.s;
+            Synapse s = sa.synapse;
             Activation oAct = sa.output;
 
             act.errorSignal += s.weight * oAct.errorSignal * (1.0 - act.finalState.value);
@@ -498,7 +498,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     private static void markConflicts(Activation iAct, Activation oAct, long v) {
         oAct.key.interpretation.markedConflict = v;
         for (SynapseActivation sa : iAct.neuronOutputs) {
-            if (sa.s.key.isRecurrent && sa.s.isNegative()) {
+            if (sa.synapse.key.isRecurrent && sa.synapse.isNegative()) {
                 sa.output.key.interpretation.markedConflict = v;
             }
         }
