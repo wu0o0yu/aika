@@ -210,7 +210,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public State computeWeight(int round, Activation act, SearchNode sn, Document doc) {
+    public State computeWeight(int round, Activation act, SearchNode sn) {
         Coverage c = sn.getCoverage(act.key.interpretation);
         if(c == Coverage.UNKNOWN) return State.ZERO;
 
@@ -234,6 +234,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         double drSum = sum[DIR] + sum[REC];
+        double currentActValue = transferFunction(drSum);
+
+        act.maxActValue = Math.max(act.maxActValue, currentActValue);
 
         // Compute only the recurrent part is above the threshold.
         NormWeight newWeight = NormWeight.create(
@@ -242,7 +245,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         );
 
         return new State(
-                c == Coverage.SELECTED ? transferFunction(drSum) : 0.0,
+                c == Coverage.SELECTED ? currentActValue : 0.0,
                 c == Coverage.SELECTED ? fired : -1,
                 newWeight
         );

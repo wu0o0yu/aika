@@ -589,7 +589,7 @@ public class Document implements Comparable<Document> {
                     Activation act = q.pollLast();
                     act.rounds.setQueued(round, false);
 
-                    State s = act.isInput ? act.finalState : act.key.node.neuron.get(Document.this).computeWeight(round, act, sn, Document.this);
+                    State s = act.isInput ? act.finalState : act.key.node.neuron.get(Document.this).computeWeight(round, act, sn);
 
                     if (OPTIMIZE_DEBUG_OUTPUT) {
                         log.info(act.key + " Round:" + round);

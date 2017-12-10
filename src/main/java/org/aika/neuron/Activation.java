@@ -36,6 +36,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
     public Rounds rounds = new Rounds();
     public State finalState;
+    public double maxActValue = 0.0;
 
     public boolean ubQueued = false;
     public boolean isQueued = false;
