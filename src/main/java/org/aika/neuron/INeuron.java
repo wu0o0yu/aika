@@ -349,7 +349,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             }
         }
 
-        Converter.convert(doc.m, doc.threadId, this, provider.inMemoryInputSynapses.values());
+        doc.notifyWeightsModified(this, provider.inMemoryInputSynapses.values());
     }
 
 

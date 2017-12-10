@@ -77,6 +77,7 @@ public class Document implements Comparable<Document> {
     public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
     public TreeSet<Activation> targetActivations = new TreeSet<>();
     public TreeSet<Activation> errorSignalActivations = new TreeSet<>();
+    public TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
 
     public TreeMap<NodeActivation.Key, NodeActivation> activationsByRid = new TreeMap<>(new Comparator<NodeActivation.Key>() {
         @Override
@@ -164,14 +165,28 @@ public class Document implements Comparable<Document> {
      * network. It performs the search for the best interpretation.
      */
     public void process() {
-        for(Activation act: inputNeuronActivations) {
-            vQueue.propagateWeight(0, act);
-        }
+        inputNeuronActivations.forEach(act -> vQueue.propagateWeight(0, act));
         interrupted = false;
         SearchNode root = new SearchNode(this, null, null, null, -1, Collections.emptyList());
         root.computeBestInterpretation(this);
     }
 
+
+    public void notifyWeightsModified(INeuron n, Collection<Synapse> inputSynapses) {
+        Set<Synapse> is = modifiedWeights.get(n);
+        if(is == null) {
+            is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
+            modifiedWeights.put(n, is);
+        }
+        is.addAll(inputSynapses);
+    }
+
+
+    public void adjust() {
+        modifiedWeights.forEach((n, inputSyns) -> {
+            Converter.convert(m, threadId, n, inputSyns);
+        });
+    }
 
 
     public static class DiscoveryConfig {
@@ -382,7 +397,9 @@ public class Document implements Comparable<Document> {
                         sb.append(" FW:" + Utils.round(act.finalState.weight.w));
                         sb.append(" FN:" + Utils.round(act.finalState.weight.n));
                     }
-                    sb.append(" - TV:" + Utils.round(act.targetValue));
+                    if(act.targetValue != null) {
+                        sb.append(" - TV:" + Utils.round(act.targetValue));
+                    }
                 }
             }
             sb.append("\n");

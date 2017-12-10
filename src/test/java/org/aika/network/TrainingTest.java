@@ -79,8 +79,8 @@ public class TrainingTest {
 
         {
             Document doc = m.createDocument("Bla");
-            inA.addInput(doc, 0, 3, 1.0, 0.0);
-            inB.addInput(doc, 0, 3, 1.0, 0.0);
+            inA.addInput(doc, 0, 3, 1.0, null);
+            inB.addInput(doc, 0, 3, 1.0, null);
 
             doc.process();
 
@@ -104,13 +104,15 @@ public class TrainingTest {
                             ))
             );
 
+            doc.adjust();
+
             doc.clearActivations();
         }
 
         {
             Document doc = m.createDocument("Bla");
-            inA.addInput(doc, 0, 3, 1.0, 0.0);
-            inB.addInput(doc, 0, 3, 1.0, 0.0);
+            inA.addInput(doc, 0, 3, 1.0, null);
+            inB.addInput(doc, 0, 3, 1.0, null);
 
             doc.process();
 
