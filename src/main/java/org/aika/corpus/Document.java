@@ -263,7 +263,7 @@ public class Document implements Comparable<Document> {
 
     public void train(TrainConfig trainConfig) {
         for(Activation tAct: targetActivations) {
-            tAct.key.node.neuron.get(this).computeOutputErrorSignal(this, tAct);
+            tAct.key.node.neuron.get(this).computeOutputErrorSignal(tAct);
         }
 
         if(trainConfig.performBackpropagation) {
@@ -666,7 +666,7 @@ public class Document implements Comparable<Document> {
                 Activation act = queue.pollFirst();
 
                 act.isQueued = false;
-                act.key.node.neuron.get(Document.this).computeBackpropagationErrorSignal(Document.this, act);
+                act.key.node.neuron.get(Document.this).computeBackpropagationErrorSignal(act);
             }
         }
     }

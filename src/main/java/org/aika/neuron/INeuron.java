@@ -309,21 +309,16 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public void computeOutputErrorSignal(Document doc, Activation act) {
+    public void computeOutputErrorSignal(Activation act) {
         if(act.targetValue != null) {
             act.errorSignal += act.targetValue - act.finalState.value;
         }
 
-        if(act.errorSignal != 0.0) {
-            doc.errorSignalActivations.add(act);
-        }
-        for (SynapseActivation sa : act.neuronInputs) {
-            doc.bQueue.add(sa.input);
-        }
+        act.updateErrorSignal();
     }
 
 
-    public void computeBackpropagationErrorSignal(Document doc, Activation act) {
+    public void computeBackpropagationErrorSignal(Activation act) {
         for (SynapseActivation sa : act.neuronOutputs) {
             Synapse s = sa.s;
             Activation oAct = sa.output;
@@ -331,12 +326,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             act.errorSignal += s.w * oAct.errorSignal * (1.0 - act.finalState.value);
         }
 
-        if(act.errorSignal != 0.0) {
-            doc.errorSignalActivations.add(act);
-        }
-        for (SynapseActivation sa : act.neuronInputs) {
-            doc.bQueue.add(sa.input);
-        }
+        act.updateErrorSignal();
     }
 
 
