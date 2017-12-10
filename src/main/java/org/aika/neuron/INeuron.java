@@ -195,13 +195,13 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
             if (s.isNegative()) {
                 if (!checkSelfReferencing(act.key.interpretation, iAct.key.interpretation, 0) && act.key.interpretation.contains(iAct.key.interpretation, true)) {
-                    ub += iAct.lowerBound * s.w;
+                    ub += iAct.lowerBound * s.weight;
                 }
 
-                lb += s.w;
+                lb += s.weight;
             } else {
-                ub += iAct.upperBound * s.w;
-                lb += iAct.lowerBound * s.w;
+                ub += iAct.upperBound * s.weight;
+                lb += iAct.lowerBound * s.weight;
             }
         }
 
@@ -226,7 +226,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             if (iAct == act) continue;
 
             int t = s.key.isRecurrent ? REC : DIR;
-            sum[t] += is.s.value * s.w;
+            sum[t] += is.s.value * s.weight;
 
             if (!s.key.isRecurrent && !s.isNegative() && sum[DIR] + sum[REC] >= 0.0 && fired < 0) {
                 fired = iAct.rounds.get(round).fired + 1;
@@ -326,7 +326,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             Synapse s = sa.s;
             Activation oAct = sa.output;
 
-            act.errorSignal += s.w * oAct.errorSignal * (1.0 - act.finalState.value);
+            act.errorSignal += s.weight * oAct.errorSignal * (1.0 - act.finalState.value);
         }
 
         act.updateErrorSignal();
@@ -381,7 +381,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             synapse.link();
         }
 
-        synapse.nw += deltaW;
+        synapse.newWeight += deltaW;
     }
 
 
@@ -808,7 +808,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         SortedSet<Synapse> is = new TreeSet<>(new Comparator<Synapse>() {
             @Override
             public int compare(Synapse s1, Synapse s2) {
-                int r = Double.compare(s2.w, s1.w);
+                int r = Double.compare(s2.weight, s1.weight);
                 if (r != 0) return r;
                 return Integer.compare(s1.input.id, s2.input.id);
             }
@@ -823,7 +823,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         sb.append(Utils.round(bias));
         for (Synapse s : is) {
             sb.append(", ");
-            sb.append(Utils.round(s.w));
+            sb.append(Utils.round(s.weight));
             sb.append(":");
             sb.append(s.key.relativeRid);
             sb.append(":");

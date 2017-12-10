@@ -324,7 +324,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         double sum = n.bias;
         for(Refinement ref: parents.keySet()) {
             Synapse s = ref.getSynapse(offset, n.provider);
-            sum += Math.abs(s.w);
+            sum += Math.abs(s.weight);
         }
         return sum;
     }

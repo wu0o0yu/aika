@@ -61,7 +61,7 @@ public class Synapse implements Writable {
     public static final Comparator<Synapse> INPUT_SYNAPSE_BY_WEIGHTS_COMP = new Comparator<Synapse>() {
         @Override
         public int compare(Synapse s1, Synapse s2) {
-            int r = compareWeights(s1.w, s2.w, 0.00001);
+            int r = compareWeights(s1.weight, s2.weight, 0.00001);
             if (r != 0) return r;
             r = s1.input.compareTo(s2.input);
             if (r != 0) return r;
@@ -99,13 +99,13 @@ public class Synapse implements Writable {
     /**
      * The weight of this synapse.
      */
-    public float w;
+    public float weight;
 
     /**
      * The new weight of this synapse. The converter will use it to compute few internal
      * parameters and then transfer it to the weight variable.
      */
-    public float nw;
+    public float newWeight;
 
     /**
      * The synapse is stored either in the input neuron or the output neuron
@@ -171,7 +171,7 @@ public class Synapse implements Writable {
 
     public boolean isConjunction(boolean v) {
         INeuron out = output.get();
-        return (v ? nw : w) + out.bias + out.posRecSum - out.negRecSum - out.negDirSum <= 0.0;
+        return (v ? newWeight : weight) + out.bias + out.posRecSum - out.negRecSum - out.negDirSum <= 0.0;
     }
 
 
@@ -185,12 +185,12 @@ public class Synapse implements Writable {
 
 
     public boolean isNegative() {
-        return w <= 0.0;
+        return weight <= 0.0;
     }
 
 
     public String toString() {
-        return "S " + w + " " + key.relativeRid + " S:" + key.startRangeMapping + " E:" + key.endRangeMapping + " " +  input + "->" + output;
+        return "S " + weight + " " + key.relativeRid + " S:" + key.startRangeMapping + " E:" + key.endRangeMapping + " " +  input + "->" + output;
     }
 
 
@@ -202,7 +202,7 @@ public class Synapse implements Writable {
 
         key.write(out);
 
-        out.writeFloat(w);
+        out.writeFloat(weight);
 
         out.writeBoolean(isConjunction);
     }
@@ -216,7 +216,7 @@ public class Synapse implements Writable {
 
         key = lookupKey(Key.read(in, m));
 
-        nw = w = in.readFloat();
+        newWeight = weight = in.readFloat();
 
         isConjunction = in.readBoolean();
     }

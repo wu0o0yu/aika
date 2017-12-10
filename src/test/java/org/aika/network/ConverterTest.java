@@ -21,11 +21,8 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Range;
-import org.aika.lattice.Node;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 /**
  *
@@ -213,7 +210,7 @@ public class ConverterTest {
         Assert.assertEquals(2, out.get().node.get().parents.firstEntry().getValue().size());
 
 
-        inD.inMemoryOutputSynapses.firstEntry().getValue().nw = 0.5f;
+        inD.inMemoryOutputSynapses.firstEntry().getValue().newWeight = 0.5f;
 
         Converter.convert(m, 0, out.get(), out.get().inputSynapses.values());
         System.out.println(out.get().node.get().logicToString());

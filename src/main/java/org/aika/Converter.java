@@ -38,7 +38,7 @@ public class Converter {
     public static Comparator<Synapse> SYNAPSE_COMP = new Comparator<Synapse>() {
         @Override
         public int compare(Synapse s1, Synapse s2) {
-            int r = Double.compare(s2.w, s1.w);
+            int r = Double.compare(s2.weight, s1.weight);
             if(r != 0) return r;
             return Synapse.INPUT_SYNAPSE_COMP.compare(s1, s2);
         }
@@ -73,7 +73,7 @@ public class Converter {
         TreeSet<Synapse> tmp = new TreeSet<>(SYNAPSE_COMP);
         for(Synapse s: neuron.inputSynapses.values()) {
             if(!s.isNegative() && !s.key.isRecurrent) {
-                remainingSum += s.w;
+                remainingSum += s.weight;
                 tmp.add(s);
             }
         }
@@ -86,13 +86,13 @@ public class Converter {
         if(remainingSum - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0) {
             int i = 0;
             for (Synapse s : tmp) {
-                final boolean isOptionalInput = sum + remainingSum - s.w - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
+                final boolean isOptionalInput = sum + remainingSum - s.weight - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
                 final boolean maxAndNodesReached = i >= MAX_AND_NODE_SIZE;
                 if (isOptionalInput || maxAndNodesReached) {
                     break;
                 }
 
-                remainingSum -= s.w;
+                remainingSum -= s.weight;
                 reqSyns.add(s);
 
                 requiredNode = getNextLevelNode(offset, requiredNode, s);
@@ -100,7 +100,7 @@ public class Converter {
 
                 i++;
 
-                sum += s.w;
+                sum += s.weight;
 
                 final boolean sumOfSynapseWeightsAboveThreshold = sum - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
                 if (sumOfSynapseWeightsAboveThreshold) {
@@ -118,7 +118,7 @@ public class Converter {
                 outputNode.addInput(offset, threadId, requiredNode, false);
             } else {
                 for (Synapse s : tmp) {
-                    boolean belowThreshold = sum + s.w + remainingSum - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias <= 0.0;
+                    boolean belowThreshold = sum + s.weight + remainingSum - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias <= 0.0;
                     if (belowThreshold) {
                         break;
                     }
@@ -129,14 +129,14 @@ public class Converter {
 
                         Integer nOffset = Utils.nullSafeMin(s.key.relativeRid, offset);
                         outputNode.addInput(nOffset, threadId, nln, false);
-                        remainingSum -= s.w;
+                        remainingSum -= s.weight;
                     }
                 }
             }
         }
 
         for (Synapse s : modifiedSynapses) {
-            if(s.w - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0) {
+            if(s.weight - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0) {
                 Node nln = s.inputNode.get();
                 offset = s.key.relativeRid;
                 outputNode.addInput(offset, threadId, nln, false);
@@ -168,13 +168,13 @@ public class Converter {
             }
 
             if (s.key.isRecurrent) {
-                maxRecurrentSumDelta += Math.abs(s.nw) - Math.abs(s.w);
+                maxRecurrentSumDelta += Math.abs(s.newWeight) - Math.abs(s.weight);
             }
 
-            sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.w;
-            sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.nw <= 0.0 ? NEGATIVE : POSITIVE] += s.nw;
+            sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
+            sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.newWeight <= 0.0 ? NEGATIVE : POSITIVE] += s.newWeight;
 
-            s.w = s.nw;
+            s.weight = s.newWeight;
 
             in.lock.releaseWriteLock();
         }

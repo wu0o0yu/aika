@@ -559,7 +559,6 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         return sb.toString();
-//        return id + " : " + Utils.round(computeAccumulatedWeight()[0].getNormWeight()) + ", " + Utils.round(computeAccumulatedWeight()[1].getNormWeight())  + " - " + Utils.round(computeAccumulatedWeight()[0].w) + ", " + Utils.round(computeAccumulatedWeight()[1].w);
     }
 
 
