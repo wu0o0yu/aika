@@ -69,7 +69,7 @@ public class Neuron extends Provider<INeuron> {
      * @param value The activation value of this input activation
      * @param targetValue The target activation value for supervised learning
      */
-    public Activation addInput(Document doc, int begin, int end, double value, double targetValue) {
+    public Activation addInput(Document doc, int begin, int end, double value, Double targetValue) {
         return addInput(doc, begin, end, null, doc.bottom, value, targetValue);
     }
 
@@ -125,7 +125,7 @@ public class Neuron extends Provider<INeuron> {
      * @param value The activation value of this input activation
      */
     public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value) {
-        return addInput(doc, begin, end, rid, o, value, 0.0);
+        return addInput(doc, begin, end, rid, o, value, null);
     }
 
     /**
@@ -139,7 +139,7 @@ public class Neuron extends Provider<INeuron> {
      * @param value The activation value of this input activation
      * @param targetValue The target activation value for supervised learning
      */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, double targetValue) {
+    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, Double targetValue) {
         return get(doc).addInput(doc, begin, end, rid, o, value, targetValue);
     }
 

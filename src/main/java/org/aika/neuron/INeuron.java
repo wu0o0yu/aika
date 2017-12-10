@@ -130,7 +130,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      * @param o     The interpretation node
      * @param value The activation value of this input activation
      */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, double targetValue) {
+    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, Double targetValue) {
         Node.addActivationAndPropagate(doc, new NodeActivation.Key(node.get(doc), new Range(begin, end), rid, o), Collections.emptySet());
 
         doc.propagate();
@@ -310,7 +310,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public void computeOutputErrorSignal(Document doc, Activation act) {
-        act.errorSignal += act.targetValue - act.finalState.value;
+        if(act.targetValue != null) {
+            act.errorSignal += act.targetValue - act.finalState.value;
+        }
 
         if(act.errorSignal != 0.0) {
             doc.errorSignalActivations.add(act);

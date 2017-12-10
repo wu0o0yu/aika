@@ -341,7 +341,7 @@ public class Document implements Comparable<Document> {
 
         StringBuilder sb = new StringBuilder();
         for(Activation act: acts) {
-            if(act.upperBound <= 0.0 && act.targetValue <= 0.0) {
+            if(act.upperBound <= 0.0 && (act.targetValue == null || act.targetValue <= 0.0)) {
                 continue;
             }
 
