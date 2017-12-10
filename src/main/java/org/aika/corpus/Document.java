@@ -182,6 +182,9 @@ public class Document implements Comparable<Document> {
     }
 
 
+    /**
+     * Reflects the changes to the synapse weights in the logic node structure.
+     */
     public void adjust() {
         modifiedWeights.forEach((n, inputSyns) -> {
             Converter.convert(m, threadId, n, inputSyns);
