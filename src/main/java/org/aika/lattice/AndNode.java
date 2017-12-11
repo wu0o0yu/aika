@@ -162,7 +162,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                         Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
                         Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
-                        AndNode nln = createNextLevelNode(doc.m, doc.threadId, this, nRef, discoveryConfig);
+                        AndNode nln = createNextLevelNode(doc.model, doc.threadId, this, nRef, discoveryConfig);
                         if(nln != null) {
                             nln.isDiscovered = true;
                             doc.addedNodes.add(nln);

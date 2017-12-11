@@ -62,7 +62,7 @@ public class Document implements Comparable<Document> {
     public SearchNode selectedSearchNode = null;
     public List<InterprNode> bestInterpretation = null;
 
-    public Model m;
+    public Model model;
     public int threadId;
     public boolean interrupted;
 
@@ -104,11 +104,11 @@ public class Document implements Comparable<Document> {
     };
 
 
-    public Document(int id, String content, Model m, int threadId) {
+    public Document(int id, String content, Model model, int threadId) {
         this.id = id;
         this.content = content;
 
-        this.m = m;
+        this.model = model;
         this.threadId = threadId;
     }
 
@@ -187,7 +187,7 @@ public class Document implements Comparable<Document> {
      */
     public void adjust() {
         modifiedWeights.forEach((n, inputSyns) -> {
-            Converter.convert(m, threadId, n, inputSyns);
+            Converter.convert(model, threadId, n, inputSyns);
         });
     }
 
@@ -304,12 +304,12 @@ public class Document implements Comparable<Document> {
         activatedNodes.clear();
         addedNodes.clear();
 
-        if(m.lastCleanup[threadId] + CLEANUP_INTERVAL < id) {
-            m.lastCleanup[threadId] = id;
+        if(model.lastCleanup[threadId] + CLEANUP_INTERVAL < id) {
+            model.lastCleanup[threadId] = id;
 
             List<Provider<? extends AbstractNode>> tmp;
-            synchronized(m.activeProviders) {
-                tmp = new ArrayList<>(m.activeProviders.values());
+            synchronized(model.activeProviders) {
+                tmp = new ArrayList<>(model.activeProviders.values());
             }
 
             for (Provider<? extends AbstractNode> np : tmp) {
@@ -326,7 +326,7 @@ public class Document implements Comparable<Document> {
             }
         }
 
-        m.docs[threadId] = null;
+        model.docs[threadId] = null;
     }
 
 

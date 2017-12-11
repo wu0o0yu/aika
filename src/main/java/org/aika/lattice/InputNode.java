@@ -247,7 +247,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                             erm.compare(secondAct.key.range.end, act.key.range.end)
                         ) {
                         in.visitedDiscover = v;
-                        AndNode nln = AndNode.createNextLevelNode(doc.m, doc.threadId, this, ref, discoveryConfig);
+                        AndNode nln = AndNode.createNextLevelNode(doc.model, doc.threadId, this, ref, discoveryConfig);
 
                         if(nln != null) {
                             nln.isDiscovered = true;
