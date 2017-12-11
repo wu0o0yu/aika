@@ -85,10 +85,10 @@ public class Converter {
         boolean noFurtherRefinement = false;
         TreeSet<Synapse> reqSyns = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
         double sum = 0.0;
-        if(remainingSum - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0) {
+        if(remainingSum + neuron.posRecSum + neuron.bias > 0.0) {
             int i = 0;
             for (Synapse s : tmp) {
-                final boolean isOptionalInput = sum + remainingSum - s.weight - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
+                final boolean isOptionalInput = sum + remainingSum - s.weight + neuron.posRecSum + neuron.bias > 0.0;
                 final boolean maxAndNodesReached = i >= MAX_AND_NODE_SIZE;
                 if (isOptionalInput || maxAndNodesReached) {
                     break;
@@ -104,7 +104,7 @@ public class Converter {
 
                 sum += s.weight;
 
-                final boolean sumOfSynapseWeightsAboveThreshold = sum - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0;
+                final boolean sumOfSynapseWeightsAboveThreshold = sum + neuron.posRecSum + neuron.bias > 0.0;
                 if (sumOfSynapseWeightsAboveThreshold) {
                     noFurtherRefinement = true;
                     break;
@@ -120,7 +120,7 @@ public class Converter {
                 outputNode.addInput(offset, threadId, requiredNode, false);
             } else {
                 for (Synapse s : tmp) {
-                    boolean belowThreshold = sum + s.weight + remainingSum - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias <= 0.0;
+                    boolean belowThreshold = sum + s.weight + remainingSum + neuron.posRecSum + neuron.bias <= 0.0;
                     if (belowThreshold) {
                         break;
                     }
@@ -138,7 +138,7 @@ public class Converter {
         }
 
         for (Synapse s : modifiedSynapses) {
-            if(s.weight - neuron.negRecSum - neuron.negDirSum + neuron.posRecSum + neuron.bias > 0.0) {
+            if(s.weight + neuron.posRecSum + neuron.bias > 0.0) {
                 Node nln = s.inputNode.get();
                 offset = s.key.relativeRid;
                 outputNode.addInput(offset, threadId, nln, false);

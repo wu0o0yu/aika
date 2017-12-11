@@ -61,9 +61,9 @@ public class CountingTest {
         Neuron inA = m.createNeuron("inA");
         Neuron outA = m.initNeuron(m.createNeuron("nA"), 50.0,
                 new Input()
-                        .setBiasDelta(-47.5)
-                        .setWeight(100.0f)
                         .setNeuron(inA)
+                        .setWeight(100.0f)
+                        .setBiasDelta(-47.5)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );

@@ -95,7 +95,7 @@ public class WeightsTest {
                         .setNeuron(pSuppr)
                         .setWeight(-2.0f)
                         .setRecurrent(true)
-                        .setBiasDelta(-2.0)
+                        .setBiasDelta(0.0)
                         .setRangeMatch(CONTAINED_IN)
         );
 
@@ -144,7 +144,7 @@ public class WeightsTest {
                         .setNeuron(pSuppr)
                         .setWeight(-2.0f)
                         .setRecurrent(true)
-                        .setBiasDelta(-2.0)
+                        .setBiasDelta(0.0)
                         .setRangeMatch(CONTAINED_IN)
         );
 

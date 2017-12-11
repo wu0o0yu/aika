@@ -89,7 +89,7 @@ public class NamedEntityRecognitionTest {
                 new Input()
                         .setNeuron(suppressingN)
                         .setWeight(-20.0f)
-                        .setBiasDelta(-20.0)
+                        .setBiasDelta(0.0)
                         .setRecurrent(true) // this input is a negative feedback loop
                         .setRangeMatch(CONTAINS)
         );
@@ -107,7 +107,7 @@ public class NamedEntityRecognitionTest {
                 new Input()
                         .setNeuron(suppressingN)
                         .setWeight(-20.0f)
-                        .setBiasDelta(-20.0)
+                        .setBiasDelta(0.0)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINS)
         );
@@ -133,7 +133,7 @@ public class NamedEntityRecognitionTest {
                 new Input()
                         .setNeuron(suppressingN)
                         .setWeight(-20.0f)
-                        .setBiasDelta(-20.0)
+                        .setBiasDelta(0.0)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINED_IN)
         );
@@ -151,7 +151,7 @@ public class NamedEntityRecognitionTest {
                 new Input()
                         .setNeuron(suppressingN)
                         .setWeight(-20.0f)
-                        .setBiasDelta(-20.0)
+                        .setBiasDelta(0.0)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINED_IN)
         );

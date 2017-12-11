@@ -185,8 +185,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public void computeBounds(Activation act) {
-        double ub = bias + posRecSum - (negDirSum + negRecSum);
-        double lb = bias + posRecSum - (negDirSum + negRecSum);
+        double ub = bias + posRecSum;
+        double lb = bias + posRecSum;
 
         for (SynapseActivation sa : act.neuronInputs) {
             Synapse s = sa.synapse;
@@ -215,8 +215,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         Coverage c = sn.getCoverage(act.key.interpretation);
         if(c == Coverage.UNKNOWN) return State.ZERO;
 
-        double st = bias - (negDirSum + negRecSum);
-        double[] sum = {st, 0.0};
+        double[] sum = {bias, 0.0};
 
         int fired = -1;
 

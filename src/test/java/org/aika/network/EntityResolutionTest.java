@@ -225,7 +225,7 @@ public class EntityResolutionTest {
                 new Input()
                         .setNeuron(eJaguar)
                         .setWeight(-30.0f)
-                        .setBiasDelta(-30.0)
+                        .setBiasDelta(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
         );
@@ -248,7 +248,7 @@ public class EntityResolutionTest {
                 new Input()
                         .setNeuron(ePuma)
                         .setWeight(-30.0f)
-                        .setBiasDelta(-30.0)
+                        .setBiasDelta(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
         );
@@ -271,7 +271,7 @@ public class EntityResolutionTest {
                 new Input()
                         .setNeuron(eLeopard)
                         .setWeight(-30.0f)
-                        .setBiasDelta(-30.0)
+                        .setBiasDelta(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
         );

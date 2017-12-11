@@ -84,7 +84,7 @@ public class OptionalAndTest {
                         .setNeuron(suppr)
                         .setWeight(-1.0f)
                         .setRecurrent(true)
-                        .setBiasDelta(-1.0)
+                        .setBiasDelta(0.0)
         );
 
         Neuron verb = m.initNeuron(m.createNeuron("VERB"),
@@ -98,7 +98,7 @@ public class OptionalAndTest {
                         .setNeuron(suppr)
                         .setWeight(-1.0f)
                         .setRecurrent(true)
-                        .setBiasDelta(-1.0)
+                        .setBiasDelta(0.0)
         );
 
         m.initNeuron(suppr,

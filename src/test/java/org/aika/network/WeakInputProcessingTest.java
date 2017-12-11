@@ -66,7 +66,7 @@ public class WeakInputProcessingTest {
                         .setNeuron(suppr)
                         .setWeight(-60.0f)
                         .setRecurrent(true)
-                        .setBiasDelta(-60.0)
+                        .setBiasDelta(0.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
@@ -92,7 +92,7 @@ public class WeakInputProcessingTest {
                         .setNeuron(suppr)
                         .setWeight(-60.0f)
                         .setRecurrent(true)
-                        .setBiasDelta(-60.0)
+                        .setBiasDelta(0.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
@@ -118,7 +118,7 @@ public class WeakInputProcessingTest {
                         .setNeuron(suppr)
                         .setWeight(-60.0f)
                         .setRecurrent(true)
-                        .setBiasDelta(-60.0)
+                        .setBiasDelta(0.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
