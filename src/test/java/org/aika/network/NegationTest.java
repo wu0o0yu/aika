@@ -56,19 +56,19 @@ public class NegationTest {
                         .setWeight(10.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(0.95),
+                        .setBiasDelta(-9.5),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(-10.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0),
+                        .setBiasDelta(-10.0),
                 new Input()
                         .setNeuron(inC)
                         .setWeight(-10.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-10.0)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -123,19 +123,19 @@ public class NegationTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0),
+                        .setBiasDelta(-1.0),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(-1.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0),
+                        .setBiasDelta(-1.0),
                 new Input()
                         .setNeuron(inC)
                         .setWeight(-1.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -185,7 +185,7 @@ public class NegationTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
@@ -193,7 +193,7 @@ public class NegationTest {
                         .setWeight(-1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(NONE)
         );
 
@@ -242,7 +242,7 @@ public class NegationTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
@@ -250,7 +250,7 @@ public class NegationTest {
                         .setWeight(-1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.CONTAINS)
         );
 
@@ -299,7 +299,7 @@ public class NegationTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
@@ -307,7 +307,7 @@ public class NegationTest {
                         .setWeight(-1.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.CONTAINS)
         );
 
@@ -366,7 +366,7 @@ public class NegationTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
@@ -374,7 +374,7 @@ public class NegationTest {
                         .setWeight(-1.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.CONTAINS)
         );
         m.initNeuron(absN,
@@ -384,7 +384,7 @@ public class NegationTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setStartRangeMatch(EQUALS)
                         .setStartRangeOutput(true),
                 new Input()
@@ -392,7 +392,7 @@ public class NegationTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setEndRangeMatch(EQUALS)
                         .setEndRangeOutput(true),
                 new Input()
@@ -400,7 +400,7 @@ public class NegationTest {
                         .setWeight(-1.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.CONTAINS)
         );
 
@@ -488,7 +488,7 @@ public class NegationTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
@@ -496,7 +496,7 @@ public class NegationTest {
                         .setWeight(-1.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
@@ -507,7 +507,7 @@ public class NegationTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
@@ -515,7 +515,7 @@ public class NegationTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
@@ -523,7 +523,7 @@ public class NegationTest {
                         .setWeight(-1.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
@@ -535,7 +535,7 @@ public class NegationTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
@@ -543,7 +543,7 @@ public class NegationTest {
                         .setWeight(-1.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(RangeRelation.EQUALS)
                         .setRangeOutput(true)
         );
@@ -583,12 +583,6 @@ public class NegationTest {
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
-
-
-//        asN.node.weight = 0.45;
-//        ascN.node.weight = 1.0;
-
-//        bsN.node.weight = 0.5;
 
 
         inA.addInput(doc, 0, 6);
@@ -649,13 +643,13 @@ public class NegationTest {
                         .setWeight(2.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0),
+                        .setBiasDelta(-2.0),
                 new Input()
                         .setNeuron(pD)
                         .setWeight(-2.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-2.0)
         );
 
         m.initNeuron(pD,
@@ -665,13 +659,13 @@ public class NegationTest {
                         .setWeight(2.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0),
+                        .setBiasDelta(-2.0),
                 new Input()
                         .setNeuron(pC)
                         .setWeight(-2.0f)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-2.0)
         );
 
 
@@ -685,19 +679,19 @@ public class NegationTest {
                         .setWeight(2.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0),
+                        .setBiasDelta(-2.0),
                 new Input()
                         .setNeuron(pD)
                         .setWeight(2.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0),
+                        .setBiasDelta(-2.0),
                 new Input()
                         .setNeuron(inG)
                         .setWeight(2.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-2.0)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

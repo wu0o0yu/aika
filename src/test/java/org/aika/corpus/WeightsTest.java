@@ -81,7 +81,7 @@ public class WeightsTest {
                         .setNeuron(pOrA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.6)
+                        .setBiasDelta(-0.6)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
@@ -95,7 +95,7 @@ public class WeightsTest {
                         .setNeuron(pSuppr)
                         .setWeight(-2.0f)
                         .setRecurrent(true)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-2.0)
                         .setRangeMatch(CONTAINED_IN)
         );
 
@@ -130,21 +130,21 @@ public class WeightsTest {
                         .setNeuron(pOrB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.6)
+                        .setBiasDelta(-0.6)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inCB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-1.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-2.0f)
                         .setRecurrent(true)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-2.0)
                         .setRangeMatch(CONTAINED_IN)
         );
 

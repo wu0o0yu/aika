@@ -83,7 +83,7 @@ public class ConverterTest {
         System.out.println(out.get().node.get().logicToString());
         Assert.assertEquals(1, out.get().node.get().parents.firstEntry().getValue().size());
 
-        out.get().bias = -8.5;
+        out.get().biasDelta = 1.0;
         Converter.convert(m, 0, out.get(), out.get().inputSynapses.values());
 
         System.out.println(out.get().node.get().logicToString());

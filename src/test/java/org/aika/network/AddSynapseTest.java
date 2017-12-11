@@ -38,7 +38,6 @@ public class AddSynapseTest {
         Model m = new Model();
 
         Neuron n = m.createNeuron("OR");
-        n.get().bias = -0.001;
 
         TreeMap<String, Neuron> inputNeurons = new TreeMap<>();
 

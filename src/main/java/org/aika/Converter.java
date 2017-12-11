@@ -180,6 +180,10 @@ public class Converter {
             in.lock.releaseWriteLock();
         }
 
+        neuron.bias += neuron.biasDelta;
+        neuron.bias = Math.min(neuron.bias, 0.0);
+        neuron.biasDelta = 0.0;
+
         neuron.maxRecurrentSum += maxRecurrentSumDelta;
         neuron.posDirSum += sumDelta[DIRECT][POSITIVE];
         neuron.negDirSum += sumDelta[DIRECT][NEGATIVE];

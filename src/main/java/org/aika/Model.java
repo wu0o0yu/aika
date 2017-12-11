@@ -252,7 +252,7 @@ public class Model {
         for (Input input : inputs) {
             Synapse s = input.getSynapse(n);
             s.weightDelta = input.weight;
-            bias -= Math.abs(input.weight) * input.biasDelta;
+            bias += input.biasDelta;
             is.add(s);
         }
 
@@ -267,7 +267,7 @@ public class Model {
 
         s.weightDelta = input.weight;
 
-        biasDelta -= Math.abs(input.weight) * input.biasDelta;
+        biasDelta += input.biasDelta;
 
         INeuron.addSynapse(this, defaultThreadId, n, biasDelta, s);
     }

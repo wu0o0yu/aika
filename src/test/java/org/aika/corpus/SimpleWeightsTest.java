@@ -94,14 +94,14 @@ public class SimpleWeightsTest {
                         .setNeuron(inA)
                         .setWeight(3.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-3.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(3.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-3.0)
         );
 
         {

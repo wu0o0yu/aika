@@ -66,6 +66,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public String outputText;
 
     public volatile double bias;
+    public volatile double biasDelta;
     public volatile double posDirSum;
     public volatile double negDirSum;
     public volatile double negRecSum;
@@ -339,7 +340,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         long v = doc.visitedCounter++;
 
         double x = learnRate * targetAct.errorSignal;
-        bias = Math.min(0.0, bias + x);
+        biasDelta += x;
         for (INeuron n : doc.finallyActivatedNeurons) {
             for(Activation iAct: n.getFinalActivations(doc)) {
                 Synapse.Key sk = se.evaluate(iAct, targetAct);
@@ -760,9 +761,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public static Neuron init(Model m, int threadId, Neuron pn, double bias, Set<Synapse> inputs) {
+    public static Neuron init(Model m, int threadId, Neuron pn, double biasDelta, Set<Synapse> inputs) {
         INeuron n = pn.get();
-        n.bias = bias;
+        n.biasDelta += biasDelta;
 
         ArrayList<Synapse> modifiedSynapses = new ArrayList<>();
         for (Synapse s : inputs) {
@@ -782,7 +783,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public static INeuron addSynapse(Model m, int threadId, Neuron pn, double biasDelta, Synapse s) {
         INeuron n = pn.get();
-        n.bias += biasDelta;
+        n.biasDelta += biasDelta;
 
         s.link();
 

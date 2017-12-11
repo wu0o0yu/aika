@@ -85,14 +85,12 @@ public class Input implements Comparable<Input> {
     }
 
     /**
-     * The minimum activation value that is required for this input. The minInput
-     * value is used to compute the neurons bias. It is only applied in the initAndNeuron method and only affects inputs with a positive weight and the optional flag set to false.
+     * The bias delta of this input that will later on be added to the neurons bias.
      *
      * @param biasDelta
      * @return
      */
     public Input setBiasDelta(double biasDelta) {
-        assert biasDelta >= 0.0 && biasDelta <= 1.0;
         this.biasDelta = biasDelta;
         return this;
     }

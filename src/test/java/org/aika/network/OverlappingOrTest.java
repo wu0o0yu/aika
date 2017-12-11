@@ -64,7 +64,7 @@ public class OverlappingOrTest {
                         .setWeight(4.0f)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-4.0)
                         .setStartRangeMatch(Operator.EQUALS)
                         .setEndRangeMatch(Operator.GREATER_THAN_EQUAL)
                         .setStartRangeOutput(true),
@@ -80,7 +80,7 @@ public class OverlappingOrTest {
                         .setWeight(4.0f)
                         .setRecurrent(false)
                         .setRelativeRid(2)
-                        .setBiasDelta(1.0)
+                        .setBiasDelta(-4.0)
                         .setStartRangeMatch(Operator.LESS_THAN_EQUAL)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
