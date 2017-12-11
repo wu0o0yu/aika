@@ -34,6 +34,8 @@ public class Converter {
 
     public static int MAX_AND_NODE_SIZE = 4;
 
+    public static boolean REMOVE_SYNAPSES_WITH_INVERTED_SIGNS = false;
+
 
     public static Comparator<Synapse> SYNAPSE_COMP = new Comparator<Synapse>() {
         @Override
@@ -157,6 +159,11 @@ public class Converter {
         double maxRecurrentSumDelta = 0.0;
 
         for (Synapse s : modifiedSynapses) {
+            if(REMOVE_SYNAPSES_WITH_INVERTED_SIGNS && ((s.weight > 0.0) != (s.weightDelta + s.weight > 0.0))) {
+                s.unlink();
+                continue;
+            }
+
             INeuron in = s.input.get();
             in.lock.acquireWriteLock();
 

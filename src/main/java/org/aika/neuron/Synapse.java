@@ -169,6 +169,38 @@ public class Synapse implements Writable {
     }
 
 
+    public void unlink() {
+        INeuron in = input.get();
+        INeuron out = output.get();
+
+        boolean dir = in.provider.id < out.provider.id;
+
+        (dir ? in : out).lock.acquireWriteLock();
+        (dir ? out : in).lock.acquireWriteLock();
+
+        in.provider.lock.acquireWriteLock();
+        in.provider.inMemoryOutputSynapses.remove(this);
+        in.provider.lock.releaseWriteLock();
+
+        out.provider.lock.acquireWriteLock();
+        out.provider.inMemoryInputSynapses.remove(this);
+        out.provider.lock.releaseWriteLock();
+
+        if(isConjunction(false)) {
+            if(out.inputSynapses.remove(this) != null) {
+                out.setModified();
+            }
+        } else {
+            if(in.outputSynapses.remove(this) != null) {
+                in.setModified();
+            }
+        }
+
+        (dir ? in : out).lock.releaseWriteLock();
+        (dir ? out : in).lock.releaseWriteLock();
+    }
+
+
     public boolean isConjunction(boolean v) {
         INeuron out = output.get();
         return (v ? weightDelta + weight : weight) + (v ? out.biasDelta + out.bias : out.bias) + out.posRecSum - out.negRecSum - out.negDirSum <= 0.0;
