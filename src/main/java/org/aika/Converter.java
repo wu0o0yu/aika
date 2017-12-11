@@ -46,7 +46,7 @@ public class Converter {
         }
     };
 
-    private Model m;
+    private Model model;
     private int threadId;
     private INeuron neuron;
     private OrNode outputNode;
@@ -58,8 +58,8 @@ public class Converter {
     }
 
 
-    private Converter(Model m, int threadId, INeuron neuron, Collection<Synapse> modifiedSynapses) {
-        this.m = m;
+    private Converter(Model model, int threadId, INeuron neuron, Collection<Synapse> modifiedSynapses) {
+        this.model = model;
         this.neuron = neuron;
         this.threadId = threadId;
         this.modifiedSynapses = modifiedSynapses;
@@ -168,7 +168,7 @@ public class Converter {
             in.lock.acquireWriteLock();
 
             if (s.inputNode == null) {
-                InputNode iNode = InputNode.add(m, s.key.createInputNodeKey(), s.input.get());
+                InputNode iNode = InputNode.add(model, s.key.createInputNodeKey(), s.input.get());
                 iNode.setModified();
                 iNode.setSynapse(s);
                 s.inputNode = iNode.provider;
@@ -206,7 +206,7 @@ public class Converter {
         if (requiredNode == null) {
             nln = s.inputNode.get();
         } else {
-            nln = AndNode.createNextLevelNode(m, threadId, requiredNode, new AndNode.Refinement(s.key.relativeRid, offset, s.inputNode), null);
+            nln = AndNode.createNextLevelNode(model, threadId, requiredNode, new AndNode.Refinement(s.key.relativeRid, offset, s.inputNode), null);
         }
         return nln;
     }
