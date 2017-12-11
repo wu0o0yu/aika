@@ -367,15 +367,15 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     private static class SynapseKey implements Writable, Comparable<SynapseKey> {
         Integer rid;
-        Neuron n;
+        Neuron neuron;
 
         private SynapseKey() {
         }
 
 
-        public SynapseKey(Integer rid, Neuron n) {
+        public SynapseKey(Integer rid, Neuron neuron) {
             this.rid = rid;
-            this.n = n;
+            this.neuron = neuron;
         }
 
 
@@ -383,7 +383,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         public int compareTo(SynapseKey sk) {
             int r = Utils.compareInteger(rid, sk.rid);
             if (r != 0) return r;
-            return n.compareTo(sk.n);
+            return neuron.compareTo(sk.neuron);
         }
 
 
@@ -400,7 +400,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
             if (rid != null) {
                 out.writeInt(rid);
             }
-            out.writeInt(n.id);
+            out.writeInt(neuron.id);
         }
 
 
@@ -409,7 +409,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
             if (in.readBoolean()) {
                 rid = in.readInt();
             }
-            n = m.lookupNeuron(in.readInt());
+            neuron = m.lookupNeuron(in.readInt());
         }
     }
 }
