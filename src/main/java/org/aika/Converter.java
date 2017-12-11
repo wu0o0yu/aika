@@ -168,13 +168,14 @@ public class Converter {
             }
 
             if (s.key.isRecurrent) {
-                maxRecurrentSumDelta += Math.abs(s.newWeight) - Math.abs(s.weight);
+                maxRecurrentSumDelta += Math.abs(s.weight + s.weightDelta) - Math.abs(s.weight);
             }
 
             sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
-            sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.newWeight <= 0.0 ? NEGATIVE : POSITIVE] += s.newWeight;
+            sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.weight + s.weightDelta <= 0.0 ? NEGATIVE : POSITIVE] += s.weight + s.weightDelta;
 
-            s.weight = s.newWeight;
+            s.weight += s.weightDelta;
+            s.weightDelta = 0.0f;
 
             in.lock.releaseWriteLock();
         }

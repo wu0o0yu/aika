@@ -102,10 +102,10 @@ public class Synapse implements Writable {
     public float weight;
 
     /**
-     * The new weight of this synapse. The converter will use it to compute few internal
-     * parameters and then transfer it to the weight variable.
+     * The weight delta of this synapse. The converter will use it to compute few internal
+     * parameters and then update the weight variable.
      */
-    public float newWeight;
+    public float weightDelta;
 
     /**
      * The synapse is stored either in the input neuron or the output neuron
@@ -171,7 +171,7 @@ public class Synapse implements Writable {
 
     public boolean isConjunction(boolean v) {
         INeuron out = output.get();
-        return (v ? newWeight : weight) + out.bias + out.posRecSum - out.negRecSum - out.negDirSum <= 0.0;
+        return (v ? weightDelta + weight : weight) + out.bias + out.posRecSum - out.negRecSum - out.negDirSum <= 0.0;
     }
 
 
@@ -216,7 +216,7 @@ public class Synapse implements Writable {
 
         key = lookupKey(Key.read(in, m));
 
-        newWeight = weight = in.readFloat();
+        weight = in.readFloat();
 
         isConjunction = in.readBoolean();
     }

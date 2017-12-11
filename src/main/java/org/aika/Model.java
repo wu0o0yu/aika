@@ -251,7 +251,7 @@ public class Model {
 
         for (Input input : inputs) {
             Synapse s = input.getSynapse(n);
-            s.newWeight = input.weight;
+            s.weightDelta = input.weight;
             bias -= Math.abs(input.weight) * input.biasDelta;
             is.add(s);
         }
@@ -265,7 +265,7 @@ public class Model {
 
         Synapse s = input.getSynapse(n);
 
-        s.newWeight = input.weight;
+        s.weightDelta = input.weight;
 
         biasDelta -= Math.abs(input.weight) * input.biasDelta;
 

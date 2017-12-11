@@ -381,7 +381,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             synapse.link();
         }
 
-        synapse.newWeight += deltaW;
+        synapse.weightDelta = (float) deltaW;
     }
 
 
