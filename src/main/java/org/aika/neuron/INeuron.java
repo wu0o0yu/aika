@@ -372,10 +372,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         if(synapse == null) {
-            synapse = new Synapse(provider.m, inputNeuron.provider, provider, sk);
+            synapse = new Synapse(provider.model, inputNeuron.provider, provider, sk);
 
             if(in == null) {
-                in = InputNode.add(provider.m, sk.createInputNodeKey(), synapse.input.get(doc));
+                in = InputNode.add(provider.model, sk.createInputNodeKey(), synapse.input.get(doc));
             }
             in.setSynapse(synapse);
             synapse.link();
@@ -447,7 +447,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         provider.lock.acquireReadLock();
         NavigableMap<Synapse, Synapse> syns = (dir == 0 ? provider.inMemoryInputSynapses : provider.inMemoryOutputSynapses);
 
-        for (Synapse s : getActiveSynapses(provider.m, doc, dir, syns)) {
+        for (Synapse s : getActiveSynapses(provider.model, doc, dir, syns)) {
             Neuron p = (dir == 0 ? s.input : s.output);
             INeuron an = p.getIfNotSuspended();
             if (an != null) {
@@ -794,7 +794,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public static INeuron readNeuron(DataInput in, Neuron p) throws IOException {
         INeuron n = new INeuron();
         n.provider = p;
-        n.readFields(in, p.m);
+        n.readFields(in, p.model);
         return n;
     }
 

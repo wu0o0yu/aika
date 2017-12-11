@@ -11,31 +11,31 @@ import java.util.zip.GZIPOutputStream;
 
 public class Provider<T extends AbstractNode> implements Comparable<Provider<?>> {
 
-    public Model m;
+    public Model model;
     public Integer id;
 
     private volatile T n;
 
-    public Provider(Model m, int id) {
-        this.m = m;
+    public Provider(Model model, int id) {
+        this.model = model;
         this.id = id;
 
-        synchronized (m.providers) {
-            m.providers.put(this.id, new WeakReference<>(this));
+        synchronized (model.providers) {
+            model.providers.put(this.id, new WeakReference<>(this));
         }
     }
 
 
-    public Provider(Model m, T n) {
-        this.m = m;
+    public Provider(Model model, T n) {
+        this.model = model;
         this.n = n;
 
-        id = m.suspensionHook != null ? m.suspensionHook.getNewId() : m.currentId.addAndGet(1);
-        synchronized (m.providers) {
-            m.providers.put(id, new WeakReference<>(this));
+        id = model.suspensionHook != null ? model.suspensionHook.getNewId() : model.currentId.addAndGet(1);
+        synchronized (model.providers) {
+            model.providers.put(id, new WeakReference<>(this));
 
             if(n != null) {
-                m.register(this);
+                model.register(this);
             }
         }
     }
@@ -79,11 +79,11 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     public synchronized void suspend() {
         if(n == null) return;
 
-        assert m.suspensionHook != null;
+        assert model.suspensionHook != null;
 
         n.suspend();
 
-        m.unregister(this);
+        model.unregister(this);
 
         save();
 
@@ -108,16 +108,16 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
                 throw new RuntimeException(e);
             }
 
-            m.suspensionHook.store(id, baos.toByteArray());
+            model.suspensionHook.store(id, baos.toByteArray());
         }
         n.modified = false;
     }
 
 
     private void reactivate() {
-        assert m.suspensionHook != null;
+        assert model.suspensionHook != null;
 
-        byte[] data = m.suspensionHook.retrieve(id);
+        byte[] data = model.suspensionHook.retrieve(id);
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         try (
                 GZIPInputStream gzipis = new GZIPInputStream(bais);
@@ -129,7 +129,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
         n.reactivate();
 
-        m.register(this);
+        model.register(this);
     }
 
 

@@ -227,7 +227,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     @Override
     public void discover(Document doc, NodeActivation<InputNode> act, DiscoveryConfig discoveryConfig) {
-        long v = provider.m.visitedCounter.addAndGet(1);
+        long v = provider.model.visitedCounter.addAndGet(1);
 
         for (INeuron n : doc.finallyActivatedNeurons) {
             for (Activation secondNAct : n.getFinalActivations(doc)) {

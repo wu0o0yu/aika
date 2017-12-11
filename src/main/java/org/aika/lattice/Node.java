@@ -160,7 +160,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             th = new ThreadState(endRequired, ridRequired);
             threads[threadId] = th;
         }
-        th.lastUsed = provider.m.docIdCounter.get();
+        th.lastUsed = provider.model.docIdCounter.get();
         return th;
     }
 
@@ -427,7 +427,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public void clearActivations() {
-        for (int i = 0; i < provider.m.numberOfThreads; i++) {
+        for (int i = 0; i < provider.model.numberOfThreads; i++) {
             clearActivations(i);
         }
     }
@@ -626,7 +626,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
         n.provider = p;
 
-        n.readFields(in, p.m);
+        n.readFields(in, p.model);
         return n;
     }
 
