@@ -800,7 +800,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public String toString() {
-        return "node(" + label + ")";
+        return label;
     }
 
 
