@@ -518,7 +518,8 @@ public class InterprNode implements Comparable<InterprNode> {
         visitedStoreFinalWeight = v;
 
         for(Activation act: getNeuronActivations()) {
-            act.finalState = act.rounds.getLast();
+            Activation.State fs = act.rounds.getLast();
+            act.finalState = fs != null ? fs : Activation.State.ZERO;
         }
 
         for(InterprNode cn: children) {

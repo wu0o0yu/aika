@@ -389,11 +389,10 @@ public class Document implements Comparable<Document> {
                 }
 
                 if (act.isFinalActivation()) {
-                    if(act.finalState != null) {
-                        sb.append(" - FV:" + Utils.round(act.finalState.value));
-                        sb.append(" FW:" + Utils.round(act.finalState.weight.w));
-                        sb.append(" FN:" + Utils.round(act.finalState.weight.n));
-                    }
+                    sb.append(" - FV:" + Utils.round(act.finalState.value));
+                    sb.append(" FW:" + Utils.round(act.finalState.weight.w));
+                    sb.append(" FN:" + Utils.round(act.finalState.weight.n));
+
                     if(act.targetValue != null) {
                         sb.append(" - TV:" + Utils.round(act.targetValue));
                     }
@@ -652,12 +651,7 @@ public class Document implements Comparable<Document> {
                 Activation.State fs1 = act1.finalState;
                 Activation.State fs2 = act2.finalState;
 
-                int r = 0;
-                if(fs2 == null && fs1 != null) return -1;
-                if(fs2 != null && fs1 == null) return 1;
-                if(fs2 != null && fs1 != null) {
-                    r = Integer.compare(fs2.fired, fs1.fired);
-                }
+                int r = Integer.compare(fs2.fired, fs1.fired);
                 if(r != 0) return r;
                 return act1.key.compareTo(act2.key);
             }

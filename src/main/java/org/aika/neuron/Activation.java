@@ -35,7 +35,7 @@ public final class Activation extends NodeActivation<OrNode> {
     public double lowerBound;
 
     public Rounds rounds = new Rounds();
-    public State finalState;
+    public State finalState = State.ZERO;
     public double maxActValue = 0.0;
 
     public boolean ubQueued = false;
@@ -97,7 +97,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public boolean isFinalActivation() {
-        return (finalState != null && finalState.value > 0.0) || (targetValue != null && targetValue > 0.0);
+        return finalState.value > 0.0 || (targetValue != null && targetValue > 0.0);
     }
 
 
