@@ -5,7 +5,7 @@
     <groupId>org.aika-software</groupId>
     <artifactId>aika</artifactId>
     <packaging>jar</packaging>
-    <version>0.12-SNAPSHOT</version>
+    <version>0.12</version>
     <name>aika</name>
     <url>http://www.aika-software.org</url>
     <description>The Aika Text Mining Algorithm</description>
@@ -30,7 +30,7 @@
         <url>https://github.com/aika-algorithm/aika</url>
         <connection>scm:git:git://github.com/aika-algorithm/aika.git</connection>
         <developerConnection>scm:git:git@github.com:aika-algorithm/aika.git</developerConnection>
-        <tag>aika-0.11</tag>
+        <tag>aika-0.12</tag>
     </scm>
 
 
