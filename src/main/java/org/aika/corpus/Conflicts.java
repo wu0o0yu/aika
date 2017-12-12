@@ -36,12 +36,8 @@ public class Conflicts {
 
 
     static void collectDirectConflicting(Collection<InterprNode> results, InterprNode n) {
-        for(Conflict c: n.conflicts.primary.values()) {
-            results.add(c.secondary);
-        }
-        for(Conflict c: n.conflicts.secondary.values()) {
-            results.add(c.primary);
-        }
+        n.conflicts.primary.values().forEach(c -> results.add(c.secondary));
+        n.conflicts.secondary.values().forEach(c -> results.add(c.primary));
     }
 
 
@@ -69,8 +65,6 @@ public class Conflicts {
 
             primary.conflicts.primary.put(ck, c);
             secondary.conflicts.secondary.put(new Key(primary, act), c);
-
-//            c.conflict.removeActivationsRecursiveStep(doc, c.conflict, doc.visitedCounter++);
         }
     }
 

@@ -183,12 +183,10 @@ public class Document implements Comparable<Document> {
 
 
     /**
-     * Reflects the changes to the synapse weights in the logic node structure.
+     * Applies the weight and bias delta values and reflects the changes to the synapse weights in the logic node structure.
      */
-    public void adjust() {
-        modifiedWeights.forEach((n, inputSyns) -> {
-            Converter.convert(model, threadId, n, inputSyns);
-        });
+    public void commit() {
+        modifiedWeights.forEach((n, inputSyns) -> Converter.convert(model, threadId, n, inputSyns));
     }
 
 
@@ -280,9 +278,7 @@ public class Document implements Comparable<Document> {
 
 
     public void train(TrainConfig trainConfig) {
-        for(Activation tAct: targetActivations) {
-            tAct.key.node.neuron.get(this).computeOutputErrorSignal(tAct);
-        }
+        targetActivations.forEach(tAct -> tAct.key.node.neuron.get(this).computeOutputErrorSignal(tAct));
 
         if(trainConfig.performBackpropagation) {
             bQueue.backpropagtion();
@@ -298,9 +294,8 @@ public class Document implements Comparable<Document> {
      * Removes the activations of this document from the model again.
      */
     public void clearActivations() {
-        for(Node n: activatedNodes) {
-            n.clearActivations(this);
-        }
+        activatedNodes.forEach(n -> n.clearActivations(this));
+
         activatedNodes.clear();
         addedNodes.clear();
 
@@ -312,18 +307,16 @@ public class Document implements Comparable<Document> {
                 tmp = new ArrayList<>(model.activeProviders.values());
             }
 
-            for (Provider<? extends AbstractNode> np : tmp) {
-                if (np != null) {
-                    AbstractNode an = np.getIfNotSuspended();
-                    if (an != null && an instanceof Node) {
-                        Node n = (Node) an;
-                        Node.ThreadState th = n.threads[threadId];
-                        if (th != null && th.lastUsed + CLEANUP_INTERVAL < id) {
-                            n.threads[threadId] = null;
-                        }
+            tmp.forEach(np -> {
+                AbstractNode an = np.getIfNotSuspended();
+                if (an != null && an instanceof Node) {
+                    Node n = (Node) an;
+                    Node.ThreadState th = n.threads[threadId];
+                    if (th != null && th.lastUsed + CLEANUP_INTERVAL < id) {
+                        n.threads[threadId] = null;
                     }
                 }
-            }
+            });
         }
 
         model.docs[threadId] = null;
@@ -332,13 +325,13 @@ public class Document implements Comparable<Document> {
 
     public String generateOutputText() {
         StringBuilder sb = new StringBuilder();
-        for(INeuron n: finallyActivatedNeurons) {
-            if(n.outputText != null) {
-                for (Activation act : n.getFinalActivations(this)) {
-                    sb.replace(act.key.range.begin, act.key.range.end, n.outputText);
-                }
+        finallyActivatedNeurons.stream()
+                .filter(n -> n.outputText != null)
+                .forEach(n -> {
+            for (Activation act : n.getFinalActivations(this)) {
+                sb.replace(act.key.range.begin, act.key.range.end, n.outputText);
             }
-        }
+        });
 
         return sb.toString();
     }
