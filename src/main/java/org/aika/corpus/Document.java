@@ -710,7 +710,18 @@ public class Document implements Comparable<Document> {
          * @param oAct
          * @return
          */
-        Synapse.Key evaluate(Activation iAct, Activation oAct);
+        SynEvalResult evaluate(Activation iAct, Activation oAct);
+    }
+
+
+    public static class SynEvalResult {
+        public SynEvalResult(Synapse.Key synapseKey, double significance) {
+            this.synapseKey = synapseKey;
+            this.significance = significance;
+        }
+
+        public Synapse.Key synapseKey;
+        public double significance;
     }
 
 

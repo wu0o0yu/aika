@@ -48,16 +48,19 @@ public class TrainingTest {
         targetAct.errorSignal = 1.0 - targetAct.finalState.value;
 
         out.get().train(doc, targetAct, 0.01,
-                (iAct, oAct) -> new Synapse.Key(
-                        false,
-                        0,
-                        null,
-                        Range.Operator.EQUALS,
-                        Range.Mapping.START,
-                        true,
-                        Range.Operator.EQUALS,
-                        Range.Mapping.END,
-                        true
+                (iAct, oAct) -> new Document.SynEvalResult(
+                        new Synapse.Key(
+                                false,
+                                0,
+                                null,
+                                Range.Operator.EQUALS,
+                                Range.Mapping.START,
+                                true,
+                                Range.Operator.EQUALS,
+                                Range.Mapping.END,
+                                true
+                        )
+                        , 1.0
                 )
         );
 
@@ -91,20 +94,24 @@ public class TrainingTest {
                     new Document.TrainConfig()
                             .setLearnRate(2.0)
                             .setPerformBackpropagation(false)
-                            .setSynapseEvaluation((iAct, oAct) -> new Synapse.Key(
-                                    false,
-                                    0,
-                                    null,
-                                    Range.Operator.EQUALS,
-                                    Range.Mapping.START,
-                                    true,
-                                    Range.Operator.EQUALS,
-                                    Range.Mapping.END,
-                                    true
-                            ))
+                            .setSynapseEvaluation((iAct, oAct) ->
+                                    new Document.SynEvalResult(new Synapse.Key(
+                                            false,
+                                            0,
+                                            null,
+                                            Range.Operator.EQUALS,
+                                            Range.Mapping.START,
+                                            true,
+                                            Range.Operator.EQUALS,
+                                            Range.Mapping.END,
+                                            true
+                                    ),
+                                            1.0
+                                    )
+                            )
             );
 
-            doc.adjust();
+            doc.commit();
 
             doc.clearActivations();
         }

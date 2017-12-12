@@ -342,9 +342,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         biasDelta += x;
         for (INeuron n : doc.finallyActivatedNeurons) {
             for(Activation iAct: n.getFinalActivations(doc)) {
-                Synapse.Key sk = se.evaluate(iAct, targetAct);
-                if(sk != null) {
-                    trainSynapse(doc, iAct, sk, x, v);
+                Document.SynEvalResult ser = se.evaluate(iAct, targetAct);
+                if(ser != null) {
+                    trainSynapse(doc, iAct, ser, x, v);
                 }
             }
         }
@@ -353,7 +353,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private void trainSynapse(Document doc, Activation iAct, Synapse.Key sk, double x, long v) {
+    private void trainSynapse(Document doc, Activation iAct, Document.SynEvalResult ser, double x, long v) {
         if (iAct.visitedNeuronTrain == v) return;
         iAct.visitedNeuronTrain = v;
 
@@ -361,21 +361,21 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         if(inputNeuron == this) {
             return;
         }
-        double deltaW = x * iAct.finalState.value;
+        double deltaW = x * ser.significance * iAct.finalState.value;
 
-        Provider<InputNode> inp = inputNeuron.outputNodes.get(sk.createInputNodeKey());
+        Provider<InputNode> inp = inputNeuron.outputNodes.get(ser.synapseKey.createInputNodeKey());
         Synapse synapse = null;
         InputNode in = null;
         if(inp != null) {
             in = inp.get(doc);
-            synapse = in.getSynapse(sk.relativeRid, provider);
+            synapse = in.getSynapse(ser.synapseKey.relativeRid, provider);
         }
 
         if(synapse == null) {
-            synapse = new Synapse(provider.model, inputNeuron.provider, provider, sk);
+            synapse = new Synapse(provider.model, inputNeuron.provider, provider, ser.synapseKey);
 
             if(in == null) {
-                in = InputNode.add(provider.model, sk.createInputNodeKey(), synapse.input.get(doc));
+                in = InputNode.add(provider.model, ser.synapseKey.createInputNodeKey(), synapse.input.get(doc));
             }
             in.setSynapse(synapse);
             synapse.link();
