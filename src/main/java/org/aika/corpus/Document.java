@@ -184,7 +184,7 @@ public class Document implements Comparable<Document> {
 
     /**
      * Updates the model after the training step.
-     * It applies the weight and bias delta values and reflects the changes to the synapse weights in the logic node structure.
+     * It applies the weight and bias delta values and reflects the changes in the logic node structure.
      */
     public void commit() {
         modifiedWeights.forEach((n, inputSyns) -> Converter.convert(model, threadId, n, inputSyns));
