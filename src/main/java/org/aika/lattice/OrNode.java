@@ -460,5 +460,4 @@ public class OrNode extends Node<OrNode, Activation> {
             return node.compareTo(on.node);
         }
     }
-
 }

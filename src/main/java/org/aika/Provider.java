@@ -155,5 +155,4 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         else if (id > n.id) return 1;
         else return 0;
     }
-
 }

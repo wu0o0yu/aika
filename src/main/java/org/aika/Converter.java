@@ -37,13 +37,10 @@ public class Converter {
     public static boolean REMOVE_SYNAPSES_WITH_INVERTED_SIGNS = false;
 
 
-    public static Comparator<Synapse> SYNAPSE_COMP = new Comparator<Synapse>() {
-        @Override
-        public int compare(Synapse s1, Synapse s2) {
-            int r = Double.compare(s2.weight, s1.weight);
-            if(r != 0) return r;
-            return Synapse.INPUT_SYNAPSE_COMP.compare(s1, s2);
-        }
+    public static Comparator<Synapse> SYNAPSE_COMP = (s1, s2) -> {
+        int r = Double.compare(s2.weight, s1.weight);
+        if (r != 0) return r;
+        return Synapse.INPUT_SYNAPSE_COMP.compare(s1, s2);
     };
 
     private Model model;

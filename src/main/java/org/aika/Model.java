@@ -247,7 +247,7 @@ public class Model {
      * @return
      */
     public Neuron initNeuron(Neuron n, double bias, Collection<Input> inputs) {
-        Set<Synapse> is = new TreeSet<>(Synapse.INPUT_SYNAPSE_BY_WEIGHTS_COMP);
+        List<Synapse> is = new ArrayList<>();
 
         for (Input input : inputs) {
             Synapse s = input.getSynapse(n);

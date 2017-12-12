@@ -58,36 +58,20 @@ import java.util.TreeMap;
  */
 public class Synapse implements Writable {
 
-    public static final Comparator<Synapse> INPUT_SYNAPSE_BY_WEIGHTS_COMP = new Comparator<Synapse>() {
-        @Override
-        public int compare(Synapse s1, Synapse s2) {
-            int r = compareWeights(s1.weight, s2.weight, 0.00001);
-            if (r != 0) return r;
-            r = s1.input.compareTo(s2.input);
-            if (r != 0) return r;
-            return s1.key.compareTo(s2.key);
-        }
+
+    public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = (s1, s2) -> {
+        int r = s1.input.compareTo(s2.input);
+        if (r != 0) return r;
+        return s1.key.compareTo(s2.key);
     };
 
 
-    public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = new Comparator<Synapse>() {
-        @Override
-        public int compare(Synapse s1, Synapse s2) {
-            int r = s1.input.compareTo(s2.input);
-            if (r != 0) return r;
-            return s1.key.compareTo(s2.key);
-        }
+    public static final Comparator<Synapse> OUTPUT_SYNAPSE_COMP = (s1, s2) -> {
+        int r = s1.output.compareTo(s2.output);
+        if (r != 0) return r;
+        return s1.key.compareTo(s2.key);
     };
 
-
-    public static final Comparator<Synapse> OUTPUT_SYNAPSE_COMP = new Comparator<Synapse>() {
-        @Override
-        public int compare(Synapse s1, Synapse s2) {
-            int r = s1.output.compareTo(s2.output);
-            if (r != 0) return r;
-            return s1.key.compareTo(s2.key);
-        }
-    };
 
     public Neuron input;
     public Neuron output;
@@ -116,14 +100,14 @@ public class Synapse implements Writable {
     public Synapse() {}
 
 
-    public Synapse(Model m, Neuron input, Neuron output) {
+    public Synapse(Neuron input, Neuron output) {
         this.input = input;
         this.output = output;
     }
 
 
-    public Synapse(Model m, Neuron input, Neuron output, Key key) {
-        this(m, input, output);
+    public Synapse(Neuron input, Neuron output, Key key) {
+        this(input, output);
         this.key = lookupKey(key);
     }
 

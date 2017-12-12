@@ -119,22 +119,16 @@ public final class Activation extends NodeActivation<OrNode> {
         public final Activation input;
         public final Activation output;
 
-        public static Comparator<SynapseActivation> INPUT_COMP = new Comparator<SynapseActivation>() {
-            @Override
-            public int compare(SynapseActivation sa1, SynapseActivation sa2) {
-                int r = Synapse.INPUT_SYNAPSE_COMP.compare(sa1.synapse, sa2.synapse);
-                if(r != 0) return r;
-                return sa1.input.compareTo(sa2.input);
-            }
+        public static Comparator<SynapseActivation> INPUT_COMP = (sa1, sa2) -> {
+            int r = Synapse.INPUT_SYNAPSE_COMP.compare(sa1.synapse, sa2.synapse);
+            if (r != 0) return r;
+            return sa1.input.compareTo(sa2.input);
         };
 
-        public static Comparator<SynapseActivation> OUTPUT_COMP = new Comparator<SynapseActivation>() {
-            @Override
-            public int compare(SynapseActivation sa1, SynapseActivation sa2) {
-                int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(sa1.synapse, sa2.synapse);
-                if(r != 0) return r;
-                return sa1.output.compareTo(sa2.output);
-            }
+        public static Comparator<SynapseActivation> OUTPUT_COMP = (sa1, sa2) -> {
+            int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(sa1.synapse, sa2.synapse);
+            if (r != 0) return r;
+            return sa1.output.compareTo(sa2.output);
         };
 
 

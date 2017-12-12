@@ -79,28 +79,22 @@ public class Document implements Comparable<Document> {
     public TreeSet<Activation> errorSignalActivations = new TreeSet<>();
     public TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
 
-    public TreeMap<NodeActivation.Key, NodeActivation> activationsByRid = new TreeMap<>(new Comparator<NodeActivation.Key>() {
-        @Override
-        public int compare(NodeActivation.Key act1, NodeActivation.Key act2) {
-            int r = Integer.compare(act1.rid, act2.rid);
-            if(r != 0) return r;
-            return act1.compareTo(act2);
-        }
+    public TreeMap<NodeActivation.Key, NodeActivation> activationsByRid = new TreeMap<>((act1, act2) -> {
+        int r = Integer.compare(act1.rid, act2.rid);
+        if (r != 0) return r;
+        return act1.compareTo(act2);
     });
     public TreeSet<Node> addedNodes = new TreeSet<>();
 
 
-    public static Comparator<NodeActivation> ACTIVATIONS_OUTPUT_COMPARATOR = new Comparator<NodeActivation>() {
-        @Override
-        public int compare(NodeActivation act1, NodeActivation act2) {
-            int r = Range.compare(act1.key.range, act2.key.range, false);
-            if(r != 0) return r;
-            r = Utils.compareInteger(act1.key.rid, act2.key.rid);
-            if(r != 0) return r;
-            r = act1.key.interpretation.compareTo(act2.key.interpretation);
-            if(r != 0) return r;
-            return act1.key.node.compareTo(act2.key.node);
-        }
+    public static Comparator<NodeActivation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
+        int r = Range.compare(act1.key.range, act2.key.range, false);
+        if (r != 0) return r;
+        r = Utils.compareInteger(act1.key.rid, act2.key.rid);
+        if (r != 0) return r;
+        r = act1.key.interpretation.compareTo(act2.key.interpretation);
+        if (r != 0) return r;
+        return act1.key.node.compareTo(act2.key.node);
     };
 
 
