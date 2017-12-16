@@ -52,17 +52,17 @@ public class OrOptionsTest {
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.0),
+                        .setBias(0.0),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.0),
+                        .setBias(0.0),
                 new Input()
                         .setNeuron(inC)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

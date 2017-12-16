@@ -46,7 +46,7 @@ public class PropagateRidTest {
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(-0.5)
+                        .setBias(-0.5)
                         .setRelativeRid(5)
         );
 

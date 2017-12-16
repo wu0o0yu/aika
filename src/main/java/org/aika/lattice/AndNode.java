@@ -319,7 +319,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
     @Override
     public double computeSynapseWeightSum(Integer offset, INeuron n) {
-        double sum = n.bias;
+        double sum = n.biasSum;
         for(Refinement ref: parents.keySet()) {
             Synapse s = ref.getSynapse(offset, n.provider);
             sum += Math.abs(s.weight);

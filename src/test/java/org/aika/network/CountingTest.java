@@ -63,7 +63,7 @@ public class CountingTest {
                 new Input()
                         .setNeuron(inA)
                         .setWeight(100.0f)
-                        .setBiasDelta(-47.5)
+                        .setBias(-47.5)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );

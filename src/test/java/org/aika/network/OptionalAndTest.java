@@ -46,12 +46,12 @@ public class OptionalAndTest {
                         .setNeuron(wordEssen)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.0),
+                        .setBias(0.0),
                 new Input()
                         .setNeuron(wordHamburg)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
         );
         Neuron hintVerb = m.initNeuron(m.createNeuron("HINT-VERB"),
                 -0.001,
@@ -59,12 +59,12 @@ public class OptionalAndTest {
                         .setNeuron(wordEssen)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.0),
+                        .setBias(0.0),
                 new Input()
                         .setNeuron(wordGehen)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
         );
 
 
@@ -74,17 +74,17 @@ public class OptionalAndTest {
                         .setNeuron(hintNoun)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(-1.0),
+                        .setBias(-1.0),
                 new Input()
                         .setNeuron(upperCase)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(0.0),
+                        .setBias(0.0),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-1.0f)
                         .setRecurrent(true)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
         );
 
         Neuron verb = m.initNeuron(m.createNeuron("VERB"),
@@ -93,12 +93,12 @@ public class OptionalAndTest {
                         .setNeuron(hintVerb)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(-1.0),
+                        .setBias(-1.0),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-1.0f)
                         .setRecurrent(true)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
         );
 
         m.initNeuron(suppr,
@@ -106,12 +106,12 @@ public class OptionalAndTest {
                 new Input()
                         .setNeuron(noun)
                         .setWeight(1.0f)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
                         .setRecurrent(false),
                 new Input()
                         .setNeuron(verb)
                         .setWeight(1.0f)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
                         .setRecurrent(false)
         );
 

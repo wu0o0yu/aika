@@ -83,13 +83,18 @@ public class Synapse implements Writable {
     /**
      * The weight of this synapse.
      */
-    public float weight;
+    public double weight;
 
     /**
      * The weight delta of this synapse. The converter will use it to compute few internal
      * parameters and then update the weight variable.
      */
-    public float weightDelta;
+    public double weightDelta;
+
+
+    public double bias;
+
+    public double biasDelta;
 
     /**
      * The synapse is stored either in the input neuron or the output neuron
@@ -187,16 +192,7 @@ public class Synapse implements Writable {
 
     public boolean isConjunction(boolean v) {
         INeuron out = output.get();
-        return (v ? weightDelta + weight : weight) + (v ? out.biasDelta + out.bias : out.bias) <= 0.0;
-    }
-
-
-    public static int compareWeights(Float a, Float b, double tolerance) {
-        double aAbs = Math.abs(a);
-        double bAbs = Math.abs(b);
-        if(aAbs + tolerance < bAbs) return -1;
-        if(aAbs > bAbs + tolerance) return 1;
-        return 0;
+        return (v ? weightDelta + weight : weight) + (v ? out.biasSumDelta + out.biasSum : out.biasSum) <= 0.0;
     }
 
 
@@ -218,7 +214,8 @@ public class Synapse implements Writable {
 
         key.write(out);
 
-        out.writeFloat(weight);
+        out.writeDouble(weight);
+        out.writeDouble(bias);
 
         out.writeBoolean(isConjunction);
     }
@@ -232,7 +229,8 @@ public class Synapse implements Writable {
 
         key = lookupKey(Key.read(in, m));
 
-        weight = in.readFloat();
+        weight = in.readDouble();
+        bias = in.readDouble();
 
         isConjunction = in.readBoolean();
     }

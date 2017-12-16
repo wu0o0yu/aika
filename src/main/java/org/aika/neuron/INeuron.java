@@ -67,6 +67,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public volatile double bias;
     public volatile double biasDelta;
+    public volatile double biasSum;
+    public volatile double biasSumDelta;
+
     public volatile double posDirSum;
     public volatile double negDirSum;
     public volatile double negRecSum;
@@ -185,8 +188,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public void computeBounds(Activation act) {
-        double ub = bias + posRecSum;
-        double lb = bias + posRecSum;
+        double ub = biasSum + posRecSum;
+        double lb = biasSum + posRecSum;
 
         for (SynapseActivation sa : act.neuronInputs) {
             Synapse s = sa.synapse;
@@ -215,7 +218,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         Coverage c = sn.getCoverage(act.key.interpretation);
         if(c == Coverage.UNKNOWN) return State.ZERO;
 
-        double[] sum = {bias, 0.0};
+        double[] sum = {biasSum, 0.0};
 
         int fired = -1;
 
@@ -625,6 +628,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         out.writeDouble(bias);
+        out.writeDouble(biasSum);
         out.writeDouble(posDirSum);
         out.writeDouble(negDirSum);
         out.writeDouble(negRecSum);
@@ -674,6 +678,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         bias = in.readDouble();
+        biasSum = in.readDouble();
         posDirSum = in.readDouble();
         negDirSum = in.readDouble();
         negRecSum = in.readDouble();
@@ -760,9 +765,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public static Neuron init(Model m, int threadId, Neuron pn, double biasDelta, Collection<Synapse> inputs) {
+    public static Neuron init(Model m, int threadId, Neuron pn, double biasDelta, double biasSumDelta, Collection<Synapse> inputs) {
         INeuron n = pn.get();
         n.biasDelta += biasDelta;
+        n.biasSumDelta += biasSumDelta;
 
         ArrayList<Synapse> modifiedSynapses = new ArrayList<>();
         inputs.forEach(s -> {
@@ -783,6 +789,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public static INeuron addSynapse(Model m, int threadId, Neuron pn, double biasDelta, Synapse s) {
         INeuron n = pn.get();
         n.biasDelta += biasDelta;
+        n.biasSumDelta += biasDelta;
 
         s.link();
 
@@ -820,7 +827,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         sb.append(toString());
         sb.append("<");
         sb.append("B:");
-        sb.append(Utils.round(bias));
+        sb.append(Utils.round(biasSum));
         for (Synapse s : is) {
             sb.append(", ");
             sb.append(Utils.round(s.weight));

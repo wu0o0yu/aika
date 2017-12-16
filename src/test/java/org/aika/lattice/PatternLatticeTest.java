@@ -52,21 +52,21 @@ public class PatternLatticeTest {
                             .setNeuron(inA)
                             .setWeight(1.0f)
                             .setRecurrent(false)
-                            .setBiasDelta(-1.0)
+                            .setBias(-1.0)
                             .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inB)
                             .setWeight(1.0f)
                             .setRecurrent(false)
-                            .setBiasDelta(-1.0)
+                            .setBias(-1.0)
                             .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inC)
                             .setWeight(1.0f)
                             .setRecurrent(false)
-                            .setBiasDelta(-1.0)
+                            .setBias(-1.0)
                             .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true)
             );
@@ -107,21 +107,21 @@ public class PatternLatticeTest {
                             .setNeuron(inB)
                             .setWeight(1.0f)
                             .setRecurrent(false)
-                            .setBiasDelta(-1.0)
+                            .setBias(-1.0)
                             .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inC)
                             .setWeight(1.0f)
                             .setRecurrent(false)
-                            .setBiasDelta(-1.0)
+                            .setBias(-1.0)
                             .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inD)
                             .setWeight(1.0f)
                             .setRecurrent(false)
-                            .setBiasDelta(-1.0)
+                            .setBias(-1.0)
                             .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true)
             );
@@ -171,28 +171,28 @@ public class PatternLatticeTest {
                             .setNeuron(inA)
                             .setWeight(1.0f)
                             .setRecurrent(false)
-                            .setBiasDelta(-1.0)
+                            .setBias(-1.0)
                             .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inB)
                             .setWeight(1.0f)
                             .setRecurrent(false)
-                            .setBiasDelta(-1.0)
+                            .setBias(-1.0)
                             .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inC)
                             .setWeight(1.0f)
                             .setRecurrent(false)
-                            .setBiasDelta(-1.0)
+                            .setBias(-1.0)
                             .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inD)
                             .setWeight(1.0f)
                             .setRecurrent(false)
-                            .setBiasDelta(-1.0)
+                            .setBias(-1.0)
                             .setRangeMatch(RangeRelation.EQUALS)
                             .setRangeOutput(true)
             );
@@ -268,17 +268,17 @@ public class PatternLatticeTest {
                         .setNeuron(inA
                         ).setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(-1.0),
+                        .setBias(-1.0),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(-1.0),
+                        .setBias(-1.0),
                 new Input()
                         .setNeuron(inC)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(-1.0)
+                        .setBias(-1.0)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

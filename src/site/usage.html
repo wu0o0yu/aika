@@ -109,7 +109,7 @@
 The entity neurons represent the concrete meanings of the input words. As can be seen here the individual inputs have a few more properties than we are used to from other
 neural networks. The reason for this is that Aika not only propagates the input activation value to the next neuron but also the text range, the word position and the interpretation option.
 To avoid having to compute the neurons bias manually, we can use the <i>initAndNeuron</i> helper function for that. But in order to compute the bias it needs to know the
-required minimum input activation (<i>setBiasDelta</i>) of each input.
+required minimum input activation (<i>setBias</i>) of each input.
             <br/>
             This entity neuron has three inputs. The first one simply checks if the word 'cook' occurred in the text. The second one is a positive feedback loop and checks if the previous word
             was a forename. The last one is a negative feedback loop. It makes sure that only one entity is assigned to each word.
@@ -127,7 +127,7 @@ required minimum input activation (<i>setBiasDelta</i>) of each input.
                     .setWeight(10.0f)
                  // This input requires the input activation to have an
                  // activation value of at least 0.9
-                    .setBiasDelta(-9.0)
+                    .setBias(-9.0)
                     .setRelativeRid(0) // references the current word
                     .setRecurrent(false)
                     .setRangeMatch(EQUALS)
@@ -135,7 +135,7 @@ required minimum input activation (<i>setBiasDelta</i>) of each input.
             new Input() // The previous word needs to be a forename
                     .setNeuron(forenameCategory)
                     .setWeight(10.0f)
-                    .setBiasDelta(-9.0)
+                    .setBias(-9.0)
                     .setRelativeRid(-1) // references the previous word
                     .setRecurrent(true) // this input is a positive feedback loop
                     .setRangeMatch(NONE),
@@ -146,7 +146,7 @@ required minimum input activation (<i>setBiasDelta</i>) of each input.
             new Input()
                     .setNeuron(suppressingN)
                     .setWeight(-20.0f)
-                    .setBiasDelta(0.0)
+                    .setBias(0.0)
                     .setRecurrent(true) // this input is a negative feedback loop
                     .setRangeMatch(CONTAINED_IN)
     );
@@ -162,7 +162,7 @@ required minimum input activation (<i>setBiasDelta</i>) of each input.
             new Input() // In this example, only one forename is considered.
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(10.0f)
-                    .setBiasDelta(0.0)
+                    .setBias(0.0)
                     .setRelativeRid(0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
@@ -171,7 +171,7 @@ required minimum input activation (<i>setBiasDelta</i>) of each input.
             new Input()
                     .setNeuron(cookSurnameEntity)
                     .setWeight(10.0f)
-                    .setBiasDelta(0.0)
+                    .setBias(0.0)
                     .setRelativeRid(0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
@@ -188,25 +188,25 @@ required minimum input activation (<i>setBiasDelta</i>) of each input.
             new Input()
                     .setNeuron(cookProfessionEntity)
                     .setWeight(10.0f)
-                    .setBiasDelta(0.0)
+                    .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Input()
                     .setNeuron(cookSurnameEntity)
                     .setWeight(10.0f)
-                    .setBiasDelta(0.0)
+                    .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Input()
                     .setNeuron(jacksonCityEntity)
                     .setWeight(10.0f)
-                    .setBiasDelta(0.0)
+                    .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Input()
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(10.0f)
-                    .setBiasDelta(0.0)
+                    .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
     );
@@ -326,14 +326,14 @@ The output of this example looks as following. Each line in the table represents
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0f)
-                        .setBiasDelta(-10.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()                     // This input is negated
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINED_IN)
         );
@@ -344,14 +344,14 @@ The output of this example looks as following. Each line in the table represents
                 new Input()
                         .setNeuron(inB)
                         .setWeight(10.0f)
-                        .setBiasDelta(-10.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINED_IN)
         );
@@ -362,14 +362,14 @@ The output of this example looks as following. Each line in the table represents
                 new Input()
                         .setNeuron(inC)
                         .setWeight(10.0f)
-                        .setBiasDelta(-10.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0f)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINED_IN)
         );
@@ -381,7 +381,7 @@ The output of this example looks as following. Each line in the table represents
                 new Input()
                         .setNeuron(pA)
                         .setWeight(10.0f)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
                         .setRecurrent(false)
                         .setMinInput(1.0f)
                         .setRangeMatch(EQUALS)
@@ -389,14 +389,14 @@ The output of this example looks as following. Each line in the table represents
                 new Input()
                         .setNeuron(pB)
                         .setWeight(10.0f)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pC)
                         .setWeight(10.0f)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
@@ -406,7 +406,7 @@ The output of this example looks as following. Each line in the table represents
                 new Input()
                         .setNeuron(pB)
                         .setWeight(1.0f)
-                        .setBiasDelta(0.0)
+                        .setBias(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
@@ -535,7 +535,7 @@ The output of this example looks as following. Each line in the table represents
                 new Input()
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(1.0f)
-                        .setBiasDelta(-0.9)
+                        .setBias(-0.9)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setStartRangeMatch(Operator.EQUALS)
@@ -544,21 +544,21 @@ The output of this example looks as following. Each line in the table represents
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0f)
-                        .setBiasDelta(-0.9)
+                        .setBias(-0.9)
                         .setRecurrent(false)
                         .setRelativeRid(1)
                         .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(1.0f)
-                        .setBiasDelta(-0.9)
+                        .setBias(-0.9)
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(inputNeurons.get('e'))
                         .setWeight(1.0f)
-                        .setBiasDelta(-0.9)
+                        .setBias(-0.9)
                         .setRecurrent(false)
                         .setRelativeRid(3)
                         .setStartRangeMatch(Operator.LESS_THAN)

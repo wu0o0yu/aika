@@ -62,7 +62,7 @@ public class ActivationOutputsTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
-                        .setBiasDelta(-1.0)
+                        .setBias(-1.0)
                         .setStartRangeMatch(Operator.EQUALS)
                         .setStartRangeOutput(true),
                 new Input()
@@ -70,7 +70,7 @@ public class ActivationOutputsTest {
                         .setWeight(1.0f)
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
-                        .setBiasDelta(-1.0)
+                        .setBias(-1.0)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
@@ -151,7 +151,7 @@ public class ActivationOutputsTest {
                         .setWeight(1.0f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setBiasDelta(-1.0)
+                        .setBias(-1.0)
         ).get().node.get();
 
 
@@ -176,7 +176,7 @@ public class ActivationOutputsTest {
                         .setWeight(1.0f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setBiasDelta(-1.0)
+                        .setBias(-1.0)
         ).get().node.get();
 
 
@@ -201,7 +201,7 @@ public class ActivationOutputsTest {
                         .setWeight(1.0f)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setBiasDelta(-1.0)
+                        .setBias(-1.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         ).get().node.get();

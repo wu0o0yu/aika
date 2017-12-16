@@ -51,7 +51,7 @@ public class ActivationsTest {
                         .setNeuron(inA)
                         .setWeight(1.0f)
                         .setRecurrent(false)
-                        .setBiasDelta(-1.0)
+                        .setBias(-1.0)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

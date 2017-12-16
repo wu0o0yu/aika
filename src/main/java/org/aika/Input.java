@@ -31,7 +31,7 @@ public class Input implements Comparable<Input> {
     boolean recurrent;
     Neuron neuron;
     float weight;
-    double biasDelta;
+    double bias;
 
     Operator startRangeMatch = Operator.NONE;
     Operator endRangeMatch = Operator.NONE;
@@ -85,13 +85,13 @@ public class Input implements Comparable<Input> {
     }
 
     /**
-     * The bias delta of this input that will later on be added to the neurons bias.
+     * The bias of this input that will later on be added to the neurons bias.
      *
-     * @param biasDelta
+     * @param bias
      * @return
      */
-    public Input setBiasDelta(double biasDelta) {
-        this.biasDelta = biasDelta;
+    public Input setBias(double bias) {
+        this.bias = bias;
         return this;
     }
 
@@ -271,7 +271,7 @@ public class Input implements Comparable<Input> {
     public int compareTo(Input in) {
         int r = Double.compare(weight, in.weight);
         if(r != 0) return r;
-        r = Double.compare(biasDelta, in.biasDelta);
+        r = Double.compare(bias, in.bias);
         if(r != 0) return r;
         r = neuron.compareTo(in.neuron);
         if(r != 0) return r;

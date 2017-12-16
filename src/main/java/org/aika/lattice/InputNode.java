@@ -268,7 +268,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     @Override
     public double computeSynapseWeightSum(Integer offset, INeuron n) {
-        return n.bias + Math.abs(getSynapse(key.relativeRid == null ? null : offset, n.provider).weight);
+        return n.biasSum + Math.abs(getSynapse(key.relativeRid == null ? null : offset, n.provider).weight);
     }
 
 
