@@ -98,6 +98,8 @@ public class InterprNode implements Comparable<InterprNode> {
     public int isConflict = -1;
     public Conflicts conflicts = new Conflicts();
 
+    public boolean fixed = false;
+
     public NavigableMap<Key, NodeActivation> activations;
     public NavigableSet<Activation> neuronActivations;
 
