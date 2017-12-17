@@ -765,36 +765,18 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public static Neuron init(Model m, int threadId, Neuron pn, double biasDelta, double biasSumDelta, Collection<Synapse> inputs) {
-        INeuron n = pn.get();
-        n.biasDelta += biasDelta;
-        n.biasSumDelta += biasSumDelta;
-
-        ArrayList<Synapse> modifiedSynapses = new ArrayList<>();
-        inputs.forEach(s -> {
-            assert !s.key.startRangeOutput || s.key.startRangeMatch == Range.Operator.EQUALS;
-            assert !s.key.endRangeOutput || s.key.endRangeMatch == Range.Operator.EQUALS;
-
-            s.link();
-
-            modifiedSynapses.add(s);
-        });
-
-        if (!Converter.convert(m, threadId, n, modifiedSynapses)) return null;
-
-        return n.provider;
-    }
-
-
-    public static INeuron addSynapse(Model m, int threadId, Neuron pn, double biasDelta, Synapse s) {
+    public static Neuron update(Model m, int threadId, Neuron pn, double biasDelta, Collection<Synapse> modifiedSynapses) {
         INeuron n = pn.get();
         n.biasDelta += biasDelta;
         n.biasSumDelta += biasDelta;
 
-        s.link();
+        modifiedSynapses.forEach(s -> n.biasSumDelta += s.biasDelta);
+        // s.link requires an updated n.biasSumDelta value.
+        modifiedSynapses.forEach(s -> s.link());
 
-        if (!Converter.convert(m, threadId, n, Collections.singletonList(s))) return null;
-        return n;
+        if (!Converter.convert(m, threadId, n, modifiedSynapses)) return null;
+
+        return n.provider;
     }
 
 

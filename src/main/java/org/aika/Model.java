@@ -249,28 +249,24 @@ public class Model {
     public Neuron initNeuron(Neuron n, double bias, Collection<Input> inputs) {
         List<Synapse> is = new ArrayList<>();
 
-        double biasSumDelta = bias;
         for (Input input : inputs) {
             Synapse s = input.getSynapse(n);
             s.weightDelta = input.weight;
             s.biasDelta = input.bias;
-            biasSumDelta += input.bias;
             is.add(s);
         }
 
-        return INeuron.init(this, defaultThreadId, n, bias, biasSumDelta, is);
+        return INeuron.update(this, defaultThreadId, n, bias, is);
     }
 
 
     public void addSynapse(Neuron n, Input input) {
-        double biasDelta = 0.0;
-
         Synapse s = input.getSynapse(n);
 
         s.weightDelta = input.weight;
         s.biasDelta = input.bias;
 
-        INeuron.addSynapse(this, defaultThreadId, n, biasDelta, s);
+        INeuron.update(this, defaultThreadId, n, 0.0, Collections.singletonList(s));
     }
 
     /**
