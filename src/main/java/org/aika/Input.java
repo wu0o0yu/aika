@@ -30,7 +30,7 @@ import org.aika.neuron.Synapse;
 public class Input implements Comparable<Input> {
     boolean recurrent;
     Neuron neuron;
-    float weight;
+    double weight;
     double bias;
 
     Operator startRangeMatch = Operator.NONE;
@@ -79,7 +79,7 @@ public class Input implements Comparable<Input> {
      * @param weight
      * @return
      */
-    public Input setWeight(float weight) {
+    public Input setWeight(double weight) {
         this.weight = weight;
         return this;
     }
