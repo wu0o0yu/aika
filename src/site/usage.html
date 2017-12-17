@@ -124,7 +124,7 @@ required minimum input activation (<i>setBias</i>) of each input.
             3.0, // adjusts the bias
             new Input() // Requires the word to be recognized
                     .setNeuron(inputNeurons.get("cook"))
-                    .setWeight(10.0f)
+                    .setWeight(10.0)
                  // This input requires the input activation to have an
                  // activation value of at least 0.9
                     .setBias(-9.0)
@@ -134,7 +134,7 @@ required minimum input activation (<i>setBias</i>) of each input.
                     .setRangeOutput(true), // propagate the range of this input
             new Input() // The previous word needs to be a forename
                     .setNeuron(forenameCategory)
-                    .setWeight(10.0f)
+                    .setWeight(10.0)
                     .setBias(-9.0)
                     .setRelativeRid(-1) // references the previous word
                     .setRecurrent(true) // this input is a positive feedback loop
@@ -145,7 +145,7 @@ required minimum input activation (<i>setBias</i>) of each input.
             // in suppressingN.
             new Input()
                     .setNeuron(suppressingN)
-                    .setWeight(-20.0f)
+                    .setWeight(-20.0)
                     .setBias(0.0)
                     .setRecurrent(true) // this input is a negative feedback loop
                     .setRangeMatch(CONTAINED_IN)
@@ -161,7 +161,7 @@ required minimum input activation (<i>setBias</i>) of each input.
     m.initNeuron(forenameCategory, 0.0,
             new Input() // In this example, only one forename is considered.
                     .setNeuron(jacksonForenameEntity)
-                    .setWeight(10.0f)
+                    .setWeight(10.0)
                     .setBias(0.0)
                     .setRelativeRid(0)
                     .setRangeMatch(EQUALS)
@@ -170,7 +170,7 @@ required minimum input activation (<i>setBias</i>) of each input.
     m.initNeuron(surnameCategory, 0.0,
             new Input()
                     .setNeuron(cookSurnameEntity)
-                    .setWeight(10.0f)
+                    .setWeight(10.0)
                     .setBias(0.0)
                     .setRelativeRid(0)
                     .setRangeMatch(EQUALS)
@@ -187,25 +187,25 @@ required minimum input activation (<i>setBias</i>) of each input.
     m.initNeuron(suppressingN, 0.0,
             new Input()
                     .setNeuron(cookProfessionEntity)
-                    .setWeight(10.0f)
+                    .setWeight(10.0)
                     .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Input()
                     .setNeuron(cookSurnameEntity)
-                    .setWeight(10.0f)
+                    .setWeight(10.0)
                     .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Input()
                     .setNeuron(jacksonCityEntity)
-                    .setWeight(10.0f)
+                    .setWeight(10.0)
                     .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Input()
                     .setNeuron(jacksonForenameEntity)
-                    .setWeight(10.0f)
+                    .setWeight(10.0)
                     .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
@@ -325,14 +325,14 @@ The output of this example looks as following. Each line in the table represents
                 3.0,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()                     // This input is negated
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0f)
+                        .setWeight(-10.0)
                         .setBias(0.0)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINED_IN)
@@ -343,14 +343,14 @@ The output of this example looks as following. Each line in the table represents
                 5.0,
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0f)
+                        .setWeight(-10.0)
                         .setBias(0.0)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINED_IN)
@@ -361,14 +361,14 @@ The output of this example looks as following. Each line in the table represents
                 2.0,
                 new Input()
                         .setNeuron(inC)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0f)
+                        .setWeight(-10.0)
                         .setBias(0.0)
                         .setRecurrent(true)
                         .setRangeMatch(CONTAINED_IN)
@@ -380,22 +380,22 @@ The output of this example looks as following. Each line in the table represents
                 0.0,
                 new Input()
                         .setNeuron(pA)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setMinInput(1.0f)
+                        .setMinInput(1.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pB)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(pC)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
@@ -405,7 +405,7 @@ The output of this example looks as following. Each line in the table represents
         Neuron outN = m.initNeuron(new Neuron("OUT"), 0.0,
                 new Input()
                         .setNeuron(pB)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
@@ -534,7 +534,7 @@ The output of this example looks as following. Each line in the table represents
                 0.4,
                 new Input()
                         .setNeuron(inputNeurons.get('b'))
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setBias(-0.9)
                         .setRecurrent(false)
                         .setRelativeRid(0)
@@ -543,21 +543,21 @@ The output of this example looks as following. Each line in the table represents
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setBias(-0.9)
                         .setRecurrent(false)
                         .setRelativeRid(1)
                         .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(inputNeurons.get('d'))
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setBias(-0.9)
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(inputNeurons.get('e'))
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setBias(-0.9)
                         .setRecurrent(false)
                         .setRelativeRid(3)

@@ -47,7 +47,7 @@ public class AddSynapseTest {
             m.addSynapse(n,
                     new Input()
                             .setNeuron(in)
-                            .setWeight(10.0f)
+                            .setWeight(10.0)
                             .setRangeMatch(Input.RangeRelation.EQUALS)
                             .setRangeOutput(true)
                             .setRelativeRid(0)

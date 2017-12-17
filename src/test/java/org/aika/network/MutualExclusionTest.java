@@ -73,12 +73,12 @@ public class MutualExclusionTest {
                 3,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setRecurrent(false)
                         .setBias(-10.0),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0f)
+                        .setWeight(-10.0)
                         .setRecurrent(true)
                         .setBias(0.0)     // This input is negated
         );
@@ -88,12 +88,12 @@ public class MutualExclusionTest {
                 5,
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setRecurrent(false)
                         .setBias(-10.0),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0f)
+                        .setWeight(-10.0)
                         .setRecurrent(true)
                         .setBias(0.0)
         );
@@ -103,12 +103,12 @@ public class MutualExclusionTest {
                 2,
                 new Input()
                         .setNeuron(inC)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setRecurrent(false)
                         .setBias(-10.0),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0f)
+                        .setWeight(-10.0)
                         .setRecurrent(true)
                         .setBias(0.0)
         );
@@ -119,17 +119,17 @@ public class MutualExclusionTest {
                 -0.001,
                 new Input()
                         .setNeuron(pA)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setRecurrent(false)
                         .setBias(0.0),
                 new Input()
                         .setNeuron(pB)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setRecurrent(false)
                         .setBias(0.0),
                 new Input()
                         .setNeuron(pC)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setRecurrent(false)
                         .setBias(0.0)
         );
@@ -138,7 +138,7 @@ public class MutualExclusionTest {
                 -0.001,
                 new Input()
                         .setNeuron(pB)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
         );

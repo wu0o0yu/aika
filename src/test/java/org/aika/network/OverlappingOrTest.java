@@ -61,7 +61,7 @@ public class OverlappingOrTest {
                 2.0,
                 new Input()
                         .setNeuron(inputNeurons.get('b'))
-                        .setWeight(4.0f)
+                        .setWeight(4.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-4.0)
@@ -70,14 +70,14 @@ public class OverlappingOrTest {
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(1)
                         .setBias(0.0)
                         .setRangeMatch(RangeRelation.CONTAINS),
                 new Input()
                         .setNeuron(inputNeurons.get('d'))
-                        .setWeight(4.0f)
+                        .setWeight(4.0)
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setBias(-4.0)

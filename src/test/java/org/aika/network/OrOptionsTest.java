@@ -50,17 +50,17 @@ public class OrOptionsTest {
                 -0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0),
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0),
                 new Input()
                         .setNeuron(inC)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
         );

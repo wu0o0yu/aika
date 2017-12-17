@@ -53,19 +53,19 @@ public class NegationTest {
                 5.0,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-9.5),
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(-10.0f)
+                        .setWeight(-10.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0),
                 new Input()
                         .setNeuron(inC)
-                        .setWeight(-10.0f)
+                        .setWeight(-10.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -110,7 +110,7 @@ public class NegationTest {
                 -0.001,
                 new Input()
                         .setNeuron(abcN)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -120,19 +120,19 @@ public class NegationTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0),
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(-1.0f)
+                        .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0),
                 new Input()
                         .setNeuron(inC)
-                        .setWeight(-1.0f)
+                        .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -172,7 +172,7 @@ public class NegationTest {
                 -0.001,
                 new Input()
                         .setNeuron(asN)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -182,7 +182,7 @@ public class NegationTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
@@ -190,7 +190,7 @@ public class NegationTest {
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
-                        .setWeight(-1.0f)
+                        .setWeight(-1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -229,7 +229,7 @@ public class NegationTest {
                 -0.001,
                 new Input()
                         .setNeuron(asN)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -239,7 +239,7 @@ public class NegationTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
@@ -247,7 +247,7 @@ public class NegationTest {
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
-                        .setWeight(-1.0f)
+                        .setWeight(-1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -286,7 +286,7 @@ public class NegationTest {
                 -0.001,
                 new Input()
                         .setNeuron(asN)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -296,7 +296,7 @@ public class NegationTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
@@ -304,7 +304,7 @@ public class NegationTest {
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
-                        .setWeight(-1.0f)
+                        .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -343,7 +343,7 @@ public class NegationTest {
                 -0.001,
                 new Input()
                         .setNeuron(asN)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -351,7 +351,7 @@ public class NegationTest {
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(absN)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -363,7 +363,7 @@ public class NegationTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
@@ -371,7 +371,7 @@ public class NegationTest {
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
-                        .setWeight(-1.0f)
+                        .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -381,7 +381,7 @@ public class NegationTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
@@ -389,7 +389,7 @@ public class NegationTest {
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
@@ -397,7 +397,7 @@ public class NegationTest {
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
-                        .setWeight(-1.0f)
+                        .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -457,7 +457,7 @@ public class NegationTest {
                 -0.001,
                 new Input()
                         .setNeuron(asN)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -465,7 +465,7 @@ public class NegationTest {
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(ascN)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -473,7 +473,7 @@ public class NegationTest {
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(bsN)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -485,7 +485,7 @@ public class NegationTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
@@ -493,7 +493,7 @@ public class NegationTest {
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
-                        .setWeight(-1.0f)
+                        .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -504,7 +504,7 @@ public class NegationTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
@@ -512,7 +512,7 @@ public class NegationTest {
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inC)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
@@ -520,7 +520,7 @@ public class NegationTest {
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
-                        .setWeight(-1.0f)
+                        .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -532,7 +532,7 @@ public class NegationTest {
                 0.001,
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
@@ -540,7 +540,7 @@ public class NegationTest {
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
-                        .setWeight(-1.0f)
+                        .setWeight(-1.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -552,7 +552,7 @@ public class NegationTest {
                 -0.001,
                 new Input()
                         .setNeuron(asN)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -563,7 +563,7 @@ public class NegationTest {
                 -0.001,
                 new Input()
                         .setNeuron(ascN)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -574,7 +574,7 @@ public class NegationTest {
                 -0.001,
                 new Input()
                         .setNeuron(bsN)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -640,13 +640,13 @@ public class NegationTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(2.0f)
+                        .setWeight(2.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-2.0),
                 new Input()
                         .setNeuron(pD)
-                        .setWeight(-2.0f)
+                        .setWeight(-2.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -656,13 +656,13 @@ public class NegationTest {
                 0.001,
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(2.0f)
+                        .setWeight(2.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-2.0),
                 new Input()
                         .setNeuron(pC)
-                        .setWeight(-2.0f)
+                        .setWeight(-2.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
@@ -676,19 +676,19 @@ public class NegationTest {
                 0.001,
                 new Input()
                         .setNeuron(pC)
-                        .setWeight(2.0f)
+                        .setWeight(2.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-2.0),
                 new Input()
                         .setNeuron(pD)
-                        .setWeight(2.0f)
+                        .setWeight(2.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-2.0),
                 new Input()
                         .setNeuron(inG)
-                        .setWeight(2.0f)
+                        .setWeight(2.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-2.0)

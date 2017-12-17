@@ -68,7 +68,7 @@ public class SuspensionTest {
                 5.0,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(-9.0)
                         .setRelativeRid(0)
                         .setRecurrent(false)
@@ -76,7 +76,7 @@ public class SuspensionTest {
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(-9.0)
                         .setRelativeRid(null)
                         .setRecurrent(false)
@@ -89,7 +89,7 @@ public class SuspensionTest {
                 5.0,
                 new Input()
                         .setNeuron(nC)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(-9.0)
                         .setRecurrent(false)
                         .setRangeMatch(Input.RangeRelation.EQUALS)

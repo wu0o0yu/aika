@@ -59,7 +59,7 @@ public class ActivationOutputsTest {
                 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
                         .setBias(-1.0)
@@ -67,7 +67,7 @@ public class ActivationOutputsTest {
                         .setStartRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setAbsoluteRid(0)
                         .setBias(-1.0)
@@ -148,7 +148,7 @@ public class ActivationOutputsTest {
         OrNode outBNode = m.initNeuron(m.createNeuron("B"), 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setBias(-1.0)
@@ -173,7 +173,7 @@ public class ActivationOutputsTest {
         OrNode outBNode = m.initNeuron(m.createNeuron("B"), 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setBias(-1.0)
@@ -198,7 +198,7 @@ public class ActivationOutputsTest {
         OrNode outBNode = m.initNeuron(m.createNeuron("B"), 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setBias(-1.0)

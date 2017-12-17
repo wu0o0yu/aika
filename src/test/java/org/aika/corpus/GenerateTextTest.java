@@ -54,13 +54,13 @@ public class GenerateTextTest {
         m.initNeuron(outA, 4.0,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(-10.0)
                         .setStartRangeMapping(NONE)
                         .setEndRangeMapping(NONE),
                 new Input()
                         .setNeuron(suppr)
-                        .setWeight(-20.0f)
+                        .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
                         .setStartRangeMapping(END)   // Check if the suppressing activation and the outA activation are overlapping each other.
@@ -75,13 +75,13 @@ public class GenerateTextTest {
         m.initNeuron(outB, 5.0,
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(-10.0)
                         .setStartRangeMapping(NONE)
                         .setEndRangeMapping(NONE),
                 new Input()
                         .setNeuron(suppr)
-                        .setWeight(-20.0f)
+                        .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
                         .setStartRangeMapping(END)
@@ -95,13 +95,13 @@ public class GenerateTextTest {
         m.initNeuron(outC, 5.0,
                 new Input()
                         .setNeuron(outA)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(-10.0)
                         .setStartRangeMapping(Range.Mapping.END)
                         .setEndRangeMapping(NONE),
                 new Input()
                         .setNeuron(suppr)
-                        .setWeight(-20.0f)
+                        .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
                         .setStartRangeMapping(END)
@@ -114,13 +114,13 @@ public class GenerateTextTest {
         m.initNeuron(outD, 5.0,
                 new Input()
                         .setNeuron(outB)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(-10.0)
                         .setStartRangeMapping(Range.Mapping.END)
                         .setEndRangeMapping(NONE),
                 new Input()
                         .setNeuron(suppr)
-                        .setWeight(-20.0f)
+                        .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
                         .setStartRangeMapping(END)
@@ -134,25 +134,25 @@ public class GenerateTextTest {
         m.initNeuron(suppr, 0.0,
                 new Input()
                         .setNeuron(outA)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(0.0)
                         .setRangeMatch(Input.RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(outB)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(0.0)
                         .setRangeMatch(Input.RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(outC)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(0.0)
                         .setRangeMatch(Input.RangeRelation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(outD)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(0.0)
                         .setRangeMatch(Input.RangeRelation.EQUALS)
                         .setRangeOutput(true)

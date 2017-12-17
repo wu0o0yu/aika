@@ -49,7 +49,7 @@ public class ActivationsTest {
         m.initNeuron(m.createNeuron("pA"), 0.001,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
         );

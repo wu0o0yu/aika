@@ -44,7 +44,7 @@ public class ConverterTest {
                 -9.5,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(4.0f)
+                        .setWeight(4.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)
@@ -53,7 +53,7 @@ public class ConverterTest {
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(3.0f)
+                        .setWeight(3.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)
@@ -62,7 +62,7 @@ public class ConverterTest {
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inC)
-                        .setWeight(2.0f)
+                        .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)
@@ -71,7 +71,7 @@ public class ConverterTest {
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inD)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)
@@ -105,7 +105,7 @@ public class ConverterTest {
                 -5.0,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)
@@ -114,7 +114,7 @@ public class ConverterTest {
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)
@@ -123,7 +123,7 @@ public class ConverterTest {
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inC)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)
@@ -132,7 +132,7 @@ public class ConverterTest {
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inD)
-                        .setWeight(1.0f)
+                        .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)
@@ -160,7 +160,7 @@ public class ConverterTest {
                 -11.0,
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(5.0f)
+                        .setWeight(5.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)
@@ -169,7 +169,7 @@ public class ConverterTest {
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(5.0f)
+                        .setWeight(5.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)
@@ -178,7 +178,7 @@ public class ConverterTest {
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inC)
-                        .setWeight(2.0f)
+                        .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)
@@ -187,7 +187,7 @@ public class ConverterTest {
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inD)
-                        .setWeight(2.0f)
+                        .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setStartRangeMatch(Range.Operator.EQUALS)

@@ -21,13 +21,13 @@ public class TestNextWord {
         Neuron abN = m.initNeuron(m.createNeuron("AB"), 5.0,
                 new Input()
                         .setNeuron(inB)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(-9.5)
                         .setEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inA)
-                        .setWeight(10.0f)
+                        .setWeight(10.0)
                         .setBias(-9.5)
                         .setStartRangeMapping(Mapping.END)
                         .setStartRangeMatch(Operator.EQUALS)
