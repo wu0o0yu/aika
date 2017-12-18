@@ -134,15 +134,8 @@ public class Synapse implements Writable {
         out.provider.inMemoryInputSynapses.put(this, this);
         out.provider.lock.releaseWriteLock();
 
-        if(isConjunction(false)) {
-            if(out.inputSynapses.remove(this) != null) {
-                out.setModified();
-            }
-        } else {
-            if(in.outputSynapses.remove(this) != null) {
-                in.setModified();
-            }
-        }
+        removeLinkInternal(in, out);
+
         if(isConjunction(true)) {
             out.inputSynapses.put(this, this);
             isConjunction = true;
@@ -175,6 +168,14 @@ public class Synapse implements Writable {
         out.provider.inMemoryInputSynapses.remove(this);
         out.provider.lock.releaseWriteLock();
 
+        removeLinkInternal(in, out);
+
+        (dir ? in : out).lock.releaseWriteLock();
+        (dir ? out : in).lock.releaseWriteLock();
+    }
+
+
+    private void removeLinkInternal(INeuron in, INeuron out) {
         if(isConjunction(false)) {
             if(out.inputSynapses.remove(this) != null) {
                 out.setModified();
@@ -184,9 +185,13 @@ public class Synapse implements Writable {
                 in.setModified();
             }
         }
+    }
 
-        (dir ? in : out).lock.releaseWriteLock();
-        (dir ? out : in).lock.releaseWriteLock();
+
+    public boolean exists() {
+        if(input.get().outputSynapses.containsKey(this)) return true;
+        if(output.get().inputSynapses.containsKey(this)) return true;
+        return false;
     }
 
 
