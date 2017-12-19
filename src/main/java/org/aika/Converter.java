@@ -157,7 +157,7 @@ public class Converter {
 
         neuron.biasSum = 0.0;
         for (Synapse s : modifiedSynapses) {
-            if(REMOVE_SYNAPSES_WITH_INVERTED_SIGNS && ((s.weight > 0.0) != (s.weightDelta + s.weight > 0.0))) {
+            if(REMOVE_SYNAPSES_WITH_INVERTED_SIGNS && (s.weight != 0.0 && (s.weight > 0.0) != (s.weightDelta + s.weight > 0.0))) {
                 s.unlink();
                 continue;
             }
