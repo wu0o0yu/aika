@@ -50,6 +50,7 @@ public class SynapseRangeRelationTest {
         Neuron on = m.createNeuron();
 
         Synapse s = new Synapse(
+                m,
                 in,
                 on,
                 new Synapse.Key(
