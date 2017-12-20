@@ -404,7 +404,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private static boolean checkSelfReferencingForSelected(InterprNode nx, InterprNode ny, int depth) {
-        if (nx == ny) return true;
+        if (nx == ny || nx.contains(ny, true)) return true;
 
         if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
 
