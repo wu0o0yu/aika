@@ -108,17 +108,17 @@ public class Synapse implements Writable {
     public Synapse() {}
 
 
-    public Synapse(Model model, Neuron input, Neuron output) {
+    public Synapse(Neuron input, Neuron output) {
         this.input = input;
         this.output = output;
-        if(model.synapseStatisticFactory != null) {
-            this.statistic = model.synapseStatisticFactory.createStatisticObject();
+        if(output != null && output.model.synapseStatisticFactory != null) {
+            this.statistic = output.model.synapseStatisticFactory.createStatisticObject();
         }
     }
 
 
-    public Synapse(Model model, Neuron input, Neuron output, Key key) {
-        this(model, input, output);
+    public Synapse(Neuron input, Neuron output, Key key) {
+        this(input, output);
         this.key = lookupKey(key);
     }
 

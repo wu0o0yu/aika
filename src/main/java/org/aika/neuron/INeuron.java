@@ -375,7 +375,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         if(synapse == null) {
-            synapse = new Synapse(provider.model, inputNeuron.provider, provider, ser.synapseKey);
+            synapse = new Synapse(inputNeuron.provider, provider, ser.synapseKey);
 
             if(in == null) {
                 in = InputNode.add(provider.model, ser.synapseKey.createInputNodeKey(), synapse.input.get(doc));
@@ -578,8 +578,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         Collection<Synapse> synsTmp;
         ArrayList<Synapse> newSyns = new ArrayList<>();
-        Synapse lk = new Synapse(m, null, null, Synapse.Key.MIN_KEY);
-        Synapse uk = new Synapse(m, null, null, Synapse.Key.MAX_KEY);
+        Synapse lk = new Synapse(null, null, Synapse.Key.MIN_KEY);
+        Synapse uk = new Synapse(null, null, Synapse.Key.MAX_KEY);
 
         for (INeuron n : doc.activatedNeurons) {
             if (dir == 0) {
