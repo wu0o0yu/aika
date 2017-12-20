@@ -475,9 +475,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private static void addConflict(Document doc, InterprNode io, InterprNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
-        if (o.markedConflict == v) {
+        if (o.markedConflict == v || o.fixed) {
             if (!isAllowed(doc, io, o, inputActs)) {
-                Conflicts.add(doc, act, io, o);
+                Conflicts.add(act, io, o);
             }
         } else {
             if(o.orInterprNodes != null) {

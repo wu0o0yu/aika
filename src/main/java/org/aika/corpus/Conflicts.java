@@ -55,7 +55,7 @@ public class Conflicts {
     }
 
 
-    public static void add(Document doc, NodeActivation act, InterprNode primary, InterprNode secondary) {
+    public static void add(NodeActivation act, InterprNode primary, InterprNode secondary) {
         Key ck = new Key(secondary, act);
         Conflict c = primary.conflicts.primary.get(ck);
         if(c == null) {
