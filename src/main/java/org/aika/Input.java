@@ -240,7 +240,7 @@ public class Input implements Comparable<Input> {
     }
 
 
-    Synapse getSynapse(Neuron outputNeuron) {
+    protected Synapse getSynapse(Neuron outputNeuron) {
         Synapse s = new Synapse(
                 neuron.model,
                 neuron,
@@ -270,11 +270,7 @@ public class Input implements Comparable<Input> {
 
     @Override
     public int compareTo(Input in) {
-        int r = Double.compare(weight, in.weight);
-        if(r != 0) return r;
-        r = Double.compare(bias, in.bias);
-        if(r != 0) return r;
-        r = neuron.compareTo(in.neuron);
+        int r = neuron.compareTo(in.neuron);
         if(r != 0) return r;
         r = startRangeMatch.compareTo(in.startRangeMatch);
         if(r != 0) return r;
