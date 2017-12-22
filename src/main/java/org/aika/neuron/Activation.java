@@ -111,6 +111,12 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
+    public void storeFinalWeight() {
+        Activation.State fs = rounds.getLast();
+        finalState = fs != null ? fs : Activation.State.ZERO;
+    }
+
+
     /**
      * The {@code SynapseActivation} mirror the synapse link in the network of activations.
      */
