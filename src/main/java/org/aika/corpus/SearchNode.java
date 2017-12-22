@@ -344,7 +344,7 @@ public class SearchNode implements Comparable<SearchNode> {
         ArrayList<InterprNode> tmp = new ArrayList<>();
         tmp.add(doc.bottom);
         for(InterprNode pn: doc.bottom.children) {
-            if(pn.fixed || ((pn.orInterprNodes == null || pn.orInterprNodes.isEmpty()) && pn.conflicts.primary.isEmpty() && pn.conflicts.secondary.isEmpty())) {
+            if(pn.fixed == Boolean.TRUE || ((pn.orInterprNodes == null || pn.orInterprNodes.isEmpty()) && pn.conflicts.primary.isEmpty() && pn.conflicts.secondary.isEmpty())) {
                 tmp.add(pn);
             }
         }
@@ -431,6 +431,9 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public Coverage getCoverage(InterprNode n) {
+        if(n.fixed != null) {
+            return n.fixed ? Coverage.SELECTED : Coverage.EXCLUDED;
+        }
         if(n.markedExcludedRefinement) return Coverage.EXCLUDED;
         if(isCovered(n.markedSelected)) return Coverage.SELECTED;
         if(isCovered(n.markedExcluded)) return Coverage.EXCLUDED;
@@ -449,14 +452,14 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void markSelected(List<InterprNode> changed, List<InterprNode> n) {
+    public void markSelected(List<InterprNode> changed, List<InterprNode> n) {
         for(InterprNode x: n) {
             markSelected(changed, x);
         }
     }
 
 
-    private void markSelected(List<InterprNode> changed, InterprNode n) {
+    public void markSelected(List<InterprNode> changed, InterprNode n) {
         if(isCovered(n.markedSelected)) return;
 
         n.markedSelected = visited;
