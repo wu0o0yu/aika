@@ -21,7 +21,6 @@ import org.aika.lattice.NodeActivation;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.neuron.Activation;
 import org.aika.Utils;
-import org.aika.lattice.Node;
 
 import java.util.*;
 
@@ -515,17 +514,22 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    void storeFinalWeight(long v) {
+    public void storeFinalWeightRecursiveStep(long v) {
         if(visitedStoreFinalWeight == v) return;
         visitedStoreFinalWeight = v;
 
+        storeFinalWeight();
+
+        for(InterprNode cn: children) {
+            cn.storeFinalWeightRecursiveStep(v);
+        }
+    }
+
+
+    public void storeFinalWeight() {
         for(Activation act: getNeuronActivations()) {
             Activation.State fs = act.rounds.getLast();
             act.finalState = fs != null ? fs : Activation.State.ZERO;
-        }
-
-        for(InterprNode cn: children) {
-            cn.storeFinalWeight(v);
         }
     }
 
