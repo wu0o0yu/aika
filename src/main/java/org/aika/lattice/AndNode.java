@@ -49,6 +49,8 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
     public SortedMap<Refinement, Provider<? extends Node>> parents = new TreeMap<>();
 
+    public boolean combinatorialExpensive = false;
+    public int numCombExpParents = 0;
 
     public AndNode() {}
 
@@ -69,10 +71,16 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             pn.addAndChild(ref, provider);
             pn.setModified();
 
+            if(level > 2 && ((AndNode) pn).combinatorialExpensive) numCombExpParents++;
+
             if(ref.rid != null) ridRequired = true;
         }
 
         endRequired = false;
+
+        if(provider.model.getAndNodeCheck() != null) {
+            combinatorialExpensive = provider.model.getAndNodeCheck().checkIfCombinatorialExpensive(this);
+        }
     }
 
 
@@ -90,7 +98,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     NodeActivation<AndNode> processAddedActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs) {
-        if(inputActs.size() != level) {
+        if(inputActs.size() + numCombExpParents != level) {
             return null;
         }
 

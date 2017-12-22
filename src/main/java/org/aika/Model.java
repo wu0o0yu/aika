@@ -18,6 +18,7 @@ package org.aika;
 
 
 import org.aika.corpus.Document;
+import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
@@ -51,6 +52,8 @@ public class Model {
     public StatisticFactory nodeStatisticFactory;
     public StatisticFactory neuronStatisticFactory;
     public StatisticFactory synapseStatisticFactory;
+
+    public AndNodeCheck andNodeCheck;
 
     public AtomicInteger docIdCounter = new AtomicInteger(0);
     public AtomicInteger currentId = new AtomicInteger(0);
@@ -119,6 +122,15 @@ public class Model {
 
     public void setSynapseStatisticFactory(StatisticFactory synapseStatisticFactory) {
         this.synapseStatisticFactory = synapseStatisticFactory;
+    }
+
+
+    public AndNodeCheck getAndNodeCheck() {
+        return andNodeCheck;
+    }
+
+    public void setAndNodeCheck(AndNodeCheck andNodeCheck) {
+        this.andNodeCheck = andNodeCheck;
     }
 
 
@@ -302,6 +314,12 @@ public class Model {
     public interface StatisticFactory {
 
         Writable createStatisticObject();
+    }
+
+
+    public interface AndNodeCheck {
+
+        boolean checkIfCombinatorialExpensive(AndNode n);
     }
 
 }

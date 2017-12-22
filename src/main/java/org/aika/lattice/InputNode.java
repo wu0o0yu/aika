@@ -168,6 +168,9 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         ThreadState th = secondNode.getThreadState(doc.threadId, false);
         if (th == null || th.activations.isEmpty()) return;
 
+        AndNode nlp = pnlp.get(doc);
+        if(nlp.combinatorialExpensive) return;
+
         NodeActivation.Key ak = act.key;
         InputNode firstNode = ((InputNode) ak.node);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
@@ -186,7 +189,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         s.forEach(secondAct -> {
                     InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
                     if (o != null) {
-                        AndNode nlp = pnlp.get(doc);
                         nlp.addActivation(doc,
                                 new NodeActivation.Key(
                                         nlp,
