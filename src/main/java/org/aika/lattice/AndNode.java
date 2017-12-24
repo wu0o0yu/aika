@@ -106,11 +106,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    void addActivation(Document doc, Key ak, Collection<NodeActivation<?>> directInputActs) {
-        Node.addActivationAndPropagate(doc, ak, directInputActs);
-    }
-
-
     public void propagateAddedActivation(Document doc, NodeActivation act) {
         apply(doc, act);
     }
@@ -250,7 +245,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
         if (o != null) {
             AndNode nlp = pnlp.get(doc);
-            nlp.addActivation(
+            Node.addActivationAndPropagate(
                     doc,
                     new Key(
                             nlp,

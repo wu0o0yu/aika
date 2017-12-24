@@ -189,7 +189,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         s.forEach(secondAct -> {
                     InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
                     if (o != null) {
-                        nlp.addActivation(doc,
+                        Node.addActivationAndPropagate(doc,
                                 new NodeActivation.Key(
                                         nlp,
                                         Range.mergeRange(
