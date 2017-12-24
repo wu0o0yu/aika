@@ -130,27 +130,28 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
     @Override
     void apply(Document doc, NodeActivation<AndNode> act) {
+        if (andChildren != null) {
+            for (NodeActivation<?> pAct : act.inputs.values()) {
+                Node<?, NodeActivation<?>> pn = pAct.key.node;
+                pn.lock.acquireReadLock();
+                Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.node.provider, act.key.rid, pAct.key.rid));
+                if (ref != null) {
+                    for (NodeActivation secondAct : pAct.outputs.values()) {
+                        if (act != secondAct) {
+                            Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
+                            if (secondRef != null) {
+                                Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
-        for(NodeActivation<?> pAct: act.inputs.values()) {
-            Node<?, NodeActivation<?>> pn = pAct.key.node;
-            pn.lock.acquireReadLock();
-            Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.node.provider, act.key.rid, pAct.key.rid));
-            if(ref != null) {
-                for (NodeActivation secondAct : pAct.outputs.values()) {
-                    if (act != secondAct) {
-                        Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
-                        if (secondRef != null) {
-                            Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
-
-                            Provider<AndNode> nlp = getAndChild(nRef);
-                            if (nlp != null) {
-                                addNextLevelActivation(doc, act, secondAct, nlp);
+                                Provider<AndNode> nlp = getAndChild(nRef);
+                                if (nlp != null) {
+                                    addNextLevelActivation(doc, act, secondAct, nlp);
+                                }
                             }
                         }
                     }
                 }
+                pn.lock.releaseReadLock();
             }
-            pn.lock.releaseReadLock();
         }
 
         OrNode.processCandidate(doc, this, act, false);
