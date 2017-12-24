@@ -66,10 +66,10 @@ public class SynapseRangeRelationTest {
         );
         s.link();
 
-        Activation iAct0 = in.get().node.get().processAddedActivation(doc, new Key(in.get().node.get(), new Range(1, 4), null, doc.bottom), Collections.emptyList(), 1);
-        Activation iAct1 = in.get().node.get().processAddedActivation(doc, new Key(in.get().node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), 1);
-        Activation iAct2 = in.get().node.get().processAddedActivation(doc, new Key(in.get().node.get(), new Range(10, 18), null, doc.bottom), Collections.emptyList(), 1);
-        Activation oAct = on.get().node.get().processAddedActivation(doc, new Key(on.get().node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList(), 1);
+        Activation iAct0 = in.get().node.get().processAddedActivation(doc, new Key(in.get().node.get(), new Range(1, 4), null, doc.bottom), Collections.emptyList());
+        Activation iAct1 = in.get().node.get().processAddedActivation(doc, new Key(in.get().node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList());
+        Activation iAct2 = in.get().node.get().processAddedActivation(doc, new Key(in.get().node.get(), new Range(10, 18), null, doc.bottom), Collections.emptyList());
+        Activation oAct = on.get().node.get().processAddedActivation(doc, new Key(on.get().node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList());
 
         on.get().linkNeuronRelations(doc, oAct);
 

@@ -97,12 +97,12 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    NodeActivation<AndNode> processAddedActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs, long v) {
+    NodeActivation<AndNode> processAddedActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs) {
         if(inputActs.size() + numCombExpParents != level) {
             return null;
         }
 
-        return super.processAddedActivation(doc, ak, inputActs, v);
+        return super.processAddedActivation(doc, ak, inputActs);
     }
 
 

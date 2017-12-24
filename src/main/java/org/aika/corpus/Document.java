@@ -57,8 +57,6 @@ public class Document implements Comparable<Document> {
     public int activationIdCounter = 0;
     public int searchNodeIdCounter = 0;
 
-    public long visitedProcessing = 0;
-
     public InterprNode bottom = new InterprNode(this, -1, 0, 0);
 
     public SearchNode selectedSearchNode = null;
@@ -150,7 +148,7 @@ public class Document implements Comparable<Document> {
     public void propagate() {
         boolean flag = true;
         while(flag) {
-            queue.processChanges(visitedProcessing);
+            queue.processChanges();
             flag = ubQueue.process();
         }
     }
@@ -469,13 +467,13 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public void processChanges(long v) {
+        public void processChanges() {
             while(!queue.isEmpty()) {
                 Node n = queue.pollFirst();
                 ThreadState th = n.getThreadState(threadId, true);
 
                 th.isQueued = false;
-                n.processChanges(Document.this, v);
+                n.processChanges(Document.this);
 
                 if(APPLY_DEBUG_OUTPUT) {
                     log.info("QueueId:" + th.queueId);
