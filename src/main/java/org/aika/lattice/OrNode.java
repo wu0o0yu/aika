@@ -106,8 +106,8 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    Activation processAddedActivation(Document doc, Key<OrNode> ak, Collection<NodeActivation> inputActs) {
-        Activation act = super.processAddedActivation(doc, ak, inputActs);
+    Activation processAddedActivation(Document doc, Key<OrNode> ak, Collection<NodeActivation> inputActs, long v) {
+        Activation act = super.processAddedActivation(doc, ak, inputActs, v);
         if(act != null) {
             neuron.get(doc).linkNeuronRelations(doc, act);
         }

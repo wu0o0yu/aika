@@ -301,7 +301,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    A processAddedActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs) {
+    A processAddedActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs, long v) {
         if (Document.APPLY_DEBUG_OUTPUT) {
             log.info("add: " + ak + " - " + ak.node);
         }
@@ -317,7 +317,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             propagateAddedActivation(doc, act);
         } else {
             act.link(inputActs);
+
+            if(act.visitedProcessing != v) {
+                propagateAddedActivation(doc, act);
+            }
         }
+
+        act.visitedProcessing = v;
 
         return act;
     }
@@ -354,13 +360,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      *
      * @param doc
      */
-    public void processChanges(Document doc) {
+    public void processChanges(Document doc, long v) {
         ThreadState th = getThreadState(doc.threadId, true);
         NavigableMap<Key<T>, Collection<NodeActivation>> tmpAdded = th.added;
 
         th.added = new TreeMap<>();
 
-        tmpAdded.forEach((ak, iActs) -> processAddedActivation(doc, ak, iActs));
+        tmpAdded.forEach((ak, iActs) -> processAddedActivation(doc, ak, iActs, v));
     }
 
 
