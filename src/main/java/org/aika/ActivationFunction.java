@@ -8,7 +8,7 @@ public interface ActivationFunction {
 
     String RECTIFIED_SCALED_LOGISTIC_SIGMOID_KEY = "ReSLS";
     ActivationFunction RECTIFIED_SCALED_LOGISTIC_SIGMOID =
-            x -> Math.max(0.0, (2.0 * (1.0 / (1.0 + Math.pow(Math.E, (-x))))) - 1.0);
+            x -> Math.max(0.0, (2.0 / (1.0 + Math.pow(Math.E, (-x)))) - 1.0);
 
     String RECTIFIED_HYPERBOLIC_TANGENT_KEY = "ReTANH";
     ActivationFunction RECTIFIED_HYPERBOLIC_TANGENT =
