@@ -274,6 +274,34 @@ public class Model {
     }
 
 
+
+    /**
+     * Creates a neuron with the given bias.
+     *
+     * @param n
+     * @param bias
+     * @param inputs
+     * @return
+     */
+    public Neuron initNeuron(Neuron n, double bias, Input... inputs) {
+        return initNeuron(n, bias, new TreeSet<>(Arrays.asList(inputs)));
+    }
+
+
+    /**
+     * Creates a neuron with the given bias.
+     *
+     * @param n
+     * @param bias
+     * @param inputs
+     * @return
+     */
+    public Neuron initNeuron(Neuron n, double bias, String activationFunctionKey, Input... inputs) {
+        return initNeuron(n, bias, activationFunctionKey, new TreeSet<>(Arrays.asList(inputs)));
+    }
+
+
+
     /**
      * Creates a neuron with the given bias.
      *
@@ -322,18 +350,6 @@ public class Model {
         s.biasDelta = input.bias;
 
         INeuron.update(this, defaultThreadId, n, 0.0, Collections.singletonList(s));
-    }
-
-    /**
-     * Creates a neuron with the given bias.
-     *
-     * @param n
-     * @param bias
-     * @param inputs
-     * @return
-     */
-    public Neuron initNeuron(Neuron n, double bias, Input... inputs) {
-        return initNeuron(n, bias, new TreeSet<>(Arrays.asList(inputs)));
     }
 
 
