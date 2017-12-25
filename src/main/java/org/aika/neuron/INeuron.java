@@ -79,6 +79,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public Writable statistic;
 
+    public ActivationFunction activationFunction = ActivationFunction.RECTIFIED_SCALED_LOGISTIC_SIGMOID;
+    public String activationFunctionKey = ActivationFunction.RECTIFIED_SCALED_LOGISTIC_SIGMOID_KEY;
+
 
     // A synapse is stored only in one direction, depending on the synapse weight.
     public TreeMap<Synapse, Synapse> inputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
@@ -143,9 +146,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         State s = new State(value, 0, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.finalState = s;
+        act.inputValue = value;
         act.targetValue = targetValue;
-        act.upperBound = value;
-        act.isInput = true;
 
         doc.inputNeuronActivations.add(act);
         doc.finallyActivatedNeurons.add(act.key.node.neuron.get(doc));
@@ -209,8 +211,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             }
         }
 
-        act.upperBound = transferFunction(ub);
-        act.lowerBound = transferFunction(lb);
+        act.upperBound = activationFunction.f(ub);
+        act.lowerBound = activationFunction.f(lb);
     }
 
 
@@ -237,7 +239,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         double drSum = sum[DIR] + sum[REC];
-        double currentActValue = transferFunction(drSum);
+        double currentActValue = activationFunction.f(drSum);
 
         act.maxActValue = Math.max(act.maxActValue, currentActValue);
 
@@ -416,17 +418,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         return false;
     }
-
-
-    public static double transferFunction(double x) {
-        return x > 0.0 ? (2.0 * sigmoid(x)) - 1.0 : 0.0;
-    }
-
-
-    public static double sigmoid(double x) {
-        return (1 / (1 + Math.pow(Math.E, (-x))));
-    }
-
 
 
     /**
@@ -635,6 +626,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         out.writeDouble(posRecSum);
         out.writeDouble(maxRecurrentSum);
 
+        out.writeUTF(activationFunctionKey);
+
         out.writeInt(outputNodes.size());
         for (Map.Entry<Key, Provider<InputNode>> me : outputNodes.entrySet()) {
             me.getKey().write(out);
@@ -684,6 +677,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         negRecSum = in.readDouble();
         posRecSum = in.readDouble();
         maxRecurrentSum = in.readDouble();
+
+        activationFunctionKey = in.readUTF();
+        activationFunction = m.activationFunctions.get(activationFunctionKey);
 
         int s = in.readInt();
         for (int i = 0; i < s; i++) {
@@ -878,5 +874,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             return "W:" + w + " N:" + n + " NW:" + getNormWeight();
         }
     }
+
 
 }

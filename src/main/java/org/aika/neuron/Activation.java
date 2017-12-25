@@ -42,13 +42,12 @@ public final class Activation extends NodeActivation<OrNode> {
     public boolean isQueued = false;
     public long queueId;
 
-    public boolean isInput;
-
     public long currentStateV;
     public StateChange currentStateChange;
 
     public double errorSignal;
     public Double targetValue;
+    public Double inputValue;
 
 
     public Activation(int id, Document doc, Key key) {

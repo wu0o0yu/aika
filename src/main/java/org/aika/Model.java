@@ -28,6 +28,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static org.aika.ActivationFunction.*;
+
 
 /**
  * The model consists of two layers. The first layer is the actual neural network consisting of neurons and synapses.
@@ -62,6 +64,8 @@ public class Model {
     public WeakHashMap<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
     public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
 
+    public Map<String, ActivationFunction> activationFunctions = new TreeMap<>();
+
     public int defaultThreadId = 0;
 
 
@@ -83,6 +87,10 @@ public class Model {
         lastCleanup = new int[numberOfThreads];
         docs = new Document[numberOfThreads];
         suspensionHook = sh;
+
+        registerActivationFunction(RECTIFIED_SCALED_LOGISTIC_SIGMOID_KEY, RECTIFIED_SCALED_LOGISTIC_SIGMOID);
+        registerActivationFunction(RECTIFIED_HYPERBOLIC_TANGENT_KEY, RECTIFIED_HYPERBOLIC_TANGENT);
+        registerActivationFunction(RECTIFIED_LINEAR_UNIT_KEY, RECTIFIED_LINEAR_UNIT);
     }
 
 
@@ -131,6 +139,11 @@ public class Model {
 
     public void setAndNodeCheck(AndNodeCheck andNodeCheck) {
         this.andNodeCheck = andNodeCheck;
+    }
+
+
+    public void registerActivationFunction(String key, ActivationFunction af) {
+        activationFunctions.put(key, af);
     }
 
 
@@ -270,6 +283,18 @@ public class Model {
      * @return
      */
     public Neuron initNeuron(Neuron n, double bias, Collection<Input> inputs) {
+        return initNeuron(n, bias, null, inputs);
+    }
+
+    /**
+     * Creates a neuron with the given bias.
+     *
+     * @param n
+     * @param bias
+     * @param inputs
+     * @return
+     */
+    public Neuron initNeuron(Neuron n, double bias, String activationFunctionKey, Collection<Input> inputs) {
         List<Synapse> is = new ArrayList<>();
 
         for (Input input : inputs) {
@@ -277,6 +302,13 @@ public class Model {
             s.weightDelta = input.weight;
             s.biasDelta = input.bias;
             is.add(s);
+        }
+
+        if(activationFunctionKey != null) {
+            ActivationFunction af = activationFunctions.get(activationFunctionKey);
+            INeuron in = n.get();
+            in.activationFunction = af;
+            in.activationFunctionKey = activationFunctionKey;
         }
 
         return INeuron.update(this, defaultThreadId, n, bias, is);
@@ -321,5 +353,6 @@ public class Model {
 
         boolean checkIfCombinatorialExpensive(AndNode n);
     }
+
 
 }

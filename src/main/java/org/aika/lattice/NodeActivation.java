@@ -41,8 +41,8 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
 
     public long visitedNeuronTrain = -1;
 
-    public TreeMap<Key, NodeActivation> inputs = new TreeMap<>();
-    public TreeMap<Key, NodeActivation> outputs = new TreeMap<>();
+    public TreeMap<Key, NodeActivation<?>> inputs = new TreeMap<>();
+    public TreeMap<Key, NodeActivation<?>> outputs = new TreeMap<>();
 
 
     public NodeActivation(int id, Document doc, Key<T> key) {

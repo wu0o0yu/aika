@@ -504,12 +504,15 @@ public class Document implements Comparable<Document> {
                 Activation act = queue.pollFirst();
                 act.ubQueued = false;
 
-                double oldUpperBound = act.isInput ? 0.0 : act.upperBound;
+                double oldUpperBound = act.upperBound;
 
                 INeuron n = act.key.node.neuron.get(Document.this);
 
-                if(!act.isInput) {
+                if(act.inputValue == null) {
                     n.computeBounds(act);
+                } else {
+                    act.upperBound = act.inputValue;
+                    act.lowerBound = act.inputValue;
                 }
 
                 if(Math.abs(act.upperBound - oldUpperBound) > 0.01) {
@@ -596,7 +599,12 @@ public class Document implements Comparable<Document> {
                     Activation act = q.pollLast();
                     act.rounds.setQueued(round, false);
 
-                    State s = act.isInput ? act.finalState : act.key.node.neuron.get(Document.this).computeWeight(round, act, sn);
+                    State s;
+                    if(act.inputValue != null) {
+                        s = new State(act.inputValue, 0, NormWeight.ZERO_WEIGHT);
+                    } else {
+                        s = act.key.node.neuron.get(Document.this).computeWeight(round, act, sn);
+                    }
 
                     if (OPTIMIZE_DEBUG_OUTPUT) {
                         log.info(act.key + " Round:" + round);
