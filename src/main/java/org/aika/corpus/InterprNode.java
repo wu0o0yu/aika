@@ -65,7 +65,6 @@ public class InterprNode implements Comparable<InterprNode> {
     private long visitedContains;
     private long visitedCollect;
     private long visitedIsConflicting;
-    private long visitedStoreFinalWeight;
     private long visitedComputeLargestCommonSubset;
     private long visitedComputeLength;
     private long visitedComputeParents;
@@ -511,25 +510,6 @@ public class InterprNode implements Comparable<InterprNode> {
 
     private boolean conflictsAllowed() {
         return activations == null || activations.isEmpty();
-    }
-
-
-    public void storeFinalWeightRecursiveStep(long v) {
-        if(visitedStoreFinalWeight == v) return;
-        visitedStoreFinalWeight = v;
-
-        storeFinalWeight();
-
-        for(InterprNode cn: children) {
-            cn.storeFinalWeightRecursiveStep(v);
-        }
-    }
-
-
-    public void storeFinalWeight() {
-        for(Activation act: getNeuronActivations()) {
-            act.storeFinalWeight();
-        }
     }
 
 

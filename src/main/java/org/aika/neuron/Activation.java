@@ -35,7 +35,6 @@ public final class Activation extends NodeActivation<OrNode> {
     public double lowerBound;
 
     public Rounds rounds = new Rounds();
-    public State finalState = State.ZERO;
     public double maxActValue = 0.0;
 
     public boolean ubQueued = false;
@@ -96,7 +95,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public boolean isFinalActivation() {
-        return finalState.value > 0.0 || (targetValue != null && targetValue > 0.0);
+        return getFinalState().value > 0.0 || (targetValue != null && targetValue > 0.0);
     }
 
 
@@ -110,9 +109,8 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    public void storeFinalWeight() {
-        Activation.State fs = rounds.getLast();
-        finalState = fs != null ? fs : Activation.State.ZERO;
+    public State getFinalState() {
+        return rounds.getLast();
     }
 
 
@@ -192,7 +190,7 @@ public final class Activation extends NodeActivation<OrNode> {
         }
 
         public State getLast() {
-            return !rounds.isEmpty() ? rounds.lastEntry().getValue() : null;
+            return !rounds.isEmpty() ? rounds.lastEntry().getValue() : State.ZERO;
         }
 
         public void setQueued(int r, boolean v) {

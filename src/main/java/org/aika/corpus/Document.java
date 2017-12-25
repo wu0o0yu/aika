@@ -383,9 +383,10 @@ public class Document implements Comparable<Document> {
                 }
 
                 if (act.isFinalActivation()) {
-                    sb.append(" - FV:" + Utils.round(act.finalState.value));
-                    sb.append(" FW:" + Utils.round(act.finalState.weight.w));
-                    sb.append(" FN:" + Utils.round(act.finalState.weight.n));
+                    State fs = act.getFinalState();
+                    sb.append(" - FV:" + Utils.round(fs.value));
+                    sb.append(" FW:" + Utils.round(fs.weight.w));
+                    sb.append(" FN:" + Utils.round(fs.weight.n));
 
                     if(act.targetValue != null) {
                         sb.append(" - TV:" + Utils.round(act.targetValue));
@@ -650,8 +651,8 @@ public class Document implements Comparable<Document> {
         public final TreeSet<Activation> queue = new TreeSet<>(new Comparator<Activation>() {
             @Override
             public int compare(Activation act1, Activation act2) {
-                Activation.State fs1 = act1.finalState;
-                Activation.State fs2 = act2.finalState;
+                Activation.State fs1 = act1.getFinalState();
+                Activation.State fs2 = act2.getFinalState();
 
                 int r = Integer.compare(fs2.fired, fs1.fired);
                 if(r != 0) return r;

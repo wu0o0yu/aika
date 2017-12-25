@@ -145,7 +145,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         Activation act = NodeActivation.get(doc, node.get(doc), rid, new Range(begin, end), EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
         State s = new State(value, 0, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
-        act.finalState = s;
         act.inputValue = value;
         act.targetValue = targetValue;
 
@@ -319,7 +318,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public void computeOutputErrorSignal(Activation act) {
         if(act.targetValue != null) {
-            act.errorSignal += act.targetValue - act.finalState.value;
+            act.errorSignal += act.targetValue - act.getFinalState().value;
         }
 
         act.updateErrorSignal();
@@ -331,7 +330,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             Synapse s = sa.synapse;
             Activation oAct = sa.output;
 
-            act.errorSignal += s.weight * oAct.errorSignal * (1.0 - act.finalState.value);
+            act.errorSignal += s.weight * oAct.errorSignal * (1.0 - act.getFinalState().value);
         }
 
         act.updateErrorSignal();
@@ -366,7 +365,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         if(inputNeuron == this) {
             return;
         }
-        double deltaW = x * ser.significance * iAct.finalState.value;
+        double deltaW = x * ser.significance * iAct.getFinalState().value;
 
         Provider<InputNode> inp = inputNeuron.outputNodes.get(ser.synapseKey.createInputNodeKey());
         Synapse synapse = null;

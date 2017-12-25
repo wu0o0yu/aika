@@ -272,7 +272,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if (accNW > getSelectedAccumulatedWeight(doc)) {
             doc.selectedSearchNode = this;
-            doc.bottom.storeFinalWeightRecursiveStep(doc.visitedCounter++);
         }
 
         return accumulatedWeight;

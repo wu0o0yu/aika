@@ -45,7 +45,7 @@ public class TrainingTest {
         in.addInput(doc, 0, 3, 0, doc.bottom, 1.0);
         Activation targetAct = out.addInput(doc, 0, 3, 0, doc.bottom, 0.0);
 
-        targetAct.errorSignal = 1.0 - targetAct.finalState.value;
+        targetAct.errorSignal = 1.0 - targetAct.getFinalState().value;
 
         out.get().train(doc, targetAct, 0.01,
                 (iAct, oAct) -> new Document.SynEvalResult(

@@ -237,7 +237,7 @@ public class NamedEntityRecognitionTest {
             System.out.print(act.key.rid + " ");
             System.out.print(act.key.interpretation + " ");
             System.out.print(act.key.node.neuron.get().label + " ");
-            System.out.print(act.finalState.value);
+            System.out.print(act.getFinalState().value);
         }
 
         doc.clearActivations();
