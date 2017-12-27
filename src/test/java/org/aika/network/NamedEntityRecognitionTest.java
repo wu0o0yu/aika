@@ -22,6 +22,7 @@ import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.neuron.Activation;
 import org.aika.corpus.Document;
+import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -64,6 +65,7 @@ public class NamedEntityRecognitionTest {
         Neuron cookSurnameEntity = m.initNeuron(
                 m.createNeuron("E-cook (surname)"),
                 3.0, // adjusts the bias
+                INeuron.Type.EXCITATORY,
                 new Input() // Requires the word to be recognized
                         .setNeuron(inputNeurons.get("cook"))
                         .setWeight(10.0)
@@ -97,6 +99,7 @@ public class NamedEntityRecognitionTest {
         Neuron cookProfessionEntity = m.initNeuron(
                 m.createNeuron("E-cook (profession)"),
                 3.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inputNeurons.get("cook"))
                         .setWeight(15.0)
@@ -115,6 +118,7 @@ public class NamedEntityRecognitionTest {
         Neuron jacksonForenameEntity = m.initNeuron(
                 m.createNeuron("E-jackson (forename)"),
                 3.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inputNeurons.get("jackson"))
                         .setWeight(10.0)
@@ -141,6 +145,7 @@ public class NamedEntityRecognitionTest {
         Neuron jacksonCityEntity = m.initNeuron(
                 m.createNeuron("E-jackson (city)"),
                 3.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inputNeurons.get("jackson"))
                         .setWeight(12.0)
@@ -159,6 +164,7 @@ public class NamedEntityRecognitionTest {
         m.initNeuron(
                 forenameCategory,
                 0.0,
+                INeuron.Type.EXCITATORY,
                 new Input() // In this example there is only one forename considered.
                         .setNeuron(jacksonForenameEntity)
                         .setWeight(10.0)
@@ -170,6 +176,7 @@ public class NamedEntityRecognitionTest {
         m.initNeuron(
                 surnameCategory,
                 0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(cookSurnameEntity)
                         .setWeight(10.0)
@@ -182,6 +189,7 @@ public class NamedEntityRecognitionTest {
         m.initNeuron(
                 suppressingN,
                 0.0,
+                INeuron.Type.INHIBITORY,
                 new Input().setNeuron(cookProfessionEntity)
                         .setWeight(10.0)
                         .setBias(0.0)

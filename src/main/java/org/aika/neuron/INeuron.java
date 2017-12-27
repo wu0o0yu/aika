@@ -63,12 +63,23 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public static int MAX_SELF_REFERENCING_DEPTH = 5;
 
     public String label;
+    public Type type;
+
+    public enum Type {
+        EXCITATORY,
+        INHIBITORY,
+        META
+    }
+
     public String outputText;
 
     public volatile double bias;
     public volatile double biasDelta;
     public volatile double biasSum;
     public volatile double biasSumDelta;
+
+    public volatile double metaBias = 0.0;
+
 
     public volatile double posDirSum;
     public volatile double negDirSum;
@@ -607,6 +618,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             out.writeUTF(label);
         }
 
+        out.writeBoolean(type != null);
+        if(type != null) {
+            out.writeUTF(type.name());
+        }
+
         out.writeBoolean(outputText != null);
         if(outputText != null) {
             out.writeUTF(outputText);
@@ -660,6 +676,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         if(in.readBoolean()) {
             label = in.readUTF();
         }
+
+        if(in.readBoolean()) {
+            type = Type.valueOf(in.readUTF());
+        }
+
         if(in.readBoolean()) {
             outputText = in.readUTF();
         }
@@ -830,6 +851,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         Stream<Activation> s = NodeActivation.select(doc, node.get(doc), null, null, null, null, null, null);
         return s.filter(act -> act.isFinalActivation())
                 .collect(Collectors.toList());
+    }
+
+
+    public Collection<Activation> getAllActivations(Document doc) {
+        Stream<Activation> s = NodeActivation.select(doc, node.get(doc), null, null, null, null, null, null);
+        return s.collect(Collectors.toList());
     }
 
 

@@ -21,6 +21,7 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.lattice.AndNode;
+import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 import static org.aika.Input.RangeRelation.CONTAINED_IN;
@@ -56,7 +57,8 @@ public class WeightsTest {
 
         Neuron pOrA = m.createNeuron("pOrA");
         m.initNeuron(pOrA,
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inAA)
                         .setWeight(3.0)
@@ -77,6 +79,7 @@ public class WeightsTest {
 
         m.initNeuron(pDA,
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(pOrA)
                         .setWeight(1.0)
@@ -106,7 +109,8 @@ public class WeightsTest {
 
         Neuron pOrB = m.createNeuron("pOrB");
         m.initNeuron(pOrB,
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inAB)
                         .setWeight(2.0)
@@ -126,6 +130,7 @@ public class WeightsTest {
         pDB = m.createNeuron("DB");
         m.initNeuron(pDB,
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(pOrB)
                         .setWeight(1.0)
@@ -150,7 +155,8 @@ public class WeightsTest {
 
 
         m.initNeuron(pSuppr,
-                -0.001,
+                0.0,
+                INeuron.Type.INHIBITORY,
                 new Input()
                         .setNeuron(pDA)
                         .setWeight(1.0)

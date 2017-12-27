@@ -27,6 +27,7 @@ import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,6 +52,7 @@ public class NegationTest {
 
         m.initNeuron(abcN,
                 5.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0)
@@ -107,7 +109,8 @@ public class NegationTest {
         Neuron abcN = m.createNeuron("ABC");
 
         Neuron outN = m.initNeuron(m.createNeuron("OUT"),
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(abcN)
                         .setWeight(1.0)
@@ -118,6 +121,7 @@ public class NegationTest {
 
         m.initNeuron(abcN,
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -169,7 +173,8 @@ public class NegationTest {
         Neuron inS = m.createNeuron("S");
 
         Neuron outN = m.initNeuron(m.createNeuron("OUT"),
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
@@ -180,6 +185,7 @@ public class NegationTest {
 
         m.initNeuron(asN,
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -226,7 +232,8 @@ public class NegationTest {
         Neuron inS = m.createNeuron("S");
 
         Neuron outN = m.initNeuron(m.createNeuron("OUT"),
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
@@ -237,6 +244,7 @@ public class NegationTest {
 
         m.initNeuron(asN,
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -283,7 +291,8 @@ public class NegationTest {
         Neuron inS = m.createNeuron("S");
 
         Neuron outN = m.initNeuron(m.createNeuron("OUT"),
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
@@ -294,6 +303,7 @@ public class NegationTest {
 
         m.initNeuron(asN,
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -340,7 +350,8 @@ public class NegationTest {
         Neuron bsN = m.createNeuron("BS");
 
         Neuron inS = m.initNeuron(m.createNeuron("S"),
-                -0.001,
+                0.0,
+                INeuron.Type.INHIBITORY,
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
@@ -361,6 +372,7 @@ public class NegationTest {
 
         m.initNeuron(asN,
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -379,6 +391,7 @@ public class NegationTest {
         );
         m.initNeuron(absN,
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -454,7 +467,8 @@ public class NegationTest {
         Neuron bsN = m.createNeuron("BS");
 
         Neuron inS = m.initNeuron(m.createNeuron("S"),
-                -0.001,
+                0.0,
+                INeuron.Type.INHIBITORY,
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
@@ -483,6 +497,7 @@ public class NegationTest {
 
         m.initNeuron(asN,
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -502,6 +517,7 @@ public class NegationTest {
         );
         m.initNeuron(ascN,
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -530,6 +546,7 @@ public class NegationTest {
 
         m.initNeuron(bsN,
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0)
@@ -549,7 +566,8 @@ public class NegationTest {
         );
 
         Neuron outA = m.initNeuron(m.createNeuron("OUT A"),
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
@@ -560,7 +578,8 @@ public class NegationTest {
                         .setRangeOutput(true)
         );
         Neuron outAC = m.initNeuron(m.createNeuron("OUT AC"),
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(ascN)
                         .setWeight(1.0)
@@ -571,7 +590,8 @@ public class NegationTest {
                         .setRangeOutput(true)
         );
         Neuron outB = m.initNeuron(m.createNeuron("OUT B"),
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(bsN)
                         .setWeight(1.0)
@@ -638,6 +658,7 @@ public class NegationTest {
 
         m.initNeuron(pC,
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(2.0)
@@ -654,6 +675,7 @@ public class NegationTest {
 
         m.initNeuron(pD,
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(2.0)
@@ -674,6 +696,7 @@ public class NegationTest {
 
         Neuron pH = m.initNeuron(m.createNeuron("H"),
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(pC)
                         .setWeight(2.0)

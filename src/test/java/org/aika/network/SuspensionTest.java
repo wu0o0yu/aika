@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.*;
 import org.aika.corpus.Document;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -66,6 +67,7 @@ public class SuspensionTest {
 
         Neuron nC = m.initNeuron(m.createNeuron("C"),
                 5.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0)
@@ -87,6 +89,7 @@ public class SuspensionTest {
 
         Neuron outD = m.initNeuron(m.createNeuron("D"),
                 5.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(nC)
                         .setWeight(10.0)

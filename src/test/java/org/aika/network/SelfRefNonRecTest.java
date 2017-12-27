@@ -21,6 +21,7 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,7 +42,8 @@ public class SelfRefNonRecTest {
         Neuron bN = m.createNeuron("B");
         Neuron cN = m.initNeuron(
                 m.createNeuron("C"),
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(bN)
                         .setWeight(5.0)
@@ -50,7 +52,8 @@ public class SelfRefNonRecTest {
 
         m.initNeuron(
                 bN,
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(5.0)

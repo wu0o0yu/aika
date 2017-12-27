@@ -26,6 +26,7 @@ import org.aika.neuron.Activation;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.lattice.OrNode;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -52,6 +53,7 @@ public class RecurrentIdTest {
 
         OrNode outCNode = m.initNeuron(m.createNeuron("C"),
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -94,6 +96,7 @@ public class RecurrentIdTest {
 
         OrNode outDNode = m.initNeuron(m.createNeuron("D"),
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -168,7 +171,7 @@ public class RecurrentIdTest {
                 }
             }
 
-            Neuron n = m.initNeuron(m.createNeuron("PATTERN"), 0.5, inputs);
+            Neuron n = m.initNeuron(m.createNeuron("PATTERN"), 0.5, INeuron.Type.EXCITATORY, inputs);
 
             System.out.println(n.get().node.get().logicToString());
 

@@ -26,6 +26,7 @@ import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
+import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -47,7 +48,8 @@ public class OrOptionsTest {
         Neuron pD = m.createNeuron("D");
 
         m.initNeuron(pD,
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)

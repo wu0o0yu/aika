@@ -21,6 +21,7 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
+import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 /**
@@ -41,7 +42,8 @@ public class OptionalAndTest {
         Neuron suppr = m.createNeuron("SUPPRESS");
 
         Neuron hintNoun = m.initNeuron(m.createNeuron("HINT-NOUN"),
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(wordEssen)
                         .setWeight(1.0)
@@ -54,7 +56,8 @@ public class OptionalAndTest {
                         .setBias(0.0)
         );
         Neuron hintVerb = m.initNeuron(m.createNeuron("HINT-VERB"),
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(wordEssen)
                         .setWeight(1.0)
@@ -70,6 +73,7 @@ public class OptionalAndTest {
 
         Neuron noun = m.initNeuron(m.createNeuron("NOUN"),
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(hintNoun)
                         .setWeight(1.0)
@@ -89,6 +93,7 @@ public class OptionalAndTest {
 
         Neuron verb = m.initNeuron(m.createNeuron("VERB"),
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(hintVerb)
                         .setWeight(1.0)
@@ -102,7 +107,8 @@ public class OptionalAndTest {
         );
 
         m.initNeuron(suppr,
-                -0.001,
+                0.0,
+                INeuron.Type.INHIBITORY,
                 new Input()
                         .setNeuron(noun)
                         .setWeight(1.0)

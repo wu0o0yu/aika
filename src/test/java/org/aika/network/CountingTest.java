@@ -22,6 +22,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.Document.DiscoveryConfig;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -59,7 +60,7 @@ public class CountingTest {
         m.setNodeStatisticFactory(() -> new NodeStatistic());
 
         Neuron inA = m.createNeuron("inA");
-        Neuron outA = m.initNeuron(m.createNeuron("nA"), 50.0,
+        Neuron outA = m.initNeuron(m.createNeuron("nA"), 50.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(100.0)

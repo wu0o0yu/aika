@@ -25,6 +25,7 @@ import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.OrNode;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -57,6 +58,7 @@ public class SimplePatternMatchingTest {
         Neuron pattern = m.initNeuron(
                 m.createNeuron("BCD"),
                 0.4,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(1.0)
@@ -143,6 +145,7 @@ public class SimplePatternMatchingTest {
         Neuron pattern = m.initNeuron(
                 m.createNeuron("BCDE"),
                 0.4,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(1.0)

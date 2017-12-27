@@ -21,6 +21,7 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -47,7 +48,7 @@ public class EntityResolutionTest {
         Neuron ePuma = m.createNeuron("E-Puma");
 
 
-        m.initNeuron(eJaguar, 2.0,
+        m.initNeuron(eJaguar, 2.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(wJaguar)
                         .setRecurrent(false)
@@ -63,7 +64,7 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
         );
 
-        m.initNeuron(ePuma, 2.0,
+        m.initNeuron(ePuma, 2.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(wPuma)
                         .setRecurrent(false)
@@ -130,7 +131,7 @@ public class EntityResolutionTest {
         Neuron chCatsWithoutPuma = m.createNeuron("CH-Katzen/Puma");
         Neuron chCatsWithoutLeopard = m.createNeuron("CH-Katzen/Leopard");
 
-        m.initNeuron(eJaguar, 5.0,
+        m.initNeuron(eJaguar, 5.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(wJaguar)
                         .setRecurrent(false)
@@ -147,7 +148,7 @@ public class EntityResolutionTest {
                         .setRangeOutput(false)
         );
 
-        m.initNeuron(ePuma, 5.0,
+        m.initNeuron(ePuma, 5.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(wPuma)
                         .setRecurrent(false)
@@ -165,7 +166,7 @@ public class EntityResolutionTest {
         );
 
 
-        m.initNeuron(eLeopard, 5.0,
+        m.initNeuron(eLeopard, 5.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(wLeopard)
                         .setRecurrent(false)
@@ -184,6 +185,7 @@ public class EntityResolutionTest {
 
         m.initNeuron(cCats,
                 0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(eJaguar)
                         .setWeight(10.0)
@@ -207,7 +209,7 @@ public class EntityResolutionTest {
                         .setRangeOutput(true)
         );
 
-        m.initNeuron(chCatsWithoutJaguar, 5.0,
+        m.initNeuron(chCatsWithoutJaguar, 5.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(cCats)
                         .setWeight(10.0)
@@ -230,7 +232,7 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
         );
 
-        m.initNeuron(chCatsWithoutPuma, 5.0,
+        m.initNeuron(chCatsWithoutPuma, 5.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(cCats)
                         .setWeight(10.0)
@@ -253,7 +255,7 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
         );
 
-        m.initNeuron(chCatsWithoutLeopard, 5.0,
+        m.initNeuron(chCatsWithoutLeopard, 5.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(cCats)
                         .setWeight(10.0)

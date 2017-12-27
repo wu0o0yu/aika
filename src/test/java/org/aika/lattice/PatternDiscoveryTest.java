@@ -312,7 +312,7 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(pABD.provider, pAD.andChildren.get(new Refinement(0, pBNode.provider)));
         Assert.assertEquals(pABD.provider, pBD.andChildren.get(new Refinement(0, pANode.provider)));
 
-//        Assert.assertEquals(2, ((NodeStatistic) pABD.statistic).frequency, 0.01);
+//        Assert.assertEquals(2, ((NodeStatistic) pABD.meta).frequency, 0.01);
         Assert.assertEquals(3, pABD.parents.size());
         Assert.assertEquals(pAB.provider, pABD.parents.get(new Refinement(0, pDNode.provider)));
         Assert.assertEquals(pAD.provider, pABD.parents.get(new Refinement(0, pBNode.provider)));

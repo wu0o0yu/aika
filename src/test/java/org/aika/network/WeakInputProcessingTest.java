@@ -23,6 +23,7 @@ import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
 import org.aika.neuron.Activation;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,6 +49,7 @@ public class WeakInputProcessingTest {
         Neuron patternA = m.initNeuron(
                 m.createNeuron("Pattern A"),
                 0.4,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(strongInput)
                         .setWeight(50.0)
@@ -74,6 +76,7 @@ public class WeakInputProcessingTest {
         Neuron patternB = m.initNeuron(
                 m.createNeuron("Pattern B"),
                 0.4,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(strongInput)
                         .setWeight(50.0)
@@ -100,6 +103,7 @@ public class WeakInputProcessingTest {
         Neuron patternC = m.initNeuron(
                 m.createNeuron("Pattern C"),
                 0.4,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(strongInput)
                         .setWeight(50.0)
@@ -126,6 +130,7 @@ public class WeakInputProcessingTest {
 
         m.initNeuron(suppr,
                 -0.001,
+                INeuron.Type.INHIBITORY,
                 new Input()
                         .setNeuron(patternA)
                         .setWeight(10.0)

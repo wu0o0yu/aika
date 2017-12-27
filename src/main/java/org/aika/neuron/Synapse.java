@@ -21,6 +21,7 @@ import org.aika.*;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
+import org.aika.training.MetaSynapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -102,7 +103,7 @@ public class Synapse implements Writable {
      */
     public boolean isConjunction;
 
-    public Writable statistic;
+    public MetaSynapse meta;
 
 
     public Synapse() {}
@@ -111,9 +112,6 @@ public class Synapse implements Writable {
     public Synapse(Neuron input, Neuron output) {
         this.input = input;
         this.output = output;
-        if(output != null && output.model.synapseStatisticFactory != null) {
-            this.statistic = output.model.synapseStatisticFactory.createStatisticObject();
-        }
     }
 
 
@@ -230,9 +228,9 @@ public class Synapse implements Writable {
 
         out.writeBoolean(isConjunction);
 
-        out.writeBoolean(statistic != null);
-        if(statistic != null) {
-            statistic.write(out);
+        out.writeBoolean(meta != null);
+        if(meta != null) {
+            meta.write(out);
         }
     }
 
@@ -250,9 +248,9 @@ public class Synapse implements Writable {
 
         isConjunction = in.readBoolean();
 
-        if(in.readBoolean() && m.synapseStatisticFactory != null) {
-            statistic = m.synapseStatisticFactory.createStatisticObject();
-            statistic.readFields(in, m);
+        if(in.readBoolean()) {
+            meta = new MetaSynapse();
+            meta.readFields(in, m);
         }
     }
 

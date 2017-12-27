@@ -23,6 +23,7 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,6 +43,7 @@ public class PropagateRidTest {
         Neuron inA = m.createNeuron("A");
         Neuron pA = m.initNeuron(m.createNeuron("pA"),
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)

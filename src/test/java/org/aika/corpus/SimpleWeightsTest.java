@@ -20,6 +20,7 @@ package org.aika.corpus;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 import static org.aika.Input.RangeRelation.EQUALS;
@@ -39,7 +40,8 @@ public class SimpleWeightsTest {
 
         Neuron pC = m.createNeuron("C");
         m.initNeuron(pC,
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(0.3f)
@@ -90,6 +92,7 @@ public class SimpleWeightsTest {
         Neuron pC = m.createNeuron("C");
         m.initNeuron(pC,
                 0.01,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(3.0)

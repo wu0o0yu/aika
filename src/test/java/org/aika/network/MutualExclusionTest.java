@@ -25,6 +25,7 @@ import org.aika.corpus.Conflicts.Conflict;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.lattice.OrNode;
+import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 /**
@@ -71,6 +72,7 @@ public class MutualExclusionTest {
         Neuron pA = m.initNeuron(
                 m.createNeuron("A"),
                 3,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0)
@@ -86,6 +88,7 @@ public class MutualExclusionTest {
         Neuron pB = m.initNeuron(
                 m.createNeuron("B"),
                 5,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(10.0)
@@ -101,6 +104,7 @@ public class MutualExclusionTest {
         Neuron pC = m.initNeuron(
                 m.createNeuron("C"),
                 2,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inC)
                         .setWeight(10.0)
@@ -116,7 +120,8 @@ public class MutualExclusionTest {
         // Finally addInput all the inputs to the suppressing neuron.
         m.initNeuron(
                 pSuppr,
-                -0.001,
+                0.0,
+                INeuron.Type.INHIBITORY,
                 new Input()
                         .setNeuron(pA)
                         .setWeight(10.0)
@@ -135,7 +140,8 @@ public class MutualExclusionTest {
         );
 
         Neuron outN = m.initNeuron(m.createNeuron("OUT"),
-                -0.001,
+                0.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(pB)
                         .setWeight(1.0)

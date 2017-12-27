@@ -23,6 +23,7 @@ import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.network.TestHelper;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,6 +49,7 @@ public class PatternLatticeTest {
         {
             m.initNeuron(m.createNeuron("ABC"),
                     0.001,
+                    INeuron.Type.EXCITATORY,
                     new Input()
                             .setNeuron(inA)
                             .setWeight(1.0)
@@ -103,6 +105,7 @@ public class PatternLatticeTest {
         {
             m.initNeuron(m.createNeuron("BCD"),
                     0.001,
+                    INeuron.Type.EXCITATORY,
                     new Input()
                             .setNeuron(inB)
                             .setWeight(1.0)
@@ -167,6 +170,7 @@ public class PatternLatticeTest {
         {
             m.initNeuron(m.createNeuron("ABCD"),
                     0.001,
+                    INeuron.Type.EXCITATORY,
                     new Input()
                             .setNeuron(inA)
                             .setWeight(1.0)
@@ -264,6 +268,7 @@ public class PatternLatticeTest {
 
         m.initNeuron(m.createNeuron("ABC"),
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA
                         ).setWeight(1.0)

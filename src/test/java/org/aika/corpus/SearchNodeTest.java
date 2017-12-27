@@ -19,6 +19,7 @@ package org.aika.corpus;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -43,7 +44,7 @@ public class SearchNodeTest {
 
         Neuron suppr = m.createNeuron("SUPPR");
 
-        m.initNeuron(eJoergSurname, 5.0,
+        m.initNeuron(eJoergSurname, 5.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(wJoerg)
                         .setWeight(10.0)
@@ -59,7 +60,7 @@ public class SearchNodeTest {
                         .setRangeMatch(Input.RangeRelation.EQUALS)
                         .setRangeOutput(false)
         );
-        m.initNeuron(eZimmermannCompany, 5.0,
+        m.initNeuron(eZimmermannCompany, 5.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(wZimmermann)
                         .setWeight(10.0)
@@ -76,7 +77,7 @@ public class SearchNodeTest {
                         .setRangeOutput(false)
         );
 
-        m.initNeuron(eJoergForename, 6.0,
+        m.initNeuron(eJoergForename, 6.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(wJoerg)
                         .setWeight(10.0)
@@ -101,7 +102,7 @@ public class SearchNodeTest {
                         .setRangeOutput(false)
         );
 
-        m.initNeuron(eZimmermannSurname, 6.0,
+        m.initNeuron(eZimmermannSurname, 6.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(wZimmermann)
                         .setWeight(10.0)
@@ -127,7 +128,7 @@ public class SearchNodeTest {
         );
 
 
-        m.initNeuron(suppr, -0.001,
+        m.initNeuron(suppr, 0.0, INeuron.Type.INHIBITORY,
                 new Input()
                         .setNeuron(eJoergForename)
                         .setWeight(10.0)

@@ -31,6 +31,7 @@ import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
+import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,6 +58,7 @@ public class ActivationOutputsTest {
 
         Neuron pAB = m.initNeuron(m.createNeuron("pAB"),
                 0.001,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -145,7 +147,7 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        OrNode outBNode = m.initNeuron(m.createNeuron("B"), 0.001,
+        OrNode outBNode = m.initNeuron(m.createNeuron("B"), 0.001, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -170,7 +172,7 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        OrNode outBNode = m.initNeuron(m.createNeuron("B"), 0.001,
+        OrNode outBNode = m.initNeuron(m.createNeuron("B"), 0.001, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -195,7 +197,7 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        OrNode outBNode = m.initNeuron(m.createNeuron("B"), 0.001,
+        OrNode outBNode = m.initNeuron(m.createNeuron("B"), 0.001, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)

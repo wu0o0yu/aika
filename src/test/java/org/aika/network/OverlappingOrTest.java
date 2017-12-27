@@ -25,6 +25,7 @@ import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.OrNode;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -59,6 +60,7 @@ public class OverlappingOrTest {
         Neuron pattern = m.initNeuron(
                 m.createNeuron("BCD"),
                 2.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(4.0)

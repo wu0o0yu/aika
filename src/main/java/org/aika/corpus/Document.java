@@ -212,8 +212,8 @@ public class Document implements Comparable<Document> {
 
         /**
          * The counter callback function should implement a customized counting function.
-         * The counting function should modify the custom statistic object stored in the node.
-         * The NodeStatisticFactory is used to instantiate the custom statistic object for a node.
+         * The counting function should modify the custom meta object stored in the node.
+         * The NodeStatisticFactory is used to instantiate the custom meta object for a node.
          *
          * @param counter
          * @return

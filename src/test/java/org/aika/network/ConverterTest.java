@@ -21,6 +21,7 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Range;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,6 +43,7 @@ public class ConverterTest {
 
         Neuron out = m.initNeuron(m.createNeuron("ABCD"),
                 -9.5,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(4.0)
@@ -103,6 +105,7 @@ public class ConverterTest {
 
         Neuron out = m.initNeuron(m.createNeuron("ABCD"),
                 -5.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0)
@@ -158,6 +161,7 @@ public class ConverterTest {
 
         Neuron out = m.initNeuron(m.createNeuron("ABCD"),
                 -11.0,
+                INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(5.0)

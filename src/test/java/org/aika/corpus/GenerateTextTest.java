@@ -19,6 +19,7 @@ package org.aika.corpus;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
+import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,7 +52,7 @@ public class GenerateTextTest {
 
         // Word aaaaaaa is only added to the resulting text if input a is active and this neuron
         // is not suppressed by another neuron. Output aaaaaaa may start a text.
-        m.initNeuron(outA, 4.0,
+        m.initNeuron(outA, 4.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0)
@@ -72,7 +73,7 @@ public class GenerateTextTest {
         // Word bbb is only added to the resulting text if input b is active and this neuron
         // is not suppressed by another neuron. Output bbb may start a text.
         // Neuron outB has a slightly higher weight than outA.
-        m.initNeuron(outB, 5.0,
+        m.initNeuron(outB, 5.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(10.0)
@@ -92,7 +93,7 @@ public class GenerateTextTest {
 
 
         // OutC is only activated if the previous word was outA.
-        m.initNeuron(outC, 5.0,
+        m.initNeuron(outC, 5.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(outA)
                         .setWeight(10.0)
@@ -111,7 +112,7 @@ public class GenerateTextTest {
         );
 
         // OutD is only activated if the previous word was outB.
-        m.initNeuron(outD, 5.0,
+        m.initNeuron(outD, 5.0, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(outB)
                         .setWeight(10.0)
@@ -131,7 +132,7 @@ public class GenerateTextTest {
 
 
         // All outputs suppress each other.
-        m.initNeuron(suppr, 0.0,
+        m.initNeuron(suppr, 0.0, INeuron.Type.INHIBITORY,
                 new Input()
                         .setNeuron(outA)
                         .setWeight(10.0)

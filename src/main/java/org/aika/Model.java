@@ -21,6 +21,7 @@ import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.INeuron;
+import org.aika.neuron.INeuron.Type;
 import org.aika.neuron.Synapse;
 
 import java.lang.ref.WeakReference;
@@ -53,7 +54,6 @@ public class Model {
 
     public StatisticFactory nodeStatisticFactory;
     public StatisticFactory neuronStatisticFactory;
-    public StatisticFactory synapseStatisticFactory;
 
     public AndNodeCheck andNodeCheck;
 
@@ -120,16 +120,6 @@ public class Model {
 
     public void setNeuronStatisticFactory(StatisticFactory neuronStatisticFactory) {
         this.neuronStatisticFactory = neuronStatisticFactory;
-    }
-
-
-    public StatisticFactory getSynapseStatisticFactory() {
-        return synapseStatisticFactory;
-    }
-
-
-    public void setSynapseStatisticFactory(StatisticFactory synapseStatisticFactory) {
-        this.synapseStatisticFactory = synapseStatisticFactory;
     }
 
 
@@ -283,8 +273,8 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Neuron initNeuron(Neuron n, double bias, Input... inputs) {
-        return initNeuron(n, bias, new TreeSet<>(Arrays.asList(inputs)));
+    public Neuron initNeuron(Neuron n, double bias, Type type, Input... inputs) {
+        return initNeuron(n, bias, type, new TreeSet<>(Arrays.asList(inputs)));
     }
 
 
@@ -296,8 +286,8 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Neuron initNeuron(Neuron n, double bias, String activationFunctionKey, Input... inputs) {
-        return initNeuron(n, bias, activationFunctionKey, new TreeSet<>(Arrays.asList(inputs)));
+    public Neuron initNeuron(Neuron n, double bias, String activationFunctionKey, Type type, Input... inputs) {
+        return initNeuron(n, bias, activationFunctionKey, type, new TreeSet<>(Arrays.asList(inputs)));
     }
 
 
@@ -310,8 +300,8 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Neuron initNeuron(Neuron n, double bias, Collection<Input> inputs) {
-        return initNeuron(n, bias, null, inputs);
+    public Neuron initNeuron(Neuron n, double bias, Type type, Collection<Input> inputs) {
+        return initNeuron(n, bias, null, type, inputs);
     }
 
     /**
@@ -322,7 +312,7 @@ public class Model {
      * @param inputs
      * @return
      */
-    public Neuron initNeuron(Neuron n, double bias, String activationFunctionKey, Collection<Input> inputs) {
+    public Neuron initNeuron(Neuron n, double bias, String activationFunctionKey, Type type, Collection<Input> inputs) {
         List<Synapse> is = new ArrayList<>();
 
         for (Input input : inputs) {
@@ -337,6 +327,11 @@ public class Model {
             INeuron in = n.get();
             in.activationFunction = af;
             in.activationFunctionKey = activationFunctionKey;
+        }
+
+        if(type != null) {
+            INeuron in = n.get();
+            in.type = type;
         }
 
         return INeuron.update(this, defaultThreadId, n, bias, is);
