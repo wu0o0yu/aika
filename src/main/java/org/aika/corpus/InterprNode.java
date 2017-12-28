@@ -102,6 +102,11 @@ public class InterprNode implements Comparable<InterprNode> {
     public NavigableSet<Activation> neuronActivations;
 
 
+    public boolean isPrimitive() {
+        return orInterprNodes == null || orInterprNodes.isEmpty() || (orInterprNodes.size() == 1 || orInterprNodes.contains(doc.bottom));
+    }
+
+
     public enum Relation {
         EQUALS,
         CONTAINS,

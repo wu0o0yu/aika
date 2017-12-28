@@ -343,7 +343,13 @@ public class SearchNode implements Comparable<SearchNode> {
         ArrayList<InterprNode> tmp = new ArrayList<>();
         tmp.add(doc.bottom);
         for(InterprNode pn: doc.bottom.children) {
-            if(pn.fixed == Boolean.TRUE || ((pn.orInterprNodes == null || pn.orInterprNodes.isEmpty()) && pn.conflicts.primary.isEmpty() && pn.conflicts.secondary.isEmpty())) {
+            if(pn.fixed == Boolean.TRUE ||
+                    (
+                            pn.isPrimitive() &&
+                                    pn.conflicts.primary.isEmpty() &&
+                                    pn.conflicts.secondary.isEmpty()
+                    )
+               ) {
                 tmp.add(pn);
             }
         }
