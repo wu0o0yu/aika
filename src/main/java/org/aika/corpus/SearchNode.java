@@ -155,7 +155,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private void reconstructSelectedResult(Document doc) {
-        if(selectedParent != null) selectedParent.reconstructSelectedResult(doc);
+        if(getParent() != null) getParent().reconstructSelectedResult(doc);
 
         changeState(StateChange.Mode.NEW);
 
@@ -343,13 +343,7 @@ public class SearchNode implements Comparable<SearchNode> {
         ArrayList<InterprNode> tmp = new ArrayList<>();
         tmp.add(doc.bottom);
         for(InterprNode pn: doc.bottom.children) {
-            if(pn.fixed == Boolean.TRUE ||
-                    (
-                            pn.isPrimitive() &&
-                                    pn.conflicts.primary.isEmpty() &&
-                                    pn.conflicts.secondary.isEmpty()
-                    )
-               ) {
+            if(pn.fixed == Boolean.TRUE || (pn.isPrimitive() && pn.conflicts.primary.isEmpty() && pn.conflicts.secondary.isEmpty())) {
                 tmp.add(pn);
             }
         }
