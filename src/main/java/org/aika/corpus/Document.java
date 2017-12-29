@@ -623,7 +623,7 @@ public class Document implements Comparable<Document> {
 
                         if (propagate) {
                             if(round > MAX_ROUND) {
-                                log.error("Maximum number of rounds reached.");
+                                log.error("Error: Maximum number of rounds reached. The network might be oscillating.");
                                 sn.dumpDebugState();
                             } else {
                                 propagateWeight(round, act);

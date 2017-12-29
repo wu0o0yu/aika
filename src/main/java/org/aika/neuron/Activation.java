@@ -203,6 +203,13 @@ public final class Activation extends NodeActivation<OrNode> {
         public boolean isQueued(int r) {
             return r < isQueued.length ? isQueued[r] : false;
         }
+
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            rounds.forEach((r, s) -> sb.append(r + ":" + s.value + " "));
+            return sb.toString();
+        }
     }
 
 
