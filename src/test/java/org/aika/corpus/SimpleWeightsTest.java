@@ -23,7 +23,7 @@ import org.aika.Neuron;
 import org.aika.neuron.INeuron;
 import org.junit.Test;
 
-import static org.aika.Input.RangeRelation.EQUALS;
+import static org.aika.corpus.Range.Relation.EQUALS;
 
 /**
  *

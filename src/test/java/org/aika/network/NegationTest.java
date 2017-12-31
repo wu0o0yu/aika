@@ -20,7 +20,7 @@ package org.aika.network;
 import org.aika.Neuron;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
-import org.aika.Input.RangeRelation;
+import org.aika.corpus.Range.Relation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
@@ -31,7 +31,7 @@ import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.aika.Input.RangeRelation.NONE;
+import static org.aika.corpus.Range.Relation.NONE;
 import static org.aika.corpus.Range.Operator.EQUALS;
 
 /**
@@ -78,7 +78,7 @@ public class NegationTest {
         inA.addInput(doc, 0, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
-        Assert.assertNotNull(NodeActivation.get(doc, abcN.get().node.get(), null, new Range(0, 11), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
+        Assert.assertNotNull(NodeActivation.get(doc, abcN.get().node.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
         InterprNode o1 = InterprNode.addPrimitive(doc);
 
@@ -92,7 +92,7 @@ public class NegationTest {
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        Assert.assertNotNull(NodeActivation.get(doc, abcN.get().node.get(), null, new Range(0, 11), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
+        Assert.assertNotNull(NodeActivation.get(doc, abcN.get().node.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
     }
 
 
@@ -192,7 +192,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
@@ -215,7 +215,7 @@ public class NegationTest {
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
+        Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
         doc.clearActivations();
     }
@@ -251,7 +251,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
@@ -259,7 +259,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setRangeMatch(Relation.CONTAINS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -274,7 +274,7 @@ public class NegationTest {
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
+        Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
         doc.clearActivations();
     }
@@ -310,7 +310,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
@@ -318,7 +318,7 @@ public class NegationTest {
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setRangeMatch(Relation.CONTAINS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -333,7 +333,7 @@ public class NegationTest {
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
+        Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
         doc.clearActivations();
     }
@@ -358,7 +358,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(absN)
@@ -366,7 +366,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -379,7 +379,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
@@ -387,7 +387,7 @@ public class NegationTest {
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setRangeMatch(Relation.CONTAINS)
         );
         m.initNeuron(absN,
                 0.001,
@@ -398,7 +398,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
-                        .setBeginToBeginRangeMatch(EQUALS)
+                        .setRangeMatch(EQUALS, Range.Operator.NONE)
                         .setBeginRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
@@ -406,7 +406,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
-                        .setEndToEndRangeMatch(EQUALS)
+                        .setRangeMatch(Range.Operator.NONE, EQUALS)
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
@@ -414,7 +414,7 @@ public class NegationTest {
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.CONTAINS)
+                        .setRangeMatch(Relation.CONTAINS)
         );
 
         {
@@ -427,8 +427,8 @@ public class NegationTest {
 
             System.out.println(doc.neuronActivationsToString(true, false, true));
 
-            Assert.assertNotNull(NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
-            Assert.assertEquals(2, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null).key.interpretation.orInterprNodes.size());
+            Assert.assertNotNull(NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), Relation.EQUALS, null, null));
+            Assert.assertEquals(2, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), Relation.EQUALS, null, null).key.interpretation.orInterprNodes.size());
 
             doc.clearActivations();
         }
@@ -444,10 +444,10 @@ public class NegationTest {
             System.out.println(doc.neuronActivationsToString(true, false, true));
 
 //            Assert.assertNotNull(Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
-            Assert.assertNotNull(NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 9), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
+            Assert.assertNotNull(NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 9), Relation.EQUALS, null, null));
 //            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.interpretation.orInterprNodes.size());
-            Assert.assertEquals(1, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null).key.interpretation.orInterprNodes.size());
-            Assert.assertEquals(1, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 9), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null).key.interpretation.orInterprNodes.size());
+            Assert.assertEquals(1, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), Relation.EQUALS, null, null).key.interpretation.orInterprNodes.size());
+            Assert.assertEquals(1, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 9), Relation.EQUALS, null, null).key.interpretation.orInterprNodes.size());
 
             doc.clearActivations();
         }
@@ -475,7 +475,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(ascN)
@@ -483,7 +483,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(bsN)
@@ -491,7 +491,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -504,7 +504,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
@@ -512,7 +512,7 @@ public class NegationTest {
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
         m.initNeuron(ascN,
@@ -524,7 +524,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inC)
@@ -532,7 +532,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
@@ -540,7 +540,7 @@ public class NegationTest {
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -553,7 +553,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
@@ -561,7 +561,7 @@ public class NegationTest {
                         .setRecurrent(true)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -574,7 +574,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
         Neuron outAC = m.initNeuron(m.createNeuron("OUT AC"),
@@ -586,7 +586,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
         Neuron outB = m.initNeuron(m.createNeuron("OUT B"),
@@ -598,7 +598,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 

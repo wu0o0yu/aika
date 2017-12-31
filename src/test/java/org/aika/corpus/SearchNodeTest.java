@@ -19,6 +19,7 @@ package org.aika.corpus;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
+import org.aika.corpus.Range.Relation;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -50,14 +51,14 @@ public class SearchNodeTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRelativeRid(0)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(false)
         );
         m.initNeuron(eZimmermannCompany, 5.0, INeuron.Type.EXCITATORY,
@@ -66,14 +67,14 @@ public class SearchNodeTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRelativeRid(0)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(false)
         );
 
@@ -83,7 +84,7 @@ public class SearchNodeTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRelativeRid(0)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(eZimmermannSurname)
@@ -91,14 +92,14 @@ public class SearchNodeTest {
                         .setBias(-10.0)
                         .setRelativeRid(1)
                         .setRecurrent(true)
-                        .setRangeMatch(Input.RangeRelation.NONE)
+                        .setRangeMatch(Relation.NONE)
                         .setRangeOutput(false),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(false)
         );
 
@@ -108,7 +109,7 @@ public class SearchNodeTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRelativeRid(0)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(eJoergForename)
@@ -116,14 +117,14 @@ public class SearchNodeTest {
                         .setBias(-10.0)
                         .setRelativeRid(-1)
                         .setRecurrent(true)
-                        .setRangeMatch(Input.RangeRelation.NONE)
+                        .setRangeMatch(Relation.NONE)
                         .setRangeOutput(false),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(false)
         );
 
@@ -133,25 +134,25 @@ public class SearchNodeTest {
                         .setNeuron(eJoergForename)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(eJoergSurname)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(eZimmermannCompany)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(eZimmermannSurname)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 

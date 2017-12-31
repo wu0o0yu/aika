@@ -180,10 +180,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                 secondNode,
                 secondRid,
                 ak.range,
-                computeBeginToBeginRangeMatch(firstNode.key, secondNode.key),
-                computeBeginToEndRangeMatch(firstNode.key, secondNode.key),
-                computeEndToEndRangeMatch(firstNode.key, secondNode.key),
-                computeEndToBeginRangeMatch(firstNode.key, secondNode.key),
+                computeRangeMatch(firstNode.key, secondNode.key),
                 null,
                 null
         );
@@ -209,33 +206,23 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    private static Operator computeBeginToBeginRangeMatch(Key k1, Key k2) {
+    // TODO: refactor
+    private static Range.Relation computeRangeMatch(Key k1, Key k2) {
+        Range.Relation rr = new Range.Relation();
+
         if (k2.beginRangeOutput) {
-            return k1.beginToBeginRangeMatch;
+            rr.beginToBegin = k1.rangeMatch.beginToBegin;
         } else if (k1.beginRangeOutput) {
-            return Operator.invert(k2.beginToBeginRangeMatch);
+            rr.beginToBegin = Operator.invert(k2.rangeMatch.beginToBegin);
         }
-        return NONE;
-    }
 
-
-    private static Operator computeBeginToEndRangeMatch(Key k1, Key k2) {
-        return NONE; // TODO:
-    }
-
-
-    private static Operator computeEndToEndRangeMatch(Key k1, Key k2) {
         if (k2.endRangeOutput) {
-            return k1.endToEndRangeMatch;
+            rr.endToEnd = k1.rangeMatch.endToEnd;
         } else if (k1.endRangeOutput) {
-            return Operator.invert(k2.endToEndRangeMatch);
+            rr.endToEnd = Operator.invert(k2.rangeMatch.endToEnd);
         }
-        return NONE;
-    }
 
-
-    private static Operator computeEndToBeginRangeMatch(Key k1, Key k2) {
-        return NONE; // TODO:
+        return rr;
     }
 
 
@@ -248,8 +235,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                 for (NodeActivation secondAct : secondNAct.outputs.values()) {
                     Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.node.provider);
                     InputNode in = ref.input.get(doc);
-                    Operator srm = computeBeginToBeginRangeMatch(key, in.key);
-                    Operator erm = computeEndToEndRangeMatch(key, in.key);
+                    Range.Relation rm = computeRangeMatch(key, in.key);
 
                     if (act != secondAct &&
                             this != in &&
@@ -257,8 +243,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                             !in.key.isRecurrent &&
                             !(key.beginRangeOutput && in.key.beginRangeOutput) &&
                             !(key.endRangeOutput && in.key.endRangeOutput) &&
-                            srm.compare(secondAct.key.range.begin, act.key.range.begin) &&
-                            erm.compare(secondAct.key.range.end, act.key.range.end)
+                            rm.compare(secondAct.key.range, act.key.range)
                         ) {
                         in.visitedDiscover = v;
                         AndNode nln = AndNode.createNextLevelNode(doc.model, doc.threadId, this, ref, discoveryConfig);

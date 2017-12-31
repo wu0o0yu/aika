@@ -18,7 +18,7 @@ package org.aika.lattice;
 
 
 import org.aika.*;
-import org.aika.Input.RangeRelation;
+import org.aika.corpus.Range.Relation;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
@@ -55,21 +55,21 @@ public class PatternLatticeTest {
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
-                            .setRangeMatch(RangeRelation.EQUALS)
+                            .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inB)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
-                            .setRangeMatch(RangeRelation.EQUALS)
+                            .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inC)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
-                            .setRangeMatch(RangeRelation.EQUALS)
+                            .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true)
             );
 
@@ -111,21 +111,21 @@ public class PatternLatticeTest {
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
-                            .setRangeMatch(RangeRelation.EQUALS)
+                            .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inC)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
-                            .setRangeMatch(RangeRelation.EQUALS)
+                            .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inD)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
-                            .setRangeMatch(RangeRelation.EQUALS)
+                            .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true)
             );
 
@@ -176,28 +176,28 @@ public class PatternLatticeTest {
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
-                            .setRangeMatch(RangeRelation.EQUALS)
+                            .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inB)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
-                            .setRangeMatch(RangeRelation.EQUALS)
+                            .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inC)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
-                            .setRangeMatch(RangeRelation.EQUALS)
+                            .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
                     new Input()
                             .setNeuron(inD)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
-                            .setRangeMatch(RangeRelation.EQUALS)
+                            .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true)
             );
 

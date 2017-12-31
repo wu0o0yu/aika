@@ -20,6 +20,7 @@ package org.aika.network;
 import org.aika.*;
 import org.aika.corpus.Document;
 import org.aika.neuron.INeuron;
+import org.aika.corpus.Range.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -74,7 +75,7 @@ public class SuspensionTest {
                         .setBias(-9.0)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setBeginToBeginRangeMatch(EQUALS)
+                        .setRangeMatch(Relation.BEGIN_EQUALS)
                         .setBeginRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
@@ -82,7 +83,7 @@ public class SuspensionTest {
                         .setBias(-9.0)
                         .setRelativeRid(null)
                         .setRecurrent(false)
-                        .setEndToEndRangeMatch(EQUALS)
+                        .setRangeMatch(Relation.END_EQUALS)
                         .setEndRangeOutput(true)
         );
 
@@ -95,7 +96,7 @@ public class SuspensionTest {
                         .setWeight(10.0)
                         .setBias(-9.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 

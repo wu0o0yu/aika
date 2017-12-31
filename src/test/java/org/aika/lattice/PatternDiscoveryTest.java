@@ -32,6 +32,10 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static org.aika.corpus.Range.Operator.EQUALS;
+import static org.aika.corpus.Range.Operator.GREATER_THAN_EQUAL;
+import static org.aika.corpus.Range.Operator.LESS_THAN_EQUAL;
+
 /**
  *
  * @author Lukas Molzberger
@@ -418,12 +422,9 @@ public class PatternDiscoveryTest {
                         false,
                         0,
                         null,
-                        Range.Operator.EQUALS,
-                        Range.Operator.NONE,
+                        Range.Relation.create(EQUALS, GREATER_THAN_EQUAL),
                         Range.Mapping.BEGIN,
                         true,
-                        Range.Operator.GREATER_THAN_EQUAL,
-                        Range.Operator.NONE,
                         Range.Mapping.END,
                         false
                 ),
@@ -435,12 +436,9 @@ public class PatternDiscoveryTest {
                         false,
                         0,
                         null,
-                        Range.Operator.LESS_THAN_EQUAL,
-                        Range.Operator.NONE,
+                        Range.Relation.create(LESS_THAN_EQUAL, EQUALS),
                         Range.Mapping.BEGIN,
                         false,
-                        Range.Operator.EQUALS,
-                        Range.Operator.NONE,
                         Range.Mapping.END,
                         true
                 ),

@@ -22,7 +22,7 @@ import org.aika.lattice.NodeActivation;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
-import org.aika.corpus.Range.Operator;
+import org.aika.corpus.Range.Relation;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
@@ -43,29 +43,26 @@ public class TestHelper {
         in.addActivation(doc, inputAct);
         doc.propagate();
         if(in instanceof InputNode) {
-            return NodeActivation.get(doc, in, inputAct.key.rid, inputAct.key.range, LESS_THAN_EQUAL, NONE, GREATER_THAN_EQUAL, NONE, inputAct.key.interpretation, InterprNode.Relation.EQUALS);
+            return NodeActivation.get(doc, in, inputAct.key.rid, inputAct.key.range, Relation.CONTAINS, inputAct.key.interpretation, InterprNode.Relation.EQUALS);
         }
         return null;
     }
 
 
     public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, boolean ro) {
-        return addOutputNode(doc, n, relativeRid, absoluteRid, EQUALS, BEGIN, ro, EQUALS, END, ro);
+        return addOutputNode(doc, n, relativeRid, absoluteRid, Relation.EQUALS, BEGIN, ro, END, ro);
     }
 
 
-    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, Operator beginToBeginRangeMatch, Mapping beginMapping, boolean beginRangeOutput, Operator endToEndRangeMatch, Mapping endMapping, boolean endRangeOutput) {
+    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, Relation rangeMatch, Mapping beginMapping, boolean beginRangeOutput, Mapping endMapping, boolean endRangeOutput) {
         return InputNode.add(doc.model,
                 new Synapse.Key(
                         false,
                         relativeRid,
                         absoluteRid,
-                        beginToBeginRangeMatch,
-                        NONE,
+                        rangeMatch,
                         beginMapping,
                         beginRangeOutput,
-                        endToEndRangeMatch,
-                        NONE,
                         endMapping,
                         endRangeOutput
                 ),
@@ -74,6 +71,6 @@ public class TestHelper {
     }
 
     public static <T extends Node, A extends NodeActivation<T>> A get(Document doc, T n, Range r, InterprNode o) {
-        return NodeActivation.get(doc, n, null, r, LESS_THAN_EQUAL, NONE, GREATER_THAN_EQUAL, NONE, o, InterprNode.Relation.EQUALS);
+        return NodeActivation.get(doc, n, null, r, Relation.CONTAINS, o, InterprNode.Relation.EQUALS);
     }
 }

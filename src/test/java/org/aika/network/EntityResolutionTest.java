@@ -25,8 +25,8 @@ import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.aika.Input.RangeRelation.EQUALS;
-import static org.aika.Input.RangeRelation.NONE;
+import static org.aika.corpus.Range.Relation.EQUALS;
+import static org.aika.corpus.Range.Relation.NONE;
 
 /**
  *

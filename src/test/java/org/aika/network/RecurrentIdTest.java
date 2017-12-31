@@ -20,7 +20,7 @@ package org.aika.network;
 import org.aika.Neuron;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
-import org.aika.Input.RangeRelation;
+import org.aika.corpus.Range.Relation;
 import org.aika.Model;
 import org.aika.neuron.Activation;
 import org.aika.corpus.Document;
@@ -60,7 +60,7 @@ public class RecurrentIdTest {
                         .setRecurrent(false)
                         .setBias(-1.0)
                         .setRelativeRid(0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
@@ -68,7 +68,7 @@ public class RecurrentIdTest {
                         .setRecurrent(false)
                         .setBias(-1.0)
                         .setRelativeRid(1)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         ).get().node.get();
 
@@ -78,7 +78,7 @@ public class RecurrentIdTest {
         inA.addInput(doc, 0, 1, 20);
         inB.addInput(doc, 0, 1, 21);
 
-        Activation outC1 = NodeActivation.get(doc, outCNode, 20, new Range(0, 1), LESS_THAN_EQUAL, NONE, GREATER_THAN_EQUAL, NONE, null, null);
+        Activation outC1 = NodeActivation.get(doc, outCNode, 20, new Range(0, 1), Relation.CONTAINS, null, null);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -103,7 +103,7 @@ public class RecurrentIdTest {
                         .setRecurrent(false)
                         .setBias(-1.0)
                         .setRelativeRid(3)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
@@ -111,7 +111,7 @@ public class RecurrentIdTest {
                         .setRecurrent(false)
                         .setBias(-1.0)
                         .setRelativeRid(0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inC)
@@ -119,7 +119,7 @@ public class RecurrentIdTest {
                         .setRecurrent(false)
                         .setBias(-1.0)
                         .setRelativeRid(6)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         ).get().node.get();
 
@@ -129,7 +129,7 @@ public class RecurrentIdTest {
         inB.addInput(doc, 0, 1, 10);
         inC.addInput(doc, 0, 1, 16);
 
-        Activation outD1 = NodeActivation.get(doc, outDNode, 10, new Range(0, 1), EQUALS, NONE, EQUALS, NONE, null, null);
+        Activation outD1 = NodeActivation.get(doc, outDNode, 10, new Range(0, 1), Relation.EQUALS, null, null);
 
         Assert.assertNotNull(outD1);
     }
@@ -163,8 +163,7 @@ public class RecurrentIdTest {
                                 .setRecurrent(false)
                                 .setBias(begin || end ? -2.0 : -1.0)
                                 .setRelativeRid(i)
-                                .setBeginToBeginRangeMatch(begin ? EQUALS : LESS_THAN_EQUAL)
-                                .setEndToEndRangeMatch(end ? EQUALS : GREATER_THAN_EQUAL)
+                                .setRangeMatch(begin ? EQUALS : LESS_THAN_EQUAL, end ? EQUALS : GREATER_THAN_EQUAL)
                                 .setBeginRangeOutput(begin)
                                 .setEndRangeOutput(end)
                     );

@@ -84,12 +84,9 @@ public class MetaNetwork {
                                     osk.relativeRid :
                                     (ss.metaRelativeRid && ridOffset != null && rid != null ? rid - ridOffset : null),
                             osk.absoluteRid,
-                            osk.beginToBeginRangeMatch,
-                            osk.beginToEndRangeMatch,
+                            osk.rangeMatch,
                             osk.beginRangeMapping,
                             osk.beginRangeOutput,
-                            osk.endToEndRangeMatch,
-                            osk.endToBeginRangeMatch,
                             osk.endRangeMapping,
                             osk.endRangeOutput
                     );
@@ -119,10 +116,9 @@ public class MetaNetwork {
                             .setRelativeRid(inhibSynKey.relativeRid)
                             .setAbsoluteRid(inhibSynKey.absoluteRid)
                             .setStartRangeMapping(inhibSynKey.beginRangeMapping)
-                            .setBeginToBeginRangeMatch(inhibSynKey.beginToBeginRangeMatch)
+                            .setRangeMatch(inhibSynKey.rangeMatch)
                             .setBeginRangeOutput(inhibSynKey.beginRangeOutput)
                             .setEndRangeMapping(inhibSynKey.endRangeMapping)
-                            .setEndToEndRangeMatch(inhibSynKey.endToEndRangeMatch)
                             .setEndRangeOutput(inhibSynKey.endRangeOutput)
             );
 

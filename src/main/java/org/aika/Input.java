@@ -16,6 +16,8 @@
  */
 package org.aika;
 
+import org.aika.corpus.Range;
+import org.aika.corpus.Range.Relation;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.neuron.Synapse;
@@ -33,10 +35,7 @@ public class Input implements Comparable<Input> {
     double weight;
     double bias;
 
-    Operator beginToBeginRangeMatch = Operator.NONE;
-    Operator beginToEndRangeMatch = Operator.NONE;
-    Operator endToEndRangeMatch = Operator.NONE;
-    Operator endToBeginRangeMatch = Operator.NONE;
+    Relation rangeMatch = Relation.NONE;
     boolean beginRangeOutput;
     boolean endRangeOutput;
     Mapping beginMapping = Mapping.BEGIN;
@@ -120,54 +119,6 @@ public class Input implements Comparable<Input> {
         return this;
     }
 
-    /**
-     * If set to true then the range begin of this inputs activation needs to match.
-     *
-     * @return
-     */
-    public Input setBeginToBeginRangeMatch(Operator rm) {
-        this.beginToBeginRangeMatch = rm;
-        return this;
-    }
-
-    /**
-     * If set to true then the range begin of this inputs activation needs to match.
-     *
-     * @return
-     */
-    public Input setBeginToEndRangeMatch(Operator rm) {
-        this.beginToEndRangeMatch = rm;
-        return this;
-    }
-
-    /**
-     * If set to true then the range end of this inputs activation needs to match.
-     *
-     * @return
-     */
-    public Input setEndToEndRangeMatch(Operator rm) {
-        this.endToEndRangeMatch = rm;
-        return this;
-    }
-
-    /**
-     * If set to true then the range end of this inputs activation needs to match.
-     *
-     * @return
-     */
-    public Input setEndToBeginRangeMatch(Operator rm) {
-        this.endToBeginRangeMatch = rm;
-        return this;
-    }
-
-
-    public enum RangeRelation {
-        EQUALS,
-        CONTAINS,
-        CONTAINED_IN,
-        NONE
-    }
-
 
     /**
      * <code>setRangeMatch</code> is just a convenience function to call both <code>setBeginToBeginRangeMatch</code> and <code>setEndToEndRangeMatch</code> at the same time.
@@ -175,24 +126,21 @@ public class Input implements Comparable<Input> {
      * @param rr
      * @return
      */
-    public Input setRangeMatch(RangeRelation rr) {
-        switch(rr) {
-            case EQUALS:
-                setBeginToBeginRangeMatch(Operator.EQUALS);
-                setEndToEndRangeMatch(Operator.EQUALS);
-                break;
-            case CONTAINS:
-                setBeginToBeginRangeMatch(Operator.LESS_THAN_EQUAL);
-                setEndToEndRangeMatch(Operator.GREATER_THAN_EQUAL);
-                break;
-            case CONTAINED_IN:
-                setBeginToBeginRangeMatch(Operator.GREATER_THAN_EQUAL);
-                setEndToEndRangeMatch(Operator.LESS_THAN_EQUAL);
-                break;
-            default:
-                setBeginToBeginRangeMatch(Operator.NONE);
-                setEndToEndRangeMatch(Operator.NONE);
-        }
+    public Input setRangeMatch(Relation rr) {
+        rangeMatch = rr;
+        return this;
+    }
+
+
+    /**
+     * <code>setRangeMatch</code> is just a convenience function to call both <code>setBeginToBeginRangeMatch</code> and <code>setEndToEndRangeMatch</code> at the same time.
+     *
+     * @param beginToBegin
+     * @param endToEnd
+     * @return
+     */
+    public Input setRangeMatch(Operator beginToBegin, Operator endToEnd) {
+        rangeMatch = Range.Relation.create(beginToBegin, endToEnd);
         return this;
     }
 
@@ -270,12 +218,9 @@ public class Input implements Comparable<Input> {
                         recurrent,
                         relativeRid,
                         absoluteRid,
-                        beginToBeginRangeMatch,
-                        beginToEndRangeMatch,
+                        rangeMatch,
                         beginMapping,
                         beginRangeOutput,
-                        endToEndRangeMatch,
-                        endToBeginRangeMatch,
                         endMapping,
                         endRangeOutput
                 )
@@ -295,13 +240,7 @@ public class Input implements Comparable<Input> {
     public int compareTo(Input in) {
         int r = neuron.compareTo(in.neuron);
         if(r != 0) return r;
-        r = beginToBeginRangeMatch.compareTo(in.beginToBeginRangeMatch);
-        if(r != 0) return r;
-        r = beginToEndRangeMatch.compareTo(in.beginToEndRangeMatch);
-        if(r != 0) return r;
-        r = endToEndRangeMatch.compareTo(in.endToEndRangeMatch);
-        if(r != 0) return r;
-        r = endToBeginRangeMatch.compareTo(in.endToBeginRangeMatch);
+        r = rangeMatch.compareTo(in.rangeMatch);
         if(r != 0) return r;
         r = Utils.compareInteger(relativeRid, in.relativeRid);
         if (r != 0) return r;

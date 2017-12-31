@@ -20,7 +20,7 @@ package org.aika.network;
 import org.aika.Neuron;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
-import org.aika.Input.RangeRelation;
+import org.aika.corpus.Range.Relation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
@@ -67,8 +67,7 @@ public class OverlappingOrTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-4.0)
-                        .setBeginToBeginRangeMatch(Operator.EQUALS)
-                        .setEndToEndRangeMatch(Operator.GREATER_THAN_EQUAL)
+                        .setRangeMatch(Operator.EQUALS, Operator.GREATER_THAN_EQUAL)
                         .setBeginRangeOutput(true),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
@@ -76,15 +75,14 @@ public class OverlappingOrTest {
                         .setRecurrent(false)
                         .setRelativeRid(1)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.CONTAINS),
+                        .setRangeMatch(Relation.CONTAINS),
                 new Input()
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(4.0)
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setBias(-4.0)
-                        .setBeginToBeginRangeMatch(Operator.LESS_THAN_EQUAL)
-                        .setEndToEndRangeMatch(Operator.EQUALS)
+                        .setRangeMatch(Operator.LESS_THAN_EQUAL, Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
 

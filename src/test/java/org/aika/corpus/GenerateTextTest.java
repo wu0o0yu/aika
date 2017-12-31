@@ -16,16 +16,17 @@
  */
 package org.aika.corpus;
 
+import org.aika.ActivationFunction;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.neuron.INeuron;
+import org.aika.corpus.Range.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.aika.corpus.Range.Mapping.END;
 import static org.aika.corpus.Range.Mapping.NONE;
-import static org.aika.corpus.Range.Mapping.BEGIN;
+
 
 /**
  *
@@ -64,10 +65,7 @@ public class GenerateTextTest {
                         .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setStartRangeMapping(END)   // Check if the suppressing activation and the outA activation are overlapping each other.
-                        .setEndRangeMapping(BEGIN)
-                        .setBeginToBeginRangeMatch(Range.Operator.LESS_THAN)
-                        .setEndToEndRangeMatch(Range.Operator.GREATER_THAN)
+                        .setRangeMatch(Relation.OVERLAPS)
         );
 
         // Word bbb is only added to the resulting text if input b is active and this neuron
@@ -85,10 +83,7 @@ public class GenerateTextTest {
                         .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setStartRangeMapping(END)
-                        .setEndRangeMapping(BEGIN)
-                        .setBeginToBeginRangeMatch(Range.Operator.LESS_THAN)
-                        .setEndToEndRangeMatch(Range.Operator.GREATER_THAN)
+                        .setRangeMatch(Relation.OVERLAPS)
         );
 
 
@@ -105,10 +100,7 @@ public class GenerateTextTest {
                         .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setStartRangeMapping(END)
-                        .setEndRangeMapping(BEGIN)
-                        .setBeginToBeginRangeMatch(Range.Operator.LESS_THAN)
-                        .setEndToEndRangeMatch(Range.Operator.GREATER_THAN)
+                        .setRangeMatch(Relation.OVERLAPS)
         );
 
         // OutD is only activated if the previous word was outB.
@@ -124,38 +116,35 @@ public class GenerateTextTest {
                         .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setStartRangeMapping(END)
-                        .setEndRangeMapping(BEGIN)
-                        .setBeginToBeginRangeMatch(Range.Operator.LESS_THAN)
-                        .setEndToEndRangeMatch(Range.Operator.GREATER_THAN)
+                        .setRangeMatch(Relation.OVERLAPS)
         );
 
 
         // All outputs suppress each other.
-        m.initNeuron(suppr, 0.0, INeuron.Type.INHIBITORY,
+        m.initNeuron(suppr, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT_KEY, INeuron.Type.INHIBITORY,
                 new Input()
                         .setNeuron(outA)
-                        .setWeight(10.0)
+                        .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(outB)
-                        .setWeight(10.0)
+                        .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(outC)
-                        .setWeight(10.0)
+                        .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(outD)
-                        .setWeight(10.0)
+                        .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeMatch(Input.RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 

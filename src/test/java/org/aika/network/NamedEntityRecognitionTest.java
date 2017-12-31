@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
-import static org.aika.Input.RangeRelation.*;
+import static org.aika.corpus.Range.Relation.*;
 
 /**
  *

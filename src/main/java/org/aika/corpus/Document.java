@@ -341,7 +341,7 @@ public class Document implements Comparable<Document> {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         for (INeuron n : activatedNeurons) {
-            Stream<Activation> s = NodeActivation.select(this, n.node.get(), null, null, null, null, null, null, null, InterprNode.Relation.CONTAINED_IN);
+            Stream<Activation> s = NodeActivation.select(this, n.node.get(), null, null, null, null, InterprNode.Relation.CONTAINED_IN);
             acts.addAll(s.collect(Collectors.toList()));
         }
 
@@ -407,7 +407,7 @@ public class Document implements Comparable<Document> {
         Set<NodeActivation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         for(Node<?, NodeActivation<?>> n: activatedNodes) {
-            acts.addAll(NodeActivation.select(this, n, null, null, null, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
+            acts.addAll(NodeActivation.select(this, n, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
         }
         StringBuilder sb = new StringBuilder();
         for(NodeActivation act: acts) {

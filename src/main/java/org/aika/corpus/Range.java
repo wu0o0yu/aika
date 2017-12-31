@@ -16,7 +16,21 @@
  */
 package org.aika.corpus;
 
+import com.sun.org.apache.regexp.internal.RE;
+import org.aika.Model;
 import org.aika.Utils;
+import org.aika.Writable;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import static org.aika.corpus.Range.Operator.GREATER_THAN_EQUAL;
+import static org.aika.corpus.Range.Operator.LESS_THAN_EQUAL;
+import static org.aika.corpus.Range.Operator.NONE;
 
 /**
  * The class {@code Range} specifies a text range (begin char pos, end char pos) within a given document.
@@ -123,6 +137,96 @@ public class Range {
         if(a != 0) return a;
         int b = Integer.compare(ra.end, rb.end);
         return b;
+    }
+
+
+    public static class Relation implements Writable, Comparable<Relation> {
+        private static SortedMap<Relation, Relation> map = new TreeMap();
+
+        public static Relation EQUALS = create(Operator.EQUALS, Operator.EQUALS);
+        public static Relation BEGIN_EQUALS = create(Operator.EQUALS, Operator.NONE);
+        public static Relation END_EQUALS = create(Operator.NONE, Operator.EQUALS);
+        public static Relation CONTAINS = create(Operator.LESS_THAN_EQUAL, Operator.GREATER_THAN_EQUAL);
+        public static Relation CONTAINED_IN = create(Operator.GREATER_THAN_EQUAL, Operator.LESS_THAN_EQUAL);
+        public static Relation OVERLAPS = create(Operator.NONE, Operator.LESS_THAN, Operator.NONE, Operator.GREATER_THAN);
+        public static Relation NONE = create(Operator.NONE, Operator.NONE);
+
+
+        public Operator beginToBegin = Operator.NONE;
+        public Operator beginToEnd = Operator.NONE;
+        public Operator endToEnd = Operator.NONE;
+        public Operator endToBegin = Operator.NONE;
+
+        public Relation() {}
+
+        private Relation(Operator beginToBegin, Operator beginToEnd, Operator endToEnd, Operator endToBegin) {
+            this.beginToBegin = beginToBegin;
+            this.beginToEnd = beginToEnd;
+            this.endToEnd = endToEnd;
+            this.endToBegin = endToBegin;
+        }
+
+
+        public static Relation create(Operator beginToBegin, Operator beginToEnd, Operator endToEnd, Operator endToBegin) {
+            return lookup(new Relation(beginToBegin, beginToEnd, endToEnd, endToBegin));
+        }
+
+
+        public static Relation create(Operator beginToBegin, Operator endToEnd) {
+            return create(beginToBegin, Operator.NONE, endToEnd, Operator.NONE);
+        }
+
+
+        public boolean compare(Range ra, Range rb) {
+            return beginToBegin.compare(ra.begin, rb.begin) &&
+                    beginToEnd.compare(ra.begin, rb.end) &&
+                    endToEnd.compare(ra.end, rb.end) &&
+                    endToBegin.compare(ra.end, rb.begin);
+        }
+
+        @Override
+        public int compareTo(Relation rr) {
+            int r = beginToBegin.compareTo(rr.beginToBegin);
+            if(r != 0) return r;
+            r = beginToEnd.compareTo(rr.beginToEnd);
+            if(r != 0) return r;
+            r = endToEnd.compareTo(rr.endToEnd);
+            if(r != 0) return r;
+            r = endToBegin.compareTo(rr.endToBegin);
+            return r;
+        }
+
+
+        public static Relation lookup(Relation r) {
+            Relation rr = map.get(r);
+            if(rr == null) {
+                rr = r;
+                map.put(r, r);
+            }
+            return rr;
+        }
+
+        @Override
+        public void write(DataOutput out) throws IOException {
+            out.writeByte(beginToBegin.getId());
+            out.writeByte(beginToEnd.getId());
+            out.writeByte(endToEnd.getId());
+            out.writeByte(endToBegin.getId());
+        }
+
+        public static Relation read(DataInput in, Model m) throws IOException {
+            Relation r = new Relation();
+            r.readFields(in, m);
+            return lookup(r);
+        }
+
+        @Override
+        public void readFields(DataInput in, Model m) throws IOException {
+            beginToBegin = Operator.getById(in.readByte());
+            beginToEnd = Operator.getById(in.readByte());
+            endToEnd = Operator.getById(in.readByte());
+            endToBegin = Operator.getById(in.readByte());
+        }
     }
 
 

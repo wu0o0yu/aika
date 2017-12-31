@@ -58,12 +58,9 @@ public class SynapseRangeRelationTest {
                         false,
                         null,
                         null,
-                        LESS_THAN_EQUAL,
-                        NONE,
+                        Range.Relation.CONTAINS,
                         Mapping.BEGIN,
                         true,
-                        GREATER_THAN_EQUAL,
-                        NONE,
                         Mapping.END,
                         true
                 )

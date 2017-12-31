@@ -3,8 +3,8 @@ package org.aika.corpus;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
+import org.aika.corpus.Range.Relation;
 import org.aika.neuron.INeuron;
-import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -16,24 +16,24 @@ public class RangeComparisonTest {
     @Test
     public void testRangeComparison() {
 
-        testSynapse(new Range(0, 10), new Range(0, 10), EQUALS, NONE, EQUALS, NONE, true);
-        testSynapse(new Range(0, 20), new Range(5, 15), GREATER_THAN_EQUAL, NONE, LESS_THAN_EQUAL, NONE, true);
+        testSynapse(new Range(0, 10), new Range(0, 10), Relation.EQUALS, true);
+        testSynapse(new Range(0, 20), new Range(5, 15), Relation.CONTAINED_IN, true);
 
         // Overlaps
-        testSynapse(new Range(0, 10), new Range(5, 15), NONE, LESS_THAN_EQUAL, NONE, GREATER_THAN_EQUAL, true);
-        testSynapse(new Range(0, 20), new Range(5, 15), NONE, LESS_THAN_EQUAL, NONE, GREATER_THAN_EQUAL, true);
-        testSynapse(new Range(0, 5), new Range(10, 15), NONE, LESS_THAN_EQUAL, NONE, GREATER_THAN_EQUAL, false);
+        testSynapse(new Range(0, 10), new Range(5, 15), Relation.OVERLAPS, true);
+        testSynapse(new Range(0, 20), new Range(5, 15), Relation.OVERLAPS, true);
+        testSynapse(new Range(0, 5), new Range(10, 15), Relation.OVERLAPS, false);
 
         // Overlaps but does not contain
-        testSynapse(new Range(0, 10), new Range(5, 15), GREATER_THAN, LESS_THAN, GREATER_THAN, GREATER_THAN, true);
-        testSynapse(new Range(0, 20), new Range(5, 15), GREATER_THAN, LESS_THAN, GREATER_THAN, GREATER_THAN, false);
-        testSynapse(new Range(5, 15), new Range(0, 20), GREATER_THAN, LESS_THAN, GREATER_THAN, GREATER_THAN, false);
+        testSynapse(new Range(0, 10), new Range(5, 15), Relation.create(GREATER_THAN, LESS_THAN, GREATER_THAN, GREATER_THAN), true);
+        testSynapse(new Range(0, 20), new Range(5, 15), Relation.create(GREATER_THAN, LESS_THAN, GREATER_THAN, GREATER_THAN), false);
+        testSynapse(new Range(5, 15), new Range(0, 20), Relation.create(GREATER_THAN, LESS_THAN, GREATER_THAN, GREATER_THAN), false);
 
     }
 
 
 
-    public void testSynapse(Range ra, Range rb, Range.Operator bb, Range.Operator be, Range.Operator ee, Range.Operator eb, boolean targetValue) {
+    public void testSynapse(Range ra, Range rb, Relation rr, boolean targetValue) {
         for (int dir = 0; dir < 2; dir++) {
             Model m = new Model();
 
@@ -47,18 +47,12 @@ public class RangeComparisonTest {
                             .setNeuron(na)
                             .setWeight(1.0)
                             .setBias(0.0)
-                            .setBeginToBeginRangeMatch(bb)
-                            .setBeginToEndRangeMatch(be)
-                            .setEndToEndRangeMatch(ee)
-                            .setEndToBeginRangeMatch(eb),
+                            .setRangeMatch(rr),
                     new Input()
                             .setNeuron(nb)
                             .setWeight(10.0)
                             .setBias(-10.0)
-                            .setBeginToBeginRangeMatch(EQUALS)
-                            .setBeginToEndRangeMatch(NONE)
-                            .setEndToEndRangeMatch(EQUALS)
-                            .setEndToBeginRangeMatch(NONE)
+                            .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true)
             );
 

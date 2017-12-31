@@ -30,7 +30,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static org.aika.Input.RangeRelation.EQUALS;
+import static org.aika.corpus.Range.Relation.EQUALS;
 
 /**
  *

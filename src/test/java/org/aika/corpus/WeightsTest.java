@@ -20,12 +20,11 @@ package org.aika.corpus;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
-import org.aika.lattice.AndNode;
 import org.aika.neuron.INeuron;
 import org.junit.Test;
 
-import static org.aika.Input.RangeRelation.CONTAINED_IN;
-import static org.aika.Input.RangeRelation.EQUALS;
+import static org.aika.corpus.Range.Relation.CONTAINED_IN;
+import static org.aika.corpus.Range.Relation.EQUALS;
 
 /**
  *

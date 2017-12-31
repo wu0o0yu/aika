@@ -18,7 +18,7 @@ package org.aika.network;
 
 
 import org.aika.Input;
-import org.aika.Input.RangeRelation;
+import org.aika.corpus.Range.Relation;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
@@ -55,21 +55,21 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setBias(-45.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(weakInputA)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setRecurrent(true)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -82,21 +82,21 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setBias(-45.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(weakInputB)
                         .setWeight(1.5f)
                         .setRecurrent(false)
                         .setBias(-1.5)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setRecurrent(true)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -109,21 +109,21 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setBias(-45.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(weakInputC)
                         .setWeight(0.5f)
                         .setRecurrent(false)
                         .setBias(-0.5)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setRecurrent(true)
                         .setBias(0.0)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -136,21 +136,21 @@ public class WeakInputProcessingTest {
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(patternB)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(patternC)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(RangeRelation.EQUALS)
+                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
