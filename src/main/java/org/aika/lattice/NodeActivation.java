@@ -238,7 +238,7 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
 
 
         public String toString() {
-            return (node != null ? node.getNeuronLabel() : "") + range + " " + rid + " " + interpretation;
+            return (node != null ? node.getNeuronLabel() : "") + " " + range + " " + rid + " " + interpretation;
         }
     }
 }
