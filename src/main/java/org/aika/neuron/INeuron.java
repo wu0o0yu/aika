@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.aika.corpus.Range.Mapping.END;
-import static org.aika.corpus.Range.Mapping.START;
+import static org.aika.corpus.Range.Mapping.BEGIN;
 import static org.aika.corpus.Range.Operator.*;
 import static org.aika.neuron.Activation.State.*;
 
@@ -153,7 +153,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         doc.propagate();
 
-        Activation act = NodeActivation.get(doc, node.get(doc), rid, new Range(begin, end), EQUALS, EQUALS, o, InterprNode.Relation.EQUALS);
+        Activation act = NodeActivation.get(doc, node.get(doc), rid, new Range(begin, end), EQUALS, NONE, EQUALS, NONE, o, InterprNode.Relation.EQUALS);
         State s = new State(value, 0, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.inputValue = value;
@@ -520,26 +520,34 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
 
-        Operator begin = sk.startRangeMatch;
-        Operator end = sk.endRangeMatch;
+        Operator beginToBegin = sk.beginToBeginRangeMatch;
+        Operator beginToEnd = sk.beginToEndRangeMatch;
+        Operator endToEnd = sk.endToEndRangeMatch;
+        Operator endToBegin = sk.endToBeginRangeMatch;
         Range r = act.key.range;
         if (dir == 0) {
-            Operator tb = begin;
-            Operator te = end;
-            begin = Operator.invert(sk.startRangeMapping == START ? tb : (sk.endRangeMapping == START ? te : NONE));
-            end = Operator.invert(sk.endRangeMapping == END ? te : (sk.startRangeMapping == END ? tb : NONE));
+            Operator tbb = beginToBegin;
+            Operator tbe = beginToEnd;
+            Operator tee = endToEnd;
+            Operator teb = endToBegin;
 
-            if (sk.startRangeMapping != START || sk.endRangeMapping != END) {
+            beginToBegin = Operator.invert(sk.beginRangeMapping == BEGIN ? tbb : (sk.endRangeMapping == BEGIN ? tee : NONE));
+            endToEnd = Operator.invert(sk.endRangeMapping == END ? tee : (sk.beginRangeMapping == END ? tbb : NONE));
+
+            beginToEnd = Operator.invert(sk.beginRangeMapping == BEGIN ? teb : (sk.endRangeMapping == BEGIN ? tbe : NONE));
+            endToBegin = Operator.invert(sk.endRangeMapping == END ? tbe: (sk.beginRangeMapping == END ? teb : NONE));
+
+            if (sk.beginRangeMapping != BEGIN || sk.endRangeMapping != END) {
                 r = new Range(
-                        s.key.endRangeMapping == START ? r.end : (sk.startRangeMapping == START ? r.begin : Integer.MIN_VALUE),
-                        sk.startRangeMapping == END ? r.begin : (sk.endRangeMapping == END ? r.end : Integer.MAX_VALUE)
+                        sk.endRangeMapping == BEGIN ? r.end : (sk.beginRangeMapping == BEGIN ? r.begin : Integer.MIN_VALUE),
+                        sk.beginRangeMapping == END ? r.begin : (sk.endRangeMapping == END ? r.end : Integer.MAX_VALUE)
                 );
             }
         } else {
-            if (sk.startRangeMapping != START || sk.endRangeMapping != END) {
+            if (sk.beginRangeMapping != BEGIN || sk.endRangeMapping != END) {
                 r = new Range(
-                        sk.startRangeMapping == END ? r.end : (sk.startRangeMapping == START ? r.begin : Integer.MIN_VALUE),
-                        sk.endRangeMapping == START ? r.begin : (sk.endRangeMapping == END ? r.end : Integer.MAX_VALUE)
+                        sk.beginRangeMapping == END ? r.end : (sk.beginRangeMapping == BEGIN ? r.begin : Integer.MIN_VALUE),
+                        sk.endRangeMapping == BEGIN ? r.begin : (sk.endRangeMapping == END ? r.end : Integer.MAX_VALUE)
                 );
             }
         }
@@ -549,8 +557,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 n,
                 rid,
                 r,
-                begin,
-                end,
+                beginToBegin,
+                beginToEnd,
+                endToEnd,
+                endToBegin,
                 null,
                 null
         );
@@ -848,14 +858,14 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      * @return A collection with all final activations of this neuron.
      */
     public Collection<Activation> getFinalActivations(Document doc) {
-        Stream<Activation> s = NodeActivation.select(doc, node.get(doc), null, null, null, null, null, null);
+        Stream<Activation> s = NodeActivation.select(doc, node.get(doc), null, null, null, null, null, null, null, null);
         return s.filter(act -> act.isFinalActivation())
                 .collect(Collectors.toList());
     }
 
 
     public Collection<Activation> getAllActivations(Document doc) {
-        Stream<Activation> s = NodeActivation.select(doc, node.get(doc), null, null, null, null, null, null);
+        Stream<Activation> s = NodeActivation.select(doc, node.get(doc), null, null, null, null, null, null, null, null);
         return s.collect(Collectors.toList());
     }
 

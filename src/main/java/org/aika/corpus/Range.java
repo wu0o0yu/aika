@@ -191,7 +191,7 @@ public class Range {
 
 
     public enum Mapping {
-        START(0),
+        BEGIN(0),
         END(1),
         NONE(2);
 
@@ -216,7 +216,7 @@ public class Range {
 
         public Integer getSignalPos(Range r) {
             switch(this) {
-                case START:
+                case BEGIN:
                     return r.begin;
                 case END:
                     return r.end;
@@ -228,7 +228,7 @@ public class Range {
 
         public String toString() {
             switch (this) {
-                case START:
+                case BEGIN:
                     return "S";
                 case END:
                     return "E";

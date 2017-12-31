@@ -67,19 +67,19 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     }
 
 
-    public static <T extends Node, A extends NodeActivation<T>> A get(Document doc, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
-        Stream<A> s = select(doc, n, rid, r, begin, end, o, or);
+    public static <T extends Node, A extends NodeActivation<T>> A get(Document doc, T n, Integer rid, Range r, Operator beginToBegin, Operator beginToEnd, Operator endToEnd, Operator endToBegin, InterprNode o, InterprNode.Relation or) {
+        Stream<A> s = select(doc, n, rid, r, beginToBegin, beginToEnd, endToEnd, endToBegin, o, or);
         return s.findFirst()
                 .orElse(null);
     }
 
 
     public static <T extends Node, A extends NodeActivation<T>> A get(Document doc, T n, Key ak) {
-        return get(doc, n, ak.rid, ak.range, Operator.EQUALS, Operator.EQUALS, ak.interpretation, InterprNode.Relation.EQUALS);
+        return get(doc, n, ak.rid, ak.range, EQUALS, NONE, EQUALS, NONE, ak.interpretation, InterprNode.Relation.EQUALS);
     }
 
 
-    public static Stream<NodeActivation> select(Document doc, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
+    public static Stream<NodeActivation> select(Document doc, Integer rid, Range r, Operator beginToBegin, Operator beginToEnd, Operator endToEnd, Operator endToBegin, InterprNode o, Relation or) {
         Stream<NodeActivation> results;
         if(rid != null) {
             Key bk = new Key(Node.MIN_NODE, Range.MIN, rid, InterprNode.MIN);
@@ -94,18 +94,18 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
                     .flatMap(node -> getActivationsStream(node, doc));
         }
 
-        return results.filter(act -> act.filter(null, rid, r, begin, end, o, or));
+        return results.filter(act -> act.filter(null, rid, r, beginToBegin, beginToEnd, endToEnd, endToBegin, o, or));
     }
 
 
-    public static <T extends Node, A extends NodeActivation<T>> Stream<A> select(Document doc, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
+    public static <T extends Node, A extends NodeActivation<T>> Stream<A> select(Document doc, T n, Integer rid, Range r, Operator beginToBegin, Operator beginToEnd, Operator endToEnd, Operator endToBegin, InterprNode o, Relation or) {
         ThreadState<T, A> th = n.getThreadState(doc.threadId, false);
         if(th == null) return Stream.empty();
-        return select(th, n, rid, r, begin, end, o, or);
+        return select(th, n, rid, r, beginToBegin, beginToEnd, endToEnd, endToBegin, o, or);
     }
 
 
-    public static <T extends Node, A extends NodeActivation<T>> Stream<A> select(ThreadState<T, A> th, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, Relation or) {
+    public static <T extends Node, A extends NodeActivation<T>> Stream<A> select(ThreadState<T, A> th, T n, Integer rid, Range r, Operator beginToBegin, Operator beginToEnd, Operator endToEnd, Operator endToBegin, InterprNode o, Relation or) {
         Stream<A> results;
         int s = th.activations.size();
 
@@ -124,22 +124,22 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
                         .stream();
             } else return Stream.empty();
         } else {
-            if(begin == null && end == null) {
+            if(beginToBegin == null && endToEnd == null) {
                 results = th.activations.values()
                         .stream();
             } else {
-                return getActivationsByRange(th, n, rid, r, begin, end, o, or);
+                return getActivationsByRange(th, n, rid, r, beginToBegin, beginToEnd, endToEnd, endToBegin, o, or);
             }
         }
 
-        return results.filter(act -> act.filter(n, rid, r, begin, end, o, or));
+        return results.filter(act -> act.filter(n, rid, r, beginToBegin, beginToEnd, endToEnd, endToBegin, o, or));
     }
 
 
-    public static <T extends Node, A extends NodeActivation<T>> Stream<A> getActivationsByRange(ThreadState<T, A> th, T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
+    public static <T extends Node, A extends NodeActivation<T>> Stream<A> getActivationsByRange(ThreadState<T, A> th, T n, Integer rid, Range r, Operator beginToBegin, Operator beginToEnd, Operator endToEnd, Operator endToBegin, InterprNode o, InterprNode.Relation or) {
         Collection<A> s;
-        if((begin == GREATER_THAN_EQUAL || begin == EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
-            int er = (end == Operator.LESS_THAN_EQUAL || end == Operator.EQUALS) && r.end != Integer.MAX_VALUE ? r.end : Integer.MAX_VALUE;
+        if((beginToBegin == GREATER_THAN_EQUAL || beginToBegin == EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
+            int er = (endToEnd == Operator.LESS_THAN_EQUAL || endToEnd == Operator.EQUALS) && r.end != Integer.MAX_VALUE ? r.end : Integer.MAX_VALUE;
             s = th.activations.subMap(
                     new NodeActivation.Key(n, new Range(r.begin, Integer.MIN_VALUE), null, InterprNode.MIN),
                     true,
@@ -147,7 +147,7 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
                     true
             )
                     .values();
-        } else if((begin == Operator.LESS_THAN_EQUAL || begin == Operator.EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
+        } else if((beginToBegin == Operator.LESS_THAN_EQUAL || beginToBegin == Operator.EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
             s = th.activations.descendingMap().subMap(
                     new NodeActivation.Key(n, new Range(r.begin, Integer.MAX_VALUE), null, InterprNode.MAX),
                     true,
@@ -159,7 +159,7 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
             s = th.activations.values();
         }
 
-        return s.stream().filter(act -> act.filter(n, rid, r, begin, end, o, or));
+        return s.stream().filter(act -> act.filter(n, rid, r, beginToBegin, beginToEnd, endToEnd, endToBegin, o, or));
     }
 
 
@@ -169,10 +169,15 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     }
 
 
-    public <T extends Node> boolean filter(T n, Integer rid, Range r, Operator begin, Operator end, InterprNode o, InterprNode.Relation or) {
+    public <T extends Node> boolean filter(T n, Integer rid, Range r, Operator beginToBegin, Operator beginToEnd, Operator endToEnd, Operator endToBegin, InterprNode o, InterprNode.Relation or) {
         return (n == null || key.node == n) &&
                 (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) &&
-                (r == null || ((begin == null || begin.compare(key.range.begin, r.begin)) && (end == null || end.compare(key.range.end, r.end)))) &&
+                (r == null || (
+                        (beginToBegin == null || beginToBegin.compare(key.range.begin, r.begin)) &&
+                        (beginToEnd == null || beginToEnd.compare(key.range.begin, r.end)) &&
+                        (endToEnd == null || endToEnd.compare(key.range.end, r.end)) &&
+                        (endToBegin == null || endToBegin.compare(key.range.end, r.begin))
+                )) &&
                 (o == null || or.compare(key.interpretation, o));
     }
 

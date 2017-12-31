@@ -33,6 +33,7 @@ import org.junit.Test;
 import java.util.Collections;
 
 import static org.aika.corpus.Range.Operator.EQUALS;
+import static org.aika.corpus.Range.Operator.NONE;
 
 /**
  *
@@ -57,7 +58,7 @@ public class ActivationsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, Operator.LESS_THAN_EQUAL, Mapping.START, true, Operator.GREATER_THAN_EQUAL, Mapping.END, true);
+        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, Operator.LESS_THAN_EQUAL, Mapping.BEGIN, true, Operator.GREATER_THAN_EQUAL, Mapping.END, true);
 
 
         inA.addInput(doc, 0, 1, 0);
@@ -69,9 +70,9 @@ public class ActivationsTest {
 
         inA.addInput(doc, 1, 2);
 
-        Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(0, 1), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(0, 1), doc.bottom));
-        Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(1, 2), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
-        Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(2, 3), EQUALS, EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
+        Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(0, 1), EQUALS, NONE, EQUALS, NONE, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(0, 1), doc.bottom));
+        Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(1, 2), EQUALS, NONE, EQUALS, NONE, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
+        Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(2, 3), EQUALS, NONE, EQUALS, NONE, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
     }
 
 

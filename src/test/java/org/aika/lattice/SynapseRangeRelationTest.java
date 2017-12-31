@@ -24,7 +24,6 @@ import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
-import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
@@ -32,6 +31,9 @@ import org.junit.Test;
 
 import java.util.Collections;
 
+import static org.aika.corpus.Range.Operator.GREATER_THAN_EQUAL;
+import static org.aika.corpus.Range.Operator.LESS_THAN_EQUAL;
+import static org.aika.corpus.Range.Operator.NONE;
 import static org.aika.neuron.Activation.SynapseActivation.INPUT_COMP;
 
 /**
@@ -56,10 +58,12 @@ public class SynapseRangeRelationTest {
                         false,
                         null,
                         null,
-                        Operator.LESS_THAN_EQUAL,
-                        Mapping.START,
+                        LESS_THAN_EQUAL,
+                        NONE,
+                        Mapping.BEGIN,
                         true,
-                        Operator.GREATER_THAN_EQUAL,
+                        GREATER_THAN_EQUAL,
+                        NONE,
                         Mapping.END,
                         true
                 )

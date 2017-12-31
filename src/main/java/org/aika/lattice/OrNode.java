@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.aika.corpus.Range.Operator.EQUALS;
+import static org.aika.corpus.Range.Operator.NONE;
 
 
 /**
@@ -96,8 +97,8 @@ public class OrNode extends Node<OrNode, Activation> {
 
     private void retrieveInputs(Document doc, Node<?, NodeActivation<?>> n, Range inputR, Integer rid, List<NodeActivation<?>> inputs, Integer pRidOffset, TreeSet<Provider<Node>> parents) {
         Stream<NodeActivation> s = n != null ?
-                NodeActivation.select(doc, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null) :
-                NodeActivation.select(doc, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, EQUALS, null, null);
+                NodeActivation.select(doc, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, NONE, EQUALS, NONE, null, null) :
+                NodeActivation.select(doc, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, EQUALS, NONE, EQUALS, NONE, null, null);
         for(NodeActivation iAct: s.collect(Collectors.toList())) {
             if(parents.contains(iAct.key.node.provider) && !checkSelfReferencing(doc, iAct)) {
                 inputs.add(iAct);
@@ -210,7 +211,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
     // TODO: RID
     public InterprNode lookupOrOption(Document doc, Range r, boolean create) {
-        NodeActivation act = NodeActivation.select(doc, this, null, r, EQUALS, EQUALS, null, null)
+        NodeActivation act = NodeActivation.select(doc, this, null, r, EQUALS, NONE, EQUALS, NONE, null, null)
                 .findFirst()
                 .orElse(null);
 

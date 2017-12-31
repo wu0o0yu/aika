@@ -30,7 +30,7 @@ import org.aika.neuron.Synapse;
 
 import static org.aika.corpus.Range.Operator.*;
 import static org.aika.corpus.Range.Mapping.END;
-import static org.aika.corpus.Range.Mapping.START;
+import static org.aika.corpus.Range.Mapping.BEGIN;
 
 /**
  *
@@ -43,22 +43,37 @@ public class TestHelper {
         in.addActivation(doc, inputAct);
         doc.propagate();
         if(in instanceof InputNode) {
-            return NodeActivation.get(doc, in, inputAct.key.rid, inputAct.key.range, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, inputAct.key.interpretation, InterprNode.Relation.EQUALS);
+            return NodeActivation.get(doc, in, inputAct.key.rid, inputAct.key.range, LESS_THAN_EQUAL, NONE, GREATER_THAN_EQUAL, NONE, inputAct.key.interpretation, InterprNode.Relation.EQUALS);
         }
         return null;
     }
 
 
     public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, boolean ro) {
-        return addOutputNode(doc, n, relativeRid, absoluteRid, EQUALS, START, ro, EQUALS, END, ro);
+        return addOutputNode(doc, n, relativeRid, absoluteRid, EQUALS, BEGIN, ro, EQUALS, END, ro);
     }
 
 
-    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Mapping startMapping, boolean startRangeOutput, Operator endRangeMatch, Mapping endMapping, boolean endRangeOutput) {
-        return InputNode.add(doc.model, new Synapse.Key(false, relativeRid, absoluteRid, startRangeMatch, startMapping, startRangeOutput, endRangeMatch, endMapping, endRangeOutput), n.get());
+    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, Operator beginToBeginRangeMatch, Mapping beginMapping, boolean beginRangeOutput, Operator endToEndRangeMatch, Mapping endMapping, boolean endRangeOutput) {
+        return InputNode.add(doc.model,
+                new Synapse.Key(
+                        false,
+                        relativeRid,
+                        absoluteRid,
+                        beginToBeginRangeMatch,
+                        NONE,
+                        beginMapping,
+                        beginRangeOutput,
+                        endToEndRangeMatch,
+                        NONE,
+                        endMapping,
+                        endRangeOutput
+                ),
+                n.get()
+        );
     }
 
     public static <T extends Node, A extends NodeActivation<T>> A get(Document doc, T n, Range r, InterprNode o) {
-        return NodeActivation.get(doc, n, null, r, LESS_THAN_EQUAL, GREATER_THAN_EQUAL, o, InterprNode.Relation.EQUALS);
+        return NodeActivation.get(doc, n, null, r, LESS_THAN_EQUAL, NONE, GREATER_THAN_EQUAL, NONE, o, InterprNode.Relation.EQUALS);
     }
 }

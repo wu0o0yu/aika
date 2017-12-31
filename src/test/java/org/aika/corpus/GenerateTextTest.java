@@ -25,7 +25,7 @@ import org.junit.Test;
 
 import static org.aika.corpus.Range.Mapping.END;
 import static org.aika.corpus.Range.Mapping.NONE;
-import static org.aika.corpus.Range.Mapping.START;
+import static org.aika.corpus.Range.Mapping.BEGIN;
 
 /**
  *
@@ -65,9 +65,9 @@ public class GenerateTextTest {
                         .setBias(0.0)
                         .setRecurrent(true)
                         .setStartRangeMapping(END)   // Check if the suppressing activation and the outA activation are overlapping each other.
-                        .setEndRangeMapping(START)
-                        .setStartRangeMatch(Range.Operator.LESS_THAN)
-                        .setEndRangeMatch(Range.Operator.GREATER_THAN)
+                        .setEndRangeMapping(BEGIN)
+                        .setBeginToBeginRangeMatch(Range.Operator.LESS_THAN)
+                        .setEndToEndRangeMatch(Range.Operator.GREATER_THAN)
         );
 
         // Word bbb is only added to the resulting text if input b is active and this neuron
@@ -86,9 +86,9 @@ public class GenerateTextTest {
                         .setBias(0.0)
                         .setRecurrent(true)
                         .setStartRangeMapping(END)
-                        .setEndRangeMapping(START)
-                        .setStartRangeMatch(Range.Operator.LESS_THAN)
-                        .setEndRangeMatch(Range.Operator.GREATER_THAN)
+                        .setEndRangeMapping(BEGIN)
+                        .setBeginToBeginRangeMatch(Range.Operator.LESS_THAN)
+                        .setEndToEndRangeMatch(Range.Operator.GREATER_THAN)
         );
 
 
@@ -106,9 +106,9 @@ public class GenerateTextTest {
                         .setBias(0.0)
                         .setRecurrent(true)
                         .setStartRangeMapping(END)
-                        .setEndRangeMapping(START)
-                        .setStartRangeMatch(Range.Operator.LESS_THAN)
-                        .setEndRangeMatch(Range.Operator.GREATER_THAN)
+                        .setEndRangeMapping(BEGIN)
+                        .setBeginToBeginRangeMatch(Range.Operator.LESS_THAN)
+                        .setEndToEndRangeMatch(Range.Operator.GREATER_THAN)
         );
 
         // OutD is only activated if the previous word was outB.
@@ -125,9 +125,9 @@ public class GenerateTextTest {
                         .setBias(0.0)
                         .setRecurrent(true)
                         .setStartRangeMapping(END)
-                        .setEndRangeMapping(START)
-                        .setStartRangeMatch(Range.Operator.LESS_THAN)
-                        .setEndRangeMatch(Range.Operator.GREATER_THAN)
+                        .setEndRangeMapping(BEGIN)
+                        .setBeginToBeginRangeMatch(Range.Operator.LESS_THAN)
+                        .setEndToEndRangeMatch(Range.Operator.GREATER_THAN)
         );
 
 

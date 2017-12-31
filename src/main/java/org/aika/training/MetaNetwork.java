@@ -84,10 +84,12 @@ public class MetaNetwork {
                                     osk.relativeRid :
                                     (ss.metaRelativeRid && ridOffset != null && rid != null ? rid - ridOffset : null),
                             osk.absoluteRid,
-                            osk.startRangeMatch,
-                            osk.startRangeMapping,
-                            osk.startRangeOutput,
-                            osk.endRangeMatch,
+                            osk.beginToBeginRangeMatch,
+                            osk.beginToEndRangeMatch,
+                            osk.beginRangeMapping,
+                            osk.beginRangeOutput,
+                            osk.endToEndRangeMatch,
+                            osk.endToBeginRangeMatch,
                             osk.endRangeMapping,
                             osk.endRangeOutput
                     );
@@ -116,11 +118,11 @@ public class MetaNetwork {
                             .setBias(inhibSS.metaBias)
                             .setRelativeRid(inhibSynKey.relativeRid)
                             .setAbsoluteRid(inhibSynKey.absoluteRid)
-                            .setStartRangeMapping(inhibSynKey.startRangeMapping)
-                            .setStartRangeMatch(inhibSynKey.startRangeMatch)
-                            .setStartRangeOutput(inhibSynKey.startRangeOutput)
+                            .setStartRangeMapping(inhibSynKey.beginRangeMapping)
+                            .setBeginToBeginRangeMatch(inhibSynKey.beginToBeginRangeMatch)
+                            .setBeginRangeOutput(inhibSynKey.beginRangeOutput)
                             .setEndRangeMapping(inhibSynKey.endRangeMapping)
-                            .setEndRangeMatch(inhibSynKey.endRangeMatch)
+                            .setEndToEndRangeMatch(inhibSynKey.endToEndRangeMatch)
                             .setEndRangeOutput(inhibSynKey.endRangeOutput)
             );
 

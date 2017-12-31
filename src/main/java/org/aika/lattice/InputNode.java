@@ -70,7 +70,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         endRequired = false;
         ridRequired = false;
         if (key != null) {
-            endRequired = key.startRangeMapping == Mapping.NONE;
+            endRequired = key.beginRangeMapping == Mapping.NONE;
             ridRequired = key.relativeRid != null || key.absoluteRid != null;
         }
     }
@@ -105,7 +105,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
         return new NodeActivation.Key(
                 this,
-                new Range(key.startRangeMapping.getSignalPos(ak.range), key.endRangeMapping.getSignalPos(ak.range)),
+                new Range(key.beginRangeMapping.getSignalPos(ak.range), key.endRangeMapping.getSignalPos(ak.range)),
                 key.relativeRid != null ? ak.rid : null,
                 ak.interpretation
         );
@@ -180,8 +180,10 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                 secondNode,
                 secondRid,
                 ak.range,
-                computeStartRangeMatch(firstNode.key, secondNode.key),
-                computeEndRangeMatch(firstNode.key, secondNode.key),
+                computeBeginToBeginRangeMatch(firstNode.key, secondNode.key),
+                computeBeginToEndRangeMatch(firstNode.key, secondNode.key),
+                computeEndToEndRangeMatch(firstNode.key, secondNode.key),
+                computeEndToBeginRangeMatch(firstNode.key, secondNode.key),
                 null,
                 null
         );
@@ -193,8 +195,8 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                                 new NodeActivation.Key(
                                         nlp,
                                         Range.mergeRange(
-                                                Range.getOutputRange(ak.range, new boolean[]{firstNode.key.startRangeOutput, firstNode.key.endRangeOutput}),
-                                                Range.getOutputRange(secondAct.key.range, new boolean[]{secondNode.key.startRangeOutput, secondNode.key.endRangeOutput})
+                                                Range.getOutputRange(ak.range, new boolean[]{firstNode.key.beginRangeOutput, firstNode.key.endRangeOutput}),
+                                                Range.getOutputRange(secondAct.key.range, new boolean[]{secondNode.key.beginRangeOutput, secondNode.key.endRangeOutput})
                                         ),
                                         Utils.nullSafeMin(ak.rid, secondAct.key.rid),
                                         o
@@ -207,23 +209,33 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    private static Operator computeStartRangeMatch(Key k1, Key k2) {
-        if (k2.startRangeOutput) {
-            return k1.startRangeMatch;
-        } else if (k1.startRangeOutput) {
-            return Operator.invert(k2.startRangeMatch);
+    private static Operator computeBeginToBeginRangeMatch(Key k1, Key k2) {
+        if (k2.beginRangeOutput) {
+            return k1.beginToBeginRangeMatch;
+        } else if (k1.beginRangeOutput) {
+            return Operator.invert(k2.beginToBeginRangeMatch);
         }
         return NONE;
     }
 
 
-    private static Operator computeEndRangeMatch(Key k1, Key k2) {
+    private static Operator computeBeginToEndRangeMatch(Key k1, Key k2) {
+        return NONE; // TODO:
+    }
+
+
+    private static Operator computeEndToEndRangeMatch(Key k1, Key k2) {
         if (k2.endRangeOutput) {
-            return k1.endRangeMatch;
+            return k1.endToEndRangeMatch;
         } else if (k1.endRangeOutput) {
-            return Operator.invert(k2.endRangeMatch);
+            return Operator.invert(k2.endToEndRangeMatch);
         }
         return NONE;
+    }
+
+
+    private static Operator computeEndToBeginRangeMatch(Key k1, Key k2) {
+        return NONE; // TODO:
     }
 
 
@@ -236,14 +248,14 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                 for (NodeActivation secondAct : secondNAct.outputs.values()) {
                     Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.node.provider);
                     InputNode in = ref.input.get(doc);
-                    Operator srm = computeStartRangeMatch(key, in.key);
-                    Operator erm = computeEndRangeMatch(key, in.key);
+                    Operator srm = computeBeginToBeginRangeMatch(key, in.key);
+                    Operator erm = computeEndToEndRangeMatch(key, in.key);
 
                     if (act != secondAct &&
                             this != in &&
                             in.visitedDiscover != v &&
                             !in.key.isRecurrent &&
-                            !(key.startRangeOutput && in.key.startRangeOutput) &&
+                            !(key.beginRangeOutput && in.key.beginRangeOutput) &&
                             !(key.endRangeOutput && in.key.endRangeOutput) &&
                             srm.compare(secondAct.key.range.begin, act.key.range.begin) &&
                             erm.compare(secondAct.key.range.end, act.key.range.end)
@@ -318,7 +330,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         sb.append("I");
         sb.append(key.isRecurrent ? "R" : "");
 
-        sb.append(getRangeBrackets(key.startRangeOutput, key.startRangeMapping));
+        sb.append(getRangeBrackets(key.beginRangeOutput, key.beginRangeMapping));
 
         if (inputNeuron != null) {
             sb.append(inputNeuron.id);
@@ -336,8 +348,8 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     private String getRangeBrackets(boolean ro, Mapping rs) {
         if (rs == Mapping.NONE) return "|";
-        else if (ro) return rs == Mapping.START ? "[" : "]";
-        else if (!ro) return rs == Mapping.START ? "<" : ">";
+        else if (ro) return rs == Mapping.BEGIN ? "[" : "]";
+        else if (!ro) return rs == Mapping.BEGIN ? "<" : ">";
         else return "|";
     }
 

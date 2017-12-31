@@ -211,7 +211,7 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S " + weight + " " + key.relativeRid + " S:" + key.startRangeMapping + " E:" + key.endRangeMapping + " " +  input + "->" + output;
+        return "S " + weight + " " + key.relativeRid + " S:" + key.beginRangeMapping + " E:" + key.endRangeMapping + " " +  input + "->" + output;
     }
 
 
@@ -282,25 +282,29 @@ public class Synapse implements Writable {
         public boolean isRecurrent;
         public Integer relativeRid;
         public Integer absoluteRid;
-        public Operator startRangeMatch;
-        public Operator endRangeMatch;
-        public Mapping startRangeMapping;
+        public Operator beginToBeginRangeMatch;
+        public Operator beginToEndRangeMatch;
+        public Operator endToEndRangeMatch;
+        public Operator endToBeginRangeMatch;
+        public Mapping beginRangeMapping;
         public Mapping endRangeMapping;
-        public boolean startRangeOutput;
+        public boolean beginRangeOutput;
         public boolean endRangeOutput;
 
         public Key() {}
 
 
-        public Key(boolean isRecurrent, Integer relativeRid, Integer absoluteRid, Operator startRangeMatch, Mapping startRangeMapping, boolean startRangeOutput, Operator endRangeMatch, Mapping endRangeMapping, boolean endRangeOutput) {
+        public Key(boolean isRecurrent, Integer relativeRid, Integer absoluteRid, Operator beginToBeginRangeMatch, Operator beginToEndRangeMatch, Mapping beginRangeMapping, boolean beginRangeOutput, Operator endToEndRangeMatch, Operator endToBeginRangeMatch, Mapping endRangeMapping, boolean endRangeOutput) {
             this.isRecurrent = isRecurrent;
             this.relativeRid = relativeRid;
             this.absoluteRid = absoluteRid;
-            this.startRangeMatch = startRangeMatch;
-            this.endRangeMatch = endRangeMatch;
-            this.startRangeMapping = startRangeMapping;
+            this.beginToBeginRangeMatch = beginToBeginRangeMatch;
+            this.beginToEndRangeMatch = beginToEndRangeMatch;
+            this.endToEndRangeMatch = endToEndRangeMatch;
+            this.endToBeginRangeMatch = endToBeginRangeMatch;
+            this.beginRangeMapping = beginRangeMapping;
             this.endRangeMapping = endRangeMapping;
-            this.startRangeOutput = startRangeOutput;
+            this.beginRangeOutput = beginRangeOutput;
             this.endRangeOutput = endRangeOutput;
         }
 
@@ -311,10 +315,12 @@ public class Synapse implements Writable {
                             isRecurrent,
                             0,
                             absoluteRid,
-                            startRangeMatch,
-                            startRangeMapping,
-                            startRangeOutput,
-                            endRangeMatch,
+                            beginToBeginRangeMatch,
+                            beginToEndRangeMatch,
+                            beginRangeMapping,
+                            beginRangeOutput,
+                            endToEndRangeMatch,
+                            endToBeginRangeMatch,
                             endRangeMapping,
                             endRangeOutput
                     ) : this;
@@ -328,11 +334,13 @@ public class Synapse implements Writable {
             if(relativeRid != null) out.writeByte(relativeRid);
             out.writeBoolean(absoluteRid != null);
             if(absoluteRid != null) out.writeByte(absoluteRid);
-            out.writeByte(startRangeMatch.getId());
-            out.writeByte(endRangeMatch.getId());
-            out.writeByte(startRangeMapping.getId());
+            out.writeByte(beginToBeginRangeMatch.getId());
+            out.writeByte(beginToEndRangeMatch.getId());
+            out.writeByte(endToEndRangeMatch.getId());
+            out.writeByte(endToBeginRangeMatch.getId());
+            out.writeByte(beginRangeMapping.getId());
             out.writeByte(endRangeMapping.getId());
-            out.writeBoolean(startRangeOutput);
+            out.writeBoolean(beginRangeOutput);
             out.writeBoolean(endRangeOutput);
         }
 
@@ -342,11 +350,13 @@ public class Synapse implements Writable {
             isRecurrent = in.readBoolean();
             if(in.readBoolean()) relativeRid = (int) in.readByte();
             if(in.readBoolean()) absoluteRid = (int) in.readByte();
-            startRangeMatch = Operator.getById(in.readByte());
-            endRangeMatch = Operator.getById(in.readByte());
-            startRangeMapping = Mapping.getById(in.readByte());
+            beginToBeginRangeMatch = Operator.getById(in.readByte());
+            beginToEndRangeMatch = Operator.getById(in.readByte());
+            endToEndRangeMatch = Operator.getById(in.readByte());
+            endToBeginRangeMatch = Operator.getById(in.readByte());
+            beginRangeMapping = Mapping.getById(in.readByte());
             endRangeMapping = Mapping.getById(in.readByte());
-            startRangeOutput = in.readBoolean();
+            beginRangeOutput = in.readBoolean();
             endRangeOutput = in.readBoolean();
         }
 
@@ -373,15 +383,19 @@ public class Synapse implements Writable {
             if(r != 0) return r;
             r = Utils.compareInteger(absoluteRid, k.absoluteRid);
             if(r != 0) return r;
-            r = startRangeMatch.compareTo(k.startRangeMatch);
+            r = beginToBeginRangeMatch.compareTo(k.beginToBeginRangeMatch);
             if(r != 0) return r;
-            r = endRangeMatch.compareTo(k.endRangeMatch);
+            r = beginToEndRangeMatch.compareTo(k.beginToEndRangeMatch);
             if(r != 0) return r;
-            r = startRangeMapping.compareTo(k.startRangeMapping);
+            r = endToEndRangeMatch.compareTo(k.endToEndRangeMatch);
+            if(r != 0) return r;
+            r = endToBeginRangeMatch.compareTo(k.endToBeginRangeMatch);
+            if(r != 0) return r;
+            r = beginRangeMapping.compareTo(k.beginRangeMapping);
             if(r != 0) return r;
             r = endRangeMapping.compareTo(k.endRangeMapping);
             if(r != 0) return r;
-            r = Boolean.compare(startRangeOutput, k.startRangeOutput);
+            r = Boolean.compare(beginRangeOutput, k.beginRangeOutput);
             if(r != 0) return r;
             return Boolean.compare(endRangeOutput, k.endRangeOutput);
         }

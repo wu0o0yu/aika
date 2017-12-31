@@ -65,9 +65,9 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-0.9)
-                        .setStartRangeMatch(Operator.EQUALS)
-                        .setEndRangeMatch(Operator.GREATER_THAN_EQUAL)
-                        .setStartRangeOutput(true),
+                        .setBeginToBeginRangeMatch(Operator.EQUALS)
+                        .setEndToEndRangeMatch(Operator.GREATER_THAN_EQUAL)
+                        .setBeginRangeOutput(true),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0)
@@ -81,8 +81,8 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setBias(-0.9)
-                        .setStartRangeMatch(Operator.LESS_THAN_EQUAL)
-                        .setEndRangeMatch(Operator.EQUALS)
+                        .setBeginToBeginRangeMatch(Operator.LESS_THAN_EQUAL)
+                        .setEndToEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
 
@@ -152,9 +152,9 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-0.9)
-                        .setStartRangeMatch(Operator.EQUALS)
-                        .setEndRangeMatch(Operator.GREATER_THAN_EQUAL)
-                        .setStartRangeOutput(true),
+                        .setBeginToBeginRangeMatch(Operator.EQUALS)
+                        .setEndToEndRangeMatch(Operator.GREATER_THAN_EQUAL)
+                        .setBeginRangeOutput(true),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0)
@@ -175,8 +175,8 @@ public class SimplePatternMatchingTest {
                         .setRecurrent(false)
                         .setRelativeRid(3)
                         .setBias(-0.9)
-                        .setStartRangeMatch(Operator.LESS_THAN_EQUAL)
-                        .setEndRangeMatch(Operator.EQUALS)
+                        .setBeginToBeginRangeMatch(Operator.LESS_THAN_EQUAL)
+                        .setEndToEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true)
         );
 

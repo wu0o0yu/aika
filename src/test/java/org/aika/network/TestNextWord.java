@@ -24,15 +24,15 @@ public class TestNextWord {
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-9.5)
-                        .setEndRangeMatch(Operator.EQUALS)
+                        .setEndToEndRangeMatch(Operator.EQUALS)
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-9.5)
                         .setStartRangeMapping(Mapping.END)
-                        .setStartRangeMatch(Operator.EQUALS)
-                        .setStartRangeOutput(true)
+                        .setBeginToBeginRangeMatch(Operator.EQUALS)
+                        .setBeginRangeOutput(true)
         );
 
         Document doc = m.createDocument("aaaa bbbb  ", 0);

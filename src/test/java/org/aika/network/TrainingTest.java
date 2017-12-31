@@ -21,7 +21,6 @@ import org.aika.Neuron;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.neuron.Activation;
-import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
@@ -54,9 +53,11 @@ public class TrainingTest {
                                 0,
                                 null,
                                 Range.Operator.EQUALS,
-                                Range.Mapping.START,
+                                Range.Operator.NONE,
+                                Range.Mapping.BEGIN,
                                 true,
                                 Range.Operator.EQUALS,
+                                Range.Operator.NONE,
                                 Range.Mapping.END,
                                 true
                         )
@@ -100,9 +101,11 @@ public class TrainingTest {
                                             0,
                                             null,
                                             Range.Operator.EQUALS,
-                                            Range.Mapping.START,
+                                            Range.Operator.NONE,
+                                            Range.Mapping.BEGIN,
                                             true,
                                             Range.Operator.EQUALS,
+                                            Range.Operator.NONE,
                                             Range.Mapping.END,
                                             true
                                     ),

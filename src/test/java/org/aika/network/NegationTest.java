@@ -78,7 +78,7 @@ public class NegationTest {
         inA.addInput(doc, 0, 11);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
-        Assert.assertNotNull(NodeActivation.get(doc, abcN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
+        Assert.assertNotNull(NodeActivation.get(doc, abcN.get().node.get(), null, new Range(0, 11), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
 
         InterprNode o1 = InterprNode.addPrimitive(doc);
 
@@ -92,7 +92,7 @@ public class NegationTest {
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        Assert.assertNotNull(NodeActivation.get(doc, abcN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
+        Assert.assertNotNull(NodeActivation.get(doc, abcN.get().node.get(), null, new Range(0, 11), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
     }
 
 
@@ -215,7 +215,7 @@ public class NegationTest {
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
+        Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
 
         doc.clearActivations();
     }
@@ -274,7 +274,7 @@ public class NegationTest {
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
+        Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
 
         doc.clearActivations();
     }
@@ -333,7 +333,7 @@ public class NegationTest {
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, EQUALS, null, null));
+        Assert.assertNotNull(NodeActivation.get(doc, outN.get().node.get(), null, new Range(0, 11), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
 
         doc.clearActivations();
     }
@@ -398,15 +398,15 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
-                        .setStartRangeMatch(EQUALS)
-                        .setStartRangeOutput(true),
+                        .setBeginToBeginRangeMatch(EQUALS)
+                        .setBeginRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
                         .setBias(-1.0)
-                        .setEndRangeMatch(EQUALS)
+                        .setEndToEndRangeMatch(EQUALS)
                         .setEndRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
@@ -427,8 +427,8 @@ public class NegationTest {
 
             System.out.println(doc.neuronActivationsToString(true, false, true));
 
-            Assert.assertNotNull(NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, EQUALS, null, null));
-            Assert.assertEquals(2, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, EQUALS, null, null).key.interpretation.orInterprNodes.size());
+            Assert.assertNotNull(NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
+            Assert.assertEquals(2, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null).key.interpretation.orInterprNodes.size());
 
             doc.clearActivations();
         }
@@ -444,10 +444,10 @@ public class NegationTest {
             System.out.println(doc.neuronActivationsToString(true, false, true));
 
 //            Assert.assertNotNull(Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
-            Assert.assertNotNull(NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 9), EQUALS, EQUALS, null, null));
+            Assert.assertNotNull(NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 9), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null));
 //            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.interpretation.orInterprNodes.size());
-            Assert.assertEquals(1, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, EQUALS, null, null).key.interpretation.orInterprNodes.size());
-            Assert.assertEquals(1, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 9), EQUALS, EQUALS, null, null).key.interpretation.orInterprNodes.size());
+            Assert.assertEquals(1, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 6), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null).key.interpretation.orInterprNodes.size());
+            Assert.assertEquals(1, NodeActivation.get(doc, inS.get().node.get(), null, new Range(0, 9), EQUALS, Range.Operator.NONE, EQUALS, Range.Operator.NONE, null, null).key.interpretation.orInterprNodes.size());
 
             doc.clearActivations();
         }

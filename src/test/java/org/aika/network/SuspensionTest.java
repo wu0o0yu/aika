@@ -74,15 +74,15 @@ public class SuspensionTest {
                         .setBias(-9.0)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setStartRangeMatch(EQUALS)
-                        .setStartRangeOutput(true),
+                        .setBeginToBeginRangeMatch(EQUALS)
+                        .setBeginRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-9.0)
                         .setRelativeRid(null)
                         .setRecurrent(false)
-                        .setEndRangeMatch(EQUALS)
+                        .setEndToEndRangeMatch(EQUALS)
                         .setEndRangeOutput(true)
         );
 
