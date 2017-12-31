@@ -23,8 +23,8 @@ public class SynapseSignificance {
             return 1.0;
         }
 
-        int iFreq = ((NeuronStatistic) in.statistic).frequency;
-        int oFreq = ((NeuronStatistic) on.statistic).frequency;
+        int iFreq = Math.max(1, ((NeuronStatistic) in.statistic).frequency);
+        int oFreq = Math.max(1, ((NeuronStatistic) on.statistic).frequency);
         return Math.pow(iFreq * oFreq, -0.2);
     }
 }
