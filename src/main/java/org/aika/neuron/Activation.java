@@ -230,6 +230,7 @@ public final class Activation extends NodeActivation<OrNode> {
         public static final State ZERO = new State(0.0, -1, INeuron.NormWeight.ZERO_WEIGHT);
 
         public State(double value, int fired, INeuron.NormWeight weight) {
+            assert !Double.isNaN(value);
             this.value = value;
             this.fired = fired;
             this.weight = weight;

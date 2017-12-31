@@ -45,6 +45,7 @@ public class LongTermPotAndDep {
 
             sa.synapse.weightDelta += (float) sDelta;
             n.bias -= BETA * sDelta;
+            assert !Double.isNaN(n.bias);
         });
 
         doc.notifyWeightsModified(n, n.inputSynapses.values());
