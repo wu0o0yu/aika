@@ -115,7 +115,7 @@ public class MetaNetwork {
                             .setBias(inhibSS.metaBias)
                             .setRelativeRid(inhibSynKey.relativeRid)
                             .setAbsoluteRid(inhibSynKey.absoluteRid)
-                            .setStartRangeMapping(inhibSynKey.beginRangeMapping)
+                            .setBeginRangeMapping(inhibSynKey.beginRangeMapping)
                             .setRangeMatch(inhibSynKey.rangeMatch)
                             .setBeginRangeOutput(inhibSynKey.beginRangeOutput)
                             .setEndRangeMapping(inhibSynKey.endRangeMapping)

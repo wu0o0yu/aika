@@ -58,7 +58,7 @@ public class GenerateTextTest {
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setStartRangeMapping(NONE)
+                        .setBeginRangeMapping(NONE)
                         .setEndRangeMapping(NONE),
                 new Input()
                         .setNeuron(suppr)
@@ -76,7 +76,7 @@ public class GenerateTextTest {
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setStartRangeMapping(NONE)
+                        .setBeginRangeMapping(NONE)
                         .setEndRangeMapping(NONE),
                 new Input()
                         .setNeuron(suppr)
@@ -93,7 +93,7 @@ public class GenerateTextTest {
                         .setNeuron(outA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setStartRangeMapping(Range.Mapping.END)
+                        .setBeginRangeMapping(Range.Mapping.END)
                         .setEndRangeMapping(NONE),
                 new Input()
                         .setNeuron(suppr)
@@ -109,7 +109,7 @@ public class GenerateTextTest {
                         .setNeuron(outB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setStartRangeMapping(Range.Mapping.END)
+                        .setBeginRangeMapping(Range.Mapping.END)
                         .setEndRangeMapping(NONE),
                 new Input()
                         .setNeuron(suppr)

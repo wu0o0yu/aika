@@ -6,7 +6,6 @@ import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
-import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.neuron.INeuron;
 import org.junit.Test;
@@ -31,7 +30,7 @@ public class TestNextWord {
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-9.5)
-                        .setStartRangeMapping(Mapping.END)
+                        .setBeginRangeMapping(Mapping.END)
                         .setRangeMatch(Range.Relation.BEGIN_EQUALS)
                         .setBeginRangeOutput(true)
         );

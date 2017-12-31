@@ -190,7 +190,7 @@ public class Input implements Comparable<Input> {
      * @param beginMapping
      * @return
      */
-    public Input setStartRangeMapping(Mapping beginMapping) {
+    public Input setBeginRangeMapping(Mapping beginMapping) {
         this.beginMapping = beginMapping;
         return this;
     }
