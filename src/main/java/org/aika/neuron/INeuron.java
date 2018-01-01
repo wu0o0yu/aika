@@ -519,40 +519,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             rid = Utils.nullSafeSub(act.key.rid, false, sk.relativeRid, false);
         }
 
-
-        Range.Relation rr = sk.rangeMatch;
-        Range r = act.key.range;
-        if (dir == 0) {
-            Range.Relation tr = rr;
-
-            rr = new Range.Relation();
-            rr.beginToBegin = Operator.invert(sk.beginRangeMapping == BEGIN ? tr.beginToBegin : (sk.endRangeMapping == BEGIN ? tr.endToEnd : NONE));
-            rr.endToEnd = Operator.invert(sk.endRangeMapping == END ? tr.endToEnd : (sk.beginRangeMapping == END ? tr.beginToBegin : NONE));
-
-            rr.beginToEnd = Operator.invert(sk.beginRangeMapping == BEGIN ? tr.endToBegin : (sk.endRangeMapping == BEGIN ? tr.beginToEnd : NONE));
-            rr.endToBegin = Operator.invert(sk.endRangeMapping == END ? tr.beginToEnd: (sk.beginRangeMapping == END ? tr.endToBegin : NONE));
-
-            if (sk.beginRangeMapping != BEGIN || sk.endRangeMapping != END) {
-                r = new Range(
-                        sk.endRangeMapping == BEGIN ? r.end : (sk.beginRangeMapping == BEGIN ? r.begin : Integer.MIN_VALUE),
-                        sk.beginRangeMapping == END ? r.begin : (sk.endRangeMapping == END ? r.end : Integer.MAX_VALUE)
-                );
-            }
-        } else {
-            if (sk.beginRangeMapping != BEGIN || sk.endRangeMapping != END) {
-                r = new Range(
-                        sk.beginRangeMapping == END ? r.end : (sk.beginRangeMapping == BEGIN ? r.begin : Integer.MIN_VALUE),
-                        sk.endRangeMapping == BEGIN ? r.begin : (sk.endRangeMapping == END ? r.end : Integer.MAX_VALUE)
-                );
-            }
-        }
-
         Stream<Activation> tmp = NodeActivation.select(
                 doc,
                 n,
                 rid,
-                r,
-                rr,
+                act.key.range,
+                dir == 0 ? sk.rangeMatch.invert() : sk.rangeMatch,
                 null,
                 null
         );

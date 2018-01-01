@@ -85,10 +85,7 @@ public class MetaNetwork {
                                     (ss.metaRelativeRid && ridOffset != null && rid != null ? rid - ridOffset : null),
                             osk.absoluteRid,
                             osk.rangeMatch,
-                            osk.beginRangeMapping,
-                            osk.beginRangeOutput,
-                            osk.endRangeMapping,
-                            osk.endRangeOutput
+                            osk.rangeOutput
                     );
 
                     Synapse ns = new Synapse(inb, targetNeuron, nsk);
@@ -115,11 +112,8 @@ public class MetaNetwork {
                             .setBias(inhibSS.metaBias)
                             .setRelativeRid(inhibSynKey.relativeRid)
                             .setAbsoluteRid(inhibSynKey.absoluteRid)
-                            .setBeginRangeMapping(inhibSynKey.beginRangeMapping)
                             .setRangeMatch(inhibSynKey.rangeMatch)
-                            .setBeginRangeOutput(inhibSynKey.beginRangeOutput)
-                            .setEndRangeMapping(inhibSynKey.endRangeMapping)
-                            .setEndRangeOutput(inhibSynKey.endRangeOutput)
+                            .setRangeOutput(inhibSynKey.rangeOutput)
             );
 
             Activation.Key mak = metaAct.key;

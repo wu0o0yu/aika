@@ -16,7 +16,6 @@
  */
 package org.aika.corpus;
 
-import com.sun.org.apache.regexp.internal.RE;
 import org.aika.Model;
 import org.aika.Utils;
 import org.aika.Writable;
@@ -24,13 +23,8 @@ import org.aika.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import static org.aika.corpus.Range.Operator.GREATER_THAN_EQUAL;
-import static org.aika.corpus.Range.Operator.LESS_THAN_EQUAL;
-import static org.aika.corpus.Range.Operator.NONE;
 
 /**
  * The class {@code Range} specifies a text range (begin char pos, end char pos) within a given document.
@@ -184,6 +178,12 @@ public class Range {
                     endToBegin.compare(ra.end, rb.begin);
         }
 
+
+        public Relation invert() {
+            return new Relation(beginToBegin.invert(), endToBegin.invert(), endToEnd.invert(), beginToEnd.invert());
+        }
+
+
         @Override
         public int compareTo(Relation rr) {
             int r = beginToBegin.compareTo(rr.beginToBegin);
@@ -275,8 +275,8 @@ public class Range {
         }
 
 
-        public static Operator invert(Operator rm) {
-            switch(rm) {
+        public Operator invert() {
+            switch(this) {
                 case EQUALS:
                     return EQUALS;
                 case LESS_THAN_EQUAL:
@@ -290,6 +290,76 @@ public class Range {
                 default:
                     return NONE;
             }
+        }
+    }
+
+
+    public static class Output implements Writable, Comparable<Output> {
+        private static SortedMap<Output, Output> map = new TreeMap();
+
+        public static Output NONE = create(Mapping.NONE, Mapping.NONE);
+        public static Output DIRECT = create(Mapping.BEGIN, Mapping.END);
+
+        public Mapping begin = Mapping.NONE;
+        public Mapping end = Mapping.NONE;
+
+
+        private Output() {}
+
+
+        private Output(Mapping begin, Mapping end) {
+            this.begin = begin;
+            this.end = end;
+        }
+
+
+        public Range map(Range r) {
+            return new Range(begin.getSignalPos(r), end.getSignalPos(r));
+        }
+
+
+        public static Output create(Mapping begin, Mapping end) {
+            return lookup(new Output(begin, end));
+        }
+
+
+        public static Output lookup(Output r) {
+            Output rr = map.get(r);
+            if(rr == null) {
+                rr = r;
+                map.put(r, r);
+            }
+            return rr;
+        }
+
+
+        @Override
+        public int compareTo(Output ro) {
+            int r = Utils.compareInteger(begin.ordinal(), ro.begin.ordinal());
+            if (r != 0) return r;
+            r = Utils.compareInteger(end.ordinal(), ro.end.ordinal());
+            return r;
+        }
+
+
+        @Override
+        public void write(DataOutput out) throws IOException {
+            out.writeByte(begin.getId());
+            out.writeByte(end.getId());
+        }
+
+
+        public static Output read(DataInput in, Model m) throws IOException {
+            Output r = new Output();
+            r.readFields(in, m);
+            return lookup(r);
+        }
+
+
+        @Override
+        public void readFields(DataInput in, Model m) throws IOException {
+            begin = Mapping.getById(in.readByte());
+            end = Mapping.getById(in.readByte());
         }
     }
 
