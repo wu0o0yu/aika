@@ -186,7 +186,7 @@ public class Document implements Comparable<Document> {
 
     public static class DiscoveryConfig {
         public PatternEvaluation checkValidPattern;
-        public PatternEvaluation checkExpandable;
+        public ActivationEvaluation checkExpandable;
         public Counter counter;
 
 
@@ -203,7 +203,7 @@ public class Document implements Comparable<Document> {
          * @param checkExpandable
          * @return
          */
-        public DiscoveryConfig setCheckExpandable(PatternEvaluation checkExpandable) {
+        public DiscoveryConfig setCheckExpandable(ActivationEvaluation checkExpandable) {
             this.checkExpandable = checkExpandable;
             return this;
         }
@@ -664,6 +664,22 @@ public class Document implements Comparable<Document> {
 
 
     public interface PatternEvaluation {
+
+        /**
+         * Check if <code>node</code> is an interesting pattern that might be considered for further processing.
+         *
+         * This property is required to be monotonic over the size of the pattern. In other words, if a pattern is
+         * interesting, then all its sub patterns also need to be interesting.
+         *
+         * @param n
+         * @return
+         */
+
+        boolean evaluate(Node n);
+    }
+
+
+    public interface ActivationEvaluation {
 
         /**
          * Check if <code>node</code> is an interesting pattern that might be considered for further processing.

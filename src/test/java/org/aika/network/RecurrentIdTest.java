@@ -51,7 +51,7 @@ public class RecurrentIdTest {
         Neuron inB = m.createNeuron("B");
 
 
-        OrNode outCNode = m.initNeuron(m.createNeuron("C"),
+        INeuron outC = m.initNeuron(m.createNeuron("C"),
                 0.001,
                 INeuron.Type.EXCITATORY,
                 new Input()
@@ -70,7 +70,7 @@ public class RecurrentIdTest {
                         .setRelativeRid(1)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
-        ).get().node.get();
+        ).get();
 
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -78,7 +78,7 @@ public class RecurrentIdTest {
         inA.addInput(doc, 0, 1, 20);
         inB.addInput(doc, 0, 1, 21);
 
-        Activation outC1 = NodeActivation.get(doc, outCNode, 20, new Range(0, 1), Relation.CONTAINS, null, null);
+        Activation outC1 = Activation.get(doc, outC, 20, new Range(0, 1), Relation.CONTAINS, null, null);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -94,7 +94,7 @@ public class RecurrentIdTest {
         Neuron inB = m.createNeuron("B");
         Neuron inC = m.createNeuron("C");
 
-        OrNode outDNode = m.initNeuron(m.createNeuron("D"),
+        INeuron outD = m.initNeuron(m.createNeuron("D"),
                 0.001,
                 INeuron.Type.EXCITATORY,
                 new Input()
@@ -121,7 +121,7 @@ public class RecurrentIdTest {
                         .setRelativeRid(6)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
-        ).get().node.get();
+        ).get();
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
@@ -129,7 +129,7 @@ public class RecurrentIdTest {
         inB.addInput(doc, 0, 1, 10);
         inC.addInput(doc, 0, 1, 16);
 
-        Activation outD1 = NodeActivation.get(doc, outDNode, 10, new Range(0, 1), Relation.EQUALS, null, null);
+        Activation outD1 = Activation.get(doc, outD, 10, new Range(0, 1), Relation.EQUALS, null, null);
 
         Assert.assertNotNull(outD1);
     }
@@ -164,8 +164,7 @@ public class RecurrentIdTest {
                                 .setBias(begin || end ? -2.0 : -1.0)
                                 .setRelativeRid(i)
                                 .setRangeMatch(begin ? EQUALS : LESS_THAN_EQUAL, end ? EQUALS : GREATER_THAN_EQUAL)
-                                .setBeginRangeOutput(begin)
-                                .setEndRangeOutput(end)
+                                .setRangeOutput(begin, end)
                     );
                 }
             }
@@ -187,7 +186,7 @@ public class RecurrentIdTest {
                 }
             }
 
-            assert n.get().node.get().getActivations(doc).size() >= 1;
+            assert n.get().getActivations(doc).size() >= 1;
         }
     }
 }

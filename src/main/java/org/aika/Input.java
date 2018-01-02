@@ -154,6 +154,17 @@ public class Input implements Comparable<Input> {
         return this;
     }
 
+    /**
+     * <code>setRangeOutput</code> is just a convenience function to call <code>setBeginRangeOutput</code> and <code>setEndRangeOutput</code> at the same time.
+     *
+     * @param begin
+     * @param end
+     * @return
+     */
+    public Input setRangeOutput(boolean begin, boolean end) {
+        return setRangeOutput(begin ? Mapping.BEGIN : Mapping.NONE, end ? Mapping.END : Mapping.NONE);
+    }
+
 
     /**
      * <code>setRangeOutput</code> is just a convenience function to call <code>setBeginRangeOutput</code> and <code>setEndRangeOutput</code> at the same time.

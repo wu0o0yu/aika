@@ -18,6 +18,7 @@ package org.aika.network;
 
 
 import org.aika.Neuron;
+import org.aika.corpus.Range;
 import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.corpus.Range.Relation;
@@ -68,7 +69,7 @@ public class OverlappingOrTest {
                         .setRelativeRid(0)
                         .setBias(-4.0)
                         .setRangeMatch(Operator.EQUALS, Operator.GREATER_THAN_EQUAL)
-                        .setBeginRangeOutput(true),
+                        .setRangeOutput(Range.Output.BEGIN),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0)
@@ -83,7 +84,7 @@ public class OverlappingOrTest {
                         .setRelativeRid(2)
                         .setBias(-4.0)
                         .setRangeMatch(Operator.LESS_THAN_EQUAL, Operator.EQUALS)
-                        .setEndRangeOutput(true)
+                        .setRangeOutput(Range.Output.END)
         );
 
         Document doc = m.createDocument("a b c d e ", 0);
@@ -102,10 +103,10 @@ public class OverlappingOrTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().node.get().getThreadState(doc.threadId, true).activations.size());
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).activations.size());
 
         System.out.println("Output activation:");
-        OrNode n = pattern.get().node.get();
+        INeuron n = pattern.get();
         for(NodeActivation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.range);
             System.out.println("Option: " + act.key.interpretation);

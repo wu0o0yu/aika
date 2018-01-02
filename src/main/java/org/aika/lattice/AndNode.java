@@ -155,8 +155,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.node.provider, act.key.rid, pAct.key.rid));
             for(NodeActivation secondAct: pAct.outputs.values()) {
                 if(secondAct.key.node instanceof AndNode) {
-                    Node secondNode = secondAct.key.node;
-                    if (act != secondAct && discoveryConfig.checkExpandable.evaluate(secondNode)) {
+                    if (act != secondAct && discoveryConfig.checkExpandable.evaluate(secondAct)) {
                         Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
                         Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 

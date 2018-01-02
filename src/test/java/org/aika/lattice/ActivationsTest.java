@@ -27,6 +27,7 @@ import org.aika.corpus.Range.Relation;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.network.TestHelper;
+import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,7 +50,7 @@ public class ActivationsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        m.initNeuron(m.createNeuron("pA"), 0.001, INeuron.Type.EXCITATORY,
+        Neuron pA = m.initNeuron(m.createNeuron("pA"), 0.001, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
@@ -59,21 +60,21 @@ public class ActivationsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, Relation.CONTAINS, Mapping.BEGIN, true, Mapping.END, true);
+        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, Relation.CONTAINS, Range.Output.DIRECT);
 
 
         inA.addInput(doc, 0, 1, 0);
         inA.addInput(doc, 2, 3, 0);
 
-        Assert.assertNotNull(TestHelper.get(doc, pANode, new Range(0, 1), null));
-        Assert.assertNull(TestHelper.get(doc, pANode, new Range(1, 2), null));
-        Assert.assertNotNull(TestHelper.get(doc, pANode, new Range(2, 3), null));
+        Assert.assertNotNull(TestHelper.get(doc, pA.get(), new Range(0, 1), null));
+        Assert.assertNull(TestHelper.get(doc, pA.get(), new Range(1, 2), null));
+        Assert.assertNotNull(TestHelper.get(doc, pA.get(), new Range(2, 3), null));
 
         inA.addInput(doc, 1, 2);
 
-        Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(0, 1), Relation.EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(0, 1), doc.bottom));
-        Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(1, 2), Relation.EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(1, 2), doc.bottom));
-        Assert.assertEquals(NodeActivation.get(doc, pANode, null, new Range(2, 3), Relation.EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pANode, new Range(2, 3), doc.bottom));
+        Assert.assertEquals(Activation.get(doc, pA.get(), null, new Range(0, 1), Relation.EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(0, 1), doc.bottom));
+        Assert.assertEquals(Activation.get(doc, pA.get(), null, new Range(1, 2), Relation.EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(1, 2), doc.bottom));
+        Assert.assertEquals(Activation.get(doc, pA.get(), null, new Range(2, 3), Relation.EQUALS, doc.bottom, InterprNode.Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(2, 3), doc.bottom));
     }
 
 

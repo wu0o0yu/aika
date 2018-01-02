@@ -54,10 +54,7 @@ public class TrainingTest {
                                 0,
                                 null,
                                 Relation.EQUALS,
-                                Range.Mapping.BEGIN,
-                                true,
-                                Range.Mapping.END,
-                                true
+                                Range.Output.DIRECT
                         )
                         , 1.0
                 )
@@ -99,10 +96,7 @@ public class TrainingTest {
                                             0,
                                             null,
                                             Relation.EQUALS,
-                                            Range.Mapping.BEGIN,
-                                            true,
-                                            Range.Mapping.END,
-                                            true
+                                            Range.Output.DIRECT
                                     ),
                                             1.0
                                     )

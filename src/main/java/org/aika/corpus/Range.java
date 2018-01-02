@@ -337,7 +337,9 @@ public class Range {
         private static SortedMap<Output, Output> map = new TreeMap();
 
         public static Output NONE = create(Mapping.NONE, Mapping.NONE);
-        public static Output DIRECT = create(BEGIN, END);
+        public static Output DIRECT = create(Mapping.BEGIN, Mapping.END);
+        public static Output BEGIN = create(Mapping.BEGIN, Mapping.NONE);
+        public static Output END = create(Mapping.NONE, Mapping.END);
 
         public Mapping begin = Mapping.NONE;
         public Mapping end = Mapping.NONE;
@@ -408,6 +410,7 @@ public class Range {
             begin = Mapping.getById(in.readByte());
             end = Mapping.getById(in.readByte());
         }
+
     }
 
 

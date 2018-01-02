@@ -58,11 +58,8 @@ public class PatternDiscoveryTest {
     }
 
 
-    public void count(Document doc, Node n) {
-        Node.ThreadState<?, NodeActivation<?>> ts = n.getThreadState(doc.threadId, false);
-        if (ts == null) return;
-
-        NodeStatistic stat = ((NodeStatistic) n.statistic);
+    public void count(NodeActivation act) {
+        NodeStatistic stat = ((NodeStatistic) act.key.node.statistic);
         stat.frequency += 1; //ts.activations.size();
     }
 
@@ -109,8 +106,8 @@ public class PatternDiscoveryTest {
 
 
         DiscoveryConfig discoveryConfig = new DiscoveryConfig()
-                .setCounter((d, n) -> count(d, n))
-                .setCheckExpandable(n -> ((NodeStatistic) n.statistic).frequency >= 1)
+                .setCounter(act -> count(act))
+                .setCheckExpandable(act -> ((NodeStatistic) act.key.node.statistic).frequency >= 1)
                 .setCheckValidPattern(n -> checkRidRange(n, 1));
 
         doc.bestInterpretation = Arrays.asList(doc.bottom);
@@ -440,8 +437,8 @@ public class PatternDiscoveryTest {
         );
 
         DiscoveryConfig discoveryConfig = new DiscoveryConfig()
-                .setCounter((d, n) -> count(d, n))
-                .setCheckExpandable(n -> ((NodeStatistic) n.statistic).frequency >= 1)
+                .setCounter(act -> count(act))
+                .setCheckExpandable(act -> ((NodeStatistic) act.key.node.statistic).frequency >= 1)
                 .setCheckValidPattern(n -> checkRidRange(n, 2));
         {
             Document doc = m.createDocument("ab", 0);
