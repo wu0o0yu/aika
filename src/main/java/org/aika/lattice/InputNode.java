@@ -180,7 +180,8 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                 null
         );
 
-        s.forEach(secondAct -> {
+        s.filter(secondAct -> !secondAct.outputs.isEmpty())
+                .forEach(secondAct -> {
                     InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
                     if (o != null) {
                         Node.addActivationAndPropagate(doc,
