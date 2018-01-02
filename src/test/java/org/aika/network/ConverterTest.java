@@ -51,32 +51,28 @@ public class ConverterTest {
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
-                        .setBeginRangeOutput(true)
-                        .setEndRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(3.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
-                        .setBeginRangeOutput(true)
-                        .setEndRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Input()
                         .setNeuron(inC)
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
-                        .setBeginRangeOutput(true)
-                        .setEndRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Input()
                         .setNeuron(inD)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
-                        .setBeginRangeOutput(true)
-                        .setEndRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         System.out.println(out.get().node.get().logicToString());
@@ -109,32 +105,28 @@ public class ConverterTest {
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
-                        .setBeginRangeOutput(true)
-                        .setEndRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
-                        .setBeginRangeOutput(true)
-                        .setEndRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Input()
                         .setNeuron(inC)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
-                        .setBeginRangeOutput(true)
-                        .setEndRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Input()
                         .setNeuron(inD)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
-                        .setBeginRangeOutput(true)
-                        .setEndRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         System.out.println(out.get().node.get().logicToString());
@@ -161,40 +153,35 @@ public class ConverterTest {
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
-                        .setBeginRangeOutput(true)
-                        .setEndRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(5.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
-                        .setBeginRangeOutput(true)
-                        .setEndRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Input()
                         .setNeuron(inC)
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
-                        .setBeginRangeOutput(true)
-                        .setEndRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Input()
                         .setNeuron(inD)
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
-                        .setBeginRangeOutput(true)
-                        .setEndRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Input()
                         .setNeuron(inE)
                         .setWeight(0.5f)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
-                        .setBeginRangeOutput(true)
-                        .setEndRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         System.out.println(out.get().node.get().logicToString());

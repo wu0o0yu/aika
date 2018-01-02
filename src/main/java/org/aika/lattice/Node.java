@@ -25,6 +25,7 @@ import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.lattice.OrNode.OrEntry;
+import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,10 +71,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     // Prevents this node from being removed during cleanup.
     public boolean isDiscovered;
 
-    public boolean endRequired;
-    public boolean ridRequired;
-
-
     public AtomicInteger numberOfNeuronRefs = new AtomicInteger(0);
     volatile boolean isRemoved;
 
@@ -89,10 +86,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public static class ThreadState<T extends Node, A extends NodeActivation<T>> {
         public long lastUsed;
 
-        public TreeMap<Key, A> activations;
-        public TreeMap<Key, A> activationsEnd;
-        public TreeMap<Key, A> activationsRid;
-
         public NavigableMap<Key, Set<NodeActivation<?>>> added;
 
         public long visited;
@@ -103,11 +96,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         private RidVisited nullRidVisited;
         private RidVisited[] ridVisited = new RidVisited[2 * MAX_RELATIVE_RID];
 
-        public ThreadState(boolean endRequired, boolean ridRequired) {
-            activations = new TreeMap<>(BEGIN_COMP);
-            activationsEnd = endRequired ? new TreeMap<>(END_COMP) : null;
-            activationsRid = ridRequired ? new TreeMap<>(RID_COMP) : null;
-
+        public ThreadState() {
             added = new TreeMap<>();
         }
 
@@ -157,7 +146,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if (th == null) {
             if (!create) return null;
 
-            th = new ThreadState(endRequired, ridRequired);
+            th = new ThreadState();
             threads[threadId] = th;
         }
         th.lastUsed = provider.model.docIdCounter.get();
@@ -306,18 +295,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             log.info("add: " + ak + " - " + ak.node);
         }
 
-        A act = NodeActivation.get(doc, (T) this, ak);
-        if (act == null) {
-            act = createActivation(doc, ak);
+        A act = createActivation(doc, ak);
 
-            register(act, doc);
+        register(act, doc);
 
-            act.link(inputActs);
+        act.link(inputActs);
 
-            propagateAddedActivation(doc, act);
-        } else {
-            act.link(inputActs);
-        }
+        propagateAddedActivation(doc, act);
 
         return act;
     }
@@ -326,26 +310,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void register(A act, Document doc) {
         Key ak = act.key;
 
-        ThreadState th = ak.node.getThreadState(doc.threadId, true);
-        if (th.activations.isEmpty()) {
-            doc.activatedNodes.add(ak.node);
-        }
-        th.activations.put(ak, act);
-
-        TreeMap<Key, NodeActivation> actEnd = th.activationsEnd;
-        if (actEnd != null) actEnd.put(ak, act);
-
-        TreeMap<Key, NodeActivation> actRid = th.activationsRid;
-        if (actRid != null) actRid.put(ak, act);
-
         if (ak.interpretation.activations == null) {
             ak.interpretation.activations = new TreeMap<>();
         }
         ak.interpretation.activations.put(ak, act);
-
-        if (ak.rid != null) {
-            doc.activationsByRid.put(ak, act);
-        }
     }
 
 
@@ -383,44 +351,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
         iActs.addAll(inputActs);
         doc.queue.add(ak.node);
-    }
-
-
-    public Collection<A> getActivations(Document doc) {
-        ThreadState<T, A> th = getThreadState(doc.threadId, false);
-        if (th == null) return Collections.EMPTY_LIST;
-        return th.activations.values();
-    }
-
-
-    public synchronized A getFirstActivation(Document doc) {
-        ThreadState<T, A> th = getThreadState(doc.threadId, false);
-        if (th == null || th.activations.isEmpty()) return null;
-        return th.activations.firstEntry().getValue();
-    }
-
-
-    public void clearActivations(Document doc) {
-        clearActivations(doc.threadId);
-    }
-
-
-    public void clearActivations(int threadId) {
-        ThreadState th = getThreadState(threadId, false);
-        if (th == null) return;
-        th.activations.clear();
-
-        if (th.activationsEnd != null) th.activationsEnd.clear();
-        if (th.activationsRid != null) th.activationsRid.clear();
-
-        th.added.clear();
-    }
-
-
-    public void clearActivations() {
-        for (int i = 0; i < provider.model.numberOfThreads; i++) {
-            clearActivations(i);
-        }
     }
 
 
@@ -471,8 +401,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             orChildren.pollFirst().node.get().remove();
         }
         lock.releaseWriteLock();
-
-        clearActivations();
 
         isRemoved = true;
     }
@@ -542,9 +470,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         out.writeBoolean(isDiscovered);
 
-        out.writeBoolean(endRequired);
-        out.writeBoolean(ridRequired);
-
         out.writeInt(numberOfNeuronRefs.get());
 
         if (andChildren != null) {
@@ -578,9 +503,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         isDiscovered = in.readBoolean();
-
-        endRequired = in.readBoolean();
-        ridRequired = in.readBoolean();
 
         numberOfNeuronRefs.set(in.readInt());
 

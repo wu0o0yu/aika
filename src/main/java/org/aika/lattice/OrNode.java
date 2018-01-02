@@ -26,6 +26,8 @@ import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -47,6 +49,8 @@ import static org.aika.corpus.Range.Operator.NONE;
  */
 public class OrNode extends Node<OrNode, Activation> {
 
+    private static final Logger log = LoggerFactory.getLogger(OrNode.class);
+
     // Hack: Integer.MIN_VALUE represents the null key
     public TreeMap<Integer, TreeSet<Provider<Node>>> parents = new TreeMap<>();
     public TreeMap<Integer, TreeSet<Provider<Node>>> allParents = new TreeMap<>();
@@ -59,9 +63,6 @@ public class OrNode extends Node<OrNode, Activation> {
 
     public OrNode(Model m) {
         super(m, -1); // Or-node activations always need to be processed first!
-
-        endRequired = true;
-        ridRequired = true;
     }
 
 
@@ -75,43 +76,7 @@ public class OrNode extends Node<OrNode, Activation> {
     protected Activation createActivation(Document doc, NodeActivation.Key ak) {
         Activation act = new Activation(doc.activationIdCounter++, doc, ak);
         ak.interpretation.act = act;
-        ThreadState<OrNode, Activation> th = getThreadState(doc.threadId, false);
-        if(th == null || th.activations.isEmpty()) {
-            doc.activatedNeurons.add(neuron.get(doc));
-        }
-        return act;
-    }
 
-
-    private void retrieveInputs(Document doc, Range inputR, Integer rid, List<NodeActivation<?>> inputs, Integer pRidOffset, TreeSet<Provider<Node>> parents) {
-        // Optimization the number of parents can get very large, thus we need to avoid iterating over all of them.
-        if(parents.size() > 10) {
-            retrieveInputs(doc, null, inputR, rid, inputs, pRidOffset, parents);
-        } else {
-            for(Provider<Node> pn: parents) {
-                retrieveInputs(doc, pn.get(doc), inputR, rid, inputs, pRidOffset, parents);
-            }
-        }
-    }
-
-
-    private void retrieveInputs(Document doc, Node<?, NodeActivation<?>> n, Range inputR, Integer rid, List<NodeActivation<?>> inputs, Integer pRidOffset, TreeSet<Provider<Node>> parents) {
-        Stream<NodeActivation> s = n != null ?
-                NodeActivation.select(doc, n, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, Range.Relation.EQUALS, null, null) :
-                NodeActivation.select(doc, Utils.nullSafeAdd(rid, true, pRidOffset, false), inputR, Range.Relation.EQUALS, null, null);
-        for(NodeActivation iAct: s.collect(Collectors.toList())) {
-            if(parents.contains(iAct.key.node.provider) && !checkSelfReferencing(doc, iAct)) {
-                inputs.add(iAct);
-            }
-        }
-    }
-
-
-    Activation processAddedActivation(Document doc, Key<OrNode> ak, Collection<NodeActivation> inputActs) {
-        Activation act = super.processAddedActivation(doc, ak, inputActs);
-        if(act != null) {
-            neuron.get(doc).linkNeuronRelations(doc, act);
-        }
         return act;
     }
 
@@ -123,19 +88,7 @@ public class OrNode extends Node<OrNode, Activation> {
         Range r = ak.range;
         Integer rid = Utils.nullSafeSub(ak.rid, true, ridOffset, false);
 
-        List<NodeActivation<?>> inputs = new ArrayList<>();
-
-        for (Map.Entry<Integer, TreeSet<Provider<Node>>> me : parents.entrySet()) {
-            retrieveInputs(doc, r, rid, inputs, me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, me.getValue());
-        }
-
-        if(inputs.isEmpty()) return;
-
         InterprNode no = lookupOrOption(doc, r, true);
-
-        for(NodeActivation iAct: inputs) {
-            no.addOrInterpretationNode(iAct.key.interpretation);
-        }
 
         if(neuron.get(doc).outputText != null) {
             int begin = r.begin != Integer.MIN_VALUE ? r.begin : 0;
@@ -145,17 +98,15 @@ public class OrNode extends Node<OrNode, Activation> {
 
         if(r.begin == Integer.MIN_VALUE || r.end == Integer.MAX_VALUE) return;
 
-        Key nak = new Key(
-                this,
-                r,
-                rid,
-                no
-        );
-
         addActivationAndPropagate(
                 doc,
-                nak,
-                inputs
+                new Key(
+                        this,
+                        r,
+                        rid,
+                        no
+                ),
+                Collections.singleton(inputAct)
         );
     }
 
@@ -169,6 +120,33 @@ public class OrNode extends Node<OrNode, Activation> {
 
     public void propagateAddedActivation(Document doc, Activation act) {
         neuron.get(doc).propagateAddedActivation(doc, act);
+    }
+
+
+
+    Activation processAddedActivation(Document doc, Key<OrNode> ak, Collection<NodeActivation> inputActs) {
+        if (Document.APPLY_DEBUG_OUTPUT) {
+            log.info("add: " + ak + " - " + ak.node);
+        }
+
+        Activation act = Activation.get(doc,  neuron.get(), ak);
+        if (act == null) {
+            act = createActivation(doc, ak);
+
+            register(act, doc);
+
+            propagateAddedActivation(doc, act);
+        }
+
+        act.link(inputActs);
+
+        for(NodeActivation iAct: inputActs) {
+            act.key.interpretation.addOrInterpretationNode(iAct.key.interpretation);
+        }
+
+        neuron.get(doc).linkNeuronRelations(doc, act);
+
+        return act;
     }
 
 
@@ -211,7 +189,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
     // TODO: RID
     public InterprNode lookupOrOption(Document doc, Range r, boolean create) {
-        NodeActivation act = NodeActivation.select(doc, this, null, r, Range.Relation.EQUALS, null, null)
+        Activation act = Activation.select(doc, neuron.get(), null, r, Range.Relation.EQUALS, null, null)
                 .findFirst()
                 .orElse(null);
 
@@ -256,20 +234,6 @@ public class OrNode extends Node<OrNode, Activation> {
         }
         pn.add(in.provider);
         lock.releaseWriteLock();
-    }
-
-
-    public boolean hasParent(Integer ridOffset, Node in, boolean all) {
-        lock.acquireReadLock();
-        TreeMap<Integer, TreeSet<Provider<Node>>> p = all ? allParents : parents;
-
-        Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
-        TreeSet<Provider<Node>> pn = p.get(key);
-        boolean result = pn != null && pn.contains(in.provider);
-
-        lock.releaseReadLock();
-
-        return result;
     }
 
 
@@ -320,12 +284,28 @@ public class OrNode extends Node<OrNode, Activation> {
 
     public void register(Activation act, Document doc) {
         super.register(act, doc);
-        Key ak = act.key;
+        Key<OrNode> ak = act.key;
+
+        INeuron.ThreadState th = ak.node.neuron.get().getThreadState(doc.threadId, true);
+        if (th.activations.isEmpty()) {
+            doc.activatedNeurons.add(ak.node.neuron.get());
+        }
+        th.activations.put(ak, act);
+
+        TreeMap<Key, Activation> actEnd = th.activationsEnd;
+        if (actEnd != null) actEnd.put(ak, act);
+
+        TreeMap<Key, Activation> actRid = th.activationsRid;
+        if (actRid != null) actRid.put(ak, act);
 
         if(ak.interpretation.neuronActivations == null) {
             ak.interpretation.neuronActivations = new TreeSet<>();
         }
         ak.interpretation.neuronActivations.add(act);
+
+        if (ak.rid != null) {
+            doc.activationsByRid.put(ak, act);
+        }
     }
 
 

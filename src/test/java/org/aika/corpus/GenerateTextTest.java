@@ -22,10 +22,12 @@ import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.neuron.INeuron;
 import org.aika.corpus.Range.Relation;
+import org.aika.corpus.Range.Output;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static org.aika.corpus.Range.Mapping.NONE;
+
 
 
 /**
@@ -58,8 +60,7 @@ public class GenerateTextTest {
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setBeginRangeMapping(NONE)
-                        .setEndRangeMapping(NONE),
+                        .setRangeOutput(Output.NONE),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-20.0)
@@ -76,8 +77,7 @@ public class GenerateTextTest {
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setBeginRangeMapping(NONE)
-                        .setEndRangeMapping(NONE),
+                        .setRangeOutput(Output.NONE),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-20.0)
@@ -93,8 +93,7 @@ public class GenerateTextTest {
                         .setNeuron(outA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setBeginRangeMapping(Range.Mapping.END)
-                        .setEndRangeMapping(NONE),
+                        .setRangeOutput(Range.Mapping.END, NONE),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-20.0)
@@ -109,8 +108,7 @@ public class GenerateTextTest {
                         .setNeuron(outB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setBeginRangeMapping(Range.Mapping.END)
-                        .setEndRangeMapping(NONE),
+                        .setRangeOutput(Range.Mapping.END, NONE),
                 new Input()
                         .setNeuron(suppr)
                         .setWeight(-20.0)

@@ -97,17 +97,17 @@ public class EntityResolutionTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
 
-        Assert.assertNotNull(eJaguar.get().node.get().getFirstActivation(doc));
-        Assert.assertNotNull(ePuma.get().node.get().getFirstActivation(doc));
+        Assert.assertNotNull(eJaguar.get().getFirstActivation(doc));
+        Assert.assertNotNull(ePuma.get().getFirstActivation(doc));
 
-        Assert.assertEquals(0, eJaguar.get().node.get().getFirstActivation(doc).key.interpretation.primId);
-        Assert.assertEquals(1, ePuma.get().node.get().getFirstActivation(doc).key.interpretation.primId);
+        Assert.assertEquals(0, eJaguar.get().getFirstActivation(doc).key.interpretation.primId);
+        Assert.assertEquals(1, ePuma.get().getFirstActivation(doc).key.interpretation.primId);
 
-        Assert.assertEquals(doc.bottom, eJaguar.get().node.get().getFirstActivation(doc).key.interpretation.orInterprNodes.iterator().next());
-        Assert.assertEquals(doc.bottom, ePuma.get().node.get().getFirstActivation(doc).key.interpretation.orInterprNodes.iterator().next());
+        Assert.assertEquals(doc.bottom, eJaguar.get().getFirstActivation(doc).key.interpretation.orInterprNodes.iterator().next());
+        Assert.assertEquals(doc.bottom, ePuma.get().getFirstActivation(doc).key.interpretation.orInterprNodes.iterator().next());
 
-        Assert.assertEquals(1, eJaguar.get().node.get().getFirstActivation(doc).key.interpretation.orInterprNodes.size());
-        Assert.assertEquals(1, ePuma.get().node.get().getFirstActivation(doc).key.interpretation.orInterprNodes.size());
+        Assert.assertEquals(1, eJaguar.get().getFirstActivation(doc).key.interpretation.orInterprNodes.size());
+        Assert.assertEquals(1, ePuma.get().getFirstActivation(doc).key.interpretation.orInterprNodes.size());
     }
 
 
@@ -297,8 +297,8 @@ public class EntityResolutionTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
 
-        Assert.assertNotNull(eJaguar.get().node.get().getFirstActivation(doc));
-        Assert.assertNotNull(ePuma.get().node.get().getFirstActivation(doc));
+        Assert.assertNotNull(eJaguar.get().getFirstActivation(doc));
+        Assert.assertNotNull(ePuma.get().getFirstActivation(doc));
 
 
         Assert.assertFalse(eJaguar.getFinalActivations(doc).isEmpty());

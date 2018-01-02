@@ -258,13 +258,8 @@ public class PatternLatticeTest {
         Model m = new Model();
 
         Neuron inA = m.createNeuron("A");
-        Node inANode = inA.get().node.get();
-
         Neuron inB = m.createNeuron("B");
-        Node inBNode = inB.get().node.get();
-
         Neuron inC = m.createNeuron("C");
-        Node inCNode = inC.get().node.get();
 
         m.initNeuron(m.createNeuron("ABC"),
                 0.001,
@@ -288,21 +283,8 @@ public class PatternLatticeTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-
-        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, null, false);
-        InputNode pBNode = TestHelper.addOutputNode(doc, inB, null, null, false);
-        InputNode pCNode = TestHelper.addOutputNode(doc, inC, null, null, false);
-
-        NodeActivation inA1 = new NodeActivation(0, doc, inANode, new Range(0, 1), null, doc.bottom);
-
-        TestHelper.addActivation(pANode, doc, inA1);
-
-        NodeActivation inB1 = new NodeActivation(1, doc, inBNode, new Range(0, 1), null, doc.bottom);
-
-        TestHelper.addActivation(pBNode, doc, inB1);
-
-        NodeActivation inC1 = new NodeActivation(2, doc, inCNode, new Range(0, 1), null, doc.bottom);
-
-        TestHelper.addActivation(pCNode, doc, inC1);
+        inA.addInput(doc, 0, 1);
+        inB.addInput(doc, 0, 1);
+        inC.addInput(doc, 0, 1);
     }
 }

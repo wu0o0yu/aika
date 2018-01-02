@@ -26,6 +26,9 @@ import java.io.IOException;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import static org.aika.corpus.Range.Mapping.BEGIN;
+import static org.aika.corpus.Range.Mapping.END;
+
 /**
  * The class {@code Range} specifies a text range (begin char pos, end char pos) within a given document.
  *
@@ -171,6 +174,42 @@ public class Range {
         }
 
 
+        public static Relation createQuery(Relation ra, Output ob, Output oa, Relation rb) {
+            Relation r = new Relation();
+
+            if(ob.begin != Mapping.NONE) {
+                r.beginToBegin = ob.begin == BEGIN ? ra.beginToBegin : ra.beginToEnd;
+            }
+            if(ob.end != Mapping.NONE) {
+                r.beginToEnd = ob.end == BEGIN ? ra.beginToBegin : ra.beginToEnd;
+            }
+            if(ob.begin != Mapping.NONE) {
+                r.endToBegin = ob.begin == BEGIN ? ra.endToBegin : ra.endToEnd;
+            }
+            if(ob.end != Mapping.NONE) {
+                r.endToEnd = ob.end == BEGIN ? ra.endToBegin : ra.endToEnd;
+            }
+
+            Output ioa = oa.invert();
+            Relation irb = rb.invert();
+
+            if(ioa.begin != Mapping.NONE) {
+                r.beginToBegin = ioa.begin == BEGIN ? irb.beginToBegin : irb.endToBegin;
+            }
+            if(ioa.begin != Mapping.NONE) {
+                r.beginToEnd = ioa.begin == BEGIN ? irb.beginToEnd : irb.endToEnd;
+            }
+            if(ioa.end != Mapping.NONE) {
+                r.endToBegin = ioa.end == BEGIN ? irb.beginToBegin : irb.endToBegin;
+            }
+            if(ioa.end != Mapping.NONE) {
+                r.endToEnd = ioa.end == BEGIN ? irb.beginToEnd : irb.endToEnd;
+            }
+
+            return r;
+        }
+
+
         public boolean compare(Range ra, Range rb) {
             return beginToBegin.compare(ra.begin, rb.begin) &&
                     beginToEnd.compare(ra.begin, rb.end) &&
@@ -298,7 +337,7 @@ public class Range {
         private static SortedMap<Output, Output> map = new TreeMap();
 
         public static Output NONE = create(Mapping.NONE, Mapping.NONE);
-        public static Output DIRECT = create(Mapping.BEGIN, Mapping.END);
+        public static Output DIRECT = create(BEGIN, END);
 
         public Mapping begin = Mapping.NONE;
         public Mapping end = Mapping.NONE;
@@ -314,7 +353,15 @@ public class Range {
 
 
         public Range map(Range r) {
-            return new Range(begin.getSignalPos(r), end.getSignalPos(r));
+            return new Range(begin.map(r), end.map(r));
+        }
+
+
+        public Output invert() {
+            return new Output(
+                    begin == Mapping.BEGIN ? Mapping.BEGIN : (end == Mapping.BEGIN ? Mapping.END : Mapping.NONE),
+                    begin == Mapping.END ? Mapping.BEGIN : (end == Mapping.END ? Mapping.END : Mapping.NONE)
+            );
         }
 
 
@@ -388,7 +435,7 @@ public class Range {
         }
 
 
-        public Integer getSignalPos(Range r) {
+        public Integer map(Range r) {
             switch(this) {
                 case BEGIN:
                     return r.begin;
