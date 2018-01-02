@@ -59,21 +59,24 @@ public class NegationTest {
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0)
+                        .setBias(-9.5)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(-9.5),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(-10.0)
+                        .setBias(0.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBias(0.0),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(inC)
                         .setWeight(-10.0)
+                        .setBias(0.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBias(0.0)
+                        .setRangeOutput(true)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -181,9 +184,10 @@ public class NegationTest {
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
+                        .setBias(0.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(0.0)
+                        .setRangeOutput(true)
         );
 
         m.initNeuron(asN,
@@ -192,17 +196,17 @@ public class NegationTest {
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
+                        .setBias(-1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(-1.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
                         .setWeight(-1.0)
+                        .setBias(0.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(0.0)
                         .setRangeMatch(NONE)
         );
 
@@ -240,9 +244,10 @@ public class NegationTest {
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
+                        .setBias(0.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(0.0)
+                        .setRangeOutput(true)
         );
 
         m.initNeuron(asN,
@@ -251,17 +256,17 @@ public class NegationTest {
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
+                        .setBias(-1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(-1.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
                         .setWeight(-1.0)
+                        .setBias(0.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(0.0)
                         .setRangeMatch(Relation.CONTAINS)
         );
 
@@ -299,9 +304,10 @@ public class NegationTest {
                 new Input()
                         .setNeuron(asN)
                         .setWeight(1.0)
+                        .setBias(0.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(0.0)
+                        .setRangeOutput(true)
         );
 
         m.initNeuron(asN,
@@ -310,17 +316,17 @@ public class NegationTest {
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
+                        .setBias(-1.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(-1.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Input()
                         .setNeuron(inS)
                         .setWeight(-1.0)
+                        .setBias(0.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBias(0.0)
                         .setRangeMatch(Relation.CONTAINS)
         );
 
