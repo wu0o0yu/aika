@@ -624,7 +624,7 @@ public class Document implements Comparable<Document> {
                         if (propagate) {
                             if(round > MAX_ROUND) {
                                 log.error("Error: Maximum number of rounds reached. The network might be oscillating.");
-                                dumpOscillatingActivations();
+                                dumpOscillatingActivations(sn);
                                 throw new RuntimeException("Maximum number of rounds reached. ");
                             } else {
                                 propagateWeight(round, act);
@@ -647,11 +647,11 @@ public class Document implements Comparable<Document> {
     }
 
 
-    private void dumpOscillatingActivations() {
+    private void dumpOscillatingActivations(SearchNode sn) {
         activatedNeurons.stream()
                 .flatMap(n -> n.getAllActivations(this).stream())
                 .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)
-                .forEach(act -> log.error(act.key + " " + act.rounds));
+                .forEach(act -> log.error(act.key + " " + sn.getCoverage(act.key.interpretation) + " " + act.rounds));
     }
 
 
