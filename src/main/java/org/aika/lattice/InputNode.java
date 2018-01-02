@@ -180,22 +180,24 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                 null
         );
 
-        s.filter(secondAct -> !secondAct.outputs.isEmpty())
-                .forEach(secondAct -> {
-                    InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
-                    if (o != null) {
-                        Node.addActivationAndPropagate(doc,
-                                new NodeActivation.Key(
-                                        nlp,
-                                        Range.mergeRange(
-                                                firstNode.key.rangeOutput.map(iak.range),
-                                                secondNode.key.rangeOutput.map(secondAct.key.range)
-                                        ),
-                                        Utils.nullSafeMin(ak.rid, secondAct.key.rid),
-                                        o
-                                ),
-                                AndNode.prepareInputActs(act, secondNode.getInputNodeActivation(secondAct))
-                        );
+        s.forEach(secondIAct -> {
+                    NodeActivation secondAct = secondNode.getInputNodeActivation(secondIAct);
+                    if(secondAct != null) {
+                        InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondIAct.key.interpretation);
+                        if (o != null) {
+                            Node.addActivationAndPropagate(doc,
+                                    new NodeActivation.Key(
+                                            nlp,
+                                            Range.mergeRange(
+                                                    firstNode.key.rangeOutput.map(iak.range),
+                                                    secondNode.key.rangeOutput.map(secondIAct.key.range)
+                                            ),
+                                            Utils.nullSafeMin(ak.rid, secondIAct.key.rid),
+                                            o
+                                    ),
+                                    AndNode.prepareInputActs(act, secondAct)
+                            );
+                        }
                     }
                 }
         );
