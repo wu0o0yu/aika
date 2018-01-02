@@ -155,13 +155,14 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        INeuron outB = m.initNeuron(m.createNeuron("B"), 0.001, INeuron.Type.EXCITATORY,
+        INeuron outB = m.initNeuron(m.createNeuron("B"), 0.5, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
+                        .setBias(-1.0)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setBias(-1.0)
+                        .setRangeOutput(true)
         ).get();
 
 
@@ -180,13 +181,14 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        INeuron outB = m.initNeuron(m.createNeuron("B"), 0.001, INeuron.Type.EXCITATORY,
+        INeuron outB = m.initNeuron(m.createNeuron("B"), 0.5, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
+                        .setBias(-1.0)
                         .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setBias(-1.0)
+                        .setRangeOutput(true)
         ).get();
 
 

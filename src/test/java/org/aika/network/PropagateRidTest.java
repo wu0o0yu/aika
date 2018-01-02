@@ -43,14 +43,15 @@ public class PropagateRidTest {
 
         Neuron inA = m.createNeuron("A");
         Neuron pA = m.initNeuron(m.createNeuron("pA"),
-                0.001,
+                0.1,
                 INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
                         .setBias(-0.5)
+                        .setRecurrent(false)
                         .setRelativeRid(5)
+                        .setRangeOutput(true)
         );
 
         inA.addInput(doc, 0, 1, 10, doc.bottom);

@@ -161,10 +161,12 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         INeuron.ThreadState th = secondNode.inputNeuron.get().getThreadState(doc.threadId, false);
         if (th == null || th.activations.isEmpty()) return;
 
+        Activation iAct = (Activation) act.inputs.firstEntry().getValue();
         AndNode nlp = pnlp.get(doc);
         if(nlp.combinatorialExpensive) return;
 
         Activation.Key ak = act.key;
+        Activation.Key iak = iAct.key;
         InputNode firstNode = ((InputNode) ak.node);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
 
@@ -172,7 +174,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                 th,
                 secondNode.inputNeuron.get(),
                 secondRid,
-                ak.range,
+                iak.range,
                 Range.Relation.createQuery(firstNode.key.rangeMatch, secondNode.key.rangeOutput, firstNode.key.rangeOutput, secondNode.key.rangeMatch),
                 null,
                 null
@@ -185,17 +187,26 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                                 new NodeActivation.Key(
                                         nlp,
                                         Range.mergeRange(
-                                                firstNode.key.rangeOutput.map(ak.range),
+                                                firstNode.key.rangeOutput.map(iak.range),
                                                 secondNode.key.rangeOutput.map(secondAct.key.range)
                                         ),
                                         Utils.nullSafeMin(ak.rid, secondAct.key.rid),
                                         o
                                 ),
-                                AndNode.prepareInputActs(act, secondAct)
+                                AndNode.prepareInputActs(act, secondNode.getInputNodeActivation(secondAct))
                         );
                     }
                 }
         );
+    }
+
+
+
+    private NodeActivation getInputNodeActivation(Activation act) {
+        for(NodeActivation inAct: act.outputs.values()) {
+            if(inAct.key.node == this) return inAct;
+        }
+        return null;
     }
 
 

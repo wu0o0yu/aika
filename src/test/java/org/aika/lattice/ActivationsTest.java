@@ -50,18 +50,16 @@ public class ActivationsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        Neuron pA = m.initNeuron(m.createNeuron("pA"), 0.001, INeuron.Type.EXCITATORY,
+        Neuron pA = m.initNeuron(m.createNeuron("pA"), 0.5, INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
                         .setBias(-1.0)
+                        .setRecurrent(false)
+                        .setRangeOutput(true)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
-
-        InputNode pANode = TestHelper.addOutputNode(doc, inA, null, 0, Relation.CONTAINS, Range.Output.DIRECT);
-
 
         inA.addInput(doc, 0, 1, 0);
         inA.addInput(doc, 2, 3, 0);

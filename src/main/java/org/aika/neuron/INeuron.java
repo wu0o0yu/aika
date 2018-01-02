@@ -122,9 +122,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         public TreeMap<Activation.Key, Activation> activationsEnd;
         public TreeMap<Activation.Key, Activation> activationsRid;
 
-        public NavigableMap<NodeActivation.Key, Set<NodeActivation<?>>> added;
-
-
         public ThreadState() {
             activations = new TreeMap<>(BEGIN_COMP);
             activationsEnd = new TreeMap<>(END_COMP);
@@ -168,6 +165,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         if(m.neuronStatisticFactory != null) {
             statistic = m.neuronStatisticFactory.createStatisticObject();
         }
+
+        threads = new ThreadState[m.numberOfThreads];
 
         provider = new Neuron(m, this);
 
@@ -654,8 +653,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         if (th.activationsEnd != null) th.activationsEnd.clear();
         if (th.activationsRid != null) th.activationsRid.clear();
-
-        th.added.clear();
     }
 
 
@@ -856,6 +853,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public static INeuron readNeuron(DataInput in, Neuron p) throws IOException {
         INeuron n = new INeuron();
         n.provider = p;
+        n.threads = new ThreadState[p.model.numberOfThreads];
         n.readFields(in, p.model);
         return n;
     }

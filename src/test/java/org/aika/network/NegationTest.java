@@ -665,15 +665,16 @@ public class NegationTest {
                 new Input()
                         .setNeuron(inA)
                         .setWeight(2.0)
+                        .setBias(-2.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(-2.0),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pD)
                         .setWeight(-2.0)
+                        .setBias(0.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBias(0.0)
         );
 
         m.initNeuron(pD,
@@ -682,15 +683,16 @@ public class NegationTest {
                 new Input()
                         .setNeuron(inB)
                         .setWeight(2.0)
+                        .setBias(-2.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(-2.0),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pC)
                         .setWeight(-2.0)
+                        .setBias(0.0)
                         .setRecurrent(true)
                         .setRelativeRid(0)
-                        .setBias(0.0)
         );
 
 
@@ -702,22 +704,25 @@ public class NegationTest {
                 INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(pC)
+                        .setBias(-2.0)
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(-2.0),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pD)
                         .setWeight(2.0)
+                        .setBias(-2.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(-2.0),
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(inG)
                         .setWeight(2.0)
+                        .setBias(-2.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(-2.0)
+                        .setRangeOutput(true)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
