@@ -236,7 +236,26 @@ public class Document implements Comparable<Document> {
 
 
     public Collection<NodeActivation> getAllNodeActivations() {
-        return null;
+        long v = visitedCounter++;
+        ArrayList<NodeActivation> results = new ArrayList<>();
+        for(INeuron n: activatedNeurons) {
+            for(Activation act: n.getAllActivations(this)) {
+                collectNodeActivations(results, act, v);
+            }
+        }
+        return results;
+    }
+
+
+    private void collectNodeActivations(List<NodeActivation> results, NodeActivation<?> act, long v) {
+        if(act.visited == v) return;
+        act.visited = v;
+
+        results.add(act);
+
+        for(NodeActivation<?> oAct: act.outputs.values()) {
+            collectNodeActivations(results, oAct, v);
+        }
     }
 
 

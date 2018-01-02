@@ -22,10 +22,8 @@ import org.aika.neuron.Activation.State;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.corpus.*;
 import org.aika.corpus.SearchNode.Coverage;
-import org.aika.corpus.Range.Operator;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
-import org.aika.lattice.Node.ThreadState;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.Synapse.Key;
@@ -37,9 +35,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.aika.corpus.Range.Mapping.END;
-import static org.aika.corpus.Range.Mapping.BEGIN;
-import static org.aika.corpus.Range.Operator.*;
 import static org.aika.lattice.Node.BEGIN_COMP;
 import static org.aika.lattice.Node.END_COMP;
 import static org.aika.lattice.Node.RID_COMP;
@@ -412,8 +407,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private void trainSynapse(Document doc, Activation iAct, Document.SynEvalResult ser, double x, long v) {
-        if (iAct.visitedNeuronTrain == v) return;
-        iAct.visitedNeuronTrain = v;
+        if (iAct.visited == v) return;
+        iAct.visited = v;
 
         INeuron inputNeuron = iAct.key.node.neuron.get(doc);
         if(inputNeuron == this) {
