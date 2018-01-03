@@ -103,7 +103,7 @@ public class InterprNode implements Comparable<InterprNode> {
 
 
     public boolean isPrimitive() {
-        return orInterprNodes == null || orInterprNodes.isEmpty() || (orInterprNodes.size() == 1 || orInterprNodes.contains(doc.bottom));
+        return orInterprNodes == null || orInterprNodes.isEmpty() || (orInterprNodes.size() == 1 && orInterprNodes.contains(doc.bottom));
     }
 
 
