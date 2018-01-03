@@ -225,19 +225,18 @@ public class Document implements Comparable<Document> {
 
 
     public void discoverPatterns(DiscoveryConfig discoveryConfig) {
-        getAllNodeActivations().forEach(act -> {
-            discoveryConfig.counter.count(act);
+        Collection<NodeActivation> allActs = getAllNodeActivations();
+        allActs.forEach(act -> discoveryConfig.counter.count(act));
 
-            if (discoveryConfig.checkExpandable.evaluate(act)) {
-                act.key.node.discover(this, act, discoveryConfig);
-            }
-        });
+        allActs.stream()
+                .filter(act -> discoveryConfig.checkExpandable.evaluate(act))
+                .forEach(act -> act.key.node.discover(this, act, discoveryConfig));
     }
 
 
     public Collection<NodeActivation> getAllNodeActivations() {
         long v = visitedCounter++;
-        ArrayList<NodeActivation> results = new ArrayList<>();
+        TreeSet<NodeActivation> results = new TreeSet<>();
         for(INeuron n: activatedNeurons) {
             for(Activation act: n.getAllActivations(this)) {
                 collectNodeActivations(results, act, v);
@@ -247,7 +246,7 @@ public class Document implements Comparable<Document> {
     }
 
 
-    private void collectNodeActivations(List<NodeActivation> results, NodeActivation<?> act, long v) {
+    private void collectNodeActivations(Collection<NodeActivation> results, NodeActivation<?> act, long v) {
         if(act.visited == v) return;
         act.visited = v;
 
