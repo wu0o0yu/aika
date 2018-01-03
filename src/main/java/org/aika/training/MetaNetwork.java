@@ -140,6 +140,9 @@ public class MetaNetwork {
             doc.selectedSearchNode.markSelected(new ArrayList<>(), tAct.key.interpretation);
 
             Activation sAct = getOutputAct(tAct.neuronOutputs, INeuron.Type.INHIBITORY);
+            sAct.key.interpretation.fixed = true;
+            doc.selectedSearchNode.markSelected(new ArrayList<>(), sAct.key.interpretation);
+
             Activation mAct = getOutputAct(sAct.neuronOutputs, INeuron.Type.META);
 
             ArrayList<Activation> newActs = new ArrayList<>();
