@@ -62,8 +62,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     private void init() {
-        ridRequired = false;
-
         for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
             Refinement ref = me.getKey();
             Node pn = me.getValue().get();
@@ -72,11 +70,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             pn.setModified();
 
             if(level > 2 && ((AndNode) pn).combinatorialExpensive) numCombExpParents++;
-
-            if(ref.rid != null) ridRequired = true;
         }
-
-        endRequired = false;
 
         if(provider.model.getAndNodeCheck() != null) {
             combinatorialExpensive = provider.model.getAndNodeCheck().checkIfCombinatorialExpensive(this);
@@ -161,8 +155,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.node.provider, act.key.rid, pAct.key.rid));
             for(NodeActivation secondAct: pAct.outputs.values()) {
                 if(secondAct.key.node instanceof AndNode) {
-                    Node secondNode = secondAct.key.node;
-                    if (act != secondAct && discoveryConfig.checkExpandable.evaluate(secondNode)) {
+                    if (act != secondAct && discoveryConfig.checkExpandable.evaluate(secondAct)) {
                         Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
                         Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 

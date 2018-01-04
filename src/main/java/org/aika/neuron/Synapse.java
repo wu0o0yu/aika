@@ -19,7 +19,7 @@ package org.aika.neuron;
 
 import org.aika.*;
 import org.aika.corpus.Range.Relation;
-import org.aika.corpus.Range.Operator;
+import org.aika.corpus.Range.Output;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
 import org.aika.training.MetaSynapse;
@@ -212,7 +212,7 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S " + weight + " " + key.relativeRid + " S:" + key.beginRangeMapping + " E:" + key.endRangeMapping + " " +  input + "->" + output;
+        return "S " + weight + " " + key.relativeRid + " B:" + key.rangeOutput.begin + " E:" + key.rangeOutput.end + " " +  input + "->" + output;
     }
 
 
@@ -284,23 +284,17 @@ public class Synapse implements Writable {
         public Integer relativeRid;
         public Integer absoluteRid;
         public Relation rangeMatch;
-        public Mapping beginRangeMapping;
-        public Mapping endRangeMapping;
-        public boolean beginRangeOutput;
-        public boolean endRangeOutput;
+        public Output rangeOutput;
 
         public Key() {}
 
 
-        public Key(boolean isRecurrent, Integer relativeRid, Integer absoluteRid, Relation rangeMatch, Mapping beginRangeMapping, boolean beginRangeOutput, Mapping endRangeMapping, boolean endRangeOutput) {
+        public Key(boolean isRecurrent, Integer relativeRid, Integer absoluteRid, Relation rangeMatch, Output rangeOutput) {
             this.isRecurrent = isRecurrent;
             this.relativeRid = relativeRid;
             this.absoluteRid = absoluteRid;
             this.rangeMatch = rangeMatch;
-            this.beginRangeMapping = beginRangeMapping;
-            this.endRangeMapping = endRangeMapping;
-            this.beginRangeOutput = beginRangeOutput;
-            this.endRangeOutput = endRangeOutput;
+            this.rangeOutput = rangeOutput;
         }
 
 
@@ -311,10 +305,7 @@ public class Synapse implements Writable {
                             0,
                             absoluteRid,
                             rangeMatch,
-                            beginRangeMapping,
-                            beginRangeOutput,
-                            endRangeMapping,
-                            endRangeOutput
+                            rangeOutput
                     ) : this;
         }
 
@@ -327,10 +318,7 @@ public class Synapse implements Writable {
             out.writeBoolean(absoluteRid != null);
             if(absoluteRid != null) out.writeByte(absoluteRid);
             rangeMatch.write(out);
-            out.writeByte(beginRangeMapping.getId());
-            out.writeByte(endRangeMapping.getId());
-            out.writeBoolean(beginRangeOutput);
-            out.writeBoolean(endRangeOutput);
+            rangeOutput.write(out);
         }
 
 
@@ -340,10 +328,7 @@ public class Synapse implements Writable {
             if(in.readBoolean()) relativeRid = (int) in.readByte();
             if(in.readBoolean()) absoluteRid = (int) in.readByte();
             rangeMatch = Relation.read(in, m);
-            beginRangeMapping = Mapping.getById(in.readByte());
-            endRangeMapping = Mapping.getById(in.readByte());
-            beginRangeOutput = in.readBoolean();
-            endRangeOutput = in.readBoolean();
+            rangeOutput = Output.read(in, m);
         }
 
 
@@ -371,13 +356,7 @@ public class Synapse implements Writable {
             if(r != 0) return r;
             r = rangeMatch.compareTo(k.rangeMatch);
             if(r != 0) return r;
-            r = beginRangeMapping.compareTo(k.beginRangeMapping);
-            if(r != 0) return r;
-            r = endRangeMapping.compareTo(k.endRangeMapping);
-            if(r != 0) return r;
-            r = Boolean.compare(beginRangeOutput, k.beginRangeOutput);
-            if(r != 0) return r;
-            return Boolean.compare(endRangeOutput, k.endRangeOutput);
+            return rangeOutput.compareTo(k.rangeOutput);
         }
     }
 }

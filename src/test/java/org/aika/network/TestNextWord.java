@@ -25,14 +25,13 @@ public class TestNextWord {
                         .setWeight(10.0)
                         .setBias(-9.5)
                         .setRangeMatch(Range.Relation.END_EQUALS)
-                        .setEndRangeOutput(true),
+                        .setRangeOutput(false, true),
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-9.5)
-                        .setBeginRangeMapping(Mapping.END)
                         .setRangeMatch(Range.Relation.BEGIN_EQUALS)
-                        .setBeginRangeOutput(true)
+                        .setRangeOutput(Mapping.END, Mapping.NONE)
         );
 
         Document doc = m.createDocument("aaaa bbbb  ", 0);

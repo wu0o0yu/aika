@@ -71,7 +71,6 @@ public class Document implements Comparable<Document> {
     public UpperBoundQueue ubQueue = new UpperBoundQueue();
     public BackPropagationQueue bQueue = new BackPropagationQueue();
 
-    public TreeSet<Node> activatedNodes = new TreeSet<>();
     public TreeSet<INeuron> activatedNeurons = new TreeSet<>();
     public TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
     public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
@@ -79,7 +78,7 @@ public class Document implements Comparable<Document> {
     public TreeSet<Activation> errorSignalActivations = new TreeSet<>();
     public TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
 
-    public TreeMap<NodeActivation.Key, NodeActivation> activationsByRid = new TreeMap<>((act1, act2) -> {
+    public TreeMap<NodeActivation.Key, Activation> activationsByRid = new TreeMap<>((act1, act2) -> {
         int r = Integer.compare(act1.rid, act2.rid);
         if (r != 0) return r;
         return act1.compareTo(act2);
@@ -187,7 +186,7 @@ public class Document implements Comparable<Document> {
 
     public static class DiscoveryConfig {
         public PatternEvaluation checkValidPattern;
-        public PatternEvaluation checkExpandable;
+        public ActivationEvaluation checkExpandable;
         public Counter counter;
 
 
@@ -204,7 +203,7 @@ public class Document implements Comparable<Document> {
          * @param checkExpandable
          * @return
          */
-        public DiscoveryConfig setCheckExpandable(PatternEvaluation checkExpandable) {
+        public DiscoveryConfig setCheckExpandable(ActivationEvaluation checkExpandable) {
             this.checkExpandable = checkExpandable;
             return this;
         }
@@ -226,18 +225,36 @@ public class Document implements Comparable<Document> {
 
 
     public void discoverPatterns(DiscoveryConfig discoveryConfig) {
-        activatedNodes.forEach(n -> {
-            discoveryConfig.counter.count(this, n);
+        Collection<NodeActivation> allActs = getAllNodeActivations();
+        allActs.forEach(act -> discoveryConfig.counter.count(act));
 
-            if (discoveryConfig.checkExpandable.evaluate(n)) {
-                ThreadState<?, NodeActivation<?>> th = n.getThreadState(threadId, false);
-                if (th != null) {
-                    for (NodeActivation act : th.activations.values()) {
-                        n.discover(this, act, discoveryConfig);
-                    }
-                }
+        allActs.stream()
+                .filter(act -> discoveryConfig.checkExpandable.evaluate(act))
+                .forEach(act -> act.key.node.discover(this, act, discoveryConfig));
+    }
+
+
+    public Collection<NodeActivation> getAllNodeActivations() {
+        long v = visitedCounter++;
+        TreeSet<NodeActivation> results = new TreeSet<>();
+        for(INeuron n: activatedNeurons) {
+            for(Activation act: n.getAllActivations(this)) {
+                collectNodeActivations(results, act, v);
             }
-        });
+        }
+        return results;
+    }
+
+
+    private void collectNodeActivations(Collection<NodeActivation> results, NodeActivation<?> act, long v) {
+        if(act.visited == v) return;
+        act.visited = v;
+
+        results.add(act);
+
+        for(NodeActivation<?> oAct: act.outputs.values()) {
+            collectNodeActivations(results, oAct, v);
+        }
     }
 
 
@@ -289,9 +306,9 @@ public class Document implements Comparable<Document> {
      * Removes the activations of this document from the model again.
      */
     public void clearActivations() {
-        activatedNodes.forEach(n -> n.clearActivations(this));
+        activatedNeurons.forEach(n -> n.clearActivations(this));
 
-        activatedNodes.clear();
+        activatedNeurons.clear();
         addedNodes.clear();
 
         if(model.lastCleanup[threadId] + CLEANUP_INTERVAL < id) {
@@ -346,7 +363,7 @@ public class Document implements Comparable<Document> {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         for (INeuron n : activatedNeurons) {
-            Stream<Activation> s = NodeActivation.select(this, n.node.get(), null, null, null, null, InterprNode.Relation.CONTAINED_IN);
+            Stream<Activation> s = Activation.select(this, n, null, null, null, null, InterprNode.Relation.CONTAINED_IN);
             acts.addAll(s.collect(Collectors.toList()));
         }
 
@@ -417,34 +434,6 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public String nodeActivationsToString(boolean withTextSnipped, boolean withLogic) {
-        Set<NodeActivation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
-
-        for(Node<?, NodeActivation<?>> n: activatedNodes) {
-            acts.addAll(NodeActivation.select(this, n, null, null, null, null, InterprNode.Relation.CONTAINED_IN).collect(Collectors.toList()));
-        }
-        StringBuilder sb = new StringBuilder();
-        for(NodeActivation act: acts) {
-            sb.append(act.id + " ");
-            sb.append(act.key.range);
-            if(withTextSnipped) {
-                sb.append(" ");
-                sb.append(collapseText(getText(act.key.range)));
-            }
-            sb.append(" - ");
-
-            sb.append(act.key.interpretation);
-            sb.append(" - ");
-
-            sb.append(withLogic ? act.key.node.toString() : act.key.node.getNeuronLabel());
-            sb.append(" - Rid:");
-            sb.append(act.key.rid);
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
-
-
     private String collapseText(String txt) {
         if (txt.length() <= 10) {
             return txt;
@@ -493,7 +482,7 @@ public class Document implements Comparable<Document> {
                 if(APPLY_DEBUG_OUTPUT) {
                     log.info("QueueId:" + th.queueId);
                     log.info(n.toString() + "\n");
-                    log.info("\n" + nodeActivationsToString( true, false));
+                    log.info("\n" + neuronActivationsToString( true, true, true));
                 }
             }
         }
@@ -724,6 +713,22 @@ public class Document implements Comparable<Document> {
     }
 
 
+    public interface ActivationEvaluation {
+
+        /**
+         * Check if <code>node</code> is an interesting pattern that might be considered for further processing.
+         *
+         * This property is required to be monotonic over the size of the pattern. In other words, if a pattern is
+         * interesting, then all its sub patterns also need to be interesting.
+         *
+         * @param act
+         * @return
+         */
+
+        boolean evaluate(NodeActivation act);
+    }
+
+
     public interface SynapseEvaluation {
 
         /**
@@ -753,9 +758,9 @@ public class Document implements Comparable<Document> {
         /**
          * Updates the statistics of this node
          *
-         * @param n
+         * @param act
          * @return
          */
-        void count(Document doc, Node n);
+        void count(NodeActivation act);
     }
 }

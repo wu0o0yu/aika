@@ -67,7 +67,7 @@ public class SimplePatternMatchingTest {
                         .setRelativeRid(0)
                         .setBias(-0.9)
                         .setRangeMatch(Operator.EQUALS, Operator.GREATER_THAN_EQUAL)
-                        .setBeginRangeOutput(true),
+                        .setRangeOutput(true, false),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0)
@@ -82,7 +82,7 @@ public class SimplePatternMatchingTest {
                         .setRelativeRid(2)
                         .setBias(-0.9)
                         .setRangeMatch(Operator.LESS_THAN_EQUAL, Operator.EQUALS)
-                        .setEndRangeOutput(true)
+                        .setRangeOutput(false, true)
         );
 
 
@@ -103,11 +103,11 @@ public class SimplePatternMatchingTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().node.get().getThreadState(doc.threadId, true).activations.size());
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).activations.size());
 
 
         System.out.println("Output activation:");
-        OrNode n = pattern.get().node.get();
+        INeuron n = pattern.get();
         for(NodeActivation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.range);
             System.out.println("Option: " + act.key.interpretation);
@@ -152,7 +152,7 @@ public class SimplePatternMatchingTest {
                         .setRelativeRid(0)
                         .setBias(-0.9)
                         .setRangeMatch(Operator.EQUALS, Operator.GREATER_THAN_EQUAL)
-                        .setBeginRangeOutput(true),
+                        .setRangeOutput(true, false),
                 new Input()
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0)
@@ -174,7 +174,7 @@ public class SimplePatternMatchingTest {
                         .setRelativeRid(3)
                         .setBias(-0.9)
                         .setRangeMatch(Operator.LESS_THAN_EQUAL, Operator.EQUALS)
-                        .setEndRangeOutput(true)
+                        .setRangeOutput(false, true)
         );
 
 
@@ -195,11 +195,11 @@ public class SimplePatternMatchingTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().node.get().getThreadState(doc.threadId, true).activations.size());
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).activations.size());
 
 
         System.out.println("Output activation:");
-        OrNode n = pattern.get().node.get();
+        INeuron n = pattern.get();
         for(NodeActivation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.range);
             System.out.println("Interpretation: " + act.key.interpretation);

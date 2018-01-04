@@ -66,13 +66,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     public InputNode(Model m, Key key) {
         super(m, 1);
         this.key = Synapse.lookupKey(key);
-
-        endRequired = false;
-        ridRequired = false;
-        if (key != null) {
-            endRequired = key.beginRangeMapping == Mapping.NONE;
-            ridRequired = key.relativeRid != null || key.absoluteRid != null;
-        }
     }
 
 
@@ -105,7 +98,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
         return new NodeActivation.Key(
                 this,
-                new Range(key.beginRangeMapping.getSignalPos(ak.range), key.endRangeMapping.getSignalPos(ak.range)),
+                key.rangeOutput.map(ak.range),
                 key.relativeRid != null ? ak.rid : null,
                 ak.interpretation
         );
@@ -165,65 +158,60 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, Provider<AndNode> pnlp, NodeActivation act) {
-        ThreadState th = secondNode.getThreadState(doc.threadId, false);
+        INeuron.ThreadState th = secondNode.inputNeuron.get().getThreadState(doc.threadId, false);
         if (th == null || th.activations.isEmpty()) return;
 
+        Activation iAct = (Activation) act.inputs.firstEntry().getValue();
         AndNode nlp = pnlp.get(doc);
         if(nlp.combinatorialExpensive) return;
 
-        NodeActivation.Key ak = act.key;
+        Activation.Key ak = act.key;
+        Activation.Key iak = iAct.key;
         InputNode firstNode = ((InputNode) ak.node);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
 
-        Stream<NodeActivation<InputNode>> s = NodeActivation.select(
+        Stream<Activation> s = Activation.select(
                 th,
-                secondNode,
+                secondNode.inputNeuron.get(),
                 secondRid,
-                ak.range,
-                computeRangeMatch(firstNode.key, secondNode.key),
+                iak.range,
+                Range.Relation.createQuery(firstNode.key.rangeMatch, secondNode.key.rangeOutput, firstNode.key.rangeOutput, secondNode.key.rangeMatch),
                 null,
                 null
         );
 
-        s.forEach(secondAct -> {
-                    InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
-                    if (o != null) {
-                        Node.addActivationAndPropagate(doc,
-                                new NodeActivation.Key(
-                                        nlp,
-                                        Range.mergeRange(
-                                                Range.getOutputRange(ak.range, new boolean[]{firstNode.key.beginRangeOutput, firstNode.key.endRangeOutput}),
-                                                Range.getOutputRange(secondAct.key.range, new boolean[]{secondNode.key.beginRangeOutput, secondNode.key.endRangeOutput})
-                                        ),
-                                        Utils.nullSafeMin(ak.rid, secondAct.key.rid),
-                                        o
-                                ),
-                                AndNode.prepareInputActs(act, secondAct)
-                        );
+        s.forEach(secondIAct -> {
+                    NodeActivation secondAct = secondNode.getInputNodeActivation(secondIAct);
+                    if(secondAct != null) {
+                        InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondIAct.key.interpretation);
+                        if (o != null) {
+                            Node.addActivationAndPropagate(doc,
+                                    new NodeActivation.Key(
+                                            nlp,
+                                            Range.mergeRange(
+                                                    firstNode.key.rangeOutput.map(iak.range),
+                                                    secondNode.key.rangeOutput.map(secondIAct.key.range)
+                                            ),
+                                            Utils.nullSafeMin(ak.rid, secondIAct.key.rid),
+                                            o
+                                    ),
+                                    AndNode.prepareInputActs(act, secondAct)
+                            );
+                        }
                     }
                 }
         );
     }
 
 
-    // TODO: refactor
-    private static Range.Relation computeRangeMatch(Key k1, Key k2) {
-        Range.Relation rr = new Range.Relation();
 
-        if (k2.beginRangeOutput) {
-            rr.beginToBegin = k1.rangeMatch.beginToBegin;
-        } else if (k1.beginRangeOutput) {
-            rr.beginToBegin = Operator.invert(k2.rangeMatch.beginToBegin);
+    private NodeActivation getInputNodeActivation(Activation act) {
+        for(NodeActivation inAct: act.outputs.values()) {
+            if(inAct.key.node == this) return inAct;
         }
-
-        if (k2.endRangeOutput) {
-            rr.endToEnd = k1.rangeMatch.endToEnd;
-        } else if (k1.endRangeOutput) {
-            rr.endToEnd = Operator.invert(k2.rangeMatch.endToEnd);
-        }
-
-        return rr;
+        return null;
     }
+
 
 
     @Override
@@ -235,14 +223,12 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                 for (NodeActivation secondAct : secondNAct.outputs.values()) {
                     Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.node.provider);
                     InputNode in = ref.input.get(doc);
-                    Range.Relation rm = computeRangeMatch(key, in.key);
+                    Range.Relation rm = Range.Relation.createQuery(key.rangeMatch, in.key.rangeOutput, key.rangeOutput, in.key.rangeMatch);
 
                     if (act != secondAct &&
                             this != in &&
                             in.visitedDiscover != v &&
                             !in.key.isRecurrent &&
-                            !(key.beginRangeOutput && in.key.beginRangeOutput) &&
-                            !(key.endRangeOutput && in.key.endRangeOutput) &&
                             rm.compare(secondAct.key.range, act.key.range)
                         ) {
                         in.visitedDiscover = v;
@@ -315,7 +301,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         sb.append("I");
         sb.append(key.isRecurrent ? "R" : "");
 
-        sb.append(getRangeBrackets(key.beginRangeOutput, key.beginRangeMapping));
+        sb.append(getRangeBrackets(key.rangeOutput.begin));
 
         if (inputNeuron != null) {
             sb.append(inputNeuron.id);
@@ -325,17 +311,15 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
             }
         }
 
-        sb.append(getRangeBrackets(key.endRangeOutput, key.endRangeMapping));
+        sb.append(getRangeBrackets(key.rangeOutput.end));
 
         return sb.toString();
     }
 
 
-    private String getRangeBrackets(boolean ro, Mapping rs) {
+    private String getRangeBrackets(Mapping rs) {
         if (rs == Mapping.NONE) return "|";
-        else if (ro) return rs == Mapping.BEGIN ? "[" : "]";
-        else if (!ro) return rs == Mapping.BEGIN ? "<" : ">";
-        else return "|";
+        return rs == Mapping.BEGIN ? "[" : "]";
     }
 
 

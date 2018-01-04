@@ -140,8 +140,6 @@ public class OptionalAndTest {
             System.out.println(doc.neuronActivationsToString(true, false, true));
             System.out.println();
 
-            System.out.println(doc.nodeActivationsToString(false, true));
-
             doc.clearActivations();
         }
     }

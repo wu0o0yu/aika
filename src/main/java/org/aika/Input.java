@@ -18,6 +18,7 @@ package org.aika;
 
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Relation;
+import org.aika.corpus.Range.Output;
 import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.neuron.Synapse;
@@ -36,10 +37,7 @@ public class Input implements Comparable<Input> {
     double bias;
 
     Relation rangeMatch = Relation.NONE;
-    boolean beginRangeOutput;
-    boolean endRangeOutput;
-    Mapping beginMapping = Mapping.BEGIN;
-    Mapping endMapping = Mapping.END;
+    Output rangeOutput = Output.NONE;
 
     Integer relativeRid;
     Integer absoluteRid;
@@ -152,8 +150,30 @@ public class Input implements Comparable<Input> {
      * @return
      */
     public Input setRangeOutput(boolean ro) {
-        setBeginRangeOutput(ro);
-        setEndRangeOutput(ro);
+        this.rangeOutput = ro ? Output.DIRECT : Output.NONE;
+        return this;
+    }
+
+    /**
+     * <code>setRangeOutput</code> is just a convenience function to call <code>setBeginRangeOutput</code> and <code>setEndRangeOutput</code> at the same time.
+     *
+     * @param begin
+     * @param end
+     * @return
+     */
+    public Input setRangeOutput(boolean begin, boolean end) {
+        return setRangeOutput(begin ? Mapping.BEGIN : Mapping.NONE, end ? Mapping.END : Mapping.NONE);
+    }
+
+
+    /**
+     * <code>setRangeOutput</code> is just a convenience function to call <code>setBeginRangeOutput</code> and <code>setEndRangeOutput</code> at the same time.
+     *
+     * @param rangeOutput
+     * @return
+     */
+    public Input setRangeOutput(Output rangeOutput) {
+        this.rangeOutput = rangeOutput;
         return this;
     }
 
@@ -161,51 +181,12 @@ public class Input implements Comparable<Input> {
     /**
      * Determines if this input is used to compute the range start of the output activation.
      *
-     * @param ro
+     * @param begin
+     * @param end
      * @return
      */
-    public Input setBeginRangeOutput(boolean ro) {
-        this.beginRangeOutput = ro;
-        return this;
-    }
-
-
-    /**
-     * Determines if this input is used to compute the range end of the output activation.
-     *
-     * @param ro
-     * @return
-     */
-    public Input setEndRangeOutput(boolean ro) {
-        this.endRangeOutput = ro;
-        return this;
-    }
-
-
-    /**
-     * Using this method the range end of the input activation might be mapped to the range begin of the
-     * output activation. By default the range begin of the input activation is mapped to the range begin
-     * of the output activation.
-     *
-     * @param beginMapping
-     * @return
-     */
-    public Input setBeginRangeMapping(Mapping beginMapping) {
-        this.beginMapping = beginMapping;
-        return this;
-    }
-
-
-    /**
-     * Using this method the range begin of the input activation might be mapped to the range end of the
-     * output activation. By default the range end of the input activation is mapped to the range end
-     * of the output activation.
-     *
-     * @param endMapping
-     * @return
-     */
-    public Input setEndRangeMapping(Mapping endMapping) {
-        this.endMapping = endMapping;
+    public Input setRangeOutput(Mapping begin, Mapping end) {
+        this.rangeOutput = Output.create(begin, end);
         return this;
     }
 
@@ -219,10 +200,7 @@ public class Input implements Comparable<Input> {
                         relativeRid,
                         absoluteRid,
                         rangeMatch,
-                        beginMapping,
-                        beginRangeOutput,
-                        endMapping,
-                        endRangeOutput
+                        rangeOutput
                 )
         );
 
@@ -246,13 +224,7 @@ public class Input implements Comparable<Input> {
         if (r != 0) return r;
         r = Utils.compareInteger(absoluteRid, in.absoluteRid);
         if (r != 0) return r;
-        r = Boolean.compare(beginRangeOutput, in.beginRangeOutput);
-        if (r != 0) return r;
-        r = Boolean.compare(endRangeOutput, in.endRangeOutput);
-        if (r != 0) return r;
-        r = Utils.compareInteger(beginMapping.ordinal(), in.beginMapping.ordinal());
-        if (r != 0) return r;
-        r = Utils.compareInteger(endMapping.ordinal(), in.endMapping.ordinal());
+        r = rangeOutput.compareTo(in.rangeOutput);
         return r;
     }
 }

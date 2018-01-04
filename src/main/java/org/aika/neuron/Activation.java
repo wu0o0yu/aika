@@ -1,12 +1,18 @@
 package org.aika.neuron;
 
 import org.aika.corpus.Document;
+import org.aika.corpus.InterprNode;
+import org.aika.corpus.Range;
 import org.aika.corpus.SearchNode.StateChange;
+import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
 
 import java.util.*;
+import java.util.stream.Stream;
 
+import static org.aika.corpus.Range.Operator.EQUALS;
+import static org.aika.corpus.Range.Operator.GREATER_THAN_EQUAL;
 import static org.aika.neuron.Activation.SynapseActivation.INPUT_COMP;
 import static org.aika.neuron.Activation.SynapseActivation.OUTPUT_COMP;
 
@@ -113,6 +119,118 @@ public final class Activation extends NodeActivation<OrNode> {
 
     public State getFinalState() {
         return rounds.getLast();
+    }
+
+
+    public static Activation get(Document doc, INeuron n, Integer rid, Range r, Range.Relation rr, InterprNode o, InterprNode.Relation or) {
+        Stream<Activation> s = select(doc, n, rid, r, rr, o, or);
+        return s.findFirst()
+                .orElse(null);
+    }
+
+
+    public static Activation get(Document doc, INeuron n, Key ak) {
+        return get(doc, n, ak.rid, ak.range, Range.Relation.EQUALS, ak.interpretation, InterprNode.Relation.EQUALS);
+    }
+
+
+    public static Stream<Activation> select(Document doc, Integer rid, Range r, Range.Relation rr, InterprNode o, InterprNode.Relation or) {
+        Stream<Activation> results;
+        if(rid != null) {
+            Key bk = new Key(Node.MIN_NODE, Range.MIN, rid, InterprNode.MIN);
+            Key ek = new Key(Node.MAX_NODE, Range.MAX, rid, InterprNode.MAX);
+
+            results = doc.activationsByRid.subMap(bk, true, ek, true)
+                    .values()
+                    .stream();
+        } else {
+            results = doc.activatedNeurons
+                    .stream()
+                    .flatMap(neuron -> getActivationsStream(neuron, doc));
+        }
+
+        return results.filter(act -> act.filter(null, rid, r, rr, o, or));
+    }
+
+
+    public static Stream<Activation> select(Document doc, INeuron n, Integer rid, Range r, Range.Relation rr, InterprNode o, InterprNode.Relation or) {
+        INeuron.ThreadState th = n.getThreadState(doc.threadId, false);
+        if(th == null) return Stream.empty();
+        return select(th, n, rid, r, rr, o, or);
+    }
+
+
+    public static Stream<Activation> select(INeuron.ThreadState th, INeuron n, Integer rid, Range r, Range.Relation rr, InterprNode o, InterprNode.Relation or) {
+        Stream<Activation> results;
+        int s = th.activations.size();
+
+        Node node = n.node.get();
+        if(s == 0) return Stream.empty();
+        else if(s == 1) {
+            results = th.activations
+                    .values()
+                    .stream();
+        } else if(rid != null) {
+            Key bk = new Key(node, Range.MIN, rid, InterprNode.MIN);
+            Key ek = new Key(node, Range.MAX, rid, InterprNode.MAX);
+
+            if(th.activationsRid != null) {
+                results = th.activationsRid.subMap(bk, true, ek, true)
+                        .values()
+                        .stream();
+            } else return Stream.empty();
+        } else {
+            if(rr == null) {
+                results = th.activations.values()
+                        .stream();
+            } else {
+                return getActivationsByRange(th, n, rid, r, rr, o, or);
+            }
+        }
+
+        return results.filter(act -> act.filter(node, rid, r, rr, o, or));
+    }
+
+
+    public static Stream<Activation> getActivationsByRange(INeuron.ThreadState th, INeuron n, Integer rid, Range r, Range.Relation rr, InterprNode o, InterprNode.Relation or) {
+        Collection<Activation> s;
+        Node node = n.node.get();
+        if((rr.beginToBegin == GREATER_THAN_EQUAL || rr.beginToBegin == EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
+            int er = (rr.endToEnd == Range.Operator.LESS_THAN_EQUAL || rr.endToEnd == Range.Operator.EQUALS) && r.end != Integer.MAX_VALUE ? r.end : Integer.MAX_VALUE;
+            s = th.activations.subMap(
+                    new NodeActivation.Key(node, new Range(r.begin, Integer.MIN_VALUE), null, InterprNode.MIN),
+                    true,
+                    new NodeActivation.Key(node, new Range(er, Integer.MAX_VALUE), Integer.MAX_VALUE, InterprNode.MAX),
+                    true
+            )
+                    .values();
+        } else if((rr.beginToBegin == Range.Operator.LESS_THAN_EQUAL || rr.beginToBegin == Range.Operator.EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
+            s = th.activations.descendingMap().subMap(
+                    new NodeActivation.Key(node, new Range(r.begin, Integer.MAX_VALUE), null, InterprNode.MAX),
+                    true,
+                    new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, Integer.MIN_VALUE), null, InterprNode.MIN),
+                    true
+            )
+                    .values();
+        } else {
+            s = th.activations.values();
+        }
+
+        return s.stream().filter(act -> act.filter(node, rid, r, rr, o, or));
+    }
+
+
+    private static Stream<Activation> getActivationsStream(INeuron n, Document doc) {
+        INeuron.ThreadState th = n.getThreadState(doc.threadId, false);
+        return th == null ? Stream.empty() : th.activations.values().stream();
+    }
+
+
+    public <T extends Node> boolean filter(T n, Integer rid, Range r, Range.Relation rr, InterprNode o, InterprNode.Relation or) {
+        return (n == null || key.node == n) &&
+                (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) &&
+                (r == null || rr == null || rr.compare(key.range, r)) &&
+                (o == null || or.compare(key.interpretation, o));
     }
 
 

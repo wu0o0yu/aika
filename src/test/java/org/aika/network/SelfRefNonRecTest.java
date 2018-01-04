@@ -48,6 +48,7 @@ public class SelfRefNonRecTest {
                         .setNeuron(bN)
                         .setWeight(5.0)
                         .setBias(0.0)
+                        .setRangeOutput(true)
         );
 
         m.initNeuron(
@@ -57,11 +58,13 @@ public class SelfRefNonRecTest {
                 new Input()
                         .setNeuron(inA)
                         .setWeight(5.0)
-                        .setBias(0.0),
+                        .setBias(0.0)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(cN)
                         .setWeight(5.0)
                         .setBias(0.0)
+                        .setRangeOutput(true)
         );
 
 
@@ -74,6 +77,6 @@ public class SelfRefNonRecTest {
 
         System.out.println(t.neuronActivationsToString(false, false, true));
 
-        Assert.assertEquals(1, bN.get().node.get().getFirstActivation(t).key.interpretation.orInterprNodes.size());
+        Assert.assertEquals(1, bN.get().getFirstActivation(t).key.interpretation.orInterprNodes.size());
     }
 }

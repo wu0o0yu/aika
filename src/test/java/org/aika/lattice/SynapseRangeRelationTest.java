@@ -59,10 +59,7 @@ public class SynapseRangeRelationTest {
                         null,
                         null,
                         Range.Relation.CONTAINS,
-                        Mapping.BEGIN,
-                        true,
-                        Mapping.END,
-                        true
+                        Range.Output.DIRECT
                 )
         );
         s.link();

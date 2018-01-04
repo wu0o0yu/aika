@@ -87,20 +87,15 @@ public class CountingTest {
         doc.discoverPatterns(
                 new DiscoveryConfig()
                         .setCheckExpandable(n -> false)
-                        .setCounter((d, n) -> count(d, n))
+                        .setCounter(act -> count(act))
         );
         Assert.assertEquals(6.0, ((NodeStatistic) outA.get().node.get().parents.get(Integer.MIN_VALUE).first().get().statistic).frequency, 0.001);
     }
 
 
-    public void count(Document doc, Node n) {
-        Node.ThreadState<?, NodeActivation<?>> ts = n.getThreadState(doc.threadId, false);
-        if (ts == null) return;
+    public void count(NodeActivation act) {
+        NodeStatistic stat = ((NodeStatistic) act.key.node.statistic);
 
-        NodeStatistic stat = ((NodeStatistic) n.statistic);
-
-        for (NodeActivation<?> act : ts.activations.values()) {
-            stat.frequency++;
-        }
+        stat.frequency++;
     }
 }

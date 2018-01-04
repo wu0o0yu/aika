@@ -165,13 +165,13 @@ public class WeakInputProcessingTest {
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        Activation act = TestHelper.get(doc, patternA.get().node.get(), null, null);
+        Activation act = TestHelper.get(doc, patternA.get(), null, null);
         Assert.assertTrue(act.getFinalState().value < 0.5);
 
-        act = TestHelper.get(doc, patternB.get().node.get(), null, null);
+        act = TestHelper.get(doc, patternB.get(), null, null);
         Assert.assertTrue(act.getFinalState().value > 0.5);
 
-        act = TestHelper.get(doc, patternC.get().node.get(), null, null);
+        act = TestHelper.get(doc, patternC.get(), null, null);
         Assert.assertTrue(act.getFinalState().value < 0.5);
     }
 

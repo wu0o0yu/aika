@@ -23,9 +23,11 @@ import org.aika.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import static org.aika.corpus.Range.Mapping.BEGIN;
+import static org.aika.corpus.Range.Mapping.END;
 
 
 /**
@@ -173,12 +175,54 @@ public class Range {
         }
 
 
+        public static Relation createQuery(Relation ra, Output ob, Output oa, Relation rb) {
+            Relation r = new Relation();
+
+            if(ob.begin != Mapping.NONE) {
+                r.beginToBegin = ob.begin == BEGIN ? ra.beginToBegin : ra.beginToEnd;
+            }
+            if(ob.end != Mapping.NONE) {
+                r.beginToEnd = ob.end == BEGIN ? ra.beginToBegin : ra.beginToEnd;
+            }
+            if(ob.begin != Mapping.NONE) {
+                r.endToBegin = ob.begin == BEGIN ? ra.endToBegin : ra.endToEnd;
+            }
+            if(ob.end != Mapping.NONE) {
+                r.endToEnd = ob.end == BEGIN ? ra.endToBegin : ra.endToEnd;
+            }
+
+            Output ioa = oa.invert();
+            Relation irb = rb.invert();
+
+            if(ioa.begin != Mapping.NONE) {
+                r.beginToBegin = ioa.begin == BEGIN ? irb.beginToBegin : irb.endToBegin;
+            }
+            if(ioa.begin != Mapping.NONE) {
+                r.beginToEnd = ioa.begin == BEGIN ? irb.beginToEnd : irb.endToEnd;
+            }
+            if(ioa.end != Mapping.NONE) {
+                r.endToBegin = ioa.end == BEGIN ? irb.beginToBegin : irb.endToBegin;
+            }
+            if(ioa.end != Mapping.NONE) {
+                r.endToEnd = ioa.end == BEGIN ? irb.beginToEnd : irb.endToEnd;
+            }
+
+            return r;
+        }
+
+
         public boolean compare(Range ra, Range rb) {
             return beginToBegin.compare(ra.begin, rb.begin) &&
                     beginToEnd.compare(ra.begin, rb.end) &&
                     endToEnd.compare(ra.end, rb.end) &&
                     endToBegin.compare(ra.end, rb.begin);
         }
+
+
+        public Relation invert() {
+            return new Relation(beginToBegin.invert(), endToBegin.invert(), endToEnd.invert(), beginToEnd.invert());
+        }
+
 
         @Override
         public int compareTo(Relation rr) {
@@ -271,8 +315,8 @@ public class Range {
         }
 
 
-        public static Operator invert(Operator rm) {
-            switch(rm) {
+        public Operator invert() {
+            switch(this) {
                 case EQUALS:
                     return EQUALS;
                 case LESS_THAN_EQUAL:
@@ -287,6 +331,87 @@ public class Range {
                     return NONE;
             }
         }
+    }
+
+
+    public static class Output implements Writable, Comparable<Output> {
+        private static SortedMap<Output, Output> map = new TreeMap();
+
+        public static Output NONE = create(Mapping.NONE, Mapping.NONE);
+        public static Output DIRECT = create(Mapping.BEGIN, Mapping.END);
+        public static Output BEGIN = create(Mapping.BEGIN, Mapping.NONE);
+        public static Output END = create(Mapping.NONE, Mapping.END);
+
+        public Mapping begin = Mapping.NONE;
+        public Mapping end = Mapping.NONE;
+
+
+        private Output() {}
+
+
+        private Output(Mapping begin, Mapping end) {
+            this.begin = begin;
+            this.end = end;
+        }
+
+
+        public Range map(Range r) {
+            return new Range(begin.map(r), end.map(r));
+        }
+
+
+        public Output invert() {
+            return new Output(
+                    begin == Mapping.BEGIN ? Mapping.BEGIN : (end == Mapping.BEGIN ? Mapping.END : Mapping.NONE),
+                    begin == Mapping.END ? Mapping.BEGIN : (end == Mapping.END ? Mapping.END : Mapping.NONE)
+            );
+        }
+
+
+        public static Output create(Mapping begin, Mapping end) {
+            return lookup(new Output(begin, end));
+        }
+
+
+        public static Output lookup(Output r) {
+            Output rr = map.get(r);
+            if(rr == null) {
+                rr = r;
+                map.put(r, r);
+            }
+            return rr;
+        }
+
+
+        @Override
+        public int compareTo(Output ro) {
+            int r = Utils.compareInteger(begin.ordinal(), ro.begin.ordinal());
+            if (r != 0) return r;
+            r = Utils.compareInteger(end.ordinal(), ro.end.ordinal());
+            return r;
+        }
+
+
+        @Override
+        public void write(DataOutput out) throws IOException {
+            out.writeByte(begin.getId());
+            out.writeByte(end.getId());
+        }
+
+
+        public static Output read(DataInput in, Model m) throws IOException {
+            Output r = new Output();
+            r.readFields(in, m);
+            return lookup(r);
+        }
+
+
+        @Override
+        public void readFields(DataInput in, Model m) throws IOException {
+            begin = Mapping.getById(in.readByte());
+            end = Mapping.getById(in.readByte());
+        }
+
     }
 
 
@@ -314,7 +439,7 @@ public class Range {
         }
 
 
-        public Integer getSignalPos(Range r) {
+        public Integer map(Range r) {
             switch(this) {
                 case BEGIN:
                     return r.begin;

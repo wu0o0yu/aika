@@ -26,6 +26,8 @@ import org.aika.corpus.Range.Relation;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
+import org.aika.neuron.Activation;
+import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 
 import static org.aika.corpus.Range.Operator.*;
@@ -39,38 +41,25 @@ import static org.aika.corpus.Range.Mapping.BEGIN;
 public class TestHelper {
 
 
-    public static NodeActivation addActivation(InputNode in, Document doc, NodeActivation inputAct) {
-        in.addActivation(doc, inputAct);
-        doc.propagate();
-        if(in instanceof InputNode) {
-            return NodeActivation.get(doc, in, inputAct.key.rid, inputAct.key.range, Relation.CONTAINS, inputAct.key.interpretation, InterprNode.Relation.EQUALS);
-        }
-        return null;
-    }
-
-
     public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, boolean ro) {
-        return addOutputNode(doc, n, relativeRid, absoluteRid, Relation.EQUALS, BEGIN, ro, END, ro);
+        return addOutputNode(doc, n, relativeRid, absoluteRid, Relation.EQUALS, ro ? Range.Output.DIRECT : Range.Output.NONE);
     }
 
 
-    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, Relation rangeMatch, Mapping beginMapping, boolean beginRangeOutput, Mapping endMapping, boolean endRangeOutput) {
+    public static InputNode addOutputNode(Document doc, Neuron n, Integer relativeRid, Integer absoluteRid, Relation rangeMatch, Range.Output rangeOutput) {
         return InputNode.add(doc.model,
                 new Synapse.Key(
                         false,
                         relativeRid,
                         absoluteRid,
                         rangeMatch,
-                        beginMapping,
-                        beginRangeOutput,
-                        endMapping,
-                        endRangeOutput
+                        rangeOutput
                 ),
                 n.get()
         );
     }
 
-    public static <T extends Node, A extends NodeActivation<T>> A get(Document doc, T n, Range r, InterprNode o) {
-        return NodeActivation.get(doc, n, null, r, Relation.CONTAINS, o, InterprNode.Relation.EQUALS);
+    public static Activation get(Document doc, INeuron n, Range r, InterprNode o) {
+        return Activation.get(doc, n, null, r, Relation.CONTAINS, o, InterprNode.Relation.EQUALS);
     }
 }

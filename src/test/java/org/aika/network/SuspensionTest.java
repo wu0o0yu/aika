@@ -76,7 +76,7 @@ public class SuspensionTest {
                         .setRelativeRid(0)
                         .setRecurrent(false)
                         .setRangeMatch(Relation.BEGIN_EQUALS)
-                        .setBeginRangeOutput(true),
+                        .setRangeOutput(true, false),
                 new Input()
                         .setNeuron(inB)
                         .setWeight(10.0)
@@ -84,7 +84,7 @@ public class SuspensionTest {
                         .setRelativeRid(null)
                         .setRecurrent(false)
                         .setRangeMatch(Relation.END_EQUALS)
-                        .setEndRangeOutput(true)
+                        .setRangeOutput(false, true)
         );
 
 

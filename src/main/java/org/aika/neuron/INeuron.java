@@ -22,10 +22,8 @@ import org.aika.neuron.Activation.State;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.corpus.*;
 import org.aika.corpus.SearchNode.Coverage;
-import org.aika.corpus.Range.Operator;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
-import org.aika.lattice.Node.ThreadState;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.Synapse.Key;
@@ -37,9 +35,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.aika.corpus.Range.Mapping.END;
-import static org.aika.corpus.Range.Mapping.BEGIN;
-import static org.aika.corpus.Range.Operator.*;
+import static org.aika.lattice.Node.BEGIN_COMP;
+import static org.aika.lattice.Node.END_COMP;
+import static org.aika.lattice.Node.RID_COMP;
 import static org.aika.neuron.Activation.State.*;
 
 /**
@@ -108,6 +106,41 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public ReadWriteLock lock = new ReadWriteLock();
 
 
+    public ThreadState[] threads;
+
+    /**
+     * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
+     * a specific logic node.
+     */
+    public static class ThreadState {
+        public long lastUsed;
+
+        public TreeMap<Activation.Key, Activation> activations;
+        public TreeMap<Activation.Key, Activation> activationsEnd;
+        public TreeMap<Activation.Key, Activation> activationsRid;
+
+        public ThreadState() {
+            activations = new TreeMap<>(BEGIN_COMP);
+            activationsEnd = new TreeMap<>(END_COMP);
+            activationsRid = new TreeMap<>(RID_COMP);
+        }
+    }
+
+
+    public ThreadState getThreadState(int threadId, boolean create) {
+        ThreadState th = threads[threadId];
+        if (th == null) {
+            if (!create) return null;
+
+            th = new ThreadState();
+            threads[threadId] = th;
+        }
+        th.lastUsed = provider.model.docIdCounter.get();
+        return th;
+    }
+
+
+
     private INeuron() {
     }
 
@@ -129,6 +162,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         if(m.neuronStatisticFactory != null) {
             statistic = m.neuronStatisticFactory.createStatisticObject();
         }
+
+        threads = new ThreadState[m.numberOfThreads];
 
         provider = new Neuron(m, this);
 
@@ -155,7 +190,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         doc.propagate();
 
-        Activation act = NodeActivation.get(doc, node.get(doc), rid, new Range(begin, end), Range.Relation.EQUALS, o, InterprNode.Relation.EQUALS);
+        Activation act = Activation.get(doc, this, rid, new Range(begin, end), Range.Relation.EQUALS, o, InterprNode.Relation.EQUALS);
         State s = new State(value, 0, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.inputValue = value;
@@ -178,6 +213,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     // TODO
     public void remove() {
+
+        clearActivations();
+
         for (Synapse s : inputSynapses.values()) {
             INeuron in = s.input.get();
             in.provider.lock.acquireWriteLock();
@@ -371,8 +409,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private void trainSynapse(Document doc, Activation iAct, Document.SynEvalResult ser, double x, long v) {
-        if (iAct.visitedNeuronTrain == v) return;
-        iAct.visitedNeuronTrain = v;
+        if (iAct.visited == v) return;
+        iAct.visited = v;
 
         INeuron inputNeuron = iAct.key.node.neuron.get(doc);
         if(inputNeuron == this) {
@@ -457,11 +495,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             Neuron p = (dir == 0 ? s.input : s.output);
             INeuron an = p.getIfNotSuspended();
             if (an != null) {
-                OrNode n = an.node.get(doc);
-                ThreadState th = n.getThreadState(doc.threadId, false);
+                ThreadState th = an.getThreadState(doc.threadId, false);
                 if (th == null || th.activations.isEmpty()) continue;
 
-                linkActSyn(n, doc, act, dir, recNegTmp, s);
+                linkActSyn(an, doc, act, dir, recNegTmp, s);
             }
         }
         provider.lock.releaseReadLock();
@@ -511,7 +548,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private static void linkActSyn(OrNode n, Document doc, Activation act, int dir, ArrayList<Activation> recNegTmp, Synapse s) {
+    private static void linkActSyn(INeuron n, Document doc, Activation act, int dir, ArrayList<Activation> recNegTmp, Synapse s) {
         Synapse.Key sk = s.key;
 
         Integer rid;
@@ -521,40 +558,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             rid = Utils.nullSafeSub(act.key.rid, false, sk.relativeRid, false);
         }
 
-
-        Range.Relation rr = sk.rangeMatch;
-        Range r = act.key.range;
-        if (dir == 0) {
-            Range.Relation tr = rr;
-
-            rr = new Range.Relation();
-            rr.beginToBegin = Operator.invert(sk.beginRangeMapping == BEGIN ? tr.beginToBegin : (sk.endRangeMapping == BEGIN ? tr.endToEnd : NONE));
-            rr.endToEnd = Operator.invert(sk.endRangeMapping == END ? tr.endToEnd : (sk.beginRangeMapping == END ? tr.beginToBegin : NONE));
-
-            rr.beginToEnd = Operator.invert(sk.beginRangeMapping == BEGIN ? tr.endToBegin : (sk.endRangeMapping == BEGIN ? tr.beginToEnd : NONE));
-            rr.endToBegin = Operator.invert(sk.endRangeMapping == END ? tr.beginToEnd: (sk.beginRangeMapping == END ? tr.endToBegin : NONE));
-
-            if (sk.beginRangeMapping != BEGIN || sk.endRangeMapping != END) {
-                r = new Range(
-                        sk.endRangeMapping == BEGIN ? r.end : (sk.beginRangeMapping == BEGIN ? r.begin : Integer.MIN_VALUE),
-                        sk.beginRangeMapping == END ? r.begin : (sk.endRangeMapping == END ? r.end : Integer.MAX_VALUE)
-                );
-            }
-        } else {
-            if (sk.beginRangeMapping != BEGIN || sk.endRangeMapping != END) {
-                r = new Range(
-                        sk.beginRangeMapping == END ? r.end : (sk.beginRangeMapping == BEGIN ? r.begin : Integer.MIN_VALUE),
-                        sk.endRangeMapping == BEGIN ? r.begin : (sk.endRangeMapping == END ? r.end : Integer.MAX_VALUE)
-                );
-            }
-        }
-
-        Stream<Activation> tmp = NodeActivation.select(
+        Stream<Activation> tmp = Activation.select(
                 doc,
                 n,
                 rid,
-                r,
-                rr,
+                act.key.range,
+                dir == 0 ? sk.rangeMatch.invert() : sk.rangeMatch,
                 null,
                 null
         );
@@ -603,6 +612,44 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         synsTmp = newSyns;
         return synsTmp;
+    }
+
+
+
+    public Collection<Activation> getActivations(Document doc) {
+        ThreadState th = getThreadState(doc.threadId, false);
+        if (th == null) return Collections.EMPTY_LIST;
+        return th.activations.values();
+    }
+
+
+    public synchronized Activation getFirstActivation(Document doc) {
+        ThreadState th = getThreadState(doc.threadId, false);
+        if (th == null || th.activations.isEmpty()) return null;
+        return th.activations.firstEntry().getValue();
+    }
+
+
+
+    public void clearActivations() {
+        for (int i = 0; i < provider.model.numberOfThreads; i++) {
+            clearActivations(i);
+        }
+    }
+
+
+    public void clearActivations(Document doc) {
+        clearActivations(doc.threadId);
+    }
+
+
+    public void clearActivations(int threadId) {
+        ThreadState th = getThreadState(threadId, false);
+        if (th == null) return;
+        th.activations.clear();
+
+        if (th.activationsEnd != null) th.activationsEnd.clear();
+        if (th.activationsRid != null) th.activationsRid.clear();
     }
 
 
@@ -803,6 +850,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public static INeuron readNeuron(DataInput in, Neuron p) throws IOException {
         INeuron n = new INeuron();
         n.provider = p;
+        n.threads = new ThreadState[p.model.numberOfThreads];
         n.readFields(in, p.model);
         return n;
     }
@@ -852,14 +900,14 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      * @return A collection with all final activations of this neuron.
      */
     public Collection<Activation> getFinalActivations(Document doc) {
-        Stream<Activation> s = NodeActivation.select(doc, node.get(doc), null, null, null, null, null);
+        Stream<Activation> s = Activation.select(doc, this, null, null, null, null, null);
         return s.filter(act -> act.isFinalActivation())
                 .collect(Collectors.toList());
     }
 
 
     public Collection<Activation> getAllActivations(Document doc) {
-        Stream<Activation> s = NodeActivation.select(doc, node.get(doc), null, null, null, null, null);
+        Stream<Activation> s = Activation.select(doc, this, null, null, null, null, null);
         return s.collect(Collectors.toList());
     }
 
