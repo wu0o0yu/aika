@@ -31,6 +31,8 @@ public final class Activation extends NodeActivation<OrNode> {
     public TreeSet<SynapseActivation> neuronInputs = new TreeSet<>(INPUT_COMP);
     public TreeSet<SynapseActivation> neuronOutputs = new TreeSet<>(OUTPUT_COMP);
 
+    public Integer sequence;
+
     public double upperBound;
     public double lowerBound;
 
@@ -111,6 +113,15 @@ public final class Activation extends NodeActivation<OrNode> {
 
     public State getFinalState() {
         return rounds.getLast();
+    }
+
+
+    public Integer getSequence() {
+        if(sequence != null) return sequence;
+
+        sequence = 0;
+        neuronInputs.stream().filter(sa -> !sa.synapse.key.isRecurrent).forEach(sa -> sequence = Math.max(sequence, sa.input.getSequence() + 1));
+        return sequence;
     }
 
 

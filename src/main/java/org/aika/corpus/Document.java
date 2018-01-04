@@ -360,6 +360,7 @@ public class Document implements Comparable<Document> {
 
             if(sn != null) {
                 sb.append(sn.getCoverage(act.key.interpretation) + " ");
+                sb.append(act.sequence + " ");
             }
 
             sb.append(act.key.range);

@@ -16,7 +16,6 @@
  */
 package org.aika.corpus;
 
-import com.sun.org.apache.regexp.internal.RE;
 import org.aika.Model;
 import org.aika.Utils;
 import org.aika.Writable;
@@ -28,9 +27,6 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import static org.aika.corpus.Range.Operator.GREATER_THAN_EQUAL;
-import static org.aika.corpus.Range.Operator.LESS_THAN_EQUAL;
-import static org.aika.corpus.Range.Operator.NONE;
 
 /**
  * The class {@code Range} specifies a text range (begin char pos, end char pos) within a given document.

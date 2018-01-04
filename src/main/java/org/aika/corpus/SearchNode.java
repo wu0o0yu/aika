@@ -684,6 +684,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
         int id;
+        int sequence = 0;
         int minBegin;
         int maxEnd;
         Integer minRid;
@@ -691,11 +692,13 @@ public class SearchNode implements Comparable<SearchNode> {
         public Candidate(InterprNode refinement, int id) {
             this.refinement = refinement;
             if(refinement.act != null) {
+                sequence = refinement.act.getSequence();
                 minBegin = refinement.act.key.range.begin;
                 maxEnd = refinement.act.key.range.end;
                 minRid = refinement.act.key.rid;
             } else {
                 for(NodeActivation act: refinement.getActivations()) {
+                    sequence = Math.max(sequence, refinement.act.getSequence());
                     if(act.key.range != null) {
                         minBegin= Math.min(minBegin, act.key.range.begin);
                         maxEnd =  Math.max(maxEnd, act.key.range.end);
@@ -714,6 +717,10 @@ public class SearchNode implements Comparable<SearchNode> {
             if(r != 0) return r;
             r = Integer.compare(c.maxEnd, maxEnd);
             if(r != 0) return r;
+
+            r = Integer.compare(sequence, c.sequence);
+            if(r != 0) return r;
+
             r = Utils.compareInteger(minRid, c.minRid);
             if(r != 0) return r;
             return Integer.compare(id, c.id);
