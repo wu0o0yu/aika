@@ -301,6 +301,8 @@ public class SearchNodeTest {
         doc.process();
 
         System.out.println(doc.neuronActivationsToString(true, true, true));
+
+        Assert.assertFalse(nD.getFinalActivations(doc).isEmpty());
     }
 
 }
