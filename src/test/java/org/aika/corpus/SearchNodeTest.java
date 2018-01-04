@@ -187,4 +187,116 @@ public class SearchNodeTest {
         doc.clearActivations();
     }
 
+
+    @Test
+    public void testBackwardReferencingSynapses() {
+        Model m = new Model();
+
+        Neuron inA = m.createNeuron("IN A");
+        Neuron inB = m.createNeuron("IN B");
+
+        Neuron inhib = m.createNeuron("INHIB");
+
+        Neuron nF = m.createNeuron("F");
+
+        Neuron nC = m.initNeuron(m.createNeuron("C"), 6.0, INeuron.Type.EXCITATORY,
+                new Input()
+                        .setNeuron(inA)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
+                new Input()
+                        .setNeuron(inhib)
+                        .setWeight(-100.0)
+                        .setBias(0.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+        );
+
+        Neuron nD = m.initNeuron(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
+                new Input()
+                        .setNeuron(inA)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
+                new Input()
+                        .setNeuron(nF)
+                        .setWeight(2.0)
+                        .setBias(0.0)
+                        .setRangeMatch(Range.Relation.NONE),
+                new Input()
+                        .setNeuron(inhib)
+                        .setWeight(-100.0)
+                        .setBias(0.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+        );
+
+        Neuron nE = m.initNeuron(m.createNeuron("E"), 5.0, INeuron.Type.EXCITATORY,
+                new Input()
+                        .setNeuron(inB)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
+                new Input()
+                        .setNeuron(inhib)
+                        .setWeight(-100.0)
+                        .setBias(0.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+        );
+
+        m.initNeuron(nF, 6.0, INeuron.Type.EXCITATORY,
+                new Input()
+                        .setNeuron(inB)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
+                new Input()
+                        .setNeuron(inhib)
+                        .setWeight(-100.0)
+                        .setBias(0.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+        );
+
+
+        m.initNeuron(inhib, 0.0, INeuron.Type.INHIBITORY,
+                new Input()
+                        .setNeuron(nC)
+                        .setWeight(10.0)
+                        .setBias(0.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
+                new Input()
+                        .setNeuron(nD)
+                        .setWeight(10.0)
+                        .setBias(0.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
+                new Input()
+                        .setNeuron(nE)
+                        .setWeight(10.0)
+                        .setBias(0.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
+                new Input()
+                        .setNeuron(nF)
+                        .setWeight(10.0)
+                        .setBias(0.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true)
+        );
+
+
+        Document doc = m.createDocument("aaaa bbbb ");
+
+        inA.addInput(doc, 0, 5);
+        inB.addInput(doc, 5, 10);
+
+        doc.process();
+
+        System.out.println(doc.neuronActivationsToString(true, true, true));
+    }
+
 }
