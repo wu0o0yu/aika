@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import static org.aika.corpus.Range.Mapping.BEGIN;
 import static org.aika.corpus.Range.Mapping.END;
 
+
 /**
  * The class {@code Range} specifies a text range (begin char pos, end char pos) within a given document.
  *

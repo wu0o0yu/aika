@@ -54,6 +54,8 @@ import static org.aika.neuron.Activation.State.*;
  */
 public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron> {
 
+    public static boolean ALLOW_WEAK_NEGATIVE_WEIGHTS = false;
+
     private static final Logger log = LoggerFactory.getLogger(INeuron.class);
 
     public static double WEIGHT_TOLERANCE = 0.001;
@@ -298,8 +300,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         );
 
         return new State(
-                c == Coverage.SELECTED ? currentActValue : 0.0,
-                c == Coverage.SELECTED ? fired : -1,
+                c == Coverage.SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? currentActValue : 0.0,
+                c == Coverage.SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? fired : -1,
                 newWeight
         );
     }
