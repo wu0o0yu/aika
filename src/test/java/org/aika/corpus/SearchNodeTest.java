@@ -210,6 +210,7 @@ public class SearchNodeTest {
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
+                        .setRecurrent(true)
                         .setRangeMatch(Range.Relation.EQUALS)
         );
 
@@ -229,6 +230,7 @@ public class SearchNodeTest {
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
+                        .setRecurrent(true)
                         .setRangeMatch(Range.Relation.EQUALS)
         );
 
@@ -243,6 +245,7 @@ public class SearchNodeTest {
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
+                        .setRecurrent(true)
                         .setRangeMatch(Range.Relation.EQUALS)
         );
 
@@ -257,6 +260,7 @@ public class SearchNodeTest {
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
+                        .setRecurrent(true)
                         .setRangeMatch(Range.Relation.EQUALS)
         );
 
