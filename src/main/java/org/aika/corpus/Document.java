@@ -537,8 +537,17 @@ public class Document implements Comparable<Document> {
     }
 
 
+    private static Comparator<Activation> VALUE_QUEUE_COMP = (a, b) -> {
+        int r = Integer.compare(a.getSequence(), b.getSequence());
+        if(r != 0) return r;
+        return Integer.compare(a.id, b.id);
+    };
+
+
     public class ValueQueue {
-        public final ArrayList<ArrayDeque<Activation>> queue = new ArrayList<>();
+
+
+        public final ArrayList<TreeSet<Activation>> queue = new ArrayList<>();
 
         public void propagateWeight(int round, Activation act)  {
             for(Activation.SynapseActivation sa: act.neuronOutputs) {
@@ -581,24 +590,24 @@ public class Document implements Comparable<Document> {
         public void add(int round, Activation act) {
             if(act.rounds.isQueued(round)) return;
 
-            ArrayDeque<Activation> q;
+            TreeSet<Activation> q;
             if(round < queue.size()) {
                 q = queue.get(round);
             } else {
                 assert round == queue.size();
-                q = new ArrayDeque<>();
+                q = new TreeSet<>(VALUE_QUEUE_COMP);
                 queue.add(q);
             }
 
             act.rounds.setQueued(round, true);
-            q.addLast(act);
+            q.add(act);
         }
 
 
         public INeuron.NormWeight processChanges(SearchNode sn, long v) {
             NormWeight delta = NormWeight.ZERO_WEIGHT;
             for(int round = 0; round < queue.size(); round++) {
-                ArrayDeque<Activation> q = queue.get(round);
+                TreeSet<Activation> q = queue.get(round);
                 while (!q.isEmpty()) {
                     Activation act = q.pollLast();
                     act.rounds.setQueued(round, false);
