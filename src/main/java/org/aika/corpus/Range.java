@@ -144,6 +144,8 @@ public class Range {
         public static Relation EQUALS = create(Operator.EQUALS, Operator.EQUALS);
         public static Relation BEGIN_EQUALS = create(Operator.EQUALS, Operator.NONE);
         public static Relation END_EQUALS = create(Operator.NONE, Operator.EQUALS);
+        public static Relation BEGIN_TO_END_EQUALS = create(Operator.NONE, Operator.EQUALS, Operator.NONE , Operator.NONE);
+        public static Relation END_TO_BEGIN_EQUALS = create(Operator.NONE, Operator.NONE, Operator.NONE , Operator.EQUALS);
         public static Relation CONTAINS = create(Operator.LESS_THAN_EQUAL, Operator.GREATER_THAN_EQUAL);
         public static Relation CONTAINED_IN = create(Operator.GREATER_THAN_EQUAL, Operator.LESS_THAN_EQUAL);
         public static Relation OVERLAPS = create(Operator.NONE, Operator.LESS_THAN, Operator.NONE, Operator.GREATER_THAN);
