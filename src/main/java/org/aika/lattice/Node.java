@@ -137,7 +137,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      */
     public static class RidVisited {
         public long computeParents = -1;
-        public long outputNode = -1;
     }
 
 
