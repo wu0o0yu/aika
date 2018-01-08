@@ -20,12 +20,14 @@ package org.aika.network;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
+import org.aika.corpus.Range;
 import org.aika.neuron.Activation;
 import org.aika.corpus.Conflicts.Conflict;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.INeuron;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -71,50 +73,59 @@ public class MutualExclusionTest {
         // Create three neurons that might be suppressed by the suppressing neuron.
         Neuron pA = m.initNeuron(
                 m.createNeuron("A"),
-                3,
+                3.0,
                 INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inA)
                         .setWeight(10.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
-                        .setBias(-10.0),
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0)
+                        .setWeight(-100.0)
+                        .setBias(0.0)
                         .setRecurrent(true)
-                        .setBias(0.0)     // This input is negated
+                        .setRangeMatch(Range.Relation.EQUALS)
         );
 
         Neuron pB = m.initNeuron(
                 m.createNeuron("B"),
-                5,
+                5.0,
                 INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inB)
                         .setWeight(10.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
-                        .setBias(-10.0),
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0)
-                        .setRecurrent(true)
+                        .setWeight(-100.0)
                         .setBias(0.0)
+                        .setRecurrent(true)
+                        .setRangeMatch(Range.Relation.EQUALS)
         );
 
         Neuron pC = m.initNeuron(
                 m.createNeuron("C"),
-                2,
+                2.0,
                 INeuron.Type.EXCITATORY,
                 new Input()
                         .setNeuron(inC)
                         .setWeight(10.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
-                        .setBias(-10.0),
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pSuppr)
-                        .setWeight(-10.0)
-                        .setRecurrent(true)
+                        .setWeight(-100.0)
                         .setBias(0.0)
+                        .setRecurrent(true)
+                        .setRangeMatch(Range.Relation.EQUALS)
         );
 
         // Finally addInput all the inputs to the suppressing neuron.
@@ -125,18 +136,24 @@ public class MutualExclusionTest {
                 new Input()
                         .setNeuron(pA)
                         .setWeight(10.0)
+                        .setBias(0.0)
                         .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pB)
                         .setWeight(10.0)
+                        .setBias(0.0)
                         .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
                 new Input()
                         .setNeuron(pC)
                         .setWeight(10.0)
-                        .setRecurrent(false)
                         .setBias(0.0)
+                        .setRecurrent(false)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true)
         );
 
         Neuron outN = m.initNeuron(m.createNeuron("OUT"),
@@ -145,8 +162,10 @@ public class MutualExclusionTest {
                 new Input()
                         .setNeuron(pB)
                         .setWeight(1.0)
-                        .setRecurrent(false)
                         .setBias(0.0)
+                        .setRecurrent(false)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true)
         );
 
         // Now that the model is complete, apply it to a document.
@@ -174,6 +193,8 @@ public class MutualExclusionTest {
         System.out.println();
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
+
+        Assert.assertFalse(outN.getFinalActivations(doc).isEmpty());
         doc.clearActivations();
     }
 }
