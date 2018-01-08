@@ -463,14 +463,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
         n.markedSelected = visited;
 
-        if(n.refByOrInterprNode != null) {
-            for (InterprNode ref : n.refByOrInterprNode) {
-                if(ref.selectedOrInterprNodes == null) {
-                    ref.selectedOrInterprNodes = new TreeSet<>();
-                }
-                ref.selectedOrInterprNodes.add(n);
-            }
-        }
+        n.setSelectedInterpretationNode();
 
         if(n.isBottom()) {
             return;
@@ -480,6 +473,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
         return;
     }
+
 
 
     private void markUnselected(List<InterprNode> n) {
@@ -655,8 +649,10 @@ public class SearchNode implements Comparable<SearchNode> {
         for(InterprNode n: p.refinement) {
             if(n.act != null) {
                 for(SynapseActivation sa: n.act.neuronOutputs) {
-                    if(sa.synapse.key.isRecurrent && !sa.synapse.isNegative()) {
-                        if(getCoverage(sa.output.key.interpretation) == Coverage.UNKNOWN) return true;
+                    if(!sa.synapse.isNegative()) {
+                        if(getCoverage(sa.output.key.interpretation) == Coverage.UNKNOWN) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -713,9 +709,9 @@ public class SearchNode implements Comparable<SearchNode> {
 
         @Override
         public int compareTo(Candidate c) {
-            int r = Integer.compare(minBegin, c.minBegin);
+            int r = Integer.compare(maxEnd, c.maxEnd);
             if(r != 0) return r;
-            r = Integer.compare(c.maxEnd, maxEnd);
+            r = Integer.compare(c.minBegin, minBegin);
             if(r != 0) return r;
 
             r = Integer.compare(sequence, c.sequence);

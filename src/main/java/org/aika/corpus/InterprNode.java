@@ -139,6 +139,28 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
+
+    public void setFixed(boolean value) {
+        fixed = value;
+
+        if(fixed) {
+            setSelectedInterpretationNode();
+        }
+    }
+
+
+    public void setSelectedInterpretationNode() {
+        if(refByOrInterprNode != null) {
+            for (InterprNode ref : refByOrInterprNode) {
+                if(ref.selectedOrInterprNodes == null) {
+                    ref.selectedOrInterprNodes = new TreeSet<>();
+                }
+                ref.selectedOrInterprNodes.add(this);
+            }
+        }
+    }
+
+
     private void computeLargestCommonSubsetIncremental(InterprNode no) {
         if (orInterprNodes.size() == 0) {
             setLCS(no);

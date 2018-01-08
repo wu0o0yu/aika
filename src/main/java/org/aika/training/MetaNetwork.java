@@ -22,6 +22,7 @@ public class MetaNetwork {
 
 
     public static void train(Document doc) {
+        long v = doc.visitedCounter++;
         for(INeuron n: new ArrayList<>(doc.finallyActivatedNeurons)) {
             if(n.type == INeuron.Type.INHIBITORY) {
                 for (Activation sAct : n.getFinalActivations(doc)) {
@@ -36,8 +37,9 @@ public class MetaNetwork {
                         }
 
                         Activation metaNeuronAct = getMetaNeuronAct(sAct);
-                        if(metaNeuronAct != null) {
-                            transferMetaSynapses(doc, metaNeuronAct, targetNeuron, newNeuron, n.provider);
+                        if(metaNeuronAct != null && metaNeuronAct.visited != v) {
+                            metaNeuronAct.visited = v;
+                            transferMetaSynapses(doc, metaNeuronAct, targetNeuron, newNeuron, n.provider, v);
                         }
                     }
                 }
@@ -56,7 +58,7 @@ public class MetaNetwork {
     }
 
 
-    private static void transferMetaSynapses(Document doc, Activation metaAct, Neuron targetNeuron, boolean newNeuron, Neuron supprN) {
+    private static void transferMetaSynapses(Document doc, Activation metaAct, Neuron targetNeuron, boolean newNeuron, Neuron supprN, long v) {
         TreeSet<Synapse> inputSynapses = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
 
         Integer ridOffset = computeRidOffset(metaAct);
@@ -134,17 +136,16 @@ public class MetaNetwork {
 
         for(Activation tAct: targetNeuron.get().getAllActivations(doc)) {
             if(!isConflicting(tAct)) {
-                tAct.key.interpretation.fixed = true;
-                doc.selectedSearchNode.markSelected(new ArrayList<>(), tAct.key.interpretation);
+                tAct.key.interpretation.setFixed(true);
 
                 Activation sAct = getOutputAct(tAct.neuronOutputs, INeuron.Type.INHIBITORY);
-                sAct.key.interpretation.fixed = true;
-                doc.selectedSearchNode.markSelected(new ArrayList<>(), sAct.key.interpretation);
+                sAct.key.interpretation.setFixed(true);
 
                 Activation mAct = getOutputAct(sAct.neuronOutputs, INeuron.Type.META);
 
                 ArrayList<Activation> newActs = new ArrayList<>();
                 if (mAct != null) {
+                    mAct.visited = v;
                     newActs.add(mAct);
                 }
                 newActs.add(tAct);
