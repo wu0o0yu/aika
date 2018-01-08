@@ -4,7 +4,10 @@ package org.aika.training;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
+import org.aika.corpus.Conflicts;
 import org.aika.corpus.Document;
+import org.aika.corpus.InterprNode;
+import org.aika.corpus.SearchNode;
 import org.aika.lattice.NodeActivation;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
@@ -34,7 +37,7 @@ public class MetaNetwork {
 
                         Activation metaNeuronAct = getMetaNeuronAct(sAct);
                         if(metaNeuronAct != null) {
-                            transferMetaSynapses(doc, metaNeuronAct, sAct, targetNeuron, newNeuron, n.provider);
+                            transferMetaSynapses(doc, metaNeuronAct, targetNeuron, newNeuron, n.provider);
                         }
                     }
                 }
@@ -53,7 +56,7 @@ public class MetaNetwork {
     }
 
 
-    private static void transferMetaSynapses(Document doc, Activation metaAct, Activation inhibAct, Neuron targetNeuron, boolean newNeuron, Neuron supprN) {
+    private static void transferMetaSynapses(Document doc, Activation metaAct, Neuron targetNeuron, boolean newNeuron, Neuron supprN) {
         TreeSet<Synapse> inputSynapses = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
 
         Integer ridOffset = computeRidOffset(metaAct);
@@ -130,39 +133,51 @@ public class MetaNetwork {
         doc.propagate();
 
         for(Activation tAct: targetNeuron.get().getAllActivations(doc)) {
-            tAct.key.interpretation.fixed = true;
-            doc.selectedSearchNode.markSelected(new ArrayList<>(), tAct.key.interpretation);
+            if(!isConflicting(tAct)) {
+                tAct.key.interpretation.fixed = true;
+                doc.selectedSearchNode.markSelected(new ArrayList<>(), tAct.key.interpretation);
 
-            Activation sAct = getOutputAct(tAct.neuronOutputs, INeuron.Type.INHIBITORY);
-            sAct.key.interpretation.fixed = true;
-            doc.selectedSearchNode.markSelected(new ArrayList<>(), sAct.key.interpretation);
+                Activation sAct = getOutputAct(tAct.neuronOutputs, INeuron.Type.INHIBITORY);
+                sAct.key.interpretation.fixed = true;
+                doc.selectedSearchNode.markSelected(new ArrayList<>(), sAct.key.interpretation);
 
-            Activation mAct = getOutputAct(sAct.neuronOutputs, INeuron.Type.META);
+                Activation mAct = getOutputAct(sAct.neuronOutputs, INeuron.Type.META);
 
-            ArrayList<Activation> newActs = new ArrayList<>();
-            if (mAct != null) {
-                newActs.add(mAct);
-            }
-            newActs.add(tAct);
-            newActs.add(sAct);
-
-            newActs.forEach(act -> doc.vQueue.add(0, act));
-            doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++);
-
-            if(tAct.getFinalState().value <= 0.0) {
-                tAct.key.interpretation.fixed = false;
-                doc.selectedSearchNode.markSelected(new ArrayList<>(), mAct.key.interpretation);
+                ArrayList<Activation> newActs = new ArrayList<>();
+                if (mAct != null) {
+                    newActs.add(mAct);
+                }
+                newActs.add(tAct);
+                newActs.add(sAct);
 
                 newActs.forEach(act -> doc.vQueue.add(0, act));
                 doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++);
-            }
 
-            for (Activation act : newActs) {
-                if (act.isFinalActivation()) {
-                    doc.finallyActivatedNeurons.add(act.key.node.neuron.get(doc));
+                if (tAct.getFinalState().value <= 0.0) {
+                    tAct.key.interpretation.fixed = false;
+                    doc.selectedSearchNode.markSelected(new ArrayList<>(), mAct.key.interpretation);
+
+                    newActs.forEach(act -> doc.vQueue.add(0, act));
+                    doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++);
+                }
+
+                for (Activation act : newActs) {
+                    if (act.isFinalActivation()) {
+                        doc.finallyActivatedNeurons.add(act.key.node.neuron.get(doc));
+                    }
                 }
             }
         }
+    }
+
+
+    private static boolean isConflicting(Activation tAct) {
+        ArrayList<InterprNode> tmp = new ArrayList<>();
+        Conflicts.collectDirectConflicting(tmp, tAct.key.interpretation);
+        for(InterprNode c: tmp) {
+            if(tAct.doc.selectedSearchNode.getCoverage(c) == SearchNode.Coverage.SELECTED) return true;
+        }
+        return false;
     }
 
 
