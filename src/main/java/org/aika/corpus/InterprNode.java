@@ -88,6 +88,7 @@ public class InterprNode implements Comparable<InterprNode> {
 
     public final Document doc;
     public Activation act;
+    public SearchNode.Candidate cand;
 
     private static InterprNode[] EMPTY_INTR_RELS = new InterprNode[0];
     public InterprNode[] parents = EMPTY_INTR_RELS;

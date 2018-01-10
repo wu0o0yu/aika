@@ -373,57 +373,7 @@ public class Document implements Comparable<Document> {
                 continue;
             }
 
-            sb.append(act.id + " ");
-
-            if(sn != null) {
-                sb.append(sn.getCoverage(act.key.interpretation) + " ");
-                sb.append(act.sequence + " ");
-            }
-
-            sb.append(act.key.range);
-
-            if(withTextSnipped) {
-                sb.append(" ");
-                if(act.key.node.neuron.get().outputText != null) {
-                    sb.append(collapseText(act.key.node.neuron.get().outputText));
-                } else {
-                    sb.append(collapseText(getText(act.key.range)));
-                }
-            }
-            sb.append(" - ");
-
-            sb.append(act.key.interpretation);
-            sb.append(" - ");
-
-            sb.append(withLogic ? act.key.node.toString() : act.key.node.getNeuronLabel());
-
-            sb.append(" - Rid:");
-            sb.append(act.key.rid);
-
-            sb.append(" - UB:");
-            sb.append(Utils.round(act.upperBound));
-            if (withWeights) {
-                sb.append(" - ");
-                for(Map.Entry<Integer, Activation.State> me: act.rounds.rounds.entrySet()) {
-                    Activation.State s = me.getValue();
-                    sb.append("[R:" + me.getKey());
-                    sb.append(" VALUE:" + Utils.round(s.value));
-                    sb.append(" W:" + Utils.round(s.weight.w));
-                    sb.append(" N:" + Utils.round(s.weight.n));
-                    sb.append("]");
-                }
-
-                if (act.isFinalActivation()) {
-                    State fs = act.getFinalState();
-                    sb.append(" - FV:" + Utils.round(fs.value));
-                    sb.append(" FW:" + Utils.round(fs.weight.w));
-                    sb.append(" FN:" + Utils.round(fs.weight.n));
-
-                    if(act.targetValue != null) {
-                        sb.append(" - TV:" + Utils.round(act.targetValue));
-                    }
-                }
-            }
+            sb.append(act.toString(sn, withWeights, withTextSnipped, withLogic));
             sb.append("\n");
         }
 
@@ -431,15 +381,6 @@ public class Document implements Comparable<Document> {
             sb.append("\n Final SearchNode:" + selectedSearchNode.id + "  WeightSum:" + selectedSearchNode.accumulatedWeight.toString() + "\n");
         }
         return sb.toString();
-    }
-
-
-    private String collapseText(String txt) {
-        if (txt.length() <= 10) {
-            return txt;
-        } else {
-            return txt.substring(0, 5) + "..." + txt.substring(txt.length() - 5);
-        }
     }
 
 

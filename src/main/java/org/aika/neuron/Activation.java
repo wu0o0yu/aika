@@ -1,8 +1,10 @@
 package org.aika.neuron;
 
+import org.aika.Utils;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
+import org.aika.corpus.SearchNode;
 import org.aika.corpus.SearchNode.StateChange;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
@@ -376,6 +378,74 @@ public final class Activation extends NodeActivation<OrNode> {
 
         public String toString() {
             return "VALUE:" + value;
+        }
+    }
+
+
+
+    public String toString(SearchNode sn, boolean withWeights, boolean withTextSnipped, boolean withLogic) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(id + " ");
+
+        if(sn != null) {
+            sb.append(sn.getCoverage(key.interpretation) + " ");
+            sb.append(sequence + " ");
+        }
+
+        sb.append(key.range);
+
+        if(withTextSnipped) {
+            sb.append(" ");
+            if(key.node.neuron.get().outputText != null) {
+                sb.append(collapseText(key.node.neuron.get().outputText));
+            } else {
+                sb.append(collapseText(doc.getText(key.range)));
+            }
+        }
+        sb.append(" - ");
+
+        sb.append(key.interpretation);
+        sb.append(" - ");
+
+        sb.append(withLogic ? key.node.toString() : key.node.getNeuronLabel());
+
+        sb.append(" - Rid:");
+        sb.append(key.rid);
+
+        sb.append(" - UB:");
+        sb.append(Utils.round(upperBound));
+        if (withWeights) {
+            sb.append(" - ");
+            for(Map.Entry<Integer, State> me: rounds.rounds.entrySet()) {
+                State s = me.getValue();
+                sb.append("[R:" + me.getKey());
+                sb.append(" VALUE:" + Utils.round(s.value));
+                sb.append(" W:" + Utils.round(s.weight.w));
+                sb.append(" N:" + Utils.round(s.weight.n));
+                sb.append("]");
+            }
+
+            if (isFinalActivation()) {
+                State fs = getFinalState();
+                sb.append(" - FV:" + Utils.round(fs.value));
+                sb.append(" FW:" + Utils.round(fs.weight.w));
+                sb.append(" FN:" + Utils.round(fs.weight.n));
+
+                if(targetValue != null) {
+                    sb.append(" - TV:" + Utils.round(targetValue));
+                }
+            }
+        }
+
+        return sb.toString();
+    }
+
+
+    private String collapseText(String txt) {
+        if (txt.length() <= 10) {
+            return txt;
+        } else {
+            return txt.substring(0, 5) + "..." + txt.substring(txt.length() - 5);
         }
     }
 

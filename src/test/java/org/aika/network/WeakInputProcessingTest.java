@@ -129,7 +129,7 @@ public class WeakInputProcessingTest {
 
 
         m.initNeuron(suppr,
-                -0.001,
+                0.0,
                 INeuron.Type.INHIBITORY,
                 new Input()
                         .setNeuron(patternA)
