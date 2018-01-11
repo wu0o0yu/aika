@@ -40,6 +40,7 @@ public final class Activation extends NodeActivation<OrNode> {
     public TreeSet<SynapseActivation> neuronOutputs = new TreeSet<>(OUTPUT_COMP);
 
     public Integer sequence;
+    public long modified;
 
     public double upperBound;
     public double lowerBound;
@@ -285,6 +286,12 @@ public final class Activation extends NodeActivation<OrNode> {
 
         public TreeMap<Integer, State> rounds = new TreeMap<>();
 
+
+        public Rounds() {
+            rounds.put(0, State.ZERO);
+        }
+
+
         public boolean set(int r, State s) {
             State lr = get(r - 1);
             if(lr != null && lr.equalsWithWeights(s)) {
@@ -307,7 +314,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
         public State get(int r) {
             Map.Entry<Integer, State> me = rounds.floorEntry(r);
-            return me != null ? me.getValue() : State.ZERO;
+            return me != null ? me.getValue() : null;
         }
 
         public Rounds copy() {
@@ -340,6 +347,22 @@ public final class Activation extends NodeActivation<OrNode> {
             StringBuilder sb = new StringBuilder();
             rounds.forEach((r, s) -> sb.append(r + ":" + s.value + " "));
             return sb.toString();
+        }
+
+
+        public boolean compare(Rounds r) {
+            if(rounds.size() != r.rounds.size()) {
+                return false;
+            }
+            for(Map.Entry<Integer, State> me: rounds.entrySet()) {
+                State sa = me.getValue();
+                State sb = r.rounds.get(me.getKey());
+                if(sb == null || Utils.round(sa.value) != Utils.round(sb.value)) {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 

@@ -160,7 +160,7 @@ public class Document implements Comparable<Document> {
     public void process() {
         inputNeuronActivations.forEach(act -> vQueue.propagateWeight(0, act));
         interrupted = false;
-        SearchNode root = new SearchNode(this, null, null, null, -1, Collections.emptyList());
+        SearchNode root = new SearchNode(this, null, null, null, -1, Collections.emptySet(), false);
         root.computeBestInterpretation(this);
     }
 
@@ -498,7 +498,7 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public NormWeight adjustWeight(SearchNode cand, List<InterprNode> changed) {
+        public NormWeight adjustWeight(SearchNode cand, Set<InterprNode> changed) {
             long v = visitedCounter++;
 
             for(InterprNode n: changed) {

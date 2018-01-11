@@ -156,7 +156,7 @@ public class MetaNetwork {
 
                 if (tAct.getFinalState().value <= 0.0) {
                     tAct.key.interpretation.fixed = false;
-                    doc.selectedSearchNode.markSelected(new ArrayList<>(), mAct.key.interpretation);
+                    doc.selectedSearchNode.markSelected(new TreeSet<>(), mAct.key.interpretation);
 
                     newActs.forEach(act -> doc.vQueue.add(0, act));
                     doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++);
