@@ -40,7 +40,6 @@ public final class Activation extends NodeActivation<OrNode> {
     public TreeSet<SynapseActivation> neuronOutputs = new TreeSet<>(OUTPUT_COMP);
 
     public Integer sequence;
-    public long modified;
 
     public double upperBound;
     public double lowerBound;
@@ -282,6 +281,8 @@ public final class Activation extends NodeActivation<OrNode> {
      *
      */
     public static class Rounds {
+        public long modified;
+
         private boolean[] isQueued = new boolean[3];
 
         public TreeMap<Integer, State> rounds = new TreeMap<>();
@@ -319,6 +320,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
         public Rounds copy() {
             Rounds nr = new Rounds();
+            nr.modified = modified;
             nr.rounds.putAll(rounds);
             return nr;
         }

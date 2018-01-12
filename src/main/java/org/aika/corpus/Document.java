@@ -572,6 +572,8 @@ public class Document implements Comparable<Document> {
 
                         boolean propagate = act.rounds.set(round, s);
 
+                        act.rounds.modified = v;
+
                         SearchNode.StateChange.saveNewState(act);
 
                         if (propagate) {
