@@ -168,19 +168,15 @@ public class SearchNode implements Comparable<SearchNode> {
             log.info("Root SearchNode:" + toString());
         }
 
+        mark(refinement, SELECTED);
 
         Candidate[] candidates = generateCandidates(doc, refinement);
 
         Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
 
-        mark(refinement, SELECTED);
 
         SearchNode child = new SearchNode(doc, this, null, c, level + 1, refinement, false);
         child.search(doc, searchSteps, candidates);
-
-        dumpDebugCandidateStatistics(candidates);
-
-        mark(refinement, UNKNOWN);
 
         if (doc.selectedSearchNode != null) {
             doc.selectedSearchNode.reconstructSelectedResult(doc);
@@ -188,6 +184,8 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         doc.bestInterpretation = results;
+
+        dumpDebugCandidateStatistics(candidates);
 
         if(doc.interrupted) {
             log.warn("The search for the best interpretation has been interrupted. Too many search steps!");
@@ -216,6 +214,9 @@ public class SearchNode implements Comparable<SearchNode> {
         if(getParent() != null) getParent().reconstructSelectedResult(doc);
 
         changeState(StateChange.Mode.NEW);
+        if(candidate != null) {
+            mark(getDecision() ? candidate.refinement : Collections.singleton(candidate.seedRef), getDecision() ? SELECTED : EXCLUDED);
+        }
 
         for(StateChange sc : modifiedActs) {
             Activation act = sc.act;
@@ -256,7 +257,10 @@ public class SearchNode implements Comparable<SearchNode> {
         NormWeight selectedWeight = NormWeight.ZERO_WEIGHT;
         NormWeight excludedWeight = NormWeight.ZERO_WEIGHT;
 
-        boolean alreadyExcluded = checkExcluded(candidate.refinement, doc.visitedCounter++);
+        boolean precondition = checkPrecondition();
+
+        boolean alreadySelected = precondition && !candidate.isConflicting();
+        boolean alreadyExcluded = !precondition || checkExcluded(candidate.refinement, doc.visitedCounter++);
 
         if(searchSteps[0] > MAX_SEARCH_STEPS) {
             doc.interrupted = true;
@@ -311,7 +315,7 @@ public class SearchNode implements Comparable<SearchNode> {
             return NormWeight.ZERO_WEIGHT;
         }
 
-        {
+        if(!alreadySelected) {
 /*
             if(candidate.lastDecision != Boolean.FALSE) {
                 invalidateCachedDecisions();
@@ -349,6 +353,12 @@ public class SearchNode implements Comparable<SearchNode> {
         } else {
             return cd ? selectedWeight : excludedWeight;
         }
+    }
+
+
+    private boolean checkPrecondition() {
+        Set soin = candidate.seedRef.selectedOrInterprNodes;
+        return soin != null && !soin.isEmpty();
     }
 
 
@@ -448,8 +458,10 @@ public class SearchNode implements Comparable<SearchNode> {
     public Candidate[] generateCandidates(Document doc, Collection<InterprNode> refinement) {
         TreeSet<Candidate> candidates = new TreeSet<>();
         int i = 0;
-        for(InterprNode cn: collectConflicts(doc)) {
-            candidates.add(new Candidate(cn, i++));
+        for(InterprNode cn: doc.bottom.children) {
+            if(cn.state == UNKNOWN) {
+                candidates.add(new Candidate(cn, i++));
+            }
         }
 
         long v = doc.visitedCounter++;
@@ -508,21 +520,6 @@ public class SearchNode implements Comparable<SearchNode> {
             }
         }
         return false;
-    }
-
-
-    public static Set<InterprNode> collectConflicts(Document doc) {
-        Set<InterprNode> results = new TreeSet<>();
-        long v = doc.visitedCounter++;
-        for(InterprNode n: doc.bottom.children) {
-            if(!n.conflicts.primary.isEmpty()) {
-                results.add(n);
-            }
-            for(Conflict c: n.conflicts.secondary.values()) {
-                results.add(c.secondary);
-            }
-        }
-        return results;
     }
 
 
@@ -667,19 +664,19 @@ public class SearchNode implements Comparable<SearchNode> {
         int maxEnd;
         Integer minRid;
 
-        public Candidate(InterprNode refinement, int id) {
-            seedRef = refinement;
-            expandRefinement(this.refinement, refinement);
+        public Candidate(InterprNode ref, int id) {
+            seedRef = ref;
+            expandRefinement(this.refinement, ref);
             this.id = id;
-            refinement.cand = this;
-            if(refinement.act != null) {
-                sequence = refinement.act.getSequence();
-                minBegin = refinement.act.key.range.begin;
-                maxEnd = refinement.act.key.range.end;
-                minRid = refinement.act.key.rid;
+            ref.cand = this;
+            if(ref.act != null) {
+                sequence = ref.act.getSequence();
+                minBegin = ref.act.key.range.begin;
+                maxEnd = ref.act.key.range.end;
+                minRid = ref.act.key.rid;
             } else {
-                for(NodeActivation act: refinement.getActivations()) {
-                    sequence = Math.max(sequence, refinement.act.getSequence());
+                for(NodeActivation act: ref.getActivations()) {
+                    sequence = Math.max(sequence, ref.act.getSequence());
                     if(act.key.range != null) {
                         minBegin= Math.min(minBegin, act.key.range.begin);
                         maxEnd =  Math.max(maxEnd, act.key.range.end);
@@ -690,8 +687,14 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
 
+        public boolean isConflicting() {
+            return seedRef.conflicts.hasConflicts();
+        }
+
+
         public String toString() {
             return " CID:" + id +
+                    " CONFLICT:" + isConflicting() +
                     " LIMITED:" + debugCounts[SearchNode.DebugState.LIMITED.ordinal()] +
                     " CACHED:" + debugCounts[SearchNode.DebugState.CACHED.ordinal()] +
                     " EXPLORE:" + debugCounts[SearchNode.DebugState.EXPLORE.ordinal()] +

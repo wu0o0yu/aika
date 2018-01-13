@@ -69,7 +69,9 @@ public class InterprNode implements Comparable<InterprNode> {
     private long visitedComputeLength;
     private long visitedComputeParents;
     private long visitedNumberInnerInputs;
-    private long visitedComputeChildren = -1;
+    private long visitedComputeChildren;
+    private long visitedGetState;
+    private long visitedChangeSelected;
 
     public long markedConflict;
 
@@ -79,6 +81,8 @@ public class InterprNode implements Comparable<InterprNode> {
 
     long visitedState;
     public State state = State.UNKNOWN;
+
+    public boolean isSelected;
 
     public final Document doc;
     public Activation act;
@@ -149,21 +153,54 @@ public class InterprNode implements Comparable<InterprNode> {
         if ((state != State.UNKNOWN && newState != State.UNKNOWN) ||
                 newState == State.UNKNOWN && v != visitedState) return;
 
-        if (newState != state && refByOrInterprNode != null) {
-            for (InterprNode ref : refByOrInterprNode) {
-                if (newState == State.SELECTED) {
-                    if (ref.selectedOrInterprNodes == null) {
-                        ref.selectedOrInterprNodes = new TreeSet<>();
+        state = newState;
+        visitedState = v;
+
+        changeSelectedRecursive(doc.visitedCounter++);
+    }
+
+
+    private void changeSelectedRecursive(long v) {
+        if(visitedChangeSelected == v) return;
+        visitedChangeSelected = v;
+
+        boolean newSelected = isSelected(v);
+
+        if (isSelected != newSelected) {
+            if(refByOrInterprNode != null) {
+                for (InterprNode ref : refByOrInterprNode) {
+                    if (newSelected) {
+                        if (ref.selectedOrInterprNodes == null) {
+                            ref.selectedOrInterprNodes = new TreeSet<>();
+                        }
+                        ref.selectedOrInterprNodes.add(this);
+                    } else {
+                        ref.selectedOrInterprNodes.remove(this);
                     }
-                    ref.selectedOrInterprNodes.add(this);
-                } else if (newState == State.UNKNOWN && state == State.SELECTED) {
-                    ref.selectedOrInterprNodes.remove(this);
+                }
+            }
+
+            isSelected = newSelected;
+
+            if(!isBottom()) {
+                for (InterprNode cn : children) {
+                    cn.changeSelectedRecursive(v);
                 }
             }
         }
+    }
 
-        state = newState;
-        visitedState = v;
+
+    public boolean isSelected(long v) {
+        if(primId >= 0) return state == State.SELECTED;
+
+        if(visitedGetState == v) return true;
+        visitedGetState = v;
+
+        for(InterprNode pn: parents) {
+            if(!pn.isSelected(v)) return false;
+        }
+        return true;
     }
 
 
