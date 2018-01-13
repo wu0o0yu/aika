@@ -72,19 +72,15 @@ public class InterprNode implements Comparable<InterprNode> {
     private long visitedComputeChildren = -1;
 
     long visitedCollectAllConflicting;
-    long visitedExpandRefinementRecursiveStep;
-    long markedExpandRefinement;
-    long visitedCheckExcluded;
 
     public long markedConflict;
-    public long markedSelected;
-    public long markedExcluded;
-    public boolean markedExcludedRefinement;
 
     private int numberInnerInputs = 0;
     private int largestCommonSubsetCount = 0;
     private int numberOfInputsComputeChildren = 0;
 
+    long visitedState;
+    public State state;
 
     public final Document doc;
     public Activation act;
@@ -97,10 +93,15 @@ public class InterprNode implements Comparable<InterprNode> {
     public int isConflict = -1;
     public Conflicts conflicts = new Conflicts();
 
-    public Boolean fixed = null;
-
     public NavigableMap<Key, NodeActivation> activations;
     public NavigableSet<Activation> neuronActivations;
+
+
+    public enum State {
+        SELECTED,
+        UNKNOWN,
+        EXCLUDED
+    }
 
 
     public boolean isPrimitive() {
@@ -140,25 +141,27 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
+    public void setState(State newState, long v) {
+        if ((state != State.UNKNOWN && newState != State.UNKNOWN) ||
+                newState == State.UNKNOWN && v != visitedState) return;
 
-    public void setFixed(boolean value) {
-        fixed = value;
-
-        if(fixed) {
-            setSelectedInterpretationNode();
-        }
-    }
-
-
-    public void setSelectedInterpretationNode() {
-        if(refByOrInterprNode != null) {
-            for (InterprNode ref : refByOrInterprNode) {
-                if(ref.selectedOrInterprNodes == null) {
-                    ref.selectedOrInterprNodes = new TreeSet<>();
+        if (newState == state) {
+            if (refByOrInterprNode != null) {
+                for (InterprNode ref : refByOrInterprNode) {
+                    if (newState == State.SELECTED) {
+                        if (ref.selectedOrInterprNodes == null) {
+                            ref.selectedOrInterprNodes = new TreeSet<>();
+                        }
+                        ref.selectedOrInterprNodes.add(this);
+                    } else if (newState == State.UNKNOWN && state == State.SELECTED) {
+                        ref.selectedOrInterprNodes.remove(this);
+                    }
                 }
-                ref.selectedOrInterprNodes.add(this);
             }
         }
+
+        state = newState;
+        visitedState = v;
     }
 
 

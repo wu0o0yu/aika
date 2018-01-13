@@ -27,6 +27,12 @@ import org.aika.neuron.INeuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.aika.corpus.InterprNode.State;
+
+import static org.aika.corpus.InterprNode.State.SELECTED;
+import static org.aika.corpus.InterprNode.State.EXCLUDED;
+import static org.aika.corpus.InterprNode.State.UNKNOWN;
+
 import java.util.*;
 
 /**
@@ -71,13 +77,6 @@ public class SearchNode implements Comparable<SearchNode> {
     NormWeight accumulatedWeight;
 
     public List<StateChange> modifiedActs = new ArrayList<>();
-
-
-    public enum Coverage {
-        SELECTED,
-        UNKNOWN,
-        EXCLUDED
-    }
 
     public static int dbc = 0;
 
@@ -174,14 +173,14 @@ public class SearchNode implements Comparable<SearchNode> {
 
         Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
 
-        mark(refinement, true);
+        mark(refinement, SELECTED);
 
         SearchNode child = new SearchNode(doc, this, null, c, level + 1, refinement, false);
         child.search(doc, searchSteps, candidates);
 
         dumpDebugCandidateStatistics(candidates);
 
-        markUnselected(refinement);
+        mark(refinement, UNKNOWN);
 
         if (doc.selectedSearchNode != null) {
             doc.selectedSearchNode.reconstructSelectedResult(doc);
@@ -257,8 +256,7 @@ public class SearchNode implements Comparable<SearchNode> {
         NormWeight selectedWeight = NormWeight.ZERO_WEIGHT;
         NormWeight excludedWeight = NormWeight.ZERO_WEIGHT;
 
-        boolean alreadySelected = checkSelected(candidate.refinement);
-        boolean alreadyExcluded = checkExcluded(candidate.refinement, doc.visitedCounter++);
+        boolean alreadyExcluded = checkExcluded(candidate.refinement);
 
         if(searchSteps[0] > MAX_SEARCH_STEPS) {
             doc.interrupted = true;
@@ -276,9 +274,9 @@ public class SearchNode implements Comparable<SearchNode> {
             log.info(doc.neuronActivationsToString(true, true, false) + "\n");
         }
 
-        Boolean cd = !alreadyExcluded && !alreadySelected ? candidate.cache : null;
+        Boolean cd = !alreadyExcluded ? candidate.cache : null;
 
-        if(alreadyExcluded || alreadySelected) {
+        if(alreadyExcluded) {
             debugState = DebugState.LIMITED;
         } else if(cd != null) {
             debugState = DebugState.CACHED;
@@ -292,7 +290,7 @@ public class SearchNode implements Comparable<SearchNode> {
         SearchNode excludedChild = null;
 
         if (!alreadyExcluded) {
-            mark(candidate.refinement, true);
+            mark(candidate.refinement, SELECTED);
 
             if (cd == null || cd) {
                 if(candidate.cache == null) {
@@ -307,21 +305,20 @@ public class SearchNode implements Comparable<SearchNode> {
                 selectedChild.changeState(StateChange.Mode.OLD);
             }
 
-            markUnselected(candidate.refinement);
+            mark(candidate.refinement, UNKNOWN);
         }
         if(doc.interrupted) {
             return NormWeight.ZERO_WEIGHT;
         }
 
-        if(!alreadySelected) {
-            candidate.seedRef.markedExcludedRefinement = true;
+        {
 /*
             if(candidate.lastDecision != Boolean.FALSE) {
                 invalidateCachedDecisions();
             }
 */
 
-            mark(candidate.refinement, false);
+            candidate.seedRef.setState(EXCLUDED, visited);
 
             if (cd == null || !cd) {
                 if(candidate.cache == null) {
@@ -336,12 +333,12 @@ public class SearchNode implements Comparable<SearchNode> {
                 excludedChild.changeState(StateChange.Mode.OLD);
             }
 
-            candidate.seedRef.markedExcludedRefinement = false;
+            candidate.seedRef.setState(UNKNOWN, visited);
         }
 
         if(cd == null) {
             boolean dir = selectedWeight.getNormWeight() >= excludedWeight.getNormWeight();
-            if (!alreadyExcluded && !alreadySelected) {
+            if (!alreadyExcluded) {
                 candidate.cache = dir;
                 SearchNode csn = dir ? selectedChild : excludedChild;
                 if (csn.candidate != null) {
@@ -502,36 +499,14 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean checkSelected(Collection<InterprNode> n) {
-        for(InterprNode x: n) {
-            if(!isCovered(x.markedSelected)) return false;
+    private boolean checkExcluded(Collection<InterprNode> refs) {
+        for(InterprNode ref: refs) {
+            ArrayList<InterprNode> conflicts = new ArrayList<>();
+            Conflicts.collectDirectConflicting(conflicts, ref);
+            for (InterprNode cn : conflicts) {
+                if (cn.state == SELECTED) return true;
+            }
         }
-        return true;
-    }
-
-
-    private boolean checkExcluded(Collection<InterprNode> n, long v) {
-        for(InterprNode x: n) {
-            if(checkExcluded(x, v)) return true;
-        }
-        return false;
-    }
-
-
-    private boolean checkExcluded(InterprNode ref, long v) {
-        if(ref.visitedCheckExcluded == v) return false;
-        ref.visitedCheckExcluded = v;
-
-        ArrayList<InterprNode> conflicts = new ArrayList<>();
-        Conflicts.collectDirectConflicting(conflicts, ref);
-        for(InterprNode cn: conflicts) {
-            if(isCovered(cn.markedSelected)) return true;
-        }
-
-        for(InterprNode pn: ref.parents) {
-            if(checkExcluded(pn, v)) return true;
-        }
-
         return false;
     }
 
@@ -555,7 +530,7 @@ public class SearchNode implements Comparable<SearchNode> {
         ArrayList<InterprNode> tmp = new ArrayList<>();
         tmp.add(doc.bottom);
         for(InterprNode pn: doc.bottom.children) {
-            if(pn.fixed == Boolean.TRUE || (pn.isPrimitive() && pn.conflicts.primary.isEmpty() && pn.conflicts.secondary.isEmpty())) {
+            if(pn.state == SELECTED || (pn.isPrimitive() && pn.conflicts.primary.isEmpty() && pn.conflicts.secondary.isEmpty())) {
                 tmp.add(pn);
             }
         }
@@ -563,53 +538,12 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public Coverage getCoverage(InterprNode n) {
-        if(n.fixed != null) {
-            return n.fixed ? Coverage.SELECTED : Coverage.EXCLUDED;
-        }
-        if(n.markedExcludedRefinement) return Coverage.EXCLUDED;
-        if(isCovered(n.markedSelected)) return Coverage.SELECTED;
-        if(isCovered(n.markedExcluded)) return Coverage.EXCLUDED;
-        return Coverage.UNKNOWN;
-    }
-
-
-    public boolean isCovered(long g) {
-        SearchNode n = this;
-        do {
-            if(g == n.visited) return true;
-            else if(g > n.visited) return false;
-            n = n.selectedParent;
-        } while(n != null);
-        return false;
-    }
-
-
-    public void mark(Collection<InterprNode> refs, boolean dir) {
+    public void mark(Collection<InterprNode> refs, State newState) {
         for(InterprNode n: refs) {
-            if (isCovered(dir ? n.markedSelected : n.markedExcluded)) continue;
-
-            if (dir) {
-                n.markedSelected = visited;
-                n.setSelectedInterpretationNode();
-            } else {
-                n.markedExcluded = visited;
-            }
+            n.setState(newState, visited);
         }
     }
 
-
-    private void markUnselected(Collection<InterprNode> n) {
-        for(InterprNode x: n) {
-            if(x.markedSelected == visited) {
-                if (x.refByOrInterprNode != null) {
-                    for (InterprNode ref : x.refByOrInterprNode) {
-                        ref.selectedOrInterprNodes.remove(x);
-                    }
-                }
-            }
-        }
-    }
 
 
     public String pathToString(Document doc) {

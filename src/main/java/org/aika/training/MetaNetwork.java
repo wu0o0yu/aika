@@ -18,6 +18,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
+import static org.aika.corpus.InterprNode.State.SELECTED;
+import static org.aika.corpus.InterprNode.State.EXCLUDED;
+import static org.aika.corpus.InterprNode.State.UNKNOWN;
+
 public class MetaNetwork {
 
 
@@ -122,7 +126,7 @@ public class MetaNetwork {
             );
 
             Activation.Key mak = metaAct.key;
-            mak.interpretation.fixed = false;
+            mak.interpretation.setState(EXCLUDED, v);
         }
 
         for(Synapse s: inputSynapses) {
@@ -136,10 +140,10 @@ public class MetaNetwork {
 
         for(Activation tAct: targetNeuron.get().getAllActivations(doc)) {
             if(!isConflicting(tAct)) {
-                tAct.key.interpretation.setFixed(true);
+                tAct.key.interpretation.setState(SELECTED, v);
 
                 Activation sAct = getOutputAct(tAct.neuronOutputs, INeuron.Type.INHIBITORY);
-                sAct.key.interpretation.setFixed(true);
+                sAct.key.interpretation.setState(SELECTED, v);
 
                 Activation mAct = getOutputAct(sAct.neuronOutputs, INeuron.Type.META);
 
@@ -155,8 +159,8 @@ public class MetaNetwork {
                 doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++);
 
                 if (tAct.getFinalState().value <= 0.0) {
-                    tAct.key.interpretation.fixed = false;
-                    doc.selectedSearchNode.mark(Collections.singleton(mAct.key.interpretation), true);
+                    tAct.key.interpretation.setState(EXCLUDED, v);
+                    doc.selectedSearchNode.mark(Collections.singleton(mAct.key.interpretation), SELECTED);
 
                     newActs.forEach(act -> doc.vQueue.add(0, act));
                     doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++);
@@ -176,7 +180,7 @@ public class MetaNetwork {
         ArrayList<InterprNode> tmp = new ArrayList<>();
         Conflicts.collectDirectConflicting(tmp, tAct.key.interpretation);
         for(InterprNode c: tmp) {
-            if(tAct.doc.selectedSearchNode.getCoverage(c) == SearchNode.Coverage.SELECTED) return true;
+            if(c.state == SELECTED) return true;
         }
         return false;
     }

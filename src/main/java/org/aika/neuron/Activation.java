@@ -413,7 +413,7 @@ public final class Activation extends NodeActivation<OrNode> {
         sb.append(id + " ");
 
         if(sn != null) {
-            sb.append(sn.getCoverage(key.interpretation) + " ");
+            sb.append(key.interpretation.state + " ");
             sb.append(sequence + " ");
         }
 

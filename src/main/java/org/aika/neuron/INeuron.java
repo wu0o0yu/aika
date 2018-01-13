@@ -21,7 +21,6 @@ import org.aika.*;
 import org.aika.neuron.Activation.State;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.corpus.*;
-import org.aika.corpus.SearchNode.Coverage;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
@@ -39,6 +38,10 @@ import static org.aika.lattice.Node.BEGIN_COMP;
 import static org.aika.lattice.Node.END_COMP;
 import static org.aika.lattice.Node.RID_COMP;
 import static org.aika.neuron.Activation.State.*;
+
+import static org.aika.corpus.InterprNode.State.SELECTED;
+import static org.aika.corpus.InterprNode.State.EXCLUDED;
+import static org.aika.corpus.InterprNode.State.UNKNOWN;
 
 /**
  * The {@code INeuron} class represents a internal neuron implementation in Aikas neural network and is connected to other neurons through
@@ -266,15 +269,15 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public State computeWeight(int round, Activation act, SearchNode sn) {
-        Coverage c = sn.getCoverage(act.key.interpretation);
-        if(c == Coverage.UNKNOWN) return State.ZERO;
+    public State computeWeight(int round, Activation act) {
+        InterprNode.State c = act.key.interpretation.state;
+        if(c == UNKNOWN) return State.ZERO;
 
         double[] sum = {biasSum, 0.0};
 
         int fired = -1;
 
-        for (InputState is: getInputStates(act, round, sn)) {
+        for (InputState is: getInputStates(act, round)) {
             Synapse s = is.sa.synapse;
             Activation iAct = is.sa.input;
 
@@ -295,34 +298,34 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         // Compute only the recurrent part is above the threshold.
         NormWeight newWeight = NormWeight.create(
-                c == Coverage.SELECTED ? (sum[DIR] + negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC] - negRecSum : 0.0,
+                c == SELECTED ? (sum[DIR] + negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC] - negRecSum : 0.0,
                 (sum[DIR] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR] + negRecSum + maxRecurrentSum) : maxRecurrentSum
         );
 
         return new State(
-                c == Coverage.SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? currentActValue : 0.0,
-                c == Coverage.SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? fired : -1,
+                c == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? currentActValue : 0.0,
+                c == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? fired : -1,
                 newWeight
         );
     }
 
 
-    private State getInitialState(Coverage c) {
+    private State getInitialState(InterprNode.State c) {
         return new State(
-                c == Coverage.SELECTED ? 1.0 : 0.0,
+                c == SELECTED ? 1.0 : 0.0,
                 0,
                 NormWeight.ZERO_WEIGHT
         );
     }
 
 
-    private State getInputState(int round, SearchNode sn, InterprNode o, Synapse s, Activation iAct) {
+    private State getInputState(int round, InterprNode o, Synapse s, Activation iAct) {
         InterprNode io = iAct.key.interpretation;
 
         State is = State.ZERO;
         if (s.key.isRecurrent) {
             if (!s.isNegative() || !checkSelfReferencingForSelected(o, io, 0)) {
-                is = round == 0 ? getInitialState(sn.getCoverage(io)) : iAct.rounds.get(round - 1);
+                is = round == 0 ? getInitialState(io.state) : iAct.rounds.get(round - 1);
             }
         } else {
             is = iAct.rounds.get(round);
@@ -331,7 +334,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private List<InputState> getInputStates(Activation act, int round, SearchNode sn) {
+    private List<InputState> getInputStates(Activation act, int round) {
         InterprNode o = act.key.interpretation;
         ArrayList<InputState> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
@@ -342,7 +345,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 maxInputState = null;
             }
 
-            State s = getInputState(round, sn, o, sa.synapse, sa.input);
+            State s = getInputState(round, o, sa.synapse, sa.input);
             if (maxInputState == null || maxInputState.s.value < s.value) {
                 maxInputState = new InputState(sa, s);
             }
@@ -515,7 +518,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private static void addConflict(Document doc, InterprNode io, InterprNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
-        if (o.markedConflict == v || o.fixed == Boolean.TRUE) {
+        if (o.markedConflict == v || o.state == SELECTED) {
             if (!isAllowed(doc, io, o, inputActs)) {
                 Conflicts.add(act, io, o);
             }

@@ -557,7 +557,7 @@ public class Document implements Comparable<Document> {
                     if(act.inputValue != null) {
                         s = new State(act.inputValue, 0, NormWeight.ZERO_WEIGHT);
                     } else {
-                        s = act.key.node.neuron.get(Document.this).computeWeight(round, act, sn);
+                        s = act.key.node.neuron.get(Document.this).computeWeight(round, act);
                     }
 
                     if (OPTIMIZE_DEBUG_OUTPUT) {
@@ -581,7 +581,7 @@ public class Document implements Comparable<Document> {
                                 log.error("Error: Maximum number of rounds reached. The network might be oscillating.");
                                 log.info(neuronActivationsToString(sn, true, true, true));
 
-                                dumpOscillatingActivations(sn);
+                                dumpOscillatingActivations();
                                 throw new RuntimeException("Maximum number of rounds reached. The network might be oscillating.");
                             } else {
                                 propagateWeight(round, act);
@@ -604,11 +604,11 @@ public class Document implements Comparable<Document> {
     }
 
 
-    private void dumpOscillatingActivations(SearchNode sn) {
+    private void dumpOscillatingActivations() {
         activatedNeurons.stream()
                 .flatMap(n -> n.getAllActivations(this).stream())
                 .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)
-                .forEach(act -> log.error(act.key + " " + sn.getCoverage(act.key.interpretation) + " " + act.rounds));
+                .forEach(act -> log.error(act.key + " " + act.key.interpretation.state + " " + act.rounds));
     }
 
 
