@@ -160,7 +160,7 @@ public class MetaNetwork {
 
                 if (tAct.getFinalState().value <= 0.0) {
                     tAct.key.interpretation.setState(EXCLUDED, v);
-                    doc.selectedSearchNode.mark(Collections.singleton(mAct.key.interpretation), SELECTED);
+                    mAct.key.interpretation.setState(SELECTED, doc.selectedSearchNode.visited);
 
                     newActs.forEach(act -> doc.vQueue.add(0, act));
                     doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++);

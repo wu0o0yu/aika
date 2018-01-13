@@ -498,7 +498,7 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public NormWeight adjustWeight(SearchNode cand, Set<InterprNode> changed) {
+        public NormWeight adjustWeight(SearchNode cand, Collection<InterprNode> changed) {
             long v = visitedCounter++;
 
             for(InterprNode n: changed) {
