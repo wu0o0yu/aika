@@ -71,8 +71,6 @@ public class InterprNode implements Comparable<InterprNode> {
     private long visitedNumberInnerInputs;
     private long visitedComputeChildren = -1;
 
-    long visitedCollectAllConflicting;
-
     public long markedConflict;
 
     private int numberInnerInputs = 0;
@@ -80,7 +78,7 @@ public class InterprNode implements Comparable<InterprNode> {
     private int numberOfInputsComputeChildren = 0;
 
     long visitedState;
-    public State state;
+    public State state = State.UNKNOWN;
 
     public final Document doc;
     public Activation act;
@@ -98,9 +96,15 @@ public class InterprNode implements Comparable<InterprNode> {
 
 
     public enum State {
-        SELECTED,
-        UNKNOWN,
-        EXCLUDED
+        SELECTED('S'),
+        UNKNOWN('U'),
+        EXCLUDED('E');
+
+        char s;
+
+        State(char s) {
+            this.s = s;
+        }
     }
 
 
@@ -145,17 +149,15 @@ public class InterprNode implements Comparable<InterprNode> {
         if ((state != State.UNKNOWN && newState != State.UNKNOWN) ||
                 newState == State.UNKNOWN && v != visitedState) return;
 
-        if (newState == state) {
-            if (refByOrInterprNode != null) {
-                for (InterprNode ref : refByOrInterprNode) {
-                    if (newState == State.SELECTED) {
-                        if (ref.selectedOrInterprNodes == null) {
-                            ref.selectedOrInterprNodes = new TreeSet<>();
-                        }
-                        ref.selectedOrInterprNodes.add(this);
-                    } else if (newState == State.UNKNOWN && state == State.SELECTED) {
-                        ref.selectedOrInterprNodes.remove(this);
+        if (newState != state && refByOrInterprNode != null) {
+            for (InterprNode ref : refByOrInterprNode) {
+                if (newState == State.SELECTED) {
+                    if (ref.selectedOrInterprNodes == null) {
+                        ref.selectedOrInterprNodes = new TreeSet<>();
                     }
+                    ref.selectedOrInterprNodes.add(this);
+                } else if (newState == State.UNKNOWN && state == State.SELECTED) {
+                    ref.selectedOrInterprNodes.remove(this);
                 }
             }
         }
@@ -508,7 +510,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    void collectPrimitiveNodes(Set<InterprNode> results, long v) {
+    public void collectPrimitiveNodes(Collection<InterprNode> results, long v) {
         if(v == visitedCollect) return;
         visitedCollect = v;
 
@@ -560,6 +562,7 @@ public class InterprNode implements Comparable<InterprNode> {
             if(!f1) sb.append(",");
             f1 = false;
             sb.append(n.primId);
+            sb.append(n.state.s);
             if(!level && n.orInterprNodes != null) {
                 sb.append("[");
                 boolean f2 = true;

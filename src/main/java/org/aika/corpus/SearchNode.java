@@ -256,7 +256,7 @@ public class SearchNode implements Comparable<SearchNode> {
         NormWeight selectedWeight = NormWeight.ZERO_WEIGHT;
         NormWeight excludedWeight = NormWeight.ZERO_WEIGHT;
 
-        boolean alreadyExcluded = checkExcluded(candidate.refinement);
+        boolean alreadyExcluded = checkExcluded(candidate.refinement, doc.visitedCounter++);
 
         if(searchSteps[0] > MAX_SEARCH_STEPS) {
             doc.interrupted = true;
@@ -294,7 +294,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
             if (cd == null || cd) {
                 if(candidate.cache == null) {
-                    invalidateCachedDecisions();
+                    invalidateCachedDecisions(doc.visitedCounter++);
                 }
 
                 Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
@@ -400,7 +400,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void invalidateCachedDecisions() {
+    private void invalidateCachedDecisions(long v) {
         for(InterprNode n: candidate.refinement) {
             for(Activation act: n.neuronActivations) {
                 for(SynapseActivation sa: act.neuronOutputs) {
@@ -413,7 +413,7 @@ public class SearchNode implements Comparable<SearchNode> {
                         }
 
                         ArrayList<InterprNode> conflicting = new ArrayList<>();
-                        Conflicts.collectDirectConflicting(conflicting, sa.output.key.interpretation);
+                        Conflicts.collectConflicting(conflicting, sa.output.key.interpretation, v);
                         for (InterprNode c : conflicting) {
                             Candidate negCand = c.cand;
                             if (negCand != null) {
@@ -499,10 +499,10 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean checkExcluded(Collection<InterprNode> refs) {
+    private boolean checkExcluded(Collection<InterprNode> refs, long v) {
         for(InterprNode ref: refs) {
             ArrayList<InterprNode> conflicts = new ArrayList<>();
-            Conflicts.collectDirectConflicting(conflicts, ref);
+            Conflicts.collectConflicting(conflicts, ref, v);
             for (InterprNode cn : conflicts) {
                 if (cn.state == SELECTED) return true;
             }

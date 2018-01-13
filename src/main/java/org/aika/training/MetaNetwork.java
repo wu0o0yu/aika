@@ -139,7 +139,7 @@ public class MetaNetwork {
         doc.propagate();
 
         for(Activation tAct: targetNeuron.get().getAllActivations(doc)) {
-            if(!isConflicting(tAct)) {
+            if(!isConflicting(tAct, doc.visitedCounter++)) {
                 tAct.key.interpretation.setState(SELECTED, v);
 
                 Activation sAct = getOutputAct(tAct.neuronOutputs, INeuron.Type.INHIBITORY);
@@ -176,9 +176,9 @@ public class MetaNetwork {
     }
 
 
-    private static boolean isConflicting(Activation tAct) {
+    private static boolean isConflicting(Activation tAct, long v) {
         ArrayList<InterprNode> tmp = new ArrayList<>();
-        Conflicts.collectDirectConflicting(tmp, tAct.key.interpretation);
+        Conflicts.collectConflicting(tmp, tAct.key.interpretation, v);
         for(InterprNode c: tmp) {
             if(c.state == SELECTED) return true;
         }

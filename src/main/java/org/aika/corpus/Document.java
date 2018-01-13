@@ -529,7 +529,7 @@ public class Document implements Comparable<Document> {
 
 
         public void add(int round, Activation act) {
-            if(act.rounds.isQueued(round)) return;
+            if(act.rounds.isQueued(round) || act.key.interpretation.state == InterprNode.State.UNKNOWN) return;
 
             TreeSet<Activation> q;
             if(round < queue.size()) {
@@ -550,7 +550,7 @@ public class Document implements Comparable<Document> {
             for(int round = 0; round < queue.size(); round++) {
                 TreeSet<Activation> q = queue.get(round);
                 while (!q.isEmpty()) {
-                    Activation act = q.pollLast();
+                    Activation act = q.pollFirst();
                     act.rounds.setQueued(round, false);
 
                     State s;

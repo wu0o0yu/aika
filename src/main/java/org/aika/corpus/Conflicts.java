@@ -35,23 +35,10 @@ public class Conflicts {
     public Map<Key, Conflict> secondary = new TreeMap<>();
 
 
-    public static void collectDirectConflicting(Collection<InterprNode> results, InterprNode n) {
-        n.conflicts.primary.values().forEach(c -> results.add(c.secondary));
+    public static void collectConflicting(Collection<InterprNode> results, InterprNode n, long v) {
+        assert n.primId >= 0;
+        n.conflicts.primary.values().forEach(c -> c.secondary.collectPrimitiveNodes(results, v));
         n.conflicts.secondary.values().forEach(c -> results.add(c.primary));
-    }
-
-
-    public static void collectAllConflicting(Collection<InterprNode> results, InterprNode n, long v) {
-        if(n.visitedCollectAllConflicting == v) return;
-        n.visitedCollectAllConflicting = v;
-
-        collectDirectConflicting(results, n);
-
-        for(InterprNode pn: n.parents) {
-            collectAllConflicting(results, pn, v);
-        }
-
-        // TODO: consider orInterprNodes.size() == 1
     }
 
 

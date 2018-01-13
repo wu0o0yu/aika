@@ -271,7 +271,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public State computeWeight(int round, Activation act) {
         InterprNode.State c = act.key.interpretation.state;
-        if(c == UNKNOWN) return State.ZERO;
 
         double[] sum = {biasSum, 0.0};
 
