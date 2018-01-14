@@ -281,7 +281,7 @@ public class SearchNode implements Comparable<SearchNode> {
                 }
 
                 Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
-                selectedChild = new SearchNode(doc, this, excludedParent, c, level + 1, Collections.singleton(candidate.refinement), candidate.cachedDecision == Boolean.TRUE);
+                selectedChild = new SearchNode(doc, this, excludedParent, c, level + 1, Collections.singleton(candidate.refinement), candidate.cachedSNDecision == Boolean.TRUE);
 
                 candidate.debugDecisionCounts[0]++;
                 selectedWeight = selectedChild.search(doc, searchSteps, candidates);
@@ -304,7 +304,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
             if (cachedDecision == null || !cachedDecision) {
                 Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
-                excludedChild = new SearchNode(doc, selectedParent, this, c, level + 1, Collections.singleton(candidate.refinement), candidate.cachedDecision == Boolean.FALSE);
+                excludedChild = new SearchNode(doc, selectedParent, this, c, level + 1, Collections.singleton(candidate.refinement), candidate.cachedSNDecision == Boolean.FALSE);
 
                 candidate.debugDecisionCounts[1]++;
                 excludedWeight = excludedChild.search(doc, searchSteps, candidates);
@@ -318,12 +318,16 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if (cachedDecision == null) {
             boolean dir = selectedWeight.getNormWeight() >= excludedWeight.getNormWeight();
+            dir = alreadySelected || (!alreadyExcluded && dir);
+
             if (!alreadyExcluded) {
                 candidate.cachedDecision = dir;
-                SearchNode csn = dir ? selectedChild : excludedChild;
-                if (csn.candidate != null) {
-                    csn.candidate.cachedSearchNode = csn;
-                }
+            }
+
+            candidate.cachedSNDecision = dir;
+            SearchNode csn = dir ? selectedChild : excludedChild;
+            if (csn.candidate != null) {
+                csn.candidate.cachedSearchNode = csn;
             }
             return dir ? selectedWeight : excludedWeight;
         } else {
@@ -369,6 +373,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     if (posCand != null) {
                         if (posCand.cachedDecision == Boolean.FALSE && candidate.id < posCand.id) {
                             posCand.cachedDecision = null;
+                            posCand.cachedSNDecision = null;
                         }
                     }
 
@@ -379,6 +384,7 @@ public class SearchNode implements Comparable<SearchNode> {
                         if (negCand != null) {
                             if (negCand.cachedDecision == Boolean.TRUE && candidate.id < negCand.id) {
                                 negCand.cachedDecision = null;
+                                negCand.cachedSNDecision = null;
                             }
                         }
                     }
@@ -579,6 +585,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public static class Candidate implements Comparable<Candidate> {
         public Boolean cachedDecision;
+        public Boolean cachedSNDecision;
         public SearchNode cachedSearchNode;
 
         public InterprNode refinement;
