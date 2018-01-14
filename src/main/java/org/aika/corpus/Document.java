@@ -503,13 +503,6 @@ public class Document implements Comparable<Document> {
 
             for(InterprNode n: changed) {
                 addAllActs(n.getNeuronActivations());
-
-                // Does not need to be expanded recursively, because the activation will be propagated anyway.
-                if(n.refByOrInterprNode != null) {
-                    for (InterprNode on: n.refByOrInterprNode) {
-                        addAllActs(on.getNeuronActivations());
-                    }
-                }
             }
 
             return processChanges(cand, v);
