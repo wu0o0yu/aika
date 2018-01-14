@@ -345,6 +345,12 @@ public final class Activation extends NodeActivation<OrNode> {
         }
 
 
+        public void reset() {
+            modified = 0;
+            rounds.clear();
+            rounds.put(0, State.ZERO);
+        }
+
         public String toString() {
             StringBuilder sb = new StringBuilder();
             rounds.forEach((r, s) -> sb.append(r + ":" + s.value + " "));

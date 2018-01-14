@@ -24,6 +24,8 @@ import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Collections;
+
 /**
  *
  * @author Lukas Molzberger
