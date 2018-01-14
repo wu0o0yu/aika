@@ -20,6 +20,7 @@ package org.aika.corpus;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.neuron.Activation;
+import org.aika.corpus.SearchNode.Candidate;
 import org.aika.Utils;
 
 import java.util.*;
@@ -85,8 +86,8 @@ public class InterprNode implements Comparable<InterprNode> {
     public boolean isSelected;
 
     public final Document doc;
-    public Activation act;
-    public SearchNode.Candidate cand;
+    public Activation activation;
+    public Candidate candidate;
 
     private static InterprNode[] EMPTY_INTR_RELS = new InterprNode[0];
     public InterprNode[] parents = EMPTY_INTR_RELS;

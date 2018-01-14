@@ -194,8 +194,10 @@ public class SearchNode implements Comparable<SearchNode> {
         if (getParent() != null) getParent().reconstructSelectedResult(doc);
 
         changeState(StateChange.Mode.NEW);
-        if (candidate != null) {
-            candidate.refinement.setState(getDecision() ? SELECTED : EXCLUDED, visited);
+
+        SearchNode pn = getParent();
+        if (pn != null && pn.candidate != null) {
+            pn.candidate.refinement.setState(getDecision() ? SELECTED : EXCLUDED, visited);
         }
 
         for (StateChange sc : modifiedActs) {
@@ -385,7 +387,7 @@ public class SearchNode implements Comparable<SearchNode> {
         for (Activation act : candidate.refinement.neuronActivations) {
             for (SynapseActivation sa : act.neuronOutputs) {
                 if (!sa.synapse.isNegative()) {
-                    Candidate posCand = sa.output.key.interpretation.cand;
+                    Candidate posCand = sa.output.key.interpretation.candidate;
                     if (posCand != null) {
                         if (posCand.cache == Boolean.FALSE && candidate.id < posCand.id) {
                             posCand.cache = null;
@@ -395,7 +397,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     ArrayList<InterprNode> conflicting = new ArrayList<>();
                     Conflicts.collectConflicting(conflicting, sa.output.key.interpretation, v);
                     for (InterprNode c : conflicting) {
-                        Candidate negCand = c.cand;
+                        Candidate negCand = c.candidate;
                         if (negCand != null) {
                             if (negCand.cache == Boolean.TRUE && candidate.id < negCand.id) {
                                 negCand.cache = null;
@@ -473,7 +475,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean checkDependenciesSatisfied(Candidate c, long v) {
-        for (SynapseActivation sa : c.refinement.act.neuronInputs) {
+        for (SynapseActivation sa : c.refinement.activation.neuronInputs) {
             if (sa.input.visited != v && !sa.synapse.key.isRecurrent) return false;
         }
         return true;
@@ -622,15 +624,15 @@ public class SearchNode implements Comparable<SearchNode> {
         public Candidate(InterprNode ref, int id) {
             this.refinement = ref;
             this.id = id;
-            ref.cand = this;
-            if (ref.act != null) {
-                sequence = ref.act.getSequence();
-                minBegin = ref.act.key.range.begin;
-                maxEnd = ref.act.key.range.end;
-                minRid = ref.act.key.rid;
+            ref.candidate = this;
+            if (ref.activation != null) {
+                sequence = ref.activation.getSequence();
+                minBegin = ref.activation.key.range.begin;
+                maxEnd = ref.activation.key.range.end;
+                minRid = ref.activation.key.rid;
             } else {
                 for (NodeActivation act : ref.getActivations()) {
-                    sequence = Math.max(sequence, ref.act.getSequence());
+                    sequence = Math.max(sequence, ref.activation.getSequence());
                     if (act.key.range != null) {
                         minBegin = Math.min(minBegin, act.key.range.begin);
                         maxEnd = Math.max(maxEnd, act.key.range.end);
@@ -656,9 +658,9 @@ public class SearchNode implements Comparable<SearchNode> {
                     " EXCLUDED:" + debugDecisionCounts[1] +
                     " SIM-CACHED:" + debugComputed[0] +
                     " SIM-COMPUTED:" + debugComputed[1] +
-                    " " + refinement.act.key.range +
-                    " " + refinement.act.key.interpretation +
-                    " " + refinement.act.key.node.neuron.get().label;
+                    " " + refinement.activation.key.range +
+                    " " + refinement.activation.key.interpretation +
+                    " " + refinement.activation.key.node.neuron.get().label;
         }
 
 

@@ -75,7 +75,7 @@ public class OrNode extends Node<OrNode, Activation> {
     @Override
     protected Activation createActivation(Document doc, NodeActivation.Key ak) {
         Activation act = new Activation(doc.activationIdCounter++, doc, ak);
-        ak.interpretation.act = act;
+        ak.interpretation.activation = act;
 
         return act;
     }
