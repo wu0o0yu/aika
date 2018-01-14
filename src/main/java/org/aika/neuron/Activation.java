@@ -136,25 +136,6 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    public static Stream<Activation> select(Document doc, Integer rid, Range r, Range.Relation rr, InterprNode o, InterprNode.Relation or) {
-        Stream<Activation> results;
-        if(rid != null) {
-            Key bk = new Key(Node.MIN_NODE, Range.MIN, rid, InterprNode.MIN);
-            Key ek = new Key(Node.MAX_NODE, Range.MAX, rid, InterprNode.MAX);
-
-            results = doc.activationsByRid.subMap(bk, true, ek, true)
-                    .values()
-                    .stream();
-        } else {
-            results = doc.activatedNeurons
-                    .stream()
-                    .flatMap(neuron -> getActivationsStream(neuron, doc));
-        }
-
-        return results.filter(act -> act.filter(null, rid, r, rr, o, or));
-    }
-
-
     public static Stream<Activation> select(Document doc, INeuron n, Integer rid, Range r, Range.Relation rr, InterprNode o, InterprNode.Relation or) {
         INeuron.ThreadState th = n.getThreadState(doc.threadId, false);
         if(th == null) return Stream.empty();
