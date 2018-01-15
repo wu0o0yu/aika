@@ -138,6 +138,8 @@ public class MetaNetwork {
 
         doc.propagate();
 
+        doc.process();
+/*
         for(Activation tAct: targetNeuron.get().getAllActivations(doc)) {
             if(!isConflicting(tAct, doc.visitedCounter++)) {
                 tAct.key.interpretation.setState(SELECTED, v);
@@ -173,6 +175,7 @@ public class MetaNetwork {
                 }
             }
         }
+        */
     }
 
 

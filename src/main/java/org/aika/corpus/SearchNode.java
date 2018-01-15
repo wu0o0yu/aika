@@ -17,9 +17,7 @@
 package org.aika.corpus;
 
 
-import org.aika.Utils;
-import org.aika.lattice.NodeActivation;
-import org.aika.neuron.Activation.Rounds;
+import org.aika.neuron.Activation.StateChange;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron.NormWeight;
@@ -135,7 +133,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void collectResults(Collection<InterprNode> results) {
+    public void collectResults(Collection<InterprNode> results) {
         if (candidate != null) {
             results.add(candidate.refinement);
         }
@@ -143,47 +141,10 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public void computeBestInterpretation(Document doc) {
-        ArrayList<InterprNode> results = new ArrayList<>();
-        results.add(doc.bottom);
-
-        int[] searchSteps = new int[1];
-
-        List<InterprNode> rootRefs = expandRootRefinement(doc);
-
-        if (Document.OPTIMIZE_DEBUG_OUTPUT) {
-            log.info("Root SearchNode:" + toString());
-        }
-
-        rootRefs.forEach(n -> n.setState(SELECTED, visited));
-
-        Candidate[] candidates = generateCandidates(doc, rootRefs);
-
-        Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
-
-
-        SearchNode child = new SearchNode(doc, this, null, c, level + 1, rootRefs, false);
-        child.search(doc, searchSteps, candidates);
-
-        if (doc.selectedSearchNode != null) {
-            doc.selectedSearchNode.reconstructSelectedResult(doc);
-            doc.selectedSearchNode.collectResults(results);
-        }
-
-        doc.bestInterpretation = results;
-
-        dumpDebugCandidateStatistics(candidates);
-
-        if (doc.interrupted) {
-            log.warn("The search for the best interpretation has been interrupted. Too many search steps!");
-        }
-    }
-
-
-    private void reconstructSelectedResult(Document doc) {
+    public void reconstructSelectedResult(Document doc) {
         if (getParent() != null) getParent().reconstructSelectedResult(doc);
 
-        changeState(StateChange.Mode.NEW);
+        changeState(Activation.Mode.NEW);
 
         SearchNode pn = getParent();
         if (pn != null && pn.candidate != null) {
@@ -191,7 +152,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         for (StateChange sc : modifiedActs) {
-            Activation act = sc.act;
+            Activation act = sc.getActivation();
             if (act.isFinalActivation()) {
                 doc.finallyActivatedNeurons.add(act.key.node.neuron.get(doc));
             }
@@ -215,14 +176,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public void dumpDebugCandidateStatistics(Candidate[] candidates) {
-        for (Candidate c : candidates) {
-            System.out.println(c.toString());
-        }
-    }
-
-
-    private NormWeight search(Document doc, int[] searchSteps, Candidate[] candidates) {
+    public NormWeight search(Document doc) {
         if (candidate == null) {
             return processResult(doc);
         }
@@ -236,12 +190,12 @@ public class SearchNode implements Comparable<SearchNode> {
         boolean alreadyExcluded = !precondition || checkExcluded(candidate.refinement, doc.visitedCounter++);
         Boolean cachedDecision = !alreadyExcluded ? candidate.cachedDecision : null;
 
-        if (searchSteps[0] > MAX_SEARCH_STEPS) {
+        if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
             doc.interrupted = true;
 
             dumpDebugState();
         }
-        searchSteps[0]++;
+        doc.searchStepCounter++;
 
         if (Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Search Step: " + id);
@@ -273,12 +227,12 @@ public class SearchNode implements Comparable<SearchNode> {
                     invalidateCachedDecisions(doc.visitedCounter++);
                 }
 
-                Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
+                Candidate c = doc.candidates.size() > level + 1 ? doc.candidates.get(level + 1) : null;
                 selectedChild = new SearchNode(doc, this, excludedParent, c, level + 1, Collections.singleton(candidate.refinement), candidate.cachedSNDecision == Boolean.TRUE);
 
                 candidate.debugDecisionCounts[0]++;
-                selectedWeight = selectedChild.search(doc, searchSteps, candidates);
-                selectedChild.changeState(StateChange.Mode.OLD);
+                selectedWeight = selectedChild.search(doc);
+                selectedChild.changeState(Activation.Mode.OLD);
             }
 
             candidate.refinement.setState(UNKNOWN, visited);
@@ -292,12 +246,12 @@ public class SearchNode implements Comparable<SearchNode> {
             candidate.refinement.setState(EXCLUDED, visited);
 
             if (cachedDecision == null || !cachedDecision) {
-                Candidate c = candidates.length > level + 1 ? candidates[level + 1] : null;
+                Candidate c = doc.candidates.size() > level + 1 ? doc.candidates.get(level + 1) : null;
                 excludedChild = new SearchNode(doc, selectedParent, this, c, level + 1, Collections.singleton(candidate.refinement), candidate.cachedSNDecision == Boolean.FALSE);
 
                 candidate.debugDecisionCounts[1]++;
-                excludedWeight = excludedChild.search(doc, searchSteps, candidates);
-                excludedChild.changeState(StateChange.Mode.OLD);
+                excludedWeight = excludedChild.search(doc);
+                excludedChild.changeState(Activation.Mode.OLD);
             }
 
             candidate.refinement.setState(UNKNOWN, visited);
@@ -333,7 +287,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private boolean checkInputActModified() {
         for (StateChange sc : modifiedActs) {
-            if (checkInputActModified(sc.act)) {
+            if (checkInputActModified(sc.getActivation())) {
                 return true;
             }
         }
@@ -399,56 +353,6 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public static Candidate[] generateCandidates(Document doc, Collection<InterprNode> refinement) {
-        TreeSet<Candidate> candidates = new TreeSet<>();
-        int i = 0;
-        for (InterprNode cn : doc.bottom.children) {
-            if (cn.state == UNKNOWN) {
-                candidates.add(new Candidate(cn, i++));
-            }
-        }
-
-        long v = doc.visitedCounter++;
-        for (InterprNode n : refinement) {
-            markCandidateSelected(n, v);
-        }
-
-        i = 0;
-        Candidate[] results = new Candidate[candidates.size()];
-        while (!candidates.isEmpty()) {
-            for (Candidate c : candidates) {
-                if (checkDependenciesSatisfied(c, v)) {
-                    candidates.remove(c);
-                    c.id = i++;
-                    results[c.id] = c;
-
-                    markCandidateSelected(c.refinement, v);
-                    break;
-                }
-            }
-        }
-
-        return results;
-    }
-
-
-    private static void markCandidateSelected(InterprNode n, long v) {
-        if (n.neuronActivations != null) {
-            for (Activation act : n.neuronActivations) {
-                act.visited = v;
-            }
-        }
-    }
-
-
-    private static boolean checkDependenciesSatisfied(Candidate c, long v) {
-        for (SynapseActivation sa : c.refinement.activation.neuronInputs) {
-            if (sa.input.visited != v && !sa.synapse.key.isRecurrent) return false;
-        }
-        return true;
-    }
-
-
     private boolean checkExcluded(InterprNode ref, long v) {
         ArrayList<InterprNode> conflicts = new ArrayList<>();
         Conflicts.collectConflicting(conflicts, ref, v);
@@ -458,17 +362,6 @@ public class SearchNode implements Comparable<SearchNode> {
         return false;
     }
 
-
-    private static List<InterprNode> expandRootRefinement(Document doc) {
-        ArrayList<InterprNode> tmp = new ArrayList<>();
-        tmp.add(doc.bottom);
-        for (InterprNode pn : doc.bottom.children) {
-            if (pn.state == SELECTED || (pn.isPrimitive() && pn.conflicts.primary.isEmpty() && pn.conflicts.secondary.isEmpty())) {
-                tmp.add(pn);
-            }
-        }
-        return tmp;
-    }
 
 
     public String pathToString(Document doc) {
@@ -489,7 +382,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public void changeState(StateChange.Mode m) {
+    public void changeState(Activation.Mode m) {
         for (StateChange sc : modifiedActs) {
             sc.restoreState(m);
         }
@@ -521,46 +414,6 @@ public class SearchNode implements Comparable<SearchNode> {
         return true;
     }
 
-    /**
-     * The {@code StateChange} class is used to store the state change of an activation that occurs in each node of
-     * the binary search tree. When a candidate refinement is selected during the search, then the activation values of
-     * all affected activation objects are adjusted. The changes to the activation values are also propagated through
-     * the network. The old state needs to be stored here in order for the search to be able to restore the old network
-     * state before following the alternative search branch.
-     */
-    public static class StateChange {
-        public Activation act;
-
-        public Rounds oldRounds;
-        public Rounds newRounds;
-
-        public enum Mode {OLD, NEW}
-
-        public static void saveOldState(List<StateChange> changes, Activation act, long v) {
-            StateChange sc = act.currentStateChange;
-            if (sc == null || act.currentStateV != v) {
-                sc = new StateChange();
-                sc.oldRounds = act.rounds.copy();
-                act.currentStateChange = sc;
-                act.currentStateV = v;
-                sc.act = act;
-                if (changes != null) {
-                    changes.add(sc);
-                }
-            }
-        }
-
-        public static void saveNewState(Activation act) {
-            StateChange sc = act.currentStateChange;
-
-            sc.newRounds = act.rounds.copy();
-        }
-
-        public void restoreState(Mode m) {
-            act.rounds = (m == Mode.OLD ? oldRounds : newRounds).copy();
-        }
-    }
-
 
     public SearchNode getParent() {
         return getDecision() ? selectedParent : excludedParent;
@@ -569,82 +422,5 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private boolean getDecision() {
         return excludedParent == null || selectedParent.id > excludedParent.id;
-    }
-
-
-    public static class Candidate implements Comparable<Candidate> {
-        public Boolean cachedDecision;
-        public Boolean cachedSNDecision;
-        public SearchNode cachedSearchNode;
-
-        public InterprNode refinement;
-
-        int[] debugCounts = new int[3];
-        int[] debugDecisionCounts = new int[3];
-        int[] debugComputed = new int[2];
-
-        int id;
-        int sequence = 0;
-        int minBegin;
-        int maxEnd;
-        Integer minRid;
-
-        public Candidate(InterprNode ref, int id) {
-            this.refinement = ref;
-            this.id = id;
-            ref.candidate = this;
-            if (ref.activation != null) {
-                sequence = ref.activation.getSequence();
-                minBegin = ref.activation.key.range.begin;
-                maxEnd = ref.activation.key.range.end;
-                minRid = ref.activation.key.rid;
-            } else {
-                for (NodeActivation act : ref.getActivations()) {
-                    sequence = Math.max(sequence, ref.activation.getSequence());
-                    if (act.key.range != null) {
-                        minBegin = Math.min(minBegin, act.key.range.begin);
-                        maxEnd = Math.max(maxEnd, act.key.range.end);
-                    }
-                    minRid = Utils.nullSafeMin(minRid, act.key.rid);
-                }
-            }
-        }
-
-
-        public boolean isConflicting() {
-            return refinement.conflicts.hasConflicts();
-        }
-
-
-        public String toString() {
-            return " CID:" + id +
-                    " CONFLICT:" + isConflicting() +
-                    " LIMITED:" + debugCounts[SearchNode.DebugState.LIMITED.ordinal()] +
-                    " CACHED:" + debugCounts[SearchNode.DebugState.CACHED.ordinal()] +
-                    " EXPLORE:" + debugCounts[SearchNode.DebugState.EXPLORE.ordinal()] +
-                    " SELECTED:" + debugDecisionCounts[0] +
-                    " EXCLUDED:" + debugDecisionCounts[1] +
-                    " SIM-CACHED:" + debugComputed[0] +
-                    " SIM-COMPUTED:" + debugComputed[1] +
-                    " " + refinement.activation.key.range +
-                    " " + refinement.activation.key.interpretation +
-                    " " + refinement.activation.key.node.neuron.get().label;
-        }
-
-
-        @Override
-        public int compareTo(Candidate c) {
-            int r = Integer.compare(minBegin, c.minBegin);
-            if (r != 0) return r;
-            r = Integer.compare(maxEnd, c.maxEnd);
-            if (r != 0) return r;
-
-            r = Integer.compare(sequence, c.sequence);
-            if (r != 0) return r;
-
-            r = Utils.compareInteger(minRid, c.minRid);
-            if (r != 0) return r;
-            return Integer.compare(id, c.id);
-        }
     }
 }

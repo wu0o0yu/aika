@@ -32,6 +32,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.aika.corpus.InterprNode.State.SELECTED;
+import static org.aika.corpus.InterprNode.State.UNKNOWN;
+
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
  * training input. A document consists of the raw text, the interpretations and the activations.
@@ -56,15 +59,13 @@ public class Document implements Comparable<Document> {
     public int interpretationIdCounter = 1;
     public int activationIdCounter = 0;
     public int searchNodeIdCounter = 0;
+    public int searchStepCounter = 0;
 
     public InterprNode bottom = new InterprNode(this, -1, 0, 0);
 
-    public SearchNode selectedSearchNode = null;
-    public List<InterprNode> bestInterpretation = null;
-
     public Model model;
     public int threadId;
-    public boolean interrupted;
+    public boolean interrupted = false;
 
     public Queue queue = new Queue();
     public ValueQueue vQueue = new ValueQueue();
@@ -84,6 +85,13 @@ public class Document implements Comparable<Document> {
         return act1.compareTo(act2);
     });
     public TreeSet<Node> addedNodes = new TreeSet<>();
+
+
+    public SearchNode rootSearchNode = new SearchNode(this, null, null, null, -1, Collections.emptySet(), false);
+    public SearchNode selectedSearchNode = null;
+    public List<InterprNode> rootRefs;
+    public ArrayList<Candidate> candidates;
+    public List<InterprNode> bestInterpretation = null;
 
 
     public static Comparator<NodeActivation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
@@ -153,15 +161,101 @@ public class Document implements Comparable<Document> {
     }
 
 
+
+    private void expandRootRefinement() {
+        rootRefs = new ArrayList<>();
+        rootRefs.add(bottom);
+        for (InterprNode pn : bottom.children) {
+            if (pn.state == SELECTED || (pn.isPrimitive() && pn.conflicts.primary.isEmpty() && pn.conflicts.secondary.isEmpty())) {
+                rootRefs.add(pn);
+            }
+        }
+    }
+
+
+    public void generateCandidates() {
+        TreeSet<Candidate> tmp = new TreeSet<>();
+        int i = 0;
+        for (InterprNode cn : bottom.children) {
+            if (cn.state == UNKNOWN) {
+                tmp.add(new Candidate(cn, i++));
+            }
+        }
+
+        long v = visitedCounter++;
+        for (InterprNode n : rootRefs) {
+            markCandidateSelected(n, v);
+        }
+
+        i = 0;
+        candidates = new ArrayList<>();
+        while (!tmp.isEmpty()) {
+            for (Candidate c : tmp) {
+                if (c.checkDependenciesSatisfied(v)) {
+                    tmp.remove(c);
+                    c.id = i++;
+                    candidates.add(c);
+
+                    markCandidateSelected(c.refinement, v);
+                    break;
+                }
+            }
+        }
+    }
+
+
+    private static void markCandidateSelected(InterprNode n, long v) {
+        if (n.neuronActivations != null) {
+            for (Activation act : n.neuronActivations) {
+                act.visited = v;
+            }
+        }
+    }
+
+
     /**
      * The method <code>process</code> needs to be called after all the input activations have been added to the
      * network. It performs the search for the best interpretation.
      */
     public void process() {
         inputNeuronActivations.forEach(act -> vQueue.propagateWeight(0, act));
-        interrupted = false;
-        SearchNode root = new SearchNode(this, null, null, null, -1, Collections.emptySet(), false);
-        root.computeBestInterpretation(this);
+
+        expandRootRefinement();
+
+        if (Document.OPTIMIZE_DEBUG_OUTPUT) {
+            log.info("Root SearchNode:" + toString());
+        }
+
+        rootRefs.forEach(n -> n.setState(SELECTED, rootSearchNode.visited));
+
+        generateCandidates();
+
+        Candidate c = !candidates.isEmpty() ? candidates.get(0) : null;
+
+        SearchNode child = new SearchNode(this, rootSearchNode, null, c, 0, rootRefs, false);
+        child.search(this);
+
+        ArrayList<InterprNode> results = new ArrayList<>();
+        results.add(bottom);
+        if (selectedSearchNode != null) {
+            selectedSearchNode.reconstructSelectedResult(this);
+            selectedSearchNode.collectResults(results);
+        }
+
+        bestInterpretation = results;
+
+        dumpDebugCandidateStatistics();
+
+        if (interrupted) {
+            log.warn("The search for the best interpretation has been interrupted. Too many search steps!");
+        }
+    }
+
+
+    public void dumpDebugCandidateStatistics() {
+        for (Candidate c : candidates) {
+            System.out.println(c.toString());
+        }
     }
 
 
@@ -559,7 +653,7 @@ public class Document implements Comparable<Document> {
                     }
 
                     if (round == 0 || !act.rounds.get(round).equalsWithWeights(s)) {
-                        SearchNode.StateChange.saveOldState(sn.modifiedActs, act, v);
+                        act.saveOldState(sn.modifiedActs, v);
 
                         State oldState = act.rounds.get(round);
 
@@ -567,7 +661,7 @@ public class Document implements Comparable<Document> {
 
                         act.rounds.modified = visitedModified;
 
-                        SearchNode.StateChange.saveNewState(act);
+                        act.saveNewState();
 
                         if (propagate) {
                             if(round > MAX_ROUND) {

@@ -5,7 +5,6 @@ import org.aika.corpus.Document;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.SearchNode;
-import org.aika.corpus.SearchNode.StateChange;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
@@ -473,6 +472,49 @@ public final class Activation extends NodeActivation<OrNode> {
             return txt;
         } else {
             return txt.substring(0, 5) + "..." + txt.substring(txt.length() - 5);
+        }
+    }
+
+
+    public enum Mode {OLD, NEW}
+
+    public void saveOldState(List<StateChange> changes, long v) {
+        StateChange sc = currentStateChange;
+        if (sc == null || currentStateV != v) {
+            sc = new StateChange();
+            sc.oldRounds = rounds.copy();
+            currentStateChange = sc;
+            currentStateV = v;
+            if (changes != null) {
+                changes.add(sc);
+            }
+        }
+    }
+
+    public void saveNewState() {
+        StateChange sc = currentStateChange;
+
+        sc.newRounds = rounds.copy();
+    }
+
+
+    /**
+     * The {@code StateChange} class is used to store the state change of an activation that occurs in each node of
+     * the binary search tree. When a candidate refinement is selected during the search, then the activation values of
+     * all affected activation objects are adjusted. The changes to the activation values are also propagated through
+     * the network. The old state needs to be stored here in order for the search to be able to restore the old network
+     * state before following the alternative search branch.
+     */
+    public class StateChange {
+        public Rounds oldRounds;
+        public Rounds newRounds;
+
+        public void restoreState(Mode m) {
+            rounds = (m == Mode.OLD ? oldRounds : newRounds).copy();
+        }
+
+        public Activation getActivation() {
+            return Activation.this;
         }
     }
 

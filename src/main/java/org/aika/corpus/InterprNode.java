@@ -20,7 +20,6 @@ package org.aika.corpus;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.neuron.Activation;
-import org.aika.corpus.SearchNode.Candidate;
 import org.aika.Utils;
 
 import java.util.*;
