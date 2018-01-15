@@ -498,14 +498,14 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public NormWeight adjustWeight(SearchNode cand, Collection<InterprNode> changed) {
+        public NormWeight adjustWeight(SearchNode cand, Collection<InterprNode> changed, long visitedModified) {
             long v = visitedCounter++;
 
             for(InterprNode n: changed) {
                 addAllActs(n.getNeuronActivations());
             }
 
-            return processChanges(cand, v);
+            return processChanges(cand, v, visitedModified);
         }
 
 
@@ -538,7 +538,7 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public INeuron.NormWeight processChanges(SearchNode sn, long v) {
+        public INeuron.NormWeight processChanges(SearchNode sn, long v, long visitedModified) {
             NormWeight delta = NormWeight.ZERO_WEIGHT;
             for(int round = 0; round < queue.size(); round++) {
                 TreeSet<Activation> q = queue.get(round);
@@ -563,9 +563,9 @@ public class Document implements Comparable<Document> {
 
                         State oldState = act.rounds.get(round);
 
-                        boolean propagate = act.rounds.set(round, s);
+                        boolean propagate = act.rounds.set(round, s) && s.value > 0.0;
 
-                        act.rounds.modified = sn.visited;
+                        act.rounds.modified = visitedModified;
 
                         SearchNode.StateChange.saveNewState(act);
 

@@ -156,14 +156,14 @@ public class MetaNetwork {
                 newActs.add(sAct);
 
                 newActs.forEach(act -> doc.vQueue.add(0, act));
-                doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++);
+                doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++, doc.selectedSearchNode.visited);
 
                 if (tAct.getFinalState().value <= 0.0) {
                     tAct.key.interpretation.setState(EXCLUDED, v);
                     mAct.key.interpretation.setState(SELECTED, doc.selectedSearchNode.visited);
 
                     newActs.forEach(act -> doc.vQueue.add(0, act));
-                    doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++);
+                    doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++, doc.selectedSearchNode.visited);
                 }
 
                 for (Activation act : newActs) {

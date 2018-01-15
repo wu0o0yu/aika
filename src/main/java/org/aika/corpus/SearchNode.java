@@ -75,7 +75,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public List<StateChange> modifiedActs = new ArrayList<>();
 
-    public static int dbc = 0;
 
     public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate c, int level, Collection<InterprNode> changed, boolean cached) {
         id = doc.searchNodeIdCounter++;
@@ -88,12 +87,6 @@ public class SearchNode implements Comparable<SearchNode> {
         boolean modified = true;
         if (c != null) {
             candidate = c;
-
-            dbc++;
-
-            if (candidate.id == 139  || candidate.id == 140  || candidate.id == 141  || candidate.id == 142) {
-                System.out.println();
-            }
 
             lsn = candidate.cachedSearchNode;
             if (lsn != null && cached) {
@@ -114,22 +107,22 @@ public class SearchNode implements Comparable<SearchNode> {
             */
 //            candidate.cachedSearchNode = this;
         }
-        weightDelta = doc.vQueue.adjustWeight(this, changed);
+        boolean cachedSim = cached && !modified && lsn != null;
 
-        if (cached && !modified && lsn != null) {
+        weightDelta = doc.vQueue.adjustWeight(this, changed, cachedSim ? lsn.visited : visited);
+
+/*        if (cachedSim) {
             if (Utils.round(weightDelta.w) != Utils.round(lsn.weightDelta.w)) {
                 System.out.println();
             }
             if (!compareNewState(lsn)) {
                 System.out.println();
             }
-            if (candidate != null) {
-                candidate.debugComputed[0]++;
-            }
-        } else {
-            if (candidate != null) {
-                candidate.debugComputed[1]++;
-            }
+        }
+*/
+        SearchNode pn = getParent();
+        if (pn != null && pn.candidate != null) {
+            pn.candidate.debugComputed[cachedSim ? 0 : 1]++;
         }
 
         if (getParent() != null) {

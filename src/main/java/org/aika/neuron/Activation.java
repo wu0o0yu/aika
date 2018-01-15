@@ -9,6 +9,8 @@ import org.aika.corpus.SearchNode.StateChange;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -35,6 +37,7 @@ import static org.aika.neuron.Activation.SynapseActivation.OUTPUT_COMP;
  * @author Lukas Molzberger
  */
 public final class Activation extends NodeActivation<OrNode> {
+    private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
     public TreeSet<SynapseActivation> neuronInputs = new TreeSet<>(INPUT_COMP);
     public TreeSet<SynapseActivation> neuronOutputs = new TreeSet<>(OUTPUT_COMP);
@@ -279,6 +282,8 @@ public final class Activation extends NodeActivation<OrNode> {
             if(lr != null && lr.equalsWithWeights(s)) {
                 State or = rounds.get(r);
                 if(or != null) {
+                    checkIfNonMonotone(or, s);
+
                     rounds.remove(r);
                     return !or.equalsWithWeights(s);
                 }
@@ -286,11 +291,21 @@ public final class Activation extends NodeActivation<OrNode> {
             } else {
                 State or = rounds.put(r, s);
 
+                checkIfNonMonotone(or, s);
+
                 for(Iterator<Map.Entry<Integer, State>> it = rounds.tailMap(r + 1).entrySet().iterator(); it.hasNext(); ) {
                     Map.Entry<Integer, State> me = it.next();
                     if(me.getValue().equalsWithWeights(s)) it.remove();
                 }
                 return or == null || !or.equalsWithWeights(s);
+            }
+        }
+
+        public void checkIfNonMonotone(State os, State s) {
+            if(os != null && os.value > s.value) {
+                log.error("Error: Non monotone activation value occurred.");
+
+                throw new RuntimeException("Non monotone activation value occurred.");
             }
         }
 
