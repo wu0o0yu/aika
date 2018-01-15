@@ -288,10 +288,6 @@ public class SearchNode implements Comparable<SearchNode> {
             return NormWeight.ZERO_WEIGHT;
         }
 
-        if(candidate.id == 293) {
-            System.out.println();
-        }
-
         if (!alreadySelected) {
             candidate.refinement.setState(EXCLUDED, visited);
 
