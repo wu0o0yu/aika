@@ -657,7 +657,7 @@ public class Document implements Comparable<Document> {
 
                         State oldState = act.rounds.get(round);
 
-                        boolean propagate = act.rounds.set(round, s) && s.value > 0.0;
+                        boolean propagate = act.rounds.set(round, s) && (oldState == null || !oldState.equals(s));
 
                         act.rounds.modified = visitedModified;
 

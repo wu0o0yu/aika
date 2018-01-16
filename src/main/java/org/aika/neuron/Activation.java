@@ -281,16 +281,12 @@ public final class Activation extends NodeActivation<OrNode> {
             if(lr != null && lr.equalsWithWeights(s)) {
                 State or = rounds.get(r);
                 if(or != null) {
-                    checkIfNonMonotone(or, s);
-
                     rounds.remove(r);
                     return !or.equalsWithWeights(s);
                 }
                 return false;
             } else {
                 State or = rounds.put(r, s);
-
-                checkIfNonMonotone(or, s);
 
                 for(Iterator<Map.Entry<Integer, State>> it = rounds.tailMap(r + 1).entrySet().iterator(); it.hasNext(); ) {
                     Map.Entry<Integer, State> me = it.next();
@@ -300,13 +296,6 @@ public final class Activation extends NodeActivation<OrNode> {
             }
         }
 
-        public void checkIfNonMonotone(State os, State s) {
-            if(os != null && os.value > s.value) {
-                log.error("Error: Non monotone activation value occurred.");
-
-                throw new RuntimeException("Non monotone activation value occurred.");
-            }
-        }
 
         public State get(int r) {
             Map.Entry<Integer, State> me = rounds.floorEntry(r);
