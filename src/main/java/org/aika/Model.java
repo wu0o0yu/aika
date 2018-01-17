@@ -255,7 +255,7 @@ public class Model {
 
     private boolean suspend(int docId, Provider<? extends AbstractNode> p, SuspensionMode sm) {
         AbstractNode an = p.getIfNotSuspended();
-        if (an != null && an.lastUsedDocumentId <= docId) {
+        if (an != null && an.lastUsedDocumentId < docId) {
             p.suspend(sm);
             return true;
         }
