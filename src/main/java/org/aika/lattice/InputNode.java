@@ -192,7 +192,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                                                     firstNode.key.rangeOutput.map(iak.range),
                                                     secondNode.key.rangeOutput.map(secondIAct.key.range)
                                             ),
-                                            Utils.nullSafeMin(ak.rid, secondIAct.key.rid),
+                                            Utils.nullSafeMin(ak.rid, secondAct.key.rid),
                                             o
                                     ),
                                     AndNode.prepareInputActs(act, secondAct)
