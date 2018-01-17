@@ -23,6 +23,7 @@ import org.aika.lattice.Node;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.INeuron.Type;
 import org.aika.neuron.Synapse;
+import org.aika.Provider.SuspensionMode;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -216,19 +217,30 @@ public class Model {
     }
 
 
+
     /**
      * Suspend all neurons and logic nodes whose last used document id is lower/older than {@param docId}.
      *
      * @param docId
      */
-    public void suspendUnusedNodes(int docId) {
+    public void suspendUnusedNodes(int docId, SuspensionMode sm) {
+        docId = Math.min(docId, getOldestDocIdInProcessing());
         List<Provider> tmp;
         synchronized (activeProviders) {
             tmp = new ArrayList<>(activeProviders.values());
         }
         for (Provider p: tmp) {
-            suspend(docId, p);
+            suspend(docId, p, sm);
         }
+    }
+
+
+    public int getOldestDocIdInProcessing() {
+        int oldestDocId = Integer.MAX_VALUE;
+        for(Document doc: docs) {
+            if(doc != null) oldestDocId = Math.min(oldestDocId, doc.id);
+        }
+        return oldestDocId;
     }
 
 
@@ -236,33 +248,19 @@ public class Model {
      * Suspend all neurons and logic nodes in memory.
      *
      */
-    public void suspendAll() {
-        suspendUnusedNodes(Integer.MAX_VALUE);
+    public void suspendAll(SuspensionMode sm) {
+        suspendUnusedNodes(Integer.MAX_VALUE, sm);
     }
 
 
-    private boolean suspend(int docId, Provider<? extends AbstractNode> p) {
+    private boolean suspend(int docId, Provider<? extends AbstractNode> p, SuspensionMode sm) {
         AbstractNode an = p.getIfNotSuspended();
         if (an != null && an.lastUsedDocumentId <= docId) {
-            p.suspend();
+            p.suspend(sm);
             return true;
         }
         return false;
     }
-
-    /**
-     * Discards all unsuspended neurons and logic nodes.
-     */
-    public void discardAll() {
-        List<Provider> tmp;
-        synchronized (activeProviders) {
-            tmp = new ArrayList<>(activeProviders.values());
-        }
-        for (Provider p: tmp) {
-            p.discard();
-        }
-    }
-
 
 
     /**

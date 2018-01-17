@@ -16,6 +16,13 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
     private volatile T n;
 
+
+    public enum SuspensionMode {
+        SAVE,
+        DISCARD
+    }
+
+
     public Provider(Model model, int id) {
         this.model = model;
         this.id = id;
@@ -76,7 +83,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     }
 
 
-    public synchronized void suspend() {
+    public synchronized void suspend(SuspensionMode sm) {
         if(n == null) return;
 
         assert model.suspensionHook != null;
@@ -85,13 +92,10 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
         model.unregister(this);
 
-        save();
+        if(sm == SuspensionMode.SAVE) {
+            save();
+        }
 
-        discard();
-    }
-
-
-    public synchronized void discard() {
         n = null;
     }
 

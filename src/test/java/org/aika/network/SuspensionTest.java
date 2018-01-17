@@ -42,8 +42,8 @@ public class SuspensionTest {
         Model m = new Model(new DummySuspensionHook(), 1);
 
         Neuron n = m.createNeuron("A");
-        n.get().node.suspend();
-        n.suspend();
+        n.get().node.suspend(Provider.SuspensionMode.SAVE);
+        n.suspend(Provider.SuspensionMode.SAVE);
 
         int id = n.id;
 
@@ -100,7 +100,7 @@ public class SuspensionTest {
                         .setRangeOutput(true)
         );
 
-        m.suspendAll();
+        m.suspendAll(Provider.SuspensionMode.SAVE);
 
         Assert.assertTrue(outD.isSuspended());
 
