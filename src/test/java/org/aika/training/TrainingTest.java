@@ -48,7 +48,7 @@ public class TrainingTest {
         targetAct.errorSignal = 1.0 - targetAct.getFinalState().value;
 
         doc.supervisedTraining.train(out.get(), targetAct, 0.01,
-                (iAct, oAct) -> new SupervisedTraining.SynEvalResult(
+                (s, iAct, oAct) -> new SynapseEvaluation.Result(
                         new Synapse.Key(
                                 false,
                                 0,
@@ -90,8 +90,8 @@ public class TrainingTest {
                     new SupervisedTraining.TrainConfig()
                             .setLearnRate(2.0)
                             .setPerformBackpropagation(false)
-                            .setSynapseEvaluation((iAct, oAct) ->
-                                    new SupervisedTraining.SynEvalResult(new Synapse.Key(
+                            .setSynapseEvaluation((s, iAct, oAct) ->
+                                    new SynapseEvaluation.Result(new Synapse.Key(
                                             false,
                                             0,
                                             null,

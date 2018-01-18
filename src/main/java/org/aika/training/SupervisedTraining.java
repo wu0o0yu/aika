@@ -45,29 +45,6 @@ public class SupervisedTraining {
     }
 
 
-    public interface SynapseEvaluation {
-
-        /**
-         * Determines whether a synapse should be created between two neurons during training.
-         *
-         * @param iAct
-         * @param oAct
-         * @return
-         */
-        SynEvalResult evaluate(Activation iAct, Activation oAct);
-    }
-
-
-    public static class SynEvalResult {
-        public SynEvalResult(Synapse.Key synapseKey, double significance) {
-            this.synapseKey = synapseKey;
-            this.significance = significance;
-        }
-
-        public Synapse.Key synapseKey;
-        public double significance;
-    }
-
     public static class TrainConfig {
         public SynapseEvaluation synapseEvaluation;
         public double learnRate;
@@ -123,7 +100,7 @@ public class SupervisedTraining {
         n.biasDelta += x;
         for (INeuron in : doc.finallyActivatedNeurons) {
             for(Activation iAct: in.getFinalActivations(doc)) {
-                SupervisedTraining.SynEvalResult ser = se.evaluate(iAct, targetAct);
+                SynapseEvaluation.Result ser = se.evaluate(null, iAct, targetAct);
                 if(ser != null) {
                     trainSynapse(n, iAct, ser, x, v);
                 }
@@ -166,7 +143,7 @@ public class SupervisedTraining {
     }
 
 
-    private void trainSynapse(INeuron n, Activation iAct, SynEvalResult ser, double x, long v) {
+    private void trainSynapse(INeuron n, Activation iAct, SynapseEvaluation.Result ser, double x, long v) {
         if (iAct.visited == v) return;
         iAct.visited = v;
 
