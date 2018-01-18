@@ -275,6 +275,27 @@ public class Synapse implements Writable {
     }
 
 
+    public static Synapse createOrLookup(Key synapseKey, Neuron inputNeuron, Neuron outputNeuron) {
+        Provider<InputNode> inp = inputNeuron.get().outputNodes.get(synapseKey.createInputNodeKey());
+        Synapse synapse = null;
+        InputNode in = null;
+        if(inp != null) {
+            in = inp.get();
+            synapse = in.getSynapse(synapseKey.relativeRid, outputNeuron);
+        }
+
+        if(synapse == null) {
+            synapse = new Synapse(inputNeuron, outputNeuron, synapseKey);
+
+            if(in == null) {
+                in = InputNode.add(outputNeuron.model, synapseKey.createInputNodeKey(), synapse.input.get());
+            }
+            in.setSynapse(synapse);
+            synapse.link();
+        }
+        return synapse;
+    }
+
 
     public static class Key implements Comparable<Key>, Writable {
         public static final Key MIN_KEY = new Key();

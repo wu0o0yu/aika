@@ -23,6 +23,7 @@ import org.aika.lattice.InputNode;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
+import org.aika.training.SynapseEvaluation.Result;
 
 import java.util.TreeSet;
 
@@ -100,7 +101,7 @@ public class SupervisedTraining {
         n.biasDelta += x;
         for (INeuron in : doc.finallyActivatedNeurons) {
             for(Activation iAct: in.getFinalActivations(doc)) {
-                SynapseEvaluation.Result ser = se.evaluate(null, iAct, targetAct);
+                Result ser = se.evaluate(null, iAct, targetAct);
                 if(ser != null) {
                     trainSynapse(n, iAct, ser, x, v);
                 }
@@ -143,7 +144,7 @@ public class SupervisedTraining {
     }
 
 
-    private void trainSynapse(INeuron n, Activation iAct, SynapseEvaluation.Result ser, double x, long v) {
+    private void trainSynapse(INeuron n, Activation iAct, Result ser, double x, long v) {
         if (iAct.visited == v) return;
         iAct.visited = v;
 
@@ -153,23 +154,8 @@ public class SupervisedTraining {
         }
         double deltaW = x * ser.significance * iAct.getFinalState().value;
 
-        Provider<InputNode> inp = inputNeuron.outputNodes.get(ser.synapseKey.createInputNodeKey());
-        Synapse synapse = null;
-        InputNode in = null;
-        if(inp != null) {
-            in = inp.get(doc);
-            synapse = in.getSynapse(ser.synapseKey.relativeRid, n.provider);
-        }
 
-        if(synapse == null) {
-            synapse = new Synapse(inputNeuron.provider, n.provider, ser.synapseKey);
-
-            if(in == null) {
-                in = InputNode.add(n.provider.model, ser.synapseKey.createInputNodeKey(), synapse.input.get(doc));
-            }
-            in.setSynapse(synapse);
-            synapse.link();
-        }
+        Synapse synapse = Synapse.createOrLookup(ser.synapseKey, inputNeuron.provider, n.provider);
 
         synapse.weightDelta = (float) deltaW;
     }

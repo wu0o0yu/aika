@@ -21,6 +21,7 @@ import org.aika.corpus.Document;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
+import org.aika.training.SynapseEvaluation.Result;
 
 import java.util.Collections;
 import java.util.Set;
@@ -29,21 +30,20 @@ import java.util.TreeSet;
 
 /**
  *
+ * Implements the biologically inspired learning algorithms: long term potentiation and long term depression
+ *
+ *
+ *
  * @author Lukas Molzberger
  */
-public class LongTermPotAndDep {
-
-    public static double LTP_LEARN_RATE = 0.1;
-    public static double LTD_LEARN_RATE = 0.1;
-
-    public static double BETA = 0.5;
-
+public class LongTermLearning {
 
 
     public static class TrainConfig {
         public SynapseEvaluation synapseEvaluation;
         public double ltpLearnRate;
         public double ltdLearnRate;
+        public double beta;
 
 
         /**
@@ -67,6 +67,11 @@ public class LongTermPotAndDep {
         public TrainConfig setLTDLearnRate(double learnRate) {
             this.ltdLearnRate = learnRate;
             return this;
+        }
+
+
+        public void setBeta(double beta) {
+            this.beta = beta;
         }
     }
 
@@ -92,14 +97,18 @@ public class LongTermPotAndDep {
         }
 
         // n.posDirSum wird bei Oder-Neuronen sehr groß.
-        double x = LTP_LEARN_RATE * (1.0 - act.getFinalState().value) * (iaSum / (n.posDirSum + n.posRecSum));
+        double x = trainConfig.ltpLearnRate * (1.0 - act.getFinalState().value) * (iaSum / (n.posDirSum + n.posRecSum));
 
-        act.getFinalInputActivations().forEach(sa -> {
-            SynapseEvaluation.Result r = trainConfig.synapseEvaluation.evaluate(sa.synapse, sa.input, sa.output);
-            double sDelta = sa.input.getFinalState().value * x * r.significance;
+        doc.finallyActivatedNeurons.stream().
+                flatMap(in -> in.getFinalActivations(doc).stream())
+                .forEach(iAct -> {
+            Result r = trainConfig.synapseEvaluation.evaluate(null, iAct, act);
+            double sDelta = iAct.getFinalState().value * x * r.significance;
 
-            sa.synapse.weightDelta += (float) sDelta;
-            n.bias -= BETA * sDelta;
+            Synapse synapse = Synapse.createOrLookup(r.synapseKey, iAct.key.node.neuron, act.key.node.neuron);
+
+            synapse.weightDelta += (float) sDelta;
+            n.bias -= trainConfig.beta * sDelta;
             assert !Double.isNaN(n.bias);
         });
 
@@ -114,8 +123,8 @@ public class LongTermPotAndDep {
         (dir ? n.outputSynapses : n.inputSynapses).values().stream()
                 .filter(s -> !s.isNegative() && !actSyns.contains(s))
                 .forEach(s -> {
-                    SynapseEvaluation.Result r = trainConfig.synapseEvaluation.evaluate(s, dir ? act : null, dir ? null : act);
-                    s.weightDelta -= (float) (LTD_LEARN_RATE * act.getFinalState().value * r.significance);
+                    Result r = trainConfig.synapseEvaluation.evaluate(s, dir ? act : null, dir ? null : act);
+                    s.weightDelta -= (float) (trainConfig.ltdLearnRate * act.getFinalState().value * r.significance);
 
                     if (dir) {
                         doc.notifyWeightsModified(s.output.get(), Collections.singletonList(s));
