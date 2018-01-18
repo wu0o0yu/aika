@@ -218,30 +218,28 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     public void discover(Document doc, NodeActivation<InputNode> act, DiscoveryConfig discoveryConfig) {
         long v = provider.model.visitedCounter.addAndGet(1);
 
-        for (INeuron n : doc.finallyActivatedNeurons) {
-            for (Activation secondNAct : n.getFinalActivations(doc)) {
-                for (NodeActivation secondAct : secondNAct.outputs.values()) {
-                    Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.node.provider);
-                    InputNode in = ref.input.get(doc);
-                    Range.Relation rm = Range.Relation.createQuery(key.rangeMatch, in.key.rangeOutput, key.rangeOutput, in.key.rangeMatch);
+        doc.getFinalActivations().forEach(secondNAct -> {
+            for (NodeActivation secondAct : secondNAct.outputs.values()) {
+                Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.node.provider);
+                InputNode in = ref.input.get(doc);
+                Range.Relation rm = Range.Relation.createQuery(key.rangeMatch, in.key.rangeOutput, key.rangeOutput, in.key.rangeMatch);
 
-                    if (act != secondAct &&
-                            this != in &&
-                            in.visitedDiscover != v &&
-                            !in.key.isRecurrent &&
-                            rm.compare(secondAct.key.range, act.key.range)
+                if (act != secondAct &&
+                        this != in &&
+                        in.visitedDiscover != v &&
+                        !in.key.isRecurrent &&
+                        rm.compare(secondAct.key.range, act.key.range)
                         ) {
-                        in.visitedDiscover = v;
-                        AndNode nln = AndNode.createNextLevelNode(doc.model, doc.threadId, this, ref, discoveryConfig);
+                    in.visitedDiscover = v;
+                    AndNode nln = AndNode.createNextLevelNode(doc.model, doc.threadId, this, ref, discoveryConfig);
 
-                        if(nln != null) {
-                            nln.isDiscovered = true;
-                            doc.addedNodes.add(nln);
-                        }
+                    if (nln != null) {
+                        nln.isDiscovered = true;
+                        doc.addedNodes.add(nln);
                     }
                 }
             }
-        }
+        });
     }
 
 

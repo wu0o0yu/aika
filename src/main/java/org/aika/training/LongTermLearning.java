@@ -30,7 +30,7 @@ import java.util.TreeSet;
 
 /**
  *
- * Implements the biologically inspired learning algorithms: long term potentiation and long term depression
+ * Implements the biologically inspired learning algorithms long term potentiation and long term depression.
  *
  *
  *
@@ -78,17 +78,17 @@ public class LongTermLearning {
 
 
     public static void train(Document doc, TrainConfig trainConfig) {
-        for(INeuron n: doc.finallyActivatedNeurons) {
-            for(Activation act: n.getFinalActivations(doc)) {
-                longTermPotentiation(doc, trainConfig, n, act);
-                longTermDepression(doc, trainConfig, n, act, false);
-                longTermDepression(doc, trainConfig, n, act, true);
-            }
-        }
+        doc.getFinalActivations().forEach(act -> {
+            longTermPotentiation(doc, trainConfig, act);
+            longTermDepression(doc, trainConfig, act, false);
+            longTermDepression(doc, trainConfig, act, true);
+        });
     }
 
 
-    private static void longTermPotentiation(Document doc, TrainConfig trainConfig, INeuron n, Activation act) {
+    private static void longTermPotentiation(Document doc, TrainConfig trainConfig, Activation act) {
+        INeuron n = act.key.node.neuron.get();
+
         double iaSum = 0.0;
         for(Activation.SynapseActivation sa: act.getFinalInputActivations()) {
             if(!sa.synapse.isNegative()) {
@@ -99,9 +99,7 @@ public class LongTermLearning {
         // n.posDirSum wird bei Oder-Neuronen sehr groß.
         double x = trainConfig.ltpLearnRate * (1.0 - act.getFinalState().value) * (iaSum / (n.posDirSum + n.posRecSum));
 
-        doc.finallyActivatedNeurons.stream().
-                flatMap(in -> in.getFinalActivations(doc).stream())
-                .forEach(iAct -> {
+        doc.getFinalActivations().forEach(iAct -> {
             Result r = trainConfig.synapseEvaluation.evaluate(null, iAct, act);
             double sDelta = iAct.getFinalState().value * x * r.significance;
 
@@ -116,7 +114,9 @@ public class LongTermLearning {
     }
 
 
-    private static void longTermDepression(Document doc, TrainConfig trainConfig, INeuron n, Activation act, boolean dir) {
+    private static void longTermDepression(Document doc, TrainConfig trainConfig, Activation act, boolean dir) {
+        INeuron n = act.key.node.neuron.get();
+
         Set<Synapse> actSyns = new TreeSet<>(dir ? Synapse.OUTPUT_SYNAPSE_COMP : Synapse.INPUT_SYNAPSE_COMP);
         (dir ? act.getFinalOutputActivations() : act.getFinalInputActivations()).forEach(sa -> actSyns.add(sa.synapse));
 

@@ -1,10 +1,21 @@
 package org.aika.training;
 
 import org.aika.neuron.INeuron;
+import org.junit.Test;
 
-public class LongTermPotAndDepTest {
+public class LongTermLearningTest {
 
 
+    @Test
+    public void testLongTermPotentiation() {
+
+    }
+
+
+    @Test
+    public void testLongTermDepression() {
+
+    }
 
 
     public static double sig(INeuron in, INeuron on) {

@@ -137,6 +137,12 @@ public class Document implements Comparable<Document> {
     }
 
 
+    public Stream<Activation> getFinalActivations() {
+        return finallyActivatedNeurons.stream().
+                flatMap(in -> in.getFinalActivations(this).stream());
+    }
+
+
     public String bestInterpretationToString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Best Interpretation:\n");

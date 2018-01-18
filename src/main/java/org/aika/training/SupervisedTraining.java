@@ -99,14 +99,12 @@ public class SupervisedTraining {
 
         double x = learnRate * targetAct.errorSignal;
         n.biasDelta += x;
-        for (INeuron in : doc.finallyActivatedNeurons) {
-            for(Activation iAct: in.getFinalActivations(doc)) {
-                Result ser = se.evaluate(null, iAct, targetAct);
-                if(ser != null) {
-                    trainSynapse(n, iAct, ser, x, v);
-                }
+        doc.getFinalActivations().forEach(iAct -> {
+            Result ser = se.evaluate(null, iAct, targetAct);
+            if (ser != null) {
+                trainSynapse(n, iAct, ser, x, v);
             }
-        }
+        });
 
         doc.notifyWeightsModified(n, n.provider.inMemoryInputSynapses.values());
     }
