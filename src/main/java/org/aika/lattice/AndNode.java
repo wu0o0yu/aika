@@ -23,7 +23,7 @@ import org.aika.Model;
 import org.aika.Provider;
 import org.aika.Utils;
 import org.aika.corpus.Document;
-import org.aika.corpus.Document.DiscoveryConfig;
+import org.aika.training.PatternDiscovery.DiscoveryConfig;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.neuron.INeuron;

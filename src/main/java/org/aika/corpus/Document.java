@@ -278,56 +278,6 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public static class DiscoveryConfig {
-        public PatternEvaluation checkValidPattern;
-        public ActivationEvaluation checkExpandable;
-        public Counter counter;
-
-
-        public DiscoveryConfig setCheckValidPattern(PatternEvaluation checkValidPattern) {
-            this.checkValidPattern = checkValidPattern;
-            return this;
-        }
-
-
-        /**
-         * This callback checks whether the current pattern might be refined to an even larger pattern.
-         * If frequency is the criterion, then infrequent are not expandable.
-         *
-         * @param checkExpandable
-         * @return
-         */
-        public DiscoveryConfig setCheckExpandable(ActivationEvaluation checkExpandable) {
-            this.checkExpandable = checkExpandable;
-            return this;
-        }
-
-
-        /**
-         * The counter callback function should implement a customized counting function.
-         * The counting function should modify the custom meta object stored in the node.
-         * The NodeStatisticFactory is used to instantiate the custom meta object for a node.
-         *
-         * @param counter
-         * @return
-         */
-        public DiscoveryConfig setCounter(Counter counter) {
-            this.counter = counter;
-            return this;
-        }
-    }
-
-
-    public void discoverPatterns(DiscoveryConfig discoveryConfig) {
-        Collection<NodeActivation> allActs = getAllNodeActivations();
-        allActs.forEach(act -> discoveryConfig.counter.count(act));
-
-        allActs.stream()
-                .filter(act -> discoveryConfig.checkExpandable.evaluate(act))
-                .forEach(act -> act.key.node.discover(this, act, discoveryConfig));
-    }
-
-
     public Collection<NodeActivation> getAllNodeActivations() {
         long v = visitedCounter++;
         TreeSet<NodeActivation> results = new TreeSet<>();

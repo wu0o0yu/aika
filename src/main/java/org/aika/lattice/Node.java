@@ -20,7 +20,7 @@ package org.aika.lattice;
 import org.aika.*;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.corpus.Document;
-import org.aika.corpus.Document.DiscoveryConfig;
+import org.aika.training.PatternDiscovery.DiscoveryConfig;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
