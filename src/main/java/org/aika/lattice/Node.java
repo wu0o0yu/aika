@@ -496,7 +496,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void readFields(DataInput in, Model m) throws IOException {
         level = in.readInt();
 
-        if(in.readBoolean() && m.nodeStatisticFactory != null) {
+        if(in.readBoolean()) {
             statistic = m.nodeStatisticFactory.createStatisticObject();
             statistic.readFields(in, m);
         }

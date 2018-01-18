@@ -667,7 +667,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             outputText = in.readUTF();
         }
 
-        if(in.readBoolean() && m.neuronStatisticFactory != null) {
+        if(in.readBoolean()) {
             statistic = m.neuronStatisticFactory.createStatisticObject();
             statistic.readFields(in, m);
         }
