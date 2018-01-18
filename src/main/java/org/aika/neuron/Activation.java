@@ -111,16 +111,6 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    public void updateErrorSignal() {
-        if(errorSignal != 0.0) {
-            doc.errorSignalActivations.add(this);
-            for (SynapseActivation sa : neuronInputs) {
-                doc.bQueue.add(sa.input);
-            }
-        }
-    }
-
-
     public State getFinalState() {
         return rounds.getLast();
     }

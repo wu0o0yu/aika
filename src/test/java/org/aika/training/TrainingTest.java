@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aika.network;
+package org.aika.training;
 
 import org.aika.Model;
 import org.aika.Neuron;
@@ -47,8 +47,8 @@ public class TrainingTest {
 
         targetAct.errorSignal = 1.0 - targetAct.getFinalState().value;
 
-        out.get().train(doc, targetAct, 0.01,
-                (iAct, oAct) -> new Document.SynEvalResult(
+        doc.supervisedTraining.train(out.get(), targetAct, 0.01,
+                (iAct, oAct) -> new SupervisedTraining.SynEvalResult(
                         new Synapse.Key(
                                 false,
                                 0,
@@ -86,12 +86,12 @@ public class TrainingTest {
 
             outC.addInput(doc, 0, 3, 0.0, 1.0);
 
-            doc.train(
-                    new Document.TrainConfig()
+            doc.supervisedTraining.train(
+                    new SupervisedTraining.TrainConfig()
                             .setLearnRate(2.0)
                             .setPerformBackpropagation(false)
                             .setSynapseEvaluation((iAct, oAct) ->
-                                    new Document.SynEvalResult(new Synapse.Key(
+                                    new SupervisedTraining.SynEvalResult(new Synapse.Key(
                                             false,
                                             0,
                                             null,

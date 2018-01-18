@@ -26,6 +26,7 @@ import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.Synapse.Key;
+import org.aika.training.SupervisedTraining;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -205,7 +206,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         doc.ubQueue.add(act);
 
         if(targetValue != null) {
-            doc.targetActivations.add(act);
+            doc.supervisedTraining.targetActivations.add(act);
         }
 
         doc.propagate();
@@ -368,78 +369,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         State s;
     }
 
-
-    public void computeOutputErrorSignal(Activation act) {
-        if(act.targetValue != null) {
-            act.errorSignal += act.targetValue - act.getFinalState().value;
-        }
-
-        act.updateErrorSignal();
-    }
-
-
-    public void computeBackpropagationErrorSignal(Activation act) {
-        for (SynapseActivation sa : act.neuronOutputs) {
-            Synapse s = sa.synapse;
-            Activation oAct = sa.output;
-
-            act.errorSignal += s.weight * oAct.errorSignal * (1.0 - act.getFinalState().value);
-        }
-
-        act.updateErrorSignal();
-    }
-
-
-    public void train(Document doc, Activation targetAct, double learnRate, Document.SynapseEvaluation se) {
-        if (Math.abs(targetAct.errorSignal) < TOLERANCE) return;
-
-        long v = doc.visitedCounter++;
-
-        double x = learnRate * targetAct.errorSignal;
-        biasDelta += x;
-        for (INeuron n : doc.finallyActivatedNeurons) {
-            for(Activation iAct: n.getFinalActivations(doc)) {
-                Document.SynEvalResult ser = se.evaluate(iAct, targetAct);
-                if(ser != null) {
-                    trainSynapse(doc, iAct, ser, x, v);
-                }
-            }
-        }
-
-        doc.notifyWeightsModified(this, provider.inMemoryInputSynapses.values());
-    }
-
-
-    private void trainSynapse(Document doc, Activation iAct, Document.SynEvalResult ser, double x, long v) {
-        if (iAct.visited == v) return;
-        iAct.visited = v;
-
-        INeuron inputNeuron = iAct.key.node.neuron.get(doc);
-        if(inputNeuron == this) {
-            return;
-        }
-        double deltaW = x * ser.significance * iAct.getFinalState().value;
-
-        Provider<InputNode> inp = inputNeuron.outputNodes.get(ser.synapseKey.createInputNodeKey());
-        Synapse synapse = null;
-        InputNode in = null;
-        if(inp != null) {
-            in = inp.get(doc);
-            synapse = in.getSynapse(ser.synapseKey.relativeRid, provider);
-        }
-
-        if(synapse == null) {
-            synapse = new Synapse(inputNeuron.provider, provider, ser.synapseKey);
-
-            if(in == null) {
-                in = InputNode.add(provider.model, ser.synapseKey.createInputNodeKey(), synapse.input.get(doc));
-            }
-            in.setSynapse(synapse);
-            synapse.link();
-        }
-
-        synapse.weightDelta = (float) deltaW;
-    }
 
 
     private static boolean checkSelfReferencing(InterprNode nx, InterprNode ny, int depth) {

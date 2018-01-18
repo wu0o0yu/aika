@@ -14,11 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aika.lattice;
+package org.aika.training;
 
 
 import org.aika.*;
 import org.aika.corpus.Document;
+import org.aika.lattice.AndNode;
+import org.aika.lattice.InputNode;
+import org.aika.lattice.Node;
+import org.aika.lattice.NodeActivation;
 import org.aika.training.PatternDiscovery;
 import org.aika.training.PatternDiscovery.DiscoveryConfig;
 import org.aika.corpus.Range;

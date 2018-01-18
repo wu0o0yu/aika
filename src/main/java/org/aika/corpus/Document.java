@@ -25,6 +25,7 @@ import org.aika.neuron.Activation.State;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.INeuron.NormWeight;
 import org.aika.neuron.Synapse;
+import org.aika.training.SupervisedTraining;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,14 +71,13 @@ public class Document implements Comparable<Document> {
     public Queue queue = new Queue();
     public ValueQueue vQueue = new ValueQueue();
     public UpperBoundQueue ubQueue = new UpperBoundQueue();
-    public BackPropagationQueue bQueue = new BackPropagationQueue();
 
     public TreeSet<INeuron> activatedNeurons = new TreeSet<>();
     public TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
     public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
-    public TreeSet<Activation> targetActivations = new TreeSet<>();
-    public TreeSet<Activation> errorSignalActivations = new TreeSet<>();
     public TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
+
+    public SupervisedTraining supervisedTraining = new SupervisedTraining(this);
 
     public TreeMap<NodeActivation.Key, Activation> activationsByRid = new TreeMap<>((act1, act2) -> {
         int r = Integer.compare(act1.rid, act2.rid);
@@ -302,49 +302,6 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public static class TrainConfig {
-        public SynapseEvaluation synapseEvaluation;
-        public double learnRate;
-        public boolean performBackpropagation;
-
-
-        /**
-         * Determines whether a synapse should be created between two neurons during training.
-         *
-         * @param synapseEvaluation
-         * @return
-         */
-        public TrainConfig setSynapseEvaluation(SynapseEvaluation synapseEvaluation) {
-            this.synapseEvaluation = synapseEvaluation;
-            return this;
-        }
-
-
-        public TrainConfig setLearnRate(double learnRate) {
-            this.learnRate = learnRate;
-            return this;
-        }
-
-
-        public TrainConfig setPerformBackpropagation(boolean performBackpropagation) {
-            this.performBackpropagation = performBackpropagation;
-            return this;
-        }
-    }
-
-
-    public void train(TrainConfig trainConfig) {
-        targetActivations.forEach(tAct -> tAct.key.node.neuron.get(this).computeOutputErrorSignal(tAct));
-
-        if(trainConfig.performBackpropagation) {
-            bQueue.backpropagtion();
-        }
-
-        for (Activation act : errorSignalActivations) {
-            act.key.node.neuron.get(this).train(this, act, trainConfig.learnRate, trainConfig.synapseEvaluation);
-        }
-        errorSignalActivations.clear();
-    }
 
     /**
      * Removes the activations of this document from the model again.
@@ -648,108 +605,4 @@ public class Document implements Comparable<Document> {
                 .forEach(act -> log.error(act.key + " " + act.key.interpretation.state + " " + act.rounds));
     }
 
-
-    public class BackPropagationQueue {
-
-        public final TreeSet<Activation> queue = new TreeSet<>(new Comparator<Activation>() {
-            @Override
-            public int compare(Activation act1, Activation act2) {
-                Activation.State fs1 = act1.getFinalState();
-                Activation.State fs2 = act2.getFinalState();
-
-                int r = Integer.compare(fs2.fired, fs1.fired);
-                if(r != 0) return r;
-                return act1.key.compareTo(act2.key);
-            }
-        });
-
-        private long queueIdCounter = 0;
-
-
-        public void add(Activation act) {
-            if(!act.isQueued) {
-                act.isQueued = true;
-                act.queueId = queueIdCounter++;
-                queue.add(act);
-            }
-        }
-
-
-        public void backpropagtion() {
-            while(!queue.isEmpty()) {
-                Activation act = queue.pollFirst();
-
-                act.isQueued = false;
-                act.key.node.neuron.get(Document.this).computeBackpropagationErrorSignal(act);
-            }
-        }
-    }
-
-
-    public interface PatternEvaluation {
-
-        /**
-         * Check if <code>node</code> is an interesting pattern that might be considered for further processing.
-         *
-         * This property is required to be monotonic over the size of the pattern. In other words, if a pattern is
-         * interesting, then all its sub patterns also need to be interesting.
-         *
-         * @param n
-         * @return
-         */
-
-        boolean evaluate(Node n);
-    }
-
-
-    public interface ActivationEvaluation {
-
-        /**
-         * Check if <code>node</code> is an interesting pattern that might be considered for further processing.
-         *
-         * This property is required to be monotonic over the size of the pattern. In other words, if a pattern is
-         * interesting, then all its sub patterns also need to be interesting.
-         *
-         * @param act
-         * @return
-         */
-
-        boolean evaluate(NodeActivation act);
-    }
-
-
-    public interface SynapseEvaluation {
-
-        /**
-         * Determines whether a synapse should be created between two neurons during training.
-         *
-         * @param iAct
-         * @param oAct
-         * @return
-         */
-        SynEvalResult evaluate(Activation iAct, Activation oAct);
-    }
-
-
-    public static class SynEvalResult {
-        public SynEvalResult(Synapse.Key synapseKey, double significance) {
-            this.synapseKey = synapseKey;
-            this.significance = significance;
-        }
-
-        public Synapse.Key synapseKey;
-        public double significance;
-    }
-
-
-    public interface Counter {
-
-        /**
-         * Updates the statistics of this node
-         *
-         * @param act
-         * @return
-         */
-        void count(NodeActivation act);
-    }
 }

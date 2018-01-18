@@ -1,22 +1,86 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.aika.training;
 
 
 import org.aika.corpus.Document;
+import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 
 import java.util.Collection;
 
+
+/**
+ *
+ * @author Lukas Molzberger
+ */
 public class PatternDiscovery {
 
+    public interface PatternEvaluation {
+
+        /**
+         * Check if <code>node</code> is an interesting pattern that might be considered for further processing.
+         *
+         * This property is required to be monotonic over the size of the pattern. In other words, if a pattern is
+         * interesting, then all its sub patterns also need to be interesting.
+         *
+         * @param n
+         * @return
+         */
+
+        boolean evaluate(Node n);
+    }
+
+
+    public interface ActivationEvaluation {
+
+        /**
+         * Check if <code>node</code> is an interesting pattern that might be considered for further processing.
+         *
+         * This property is required to be monotonic over the size of the pattern. In other words, if a pattern is
+         * interesting, then all its sub patterns also need to be interesting.
+         *
+         * @param act
+         * @return
+         */
+
+        boolean evaluate(NodeActivation act);
+    }
+
+
+    public interface Counter {
+
+        /**
+         * Updates the statistics of this node
+         *
+         * @param act
+         * @return
+         */
+        void count(NodeActivation act);
+    }
 
 
     public static class DiscoveryConfig {
-        public Document.PatternEvaluation checkValidPattern;
-        public Document.ActivationEvaluation checkExpandable;
-        public Document.Counter counter;
+        public PatternEvaluation checkValidPattern;
+        public ActivationEvaluation checkExpandable;
+        public Counter counter;
 
 
-        public DiscoveryConfig setCheckValidPattern(Document.PatternEvaluation checkValidPattern) {
+        public DiscoveryConfig setCheckValidPattern(PatternEvaluation checkValidPattern) {
             this.checkValidPattern = checkValidPattern;
             return this;
         }
@@ -29,7 +93,7 @@ public class PatternDiscovery {
          * @param checkExpandable
          * @return
          */
-        public DiscoveryConfig setCheckExpandable(Document.ActivationEvaluation checkExpandable) {
+        public DiscoveryConfig setCheckExpandable(ActivationEvaluation checkExpandable) {
             this.checkExpandable = checkExpandable;
             return this;
         }
@@ -43,7 +107,7 @@ public class PatternDiscovery {
          * @param counter
          * @return
          */
-        public DiscoveryConfig setCounter(Document.Counter counter) {
+        public DiscoveryConfig setCounter(Counter counter) {
             this.counter = counter;
             return this;
         }
