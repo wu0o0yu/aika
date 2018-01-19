@@ -177,19 +177,45 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
+    boolean alreadySelected;
+    boolean alreadyExcluded;
+    Boolean cachedDecision;
+    SearchNode selectedChild = null;
+    SearchNode excludedChild = null;
+    NormWeight selectedWeight = NormWeight.ZERO_WEIGHT;
+    NormWeight excludedWeight = NormWeight.ZERO_WEIGHT;
+
+
+
     public NormWeight search(Document doc) {
         if (candidate == null) {
             return processResult(doc);
         }
 
-        NormWeight selectedWeight = NormWeight.ZERO_WEIGHT;
-        NormWeight excludedWeight = NormWeight.ZERO_WEIGHT;
+        initStep(doc);
 
+        if (prepareSelectStep(doc)) {
+            selectedWeight = selectedChild.search(doc);
+
+            postReturn(selectedChild);
+        }
+
+        if (prepareExcludeStep(doc)) {
+            excludedWeight = excludedChild.search(doc);
+
+            postReturn(excludedChild);
+        }
+
+        return finalStep();
+    }
+
+
+    private void initStep(Document doc) {
         boolean precondition = checkPrecondition();
 
-        boolean alreadySelected = precondition && !candidate.isConflicting();
-        boolean alreadyExcluded = !precondition || checkExcluded(candidate.refinement, doc.visitedCounter++);
-        Boolean cachedDecision = !alreadyExcluded ? candidate.cachedDecision : null;
+        alreadySelected = precondition && !candidate.isConflicting();
+        alreadyExcluded = !precondition || checkExcluded(candidate.refinement, doc.visitedCounter++);
+        cachedDecision = !alreadyExcluded ? candidate.cachedDecision : null;
 
         if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
             dumpDebugState();
@@ -219,47 +245,51 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         candidate.debugCounts[debugState.ordinal()]++;
+    }
 
-        SearchNode selectedChild = null;
-        SearchNode excludedChild = null;
 
-        if (!alreadyExcluded) {
-            candidate.refinement.setState(SELECTED, visited);
+    private boolean prepareSelectStep(Document doc) {
+        if(alreadyExcluded || !(cachedDecision == null || cachedDecision)) return false;
 
-            if (cachedDecision == null || cachedDecision) {
-                if (candidate.cachedDecision == null) {
-                    invalidateCachedDecisions(doc.visitedCounter++);
-                }
+        candidate.refinement.setState(SELECTED, visited);
 
-                Candidate c = doc.candidates.size() > level + 1 ? doc.candidates.get(level + 1) : null;
-                selectedChild = new SearchNode(doc, this, excludedParent, c, level + 1, Collections.singleton(candidate.refinement), candidate.cachedSNDecision == Boolean.TRUE);
-
-                candidate.debugDecisionCounts[0]++;
-                selectedWeight = selectedChild.search(doc);
-                selectedChild.changeState(Activation.Mode.OLD);
-            }
-
-            candidate.refinement.setState(UNKNOWN, visited);
-            candidate.refinement.activation.rounds.reset();
+        if (candidate.cachedDecision == null) {
+            invalidateCachedDecisions(doc.visitedCounter++);
         }
 
-        if (!alreadySelected) {
-            candidate.refinement.setState(EXCLUDED, visited);
+        Candidate c = doc.candidates.size() > level + 1 ? doc.candidates.get(level + 1) : null;
+        selectedChild = new SearchNode(doc, this, excludedParent, c, level + 1, Collections.singleton(candidate.refinement), candidate.cachedSNDecision == Boolean.TRUE);
 
-            if (cachedDecision == null || !cachedDecision) {
-                Candidate c = doc.candidates.size() > level + 1 ? doc.candidates.get(level + 1) : null;
-                excludedChild = new SearchNode(doc, selectedParent, this, c, level + 1, Collections.singleton(candidate.refinement), candidate.cachedSNDecision == Boolean.FALSE);
+        candidate.debugDecisionCounts[0]++;
 
-                candidate.debugDecisionCounts[1]++;
-                excludedWeight = excludedChild.search(doc);
-                excludedChild.changeState(Activation.Mode.OLD);
-            }
-
-            candidate.refinement.setState(UNKNOWN, visited);
-            candidate.refinement.activation.rounds.reset();
-        }
+        return true;
+    }
 
 
+    private boolean prepareExcludeStep(Document doc) {
+        if(alreadySelected || !(cachedDecision == null || !cachedDecision)) return false;
+
+        candidate.refinement.setState(EXCLUDED, visited);
+
+        Candidate c = doc.candidates.size() > level + 1 ? doc.candidates.get(level + 1) : null;
+        excludedChild = new SearchNode(doc, selectedParent, this, c, level + 1, Collections.singleton(candidate.refinement), candidate.cachedSNDecision == Boolean.FALSE);
+
+        candidate.debugDecisionCounts[1]++;
+
+        return true;
+    }
+
+
+    private void postReturn(SearchNode child) {
+        child.changeState(Activation.Mode.OLD);
+
+        candidate.refinement.setState(UNKNOWN, visited);
+        candidate.refinement.activation.rounds.reset();
+    }
+
+
+    private NormWeight finalStep() {
+        NormWeight result;
         if (cachedDecision == null) {
             boolean dir = selectedWeight.getNormWeight() >= excludedWeight.getNormWeight();
             dir = alreadySelected || (!alreadyExcluded && dir);
@@ -273,11 +303,17 @@ public class SearchNode implements Comparable<SearchNode> {
             if (csn.candidate != null) {
                 csn.candidate.cachedSearchNode = csn;
             }
-            return dir ? selectedWeight : excludedWeight;
+
+            result = dir ? selectedWeight : excludedWeight;
         } else {
-            return cachedDecision ? selectedWeight : excludedWeight;
+            result = cachedDecision ? selectedWeight : excludedWeight;
         }
+
+        selectedChild = null;
+        excludedChild = null;
+        return result;
     }
+
 
 
     private boolean checkPrecondition() {
