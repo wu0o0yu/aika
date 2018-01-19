@@ -66,7 +66,6 @@ public class Document implements Comparable<Document> {
 
     public Model model;
     public int threadId;
-    public boolean interrupted = false;
 
     public Queue queue = new Queue();
     public ValueQueue vQueue = new ValueQueue();
@@ -251,10 +250,6 @@ public class Document implements Comparable<Document> {
         bestInterpretation = results;
 
         dumpDebugCandidateStatistics();
-
-        if (interrupted) {
-            log.warn("The search for the best interpretation has been interrupted. Too many search steps!");
-        }
     }
 
 

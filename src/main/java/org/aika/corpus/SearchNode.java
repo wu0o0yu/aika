@@ -50,6 +50,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private static final Logger log = LoggerFactory.getLogger(SearchNode.class);
 
     public static int MAX_SEARCH_STEPS = 1000000;
+    public static int MAX_DEPTH = 1600;
 
     public int id;
 
@@ -191,9 +192,12 @@ public class SearchNode implements Comparable<SearchNode> {
         Boolean cachedDecision = !alreadyExcluded ? candidate.cachedDecision : null;
 
         if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
-            doc.interrupted = true;
-
             dumpDebugState();
+            throw new RuntimeException("Max search step exceeded.");
+        }
+        if (level >= MAX_DEPTH) {
+            dumpDebugState();
+            throw new RuntimeException("Max depth exceeded.");
         }
         doc.searchStepCounter++;
 
@@ -237,9 +241,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
             candidate.refinement.setState(UNKNOWN, visited);
             candidate.refinement.activation.rounds.reset();
-        }
-        if (doc.interrupted) {
-            return NormWeight.ZERO_WEIGHT;
         }
 
         if (!alreadySelected) {
