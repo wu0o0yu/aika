@@ -57,6 +57,7 @@ public class TrainingTest {
                                 Range.Output.DIRECT
                         )
                         , 1.0
+                        , false
                 )
         );
 
@@ -98,7 +99,8 @@ public class TrainingTest {
                                             Relation.EQUALS,
                                             Range.Output.DIRECT
                                     ),
-                                            1.0
+                                            1.0,
+                                            false
                                     )
                             )
             );

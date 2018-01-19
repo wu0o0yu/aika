@@ -70,8 +70,9 @@ public class LongTermLearning {
         }
 
 
-        public void setBeta(double beta) {
+        public TrainConfig setBeta(double beta) {
             this.beta = beta;
+            return this;
         }
     }
 
@@ -96,18 +97,22 @@ public class LongTermLearning {
             }
         }
 
-        // n.posDirSum wird bei Oder-Neuronen sehr groß.
-        double x = trainConfig.ltpLearnRate * (1.0 - act.getFinalState().value) * (iaSum / (n.posDirSum + n.posRecSum));
+        double norm = n.posDirSum + n.posRecSum > 0.0 ? (iaSum / (n.posDirSum + n.posRecSum)) : 1.0;
 
-        doc.getFinalActivations().forEach(iAct -> {
+        // n.posDirSum wird bei Oder-Neuronen sehr groß.
+        double x = trainConfig.ltpLearnRate * (1.0 - act.getFinalState().value) * norm;
+
+        doc.getFinalActivations().filter(iAct -> iAct.key.node != act.key.node).forEach(iAct -> {
             Result r = trainConfig.synapseEvaluation.evaluate(null, iAct, act);
             double sDelta = iAct.getFinalState().value * x * r.significance;
 
-            Synapse synapse = Synapse.createOrLookup(r.synapseKey, iAct.key.node.neuron, act.key.node.neuron);
+            if(sDelta > 0.0) {
+                Synapse synapse = Synapse.createOrLookup(r.synapseKey, iAct.key.node.neuron, act.key.node.neuron);
 
-            synapse.weightDelta += (float) sDelta;
-            n.bias -= trainConfig.beta * sDelta;
-            assert !Double.isNaN(n.bias);
+                synapse.weightDelta += (float) sDelta;
+                synapse.biasDelta -= trainConfig.beta * sDelta;
+                assert !Double.isNaN(n.bias);
+            }
         });
 
         doc.notifyWeightsModified(n, n.inputSynapses.values());
@@ -125,6 +130,10 @@ public class LongTermLearning {
                 .forEach(s -> {
                     Result r = trainConfig.synapseEvaluation.evaluate(s, dir ? act : null, dir ? null : act);
                     s.weightDelta -= (float) (trainConfig.ltdLearnRate * act.getFinalState().value * r.significance);
+
+                    if(r.deleteIfNull && s.weight - s.weightDelta <= 0.0) {
+                        s.toBeDeleted = true;
+                    }
 
                     if (dir) {
                         doc.notifyWeightsModified(s.output.get(), Collections.singletonList(s));

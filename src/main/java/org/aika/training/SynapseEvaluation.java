@@ -18,12 +18,14 @@ public interface SynapseEvaluation {
 
 
     class Result {
-        public Result(Synapse.Key synapseKey, double significance) {
+        public Result(Synapse.Key synapseKey, double significance, boolean deleteIfNull) {
             this.synapseKey = synapseKey;
             this.significance = significance;
+            this.deleteIfNull = deleteIfNull;
         }
 
         public Synapse.Key synapseKey;
         public double significance;
+        public boolean deleteIfNull;
     }
 }

@@ -189,13 +189,13 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      * @param o     The interpretation node
      * @param value The activation value of this input activation
      */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, Double targetValue) {
+    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, Double targetValue, int fired) {
         Node.addActivationAndPropagate(doc, new NodeActivation.Key(node.get(doc), new Range(begin, end), rid, o), Collections.emptySet());
 
         doc.propagate();
 
         Activation act = Activation.get(doc, this, rid, new Range(begin, end), Range.Relation.EQUALS, o, InterprNode.Relation.EQUALS);
-        State s = new State(value, 0, NormWeight.ZERO_WEIGHT);
+        State s = new State(value, fired, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.inputValue = value;
         act.targetValue = targetValue;
@@ -793,13 +793,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public String toStringWithSynapses() {
-        SortedSet<Synapse> is = new TreeSet<>(new Comparator<Synapse>() {
-            @Override
-            public int compare(Synapse s1, Synapse s2) {
-                int r = Double.compare(s2.weight, s1.weight);
-                if (r != 0) return r;
-                return Integer.compare(s1.input.id, s2.input.id);
-            }
+        SortedSet<Synapse> is = new TreeSet<>((s1, s2) -> {
+            int r = Double.compare(s2.weight, s1.weight);
+            if (r != 0) return r;
+            return Integer.compare(s1.input.id, s2.input.id);
         });
 
         is.addAll(inputSynapses.values());

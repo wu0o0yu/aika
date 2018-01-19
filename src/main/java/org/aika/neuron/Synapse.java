@@ -98,6 +98,8 @@ public class Synapse implements Writable {
 
     public double biasDelta;
 
+    public boolean toBeDeleted;
+
     /**
      * The synapse is stored either in the input neuron or the output neuron
      * depending on whether it is a conjunctive or disjunctive synapse.

@@ -70,7 +70,21 @@ public class Neuron extends Provider<INeuron> {
      * @param targetValue The target activation value for supervised learning
      */
     public Activation addInput(Document doc, int begin, int end, double value, Double targetValue) {
-        return addInput(doc, begin, end, null, doc.bottom, value, targetValue);
+        return addInput(doc, begin, end, null, doc.bottom, value, targetValue, 0);
+    }
+
+
+    /**
+     * Propagate an input activation into the network.
+     *
+     * @param doc   The current document
+     * @param begin The range begin
+     * @param end   The range end
+     * @param value The activation value of this input activation
+     * @param targetValue The target activation value for supervised learning
+     */
+    public Activation addInput(Document doc, int begin, int end, double value, Double targetValue, int fired) {
+        return addInput(doc, begin, end, null, doc.bottom, value, targetValue, fired);
     }
 
 
@@ -125,7 +139,7 @@ public class Neuron extends Provider<INeuron> {
      * @param value The activation value of this input activation
      */
     public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value) {
-        return addInput(doc, begin, end, rid, o, value, null);
+        return addInput(doc, begin, end, rid, o, value, null, 0);
     }
 
     /**
@@ -139,8 +153,8 @@ public class Neuron extends Provider<INeuron> {
      * @param value The activation value of this input activation
      * @param targetValue The target activation value for supervised learning
      */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, Double targetValue) {
-        return get(doc).addInput(doc, begin, end, rid, o, value, targetValue);
+    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, Double targetValue, int fired) {
+        return get(doc).addInput(doc, begin, end, rid, o, value, targetValue, fired);
     }
 
 

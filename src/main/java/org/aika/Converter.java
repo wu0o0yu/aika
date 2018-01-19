@@ -34,8 +34,6 @@ public class Converter {
 
     public static int MAX_AND_NODE_SIZE = 4;
 
-    public static boolean REMOVE_SYNAPSES_WITH_INVERTED_SIGNS = false;
-
 
     public static Comparator<Synapse> SYNAPSE_COMP = (s1, s2) -> {
         int r = Double.compare(s2.weight, s1.weight);
@@ -157,9 +155,9 @@ public class Converter {
 
         neuron.biasSum = 0.0;
         for (Synapse s : modifiedSynapses) {
-            if(REMOVE_SYNAPSES_WITH_INVERTED_SIGNS && (s.weight != 0.0 && (s.weight > 0.0) != (s.weightDelta + s.weight > 0.0))) {
-                s.unlink();
-                continue;
+            if(s.toBeDeleted) {
+                s.weightDelta = -s.weight;
+                s.biasDelta = -s.bias;
             }
 
             INeuron in = s.input.get();
@@ -188,6 +186,10 @@ public class Converter {
             neuron.biasSum += s.bias;
 
             in.lock.releaseWriteLock();
+
+            if(s.toBeDeleted) {
+                s.unlink();
+            }
         }
 
         neuron.bias += neuron.biasDelta;
