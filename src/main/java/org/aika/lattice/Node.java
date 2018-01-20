@@ -20,12 +20,11 @@ package org.aika.lattice;
 import org.aika.*;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.corpus.Document;
-import org.aika.training.PatternDiscovery.DiscoveryConfig;
+import org.aika.training.PatternDiscovery.Config;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.lattice.OrNode.OrEntry;
-import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,7 +168,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     abstract void apply(Document doc, A act);
 
-    public abstract void discover(Document doc, NodeActivation<T> act, DiscoveryConfig discoveryConfig);
+    public abstract void discover(Document doc, NodeActivation<T> act, Config config);
 
     abstract Collection<Refinement> collectNodeAndRefinements(Refinement newRef);
 
@@ -353,7 +352,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    boolean computeAndParents(Model m, int threadId, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Provider<? extends Node>> parents, DiscoveryConfig discoveryConfig, long v) throws ThreadState.RidOutOfRange {
+    boolean computeAndParents(Model m, int threadId, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Provider<? extends Node>> parents, Config config, long v) throws ThreadState.RidOutOfRange {
         RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
         if (nv.computeParents == v) return true;
         nv.computeParents = v;
@@ -373,13 +372,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             lock.releaseReadLock();
 
             if (cp == null) {
-                if (discoveryConfig != null) return false;
-                cp = AndNode.createNextLevelNode(m, threadId, this, nRef, discoveryConfig).provider;
+                if (config != null) return false;
+                cp = AndNode.createNextLevelNode(m, threadId, this, nRef, config).provider;
                 if (cp == null) return false;
             }
 
             Integer nOffset = Utils.nullSafeMin(ref.getRelativePosition(), offset);
-            if (!cp.get().computeAndParents(m, threadId, nOffset, childInputs, parents, discoveryConfig, v)) {
+            if (!cp.get().computeAndParents(m, threadId, nOffset, childInputs, parents, config, v)) {
                 return false;
             }
         }

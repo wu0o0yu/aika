@@ -17,9 +17,7 @@
 package org.aika.training;
 
 
-import org.aika.Provider;
 import org.aika.corpus.Document;
-import org.aika.lattice.InputNode;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
@@ -46,7 +44,7 @@ public class SupervisedTraining {
     }
 
 
-    public static class TrainConfig {
+    public static class Config {
         public SynapseEvaluation synapseEvaluation;
         public double learnRate;
         public boolean performBackpropagation;
@@ -58,34 +56,34 @@ public class SupervisedTraining {
          * @param synapseEvaluation
          * @return
          */
-        public TrainConfig setSynapseEvaluation(SynapseEvaluation synapseEvaluation) {
+        public Config setSynapseEvaluation(SynapseEvaluation synapseEvaluation) {
             this.synapseEvaluation = synapseEvaluation;
             return this;
         }
 
 
-        public TrainConfig setLearnRate(double learnRate) {
+        public Config setLearnRate(double learnRate) {
             this.learnRate = learnRate;
             return this;
         }
 
 
-        public TrainConfig setPerformBackpropagation(boolean performBackpropagation) {
+        public Config setPerformBackpropagation(boolean performBackpropagation) {
             this.performBackpropagation = performBackpropagation;
             return this;
         }
     }
 
 
-    public void train(TrainConfig trainConfig) {
+    public void train(Config config) {
         targetActivations.forEach(tAct -> computeOutputErrorSignal(tAct));
 
-        if(trainConfig.performBackpropagation) {
+        if(config.performBackpropagation) {
             queue.backpropagtion();
         }
 
         for (Activation act : errorSignalActivations) {
-            train(act.key.node.neuron.get(doc), act, trainConfig.learnRate, trainConfig.synapseEvaluation);
+            train(act.key.node.neuron.get(doc), act, config.learnRate, config.synapseEvaluation);
         }
         errorSignalActivations.clear();
     }

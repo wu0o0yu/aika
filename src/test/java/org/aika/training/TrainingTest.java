@@ -88,7 +88,7 @@ public class TrainingTest {
             outC.addInput(doc, 0, 3, 0.0, 1.0);
 
             doc.supervisedTraining.train(
-                    new SupervisedTraining.TrainConfig()
+                    new SupervisedTraining.Config()
                             .setLearnRate(2.0)
                             .setPerformBackpropagation(false)
                             .setSynapseEvaluation((s, iAct, oAct) ->

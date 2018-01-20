@@ -20,7 +20,7 @@ package org.aika.lattice;
 import org.aika.*;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.corpus.Document;
-import org.aika.training.PatternDiscovery.DiscoveryConfig;
+import org.aika.training.PatternDiscovery.Config;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
@@ -33,11 +33,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.aika.corpus.Range.Operator.EQUALS;
-import static org.aika.corpus.Range.Operator.NONE;
 
 
 /**
@@ -169,7 +164,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public void discover(Document doc, NodeActivation act, DiscoveryConfig discoveryConfig) {
+    public void discover(Document doc, NodeActivation act, Config config) {
     }
 
 

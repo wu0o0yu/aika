@@ -20,8 +20,7 @@ package org.aika.network;
 import org.aika.*;
 import org.aika.corpus.Document;
 import org.aika.training.PatternDiscovery;
-import org.aika.training.PatternDiscovery.DiscoveryConfig;
-import org.aika.lattice.Node;
+import org.aika.training.PatternDiscovery.Config;
 import org.aika.lattice.NodeActivation;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
@@ -86,7 +85,7 @@ public class CountingTest {
 
         doc.process();
         PatternDiscovery.discover(doc,
-                new DiscoveryConfig()
+                new Config()
                         .setCheckExpandable(n -> false)
                         .setCounter(act -> count(act))
         );

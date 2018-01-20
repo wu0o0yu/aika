@@ -4,9 +4,8 @@ import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
-import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
-import org.aika.training.LongTermLearning.TrainConfig;
+import org.aika.training.LongTermLearning.Config;
 import org.junit.Test;
 
 public class LongTermLearningTest {
@@ -25,7 +24,7 @@ public class LongTermLearningTest {
         nB.addInput(doc, 0, 3, 0.5, null, 1);
 
         LongTermLearning.train(doc,
-                new TrainConfig()
+                new Config()
                         .setLTPLearnRate(0.5)
                         .setLTDLearnRate(0.5)
                         .setBeta(0.5)

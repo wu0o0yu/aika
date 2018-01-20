@@ -19,10 +19,9 @@ package org.aika.lattice;
 
 import org.aika.*;
 import org.aika.corpus.Document;
-import org.aika.training.PatternDiscovery.DiscoveryConfig;
+import org.aika.training.PatternDiscovery.Config;
 import org.aika.corpus.InterprNode;
 import org.aika.corpus.Range;
-import org.aika.corpus.Range.Operator;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.Activation;
@@ -35,8 +34,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
-
-import static org.aika.corpus.Range.Operator.*;
 
 
 /**
@@ -215,7 +212,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    public void discover(Document doc, NodeActivation<InputNode> act, DiscoveryConfig discoveryConfig) {
+    public void discover(Document doc, NodeActivation<InputNode> act, Config config) {
         long v = provider.model.visitedCounter.addAndGet(1);
 
         doc.getFinalActivations().forEach(secondNAct -> {
@@ -231,7 +228,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                         rm.compare(secondAct.key.range, act.key.range)
                         ) {
                     in.visitedDiscover = v;
-                    AndNode nln = AndNode.createNextLevelNode(doc.model, doc.threadId, this, ref, discoveryConfig);
+                    AndNode nln = AndNode.createNextLevelNode(doc.model, doc.threadId, this, ref, config);
 
                     if (nln != null) {
                         nln.isDiscovered = true;

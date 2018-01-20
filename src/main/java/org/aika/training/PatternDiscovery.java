@@ -74,13 +74,13 @@ public class PatternDiscovery {
     }
 
 
-    public static class DiscoveryConfig {
+    public static class Config {
         public PatternEvaluation checkValidPattern;
         public ActivationEvaluation checkExpandable;
         public Counter counter;
 
 
-        public DiscoveryConfig setCheckValidPattern(PatternEvaluation checkValidPattern) {
+        public Config setCheckValidPattern(PatternEvaluation checkValidPattern) {
             this.checkValidPattern = checkValidPattern;
             return this;
         }
@@ -93,7 +93,7 @@ public class PatternDiscovery {
          * @param checkExpandable
          * @return
          */
-        public DiscoveryConfig setCheckExpandable(ActivationEvaluation checkExpandable) {
+        public Config setCheckExpandable(ActivationEvaluation checkExpandable) {
             this.checkExpandable = checkExpandable;
             return this;
         }
@@ -107,20 +107,20 @@ public class PatternDiscovery {
          * @param counter
          * @return
          */
-        public DiscoveryConfig setCounter(Counter counter) {
+        public Config setCounter(Counter counter) {
             this.counter = counter;
             return this;
         }
     }
 
 
-    public static void discover(Document doc, DiscoveryConfig discoveryConfig) {
+    public static void discover(Document doc, Config config) {
         Collection<NodeActivation> allActs = doc.getAllNodeActivations();
-        allActs.forEach(act -> discoveryConfig.counter.count(act));
+        allActs.forEach(act -> config.counter.count(act));
 
         allActs.stream()
-                .filter(act -> discoveryConfig.checkExpandable.evaluate(act))
-                .forEach(act -> act.key.node.discover(doc, act, discoveryConfig));
+                .filter(act -> config.checkExpandable.evaluate(act))
+                .forEach(act -> act.key.node.discover(doc, act, config));
     }
 
 }

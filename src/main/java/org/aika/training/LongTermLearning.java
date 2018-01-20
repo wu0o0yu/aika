@@ -30,8 +30,12 @@ import java.util.TreeSet;
 
 /**
  *
- * Implements the biologically inspired learning algorithms long term potentiation and long term depression.
+ * Implements the biologically inspired learning algorithms for long-term potentiation and long-term depression.
  *
+ * Wikipedia: "In neuroscience, long-term potentiation (LTP) is a persistent strengthening of synapses based on recent
+ * patterns of activity. These are patterns of synaptic activity that produce a long-lasting increase in signal
+ * transmission between two neurons. The opposite of LTP is long-term depression, which produces a long-lasting
+ * decrease in synaptic strength."
  *
  *
  * @author Lukas Molzberger
@@ -39,7 +43,7 @@ import java.util.TreeSet;
 public class LongTermLearning {
 
 
-    public static class TrainConfig {
+    public static class Config {
         public SynapseEvaluation synapseEvaluation;
         public double ltpLearnRate;
         public double ltdLearnRate;
@@ -52,25 +56,25 @@ public class LongTermLearning {
          * @param synapseEvaluation
          * @return
          */
-        public TrainConfig setSynapseEvaluation(SynapseEvaluation synapseEvaluation) {
+        public Config setSynapseEvaluation(SynapseEvaluation synapseEvaluation) {
             this.synapseEvaluation = synapseEvaluation;
             return this;
         }
 
 
-        public TrainConfig setLTPLearnRate(double learnRate) {
+        public Config setLTPLearnRate(double learnRate) {
             this.ltpLearnRate = learnRate;
             return this;
         }
 
 
-        public TrainConfig setLTDLearnRate(double learnRate) {
+        public Config setLTDLearnRate(double learnRate) {
             this.ltdLearnRate = learnRate;
             return this;
         }
 
 
-        public TrainConfig setBeta(double beta) {
+        public Config setBeta(double beta) {
             this.beta = beta;
             return this;
         }
@@ -78,16 +82,23 @@ public class LongTermLearning {
 
 
 
-    public static void train(Document doc, TrainConfig trainConfig) {
+    public static void train(Document doc, Config config) {
         doc.getFinalActivations().forEach(act -> {
-            longTermPotentiation(doc, trainConfig, act);
-            longTermDepression(doc, trainConfig, act, false);
-            longTermDepression(doc, trainConfig, act, true);
+            longTermPotentiation(doc, config, act);
+            longTermDepression(doc, config, act, false);
+            longTermDepression(doc, config, act, true);
         });
     }
 
 
-    private static void longTermPotentiation(Document doc, TrainConfig trainConfig, Activation act) {
+    /**
+     * The long-term potentiation algorithm is a variant of the Hebb learning rule.
+     *
+     * @param doc
+     * @param config
+     * @param act
+     */
+    public static void longTermPotentiation(Document doc, Config config, Activation act) {
         INeuron n = act.key.node.neuron.get();
 
         double iaSum = 0.0;
@@ -97,20 +108,20 @@ public class LongTermLearning {
             }
         }
 
+        // n.posDirSum wird bei Oder-Neuronen sehr groß.
         double norm = n.posDirSum + n.posRecSum > 0.0 ? (iaSum / (n.posDirSum + n.posRecSum)) : 1.0;
 
-        // n.posDirSum wird bei Oder-Neuronen sehr groß.
-        double x = trainConfig.ltpLearnRate * (1.0 - act.getFinalState().value) * norm;
+        double x = config.ltpLearnRate * act.getFinalState().value * (1.0 - act.getFinalState().value) * norm;
 
         doc.getFinalActivations().filter(iAct -> iAct.key.node != act.key.node).forEach(iAct -> {
-            Result r = trainConfig.synapseEvaluation.evaluate(null, iAct, act);
+            Result r = config.synapseEvaluation.evaluate(null, iAct, act);
             double sDelta = iAct.getFinalState().value * x * r.significance;
 
             if(sDelta > 0.0) {
                 Synapse synapse = Synapse.createOrLookup(r.synapseKey, iAct.key.node.neuron, act.key.node.neuron);
 
                 synapse.weightDelta += (float) sDelta;
-                synapse.biasDelta -= trainConfig.beta * sDelta;
+                synapse.biasDelta -= config.beta * sDelta;
                 assert !Double.isNaN(n.bias);
             }
         });
@@ -118,8 +129,19 @@ public class LongTermLearning {
         doc.notifyWeightsModified(n, n.inputSynapses.values());
     }
 
-
-    private static void longTermDepression(Document doc, TrainConfig trainConfig, Activation act, boolean dir) {
+    /**
+     * The long-term depression algorithm decreases the strength of a synapse if only one side of the synapse is
+     * firing. The algorithm tries however to preserve the logical characteristic of the synapse. If for example the
+     * synapse has an or-characteristic, then a non firing input neuron and a firing output neuron will not change
+     * the synapse weight. On the other hand, if the synapse has an and-characteristic, then a firing input neuron
+     * and a non firing output neuron will not change the synapse weight, too.
+     *
+     * @param doc
+     * @param config
+     * @param act
+     * @param dir
+     */
+    public static void longTermDepression(Document doc, Config config, Activation act, boolean dir) {
         INeuron n = act.key.node.neuron.get();
 
         Set<Synapse> actSyns = new TreeSet<>(dir ? Synapse.OUTPUT_SYNAPSE_COMP : Synapse.INPUT_SYNAPSE_COMP);
@@ -128,8 +150,8 @@ public class LongTermLearning {
         (dir ? n.outputSynapses : n.inputSynapses).values().stream()
                 .filter(s -> !s.isNegative() && !actSyns.contains(s))
                 .forEach(s -> {
-                    Result r = trainConfig.synapseEvaluation.evaluate(s, dir ? act : null, dir ? null : act);
-                    s.weightDelta -= (float) (trainConfig.ltdLearnRate * act.getFinalState().value * r.significance);
+                    Result r = config.synapseEvaluation.evaluate(s, dir ? act : null, dir ? null : act);
+                    s.weightDelta -= (float) (config.ltdLearnRate * act.getFinalState().value * r.significance);
 
                     if(r.deleteIfNull && s.weight - s.weightDelta <= 0.0) {
                         s.toBeDeleted = true;

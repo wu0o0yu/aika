@@ -23,20 +23,28 @@ import org.aika.neuron.INeuron;
 
 
 /**
+ * This learning method treats suppressed interpretations as negative training examples.
  *
  * @author Lukas Molzberger
  */
 public class InterprSupprTraining {
 
 
-    public static double LEARN_RATE = -0.1;
+    public static class Config {
+        public double learnRate;
+
+        public Config setLearnRate(double learnRate) {
+            this.learnRate = learnRate;
+            return this;
+        }
+    }
 
 
-    public static void train(Document doc, double learnRate) {
+    public static void train(Document doc, Config config) {
         for(INeuron n: doc.activatedNeurons) {
             for(Activation act: n.getActivations(doc)) {
                 if(!act.isFinalActivation() && act.maxActValue > 0.0 && n.type != INeuron.Type.META) {
-                    act.errorSignal += learnRate * act.maxActValue;
+                    act.errorSignal += config.learnRate * act.maxActValue;
                 }
             }
         }
