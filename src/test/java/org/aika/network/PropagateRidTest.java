@@ -18,11 +18,9 @@ package org.aika.network;
 
 
 import org.aika.Neuron;
-import org.aika.lattice.NodeActivation;
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.lattice.AndNode;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
@@ -42,10 +40,10 @@ public class PropagateRidTest {
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
         Neuron inA = m.createNeuron("A");
-        Neuron pA = m.initNeuron(m.createNeuron("pA"),
+        Neuron pA = Neuron.init(m.createNeuron("pA"),
                 0.1,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setBias(-0.5)

@@ -18,14 +18,12 @@ package org.aika.network;
 
 
 import org.aika.Neuron;
-import org.aika.lattice.NodeActivation;
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.corpus.Range.Relation;
 import org.aika.Model;
 import org.aika.neuron.Activation;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
-import org.aika.lattice.OrNode;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,10 +49,10 @@ public class RecurrentIdTest {
         Neuron inB = m.createNeuron("B");
 
 
-        INeuron outC = m.initNeuron(m.createNeuron("C"),
+        INeuron outC = Neuron.init(m.createNeuron("C"),
                 0.001,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -62,7 +60,7 @@ public class RecurrentIdTest {
                         .setRelativeRid(0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -94,10 +92,10 @@ public class RecurrentIdTest {
         Neuron inB = m.createNeuron("B");
         Neuron inC = m.createNeuron("C");
 
-        INeuron outD = m.initNeuron(m.createNeuron("D"),
+        INeuron outD = Neuron.init(m.createNeuron("D"),
                 0.001,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -105,7 +103,7 @@ public class RecurrentIdTest {
                         .setRelativeRid(3)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -113,7 +111,7 @@ public class RecurrentIdTest {
                         .setRelativeRid(0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inC)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -148,7 +146,7 @@ public class RecurrentIdTest {
         String[] testWords = {"Hüttenheim"};
 
         for (String word : testWords) {
-            Set<Input> inputs = new TreeSet<>();
+            Set<Synapse.Builder> inputs = new TreeSet<>();
             for (int i = 0; i < word.length(); i++) {
                 char c = word.toLowerCase().charAt(i);
 
@@ -157,7 +155,7 @@ public class RecurrentIdTest {
                     boolean begin = i == 0;
                     boolean end = i + 1 == word.length();
                     inputs.add(
-                            new Input()
+                            new Synapse.Builder()
                                 .setNeuron(rec)
                                 .setWeight(begin || end ? 2.0 : 1.0)
                                 .setRecurrent(false)
@@ -169,7 +167,7 @@ public class RecurrentIdTest {
                 }
             }
 
-            Neuron n = m.initNeuron(m.createNeuron("PATTERN"), 0.5, INeuron.Type.EXCITATORY, inputs);
+            Neuron n = Neuron.init(m.createNeuron("PATTERN"), 0.5, INeuron.Type.EXCITATORY, inputs);
 
             System.out.println(n.get().node.get().logicToString());
 

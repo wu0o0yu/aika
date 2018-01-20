@@ -20,17 +20,12 @@ package org.aika.lattice;
 import org.aika.*;
 import org.aika.corpus.Range.Relation;
 import org.aika.corpus.Document;
-import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.network.TestHelper;
 import org.aika.neuron.INeuron;
+import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.util.Arrays;
 
 /**
  *
@@ -47,24 +42,24 @@ public class PatternLatticeTest {
         Neuron inD = m.createNeuron("D");
 
         {
-            m.initNeuron(m.createNeuron("ABC"),
+            Neuron.init(m.createNeuron("ABC"),
                     0.001,
                     INeuron.Type.EXCITATORY,
-                    new Input()
+                    new Synapse.Builder()
                             .setNeuron(inA)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
                             .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
-                    new Input()
+                    new Synapse.Builder()
                             .setNeuron(inB)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
                             .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
-                    new Input()
+                    new Synapse.Builder()
                             .setNeuron(inC)
                             .setWeight(1.0)
                             .setRecurrent(false)
@@ -103,24 +98,24 @@ public class PatternLatticeTest {
             Assert.assertEquals(pBC.provider, pABC.parents.get(new Refinement(null, pA.provider)));
         }
         {
-            m.initNeuron(m.createNeuron("BCD"),
+            Neuron.init(m.createNeuron("BCD"),
                     0.001,
                     INeuron.Type.EXCITATORY,
-                    new Input()
+                    new Synapse.Builder()
                             .setNeuron(inB)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
                             .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
-                    new Input()
+                    new Synapse.Builder()
                             .setNeuron(inC)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
                             .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
-                    new Input()
+                    new Synapse.Builder()
                             .setNeuron(inD)
                             .setWeight(1.0)
                             .setRecurrent(false)
@@ -168,31 +163,31 @@ public class PatternLatticeTest {
             Assert.assertEquals(pCD.provider, pBCD.parents.get(new Refinement(null, pB.provider)));
         }
         {
-            m.initNeuron(m.createNeuron("ABCD"),
+            Neuron.init(m.createNeuron("ABCD"),
                     0.001,
                     INeuron.Type.EXCITATORY,
-                    new Input()
+                    new Synapse.Builder()
                             .setNeuron(inA)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
                             .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
-                    new Input()
+                    new Synapse.Builder()
                             .setNeuron(inB)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
                             .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
-                    new Input()
+                    new Synapse.Builder()
                             .setNeuron(inC)
                             .setWeight(1.0)
                             .setRecurrent(false)
                             .setBias(-1.0)
                             .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true),
-                    new Input()
+                    new Synapse.Builder()
                             .setNeuron(inD)
                             .setWeight(1.0)
                             .setRecurrent(false)
@@ -261,20 +256,20 @@ public class PatternLatticeTest {
         Neuron inB = m.createNeuron("B");
         Neuron inC = m.createNeuron("C");
 
-        m.initNeuron(m.createNeuron("ABC"),
+        Neuron.init(m.createNeuron("ABC"),
                 0.001,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA
                         ).setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inC)
                         .setWeight(1.0)
                         .setRecurrent(false)

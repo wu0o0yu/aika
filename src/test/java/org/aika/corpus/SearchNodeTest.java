@@ -16,15 +16,13 @@
  */
 package org.aika.corpus;
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Range.Relation;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Collections;
 
 /**
  *
@@ -47,15 +45,15 @@ public class SearchNodeTest {
 
         Neuron suppr = m.createNeuron("SUPPR");
 
-        m.initNeuron(eJoergSurname, 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(eJoergSurname, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(wJoerg)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRelativeRid(0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
@@ -63,15 +61,15 @@ public class SearchNodeTest {
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(false)
         );
-        m.initNeuron(eZimmermannCompany, 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(eZimmermannCompany, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(wZimmermann)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRelativeRid(0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
@@ -80,15 +78,15 @@ public class SearchNodeTest {
                         .setRangeOutput(false)
         );
 
-        m.initNeuron(eJoergForename, 6.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(eJoergForename, 6.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(wJoerg)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRelativeRid(0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(eZimmermannSurname)
                         .setWeight(10.0)
                         .setBias(-10.0)
@@ -96,7 +94,7 @@ public class SearchNodeTest {
                         .setRecurrent(true)
                         .setRangeMatch(Relation.NONE)
                         .setRangeOutput(false),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
@@ -105,15 +103,15 @@ public class SearchNodeTest {
                         .setRangeOutput(false)
         );
 
-        m.initNeuron(eZimmermannSurname, 6.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(eZimmermannSurname, 6.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(wZimmermann)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRelativeRid(0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(eJoergForename)
                         .setWeight(10.0)
                         .setBias(-10.0)
@@ -121,7 +119,7 @@ public class SearchNodeTest {
                         .setRecurrent(true)
                         .setRangeMatch(Relation.NONE)
                         .setRangeOutput(false),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
@@ -131,26 +129,26 @@ public class SearchNodeTest {
         );
 
 
-        m.initNeuron(suppr, 0.0, INeuron.Type.INHIBITORY,
-                new Input()
+        Neuron.init(suppr, 0.0, INeuron.Type.INHIBITORY,
+                new Synapse.Builder()
                         .setNeuron(eJoergForename)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(eJoergSurname)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(eZimmermannCompany)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(eZimmermannSurname)
                         .setWeight(10.0)
                         .setBias(0.0)
@@ -201,14 +199,14 @@ public class SearchNodeTest {
 
         Neuron nF = m.createNeuron("F");
 
-        Neuron nC = m.initNeuron(m.createNeuron("C"), 6.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron nC = Neuron.init(m.createNeuron("C"), 6.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
@@ -216,19 +214,19 @@ public class SearchNodeTest {
                         .setRangeMatch(Range.Relation.EQUALS)
         );
 
-        Neuron nD = m.initNeuron(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(nF)
                         .setWeight(2.0)
                         .setBias(0.0)
                         .setRangeMatch(Range.Relation.NONE),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
@@ -236,14 +234,14 @@ public class SearchNodeTest {
                         .setRangeMatch(Range.Relation.EQUALS)
         );
 
-        Neuron nE = m.initNeuron(m.createNeuron("E"), 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron nE = Neuron.init(m.createNeuron("E"), 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
@@ -251,14 +249,14 @@ public class SearchNodeTest {
                         .setRangeMatch(Range.Relation.EQUALS)
         );
 
-        m.initNeuron(nF, 6.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(nF, 6.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
@@ -267,26 +265,26 @@ public class SearchNodeTest {
         );
 
 
-        m.initNeuron(inhib, 0.0, INeuron.Type.INHIBITORY,
-                new Input()
+        Neuron.init(inhib, 0.0, INeuron.Type.INHIBITORY,
+                new Synapse.Builder()
                         .setNeuron(nC)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(nD)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(nE)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(nF)
                         .setWeight(10.0)
                         .setBias(0.0)

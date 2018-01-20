@@ -17,7 +17,7 @@
 package org.aika.corpus;
 
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.neuron.INeuron;
@@ -55,17 +55,17 @@ public class WeightsTest {
         inCA = m.createNeuron("CA");
 
         Neuron pOrA = m.createNeuron("pOrA");
-        m.initNeuron(pOrA,
+        Neuron.init(pOrA,
                 0.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inAA)
                         .setWeight(3.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inBA)
                         .setWeight(4.0)
                         .setRecurrent(false)
@@ -76,24 +76,24 @@ public class WeightsTest {
 
         pDA = m.createNeuron("DA");
 
-        m.initNeuron(pDA,
+        Neuron.init(pDA,
                 0.001,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pOrA)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-0.6)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inCA)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pSuppr)
                         .setWeight(-2.0)
                         .setRecurrent(true)
@@ -107,17 +107,17 @@ public class WeightsTest {
         inCB = m.createNeuron("CB");
 
         Neuron pOrB = m.createNeuron("pOrB");
-        m.initNeuron(pOrB,
+        Neuron.init(pOrB,
                 0.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inAB)
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inBB)
                         .setWeight(5.0)
                         .setRecurrent(false)
@@ -127,24 +127,24 @@ public class WeightsTest {
         );
 
         pDB = m.createNeuron("DB");
-        m.initNeuron(pDB,
+        Neuron.init(pDB,
                 0.001,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pOrB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-0.6)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inCB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pSuppr)
                         .setWeight(-2.0)
                         .setRecurrent(true)
@@ -153,17 +153,17 @@ public class WeightsTest {
         );
 
 
-        m.initNeuron(pSuppr,
+        Neuron.init(pSuppr,
                 0.0,
                 INeuron.Type.INHIBITORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pDA)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pDB)
                         .setWeight(1.0)
                         .setRecurrent(false)

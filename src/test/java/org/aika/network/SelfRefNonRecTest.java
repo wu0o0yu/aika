@@ -17,7 +17,7 @@
 package org.aika.network;
 
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
@@ -40,27 +40,27 @@ public class SelfRefNonRecTest {
         Neuron inA = m.createNeuron("A");
 
         Neuron bN = m.createNeuron("B");
-        Neuron cN = m.initNeuron(
+        Neuron cN = Neuron.init(
                 m.createNeuron("C"),
                 0.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(bN)
                         .setWeight(5.0)
                         .setBias(0.0)
                         .setRangeOutput(true)
         );
 
-        m.initNeuron(
+        Neuron.init(
                 bN,
                 0.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(5.0)
                         .setBias(0.0)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(cN)
                         .setWeight(5.0)
                         .setBias(0.0)

@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.*;
 import org.aika.corpus.Document;
+import org.aika.neuron.Synapse;
 import org.aika.training.PatternDiscovery;
 import org.aika.training.PatternDiscovery.Config;
 import org.aika.lattice.NodeActivation;
@@ -60,8 +61,8 @@ public class CountingTest {
         m.setNodeStatisticFactory(() -> new NodeStatistic());
 
         Neuron inA = m.createNeuron("inA");
-        Neuron outA = m.initNeuron(m.createNeuron("nA"), 50.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron outA = Neuron.init(m.createNeuron("nA"), 50.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(100.0)
                         .setBias(-47.5)

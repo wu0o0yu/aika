@@ -17,7 +17,7 @@
 package org.aika.network;
 
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Range;
@@ -73,18 +73,18 @@ public class MutualExclusionTest {
         Neuron pSuppr = m.createNeuron("SUPPRESS");
 
         // Create three neurons that might be suppressed by the suppressing neuron.
-        Neuron pA = m.initNeuron(
+        Neuron pA = Neuron.init(
                 m.createNeuron("A"),
                 3.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pSuppr)
                         .setWeight(-100.0)
                         .setBias(0.0)
@@ -92,18 +92,18 @@ public class MutualExclusionTest {
                         .setRangeMatch(Range.Relation.EQUALS)
         );
 
-        Neuron pB = m.initNeuron(
+        Neuron pB = Neuron.init(
                 m.createNeuron("B"),
                 5.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pSuppr)
                         .setWeight(-100.0)
                         .setBias(0.0)
@@ -111,18 +111,18 @@ public class MutualExclusionTest {
                         .setRangeMatch(Range.Relation.EQUALS)
         );
 
-        Neuron pC = m.initNeuron(
+        Neuron pC = Neuron.init(
                 m.createNeuron("C"),
                 2.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inC)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pSuppr)
                         .setWeight(-100.0)
                         .setBias(0.0)
@@ -131,25 +131,25 @@ public class MutualExclusionTest {
         );
 
         // Finally addInput all the inputs to the suppressing neuron.
-        m.initNeuron(
+        Neuron.init(
                 pSuppr,
                 0.0,
                 INeuron.Type.INHIBITORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pA)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pB)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pC)
                         .setWeight(10.0)
                         .setBias(0.0)
@@ -158,10 +158,10 @@ public class MutualExclusionTest {
                         .setRangeOutput(true)
         );
 
-        Neuron outN = m.initNeuron(m.createNeuron("OUT"),
+        Neuron outN = Neuron.init(m.createNeuron("OUT"),
                 0.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pB)
                         .setWeight(1.0)
                         .setBias(0.0)

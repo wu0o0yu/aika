@@ -20,12 +20,11 @@ package org.aika.network;
 import org.aika.Neuron;
 import org.aika.corpus.Range;
 import org.aika.lattice.NodeActivation;
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.corpus.Range.Relation;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
-import org.aika.lattice.OrNode;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,11 +57,11 @@ public class OverlappingOrTest {
         // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
         // of the inputs relative to each other. The following flag specifies whether this relativeRid is
         // relative or absolute.
-        Neuron pattern = m.initNeuron(
+        Neuron pattern = Neuron.init(
                 m.createNeuron("BCD"),
                 2.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(4.0)
                         .setRecurrent(false)
@@ -70,14 +69,14 @@ public class OverlappingOrTest {
                         .setBias(-4.0)
                         .setRangeMatch(Operator.EQUALS, Operator.GREATER_THAN_EQUAL)
                         .setRangeOutput(Range.Output.BEGIN),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(1)
                         .setBias(0.0)
                         .setRangeMatch(Relation.CONTAINS),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(4.0)
                         .setRecurrent(false)

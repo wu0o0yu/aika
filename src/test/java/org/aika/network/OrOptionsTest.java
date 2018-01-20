@@ -19,7 +19,7 @@ package org.aika.network;
 
 import org.aika.Neuron;
 import org.aika.lattice.NodeActivation;
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterpretationNode;
@@ -46,20 +46,20 @@ public class OrOptionsTest {
 
         Neuron pD = m.createNeuron("D");
 
-        m.initNeuron(pD,
+        Neuron.init(pD,
                 0.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inC)
                         .setWeight(1.0)
                         .setRecurrent(false)

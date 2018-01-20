@@ -17,7 +17,7 @@
 package org.aika.network;
 
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
@@ -48,15 +48,15 @@ public class EntityResolutionTest {
         Neuron ePuma = m.createNeuron("E-Puma");
 
 
-        m.initNeuron(eJaguar, 2.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(eJaguar, 2.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(wJaguar)
                         .setRecurrent(false)
                         .setWeight(5.0)
                         .setBias(-4.75)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(ePuma)
                         .setRecurrent(true)
                         .setWeight(5.0)
@@ -64,15 +64,15 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
         );
 
-        m.initNeuron(ePuma, 2.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(ePuma, 2.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(wPuma)
                         .setRecurrent(false)
                         .setWeight(5.0)
                         .setBias(-4.75)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(eJaguar)
                         .setRecurrent(true)
                         .setWeight(5.0)
@@ -131,15 +131,15 @@ public class EntityResolutionTest {
         Neuron chCatsWithoutPuma = m.createNeuron("CH-Katzen/Puma");
         Neuron chCatsWithoutLeopard = m.createNeuron("CH-Katzen/Leopard");
 
-        m.initNeuron(eJaguar, 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(eJaguar, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(wJaguar)
                         .setRecurrent(false)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(chCatsWithoutJaguar)
                         .setRecurrent(true)
                         .setWeight(10.0)
@@ -148,15 +148,15 @@ public class EntityResolutionTest {
                         .setRangeOutput(false)
         );
 
-        m.initNeuron(ePuma, 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(ePuma, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(wPuma)
                         .setRecurrent(false)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(chCatsWithoutPuma)
                         .setRecurrent(true)
                         .setWeight(10.0)
@@ -166,15 +166,15 @@ public class EntityResolutionTest {
         );
 
 
-        m.initNeuron(eLeopard, 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(eLeopard, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(wLeopard)
                         .setRecurrent(false)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(chCatsWithoutLeopard)
                         .setRecurrent(true)
                         .setWeight(10.0)
@@ -183,24 +183,24 @@ public class EntityResolutionTest {
                         .setRangeMatch(NONE)
         );
 
-        m.initNeuron(cCats,
+        Neuron.init(cCats,
                 0.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(eJaguar)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(ePuma)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(eLeopard)
                         .setWeight(10.0)
                         .setBias(0.0)
@@ -209,22 +209,22 @@ public class EntityResolutionTest {
                         .setRangeOutput(true)
         );
 
-        m.initNeuron(chCatsWithoutJaguar, 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(chCatsWithoutJaguar, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(cCats)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(eJaguar)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(NONE)
                         .setRangeOutput(false),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(eJaguar)
                         .setWeight(-30.0)
                         .setBias(0.0)
@@ -232,22 +232,22 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
         );
 
-        m.initNeuron(chCatsWithoutPuma, 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(chCatsWithoutPuma, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(cCats)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(ePuma)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(NONE)
                         .setRangeOutput(false),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(ePuma)
                         .setWeight(-30.0)
                         .setBias(0.0)
@@ -255,22 +255,22 @@ public class EntityResolutionTest {
                         .setRangeMatch(EQUALS)
         );
 
-        m.initNeuron(chCatsWithoutLeopard, 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(chCatsWithoutLeopard, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(cCats)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(eLeopard)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(NONE)
                         .setRangeOutput(false),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(eLeopard)
                         .setWeight(-30.0)
                         .setBias(0.0)

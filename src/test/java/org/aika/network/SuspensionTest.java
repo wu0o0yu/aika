@@ -21,14 +21,13 @@ import org.aika.*;
 import org.aika.corpus.Document;
 import org.aika.neuron.INeuron;
 import org.aika.corpus.Range.Relation;
+import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.aika.corpus.Range.Operator.EQUALS;
 
 /**
  *
@@ -66,10 +65,10 @@ public class SuspensionTest {
         int idA = inA.id;
         int idB = inB.id;
 
-        Neuron nC = m.initNeuron(m.createNeuron("C"),
+        Neuron nC = Neuron.init(m.createNeuron("C"),
                 5.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-9.0)
@@ -77,7 +76,7 @@ public class SuspensionTest {
                         .setRecurrent(false)
                         .setRangeMatch(Relation.BEGIN_EQUALS)
                         .setRangeOutput(true, false),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-9.0)
@@ -88,10 +87,10 @@ public class SuspensionTest {
         );
 
 
-        Neuron outD = m.initNeuron(m.createNeuron("D"),
+        Neuron outD = Neuron.init(m.createNeuron("D"),
                 5.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(nC)
                         .setWeight(10.0)
                         .setBias(-9.0)

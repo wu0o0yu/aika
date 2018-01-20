@@ -17,7 +17,7 @@
 package org.aika.network;
 
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.neuron.Activation;
@@ -62,11 +62,11 @@ public class NamedEntityRecognitionTest {
         // The entity neurons represent the concrete meanings of the input words.
         // The helper function 'initAndNeuron' computes the required bias for a
         // conjunction of the inputs.
-        Neuron cookSurnameEntity = m.initNeuron(
+        Neuron cookSurnameEntity = Neuron.init(
                 m.createNeuron("E-cook (surname)"),
                 3.0, // adjusts the bias
                 INeuron.Type.EXCITATORY,
-                new Input() // Requires the word to be recognized
+                new Synapse.Builder() // Requires the word to be recognized
                         .setNeuron(inputNeurons.get("cook"))
                         .setWeight(10.0)
                         // This input requires the input activation to have an
@@ -76,7 +76,7 @@ public class NamedEntityRecognitionTest {
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input() // The previous word needs to be a forename
+                new Synapse.Builder() // The previous word needs to be a forename
                         .setNeuron(forenameCategory)
                         .setWeight(10.0)
                         .setBias(-9.0)
@@ -88,7 +88,7 @@ public class NamedEntityRecognitionTest {
                 // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
                 // self suppression taking place even though 'E-cook (surname)' is also contained
                 // in the suppressingN.
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppressingN)
                         .setWeight(-20.0)
                         .setBias(0.0)
@@ -96,18 +96,18 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(CONTAINS)
         );
 
-        Neuron cookProfessionEntity = m.initNeuron(
+        Neuron cookProfessionEntity = Neuron.init(
                 m.createNeuron("E-cook (profession)"),
                 3.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get("cook"))
                         .setWeight(15.0)
                         .setBias(-13.5)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppressingN)
                         .setWeight(-20.0)
                         .setBias(0.0)
@@ -115,11 +115,11 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(CONTAINS)
         );
 
-        Neuron jacksonForenameEntity = m.initNeuron(
+        Neuron jacksonForenameEntity = Neuron.init(
                 m.createNeuron("E-jackson (forename)"),
                 3.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get("jackson"))
                         .setWeight(10.0)
                         .setBias(-9.0)
@@ -127,14 +127,14 @@ public class NamedEntityRecognitionTest {
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(surnameCategory)
                         .setWeight(10.0)
                         .setBias(-9.0)
                         .setRelativeRid(1)
                         .setRecurrent(true)
                         .setRangeMatch(NONE),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppressingN)
                         .setWeight(-20.0)
                         .setBias(0.0)
@@ -142,18 +142,18 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(CONTAINED_IN)
         );
 
-        Neuron jacksonCityEntity = m.initNeuron(
+        Neuron jacksonCityEntity = Neuron.init(
                 m.createNeuron("E-jackson (city)"),
                 3.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get("jackson"))
                         .setWeight(12.0)
                         .setBias(-9.2)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppressingN)
                         .setWeight(-20.0)
                         .setBias(0.0)
@@ -161,11 +161,11 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(CONTAINED_IN)
         );
 
-        m.initNeuron(
+        Neuron.init(
                 forenameCategory,
                 0.0,
                 INeuron.Type.EXCITATORY,
-                new Input() // In this example there is only one forename considered.
+                new Synapse.Builder() // In this example there is only one forename considered.
                         .setNeuron(jacksonForenameEntity)
                         .setWeight(10.0)
                         .setBias(0.0)
@@ -173,11 +173,11 @@ public class NamedEntityRecognitionTest {
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
-        m.initNeuron(
+        Neuron.init(
                 surnameCategory,
                 0.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(cookSurnameEntity)
                         .setWeight(10.0)
                         .setBias(0.0)
@@ -186,28 +186,28 @@ public class NamedEntityRecognitionTest {
                         .setRangeOutput(true)
         );
 
-        m.initNeuron(
+        Neuron.init(
                 suppressingN,
                 0.0,
                 INeuron.Type.INHIBITORY,
-                new Input().setNeuron(cookProfessionEntity)
+                new Synapse.Builder().setNeuron(cookProfessionEntity)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(cookSurnameEntity)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(jacksonCityEntity)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(jacksonForenameEntity)
                         .setWeight(10.0)
                         .setBias(0.0)

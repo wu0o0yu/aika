@@ -158,6 +158,106 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
+
+
+    /**
+     * Creates a neuron with the given bias.
+     *
+     * @param n
+     * @param bias
+     * @param inputs
+     * @return
+     */
+    public static Neuron init(Neuron n, double bias, INeuron.Type type, Synapse.Builder... inputs) {
+        return init(n, bias, type, new TreeSet<>(Arrays.asList(inputs)));
+    }
+
+
+    /**
+     * Creates a neuron with the given bias.
+     *
+     * @param n
+     * @param bias
+     * @param inputs
+     * @return
+     */
+    public static Neuron init(Neuron n, double bias, String activationFunctionKey, INeuron.Type type, Synapse.Builder... inputs) {
+        return init(n, bias, activationFunctionKey, type, new TreeSet<>(Arrays.asList(inputs)));
+    }
+
+
+
+    /**
+     * Creates a neuron with the given bias.
+     *
+     * @param n
+     * @param bias
+     * @param inputs
+     * @return
+     */
+    public static Neuron init(Neuron n, double bias, INeuron.Type type, Collection<Synapse.Builder> inputs) {
+        return init(n, bias, null, type, inputs);
+    }
+
+
+    /**
+     * Initializes a neuron with the given bias.
+     *
+     * @param n
+     * @param bias
+     * @param inputs
+     * @return
+     */
+    public static Neuron init(Neuron n, double bias, String activationFunctionKey, INeuron.Type type, Collection<Synapse.Builder> inputs) {
+        if(n.init(bias, activationFunctionKey, type, inputs)) return n;
+        return null;
+    }
+
+
+    /**
+     * Initializes a neuron with the given bias.
+     *
+     * @param bias
+     * @param inputs
+     * @return
+     */
+    public boolean init(double bias, String activationFunctionKey, INeuron.Type type, Collection<Synapse.Builder> inputs) {
+        List<Synapse> is = new ArrayList<>();
+
+        for (Synapse.Builder input : inputs) {
+            Synapse s = input.getSynapse(this);
+            s.weightDelta = input.weight;
+            s.biasDelta = input.bias;
+            is.add(s);
+        }
+
+        if(activationFunctionKey != null) {
+            ActivationFunction af = model.activationFunctions.get(activationFunctionKey);
+            INeuron in = get();
+            in.activationFunction = af;
+            in.activationFunctionKey = activationFunctionKey;
+        }
+
+        if(type != null) {
+            INeuron in = get();
+            in.type = type;
+        }
+
+        return INeuron.update(model, model.defaultThreadId, this, bias, is);
+    }
+
+
+    public void addSynapse(Synapse.Builder input) {
+        Synapse s = input.getSynapse(this);
+
+        s.weightDelta = input.weight;
+        s.biasDelta = input.bias;
+
+        INeuron.update(model, model.defaultThreadId, this, 0.0, Collections.singletonList(s));
+    }
+
+
+
     /**
      * {@code getFinalActivations} is a convenience method to retrieve all activations of the given neuron that
      * are part of the final interpretation. Before calling this method, the {@code doc.process()} needs to

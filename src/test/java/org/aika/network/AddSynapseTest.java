@@ -17,13 +17,12 @@
 package org.aika.network;
 
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Range.Relation;
 import org.aika.corpus.Document;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.TreeMap;
@@ -45,8 +44,8 @@ public class AddSynapseTest {
         for(String l: new String[] {"A", "B", "C", "D"}) {
             Neuron in = m.createNeuron(l);
             inputNeurons.put(l, in);
-            m.addSynapse(n,
-                    new Input()
+            n.addSynapse(
+                    new Synapse.Builder()
                             .setNeuron(in)
                             .setWeight(10.0)
                             .setRangeMatch(Relation.EQUALS)

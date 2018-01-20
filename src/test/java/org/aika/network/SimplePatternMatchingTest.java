@@ -20,12 +20,10 @@ package org.aika.network;
 import org.aika.Neuron;
 import org.aika.corpus.Range;
 import org.aika.lattice.NodeActivation;
-import org.aika.Input;
-import org.aika.corpus.Range.Relation;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range.Operator;
-import org.aika.lattice.OrNode;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -56,11 +54,11 @@ public class SimplePatternMatchingTest {
         // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
         // of the inputs relative to each other. The following flag specifies whether this relativeRid
         // is relative or absolute.
-        Neuron pattern = m.initNeuron(
+        Neuron pattern = Neuron.init(
                 m.createNeuron("BCD"),
                 0.4,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -68,14 +66,14 @@ public class SimplePatternMatchingTest {
                         .setBias(-0.9)
                         .setRangeMatch(Operator.EQUALS, Operator.GREATER_THAN_EQUAL)
                         .setRangeOutput(true, false),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(1)
                         .setBias(-0.9)
                         .setRangeMatch(Range.Relation.CONTAINS),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -141,11 +139,11 @@ public class SimplePatternMatchingTest {
         // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
         // of the inputs relative to each other. The following flag specifies whether this relativeRid
         // is relative or absolute.
-        Neuron pattern = m.initNeuron(
+        Neuron pattern = Neuron.init(
                 m.createNeuron("BCDE"),
                 0.4,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -153,21 +151,21 @@ public class SimplePatternMatchingTest {
                         .setBias(-0.9)
                         .setRangeMatch(Operator.EQUALS, Operator.GREATER_THAN_EQUAL)
                         .setRangeOutput(true, false),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(1)
                         .setBias(-0.9)
                         .setRangeMatch(Range.Relation.CONTAINS),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setBias(-0.9)
                         .setRangeMatch(Range.Relation.CONTAINS),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('e'))
                         .setWeight(1.0)
                         .setRecurrent(false)

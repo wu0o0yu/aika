@@ -17,7 +17,7 @@
 package org.aika.lattice;
 
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
@@ -45,8 +45,8 @@ public class ActivationsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        Neuron pA = m.initNeuron(m.createNeuron("pA"), 0.5, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron pA = Neuron.init(m.createNeuron("pA"), 0.5, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setBias(-1.0)

@@ -1,7 +1,7 @@
 package org.aika.network;
 
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
@@ -19,14 +19,14 @@ public class TestNextWord {
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
 
-        Neuron abN = m.initNeuron(m.createNeuron("AB"), 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron abN = Neuron.init(m.createNeuron("AB"), 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-9.5)
                         .setRangeMatch(Range.Relation.END_EQUALS)
                         .setRangeOutput(false, true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-9.5)

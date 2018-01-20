@@ -17,7 +17,7 @@
 package org.aika.corpus;
 
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.neuron.INeuron;
@@ -39,15 +39,15 @@ public class SimpleWeightsTest {
         Neuron inB = m.createNeuron("B");
 
         Neuron pC = m.createNeuron("C");
-        m.initNeuron(pC,
+        Neuron.init(pC,
                 0.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(0.3f)
                         .setRecurrent(false)
                         .setBias(0.0),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(0.4f)
                         .setRecurrent(false)
@@ -90,17 +90,17 @@ public class SimpleWeightsTest {
         Neuron inB = m.createNeuron("B");
 
         Neuron pC = m.createNeuron("C");
-        m.initNeuron(pC,
+        Neuron.init(pC,
                 0.01,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(3.0)
                         .setRecurrent(false)
                         .setBias(-3.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(3.0)
                         .setRecurrent(false)

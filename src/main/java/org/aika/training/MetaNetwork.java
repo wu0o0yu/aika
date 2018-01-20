@@ -17,7 +17,7 @@
 package org.aika.training;
 
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Conflicts;
@@ -142,8 +142,8 @@ public class MetaNetwork {
             Activation.SynapseActivation inhibMetaLink = metaAct.getFinalOutputActivations().get(0);
             Synapse.Key inhibSynKey = inhibMetaLink.synapse.key;
             MetaSynapse inhibSS = inhibMetaLink.synapse.meta;
-            doc.model.addSynapse(supprN,
-                    new Input()
+            supprN.addSynapse(
+                    new Synapse.Builder()
                             .setNeuron(targetNeuron)
                             .setWeight(inhibSS.metaWeight)
                             .setBias(inhibSS.metaBias)
@@ -246,8 +246,8 @@ public class MetaNetwork {
     }
 
 
-    public static Neuron initMetaNeuron(Model m, Neuron n, double bias, double metaBias, Input... inputs) {
+    public static Neuron initMetaNeuron(Model m, Neuron n, double bias, double metaBias, Synapse.Builder... inputs) {
         n.get().metaBias = metaBias;
-        return m.initNeuron(n, bias, INeuron.Type.META, inputs);
+        return Neuron.init(n, bias, INeuron.Type.META, inputs);
     }
 }

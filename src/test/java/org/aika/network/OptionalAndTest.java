@@ -17,7 +17,7 @@
 package org.aika.network;
 
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
@@ -41,29 +41,29 @@ public class OptionalAndTest {
 
         Neuron suppr = m.createNeuron("SUPPRESS");
 
-        Neuron hintNoun = m.initNeuron(m.createNeuron("HINT-NOUN"),
+        Neuron hintNoun = Neuron.init(m.createNeuron("HINT-NOUN"),
                 0.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(wordEssen)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(wordHamburg)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
         );
-        Neuron hintVerb = m.initNeuron(m.createNeuron("HINT-VERB"),
+        Neuron hintVerb = Neuron.init(m.createNeuron("HINT-VERB"),
                 0.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(wordEssen)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(wordGehen)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -71,50 +71,50 @@ public class OptionalAndTest {
         );
 
 
-        Neuron noun = m.initNeuron(m.createNeuron("NOUN"),
+        Neuron noun = Neuron.init(m.createNeuron("NOUN"),
                 0.001,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(hintNoun)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(upperCase)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppr)
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setBias(0.0)
         );
 
-        Neuron verb = m.initNeuron(m.createNeuron("VERB"),
+        Neuron verb = Neuron.init(m.createNeuron("VERB"),
                 0.001,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(hintVerb)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppr)
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setBias(0.0)
         );
 
-        m.initNeuron(suppr,
+        Neuron.init(suppr,
                 0.0,
                 INeuron.Type.INHIBITORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(noun)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(verb)
                         .setWeight(1.0)
                         .setBias(0.0)

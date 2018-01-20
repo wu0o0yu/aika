@@ -18,7 +18,10 @@ package org.aika.training;
 
 
 import org.aika.Model;
+import org.aika.Neuron;
+import org.aika.neuron.Synapse;
 import org.aika.Writable;
+import org.aika.neuron.Synapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -49,4 +52,44 @@ public class MetaSynapse implements Writable {
         metaBias = in.readDouble();
         metaRelativeRid = in.readBoolean();
     }
+
+
+    /**
+     *
+     * @author Lukas Molzberger
+     */
+    public static class Builder extends Synapse.Builder {
+
+        public double metaWeight;
+        public double metaBias;
+        public boolean metaRelativeRid;
+
+        public Synapse.Builder setMetaWeight(double metaWeight) {
+            this.metaWeight = metaWeight;
+            return this;
+        }
+
+        public Builder setMetaBias(double metaBias) {
+            this.metaBias = metaBias;
+            return this;
+        }
+
+        public Builder setMetaRelativeRid(boolean metaRelativeRid) {
+            this.metaRelativeRid = metaRelativeRid;
+            return this;
+        }
+
+
+        public Synapse getSynapse(Neuron outputNeuron) {
+            Synapse s = super.getSynapse(outputNeuron);
+
+            MetaSynapse ss = new MetaSynapse();
+            ss.metaWeight = metaWeight;
+            ss.metaBias = metaBias;
+            ss.metaRelativeRid = metaRelativeRid;
+            s.meta = ss;
+            return s;
+        }
+    }
+
 }

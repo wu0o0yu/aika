@@ -17,7 +17,7 @@
 package org.aika.corpus;
 
 import org.aika.ActivationFunction;
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.neuron.INeuron;
@@ -55,13 +55,13 @@ public class GenerateTextTest {
 
         // Word aaaaaaa is only added to the resulting text if input a is active and this neuron
         // is not suppressed by another neuron. Output aaaaaaa may start a text.
-        m.initNeuron(outA, 4.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(outA, 4.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeOutput(Output.NONE),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppr)
                         .setWeight(-20.0)
                         .setBias(0.0)
@@ -72,13 +72,13 @@ public class GenerateTextTest {
         // Word bbb is only added to the resulting text if input b is active and this neuron
         // is not suppressed by another neuron. Output bbb may start a text.
         // Neuron outB has a slightly higher weight than outA.
-        m.initNeuron(outB, 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(outB, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeOutput(Output.NONE),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppr)
                         .setWeight(-20.0)
                         .setBias(0.0)
@@ -88,13 +88,13 @@ public class GenerateTextTest {
 
 
         // OutC is only activated if the previous word was outA.
-        m.initNeuron(outC, 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(outC, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(outA)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeOutput(Range.Mapping.END, NONE),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppr)
                         .setWeight(-20.0)
                         .setBias(0.0)
@@ -103,13 +103,13 @@ public class GenerateTextTest {
         );
 
         // OutD is only activated if the previous word was outB.
-        m.initNeuron(outD, 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(outD, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(outB)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeOutput(Range.Mapping.END, NONE),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppr)
                         .setWeight(-20.0)
                         .setBias(0.0)
@@ -119,26 +119,26 @@ public class GenerateTextTest {
 
 
         // All outputs suppress each other.
-        m.initNeuron(suppr, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT_KEY, INeuron.Type.INHIBITORY,
-                new Input()
+        Neuron.init(suppr, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT_KEY, INeuron.Type.INHIBITORY,
+                new Synapse.Builder()
                         .setNeuron(outA)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(outB)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(outC)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(outD)
                         .setWeight(1.0)
                         .setBias(0.0)

@@ -17,7 +17,7 @@
 package org.aika.network;
 
 import org.aika.Converter;
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Range;
@@ -42,31 +42,31 @@ public class ConverterTest {
         Neuron inC = m.createNeuron("C");
         Neuron inD = m.createNeuron("D");
 
-        Neuron out = m.initNeuron(m.createNeuron("ABCD"),
+        Neuron out = Neuron.init(m.createNeuron("ABCD"),
                 -9.5,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(4.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(Range.Output.DIRECT),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(3.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(Range.Output.DIRECT),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inC)
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(Range.Output.DIRECT),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inD)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -96,31 +96,31 @@ public class ConverterTest {
         Neuron inC = m.createNeuron("C");
         Neuron inD = m.createNeuron("D");
 
-        Neuron out = m.initNeuron(m.createNeuron("ABCD"),
+        Neuron out = Neuron.init(m.createNeuron("ABCD"),
                 -5.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(Range.Output.DIRECT),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(Range.Output.DIRECT),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inC)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(Range.Output.DIRECT),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inD)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -144,38 +144,38 @@ public class ConverterTest {
         Neuron inD = m.createNeuron("D");
         Neuron inE = m.createNeuron("E");
 
-        Neuron out = m.initNeuron(m.createNeuron("ABCD"),
+        Neuron out = Neuron.init(m.createNeuron("ABCD"),
                 -11.0,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(5.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(Range.Output.DIRECT),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(5.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(Range.Output.DIRECT),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inC)
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(Range.Output.DIRECT),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inD)
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(Range.Output.DIRECT),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inE)
                         .setWeight(0.5f)
                         .setRecurrent(false)

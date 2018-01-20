@@ -20,7 +20,7 @@ package org.aika.network;
 import org.aika.Neuron;
 import org.aika.neuron.Activation;
 import org.aika.neuron.Activation.SynapseActivation;
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterpretationNode;
@@ -55,10 +55,10 @@ public class ActivationOutputsTest {
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
 
-        Neuron pAB = m.initNeuron(m.createNeuron("pAB"),
+        Neuron pAB = Neuron.init(m.createNeuron("pAB"),
                 0.001,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -66,7 +66,7 @@ public class ActivationOutputsTest {
                         .setBias(-1.0)
                         .setRangeMatch(Operator.EQUALS, NONE)
                         .setRangeOutput(Range.Output.BEGIN),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -152,8 +152,8 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        INeuron outB = m.initNeuron(m.createNeuron("B"), 0.5, INeuron.Type.EXCITATORY,
-                new Input()
+        INeuron outB = Neuron.init(m.createNeuron("B"), 0.5, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setBias(-1.0)
@@ -178,8 +178,8 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        INeuron outB = m.initNeuron(m.createNeuron("B"), 0.5, INeuron.Type.EXCITATORY,
-                new Input()
+        INeuron outB = Neuron.init(m.createNeuron("B"), 0.5, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setBias(-1.0)
@@ -204,8 +204,8 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        INeuron outB = m.initNeuron(m.createNeuron("B"), 0.001, INeuron.Type.EXCITATORY,
-                new Input()
+        INeuron outB = Neuron.init(m.createNeuron("B"), 0.001, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRelativeRid(0)

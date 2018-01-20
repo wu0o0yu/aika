@@ -1,6 +1,6 @@
 package org.aika.corpus;
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Range.Relation;
@@ -42,13 +42,13 @@ public class RangeComparisonTest {
 
             Neuron nc = m.createNeuron("C");
 
-            m.initNeuron(nc, 5.0, INeuron.Type.EXCITATORY,
-                    new Input()
+            Neuron.init(nc, 5.0, INeuron.Type.EXCITATORY,
+                    new Synapse.Builder()
                             .setNeuron(na)
                             .setWeight(1.0)
                             .setBias(0.0)
                             .setRangeMatch(rr),
-                    new Input()
+                    new Synapse.Builder()
                             .setNeuron(nb)
                             .setWeight(10.0)
                             .setBias(-10.0)

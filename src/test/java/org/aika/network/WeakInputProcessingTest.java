@@ -17,7 +17,7 @@
 package org.aika.network;
 
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.corpus.Range.Relation;
 import org.aika.Model;
 import org.aika.Neuron;
@@ -46,25 +46,25 @@ public class WeakInputProcessingTest {
 
         Neuron suppr = m.createNeuron("suppr");
 
-        Neuron patternA = m.initNeuron(
+        Neuron patternA = Neuron.init(
                 m.createNeuron("Pattern A"),
                 0.4,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(strongInput)
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setBias(-45.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(weakInputA)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setRecurrent(true)
@@ -73,25 +73,25 @@ public class WeakInputProcessingTest {
                         .setRangeOutput(true)
         );
 
-        Neuron patternB = m.initNeuron(
+        Neuron patternB = Neuron.init(
                 m.createNeuron("Pattern B"),
                 0.4,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(strongInput)
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setBias(-45.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(weakInputB)
                         .setWeight(1.5f)
                         .setRecurrent(false)
                         .setBias(-1.5)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setRecurrent(true)
@@ -100,25 +100,25 @@ public class WeakInputProcessingTest {
                         .setRangeOutput(true)
         );
 
-        Neuron patternC = m.initNeuron(
+        Neuron patternC = Neuron.init(
                 m.createNeuron("Pattern C"),
                 0.4,
                 INeuron.Type.EXCITATORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(strongInput)
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setBias(-45.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(weakInputC)
                         .setWeight(0.5f)
                         .setRecurrent(false)
                         .setBias(-0.5)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setRecurrent(true)
@@ -128,24 +128,24 @@ public class WeakInputProcessingTest {
         );
 
 
-        m.initNeuron(suppr,
+        Neuron.init(suppr,
                 0.0,
                 INeuron.Type.INHIBITORY,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(patternA)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(patternB)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(patternC)
                         .setWeight(10.0)
                         .setBias(0.0)

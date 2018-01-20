@@ -1,6 +1,6 @@
 package org.aika.network;
 
-import org.aika.Input;
+import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
@@ -22,14 +22,14 @@ public class PositiveFeedbackLoop {
         Neuron nC = m.createNeuron("N C");
         Neuron nD = m.createNeuron("N D");
 
-        m.initNeuron(nC, 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(nC, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(nD)
                         .setWeight(10.0)
                         .setBias(-10.0)
@@ -37,14 +37,14 @@ public class PositiveFeedbackLoop {
                         .setRangeMatch(Range.Relation.EQUALS)
         );
 
-        m.initNeuron(nD, 5.0, INeuron.Type.EXCITATORY,
-                new Input()
+        Neuron.init(nD, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(nC)
                         .setWeight(10.0)
                         .setBias(-10.0)

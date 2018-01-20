@@ -119,7 +119,7 @@ required minimum input activation (<i>setBias</i>) of each input.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    Neuron cookSurnameEntity = m.initNeuron(
+    Neuron cookSurnameEntity = Neuron.init(
             m.createNeuron("E-cook (surname)"),
             3.0, // adjusts the bias
             new Input() // Requires the word to be recognized
@@ -158,7 +158,7 @@ required minimum input activation (<i>setBias</i>) of each input.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    m.initNeuron(forenameCategory, 0.0,
+    Neuron.init(forenameCategory, 0.0,
             new Input() // In this example, only one forename is considered.
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(10.0)
@@ -167,7 +167,7 @@ required minimum input activation (<i>setBias</i>) of each input.
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
     );
-    m.initNeuron(surnameCategory, 0.0,
+    Neuron.init(surnameCategory, 0.0,
             new Input()
                     .setNeuron(cookSurnameEntity)
                     .setWeight(10.0)
@@ -184,7 +184,7 @@ required minimum input activation (<i>setBias</i>) of each input.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    m.initNeuron(suppressingN, 0.0,
+    Neuron.init(suppressingN, 0.0,
             new Input()
                     .setNeuron(cookProfessionEntity)
                     .setWeight(10.0)
@@ -320,7 +320,7 @@ The output of this example looks as following. Each line in the table represents
         // Create three neurons that might be suppressed by the suppressing neuron.
         // createAndNeuron is a helper method which is used set the synapse weights
         // and bias of new neuron.
-        Neuron pA = m.initNeuron(
+        Neuron pA = Neuron.init(
                 m.createNeuron("A"),
                 3.0,
                 new Input()
@@ -338,7 +338,7 @@ The output of this example looks as following. Each line in the table represents
                         .setRangeMatch(CONTAINED_IN)
         );
 
-        Neuron pB = m.initNeuron(
+        Neuron pB = Neuron.init(
                 m.createNeuron("B"),
                 5.0,
                 new Input()
@@ -356,7 +356,7 @@ The output of this example looks as following. Each line in the table represents
                         .setRangeMatch(CONTAINED_IN)
         );
 
-        Neuron pC = m.initNeuron(
+        Neuron pC = Neuron.init(
                 m.createNeuron("C"),
                 2.0,
                 new Input()
@@ -375,7 +375,7 @@ The output of this example looks as following. Each line in the table represents
         );
 
         // Finally addInput adds all the inputs to the suppressing neuron.
-        m.initNeuron(
+        Neuron.init(
                 pSuppr,
                 0.0,
                 new Input()
@@ -402,7 +402,7 @@ The output of this example looks as following. Each line in the table represents
                         .setRangeOutput(true)
         );
 
-        Neuron outN = m.initNeuron(new Neuron("OUT"), 0.0,
+        Neuron outN = Neuron.init(new Neuron("OUT"), 0.0,
                 new Input()
                         .setNeuron(pB)
                         .setWeight(1.0)
@@ -529,7 +529,7 @@ The output of this example looks as following. Each line in the table represents
         // Create a pattern neuron with relational neurons as input. The numbers that are
         // given in the inputs are the relational ids (relativeRid) which specify the word positions
         // of the inputs relative to each other.
-        Neuron pattern = m.initNeuron(
+        Neuron pattern = Neuron.init(
                 m.createNeuron("BCDE"),
                 0.4,
                 new Input()
