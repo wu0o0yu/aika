@@ -64,7 +64,7 @@ public class MetaSynapse implements Writable {
         public double metaBias;
         public boolean metaRelativeRid;
 
-        public Synapse.Builder setMetaWeight(double metaWeight) {
+        public Builder setMetaWeight(double metaWeight) {
             this.metaWeight = metaWeight;
             return this;
         }
