@@ -22,8 +22,7 @@ import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Conflicts;
 import org.aika.corpus.Document;
-import org.aika.corpus.InterprNode;
-import org.aika.corpus.SearchNode;
+import org.aika.corpus.InterpretationNode;
 import org.aika.lattice.NodeActivation;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
@@ -34,12 +33,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
-import static org.aika.corpus.InterprNode.State.SELECTED;
-import static org.aika.corpus.InterprNode.State.EXCLUDED;
-import static org.aika.corpus.InterprNode.State.UNKNOWN;
+import static org.aika.corpus.InterpretationNode.State.SELECTED;
+import static org.aika.corpus.InterpretationNode.State.EXCLUDED;
 
 
 /**
+ * Meta-neurons and meta-synapses allow to generate new fully trained neurons based on a single training data set.
+ * The meta-network employs an inhibitory feedback loop to determine if a certain information is already known (i.e.
+ * there is already a neuron representing it) or if it is new knowledge that should be represented by a new neuron. If
+ * there is already a neuron that represents this information, then the meta-neuron will be suppressed by the
+ * feedback loop. Otherwise the meta-neuron will be activated which means a copy of the meta-neuron will be generated
+ * using only the meta information of this neuron. The meta-synapses are only added to this new neuron if the input
+ * neuron has beed active in the training data set as well. If the input neuron of the meta-synapse is another
+ * inhibitory neuron, then the resulting synapse of the new neuron is going to be connected to the activated input
+ * neuron of this inhibitory neuron.
  *
  * @author Lukas Molzberger
  */
@@ -200,9 +207,9 @@ public class MetaNetwork {
 
 
     private static boolean isConflicting(Activation tAct, long v) {
-        ArrayList<InterprNode> tmp = new ArrayList<>();
+        ArrayList<InterpretationNode> tmp = new ArrayList<>();
         Conflicts.collectConflicting(tmp, tAct.key.interpretation, v);
-        for(InterprNode c: tmp) {
+        for(InterpretationNode c: tmp) {
             if(c.state == SELECTED) return true;
         }
         return false;
