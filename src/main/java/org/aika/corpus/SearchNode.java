@@ -74,6 +74,28 @@ public class SearchNode implements Comparable<SearchNode> {
     public List<StateChange> modifiedActs = new ArrayList<>();
 
 
+
+    Step step = Step.INIT;
+    boolean alreadySelected;
+    boolean alreadyExcluded;
+    Boolean cachedDecision;
+    SearchNode selectedChild = null;
+    SearchNode excludedChild = null;
+    NormWeight selectedWeight = NormWeight.ZERO_WEIGHT;
+    NormWeight excludedWeight = NormWeight.ZERO_WEIGHT;
+
+    enum Step {
+        INIT,
+        PREPARE_SELECT,
+        SELECT,
+        POST_SELECT,
+        PREPARE_EXCLUDE,
+        EXCLUDE,
+        POST_EXCLUDE,
+        FINAL
+    }
+
+
     public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate c, int level, Collection<InterprNode> changed, boolean cached) {
         id = doc.searchNodeIdCounter++;
         this.level = level;
@@ -176,27 +198,42 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    Step step = Step.INIT;
-    boolean alreadySelected;
-    boolean alreadyExcluded;
-    Boolean cachedDecision;
-    SearchNode selectedChild = null;
-    SearchNode excludedChild = null;
-    NormWeight selectedWeight = NormWeight.ZERO_WEIGHT;
-    NormWeight excludedWeight = NormWeight.ZERO_WEIGHT;
+    /**
+     * This algorithm is the recursive version of the interpretation search.
+     * Its perhaps easier to read than the iterative version.
+     */
+    public NormWeight searchRecursive(Document doc) {
+        if (candidate == null) {
+            return processResult(doc);
+        }
 
-    enum Step {
-        INIT,
-        PREPARE_SELECT,
-        SELECT,
-        POST_SELECT,
-        PREPARE_EXCLUDE,
-        EXCLUDE,
-        POST_EXCLUDE,
-        FINAL
+        initStep(doc);
+
+        if (prepareSelectStep(doc)) {
+            selectedWeight = selectedChild.searchRecursive(doc);
+
+            postReturn(selectedChild);
+        }
+
+        if (prepareExcludeStep(doc)) {
+            excludedWeight = excludedChild.searchRecursive(doc);
+
+            postReturn(excludedChild);
+        }
+
+        return finalStep();
     }
 
 
+    /**
+     * Searches for the best interpretation for the given document.
+     *
+     * This implementation of the algorithm is iterative to prevent stack overflow errors from happening.
+     * Depending on the document the search tree might be getting very deep.
+     *
+     * @param doc
+     * @param root
+     */
     public static void search(Document doc, SearchNode root) {
         SearchNode sn = root;
         NormWeight returnWeight = null;
