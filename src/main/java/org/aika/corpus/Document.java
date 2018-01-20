@@ -249,7 +249,9 @@ public class Document implements Comparable<Document> {
 
         bestInterpretation = results;
 
-        dumpDebugCandidateStatistics();
+        if (Document.OPTIMIZE_DEBUG_OUTPUT) {
+            dumpDebugCandidateStatistics();
+        }
     }
 
 
