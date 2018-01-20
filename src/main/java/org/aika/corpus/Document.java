@@ -238,7 +238,7 @@ public class Document implements Comparable<Document> {
         Candidate c = !candidates.isEmpty() ? candidates.get(0) : null;
 
         SearchNode child = new SearchNode(this, rootSearchNode, null, c, 0, rootRefs, false);
-        child.search(this);
+        SearchNode.search(this, child);
 
         ArrayList<InterprNode> results = new ArrayList<>();
         results.add(bottom);

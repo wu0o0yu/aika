@@ -50,7 +50,6 @@ public class SearchNode implements Comparable<SearchNode> {
     private static final Logger log = LoggerFactory.getLogger(SearchNode.class);
 
     public static int MAX_SEARCH_STEPS = 1000000;
-    public static int MAX_DEPTH = 1600;
 
     public int id;
 
@@ -177,6 +176,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
+    Step step = Step.INIT;
     boolean alreadySelected;
     boolean alreadyExcluded;
     Boolean cachedDecision;
@@ -185,28 +185,67 @@ public class SearchNode implements Comparable<SearchNode> {
     NormWeight selectedWeight = NormWeight.ZERO_WEIGHT;
     NormWeight excludedWeight = NormWeight.ZERO_WEIGHT;
 
+    enum Step {
+        INIT,
+        PREPARE_SELECT,
+        SELECT,
+        POST_SELECT,
+        PREPARE_EXCLUDE,
+        EXCLUDE,
+        POST_EXCLUDE,
+        FINAL
+    }
 
 
-    public NormWeight search(Document doc) {
-        if (candidate == null) {
-            return processResult(doc);
-        }
+    public static void search(Document doc, SearchNode root) {
+        SearchNode sn = root;
+        NormWeight returnWeight = null;
 
-        initStep(doc);
+        do {
+            switch(sn.step) {
+                case INIT:
+                    if (sn.candidate == null) {
+                        returnWeight = sn.processResult(doc);
+                        sn.step = Step.FINAL;
+                        sn = sn.getParent();
+                    } else {
+                        sn.initStep(doc);
+                        sn.step = Step.PREPARE_SELECT;
+                    }
+                    break;
+                case PREPARE_SELECT:
+                    sn.step = sn.prepareSelectStep(doc) ? Step.SELECT : Step.PREPARE_EXCLUDE;
+                    break;
+                case SELECT:
+                    sn.step = Step.POST_SELECT;
+                    sn = sn.selectedChild;
+                    break;
+                case POST_SELECT:
+                    sn.selectedWeight = returnWeight;
 
-        if (prepareSelectStep(doc)) {
-            selectedWeight = selectedChild.search(doc);
+                    sn.postReturn(sn.selectedChild);
+                    sn.step = Step.PREPARE_EXCLUDE;
+                    break;
+                case PREPARE_EXCLUDE:
+                    sn.step = sn.prepareExcludeStep(doc) ? Step.EXCLUDE : Step.FINAL;
+                    break;
+                case EXCLUDE:
+                    sn.step = Step.POST_EXCLUDE;
+                    sn = sn.excludedChild;
+                    break;
+                case POST_EXCLUDE:
+                    sn.excludedWeight = returnWeight;
 
-            postReturn(selectedChild);
-        }
-
-        if (prepareExcludeStep(doc)) {
-            excludedWeight = excludedChild.search(doc);
-
-            postReturn(excludedChild);
-        }
-
-        return finalStep();
+                    sn.postReturn(sn.excludedChild);
+                    sn.step = Step.FINAL;
+                    break;
+                case FINAL:
+                    returnWeight = sn.finalStep();
+                    sn = sn.getParent();
+                    break;
+                default:
+            }
+        } while(sn.level >= root.level);
     }
 
 
@@ -221,10 +260,7 @@ public class SearchNode implements Comparable<SearchNode> {
             dumpDebugState();
             throw new RuntimeException("Max search step exceeded.");
         }
-        if (level >= MAX_DEPTH) {
-            dumpDebugState();
-            throw new RuntimeException("Max depth exceeded.");
-        }
+
         doc.searchStepCounter++;
 
         if (Document.OPTIMIZE_DEBUG_OUTPUT) {
