@@ -111,7 +111,7 @@ public class LongTermLearning {
         // n.posDirSum wird bei Oder-Neuronen sehr groß.
         double norm = n.posDirSum + n.posRecSum > 0.0 ? (iaSum / (n.posDirSum + n.posRecSum)) : 1.0;
 
-        double x = config.ltpLearnRate * act.getFinalState().value * (1.0 - act.getFinalState().value) * norm;
+        double x = config.ltpLearnRate * (1.0 - act.getFinalState().value) * norm;
 
         doc.getFinalActivations().filter(iAct -> iAct.key.node != act.key.node).forEach(iAct -> {
             Result r = config.synapseEvaluation.evaluate(null, iAct, act);
@@ -128,6 +128,7 @@ public class LongTermLearning {
 
         doc.notifyWeightsModified(n, n.inputSynapses.values());
     }
+
 
     /**
      * The long-term depression algorithm decreases the strength of a synapse if only one side of the synapse is
