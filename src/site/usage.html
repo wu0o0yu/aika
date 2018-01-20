@@ -122,7 +122,7 @@ required minimum input activation (<i>setBias</i>) of each input.
     Neuron cookSurnameEntity = Neuron.init(
             m.createNeuron("E-cook (surname)"),
             3.0, // adjusts the bias
-            new Input() // Requires the word to be recognized
+            new Synapse.Builder() // Requires the word to be recognized
                     .setNeuron(inputNeurons.get("cook"))
                     .setWeight(10.0)
                  // This input requires the input activation to have an
@@ -132,7 +132,7 @@ required minimum input activation (<i>setBias</i>) of each input.
                     .setRecurrent(false)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true), // propagate the range of this input
-            new Input() // The previous word needs to be a forename
+            new Synapse.Builder() // The previous word needs to be a forename
                     .setNeuron(forenameCategory)
                     .setWeight(10.0)
                     .setBias(-9.0)
@@ -143,7 +143,7 @@ required minimum input activation (<i>setBias</i>) of each input.
             // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
             // self suppression taking place even though 'E-cook (surname)' is also contained
             // in suppressingN.
-            new Input()
+            new Synapse.Builder()
                     .setNeuron(suppressingN)
                     .setWeight(-20.0)
                     .setBias(0.0)
@@ -159,7 +159,7 @@ required minimum input activation (<i>setBias</i>) of each input.
             <pre class="prettyprint">
 				<code class="language-java">
     Neuron.init(forenameCategory, 0.0,
-            new Input() // In this example, only one forename is considered.
+            new Synapse.Builder() // In this example, only one forename is considered.
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(10.0)
                     .setBias(0.0)
@@ -168,7 +168,7 @@ required minimum input activation (<i>setBias</i>) of each input.
                     .setRangeOutput(true)
     );
     Neuron.init(surnameCategory, 0.0,
-            new Input()
+            new Synapse.Builder()
                     .setNeuron(cookSurnameEntity)
                     .setWeight(10.0)
                     .setBias(0.0)
@@ -185,25 +185,25 @@ required minimum input activation (<i>setBias</i>) of each input.
             <pre class="prettyprint">
 				<code class="language-java">
     Neuron.init(suppressingN, 0.0,
-            new Input()
+            new Synapse.Builder()
                     .setNeuron(cookProfessionEntity)
                     .setWeight(10.0)
                     .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
-            new Input()
+            new Synapse.Builder()
                     .setNeuron(cookSurnameEntity)
                     .setWeight(10.0)
                     .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
-            new Input()
+            new Synapse.Builder()
                     .setNeuron(jacksonCityEntity)
                     .setWeight(10.0)
                     .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
-            new Input()
+            new Synapse.Builder()
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(10.0)
                     .setBias(0.0)
@@ -323,14 +323,14 @@ The output of this example looks as following. Each line in the table represents
         Neuron pA = Neuron.init(
                 m.createNeuron("A"),
                 3.0,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()                     // This input is negated
+                new Synapse.Builder()                     // This input is negated
                         .setNeuron(pSuppr)
                         .setWeight(-10.0)
                         .setBias(0.0)
@@ -341,14 +341,14 @@ The output of this example looks as following. Each line in the table represents
         Neuron pB = Neuron.init(
                 m.createNeuron("B"),
                 5.0,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0)
                         .setBias(0.0)
@@ -359,14 +359,14 @@ The output of this example looks as following. Each line in the table represents
         Neuron pC = Neuron.init(
                 m.createNeuron("C"),
                 2.0,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inC)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pSuppr)
                         .setWeight(-10.0)
                         .setBias(0.0)
@@ -378,22 +378,21 @@ The output of this example looks as following. Each line in the table represents
         Neuron.init(
                 pSuppr,
                 0.0,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pA)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setMinInput(1.0)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pB)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pC)
                         .setWeight(10.0)
                         .setBias(0.0)
@@ -403,7 +402,7 @@ The output of this example looks as following. Each line in the table represents
         );
 
         Neuron outN = Neuron.init(new Neuron("OUT"), 0.0,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(pB)
                         .setWeight(1.0)
                         .setBias(0.0)
@@ -532,7 +531,7 @@ The output of this example looks as following. Each line in the table represents
         Neuron pattern = Neuron.init(
                 m.createNeuron("BCDE"),
                 0.4,
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(1.0)
                         .setBias(-0.9)
@@ -541,21 +540,21 @@ The output of this example looks as following. Each line in the table represents
                         .setStartRangeMatch(Operator.EQUALS)
                         .setEndRangeMatch(Operator.GREATER_THAN)
                         .setStartRangeOutput(true),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0)
                         .setBias(-0.9)
                         .setRecurrent(false)
                         .setRelativeRid(1)
                         .setRangeMatch(RangeRelation.CONTAINS),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(1.0)
                         .setBias(-0.9)
                         .setRecurrent(false)
                         .setRelativeRid(2)
                         .setRangeMatch(RangeRelation.CONTAINS),
-                new Input()
+                new Synapse.Builder()
                         .setNeuron(inputNeurons.get('e'))
                         .setWeight(1.0)
                         .setBias(-0.9)
