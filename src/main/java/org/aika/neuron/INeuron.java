@@ -180,29 +180,26 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      * Propagate an input activation into the network.
      *
      * @param doc   The current document
-     * @param begin The range begin
-     * @param end   The range end
-     * @param rid   The relational id (e.g. the word position)
-     * @param o     The interpretation node
-     * @param value The activation value of this input activation
+     * @param input
      */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterpretationNode o, double value, Double targetValue, int fired) {
-        Node.addActivationAndPropagate(doc, new NodeActivation.Key(node.get(doc), new Range(begin, end), rid, o), Collections.emptySet());
+    public Activation addInput(Document doc, Activation.Builder input) {
+        InterpretationNode interpr = input.interpretation != null ? input.interpretation : doc.bottom;
+        Node.addActivationAndPropagate(doc, new NodeActivation.Key(node.get(doc), input.range, input.rid, interpr), Collections.emptySet());
 
         doc.propagate();
 
-        Activation act = Activation.get(doc, this, rid, new Range(begin, end), Range.Relation.EQUALS, o, InterpretationNode.Relation.EQUALS);
-        State s = new State(value, fired, NormWeight.ZERO_WEIGHT);
+        Activation act = Activation.get(doc, this, input.rid, input.range, Range.Relation.EQUALS, interpr, InterpretationNode.Relation.EQUALS);
+        State s = new State(input.value, input.fired, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
-        act.inputValue = value;
-        act.targetValue = targetValue;
+        act.inputValue = input.value;
+        act.targetValue = input.targetValue;
 
         doc.inputNeuronActivations.add(act);
         doc.finallyActivatedNeurons.add(act.key.node.neuron.get(doc));
 
         doc.ubQueue.add(act);
 
-        if(targetValue != null) {
+        if(input.targetValue != null) {
             doc.supervisedTraining.targetActivations.add(act);
         }
 

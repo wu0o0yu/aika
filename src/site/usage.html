@@ -226,7 +226,11 @@ Now that the model is complete, we can start processing an actual text.
     for(String w: doc.getContent().split(" ")) {
         int j = i + w.length();
 
-        inputNeurons.get(w).addInput(doc, i, j, wordPos);
+        inputNeurons.get(w).addInput(doc,
+                    new Activation.Builder()
+                        .setRange(i, j)
+                        .setRelationalId(wordPos)
+                    );
 
         i = j + 1;
         wordPos++;
@@ -374,7 +378,7 @@ The output of this example looks as following. Each line in the table represents
                         .setRangeMatch(CONTAINED_IN)
         );
 
-        // Finally addInput adds all the inputs to the suppressing neuron.
+        // Finally we add all the inputs to the suppressing neuron.
         Neuron.init(
                 pSuppr,
                 0.0,
@@ -574,7 +578,11 @@ The output of this example looks as following. Each line in the table represents
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).addInput(doc, i, i + 1, wordPos);
+                inputNeurons.get(c).addInput(doc,
+                    new Activation.Builder()
+                        .setRange(i, i + 1)
+                        .setRelationalId(wordPos)
+                );
             } else {
                 wordPos++;
             }

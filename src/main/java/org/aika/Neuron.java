@@ -56,90 +56,7 @@ public class Neuron extends Provider<INeuron> {
      * @param end   The range end
      */
     public Activation addInput(Document doc, int begin, int end) {
-        return addInput(doc, begin, end, null, doc.bottom);
-    }
-
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc   The current document
-     * @param begin The range begin
-     * @param end   The range end
-     * @param value The activation value of this input activation
-     * @param targetValue The target activation value for supervised learning
-     */
-    public Activation addInput(Document doc, int begin, int end, double value, Double targetValue) {
-        return addInput(doc, begin, end, null, doc.bottom, value, targetValue, 0);
-    }
-
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc   The current document
-     * @param begin The range begin
-     * @param end   The range end
-     * @param value The activation value of this input activation
-     * @param targetValue The target activation value for supervised learning
-     */
-    public Activation addInput(Document doc, int begin, int end, double value, Double targetValue, int fired) {
-        return addInput(doc, begin, end, null, doc.bottom, value, targetValue, fired);
-    }
-
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc   The current document
-     * @param begin The range begin
-     * @param end   The range end
-     * @param o     The interpretation node
-     */
-    public Activation addInput(Document doc, int begin, int end, InterpretationNode o) {
-        return addInput(doc, begin, end, null, o);
-    }
-
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc   The current document
-     * @param begin The range begin
-     * @param end   The range end
-     * @param rid   The relational id (e.g. the word position)
-     */
-    public Activation addInput(Document doc, int begin, int end, Integer rid) {
-        return addInput(doc, begin, end, rid, doc.bottom);
-    }
-
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc   The current document
-     * @param begin The range begin
-     * @param end   The range end
-     * @param rid   The relational id (e.g. the word position)
-     * @param o     The interpretation node
-     */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterpretationNode o) {
-        return addInput(doc, begin, end, rid, o, 1.0);
-    }
-
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc   The current document
-     * @param begin The range begin
-     * @param end   The range end
-     * @param rid   The relational id (e.g. the word position)
-     * @param o     The interpretation node
-     * @param value The activation value of this input activation
-     */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterpretationNode o, double value) {
-        return addInput(doc, begin, end, rid, o, value, null, 0);
+        return addInput(doc, begin, end, null);
     }
 
     /**
@@ -148,16 +65,26 @@ public class Neuron extends Provider<INeuron> {
      * @param doc   The current document
      * @param begin The range begin
      * @param end   The range end
-     * @param rid   The relational id (e.g. the word position)
-     * @param o     The interpretation node
-     * @param value The activation value of this input activation
-     * @param targetValue The target activation value for supervised learning
+     * @param relationalId
      */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterpretationNode o, double value, Double targetValue, int fired) {
-        return get(doc).addInput(doc, begin, end, rid, o, value, targetValue, fired);
+    public Activation addInput(Document doc, int begin, int end, Integer relationalId) {
+        return addInput(doc,
+                new Activation.Builder()
+                        .setRange(begin, end)
+                        .setRelationalId(relationalId)
+        );
     }
 
 
+    /**
+     * Propagate an input activation into the network.
+     *
+     * @param doc   The current document
+     * @param inputAct
+     */
+    public Activation addInput(Document doc, Activation.Builder inputAct) {
+        return get(doc).addInput(doc, inputAct);
+    }
 
 
     /**

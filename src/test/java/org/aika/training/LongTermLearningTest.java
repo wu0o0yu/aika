@@ -4,6 +4,7 @@ import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
+import org.aika.neuron.Activation;
 import org.aika.neuron.Synapse;
 import org.aika.training.LongTermLearning.Config;
 import org.junit.Test;
@@ -20,8 +21,20 @@ public class LongTermLearningTest {
 
         Document doc = m.createDocument("Bla ");
 
-        nA.addInput(doc, 0, 3, 1.0, null, 0);
-        nB.addInput(doc, 0, 3, 0.5, null, 1);
+        nA.addInput(doc,
+                new Activation.Builder()
+                        .setRange(0, 3)
+                        .setValue(1.0)
+                        .setTargetValue(null)
+                        .setFired(0)
+        );
+        nB.addInput(doc,
+                new Activation.Builder()
+                        .setRange(0, 3)
+                        .setValue(0.5)
+                        .setTargetValue(null)
+                        .setFired(1)
+        );
 
         LongTermLearning.train(doc,
                 new Config()

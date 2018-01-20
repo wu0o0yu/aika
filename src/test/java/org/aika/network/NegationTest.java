@@ -87,13 +87,21 @@ public class NegationTest {
 
         InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
 
-        inB.addInput(doc, 2, 7, o1);
+        inB.addInput(doc,
+                new Activation.Builder()
+                        .setRange(2, 7)
+                        .setInterpretation(o1)
+        );
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         InterpretationNode o2 = InterpretationNode.addPrimitive(doc);
 
-        inC.addInput(doc, 4, 9, o2);
+        inC.addInput(doc,
+                new Activation.Builder()
+                        .setRange(4, 9)
+                        .setInterpretation(o2)
+        );
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -154,12 +162,20 @@ public class NegationTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         InterpretationNode ob = InterpretationNode.addPrimitive(doc);
-        inB.addInput(doc, 2, 7, ob);
+        inB.addInput(doc,
+                new Activation.Builder()
+                        .setRange(2, 7)
+                        .setInterpretation(ob)
+        );
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
         InterpretationNode oc = InterpretationNode.addPrimitive(doc);
-        inC.addInput(doc, 4, 9, oc);
+        inC.addInput(doc,
+                new Activation.Builder()
+                        .setRange(4, 9)
+                        .setInterpretation(oc)
+        );
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -213,7 +229,11 @@ public class NegationTest {
 
         InterpretationNode o = InterpretationNode.addPrimitive(doc);
 
-        inS.addInput(doc, 3, 8, o);
+        inS.addInput(doc,
+                new Activation.Builder()
+                        .setRange(3, 8)
+                        .setInterpretation(o)
+        );
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -273,7 +293,11 @@ public class NegationTest {
 
         InterpretationNode o = InterpretationNode.addPrimitive(doc);
 
-        inS.addInput(doc, 3, 8, o);
+        inS.addInput(doc,
+                new Activation.Builder()
+                        .setRange(3, 8)
+                        .setInterpretation(o)
+        );
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
@@ -337,7 +361,11 @@ public class NegationTest {
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        inS.addInput(doc, 3, 8, o);
+        inS.addInput(doc,
+                new Activation.Builder()
+                        .setRange(3, 8)
+                        .setInterpretation(o)
+        );
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 

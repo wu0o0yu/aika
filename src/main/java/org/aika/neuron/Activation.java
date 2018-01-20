@@ -497,5 +497,50 @@ public final class Activation extends NodeActivation<OrNode> {
         }
     }
 
+
+    public static class Builder {
+        public Range range;
+        public Integer rid;
+        public InterpretationNode interpretation;
+        public double value = 1.0;
+        public Double targetValue;
+        public int fired;
+
+
+        public Builder setRange(int begin, int end) {
+            this.range = new Range(begin, end);
+            return this;
+        }
+
+        public Builder setRange(Range range) {
+            this.range = range;
+            return this;
+        }
+
+        public Builder setRelationalId(Integer rid) {
+            this.rid = rid;
+            return this;
+        }
+
+        public Builder setInterpretation(InterpretationNode interpretation) {
+            this.interpretation = interpretation;
+            return this;
+        }
+
+        public Builder setValue(double value) {
+            this.value = value;
+            return this;
+        }
+
+        public Builder setTargetValue(Double targetValue) {
+            this.targetValue = targetValue;
+            return this;
+        }
+
+        public Builder setFired(int fired) {
+            this.fired = fired;
+            return this;
+        }
+    }
 }
 

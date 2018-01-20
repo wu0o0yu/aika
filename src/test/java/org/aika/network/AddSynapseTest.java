@@ -17,6 +17,7 @@
 package org.aika.network;
 
 
+import org.aika.neuron.Activation;
 import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.Neuron;
@@ -58,7 +59,11 @@ public class AddSynapseTest {
 
         int i = 0;
         for(Neuron in: inputNeurons.values()) {
-            in.addInput(doc, i * 2, (i * 2) + 1, i);
+            in.addInput(doc,
+                    new Activation.Builder()
+                            .setRange(i * 2, (i * 2) + 1)
+                            .setRelationalId(i)
+            );
 
             i++;
         }

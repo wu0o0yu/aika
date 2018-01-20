@@ -164,7 +164,10 @@ public class ActivationOutputsTest {
 
 
         InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
-        inA.addInput(doc, 0, 1, o1);
+        inA.addInput(doc, new Activation.Builder()
+                .setRange(0, 1)
+                .setInterpretation(o1)
+        );
 
         Activation outB1 = Activation.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
         Assert.assertTrue(containsOutputActivation(inA.get().getFirstActivation(doc).neuronOutputs, outB1));
@@ -189,7 +192,11 @@ public class ActivationOutputsTest {
         ).get();
 
 
-        inA.addInput(doc, 0, 1, InterpretationNode.addPrimitive(doc));
+        inA.addInput(doc,
+                new Activation.Builder()
+                        .setRange(0, 1)
+                        .setInterpretation(InterpretationNode.addPrimitive(doc))
+        );
 
         Activation outB1 = Activation.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
 
@@ -217,7 +224,13 @@ public class ActivationOutputsTest {
 
 
         InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
-        inA.addInput(doc, 0, 1, 0, o1);
+        inA.addInput(doc,
+                new Activation.Builder()
+                        .setRange(0, 1)
+                        .setRelationalId(0)
+                        .setInterpretation(o1)
+        );
+
         Activation outB1 = Activation.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
 
         Assert.assertTrue(containsOutputActivation(inA.get().getFirstActivation(doc).neuronOutputs, outB1));

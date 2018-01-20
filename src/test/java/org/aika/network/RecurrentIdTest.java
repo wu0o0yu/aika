@@ -180,7 +180,12 @@ public class RecurrentIdTest {
                 if (rec != null) {
                     Range r = new Range(i, doc.length());
 
-                    rec.addInput(doc, r.begin, r.end, i, doc.bottom);
+                    rec.addInput(doc,
+                            new Activation.Builder()
+                                    .setRange(r)
+                                    .setRelationalId(i)
+                                    .setInterpretation(doc.bottom)
+                    );
                 }
             }
 

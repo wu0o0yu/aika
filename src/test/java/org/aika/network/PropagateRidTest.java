@@ -52,7 +52,12 @@ public class PropagateRidTest {
                         .setRangeOutput(true)
         );
 
-        inA.addInput(doc, 0, 1, 10, doc.bottom);
+        inA.addInput(doc,
+                new Activation.Builder()
+                        .setRange(0, 1)
+                        .setRelationalId(10)
+                        .setInterpretation(doc.bottom)
+        );
 
         Assert.assertEquals(5, Activation.get(doc, pA.get(), null, null, null, null, null).key.rid.intValue());
 

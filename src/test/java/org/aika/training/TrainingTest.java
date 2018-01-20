@@ -42,8 +42,18 @@ public class TrainingTest {
 
         Document doc = m.createDocument("Bla");
 
-        in.addInput(doc, 0, 3, 0, doc.bottom, 1.0);
-        Activation targetAct = out.addInput(doc, 0, 3, 0, doc.bottom, 0.0);
+        in.addInput(doc,
+                new Activation.Builder()
+                        .setRange(0, 3)
+                        .setRelationalId(0)
+                        .setValue(1.0)
+        );
+        Activation targetAct = out.addInput(doc,
+                new Activation.Builder()
+                        .setRange(0, 3)
+                        .setRelationalId(0)
+                        .setValue(0.0)
+        );
 
         targetAct.errorSignal = 1.0 - targetAct.getFinalState().value;
 
@@ -64,7 +74,12 @@ public class TrainingTest {
         doc.clearActivations();
 
         doc = m.createDocument("Bla");
-        in.addInput(doc, 0, 3, 0, doc.bottom, 1.0);
+        in.addInput(doc,
+                new Activation.Builder()
+                        .setRange(0, 3)
+                        .setRelationalId(0)
+                        .setValue(1.0)
+        );
     }
 
 
@@ -79,13 +94,28 @@ public class TrainingTest {
 
         {
             Document doc = m.createDocument("Bla");
-            inA.addInput(doc, 0, 3, 1.0, null);
-            inB.addInput(doc, 0, 3, 1.0, null);
+            inA.addInput(doc,
+                    new Activation.Builder()
+                            .setRange(0, 3)
+                            .setValue(1.0)
+                            .setTargetValue(null)
+            );
+            inB.addInput(doc,
+                    new Activation.Builder()
+                            .setRange(0, 3)
+                            .setValue(1.0)
+                            .setTargetValue(null)
+            );
 
             doc.process();
 
 
-            outC.addInput(doc, 0, 3, 0.0, 1.0);
+            outC.addInput(doc,
+                    new Activation.Builder()
+                            .setRange(0, 3)
+                            .setValue(0.0)
+                            .setTargetValue(1.0)
+            );
 
             doc.supervisedTraining.train(
                     new SupervisedTraining.Config()
@@ -112,8 +142,18 @@ public class TrainingTest {
 
         {
             Document doc = m.createDocument("Bla");
-            inA.addInput(doc, 0, 3, 1.0, null);
-            inB.addInput(doc, 0, 3, 1.0, null);
+            inA.addInput(doc,
+                    new Activation.Builder()
+                            .setRange(0, 3)
+                            .setValue(1.0)
+                            .setTargetValue(null)
+            );
+            inB.addInput(doc,
+                    new Activation.Builder()
+                            .setRange(0, 3)
+                            .setValue(1.0)
+                            .setTargetValue(null)
+            );
 
             doc.process();
 
