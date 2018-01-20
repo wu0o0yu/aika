@@ -24,7 +24,7 @@ import org.aika.Provider;
 import org.aika.Utils;
 import org.aika.corpus.Document;
 import org.aika.training.PatternDiscovery.Config;
-import org.aika.corpus.InterprNode;
+import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
@@ -79,7 +79,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    public boolean isAllowedOption(int threadId, InterprNode n, NodeActivation<?> act, long v) {
+    public boolean isAllowedOption(int threadId, InterpretationNode n, NodeActivation<?> act, long v) {
         ThreadState th = getThreadState(threadId, true);
         if(th.visited == v) return false;
         th.visited = v;
@@ -235,7 +235,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     public static void addNextLevelActivation(Document doc, NodeActivation<AndNode> act, NodeActivation<AndNode> secondAct, Provider<AndNode> pnlp) {
         // TODO: check if the activation already exists
         Key ak = act.key;
-        InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
+        InterpretationNode o = InterpretationNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
         if (o != null) {
             AndNode nlp = pnlp.get(doc);
             Node.addActivationAndPropagate(

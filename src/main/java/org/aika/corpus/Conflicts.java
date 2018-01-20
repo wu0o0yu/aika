@@ -35,18 +35,18 @@ public class Conflicts {
     public Map<Key, Conflict> secondary = new TreeMap<>();
 
 
-    public static void collectConflicting(Collection<InterprNode> results, InterprNode n, long v) {
+    public static void collectConflicting(Collection<InterpretationNode> results, InterpretationNode n, long v) {
         assert n.primId >= 0;
         n.conflicts.primary.values().forEach(c -> c.secondary.collectPrimitiveNodes(results, v));
         n.conflicts.secondary.values().forEach(c -> results.add(c.primary));
     }
 
 
-    public static void add(NodeActivation act, InterprNode primary, InterprNode secondary) {
+    public static void add(NodeActivation act, InterpretationNode primary, InterpretationNode secondary) {
         Key ck = new Key(secondary, act);
         Conflict c = primary.conflicts.primary.get(ck);
         if(c == null) {
-            c = new Conflict(act, primary, secondary, InterprNode.add(primary.doc, false, primary, secondary));
+            c = new Conflict(act, primary, secondary, InterpretationNode.add(primary.doc, false, primary, secondary));
 
             c.conflict.isConflict++;
 
@@ -63,12 +63,12 @@ public class Conflicts {
 
     public static class Conflict {
         public NodeActivation act;
-        public InterprNode primary;
-        public InterprNode secondary;
-        public InterprNode conflict;
+        public InterpretationNode primary;
+        public InterpretationNode secondary;
+        public InterpretationNode conflict;
 
 
-        public Conflict(NodeActivation act, InterprNode primary, InterprNode secondary, InterprNode conflict) {
+        public Conflict(NodeActivation act, InterpretationNode primary, InterpretationNode secondary, InterpretationNode conflict) {
             this.act = act;
             this.primary = primary;
             this.secondary = secondary;
@@ -78,10 +78,10 @@ public class Conflicts {
 
 
     public static class Key implements Comparable<Key> {
-        public InterprNode o;
+        public InterpretationNode o;
         public NodeActivation act;
 
-        public Key(InterprNode o, NodeActivation act) {
+        public Key(InterpretationNode o, NodeActivation act) {
             this.o = o;
             this.act = act;
         }

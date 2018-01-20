@@ -19,16 +19,10 @@ package org.aika.lattice;
 
 import org.aika.Utils;
 import org.aika.corpus.Document;
-import org.aika.corpus.InterprNode;
-import org.aika.corpus.InterprNode.Relation;
+import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
-import org.aika.corpus.Range.Operator;
-import org.aika.lattice.Node.ThreadState;
 
 import java.util.*;
-import java.util.stream.Stream;
-
-import static org.aika.corpus.Range.Operator.*;
 
 
 public class NodeActivation<T extends Node> implements Comparable<NodeActivation> {
@@ -52,7 +46,7 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     }
 
 
-    public NodeActivation(int id, Document doc, T n, Range pos, Integer rid, InterprNode o) {
+    public NodeActivation(int id, Document doc, T n, Range pos, Integer rid, InterpretationNode o) {
         this.id = id;
         this.doc = doc;
         key = new Key<>(n, pos, rid, o);
@@ -99,10 +93,10 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
         public final T node;
         public final Range range;
         public final Integer rid;
-        public final InterprNode interpretation;
+        public final InterpretationNode interpretation;
 
 
-        public Key(T node, Range range, Integer rid, InterprNode interpretation) {
+        public Key(T node, Range range, Integer rid, InterpretationNode interpretation) {
             this.node = node;
             this.range = range;
             this.rid = rid;

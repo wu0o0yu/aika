@@ -24,9 +24,9 @@ import org.aika.neuron.INeuron.NormWeight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.aika.corpus.InterprNode.State.SELECTED;
-import static org.aika.corpus.InterprNode.State.EXCLUDED;
-import static org.aika.corpus.InterprNode.State.UNKNOWN;
+import static org.aika.corpus.InterpretationNode.State.SELECTED;
+import static org.aika.corpus.InterpretationNode.State.EXCLUDED;
+import static org.aika.corpus.InterpretationNode.State.UNKNOWN;
 
 import java.util.*;
 
@@ -96,7 +96,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate c, int level, Collection<InterprNode> changed, boolean cached) {
+    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate c, int level, Collection<InterpretationNode> changed, boolean cached) {
         id = doc.searchNodeIdCounter++;
         this.level = level;
         visited = doc.visitedCounter++;
@@ -155,7 +155,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public void collectResults(Collection<InterprNode> results) {
+    public void collectResults(Collection<InterpretationNode> results) {
         if (candidate != null) {
             results.add(candidate.refinement);
         }
@@ -390,7 +390,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean checkPrecondition() {
-        Set soin = candidate.refinement.selectedOrInterprNodes;
+        Set soin = candidate.refinement.selectedOrInterpretationNodes;
         return soin != null && !soin.isEmpty();
     }
 
@@ -430,9 +430,9 @@ public class SearchNode implements Comparable<SearchNode> {
                         }
                     }
 
-                    ArrayList<InterprNode> conflicting = new ArrayList<>();
+                    ArrayList<InterpretationNode> conflicting = new ArrayList<>();
                     Conflicts.collectConflicting(conflicting, sa.output.key.interpretation, v);
-                    for (InterprNode c : conflicting) {
+                    for (InterpretationNode c : conflicting) {
                         Candidate negCand = c.candidate;
                         if (negCand != null) {
                             if (negCand.cachedDecision == Boolean.TRUE && candidate.id < negCand.id) {
@@ -463,10 +463,10 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean checkExcluded(InterprNode ref, long v) {
-        ArrayList<InterprNode> conflicts = new ArrayList<>();
+    private boolean checkExcluded(InterpretationNode ref, long v) {
+        ArrayList<InterpretationNode> conflicts = new ArrayList<>();
         Conflicts.collectConflicting(conflicts, ref, v);
-        for (InterprNode cn : conflicts) {
+        for (InterpretationNode cn : conflicts) {
             if (cn.state == SELECTED) return true;
         }
         return false;
@@ -480,10 +480,10 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public String toString(Document doc) {
-        TreeSet<InterprNode> tmp = new TreeSet<>();
+        TreeSet<InterpretationNode> tmp = new TreeSet<>();
         candidate.refinement.collectPrimitiveNodes(tmp, doc.interpretationIdCounter++);
         StringBuilder sb = new StringBuilder();
-        for (InterprNode n : tmp) {
+        for (InterpretationNode n : tmp) {
             sb.append(n.primId);
             sb.append(", ");
         }

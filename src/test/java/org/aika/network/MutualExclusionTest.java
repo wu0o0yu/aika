@@ -21,11 +21,9 @@ import org.aika.Input;
 import org.aika.Model;
 import org.aika.Neuron;
 import org.aika.corpus.Range;
-import org.aika.neuron.Activation;
 import org.aika.corpus.Conflicts.Conflict;
 import org.aika.corpus.Document;
-import org.aika.corpus.InterprNode;
-import org.aika.lattice.OrNode;
+import org.aika.corpus.InterpretationNode;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
@@ -189,7 +187,7 @@ public class MutualExclusionTest {
         System.out.println();
 
         System.out.println("Show all conflicts with the selected option:");
-        for(InterprNode so: doc.bestInterpretation) {
+        for(InterpretationNode so: doc.bestInterpretation) {
             for(Conflict c: so.conflicts.primary.values()) {
                 System.out.println(c.conflict);
             }

@@ -21,7 +21,7 @@ import org.aika.*;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.corpus.Document;
 import org.aika.training.PatternDiscovery.Config;
-import org.aika.corpus.InterprNode;
+import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.lattice.OrNode.OrEntry;
@@ -162,7 +162,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      */
     public abstract void propagateAddedActivation(Document doc, A act);
 
-    public abstract boolean isAllowedOption(int threadId, InterprNode n, NodeActivation<?> act, long v);
+    public abstract boolean isAllowedOption(int threadId, InterpretationNode n, NodeActivation<?> act, long v);
 
     public abstract double computeSynapseWeightSum(Integer offset, INeuron n);
 
@@ -201,7 +201,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if (r != 0) return r;
         r = Utils.compareInteger(k1.rid, k2.rid);
         if (r != 0) return r;
-        return InterprNode.compare(k1.interpretation, k2.interpretation);
+        return InterpretationNode.compare(k1.interpretation, k2.interpretation);
     };
 
 
@@ -211,7 +211,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if (r != 0) return r;
         r = Utils.compareInteger(k1.rid, k2.rid);
         if (r != 0) return r;
-        return InterprNode.compare(k1.interpretation, k2.interpretation);
+        return InterpretationNode.compare(k1.interpretation, k2.interpretation);
     };
 
 
@@ -221,7 +221,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if (r != 0) return r;
         r = Range.compare(k1.range, k2.range, false);
         if (r != 0) return r;
-        return InterprNode.compare(k1.interpretation, k2.interpretation);
+        return InterpretationNode.compare(k1.interpretation, k2.interpretation);
     };
 
 

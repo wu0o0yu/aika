@@ -26,7 +26,7 @@ import java.util.*;
 
 
 /**
- * The {@code InterprNode} class represents a node within the interpretations lattice. Such a node consists of a conjunction of
+ * The {@code InterpretationNode} class represents a node within the interpretations lattice. Such a node consists of a conjunction of
  * primitive interpretation nodes that are emitted during each activation of a {@code Neuron} (but not the InputNeurons).
  * The primitive nodes them self can consist of a disjunction of other interpretation nodes.
  * For example the primitive interpretation node 9[(1),(6,7,8)] has the primitive node id 9 and consists of the
@@ -38,10 +38,10 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-public class InterprNode implements Comparable<InterprNode> {
+public class InterpretationNode implements Comparable<InterpretationNode> {
 
-    public static final InterprNode MIN = new InterprNode(null, -1, 0, 0);
-    public static final InterprNode MAX = new InterprNode(null, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+    public static final InterpretationNode MIN = new InterpretationNode(null, -1, 0, 0);
+    public static final InterpretationNode MAX = new InterpretationNode(null, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
 
     public final int primId;
     public int minPrim = -1;
@@ -50,11 +50,11 @@ public class InterprNode implements Comparable<InterprNode> {
     public final int id;
     public int length;
 
-    public Set<InterprNode> orInterprNodes;
-    public Set<InterprNode> selectedOrInterprNodes;
-    public Set<InterprNode> refByOrInterprNode;
-    public InterprNode largestCommonSubset;
-    public Set<InterprNode> linkedByLCS;
+    public Set<InterpretationNode> orInterpretationNodes;
+    public Set<InterpretationNode> selectedOrInterpretationNodes;
+    public Set<InterpretationNode> refByOrInterpretationNode;
+    public InterpretationNode largestCommonSubset;
+    public Set<InterpretationNode> linkedByLCS;
 
     /*
     Aika extensively uses graph coloring techniques. When traversing the interpretation node lattice nodes will be
@@ -88,9 +88,9 @@ public class InterprNode implements Comparable<InterprNode> {
     public Activation activation;
     public Candidate candidate;
 
-    private static InterprNode[] EMPTY_INTR_RELS = new InterprNode[0];
-    public InterprNode[] parents = EMPTY_INTR_RELS;
-    public InterprNode[] children = EMPTY_INTR_RELS;
+    private static InterpretationNode[] EMPTY_INTR_RELS = new InterpretationNode[0];
+    public InterpretationNode[] parents = EMPTY_INTR_RELS;
+    public InterpretationNode[] children = EMPTY_INTR_RELS;
 
     public int isConflict = -1;
     public Conflicts conflicts = new Conflicts();
@@ -113,7 +113,7 @@ public class InterprNode implements Comparable<InterprNode> {
 
 
     public boolean isPrimitive() {
-        return orInterprNodes == null || orInterprNodes.isEmpty() || (orInterprNodes.size() == 1 && orInterprNodes.contains(doc.bottom));
+        return orInterpretationNodes == null || orInterpretationNodes.isEmpty() || (orInterpretationNodes.size() == 1 && orInterpretationNodes.contains(doc.bottom));
     }
 
 
@@ -122,7 +122,7 @@ public class InterprNode implements Comparable<InterprNode> {
         CONTAINS,
         CONTAINED_IN;
 
-        public boolean compare(InterprNode a, InterprNode b) {
+        public boolean compare(InterpretationNode a, InterpretationNode b) {
             switch (this) {
                 case EQUALS:
                     return a == b;
@@ -136,13 +136,13 @@ public class InterprNode implements Comparable<InterprNode> {
         }
     }
 
-    public InterprNode(Document doc, int primId, int id, int length) {
+    public InterpretationNode(Document doc, int primId, int id, int length) {
         this(doc, primId, id);
         this.length = length;
     }
 
 
-    public InterprNode(Document doc, int primId, int id) {
+    public InterpretationNode(Document doc, int primId, int id) {
         this.doc = doc;
         this.primId = primId;
         this.id = id;
@@ -167,15 +167,15 @@ public class InterprNode implements Comparable<InterprNode> {
         boolean newSelected = isSelected(v);
 
         if (isSelected != newSelected) {
-            if(refByOrInterprNode != null) {
-                for (InterprNode ref : refByOrInterprNode) {
+            if(refByOrInterpretationNode != null) {
+                for (InterpretationNode ref : refByOrInterpretationNode) {
                     if (newSelected) {
-                        if (ref.selectedOrInterprNodes == null) {
-                            ref.selectedOrInterprNodes = new TreeSet<>();
+                        if (ref.selectedOrInterpretationNodes == null) {
+                            ref.selectedOrInterpretationNodes = new TreeSet<>();
                         }
-                        ref.selectedOrInterprNodes.add(this);
+                        ref.selectedOrInterpretationNodes.add(this);
                     } else {
-                        ref.selectedOrInterprNodes.remove(this);
+                        ref.selectedOrInterpretationNodes.remove(this);
                     }
                 }
             }
@@ -183,7 +183,7 @@ public class InterprNode implements Comparable<InterprNode> {
             isSelected = newSelected;
 
             if(!isBottom()) {
-                for (InterprNode cn : children) {
+                for (InterpretationNode cn : children) {
                     cn.changeSelectedRecursive(v);
                 }
             }
@@ -197,29 +197,29 @@ public class InterprNode implements Comparable<InterprNode> {
         if(visitedGetState == v) return true;
         visitedGetState = v;
 
-        for(InterprNode pn: parents) {
+        for(InterpretationNode pn: parents) {
             if(!pn.isSelected(v)) return false;
         }
         return true;
     }
 
 
-    private void computeLargestCommonSubsetIncremental(InterprNode no) {
-        if (orInterprNodes.size() == 0) {
+    private void computeLargestCommonSubsetIncremental(InterpretationNode no) {
+        if (orInterpretationNodes.size() == 0) {
             setLCS(no);
             return;
         }
         long vMin = doc.visitedCounter++;
-        List<InterprNode> results = new ArrayList<>();
+        List<InterpretationNode> results = new ArrayList<>();
         if(largestCommonSubset != null) {
             largestCommonSubset.computeLargestCommonSubsetRecursiveStep(results, doc.visitedCounter++, vMin, 2, 0);
         }
         no.computeLargestCommonSubsetRecursiveStep(results, doc.visitedCounter++, vMin, 2, 0);
-        setLCS(InterprNode.add(doc, true, results));
+        setLCS(InterpretationNode.add(doc, true, results));
     }
 
 
-    private void setLCS(InterprNode lcs) {
+    private void setLCS(InterpretationNode lcs) {
         if (largestCommonSubset != null) {
             largestCommonSubset.linkedByLCS.remove(this);
         }
@@ -233,7 +233,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    private void computeLargestCommonSubsetRecursiveStep(List<InterprNode> results, long v, long vMin, int s, int depth) {
+    private void computeLargestCommonSubsetRecursiveStep(List<InterpretationNode> results, long v, long vMin, int s, int depth) {
         if (visitedComputeLargestCommonSubset == v) return;
         if (visitedComputeLargestCommonSubset <= vMin) largestCommonSubsetCount = 0;
         visitedComputeLargestCommonSubset = v;
@@ -246,7 +246,7 @@ public class InterprNode implements Comparable<InterprNode> {
             return;
         }
 
-        for (InterprNode pn : parents) {
+        for (InterpretationNode pn : parents) {
             pn.computeLargestCommonSubsetRecursiveStep(results, v, vMin, s, depth + 1);
         }
 
@@ -256,16 +256,16 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public void addOrInterpretationNode(InterprNode n) {
-        if (orInterprNodes == null) {
-            orInterprNodes = new TreeSet<>();
+    public void addOrInterpretationNode(InterpretationNode n) {
+        if (orInterpretationNodes == null) {
+            orInterpretationNodes = new TreeSet<>();
         }
         computeLargestCommonSubsetIncremental(n);
-        orInterprNodes.add(n);
-        if (n.refByOrInterprNode == null) {
-            n.refByOrInterprNode = new TreeSet<>();
+        orInterpretationNodes.add(n);
+        if (n.refByOrInterpretationNode == null) {
+            n.refByOrInterpretationNode = new TreeSet<>();
         }
-        n.refByOrInterprNode.add(this);
+        n.refByOrInterpretationNode.add(this);
     }
 
 
@@ -279,49 +279,49 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public static InterprNode add(Document doc, boolean nonConflicting, InterprNode... input) {
-        ArrayList<InterprNode> in = new ArrayList<>();
-        for (InterprNode n : input) {
+    public static InterpretationNode add(Document doc, boolean nonConflicting, InterpretationNode... input) {
+        ArrayList<InterpretationNode> in = new ArrayList<>();
+        for (InterpretationNode n : input) {
             if (n != null && !n.isBottom()) in.add(n);
         }
         return add(doc, nonConflicting, in);
     }
 
 
-    public static InterprNode add(Document doc, boolean nonConflicting, List<InterprNode> inputs) {
+    public static InterpretationNode add(Document doc, boolean nonConflicting, List<InterpretationNode> inputs) {
         if (inputs.size() == 0) return doc.bottom;
 
-        for (Iterator<InterprNode> it = inputs.iterator(); it.hasNext(); ) {
+        for (Iterator<InterpretationNode> it = inputs.iterator(); it.hasNext(); ) {
             if (it.next().isBottom()) {
                 it.remove();
             }
         }
 
         if (inputs.size() == 1 || (inputs.size() == 2 && inputs.get(0) == inputs.get(1))) {
-            InterprNode n = inputs.get(0);
+            InterpretationNode n = inputs.get(0);
             if (nonConflicting && n.isConflicting(doc.visitedCounter++)) return null;
             return n;
         }
 
-        ArrayList<InterprNode> parents = new ArrayList<>();
-        ArrayList<InterprNode> children = new ArrayList<>();
+        ArrayList<InterpretationNode> parents = new ArrayList<>();
+        ArrayList<InterpretationNode> children = new ArrayList<>();
         computeRelations(doc, parents, children, inputs);
 
         if (parents.size() == 1) {
-            InterprNode n = parents.get(0);
+            InterpretationNode n = parents.get(0);
             if (nonConflicting && n.isConflicting(doc.visitedCounter++)) return null;
             return n;
         }
 
         if (nonConflicting) {
-            for (InterprNode p : parents) {
+            for (InterpretationNode p : parents) {
                 if (p.isConflicting(doc.visitedCounter++)) {
                     return null;
                 }
             }
         }
 
-        InterprNode n = new InterprNode(doc, -1, doc.interpretationIdCounter++);
+        InterpretationNode n = new InterpretationNode(doc, -1, doc.interpretationIdCounter++);
 
         n.linkRelations(parents, children, doc.visitedCounter++);
 
@@ -329,7 +329,7 @@ public class InterprNode implements Comparable<InterprNode> {
 
         n.minPrim = Integer.MAX_VALUE;
         n.maxPrim = Integer.MIN_VALUE;
-        for(InterprNode in: inputs) {
+        for(InterpretationNode in: inputs) {
             n.minPrim = Math.min(n.minPrim, in.minPrim);
             n.maxPrim = Math.max(n.maxPrim, in.maxPrim);
         }
@@ -338,15 +338,15 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    private static Comparator<InterprNode> LENGTH_COMP = new Comparator<InterprNode>() {
+    private static Comparator<InterpretationNode> LENGTH_COMP = new Comparator<InterpretationNode>() {
         @Override
-        public int compare(InterprNode n1, InterprNode n2) {
+        public int compare(InterpretationNode n1, InterpretationNode n2) {
             return Integer.compare(n2.length, n1.length);
         }
     };
 
 
-    private static void computeRelations(Document doc, List<InterprNode> parentsResults, List<InterprNode> childrenResults, List<InterprNode> inputs) {
+    private static void computeRelations(Document doc, List<InterpretationNode> parentsResults, List<InterpretationNode> childrenResults, List<InterpretationNode> inputs) {
         if (inputs.isEmpty()) return;
         long v = doc.visitedCounter++;
         int i = 0;
@@ -360,7 +360,7 @@ public class InterprNode implements Comparable<InterprNode> {
         }
 
         for(int pass = 0; pass <= 1; pass++) {
-            for (InterprNode n : inputs) {
+            for (InterpretationNode n : inputs) {
                 n.computeParents(parentsResults, v, pass);
             }
             v = doc.visitedCounter++;
@@ -369,7 +369,7 @@ public class InterprNode implements Comparable<InterprNode> {
         if(parentsResults.size() == 1) return;
         assert parentsResults.size() != 0;
 
-        for (InterprNode n : inputs) {
+        for (InterpretationNode n : inputs) {
             n.computeChildren(childrenResults, doc.visitedCounter++, v, inputs.size(), 0);
         }
 
@@ -377,16 +377,16 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    private void computeParents(List<InterprNode> parentResults, long v, int pass) {
+    private void computeParents(List<InterpretationNode> parentResults, long v, int pass) {
         if (visitedComputeParents == v || length == 0) return;
         visitedComputeParents = v;
 
-        for (InterprNode pn: parents) {
+        for (InterpretationNode pn: parents) {
             pn.computeParents(parentResults, v, pass);
         }
 
         boolean flag = true;
-        for(InterprNode cn: children) {
+        for(InterpretationNode cn: children) {
             if(pass == 0) {
                 if (cn.visitedNumberInnerInputs != v) {
                     cn.numberInnerInputs = 0;
@@ -407,7 +407,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    private void computeChildren(List<InterprNode> childrenResults, long v, long nv, int s, int pass) {
+    private void computeChildren(List<InterpretationNode> childrenResults, long v, long nv, int s, int pass) {
         if (visitedComputeChildren == v) return;
 
         if (pass == 0) {
@@ -421,7 +421,7 @@ public class InterprNode implements Comparable<InterprNode> {
 
         if(pass == 1 && numberOfInputsComputeChildren == s) {
             boolean covered = false;
-            for(InterprNode pn: parents) {
+            for(InterpretationNode pn: parents) {
                 if(pn.numberOfInputsComputeChildren == s) {
                     covered = true;
                     break;
@@ -432,7 +432,7 @@ public class InterprNode implements Comparable<InterprNode> {
                 childrenResults.add(this);
             }
         } else {
-            for (InterprNode cn : children) {
+            for (InterpretationNode cn : children) {
                 cn.computeChildren(childrenResults, v, nv, s, pass);
             }
         }
@@ -446,53 +446,53 @@ public class InterprNode implements Comparable<InterprNode> {
         if (primId >= 0) return 1;
 
         int result = 0;
-        for (InterprNode p : parents) {
+        for (InterpretationNode p : parents) {
             result += p.computeLength(v);
         }
         return result;
     }
 
 
-    private void linkRelations(List<InterprNode> pSet, List<InterprNode> cSet, long v) {
-        for (InterprNode p : pSet) {
+    private void linkRelations(List<InterpretationNode> pSet, List<InterpretationNode> cSet, long v) {
+        for (InterpretationNode p : pSet) {
             addLink(p, this);
         }
-        for (InterprNode c : cSet) {
+        for (InterpretationNode c : cSet) {
             c.visitedLinkRelations = v;
             addLink(this, c);
         }
 
-        for (InterprNode p : pSet) {
-            ArrayList<InterprNode> tmp = new ArrayList<>();
-            for (InterprNode c : p.children) {
+        for (InterpretationNode p : pSet) {
+            ArrayList<InterpretationNode> tmp = new ArrayList<>();
+            for (InterpretationNode c : p.children) {
                 if (c.visitedLinkRelations == v) {
                     tmp.add(c);
                 }
             }
 
-            for (InterprNode c : tmp) {
+            for (InterpretationNode c : tmp) {
                 removeLink(p, c);
             }
         }
     }
 
 
-    private static void addLink(InterprNode a, InterprNode b) {
+    private static void addLink(InterpretationNode a, InterpretationNode b) {
         a.children = Utils.addToArray(a.children, b);
         b.parents = Utils.addToArray(b.parents, a);
     }
 
 
-    private static void removeLink(InterprNode a, InterprNode b) {
+    private static void removeLink(InterpretationNode a, InterpretationNode b) {
         a.children = Utils.removeToArray(a.children, b);
         b.parents = Utils.removeToArray(b.parents, a);
     }
 
 
-    public static InterprNode addPrimitive(Document doc) {
+    public static InterpretationNode addPrimitive(Document doc) {
         assert doc != null;
 
-        InterprNode n = new InterprNode(doc, doc.bottom.children.length, doc.interpretationIdCounter++, 1);
+        InterpretationNode n = new InterpretationNode(doc, doc.bottom.children.length, doc.interpretationIdCounter++, 1);
 
         n.minPrim = n.primId;
         n.maxPrim = n.primId;
@@ -507,7 +507,7 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public boolean contains(boolean dir, InterprNode n, boolean followLCS) {
+    public boolean contains(boolean dir, InterpretationNode n, boolean followLCS) {
         boolean r;
         if (!dir) {
             r = contains(n, followLCS);
@@ -518,12 +518,12 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public boolean contains(InterprNode n, boolean followLCS) {
+    public boolean contains(InterpretationNode n, boolean followLCS) {
         return contains(n, followLCS, doc.visitedCounter++);
     }
 
 
-    private boolean contains(InterprNode n, boolean followLCS, long v) {
+    private boolean contains(InterpretationNode n, boolean followLCS, long v) {
         visitedContains = v;
 
         if(this == n || n.isBottom()) {
@@ -532,7 +532,7 @@ public class InterprNode implements Comparable<InterprNode> {
 
         if(!followLCS && length <= n.length) return false;
 
-        for(InterprNode p: parents) {
+        for(InterpretationNode p: parents) {
             if(n.maxPrim >= p.minPrim && n.minPrim <= p.maxPrim &&
                     (p.visitedContains != v && p.contains(n, followLCS, v))) {
                 return true;
@@ -547,14 +547,14 @@ public class InterprNode implements Comparable<InterprNode> {
     }
 
 
-    public void collectPrimitiveNodes(Collection<InterprNode> results, long v) {
+    public void collectPrimitiveNodes(Collection<InterpretationNode> results, long v) {
         if(v == visitedCollect) return;
         visitedCollect = v;
 
         if(primId >= 0) {
             results.add(this);
         } else {
-            for(InterprNode n: parents) {
+            for(InterpretationNode n: parents) {
                 n.collectPrimitiveNodes(results, v);
             }
         }
@@ -568,7 +568,7 @@ public class InterprNode implements Comparable<InterprNode> {
             if(visitedIsConflicting == v) return false;
             visitedIsConflicting = v;
 
-            for(InterprNode p : parents) {
+            for(InterpretationNode p : parents) {
                 if(p.isConflicting(v)) {
                     return true;
                 }
@@ -589,21 +589,21 @@ public class InterprNode implements Comparable<InterprNode> {
 
 
     private String toString(boolean level) {
-        SortedSet<InterprNode> ids = new TreeSet<>();
+        SortedSet<InterpretationNode> ids = new TreeSet<>();
         collectPrimitiveNodes(ids, doc.visitedCounter++);
 
         StringBuilder sb = new StringBuilder();
         sb.append("(");
         boolean f1 = true;
-        for(InterprNode n: ids) {
+        for(InterpretationNode n: ids) {
             if(!f1) sb.append(",");
             f1 = false;
             sb.append(n.primId);
             sb.append(n.state.s);
-            if(!level && n.orInterprNodes != null) {
+            if(!level && n.orInterpretationNodes != null) {
                 sb.append("[");
                 boolean f2 = true;
-                for(InterprNode on: n.orInterprNodes) {
+                for(InterpretationNode on: n.orInterpretationNodes) {
                     if(!f2) sb.append(",");
                     f2 = false;
                     sb.append(on.toString(true));
@@ -618,14 +618,14 @@ public class InterprNode implements Comparable<InterprNode> {
 
 
     @Override
-    public int compareTo(InterprNode n) {
+    public int compareTo(InterpretationNode n) {
         int r = Integer.compare(length, n.length);
         if(r != 0) return r;
         return Integer.compare(id, n.id);
     }
 
 
-    public static int compare(InterprNode oa, InterprNode ob) {
+    public static int compare(InterpretationNode oa, InterpretationNode ob) {
         if(oa == ob) return 0;
         if(oa == null && ob != null) return -1;
         if(oa != null && ob == null) return 1;

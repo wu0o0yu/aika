@@ -21,7 +21,7 @@ import org.aika.*;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.corpus.Document;
 import org.aika.training.PatternDiscovery.Config;
-import org.aika.corpus.InterprNode;
+import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.Activation;
@@ -62,7 +62,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public boolean isAllowedOption(int threadId, InterprNode n, NodeActivation act, long v) {
+    public boolean isAllowedOption(int threadId, InterpretationNode n, NodeActivation act, long v) {
         return false;
     }
 
@@ -83,7 +83,7 @@ public class OrNode extends Node<OrNode, Activation> {
         Range r = ak.range;
         Integer rid = Utils.nullSafeSub(ak.rid, true, ridOffset, false);
 
-        InterprNode no = lookupOrOption(doc, r, true);
+        InterpretationNode no = lookupOrOption(doc, r, true);
 
         if(neuron.get(doc).outputText != null) {
             int begin = r.begin != Integer.MIN_VALUE ? r.begin : 0;
@@ -107,7 +107,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     private boolean checkSelfReferencing(Document doc, NodeActivation inputAct) {
-        InterprNode o = lookupOrOption(doc, inputAct.key.range, false);
+        InterpretationNode o = lookupOrOption(doc, inputAct.key.range, false);
         if(o == null) return false;
         return inputAct.key.interpretation.contains(o, true);
     }
@@ -183,7 +183,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     // TODO: RID
-    public InterprNode lookupOrOption(Document doc, Range r, boolean create) {
+    public InterpretationNode lookupOrOption(Document doc, Range r, boolean create) {
         Activation act = Activation.select(doc, neuron.get(), null, r, Range.Relation.EQUALS, null, null)
                 .findFirst()
                 .orElse(null);
@@ -200,7 +200,7 @@ public class OrNode extends Node<OrNode, Activation> {
                 }
             }
         }
-        return create ? InterprNode.addPrimitive(doc) : null;
+        return create ? InterpretationNode.addPrimitive(doc) : null;
     }
 
 

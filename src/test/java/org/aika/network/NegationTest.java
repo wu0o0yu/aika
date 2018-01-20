@@ -18,12 +18,11 @@ package org.aika.network;
 
 
 import org.aika.Neuron;
-import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.corpus.Range.Relation;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.InterprNode;
+import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
@@ -86,13 +85,13 @@ public class NegationTest {
         System.out.println(doc.neuronActivationsToString(true, false, true));
         Assert.assertNotNull(Activation.get(doc, abcN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
-        InterprNode o1 = InterprNode.addPrimitive(doc);
+        InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
 
         inB.addInput(doc, 2, 7, o1);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        InterprNode o2 = InterprNode.addPrimitive(doc);
+        InterpretationNode o2 = InterpretationNode.addPrimitive(doc);
 
         inC.addInput(doc, 4, 9, o2);
 
@@ -154,12 +153,12 @@ public class NegationTest {
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        InterprNode ob = InterprNode.addPrimitive(doc);
+        InterpretationNode ob = InterpretationNode.addPrimitive(doc);
         inB.addInput(doc, 2, 7, ob);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
 
-        InterprNode oc = InterprNode.addPrimitive(doc);
+        InterpretationNode oc = InterpretationNode.addPrimitive(doc);
         inC.addInput(doc, 4, 9, oc);
 
         System.out.println(doc.neuronActivationsToString(true, false, true));
@@ -212,7 +211,7 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        InterprNode o = InterprNode.addPrimitive(doc);
+        InterpretationNode o = InterpretationNode.addPrimitive(doc);
 
         inS.addInput(doc, 3, 8, o);
 
@@ -272,7 +271,7 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        InterprNode o = InterprNode.addPrimitive(doc);
+        InterpretationNode o = InterpretationNode.addPrimitive(doc);
 
         inS.addInput(doc, 3, 8, o);
 
@@ -332,7 +331,7 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        InterprNode o = InterprNode.addPrimitive(doc);
+        InterpretationNode o = InterpretationNode.addPrimitive(doc);
 
         inA.addInput(doc, 0, 11);
 
@@ -437,7 +436,7 @@ public class NegationTest {
             System.out.println(doc.neuronActivationsToString(true, false, true));
 
             Assert.assertNotNull(Activation.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null));
-            Assert.assertEquals(2, Activation.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null).key.interpretation.orInterprNodes.size());
+            Assert.assertEquals(2, Activation.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null).key.interpretation.orInterpretationNodes.size());
 
             doc.clearActivations();
         }
@@ -455,8 +454,8 @@ public class NegationTest {
 //            Assert.assertNotNull(Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
             Assert.assertNotNull(Activation.get(doc, inS.get(), null, new Range(0, 9), Relation.EQUALS, null, null));
 //            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.interpretation.orInterprNodes.size());
-            Assert.assertEquals(1, Activation.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null).key.interpretation.orInterprNodes.size());
-            Assert.assertEquals(1, Activation.get(doc, inS.get(), null, new Range(0, 9), Relation.EQUALS, null, null).key.interpretation.orInterprNodes.size());
+            Assert.assertEquals(1, Activation.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null).key.interpretation.orInterpretationNodes.size());
+            Assert.assertEquals(1, Activation.get(doc, inS.get(), null, new Range(0, 9), Relation.EQUALS, null, null).key.interpretation.orInterpretationNodes.size());
 
             doc.clearActivations();
         }

@@ -18,7 +18,7 @@ package org.aika;
 
 
 import org.aika.corpus.Document;
-import org.aika.corpus.InterprNode;
+import org.aika.corpus.InterpretationNode;
 import org.aika.lattice.InputNode;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
@@ -96,7 +96,7 @@ public class Neuron extends Provider<INeuron> {
      * @param end   The range end
      * @param o     The interpretation node
      */
-    public Activation addInput(Document doc, int begin, int end, InterprNode o) {
+    public Activation addInput(Document doc, int begin, int end, InterpretationNode o) {
         return addInput(doc, begin, end, null, o);
     }
 
@@ -123,7 +123,7 @@ public class Neuron extends Provider<INeuron> {
      * @param rid   The relational id (e.g. the word position)
      * @param o     The interpretation node
      */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o) {
+    public Activation addInput(Document doc, int begin, int end, Integer rid, InterpretationNode o) {
         return addInput(doc, begin, end, rid, o, 1.0);
     }
 
@@ -138,7 +138,7 @@ public class Neuron extends Provider<INeuron> {
      * @param o     The interpretation node
      * @param value The activation value of this input activation
      */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value) {
+    public Activation addInput(Document doc, int begin, int end, Integer rid, InterpretationNode o, double value) {
         return addInput(doc, begin, end, rid, o, value, null, 0);
     }
 
@@ -153,7 +153,7 @@ public class Neuron extends Provider<INeuron> {
      * @param value The activation value of this input activation
      * @param targetValue The target activation value for supervised learning
      */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, Double targetValue, int fired) {
+    public Activation addInput(Document doc, int begin, int end, Integer rid, InterpretationNode o, double value, Double targetValue, int fired) {
         return get(doc).addInput(doc, begin, end, rid, o, value, targetValue, fired);
     }
 

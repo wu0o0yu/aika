@@ -18,19 +18,16 @@ package org.aika.network;
 
 
 import org.aika.Neuron;
-import org.aika.lattice.NodeActivation;
 import org.aika.neuron.Activation;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.InterprNode;
+import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
-import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
-import org.aika.lattice.OrNode;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
@@ -166,7 +163,7 @@ public class ActivationOutputsTest {
         ).get();
 
 
-        InterprNode o1 = InterprNode.addPrimitive(doc);
+        InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
         inA.addInput(doc, 0, 1, o1);
 
         Activation outB1 = Activation.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
@@ -192,7 +189,7 @@ public class ActivationOutputsTest {
         ).get();
 
 
-        inA.addInput(doc, 0, 1, InterprNode.addPrimitive(doc));
+        inA.addInput(doc, 0, 1, InterpretationNode.addPrimitive(doc));
 
         Activation outB1 = Activation.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
 
@@ -219,7 +216,7 @@ public class ActivationOutputsTest {
         ).get();
 
 
-        InterprNode o1 = InterprNode.addPrimitive(doc);
+        InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
         inA.addInput(doc, 0, 1, 0, o1);
         Activation outB1 = Activation.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
 

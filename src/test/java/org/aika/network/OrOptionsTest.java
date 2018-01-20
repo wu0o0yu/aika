@@ -22,9 +22,8 @@ import org.aika.lattice.NodeActivation;
 import org.aika.Input;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.InterprNode;
+import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
-import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.INeuron;
 import org.junit.Test;
@@ -69,16 +68,16 @@ public class OrOptionsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InterprNode o0 = InterprNode.addPrimitive(doc);
+        InterpretationNode o0 = InterpretationNode.addPrimitive(doc);
         Range r = new Range(0, 10);
         Node.addActivationAndPropagate(doc, new NodeActivation.Key(inA.get().node.get(), r, 0, o0), Collections.emptySet());
         doc.propagate();
 
-        InterprNode o1 = InterprNode.addPrimitive(doc);
+        InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
         Node.addActivationAndPropagate(doc, new NodeActivation.Key(inA.get().node.get(), r, 0, o1), Collections.emptySet());
         doc.propagate();
 
-        InterprNode o2 = InterprNode.addPrimitive(doc);
+        InterpretationNode o2 = InterpretationNode.addPrimitive(doc);
         Node.addActivationAndPropagate(doc, new NodeActivation.Key(inA.get().node.get(), r, 0, o2), Collections.emptySet());
         doc.propagate();
 

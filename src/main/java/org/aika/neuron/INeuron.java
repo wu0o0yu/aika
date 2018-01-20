@@ -26,7 +26,6 @@ import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.Synapse.Key;
-import org.aika.training.SupervisedTraining;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +39,7 @@ import static org.aika.lattice.Node.END_COMP;
 import static org.aika.lattice.Node.RID_COMP;
 import static org.aika.neuron.Activation.State.*;
 
-import static org.aika.corpus.InterprNode.State.SELECTED;
-import static org.aika.corpus.InterprNode.State.EXCLUDED;
-import static org.aika.corpus.InterprNode.State.UNKNOWN;
+import static org.aika.corpus.InterpretationNode.State.SELECTED;
 
 /**
  * The {@code INeuron} class represents a internal neuron implementation in Aikas neural network and is connected to other neurons through
@@ -189,12 +186,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      * @param o     The interpretation node
      * @param value The activation value of this input activation
      */
-    public Activation addInput(Document doc, int begin, int end, Integer rid, InterprNode o, double value, Double targetValue, int fired) {
+    public Activation addInput(Document doc, int begin, int end, Integer rid, InterpretationNode o, double value, Double targetValue, int fired) {
         Node.addActivationAndPropagate(doc, new NodeActivation.Key(node.get(doc), new Range(begin, end), rid, o), Collections.emptySet());
 
         doc.propagate();
 
-        Activation act = Activation.get(doc, this, rid, new Range(begin, end), Range.Relation.EQUALS, o, InterprNode.Relation.EQUALS);
+        Activation act = Activation.get(doc, this, rid, new Range(begin, end), Range.Relation.EQUALS, o, InterpretationNode.Relation.EQUALS);
         State s = new State(value, fired, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.inputValue = value;
@@ -271,7 +268,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public State computeWeight(int round, Activation act) {
-        InterprNode.State c = act.key.interpretation.state;
+        InterpretationNode.State c = act.key.interpretation.state;
 
         double[] sum = {biasSum, 0.0};
 
@@ -310,7 +307,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private State getInitialState(InterprNode.State c) {
+    private State getInitialState(InterpretationNode.State c) {
         return new State(
                 c == SELECTED ? 1.0 : 0.0,
                 0,
@@ -319,8 +316,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private State getInputState(int round, InterprNode o, Synapse s, Activation iAct) {
-        InterprNode io = iAct.key.interpretation;
+    private State getInputState(int round, InterpretationNode o, Synapse s, Activation iAct) {
+        InterpretationNode io = iAct.key.interpretation;
 
         State is = State.ZERO;
         if (s.key.isRecurrent) {
@@ -335,7 +332,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private List<InputState> getInputStates(Activation act, int round) {
-        InterprNode o = act.key.interpretation;
+        InterpretationNode o = act.key.interpretation;
         ArrayList<InputState> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
         InputState maxInputState = null;
@@ -371,13 +368,13 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
 
-    private static boolean checkSelfReferencing(InterprNode nx, InterprNode ny, int depth) {
+    private static boolean checkSelfReferencing(InterpretationNode nx, InterpretationNode ny, int depth) {
         if (nx == ny) return true;
 
         if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
 
-        if (ny.orInterprNodes != null) {
-            for (InterprNode n : ny.orInterprNodes) {
+        if (ny.orInterpretationNodes != null) {
+            for (InterpretationNode n : ny.orInterpretationNodes) {
                 if (checkSelfReferencing(nx, n, depth + 1)) return true;
             }
         }
@@ -386,13 +383,13 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private static boolean checkSelfReferencingForSelected(InterprNode nx, InterprNode ny, int depth) {
+    private static boolean checkSelfReferencingForSelected(InterpretationNode nx, InterpretationNode ny, int depth) {
         if (nx == ny || nx.contains(ny, true)) return true;
 
         if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
 
-        if (ny.selectedOrInterprNodes != null) {
-            for (InterprNode n : ny.selectedOrInterprNodes) {
+        if (ny.selectedOrInterpretationNodes != null) {
+            for (InterpretationNode n : ny.selectedOrInterpretationNodes) {
                 if (checkSelfReferencingForSelected(nx, n, depth + 1)) return true;
             }
         }
@@ -445,14 +442,14 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private static void addConflict(Document doc, InterprNode io, InterprNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
+    private static void addConflict(Document doc, InterpretationNode io, InterpretationNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
         if (o.markedConflict == v || o.state == SELECTED) {
             if (!isAllowed(doc, io, o, inputActs)) {
                 Conflicts.add(act, io, o);
             }
         } else {
-            if(o.orInterprNodes != null) {
-                for (InterprNode no : o.orInterprNodes) {
+            if(o.orInterpretationNodes != null) {
+                for (InterpretationNode no : o.orInterpretationNodes) {
                     addConflict(doc, io, no, act, inputActs, v);
                 }
             }
@@ -460,7 +457,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    private static boolean isAllowed(Document doc, InterprNode io, InterprNode o, Collection<NodeActivation> inputActs) {
+    private static boolean isAllowed(Document doc, InterpretationNode io, InterpretationNode o, Collection<NodeActivation> inputActs) {
         if (io != null && o.contains(io, false)) return true;
         for (NodeActivation act : inputActs) {
             if (act.key.node.isAllowedOption(doc.threadId, o, act, doc.visitedCounter++)) return true;

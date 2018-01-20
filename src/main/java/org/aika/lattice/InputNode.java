@@ -20,7 +20,7 @@ package org.aika.lattice;
 import org.aika.*;
 import org.aika.corpus.Document;
 import org.aika.training.PatternDiscovery.Config;
-import org.aika.corpus.InterprNode;
+import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode.Refinement;
@@ -119,7 +119,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    public boolean isAllowedOption(int threadId, InterprNode n, NodeActivation act, long v) {
+    public boolean isAllowedOption(int threadId, InterpretationNode n, NodeActivation act, long v) {
         return false;
     }
 
@@ -180,7 +180,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         s.forEach(secondIAct -> {
                     NodeActivation secondAct = secondNode.getInputNodeActivation(secondIAct);
                     if(secondAct != null) {
-                        InterprNode o = InterprNode.add(doc, true, ak.interpretation, secondIAct.key.interpretation);
+                        InterpretationNode o = InterpretationNode.add(doc, true, ak.interpretation, secondIAct.key.interpretation);
                         if (o != null) {
                             Node.addActivationAndPropagate(doc,
                                     new NodeActivation.Key(

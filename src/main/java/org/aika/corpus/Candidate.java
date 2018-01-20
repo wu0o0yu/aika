@@ -11,7 +11,7 @@ public class Candidate  implements Comparable<Candidate> {
     public Boolean cachedSNDecision;
     public SearchNode cachedSearchNode;
 
-    public InterprNode refinement;
+    public InterpretationNode refinement;
 
     int[] debugCounts = new int[3];
     int[] debugDecisionCounts = new int[3];
@@ -23,7 +23,7 @@ public class Candidate  implements Comparable<Candidate> {
     int maxEnd;
     Integer minRid;
 
-    public Candidate(InterprNode ref, int id) {
+    public Candidate(InterpretationNode ref, int id) {
         this.refinement = ref;
         this.id = id;
         ref.candidate = this;

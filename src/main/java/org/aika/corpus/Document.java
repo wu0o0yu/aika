@@ -33,8 +33,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.aika.corpus.InterprNode.State.SELECTED;
-import static org.aika.corpus.InterprNode.State.UNKNOWN;
+import static org.aika.corpus.InterpretationNode.State.SELECTED;
+import static org.aika.corpus.InterpretationNode.State.UNKNOWN;
 
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
@@ -62,7 +62,7 @@ public class Document implements Comparable<Document> {
     public int searchNodeIdCounter = 0;
     public int searchStepCounter = 0;
 
-    public InterprNode bottom = new InterprNode(this, -1, 0, 0);
+    public InterpretationNode bottom = new InterpretationNode(this, -1, 0, 0);
 
     public Model model;
     public int threadId;
@@ -88,9 +88,9 @@ public class Document implements Comparable<Document> {
 
     public SearchNode rootSearchNode = new SearchNode(this, null, null, null, -1, Collections.emptySet(), false);
     public SearchNode selectedSearchNode = null;
-    public List<InterprNode> rootRefs;
+    public List<InterpretationNode> rootRefs;
     public ArrayList<Candidate> candidates;
-    public List<InterprNode> bestInterpretation = null;
+    public List<InterpretationNode> bestInterpretation = null;
 
 
     public static Comparator<NodeActivation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
@@ -170,7 +170,7 @@ public class Document implements Comparable<Document> {
     private void expandRootRefinement() {
         rootRefs = new ArrayList<>();
         rootRefs.add(bottom);
-        for (InterprNode pn : bottom.children) {
+        for (InterpretationNode pn : bottom.children) {
             if (pn.state == SELECTED || (pn.isPrimitive() && pn.conflicts.primary.isEmpty() && pn.conflicts.secondary.isEmpty())) {
                 rootRefs.add(pn);
             }
@@ -181,14 +181,14 @@ public class Document implements Comparable<Document> {
     public void generateCandidates() {
         TreeSet<Candidate> tmp = new TreeSet<>();
         int i = 0;
-        for (InterprNode cn : bottom.children) {
+        for (InterpretationNode cn : bottom.children) {
             if (cn.state == UNKNOWN) {
                 tmp.add(new Candidate(cn, i++));
             }
         }
 
         long v = visitedCounter++;
-        for (InterprNode n : rootRefs) {
+        for (InterpretationNode n : rootRefs) {
             markCandidateSelected(n, v);
         }
 
@@ -209,7 +209,7 @@ public class Document implements Comparable<Document> {
     }
 
 
-    private static void markCandidateSelected(InterprNode n, long v) {
+    private static void markCandidateSelected(InterpretationNode n, long v) {
         if (n.neuronActivations != null) {
             for (Activation act : n.neuronActivations) {
                 act.visited = v;
@@ -240,7 +240,7 @@ public class Document implements Comparable<Document> {
         SearchNode child = new SearchNode(this, rootSearchNode, null, c, 0, rootRefs, false);
         SearchNode.search(this, child);
 
-        ArrayList<InterprNode> results = new ArrayList<>();
+        ArrayList<InterpretationNode> results = new ArrayList<>();
         results.add(bottom);
         if (selectedSearchNode != null) {
             selectedSearchNode.reconstructSelectedResult(this);
@@ -365,7 +365,7 @@ public class Document implements Comparable<Document> {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         for (INeuron n : activatedNeurons) {
-            Stream<Activation> s = Activation.select(this, n, null, null, null, null, InterprNode.Relation.CONTAINED_IN);
+            Stream<Activation> s = Activation.select(this, n, null, null, null, null, InterpretationNode.Relation.CONTAINED_IN);
             acts.addAll(s.collect(Collectors.toList()));
         }
 
@@ -500,10 +500,10 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public NormWeight adjustWeight(SearchNode cand, Collection<InterprNode> changed, long visitedModified) {
+        public NormWeight adjustWeight(SearchNode cand, Collection<InterpretationNode> changed, long visitedModified) {
             long v = visitedCounter++;
 
-            for(InterprNode n: changed) {
+            for(InterpretationNode n: changed) {
                 addAllActs(n.getNeuronActivations());
             }
 
@@ -524,7 +524,7 @@ public class Document implements Comparable<Document> {
 
 
         public void add(int round, Activation act) {
-            if(act.rounds.isQueued(round) || act.key.interpretation.state == InterprNode.State.UNKNOWN) return;
+            if(act.rounds.isQueued(round) || act.key.interpretation.state == InterpretationNode.State.UNKNOWN) return;
 
             TreeSet<Activation> q;
             if(round < queue.size()) {
