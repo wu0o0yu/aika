@@ -51,12 +51,10 @@ public class LongTermLearningTest {
                                             Range.Output.DIRECT
                                     ),
                                     1.0,
-                                    true
+                                    SynapseEvaluation.DeleteMode.DELETE_IF_SIGN_CHANGES
                             );
                         })
         );
-
-        System.out.println();
     }
 
 }

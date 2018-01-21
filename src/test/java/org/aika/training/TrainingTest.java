@@ -26,6 +26,9 @@ import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.aika.training.SynapseEvaluation.DeleteMode.DELETE_IF_SIGN_CHANGES;
+import static org.aika.training.SynapseEvaluation.DeleteMode.NONE;
+
 /**
  *
  * @author Lukas Molzberger
@@ -67,7 +70,7 @@ public class TrainingTest {
                                 Range.Output.DIRECT
                         )
                         , 1.0
-                        , false
+                        , NONE
                 )
         );
 
@@ -130,7 +133,7 @@ public class TrainingTest {
                                             Range.Output.DIRECT
                                     ),
                                             1.0,
-                                            false
+                                            NONE
                                     )
                             )
             );

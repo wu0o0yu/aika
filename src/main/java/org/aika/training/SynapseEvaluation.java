@@ -16,16 +16,21 @@ public interface SynapseEvaluation {
      */
     Result evaluate(Synapse s, Activation iAct, Activation oAct);
 
+    enum DeleteMode {
+        NONE,
+        DELETE,
+        DELETE_IF_SIGN_CHANGES
+    }
 
     class Result {
-        public Result(Synapse.Key synapseKey, double significance, boolean deleteIfNull) {
+        public Result(Synapse.Key synapseKey, double significance, DeleteMode deleteMode) {
             this.synapseKey = synapseKey;
             this.significance = significance;
-            this.deleteIfNull = deleteIfNull;
+            this.deleteMode = deleteMode;
         }
 
         public Synapse.Key synapseKey;
         public double significance;
-        public boolean deleteIfNull;
+        public DeleteMode deleteMode;
     }
 }

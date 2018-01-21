@@ -27,6 +27,9 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static org.aika.training.SynapseEvaluation.DeleteMode.DELETE;
+import static org.aika.training.SynapseEvaluation.DeleteMode.DELETE_IF_SIGN_CHANGES;
+
 
 /**
  *
@@ -48,6 +51,7 @@ public class LongTermLearning {
         public double ltpLearnRate;
         public double ltdLearnRate;
         public double beta;
+        public boolean createNewSynapses;
 
 
         /**
@@ -78,6 +82,12 @@ public class LongTermLearning {
             this.beta = beta;
             return this;
         }
+
+
+        public Config setCreateNewSynapses(boolean createNewSynapses) {
+            this.createNewSynapses = createNewSynapses;
+            return this;
+        }
     }
 
 
@@ -106,20 +116,31 @@ public class LongTermLearning {
         double m = maxActValue > 0.0 ? Math.max(1.0, act.getFinalState().value / maxActValue) : 1.0;
         double x = config.ltpLearnRate * (1.0 - act.getFinalState().value) * m;
 
-        doc.getFinalActivations().filter(iAct -> iAct.key.node != act.key.node).forEach(iAct -> {
-            Result r = config.synapseEvaluation.evaluate(null, iAct, act);
-            double sDelta = iAct.getFinalState().value * x * r.significance;
-
-            if(sDelta > 0.0) {
-                Synapse synapse = Synapse.createOrLookup(r.synapseKey, iAct.key.node.neuron, act.key.node.neuron);
-
-                synapse.weightDelta += (float) sDelta;
-                synapse.biasDelta -= config.beta * sDelta;
-                assert !Double.isNaN(n.bias);
-            }
-        });
+        if(config.createNewSynapses) {
+            doc.getFinalActivations().filter(iAct -> iAct.key.node != act.key.node).forEach(iAct -> {
+                Result r = config.synapseEvaluation.evaluate(null, iAct, act);
+                synapseLTP(config, iAct, act, x, r);
+            });
+        } else {
+            act.getFinalInputActivations().forEach(sa -> {
+                Result r = config.synapseEvaluation.evaluate(sa.synapse, sa.input, act);
+                synapseLTP(config, sa.input, act, x, r);
+            });
+        }
 
         doc.notifyWeightsModified(n, n.inputSynapses.values());
+    }
+
+
+    private static void synapseLTP(Config config, Activation iAct, Activation act, double x, Result r) {
+        double sDelta = iAct.getFinalState().value * x * r.significance;
+
+        if(sDelta > 0.0) {
+            Synapse synapse = Synapse.createOrLookup(r.synapseKey, iAct.key.node.neuron, act.key.node.neuron);
+
+            synapse.weightDelta += (float) sDelta;
+            synapse.biasDelta -= config.beta * sDelta;
+        }
     }
 
 
@@ -147,7 +168,7 @@ public class LongTermLearning {
                     Result r = config.synapseEvaluation.evaluate(s, dir ? act : null, dir ? null : act);
                     s.weightDelta -= (float) (config.ltdLearnRate * act.getFinalState().value * r.significance);
 
-                    if(r.deleteIfNull && s.weight - s.weightDelta <= 0.0) {
+                    if(r.deleteMode == DELETE || (r.deleteMode == DELETE_IF_SIGN_CHANGES && s.weight - s.weightDelta <= 0.0)) {
                         s.toBeDeleted = true;
                     }
 

@@ -154,6 +154,13 @@ public class SupervisedTraining {
         Synapse synapse = Synapse.createOrLookup(ser.synapseKey, inputNeuron.provider, n.provider);
 
         synapse.weightDelta = (float) deltaW;
+
+        double ow = synapse.weight;
+        double nw = synapse.weight + synapse.weightDelta;
+
+        if(nw == 0.0 || (ow != 0.0 && ow > 0.0 != nw > 0.0)) {
+            synapse.toBeDeleted = true;
+        }
     }
 
 
