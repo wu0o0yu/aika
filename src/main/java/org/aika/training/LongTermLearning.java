@@ -88,6 +88,7 @@ public class LongTermLearning {
             longTermDepression(doc, config, act, false);
             longTermDepression(doc, config, act, true);
         });
+        doc.commit();
     }
 
 
@@ -101,17 +102,9 @@ public class LongTermLearning {
     public static void longTermPotentiation(Document doc, Config config, Activation act) {
         INeuron n = act.key.node.neuron.get();
 
-        double iaSum = 0.0;
-        for(Activation.SynapseActivation sa: act.getFinalInputActivations()) {
-            if(!sa.synapse.isNegative()) {
-                iaSum += sa.input.getFinalState().value * sa.synapse.weight;
-            }
-        }
-
-        // n.posDirSum wird bei Oder-Neuronen sehr groß.
-        double norm = n.posDirSum + n.posRecSum > 0.0 ? (iaSum / (n.posDirSum + n.posRecSum)) : 1.0;
-
-        double x = config.ltpLearnRate * (1.0 - act.getFinalState().value) * norm;
+        double maxActValue = n.activationFunction.f(n.biasSum + n.posDirSum + n.posRecSum);
+        double m = maxActValue > 0.0 ? Math.max(1.0, act.getFinalState().value / maxActValue) : 1.0;
+        double x = config.ltpLearnRate * (1.0 - act.getFinalState().value) * m;
 
         doc.getFinalActivations().filter(iAct -> iAct.key.node != act.key.node).forEach(iAct -> {
             Result r = config.synapseEvaluation.evaluate(null, iAct, act);

@@ -55,6 +55,8 @@ public class LongTermLearningTest {
                             );
                         })
         );
+
+        System.out.println();
     }
 
 }
