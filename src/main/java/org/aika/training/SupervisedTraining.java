@@ -108,7 +108,6 @@ public class SupervisedTraining {
     }
 
 
-
     public void computeOutputErrorSignal(Activation act) {
         if(act.targetValue != null) {
             act.errorSignal += act.targetValue - act.getFinalState().value;
@@ -164,8 +163,6 @@ public class SupervisedTraining {
     }
 
 
-
-
     public class BackPropagationQueue {
 
         public final TreeSet<Activation> queue = new TreeSet<>((act1, act2) -> {
@@ -198,5 +195,4 @@ public class SupervisedTraining {
             }
         }
     }
-
 }

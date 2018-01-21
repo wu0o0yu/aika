@@ -133,6 +133,8 @@ public class LongTermLearning {
 
 
     private static void synapseLTP(Config config, Activation iAct, Activation act, double x, Result r) {
+        if(r == null) return;
+
         double sDelta = iAct.getFinalState().value * x * r.significance;
 
         if(sDelta > 0.0) {
@@ -166,14 +168,16 @@ public class LongTermLearning {
                 .filter(s -> !s.isNegative() && !actSyns.contains(s))
                 .forEach(s -> {
                     Result r = config.synapseEvaluation.evaluate(s, dir ? act : null, dir ? null : act);
-                    s.weightDelta -= (float) (config.ltdLearnRate * act.getFinalState().value * r.significance);
+                    if(r != null) {
+                        s.weightDelta -= (float) (config.ltdLearnRate * act.getFinalState().value * r.significance);
 
-                    if(r.deleteMode == DELETE || (r.deleteMode == DELETE_IF_SIGN_CHANGES && s.weight - s.weightDelta <= 0.0)) {
-                        s.toBeDeleted = true;
-                    }
+                        if (r.deleteMode == DELETE || (r.deleteMode == DELETE_IF_SIGN_CHANGES && s.weight - s.weightDelta <= 0.0)) {
+                            s.toBeDeleted = true;
+                        }
 
-                    if (dir) {
-                        doc.notifyWeightsModified(s.output.get(), Collections.singletonList(s));
+                        if (dir) {
+                            doc.notifyWeightsModified(s.output.get(), Collections.singletonList(s));
+                        }
                     }
                 });
 
