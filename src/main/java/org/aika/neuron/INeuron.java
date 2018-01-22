@@ -192,16 +192,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         State s = new State(input.value, input.fired, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.inputValue = input.value;
-        act.targetValue = input.targetValue;
+        act.setTargetValue(input.targetValue);
 
         doc.inputNeuronActivations.add(act);
         doc.finallyActivatedNeurons.add(act.key.node.neuron.get(doc));
 
         doc.ubQueue.add(act);
-
-        if(input.targetValue != null) {
-            doc.supervisedTraining.targetActivations.add(act);
-        }
 
         doc.propagate();
 

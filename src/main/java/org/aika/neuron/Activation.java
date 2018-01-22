@@ -66,6 +66,16 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
+    public void setTargetValue(Double targetValue) {
+        this.targetValue = targetValue;
+        if(targetValue != null) {
+            doc.supervisedTraining.targetActivations.add(this);
+        } else {
+            doc.supervisedTraining.targetActivations.remove(this);
+        }
+    }
+
+
     public void addSynapseActivation(int dir, SynapseActivation sa) {
         if(dir == 0) {
             neuronOutputs.add(sa);
@@ -107,7 +117,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public boolean isFinalActivation() {
-        return getFinalState().value > 0.0 || (targetValue != null && targetValue > 0.0);
+        return getFinalState().value > 0.0;
     }
 
 

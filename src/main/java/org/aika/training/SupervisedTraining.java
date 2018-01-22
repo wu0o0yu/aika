@@ -96,7 +96,13 @@ public class SupervisedTraining {
         long v = doc.visitedCounter++;
 
         double x = learnRate * targetAct.errorSignal;
-        n.biasDelta += x;
+
+        if(n.biasSum + x > 0.0) {
+            n.biasDelta -= n.biasSum;
+        } else {
+            n.biasDelta += x;
+        }
+
         doc.getFinalActivations().forEach(iAct -> {
             Result r = se.evaluate(null, iAct, targetAct);
             if (r != null) {
