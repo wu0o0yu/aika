@@ -205,7 +205,7 @@ public class Synapse implements Writable {
 
     public boolean isConjunction(boolean v) {
         INeuron out = output.get();
-        return (v ? weightDelta + weight : weight) + (v ? out.biasSumDelta + out.biasSum : out.biasSum) <= 0.0;
+        return (v ? getNewWeight() : weight) + (v ? out.biasSumDelta + out.biasSum : out.biasSum) <= 0.0;
     }
 
 
@@ -215,7 +215,7 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S " + weight + " " + key.relativeRid + " B:" + key.rangeOutput.begin + " E:" + key.rangeOutput.end + " " +  input + "->" + output;
+        return "S OW:" + weight + " NW:" + (weight + weightDelta) + " " + key.relativeRid + " B:" + key.rangeOutput.begin + " E:" + key.rangeOutput.end + " " +  input + "->" + output;
     }
 
 
@@ -297,6 +297,16 @@ public class Synapse implements Writable {
             synapse.link();
         }
         return synapse;
+    }
+
+
+    public double getNewWeight() {
+        return weight + weightDelta;
+    }
+
+
+    public double getNewBias() {
+        return bias + biasDelta;
     }
 
 

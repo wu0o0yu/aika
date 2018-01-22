@@ -98,9 +98,9 @@ public class SupervisedTraining {
         double x = learnRate * targetAct.errorSignal;
         n.biasDelta += x;
         doc.getFinalActivations().forEach(iAct -> {
-            Result ser = se.evaluate(null, iAct, targetAct);
-            if (ser != null) {
-                trainSynapse(n, iAct, ser, x, v);
+            Result r = se.evaluate(null, iAct, targetAct);
+            if (r != null) {
+                trainSynapse(n, iAct, r, x, v);
             }
         });
 
@@ -139,7 +139,7 @@ public class SupervisedTraining {
     }
 
 
-    private void trainSynapse(INeuron n, Activation iAct, Result ser, double x, long v) {
+    private void trainSynapse(INeuron n, Activation iAct, Result r, double x, long v) {
         if (iAct.visited == v) return;
         iAct.visited = v;
 
@@ -147,19 +147,13 @@ public class SupervisedTraining {
         if(inputNeuron == n) {
             return;
         }
-        double deltaW = x * ser.significance * iAct.getFinalState().value;
+        double deltaW = x * r.significance * iAct.getFinalState().value;
 
-
-        Synapse synapse = Synapse.createOrLookup(ser.synapseKey, inputNeuron.provider, n.provider);
+        Synapse synapse = Synapse.createOrLookup(r.synapseKey, inputNeuron.provider, n.provider);
 
         synapse.weightDelta = (float) deltaW;
 
-        double ow = synapse.weight;
-        double nw = synapse.weight + synapse.weightDelta;
-
-        if(nw == 0.0 || (ow != 0.0 && ow > 0.0 != nw > 0.0)) {
-            synapse.toBeDeleted = true;
-        }
+        r.deleteMode.checkIfDelete(synapse);
     }
 
 

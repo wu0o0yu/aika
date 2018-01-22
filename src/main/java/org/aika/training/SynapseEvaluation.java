@@ -19,7 +19,29 @@ public interface SynapseEvaluation {
     enum DeleteMode {
         NONE,
         DELETE,
-        DELETE_IF_SIGN_CHANGES
+        DELETE_IF_SIGN_CHANGES,
+        DELETE_NEGATIVES,
+        DELETE_POSITIVES;
+
+        public void checkIfDelete(Synapse s) {
+            double ow = s.weight;
+            double nw = s.getNewWeight();
+
+            switch(this) {
+                case DELETE:
+                    s.toBeDeleted = true;
+                    break;
+                case DELETE_IF_SIGN_CHANGES:
+                    if(nw == 0.0 || (ow != 0.0 && nw > 0.0 != ow > 0.0)) s.toBeDeleted = true;
+                    break;
+                case DELETE_NEGATIVES:
+                    if(nw <= 0.0) s.toBeDeleted = true;
+                    break;
+                case DELETE_POSITIVES:
+                    if(nw >= 0.0) s.toBeDeleted = true;
+                    break;
+            }
+        }
     }
 
     class Result {

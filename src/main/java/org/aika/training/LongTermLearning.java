@@ -27,8 +27,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.aika.training.SynapseEvaluation.DeleteMode.DELETE;
-import static org.aika.training.SynapseEvaluation.DeleteMode.DELETE_IF_SIGN_CHANGES;
+import static org.aika.training.SynapseEvaluation.DeleteMode.*;
 
 
 /**
@@ -159,6 +158,8 @@ public class LongTermLearning {
      * @param dir
      */
     public static void longTermDepression(Document doc, Config config, Activation act, boolean dir) {
+        if(act.getFinalState().value <= 0.0) return;
+
         INeuron n = act.key.node.neuron.get();
 
         Set<Synapse> actSyns = new TreeSet<>(dir ? Synapse.OUTPUT_SYNAPSE_COMP : Synapse.INPUT_SYNAPSE_COMP);
@@ -171,9 +172,7 @@ public class LongTermLearning {
                     if(r != null) {
                         s.weightDelta -= (float) (config.ltdLearnRate * act.getFinalState().value * r.significance);
 
-                        if (r.deleteMode == DELETE || (r.deleteMode == DELETE_IF_SIGN_CHANGES && s.weight - s.weightDelta <= 0.0)) {
-                            s.toBeDeleted = true;
-                        }
+                        r.deleteMode.checkIfDelete(s);
 
                         if (dir) {
                             doc.notifyWeightsModified(s.output.get(), Collections.singletonList(s));

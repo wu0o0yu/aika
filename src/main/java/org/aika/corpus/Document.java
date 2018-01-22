@@ -137,8 +137,8 @@ public class Document implements Comparable<Document> {
 
 
     public Stream<Activation> getFinalActivations() {
-        return finallyActivatedNeurons.stream().
-                flatMap(in -> in.getFinalActivations(this).stream());
+        return finallyActivatedNeurons.stream()
+                .flatMap(in -> in.getFinalActivationsStream(this));
     }
 
 
