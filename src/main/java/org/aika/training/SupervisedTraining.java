@@ -116,7 +116,8 @@ public class SupervisedTraining {
 
     public void computeOutputErrorSignal(Activation act) {
         if(act.targetValue != null) {
-            act.errorSignal += act.targetValue - act.getFinalState().value;
+            double actValue = (act.targetValue > 0.0 ? act.getFinalState().value : act.upperBound);
+            act.errorSignal += act.targetValue - actValue;
         }
 
         updateErrorSignal(act);

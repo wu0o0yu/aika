@@ -816,8 +816,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      * @return A collection with all final activations of this neuron.
      */
     public Stream<Activation> getFinalActivationsStream(Document doc) {
-        Stream<Activation> s = Activation.select(doc, this, null, null, null, null, null);
-        return s.filter(act -> act.isFinalActivation());
+        return getActivationsStream(doc).filter(act -> act.isFinalActivation());
+    }
+
+
+    public Stream<Activation> getActivationsStream(Document doc) {
+        return Activation.select(doc, this, null, null, null, null, null);
     }
 
 

@@ -445,10 +445,14 @@ public final class Activation extends NodeActivation<OrNode> {
                 sb.append(" - FV:" + Utils.round(fs.value));
                 sb.append(" FW:" + Utils.round(fs.weight.w));
                 sb.append(" FN:" + Utils.round(fs.weight.n));
+            }
 
-                if(targetValue != null) {
-                    sb.append(" - TV:" + Utils.round(targetValue));
-                }
+            if(inputValue != null) {
+                sb.append(" - IV:" + Utils.round(inputValue));
+            }
+
+            if(targetValue != null) {
+                sb.append(" - TV:" + Utils.round(targetValue));
             }
         }
 
