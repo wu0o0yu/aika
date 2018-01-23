@@ -168,14 +168,16 @@ public class LongTermLearning {
         (dir ? n.outputSynapses : n.inputSynapses).values().stream()
                 .filter(s -> !s.isNegative() && !actSyns.contains(s))
                 .forEach(s -> {
-                    Result r = config.synapseEvaluation.evaluate(s, dir ? act : null, dir ? null : act);
-                    if(r != null) {
-                        s.weightDelta -= (float) (config.ltdLearnRate * act.getFinalState().value * r.significance);
+                    if(s.isConjunction(false) != dir) {
+                        Result r = config.synapseEvaluation.evaluate(s, dir ? act : null, dir ? null : act);
+                        if (r != null) {
+                            s.weightDelta -= (float) (config.ltdLearnRate * act.getFinalState().value * r.significance);
 
-                        r.deleteMode.checkIfDelete(s);
+                            r.deleteMode.checkIfDelete(s);
 
-                        if (dir) {
-                            doc.notifyWeightsModified(s.output.get(), Collections.singletonList(s));
+                            if (dir) {
+                                doc.notifyWeightsModified(s.output.get(), Collections.singletonList(s));
+                            }
                         }
                     }
                 });
