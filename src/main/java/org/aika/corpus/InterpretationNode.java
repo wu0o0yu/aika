@@ -526,11 +526,18 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     private boolean contains(InterpretationNode n, boolean followLCS, long v) {
         visitedContains = v;
 
+        if(!followLCS) {
+            if(primId >= 0 && n.primId >= 0) {
+                return primId == n.primId;
+            }
+            if(length <= n.length) {
+                return false;
+            }
+        }
+
         if(this == n || n.isBottom()) {
             return true;
         }
-
-        if(!followLCS && length <= n.length) return false;
 
         for(InterpretationNode p: parents) {
             if(n.maxPrim >= p.minPrim && n.minPrim <= p.maxPrim &&
