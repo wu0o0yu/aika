@@ -76,16 +76,16 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     // Only the children maps are locked.
     public ReadWriteLock lock = new ReadWriteLock();
 
-    public ThreadState<T, A>[] threads;
+    public ThreadState<T>[] threads;
 
     /**
      * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
      * a specific logic node.
      */
-    public static class ThreadState<T extends Node, A extends NodeActivation<T>> {
+    public static class ThreadState<T extends Node> {
         public long lastUsed;
 
-        public NavigableMap<Key, Set<NodeActivation<?>>> added;
+        public NavigableMap<Key<T>, Set<NodeActivation<?>>> added;
 
         public long visited;
 
@@ -139,8 +139,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public ThreadState<T, A> getThreadState(int threadId, boolean create) {
-        ThreadState<T, A> th = threads[threadId];
+    public ThreadState<T> getThreadState(int threadId, boolean create) {
+        ThreadState<T> th = threads[threadId];
         if (th == null) {
             if (!create) return null;
 
@@ -340,8 +340,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * @param ak
      * @param inputActs
      */
-    public static <T extends Node, A extends NodeActivation<T>> void addActivationAndPropagate(Document doc, Key<T> ak, Collection<NodeActivation<?>> inputActs) {
-        ThreadState<T, A> th = ak.node.getThreadState(doc.threadId, true);
+    public static <T extends Node> void addActivationAndPropagate(Document doc, Key<T> ak, Collection<NodeActivation<?>> inputActs) {
+        ThreadState<T> th = ak.node.getThreadState(doc.threadId, true);
         Set<NodeActivation<?>> iActs = th.added.get(ak);
         if (iActs == null) {
             iActs = new TreeSet<>();

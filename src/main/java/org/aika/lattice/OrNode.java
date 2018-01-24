@@ -192,7 +192,7 @@ public class OrNode extends Node<OrNode, Activation> {
             return act.key.interpretation;
         }
 
-        ThreadState<OrNode, Activation> th = getThreadState(doc.threadId, false);
+        ThreadState<OrNode> th = getThreadState(doc.threadId, false);
         if(th != null) {
             for (Key<OrNode> ak : th.added.keySet()) {
                 if (Range.compare(ak.range, r) == 0) {
