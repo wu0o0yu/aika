@@ -78,7 +78,6 @@ public class SearchNode implements Comparable<SearchNode> {
     Step step = Step.INIT;
     boolean alreadySelected;
     boolean alreadyExcluded;
-    Boolean cachedDecision;
     SearchNode selectedChild = null;
     SearchNode excludedChild = null;
     NormWeight selectedWeight = NormWeight.ZERO_WEIGHT;
@@ -234,7 +233,7 @@ public class SearchNode implements Comparable<SearchNode> {
      * @param doc
      * @param root
      */
-    public static void search(Document doc, SearchNode root) {
+    public static void searchIterative(Document doc, SearchNode root) {
         SearchNode sn = root;
         NormWeight returnWeight = null;
 
@@ -291,7 +290,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
         alreadySelected = precondition && !candidate.isConflicting();
         alreadyExcluded = !precondition || checkExcluded(candidate.refinement, doc.visitedCounter++);
-        cachedDecision = !alreadyExcluded ? candidate.cachedDecision : null;
 
         if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
             dumpDebugState();
@@ -311,7 +309,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if (alreadyExcluded || alreadySelected) {
             debugState = DebugState.LIMITED;
-        } else if (cachedDecision != null) {
+        } else if (getCachedDecision() != null) {
             debugState = DebugState.CACHED;
         } else {
             debugState = DebugState.EXPLORE;
@@ -320,9 +318,13 @@ public class SearchNode implements Comparable<SearchNode> {
         candidate.debugCounts[debugState.ordinal()]++;
     }
 
+    private Boolean getCachedDecision() {
+        return !alreadyExcluded ? candidate.cachedDecision : null;
+    }
+
 
     private boolean prepareSelectStep(Document doc) {
-        if(alreadyExcluded || !(cachedDecision == null || cachedDecision)) return false;
+        if(alreadyExcluded || !(getCachedDecision() == null || getCachedDecision())) return false;
 
         candidate.refinement.setState(SELECTED, visited);
 
@@ -340,7 +342,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean prepareExcludeStep(Document doc) {
-        if(alreadySelected || !(cachedDecision == null || !cachedDecision)) return false;
+        if(alreadySelected || !(getCachedDecision() == null || !getCachedDecision())) return false;
 
         candidate.refinement.setState(EXCLUDED, visited);
 
@@ -363,7 +365,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private NormWeight finalStep() {
         NormWeight result;
-        if (cachedDecision == null) {
+        if (getCachedDecision() == null) {
             boolean dir = selectedWeight.getNormWeight() >= excludedWeight.getNormWeight();
             dir = alreadySelected || (!alreadyExcluded && dir);
 
@@ -379,7 +381,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
             result = dir ? selectedWeight : excludedWeight;
         } else {
-            result = cachedDecision ? selectedWeight : excludedWeight;
+            result = getCachedDecision() ? selectedWeight : excludedWeight;
         }
 
         selectedChild = null;
@@ -424,7 +426,7 @@ public class SearchNode implements Comparable<SearchNode> {
                 if (!sa.synapse.isNegative()) {
                     Candidate posCand = sa.output.key.interpretation.candidate;
                     if (posCand != null) {
-                        if (posCand.cachedDecision == Boolean.FALSE && candidate.id < posCand.id) {
+                        if (posCand.cachedDecision == Boolean.FALSE && candidate.id > posCand.id) {
                             posCand.cachedDecision = null;
                             posCand.cachedSNDecision = null;
                         }
@@ -435,7 +437,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     for (InterpretationNode c : conflicting) {
                         Candidate negCand = c.candidate;
                         if (negCand != null) {
-                            if (negCand.cachedDecision == Boolean.TRUE && candidate.id < negCand.id) {
+                            if (negCand.cachedDecision == Boolean.TRUE && candidate.id > negCand.id) {
                                 negCand.cachedDecision = null;
                                 negCand.cachedSNDecision = null;
                             }

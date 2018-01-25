@@ -188,7 +188,7 @@ public class Document implements Comparable<Document> {
         TreeSet<Candidate> tmp = new TreeSet<>();
         int i = 0;
         for (InterpretationNode cn : bottom.children) {
-            if (cn.state == UNKNOWN) {
+            if (cn.state == UNKNOWN && cn.activation.upperBound > 0.0) {
                 tmp.add(new Candidate(cn, i++));
             }
         }
@@ -244,7 +244,8 @@ public class Document implements Comparable<Document> {
         Candidate c = !candidates.isEmpty() ? candidates.get(0) : null;
 
         SearchNode child = new SearchNode(this, rootSearchNode, null, c, 0, rootRefs, false);
-        SearchNode.search(this, child);
+        SearchNode.searchIterative(this, child);
+//        child.searchRecursive(this);
 
         ArrayList<InterpretationNode> results = new ArrayList<>();
         results.add(bottom);
