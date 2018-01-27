@@ -62,12 +62,6 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public boolean isAllowedOption(int threadId, InterpretationNode n, NodeActivation act, long v) {
-        return false;
-    }
-
-
-    @Override
     protected Activation createActivation(Document doc, NodeActivation.Key ak) {
         Activation act = new Activation(doc.activationIdCounter++, doc, ak);
         ak.interpretation.activation = act;

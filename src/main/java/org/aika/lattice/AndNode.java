@@ -78,19 +78,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    @Override
-    public boolean isAllowedOption(int threadId, InterpretationNode n, NodeActivation<?> act, long v) {
-        ThreadState th = getThreadState(threadId, true);
-        if(th.visited == v) return false;
-        th.visited = v;
-
-        for(NodeActivation pAct: act.inputs.values()) {
-            if(pAct.key.node.isAllowedOption(threadId, n, pAct, v)) return true;
-        }
-        return false;
-    }
-
-
     NodeActivation<AndNode> processAddedActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs) {
         if(inputActs.size() + numCombExpParents != level) {
             return null;

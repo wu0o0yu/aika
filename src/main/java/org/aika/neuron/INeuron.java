@@ -438,7 +438,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private static void addConflict(Document doc, InterpretationNode io, InterpretationNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
         if (o.markedConflict == v || o.state == SELECTED) {
-            if (!isAllowed(doc, io, o, inputActs)) {
+            if (!checkSelfReferencing(o, io, 0)) {
                 Conflicts.add(act, io, o);
             }
         } else {
@@ -448,15 +448,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 }
             }
         }
-    }
-
-
-    private static boolean isAllowed(Document doc, InterpretationNode io, InterpretationNode o, Collection<NodeActivation> inputActs) {
-        if (io != null && o.contains(io, false)) return true;
-        for (NodeActivation act : inputActs) {
-            if (act.key.node.isAllowedOption(doc.threadId, o, act, doc.visitedCounter++)) return true;
-        }
-        return false;
     }
 
 

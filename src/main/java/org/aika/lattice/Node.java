@@ -162,8 +162,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      */
     public abstract void propagateAddedActivation(Document doc, A act);
 
-    public abstract boolean isAllowedOption(int threadId, InterpretationNode n, NodeActivation<?> act, long v);
-
     public abstract double computeSynapseWeightSum(Integer offset, INeuron n);
 
     abstract void apply(Document doc, A act);

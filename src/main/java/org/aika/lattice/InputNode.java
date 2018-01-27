@@ -119,12 +119,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    public boolean isAllowedOption(int threadId, InterpretationNode n, NodeActivation act, long v) {
-        return false;
-    }
-
-
-    @Override
     Collection<Refinement> collectNodeAndRefinements(Refinement newRef) {
         List<Refinement> result = new ArrayList<>(2);
         result.add(new Refinement(key.relativeRid, newRef.rid, provider));
