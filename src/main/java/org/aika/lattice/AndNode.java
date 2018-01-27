@@ -146,10 +146,9 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                         Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
                         Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
-                        AndNode nln = createNextLevelNode(doc.model, doc.threadId, this, nRef, config);
+                        AndNode nln = createNextLevelNode(doc.model, doc.threadId, doc, this, nRef, config);
                         if(nln != null) {
                             nln.isDiscovered = true;
-                            doc.addedNodes.add(nln);
                         }
                     }
                 }
@@ -182,7 +181,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public static AndNode createNextLevelNode(Model m, int threadId, Node n, Refinement ref, Config config) {
+    public static AndNode createNextLevelNode(Model m, int threadId, Document doc, Node n, Refinement ref, Config config) {
         Provider<AndNode> pnln = n.getAndChild(ref);
         if(pnln != null) {
             return config != null ? null : pnln.get();
@@ -190,7 +189,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
         if(n.contains(ref)) return null;
 
-        SortedMap<Refinement, Provider<? extends Node>> parents = computeNextLevelParents(m, threadId, n, ref, config);
+        SortedMap<Refinement, Provider<? extends Node>> parents = computeNextLevelParents(m, threadId, doc, n, ref, config);
 
         AndNode nln = null;
         if (parents != null) {
@@ -205,6 +204,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
                 if(config == null || config.checkValidPattern.evaluate(nln)) {
                     nln.init();
+                    nln.postCreate(doc);
                 } else {
                     m.removeProvider(nln.provider);
                     nln = null;
@@ -215,16 +215,19 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                 pn.get().lock.releaseWriteLock();
             }
         }
+
         return nln;
     }
 
 
     public static void addNextLevelActivation(Document doc, NodeActivation<AndNode> act, NodeActivation<AndNode> secondAct, Provider<AndNode> pnlp) {
         // TODO: check if the activation already exists
+        AndNode nlp = pnlp.get(doc);
+        if(act.repropagateV != null && act.repropagateV != nlp.markedCreated) return;
+
         Key ak = act.key;
         InterpretationNode o = InterpretationNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
         if (o != null) {
-            AndNode nlp = pnlp.get(doc);
             Node.addActivationAndPropagate(
                     doc,
                     new Key(
@@ -255,7 +258,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public static SortedMap<Refinement, Provider<? extends Node>> computeNextLevelParents(Model m, int threadId, Node pa, Refinement ref, Config config) {
+    public static SortedMap<Refinement, Provider<? extends Node>> computeNextLevelParents(Model m, int threadId, Document doc, Node pa, Refinement ref, Config config) {
         Collection<Refinement> refinements = pa.collectNodeAndRefinements(ref);
 
         long v = m.visitedCounter.addAndGet(1);
@@ -265,7 +268,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             SortedSet<Refinement> childInputs = new TreeSet<>(refinements);
             childInputs.remove(pRef);
             try {
-                if (!pRef.input.get().computeAndParents(m, threadId, pRef.getRelativePosition(), childInputs, parents, config, v)) {
+                if (!pRef.input.get().computeAndParents(m, threadId, doc, pRef.getRelativePosition(), childInputs, parents, config, v)) {
                     return null;
                 }
             } catch(ThreadState.RidOutOfRange e) {
@@ -298,6 +301,18 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         }
 
         return inputs;
+    }
+
+
+    @Override
+    public void reprocessInputs(Document doc) {
+        for(Provider<? extends Node> pp: parents.values()) {
+            Node<?, NodeActivation<?>> pn = pp.get();
+            for(NodeActivation act : pn.getActivations(doc)) {
+                act.repropagateV = markedCreated;
+                act.key.node.propagateAddedActivation(doc, act);
+            }
+        }
     }
 
 

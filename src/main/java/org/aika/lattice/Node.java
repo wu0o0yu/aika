@@ -76,16 +76,19 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     // Only the children maps are locked.
     public ReadWriteLock lock = new ReadWriteLock();
 
-    public ThreadState<T>[] threads;
+    public ThreadState<T, A>[] threads;
+
+    public long markedCreated;
 
     /**
      * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
      * a specific logic node.
      */
-    public static class ThreadState<T extends Node> {
+    public static class ThreadState<T extends Node, A extends NodeActivation> {
         public long lastUsed;
 
         public NavigableMap<Key<T>, Set<NodeActivation<?>>> added;
+        public TreeMap<Key, A> activations;
 
         public long visited;
 
@@ -97,6 +100,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         public ThreadState() {
             added = new TreeMap<>();
+            activations = new TreeMap<>(BEGIN_COMP);
         }
 
 
@@ -139,8 +143,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public ThreadState<T> getThreadState(int threadId, boolean create) {
-        ThreadState<T> th = threads[threadId];
+    public ThreadState<T, A> getThreadState(int threadId, boolean create) {
+        ThreadState<T, A> th = threads[threadId];
         if (th == null) {
             if (!create) return null;
 
@@ -169,6 +173,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public abstract void discover(Document doc, NodeActivation<T> act, Config config);
 
     abstract Collection<Refinement> collectNodeAndRefinements(Refinement newRef);
+
+    public abstract void reprocessInputs(Document doc);
 
     abstract boolean contains(Refinement ref);
 
@@ -221,6 +227,14 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if (r != 0) return r;
         return InterpretationNode.compare(k1.interpretation, k2.interpretation);
     };
+
+
+    public void postCreate(Document doc) {
+        if(doc != null) {
+            markedCreated = doc.createV;
+            doc.addedNodes.add(this);
+        }
+    }
 
 
     void addOrChild(OrEntry oe, boolean all) {
@@ -310,6 +324,12 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             ak.interpretation.activations = new TreeMap<>();
         }
         ak.interpretation.activations.put(ak, act);
+
+        ThreadState th = ak.node.getThreadState(doc.threadId, true);
+        if (th.activations.isEmpty()) {
+            doc.activatedNodes.add(ak.node);
+        }
+        th.activations.put(ak, act);
     }
 
 
@@ -338,8 +358,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * @param ak
      * @param inputActs
      */
-    public static <T extends Node> void addActivationAndPropagate(Document doc, Key<T> ak, Collection<NodeActivation<?>> inputActs) {
-        ThreadState<T> th = ak.node.getThreadState(doc.threadId, true);
+    public static <T extends Node, A extends NodeActivation<T>> void addActivationAndPropagate(Document doc, Key<T> ak, Collection<NodeActivation<?>> inputActs) {
+        ThreadState<T, A> th = ak.node.getThreadState(doc.threadId, true);
         Set<NodeActivation<?>> iActs = th.added.get(ak);
         if (iActs == null) {
             iActs = new TreeSet<>();
@@ -350,7 +370,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    boolean computeAndParents(Model m, int threadId, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Provider<? extends Node>> parents, Config config, long v) throws ThreadState.RidOutOfRange {
+    boolean computeAndParents(Model m, int threadId, Document doc, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Provider<? extends Node>> parents, Config config, long v) throws ThreadState.RidOutOfRange {
         RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
         if (nv.computeParents == v) return true;
         nv.computeParents = v;
@@ -371,12 +391,12 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
             if (cp == null) {
                 if (config != null) return false;
-                cp = AndNode.createNextLevelNode(m, threadId, this, nRef, config).provider;
+                cp = AndNode.createNextLevelNode(m, threadId, doc, this, nRef, config).provider;
                 if (cp == null) return false;
             }
 
             Integer nOffset = Utils.nullSafeMin(ref.getRelativePosition(), offset);
-            if (!cp.get().computeAndParents(m, threadId, nOffset, childInputs, parents, config, v)) {
+            if (!cp.get().computeAndParents(m, threadId, doc, nOffset, childInputs, parents, config, v)) {
                 return false;
             }
         }
@@ -386,6 +406,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public void remove() {
         assert !isRemoved;
+
+        clearActivations();
 
         lock.acquireWriteLock();
         setModified();
@@ -420,6 +442,34 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         if (th.visited == v) return;
         th.visited = v;
         numberOfNeuronRefs.addAndGet(d);
+    }
+
+
+    public Collection<A> getActivations(Document doc) {
+        ThreadState<T, A> th = getThreadState(doc.threadId, false);
+        if (th == null) return Collections.EMPTY_LIST;
+        return th.activations.values();
+    }
+
+
+    public void clearActivations(Document doc) {
+        clearActivations(doc.threadId);
+    }
+
+
+    public void clearActivations(int threadId) {
+        ThreadState th = getThreadState(threadId, false);
+        if (th == null) return;
+        th.activations.clear();
+
+        th.added.clear();
+    }
+
+
+    public void clearActivations() {
+        for (int i = 0; i < provider.model.numberOfThreads; i++) {
+            clearActivations(i);
+        }
     }
 
 

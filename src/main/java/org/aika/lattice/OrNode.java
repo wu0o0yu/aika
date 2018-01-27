@@ -112,7 +112,6 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-
     Activation processAddedActivation(Document doc, Key<OrNode> ak, Collection<NodeActivation> inputActs) {
         if (Document.APPLY_DEBUG_OUTPUT) {
             log.info("add: " + ak + " - " + ak.node);
@@ -186,7 +185,7 @@ public class OrNode extends Node<OrNode, Activation> {
             return act.key.interpretation;
         }
 
-        ThreadState<OrNode> th = getThreadState(doc.threadId, false);
+        ThreadState<OrNode, Activation> th = getThreadState(doc.threadId, false);
         if(th != null) {
             for (Key<OrNode> ak : th.added.keySet()) {
                 if (Range.compare(ak.range, r) == 0) {
@@ -201,6 +200,20 @@ public class OrNode extends Node<OrNode, Activation> {
     @Override
     Set<Refinement> collectNodeAndRefinements(Refinement newRef) {
         throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public void reprocessInputs(Document doc) {
+        for(TreeSet<Provider<Node>> ppSet: parents.values()) {
+            for(Provider<Node> pp: ppSet) {
+                Node<?, NodeActivation<?>> pn = pp.get();
+                for (NodeActivation act : pn.getActivations(doc)) {
+                    act.repropagateV = markedCreated;
+                    act.key.node.propagateAddedActivation(doc, act);
+                }
+            }
+        }
     }
 
 

@@ -745,7 +745,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public static boolean update(Model m, int threadId, Neuron pn, double biasDelta, Collection<Synapse> modifiedSynapses) {
+    public static boolean update(Model m, int threadId, Document doc, Neuron pn, double biasDelta, Collection<Synapse> modifiedSynapses) {
         INeuron n = pn.get();
         n.biasDelta += biasDelta;
         n.biasSumDelta += biasDelta;
@@ -754,7 +754,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         // s.link requires an updated n.biasSumDelta value.
         modifiedSynapses.forEach(s -> s.link());
 
-        return Converter.convert(m, threadId, n, modifiedSynapses);
+        return Converter.convert(m, threadId, doc, n, modifiedSynapses);
     }
 
 

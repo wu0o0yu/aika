@@ -71,6 +71,7 @@ public class Document implements Comparable<Document> {
     public ValueQueue vQueue = new ValueQueue();
     public UpperBoundQueue ubQueue = new UpperBoundQueue();
 
+    public TreeSet<Node> activatedNodes = new TreeSet<>();
     public TreeSet<INeuron> activatedNeurons = new TreeSet<>();
     public TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
     public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
@@ -91,6 +92,8 @@ public class Document implements Comparable<Document> {
     public List<InterpretationNode> rootRefs;
     public ArrayList<Candidate> candidates;
     public List<InterpretationNode> bestInterpretation = null;
+
+    public long createV;
 
 
     public static Comparator<NodeActivation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
@@ -284,32 +287,8 @@ public class Document implements Comparable<Document> {
      * It applies the weight and bias delta values and reflects the changes in the logic node structure.
      */
     public void commit() {
-        modifiedWeights.forEach((n, inputSyns) -> Converter.convert(model, threadId, n, inputSyns));
+        modifiedWeights.forEach((n, inputSyns) -> Converter.convert(model, threadId, this, n, inputSyns));
         modifiedWeights.clear();
-    }
-
-
-    public Collection<NodeActivation> getAllNodeActivations() {
-        long v = visitedCounter++;
-        TreeSet<NodeActivation> results = new TreeSet<>();
-        for(INeuron n: activatedNeurons) {
-            for(Activation act: n.getAllActivations(this)) {
-                collectNodeActivations(results, act, v);
-            }
-        }
-        return results;
-    }
-
-
-    private void collectNodeActivations(Collection<NodeActivation> results, NodeActivation<?> act, long v) {
-        if(act.visited == v) return;
-        act.visited = v;
-
-        results.add(act);
-
-        for(NodeActivation<?> oAct: act.outputs.values()) {
-            collectNodeActivations(results, oAct, v);
-        }
     }
 
 
@@ -319,8 +298,10 @@ public class Document implements Comparable<Document> {
      */
     public void clearActivations() {
         activatedNeurons.forEach(n -> n.clearActivations(this));
+        activatedNodes.forEach(n -> n.clearActivations(this));
 
         activatedNeurons.clear();
+        activatedNodes.clear();
         addedNodes.clear();
 
         if(model.lastCleanup[threadId] + CLEANUP_INTERVAL < id) {
@@ -393,6 +374,11 @@ public class Document implements Comparable<Document> {
             sb.append("\n Final SearchNode:" + selectedSearchNode.id + "  WeightSum:" + selectedSearchNode.accumulatedWeight.toString() + "\n");
         }
         return sb.toString();
+    }
+
+
+    public Stream<NodeActivation> getAllActivationsStream() {
+        return activatedNodes.stream().flatMap(n -> n.getActivations(this).stream());
     }
 
 

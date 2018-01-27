@@ -115,10 +115,10 @@ public class PatternDiscovery {
 
 
     public static void discover(Document doc, Config config) {
-        Collection<NodeActivation> allActs = doc.getAllNodeActivations();
-        allActs.forEach(act -> config.counter.count(act));
 
-        allActs.stream()
+        doc.getAllActivationsStream().forEach(act -> config.counter.count(act));
+
+        doc.getAllActivationsStream()
                 .filter(act -> config.checkExpandable.evaluate(act))
                 .forEach(act -> act.key.node.discover(doc, act, config));
     }

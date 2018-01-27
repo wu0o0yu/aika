@@ -16,6 +16,7 @@
  */
 package org.aika;
 
+import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
@@ -44,17 +45,19 @@ public class Converter {
     private Model model;
     private int threadId;
     private INeuron neuron;
+    private Document doc;
     private OrNode outputNode;
     private Collection<Synapse> modifiedSynapses;
 
 
-    public static boolean convert(Model m, int threadId, INeuron neuron, Collection<Synapse> modifiedSynapses) {
-        return new Converter(m, threadId, neuron, modifiedSynapses).convert();
+    public static boolean convert(Model m, int threadId, Document doc, INeuron neuron, Collection<Synapse> modifiedSynapses) {
+        return new Converter(m, threadId, doc, neuron, modifiedSynapses).convert();
     }
 
 
-    private Converter(Model model, int threadId, INeuron neuron, Collection<Synapse> modifiedSynapses) {
+    private Converter(Model model, int threadId, Document doc, INeuron neuron, Collection<Synapse> modifiedSynapses) {
         this.model = model;
+        this.doc = doc;
         this.neuron = neuron;
         this.threadId = threadId;
         this.modifiedSynapses = modifiedSynapses;
@@ -167,6 +170,7 @@ public class Converter {
                 InputNode iNode = InputNode.add(model, s.key.createInputNodeKey(), s.input.get());
                 iNode.setModified();
                 iNode.setSynapse(s);
+                iNode.postCreate(doc);
                 s.inputNode = iNode.provider;
             }
 
@@ -216,7 +220,7 @@ public class Converter {
         if (requiredNode == null) {
             nln = s.inputNode.get();
         } else {
-            nln = AndNode.createNextLevelNode(model, threadId, requiredNode, new AndNode.Refinement(s.key.relativeRid, offset, s.inputNode), null);
+            nln = AndNode.createNextLevelNode(model, threadId, doc, requiredNode, new AndNode.Refinement(s.key.relativeRid, offset, s.inputNode), null);
         }
         return nln;
     }

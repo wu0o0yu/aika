@@ -170,7 +170,7 @@ public class Neuron extends Provider<INeuron> {
             in.type = type;
         }
 
-        return INeuron.update(model, model.defaultThreadId, this, bias, is);
+        return INeuron.update(model, model.defaultThreadId, null, this, bias, is);
     }
 
 
@@ -180,7 +180,7 @@ public class Neuron extends Provider<INeuron> {
         s.weightDelta = input.weight;
         s.biasDelta = input.bias;
 
-        INeuron.update(model, model.defaultThreadId, this, 0.0, Collections.singletonList(s));
+        INeuron.update(model, model.defaultThreadId, null, this, 0.0, Collections.singletonList(s));
     }
 
 

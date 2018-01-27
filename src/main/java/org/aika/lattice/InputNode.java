@@ -88,7 +88,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    private NodeActivation.Key computeActivationKey(NodeActivation iAct) {
+    private NodeActivation.Key computeActivationKey(Activation iAct) {
         NodeActivation.Key ak = iAct.key;
         if ((key.absoluteRid != null && key.absoluteRid != ak.rid) || ak.interpretation.isConflicting(ak.interpretation.doc.visitedCounter++))
             return null;
@@ -102,7 +102,9 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    public void addActivation(Document doc, NodeActivation inputAct) {
+    public void addActivation(Document doc, Activation inputAct) {
+        if(inputAct.repropagateV != null && inputAct.repropagateV != markedCreated) return;
+
         NodeActivation.Key ak = computeActivationKey(inputAct);
 
         if (ak != null) {
@@ -115,6 +117,14 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         if (!key.isRecurrent) {
             apply(doc, act);
         }
+    }
+
+
+    public void reprocessInputs(Document doc) {
+        inputNeuron.get().getActivations(doc).forEach(act -> {
+            act.repropagateV = markedCreated;
+            act.key.node.propagateAddedActivation(doc, act);
+        });
     }
 
 
@@ -155,6 +165,8 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         Activation iAct = (Activation) act.inputs.firstEntry().getValue();
         AndNode nlp = pnlp.get(doc);
         if(nlp.combinatorialExpensive) return;
+
+        if(act.repropagateV != null && act.repropagateV != nlp.markedCreated) return;
 
         Activation.Key ak = act.key;
         Activation.Key iak = iAct.key;
@@ -222,11 +234,10 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                         rm.compare(secondAct.key.range, act.key.range)
                         ) {
                     in.visitedDiscover = v;
-                    AndNode nln = AndNode.createNextLevelNode(doc.model, doc.threadId, this, ref, config);
+                    AndNode nln = AndNode.createNextLevelNode(doc.model, doc.threadId, doc, this, ref, config);
 
                     if (nln != null) {
                         nln.isDiscovered = true;
-                        doc.addedNodes.add(nln);
                     }
                 }
             }
