@@ -61,6 +61,9 @@ public class MetaNetwork {
                     for(Activation.SynapseActivation sa: sAct.getFinalInputActivations()) {
                         Activation act = sa.input;
                         Neuron targetNeuron = act.key.node.neuron;
+
+                        doc.createV = doc.visitedCounter++;
+
                         boolean newNeuron = false;
                         if(targetNeuron.get().type == INeuron.Type.META) {
                             newNeuron = true;

@@ -115,6 +115,7 @@ public class PatternDiscovery {
 
 
     public static void discover(Document doc, Config config) {
+        doc.createV = doc.visitedCounter++;
 
         doc.getAllActivationsStream().forEach(act -> config.counter.count(act));
 
