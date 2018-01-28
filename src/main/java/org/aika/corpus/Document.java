@@ -204,6 +204,7 @@ public class Document implements Comparable<Document> {
         i = 0;
         candidates = new ArrayList<>();
         while (!tmp.isEmpty()) {
+            int oldSize = tmp.size();
             for (Candidate c : tmp) {
                 if (c.checkDependenciesSatisfied(v)) {
                     tmp.remove(c);
@@ -213,6 +214,12 @@ public class Document implements Comparable<Document> {
                     markCandidateSelected(c.refinement, v);
                     break;
                 }
+            }
+
+            if(tmp.size() == oldSize) {
+                log.error("Cycle detected in the activations that is not marked recurrent.");
+
+                throw new RuntimeException("Cycle detected in the activations that is not marked recurrent.");
             }
         }
     }
