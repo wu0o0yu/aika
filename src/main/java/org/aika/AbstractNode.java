@@ -30,7 +30,7 @@ public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> i
 
     public volatile int lastUsedDocumentId = 0;
 
-    volatile boolean modified;
+    public volatile boolean modified;
 
     public P provider;
 
