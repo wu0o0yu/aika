@@ -85,6 +85,7 @@ public class Document implements Comparable<Document> {
         return act1.compareTo(act2);
     });
     public TreeSet<Node> addedNodes = new TreeSet<>();
+    public ArrayList<NodeActivation> addedActivations = new ArrayList<>();
 
 
     public SearchNode rootSearchNode = new SearchNode(this, null, null, null, -1, Collections.emptySet(), false);
@@ -254,6 +255,8 @@ public class Document implements Comparable<Document> {
         rootRefs.forEach(n -> n.setState(SELECTED, rootSearchNode.visited));
 
         generateCandidates();
+
+        addedActivations.clear();
 
         Candidate c = !candidates.isEmpty() ? candidates.get(0) : null;
 

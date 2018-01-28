@@ -117,11 +117,17 @@ public class PatternDiscovery {
     public static void discover(Document doc, Config config) {
         doc.createV = doc.visitedCounter++;
 
+        doc.addedActivations.clear();
+
         doc.getAllActivationsStream().forEach(act -> config.counter.count(act));
 
         doc.getAllActivationsStream()
                 .filter(act -> config.checkExpandable.evaluate(act))
                 .forEach(act -> act.key.node.discover(doc, act, config));
+
+        doc.propagate();
+
+        doc.addedActivations.forEach(act -> config.counter.count(act));
     }
 
 }

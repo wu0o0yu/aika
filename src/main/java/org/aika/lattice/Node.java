@@ -330,6 +330,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             doc.activatedNodes.add(ak.node);
         }
         th.activations.put(ak, act);
+
+        doc.addedActivations.add(act);
     }
 
 
