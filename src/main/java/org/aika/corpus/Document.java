@@ -167,13 +167,17 @@ public class Document implements Comparable<Document> {
 
 
     public void propagate() {
+        for(Node n: addedNodes) {
+            n.reprocessInputs(this);
+        }
+        addedNodes.clear();
+
         boolean flag = true;
         while(flag) {
             queue.processChanges();
             flag = ubQueue.process();
         }
     }
-
 
 
     private void expandRootRefinement() {
@@ -297,7 +301,6 @@ public class Document implements Comparable<Document> {
         modifiedWeights.forEach((n, inputSyns) -> Converter.convert(model, threadId, this, n, inputSyns));
         modifiedWeights.clear();
     }
-
 
 
     /**
