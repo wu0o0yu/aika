@@ -97,11 +97,7 @@ public class SupervisedTraining {
 
         double x = learnRate * targetAct.errorSignal;
 
-        if(n.biasSum + x > 0.0) {
-            n.biasDelta -= n.biasSum;
-        } else {
-            n.biasDelta += x;
-        }
+        n.changeBias(x);
 
         doc.getFinalActivations().forEach(iAct -> {
             Result r = se.evaluate(null, iAct, targetAct);
@@ -118,7 +114,7 @@ public class SupervisedTraining {
         if(act.targetValue != null) {
             if(act.targetValue > 0.0) {
                 act.errorSignal += act.targetValue - act.getFinalState().value;
-            } else {
+            } else if(act.upperBound > 0.0) {
                 act.errorSignal += act.upperBound - 1.0;
             }
         }
