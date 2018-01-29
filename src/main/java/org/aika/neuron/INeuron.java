@@ -744,13 +744,28 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
     }
 
+    public void setBias(double b) {
+        double newBiasDelta = b - bias;
+        biasSumDelta += newBiasDelta - biasDelta;
+        biasDelta = newBiasDelta;
+    }
+
+
+    public void changeBias(double bd) {
+        biasDelta += bd;
+        biasSumDelta += bd;
+    }
+
+
+    public double getNewBiasSum() {
+        return biasSum + biasSumDelta;
+    }
+
 
     public static boolean update(Model m, int threadId, Document doc, Neuron pn, double biasDelta, Collection<Synapse> modifiedSynapses) {
         INeuron n = pn.get();
-        n.biasDelta += biasDelta;
-        n.biasSumDelta += biasDelta;
+        n.changeBias(biasDelta);
 
-        modifiedSynapses.forEach(s -> n.biasSumDelta += s.biasDelta);
         // s.link requires an updated n.biasSumDelta value.
         modifiedSynapses.forEach(s -> s.link());
 
@@ -868,6 +883,4 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             return "W:" + w + " N:" + n + " NW:" + getNormWeight();
         }
     }
-
-
 }

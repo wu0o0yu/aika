@@ -205,12 +205,25 @@ public class Synapse implements Writable {
 
     public boolean isConjunction(boolean v) {
         INeuron out = output.get();
-        return (v ? getNewWeight() : weight) + (v ? out.biasSumDelta + out.biasSum : out.biasSum) <= 0.0;
+        return (v ? getNewWeight() : weight) + (v ? out.getNewBiasSum() : out.biasSum) <= 0.0;
     }
 
 
     public boolean isNegative() {
         return weight <= 0.0;
+    }
+
+
+    public void changeBias(double bd) {
+        biasDelta += bd;
+        output.get().biasSumDelta += bd;
+    }
+
+
+    public void setBias(double b) {
+        double newBiasDelta = b - bias;
+        output.get().biasSumDelta += newBiasDelta - biasDelta;
+        biasDelta = newBiasDelta;
     }
 
 

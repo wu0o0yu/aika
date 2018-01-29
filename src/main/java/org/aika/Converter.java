@@ -156,11 +156,11 @@ public class Converter {
         double[][] sumDelta = new double[2][2];
         double maxRecurrentSumDelta = 0.0;
 
-        neuron.biasSum = 0.0;
+//        neuron.biasSum = 0.0;
         for (Synapse s : modifiedSynapses) {
             if(s.toBeDeleted) {
-                s.weightDelta = -s.weight;
-                s.biasDelta = -s.bias;
+                s.weightDelta -= s.weight;
+                s.setBias(0.0);
             }
 
             INeuron in = s.input.get();
@@ -187,8 +187,6 @@ public class Converter {
             s.bias += s.biasDelta;
             s.biasDelta = 0.0;
 
-            neuron.biasSum += s.bias;
-
             in.lock.releaseWriteLock();
 
             if(s.toBeDeleted) {
@@ -199,7 +197,8 @@ public class Converter {
         neuron.bias += neuron.biasDelta;
         neuron.biasDelta = 0.0;
 
-        neuron.biasSum += neuron.bias;
+        neuron.biasSum += neuron.biasSumDelta;
+        neuron.biasSumDelta = 0.0;
 
         neuron.biasSum = Math.min(neuron.biasSum, 0.0);
 

@@ -154,7 +154,7 @@ public class Neuron extends Provider<INeuron> {
         for (Synapse.Builder input : inputs) {
             Synapse s = input.getSynapse(this);
             s.weightDelta = input.weight;
-            s.biasDelta = input.bias;
+            s.setBias(input.bias);
             is.add(s);
         }
 
@@ -178,7 +178,7 @@ public class Neuron extends Provider<INeuron> {
         Synapse s = input.getSynapse(this);
 
         s.weightDelta = input.weight;
-        s.biasDelta = input.bias;
+        s.setBias(input.bias);
 
         INeuron.update(model, model.defaultThreadId, null, this, 0.0, Collections.singletonList(s));
     }

@@ -140,7 +140,7 @@ public class LongTermLearning {
             Synapse synapse = Synapse.createOrLookup(r.synapseKey, iAct.key.node.neuron, act.key.node.neuron);
 
             synapse.weightDelta += (float) sDelta;
-            synapse.biasDelta -= config.beta * sDelta;
+            synapse.changeBias(-config.beta * sDelta);
         }
     }
 
