@@ -69,6 +69,11 @@ public class Converter {
 
         initInputNodesAndComputeWeightSums();
 
+        if(neuron.biasSum + neuron.posDirSum + neuron.posRecSum <= 0.0) {
+            outputNode.removeParents(threadId, false);
+            return false;
+        }
+
         double remainingSum = 0.0;
         TreeSet<Synapse> tmp = new TreeSet<>(SYNAPSE_COMP);
         for(Synapse s: neuron.inputSynapses.values()) {

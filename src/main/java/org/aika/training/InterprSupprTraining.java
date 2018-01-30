@@ -43,8 +43,8 @@ public class InterprSupprTraining {
     public static void train(Document doc, Config config) {
         for(INeuron n: doc.activatedNeurons) {
             for(Activation act: n.getActivations(doc)) {
-                if(!act.isFinalActivation() && act.maxActValue > 0.0 && n.type != INeuron.Type.META) {
-                    act.errorSignal += config.learnRate * act.maxActValue;
+                if(!act.isFinalActivation() && act.upperBound > 0.0 && n.type != INeuron.Type.META) {
+                    act.errorSignal += config.learnRate * act.upperBound;
                 }
             }
         }
