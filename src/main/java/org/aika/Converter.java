@@ -159,7 +159,7 @@ public class Converter {
 //        neuron.biasSum = 0.0;
         for (Synapse s : modifiedSynapses) {
             if(s.toBeDeleted) {
-                s.weightDelta -= s.weight;
+                s.weightDelta = -s.weight;
                 s.setBias(0.0);
             }
 

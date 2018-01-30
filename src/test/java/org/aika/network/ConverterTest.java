@@ -197,4 +197,52 @@ public class ConverterTest {
 
     }
 
+
+    @Test
+    public void testConverter3() {
+        Model m = new Model();
+
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
+        Neuron inC = m.createNeuron("C");
+        Neuron inD = m.createNeuron("D");
+
+        Neuron out = Neuron.init(m.createNeuron("ABCD"),
+                -50.5,
+                INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setNeuron(inA)
+                        .setWeight(50.0)
+                        .setRecurrent(false)
+                        .setBias(0.0)
+                        .setRangeMatch(Relation.EQUALS)
+                        .setRangeOutput(Range.Output.DIRECT),
+                new Synapse.Builder()
+                        .setNeuron(inB)
+                        .setWeight(3.0)
+                        .setRecurrent(false)
+                        .setBias(0.0)
+                        .setRangeMatch(Relation.EQUALS)
+                        .setRangeOutput(Range.Output.DIRECT),
+                new Synapse.Builder()
+                        .setNeuron(inC)
+                        .setWeight(2.0)
+                        .setRecurrent(false)
+                        .setBias(0.0)
+                        .setRangeMatch(Relation.EQUALS)
+                        .setRangeOutput(Range.Output.DIRECT),
+                new Synapse.Builder()
+                        .setNeuron(inD)
+                        .setWeight(1.0)
+                        .setRecurrent(false)
+                        .setBias(0.0)
+                        .setRangeMatch(Relation.EQUALS)
+                        .setRangeOutput(Range.Output.DIRECT)
+        );
+
+        System.out.println(out.get().node.get().logicToString());
+        Assert.assertEquals(3, out.get().node.get().parents.firstEntry().getValue().size());
+
+    }
+
 }
