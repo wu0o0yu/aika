@@ -612,7 +612,11 @@ public class Document implements Comparable<Document> {
         activatedNeurons.stream()
                 .flatMap(n -> n.getAllActivations(this).stream())
                 .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)
-                .forEach(act -> log.error(act.key + " " + act.key.interpretation.state + " " + act.rounds));
+                .forEach(act -> {
+                    log.error(act.key + " " + act.key.interpretation.state + " " + act.rounds);
+                    log.error(act.linksToString());
+                    log.error("");
+                });
     }
 
 }

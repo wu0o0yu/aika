@@ -9,13 +9,13 @@ import org.aika.neuron.Activation;
 public class Candidate  implements Comparable<Candidate> {
     public Boolean cachedDecision;
     public Boolean cachedSNDecision;
-    public SearchNode cachedSearchNode;
+    public SearchNode[] cachedSearchNodes = new SearchNode[2];
 
     public InterpretationNode refinement;
 
     int[] debugCounts = new int[3];
     int[] debugDecisionCounts = new int[3];
-    int[] debugComputed = new int[2];
+    int[] debugComputed = new int[3];
 
     int id;
     int sequence = 0;
@@ -68,6 +68,7 @@ public class Candidate  implements Comparable<Candidate> {
                 " EXCLUDED:" + debugDecisionCounts[1] +
                 " SIM-CACHED:" + debugComputed[0] +
                 " SIM-COMPUTED:" + debugComputed[1] +
+                " MODIFIED:" + debugComputed[2] +
                 " " + refinement.activation.key.range +
                 " " + refinement.activation.key.interpretation +
                 " " + refinement.activation.key.node.neuron.get().label;

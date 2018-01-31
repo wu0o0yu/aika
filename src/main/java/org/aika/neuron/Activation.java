@@ -460,6 +460,16 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
+    public String linksToString() {
+        StringBuilder sb = new StringBuilder();
+        for(SynapseActivation sa: neuronInputs) {
+            sb.append("  " + sa.input.key.node.neuron.get().label + "  W:" + sa.synapse.weight + "\n");
+        }
+
+        return sb.toString();
+    }
+
+
     private String collapseText(String txt) {
         if (txt.length() <= 10) {
             return txt;
