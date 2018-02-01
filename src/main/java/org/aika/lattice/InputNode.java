@@ -305,9 +305,9 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
         if (inputNeuron != null) {
             sb.append(inputNeuron.id);
-            if (inputNeuron.get().label != null) {
+            if (inputNeuron.getLabel() != null) {
                 sb.append(",");
-                sb.append(inputNeuron.get().label);
+                sb.append(inputNeuron.getLabel());
             }
         }
 

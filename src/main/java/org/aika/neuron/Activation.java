@@ -1,5 +1,6 @@
 package org.aika.neuron;
 
+import org.aika.Neuron;
 import org.aika.Utils;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterpretationNode;
@@ -55,6 +56,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
     public long currentStateV;
     public StateChange currentStateChange;
+    public long markedDirty;
 
     public double errorSignal;
     public Double targetValue;
@@ -68,7 +70,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
     public void setTargetValue(Double targetValue) {
         this.targetValue = targetValue;
-        if(targetValue != null) {
+        if (targetValue != null) {
             doc.supervisedTraining.targetActivations.add(this);
         } else {
             doc.supervisedTraining.targetActivations.remove(this);
@@ -76,8 +78,23 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
+    public String getLabel() {
+        return getINeuron().label;
+    }
+
+
+    public INeuron getINeuron() {
+        return getNeuron().get(doc);
+    }
+
+
+    public Neuron getNeuron() {
+        return key.node.neuron;
+    }
+
+
     public void addSynapseActivation(int dir, SynapseActivation sa) {
-        if(dir == 0) {
+        if (dir == 0) {
             neuronOutputs.add(sa);
         } else {
             neuronInputs.add(sa);
@@ -86,11 +103,12 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public void removeSynapseActivation(int dir, SynapseActivation sa) {
-        if(dir == 0) {
+        if (dir == 0) {
             neuronOutputs.remove(sa);
         } else {
             neuronInputs.remove(sa);
-        };
+        }
+        ;
     }
 
 
@@ -140,7 +158,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
     public static Stream<Activation> select(Document doc, INeuron n, Integer rid, Range r, Range.Relation rr, InterpretationNode o, InterpretationNode.Relation or) {
         INeuron.ThreadState th = n.getThreadState(doc.threadId, false);
-        if(th == null) return Stream.empty();
+        if (th == null) return Stream.empty();
         return select(th, n, rid, r, rr, o, or);
     }
 
@@ -150,22 +168,22 @@ public final class Activation extends NodeActivation<OrNode> {
         int s = th.activations.size();
 
         Node node = n.node.get();
-        if(s == 0) return Stream.empty();
-        else if(s == 1) {
+        if (s == 0) return Stream.empty();
+        else if (s == 1) {
             results = th.activations
                     .values()
                     .stream();
-        } else if(rid != null) {
+        } else if (rid != null) {
             Key bk = new Key(node, Range.MIN, rid, InterpretationNode.MIN);
             Key ek = new Key(node, Range.MAX, rid, InterpretationNode.MAX);
 
-            if(th.activationsRid != null) {
+            if (th.activationsRid != null) {
                 results = th.activationsRid.subMap(bk, true, ek, true)
                         .values()
                         .stream();
             } else return Stream.empty();
         } else {
-            if(rr == null) {
+            if (rr == null) {
                 results = th.activations.values()
                         .stream();
             } else {
@@ -180,7 +198,7 @@ public final class Activation extends NodeActivation<OrNode> {
     public static Stream<Activation> getActivationsByRange(INeuron.ThreadState th, INeuron n, Integer rid, Range r, Range.Relation rr, InterpretationNode o, InterpretationNode.Relation or) {
         Collection<Activation> s;
         Node node = n.node.get();
-        if((rr.beginToBegin == GREATER_THAN_EQUAL || rr.beginToBegin == EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
+        if ((rr.beginToBegin == GREATER_THAN_EQUAL || rr.beginToBegin == EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
             int er = (rr.endToEnd == Range.Operator.LESS_THAN_EQUAL || rr.endToEnd == Range.Operator.EQUALS) && r.end != Integer.MAX_VALUE ? r.end : Integer.MAX_VALUE;
             s = th.activations.subMap(
                     new NodeActivation.Key(node, new Range(r.begin, Integer.MIN_VALUE), null, InterpretationNode.MIN),
@@ -189,7 +207,7 @@ public final class Activation extends NodeActivation<OrNode> {
                     true
             )
                     .values();
-        } else if((rr.beginToBegin == Range.Operator.LESS_THAN_EQUAL || rr.beginToBegin == Range.Operator.EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
+        } else if ((rr.beginToBegin == Range.Operator.LESS_THAN_EQUAL || rr.beginToBegin == Range.Operator.EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
             s = th.activations.descendingMap().subMap(
                     new NodeActivation.Key(node, new Range(r.begin, Integer.MAX_VALUE), null, InterpretationNode.MAX),
                     true,
@@ -220,11 +238,16 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public Integer getSequence() {
-        if(sequence != null) return sequence;
+        if (sequence != null) return sequence;
 
         sequence = 0;
         neuronInputs.stream().filter(sa -> !sa.synapse.key.isRecurrent).forEach(sa -> sequence = Math.max(sequence, sa.input.getSequence() + 1));
         return sequence;
+    }
+
+
+    public void markDirty(long v) {
+        markedDirty = Math.max(markedDirty, v);
     }
 
 
@@ -264,8 +287,6 @@ public final class Activation extends NodeActivation<OrNode> {
      *
      */
     public static class Rounds {
-        public long modified;
-
         private boolean[] isQueued = new boolean[3];
 
         public TreeMap<Integer, State> rounds = new TreeMap<>();
@@ -304,7 +325,6 @@ public final class Activation extends NodeActivation<OrNode> {
 
         public Rounds copy() {
             Rounds nr = new Rounds();
-            nr.modified = modified;
             nr.rounds.putAll(rounds);
             return nr;
         }
@@ -330,7 +350,6 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
         public void reset() {
-            modified = 0;
             rounds.clear();
             rounds.put(0, State.ZERO);
         }
@@ -349,12 +368,17 @@ public final class Activation extends NodeActivation<OrNode> {
             for(Map.Entry<Integer, State> me: rounds.entrySet()) {
                 State sa = me.getValue();
                 State sb = r.rounds.get(me.getKey());
-                if(sb == null || Utils.round(sa.value) != Utils.round(sb.value)) {
+                if(sb == null || Math.abs(sa.value - sb.value) > 0.0000001) {
                     return false;
                 }
             }
 
             return true;
+        }
+
+
+        public boolean isActive() {
+            return rounds.size() <= 1 && getLast().value > 0.0;
         }
     }
 
@@ -463,7 +487,7 @@ public final class Activation extends NodeActivation<OrNode> {
     public String linksToString() {
         StringBuilder sb = new StringBuilder();
         for(SynapseActivation sa: neuronInputs) {
-            sb.append("  " + sa.input.key.node.neuron.get().label + "  W:" + sa.synapse.weight + "\n");
+            sb.append("  " + sa.input.getLabel() + "  W:" + sa.synapse.weight + "\n");
         }
 
         return sb.toString();

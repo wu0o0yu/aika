@@ -17,6 +17,7 @@
 package org.aika.corpus;
 
 
+import org.aika.Utils;
 import org.aika.neuron.Activation.StateChange;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.neuron.Activation;
@@ -95,25 +96,31 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate c, int level, Collection<InterpretationNode> changed, boolean cached) {
+    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate c, int level, Collection<InterpretationNode> changed) {
         id = doc.searchNodeIdCounter++;
         this.level = level;
         visited = doc.visitedCounter++;
         selectedParent = selParent;
         excludedParent = exclParent;
 
+        SearchNode pn = getParent();
         SearchNode lsn = null;
+        boolean cached = false;
         boolean modified = true;
         if (c != null) {
             candidate = c;
 
-            lsn = candidate.cachedSearchNode;
-            if (lsn != null && cached) {
-                modified = lsn.checkInputActModified();
+            lsn = candidate.cachedSearchNodes;
+            if (lsn != null && candidate.cachedSNDecision != null && candidate.cachedSNDecision == getDecision()) {
+                modified = lsn.isModified();
+
+                if (pn != null && pn.candidate != null && modified) {
+                    pn.candidate.debugComputed[2]++;
+                }
+                cached = true;
             }
-
-
-/*            if(cached) {
+            /*
+            if(cached && !modified) {
                 candidate.cachedSearchNode.changeState(StateChange.Mode.NEW);
                 weightDelta = candidate.cachedSearchNode.weightDelta;
 
@@ -123,23 +130,34 @@ public class SearchNode implements Comparable<SearchNode> {
                 return;
 
             }
+
+            candidate.cachedSearchNode = this;
             */
-//            candidate.cachedSearchNode = this;
         }
         boolean cachedSim = cached && !modified && lsn != null;
 
-        weightDelta = doc.vQueue.adjustWeight(this, changed, cachedSim ? lsn.visited : visited);
+        weightDelta = doc.vQueue.adjustWeight(this, changed);
 
-/*        if (cachedSim) {
-            if (Utils.round(weightDelta.w) != Utils.round(lsn.weightDelta.w)) {
+        if(!cachedSim) {
+            markDirty();
+        }
+        if(candidate != null) {
+            candidate.cachedSNDecision = getDecision();
+        }
+
+        if (cachedSim) {
+            if (Math.abs(weightDelta.w - lsn.weightDelta.w) > 0.00001) {
                 System.out.println();
             }
             if (!compareNewState(lsn)) {
                 System.out.println();
             }
         }
-*/
-        SearchNode pn = getParent();
+
+        if(candidate != null && modified) {
+            candidate.cachedSearchNodes = this;
+        }
+
         if (pn != null && pn.candidate != null) {
             pn.candidate.debugComputed[cachedSim ? 0 : 1]++;
         }
@@ -151,6 +169,44 @@ public class SearchNode implements Comparable<SearchNode> {
             log.info("Search Step: " + id + "  Candidate Weight Delta: " + weightDelta);
             log.info(doc.neuronActivationsToString(true, true, false) + "\n");
         }
+    }
+
+
+    private boolean isModified() {
+        for (StateChange sc : modifiedActs) {
+            if (sc.getActivation().markedDirty > visited) {
+                return true;
+            }
+            if(sc.newRounds.isActive()) {
+                for (SynapseActivation sa : sc.getActivation().neuronOutputs) {
+                    if (sa.output.key.interpretation.state != UNKNOWN &&
+                            sa.output.markedDirty > visited) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    public boolean compareNewState(SearchNode cachedNode) {
+        if (modifiedActs == null && cachedNode.modifiedActs == null) return true;
+        if (modifiedActs == null || cachedNode.modifiedActs == null) return false;
+
+        if (modifiedActs.size() != cachedNode.modifiedActs.size()) {
+            return false;
+        }
+        for (int i = 0; i < modifiedActs.size(); i++) {
+            StateChange sca = modifiedActs.get(i);
+            StateChange scb = cachedNode.modifiedActs.get(i);
+
+            if (!sca.newRounds.compare(scb.newRounds)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
@@ -175,7 +231,7 @@ public class SearchNode implements Comparable<SearchNode> {
         for (StateChange sc : modifiedActs) {
             Activation act = sc.getActivation();
             if (act.isFinalActivation()) {
-                doc.finallyActivatedNeurons.add(act.key.node.neuron.get(doc));
+                doc.finallyActivatedNeurons.add(act.getINeuron());
             }
         }
     }
@@ -333,7 +389,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         Candidate c = doc.candidates.size() > level + 1 ? doc.candidates.get(level + 1) : null;
-        selectedChild = new SearchNode(doc, this, excludedParent, c, level + 1, Collections.singleton(candidate.refinement), candidate.cachedSNDecision == Boolean.TRUE);
+        selectedChild = new SearchNode(doc, this, excludedParent, c, level + 1, Collections.singleton(candidate.refinement));
 
         candidate.debugDecisionCounts[0]++;
 
@@ -347,7 +403,7 @@ public class SearchNode implements Comparable<SearchNode> {
         candidate.refinement.setState(EXCLUDED, visited);
 
         Candidate c = doc.candidates.size() > level + 1 ? doc.candidates.get(level + 1) : null;
-        excludedChild = new SearchNode(doc, selectedParent, this, c, level + 1, Collections.singleton(candidate.refinement), candidate.cachedSNDecision == Boolean.FALSE);
+        excludedChild = new SearchNode(doc, selectedParent, this, c, level + 1, Collections.singleton(candidate.refinement));
 
         candidate.debugDecisionCounts[1]++;
 
@@ -373,12 +429,6 @@ public class SearchNode implements Comparable<SearchNode> {
                 candidate.cachedDecision = dir;
             }
 
-            candidate.cachedSNDecision = dir;
-            SearchNode csn = dir ? selectedChild : excludedChild;
-            if (csn.candidate != null) {
-                csn.candidate.cachedSearchNode = csn;
-            }
-
             result = dir ? selectedWeight : excludedWeight;
         } else {
             result = getCachedDecision() ? selectedWeight : excludedWeight;
@@ -397,29 +447,6 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean checkInputActModified() {
-        for (StateChange sc : modifiedActs) {
-            if (checkInputActModified(sc.getActivation())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    private boolean checkInputActModified(Activation act) {
-        if (act.rounds.modified > visited) {
-            return true;
-        }
-        for (SynapseActivation sa : act.neuronInputs) {
-            if (sa.input.rounds.modified > visited) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
     private void invalidateCachedDecisions(long v) {
         for (Activation act : candidate.refinement.neuronActivations) {
             for (SynapseActivation sa : act.neuronOutputs) {
@@ -428,7 +455,6 @@ public class SearchNode implements Comparable<SearchNode> {
                     if (posCand != null) {
                         if (posCand.cachedDecision == Boolean.FALSE && candidate.id > posCand.id) {
                             posCand.cachedDecision = null;
-                            posCand.cachedSNDecision = null;
                         }
                     }
 
@@ -439,7 +465,6 @@ public class SearchNode implements Comparable<SearchNode> {
                         if (negCand != null) {
                             if (negCand.cachedDecision == Boolean.TRUE && candidate.id > negCand.id) {
                                 negCand.cachedDecision = null;
-                                negCand.cachedSNDecision = null;
                             }
                         }
                     }
@@ -487,6 +512,7 @@ public class SearchNode implements Comparable<SearchNode> {
         StringBuilder sb = new StringBuilder();
         for (InterpretationNode n : tmp) {
             sb.append(n.primId);
+            sb.append(" Decision:" + getDecision());
             sb.append(", ");
         }
 
@@ -507,23 +533,29 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public boolean compareNewState(SearchNode cachedNode) {
-        if (modifiedActs == null && cachedNode.modifiedActs == null) return true;
-        if (modifiedActs == null || cachedNode.modifiedActs == null) return false;
 
-        if (modifiedActs.size() != cachedNode.modifiedActs.size()) {
-            return false;
+    private void markDirty() {
+        if(candidate == null) return;
+
+        SearchNode lsn = candidate.cachedSearchNodes;
+        boolean decisionChanged = candidate.cachedSNDecision == null || candidate.cachedSNDecision != getDecision();
+
+        if(decisionChanged && getParent().candidate != null) {
+            getParent().candidate.refinement.activation.markDirty(visited);
         }
+
         for (int i = 0; i < modifiedActs.size(); i++) {
             StateChange sca = modifiedActs.get(i);
-            StateChange scb = cachedNode.modifiedActs.get(i);
+            StateChange scb = lsn != null && lsn.modifiedActs.size() > i ? lsn.modifiedActs.get(i) : null;
 
-            if (!sca.newRounds.compare(scb.newRounds)) {
-                return false;
+            assert scb == null || sca.getActivation() == scb.getActivation();
+
+            if (scb == null || decisionChanged || !sca.newRounds.compare(scb.newRounds)) {
+                for (Activation.SynapseActivation sa : sca.getActivation().neuronOutputs) {
+                    sa.output.markDirty(visited);
+                }
             }
         }
-
-        return true;
     }
 
 
@@ -532,7 +564,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean getDecision() {
+    public boolean getDecision() {
         return excludedParent == null || selectedParent.id > excludedParent.id;
     }
 }

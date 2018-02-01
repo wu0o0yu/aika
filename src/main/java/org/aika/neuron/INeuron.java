@@ -195,7 +195,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         act.setTargetValue(input.targetValue);
 
         doc.inputNeuronActivations.add(act);
-        doc.finallyActivatedNeurons.add(act.key.node.neuron.get(doc));
+        doc.finallyActivatedNeurons.add(act.getINeuron());
 
         doc.ubQueue.add(act);
 

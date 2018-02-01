@@ -83,7 +83,7 @@ public class SupervisedTraining {
         }
 
         for (Activation act : errorSignalActivations) {
-            train(act.key.node.neuron.get(doc), act, config.learnRate, config.synapseEvaluation);
+            train(act.getINeuron(), act, config.learnRate, config.synapseEvaluation);
         }
         errorSignalActivations.clear();
     }
@@ -149,7 +149,7 @@ public class SupervisedTraining {
         if (iAct.visited == v) return;
         iAct.visited = v;
 
-        INeuron inputNeuron = iAct.key.node.neuron.get(doc);
+        INeuron inputNeuron = iAct.getINeuron();
         if(inputNeuron == n) {
             return;
         }

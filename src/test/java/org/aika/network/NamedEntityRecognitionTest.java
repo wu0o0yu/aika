@@ -244,7 +244,7 @@ public class NamedEntityRecognitionTest {
             System.out.print(act.key.range + " ");
             System.out.print(act.key.rid + " ");
             System.out.print(act.key.interpretation + " ");
-            System.out.print(act.key.node.neuron.get().label + " ");
+            System.out.print(act.getLabel() + " ");
             System.out.print(act.getFinalState().value);
         }
 

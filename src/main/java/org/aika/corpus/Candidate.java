@@ -9,7 +9,7 @@ import org.aika.neuron.Activation;
 public class Candidate  implements Comparable<Candidate> {
     public Boolean cachedDecision;
     public Boolean cachedSNDecision;
-    public SearchNode[] cachedSearchNodes = new SearchNode[2];
+    public SearchNode cachedSearchNodes;
 
     public InterpretationNode refinement;
 
@@ -71,7 +71,7 @@ public class Candidate  implements Comparable<Candidate> {
                 " MODIFIED:" + debugComputed[2] +
                 " " + refinement.activation.key.range +
                 " " + refinement.activation.key.interpretation +
-                " " + refinement.activation.key.node.neuron.get().label;
+                " " + refinement.activation.getLabel();
     }
 
 

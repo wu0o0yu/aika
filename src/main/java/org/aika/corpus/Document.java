@@ -88,7 +88,7 @@ public class Document implements Comparable<Document> {
     public ArrayList<NodeActivation> addedActivations = new ArrayList<>();
 
 
-    public SearchNode rootSearchNode = new SearchNode(this, null, null, null, -1, Collections.emptySet(), false);
+    public SearchNode rootSearchNode = new SearchNode(this, null, null, null, -1, Collections.emptySet());
     public SearchNode selectedSearchNode = null;
     public List<InterpretationNode> rootRefs;
     public ArrayList<Candidate> candidates;
@@ -260,7 +260,7 @@ public class Document implements Comparable<Document> {
 
         Candidate c = !candidates.isEmpty() ? candidates.get(0) : null;
 
-        SearchNode child = new SearchNode(this, rootSearchNode, null, c, 0, rootRefs, false);
+        SearchNode child = new SearchNode(this, rootSearchNode, null, c, 0, rootRefs);
         SearchNode.searchIterative(this, child);
 //        child.searchRecursive(this);
 
@@ -462,7 +462,7 @@ public class Document implements Comparable<Document> {
 
                 double oldUpperBound = act.upperBound;
 
-                INeuron n = act.key.node.neuron.get(Document.this);
+                INeuron n = act.getINeuron();
 
                 if(act.inputValue == null) {
                     n.computeBounds(act);
@@ -509,14 +509,14 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public NormWeight adjustWeight(SearchNode cand, Collection<InterpretationNode> changed, long visitedModified) {
+        public NormWeight adjustWeight(SearchNode cand, Collection<InterpretationNode> changed) {
             long v = visitedCounter++;
 
             for(InterpretationNode n: changed) {
                 addAllActs(n.getNeuronActivations());
             }
 
-            return processChanges(cand, v, visitedModified);
+            return processChanges(cand, v);
         }
 
 
@@ -549,7 +549,7 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public INeuron.NormWeight processChanges(SearchNode sn, long v, long visitedModified) {
+        public INeuron.NormWeight processChanges(SearchNode sn, long v) {
             NormWeight delta = NormWeight.ZERO_WEIGHT;
             for(int round = 0; round < queue.size(); round++) {
                 TreeSet<Activation> q = queue.get(round);
@@ -561,7 +561,7 @@ public class Document implements Comparable<Document> {
                     if(act.inputValue != null) {
                         s = new State(act.inputValue, 0, NormWeight.ZERO_WEIGHT);
                     } else {
-                        s = act.key.node.neuron.get(Document.this).computeWeight(round, act);
+                        s = act.getINeuron().computeWeight(round, act);
                     }
 
                     if (OPTIMIZE_DEBUG_OUTPUT) {
@@ -575,8 +575,6 @@ public class Document implements Comparable<Document> {
                         State oldState = act.rounds.get(round);
 
                         boolean propagate = act.rounds.set(round, s) && (oldState == null || !oldState.equals(s));
-
-                        act.rounds.modified = visitedModified;
 
                         act.saveNewState();
 

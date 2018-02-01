@@ -109,7 +109,7 @@ public class LongTermLearning {
      * @param act
      */
     public static void longTermPotentiation(Document doc, Config config, Activation act) {
-        INeuron n = act.key.node.neuron.get();
+        INeuron n = act.getINeuron();
 
         double maxActValue = n.activationFunction.f(n.biasSum + n.posDirSum + n.posRecSum);
         double m = maxActValue > 0.0 ? Math.max(1.0, act.getFinalState().value / maxActValue) : 1.0;
@@ -137,7 +137,7 @@ public class LongTermLearning {
         double sDelta = iAct.getFinalState().value * x * r.significance;
 
         if(sDelta > 0.0) {
-            Synapse synapse = Synapse.createOrLookup(r.synapseKey, iAct.key.node.neuron, act.key.node.neuron);
+            Synapse synapse = Synapse.createOrLookup(r.synapseKey, iAct.getNeuron(), act.getNeuron());
 
             synapse.weightDelta += (float) sDelta;
             synapse.changeBias(-config.beta * sDelta);
@@ -160,7 +160,7 @@ public class LongTermLearning {
     public static void longTermDepression(Document doc, Config config, Activation act, boolean dir) {
         if(act.getFinalState().value <= 0.0) return;
 
-        INeuron n = act.key.node.neuron.get();
+        INeuron n = act.getINeuron();
 
         Set<Synapse> actSyns = new TreeSet<>(dir ? Synapse.OUTPUT_SYNAPSE_COMP : Synapse.INPUT_SYNAPSE_COMP);
         (dir ? act.getFinalOutputActivations() : act.getFinalInputActivations()).forEach(sa -> actSyns.add(sa.synapse));

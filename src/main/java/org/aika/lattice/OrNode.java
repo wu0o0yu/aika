@@ -391,7 +391,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     public String getNeuronLabel() {
-        String l = neuron.get().label;
+        String l = neuron.getLabel();
         return l != null ? l : "";
     }
 

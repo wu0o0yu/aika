@@ -60,7 +60,7 @@ public class MetaNetwork {
                 for (Activation sAct : n.getFinalActivations(doc)) {
                     for(Activation.SynapseActivation sa: sAct.getFinalInputActivations()) {
                         Activation act = sa.input;
-                        Neuron targetNeuron = act.key.node.neuron;
+                        Neuron targetNeuron = act.getNeuron();
 
                         doc.createV = doc.visitedCounter++;
 
@@ -85,7 +85,7 @@ public class MetaNetwork {
 
     private static Activation getMetaNeuronAct(Activation sAct) {
         for(Activation.SynapseActivation sa: sAct.neuronInputs) {
-            if(sa.input.key.node.neuron.get().label.startsWith("M-")) {
+            if(sa.input.getLabel().startsWith("M-")) {
                 return sa.input;
             }
         }
@@ -108,7 +108,7 @@ public class MetaNetwork {
                     List<Activation.SynapseActivation> inputs = sa.input.getFinalInputActivations();
                     for(Activation.SynapseActivation iSA: inputs) {
                         Activation iAct = iSA.input;
-                        inb = iAct.key.node.neuron;
+                        inb = iAct.getNeuron();
                         rid = iAct.key.rid;
                     }
                 } else {
@@ -139,7 +139,7 @@ public class MetaNetwork {
             }
         }
 
-        INeuron.update(doc.model, doc.threadId, doc, targetNeuron, newNeuron ? metaAct.key.node.neuron.get().metaBias : 0.0, inputSynapses);
+        INeuron.update(doc.model, doc.threadId, doc, targetNeuron, newNeuron ? metaAct.getINeuron().metaBias : 0.0, inputSynapses);
 
         if (newNeuron) {
             Activation.SynapseActivation inhibMetaLink = metaAct.getFinalOutputActivations().get(0);
@@ -189,19 +189,19 @@ public class MetaNetwork {
                 newActs.add(sAct);
 
                 newActs.forEach(act -> doc.vQueue.add(0, act));
-                doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++, doc.selectedSearchNode.visited);
+                doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++);
 
                 if (tAct.getFinalState().value <= 0.0) {
                     tAct.key.interpretation.setState(EXCLUDED, v);
                     mAct.key.interpretation.setState(SELECTED, doc.selectedSearchNode.visited);
 
                     newActs.forEach(act -> doc.vQueue.add(0, act));
-                    doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++, doc.selectedSearchNode.visited);
+                    doc.vQueue.processChanges(doc.selectedSearchNode, doc.visitedCounter++);
                 }
 
                 for (Activation act : newActs) {
                     if (act.isFinalActivation()) {
-                        doc.finallyActivatedNeurons.add(act.key.node.neuron.get(doc));
+                        doc.finallyActivatedNeurons.add(act.getINeuron());
                     }
                 }
             }
@@ -221,7 +221,7 @@ public class MetaNetwork {
 
     private static Activation getOutputAct(TreeSet<Activation.SynapseActivation> outputActs, INeuron.Type type) {
         for(Activation.SynapseActivation sa: outputActs) {
-            if(sa.output.key.node.neuron.get().type == type) {
+            if(sa.output.getINeuron().type == type) {
                 return sa.output;
             }
         }
