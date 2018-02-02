@@ -509,14 +509,14 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public NormWeight adjustWeight(SearchNode cand, Collection<InterpretationNode> changed) {
+        public NormWeight adjustWeight(SearchNode sn, Collection<InterpretationNode> changed) {
             long v = visitedCounter++;
 
             for(InterpretationNode n: changed) {
                 addAllActs(n.getNeuronActivations());
             }
 
-            return processChanges(cand, v);
+            return processChanges(sn, v);
         }
 
 

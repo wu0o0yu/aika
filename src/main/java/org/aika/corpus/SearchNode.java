@@ -29,6 +29,7 @@ import static org.aika.corpus.InterpretationNode.State.SELECTED;
 import static org.aika.corpus.InterpretationNode.State.EXCLUDED;
 import static org.aika.corpus.InterpretationNode.State.UNKNOWN;
 import static org.aika.neuron.Activation.ACTIVATION_ID_COMP;
+import static org.aika.neuron.Activation.Mode.NEW;
 
 import java.util.*;
 
@@ -52,6 +53,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private static final Logger log = LoggerFactory.getLogger(SearchNode.class);
 
     public static int MAX_SEARCH_STEPS = Integer.MAX_VALUE;
+    public static boolean ENABLE_CACHING = true;
 
     public int id;
 
@@ -129,39 +131,34 @@ public class SearchNode implements Comparable<SearchNode> {
                     pn.candidate.debugComputed[2]++;
                 }
             }
-            /*
-            if(cached && !modified) {
-                candidate.cachedSearchNode.changeState(StateChange.Mode.NEW);
-                weightDelta = candidate.cachedSearchNode.weightDelta;
-
-                if (getParent() != null) {
-                    accumulatedWeight = weightDelta.add(getParent().accumulatedWeight);
-                }
-                return;
-
-            }
-
-            candidate.cachedSearchNode = this;
-            */
         }
-
-        weightDelta = doc.vQueue.adjustWeight(this, changed);
 
         if(modified) {
-            markDirty(doc);
-        }
+            weightDelta = doc.vQueue.adjustWeight(this, changed);
+            markDirty();
 
-        if (!modified) {
-            if (Math.abs(weightDelta.w - csn.weightDelta.w) > 0.00001) {
-                System.out.println();
+            if(candidate != null) {
+                candidate.cachedSearchNodes = this;
             }
-            if (!compareNewState(csn)) {
-                System.out.println();
-            }
-        }
 
-        if(candidate != null && modified) {
-            candidate.cachedSearchNodes = this;
+        } else {
+            if(ENABLE_CACHING) {
+                candidate.cachedSearchNodes.changeState(NEW);
+                weightDelta = candidate.cachedSearchNodes.weightDelta;
+
+                for(Activation act: candidate.cachedSearchNodes.modifiedActs.keySet()) {
+                    act.saveOldState(modifiedActs, doc.visitedCounter++);
+                    act.saveNewState();
+                }
+            } else {
+                weightDelta = doc.vQueue.adjustWeight(this, changed);
+                if (Math.abs(weightDelta.w - csn.weightDelta.w) > 0.00001) {
+                    System.out.println();
+                }
+                if (!compareNewState(csn)) {
+                    System.out.println();
+                }
+            }
         }
 
         if (pn != null && pn.candidate != null) {
@@ -196,7 +193,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void markDirty(Document doc) {
+    private void markDirty() {
         if(candidate == null) return;
 
         SearchNode csn = candidate.cachedSearchNodes;
@@ -260,7 +257,7 @@ public class SearchNode implements Comparable<SearchNode> {
         } while(snt != null);
 
         for(SearchNode sn: tmp) {
-            sn.changeState(Activation.Mode.NEW);
+            sn.changeState(NEW);
 
             SearchNode pn = sn.getParent();
             if (pn != null && pn.candidate != null) {
