@@ -249,19 +249,26 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public void reconstructSelectedResult(Document doc) {
-        if (getParent() != null) getParent().reconstructSelectedResult(doc);
+        LinkedList<SearchNode> tmp = new LinkedList<>();
+        SearchNode snt = this;
+        do {
+            tmp.addFirst(snt);
+            snt = snt.getParent();
+        } while(snt != null);
 
-        changeState(Activation.Mode.NEW);
+        for(SearchNode sn: tmp) {
+            sn.changeState(Activation.Mode.NEW);
 
-        SearchNode pn = getParent();
-        if (pn != null && pn.candidate != null) {
-            pn.candidate.refinement.setState(getDecision() ? SELECTED : EXCLUDED, visited);
-        }
+            SearchNode pn = sn.getParent();
+            if (pn != null && pn.candidate != null) {
+                pn.candidate.refinement.setState(sn.getDecision() ? SELECTED : EXCLUDED, sn.visited);
+            }
 
-        for (StateChange sc : modifiedActs.values()) {
-            Activation act = sc.getActivation();
-            if (act.isFinalActivation()) {
-                doc.finallyActivatedNeurons.add(act.getINeuron());
+            for (StateChange sc : sn.modifiedActs.values()) {
+                Activation act = sc.getActivation();
+                if (act.isFinalActivation()) {
+                    doc.finallyActivatedNeurons.add(act.getINeuron());
+                }
             }
         }
     }
