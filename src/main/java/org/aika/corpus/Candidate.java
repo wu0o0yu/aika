@@ -7,8 +7,9 @@ import org.aika.neuron.Activation;
 
 
 public class Candidate  implements Comparable<Candidate> {
+    public SearchNode currentSearchNode;
+
     public Boolean cachedDecision;
-    public Boolean cachedSNDecision;
     public SearchNode cachedSearchNodes;
 
     public InterpretationNode refinement;

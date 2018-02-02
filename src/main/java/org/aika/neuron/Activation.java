@@ -37,6 +37,8 @@ import static org.aika.neuron.Activation.SynapseActivation.OUTPUT_COMP;
  * @author Lukas Molzberger
  */
 public final class Activation extends NodeActivation<OrNode> {
+    public static final Comparator<Activation> ACTIVATION_ID_COMP = Comparator.comparingInt(act -> act.id);
+
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
     public TreeSet<SynapseActivation> neuronInputs = new TreeSet<>(INPUT_COMP);
@@ -505,7 +507,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
     public enum Mode {OLD, NEW}
 
-    public void saveOldState(List<StateChange> changes, long v) {
+    public void saveOldState(Map<Activation, StateChange> changes, long v) {
         StateChange sc = currentStateChange;
         if (sc == null || currentStateV != v) {
             sc = new StateChange();
@@ -513,7 +515,7 @@ public final class Activation extends NodeActivation<OrNode> {
             currentStateChange = sc;
             currentStateV = v;
             if (changes != null) {
-                changes.add(sc);
+                changes.put(sc.getActivation(), sc);
             }
         }
     }
@@ -522,6 +524,7 @@ public final class Activation extends NodeActivation<OrNode> {
         StateChange sc = currentStateChange;
 
         sc.newRounds = rounds.copy();
+        sc.newState = key.interpretation.state;
     }
 
 
@@ -535,6 +538,7 @@ public final class Activation extends NodeActivation<OrNode> {
     public class StateChange {
         public Rounds oldRounds;
         public Rounds newRounds;
+        public InterpretationNode.State newState;
 
         public void restoreState(Mode m) {
             rounds = (m == Mode.OLD ? oldRounds : newRounds).copy();

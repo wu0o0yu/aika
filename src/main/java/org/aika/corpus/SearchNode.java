@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import static org.aika.corpus.InterpretationNode.State.SELECTED;
 import static org.aika.corpus.InterpretationNode.State.EXCLUDED;
 import static org.aika.corpus.InterpretationNode.State.UNKNOWN;
+import static org.aika.neuron.Activation.ACTIVATION_ID_COMP;
 
 import java.util.*;
 
@@ -63,6 +64,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
     DebugState debugState;
 
+
     public enum DebugState {
         CACHED,
         LIMITED,
@@ -72,7 +74,7 @@ public class SearchNode implements Comparable<SearchNode> {
     NormWeight weightDelta = NormWeight.ZERO_WEIGHT;
     NormWeight accumulatedWeight;
 
-    public List<StateChange> modifiedActs = new ArrayList<>();
+    public Map<Activation, StateChange> modifiedActs = new TreeMap<>(ACTIVATION_ID_COMP);
 
 
 
@@ -104,20 +106,28 @@ public class SearchNode implements Comparable<SearchNode> {
         excludedParent = exclParent;
 
         SearchNode pn = getParent();
-        SearchNode lsn = null;
-        boolean cached = false;
+        SearchNode csn = null;
         boolean modified = true;
         if (c != null) {
             candidate = c;
+            candidate.currentSearchNode = this;
 
-            lsn = candidate.cachedSearchNodes;
-            if (lsn != null && candidate.cachedSNDecision != null && candidate.cachedSNDecision == getDecision()) {
-                modified = lsn.isModified();
+            csn = candidate.cachedSearchNodes;
+
+            if (csn == null || csn.getDecision() != getDecision()) {
+                if (pn != null && pn.candidate != null) {
+                    Activation act = pn.candidate.refinement.activation;
+                    act.markDirty(visited);
+                    for (SynapseActivation sa : act.neuronOutputs) {
+                        sa.output.markDirty(visited);
+                    }
+                }
+            } else {
+                modified = csn.isModified();
 
                 if (pn != null && pn.candidate != null && modified) {
                     pn.candidate.debugComputed[2]++;
                 }
-                cached = true;
             }
             /*
             if(cached && !modified) {
@@ -134,22 +144,18 @@ public class SearchNode implements Comparable<SearchNode> {
             candidate.cachedSearchNode = this;
             */
         }
-        boolean cachedSim = cached && !modified && lsn != null;
 
         weightDelta = doc.vQueue.adjustWeight(this, changed);
 
-        if(!cachedSim) {
-            markDirty();
-        }
-        if(candidate != null) {
-            candidate.cachedSNDecision = getDecision();
+        if(modified) {
+            markDirty(doc);
         }
 
-        if (cachedSim) {
-            if (Math.abs(weightDelta.w - lsn.weightDelta.w) > 0.00001) {
+        if (!modified) {
+            if (Math.abs(weightDelta.w - csn.weightDelta.w) > 0.00001) {
                 System.out.println();
             }
-            if (!compareNewState(lsn)) {
+            if (!compareNewState(csn)) {
                 System.out.println();
             }
         }
@@ -159,7 +165,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         if (pn != null && pn.candidate != null) {
-            pn.candidate.debugComputed[cachedSim ? 0 : 1]++;
+            pn.candidate.debugComputed[modified ? 1 : 0]++;
         }
 
         if (getParent() != null) {
@@ -173,8 +179,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean isModified() {
-        for (StateChange sc : modifiedActs) {
-            if (sc.getActivation().markedDirty > visited) {
+        for (StateChange sc : modifiedActs.values()) {
+            if (sc.getActivation().markedDirty > visited || sc.newState != sc.getActivation().key.interpretation.state) {
                 return true;
             }
             if(sc.newRounds.isActive()) {
@@ -190,6 +196,30 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
+    private void markDirty(Document doc) {
+        if(candidate == null) return;
+
+        SearchNode csn = candidate.cachedSearchNodes;
+
+        Set<Activation> acts = new TreeSet<>(ACTIVATION_ID_COMP);
+        acts.addAll(modifiedActs.keySet());
+        if(csn != null) {
+            acts.addAll(csn.modifiedActs.keySet());
+        }
+
+        acts.forEach(act -> {
+            StateChange sca = modifiedActs.get(act);
+            StateChange scb = csn != null ? csn.modifiedActs.get(act) : null;
+
+            if (sca == null || scb == null || !sca.newRounds.compare(scb.newRounds)) {
+                for (Activation.SynapseActivation sa : act.neuronOutputs) {
+                    sa.output.markDirty(visited);
+                }
+            }
+        });
+    }
+
+
     public boolean compareNewState(SearchNode cachedNode) {
         if (modifiedActs == null && cachedNode.modifiedActs == null) return true;
         if (modifiedActs == null || cachedNode.modifiedActs == null) return false;
@@ -197,9 +227,9 @@ public class SearchNode implements Comparable<SearchNode> {
         if (modifiedActs.size() != cachedNode.modifiedActs.size()) {
             return false;
         }
-        for (int i = 0; i < modifiedActs.size(); i++) {
-            StateChange sca = modifiedActs.get(i);
-            StateChange scb = cachedNode.modifiedActs.get(i);
+        for (Map.Entry<Activation, StateChange> me: modifiedActs.entrySet()) {
+            StateChange sca = me.getValue();
+            StateChange scb = cachedNode.modifiedActs.get(me.getKey());
 
             if (!sca.newRounds.compare(scb.newRounds)) {
                 return false;
@@ -228,7 +258,7 @@ public class SearchNode implements Comparable<SearchNode> {
             pn.candidate.refinement.setState(getDecision() ? SELECTED : EXCLUDED, visited);
         }
 
-        for (StateChange sc : modifiedActs) {
+        for (StateChange sc : modifiedActs.values()) {
             Activation act = sc.getActivation();
             if (act.isFinalActivation()) {
                 doc.finallyActivatedNeurons.add(act.getINeuron());
@@ -521,7 +551,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public void changeState(Activation.Mode m) {
-        for (StateChange sc : modifiedActs) {
+        for (StateChange sc : modifiedActs.values()) {
             sc.restoreState(m);
         }
     }
@@ -530,32 +560,6 @@ public class SearchNode implements Comparable<SearchNode> {
     @Override
     public int compareTo(SearchNode sn) {
         return Integer.compare(id, sn.id);
-    }
-
-
-
-    private void markDirty() {
-        if(candidate == null) return;
-
-        SearchNode lsn = candidate.cachedSearchNodes;
-        boolean decisionChanged = candidate.cachedSNDecision == null || candidate.cachedSNDecision != getDecision();
-
-        if(decisionChanged && getParent().candidate != null) {
-            getParent().candidate.refinement.activation.markDirty(visited);
-        }
-
-        for (int i = 0; i < modifiedActs.size(); i++) {
-            StateChange sca = modifiedActs.get(i);
-            StateChange scb = lsn != null && lsn.modifiedActs.size() > i ? lsn.modifiedActs.get(i) : null;
-
-            assert scb == null || sca.getActivation() == scb.getActivation();
-
-            if (scb == null || decisionChanged || !sca.newRounds.compare(scb.newRounds)) {
-                for (Activation.SynapseActivation sa : sca.getActivation().neuronOutputs) {
-                    sa.output.markDirty(visited);
-                }
-            }
-        }
     }
 
 
