@@ -241,10 +241,13 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public void collectResults(Collection<InterpretationNode> results) {
-        if (candidate != null) {
-            results.add(candidate.refinement);
-        }
-        if (selectedParent != null) selectedParent.collectResults(results);
+        SearchNode sn = this;
+        do {
+            if (sn.candidate != null) {
+                results.add(sn.candidate.refinement);
+            }
+            sn = sn.selectedParent;
+        } while(sn != null);
     }
 
 
