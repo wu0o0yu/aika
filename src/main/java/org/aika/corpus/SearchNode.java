@@ -51,7 +51,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private static final Logger log = LoggerFactory.getLogger(SearchNode.class);
 
-    public static int MAX_SEARCH_STEPS = 1000000;
+    public static int MAX_SEARCH_STEPS = Integer.MAX_VALUE;
 
     public int id;
 
