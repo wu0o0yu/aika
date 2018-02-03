@@ -28,7 +28,7 @@ import org.junit.Test;
  *
  * @author Lukas Molzberger
  */
-public class SearchNodeTest {
+public class InterpretationSearchTest {
 
 
     @Test
@@ -163,7 +163,7 @@ public class SearchNodeTest {
 
         doc.process();
 
-        System.out.println(doc.neuronActivationsToString(true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertTrue(eZimmermannCompany.getFinalActivations(doc).isEmpty());
         Assert.assertFalse(eZimmermannSurname.getFinalActivations(doc).isEmpty());
@@ -179,7 +179,7 @@ public class SearchNodeTest {
 
         doc.process();
 
-        System.out.println(doc.neuronActivationsToString(true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertEquals(0, eZimmermannCompany.getFinalActivations(doc).size());
         Assert.assertEquals(2, eZimmermannSurname.getFinalActivations(doc).size());
@@ -300,9 +300,153 @@ public class SearchNodeTest {
 
         doc.process();
 
-        System.out.println(doc.neuronActivationsToString(true, true, true));
+        System.out.println(doc.activationsToString(true, true));
 
         Assert.assertFalse(nD.getFinalActivations(doc).isEmpty());
     }
 
+
+    @Test
+    public void testIncremental() {
+        Model m = new Model();
+
+        Neuron inA = m.createNeuron("IN A");
+        Neuron inB = m.createNeuron("IN B");
+
+        Neuron inhib = m.createNeuron("INHIB");
+        Neuron.init(inhib, 0.0, INeuron.Type.INHIBITORY);
+
+
+        Neuron nE = m.createNeuron("E");
+        Neuron nF = m.createNeuron("F");
+
+
+        Neuron nC = Neuron.init(m.createNeuron("C"), 6.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setNeuron(inA)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
+                new Synapse.Builder()
+                        .setNeuron(inhib)
+                        .setWeight(-100.0)
+                        .setBias(0.0)
+                        .setRecurrent(true)
+                        .setRangeMatch(Range.Relation.EQUALS)
+        );
+
+        Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setNeuron(inA)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
+                new Synapse.Builder()
+                        .setNeuron(inhib)
+                        .setWeight(-100.0)
+                        .setBias(0.0)
+                        .setRecurrent(true)
+                        .setRangeMatch(Range.Relation.EQUALS)
+        );
+
+        inhib.addSynapse(
+                new Synapse.Builder()
+                        .setNeuron(nC)
+                        .setWeight(10.0)
+                        .setBias(0.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true)
+        );
+
+        inhib.addSynapse(
+                new Synapse.Builder()
+                        .setNeuron(nD)
+                        .setWeight(10.0)
+                        .setBias(0.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true)
+        );
+
+
+
+        // Create the document even though the model is not yet complete
+
+        Document doc = m.createDocument("aaaa bbbb ");
+
+        inA.addInput(doc, 0, 5);
+        inB.addInput(doc, 5, 10);
+
+        doc.process();
+
+        System.out.println(doc.activationsToString(true, true));
+
+
+        // Complete the model
+
+        nD.addSynapse(new Synapse.Builder()
+                .setNeuron(nF)
+                .setWeight(2.0)
+                .setBias(0.0)
+                .setRangeMatch(Range.Relation.NONE)
+        );
+
+        Neuron.init(nE, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setNeuron(inB)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
+                new Synapse.Builder()
+                        .setNeuron(inhib)
+                        .setWeight(-100.0)
+                        .setBias(0.0)
+                        .setRecurrent(true)
+                        .setRangeMatch(Range.Relation.EQUALS)
+        );
+
+        Neuron.init(nF, 6.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setNeuron(inB)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true),
+                new Synapse.Builder()
+                        .setNeuron(inhib)
+                        .setWeight(-100.0)
+                        .setBias(0.0)
+                        .setRecurrent(true)
+                        .setRangeMatch(Range.Relation.EQUALS)
+        );
+
+        inhib.addSynapse(
+                new Synapse.Builder()
+                        .setNeuron(nE)
+                        .setWeight(10.0)
+                        .setBias(0.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true)
+        );
+
+        inhib.addSynapse(
+                new Synapse.Builder()
+                        .setNeuron(nF)
+                        .setWeight(10.0)
+                        .setBias(0.0)
+                        .setRangeMatch(Range.Relation.EQUALS)
+                        .setRangeOutput(true)
+        );
+
+
+        doc.propagate();
+        doc.process();
+
+        System.out.println(doc.activationsToString(true, true));
+
+        Assert.assertFalse(nD.getFinalActivations(doc).isEmpty());
+
+    }
 }
