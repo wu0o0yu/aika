@@ -22,7 +22,6 @@ import org.aika.neuron.Activation.State;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.corpus.*;
 import org.aika.lattice.InputNode;
-import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.Synapse.Key;
@@ -53,7 +52,7 @@ import static org.aika.corpus.InterpretationNode.State.SELECTED;
  *
  * @author Lukas Molzberger
  */
-public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron> {
+public class INeuron extends AbstractNode<Neuron, Activation> implements Comparable<INeuron> {
 
     public static boolean ALLOW_WEAK_NEGATIVE_WEIGHTS = false;
 
@@ -184,20 +183,24 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      */
     public Activation addInput(Document doc, Activation.Builder input) {
         InterpretationNode interpr = input.interpretation != null ? input.interpretation : doc.bottom;
-        Node.addActivation(doc, new NodeActivation.Key(node.get(doc), input.range, input.rid, interpr), Collections.emptySet());
 
-        doc.propagate();
+        Activation.Key ak = new Activation.Key(node.get(doc), input.range, input.rid, interpr);
+        Activation act = node.get(doc).createActivation(doc, ak);
 
-        Activation act = Activation.get(doc, this, input.rid, input.range, Range.Relation.EQUALS, interpr, InterpretationNode.Relation.EQUALS);
+        register(act);
+
         State s = new State(input.value, input.fired, NormWeight.ZERO_WEIGHT);
         act.rounds.set(0, s);
         act.inputValue = input.value;
+        act.upperBound = input.value;
+        act.lowerBound = input.value;
+
         act.setTargetValue(input.targetValue);
 
         doc.inputNeuronActivations.add(act);
         doc.finallyActivatedNeurons.add(act.getINeuron());
 
-        doc.ubQueue.add(act);
+        propagate(act);
 
         doc.propagate();
 
@@ -228,11 +231,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public void propagate(Document doc, Activation act) {
-        if(act.upperBound > 0.0) {
-            for (Provider<InputNode> out : outputNodes.values()) {
-                out.get(doc).addActivation(doc, act);
-            }
+    public void propagate(Activation act) {
+        Document doc = act.doc;
+        for (Provider<InputNode> out : outputNodes.values()) {
+            out.get(doc).addActivation(doc, act);
         }
     }
 
@@ -264,7 +266,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public State computeWeight(int round, Activation act) {
+    public State computeActivationValueAndWeight(int round, Activation act) {
         InterpretationNode.State c = act.key.interpretation.state;
 
         double[] sum = {biasSum, 0.0};
@@ -399,24 +401,24 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     /**
      * Sets the incoming and outgoing links between neuron activations.
      *
-     * @param doc
      * @param act
      */
-    public void linkNeuronRelations(Document doc, Activation act) {
-        long v = doc.visitedCounter++;
+    public void link(Activation act) {
+        long v = act.doc.visitedCounter++;
         lock.acquireReadLock();
-        linkNeuronActs(doc, act, v, 0);
-        linkNeuronActs(doc, act, v, 1);
+        link(act, v, 0);
+        link(act, v, 1);
         lock.releaseReadLock();
     }
 
 
-    private void linkNeuronActs(Document doc, Activation act, long v, int dir) {
+    private void link(Activation act, long v, int dir) {
         ArrayList<Activation> recNegTmp = new ArrayList<>();
 
         provider.lock.acquireReadLock();
         NavigableMap<Synapse, Synapse> syns = (dir == 0 ? provider.inMemoryInputSynapses : provider.inMemoryOutputSynapses);
 
+        Document doc = act.doc;
         for (Synapse s : getActiveSynapses(provider.model, doc, dir, syns)) {
             Neuron p = (dir == 0 ? s.input : s.output);
             INeuron an = p.getIfNotSuspended();
@@ -435,12 +437,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
             markConflicts(iAct, oAct, v);
 
-            addConflict(doc, oAct.key.interpretation, iAct.key.interpretation, iAct, Collections.singleton(act), v);
+            addConflict(oAct.key.interpretation, iAct.key.interpretation, iAct, Collections.singleton(act), v);
         }
     }
 
 
-    private static void addConflict(Document doc, InterpretationNode io, InterpretationNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
+    private static void addConflict(InterpretationNode io, InterpretationNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
         if (o.markedConflict == v || o.state == SELECTED) {
             if (!checkSelfReferencing(o, io, 0)) {
                 Conflicts.add(act, io, o);
@@ -448,7 +450,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         } else {
             if(o.orInterpretationNodes != null) {
                 for (InterpretationNode no : o.orInterpretationNodes) {
-                    addConflict(doc, io, no, act, inputActs, v);
+                    addConflict(io, no, act, inputActs, v);
                 }
             }
         }
@@ -763,6 +765,35 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public double getNewBiasSum() {
         return biasSum + biasSumDelta;
+    }
+
+
+    public void register(Activation act) {
+        NodeActivation.Key<OrNode> ak = act.key;
+
+        Document doc = act.doc;
+        INeuron.ThreadState th = ak.node.neuron.get().getThreadState(doc.threadId, true);
+        if (th.activations.isEmpty()) {
+            doc.activatedNeurons.add(ak.node.neuron.get());
+        }
+        th.activations.put(ak, act);
+
+        TreeMap<NodeActivation.Key, Activation> actEnd = th.activationsEnd;
+        if (actEnd != null) actEnd.put(ak, act);
+
+        TreeMap<NodeActivation.Key, Activation> actRid = th.activationsRid;
+        if (actRid != null) actRid.put(ak, act);
+
+        if(ak.interpretation.activations == null) {
+            ak.interpretation.activations = new TreeSet<>();
+        }
+        ak.interpretation.activations.add(act);
+
+        if (ak.rid != null) {
+            doc.activationsByRid.put(ak, act);
+        }
+
+        link(act);
     }
 
 

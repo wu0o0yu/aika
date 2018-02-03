@@ -65,7 +65,7 @@ public class SynapseRangeRelationTest {
         Activation iAct2 = in.get().node.get().processActivation(doc, new Key(in.get().node.get(), new Range(10, 18), null, doc.bottom), Collections.emptyList());
         Activation oAct = on.get().node.get().processActivation(doc, new Key(on.get().node.get(), new Range(6, 7), null, doc.bottom), Collections.emptyList());
 
-        on.get().linkNeuronRelations(doc, oAct);
+        on.get().link(oAct);
 
         boolean f = false;
         for(SynapseActivation sa: oAct.neuronInputs) {

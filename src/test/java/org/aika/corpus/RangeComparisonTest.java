@@ -32,7 +32,6 @@ public class RangeComparisonTest {
     }
 
 
-
     public void testSynapse(Range ra, Range rb, Relation rr, boolean targetValue) {
         for (int dir = 0; dir < 2; dir++) {
             Model m = new Model();

@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Lukas Molzberger
  */
-public abstract class Node<T extends Node, A extends NodeActivation<T>> extends AbstractNode<Provider<T>> implements Comparable<Node> {
+public abstract class Node<T extends Node, A extends NodeActivation<T>> extends AbstractNode<Provider<T>, A> implements Comparable<Node> {
     public static int MAX_RELATIVE_RID = 25;
 
     public static final Node MIN_NODE = new InputNode();
@@ -157,13 +157,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     abstract A createActivation(Document doc, Key ak);
-
-    /**
-     * Propagate an activation to the next node or the next neuron that is depending on the current node.
-     *
-     * @param act
-     */
-    public abstract void propagate(A act);
 
     public abstract double computeSynapseWeightSum(Integer offset, INeuron n);
 

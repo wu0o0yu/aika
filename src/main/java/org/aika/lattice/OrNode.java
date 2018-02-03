@@ -62,7 +62,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    protected Activation createActivation(Document doc, NodeActivation.Key ak) {
+    public Activation createActivation(Document doc, NodeActivation.Key ak) {
         Activation act = new Activation(doc.activationIdCounter++, doc, ak);
         ak.interpretation.activation = act;
 
@@ -132,7 +132,7 @@ public class OrNode extends Node<OrNode, Activation> {
             act.key.interpretation.addOrInterpretationNode(iAct.key.interpretation);
         }
 
-        neuron.get(doc).linkNeuronRelations(doc, act);
+        neuron.get(doc).register(act);
 
         return act;
     }
@@ -282,34 +282,6 @@ public class OrNode extends Node<OrNode, Activation> {
             }
         }
         (all ? allParents : parents).clear();
-    }
-
-
-    public void register(Activation act) {
-        super.register(act);
-        Key<OrNode> ak = act.key;
-
-        Document doc = act.doc;
-        INeuron.ThreadState th = ak.node.neuron.get().getThreadState(doc.threadId, true);
-        if (th.activations.isEmpty()) {
-            doc.activatedNeurons.add(ak.node.neuron.get());
-        }
-        th.activations.put(ak, act);
-
-        TreeMap<Key, Activation> actEnd = th.activationsEnd;
-        if (actEnd != null) actEnd.put(ak, act);
-
-        TreeMap<Key, Activation> actRid = th.activationsRid;
-        if (actRid != null) actRid.put(ak, act);
-
-        if(ak.interpretation.activations == null) {
-            ak.interpretation.activations = new TreeSet<>();
-        }
-        ak.interpretation.activations.add(act);
-
-        if (ak.rid != null) {
-            doc.activationsByRid.put(ak, act);
-        }
     }
 
 

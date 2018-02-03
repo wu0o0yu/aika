@@ -121,9 +121,11 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     public void reprocessInputs(Document doc) {
-        inputNeuron.get().getActivations(doc).forEach(act -> {
+        inputNeuron.get(doc).getActivations(doc).forEach(act -> {
             act.repropagateV = markedCreated;
-            act.getINeuron().propagate(doc, act);
+            if(act.upperBound > 0.0) {
+                act.getINeuron().propagate(act);
+            }
         });
     }
 

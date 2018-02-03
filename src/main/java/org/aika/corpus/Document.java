@@ -494,8 +494,8 @@ public class Document implements Comparable<Document> {
                     }
                 }
 
-                if(oldUpperBound <= 0.0) {
-                    n.propagate(Document.this, act);
+                if (oldUpperBound <= 0.0 && act.upperBound > 0.0) {
+                    n.propagate(act);
                 }
             }
             return flag;
@@ -576,7 +576,7 @@ public class Document implements Comparable<Document> {
                     if(act.inputValue != null) {
                         s = new State(act.inputValue, 0, NormWeight.ZERO_WEIGHT);
                     } else {
-                        s = act.getINeuron().computeWeight(round, act);
+                        s = act.getINeuron().computeActivationValueAndWeight(round, act);
                     }
 
                     if (OPTIMIZE_DEBUG_OUTPUT) {
