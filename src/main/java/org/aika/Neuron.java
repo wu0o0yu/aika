@@ -113,8 +113,34 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
+    public static Neuron init(Document doc, Neuron n, double bias, INeuron.Type type, Synapse.Builder... inputs) {
+        return init(doc, n, bias, null, type, new TreeSet<>(Arrays.asList(inputs)));
+    }
+
+
+    /**
+     * Creates a neuron with the given bias.
+     *
+     * @param n
+     * @param bias
+     * @param inputs
+     * @return
+     */
     public static Neuron init(Neuron n, double bias, String activationFunctionKey, INeuron.Type type, Synapse.Builder... inputs) {
         return init(n, bias, activationFunctionKey, type, new TreeSet<>(Arrays.asList(inputs)));
+    }
+
+
+    /**
+     * Creates a neuron with the given bias.
+     *
+     * @param n
+     * @param bias
+     * @param inputs
+     * @return
+     */
+    public static Neuron init(Document doc, Neuron n, double bias, String activationFunctionKey, INeuron.Type type, Synapse.Builder... inputs) {
+        return init(doc, n, bias, activationFunctionKey, type, new TreeSet<>(Arrays.asList(inputs)));
     }
 
 
@@ -145,6 +171,19 @@ public class Neuron extends Provider<INeuron> {
         return null;
     }
 
+    /**
+     * Initializes a neuron with the given bias.
+     *
+     * @param n
+     * @param bias
+     * @param inputs
+     * @return
+     */
+    public static Neuron init(Document doc, Neuron n, double bias, String activationFunctionKey, INeuron.Type type, Collection<Synapse.Builder> inputs) {
+        if(n.init(doc, bias, activationFunctionKey, type, inputs)) return n;
+        return null;
+    }
+
 
     /**
      * Initializes a neuron with the given bias.
@@ -154,6 +193,11 @@ public class Neuron extends Provider<INeuron> {
      * @return
      */
     public boolean init(double bias, String activationFunctionKey, INeuron.Type type, Collection<Synapse.Builder> inputs) {
+        return init((Document) null, bias, activationFunctionKey, type, inputs);
+    }
+
+
+    public boolean init(Document doc, double bias, String activationFunctionKey, INeuron.Type type, Collection<Synapse.Builder> inputs) {
         List<Synapse> is = new ArrayList<>();
 
         for (Synapse.Builder input : inputs) {
@@ -175,17 +219,22 @@ public class Neuron extends Provider<INeuron> {
             in.type = type;
         }
 
-        return INeuron.update(model, model.defaultThreadId, null, this, bias, is);
+        return INeuron.update(model, model.defaultThreadId, doc, this, bias, is);
     }
 
 
     public void addSynapse(Synapse.Builder input) {
+        addSynapse(null, input);
+    }
+
+
+    public void addSynapse(Document doc, Synapse.Builder input) {
         Synapse s = input.getSynapse(this);
 
         s.weightDelta = input.weight;
         s.setBias(input.bias);
 
-        INeuron.update(model, model.defaultThreadId, null, this, 0.0, Collections.singletonList(s));
+        INeuron.update(model, doc != null ? doc.threadId : model.defaultThreadId, doc, this, 0.0, Collections.singletonList(s));
     }
 
 

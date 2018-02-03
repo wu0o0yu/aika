@@ -385,14 +385,14 @@ public class InterpretationSearchTest {
 
         // Complete the model
 
-        nD.addSynapse(new Synapse.Builder()
+        nD.addSynapse(doc, new Synapse.Builder()
                 .setNeuron(nF)
                 .setWeight(2.0)
                 .setBias(0.0)
                 .setRangeMatch(Range.Relation.NONE)
         );
 
-        Neuron.init(nE, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(doc, nE, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0)
@@ -407,7 +407,7 @@ public class InterpretationSearchTest {
                         .setRangeMatch(Range.Relation.EQUALS)
         );
 
-        Neuron.init(nF, 6.0, INeuron.Type.EXCITATORY,
+        Neuron.init(doc, nF, 6.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0)
@@ -423,6 +423,7 @@ public class InterpretationSearchTest {
         );
 
         inhib.addSynapse(
+                doc,
                 new Synapse.Builder()
                         .setNeuron(nE)
                         .setWeight(10.0)
@@ -432,6 +433,7 @@ public class InterpretationSearchTest {
         );
 
         inhib.addSynapse(
+                doc,
                 new Synapse.Builder()
                         .setNeuron(nF)
                         .setWeight(10.0)
