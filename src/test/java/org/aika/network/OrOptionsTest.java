@@ -70,15 +70,15 @@ public class OrOptionsTest {
 
         InterpretationNode o0 = InterpretationNode.addPrimitive(doc);
         Range r = new Range(0, 10);
-        Node.addActivationAndPropagate(doc, new NodeActivation.Key(inA.get().node.get(), r, 0, o0), Collections.emptySet());
+        Node.addActivation(doc, new NodeActivation.Key(inA.get().node.get(), r, 0, o0), Collections.emptySet());
         doc.propagate();
 
         InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
-        Node.addActivationAndPropagate(doc, new NodeActivation.Key(inA.get().node.get(), r, 0, o1), Collections.emptySet());
+        Node.addActivation(doc, new NodeActivation.Key(inA.get().node.get(), r, 0, o1), Collections.emptySet());
         doc.propagate();
 
         InterpretationNode o2 = InterpretationNode.addPrimitive(doc);
-        Node.addActivationAndPropagate(doc, new NodeActivation.Key(inA.get().node.get(), r, 0, o2), Collections.emptySet());
+        Node.addActivation(doc, new NodeActivation.Key(inA.get().node.get(), r, 0, o2), Collections.emptySet());
         doc.propagate();
 
 

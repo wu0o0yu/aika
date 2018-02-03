@@ -26,7 +26,6 @@ import org.aika.corpus.InterpretationNode;
 import org.aika.lattice.NodeActivation;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
-import org.aika.neuron.Synapse;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -230,7 +229,7 @@ public class MetaNetwork {
 
 
     private static void repropagate(Document doc, NodeActivation<?> act) {
-        act.key.node.propagateAddedActivation(doc, act);
+        act.key.node.propagate(act);
         for(NodeActivation<?> oAct: act.outputs.values()) {
             if(!(oAct instanceof Activation)) {
                 repropagate(doc, oAct);

@@ -87,7 +87,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
         if(r.begin == Integer.MIN_VALUE || r.end == Integer.MAX_VALUE) return;
 
-        addActivationAndPropagate(
+        addActivation(
                 doc,
                 new Key(
                         this,
@@ -107,12 +107,12 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    public void propagateAddedActivation(Document doc, Activation act) {
-        neuron.get(doc).propagateAddedActivation(doc, act);
+    public void propagate(Activation act) {
+        act.doc.ubQueue.add(act);
     }
 
 
-    Activation processAddedActivation(Document doc, Key<OrNode> ak, Collection<NodeActivation> inputActs) {
+    Activation processActivation(Document doc, Key<OrNode> ak, Collection<NodeActivation> inputActs) {
         if (Document.APPLY_DEBUG_OUTPUT) {
             log.info("add: " + ak + " - " + ak.node);
         }
@@ -121,9 +121,9 @@ public class OrNode extends Node<OrNode, Activation> {
         if (act == null) {
             act = createActivation(doc, ak);
 
-            register(act, doc);
+            register(act);
 
-            propagateAddedActivation(doc, act);
+            propagate(act);
         }
 
         act.link(inputActs);
@@ -151,18 +151,19 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public void apply(Document doc, Activation act) {
-        OrNode.processCandidate(doc, this, act, false);
+    public void apply(Activation act) {
+        OrNode.processCandidate(this, act, false);
     }
 
 
     @Override
-    public void discover(Document doc, NodeActivation act, Config config) {
+    public void discover(NodeActivation act, Config config) {
     }
 
 
-    public static void processCandidate(Document doc, Node<?, ? extends NodeActivation<?>> parentNode, NodeActivation inputAct, boolean train) {
+    public static void processCandidate(Node<?, ? extends NodeActivation<?>> parentNode, NodeActivation inputAct, boolean train) {
         Key ak = inputAct.key;
+        Document doc = inputAct.doc;
         parentNode.lock.acquireReadLock();
         if(parentNode.orChildren != null) {
             for (OrEntry oe : parentNode.orChildren) {
@@ -210,7 +211,7 @@ public class OrNode extends Node<OrNode, Activation> {
                 Node<?, NodeActivation<?>> pn = pp.get();
                 for (NodeActivation act : pn.getActivations(doc)) {
                     act.repropagateV = markedCreated;
-                    act.key.node.propagateAddedActivation(doc, act);
+                    act.key.node.propagate(act);
                 }
             }
         }
@@ -284,10 +285,11 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    public void register(Activation act, Document doc) {
-        super.register(act, doc);
+    public void register(Activation act) {
+        super.register(act);
         Key<OrNode> ak = act.key;
 
+        Document doc = act.doc;
         INeuron.ThreadState th = ak.node.neuron.get().getThreadState(doc.threadId, true);
         if (th.activations.isEmpty()) {
             doc.activatedNeurons.add(ak.node.neuron.get());

@@ -78,17 +78,17 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    NodeActivation<AndNode> processAddedActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs) {
+    NodeActivation<AndNode> processActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs) {
         if(inputActs.size() + numCombExpParents != level) {
             return null;
         }
 
-        return super.processAddedActivation(doc, ak, inputActs);
+        return super.processActivation(doc, ak, inputActs);
     }
 
 
-    public void propagateAddedActivation(Document doc, NodeActivation act) {
-        apply(doc, act);
+    public void propagate(NodeActivation act) {
+        apply(act);
     }
 
 
@@ -105,7 +105,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    void apply(Document doc, NodeActivation<AndNode> act) {
+    void apply(NodeActivation<AndNode> act) {
         if (andChildren != null) {
             for (NodeActivation<?> pAct : act.inputs.values()) {
                 Node<?, NodeActivation<?>> pn = pAct.key.node;
@@ -120,7 +120,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
                                 Provider<AndNode> nlp = getAndChild(nRef);
                                 if (nlp != null) {
-                                    addNextLevelActivation(doc, act, secondAct, nlp);
+                                    addNextLevelActivation(act, secondAct, nlp);
                                 }
                             }
                         }
@@ -130,12 +130,13 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             }
         }
 
-        OrNode.processCandidate(doc, this, act, false);
+        OrNode.processCandidate(this, act, false);
     }
 
 
     @Override
-    public void discover(Document doc, NodeActivation<AndNode> act, Config config) {
+    public void discover(NodeActivation<AndNode> act, Config config) {
+        Document doc = act.doc;
         for(NodeActivation<?> pAct: act.inputs.values()) {
             Node<?, NodeActivation<?>> pn = pAct.key.node;
             pn.lock.acquireReadLock();
@@ -220,15 +221,16 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public static void addNextLevelActivation(Document doc, NodeActivation<AndNode> act, NodeActivation<AndNode> secondAct, Provider<AndNode> pnlp) {
+    public static void addNextLevelActivation(NodeActivation<AndNode> act, NodeActivation<AndNode> secondAct, Provider<AndNode> pnlp) {
         // TODO: check if the activation already exists
+        Document doc = act.doc;
         AndNode nlp = pnlp.get(doc);
         if(act.repropagateV != null && act.repropagateV != nlp.markedCreated) return;
 
         Key ak = act.key;
         InterpretationNode o = InterpretationNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
         if (o != null) {
-            Node.addActivationAndPropagate(
+            Node.addActivation(
                     doc,
                     new Key(
                             nlp,
@@ -310,7 +312,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             Node<?, NodeActivation<?>> pn = pp.get();
             for(NodeActivation act : pn.getActivations(doc)) {
                 act.repropagateV = markedCreated;
-                act.key.node.propagateAddedActivation(doc, act);
+                act.key.node.propagate(act);
             }
         }
     }

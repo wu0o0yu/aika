@@ -161,16 +161,15 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     /**
      * Propagate an activation to the next node or the next neuron that is depending on the current node.
      *
-     * @param doc
      * @param act
      */
-    public abstract void propagateAddedActivation(Document doc, A act);
+    public abstract void propagate(A act);
 
     public abstract double computeSynapseWeightSum(Integer offset, INeuron n);
 
-    abstract void apply(Document doc, A act);
+    abstract void apply(A act);
 
-    public abstract void discover(Document doc, NodeActivation<T> act, Config config);
+    public abstract void discover(NodeActivation<T> act, Config config);
 
     abstract Collection<Refinement> collectNodeAndRefinements(Refinement newRef);
 
@@ -300,25 +299,26 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    A processAddedActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs) {
+    A processActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs) {
         if (Document.APPLY_DEBUG_OUTPUT) {
             log.info("add: " + ak + " - " + ak.node);
         }
 
         A act = createActivation(doc, ak);
 
-        register(act, doc);
+        register(act);
 
         act.link(inputActs);
 
-        propagateAddedActivation(doc, act);
+        propagate(act);
 
         return act;
     }
 
 
-    public void register(A act, Document doc) {
+    public void register(A act) {
         Key ak = act.key;
+        Document doc = act.doc;
 
         if (ak.interpretation.nodeActivations == null) {
             ak.interpretation.nodeActivations = new TreeMap<>();
@@ -346,7 +346,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         th.added = new TreeMap<>();
 
-        tmpAdded.forEach((ak, iActs) -> processAddedActivation(doc, ak, iActs));
+        tmpAdded.forEach((ak, iActs) -> processActivation(doc, ak, iActs));
     }
 
 
@@ -360,7 +360,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * @param ak
      * @param inputActs
      */
-    public static <T extends Node, A extends NodeActivation<T>> void addActivationAndPropagate(Document doc, Key<T> ak, Collection<NodeActivation<?>> inputActs) {
+    public static <T extends Node, A extends NodeActivation<T>> void addActivation(Document doc, Key<T> ak, Collection<NodeActivation<?>> inputActs) {
         ThreadState<T, A> th = ak.node.getThreadState(doc.threadId, true);
         Set<NodeActivation<?>> iActs = th.added.get(ak);
         if (iActs == null) {

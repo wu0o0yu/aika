@@ -108,14 +108,14 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         NodeActivation.Key ak = computeActivationKey(inputAct);
 
         if (ak != null) {
-            addActivationAndPropagate(doc, ak, Collections.singleton(inputAct));
+            addActivation(doc, ak, Collections.singleton(inputAct));
         }
     }
 
 
-    public void propagateAddedActivation(Document doc, NodeActivation act) {
+    public void propagate(NodeActivation act) {
         if (!key.isRecurrent) {
-            apply(doc, act);
+            apply(act);
         }
     }
 
@@ -123,7 +123,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     public void reprocessInputs(Document doc) {
         inputNeuron.get().getActivations(doc).forEach(act -> {
             act.repropagateV = markedCreated;
-            act.key.node.propagateAddedActivation(doc, act);
+            act.getINeuron().propagate(doc, act);
         });
     }
 
@@ -137,28 +137,28 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
     /**
-     * @param doc
      * @param act
      */
     @Override
-    void apply(Document doc, NodeActivation act) {
+    void apply(NodeActivation act) {
 
         lock.acquireReadLock();
         if (andChildren != null) {
             andChildren.forEach((ref, cn) -> {
                 InputNode in = ref.input.getIfNotSuspended();
                 if (in != null) {
-                    addNextLevelActivations(doc, in, ref, cn, act);
+                    addNextLevelActivations(in, ref, cn, act);
                 }
             });
         }
         lock.releaseReadLock();
 
-        OrNode.processCandidate(doc, this, act, false);
+        OrNode.processCandidate(this, act, false);
     }
 
 
-    private static void addNextLevelActivations(Document doc, InputNode secondNode, Refinement ref, Provider<AndNode> pnlp, NodeActivation act) {
+    private static void addNextLevelActivations(InputNode secondNode, Refinement ref, Provider<AndNode> pnlp, NodeActivation act) {
+        Document doc = act.doc;
         INeuron.ThreadState th = secondNode.inputNeuron.get().getThreadState(doc.threadId, false);
         if (th == null || th.activations.isEmpty()) return;
 
@@ -188,7 +188,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                     if(secondAct != null) {
                         InterpretationNode o = InterpretationNode.add(doc, true, ak.interpretation, secondIAct.key.interpretation);
                         if (o != null) {
-                            Node.addActivationAndPropagate(doc,
+                            Node.addActivation(doc,
                                     new NodeActivation.Key(
                                             nlp,
                                             Range.mergeRange(
@@ -216,11 +216,11 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-
     @Override
-    public void discover(Document doc, NodeActivation<InputNode> act, Config config) {
+    public void discover(NodeActivation<InputNode> act, Config config) {
         long v = provider.model.visitedCounter.addAndGet(1);
 
+        Document doc = act.doc;
         doc.getFinalActivations().forEach(secondNAct -> {
             for (NodeActivation secondAct : secondNAct.outputs.values()) {
                 Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.node.provider);

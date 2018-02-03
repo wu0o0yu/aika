@@ -184,7 +184,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      */
     public Activation addInput(Document doc, Activation.Builder input) {
         InterpretationNode interpr = input.interpretation != null ? input.interpretation : doc.bottom;
-        Node.addActivationAndPropagate(doc, new NodeActivation.Key(node.get(doc), input.range, input.rid, interpr), Collections.emptySet());
+        Node.addActivation(doc, new NodeActivation.Key(node.get(doc), input.range, input.rid, interpr), Collections.emptySet());
 
         doc.propagate();
 
@@ -228,8 +228,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public void propagateAddedActivation(Document doc, Activation act) {
-        doc.ubQueue.add(act);
+    public void propagate(Document doc, Activation act) {
+        if(act.upperBound > 0.0) {
+            for (Provider<InputNode> out : outputNodes.values()) {
+                out.get(doc).addActivation(doc, act);
+            }
+        }
     }
 
 

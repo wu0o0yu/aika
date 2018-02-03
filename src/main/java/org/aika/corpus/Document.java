@@ -494,10 +494,8 @@ public class Document implements Comparable<Document> {
                     }
                 }
 
-                if(oldUpperBound <= 0.0 && act.upperBound > 0.0) {
-                    for(Provider<InputNode> out: n.outputNodes.values()) {
-                        out.get(Document.this).addActivation(Document.this, act);
-                    }
+                if(oldUpperBound <= 0.0) {
+                    n.propagate(Document.this, act);
                 }
             }
             return flag;

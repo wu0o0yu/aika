@@ -123,7 +123,7 @@ public class PatternDiscovery {
 
         doc.getAllActivationsStream()
                 .filter(act -> config.checkExpandable.evaluate(act))
-                .forEach(act -> act.key.node.discover(doc, act, config));
+                .forEach(act -> act.key.node.discover(act, config));
 
         doc.propagate();
 
