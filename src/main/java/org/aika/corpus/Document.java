@@ -374,6 +374,23 @@ public class Document implements Comparable<Document> {
         }
 
         StringBuilder sb = new StringBuilder();
+
+        sb.append("Activation ID -");
+        sb.append((sn != null ? " Interpr. Node State | SequenceNr. |" : ""));
+        sb.append(" Range" + (withTextSnipped ? " | Text Snipped" : ""));
+        sb.append(" -");
+        sb.append(" Interpr. Node -");
+        sb.append(" Neuron Label -");
+        sb.append((withLogic ? " Logic Layer -" : ""));
+        sb.append(" Relational ID (Word Pos.) -");
+        sb.append(" Upper Bound -");
+        sb.append(" Simulation Rounds [Round | Value | Weight | Norm] -");
+        sb.append(" Final Value | Final Weight | Final Norm -");
+        sb.append(" Input Value |");
+        sb.append(" Target Value");
+        sb.append("\n");
+        sb.append("\n");
+
         for(Activation act: acts) {
             if(act.upperBound <= 0.0 && (act.targetValue == null || act.targetValue <= 0.0)) {
                 continue;

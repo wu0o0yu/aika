@@ -485,14 +485,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         sb.append(getNeuronLabel());
         sb.append(" - ");
         sb.append(logicToString());
-        sb.append(" - ");
-        sb.append(weightsToString());
         return sb.toString();
-    }
-
-
-    public String weightsToString() {
-        return "";
     }
 
 

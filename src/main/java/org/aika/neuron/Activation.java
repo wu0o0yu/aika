@@ -423,10 +423,19 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
+    public String toString() {
+        return key + " -" +
+                " UB:" + Utils.round(upperBound) +
+                (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
+                (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +
+                " V:" + Utils.round(rounds.getLast().value);
+    }
+
+
 
     public String toString(SearchNode sn, boolean withWeights, boolean withTextSnipped, boolean withLogic) {
         StringBuilder sb = new StringBuilder();
-        sb.append(id + " ");
+        sb.append(id + " - ");
 
         if(sn != null) {
             sb.append(key.interpretation.state + " ");
@@ -436,12 +445,13 @@ public final class Activation extends NodeActivation<OrNode> {
         sb.append(key.range);
 
         if(withTextSnipped) {
-            sb.append(" ");
+            sb.append(" \"");
             if(key.node.neuron.get().outputText != null) {
                 sb.append(collapseText(key.node.neuron.get().outputText));
             } else {
                 sb.append(collapseText(doc.getText(key.range)));
             }
+            sb.append("\"");
         }
         sb.append(" - ");
 
@@ -450,7 +460,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
         sb.append(withLogic ? key.node.toString() : key.node.getNeuronLabel());
 
-        sb.append(" - Rid:");
+        sb.append(" - RID:");
         sb.append(key.rid);
 
         sb.append(" - UB:");
@@ -460,7 +470,7 @@ public final class Activation extends NodeActivation<OrNode> {
             for(Map.Entry<Integer, State> me: rounds.rounds.entrySet()) {
                 State s = me.getValue();
                 sb.append("[R:" + me.getKey());
-                sb.append(" VALUE:" + Utils.round(s.value));
+                sb.append(" V:" + Utils.round(s.value));
                 sb.append(" W:" + Utils.round(s.weight.w));
                 sb.append(" N:" + Utils.round(s.weight.n));
                 sb.append("]");
