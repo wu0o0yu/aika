@@ -281,7 +281,7 @@ public class Document implements Comparable<Document> {
 
     public void dumpDebugCandidateStatistics() {
         for (Candidate c : candidates) {
-            System.out.println(c.toString());
+            log.info(c.toString());
         }
     }
 

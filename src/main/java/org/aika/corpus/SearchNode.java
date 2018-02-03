@@ -151,11 +151,12 @@ public class SearchNode implements Comparable<SearchNode> {
                 }
             } else {
                 weightDelta = doc.vQueue.adjustWeight(this, changed);
-                if (Math.abs(weightDelta.w - csn.weightDelta.w) > 0.00001) {
-                    System.out.println();
-                }
-                if (!compareNewState(csn)) {
-                    System.out.println();
+                if (Math.abs(weightDelta.w - csn.weightDelta.w) > 0.00001 || !compareNewState(csn)) {
+                    log.error("Cached search node activation do not match the newly computed results.");
+                    log.info("Computed results:");
+                    dumpDebugState();
+                    log.info("Cached results:");
+                    csn.dumpDebugState();
                 }
             }
         }
@@ -276,7 +277,7 @@ public class SearchNode implements Comparable<SearchNode> {
     public void dumpDebugState() {
         SearchNode n = this;
         while (n != null && n.level >= 0) {
-            System.out.println(
+            log.info(
                     n.level + " " +
                             n.debugState +
                             " DECISION:" + n.getDecision() +
