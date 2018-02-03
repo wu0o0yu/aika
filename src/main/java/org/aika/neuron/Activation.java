@@ -433,7 +433,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
 
-    public String toString(SearchNode sn, boolean withWeights, boolean withTextSnipped, boolean withLogic) {
+    public String toString(SearchNode sn, boolean withWeights, boolean withTextSnippet, boolean withLogic) {
         StringBuilder sb = new StringBuilder();
         sb.append(id + " - ");
 
@@ -444,7 +444,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
         sb.append(key.range);
 
-        if(withTextSnipped) {
+        if(withTextSnippet) {
             sb.append(" \"");
             if(key.node.neuron.get().outputText != null) {
                 sb.append(collapseText(key.node.neuron.get().outputText));
