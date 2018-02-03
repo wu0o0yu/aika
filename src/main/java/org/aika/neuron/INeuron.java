@@ -403,16 +403,16 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
      *
      * @param act
      */
-    public void link(Activation act) {
+    public void linkActivation(Activation act) {
         long v = act.doc.visitedCounter++;
         lock.acquireReadLock();
-        link(act, v, 0);
-        link(act, v, 1);
+        linkActivation(act, v, 0);
+        linkActivation(act, v, 1);
         lock.releaseReadLock();
     }
 
 
-    private void link(Activation act, long v, int dir) {
+    private void linkActivation(Activation act, long v, int dir) {
         ArrayList<Activation> recNegTmp = new ArrayList<>();
 
         provider.lock.acquireReadLock();
@@ -426,7 +426,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
                 ThreadState th = an.getThreadState(doc.threadId, false);
                 if (th == null || th.activations.isEmpty()) continue;
 
-                linkActSyn(an, doc, act, dir, recNegTmp, s);
+                linkActSyn(an, act, dir, recNegTmp, s);
             }
         }
         provider.lock.releaseReadLock();
@@ -467,7 +467,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-    private static void linkActSyn(INeuron n, Document doc, Activation act, int dir, ArrayList<Activation> recNegTmp, Synapse s) {
+    private static void linkActSyn(INeuron n, Activation act, int dir, ArrayList<Activation> recNegTmp, Synapse s) {
         Synapse.Key sk = s.key;
 
         Integer rid;
@@ -478,7 +478,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         }
 
         Stream<Activation> tmp = Activation.select(
-                doc,
+                act.doc,
                 n,
                 rid,
                 act.key.range,
@@ -793,7 +793,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             doc.activationsByRid.put(ak, act);
         }
 
-        link(act);
+        linkActivation(act);
     }
 
 

@@ -481,12 +481,7 @@ public class Document implements Comparable<Document> {
 
                 INeuron n = act.getINeuron();
 
-                if(act.inputValue == null) {
-                    n.computeBounds(act);
-                } else {
-                    act.upperBound = act.inputValue;
-                    act.lowerBound = act.inputValue;
-                }
+                n.computeBounds(act);
 
                 if(Math.abs(act.upperBound - oldUpperBound) > 0.01) {
                     for(Activation.SynapseActivation sa: act.neuronOutputs) {
