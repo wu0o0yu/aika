@@ -433,7 +433,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
 
-    public String toString(SearchNode sn, boolean withWeights, boolean withTextSnippet, boolean withLogic) {
+    public String toString(SearchNode sn, boolean withTextSnippet, boolean withLogic) {
         StringBuilder sb = new StringBuilder();
         sb.append(id + " - ");
 
@@ -465,31 +465,30 @@ public final class Activation extends NodeActivation<OrNode> {
 
         sb.append(" - UB:");
         sb.append(Utils.round(upperBound));
-        if (withWeights) {
-            sb.append(" - ");
-            for(Map.Entry<Integer, State> me: rounds.rounds.entrySet()) {
-                State s = me.getValue();
-                sb.append("[R:" + me.getKey());
-                sb.append(" V:" + Utils.round(s.value));
-                sb.append(" W:" + Utils.round(s.weight.w));
-                sb.append(" N:" + Utils.round(s.weight.n));
-                sb.append("]");
-            }
 
-            if (isFinalActivation()) {
-                State fs = getFinalState();
-                sb.append(" - FV:" + Utils.round(fs.value));
-                sb.append(" FW:" + Utils.round(fs.weight.w));
-                sb.append(" FN:" + Utils.round(fs.weight.n));
-            }
+        sb.append(" - ");
+        for (Map.Entry<Integer, State> me : rounds.rounds.entrySet()) {
+            State s = me.getValue();
+            sb.append("[R:" + me.getKey());
+            sb.append(" V:" + Utils.round(s.value));
+            sb.append(" W:" + Utils.round(s.weight.w));
+            sb.append(" N:" + Utils.round(s.weight.n));
+            sb.append("]");
+        }
 
-            if(inputValue != null) {
-                sb.append(" - IV:" + Utils.round(inputValue));
-            }
+        if (isFinalActivation()) {
+            State fs = getFinalState();
+            sb.append(" - FV:" + Utils.round(fs.value));
+            sb.append(" FW:" + Utils.round(fs.weight.w));
+            sb.append(" FN:" + Utils.round(fs.weight.n));
+        }
 
-            if(targetValue != null) {
-                sb.append(" - TV:" + Utils.round(targetValue));
-            }
+        if (inputValue != null) {
+            sb.append(" - IV:" + Utils.round(inputValue));
+        }
+
+        if (targetValue != null) {
+            sb.append(" - TV:" + Utils.round(targetValue));
         }
 
         return sb.toString();

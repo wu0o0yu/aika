@@ -233,7 +233,7 @@ public class NamedEntityRecognitionTest {
         // Search for the best interpretation of this text.
         doc.process();
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
         System.out.println();
 
         System.out.println("Final Interpretation: " + doc.bestInterpretation.toString());

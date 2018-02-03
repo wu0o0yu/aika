@@ -75,7 +75,7 @@ public class SelfRefNonRecTest {
 
         inA.addInput(t, 0, 1);
 
-        System.out.println(t.neuronActivationsToString(false, false, true));
+        System.out.println(t.activationsToString(false, true));
 
         Assert.assertEquals(1, bN.get().getFirstActivation(t).key.interpretation.orInterpretationNodes.size());
     }

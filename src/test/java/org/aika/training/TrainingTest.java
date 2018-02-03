@@ -26,7 +26,6 @@ import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.aika.training.SynapseEvaluation.DeleteMode.DELETE_IF_SIGN_CHANGES;
 import static org.aika.training.SynapseEvaluation.DeleteMode.NONE;
 
 /**
@@ -160,7 +159,7 @@ public class TrainingTest {
 
             doc.process();
 
-            System.out.println(doc.neuronActivationsToString(true, false, true));
+            System.out.println(doc.activationsToString(false, true));
             Assert.assertFalse(outC.getFinalActivations(doc).isEmpty());
 
             doc.clearActivations();

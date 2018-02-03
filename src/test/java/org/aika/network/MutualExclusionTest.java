@@ -194,7 +194,7 @@ public class MutualExclusionTest {
         }
         System.out.println();
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         Assert.assertTrue(pA.getFinalActivations(doc).isEmpty());
         Assert.assertFalse(pB.getFinalActivations(doc).isEmpty());

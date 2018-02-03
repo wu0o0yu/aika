@@ -231,8 +231,8 @@ public class Document implements Comparable<Document> {
 
 
     private static void markCandidateSelected(InterpretationNode n, long v) {
-        if (n.neuronActivations != null) {
-            for (Activation act : n.neuronActivations) {
+        if (n.activations != null) {
+            for (Activation act : n.activations) {
                 act.visited = v;
             }
         }
@@ -355,17 +355,17 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public String neuronActivationsToString(boolean withWeights) {
-        return neuronActivationsToString(withWeights, false, false);
+    public String activationsToString() {
+        return activationsToString(false, false);
     }
 
 
-    public String neuronActivationsToString(boolean withWeights, boolean withTextSnipped, boolean withLogic) {
-        return neuronActivationsToString(null, withWeights, withTextSnipped, withLogic);
+    public String activationsToString(boolean withTextSnipped, boolean withLogic) {
+        return activationsToString(null, withTextSnipped, withLogic);
     }
 
 
-    public String neuronActivationsToString(SearchNode sn, boolean withWeights, boolean withTextSnippet, boolean withLogic) {
+    public String activationsToString(SearchNode sn, boolean withTextSnippet, boolean withLogic) {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         for (INeuron n : activatedNeurons) {
@@ -396,7 +396,7 @@ public class Document implements Comparable<Document> {
                 continue;
             }
 
-            sb.append(act.toString(sn, withWeights, withTextSnippet, withLogic));
+            sb.append(act.toString(sn, withTextSnippet, withLogic));
             sb.append("\n");
         }
 
@@ -451,7 +451,7 @@ public class Document implements Comparable<Document> {
                 if(APPLY_DEBUG_OUTPUT) {
                     log.info("QueueId:" + th.queueId);
                     log.info(n.toString() + "\n");
-                    log.info("\n" + neuronActivationsToString( true, true, true));
+                    log.info("\n" + activationsToString( true, true));
                 }
             }
         }
@@ -530,7 +530,7 @@ public class Document implements Comparable<Document> {
             long v = visitedCounter++;
 
             for(InterpretationNode n: changed) {
-                addAllActs(n.getNeuronActivations());
+                addAllActs(n.getActivations());
             }
 
             return processChanges(sn, v);
@@ -598,7 +598,7 @@ public class Document implements Comparable<Document> {
                         if (propagate) {
                             if(round > MAX_ROUND) {
                                 log.error("Error: Maximum number of rounds reached. The network might be oscillating.");
-                                log.info(neuronActivationsToString(sn, true, true, true));
+                                log.info(activationsToString(sn, true, true));
 
                                 dumpOscillatingActivations();
                                 throw new RuntimeException("Maximum number of rounds reached. The network might be oscillating.");

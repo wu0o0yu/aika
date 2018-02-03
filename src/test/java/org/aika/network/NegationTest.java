@@ -82,7 +82,7 @@ public class NegationTest {
 
         inA.addInput(doc, 0, 11);
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
         Assert.assertNotNull(Activation.get(doc, abcN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
         InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
@@ -93,7 +93,7 @@ public class NegationTest {
                         .setInterpretation(o1)
         );
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         InterpretationNode o2 = InterpretationNode.addPrimitive(doc);
 
@@ -103,7 +103,7 @@ public class NegationTest {
                         .setInterpretation(o2)
         );
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         Assert.assertNotNull(Activation.get(doc, abcN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
     }
@@ -159,7 +159,7 @@ public class NegationTest {
 
         inA.addInput(doc, 0, 11);
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         InterpretationNode ob = InterpretationNode.addPrimitive(doc);
         inB.addInput(doc,
@@ -168,7 +168,7 @@ public class NegationTest {
                         .setInterpretation(ob)
         );
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         InterpretationNode oc = InterpretationNode.addPrimitive(doc);
         inC.addInput(doc,
@@ -177,7 +177,7 @@ public class NegationTest {
                         .setInterpretation(oc)
         );
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
 //        Assert.assertNull(Activation.get(t, outN.node, 0, new Range(0, 11), Range.Relation.EQUALS, null, null, null));
     }
@@ -235,11 +235,11 @@ public class NegationTest {
                         .setInterpretation(o)
         );
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         inA.addInput(doc, 0, 11);
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         Assert.assertNotNull(Activation.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
@@ -299,11 +299,11 @@ public class NegationTest {
                         .setInterpretation(o)
         );
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         inA.addInput(doc, 0, 11);
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         Assert.assertNotNull(Activation.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
@@ -359,7 +359,7 @@ public class NegationTest {
 
         inA.addInput(doc, 0, 11);
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         inS.addInput(doc,
                 new Activation.Builder()
@@ -367,7 +367,7 @@ public class NegationTest {
                         .setInterpretation(o)
         );
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         Assert.assertNotNull(Activation.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
@@ -457,11 +457,11 @@ public class NegationTest {
             Document doc = m.createDocument("aaaaaaaaaa", 0);
 
             inA.addInput(doc, 0, 6);
-            System.out.println(doc.neuronActivationsToString(true, false, true));
+            System.out.println(doc.activationsToString(false, true));
 
             inB.addInput(doc, 0, 6);
 
-            System.out.println(doc.neuronActivationsToString(true, false, true));
+            System.out.println(doc.activationsToString(false, true));
 
             Assert.assertNotNull(Activation.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null));
             Assert.assertEquals(2, Activation.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null).key.interpretation.orInterpretationNodes.size());
@@ -473,11 +473,11 @@ public class NegationTest {
             Document doc = m.createDocument("aaaaaaaaaa", 0);
 
             inA.addInput(doc, 0, 6);
-            System.out.println(doc.neuronActivationsToString(true, false, true));
+            System.out.println(doc.activationsToString(false, true));
 
             inB.addInput(doc, 3, 9);
 
-            System.out.println(doc.neuronActivationsToString(true, false, true));
+            System.out.println(doc.activationsToString(false, true));
 
 //            Assert.assertNotNull(Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
             Assert.assertNotNull(Activation.get(doc, inS.get(), null, new Range(0, 9), Relation.EQUALS, null, null));
@@ -643,19 +643,19 @@ public class NegationTest {
 
         inA.addInput(doc, 0, 6);
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         inB.addInput(doc, 0, 6);
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         inC.addInput(doc, 0, 6);
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         doc.process();
 
-        System.out.println(doc.neuronActivationsToString( true, false, true));
+        System.out.println(doc.activationsToString( false, true));
     }
 
 
@@ -764,7 +764,7 @@ public class NegationTest {
         inB.addInput(doc, 0, 1);
         inG.addInput(doc, 0, 1);
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         Assert.assertNotNull(pC.get().getFirstActivation(doc));
         Assert.assertNotNull(pD.get().getFirstActivation(doc));

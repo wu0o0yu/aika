@@ -88,7 +88,7 @@ public class OverlappingOrTest {
 
         Document doc = m.createDocument("a b c d e ", 0);
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         int wordPos = 0;
         for(int i = 0; i < doc.length(); i++) {
@@ -96,7 +96,7 @@ public class OverlappingOrTest {
             if(c != ' ') {
                 inputNeurons.get(c).addInput(doc, i, i + 1, wordPos++);
             }
-            System.out.println(doc.neuronActivationsToString(true, false, true));
+            System.out.println(doc.activationsToString(false, true));
         }
 
         // Computes the selected option
@@ -116,7 +116,7 @@ public class OverlappingOrTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
         System.out.println();
 
         doc.clearActivations();

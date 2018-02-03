@@ -82,6 +82,6 @@ public class OrOptionsTest {
         doc.propagate();
 
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
     }
 }

@@ -95,8 +95,8 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     public int isConflict = -1;
     public Conflicts conflicts = new Conflicts();
 
-    public NavigableMap<Key, NodeActivation> activations;
-    public NavigableSet<Activation> neuronActivations;
+    public NavigableMap<Key, NodeActivation> nodeActivations;
+    public NavigableSet<Activation> activations;
 
 
     public enum State {
@@ -269,13 +269,13 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     }
 
 
-    public Collection<NodeActivation> getActivations() {
-        return activations != null ? activations.values() : Collections.emptySet();
+    public Collection<NodeActivation> getNodeActivations() {
+        return nodeActivations != null ? nodeActivations.values() : Collections.emptySet();
     }
 
 
-    public Collection<Activation> getNeuronActivations() {
-        return neuronActivations != null ? neuronActivations : Collections.emptySet();
+    public Collection<Activation> getActivations() {
+        return activations != null ? activations : Collections.emptySet();
     }
 
 
@@ -586,7 +586,7 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
 
     private boolean conflictsAllowed() {
-        return activations == null || activations.isEmpty();
+        return nodeActivations == null || nodeActivations.isEmpty();
     }
 
 

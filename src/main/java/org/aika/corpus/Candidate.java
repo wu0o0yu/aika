@@ -34,7 +34,7 @@ public class Candidate  implements Comparable<Candidate> {
             maxEnd = ref.activation.key.range.end;
             minRid = ref.activation.key.rid;
         } else {
-            for (NodeActivation act : ref.getActivations()) {
+            for (NodeActivation act : ref.getNodeActivations()) {
                 sequence = Math.max(sequence, ref.activation.getSequence());
                 if (act.key.range != null) {
                     minBegin = Math.min(minBegin, act.key.range.begin);

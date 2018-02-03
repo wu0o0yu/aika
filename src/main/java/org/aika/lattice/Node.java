@@ -320,10 +320,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void register(A act, Document doc) {
         Key ak = act.key;
 
-        if (ak.interpretation.activations == null) {
-            ak.interpretation.activations = new TreeMap<>();
+        if (ak.interpretation.nodeActivations == null) {
+            ak.interpretation.nodeActivations = new TreeMap<>();
         }
-        ak.interpretation.activations.put(ak, act);
+        ak.interpretation.nodeActivations.put(ak, act);
 
         ThreadState th = ak.node.getThreadState(doc.threadId, true);
         if (th.activations.isEmpty()) {

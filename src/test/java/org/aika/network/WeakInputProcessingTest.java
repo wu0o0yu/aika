@@ -163,7 +163,7 @@ public class WeakInputProcessingTest {
         Document.APPLY_DEBUG_OUTPUT = true;
         doc.process();
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         Activation act = TestHelper.get(doc, patternA.get(), null, null);
         Assert.assertTrue(act.getFinalState().value < 0.5);

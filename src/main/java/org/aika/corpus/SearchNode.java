@@ -17,7 +17,6 @@
 package org.aika.corpus;
 
 
-import org.aika.Utils;
 import org.aika.neuron.Activation.StateChange;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.neuron.Activation;
@@ -170,7 +169,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
         if (Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Search Step: " + id + "  Candidate Weight Delta: " + weightDelta);
-            log.info(doc.neuronActivationsToString(true, true, false) + "\n");
+            log.info(doc.activationsToString(true, false) + "\n");
         }
     }
 
@@ -397,7 +396,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         if (Document.OPTIMIZE_DEBUG_OUTPUT) {
-            log.info(doc.neuronActivationsToString(true, true, false) + "\n");
+            log.info(doc.activationsToString(true, false) + "\n");
         }
 
         if (alreadyExcluded || alreadySelected) {
@@ -485,7 +484,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private void invalidateCachedDecisions(long v) {
-        for (Activation act : candidate.refinement.neuronActivations) {
+        for (Activation act : candidate.refinement.activations) {
             for (SynapseActivation sa : act.neuronOutputs) {
                 if (!sa.synapse.isNegative()) {
                     Candidate posCand = sa.output.key.interpretation.candidate;

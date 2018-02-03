@@ -300,10 +300,10 @@ public class OrNode extends Node<OrNode, Activation> {
         TreeMap<Key, Activation> actRid = th.activationsRid;
         if (actRid != null) actRid.put(ak, act);
 
-        if(ak.interpretation.neuronActivations == null) {
-            ak.interpretation.neuronActivations = new TreeSet<>();
+        if(ak.interpretation.activations == null) {
+            ak.interpretation.activations = new TreeSet<>();
         }
-        ak.interpretation.neuronActivations.add(act);
+        ak.interpretation.activations.add(act);
 
         if (ak.rid != null) {
             doc.activationsByRid.put(ak, act);

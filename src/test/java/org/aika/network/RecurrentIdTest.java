@@ -78,7 +78,7 @@ public class RecurrentIdTest {
 
         Activation outC1 = Activation.get(doc, outC, 20, new Range(0, 1), Relation.CONTAINS, null, null);
 
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         Assert.assertNotNull(outC1);
     }

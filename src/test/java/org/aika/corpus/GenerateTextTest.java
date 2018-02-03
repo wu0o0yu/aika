@@ -153,12 +153,12 @@ public class GenerateTextTest {
         inA.addInput(doc, 0, 3);
         inB.addInput(doc, 0, 3);
 
-        System.out.println(doc.neuronActivationsToString(true, true, true));
+        System.out.println(doc.activationsToString(true, true));
 
         // Search for the best interpretation.
         doc.process();
 
-        System.out.println(doc.neuronActivationsToString(true, true, true));
+        System.out.println(doc.activationsToString(true, true));
 
         System.out.println();
 
