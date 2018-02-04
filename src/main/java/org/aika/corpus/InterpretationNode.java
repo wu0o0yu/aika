@@ -138,6 +138,14 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
         }
     }
 
+
+    public InterpretationNode(Document doc, int primId, int id, int length, State s) {
+        this(doc, primId, id);
+        this.length = length;
+        this.state = s;
+    }
+
+
     public InterpretationNode(Document doc, int primId, int id, int length) {
         this(doc, primId, id);
         this.length = length;
@@ -188,14 +196,7 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
         if (isSelected != newSelected) {
             if(refByOrInterpretationNode != null) {
                 for (InterpretationNode ref : refByOrInterpretationNode) {
-                    if (newSelected) {
-                        if (ref.selectedOrInterpretationNodes == null) {
-                            ref.selectedOrInterpretationNodes = new TreeSet<>();
-                        }
-                        ref.selectedOrInterpretationNodes.add(this);
-                    } else {
-                        ref.selectedOrInterpretationNodes.remove(this);
-                    }
+                    ref.setSelectedOrInterpretationNode(this, newSelected);
                 }
             }
 
@@ -205,6 +206,20 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
                 for (InterpretationNode cn : children) {
                     cn.changeSelectedRecursive(v);
                 }
+            }
+        }
+    }
+
+
+    private void setSelectedOrInterpretationNode(InterpretationNode n, boolean state) {
+        if (state) {
+            if (selectedOrInterpretationNodes == null) {
+                selectedOrInterpretationNodes = new TreeSet<>();
+            }
+            selectedOrInterpretationNodes.add(n);
+        } else {
+            if(selectedOrInterpretationNodes != null) {
+                selectedOrInterpretationNodes.remove(n);
             }
         }
     }
@@ -285,6 +300,8 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
             n.refByOrInterpretationNode = new TreeSet<>();
         }
         n.refByOrInterpretationNode.add(this);
+
+        setSelectedOrInterpretationNode(n, n.isSelected(doc.visitedCounter++));
     }
 
 

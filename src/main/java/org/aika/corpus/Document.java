@@ -61,7 +61,7 @@ public class Document implements Comparable<Document> {
     public int searchNodeIdCounter = 0;
     public int searchStepCounter = 0;
 
-    public InterpretationNode bottom = new InterpretationNode(this, -1, 0, 0);
+    public InterpretationNode bottom = new InterpretationNode(this, -1, 0, 0, InterpretationNode.State.SELECTED);
 
     public Model model;
     public int threadId;
