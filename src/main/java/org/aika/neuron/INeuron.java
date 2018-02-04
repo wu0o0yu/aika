@@ -625,11 +625,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         TreeMap<NodeActivation.Key, Activation> actRid = th.activationsRid;
         if (actRid != null) actRid.put(ak, act);
 
-        if(ak.interpretation.activations == null) {
-            ak.interpretation.activations = new TreeSet<>();
-        }
-        ak.interpretation.activations.add(act);
-
         if (ak.rid != null) {
             doc.activationsByRid.put(ak, act);
         }

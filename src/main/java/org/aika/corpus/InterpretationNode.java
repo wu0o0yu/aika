@@ -98,7 +98,6 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     public Conflicts conflicts = new Conflicts();
 
     public NavigableMap<Key, NodeActivation> nodeActivations;
-    public NavigableSet<Activation> activations;
 
 
     public enum State {
@@ -307,11 +306,6 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
     public Collection<NodeActivation> getNodeActivations() {
         return nodeActivations != null ? nodeActivations.values() : Collections.emptySet();
-    }
-
-
-    public Collection<Activation> getActivations() {
-        return activations != null ? activations : Collections.emptySet();
     }
 
 

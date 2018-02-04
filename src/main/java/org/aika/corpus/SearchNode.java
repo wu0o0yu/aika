@@ -486,24 +486,22 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private void invalidateCachedDecisions(long v) {
-        for (Activation act : candidate.refinement.activations) {
-            for (SynapseActivation sa : act.neuronOutputs) {
-                if (!sa.synapse.isNegative()) {
-                    Candidate posCand = sa.output.key.interpretation.candidate;
-                    if (posCand != null) {
-                        if (posCand.cachedDecision == Boolean.FALSE && candidate.id > posCand.id) {
-                            posCand.cachedDecision = null;
-                        }
+        for (SynapseActivation sa : candidate.refinement.activation.neuronOutputs) {
+            if (!sa.synapse.isNegative()) {
+                Candidate posCand = sa.output.key.interpretation.candidate;
+                if (posCand != null) {
+                    if (posCand.cachedDecision == Boolean.FALSE && candidate.id > posCand.id) {
+                        posCand.cachedDecision = null;
                     }
+                }
 
-                    ArrayList<InterpretationNode> conflicting = new ArrayList<>();
-                    Conflicts.collectConflicting(conflicting, sa.output.key.interpretation, v);
-                    for (InterpretationNode c : conflicting) {
-                        Candidate negCand = c.candidate;
-                        if (negCand != null) {
-                            if (negCand.cachedDecision == Boolean.TRUE && candidate.id > negCand.id) {
-                                negCand.cachedDecision = null;
-                            }
+                ArrayList<InterpretationNode> conflicting = new ArrayList<>();
+                Conflicts.collectConflicting(conflicting, sa.output.key.interpretation, v);
+                for (InterpretationNode c : conflicting) {
+                    Candidate negCand = c.candidate;
+                    if (negCand != null) {
+                        if (negCand.cachedDecision == Boolean.TRUE && candidate.id > negCand.id) {
+                            negCand.cachedDecision = null;
                         }
                     }
                 }

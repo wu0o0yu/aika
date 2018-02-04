@@ -190,7 +190,9 @@ public class Document implements Comparable<Document> {
         }
 
         long v = visitedCounter++;
-        markCandidateSelected(bottom, v);
+        for(Activation act: inputNeuronActivations) {
+            act.visited = v;
+        }
 
         i = 0;
         candidates = new ArrayList<>();
@@ -202,7 +204,7 @@ public class Document implements Comparable<Document> {
                     c.id = i++;
                     candidates.add(c);
 
-                    markCandidateSelected(c.refinement, v);
+                    c.refinement.activation.visited = v;
                     break;
                 }
             }
@@ -211,15 +213,6 @@ public class Document implements Comparable<Document> {
                 log.error("Cycle detected in the activations that is not marked recurrent.");
 
                 throw new RuntimeException("Cycle detected in the activations that is not marked recurrent.");
-            }
-        }
-    }
-
-
-    private static void markCandidateSelected(InterpretationNode n, long v) {
-        if (n.activations != null) {
-            for (Activation act : n.activations) {
-                act.visited = v;
             }
         }
     }
@@ -488,13 +481,11 @@ public class Document implements Comparable<Document> {
         }
 
 
-        private void addAll(Collection<Activation> acts) {
-            for(Activation act: acts) {
-                add(0, act);
-                for(Activation.SynapseActivation sa: act.neuronOutputs) {
-                    if(sa.synapse.key.isRecurrent) {
-                        add(0, sa.output);
-                    }
+        private void add(Activation act) {
+            add(0, act);
+            for (Activation.SynapseActivation sa : act.neuronOutputs) {
+                if (sa.synapse.key.isRecurrent) {
+                    add(0, sa.output);
                 }
             }
         }
@@ -521,7 +512,7 @@ public class Document implements Comparable<Document> {
             long v = visitedCounter++;
 
             if(sn.getParent() != null && sn.getParent().candidate != null) {
-                addAll(sn.getParent().candidate.refinement.getActivations());
+                add(sn.getParent().candidate.refinement.activation);
             }
 
             Weight delta = Weight.ZERO;
