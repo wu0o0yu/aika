@@ -245,7 +245,7 @@ Now that the model is complete, we can start processing an actual text.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    System.out.println(doc.neuronActivationsToString(true));
+    System.out.println(doc.activationsToString());
     System.out.println();
 
     System.out.println("Final interpretation: " + doc.bestInterpretation.toString());
@@ -448,11 +448,11 @@ The output of this example looks as following. Each line in the table represents
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.neuronActivationsToString(true));
+        System.out.println(doc.activationsToString());
         System.out.println();
 
         System.out.println("Selected activations:");
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
 
         doc.clearActivations();
     }
@@ -601,7 +601,7 @@ The output of this example looks as following. Each line in the table represents
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.neuronActivationsToString(true, false, true));
+        System.out.println(doc.activationsToString(false, true));
         System.out.println();
 
         doc.clearActivations();
