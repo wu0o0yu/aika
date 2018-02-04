@@ -20,7 +20,7 @@ package org.aika.corpus;
 import org.aika.neuron.Activation.StateChange;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.neuron.Activation;
-import org.aika.neuron.INeuron.NormWeight;
+import org.aika.neuron.INeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,8 +72,8 @@ public class SearchNode implements Comparable<SearchNode> {
         EXPLORE
     }
 
-    NormWeight weightDelta = NormWeight.ZERO_WEIGHT;
-    NormWeight accumulatedWeight;
+    Weight weightDelta = Weight.ZERO;
+    Weight accumulatedWeight;
 
     public Map<Activation, StateChange> modifiedActs = new TreeMap<>(ACTIVATION_ID_COMP);
 
@@ -84,8 +84,8 @@ public class SearchNode implements Comparable<SearchNode> {
     boolean alreadyExcluded;
     SearchNode selectedChild = null;
     SearchNode excludedChild = null;
-    NormWeight selectedWeight = NormWeight.ZERO_WEIGHT;
-    NormWeight excludedWeight = NormWeight.ZERO_WEIGHT;
+    Weight selectedWeight = Weight.ZERO;
+    Weight excludedWeight = Weight.ZERO;
 
     enum Step {
         INIT,
@@ -133,7 +133,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         if(modified) {
-            weightDelta = doc.vQueue.adjustWeight(this, changed);
+            weightDelta = doc.vQueue.process(this, changed);
             markDirty();
 
             if(candidate != null) {
@@ -150,7 +150,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     act.saveNewState();
                 }
             } else {
-                weightDelta = doc.vQueue.adjustWeight(this, changed);
+                weightDelta = doc.vQueue.process(this, changed);
                 if (Math.abs(weightDelta.w - csn.weightDelta.w) > 0.00001 || !compareNewState(csn)) {
                     log.error("Cached search node activation do not match the newly computed results.");
                     log.info("Computed results:");
@@ -294,7 +294,7 @@ public class SearchNode implements Comparable<SearchNode> {
      * This algorithm is the recursive version of the interpretation search.
      * Its perhaps easier to read than the iterative version.
      */
-    public NormWeight searchRecursive(Document doc) {
+    public Weight searchRecursive(Document doc) {
         if (candidate == null) {
             return processResult(doc);
         }
@@ -328,7 +328,7 @@ public class SearchNode implements Comparable<SearchNode> {
      */
     public static void searchIterative(Document doc, SearchNode root) {
         SearchNode sn = root;
-        NormWeight returnWeight = null;
+        Weight returnWeight = null;
 
         do {
             switch(sn.step) {
@@ -456,8 +456,8 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private NormWeight finalStep() {
-        NormWeight result;
+    private Weight finalStep() {
+        Weight result;
         if (getCachedDecision() == null) {
             boolean dir = selectedWeight.getNormWeight() >= excludedWeight.getNormWeight();
             dir = alreadySelected || (!alreadyExcluded && dir);
@@ -511,7 +511,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private NormWeight processResult(Document doc) {
+    private Weight processResult(Document doc) {
         double accNW = accumulatedWeight.getNormWeight();
 
         if (accNW > getSelectedAccumulatedWeight(doc)) {
@@ -578,4 +578,48 @@ public class SearchNode implements Comparable<SearchNode> {
     public boolean getDecision() {
         return excludedParent == null || selectedParent.id > excludedParent.id;
     }
+
+
+
+    public static class Weight {
+        public final static Weight ZERO = new Weight(0.0, 0.0);
+
+        public final double w;
+        public final double n;
+
+        private Weight(double w, double n) {
+            this.w = w;
+            this.n = n;
+        }
+
+        public static Weight create(double w, double n) {
+            assert w >= 0.0 && n >= 0.0;
+            if (w == 0.0 && n == 0.0) return ZERO;
+            return new Weight(w, n);
+        }
+
+        public Weight add(Weight nw) {
+            if (nw == null || nw == ZERO) return this;
+            return new Weight(w + nw.w, n + nw.n);
+        }
+
+        public Weight sub(Weight nw) {
+            if (nw == null || nw == ZERO) return this;
+            return new Weight(w - nw.w, n - nw.n);
+        }
+
+        public double getNormWeight() {
+            return n > 0 ? w / n : 0.0;
+        }
+
+
+        public boolean equals(Weight nw) {
+            return (Math.abs(w - nw.w) <= INeuron.WEIGHT_TOLERANCE && Math.abs(n - nw.n) <= INeuron.WEIGHT_TOLERANCE);
+        }
+
+        public String toString() {
+            return "W:" + w + " N:" + n + " NW:" + getNormWeight();
+        }
+    }
+
 }

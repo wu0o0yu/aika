@@ -21,8 +21,6 @@ import org.aika.corpus.Document;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 
-import java.util.Collection;
-
 
 /**
  *
@@ -117,7 +115,7 @@ public class PatternDiscovery {
     public static void discover(Document doc, Config config) {
         doc.createV = doc.visitedCounter++;
 
-        doc.addedActivations.clear();
+        doc.addedNodeActivations.clear();
 
         doc.getAllActivationsStream().forEach(act -> config.counter.count(act));
 
@@ -127,7 +125,7 @@ public class PatternDiscovery {
 
         doc.propagate();
 
-        doc.addedActivations.forEach(act -> config.counter.count(act));
+        doc.addedNodeActivations.forEach(act -> config.counter.count(act));
     }
 
 }

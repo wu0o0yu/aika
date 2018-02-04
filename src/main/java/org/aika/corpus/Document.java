@@ -21,9 +21,8 @@ import org.aika.*;
 import org.aika.lattice.*;
 import org.aika.lattice.Node.ThreadState;
 import org.aika.neuron.Activation;
-import org.aika.neuron.Activation.State;
 import org.aika.neuron.INeuron;
-import org.aika.neuron.INeuron.NormWeight;
+import org.aika.corpus.SearchNode.Weight;
 import org.aika.neuron.Synapse;
 import org.aika.training.SupervisedTraining;
 import org.slf4j.Logger;
@@ -85,7 +84,8 @@ public class Document implements Comparable<Document> {
         return act1.compareTo(act2);
     });
     public TreeSet<Node> addedNodes = new TreeSet<>();
-    public ArrayList<NodeActivation> addedActivations = new ArrayList<>();
+    public ArrayList<NodeActivation> addedNodeActivations = new ArrayList<>();
+    public ArrayList<Activation> addedActivations = new ArrayList<>();
 
 
     public SearchNode rootSearchNode = new SearchNode(this, null, null, null, -1, Collections.emptySet());
@@ -244,7 +244,7 @@ public class Document implements Comparable<Document> {
      * network. It performs the search for the best interpretation.
      */
     public void process() {
-        inputNeuronActivations.forEach(act -> vQueue.propagateWeight(0, act));
+        inputNeuronActivations.forEach(act -> vQueue.propagateActivationValue(0, act));
 
         expandRootRefinement();
 
@@ -313,6 +313,8 @@ public class Document implements Comparable<Document> {
         activatedNeurons.forEach(n -> n.clearActivations(this));
         activatedNodes.forEach(n -> n.clearActivations(this));
 
+        addedActivations.clear();
+        addedNodeActivations.clear();
         activatedNeurons.clear();
         activatedNodes.clear();
         addedNodes.clear();
@@ -477,25 +479,10 @@ public class Document implements Comparable<Document> {
                 Activation act = queue.pollFirst();
                 act.ubQueued = false;
 
-                double oldUpperBound = act.upperBound;
-
-                INeuron n = act.getINeuron();
-
-                n.computeBounds(act);
-
-                if(Math.abs(act.upperBound - oldUpperBound) > 0.01) {
-                    for(Activation.SynapseActivation sa: act.neuronOutputs) {
-                        add(sa.output);
-                    }
-                }
-
-                if (oldUpperBound <= 0.0 && act.upperBound > 0.0) {
-                    n.propagate(act);
-                }
+                act.processBounds();
             }
             return flag;
         }
-
     }
 
 
@@ -511,7 +498,7 @@ public class Document implements Comparable<Document> {
 
         public final ArrayList<TreeSet<Activation>> queue = new ArrayList<>();
 
-        public void propagateWeight(int round, Activation act)  {
+        public void propagateActivationValue(int round, Activation act)  {
             for(Activation.SynapseActivation sa: act.neuronOutputs) {
                 int r = sa.synapse.key.isRecurrent ? round + 1 : round;
                 add(r, sa.output);
@@ -519,18 +506,7 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public NormWeight adjustWeight(SearchNode sn, Collection<InterpretationNode> changed) {
-            long v = visitedCounter++;
-
-            for(InterpretationNode n: changed) {
-                addAllActs(n.getActivations());
-            }
-
-            return processChanges(sn, v);
-        }
-
-
-        private void addAllActs(Collection<Activation> acts) {
+        private void addAll(Collection<Activation> acts) {
             for(Activation act: acts) {
                 add(0, act);
                 for(Activation.SynapseActivation sa: act.neuronOutputs) {
@@ -559,56 +535,21 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public INeuron.NormWeight processChanges(SearchNode sn, long v) {
-            NormWeight delta = NormWeight.ZERO_WEIGHT;
+        public Weight process(SearchNode sn, Collection<InterpretationNode> changed) {
+            long v = visitedCounter++;
+
+            for(InterpretationNode n: changed) {
+                addAll(n.getActivations());
+            }
+
+            Weight delta = Weight.ZERO;
             for(int round = 0; round < queue.size(); round++) {
                 TreeSet<Activation> q = queue.get(round);
                 while (!q.isEmpty()) {
                     Activation act = q.pollFirst();
                     act.rounds.setQueued(round, false);
 
-                    State s;
-                    if(act.inputValue != null) {
-                        s = new State(act.inputValue, 0, NormWeight.ZERO_WEIGHT);
-                    } else {
-                        s = act.getINeuron().computeActivationValueAndWeight(round, act);
-                    }
-
-                    if (OPTIMIZE_DEBUG_OUTPUT) {
-                        log.info(act.key + " Round:" + round);
-                        log.info("Value:" + s.value + "  Weight:" + s.weight.w + "  Norm:" + s.weight.n + "\n");
-                    }
-
-                    if (round == 0 || !act.rounds.get(round).equalsWithWeights(s)) {
-                        act.saveOldState(sn.modifiedActs, v);
-
-                        State oldState = act.rounds.get(round);
-
-                        boolean propagate = act.rounds.set(round, s) && (oldState == null || !oldState.equals(s));
-
-                        act.saveNewState();
-
-                        if (propagate) {
-                            if(round > MAX_ROUND) {
-                                log.error("Error: Maximum number of rounds reached. The network might be oscillating.");
-                                log.info(activationsToString(sn, true, true));
-
-                                dumpOscillatingActivations();
-                                throw new RuntimeException("Maximum number of rounds reached. The network might be oscillating.");
-                            } else {
-                                propagateWeight(round, act);
-                            }
-                        }
-
-                        if (round == 0) {
-                            // In case that there is a positive feedback loop.
-                            add(1, act);
-                        }
-
-                        if (act.rounds.getLastRound() != null && round >= act.rounds.getLastRound()) { // Consider only the final round.
-                            delta = delta.add(s.weight.sub(oldState.weight));
-                        }
-                    }
+                    delta = delta.add(act.process(sn, round, v));
                 }
             }
             return delta;
@@ -616,7 +557,7 @@ public class Document implements Comparable<Document> {
     }
 
 
-    private void dumpOscillatingActivations() {
+    public void dumpOscillatingActivations() {
         activatedNeurons.stream()
                 .flatMap(n -> n.getAllActivations(this).stream())
                 .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)

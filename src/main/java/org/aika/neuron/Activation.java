@@ -9,16 +9,23 @@ import org.aika.corpus.SearchNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
+import org.aika.corpus.SearchNode.Weight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Stream;
 
+import static org.aika.corpus.Document.OPTIMIZE_DEBUG_OUTPUT;
+import static org.aika.corpus.InterpretationNode.State.SELECTED;
+import static org.aika.corpus.InterpretationNode.checkSelfReferencing;
 import static org.aika.corpus.Range.Operator.EQUALS;
 import static org.aika.corpus.Range.Operator.GREATER_THAN_EQUAL;
+import static org.aika.neuron.Activation.State.DIR;
+import static org.aika.neuron.Activation.State.REC;
 import static org.aika.neuron.Activation.SynapseActivation.INPUT_COMP;
 import static org.aika.neuron.Activation.SynapseActivation.OUTPUT_COMP;
+import static org.aika.neuron.INeuron.ALLOW_WEAK_NEGATIVE_WEIGHTS;
 
 
 /**
@@ -104,13 +111,198 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    public void removeSynapseActivation(int dir, SynapseActivation sa) {
-        if (dir == 0) {
-            neuronOutputs.remove(sa);
+    public Weight process(SearchNode sn, int round, long v) {
+        Weight delta = Weight.ZERO;
+        State s;
+        if(inputValue != null) {
+            s = new State(inputValue, 0, Weight.ZERO);
         } else {
-            neuronInputs.remove(sa);
+            s = computeValueAndWeight(round);
         }
-        ;
+
+        if (OPTIMIZE_DEBUG_OUTPUT) {
+            log.info(key + " Round:" + round);
+            log.info("Value:" + s.value + "  Weight:" + s.weight.w + "  Norm:" + s.weight.n + "\n");
+        }
+
+        if (round == 0 || !rounds.get(round).equalsWithWeights(s)) {
+            saveOldState(sn.modifiedActs, v);
+
+            State oldState = rounds.get(round);
+
+            boolean propagate = rounds.set(round, s) && (oldState == null || !oldState.equals(s));
+
+            saveNewState();
+
+            if (propagate) {
+                if(round > Document.MAX_ROUND) {
+                    log.error("Error: Maximum number of rounds reached. The network might be oscillating.");
+                    log.info(doc.activationsToString(sn, true, true));
+
+                    doc.dumpOscillatingActivations();
+                    throw new RuntimeException("Maximum number of rounds reached. The network might be oscillating.");
+                } else {
+                    doc.vQueue.propagateActivationValue(round, this);
+                }
+            }
+
+            if (round == 0) {
+                // In case that there is a positive feedback loop.
+                doc.vQueue.add(1, this);
+            }
+
+            if (rounds.getLastRound() != null && round >= rounds.getLastRound()) { // Consider only the final round.
+                delta = delta.add(s.weight.sub(oldState.weight));
+            }
+        }
+        return delta;
+    }
+
+
+    public State computeValueAndWeight(int round) {
+        InterpretationNode.State c = key.interpretation.state;
+
+        INeuron n = getINeuron();
+        double[] sum = {n.biasSum, 0.0};
+
+        int fired = -1;
+
+        for (InputState is: getInputStates(round)) {
+            Synapse s = is.sa.synapse;
+            Activation iAct = is.sa.input;
+
+            if (iAct == this) continue;
+
+            int t = s.key.isRecurrent ? REC : DIR;
+            sum[t] += is.s.value * s.weight;
+
+            if (!s.key.isRecurrent && !s.isNegative() && sum[DIR] + sum[REC] >= 0.0 && fired < 0) {
+                fired = iAct.rounds.get(round).fired + 1;
+            }
+        }
+
+        double drSum = sum[DIR] + sum[REC];
+        double currentActValue = n.activationFunction.f(drSum);
+
+        maxActValue = Math.max(maxActValue, currentActValue);
+
+        // Compute only the recurrent part is above the threshold.
+        Weight newWeight = Weight.create(
+                c == SELECTED ? (sum[DIR] + n.negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC] - n.negRecSum : 0.0,
+                (sum[DIR] + n.negRecSum) < 0.0 ? Math.max(0.0, sum[DIR] + n.negRecSum + n.maxRecurrentSum) : n.maxRecurrentSum
+        );
+
+        return new State(
+                c == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? currentActValue : 0.0,
+                c == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? fired : -1,
+                newWeight
+        );
+    }
+
+
+    public void processBounds() {
+        double oldUpperBound = upperBound;
+
+        computeBounds();
+
+        if(Math.abs(upperBound - oldUpperBound) > 0.01) {
+            for(Activation.SynapseActivation sa: neuronOutputs) {
+                doc.ubQueue.add(sa.output);
+            }
+        }
+
+        if (oldUpperBound <= 0.0 && upperBound > 0.0) {
+            getINeuron().propagate(this);
+        }
+    }
+
+
+    public void computeBounds() {
+        INeuron n = getINeuron();
+        double ub = n.biasSum + n.posRecSum;
+        double lb = n.biasSum + n.posRecSum;
+
+        for (SynapseActivation sa : neuronInputs) {
+            Synapse s = sa.synapse;
+            Activation iAct = sa.input;
+
+            if (iAct == this) continue;
+
+            if (s.isNegative()) {
+                if (!checkSelfReferencing(key.interpretation, iAct.key.interpretation, false, 0) && key.interpretation.contains(iAct.key.interpretation, true)) {
+                    ub += iAct.lowerBound * s.weight;
+                }
+
+                lb += s.weight;
+            } else {
+                ub += iAct.upperBound * s.weight;
+                lb += iAct.lowerBound * s.weight;
+            }
+        }
+
+        upperBound = n.activationFunction.f(ub);
+        lowerBound = n.activationFunction.f(lb);
+    }
+
+
+    private static State getInitialState(InterpretationNode.State c) {
+        return new State(
+                c == SELECTED ? 1.0 : 0.0,
+                0,
+                Weight.ZERO
+        );
+    }
+
+
+
+    private List<InputState> getInputStates(int round) {
+        InterpretationNode o = key.interpretation;
+        ArrayList<InputState> tmp = new ArrayList<>();
+        Synapse lastSynapse = null;
+        InputState maxInputState = null;
+        for (SynapseActivation sa : neuronInputs) {
+            if (lastSynapse != null && lastSynapse != sa.synapse) {
+                tmp.add(maxInputState);
+                maxInputState = null;
+            }
+
+            State s = sa.input.getInputState(round, o, sa.synapse);
+            if (maxInputState == null || maxInputState.s.value < s.value) {
+                maxInputState = new InputState(sa, s);
+            }
+            lastSynapse = sa.synapse;
+        }
+        if (maxInputState != null) {
+            tmp.add(maxInputState);
+        }
+
+        return tmp;
+    }
+
+
+    private static class InputState {
+        public InputState(SynapseActivation sa, State s) {
+            this.sa = sa;
+            this.s = s;
+        }
+
+        SynapseActivation sa;
+        State s;
+    }
+
+
+    private State getInputState(int round, InterpretationNode o, Synapse s) {
+        InterpretationNode io = key.interpretation;
+
+        State is = State.ZERO;
+        if (s.key.isRecurrent) {
+            if (!s.isNegative() || !checkSelfReferencing(o, io, true, 0)) {
+                is = round == 0 ? getInitialState(io.state) : rounds.get(round - 1);
+            }
+        } else {
+            is = rounds.get(round);
+        }
+        return is;
     }
 
 
@@ -397,11 +589,11 @@ public final class Activation extends NodeActivation<OrNode> {
         public final double value;
 
         public final int fired;
-        public final INeuron.NormWeight weight;
+        public final Weight weight;
 
-        public static final State ZERO = new State(0.0, -1, INeuron.NormWeight.ZERO_WEIGHT);
+        public static final State ZERO = new State(0.0, -1, Weight.ZERO);
 
-        public State(double value, int fired, INeuron.NormWeight weight) {
+        public State(double value, int fired, Weight weight) {
             assert !Double.isNaN(value);
             this.value = value;
             this.fired = fired;

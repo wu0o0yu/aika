@@ -21,6 +21,7 @@ import org.aika.*;
 import org.aika.neuron.Activation.State;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.corpus.*;
+import org.aika.corpus.SearchNode.Weight;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
@@ -33,10 +34,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.aika.corpus.InterpretationNode.checkSelfReferencing;
 import static org.aika.lattice.Node.BEGIN_COMP;
 import static org.aika.lattice.Node.END_COMP;
 import static org.aika.lattice.Node.RID_COMP;
-import static org.aika.neuron.Activation.State.*;
 
 import static org.aika.corpus.InterpretationNode.State.SELECTED;
 
@@ -60,7 +61,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     public static double WEIGHT_TOLERANCE = 0.001;
     public static double TOLERANCE = 0.000001;
-    public static int MAX_SELF_REFERENCING_DEPTH = 5;
 
     public String label;
     public Type type;
@@ -189,7 +189,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         register(act);
 
-        State s = new State(input.value, input.fired, NormWeight.ZERO_WEIGHT);
+        State s = new State(input.value, input.fired, Weight.ZERO);
         act.rounds.set(0, s);
         act.inputValue = input.value;
         act.upperBound = input.value;
@@ -239,165 +239,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-    public void computeBounds(Activation act) {
-        double ub = biasSum + posRecSum;
-        double lb = biasSum + posRecSum;
-
-        for (SynapseActivation sa : act.neuronInputs) {
-            Synapse s = sa.synapse;
-            Activation iAct = sa.input;
-
-            if (iAct == act) continue;
-
-            if (s.isNegative()) {
-                if (!checkSelfReferencing(act.key.interpretation, iAct.key.interpretation, 0) && act.key.interpretation.contains(iAct.key.interpretation, true)) {
-                    ub += iAct.lowerBound * s.weight;
-                }
-
-                lb += s.weight;
-            } else {
-                ub += iAct.upperBound * s.weight;
-                lb += iAct.lowerBound * s.weight;
-            }
-        }
-
-        act.upperBound = activationFunction.f(ub);
-        act.lowerBound = activationFunction.f(lb);
-    }
-
-
-    public State computeActivationValueAndWeight(int round, Activation act) {
-        InterpretationNode.State c = act.key.interpretation.state;
-
-        double[] sum = {biasSum, 0.0};
-
-        int fired = -1;
-
-        for (InputState is: getInputStates(act, round)) {
-            Synapse s = is.sa.synapse;
-            Activation iAct = is.sa.input;
-
-            if (iAct == act) continue;
-
-            int t = s.key.isRecurrent ? REC : DIR;
-            sum[t] += is.s.value * s.weight;
-
-            if (!s.key.isRecurrent && !s.isNegative() && sum[DIR] + sum[REC] >= 0.0 && fired < 0) {
-                fired = iAct.rounds.get(round).fired + 1;
-            }
-        }
-
-        double drSum = sum[DIR] + sum[REC];
-        double currentActValue = activationFunction.f(drSum);
-
-        act.maxActValue = Math.max(act.maxActValue, currentActValue);
-
-        // Compute only the recurrent part is above the threshold.
-        NormWeight newWeight = NormWeight.create(
-                c == SELECTED ? (sum[DIR] + negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC] - negRecSum : 0.0,
-                (sum[DIR] + negRecSum) < 0.0 ? Math.max(0.0, sum[DIR] + negRecSum + maxRecurrentSum) : maxRecurrentSum
-        );
-
-        return new State(
-                c == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? currentActValue : 0.0,
-                c == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? fired : -1,
-                newWeight
-        );
-    }
-
-
-    private State getInitialState(InterpretationNode.State c) {
-        return new State(
-                c == SELECTED ? 1.0 : 0.0,
-                0,
-                NormWeight.ZERO_WEIGHT
-        );
-    }
-
-
-    private State getInputState(int round, InterpretationNode o, Synapse s, Activation iAct) {
-        InterpretationNode io = iAct.key.interpretation;
-
-        State is = State.ZERO;
-        if (s.key.isRecurrent) {
-            if (!s.isNegative() || !checkSelfReferencingForSelected(o, io, 0)) {
-                is = round == 0 ? getInitialState(io.state) : iAct.rounds.get(round - 1);
-            }
-        } else {
-            is = iAct.rounds.get(round);
-        }
-        return is;
-    }
-
-
-    private List<InputState> getInputStates(Activation act, int round) {
-        InterpretationNode o = act.key.interpretation;
-        ArrayList<InputState> tmp = new ArrayList<>();
-        Synapse lastSynapse = null;
-        InputState maxInputState = null;
-        for (SynapseActivation sa : act.neuronInputs) {
-            if (lastSynapse != null && lastSynapse != sa.synapse) {
-                tmp.add(maxInputState);
-                maxInputState = null;
-            }
-
-            State s = getInputState(round, o, sa.synapse, sa.input);
-            if (maxInputState == null || maxInputState.s.value < s.value) {
-                maxInputState = new InputState(sa, s);
-            }
-            lastSynapse = sa.synapse;
-        }
-        if (maxInputState != null) {
-            tmp.add(maxInputState);
-        }
-
-        return tmp;
-    }
-
-
-    private static class InputState {
-        public InputState(SynapseActivation sa, State s) {
-            this.sa = sa;
-            this.s = s;
-        }
-
-        SynapseActivation sa;
-        State s;
-    }
-
-
-
-    private static boolean checkSelfReferencing(InterpretationNode nx, InterpretationNode ny, int depth) {
-        if (nx == ny) return true;
-
-        if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
-
-        if (ny.orInterpretationNodes != null) {
-            for (InterpretationNode n : ny.orInterpretationNodes) {
-                if (checkSelfReferencing(nx, n, depth + 1)) return true;
-            }
-        }
-
-        return false;
-    }
-
-
-    private static boolean checkSelfReferencingForSelected(InterpretationNode nx, InterpretationNode ny, int depth) {
-        if (ny.isBottom()) return false;
-        if (nx == ny || nx.contains(ny, true)) return true;
-
-        if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
-
-        if (ny.selectedOrInterpretationNodes != null) {
-            for (InterpretationNode n : ny.selectedOrInterpretationNodes) {
-                if (checkSelfReferencingForSelected(nx, n, depth + 1)) return true;
-            }
-        }
-
-        return false;
-    }
-
-
     /**
      * Sets the incoming and outgoing links between neuron activations.
      *
@@ -444,7 +285,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     private static void addConflict(InterpretationNode io, InterpretationNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
         if (o.markedConflict == v || o.state == SELECTED) {
-            if (!checkSelfReferencing(o, io, 0)) {
+            if (!checkSelfReferencing(o, io, false, 0)) {
                 Conflicts.add(act, io, o);
             }
         } else {
@@ -793,6 +634,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             doc.activationsByRid.put(ak, act);
         }
 
+        doc.addedActivations.add(act);
+
         linkActivation(act);
     }
 
@@ -875,47 +718,5 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public Collection<Activation> getAllActivations(Document doc) {
         Stream<Activation> s = Activation.select(doc, this, null, null, null, null, null);
         return s.collect(Collectors.toList());
-    }
-
-
-    public static class NormWeight {
-        public final static NormWeight ZERO_WEIGHT = new NormWeight(0.0, 0.0);
-
-        public final double w;
-        public final double n;
-
-        private NormWeight(double w, double n) {
-            this.w = w;
-            this.n = n;
-        }
-
-        public static NormWeight create(double w, double n) {
-            assert w >= 0.0 && n >= 0.0;
-            if (w == 0.0 && n == 0.0) return ZERO_WEIGHT;
-            return new NormWeight(w, n);
-        }
-
-        public NormWeight add(NormWeight nw) {
-            if (nw == null || nw == ZERO_WEIGHT) return this;
-            return new NormWeight(w + nw.w, n + nw.n);
-        }
-
-        public NormWeight sub(NormWeight nw) {
-            if (nw == null || nw == ZERO_WEIGHT) return this;
-            return new NormWeight(w - nw.w, n - nw.n);
-        }
-
-        public double getNormWeight() {
-            return n > 0 ? w / n : 0.0;
-        }
-
-
-        public boolean equals(NormWeight nw) {
-            return (Math.abs(w - nw.w) <= INeuron.WEIGHT_TOLERANCE && Math.abs(n - nw.n) <= INeuron.WEIGHT_TOLERANCE);
-        }
-
-        public String toString() {
-            return "W:" + w + " N:" + n + " NW:" + getNormWeight();
-        }
     }
 }

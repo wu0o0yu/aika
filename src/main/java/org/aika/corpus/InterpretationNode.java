@@ -43,6 +43,8 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     public static final InterpretationNode MIN = new InterpretationNode(null, -1, 0, 0);
     public static final InterpretationNode MAX = new InterpretationNode(null, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
 
+    public static int MAX_SELF_REFERENCING_DEPTH = 5;
+
     public final int primId;
     public int minPrim = -1;
     public int maxPrim = -1;
@@ -157,6 +159,23 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
         visitedState = v;
 
         changeSelectedRecursive(doc.visitedCounter++);
+    }
+
+
+    public static boolean checkSelfReferencing(InterpretationNode nx, InterpretationNode ny, boolean onlySelected, int depth) {
+        if (ny.isBottom()) return false;
+        if (nx == ny || nx.contains(ny, true)) return true;
+
+        if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
+
+        Set<InterpretationNode> orIN = onlySelected ? ny.selectedOrInterpretationNodes : ny.orInterpretationNodes;
+        if (orIN != null) {
+            for (InterpretationNode n : orIN) {
+                if (checkSelfReferencing(nx, n, onlySelected, depth + 1)) return true;
+            }
+        }
+
+        return false;
     }
 
 
