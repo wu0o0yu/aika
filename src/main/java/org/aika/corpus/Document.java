@@ -183,11 +183,14 @@ public class Document implements Comparable<Document> {
     public void generateCandidates() {
         TreeSet<Candidate> tmp = new TreeSet<>();
         int i = 0;
-        for (InterpretationNode cn : bottom.children) {
+
+        for(Activation act: addedActivations) {
+            InterpretationNode cn = act.key.interpretation;
             if (cn.state == UNKNOWN && cn.activation.upperBound > 0.0) {
                 tmp.add(new Candidate(cn, i++));
             }
         }
+
 
         long v = visitedCounter++;
         for(Activation act: inputNeuronActivations) {

@@ -614,22 +614,24 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         Document doc = act.doc;
         INeuron.ThreadState th = ak.node.neuron.get().getThreadState(doc.threadId, true);
-        if (th.activations.isEmpty()) {
-            doc.activatedNeurons.add(ak.node.neuron.get());
+        if(!th.activations.containsKey(ak)) {
+            if (th.activations.isEmpty()) {
+                doc.activatedNeurons.add(ak.node.neuron.get());
+            }
+            th.activations.put(ak, act);
+
+            TreeMap<NodeActivation.Key, Activation> actEnd = th.activationsEnd;
+            if (actEnd != null) actEnd.put(ak, act);
+
+            TreeMap<NodeActivation.Key, Activation> actRid = th.activationsRid;
+            if (actRid != null) actRid.put(ak, act);
+
+            if (ak.rid != null) {
+                doc.activationsByRid.put(ak, act);
+            }
+
+            doc.addedActivations.add(act);
         }
-        th.activations.put(ak, act);
-
-        TreeMap<NodeActivation.Key, Activation> actEnd = th.activationsEnd;
-        if (actEnd != null) actEnd.put(ak, act);
-
-        TreeMap<NodeActivation.Key, Activation> actRid = th.activationsRid;
-        if (actRid != null) actRid.put(ak, act);
-
-        if (ak.rid != null) {
-            doc.activationsByRid.put(ak, act);
-        }
-
-        doc.addedActivations.add(act);
 
         linkActivation(act);
     }
