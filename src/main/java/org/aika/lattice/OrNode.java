@@ -78,8 +78,6 @@ public class OrNode extends Node<OrNode, Activation> {
         Range r = ak.range;
         Integer rid = Utils.nullSafeSub(ak.rid, true, ridOffset, false);
 
-        InterpretationNode no = lookupOrOption(doc, r, true);
-
         if(neuron.get(doc).outputText != null) {
             int begin = r.begin != Integer.MIN_VALUE ? r.begin : 0;
             int end = r.end != Integer.MAX_VALUE ? r.end : begin + neuron.get(doc).outputText.length();
@@ -87,6 +85,8 @@ public class OrNode extends Node<OrNode, Activation> {
         }
 
         if(r.begin == Integer.MIN_VALUE || r.end == Integer.MAX_VALUE) return;
+
+        InterpretationNode no = lookupOrOption(doc, r, true);
 
         addActivation(
                 doc,

@@ -90,9 +90,9 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     public Activation activation;
     public Candidate candidate;
 
-    private static InterpretationNode[] EMPTY_INTR_RELS = new InterpretationNode[0];
-    public InterpretationNode[] parents = EMPTY_INTR_RELS;
-    public InterpretationNode[] children = EMPTY_INTR_RELS;
+    private static InterpretationNode[] EMPTY_INTERPRETATION_RELATIONS = new InterpretationNode[0];
+    public InterpretationNode[] parents = EMPTY_INTERPRETATION_RELATIONS;
+    public InterpretationNode[] children = EMPTY_INTERPRETATION_RELATIONS;
 
     public int isConflict = -1;
     public Conflicts conflicts = new Conflicts();

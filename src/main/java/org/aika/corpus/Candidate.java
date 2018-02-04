@@ -78,6 +78,9 @@ public class Candidate  implements Comparable<Candidate> {
 
     @Override
     public int compareTo(Candidate c) {
+        if(!isConflicting() && c.isConflicting()) return -1;
+        if(isConflicting() && !c.isConflicting()) return 1;
+
         int r = Integer.compare(minBegin, c.minBegin);
         if (r != 0) return r;
         r = Integer.compare(maxEnd, c.maxEnd);

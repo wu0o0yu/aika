@@ -90,7 +90,6 @@ public class Document implements Comparable<Document> {
 
     public SearchNode rootSearchNode = new SearchNode(this, null, null, null, -1, Collections.emptySet());
     public SearchNode selectedSearchNode = null;
-    public List<InterpretationNode> rootRefs;
     public ArrayList<Candidate> candidates;
     public List<InterpretationNode> bestInterpretation = null;
 
@@ -181,17 +180,6 @@ public class Document implements Comparable<Document> {
     }
 
 
-    private void expandRootRefinement() {
-        rootRefs = new ArrayList<>();
-        rootRefs.add(bottom);
-        for (InterpretationNode pn : bottom.children) {
-            if (pn.state == SELECTED || (pn.isPrimitive() && pn.conflicts.primary.isEmpty() && pn.conflicts.secondary.isEmpty())) {
-                rootRefs.add(pn);
-            }
-        }
-    }
-
-
     public void generateCandidates() {
         TreeSet<Candidate> tmp = new TreeSet<>();
         int i = 0;
@@ -202,9 +190,7 @@ public class Document implements Comparable<Document> {
         }
 
         long v = visitedCounter++;
-        for (InterpretationNode n : rootRefs) {
-            markCandidateSelected(n, v);
-        }
+        markCandidateSelected(bottom, v);
 
         i = 0;
         candidates = new ArrayList<>();
@@ -246,13 +232,9 @@ public class Document implements Comparable<Document> {
     public void process() {
         inputNeuronActivations.forEach(act -> vQueue.propagateActivationValue(0, act));
 
-        expandRootRefinement();
-
         if (Document.OPTIMIZE_DEBUG_OUTPUT) {
             log.info("Root SearchNode:" + toString());
         }
-
-        rootRefs.forEach(n -> n.setState(SELECTED, rootSearchNode.visited));
 
         generateCandidates();
 
@@ -260,7 +242,7 @@ public class Document implements Comparable<Document> {
 
         Candidate c = !candidates.isEmpty() ? candidates.get(0) : null;
 
-        SearchNode child = new SearchNode(this, rootSearchNode, null, c, 0, rootRefs);
+        SearchNode child = new SearchNode(this, rootSearchNode, null, c, 0, Collections.singleton(bottom));
         SearchNode.searchIterative(this, child);
 //        child.searchRecursive(this);
 
