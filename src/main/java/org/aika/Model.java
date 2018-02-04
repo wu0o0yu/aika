@@ -21,8 +21,7 @@ import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.INeuron;
-import org.aika.neuron.INeuron.Type;
-import org.aika.neuron.Synapse;
+import org.aika.neuron.Neuron;
 import org.aika.Provider.SuspensionMode;
 
 import java.lang.ref.WeakReference;

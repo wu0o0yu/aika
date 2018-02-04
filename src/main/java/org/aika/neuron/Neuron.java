@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aika;
+package org.aika.neuron;
 
 
+import org.aika.ActivationFunction;
+import org.aika.Model;
+import org.aika.Provider;
+import org.aika.ReadWriteLock;
 import org.aika.corpus.Document;
-import org.aika.corpus.InterpretationNode;
 import org.aika.lattice.InputNode;
-import org.aika.neuron.Activation;
-import org.aika.neuron.INeuron;
-import org.aika.neuron.Synapse;
 
 import java.util.*;
 

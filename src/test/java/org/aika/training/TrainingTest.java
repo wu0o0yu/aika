@@ -17,7 +17,7 @@
 package org.aika.training;
 
 import org.aika.Model;
-import org.aika.Neuron;
+import org.aika.neuron.Neuron;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Relation;

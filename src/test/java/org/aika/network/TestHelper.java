@@ -17,7 +17,7 @@
 package org.aika.network;
 
 
-import org.aika.Neuron;
+import org.aika.neuron.Neuron;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;

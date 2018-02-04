@@ -19,6 +19,7 @@ package org.aika.network;
 
 import org.aika.*;
 import org.aika.corpus.Document;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.aika.training.PatternDiscovery;
 import org.aika.training.PatternDiscovery.Config;

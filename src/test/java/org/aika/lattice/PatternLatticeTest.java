@@ -23,6 +23,7 @@ import org.aika.corpus.Document;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.network.TestHelper;
 import org.aika.neuron.INeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;

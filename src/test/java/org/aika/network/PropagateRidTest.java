@@ -17,7 +17,7 @@
 package org.aika.network;
 
 
-import org.aika.Neuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.corpus.Document;

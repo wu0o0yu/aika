@@ -23,6 +23,7 @@ import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
+import org.aika.neuron.Neuron;
 import org.aika.training.PatternDiscovery.Config;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;

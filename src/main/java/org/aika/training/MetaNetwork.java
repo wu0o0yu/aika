@@ -19,7 +19,7 @@ package org.aika.training;
 
 import org.aika.neuron.Synapse;
 import org.aika.Model;
-import org.aika.Neuron;
+import org.aika.neuron.Neuron;
 import org.aika.corpus.Conflicts;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterpretationNode;

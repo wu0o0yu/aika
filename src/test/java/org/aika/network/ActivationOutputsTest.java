@@ -17,7 +17,7 @@
 package org.aika.network;
 
 
-import org.aika.Neuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Activation;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.neuron.Synapse;
@@ -29,7 +29,6 @@ import org.aika.corpus.Range.Operator;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.INeuron;
-import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
 

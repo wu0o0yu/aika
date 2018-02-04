@@ -18,10 +18,9 @@ package org.aika.training;
 
 
 import org.aika.Model;
-import org.aika.Neuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.aika.Writable;
-import org.aika.neuron.Synapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;

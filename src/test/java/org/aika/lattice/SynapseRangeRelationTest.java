@@ -17,7 +17,7 @@
 package org.aika.lattice;
 
 
-import org.aika.Neuron;
+import org.aika.neuron.Neuron;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.neuron.Activation;
 import org.aika.neuron.Activation.SynapseActivation;

@@ -20,6 +20,7 @@ package org.aika.lattice;
 import org.aika.*;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.corpus.Document;
+import org.aika.neuron.Neuron;
 import org.aika.training.PatternDiscovery.Config;
 import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
