@@ -22,6 +22,7 @@ import org.aika.neuron.Neuron;
 import org.aika.corpus.Range.Relation;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -305,7 +306,7 @@ public class InterpretationSearchTest {
         Assert.assertFalse(nD.getFinalActivations(doc).isEmpty());
     }
 
-
+    @Ignore
     @Test
     public void testIncremental() {
         Model m = new Model();
