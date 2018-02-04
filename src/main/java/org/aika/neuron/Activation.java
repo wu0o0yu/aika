@@ -609,7 +609,7 @@ public final class Activation extends NodeActivation<OrNode> {
         }
 
         public String toString() {
-            return "VALUE:" + value;
+            return "V:" + Utils.round(value) + " " + weight;
         }
     }
 
@@ -621,7 +621,6 @@ public final class Activation extends NodeActivation<OrNode> {
                 (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +
                 " V:" + Utils.round(rounds.getLast().value);
     }
-
 
 
     public String toString(SearchNode sn, boolean withTextSnippet, boolean withLogic) {
@@ -638,9 +637,9 @@ public final class Activation extends NodeActivation<OrNode> {
         if(withTextSnippet) {
             sb.append(" \"");
             if(key.node.neuron.get().outputText != null) {
-                sb.append(collapseText(key.node.neuron.get().outputText));
+                sb.append(Utils.collapseText(key.node.neuron.get().outputText));
             } else {
-                sb.append(collapseText(doc.getText(key.range)));
+                sb.append(Utils.collapseText(doc.getText(key.range)));
             }
             sb.append("\"");
         }
@@ -660,18 +659,12 @@ public final class Activation extends NodeActivation<OrNode> {
         sb.append(" - ");
         for (Map.Entry<Integer, State> me : rounds.rounds.entrySet()) {
             State s = me.getValue();
-            sb.append("[R:" + me.getKey());
-            sb.append(" V:" + Utils.round(s.value));
-            sb.append(" W:" + Utils.round(s.weight.w));
-            sb.append(" N:" + Utils.round(s.weight.n));
-            sb.append("]");
+            sb.append("[R: " + me.getKey() + " " + s + "]");
         }
 
         if (isFinalActivation()) {
             State fs = getFinalState();
-            sb.append(" - FV:" + Utils.round(fs.value));
-            sb.append(" FW:" + Utils.round(fs.weight.w));
-            sb.append(" FN:" + Utils.round(fs.weight.n));
+            sb.append(" - Final: " + fs);
         }
 
         if (inputValue != null) {
@@ -693,15 +686,6 @@ public final class Activation extends NodeActivation<OrNode> {
         }
 
         return sb.toString();
-    }
-
-
-    private String collapseText(String txt) {
-        if (txt.length() <= 10) {
-            return txt;
-        } else {
-            return txt.substring(0, 5) + "..." + txt.substring(txt.length() - 5);
-        }
     }
 
 

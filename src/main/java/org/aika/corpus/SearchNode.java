@@ -17,6 +17,7 @@
 package org.aika.corpus;
 
 
+import org.aika.Utils;
 import org.aika.neuron.Activation.StateChange;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.neuron.Activation;
@@ -618,7 +619,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         public String toString() {
-            return "W:" + w + " N:" + n + " NW:" + getNormWeight();
+            return "W:" + Utils.round(w) + " N:" + Utils.round(n);
         }
     }
 

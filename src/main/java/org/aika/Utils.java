@@ -101,4 +101,13 @@ public class Utils {
         if(b == null) return a;
         return Math.max(a, b);
     }
+
+
+    public static String collapseText(String txt) {
+        if (txt.length() <= 10) {
+            return txt;
+        } else {
+            return txt.substring(0, 5) + "..." + txt.substring(txt.length() - 5);
+        }
+    }
 }
