@@ -100,7 +100,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate c, int level, Collection<InterpretationNode> changed) {
+    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate c, int level) {
         id = doc.searchNodeIdCounter++;
         this.level = level;
         visited = doc.visitedCounter++;
@@ -134,7 +134,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         if(modified) {
-            weightDelta = doc.vQueue.process(this, changed);
+            weightDelta = doc.vQueue.process(this);
             markDirty();
 
             if(candidate != null) {
@@ -151,7 +151,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     act.saveNewState();
                 }
             } else {
-                weightDelta = doc.vQueue.process(this, changed);
+                weightDelta = doc.vQueue.process(this);
                 if (Math.abs(weightDelta.w - csn.weightDelta.w) > 0.00001 || !compareNewState(csn)) {
                     log.error("Cached search node activation do not match the newly computed results.");
                     log.info("Computed results:");
@@ -427,7 +427,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         Candidate c = doc.candidates.size() > level + 1 ? doc.candidates.get(level + 1) : null;
-        selectedChild = new SearchNode(doc, this, excludedParent, c, level + 1, Collections.singleton(candidate.refinement));
+        selectedChild = new SearchNode(doc, this, excludedParent, c, level + 1);
 
         candidate.debugDecisionCounts[0]++;
 
@@ -441,7 +441,7 @@ public class SearchNode implements Comparable<SearchNode> {
         candidate.refinement.setState(EXCLUDED, visited);
 
         Candidate c = doc.candidates.size() > level + 1 ? doc.candidates.get(level + 1) : null;
-        excludedChild = new SearchNode(doc, selectedParent, this, c, level + 1, Collections.singleton(candidate.refinement));
+        excludedChild = new SearchNode(doc, selectedParent, this, c, level + 1);
 
         candidate.debugDecisionCounts[1]++;
 

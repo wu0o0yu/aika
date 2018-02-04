@@ -88,7 +88,7 @@ public class Document implements Comparable<Document> {
     public ArrayList<Activation> addedActivations = new ArrayList<>();
 
 
-    public SearchNode rootSearchNode = new SearchNode(this, null, null, null, -1, Collections.emptySet());
+    public SearchNode rootSearchNode = new SearchNode(this, null, null, null, -1);
     public SearchNode selectedSearchNode = null;
     public ArrayList<Candidate> candidates;
     public List<InterpretationNode> bestInterpretation = null;
@@ -242,7 +242,7 @@ public class Document implements Comparable<Document> {
 
         Candidate c = !candidates.isEmpty() ? candidates.get(0) : null;
 
-        SearchNode child = new SearchNode(this, rootSearchNode, null, c, 0, Collections.singleton(bottom));
+        SearchNode child = new SearchNode(this, rootSearchNode, null, c, 0);
         SearchNode.searchIterative(this, child);
 //        child.searchRecursive(this);
 
@@ -517,11 +517,11 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public Weight process(SearchNode sn, Collection<InterpretationNode> changed) {
+        public Weight process(SearchNode sn) {
             long v = visitedCounter++;
 
-            for(InterpretationNode n: changed) {
-                addAll(n.getActivations());
+            if(sn.getParent() != null && sn.getParent().candidate != null) {
+                addAll(sn.getParent().candidate.refinement.getActivations());
             }
 
             Weight delta = Weight.ZERO;
