@@ -90,7 +90,7 @@ public class Document implements Comparable<Document> {
 
     public SearchNode rootSearchNode = new SearchNode(this, null, null, null, -1);
     public SearchNode selectedSearchNode = null;
-    public ArrayList<Candidate> candidates;
+    public ArrayList<Candidate> candidates = new ArrayList<>();
     public List<InterpretationNode> bestInterpretation = null;
 
     public long createV;
@@ -197,14 +197,12 @@ public class Document implements Comparable<Document> {
             act.visited = v;
         }
 
-        i = 0;
-        candidates = new ArrayList<>();
         while (!tmp.isEmpty()) {
             int oldSize = tmp.size();
             for (Candidate c : tmp) {
                 if (c.checkDependenciesSatisfied(v)) {
                     tmp.remove(c);
-                    c.id = i++;
+                    c.id = candidates.size();
                     candidates.add(c);
 
                     c.refinement.activation.visited = v;
