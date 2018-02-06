@@ -54,6 +54,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public static int MAX_SEARCH_STEPS = Integer.MAX_VALUE;
     public static boolean ENABLE_CACHING = true;
+    public static boolean SEARCH_ITERATIVE = true;
 
     public int id;
 

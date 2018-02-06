@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 
 import static org.aika.corpus.InterpretationNode.State.SELECTED;
 import static org.aika.corpus.InterpretationNode.State.UNKNOWN;
+import static org.aika.corpus.SearchNode.SEARCH_ITERATIVE;
 
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
@@ -237,8 +238,12 @@ public class Document implements Comparable<Document> {
         Candidate c = !candidates.isEmpty() ? candidates.get(0) : null;
 
         SearchNode child = new SearchNode(this, rootSearchNode, null, c, 0);
-        SearchNode.searchIterative(this, child);
-//        child.searchRecursive(this);
+
+        if(SEARCH_ITERATIVE) {
+            SearchNode.searchIterative(this, child);
+        } else {
+            child.searchRecursive(this);
+        }
 
         ArrayList<InterpretationNode> results = new ArrayList<>();
         results.add(bottom);

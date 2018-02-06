@@ -83,6 +83,7 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
     long visitedState;
     public State state = State.UNKNOWN;
+    public boolean fixed;
 
     public boolean isSelected;
 
@@ -159,7 +160,7 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
 
     public void setState(State newState, long v) {
-        if ((state != State.UNKNOWN && newState != State.UNKNOWN) ||
+        if ((fixed && state != State.UNKNOWN && newState != State.UNKNOWN) ||
                 newState == State.UNKNOWN && v != visitedState) return;
 
         state = newState;
