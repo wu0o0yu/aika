@@ -91,6 +91,11 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
+    public String getText() {
+        return doc.getText(key.range);
+    }
+
+
     public INeuron getINeuron() {
         return getNeuron().get(doc);
     }
