@@ -18,11 +18,12 @@ package org.aika.corpus;
 
 
 import org.aika.lattice.NodeActivation;
+import org.aika.neuron.Activation;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
+
+import static org.aika.corpus.InterpretationNode.State.SELECTED;
+import static org.aika.corpus.InterpretationNode.checkSelfReferencing;
 
 /**
  * The class {@code Conflicts} handles between different interpretation options for a given text.
@@ -34,6 +35,44 @@ public class Conflicts {
     public SortedMap<Key, Conflict> primary = new TreeMap<>();
     public Map<Key, Conflict> secondary = new TreeMap<>();
 
+
+    public static void linkConflicts(Activation act, long v, int dir) {
+        for (Activation.SynapseActivation sa : (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
+            if(sa.synapse.isNegative() && sa.synapse.key.isRecurrent) {
+                Activation oAct = (dir == 0 ? act : sa.output);
+                Activation iAct = (dir == 0 ? sa.input : act);
+
+                markConflicts(iAct, oAct, v);
+
+                addConflict(oAct.key.interpretation, iAct.key.interpretation, iAct, Collections.singleton(act), v);
+            }
+        }
+    }
+
+
+    private static void addConflict(InterpretationNode io, InterpretationNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
+        if (o.markedConflict == v || o.state == SELECTED) {
+            if (!checkSelfReferencing(o, io, false, 0)) {
+                add(act, io, o);
+            }
+        } else {
+            if(o.orInterpretationNodes != null) {
+                for (InterpretationNode no : o.orInterpretationNodes) {
+                    addConflict(io, no, act, inputActs, v);
+                }
+            }
+        }
+    }
+
+
+    private static void markConflicts(Activation iAct, Activation oAct, long v) {
+        oAct.key.interpretation.markedConflict = v;
+        for (Activation.SynapseActivation sa : iAct.neuronOutputs) {
+            if (sa.synapse.key.isRecurrent && sa.synapse.isNegative()) {
+                sa.output.key.interpretation.markedConflict = v;
+            }
+        }
+    }
 
     public static void collectConflicting(Collection<InterpretationNode> results, InterpretationNode n, long v) {
         assert n.primId >= 0;

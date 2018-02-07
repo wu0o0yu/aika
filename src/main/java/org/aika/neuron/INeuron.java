@@ -247,15 +247,17 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public void linkActivation(Activation act) {
         long v = act.doc.visitedCounter++;
         lock.acquireReadLock();
-        linkActivation(act, v, 0);
-        linkActivation(act, v, 1);
+        linkActivation(act, 0);
+        linkActivation(act, 1);
+
+        Conflicts.linkConflicts(act, v, 0);
+        Conflicts.linkConflicts(act, v, 1);
+
         lock.releaseReadLock();
     }
 
 
-    private void linkActivation(Activation act, long v, int dir) {
-        ArrayList<Activation> recNegTmp = new ArrayList<>();
-
+    private void linkActivation(Activation act, int dir) {
         provider.lock.acquireReadLock();
         NavigableMap<Synapse, Synapse> syns = (dir == 0 ? provider.inMemoryInputSynapses : provider.inMemoryOutputSynapses);
 
@@ -267,48 +269,15 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
                 ThreadState th = an.getThreadState(doc.threadId, false);
                 if (th == null || th.activations.isEmpty()) continue;
 
-                linkActSyn(an, act, dir, recNegTmp, s);
+                linkActSyn(an, act, dir, s);
             }
         }
         provider.lock.releaseReadLock();
-
-        for (Activation rAct : recNegTmp) {
-            Activation oAct = (dir == 0 ? act : rAct);
-            Activation iAct = (dir == 0 ? rAct : act);
-
-            markConflicts(iAct, oAct, v);
-
-            addConflict(oAct.key.interpretation, iAct.key.interpretation, iAct, Collections.singleton(act), v);
-        }
     }
 
 
-    private static void addConflict(InterpretationNode io, InterpretationNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
-        if (o.markedConflict == v || o.state == SELECTED) {
-            if (!checkSelfReferencing(o, io, false, 0)) {
-                Conflicts.add(act, io, o);
-            }
-        } else {
-            if(o.orInterpretationNodes != null) {
-                for (InterpretationNode no : o.orInterpretationNodes) {
-                    addConflict(io, no, act, inputActs, v);
-                }
-            }
-        }
-    }
 
-
-    private static void markConflicts(Activation iAct, Activation oAct, long v) {
-        oAct.key.interpretation.markedConflict = v;
-        for (SynapseActivation sa : iAct.neuronOutputs) {
-            if (sa.synapse.key.isRecurrent && sa.synapse.isNegative()) {
-                sa.output.key.interpretation.markedConflict = v;
-            }
-        }
-    }
-
-
-    private static void linkActSyn(INeuron n, Activation act, int dir, ArrayList<Activation> recNegTmp, Synapse s) {
+    private static void linkActSyn(INeuron n, Activation act, int dir, Synapse s) {
         Synapse.Key sk = s.key;
 
         Integer rid;
@@ -336,10 +305,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             SynapseActivation sa = new SynapseActivation(s, iAct, oAct);
             iAct.addSynapseActivation(0, sa);
             oAct.addSynapseActivation(1, sa);
-
-            if (s.isNegative() && sk.isRecurrent) {
-                recNegTmp.add(rAct);
-            }
         });
     }
 
