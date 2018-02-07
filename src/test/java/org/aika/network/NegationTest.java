@@ -683,17 +683,13 @@ public class NegationTest {
         Model m = new Model();
 
         Neuron inA = m.createNeuron("A");
-        Node inANode = inA.get().node.get();
-
         Neuron inB = m.createNeuron("B");
-        Node inBNode = inB.get().node.get();
-
 
         Neuron pC = m.createNeuron("C");
         Neuron pD = m.createNeuron("D");
 
         Neuron.init(pC,
-                0.001,
+                0.5,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(inA)
@@ -711,7 +707,7 @@ public class NegationTest {
         );
 
         Neuron.init(pD,
-                0.001,
+                0.5,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(inB)

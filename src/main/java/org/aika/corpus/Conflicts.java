@@ -82,6 +82,8 @@ public class Conflicts {
 
 
     public static void add(NodeActivation act, InterpretationNode primary, InterpretationNode secondary) {
+        assert !primary.isBottom() && !secondary.isBottom();
+
         Key ck = new Key(secondary, act);
         Conflict c = primary.conflicts.primary.get(ck);
         if(c == null) {

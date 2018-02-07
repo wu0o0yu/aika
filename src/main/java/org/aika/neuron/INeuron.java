@@ -245,20 +245,21 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
      * @param act
      */
     public void linkActivation(Activation act) {
-        long v = act.doc.visitedCounter++;
+
         lock.acquireReadLock();
+        provider.lock.acquireReadLock();
         linkActivation(act, 0);
         linkActivation(act, 1);
+        provider.lock.releaseReadLock();
+        lock.releaseReadLock();
 
+        long v = act.doc.visitedCounter++;
         Conflicts.linkConflicts(act, v, 0);
         Conflicts.linkConflicts(act, v, 1);
-
-        lock.releaseReadLock();
     }
 
 
     private void linkActivation(Activation act, int dir) {
-        provider.lock.acquireReadLock();
         NavigableMap<Synapse, Synapse> syns = (dir == 0 ? provider.inMemoryInputSynapses : provider.inMemoryOutputSynapses);
 
         Document doc = act.doc;
@@ -272,7 +273,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
                 linkActSyn(an, act, dir, s);
             }
         }
-        provider.lock.releaseReadLock();
     }
 
 
