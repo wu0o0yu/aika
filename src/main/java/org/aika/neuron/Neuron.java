@@ -54,6 +54,8 @@ public class Neuron extends Provider<INeuron> {
 
     public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(IM_INPUT_SYNAPSE_COMP);
     public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(IM_OUTPUT_SYNAPSE_COMP);
+    int[] inputSortGroupCounts = new int[4];
+    int[] outputSortGroupCounts = new int[4];
 
 
     public Neuron(Model m, int id) {

@@ -98,7 +98,7 @@ public class Linker {
 
 
     /**
-     * Sets the incoming and outgoing links between neuron activations.
+     * Adds the incoming and outgoing links between neuron activations.
      *
      * @param act
      */
@@ -121,6 +121,7 @@ public class Linker {
     private static void link(Activation act, Direction dir) {
         Neuron n = act.getNeuron();
         NavigableMap<Synapse, Synapse> syns = (dir == INPUT ? n.inMemoryInputSynapses : n.inMemoryOutputSynapses);
+        int[] sortGroupCounts = (dir == INPUT ? n.inputSortGroupCounts : n.outputSortGroupCounts);
 
         if(syns.isEmpty()) return;
 
@@ -131,14 +132,16 @@ public class Linker {
         }
 
         for(SortGroup sg: new SortGroup[] {SortGroup.RANGE_BEGIN, SortGroup.RANGE_END, SortGroup.RID_ZERO}) {
-            link(act, dir, sg, syns);
+            if(sortGroupCounts[sg.ordinal()] > 0) {
+                link(act, dir, sg, syns);
+            }
         }
 
         NavigableMap<Synapse, Synapse> remainingSyns = syns.subMap(SortGroup.OTHERS.begin, true, SortGroup.OTHERS.end, true);
         if(remainingSyns.isEmpty()) return;
 
         // Optimization in case the set of synapses is very large
-        if (act.doc.activatedNeurons.size() * 20 > syns.size()) { // Calling size() on a subset is expensive
+        if (act.doc.activatedNeurons.size() * 20 > sortGroupCounts[SortGroup.OTHERS.ordinal()]) {
             linkOthers(act, dir, remainingSyns.values());
         } else {
             linkOthers(act, dir, getActiveSynapses(act.doc, dir, remainingSyns));
@@ -147,16 +150,13 @@ public class Linker {
 
 
     private static void link(Activation act, Direction dir, SortGroup sortGroup, NavigableMap<Synapse, Synapse> syns) {
-        NavigableMap<Synapse, Synapse> synsFromGroup = syns.subMap(sortGroup.begin, true, sortGroup.end, true);
-        if(synsFromGroup.isEmpty()) return;
-
         assert sortGroup.checkActivation(act.key);
 
         Selector.select(sortGroup, act).forEach(rAct -> {
             Activation oAct = (dir == INPUT ? act : rAct);
             Activation iAct = (dir == INPUT ? rAct : act);
 
-            for(Synapse s: synsFromGroup.subMap(
+            for(Synapse s: syns.subMap(
                     new Synapse(iAct.getNeuron(), oAct.getNeuron(), sortGroup.begin.key), true,
                     new Synapse(iAct.getNeuron(), oAct.getNeuron(), sortGroup.end.key), true).values()) {
                 Synapse.Key sk = s.key;
