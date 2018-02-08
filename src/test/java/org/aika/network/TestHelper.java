@@ -17,15 +17,12 @@
 package org.aika.network;
 
 
-import org.aika.neuron.Neuron;
+import org.aika.neuron.*;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Relation;
 import org.aika.lattice.InputNode;
-import org.aika.neuron.Activation;
-import org.aika.neuron.INeuron;
-import org.aika.neuron.Synapse;
 
 /**
  *
@@ -53,6 +50,6 @@ public class TestHelper {
     }
 
     public static Activation get(Document doc, INeuron n, Range r, InterpretationNode o) {
-        return Activation.get(doc, n, null, r, Relation.CONTAINS, o, InterpretationNode.Relation.EQUALS);
+        return Selector.get(doc, n, null, r, Relation.CONTAINS, o, InterpretationNode.Relation.EQUALS);
     }
 }

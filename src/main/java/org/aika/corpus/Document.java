@@ -23,6 +23,7 @@ import org.aika.lattice.Node.ThreadState;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
 import org.aika.corpus.SearchNode.Weight;
+import org.aika.neuron.Selector;
 import org.aika.neuron.Synapse;
 import org.aika.training.SupervisedTraining;
 import org.slf4j.Logger;
@@ -79,10 +80,20 @@ public class Document implements Comparable<Document> {
 
     public SupervisedTraining supervisedTraining = new SupervisedTraining(this);
 
-    public TreeMap<NodeActivation.Key, Activation> activationsByRid = new TreeMap<>((act1, act2) -> {
-        int r = Integer.compare(act1.rid, act2.rid);
+    public TreeMap<NodeActivation.Key, Activation> activationsByRangeBegin = new TreeMap<>((ak1, ak2) -> {
+        int r = Integer.compare(ak1.range.begin, ak2.range.begin);
         if (r != 0) return r;
-        return act1.compareTo(act2);
+        return ak1.compareTo(ak2);
+    });
+    public TreeMap<NodeActivation.Key, Activation> activationsByRangeEnd = new TreeMap<>((ak1, ak2) -> {
+        int r = Integer.compare(ak1.range.end, ak2.range.end);
+        if (r != 0) return r;
+        return ak1.compareTo(ak2);
+    });
+    public TreeMap<NodeActivation.Key, Activation> activationsByRid = new TreeMap<>((ak1, ak2) -> {
+        int r = Integer.compare(ak1.rid, ak2.rid);
+        if (r != 0) return r;
+        return ak1.compareTo(ak2);
     });
     public TreeSet<Node> addedNodes = new TreeSet<>();
     public ArrayList<NodeActivation> addedNodeActivations = new ArrayList<>();
@@ -148,7 +159,7 @@ public class Document implements Comparable<Document> {
 
     public Stream<Activation> getActivations() {
         return activatedNeurons.stream()
-                .flatMap(in -> in.getActivationsStream(this));
+                .flatMap(in -> in.getActivations(this).stream());
     }
 
 
@@ -352,7 +363,7 @@ public class Document implements Comparable<Document> {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         for (INeuron n : activatedNeurons) {
-            Stream<Activation> s = Activation.select(this, n, null, null, null, null, InterpretationNode.Relation.CONTAINED_IN);
+            Stream<Activation> s = Selector.select(this, n, null, null, null, null, InterpretationNode.Relation.CONTAINED_IN);
             acts.addAll(s.collect(Collectors.toList()));
         }
 
@@ -538,7 +549,7 @@ public class Document implements Comparable<Document> {
 
     public void dumpOscillatingActivations() {
         activatedNeurons.stream()
-                .flatMap(n -> n.getAllActivations(this).stream())
+                .flatMap(n -> n.getActivations(this).stream())
                 .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)
                 .forEach(act -> {
                     log.error(act.id + " " + act.key + " " + act.key.interpretation.state + " " + act.rounds);

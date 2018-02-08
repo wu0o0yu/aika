@@ -19,11 +19,14 @@ package org.aika.corpus;
 
 import org.aika.lattice.NodeActivation;
 import org.aika.neuron.Activation;
+import org.aika.neuron.Linker;
+import org.aika.neuron.Linker.Direction;
 
 import java.util.*;
 
 import static org.aika.corpus.InterpretationNode.State.SELECTED;
 import static org.aika.corpus.InterpretationNode.checkSelfReferencing;
+import static org.aika.neuron.Linker.Direction.INPUT;
 
 /**
  * The class {@code Conflicts} handles between different interpretation options for a given text.
@@ -36,11 +39,11 @@ public class Conflicts {
     public Map<Key, Conflict> secondary = new TreeMap<>();
 
 
-    public static void linkConflicts(Activation act, long v, int dir) {
-        for (Activation.SynapseActivation sa : (dir == 0 ? act.neuronInputs : act.neuronOutputs)) {
+    public static void linkConflicts(Activation act, long v, Direction dir) {
+        for (Activation.SynapseActivation sa : (dir == INPUT ? act.neuronInputs : act.neuronOutputs)) {
             if(sa.synapse.isNegative() && sa.synapse.key.isRecurrent) {
-                Activation oAct = (dir == 0 ? act : sa.output);
-                Activation iAct = (dir == 0 ? sa.input : act);
+                Activation oAct = (dir == INPUT ? act : sa.output);
+                Activation iAct = (dir == INPUT ? sa.input : act);
 
                 markConflicts(iAct, oAct, v);
 
@@ -74,6 +77,7 @@ public class Conflicts {
         }
     }
 
+
     public static void collectConflicting(Collection<InterpretationNode> results, InterpretationNode n, long v) {
         assert n.primId >= 0;
         n.conflicts.primary.values().forEach(c -> c.secondary.collectPrimitiveNodes(results, v));
@@ -82,8 +86,6 @@ public class Conflicts {
 
 
     public static void add(NodeActivation act, InterpretationNode primary, InterpretationNode secondary) {
-        assert !primary.isBottom() && !secondary.isBottom();
-
         Key ck = new Key(secondary, act);
         Conflict c = primary.conflicts.primary.get(ck);
         if(c == null) {

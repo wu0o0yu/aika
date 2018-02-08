@@ -1,5 +1,7 @@
-package org.aika.corpus;
+package org.aika.network;
 
+import org.aika.corpus.Document;
+import org.aika.corpus.Range;
 import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.neuron.Neuron;
@@ -10,14 +12,14 @@ import org.junit.Test;
 
 import static org.aika.corpus.Range.Operator.*;
 
-public class RangeComparisonTest {
+public class LinkerTest {
 
 
     @Test
-    public void testRangeComparison() {
+    public void testLinker() {
 
-        testSynapse(new Range(0, 10), new Range(0, 10), Relation.EQUALS, true);
         testSynapse(new Range(0, 20), new Range(5, 15), Relation.CONTAINED_IN, true);
+        testSynapse(new Range(0, 10), new Range(0, 10), Relation.EQUALS, true);
 
         // Overlaps
         testSynapse(new Range(0, 10), new Range(5, 15), Relation.OVERLAPS, true);
@@ -64,7 +66,7 @@ public class RangeComparisonTest {
                 na.addInput(doc, ra.begin, ra.end);
             }
 
-            Assert.assertEquals(targetValue, !na.get().getAllActivations(doc).iterator().next().neuronOutputs.isEmpty());
+            Assert.assertEquals(targetValue, !na.get().getActivations(doc).iterator().next().neuronOutputs.isEmpty());
         }
     }
 }

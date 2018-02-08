@@ -17,16 +17,13 @@
 package org.aika.lattice;
 
 
-import org.aika.neuron.Synapse;
+import org.aika.neuron.*;
 import org.aika.Model;
-import org.aika.neuron.Neuron;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Relation;
 import org.aika.network.TestHelper;
-import org.aika.neuron.Activation;
-import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -65,9 +62,9 @@ public class ActivationsTest {
 
         inA.addInput(doc, 1, 2);
 
-        Assert.assertEquals(Activation.get(doc, pA.get(), null, new Range(0, 1), Relation.EQUALS, doc.bottom, InterpretationNode.Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(0, 1), doc.bottom));
-        Assert.assertEquals(Activation.get(doc, pA.get(), null, new Range(1, 2), Relation.EQUALS, doc.bottom, InterpretationNode.Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(1, 2), doc.bottom));
-        Assert.assertEquals(Activation.get(doc, pA.get(), null, new Range(2, 3), Relation.EQUALS, doc.bottom, InterpretationNode.Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(2, 3), doc.bottom));
+        Assert.assertEquals(Selector.get(doc, pA.get(), null, new Range(0, 1), Relation.EQUALS, doc.bottom, InterpretationNode.Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(0, 1), doc.bottom));
+        Assert.assertEquals(Selector.get(doc, pA.get(), null, new Range(1, 2), Relation.EQUALS, doc.bottom, InterpretationNode.Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(1, 2), doc.bottom));
+        Assert.assertEquals(Selector.get(doc, pA.get(), null, new Range(2, 3), Relation.EQUALS, doc.bottom, InterpretationNode.Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(2, 3), doc.bottom));
     }
 
 

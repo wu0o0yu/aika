@@ -21,6 +21,7 @@ import org.aika.*;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.corpus.Document;
 import org.aika.neuron.Neuron;
+import org.aika.neuron.Selector;
 import org.aika.training.PatternDiscovery.Config;
 import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
@@ -118,7 +119,7 @@ public class OrNode extends Node<OrNode, Activation> {
             log.info("add: " + ak + " - " + ak.node);
         }
 
-        Activation act = Activation.get(doc,  neuron.get(), ak);
+        Activation act = Selector.get(doc,  neuron.get(), ak);
         if (act == null) {
             act = createActivation(doc, ak);
 
@@ -179,7 +180,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
     // TODO: RID
     public InterpretationNode lookupOrOption(Document doc, Range r, boolean create) {
-        Activation act = Activation.select(doc, neuron.get(), null, r, Range.Relation.EQUALS, null, null)
+        Activation act = Selector.select(doc, neuron.get(), null, r, Range.Relation.EQUALS, null, null)
                 .findFirst()
                 .orElse(null);
 

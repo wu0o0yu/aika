@@ -27,8 +27,10 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         this.model = model;
         this.id = id;
 
-        synchronized (model.providers) {
-            model.providers.put(this.id, new WeakReference<>(this));
+        if(model != null) {
+            synchronized (model.providers) {
+                model.providers.put(this.id, new WeakReference<>(this));
+            }
         }
     }
 

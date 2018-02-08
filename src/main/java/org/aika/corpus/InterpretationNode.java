@@ -622,6 +622,9 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
 
     public String toString() {
+        if(this == MIN) return "MIN_INTERPRETATION";
+        if(this == MAX) return "MAX_INTERPRETATION";
+
         return toString(false);
     }
 

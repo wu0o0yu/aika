@@ -17,8 +17,7 @@
 package org.aika.network;
 
 
-import org.aika.neuron.Neuron;
-import org.aika.neuron.Synapse;
+import org.aika.neuron.*;
 import org.aika.corpus.Range.Relation;
 import org.aika.Model;
 import org.aika.corpus.Document;
@@ -26,8 +25,6 @@ import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.Activation;
-import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -60,30 +57,27 @@ public class NegationTest {
                         .setWeight(10.0)
                         .setBias(-9.5)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(-10.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRelativeRid(0)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setNeuron(inC)
                         .setWeight(-10.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRelativeRid(0)
                         .setRangeOutput(true)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        inA.addInput(doc, 0, 11);
+        inA.addInput(doc, 0, 11, 0);
 
         System.out.println(doc.activationsToString(false, true));
-        Assert.assertNotNull(Activation.get(doc, abcN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
+        Assert.assertNotNull(Selector.get(doc, abcN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
         InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
 
@@ -105,7 +99,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, true));
 
-        Assert.assertNotNull(Activation.get(doc, abcN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
+        Assert.assertNotNull(Selector.get(doc, abcN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
     }
 
 
@@ -128,7 +122,6 @@ public class NegationTest {
                         .setNeuron(abcN)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setBias(0.0)
         );
 
@@ -139,19 +132,16 @@ public class NegationTest {
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setBias(-1.0),
                 new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(-1.0)
                         .setRecurrent(true)
-                        .setRelativeRid(0)
                         .setBias(0.0),
                 new Synapse.Builder()
                         .setNeuron(inC)
                         .setWeight(-1.0)
                         .setRecurrent(true)
-                        .setRelativeRid(0)
                         .setBias(0.0)
         );
 
@@ -201,7 +191,6 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setRangeOutput(true)
         );
 
@@ -213,7 +202,6 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setBias(-1.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
@@ -221,7 +209,6 @@ public class NegationTest {
                         .setWeight(-1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setRangeMatch(NONE)
         );
 
@@ -241,7 +228,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, true));
 
-        Assert.assertNotNull(Activation.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
+        Assert.assertNotNull(Selector.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
         doc.clearActivations();
     }
@@ -265,7 +252,6 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setRangeOutput(true)
         );
 
@@ -277,7 +263,6 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setBias(-1.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
@@ -285,7 +270,6 @@ public class NegationTest {
                         .setWeight(-1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setRangeMatch(Relation.CONTAINS)
         );
 
@@ -305,7 +289,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, true));
 
-        Assert.assertNotNull(Activation.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
+        Assert.assertNotNull(Selector.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
         doc.clearActivations();
     }
@@ -329,7 +313,6 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setRangeOutput(true)
         );
 
@@ -341,7 +324,6 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setBias(-1.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
@@ -349,7 +331,6 @@ public class NegationTest {
                         .setWeight(-1.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRelativeRid(0)
                         .setRangeMatch(Relation.CONTAINS)
         );
 
@@ -369,7 +350,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, true));
 
-        Assert.assertNotNull(Activation.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
+        Assert.assertNotNull(Selector.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
         doc.clearActivations();
     }
@@ -392,7 +373,6 @@ public class NegationTest {
                         .setNeuron(asN)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
@@ -400,7 +380,6 @@ public class NegationTest {
                         .setNeuron(absN)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
@@ -413,7 +392,6 @@ public class NegationTest {
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setBias(-1.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
@@ -421,7 +399,6 @@ public class NegationTest {
                         .setNeuron(inS)
                         .setWeight(-1.0)
                         .setRecurrent(true)
-                        .setRelativeRid(0)
                         .setBias(0.0)
                         .setRangeMatch(Relation.CONTAINS)
         );
@@ -432,7 +409,6 @@ public class NegationTest {
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setBias(-1.0)
                         .setRangeMatch(EQUALS, Range.Operator.NONE)
                         .setRangeOutput(BEGIN, Range.Mapping.NONE),
@@ -440,7 +416,6 @@ public class NegationTest {
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setBias(-1.0)
                         .setRangeMatch(Range.Operator.NONE, EQUALS)
                         .setRangeOutput(Range.Mapping.NONE, END),
@@ -448,7 +423,6 @@ public class NegationTest {
                         .setNeuron(inS)
                         .setWeight(-1.0)
                         .setRecurrent(true)
-                        .setRelativeRid(0)
                         .setBias(0.0)
                         .setRangeMatch(Relation.CONTAINS)
         );
@@ -456,15 +430,15 @@ public class NegationTest {
         {
             Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-            inA.addInput(doc, 0, 6);
+            inA.addInput(doc, 0, 6, 0);
             System.out.println(doc.activationsToString(false, true));
 
-            inB.addInput(doc, 0, 6);
+            inB.addInput(doc, 0, 6, 0);
 
             System.out.println(doc.activationsToString(false, true));
 
-            Assert.assertNotNull(Activation.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null));
-            Assert.assertEquals(2, Activation.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null).key.interpretation.orInterpretationNodes.size());
+            Assert.assertNotNull(Selector.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null));
+            Assert.assertEquals(2, Selector.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null).key.interpretation.orInterpretationNodes.size());
 
             doc.clearActivations();
         }
@@ -479,11 +453,11 @@ public class NegationTest {
 
             System.out.println(doc.activationsToString(false, true));
 
-//            Assert.assertNotNull(Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
-            Assert.assertNotNull(Activation.get(doc, inS.get(), null, new Range(0, 9), Relation.EQUALS, null, null));
+//            Assert.assertNotNull(Selector.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
+            Assert.assertNotNull(Selector.get(doc, inS.get(), null, new Range(0, 9), Relation.EQUALS, null, null));
 //            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.interpretation.orInterprNodes.size());
-            Assert.assertEquals(1, Activation.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null).key.interpretation.orInterpretationNodes.size());
-            Assert.assertEquals(1, Activation.get(doc, inS.get(), null, new Range(0, 9), Relation.EQUALS, null, null).key.interpretation.orInterpretationNodes.size());
+            Assert.assertEquals(1, Selector.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null).key.interpretation.orInterpretationNodes.size());
+            Assert.assertEquals(1, Selector.get(doc, inS.get(), null, new Range(0, 9), Relation.EQUALS, null, null).key.interpretation.orInterpretationNodes.size());
 
             doc.clearActivations();
         }
@@ -756,9 +730,9 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inA.addInput(doc, 0, 1);
-        inB.addInput(doc, 0, 1);
-        inG.addInput(doc, 0, 1);
+        inA.addInput(doc, 0, 1, 0);
+        inB.addInput(doc, 0, 1, 0);
+        inG.addInput(doc, 0, 1, 0);
 
         System.out.println(doc.activationsToString(false, true));
 

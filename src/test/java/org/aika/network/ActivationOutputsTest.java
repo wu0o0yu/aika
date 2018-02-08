@@ -17,10 +17,8 @@
 package org.aika.network;
 
 
-import org.aika.neuron.Neuron;
-import org.aika.neuron.Activation;
+import org.aika.neuron.*;
 import org.aika.neuron.Activation.SynapseActivation;
-import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.corpus.Document;
 import org.aika.corpus.InterpretationNode;
@@ -28,7 +26,6 @@ import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
-import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -165,10 +162,11 @@ public class ActivationOutputsTest {
         InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
         inA.addInput(doc, new Activation.Builder()
                 .setRange(0, 1)
+                .setRelationalId(0)
                 .setInterpretation(o1)
         );
 
-        Activation outB1 = Activation.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
+        Activation outB1 = Selector.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
         Assert.assertTrue(containsOutputActivation(inA.get().getFirstActivation(doc).neuronOutputs, outB1));
     }
 
@@ -194,10 +192,11 @@ public class ActivationOutputsTest {
         inA.addInput(doc,
                 new Activation.Builder()
                         .setRange(0, 1)
+                        .setRelationalId(0)
                         .setInterpretation(InterpretationNode.addPrimitive(doc))
         );
 
-        Activation outB1 = Activation.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
+        Activation outB1 = Selector.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
 
         Assert.assertTrue(containsOutputActivation(inA.get().getFirstActivation(doc).neuronOutputs, outB1));
     }
@@ -230,7 +229,7 @@ public class ActivationOutputsTest {
                         .setInterpretation(o1)
         );
 
-        Activation outB1 = Activation.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
+        Activation outB1 = Selector.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
 
         Assert.assertTrue(containsOutputActivation(inA.get().getFirstActivation(doc).neuronOutputs, outB1));
     }

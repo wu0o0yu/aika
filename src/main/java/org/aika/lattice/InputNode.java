@@ -19,15 +19,12 @@ package org.aika.lattice;
 
 import org.aika.*;
 import org.aika.corpus.Document;
-import org.aika.neuron.Neuron;
+import org.aika.neuron.*;
 import org.aika.training.PatternDiscovery.Config;
 import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode.Refinement;
-import org.aika.neuron.Activation;
-import org.aika.neuron.INeuron;
-import org.aika.neuron.Synapse;
 import org.aika.neuron.Synapse.Key;
 
 import java.io.DataInput;
@@ -176,7 +173,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         InputNode firstNode = ((InputNode) ak.node);
         Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
 
-        Stream<Activation> s = Activation.select(
+        Stream<Activation> s = Selector.select(
                 th,
                 secondNode.inputNeuron.get(),
                 secondRid,

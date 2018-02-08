@@ -35,7 +35,6 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
 
     public long visited = -1;
     public Long repropagateV;
-    public Long recomputeUBV;
 
     public TreeMap<Key, NodeActivation<?>> inputs = new TreeMap<>();
     public TreeMap<Key, NodeActivation<?>> outputs = new TreeMap<>();

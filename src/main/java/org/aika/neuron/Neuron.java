@@ -34,10 +34,26 @@ import java.util.*;
  */
 public class Neuron extends Provider<INeuron> {
 
+    public static final Neuron MIN_NEURON = new Neuron(null, Integer.MIN_VALUE);
+    public static final Neuron MAX_NEURON = new Neuron(null, Integer.MAX_VALUE);
+
+
     public ReadWriteLock lock = new ReadWriteLock();
 
-    public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
-    public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
+    private static final Comparator<Synapse> IM_INPUT_SYNAPSE_COMP = (sa, sb) -> {
+        int r = Linker.SortGroup.compare(sa.key, sb.key);
+        if(r != 0) return r;
+        return Synapse.INPUT_SYNAPSE_COMP.compare(sa, sb);
+    };
+
+    private static final Comparator<Synapse> IM_OUTPUT_SYNAPSE_COMP = (sa, sb) -> {
+        int r = Linker.SortGroup.compare(sa.key, sb.key);
+        if(r != 0) return r;
+        return Synapse.OUTPUT_SYNAPSE_COMP.compare(sa, sb);
+    };
+
+    public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(IM_INPUT_SYNAPSE_COMP);
+    public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(IM_OUTPUT_SYNAPSE_COMP);
 
 
     public Neuron(Model m, int id) {
@@ -306,5 +322,12 @@ public class Neuron extends Provider<INeuron> {
                 iNode.setSynapse(s);
             }
         }
+    }
+
+    public String toString() {
+        if(this == MIN_NEURON) return "MIN_NEURON";
+        if(this == MAX_NEURON) return "MAX_NEURON";
+
+        return super.toString();
     }
 }

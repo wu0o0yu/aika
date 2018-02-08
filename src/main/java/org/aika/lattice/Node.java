@@ -474,6 +474,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public String toString() {
+        if(this == MIN_NODE) return "MIN_NODE";
+        if(this == MAX_NODE) return "MAX_NODE";
+
         StringBuilder sb = new StringBuilder();
         sb.append(getNeuronLabel());
         sb.append(" - ");

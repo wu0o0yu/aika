@@ -17,14 +17,11 @@
 package org.aika.network;
 
 
-import org.aika.neuron.Neuron;
-import org.aika.neuron.Synapse;
+import org.aika.neuron.*;
 import org.aika.corpus.Range.Relation;
 import org.aika.Model;
-import org.aika.neuron.Activation;
 import org.aika.corpus.Document;
 import org.aika.corpus.Range;
-import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -76,7 +73,7 @@ public class RecurrentIdTest {
         inA.addInput(doc, 0, 1, 20);
         inB.addInput(doc, 0, 1, 21);
 
-        Activation outC1 = Activation.get(doc, outC, 20, new Range(0, 1), Relation.CONTAINS, null, null);
+        Activation outC1 = Selector.get(doc, outC, 20, new Range(0, 1), Relation.CONTAINS, null, null);
 
         System.out.println(doc.activationsToString(false, true));
 
@@ -127,7 +124,7 @@ public class RecurrentIdTest {
         inB.addInput(doc, 0, 1, 10);
         inC.addInput(doc, 0, 1, 16);
 
-        Activation outD1 = Activation.get(doc, outD, 10, new Range(0, 1), Relation.EQUALS, null, null);
+        Activation outD1 = Selector.get(doc, outD, 10, new Range(0, 1), Relation.EQUALS, null, null);
 
         Assert.assertNotNull(outD1);
     }

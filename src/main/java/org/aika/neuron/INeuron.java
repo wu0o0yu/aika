@@ -35,11 +35,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.aika.corpus.InterpretationNode.checkSelfReferencing;
-import static org.aika.lattice.Node.BEGIN_COMP;
-import static org.aika.lattice.Node.END_COMP;
-import static org.aika.lattice.Node.RID_COMP;
 
 import static org.aika.corpus.InterpretationNode.State.SELECTED;
+import static org.aika.lattice.Node.*;
 
 /**
  * The {@code INeuron} class represents a internal neuron implementation in Aikas neural network and is connected to other neurons through
@@ -239,108 +237,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-    /**
-     * Sets the incoming and outgoing links between neuron activations.
-     *
-     * @param act
-     */
-    public void linkActivation(Activation act) {
-
-        lock.acquireReadLock();
-        provider.lock.acquireReadLock();
-        linkActivation(act, 0);
-        linkActivation(act, 1);
-        provider.lock.releaseReadLock();
-        lock.releaseReadLock();
-
-        long v = act.doc.visitedCounter++;
-        Conflicts.linkConflicts(act, v, 0);
-        Conflicts.linkConflicts(act, v, 1);
-    }
-
-
-    private void linkActivation(Activation act, int dir) {
-        NavigableMap<Synapse, Synapse> syns = (dir == 0 ? provider.inMemoryInputSynapses : provider.inMemoryOutputSynapses);
-
-        Document doc = act.doc;
-        for (Synapse s : getActiveSynapses(provider.model, doc, dir, syns)) {
-            Neuron p = (dir == 0 ? s.input : s.output);
-            INeuron an = p.getIfNotSuspended();
-            if (an != null) {
-                ThreadState th = an.getThreadState(doc.threadId, false);
-                if (th == null || th.activations.isEmpty()) continue;
-
-                linkActSyn(an, act, dir, s);
-            }
-        }
-    }
-
-
-
-    private static void linkActSyn(INeuron n, Activation act, int dir, Synapse s) {
-        Synapse.Key sk = s.key;
-
-        Integer rid;
-        if (dir == 0) {
-            rid = sk.absoluteRid != null ? sk.absoluteRid : Utils.nullSafeAdd(act.key.rid, false, sk.relativeRid, false);
-        } else {
-            rid = Utils.nullSafeSub(act.key.rid, false, sk.relativeRid, false);
-        }
-
-        Stream<Activation> tmp = Activation.select(
-                act.doc,
-                n,
-                rid,
-                act.key.range,
-                dir == 0 ? sk.rangeMatch.invert() : sk.rangeMatch,
-                null,
-                null
-        );
-
-        final int d = dir;
-        tmp.forEach(rAct -> {
-            Activation oAct = (d == 0 ? act : rAct);
-            Activation iAct = (d == 0 ? rAct : act);
-
-            SynapseActivation sa = new SynapseActivation(s, iAct, oAct);
-            iAct.addSynapseActivation(0, sa);
-            oAct.addSynapseActivation(1, sa);
-        });
-    }
-
-
-    private static Collection<Synapse> getActiveSynapses(Model m, Document doc, int dir, NavigableMap<Synapse, Synapse> syns) {
-        // Optimization in case the set of synapses is very large
-        if (syns.size() < 10 || doc.activatedNeurons.size() * 20 > syns.size()) {
-            return syns.values();
-        }
-
-        Collection<Synapse> synsTmp;
-        ArrayList<Synapse> newSyns = new ArrayList<>();
-        Synapse lk = new Synapse(null, null, Synapse.Key.MIN_KEY);
-        Synapse uk = new Synapse(null, null, Synapse.Key.MAX_KEY);
-
-        for (INeuron n : doc.activatedNeurons) {
-            if (dir == 0) {
-                lk.input = n.provider;
-                uk.input = n.provider;
-            } else {
-                lk.output = n.provider;
-                uk.output = n.provider;
-            }
-
-            // Using addAll is not efficient here.
-            for (Synapse s : syns.subMap(lk, true, uk, true).values()) {
-                newSyns.add(s);
-            }
-        }
-
-        synsTmp = newSyns;
-        return synsTmp;
-    }
-
-
-
     public Collection<Activation> getActivations(Document doc) {
         ThreadState th = getThreadState(doc.threadId, false);
         if (th == null) return Collections.EMPTY_LIST;
@@ -353,7 +249,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         if (th == null || th.activations.isEmpty()) return null;
         return th.activations.firstEntry().getValue();
     }
-
 
 
     public void clearActivations() {
@@ -591,6 +486,12 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             TreeMap<NodeActivation.Key, Activation> actRid = th.activationsRid;
             if (actRid != null) actRid.put(ak, act);
 
+            if (ak.range.begin != Integer.MIN_VALUE) {
+                doc.activationsByRangeBegin.put(ak, act);
+            }
+            if (ak.range.end != Integer.MAX_VALUE) {
+                doc.activationsByRangeEnd.put(ak, act);
+            }
             if (ak.rid != null) {
                 doc.activationsByRid.put(ak, act);
             }
@@ -598,7 +499,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             doc.addedActivations.add(act);
         }
 
-        linkActivation(act);
+        Linker.link(act);
     }
 
 
@@ -663,12 +564,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
      * @return A collection with all final activations of this neuron.
      */
     public Stream<Activation> getFinalActivationsStream(Document doc) {
-        return getActivationsStream(doc).filter(act -> act.isFinalActivation());
-    }
-
-
-    public Stream<Activation> getActivationsStream(Document doc) {
-        return Activation.select(doc, this, null, null, null, null, null);
+        return getActivations(doc).stream().filter(act -> act.isFinalActivation());
     }
 
 
@@ -676,9 +572,4 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         return getFinalActivationsStream(doc).collect(Collectors.toList());
     }
 
-
-    public Collection<Activation> getAllActivations(Document doc) {
-        Stream<Activation> s = Activation.select(doc, this, null, null, null, null, null);
-        return s.collect(Collectors.toList());
-    }
 }

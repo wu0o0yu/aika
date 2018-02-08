@@ -228,7 +228,7 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S OW:" + weight + " NW:" + (weight + weightDelta) + " " + key.relativeRid + " B:" + key.rangeOutput.begin + " E:" + key.rangeOutput.end + " " +  input + "->" + output;
+        return "S OW:" + weight + " NW:" + (weight + weightDelta) + " " + key + " " +  input + "->" + output;
     }
 
 
@@ -282,6 +282,8 @@ public class Synapse implements Writable {
     static Map<Key, Key> keyMap = new TreeMap<>();
 
     public static Key lookupKey(Key k) {
+        if(k.minKey || k.maxKey) return k;
+
         Key rk = keyMap.get(k);
         if(rk == null) {
             keyMap.put(k, k);
@@ -324,8 +326,8 @@ public class Synapse implements Writable {
 
 
     public static class Key implements Comparable<Key>, Writable {
-        public static final Key MIN_KEY = new Key();
-        public static final Key MAX_KEY = new Key();
+        public static final Key MIN_KEY = new Key(true, false);
+        public static final Key MAX_KEY = new Key(false, true);
 
         public boolean isRecurrent;
         public Integer relativeRid;
@@ -333,7 +335,25 @@ public class Synapse implements Writable {
         public Relation rangeMatch;
         public Output rangeOutput;
 
+        private boolean minKey = false;
+        private boolean maxKey = false;
+
+
         public Key() {}
+
+
+        public Key(boolean minKey, boolean maxKey) {
+            this.minKey = minKey;
+            this.maxKey = maxKey;
+        }
+
+
+        public Key(boolean minKey, boolean maxKey, Integer relativeRid, Relation rangeMatch) {
+            this.minKey = minKey;
+            this.maxKey = maxKey;
+            this.relativeRid = relativeRid;
+            this.rangeMatch = rangeMatch;
+        }
 
 
         public Key(boolean isRecurrent, Integer relativeRid, Integer absoluteRid, Relation rangeMatch, Output rangeOutput) {
@@ -386,14 +406,22 @@ public class Synapse implements Writable {
         }
 
 
+        public String toString() {
+            if(this.minKey) return "MIN_KEY";
+            if(this.maxKey) return "MAX_KEY";
+
+            return relativeRid + " B:" + rangeOutput.begin + " E:" + rangeOutput.end;
+        }
+
+
         @Override
         public int compareTo(Key k) {
             if(this == k) return 0;
 
-            if(this == MIN_KEY && k != MIN_KEY) return -1;
-            else if(this != MIN_KEY && k == MIN_KEY) return 1;
-            if(this == MAX_KEY && k != MAX_KEY) return 1;
-            else if(this != MAX_KEY && k == MAX_KEY) return -1;
+            if(minKey && !k.minKey) return -1;
+            else if(!minKey && k.minKey) return 1;
+            if(maxKey && !k.maxKey) return 1;
+            else if(!maxKey && k.maxKey) return -1;
 
             int r = Boolean.compare(isRecurrent, k.isRecurrent);
             if(r != 0) return r;
