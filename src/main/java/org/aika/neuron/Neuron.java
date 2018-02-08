@@ -275,6 +275,7 @@ public class Neuron extends Provider<INeuron> {
     public void addInMemoryInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryInputSynapses.put(s, s);
+        inputSortGroupCounts[Linker.SortGroup.getSortGroup(s.key).ordinal()]++;
         lock.releaseWriteLock();
 
         if(!s.input.isSuspended()) {
@@ -288,6 +289,7 @@ public class Neuron extends Provider<INeuron> {
     public void removeInMemoryInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryInputSynapses.remove(s);
+        inputSortGroupCounts[Linker.SortGroup.getSortGroup(s.key).ordinal()]--;
         lock.releaseWriteLock();
 
         if(!s.input.isSuspended()) {
@@ -302,6 +304,7 @@ public class Neuron extends Provider<INeuron> {
     public void addInMemoryOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryOutputSynapses.put(s, s);
+        outputSortGroupCounts[Linker.SortGroup.getSortGroup(s.key).ordinal()]++;
         lock.releaseWriteLock();
 
         if(!s.output.isSuspended()) {
@@ -316,6 +319,7 @@ public class Neuron extends Provider<INeuron> {
     public void removeInMemoryOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryOutputSynapses.remove(s);
+        outputSortGroupCounts[Linker.SortGroup.getSortGroup(s.key).ordinal()]--;
         lock.releaseWriteLock();
 
         if(!s.output.isSuspended()) {
