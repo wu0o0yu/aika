@@ -130,19 +130,18 @@ public class Linker {
             return;
         }
 
-
         for(SortGroup sg: new SortGroup[] {SortGroup.RANGE_BEGIN, SortGroup.RANGE_END, SortGroup.RID_ZERO}) {
             link(act, dir, sg, syns);
         }
 
         NavigableMap<Synapse, Synapse> remainingSyns = syns.subMap(SortGroup.OTHERS.begin, true, SortGroup.OTHERS.end, true);
-        if(!remainingSyns.isEmpty()) {
-            // Optimization in case the set of synapses is very large
-            if (act.doc.activatedNeurons.size() * 20 > remainingSyns.size()) {
-                linkOthers(act, dir, getActiveSynapses(act.doc, dir, remainingSyns));
-            } else {
-                linkOthers(act, dir, remainingSyns.values());
-            }
+        if(remainingSyns.isEmpty()) return;
+
+        // Optimization in case the set of synapses is very large
+        if (act.doc.activatedNeurons.size() * 20 > syns.size()) { // Calling size() on a subset is expensive
+            linkOthers(act, dir, remainingSyns.values());
+        } else {
+            linkOthers(act, dir, getActiveSynapses(act.doc, dir, remainingSyns));
         }
     }
 
@@ -216,15 +215,13 @@ public class Linker {
 
 
     private static Integer computeTargetRID(Activation act, Direction dir, Synapse.Key sk) {
-        Integer rid = null;
         switch (dir) {
             case INPUT:
-                rid = sk.absoluteRid != null ? sk.absoluteRid : Utils.nullSafeAdd(act.key.rid, false, sk.relativeRid, false);
-                break;
+                return sk.absoluteRid != null ? sk.absoluteRid : Utils.nullSafeAdd(act.key.rid, false, sk.relativeRid, false);
             case OUTPUT:
-                rid = Utils.nullSafeSub(act.key.rid, false, sk.relativeRid, false);
+                return Utils.nullSafeSub(act.key.rid, false, sk.relativeRid, false);
         }
-        return rid;
+        return null;
     }
 
 
