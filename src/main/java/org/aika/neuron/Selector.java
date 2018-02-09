@@ -260,7 +260,7 @@ public class Selector {
                     true
             ).values();
         } else if(rr.endToEnd == EQUALS || rr.endToBegin == EQUALS) {
-            int key = rr.endToEnd == EQUALS ? r.begin : r.end;
+            int key = rr.endToEnd == EQUALS ? r.end : r.begin;
             return th.activationsEnd.subMap(
                     new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, key), null, InterpretationNode.MIN),
                     true,
