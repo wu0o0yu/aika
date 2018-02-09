@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.stream.Stream;
 
 import static org.aika.corpus.Range.Operator.EQUALS;
-import static org.aika.corpus.Range.Operator.GREATER_THAN_EQUAL;
 import static org.aika.lattice.Node.MAX_NODE;
 import static org.aika.lattice.Node.MIN_NODE;
 
@@ -95,27 +94,159 @@ public class Selector {
         Node node = n.node.get();
         if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS || rr.endToBegin == EQUALS || rr.endToEnd == EQUALS) {
             return getActivationsByRangeEquals(th, n, r, rr);
-        } else if (rr.beginToBegin == GREATER_THAN_EQUAL && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
-            int er = (rr.endToEnd == Range.Operator.LESS_THAN_EQUAL || rr.endToEnd == Range.Operator.EQUALS) && r.end != Integer.MAX_VALUE ? r.end : Integer.MAX_VALUE;
-            return th.activations.subMap(
-                    new NodeActivation.Key(node, new Range(r.begin, Integer.MIN_VALUE), null, InterpretationNode.MIN),
-                    true,
-                    new NodeActivation.Key(node, new Range(er, Integer.MAX_VALUE), Integer.MAX_VALUE, InterpretationNode.MAX),
-                    true
-            )
-                    .values();
-        } else if (rr.beginToBegin == Range.Operator.LESS_THAN_EQUAL && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
-            return th.activations.descendingMap().subMap(
-                    new NodeActivation.Key(node, new Range(r.begin, Integer.MAX_VALUE), null, InterpretationNode.MAX),
-                    true,
-                    new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, Integer.MIN_VALUE), null, InterpretationNode.MIN),
-                    true
-            )
-                    .values();
+        } else if (((rr.beginToBegin.isGreaterThanOrGreaterThanEqual() || rr.beginToEnd.isGreaterThanOrGreaterThanEqual())) && r.begin <= r.end) {
+            return getActivationsByRangeBeginGreaterThan(th, r, rr, node);
+        } else if (((rr.endToEnd.isGreaterThanOrGreaterThanEqual() || rr.endToBegin.isGreaterThanOrGreaterThanEqual())) && r.begin >= r.end) {
+            return getActivationsByRangeEndGreaterThan(th, r, rr, node);
+        } else if ((rr.beginToBegin.isLessThanOrLessThanEqual() || rr.beginToEnd.isLessThanOrLessThanEqual()) && r.begin <= r.end) {
+            return getActivationsByRangeBeginLessThanEqual(th, r, rr, node);
+        } else if ((rr.endToEnd.isLessThanOrLessThanEqual() || rr.endToBegin.isLessThanOrLessThanEqual()) && r.begin >= r.end) {
+            return getActivationsByRangeEndLessThanEqual(th, r, rr, node);
         } else {
             return th.activations.values();
         }
     }
+
+
+    private static Collection<Activation> getActivationsByRangeBeginGreaterThan(INeuron.ThreadState th, Range r, Range.Relation rr, Node node) {
+        int fromKey;
+        boolean fromInclusive;
+
+        if(rr.beginToBegin.isGreaterThanOrGreaterThanEqual()) {
+            fromKey = r.begin;
+            fromInclusive = rr.beginToBegin.includesEqual();
+        } else {
+            fromKey = r.end;
+            fromInclusive = rr.beginToEnd.includesEqual();
+        }
+
+        int toKey;
+        boolean toInclusive;
+        if(rr.endToEnd.isLessThanOrLessThanEqual()) {
+            toKey = r.end;
+            toInclusive = rr.endToEnd.includesEqual();
+        } else if(rr.endToBegin.isLessThanOrLessThanEqual()) {
+            toKey = r.begin;
+            toInclusive = rr.endToBegin.includesEqual();
+        } else {
+            toKey = Integer.MAX_VALUE;
+            toInclusive = true;
+        }
+
+        return th.activations.subMap(
+                new NodeActivation.Key(node, new Range(fromKey, Integer.MIN_VALUE), null, InterpretationNode.MIN),
+                fromInclusive,
+                new NodeActivation.Key(node, new Range(toKey, Integer.MAX_VALUE), Integer.MAX_VALUE, InterpretationNode.MAX),
+                toInclusive
+        ).values();
+    }
+
+
+    private static Collection<Activation> getActivationsByRangeEndGreaterThan(INeuron.ThreadState th, Range r, Range.Relation rr, Node node) {
+        int fromKey;
+        boolean fromInclusive;
+
+        if(rr.endToEnd.isGreaterThanOrGreaterThanEqual()) {
+            fromKey = r.end;
+            fromInclusive = rr.endToEnd.includesEqual();
+        } else {
+            fromKey = r.begin;
+            fromInclusive = rr.endToBegin.includesEqual();
+        }
+
+        int toKey;
+        boolean toInclusive;
+        if(rr.beginToBegin.isLessThanOrLessThanEqual()) {
+            toKey = r.begin;
+            toInclusive = rr.beginToBegin.includesEqual();
+        } else if(rr.beginToEnd.isLessThanOrLessThanEqual()) {
+            toKey = r.end;
+            toInclusive = rr.beginToEnd.includesEqual();
+        } else {
+            toKey = Integer.MAX_VALUE;
+            toInclusive = true;
+        }
+
+        return th.activationsEnd.subMap(
+                new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, fromKey), null, InterpretationNode.MIN),
+                fromInclusive,
+                new NodeActivation.Key(node, new Range(Integer.MAX_VALUE, toKey), Integer.MAX_VALUE, InterpretationNode.MAX),
+                toInclusive
+        ).values();
+    }
+
+
+    private static Collection<Activation> getActivationsByRangeBeginLessThanEqual(INeuron.ThreadState th, Range r, Range.Relation rr, Node node) {
+        int fromKey;
+        boolean fromInclusive;
+        if(rr.endToEnd.isGreaterThanOrGreaterThanEqual()) {
+            fromKey = r.end - th.maxLength;
+            fromInclusive = rr.endToEnd.includesEqual();
+        } else if(rr.endToBegin.isGreaterThanOrGreaterThanEqual()) {
+            fromKey = r.begin - th.maxLength;
+            fromInclusive = rr.endToBegin.includesEqual();
+        } else {
+            fromKey = Integer.MIN_VALUE;
+            fromInclusive = true;
+        }
+
+        int toKey;
+        boolean toInclusive;
+
+        if(rr.beginToBegin.isLessThanOrLessThanEqual()) {
+            toKey = r.begin;
+            toInclusive = rr.beginToBegin.includesEqual();
+        } else {
+            toKey = r.end;
+            toInclusive = rr.beginToEnd.includesEqual();
+        }
+
+        if(fromKey > toKey) return Collections.EMPTY_LIST;
+
+        return th.activations.subMap(
+                new NodeActivation.Key(node, new Range(fromKey, Integer.MIN_VALUE), null, InterpretationNode.MIN),
+                fromInclusive,
+                new NodeActivation.Key(node, new Range(toKey, Integer.MAX_VALUE), null, InterpretationNode.MAX),
+                toInclusive
+        ).values();
+    }
+
+
+    private static Collection<Activation> getActivationsByRangeEndLessThanEqual(INeuron.ThreadState th, Range r, Range.Relation rr, Node node) {
+        int fromKey;
+        boolean fromInclusive;
+        if(rr.beginToEnd.isGreaterThanOrGreaterThanEqual()) {
+            fromKey = r.end - th.maxLength;
+            fromInclusive = rr.beginToEnd.includesEqual();
+        } else if(rr.beginToBegin.isGreaterThanOrGreaterThanEqual()) {
+            fromKey = r.begin - th.maxLength;
+            fromInclusive = rr.beginToBegin.includesEqual();
+        } else {
+            fromKey = Integer.MIN_VALUE;
+            fromInclusive = true;
+        }
+
+        int toKey;
+        boolean toInclusive;
+
+        if(rr.endToBegin.isLessThanOrLessThanEqual()) {
+            toKey = r.begin;
+            toInclusive = rr.endToBegin.includesEqual();
+        } else {
+            toKey = r.end;
+            toInclusive = rr.endToEnd.includesEqual();
+        }
+
+        if(fromKey > toKey) return Collections.EMPTY_LIST;
+
+        return th.activationsEnd.subMap(
+                new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, fromKey), null, InterpretationNode.MIN),
+                fromInclusive,
+                new NodeActivation.Key(node, new Range(Integer.MAX_VALUE, toKey), null, InterpretationNode.MAX),
+                toInclusive
+        ).values();
+    }
+
 
 
     public static Collection<Activation> getActivationsByRangeEquals(INeuron.ThreadState th, INeuron n, Range r, Range.Relation rr) {

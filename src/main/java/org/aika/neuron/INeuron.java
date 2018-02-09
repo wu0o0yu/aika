@@ -116,6 +116,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         public TreeMap<Activation.Key, Activation> activations;
         public TreeMap<Activation.Key, Activation> activationsEnd;
         public TreeMap<Activation.Key, Activation> activationsRid;
+        public int minLength = Integer.MAX_VALUE;
+        public int maxLength = 0;
 
         public ThreadState() {
             activations = new TreeMap<>(BEGIN_COMP);
@@ -478,6 +480,10 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             if (th.activations.isEmpty()) {
                 doc.activatedNeurons.add(ak.node.neuron.get());
             }
+
+            th.minLength = Math.min(th.minLength, ak.range.length());
+            th.maxLength = Math.max(th.maxLength, ak.range.length());
+
             th.activations.put(ak, act);
 
             TreeMap<NodeActivation.Key, Activation> actEnd = th.activationsEnd;

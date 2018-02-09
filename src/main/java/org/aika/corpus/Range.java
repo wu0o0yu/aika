@@ -294,6 +294,21 @@ public class Range {
         }
 
 
+        public boolean isGreaterThanOrGreaterThanEqual() {
+            return this == GREATER_THAN || this == GREATER_THAN_EQUAL;
+        }
+
+
+        public boolean isLessThanOrLessThanEqual() {
+            return this == LESS_THAN || this == LESS_THAN_EQUAL;
+        }
+
+
+        public boolean includesEqual() {
+            return this == EQUALS || this == GREATER_THAN_EQUAL || this == LESS_THAN_EQUAL;
+        }
+
+
         public int getId() {
             return id;
         }
