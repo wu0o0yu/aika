@@ -63,48 +63,49 @@ public class Selector {
         Stream<Activation> results;
         int s = th.activations.size();
 
-        Node node = n.node.get();
         if (s == 0) return Stream.empty();
         else if (s == 1) {
-            results = th.activations
-                    .values()
-                    .stream();
+            results = th.activations.values().stream();
         } else if (rid != null) {
-            NodeActivation.Key bk = new NodeActivation.Key(node, Range.MIN, rid, InterpretationNode.MIN);
-            NodeActivation.Key ek = new NodeActivation.Key(node, Range.MAX, rid, InterpretationNode.MAX);
-
-            if (th.activationsRid != null) {
-                results = th.activationsRid.subMap(bk, true, ek, true)
-                        .values()
-                        .stream();
-            } else return Stream.empty();
+            return getActivationsByRid(th, n, rid).stream();
+        } else if(rr != null) {
+            results = getActivationsByRange(th, n, r, rr).stream();
         } else {
-            if (rr == null) {
-                results = th.activations.values()
-                        .stream();
-            } else {
-                return getActivationsByRange(th, n, rid, r, rr, o, or);
-            }
+            results = th.activations.values().stream();
         }
 
-        return results.filter(act -> act.filter(node, rid, r, rr, o, or));
+        return results.filter(act -> act.filter(n.node.get(), rid, r, rr, o, or));
     }
 
 
-    public static Stream<Activation> getActivationsByRange(INeuron.ThreadState th, INeuron n, Integer rid, Range r, Range.Relation rr, InterpretationNode o, InterpretationNode.Relation or) {
-        Collection<Activation> s;
+    private static Collection<Activation> getActivationsByRid(INeuron.ThreadState th, INeuron n, Integer rid) {
         Node node = n.node.get();
-        if ((rr.beginToBegin == GREATER_THAN_EQUAL || rr.beginToBegin == EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
+        NodeActivation.Key bk = new NodeActivation.Key(node, Range.MIN, rid, InterpretationNode.MIN);
+        NodeActivation.Key ek = new NodeActivation.Key(node, Range.MAX, rid, InterpretationNode.MAX);
+
+        if (th.activationsRid != null) {
+            return th.activationsRid.subMap(bk, true, ek, true).values();
+        } else {
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+
+    public static Collection<Activation> getActivationsByRange(INeuron.ThreadState th, INeuron n, Range r, Range.Relation rr) {
+        Node node = n.node.get();
+        if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS || rr.endToBegin == EQUALS || rr.endToEnd == EQUALS) {
+            return getActivationsByRangeEquals(th, n, r, rr);
+        } else if (rr.beginToBegin == GREATER_THAN_EQUAL && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
             int er = (rr.endToEnd == Range.Operator.LESS_THAN_EQUAL || rr.endToEnd == Range.Operator.EQUALS) && r.end != Integer.MAX_VALUE ? r.end : Integer.MAX_VALUE;
-            s = th.activations.subMap(
+            return th.activations.subMap(
                     new NodeActivation.Key(node, new Range(r.begin, Integer.MIN_VALUE), null, InterpretationNode.MIN),
                     true,
                     new NodeActivation.Key(node, new Range(er, Integer.MAX_VALUE), Integer.MAX_VALUE, InterpretationNode.MAX),
                     true
             )
                     .values();
-        } else if ((rr.beginToBegin == Range.Operator.LESS_THAN_EQUAL || rr.beginToBegin == Range.Operator.EQUALS) && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
-            s = th.activations.descendingMap().subMap(
+        } else if (rr.beginToBegin == Range.Operator.LESS_THAN_EQUAL && r.begin != Integer.MIN_VALUE && r.begin <= r.end) {
+            return th.activations.descendingMap().subMap(
                     new NodeActivation.Key(node, new Range(r.begin, Integer.MAX_VALUE), null, InterpretationNode.MAX),
                     true,
                     new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, Integer.MIN_VALUE), null, InterpretationNode.MIN),
@@ -112,16 +113,31 @@ public class Selector {
             )
                     .values();
         } else {
-            s = th.activations.values();
+            return th.activations.values();
         }
-
-        return s.stream().filter(act -> act.filter(node, rid, r, rr, o, or));
     }
 
 
-    private static Collection<Activation> getActivations(INeuron n, Document doc) {
-        INeuron.ThreadState th = n.getThreadState(doc.threadId, false);
-        return th == null ? Collections.emptyList() : th.activations.values();
+    public static Collection<Activation> getActivationsByRangeEquals(INeuron.ThreadState th, INeuron n, Range r, Range.Relation rr) {
+        Node node = n.node.get();
+        if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS) {
+            int key = rr.beginToBegin == EQUALS ? r.begin : r.end;
+            return th.activations.subMap(
+                    new NodeActivation.Key(node, new Range(key, Integer.MIN_VALUE), null, InterpretationNode.MIN),
+                    true,
+                    new NodeActivation.Key(node, new Range(key, Integer.MAX_VALUE), Integer.MAX_VALUE, InterpretationNode.MAX),
+                    true
+            ).values();
+        } else if(rr.endToEnd == EQUALS || rr.endToBegin == EQUALS) {
+            int key = rr.endToEnd == EQUALS ? r.begin : r.end;
+            return th.activationsEnd.subMap(
+                    new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, key), null, InterpretationNode.MIN),
+                    true,
+                    new NodeActivation.Key(node, new Range(Integer.MAX_VALUE, key), Integer.MAX_VALUE, InterpretationNode.MAX),
+                    true
+            ).values();
+        }
+        throw new RuntimeException("Invalid Range Relation");
     }
 
 
