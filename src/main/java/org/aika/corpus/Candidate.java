@@ -10,7 +10,7 @@ public class Candidate  implements Comparable<Candidate> {
     public SearchNode currentSearchNode;
 
     public Boolean cachedDecision;
-    public SearchNode cachedSearchNodes;
+    public SearchNode cachedSearchNode;
 
     public InterpretationNode refinement;
 

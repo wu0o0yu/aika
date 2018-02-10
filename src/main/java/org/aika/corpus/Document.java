@@ -33,7 +33,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.aika.corpus.InterpretationNode.State.SELECTED;
 import static org.aika.corpus.InterpretationNode.State.UNKNOWN;
 import static org.aika.corpus.SearchNode.SEARCH_ITERATIVE;
 
@@ -100,8 +99,7 @@ public class Document implements Comparable<Document> {
     public ArrayList<Activation> addedActivations = new ArrayList<>();
 
 
-    public SearchNode rootSearchNode = new SearchNode(this, null, null, null, -1);
-    public SearchNode selectedSearchNode = null;
+    public SearchNode selectedSearchNode = new SearchNode(this, null, null, null, -1);
     public ArrayList<Candidate> candidates = new ArrayList<>();
     public List<InterpretationNode> bestInterpretation = null;
 
@@ -248,7 +246,7 @@ public class Document implements Comparable<Document> {
 
         Candidate c = !candidates.isEmpty() ? candidates.get(0) : null;
 
-        SearchNode child = new SearchNode(this, rootSearchNode, null, c, 0);
+        SearchNode child = new SearchNode(this, selectedSearchNode, null, c, 0);
 
         if(SEARCH_ITERATIVE) {
             SearchNode.searchIterative(this, child);

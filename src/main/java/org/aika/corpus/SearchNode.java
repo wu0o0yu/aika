@@ -75,7 +75,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
     Weight weightDelta = Weight.ZERO;
-    Weight accumulatedWeight;
+    Weight accumulatedWeight = Weight.ZERO;
 
     public Map<Activation, StateChange> modifiedActs = new TreeMap<>(ACTIVATION_ID_COMP);
 
@@ -101,35 +101,34 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate c, int level) {
+    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate nc, int level) {
         id = doc.searchNodeIdCounter++;
         this.level = level;
         visited = doc.visitedCounter++;
         selectedParent = selParent;
         excludedParent = exclParent;
+        candidate = nc;
 
-        SearchNode pn = getParent();
+        Candidate c = getParent() != null ? getParent().candidate : null;
+
         SearchNode csn = null;
         boolean modified = true;
         if (c != null) {
-            candidate = c;
-            candidate.currentSearchNode = this;
+            c.currentSearchNode = this;
 
-            csn = candidate.cachedSearchNodes;
+            csn = c.cachedSearchNode;
 
             if (csn == null || csn.getDecision() != getDecision()) {
-                if (pn != null && pn.candidate != null) {
-                    Activation act = pn.candidate.refinement.activation;
-                    act.markDirty(visited);
-                    for (SynapseActivation sa : act.neuronOutputs) {
-                        sa.output.markDirty(visited);
-                    }
+                Activation act = c.refinement.activation;
+                act.markDirty(visited);
+                for (SynapseActivation sa : act.neuronOutputs) {
+                    sa.output.markDirty(visited);
                 }
             } else {
                 modified = csn.isModified();
 
-                if (pn != null && pn.candidate != null && modified) {
-                    pn.candidate.debugComputed[2]++;
+                if (modified) {
+                    c.debugComputed[2]++;
                 }
             }
         }
@@ -138,16 +137,16 @@ public class SearchNode implements Comparable<SearchNode> {
             weightDelta = doc.vQueue.process(this);
             markDirty();
 
-            if(candidate != null) {
-                candidate.cachedSearchNodes = this;
+            if(c != null) {
+                c.cachedSearchNode = this;
             }
 
         } else {
             if(ENABLE_CACHING) {
-                candidate.cachedSearchNodes.changeState(NEW);
-                weightDelta = candidate.cachedSearchNodes.weightDelta;
+                c.cachedSearchNode.changeState(NEW);
+                weightDelta = c.cachedSearchNode.weightDelta;
 
-                for(Activation act: candidate.cachedSearchNodes.modifiedActs.keySet()) {
+                for(Activation act: c.cachedSearchNode.modifiedActs.keySet()) {
                     act.saveOldState(modifiedActs, doc.visitedCounter++);
                     act.saveNewState();
                 }
@@ -163,8 +162,8 @@ public class SearchNode implements Comparable<SearchNode> {
             }
         }
 
-        if (pn != null && pn.candidate != null) {
-            pn.candidate.debugComputed[modified ? 1 : 0]++;
+        if (c != null) {
+            c.debugComputed[modified ? 1 : 0]++;
         }
 
         if (getParent() != null) {
@@ -196,9 +195,9 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private void markDirty() {
-        if(candidate == null) return;
+        if(getParent() == null || getParent().candidate == null) return;
 
-        SearchNode csn = candidate.cachedSearchNodes;
+        SearchNode csn = getParent().candidate.cachedSearchNode;
 
         Set<Activation> acts = new TreeSet<>(ACTIVATION_ID_COMP);
         acts.addAll(modifiedActs.keySet());
@@ -514,7 +513,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private Weight processResult(Document doc) {
         double accNW = accumulatedWeight.getNormWeight();
 
-        if (accNW > getSelectedAccumulatedWeight(doc)) {
+        if (level > doc.selectedSearchNode.level || accNW > getSelectedAccumulatedWeight(doc)) {
             doc.selectedSearchNode = this;
         }
 
