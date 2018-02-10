@@ -277,14 +277,21 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public void dumpDebugState() {
         SearchNode n = this;
+        String weights = "";
         while (n != null && n.level >= 0) {
             log.info(
                     n.level + " " +
                             n.debugState +
                             " DECISION:" + n.getDecision() +
-                            " " + n.candidate != null ? n.candidate.toString() : "" +
-                            " MOD-ACTS:" + n.modifiedActs.size()
+                            " " + (n.candidate != null ? n.candidate.toString() : "") +
+                            " MOD-ACTS:" + n.modifiedActs.size() +
+                            weights
             );
+
+            weights = " AW:" + Utils.round(n.accumulatedWeight.w) +
+                    " AN:" + Utils.round(n.accumulatedWeight.n) +
+                    " DW:" + Utils.round(n.weightDelta.w) +
+                    " DN:" + Utils.round(n.weightDelta.n);
 
             n = n.getParent();
         }

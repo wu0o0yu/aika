@@ -70,6 +70,7 @@ public class Candidate  implements Comparable<Candidate> {
                 " SIM-CACHED:" + debugComputed[0] +
                 " SIM-COMPUTED:" + debugComputed[1] +
                 " MODIFIED:" + debugComputed[2] +
+                " ACT-ID:" + refinement.id +
                 " " + refinement.activation.key.range +
                 " " + refinement.activation.key.interpretation +
                 " " + refinement.activation.getLabel();
