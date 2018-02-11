@@ -3,13 +3,14 @@ package org.aika.corpus;
 import org.aika.Utils;
 import org.aika.lattice.NodeActivation;
 import org.aika.neuron.Activation;
+import org.aika.corpus.SearchNode.Decision;
 
 
 
 public class Candidate  implements Comparable<Candidate> {
     public SearchNode currentSearchNode;
 
-    public Boolean cachedDecision;
+    public Decision cachedDecision = Decision.UNKNOWN;
     public SearchNode cachedSearchNode;
 
     public InterpretationNode refinement;

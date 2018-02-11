@@ -25,9 +25,9 @@ import org.aika.neuron.INeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.aika.corpus.InterpretationNode.State.SELECTED;
-import static org.aika.corpus.InterpretationNode.State.EXCLUDED;
-import static org.aika.corpus.InterpretationNode.State.UNKNOWN;
+import static org.aika.corpus.SearchNode.Decision.SELECTED;
+import static org.aika.corpus.SearchNode.Decision.EXCLUDED;
+import static org.aika.corpus.SearchNode.Decision.UNKNOWN;
 import static org.aika.neuron.Activation.ACTIVATION_ID_COMP;
 import static org.aika.neuron.Activation.Mode.NEW;
 
@@ -68,6 +68,19 @@ public class SearchNode implements Comparable<SearchNode> {
     DebugState debugState;
 
 
+    public enum Decision {
+        SELECTED('S'),
+        EXCLUDED('E'),
+        UNKNOWN('U');
+
+        char s;
+
+        Decision(char s) {
+            this.s = s;
+        }
+    }
+
+
     public enum DebugState {
         CACHED,
         LIMITED,
@@ -81,15 +94,19 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
 
-    Step step = Step.INIT;
-    boolean alreadySelected;
-    boolean alreadyExcluded;
-    SearchNode selectedChild = null;
-    SearchNode excludedChild = null;
-    Weight selectedWeight = Weight.ZERO;
-    Weight excludedWeight = Weight.ZERO;
+    private Step step = Step.INIT;
+    private boolean alreadySelected;
+    private boolean alreadyExcluded;
+    private SearchNode selectedChild = null;
+    private SearchNode excludedChild = null;
+    private Weight selectedWeight = Weight.ZERO;
+    private Weight excludedWeight = Weight.ZERO;
+    private long processVisited;
 
-    enum Step {
+    // Avoids having to search the same path twice.
+    private Decision skip = UNKNOWN;
+
+    private enum Step {
         INIT,
         PREPARE_SELECT,
         SELECT,
@@ -101,13 +118,12 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, Candidate nc, int level) {
+    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, int level) {
         id = doc.searchNodeIdCounter++;
         this.level = level;
         visited = doc.visitedCounter++;
         selectedParent = selParent;
         excludedParent = exclParent;
-        candidate = nc;
 
         Candidate c = getParent() != null ? getParent().candidate : null;
 
@@ -168,10 +184,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if (getParent() != null) {
             accumulatedWeight = weightDelta.add(getParent().accumulatedWeight);
-        }
-        if (Document.OPTIMIZE_DEBUG_OUTPUT) {
-            log.info("Search Step: " + id + "  Candidate Weight Delta: " + weightDelta);
-            log.info(doc.activationsToString(true, false) + "\n");
         }
     }
 
@@ -262,7 +274,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
             SearchNode pn = sn.getParent();
             if (pn != null && pn.candidate != null) {
-                pn.candidate.refinement.setState(sn.getDecision() ? SELECTED : EXCLUDED, sn.visited);
+                pn.candidate.refinement.setState(sn.getDecision(), sn.visited);
             }
 
             for (StateChange sc : sn.modifiedActs.values()) {
@@ -278,16 +290,18 @@ public class SearchNode implements Comparable<SearchNode> {
     public void dumpDebugState() {
         SearchNode n = this;
         String weights = "";
+        Decision decision = UNKNOWN;
         while (n != null && n.level >= 0) {
             log.info(
                     n.level + " " +
                             n.debugState +
-                            " DECISION:" + n.getDecision() +
+                            " DECISION:" + decision +
                             " " + (n.candidate != null ? n.candidate.toString() : "") +
                             " MOD-ACTS:" + n.modifiedActs.size() +
                             weights
             );
 
+            decision = n.getDecision();
             weights = " AW:" + Utils.round(n.accumulatedWeight.w) +
                     " AN:" + Utils.round(n.accumulatedWeight.n) +
                     " DW:" + Utils.round(n.weightDelta.w) +
@@ -303,7 +317,7 @@ public class SearchNode implements Comparable<SearchNode> {
      * Its perhaps easier to read than the iterative version.
      */
     public Weight searchRecursive(Document doc) {
-        if (candidate == null) {
+        if (level >= doc.candidates.size()) {
             return processResult(doc);
         }
 
@@ -334,14 +348,19 @@ public class SearchNode implements Comparable<SearchNode> {
      * @param doc
      * @param root
      */
-    public static void searchIterative(Document doc, SearchNode root) {
+    public static void searchIterative(Document doc, SearchNode root, long v) {
         SearchNode sn = root;
         Weight returnWeight = null;
 
         do {
+            if (sn.processVisited != v) {
+                sn.step = Step.INIT;
+                sn.processVisited = v;
+            }
+
             switch(sn.step) {
                 case INIT:
-                    if (sn.candidate == null) {
+                    if (sn.level >= doc.candidates.size()) {
                         returnWeight = sn.processResult(doc);
                         sn.step = Step.FINAL;
                         sn = sn.getParent();
@@ -378,15 +397,21 @@ public class SearchNode implements Comparable<SearchNode> {
                     break;
                 case FINAL:
                     returnWeight = sn.finalStep();
-                    sn = sn.getParent();
+                    SearchNode pn = sn.getParent();
+                    if(pn != null) {
+                        pn.skip = sn.getDecision();
+                    }
+                    sn = pn;
                     break;
                 default:
             }
-        } while(sn.level >= root.level);
+        } while(sn != null);
     }
 
 
     private void initStep(Document doc) {
+        candidate = doc.candidates.get(level);
+
         boolean precondition = checkPrecondition();
 
         alreadySelected = precondition && !candidate.isConflicting();
@@ -399,42 +424,25 @@ public class SearchNode implements Comparable<SearchNode> {
 
         doc.searchStepCounter++;
 
-        if (Document.OPTIMIZE_DEBUG_OUTPUT) {
-            log.info("Search Step: " + id);
-            log.info(toString());
-        }
-
-        if (Document.OPTIMIZE_DEBUG_OUTPUT) {
-            log.info(doc.activationsToString(true, false) + "\n");
-        }
-
-        if (alreadyExcluded || alreadySelected) {
-            debugState = DebugState.LIMITED;
-        } else if (getCachedDecision() != null) {
-            debugState = DebugState.CACHED;
-        } else {
-            debugState = DebugState.EXPLORE;
-        }
-
-        candidate.debugCounts[debugState.ordinal()]++;
+        storeDebugInfos();
     }
 
-    private Boolean getCachedDecision() {
-        return !alreadyExcluded ? candidate.cachedDecision : null;
+
+    private Decision getCachedDecision() {
+        return !alreadyExcluded ? candidate.cachedDecision : Decision.UNKNOWN;
     }
 
 
     private boolean prepareSelectStep(Document doc) {
-        if(alreadyExcluded || !(getCachedDecision() == null || getCachedDecision())) return false;
+        if(alreadyExcluded || skip == SELECTED || getCachedDecision() == Decision.EXCLUDED) return false;
 
         candidate.refinement.setState(SELECTED, visited);
 
-        if (candidate.cachedDecision == null) {
+        if (candidate.cachedDecision == UNKNOWN) {
             invalidateCachedDecisions(doc.visitedCounter++);
         }
 
-        Candidate c = doc.candidates.size() > level + 1 ? doc.candidates.get(level + 1) : null;
-        selectedChild = new SearchNode(doc, this, excludedParent, c, level + 1);
+        selectedChild = new SearchNode(doc, this, excludedParent, level + 1);
 
         candidate.debugDecisionCounts[0]++;
 
@@ -443,12 +451,11 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean prepareExcludeStep(Document doc) {
-        if(alreadySelected || !(getCachedDecision() == null || !getCachedDecision())) return false;
+        if(alreadySelected || skip == EXCLUDED || getCachedDecision() == Decision.SELECTED) return false;
 
         candidate.refinement.setState(EXCLUDED, visited);
 
-        Candidate c = doc.candidates.size() > level + 1 ? doc.candidates.get(level + 1) : null;
-        excludedChild = new SearchNode(doc, selectedParent, this, c, level + 1);
+        excludedChild = new SearchNode(doc, selectedParent, this, level + 1);
 
         candidate.debugDecisionCounts[1]++;
 
@@ -465,23 +472,25 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private Weight finalStep() {
-        Weight result;
-        if (getCachedDecision() == null) {
-            boolean dir = selectedWeight.getNormWeight() >= excludedWeight.getNormWeight();
-            dir = alreadySelected || (!alreadyExcluded && dir);
-
-            if (!alreadyExcluded) {
-                candidate.cachedDecision = dir;
-            }
-
-            result = dir ? selectedWeight : excludedWeight;
-        } else {
-            result = getCachedDecision() ? selectedWeight : excludedWeight;
-        }
-
         selectedChild = null;
         excludedChild = null;
-        return result;
+        switch (getCachedDecision()) {
+            case UNKNOWN:
+                boolean dir = selectedWeight.getNormWeight() >= excludedWeight.getNormWeight();
+                dir = alreadySelected || (!alreadyExcluded && dir);
+
+                if (!alreadyExcluded) {
+                    candidate.cachedDecision = dir ? Decision.SELECTED : Decision.EXCLUDED;
+                }
+
+                return dir ? selectedWeight : excludedWeight;
+            case SELECTED:
+                return selectedWeight;
+            case EXCLUDED:
+                return excludedWeight;
+            default:
+                throw new IllegalStateException();
+        }
     }
 
 
@@ -495,20 +504,18 @@ public class SearchNode implements Comparable<SearchNode> {
     private void invalidateCachedDecisions(long v) {
         for (SynapseActivation sa : candidate.refinement.activation.neuronOutputs) {
             if (!sa.synapse.isNegative()) {
-                Candidate posCand = sa.output.key.interpretation.candidate;
-                if (posCand != null) {
-                    if (posCand.cachedDecision == Boolean.FALSE && candidate.id > posCand.id) {
-                        posCand.cachedDecision = null;
+                Candidate pos = sa.output.key.interpretation.candidate;
+                if (pos != null) {
+                    if (pos.cachedDecision == Decision.EXCLUDED && candidate.id > pos.id) {
+                        pos.cachedDecision = UNKNOWN;
                     }
                 }
 
-                ArrayList<InterpretationNode> conflicting = new ArrayList<>();
-                Conflicts.collectConflicting(conflicting, sa.output.key.interpretation, v);
-                for (InterpretationNode c : conflicting) {
-                    Candidate negCand = c.candidate;
-                    if (negCand != null) {
-                        if (negCand.cachedDecision == Boolean.TRUE && candidate.id > negCand.id) {
-                            negCand.cachedDecision = null;
+                for (InterpretationNode c : Conflicts.getConflicting(sa.output.key.interpretation, v)) {
+                    Candidate neg = c.candidate;
+                    if (neg != null) {
+                        if (neg.cachedDecision == Decision.SELECTED && candidate.id > neg.id) {
+                            neg.cachedDecision = UNKNOWN;
                         }
                     }
                 }
@@ -534,9 +541,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean checkExcluded(InterpretationNode ref, long v) {
-        ArrayList<InterpretationNode> conflicts = new ArrayList<>();
-        Conflicts.collectConflicting(conflicts, ref, v);
-        for (InterpretationNode cn : conflicts) {
+        for (InterpretationNode cn : Conflicts.getConflicting(ref, v)) {
             if (cn.state == SELECTED) return true;
         }
         return false;
@@ -577,14 +582,26 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public SearchNode getParent() {
-        return getDecision() ? selectedParent : excludedParent;
+        return getDecision() == SELECTED ? selectedParent : excludedParent;
     }
 
 
-    public boolean getDecision() {
-        return excludedParent == null || selectedParent.id > excludedParent.id;
+    public Decision getDecision() {
+        return excludedParent == null || (selectedParent != null && selectedParent.id > excludedParent.id) ? SELECTED : EXCLUDED;
     }
 
+
+    private void storeDebugInfos() {
+        if (alreadyExcluded || alreadySelected) {
+            debugState = DebugState.LIMITED;
+        } else if (getCachedDecision() != UNKNOWN) {
+            debugState = DebugState.CACHED;
+        } else {
+            debugState = DebugState.EXPLORE;
+        }
+
+        candidate.debugCounts[debugState.ordinal()]++;
+    }
 
 
     public static class Weight {

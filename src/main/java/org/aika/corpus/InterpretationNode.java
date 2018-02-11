@@ -21,6 +21,7 @@ import org.aika.lattice.NodeActivation;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.neuron.Activation;
 import org.aika.Utils;
+import org.aika.corpus.SearchNode.Decision;
 
 import java.util.*;
 
@@ -82,7 +83,7 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     private int numberOfInputsComputeChildren = 0;
 
     long visitedState;
-    public State state = State.UNKNOWN;
+    public Decision state = Decision.UNKNOWN;
     public boolean fixed;
 
     public boolean isSelected;
@@ -99,19 +100,6 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     public Conflicts conflicts = new Conflicts();
 
     public NavigableMap<Key, NodeActivation> nodeActivations;
-
-
-    public enum State {
-        SELECTED('S'),
-        UNKNOWN('U'),
-        EXCLUDED('E');
-
-        char s;
-
-        State(char s) {
-            this.s = s;
-        }
-    }
 
 
     public boolean isPrimitive() {
@@ -139,7 +127,7 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     }
 
 
-    public InterpretationNode(Document doc, int primId, int id, int length, State s) {
+    public InterpretationNode(Document doc, int primId, int id, int length, Decision s) {
         this(doc, primId, id);
         this.length = length;
         this.state = s;
@@ -159,9 +147,9 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     }
 
 
-    public void setState(State newState, long v) {
-        if ((fixed && state != State.UNKNOWN && newState != State.UNKNOWN) ||
-                newState == State.UNKNOWN && v != visitedState) return;
+    public void setState(Decision newState, long v) {
+        if ((fixed && state != Decision.UNKNOWN && newState != Decision.UNKNOWN) ||
+                newState == Decision.UNKNOWN && v != visitedState) return;
 
         state = newState;
         visitedState = v;
@@ -226,7 +214,7 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
 
     public boolean isSelected(long v) {
-        if(primId >= 0) return state == State.SELECTED;
+        if(primId >= 0) return state == Decision.SELECTED;
 
         if(visitedGetState == v) return true;
         visitedGetState = v;

@@ -167,8 +167,8 @@ public class Linker {
                         null,
                         null)) {
                     Activation.SynapseActivation sa = new Activation.SynapseActivation(s, iAct, oAct);
-                    iAct.addSynapseActivation(0, sa);
-                    oAct.addSynapseActivation(1, sa);
+                    iAct.addSynapseActivation(INPUT, sa);
+                    oAct.addSynapseActivation(OUTPUT, sa);
                 }
             }
         });
@@ -208,8 +208,8 @@ public class Linker {
             Activation iAct = (dir == INPUT ? rAct : act);
 
             Activation.SynapseActivation sa = new Activation.SynapseActivation(s, iAct, oAct);
-            iAct.addSynapseActivation(0, sa);
-            oAct.addSynapseActivation(1, sa);
+            iAct.addSynapseActivation(INPUT, sa);
+            oAct.addSynapseActivation(OUTPUT, sa);
         });
     }
 

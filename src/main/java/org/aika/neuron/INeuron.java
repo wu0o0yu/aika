@@ -19,7 +19,6 @@ package org.aika.neuron;
 
 import org.aika.*;
 import org.aika.neuron.Activation.State;
-import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.corpus.*;
 import org.aika.corpus.SearchNode.Weight;
 import org.aika.lattice.InputNode;
@@ -34,9 +33,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.aika.corpus.InterpretationNode.checkSelfReferencing;
-
-import static org.aika.corpus.InterpretationNode.State.SELECTED;
 import static org.aika.lattice.Node.*;
 
 /**

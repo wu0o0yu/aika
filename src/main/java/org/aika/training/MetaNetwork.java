@@ -20,10 +20,7 @@ package org.aika.training;
 import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.neuron.Neuron;
-import org.aika.corpus.Conflicts;
 import org.aika.corpus.Document;
-import org.aika.corpus.InterpretationNode;
-import org.aika.lattice.NodeActivation;
 import org.aika.neuron.Activation;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.neuron.INeuron;
@@ -33,8 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
-import static org.aika.corpus.InterpretationNode.State.SELECTED;
-import static org.aika.corpus.InterpretationNode.State.EXCLUDED;
+import static org.aika.corpus.SearchNode.Decision.EXCLUDED;
 
 
 /**

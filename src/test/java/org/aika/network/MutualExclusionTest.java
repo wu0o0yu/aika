@@ -28,7 +28,6 @@ import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.aika.corpus.Document.OPTIMIZE_DEBUG_OUTPUT;
 
 /**
  *
@@ -60,8 +59,6 @@ public class MutualExclusionTest {
 
     @Test
     public void testMutualExclusion() {
-        OPTIMIZE_DEBUG_OUTPUT = true;
-
         Model m = new Model();
 
         // Create the input neurons for the network.

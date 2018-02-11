@@ -8,18 +8,16 @@ import org.aika.corpus.SearchNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
+import org.aika.neuron.Linker.Direction;
 import org.aika.corpus.SearchNode.Weight;
+import org.aika.corpus.SearchNode.Decision;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Stream;
 
-import static org.aika.corpus.Document.OPTIMIZE_DEBUG_OUTPUT;
-import static org.aika.corpus.InterpretationNode.State.SELECTED;
+import static org.aika.corpus.SearchNode.Decision.SELECTED;
 import static org.aika.corpus.InterpretationNode.checkSelfReferencing;
-import static org.aika.corpus.Range.Operator.EQUALS;
-import static org.aika.corpus.Range.Operator.GREATER_THAN_EQUAL;
 import static org.aika.neuron.Activation.State.DIR;
 import static org.aika.neuron.Activation.State.REC;
 import static org.aika.neuron.Activation.SynapseActivation.INPUT_COMP;
@@ -106,11 +104,14 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    public void addSynapseActivation(int dir, SynapseActivation sa) {
-        if (dir == 0) {
-            neuronOutputs.add(sa);
-        } else {
-            neuronInputs.add(sa);
+    public void addSynapseActivation(Direction dir, SynapseActivation sa) {
+        switch(dir) {
+            case INPUT:
+                neuronOutputs.add(sa);
+                break;
+            case OUTPUT:
+                neuronInputs.add(sa);
+                break;
         }
     }
 
@@ -122,11 +123,6 @@ public final class Activation extends NodeActivation<OrNode> {
             s = new State(inputValue, 0, Weight.ZERO);
         } else {
             s = computeValueAndWeight(round);
-        }
-
-        if (OPTIMIZE_DEBUG_OUTPUT) {
-            log.info(key + " Round:" + round);
-            log.info("Value:" + s.value + "  Weight:" + s.weight.w + "  Norm:" + s.weight.n + "\n");
         }
 
         if (round == 0 || !rounds.get(round).equalsWithWeights(s)) {
@@ -164,7 +160,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public State computeValueAndWeight(int round) {
-        InterpretationNode.State c = key.interpretation.state;
+        Decision c = key.interpretation.state;
 
         INeuron n = getINeuron();
         double[] sum = {n.biasSum, 0.0};
@@ -249,7 +245,7 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    private static State getInitialState(InterpretationNode.State c) {
+    private static State getInitialState(Decision c) {
         return new State(
                 c == SELECTED ? 1.0 : 0.0,
                 0,
@@ -642,7 +638,7 @@ public final class Activation extends NodeActivation<OrNode> {
     public class StateChange {
         public Rounds oldRounds;
         public Rounds newRounds;
-        public InterpretationNode.State newState;
+        public Decision newState;
 
         public void restoreState(Mode m) {
             rounds = (m == Mode.OLD ? oldRounds : newRounds).copy();

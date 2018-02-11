@@ -379,7 +379,7 @@ public class InterpretationSearchTest {
         inA.addInput(doc, 0, 5);
         inB.addInput(doc, 5, 10);
 
-        SearchNode.SEARCH_ITERATIVE = false;
+        SearchNode.SEARCH_ITERATIVE = true;
         doc.process();
 
         System.out.println(doc.activationsToString(true, true));

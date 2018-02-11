@@ -19,12 +19,11 @@ package org.aika.corpus;
 
 import org.aika.lattice.NodeActivation;
 import org.aika.neuron.Activation;
-import org.aika.neuron.Linker;
 import org.aika.neuron.Linker.Direction;
 
 import java.util.*;
 
-import static org.aika.corpus.InterpretationNode.State.SELECTED;
+import static org.aika.corpus.SearchNode.Decision.SELECTED;
 import static org.aika.corpus.InterpretationNode.checkSelfReferencing;
 import static org.aika.neuron.Linker.Direction.INPUT;
 
@@ -78,7 +77,14 @@ public class Conflicts {
     }
 
 
-    public static void collectConflicting(Collection<InterpretationNode> results, InterpretationNode n, long v) {
+    public static Collection<InterpretationNode> getConflicting(InterpretationNode n, long v) {
+        ArrayList<InterpretationNode> conflicts = new ArrayList<>();
+        Conflicts.collectConflicting(conflicts, n, v);
+        return conflicts;
+    }
+
+
+    private static void collectConflicting(Collection<InterpretationNode> results, InterpretationNode n, long v) {
         assert n.primId >= 0;
         n.conflicts.primary.values().forEach(c -> c.secondary.collectPrimitiveNodes(results, v));
         n.conflicts.secondary.values().forEach(c -> results.add(c.primary));

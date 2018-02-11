@@ -23,6 +23,7 @@ import org.aika.lattice.Node.ThreadState;
 import org.aika.neuron.Activation;
 import org.aika.neuron.INeuron;
 import org.aika.corpus.SearchNode.Weight;
+import org.aika.corpus.SearchNode.Decision;
 import org.aika.neuron.Selector;
 import org.aika.neuron.Synapse;
 import org.aika.training.SupervisedTraining;
@@ -33,7 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.aika.corpus.InterpretationNode.State.UNKNOWN;
+import static org.aika.corpus.SearchNode.Decision.UNKNOWN;
 import static org.aika.corpus.SearchNode.SEARCH_ITERATIVE;
 
 /**
@@ -49,7 +50,6 @@ public class Document implements Comparable<Document> {
     private static final Logger log = LoggerFactory.getLogger(Document.class);
 
     public static boolean APPLY_DEBUG_OUTPUT = false;
-    public static boolean OPTIMIZE_DEBUG_OUTPUT = false;
     public static int CLEANUP_INTERVAL = 500;
     public static int MAX_ROUND = 20;
 
@@ -62,7 +62,7 @@ public class Document implements Comparable<Document> {
     public int searchNodeIdCounter = 0;
     public int searchStepCounter = 0;
 
-    public InterpretationNode bottom = new InterpretationNode(this, -1, 0, 0, InterpretationNode.State.SELECTED);
+    public InterpretationNode bottom = new InterpretationNode(this, -1, 0, 0, Decision.SELECTED);
 
     public Model model;
     public int threadId;
@@ -99,7 +99,7 @@ public class Document implements Comparable<Document> {
     public ArrayList<Activation> addedActivations = new ArrayList<>();
 
 
-    public SearchNode selectedSearchNode = new SearchNode(this, null, null, null, -1);
+    public SearchNode selectedSearchNode;
     public ArrayList<Candidate> candidates = new ArrayList<>();
     public List<InterpretationNode> bestInterpretation = null;
 
@@ -236,22 +236,18 @@ public class Document implements Comparable<Document> {
     public void process() {
         inputNeuronActivations.forEach(act -> vQueue.propagateActivationValue(0, act));
 
-        if (Document.OPTIMIZE_DEBUG_OUTPUT) {
-            log.info("Root SearchNode:" + toString());
-        }
-
         generateCandidates();
 
         addedActivations.clear();
 
-        Candidate c = !candidates.isEmpty() ? candidates.get(0) : null;
-
-        SearchNode child = new SearchNode(this, selectedSearchNode, null, c, 0);
+        if(selectedSearchNode == null) {
+            selectedSearchNode = new SearchNode(this, null, null, 0);
+        }
 
         if(SEARCH_ITERATIVE) {
-            SearchNode.searchIterative(this, child);
+            SearchNode.searchIterative(this, selectedSearchNode, visitedCounter++);
         } else {
-            child.searchRecursive(this);
+            selectedSearchNode.searchRecursive(this);
         }
 
         ArrayList<InterpretationNode> results = new ArrayList<>();
@@ -262,10 +258,6 @@ public class Document implements Comparable<Document> {
         }
 
         bestInterpretation = results;
-
-        if (Document.OPTIMIZE_DEBUG_OUTPUT) {
-            dumpDebugCandidateStatistics();
-        }
     }
 
 
@@ -507,7 +499,7 @@ public class Document implements Comparable<Document> {
 
 
         public void add(int round, Activation act) {
-            if(act.rounds.isQueued(round) || act.key.interpretation.state == InterpretationNode.State.UNKNOWN) return;
+            if(act.rounds.isQueued(round) || act.key.interpretation.state == Decision.UNKNOWN) return;
 
             TreeSet<Activation> q;
             if(round < queue.size()) {
