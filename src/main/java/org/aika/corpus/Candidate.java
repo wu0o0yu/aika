@@ -17,7 +17,7 @@ public class Candidate  implements Comparable<Candidate> {
     public Decision cachedDecision = Decision.UNKNOWN;
 
     /**
-     * The cached search node is used to avoid having to recompute the activation values and weight that are associated
+     * The cached search node is used to avoid having to recompute the activation values and weights that are associated
      * with this search node.
      */
     public SearchNode cachedSearchNode;

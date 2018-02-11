@@ -224,6 +224,12 @@ public class Synapse implements Writable {
     }
 
 
+    public void setWeight(double w) {
+        double newWeightDelta = w - weight;
+        weightDelta = newWeightDelta;
+    }
+
+
     public void setBias(double b) {
         double newBiasDelta = b - bias;
         output.get().biasSumDelta += newBiasDelta - biasDelta;
