@@ -10,7 +10,16 @@ import org.aika.corpus.SearchNode.Decision;
 public class Candidate  implements Comparable<Candidate> {
     public SearchNode currentSearchNode;
 
+    /**
+     * The cached decision is used to avoid having to explore the same candidate twice even though nothing that
+     * influences this candidate has changed.
+     */
     public Decision cachedDecision = Decision.UNKNOWN;
+
+    /**
+     * The cached search node is used to avoid having to recompute the activation values and weight that are associated
+     * with this search node.
+     */
     public SearchNode cachedSearchNode;
 
     public InterpretationNode refinement;
