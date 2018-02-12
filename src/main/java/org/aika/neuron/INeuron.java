@@ -181,7 +181,11 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         InterpretationNode interpr = input.interpretation != null ? input.interpretation : doc.bottom;
 
         Activation.Key ak = new Activation.Key(node.get(doc), input.range, input.rid, interpr);
-        Activation act = node.get(doc).createActivation(doc, ak);
+
+        Activation act = Selector.get(doc, this, ak);
+        if(act == null) {
+            act = node.get(doc).createActivation(doc, ak);
+        }
 
         register(act);
 
