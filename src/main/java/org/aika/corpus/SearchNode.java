@@ -506,7 +506,7 @@ public class SearchNode implements Comparable<SearchNode> {
             if (!sa.synapse.isNegative()) {
                 Candidate pos = sa.output.key.interpretation.candidate;
                 if (pos != null) {
-                    if (pos.cachedDecision == Decision.EXCLUDED && candidate.id > pos.id) {
+                    if (pos.cachedDecision == Decision.EXCLUDED) {
                         pos.cachedDecision = UNKNOWN;
                     }
                 }
@@ -514,7 +514,7 @@ public class SearchNode implements Comparable<SearchNode> {
                 for (InterpretationNode c : Conflicts.getConflicting(sa.output.key.interpretation, v)) {
                     Candidate neg = c.candidate;
                     if (neg != null) {
-                        if (neg.cachedDecision == Decision.SELECTED && candidate.id > neg.id) {
+                        if (neg.cachedDecision == Decision.SELECTED) {
                             neg.cachedDecision = UNKNOWN;
                         }
                     }
