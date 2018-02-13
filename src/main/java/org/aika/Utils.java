@@ -103,11 +103,11 @@ public class Utils {
     }
 
 
-    public static String collapseText(String txt) {
-        if (txt.length() <= 10) {
+    public static String collapseText(String txt, int length) {
+        if (txt.length() <= 2 * length) {
             return txt;
         } else {
-            return txt.substring(0, 5) + "..." + txt.substring(txt.length() - 5);
+            return txt.substring(0, length) + "..." + txt.substring(txt.length() - length);
         }
     }
 }

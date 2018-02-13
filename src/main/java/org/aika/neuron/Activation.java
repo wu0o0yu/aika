@@ -553,9 +553,9 @@ public final class Activation extends NodeActivation<OrNode> {
         if(withTextSnippet) {
             sb.append(" \"");
             if(key.node.neuron.get().outputText != null) {
-                sb.append(Utils.collapseText(key.node.neuron.get().outputText));
+                sb.append(Utils.collapseText(key.node.neuron.get().outputText, 7));
             } else {
-                sb.append(Utils.collapseText(doc.getText(key.range)));
+                sb.append(Utils.collapseText(doc.getText(key.range), 7));
             }
             sb.append("\"");
         }

@@ -178,6 +178,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
      * @param input
      */
     public Activation addInput(Document doc, Activation.Builder input) {
+        assert input.range.begin <= input.range.end;
+
         InterpretationNode interpr = input.interpretation != null ? input.interpretation : doc.bottom;
 
         Activation.Key ak = new Activation.Key(node.get(doc), input.range, input.rid, interpr);
