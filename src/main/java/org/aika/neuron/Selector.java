@@ -66,7 +66,7 @@ public class Selector {
         else if (s == 1) {
             results = th.activations.values().stream();
         } else if (rid != null) {
-            return getActivationsByRid(th, n, rid).stream();
+            results = getActivationsByRid(th, n, rid).stream();
         } else if(rr != null) {
             results = getActivationsByRange(th, n, r, rr).stream();
         } else {
