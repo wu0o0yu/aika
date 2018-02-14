@@ -53,7 +53,7 @@ public class Conflicts {
 
 
     private static void addConflict(InterpretationNode io, InterpretationNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
-        if (o.markedConflict == v || o.state == SELECTED) {
+        if (o.markedConflict == v) {
             if (!checkSelfReferencing(o, io, false, 0)) {
                 add(act, io, o);
             }
