@@ -61,9 +61,9 @@ public class Candidate  implements Comparable<Candidate> {
     }
 
 
-    public boolean checkDependenciesSatisfied(long v) {
+    public boolean checkDependenciesSatisfied() {
         for (Activation.SynapseActivation sa : refinement.activation.neuronInputs) {
-            if (sa.input.visited != v && !sa.synapse.key.isRecurrent && sa.input.upperBound > 0.0) return false;
+            if (!sa.input.hasCandidate && !sa.synapse.key.isRecurrent && sa.input.upperBound > 0.0) return false;
         }
         return true;
     }

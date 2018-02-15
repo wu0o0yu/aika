@@ -204,18 +204,18 @@ public class Document implements Comparable<Document> {
 
         long v = visitedCounter++;
         for(Activation act: inputNeuronActivations) {
-            act.visited = v;
+            act.hasCandidate = true;
         }
 
         while (!tmp.isEmpty()) {
             int oldSize = tmp.size();
             for (Candidate c : tmp) {
-                if (c.checkDependenciesSatisfied(v)) {
+                if (c.checkDependenciesSatisfied()) {
                     tmp.remove(c);
                     c.id = candidates.size();
                     candidates.add(c);
 
-                    c.refinement.activation.visited = v;
+                    c.refinement.activation.hasCandidate = true;
                     break;
                 }
             }
