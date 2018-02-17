@@ -88,6 +88,7 @@ public class Converter {
         boolean noFurtherRefinement = false;
         TreeSet<Synapse> reqSyns = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
         double sum = 0.0;
+        neuron.requiredSum = 0.0;
         if(remainingSum + neuron.posRecSum + neuron.biasSum > 0.0) {
             int i = 0;
             for (Synapse s : tmp) {
@@ -98,6 +99,7 @@ public class Converter {
                 }
 
                 remainingSum -= s.weight;
+                neuron.requiredSum += s.weight;
                 reqSyns.add(s);
 
                 requiredNode = getNextLevelNode(offset, requiredNode, s);

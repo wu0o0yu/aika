@@ -80,6 +80,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public volatile double negRecSum;
     public volatile double posRecSum;
 
+    public volatile double requiredSum;
     public volatile double maxRecurrentSum = 0.0;
 
     public Writable statistic;
@@ -314,6 +315,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         out.writeDouble(negDirSum);
         out.writeDouble(negRecSum);
         out.writeDouble(posRecSum);
+        out.writeDouble(requiredSum);
         out.writeDouble(maxRecurrentSum);
 
         out.writeUTF(activationFunctionKey);
@@ -371,6 +373,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         negDirSum = in.readDouble();
         negRecSum = in.readDouble();
         posRecSum = in.readDouble();
+        requiredSum = in.readDouble();
         maxRecurrentSum = in.readDouble();
 
         activationFunctionKey = in.readUTF();

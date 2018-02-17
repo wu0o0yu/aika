@@ -168,7 +168,7 @@ public class LongTermLearning {
         (dir ? n.outputSynapses : n.inputSynapses).values().stream()
                 .filter(s -> !s.isNegative() && !actSyns.contains(s))
                 .forEach(s -> {
-                    if(s.isConjunction(false) != dir) {
+                    if(isConjunction(s) != dir) {
                         Result r = config.synapseEvaluation.evaluate(s, dir ? act : null, dir ? null : act);
                         if (r != null) {
                             s.weightDelta -= (float) (config.ltdLearnRate * act.getFinalState().value * r.significance);
@@ -185,5 +185,11 @@ public class LongTermLearning {
         if(!dir) {
             doc.notifyWeightsModified(n, n.inputSynapses.values());
         }
+    }
+
+
+    private static boolean isConjunction(Synapse s) {
+        INeuron out = s.output.get();
+        return s.weight + out.requiredSum + out.biasSum <= 0.0;
     }
 }
