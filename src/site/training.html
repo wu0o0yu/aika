@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Vision - Aika</title>
+	<link rel="stylesheet" href="css/style.css" type="text/css">
+	<link rel="shortcut icon" href="images/favicon.png" />
+
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-77552310-1', 'auto');
+		ga('send', 'pageview');
+
+	</script>
+</head>
+<body>
+<div id="header">
+	<div>
+		<div class="logo">
+			<a href="index.html"></a>
+		</div>
+		<ul id="navigation">
+			<li>
+				<a href="index.html">Overall idea</a>
+			</li>
+			<li>
+				<a href="inference.html">Inference</a>
+			</li>
+			<li class="active">
+				<a href="training.html">Training</a>
+			</li>
+			<li>
+				<a href="usage.html">Examples</a>
+			</li>
+			<li>
+				<a href="resources.html">Resources</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<div id="contents">
+	<div class="features">
+		<h1>Training Mechanisms</h1>
+		<p>
+			The architectural framework of the Aika algorithm allows to implement a broad spectrum of diverse
+			training mechanisms. These training mechanisms have their roots within the different artificial intelligence
+			concepts that Aika brings together.
+
+		<h2>Supervised Learning with the Delta-Rule</h2>
+		<h2>Long-Term Potentiation and Long-Term Depression</h2>
+		The long biologically inspired learning algorithms for long-term potentiation and long-term depression.
+
+		Wikipedia: "In neuroscience, long-term potentiation (LTP) is a persistent strengthening of synapses based on recent
+		patterns of activity. These are patterns of synaptic activity that produce a long-lasting increase in signal
+		transmission between two neurons. The opposite of LTP is long-term depression, which produces a long-lasting
+		decrease in synaptic strength."
+
+		<h2>Meta-Synapses and Meta-Neurons</h2>
+		<h2>Frequent Pattern Discovery</h2>
+
+		<p>
+
+			Since Aika is using a pattern lattice as underlying data structure for neurons, we do not depend solely on
+			<a href="https://en.wikipedia.org/wiki/Backpropagation" rel="nofollow">backpropagation</a> as a training
+			method for new neurons.
+			Now we are able to enumerate all frequent patterns and use them to generate new neurons. Therefore, we do
+			not have to retrain existing neurons and risk losing the conceptual knowledge
+			they have already accumulated. Frequent patterns are also much easier to comprehend for humans than the
+			weights of conventional ANNs. This is a form of unsupervised learning.
+		</p>
+		<p>
+			Another learning mechanism that can be derived from the interpretations is the following. Since only the
+			strongest interpretation is chosen
+			and all other interpretations are suppressed, we have a convenient way to automatically generate our
+			supervised training data.
+		</p>
+
+		<p>
+
+			But there are also other
+			ways that Aika could be trained. Since Aika selects one interpretation of a text and suppresses all
+			others, we have an easy way of generating our supervised training data by labeling the suppressed options as
+			negative examples.
+			<br/>
+			Another training mechanism that
+			could be implemented is to use Aikas Frequent Pattern Lattice to search for statistically significant
+			patterns and generate new neurons based on them. This would be an unsupervised training method that could be
+			used to
+			find syllables, words, commonly used phrases or other kinds of patterns in a text.
+			<br/>
+			It should also
+			be possible to apply <a href="http://adios.tau.ac.il/algorithm.html">grammar induction</a> methods. For
+			instance if there are several significant patterns
+			in the pattern lattice that share a common unsignificant parent pattern. In this case a new neuron that
+			consists of a disjunction of the original patterns could be introduced. This way not only conjunctions like
+			patterns could be
+			trained but also disjunctions.
+		</p>
+		</p>
+	</div>
+
+</div>
+</body>
+</html>
