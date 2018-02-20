@@ -268,13 +268,13 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public void notifyWeightsModified(INeuron n, Collection<Synapse> inputSynapses) {
-        Set<Synapse> is = modifiedWeights.get(n);
+    public void notifyWeightModified(Synapse synapse) {
+        Set<Synapse> is = modifiedWeights.get(synapse.output.get());
         if(is == null) {
             is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
-            modifiedWeights.put(n, is);
+            modifiedWeights.put(synapse.output.get(), is);
         }
-        is.addAll(inputSynapses);
+        is.add(synapse);
     }
 
 

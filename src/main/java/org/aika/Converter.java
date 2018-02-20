@@ -70,6 +70,7 @@ public class Converter {
         initInputNodesAndComputeWeightSums();
 
         if(neuron.biasSum + neuron.posDirSum + neuron.posRecSum <= 0.0) {
+            neuron.requiredSum = neuron.posDirSum + neuron.posRecSum;
             outputNode.removeParents(threadId, false);
             return false;
         }
@@ -166,8 +167,7 @@ public class Converter {
 //        neuron.biasSum = 0.0;
         for (Synapse s : modifiedSynapses) {
             if(s.toBeDeleted) {
-                s.weightDelta = -s.weight;
-                s.setBias(0.0);
+                s.update(doc, -s.weight, 0.0);
             }
 
             INeuron in = s.input.get();
@@ -193,6 +193,10 @@ public class Converter {
 
             s.bias += s.biasDelta;
             s.biasDelta = 0.0;
+
+            if(doc != null) {
+                s.committedInDoc = doc.id;
+            }
 
             in.lock.releaseWriteLock();
 

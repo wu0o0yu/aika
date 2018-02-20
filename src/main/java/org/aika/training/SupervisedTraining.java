@@ -105,8 +105,6 @@ public class SupervisedTraining {
                 trainSynapse(n, iAct, r, x, v);
             }
         });
-
-        doc.notifyWeightsModified(n, n.provider.inMemoryInputSynapses.values());
     }
 
 
@@ -155,9 +153,9 @@ public class SupervisedTraining {
         }
         double deltaW = x * r.significance * iAct.getFinalState().value;
 
-        Synapse synapse = Synapse.createOrLookup(r.synapseKey, inputNeuron.provider, n.provider);
+        Synapse synapse = Synapse.createOrLookup(doc, r.synapseKey, inputNeuron.provider, n.provider);
 
-        synapse.weightDelta = (float) deltaW;
+        synapse.updateDelta(doc, deltaW, 0.0);
 
         r.deleteMode.checkIfDelete(synapse);
     }

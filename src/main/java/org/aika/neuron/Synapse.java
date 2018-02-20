@@ -18,6 +18,7 @@ package org.aika.neuron;
 
 
 import org.aika.*;
+import org.aika.corpus.Document;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Relation;
 import org.aika.corpus.Range.Output;
@@ -90,7 +91,7 @@ public class Synapse implements Writable {
 
     /**
      * The weight delta of this synapse. The converter will use it to compute few internal
-     * parameters and then update the weight variable.
+     * parameters and then createOrLookup the weight variable.
      */
     public double weightDelta;
 
@@ -109,6 +110,8 @@ public class Synapse implements Writable {
 
     public MetaSynapse meta;
 
+    public int createdInDoc;
+    public int committedInDoc;
 
     public Synapse() {}
 
@@ -161,6 +164,32 @@ public class Synapse implements Writable {
     }
 
 
+    public void relink() {
+        boolean newIsConjunction = isConjunction(true);
+        if(newIsConjunction != isConjunction) {
+            INeuron in = input.get();
+            INeuron out = output.get();
+
+            boolean dir = in.provider.id < out.provider.id;
+            (dir ? in : out).lock.acquireWriteLock();
+            (dir ? out : in).lock.acquireWriteLock();
+
+            if (newIsConjunction) {
+                out.inputSynapses.put(this, this);
+                isConjunction = true;
+                out.setModified();
+            } else {
+                in.outputSynapses.put(this, this);
+                isConjunction = false;
+                in.setModified();
+            }
+
+            (dir ? in : out).lock.releaseWriteLock();
+            (dir ? out : in).lock.releaseWriteLock();
+        }
+    }
+
+
     public void unlink() {
         INeuron in = input.get();
         INeuron out = output.get();
@@ -209,31 +238,36 @@ public class Synapse implements Writable {
 
     public boolean isConjunction(boolean v) {
         INeuron out = output.get();
-        return (v ? getNewWeight() : weight) + (v ? out.getNewBiasSum() : out.biasSum) <= 0.0;
+        return (v ? getNewWeight() : weight) + out.requiredSum + (v ? out.getNewBiasSum() : out.biasSum) <= 0.0;
+    }
+
+
+    public void updateDelta(Document doc, double weightDelta, double biasDelta) {
+        this.weightDelta += weightDelta;
+        this.biasDelta += biasDelta;
+        output.get().biasSumDelta += biasDelta;
+        relink();
+        if(doc != null) {
+            doc.notifyWeightModified(this);
+        }
+    }
+
+
+    public void update(Document doc, double weight, double bias) {
+        this.weightDelta = weight - this.weight;
+        double newBiasDelta = bias - this.bias;
+        output.get().biasSumDelta += newBiasDelta - biasDelta;
+        biasDelta = newBiasDelta;
+
+        relink();
+        if(doc != null) {
+            doc.notifyWeightModified(this);
+        }
     }
 
 
     public boolean isNegative() {
         return weight <= 0.0;
-    }
-
-
-    public void changeBias(double bd) {
-        biasDelta += bd;
-        output.get().biasSumDelta += bd;
-    }
-
-
-    public void setWeight(double w) {
-        double newWeightDelta = w - weight;
-        weightDelta = newWeightDelta;
-    }
-
-
-    public void setBias(double b) {
-        double newBiasDelta = b - bias;
-        output.get().biasSumDelta += newBiasDelta - biasDelta;
-        biasDelta = newBiasDelta;
     }
 
 
@@ -303,7 +337,7 @@ public class Synapse implements Writable {
     }
 
 
-    public static Synapse createOrLookup(Key synapseKey, Neuron inputNeuron, Neuron outputNeuron) {
+    public static Synapse createOrLookup(Document doc, Key synapseKey, Neuron inputNeuron, Neuron outputNeuron) {
         Provider<InputNode> inp = inputNeuron.get().outputNodes.get(synapseKey.createInputNodeKey());
         Synapse synapse = null;
         InputNode in = null;
@@ -320,6 +354,7 @@ public class Synapse implements Writable {
             }
             in.setSynapse(synapse);
             synapse.link();
+            synapse.createdInDoc = doc.id;
         }
         return synapse;
     }

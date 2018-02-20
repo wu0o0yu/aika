@@ -126,8 +126,7 @@ public class MetaNetwork {
 
                     Synapse ns = new Synapse(inb, targetNeuron, nsk);
                     if (!ns.exists()) {
-                        ns.weightDelta = ss.metaWeight;
-                        ns.setBias(ss.metaBias);
+                        ns.updateDelta(doc, ss.metaWeight, ss.metaBias);
 
                         inputSynapses.add(ns);
                     }

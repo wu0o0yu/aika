@@ -27,8 +27,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.aika.training.SynapseEvaluation.DeleteMode.*;
-
 
 /**
  *
@@ -92,12 +90,14 @@ public class LongTermLearning {
 
 
     public static void train(Document doc, Config config) {
-        doc.getFinalActivations().forEach(act -> {
+        doc.getActivations()
+                .filter(act -> act.targetValue == null ? act.isFinalActivation() : act.targetValue > 0.0)
+                .forEach(act -> {
             longTermPotentiation(doc, config, act);
             longTermDepression(doc, config, act, false);
             longTermDepression(doc, config, act, true);
         });
-        doc.commit();
+//        doc.commit();
     }
 
 
@@ -116,31 +116,34 @@ public class LongTermLearning {
         double x = config.ltpLearnRate * (1.0 - act.getFinalState().value) * m;
 
         if(config.createNewSynapses) {
-            doc.getFinalActivations().filter(iAct -> iAct.key.node != act.key.node).forEach(iAct -> {
-                Result r = config.synapseEvaluation.evaluate(null, iAct, act);
-                synapseLTP(config, iAct, act, x, r);
+            doc.getActivations()
+                    .filter(iAct -> iAct.targetValue == null ? iAct.isFinalActivation() : iAct.targetValue > 0.0)
+                    .filter(iAct -> iAct.key.node != act.key.node)
+                    .forEach(iAct -> {
+                synapseLTP(config, null, iAct, act, x);
             });
         } else {
-            act.getFinalInputActivations().forEach(sa -> {
-                Result r = config.synapseEvaluation.evaluate(sa.synapse, sa.input, act);
-                synapseLTP(config, sa.input, act, x, r);
+            act.neuronInputs
+                    .stream()
+                    .filter(sa -> sa.input.targetValue == null ? sa.input.isFinalActivation() : sa.input.targetValue > 0.0)
+                    .forEach(sa -> {
+                synapseLTP(config, sa.synapse, sa.input, act, x);
             });
         }
-
-        doc.notifyWeightsModified(n, n.inputSynapses.values());
     }
 
 
-    private static void synapseLTP(Config config, Activation iAct, Activation act, double x, Result r) {
+    private static void synapseLTP(Config config, Synapse s, Activation iAct, Activation act, double x) {
+        Result r = config.synapseEvaluation.evaluate(s, iAct, act);
+
         if(r == null) return;
 
         double sDelta = iAct.getFinalState().value * x * r.significance;
 
         if(sDelta > 0.0) {
-            Synapse synapse = Synapse.createOrLookup(r.synapseKey, iAct.getNeuron(), act.getNeuron());
+            Synapse synapse = Synapse.createOrLookup(act.doc, r.synapseKey, iAct.getNeuron(), act.getNeuron());
 
-            synapse.weightDelta += (float) sDelta;
-            synapse.changeBias(-config.beta * sDelta);
+            synapse.updateDelta(act.doc, sDelta, -config.beta * sDelta);
         }
     }
 
@@ -163,33 +166,25 @@ public class LongTermLearning {
         INeuron n = act.getINeuron();
 
         Set<Synapse> actSyns = new TreeSet<>(dir ? Synapse.OUTPUT_SYNAPSE_COMP : Synapse.INPUT_SYNAPSE_COMP);
-        (dir ? act.getFinalOutputActivations() : act.getFinalInputActivations()).forEach(sa -> actSyns.add(sa.synapse));
+        (dir ? act.neuronOutputs : act.neuronInputs)
+                .forEach(sa -> {
+                    Activation rAct = dir ? sa.output : sa.input;
+                    if(rAct.targetValue == null ? rAct.isFinalActivation() : rAct.targetValue > 0.0) {
+                        actSyns.add(sa.synapse);
+                    }
+                });
 
         (dir ? n.outputSynapses : n.inputSynapses).values().stream()
                 .filter(s -> !s.isNegative() && !actSyns.contains(s))
                 .forEach(s -> {
-                    if(isConjunction(s) != dir) {
+                    if(s.isConjunction(false) != dir) {
                         Result r = config.synapseEvaluation.evaluate(s, dir ? act : null, dir ? null : act);
                         if (r != null) {
-                            s.weightDelta -= (float) (config.ltdLearnRate * act.getFinalState().value * r.significance);
+                            s.updateDelta(doc,-config.ltdLearnRate * act.getFinalState().value * r.significance, 0.0);
 
                             r.deleteMode.checkIfDelete(s);
-
-                            if (dir) {
-                                doc.notifyWeightsModified(s.output.get(), Collections.singletonList(s));
-                            }
                         }
                     }
                 });
-
-        if(!dir) {
-            doc.notifyWeightsModified(n, n.inputSynapses.values());
-        }
-    }
-
-
-    private static boolean isConjunction(Synapse s) {
-        INeuron out = s.output.get();
-        return s.weight + out.requiredSum + out.biasSum <= 0.0;
     }
 }
