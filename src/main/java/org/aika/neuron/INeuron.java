@@ -514,9 +514,12 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-    public static boolean update(Model m, int threadId, Document doc, Neuron pn, double biasDelta, Collection<Synapse> modifiedSynapses) {
+    public static boolean update(Model m, int threadId, Document doc, Neuron pn, Double bias, Collection<Synapse> modifiedSynapses) {
         INeuron n = pn.get();
-        n.changeBias(biasDelta);
+
+        if(bias != null) {
+            n.setBias(bias);
+        }
 
         // s.link requires an updated n.biasSumDelta value.
         modifiedSynapses.forEach(s -> s.link());
