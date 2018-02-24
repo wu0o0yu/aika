@@ -84,6 +84,9 @@ public class Synapse implements Writable {
 
     public Key key;
 
+
+    public boolean inactive;
+
     /**
      * The weight of this synapse.
      */

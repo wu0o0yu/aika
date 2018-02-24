@@ -157,7 +157,7 @@ public class SupervisedTraining {
 
         synapse.updateDelta(doc, deltaW, 0.0);
 
-        r.deleteMode.checkIfDelete(synapse);
+        r.deleteMode.checkIfDelete(synapse, true);
     }
 
 

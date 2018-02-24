@@ -225,6 +225,9 @@ public final class Activation extends NodeActivation<OrNode> {
 
         for (SynapseActivation sa : neuronInputs) {
             Synapse s = sa.synapse;
+            if(s.inactive) {
+                continue;
+            }
             Activation iAct = sa.input;
 
             if (iAct == this) continue;
@@ -262,6 +265,9 @@ public final class Activation extends NodeActivation<OrNode> {
         Synapse lastSynapse = null;
         InputState maxInputState = null;
         for (SynapseActivation sa : neuronInputs) {
+            if(sa.synapse.inactive) {
+                continue;
+            }
             if (lastSynapse != null && lastSynapse != sa.synapse) {
                 tmp.add(maxInputState);
                 maxInputState = null;

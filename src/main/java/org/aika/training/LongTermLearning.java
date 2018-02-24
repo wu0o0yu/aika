@@ -182,7 +182,7 @@ public class LongTermLearning {
                         if (r != null) {
                             s.updateDelta(doc,-config.ltdLearnRate * act.getFinalState().value * r.significance, 0.0);
 
-                            r.deleteMode.checkIfDelete(s);
+                            r.deleteMode.checkIfDelete(s, false);
                         }
                     }
                 });

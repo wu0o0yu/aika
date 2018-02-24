@@ -23,23 +23,31 @@ public interface SynapseEvaluation {
         DELETE_NEGATIVES,
         DELETE_POSITIVES;
 
-        public void checkIfDelete(Synapse s) {
+        public void checkIfDelete(Synapse s, boolean delete) {
             double ow = s.weight;
             double nw = s.getNewWeight();
 
             switch(this) {
                 case DELETE:
-                    s.toBeDeleted = true;
+                    deleteOrInactivate(s, delete);
                     break;
                 case DELETE_IF_SIGN_CHANGES:
-                    if(nw == 0.0 || (ow != 0.0 && nw > 0.0 != ow > 0.0)) s.toBeDeleted = true;
+                    if(nw == 0.0 || (ow != 0.0 && nw > 0.0 != ow > 0.0)) deleteOrInactivate(s, delete);
                     break;
                 case DELETE_NEGATIVES:
-                    if(nw <= 0.0) s.toBeDeleted = true;
+                    if(nw <= 0.0) deleteOrInactivate(s, delete);
                     break;
                 case DELETE_POSITIVES:
-                    if(nw >= 0.0) s.toBeDeleted = true;
+                    if(nw >= 0.0) deleteOrInactivate(s, delete);
                     break;
+            }
+        }
+
+        private void deleteOrInactivate(Synapse s, boolean delete) {
+            if(delete) {
+                s.toBeDeleted = true;
+            } else {
+                s.inactive = true;
             }
         }
     }

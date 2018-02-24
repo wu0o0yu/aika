@@ -181,12 +181,14 @@ public class Converter {
                 s.inputNode = iNode.provider;
             }
 
-            if (s.key.isRecurrent) {
-                maxRecurrentSumDelta += Math.abs(s.getNewWeight()) - Math.abs(s.weight);
-            }
+            if(!s.inactive) {
+                if (s.key.isRecurrent) {
+                    maxRecurrentSumDelta += Math.abs(s.getNewWeight()) - Math.abs(s.weight);
+                }
 
-            sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
-            sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.getNewWeight();
+                sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
+                sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.getNewWeight();
+            }
 
             s.weight += s.weightDelta;
             s.weightDelta = 0.0;
