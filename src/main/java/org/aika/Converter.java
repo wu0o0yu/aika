@@ -75,11 +75,11 @@ public class Converter {
             return false;
         }
 
-        double remainingSum = 0.0;
+        double conjSum = 0.0;
         TreeSet<Synapse> tmp = new TreeSet<>(SYNAPSE_COMP);
         for(Synapse s: neuron.inputSynapses.values()) {
             if(!s.isNegative() && !s.key.isRecurrent) {
-                remainingSum += s.weight;
+                conjSum += s.weight;
                 tmp.add(s);
             }
         }
@@ -90,7 +90,9 @@ public class Converter {
         TreeSet<Synapse> reqSyns = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
         double sum = 0.0;
         neuron.requiredSum = 0.0;
-        if(remainingSum + neuron.posRecSum + neuron.biasSum > 0.0) {
+
+        if(conjSum + neuron.posRecSum + neuron.biasSum > 0.0) {
+            double remainingSum = neuron.posDirSum;
             int i = 0;
             for (Synapse s : tmp) {
                 final boolean isOptionalInput = sum + remainingSum - s.weight + neuron.posRecSum + neuron.biasSum > 0.0;
@@ -141,6 +143,8 @@ public class Converter {
                     }
                 }
             }
+        } else {
+            System.out.println();
         }
 
         for (Synapse s : modifiedSynapses) {
