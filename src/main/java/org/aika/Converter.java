@@ -75,11 +75,9 @@ public class Converter {
             return false;
         }
 
-        double conjSum = 0.0;
         TreeSet<Synapse> tmp = new TreeSet<>(SYNAPSE_COMP);
         for(Synapse s: neuron.inputSynapses.values()) {
-            if(!s.isNegative() && !s.key.isRecurrent) {
-                conjSum += s.weight;
+            if(!s.isNegative() && !s.key.isRecurrent && !s.inactive) {
                 tmp.add(s);
             }
         }
@@ -91,7 +89,7 @@ public class Converter {
         double sum = 0.0;
         neuron.requiredSum = 0.0;
 
-        if(conjSum + neuron.posRecSum + neuron.biasSum > 0.0) {
+        if(neuron.numDisjunctiveSynapses == 0) {
             double remainingSum = neuron.posDirSum;
             int i = 0;
             for (Synapse s : tmp) {
@@ -144,14 +142,12 @@ public class Converter {
                 }
             }
         } else {
-            System.out.println();
-        }
-
-        for (Synapse s : modifiedSynapses) {
-            if(s.weight + neuron.posRecSum + neuron.biasSum > 0.0) {
-                Node nln = s.inputNode.get();
-                offset = s.key.relativeRid;
-                outputNode.addInput(offset, threadId, nln, false);
+            for (Synapse s : modifiedSynapses) {
+                if (s.weight + neuron.posRecSum + neuron.biasSum > 0.0) {
+                    Node nln = s.inputNode.get();
+                    offset = s.key.relativeRid;
+                    outputNode.addInput(offset, threadId, nln, false);
+                }
             }
         }
 
@@ -192,6 +188,10 @@ public class Converter {
 
                 sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
                 sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.getNewWeight();
+
+                if(s.isConjunction(false, true) && !s.isConjunction(true, true)) {
+                    neuron.numDisjunctiveSynapses++;
+                }
             }
 
             s.weight += s.weightDelta;

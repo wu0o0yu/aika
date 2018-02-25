@@ -152,7 +152,7 @@ public class Synapse implements Writable {
 
         removeLinkInternal(in, out);
 
-        if(isConjunction(true)) {
+        if(isConjunction(true, false)) {
             out.inputSynapses.put(this, this);
             isConjunction = true;
             out.setModified();
@@ -168,7 +168,7 @@ public class Synapse implements Writable {
 
 
     public void relink() {
-        boolean newIsConjunction = isConjunction(true);
+        boolean newIsConjunction = isConjunction(true, false);
         if(newIsConjunction != isConjunction) {
             INeuron in = input.get();
             INeuron out = output.get();
@@ -220,7 +220,7 @@ public class Synapse implements Writable {
 
 
     private void removeLinkInternal(INeuron in, INeuron out) {
-        if(isConjunction(false)) {
+        if(isConjunction(false, false)) {
             if(out.inputSynapses.remove(this) != null) {
                 out.setModified();
             }
@@ -239,9 +239,15 @@ public class Synapse implements Writable {
     }
 
 
-    public boolean isConjunction(boolean v) {
+    /**
+     *
+     * @param v
+     * @param absolute if true, a disjunctive synapse needs to be able to activate the neuron by itself.
+     * @return
+     */
+    public boolean isConjunction(boolean v, boolean absolute) {
         INeuron out = output.get();
-        return (v ? getNewWeight() : weight) + out.requiredSum + (v ? out.getNewBiasSum() : out.biasSum) <= 0.0;
+        return (v ? getNewWeight() : weight) + (absolute ? 0.0 : out.requiredSum) + (v ? out.getNewBiasSum() : out.biasSum) <= 0.0;
     }
 
 

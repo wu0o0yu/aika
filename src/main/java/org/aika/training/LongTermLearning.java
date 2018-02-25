@@ -177,7 +177,7 @@ public class LongTermLearning {
         (dir ? n.outputSynapses : n.inputSynapses).values().stream()
                 .filter(s -> !s.isNegative() && !actSyns.contains(s))
                 .forEach(s -> {
-                    if(s.isConjunction(false) != dir) {
+                    if(s.isConjunction(false, false) != dir) {
                         Result r = config.synapseEvaluation.evaluate(s, dir ? act : null, dir ? null : act);
                         if (r != null) {
                             s.updateDelta(doc,-config.ltdLearnRate * act.getFinalState().value * r.significance, 0.0);
