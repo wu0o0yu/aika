@@ -22,7 +22,6 @@ import org.aika.neuron.Neuron;
 import org.aika.corpus.Range.Relation;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -444,9 +443,9 @@ public class InterpretationSearchTest {
                         .setRangeOutput(true)
         );
 
-
         doc.propagate();
         doc.process();
+        doc.restoreFinalState();
 
         System.out.println(doc.activationsToString(true, true));
 

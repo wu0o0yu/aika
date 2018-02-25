@@ -115,7 +115,6 @@ public class PatternDiscoveryTest {
                 .setCheckExpandable(act -> ((NodeStatistic) act.key.node.statistic).frequency >= 1)
                 .setCheckValidPattern(n -> checkRidRange(n, 1));
 
-        doc.bestInterpretation = Arrays.asList(doc.bottom);
         PatternDiscovery.discover(doc, config);
 
         inA.addInput(doc, 0, 1, 0);

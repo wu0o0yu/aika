@@ -180,17 +180,6 @@ public class MutualExclusionTest {
         // Computes the selected option
         doc.process();
 
-        System.out.println("Final Interpretation: " + doc.bestInterpretation);
-        System.out.println();
-
-        System.out.println("Show all conflicts with the selected option:");
-        for(InterpretationNode so: doc.bestInterpretation) {
-            for(Conflict c: so.conflicts.primary.values()) {
-                System.out.println(c.conflict);
-            }
-        }
-        System.out.println();
-
         System.out.println(doc.activationsToString(false, true));
 
         Assert.assertTrue(pA.getFinalActivations(doc).isEmpty());

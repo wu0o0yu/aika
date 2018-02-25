@@ -236,9 +236,6 @@ public class NamedEntityRecognitionTest {
         System.out.println(doc.activationsToString(false, true));
         System.out.println();
 
-        System.out.println("Final Interpretation: " + doc.bestInterpretation.toString());
-        System.out.println();
-
         System.out.println("Activations of the Surname Category:");
         for(Activation act: surnameCategory.getFinalActivations(doc)) {
             System.out.print(act.key.range + " ");

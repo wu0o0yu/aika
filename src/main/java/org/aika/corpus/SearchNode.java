@@ -250,17 +250,6 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public void collectResults(Collection<InterpretationNode> results) {
-        SearchNode sn = this;
-        do {
-            if (sn.candidate != null) {
-                results.add(sn.candidate.refinement);
-            }
-            sn = sn.selectedParent;
-        } while(sn != null);
-    }
-
-
     public void reconstructSelectedResult(Document doc) {
         LinkedList<SearchNode> tmp = new LinkedList<>();
         SearchNode snt = this;

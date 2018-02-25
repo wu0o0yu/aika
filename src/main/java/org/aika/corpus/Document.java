@@ -101,7 +101,6 @@ public class Document implements Comparable<Document> {
 
     public SearchNode selectedSearchNode;
     public ArrayList<Candidate> candidates = new ArrayList<>();
-    public List<InterpretationNode> bestInterpretation = null;
 
     public long createV;
 
@@ -158,15 +157,6 @@ public class Document implements Comparable<Document> {
     public Stream<Activation> getActivations() {
         return activatedNeurons.stream()
                 .flatMap(in -> in.getActivations(this).stream());
-    }
-
-
-    public String bestInterpretationToString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Best Interpretation:\n");
-        sb.append(bestInterpretation.toString());
-        sb.append("\n");
-        return sb.toString();
     }
 
 
@@ -234,6 +224,12 @@ public class Document implements Comparable<Document> {
      * network. It performs the search for the best interpretation.
      */
     public void process() {
+        processIncrementalStep();
+        restoreFinalState();
+    }
+
+
+    public void processIncrementalStep() {
         inputNeuronActivations.forEach(act -> vQueue.propagateActivationValue(0, act));
 
         generateCandidates();
@@ -249,15 +245,13 @@ public class Document implements Comparable<Document> {
         } else {
             selectedSearchNode.searchRecursive(this);
         }
+    }
 
-        ArrayList<InterpretationNode> results = new ArrayList<>();
-        results.add(bottom);
+
+    public void restoreFinalState() {
         if (selectedSearchNode != null) {
             selectedSearchNode.reconstructSelectedResult(this);
-            selectedSearchNode.collectResults(results);
         }
-
-        bestInterpretation = results;
     }
 
 
