@@ -54,6 +54,7 @@ public final class Activation extends NodeActivation<OrNode> {
     public double lowerBound;
 
     public Rounds rounds = new Rounds();
+    public Rounds finalRounds = rounds;
     public double maxActValue = 0.0;
 
     public boolean ubQueued = false;
@@ -341,7 +342,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public State getFinalState() {
-        return rounds.getLast();
+        return finalRounds.getLast();
     }
 
 
@@ -632,6 +633,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
         sc.newRounds = rounds.copy();
         sc.newState = key.interpretation.state;
+        doc.fsQueue.add(key.interpretation.candidate);
     }
 
 
@@ -649,6 +651,18 @@ public final class Activation extends NodeActivation<OrNode> {
 
         public void restoreState(Mode m) {
             rounds = (m == Mode.OLD ? oldRounds : newRounds).copy();
+        }
+
+        public void setFinalState() {
+            if (isFinalActivation()) {
+                doc.finallyActivatedNeurons.remove(getINeuron());
+            }
+
+            finalRounds = newRounds.copy();
+
+            if (isFinalActivation()) {
+                doc.finallyActivatedNeurons.add(getINeuron());
+            }
         }
 
         public Activation getActivation() {

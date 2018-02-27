@@ -250,32 +250,6 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public void reconstructSelectedResult(Document doc) {
-        LinkedList<SearchNode> tmp = new LinkedList<>();
-        SearchNode snt = this;
-        do {
-            tmp.addFirst(snt);
-            snt = snt.getParent();
-        } while(snt != null);
-
-        for(SearchNode sn: tmp) {
-            sn.changeState(NEW);
-
-            SearchNode pn = sn.getParent();
-            if (pn != null && pn.candidate != null) {
-                pn.candidate.refinement.setState(sn.getDecision(), sn.visited);
-            }
-
-            for (StateChange sc : sn.modifiedActs.values()) {
-                Activation act = sc.getActivation();
-                if (act.isFinalActivation()) {
-                    doc.finallyActivatedNeurons.add(act.getINeuron());
-                }
-            }
-        }
-    }
-
-
     public void dumpDebugState() {
         SearchNode n = this;
         String weights = "";
@@ -560,6 +534,12 @@ public class SearchNode implements Comparable<SearchNode> {
     public void changeState(Activation.Mode m) {
         for (StateChange sc : modifiedActs.values()) {
             sc.restoreState(m);
+        }
+    }
+
+    public void setFinalState() {
+        for (StateChange sc : modifiedActs.values()) {
+            sc.setFinalState();
         }
     }
 

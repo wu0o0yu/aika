@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 
 import static org.aika.corpus.SearchNode.Decision.UNKNOWN;
 import static org.aika.corpus.SearchNode.SEARCH_ITERATIVE;
+import static org.aika.neuron.Activation.Mode.NEW;
 
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
@@ -70,6 +71,7 @@ public class Document implements Comparable<Document> {
     public Queue queue = new Queue();
     public ValueQueue vQueue = new ValueQueue();
     public UpperBoundQueue ubQueue = new UpperBoundQueue();
+    public FinalStateQueue fsQueue = new FinalStateQueue();
 
     public TreeSet<Node> activatedNodes = new TreeSet<>();
     public TreeSet<INeuron> activatedNeurons = new TreeSet<>();
@@ -225,7 +227,7 @@ public class Document implements Comparable<Document> {
      */
     public void process() {
         processIncrementalStep();
-        restoreFinalState();
+        fsQueue.prepareFinalState();
     }
 
 
@@ -244,13 +246,6 @@ public class Document implements Comparable<Document> {
             SearchNode.searchIterative(this, selectedSearchNode, visitedCounter++);
         } else {
             selectedSearchNode.searchRecursive(this);
-        }
-    }
-
-
-    public void restoreFinalState() {
-        if (selectedSearchNode != null) {
-            selectedSearchNode.reconstructSelectedResult(this);
         }
     }
 
@@ -527,6 +522,27 @@ public class Document implements Comparable<Document> {
                 }
             }
             return delta;
+        }
+    }
+
+
+    public class FinalStateQueue {
+        private ArrayList<Candidate> queue = new ArrayList<>();
+
+        public void add(Candidate c) {
+            if(!c.queued) {
+                queue.add(c);
+                c.queued = true;
+            }
+        }
+
+
+        public void prepareFinalState() {
+            for(Candidate c: queue) {
+                c.bestChildNode.setFinalState();
+
+                c.refinement.finalState = c.bestChildNode.getDecision();
+            }
         }
     }
 

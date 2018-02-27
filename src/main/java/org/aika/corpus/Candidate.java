@@ -33,6 +33,7 @@ public class Candidate  implements Comparable<Candidate> {
     int minBegin;
     int maxEnd;
     Integer minRid;
+    public boolean queued;
 
     public Candidate(InterpretationNode ref, int id) {
         this.refinement = ref;

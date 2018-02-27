@@ -84,6 +84,7 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
     long visitedState;
     public Decision state = Decision.UNKNOWN;
+    public Decision finalState = Decision.UNKNOWN;
     public boolean fixed;
 
     public boolean isSelected;
