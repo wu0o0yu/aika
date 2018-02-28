@@ -629,7 +629,7 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
             if(!f1) sb.append(",");
             f1 = false;
             sb.append(n.primId);
-            sb.append(n.state.s);
+            sb.append(n.finalState.s);
             if(!level && n.orInterpretationNodes != null) {
                 sb.append("[");
                 boolean f2 = true;

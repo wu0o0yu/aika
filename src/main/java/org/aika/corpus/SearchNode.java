@@ -445,9 +445,13 @@ public class SearchNode implements Comparable<SearchNode> {
                 if (!alreadyExcluded) {
                     candidate.cachedDecision = dir ? Decision.SELECTED : Decision.EXCLUDED;
                 }
+                if(dir && level > 0) {
+                    getParent().candidate.bestChildNode = this;
+                }
 
                 return dir ? selectedWeight : excludedWeight;
             case SELECTED:
+                getParent().candidate.bestChildNode = this;
                 return selectedWeight;
             case EXCLUDED:
                 return excludedWeight;
@@ -492,6 +496,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if (level > doc.selectedSearchNode.level || accNW > getSelectedAccumulatedWeight(doc)) {
             doc.selectedSearchNode = this;
+            getParent().candidate.bestChildNode = this;
         }
 
         return accumulatedWeight;

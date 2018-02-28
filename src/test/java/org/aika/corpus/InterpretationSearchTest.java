@@ -445,7 +445,6 @@ public class InterpretationSearchTest {
 
         doc.propagate();
         doc.process();
-        doc.restoreFinalState();
 
         System.out.println(doc.activationsToString(true, true));
 

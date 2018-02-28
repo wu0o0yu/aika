@@ -552,7 +552,7 @@ public final class Activation extends NodeActivation<OrNode> {
         sb.append(id + " - ");
 
         if(sn != null) {
-            sb.append(key.interpretation.state + " ");
+            sb.append(key.interpretation.finalState + " ");
             sb.append(sequence + " ");
         }
 

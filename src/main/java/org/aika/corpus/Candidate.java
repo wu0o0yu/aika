@@ -21,6 +21,7 @@ public class Candidate  implements Comparable<Candidate> {
      * with this search node.
      */
     public SearchNode cachedSearchNode;
+    public SearchNode bestChildNode;
 
     public InterpretationNode refinement;
 

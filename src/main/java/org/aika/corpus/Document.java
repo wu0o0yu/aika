@@ -231,7 +231,7 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public void processIncrementalStep() {
+    private void processIncrementalStep() {
         inputNeuronActivations.forEach(act -> vQueue.propagateActivationValue(0, act));
 
         generateCandidates();
