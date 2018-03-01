@@ -35,8 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.aika.corpus.SearchNode.Decision.UNKNOWN;
-import static org.aika.corpus.SearchNode.SEARCH_ITERATIVE;
-import static org.aika.neuron.Activation.Mode.NEW;
+
 
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
@@ -242,11 +241,7 @@ public class Document implements Comparable<Document> {
             selectedSearchNode = new SearchNode(this, null, null, 0);
         }
 
-        if(SEARCH_ITERATIVE) {
-            SearchNode.searchIterative(this, selectedSearchNode, visitedCounter++);
-        } else {
-            selectedSearchNode.searchRecursive(this);
-        }
+        SearchNode.searchIterative(this, selectedSearchNode, visitedCounter++);
     }
 
 
@@ -539,9 +534,11 @@ public class Document implements Comparable<Document> {
 
         public void prepareFinalState() {
             for(Candidate c: queue) {
-                c.bestChildNode.setFinalState();
+                if(c.bestChildNode != null) {
+                    c.bestChildNode.setFinalState();
 
-                c.refinement.finalState = c.bestChildNode.getDecision();
+                    c.refinement.finalState = c.bestChildNode.getDecision();
+                }
             }
         }
     }

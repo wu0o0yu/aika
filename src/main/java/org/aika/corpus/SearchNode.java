@@ -54,7 +54,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public static int MAX_SEARCH_STEPS = Integer.MAX_VALUE;
     public static boolean ENABLE_CACHING = true;
-    public static boolean SEARCH_ITERATIVE = true;
 
     public int id;
 
@@ -102,6 +101,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private Weight selectedWeight = Weight.ZERO;
     private Weight excludedWeight = Weight.ZERO;
     private long processVisited;
+    private boolean bestPath;
 
     // Avoids having to search the same path twice.
     private Decision skip = UNKNOWN;
@@ -276,33 +276,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     /**
-     * This algorithm is the recursive version of the interpretation search.
-     * Its perhaps easier to read than the iterative version.
-     */
-    public Weight searchRecursive(Document doc) {
-        if (level >= doc.candidates.size()) {
-            return processResult(doc);
-        }
-
-        initStep(doc);
-
-        if (prepareSelectStep(doc)) {
-            selectedWeight = selectedChild.searchRecursive(doc);
-
-            postReturn(selectedChild);
-        }
-
-        if (prepareExcludeStep(doc)) {
-            excludedWeight = excludedChild.searchRecursive(doc);
-
-            postReturn(excludedChild);
-        }
-
-        return finalStep();
-    }
-
-
-    /**
      * Searches for the best interpretation for the given document.
      *
      * This implementation of the algorithm is iterative to prevent stack overflow errors from happening.
@@ -435,31 +408,34 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private Weight finalStep() {
-        selectedChild = null;
-        excludedChild = null;
-        switch (getCachedDecision()) {
-            case UNKNOWN:
-                boolean dir = selectedWeight.getNormWeight() >= excludedWeight.getNormWeight();
-                dir = alreadySelected || (!alreadyExcluded && dir);
+        Decision d;
+        Decision cd = getCachedDecision();
+        if(cd == UNKNOWN) {
+            d = alreadySelected || (!alreadyExcluded && selectedWeight.getNormWeight() >= excludedWeight.getNormWeight()) ? SELECTED : EXCLUDED;
 
-                if (!alreadyExcluded) {
-                    candidate.cachedDecision = dir ? Decision.SELECTED : Decision.EXCLUDED;
-                }
-                if(dir && level > 0) {
-                    getParent().candidate.bestChildNode = this;
-                }
-
-                return dir ? selectedWeight : excludedWeight;
-            case SELECTED:
-                getParent().candidate.bestChildNode = this;
-                return selectedWeight;
-            case EXCLUDED:
-                return excludedWeight;
-            default:
-                throw new IllegalStateException();
+            if (!alreadyExcluded) {
+                candidate.cachedDecision = d;
+            }
+        } else {
+            d = cd;
         }
-    }
 
+        SearchNode cn = d == SELECTED ? selectedChild : excludedChild;
+        if(cn.bestPath) {
+            candidate.bestChildNode = cn;
+            bestPath = true;
+        }
+
+        if(!bestPath || d != SELECTED) {
+            selectedChild = null;
+        }
+
+        if(!bestPath || d != EXCLUDED) {
+            excludedChild = null;
+        }
+
+        return d == SELECTED ? selectedWeight : excludedWeight;
+    }
 
 
     private boolean checkPrecondition() {
@@ -496,7 +472,9 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if (level > doc.selectedSearchNode.level || accNW > getSelectedAccumulatedWeight(doc)) {
             doc.selectedSearchNode = this;
-            getParent().candidate.bestChildNode = this;
+            bestPath = true;
+        } else {
+            bestPath = false;
         }
 
         return accumulatedWeight;
