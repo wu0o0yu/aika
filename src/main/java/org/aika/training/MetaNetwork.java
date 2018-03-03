@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import static org.aika.corpus.SearchNode.Decision.EXCLUDED;
+import static org.aika.corpus.SearchNode.Decision.UNKNOWN;
 
 
 /**
@@ -61,7 +62,7 @@ public class MetaNetwork {
                         doc.createV = doc.visitedCounter++;
 
                         boolean newNeuron = false;
-                        if(targetNeuron.get().type == INeuron.Type.META) {
+                        if(targetNeuron.get().type == INeuron.Type.META && checkForNewlyCreatedActivations(sAct)) {
                             newNeuron = true;
                             targetNeuron = doc.model.createNeuron(n.label.substring(2) + "-" + doc.getText(act.key.range));
                             INeuron.update(doc.model, doc.threadId, doc, targetNeuron, n.bias, Collections.emptySet());
@@ -76,6 +77,18 @@ public class MetaNetwork {
                 }
             }
         }
+        doc.process();
+    }
+
+
+    private static boolean checkForNewlyCreatedActivations(Activation sAct) {
+        for(SynapseActivation sa: sAct.neuronInputs) {
+            if(sa.input.key.interpretation.finalState == UNKNOWN) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
@@ -156,7 +169,6 @@ public class MetaNetwork {
         }
 
         doc.propagate();
-        doc.process();
     }
 
 
