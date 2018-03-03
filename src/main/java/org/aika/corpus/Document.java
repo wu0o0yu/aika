@@ -49,7 +49,6 @@ import static org.aika.corpus.SearchNode.Decision.UNKNOWN;
 public class Document implements Comparable<Document> {
     private static final Logger log = LoggerFactory.getLogger(Document.class);
 
-    public static boolean APPLY_DEBUG_OUTPUT = false;
     public static int CLEANUP_INTERVAL = 500;
     public static int MAX_ROUND = 20;
 
@@ -416,10 +415,10 @@ public class Document implements Comparable<Document> {
                 th.isQueued = false;
                 n.processChanges(Document.this);
 
-                if(APPLY_DEBUG_OUTPUT) {
-                    log.info("QueueId:" + th.queueId);
-                    log.info(n.toString() + "\n");
-                    log.info("\n" + activationsToString( true, true));
+                if(log.isDebugEnabled()) {
+                    log.debug("QueueId:" + th.queueId);
+                    log.debug(n.toString() + "\n");
+                    log.debug("\n" + activationsToString( true, true));
                 }
             }
         }

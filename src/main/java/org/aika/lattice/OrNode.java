@@ -115,8 +115,8 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     Activation processActivation(Document doc, Key<OrNode> ak, Collection<NodeActivation> inputActs) {
-        if (Document.APPLY_DEBUG_OUTPUT) {
-            log.info("add: " + ak + " - " + ak.node);
+        if (log.isDebugEnabled()) {
+            log.debug("add: " + ak + " - " + ak.node);
         }
 
         Activation act = Selector.get(doc,  neuron.get(), ak);

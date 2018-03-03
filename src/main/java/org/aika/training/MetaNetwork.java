@@ -17,6 +17,7 @@
 package org.aika.training;
 
 
+import org.aika.corpus.SearchNode;
 import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.neuron.Neuron;
@@ -24,11 +25,10 @@ import org.aika.corpus.Document;
 import org.aika.neuron.Activation;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.neuron.INeuron;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 import static org.aika.corpus.SearchNode.Decision.EXCLUDED;
 import static org.aika.corpus.SearchNode.Decision.UNKNOWN;
@@ -49,6 +49,7 @@ import static org.aika.corpus.SearchNode.Decision.UNKNOWN;
  */
 public class MetaNetwork {
 
+    private static final Logger log = LoggerFactory.getLogger(MetaNetwork.class);
 
     public static void train(Document doc) {
         long v = doc.visitedCounter++;
@@ -147,6 +148,10 @@ public class MetaNetwork {
             }
         }
 
+        if(log.isDebugEnabled()) {
+            log.debug(showDelta(targetNeuron.get(), inputSynapses));
+        }
+
         INeuron.update(doc.model, doc.threadId, doc, targetNeuron, newNeuron ? metaAct.getINeuron().metaBias : 0.0, inputSynapses);
 
         if (newNeuron) {
@@ -170,6 +175,25 @@ public class MetaNetwork {
 
         doc.propagate();
     }
+
+
+    public static String showDelta(INeuron n, Set<Synapse> synapses) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("N: " + n.label + " ob:" + n.biasSum + " nb:" + (n.biasSum + n.biasSumDelta) + "\n");
+        for (Synapse s : synapses) {
+            if (s.weightDelta != 0.0) {
+                Integer f = null;
+                if (s.input.get().statistic != null) {
+                    f = ((NeuronStatistic) s.input.get().statistic).frequency;
+                }
+
+                sb.append("    S:" + s.input.getLabel() + " ow:" + s.weight + " nw:" + s.getNewWeight() + (f != null ? " f:" + f : "") + " " + (s.isConjunction(false, false) ? "CONJ" : "DISJ") + "\n");
+            }
+        }
+        return sb.toString();
+    }
+
 
 
     private static Integer computeRidOffset(Activation mAct) {

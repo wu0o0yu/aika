@@ -293,8 +293,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     A processActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs) {
-        if (Document.APPLY_DEBUG_OUTPUT) {
-            log.info("add: " + ak + " - " + ak.node);
+        if (log.isDebugEnabled()) {
+            log.debug("add: " + ak + " - " + ak.node);
         }
 
         A act = createActivation(doc, ak);
