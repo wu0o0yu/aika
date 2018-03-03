@@ -351,7 +351,7 @@ public class SearchNode implements Comparable<SearchNode> {
         boolean precondition = checkPrecondition();
 
         alreadySelected = precondition && !candidate.isConflicting();
-        alreadyExcluded = !precondition || checkExcluded(candidate.refinement, doc.visitedCounter++);
+        alreadyExcluded = !precondition || checkExcluded(candidate.refinement);
 
         if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
             dumpDebugState();
@@ -375,7 +375,7 @@ public class SearchNode implements Comparable<SearchNode> {
         candidate.refinement.setState(SELECTED, visited);
 
         if (candidate.cachedDecision == UNKNOWN) {
-            invalidateCachedDecisions(doc.visitedCounter++);
+            invalidateCachedDecisions();
         }
 
         selectedChild = new SearchNode(doc, this, excludedParent, level + 1);
@@ -444,23 +444,28 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void invalidateCachedDecisions(long v) {
+    private void invalidateCachedDecisions() {
         for (SynapseActivation sa : candidate.refinement.activation.neuronOutputs) {
             if (!sa.synapse.isNegative()) {
-                Candidate pos = sa.output.key.interpretation.candidate;
-                if (pos != null) {
-                    if (pos.cachedDecision == Decision.EXCLUDED) {
-                        pos.cachedDecision = UNKNOWN;
-                    }
-                }
+                invalidateCachedDecision(sa.output.key.interpretation);
+            }
+        }
+    }
 
-                for (InterpretationNode c : Conflicts.getConflicting(sa.output.key.interpretation, v)) {
-                    Candidate neg = c.candidate;
-                    if (neg != null) {
-                        if (neg.cachedDecision == Decision.SELECTED) {
-                            neg.cachedDecision = UNKNOWN;
-                        }
-                    }
+
+    public static void invalidateCachedDecision(InterpretationNode n) {
+        Candidate pos = n.candidate;
+        if (pos != null) {
+            if (pos.cachedDecision == Decision.EXCLUDED) {
+                pos.cachedDecision = UNKNOWN;
+            }
+        }
+
+        for (InterpretationNode c : Conflicts.getConflicting(n)) {
+            Candidate neg = c.candidate;
+            if (neg != null) {
+                if (neg.cachedDecision == Decision.SELECTED) {
+                    neg.cachedDecision = UNKNOWN;
                 }
             }
         }
@@ -486,8 +491,8 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean checkExcluded(InterpretationNode ref, long v) {
-        for (InterpretationNode cn : Conflicts.getConflicting(ref, v)) {
+    private boolean checkExcluded(InterpretationNode ref) {
+        for (InterpretationNode cn : Conflicts.getConflicting(ref)) {
             if (cn.state == SELECTED) return true;
         }
         return false;

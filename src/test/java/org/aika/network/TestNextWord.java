@@ -36,7 +36,6 @@ public class TestNextWord {
 
         Document doc = m.createDocument("aaaa bbbb  ", 0);
 
-        Document.APPLY_DEBUG_OUTPUT = true;
         inA.addInput(doc, 0, 5);
         inB.addInput(doc, 5, 10);
 

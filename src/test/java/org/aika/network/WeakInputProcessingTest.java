@@ -160,7 +160,6 @@ public class WeakInputProcessingTest {
 
         weakInputB.addInput(doc, 0, 1);
 
-        Document.APPLY_DEBUG_OUTPUT = true;
         doc.process();
 
         System.out.println(doc.activationsToString(false, true));

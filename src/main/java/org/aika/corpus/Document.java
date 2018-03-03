@@ -187,12 +187,12 @@ public class Document implements Comparable<Document> {
         for(Activation act: addedActivations) {
             InterpretationNode cn = act.key.interpretation;
             if (cn.state == UNKNOWN && cn.activation.upperBound > 0.0) {
+                SearchNode.invalidateCachedDecision(cn);
                 tmp.add(new Candidate(cn, i++));
             }
         }
 
 
-        long v = visitedCounter++;
         for(Activation act: inputNeuronActivations) {
             act.hasCandidate = true;
         }

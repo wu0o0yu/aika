@@ -77,16 +77,16 @@ public class Conflicts {
     }
 
 
-    public static Collection<InterpretationNode> getConflicting(InterpretationNode n, long v) {
+    public static Collection<InterpretationNode> getConflicting(InterpretationNode n) {
         ArrayList<InterpretationNode> conflicts = new ArrayList<>();
-        Conflicts.collectConflicting(conflicts, n, v);
+        Conflicts.collectConflicting(conflicts, n);
         return conflicts;
     }
 
 
-    private static void collectConflicting(Collection<InterpretationNode> results, InterpretationNode n, long v) {
+    private static void collectConflicting(Collection<InterpretationNode> results, InterpretationNode n) {
         assert n.primId >= 0;
-        n.conflicts.primary.values().forEach(c -> c.secondary.collectPrimitiveNodes(results, v));
+        n.conflicts.primary.values().forEach(c -> c.secondary.collectPrimitiveNodes(results, n.doc.visitedCounter++));
         n.conflicts.secondary.values().forEach(c -> results.add(c.primary));
     }
 

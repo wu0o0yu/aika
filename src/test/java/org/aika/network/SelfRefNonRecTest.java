@@ -70,9 +70,6 @@ public class SelfRefNonRecTest {
 
         Document t = m.createDocument("aaaaaaaaaa", 0);
 
-
-        Document.APPLY_DEBUG_OUTPUT = true;
-
         inA.addInput(t, 0, 1);
 
         System.out.println(t.activationsToString(false, true));
