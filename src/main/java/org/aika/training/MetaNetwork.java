@@ -99,38 +99,32 @@ public class MetaNetwork {
             MetaSynapse ss = sa.synapse.meta;
             if (ss != null && (ss.metaWeight != 0.0 || ss.metaBias != 0.0)) {
                 Neuron ina = sa.input.key.node.neuron;
-                Neuron inb = null;
-                Integer rid = null;
 
-                if (ina.get().type == INeuron.Type.INHIBITORY && ss.metaWeight >= 0.0) {
-                    List<SynapseActivation> inputs = sa.input.getFinalInputActivations();
-                    for(SynapseActivation iSA: inputs) {
-                        Activation iAct = iSA.input;
-                        inb = iAct.getNeuron();
-                        rid = iAct.key.rid;
-                    }
-                } else {
-                    inb = ina;
-                    rid = sa.input.key.rid;
-                }
+                List<SynapseActivation> inputs = ina.get().type == INeuron.Type.INHIBITORY && ss.metaWeight >= 0.0 ?
+                        sa.input.getFinalInputActivations() :
+                        Collections.singletonList(sa);
 
-                if (inb != null) {
-                    Synapse.Key osk = sa.synapse.key;
-                    Synapse.Key nsk = new Synapse.Key(
-                            osk.isRecurrent,
-                            osk.relativeRid != null ?
-                                    osk.relativeRid :
-                                    (ss.metaRelativeRid && ridOffset != null && rid != null ? rid - ridOffset : null),
-                            osk.absoluteRid,
-                            osk.rangeMatch,
-                            osk.rangeOutput
-                    );
+                for(SynapseActivation isa: inputs) {
+                    Neuron in = isa.input.getNeuron();
+                    if(in.get(doc).type != INeuron.Type.META) {
+                        Integer rid = isa.input.key.rid;
+                        Synapse.Key osk = sa.synapse.key;
+                        Synapse.Key nsk = new Synapse.Key(
+                                osk.isRecurrent,
+                                osk.relativeRid != null ?
+                                        osk.relativeRid :
+                                        (ss.metaRelativeRid && ridOffset != null && rid != null ? rid - ridOffset : null),
+                                osk.absoluteRid,
+                                osk.rangeMatch,
+                                osk.rangeOutput
+                        );
 
-                    Synapse ns = new Synapse(inb, targetNeuron, nsk);
-                    if (!ns.exists()) {
-                        ns.updateDelta(doc, ss.metaWeight, ss.metaBias);
+                        Synapse ns = new Synapse(in, targetNeuron, nsk);
+                        if (!ns.exists()) {
+                            ns.updateDelta(doc, ss.metaWeight, ss.metaBias);
 
-                        inputSynapses.add(ns);
+                            inputSynapses.add(ns);
+                        }
                     }
                 }
             }
@@ -156,9 +150,6 @@ public class MetaNetwork {
                             .setRangeMatch(inhibSynKey.rangeMatch)
                             .setRangeOutput(inhibSynKey.rangeOutput)
             );
-
-            Activation.Key mak = metaAct.key;
-            mak.interpretation.setState(EXCLUDED, v);
         }
 
         doc.propagate();

@@ -543,7 +543,8 @@ public final class Activation extends NodeActivation<OrNode> {
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
                 (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +
-                " V:" + Utils.round(rounds.getLast().value);
+                " V:" + Utils.round(rounds.getLast().value) +
+                " FV:" + Utils.round(finalRounds.getLast().value);
     }
 
 

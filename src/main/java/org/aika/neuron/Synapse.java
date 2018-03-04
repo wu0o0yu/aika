@@ -276,7 +276,7 @@ public class Synapse implements Writable {
 
 
     public boolean isNegative() {
-        return weight <= 0.0;
+        return weight < 0.0;
     }
 
 
