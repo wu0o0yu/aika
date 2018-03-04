@@ -375,10 +375,10 @@ public class InterpretationSearchTest {
 
         Document doc = m.createDocument("aaaa bbbb ");
 
-        inA.addInput(doc, 0, 5);
-        inB.addInput(doc, 5, 10);
+//        inA.addInput(doc, 0, 5);
+//        inB.addInput(doc, 5, 10);
 
-        doc.process();
+//        doc.process();
 
         System.out.println(doc.activationsToString(true, true));
 
@@ -441,6 +441,9 @@ public class InterpretationSearchTest {
                         .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true)
         );
+
+        inA.addInput(doc, 0, 5);
+        inB.addInput(doc, 5, 10);
 
         doc.propagate();
         doc.process();

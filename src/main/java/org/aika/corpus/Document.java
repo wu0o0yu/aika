@@ -52,6 +52,11 @@ public class Document implements Comparable<Document> {
     public static int CLEANUP_INTERVAL = 500;
     public static int MAX_ROUND = 20;
 
+    /**
+     * Experimental code: not working yet!
+     */
+    public static boolean INCREMENTAL_MODE = false;
+
     public final int id;
     private final String content;
 
@@ -184,7 +189,11 @@ public class Document implements Comparable<Document> {
         TreeSet<Candidate> tmp = new TreeSet<>();
         int i = 0;
 
-        for(Activation act: addedActivations) {
+        if(!INCREMENTAL_MODE) {
+            candidates.clear();
+        }
+
+        for(Activation act: INCREMENTAL_MODE ? addedActivations: activationsByRangeBegin.values()) {
             InterpretationNode cn = act.key.interpretation;
             if (cn.state == UNKNOWN && cn.activation.upperBound > 0.0) {
                 SearchNode.invalidateCachedDecision(cn);
@@ -192,20 +201,20 @@ public class Document implements Comparable<Document> {
             }
         }
 
-
+        long v = visitedCounter++;
         for(Activation act: inputNeuronActivations) {
-            act.hasCandidate = true;
+            act.markedHasCandidate = v;
         }
 
         while (!tmp.isEmpty()) {
             int oldSize = tmp.size();
             for (Candidate c : tmp) {
-                if (c.checkDependenciesSatisfied()) {
+                if (c.checkDependenciesSatisfied(v)) {
                     tmp.remove(c);
                     c.id = candidates.size();
                     candidates.add(c);
 
-                    c.refinement.activation.hasCandidate = true;
+                    c.refinement.activation.markedHasCandidate = v;
                     break;
                 }
             }
@@ -224,19 +233,19 @@ public class Document implements Comparable<Document> {
      * network. It performs the search for the best interpretation.
      */
     public void process() {
-        processIncrementalStep();
+        processInternal();
         fsQueue.prepareFinalState();
     }
 
 
-    private void processIncrementalStep() {
+    private void processInternal() {
         inputNeuronActivations.forEach(act -> vQueue.propagateActivationValue(0, act));
 
         generateCandidates();
 
         addedActivations.clear();
 
-        if(selectedSearchNode == null) {
+        if(selectedSearchNode == null || !INCREMENTAL_MODE) {
             selectedSearchNode = new SearchNode(this, null, null, 0);
         }
 

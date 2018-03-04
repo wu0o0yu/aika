@@ -60,7 +60,7 @@ public final class Activation extends NodeActivation<OrNode> {
     public boolean ubQueued = false;
     public boolean isQueued = false;
     public long queueId;
-    public boolean hasCandidate = false;
+    public long markedHasCandidate;
 
     public long currentStateV;
     public StateChange currentStateChange;
