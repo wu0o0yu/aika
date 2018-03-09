@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.aika.corpus.SearchNode.Decision.EXCLUDED;
 import static org.aika.corpus.SearchNode.Decision.UNKNOWN;
@@ -53,37 +54,60 @@ public class MetaNetwork {
 
     public static void train(Document doc) {
         long v = doc.visitedCounter++;
-        for(INeuron n: new ArrayList<>(doc.finallyActivatedNeurons)) {
-            if(n.type == INeuron.Type.INHIBITORY) {
-                for (Activation sAct : n.getFinalActivations(doc)) {
-                    for(SynapseActivation sa: sAct.getFinalInputActivations()) {
-                        Activation act = sa.input;
-                        Neuron targetNeuron = act.getNeuron();
 
-                        doc.createV = doc.visitedCounter++;
+        Map<Activation, Target> metaActivations = new TreeMap<>();
 
-                        boolean newNeuron = false;
-                        if(targetNeuron.get().type == INeuron.Type.META) {
-                            newNeuron = true;
-                            targetNeuron = doc.model.createNeuron(n.label.substring(2) + "-" + doc.getText(act.key.range));
-                            INeuron.update(doc.model, doc.threadId, doc, targetNeuron, n.bias, Collections.emptySet());
-                        }
+        List<INeuron> inhibitoryNeurons = doc.finallyActivatedNeurons
+                .stream()
+                .filter(n -> n.type == INeuron.Type.INHIBITORY)
+                .collect(Collectors.toList());
 
-                        Activation metaNeuronAct = getMetaNeuronAct(sAct);
-                        if(metaNeuronAct != null && metaNeuronAct.visited != v) {
-                            metaNeuronAct.visited = v;
-                            transferMetaSynapses(doc, metaNeuronAct, targetNeuron, newNeuron, n.provider, v);
-                        }
+        for (INeuron n : inhibitoryNeurons) {
+            for (Activation inhibAct : n.getFinalActivations(doc)) {
+                for (SynapseActivation sa : inhibAct.getFinalInputActivations()) {
+                    Activation act = sa.input;
+                    Neuron targetNeuron = act.getNeuron();
+
+                    doc.createV = doc.visitedCounter++;
+
+                    boolean newNeuron = false;
+                    if (targetNeuron.get().type == INeuron.Type.META) {
+                        newNeuron = true;
+                        targetNeuron = doc.model.createNeuron(n.label.substring(2) + "-" + doc.getText(act.key.range));
+                        INeuron.update(doc.model, doc.threadId, doc, targetNeuron, n.bias, Collections.emptySet());
+                    }
+
+                    Activation metaNeuronAct = getMetaNeuronAct(inhibAct);
+                    if (metaNeuronAct != null && metaNeuronAct.visited != v) {
+                        metaNeuronAct.visited = v;
+                        metaActivations.put(metaNeuronAct, new Target(targetNeuron, newNeuron, n.provider));
                     }
                 }
             }
         }
+
+        for(Map.Entry<Activation, Target> me: metaActivations.entrySet()) {
+            transferMetaSynapses(doc, metaActivations, me.getKey(), me.getValue(), v);
+        }
     }
 
 
-    private static Activation getMetaNeuronAct(Activation sAct) {
-        for(SynapseActivation sa: sAct.neuronInputs) {
-            if(sa.input.getLabel().startsWith("M-")) {
+    private static class Target {
+        Neuron targetNeuron;
+        boolean isNewNeuron;
+        Neuron inhibNeuron;
+
+        public Target(Neuron targetNeuron, boolean isNewNeuron, Neuron inhibNeuron) {
+            this.targetNeuron = targetNeuron;
+            this.isNewNeuron = isNewNeuron;
+            this.inhibNeuron = inhibNeuron;
+        }
+    }
+
+
+    private static Activation getMetaNeuronAct(Activation inhibAct) {
+        for(SynapseActivation sa: inhibAct.neuronInputs) {
+            if(sa.input.getINeuron().type == INeuron.Type.META) {
                 return sa.input;
             }
         }
@@ -91,7 +115,18 @@ public class MetaNetwork {
     }
 
 
-    private static void transferMetaSynapses(Document doc, Activation metaAct, Neuron targetNeuron, boolean newNeuron, Neuron supprN, long v) {
+    private static boolean checkForNewlyCreatedActivations(Activation sAct) {
+        for(SynapseActivation sa: sAct.neuronInputs) {
+            if(sa.input.key.interpretation.finalState == UNKNOWN) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    private static void transferMetaSynapses(Document doc, Map<Activation, Target> metaActivations, Activation metaAct, Target t, long v) {
         TreeSet<Synapse> inputSynapses = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
 
         Integer ridOffset = computeRidOffset(metaAct);
@@ -106,7 +141,12 @@ public class MetaNetwork {
 
                 for(SynapseActivation isa: inputs) {
                     Neuron in = isa.input.getNeuron();
-                    if(in.get(doc).type != INeuron.Type.META) {
+                    if(in.get(doc).type == INeuron.Type.META) {
+                        Target it = metaActivations.get(isa.input);
+                        in = it != null ? it.targetNeuron : null;
+                    }
+
+                    if(in != null) {
                         Integer rid = isa.input.key.rid;
                         Synapse.Key osk = sa.synapse.key;
                         Synapse.Key nsk = new Synapse.Key(
@@ -119,7 +159,7 @@ public class MetaNetwork {
                                 osk.rangeOutput
                         );
 
-                        Synapse ns = new Synapse(in, targetNeuron, nsk);
+                        Synapse ns = new Synapse(in, t.targetNeuron, nsk);
                         if (!ns.exists()) {
                             ns.updateDelta(doc, ss.metaWeight, ss.metaBias);
 
@@ -131,18 +171,18 @@ public class MetaNetwork {
         }
 
         if(log.isDebugEnabled()) {
-            log.debug(showDelta(targetNeuron.get(), inputSynapses));
+            log.debug(showDelta(t.targetNeuron.get(), inputSynapses));
         }
 
-        INeuron.update(doc.model, doc.threadId, doc, targetNeuron, newNeuron ? metaAct.getINeuron().metaBias : 0.0, inputSynapses);
+        INeuron.update(doc.model, doc.threadId, doc, t.targetNeuron, t.isNewNeuron ? metaAct.getINeuron().metaBias : 0.0, inputSynapses);
 
-        if (newNeuron) {
+        if (t.isNewNeuron) {
             SynapseActivation inhibMetaLink = metaAct.getFinalOutputActivations().get(0);
             Synapse.Key inhibSynKey = inhibMetaLink.synapse.key;
             MetaSynapse inhibSS = inhibMetaLink.synapse.meta;
-            supprN.addSynapse(
+            t.inhibNeuron.addSynapse(
                     new Synapse.Builder()
-                            .setNeuron(targetNeuron)
+                            .setNeuron(t.targetNeuron)
                             .setWeight(inhibSS.metaWeight)
                             .setBias(inhibSS.metaBias)
                             .setRelativeRid(inhibSynKey.relativeRid)
@@ -153,7 +193,6 @@ public class MetaNetwork {
         }
 
         doc.propagate();
-        doc.process();
     }
 
 
