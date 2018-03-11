@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static org.aika.corpus.InterpretationNode.MAX_SELF_REFERENCING_DEPTH;
 import static org.aika.corpus.SearchNode.Decision.SELECTED;
-import static org.aika.corpus.InterpretationNode.checkSelfReferencing;
 import static org.aika.neuron.Activation.State.DIR;
 import static org.aika.neuron.Activation.State.REC;
 import static org.aika.neuron.Activation.SynapseActivation.INPUT_COMP;
@@ -45,6 +45,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
+    public TreeSet<SynapseActivation> selectedNeuronInputs = new TreeSet<>(INPUT_COMP);
     public TreeSet<SynapseActivation> neuronInputs = new TreeSet<>(INPUT_COMP);
     public TreeSet<SynapseActivation> neuronOutputs = new TreeSet<>(OUTPUT_COMP);
 
@@ -112,6 +113,9 @@ public final class Activation extends NodeActivation<OrNode> {
                 neuronOutputs.add(sa);
                 break;
             case OUTPUT:
+                if(sa.input.key.interpretation.state == SELECTED) {
+                    selectedNeuronInputs.add(sa);
+                }
                 neuronInputs.add(sa);
                 break;
         }
@@ -234,7 +238,7 @@ public final class Activation extends NodeActivation<OrNode> {
             if (iAct == this) continue;
 
             if (s.isNegative()) {
-                if (!checkSelfReferencing(key.interpretation, iAct.key.interpretation, false, 0) && key.interpretation.contains(iAct.key.interpretation, true)) {
+                if (!checkSelfReferencing(this, iAct, false, 0) && key.interpretation.contains(iAct.key.interpretation, true)) {
                     ub += iAct.lowerBound * s.weight;
                 }
 
@@ -261,7 +265,6 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     private List<InputState> getInputStates(int round) {
-        InterpretationNode o = key.interpretation;
         ArrayList<InputState> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
         InputState maxInputState = null;
@@ -274,7 +277,7 @@ public final class Activation extends NodeActivation<OrNode> {
                 maxInputState = null;
             }
 
-            State s = sa.input.getInputState(round, o, sa.synapse);
+            State s = sa.input.getInputState(round, this, sa.synapse);
             if (maxInputState == null || maxInputState.s.value < s.value) {
                 maxInputState = new InputState(sa, s);
             }
@@ -299,12 +302,12 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    private State getInputState(int round, InterpretationNode o, Synapse s) {
+    private State getInputState(int round, Activation o, Synapse s) {
         InterpretationNode io = key.interpretation;
 
         State is = State.ZERO;
         if (s.key.isRecurrent) {
-            if (!s.isNegative() || !checkSelfReferencing(o, io, true, 0)) {
+            if (!s.isNegative() || !checkSelfReferencing(o, this, true, 0)) {
                 is = round == 0 ? getInitialState(io.state) : rounds.get(round - 1);
             }
         } else {
@@ -333,6 +336,31 @@ public final class Activation extends NodeActivation<OrNode> {
             }
         }
         return results;
+    }
+
+
+    public void adjustSelectedNeuronInputs(Decision d) {
+        for(SynapseActivation sa: neuronOutputs) {
+            if(d == SELECTED) {
+                sa.output.selectedNeuronInputs.add(sa);
+            } else {
+                sa.output.selectedNeuronInputs.remove(sa);
+            }
+        }
+    }
+
+
+    public static boolean checkSelfReferencing(Activation nx, Activation ny, boolean onlySelected, int depth) {
+        if (nx == ny) return true;
+
+        if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
+
+        Set<SynapseActivation> inputs = onlySelected ? ny.selectedNeuronInputs : ny.neuronInputs;
+        for (SynapseActivation sa: inputs) {
+            if (checkSelfReferencing(nx, sa.input, onlySelected, depth + 1)) return true;
+        }
+
+        return false;
     }
 
 

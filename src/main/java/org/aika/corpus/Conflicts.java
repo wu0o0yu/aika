@@ -23,8 +23,6 @@ import org.aika.neuron.Linker.Direction;
 
 import java.util.*;
 
-import static org.aika.corpus.SearchNode.Decision.SELECTED;
-import static org.aika.corpus.InterpretationNode.checkSelfReferencing;
 import static org.aika.neuron.Linker.Direction.INPUT;
 
 /**
@@ -46,22 +44,20 @@ public class Conflicts {
 
                 markConflicts(iAct, oAct, v);
 
-                addConflict(oAct.key.interpretation, iAct.key.interpretation, iAct, v);
+                addConflict(oAct, iAct, iAct, v);
             }
         }
     }
 
 
-    private static void addConflict(InterpretationNode io, InterpretationNode o, NodeActivation act, long v) {
-        if (o.markedConflict == v) {
-            if (!checkSelfReferencing(o, io, false, 0)) {
-                add(act, io, o);
+    private static void addConflict(Activation oAct, Activation iAct, NodeActivation act, long v) {
+        if (iAct.key.interpretation.markedConflict == v) {
+            if (iAct != oAct) {
+                add(act, oAct.key.interpretation, iAct.key.interpretation);
             }
         } else {
-            if(o.orInterpretationNodes != null) {
-                for (InterpretationNode no : o.orInterpretationNodes) {
-                    addConflict(io, no, act, v);
-                }
+            for (Activation.SynapseActivation sa : iAct.neuronInputs) {
+                addConflict(oAct, sa.input, act, v);
             }
         }
     }

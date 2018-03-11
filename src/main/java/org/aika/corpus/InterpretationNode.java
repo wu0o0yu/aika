@@ -148,27 +148,14 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
         if (newState == Decision.UNKNOWN && v != visitedState) return;
 
+        if(activation != null && (state == Decision.SELECTED != (newState == Decision.SELECTED))) {
+            activation.adjustSelectedNeuronInputs(newState);
+        }
+
         state = newState;
         visitedState = v;
 
         changeSelectedRecursive(doc.visitedCounter++);
-    }
-
-
-    public static boolean checkSelfReferencing(InterpretationNode nx, InterpretationNode ny, boolean onlySelected, int depth) {
-        if (ny.isBottom()) return false;
-        if (nx == ny) return true;
-
-        if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
-
-        Set<InterpretationNode> orIN = onlySelected ? ny.selectedOrInterpretationNodes : ny.orInterpretationNodes;
-        if (orIN != null) {
-            for (InterpretationNode n : orIN) {
-                if (checkSelfReferencing(nx, n, onlySelected, depth + 1)) return true;
-            }
-        }
-
-        return false;
     }
 
 
