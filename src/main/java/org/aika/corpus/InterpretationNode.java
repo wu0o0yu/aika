@@ -55,16 +55,16 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
 
 
-    public void setState(Decision newState, long v) {
-        if(inputDecision != Decision.UNKNOWN && newState != inputDecision) return;
+    public void setDecision(Decision newDecision, long v) {
+        if(inputDecision != Decision.UNKNOWN && newDecision != inputDecision) return;
 
-        if (newState == Decision.UNKNOWN && v != visitedState) return;
+        if (newDecision == Decision.UNKNOWN && v != visitedState) return;
 
-        if(activation != null && (decision == Decision.SELECTED != (newState == Decision.SELECTED))) {
-            activation.adjustSelectedNeuronInputs(newState);
+        if(activation != null && (decision == Decision.SELECTED != (newDecision == Decision.SELECTED))) {
+            activation.adjustSelectedNeuronInputs(newDecision);
         }
 
-        decision = newState;
+        decision = newDecision;
         visitedState = v;
 
         changeSelectedRecursive(doc.visitedCounter++);

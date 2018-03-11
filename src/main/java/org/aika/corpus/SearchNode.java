@@ -372,7 +372,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private boolean prepareSelectStep(Document doc) {
         if(alreadyExcluded || skip == SELECTED || getCachedDecision() == Decision.EXCLUDED) return false;
 
-        candidate.refinement.setState(SELECTED, visited);
+        candidate.refinement.setDecision(SELECTED, visited);
 
         if (candidate.cachedDecision == UNKNOWN) {
             invalidateCachedDecisions();
@@ -389,7 +389,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private boolean prepareExcludeStep(Document doc) {
         if(alreadySelected || skip == EXCLUDED || getCachedDecision() == Decision.SELECTED) return false;
 
-        candidate.refinement.setState(EXCLUDED, visited);
+        candidate.refinement.setDecision(EXCLUDED, visited);
 
         excludedChild = new SearchNode(doc, selectedParent, this, level + 1);
 
@@ -402,7 +402,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private void postReturn(SearchNode child) {
         child.changeState(Activation.Mode.OLD);
 
-        candidate.refinement.setState(UNKNOWN, visited);
+        candidate.refinement.setDecision(UNKNOWN, visited);
         candidate.refinement.activation.rounds.reset();
     }
 
