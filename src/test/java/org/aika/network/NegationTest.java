@@ -79,22 +79,16 @@ public class NegationTest {
         System.out.println(doc.activationsToString(false, true));
         Assert.assertNotNull(Selector.get(doc, abcN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
 
-        InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
-
         inB.addInput(doc,
                 new Activation.Builder()
                         .setRange(2, 7)
-                        .setInterpretation(o1)
         );
 
         System.out.println(doc.activationsToString(false, true));
 
-        InterpretationNode o2 = InterpretationNode.addPrimitive(doc);
-
         inC.addInput(doc,
                 new Activation.Builder()
                         .setRange(4, 9)
-                        .setInterpretation(o2)
         );
 
         System.out.println(doc.activationsToString(false, true));
@@ -151,20 +145,16 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, true));
 
-        InterpretationNode ob = InterpretationNode.addPrimitive(doc);
         inB.addInput(doc,
                 new Activation.Builder()
                         .setRange(2, 7)
-                        .setInterpretation(ob)
         );
 
         System.out.println(doc.activationsToString(false, true));
 
-        InterpretationNode oc = InterpretationNode.addPrimitive(doc);
         inC.addInput(doc,
                 new Activation.Builder()
                         .setRange(4, 9)
-                        .setInterpretation(oc)
         );
 
         System.out.println(doc.activationsToString(false, true));
@@ -214,12 +204,9 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        InterpretationNode o = InterpretationNode.addPrimitive(doc);
-
         inS.addInput(doc,
                 new Activation.Builder()
                         .setRange(3, 8)
-                        .setInterpretation(o)
         );
 
         System.out.println(doc.activationsToString(false, true));
@@ -275,12 +262,9 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        InterpretationNode o = InterpretationNode.addPrimitive(doc);
-
         inS.addInput(doc,
                 new Activation.Builder()
                         .setRange(3, 8)
-                        .setInterpretation(o)
         );
 
         System.out.println(doc.activationsToString(false, true));
@@ -336,8 +320,6 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        InterpretationNode o = InterpretationNode.addPrimitive(doc);
-
         inA.addInput(doc, 0, 11);
 
         System.out.println(doc.activationsToString(false, true));
@@ -345,7 +327,6 @@ public class NegationTest {
         inS.addInput(doc,
                 new Activation.Builder()
                         .setRange(3, 8)
-                        .setInterpretation(o)
         );
 
         System.out.println(doc.activationsToString(false, true));

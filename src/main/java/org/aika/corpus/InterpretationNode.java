@@ -83,9 +83,9 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     private int numberOfInputsComputeChildren = 0;
 
     long visitedState;
+    public Decision inputState = Decision.UNKNOWN;
     public Decision state = Decision.UNKNOWN;
     public Decision finalState = Decision.UNKNOWN;
-    public boolean fixed;
 
     public boolean isSelected;
 
@@ -101,11 +101,6 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     public Conflicts conflicts = new Conflicts();
 
     public NavigableMap<Key, NodeActivation> nodeActivations;
-
-
-    public boolean isPrimitive() {
-        return orInterpretationNodes == null || orInterpretationNodes.isEmpty() || (orInterpretationNodes.size() == 1 && orInterpretationNodes.contains(doc.bottom));
-    }
 
 
     public enum Relation {
@@ -149,8 +144,9 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
 
     public void setState(Decision newState, long v) {
-        if ((fixed && state != Decision.UNKNOWN && newState != Decision.UNKNOWN) ||
-                newState == Decision.UNKNOWN && v != visitedState) return;
+        if(inputState != Decision.UNKNOWN && newState != inputState) return;
+
+        if (newState == Decision.UNKNOWN && v != visitedState) return;
 
         state = newState;
         visitedState = v;
@@ -161,7 +157,7 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
     public static boolean checkSelfReferencing(InterpretationNode nx, InterpretationNode ny, boolean onlySelected, int depth) {
         if (ny.isBottom()) return false;
-        if (nx == ny || nx.contains(ny, true)) return true;
+        if (nx == ny) return true;
 
         if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
 

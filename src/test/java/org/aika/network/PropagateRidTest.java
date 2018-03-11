@@ -53,7 +53,6 @@ public class PropagateRidTest {
                 new Activation.Builder()
                         .setRange(0, 1)
                         .setRelationalId(10)
-                        .setInterpretation(doc.bottom)
         );
 
         Assert.assertEquals(5, Selector.get(doc, pA.get(), null, null, null, null, null).key.rid.intValue());

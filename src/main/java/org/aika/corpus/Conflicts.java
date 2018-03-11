@@ -46,13 +46,13 @@ public class Conflicts {
 
                 markConflicts(iAct, oAct, v);
 
-                addConflict(oAct.key.interpretation, iAct.key.interpretation, iAct, Collections.singleton(act), v);
+                addConflict(oAct.key.interpretation, iAct.key.interpretation, iAct, v);
             }
         }
     }
 
 
-    private static void addConflict(InterpretationNode io, InterpretationNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
+    private static void addConflict(InterpretationNode io, InterpretationNode o, NodeActivation act, long v) {
         if (o.markedConflict == v) {
             if (!checkSelfReferencing(o, io, false, 0)) {
                 add(act, io, o);
@@ -60,7 +60,7 @@ public class Conflicts {
         } else {
             if(o.orInterpretationNodes != null) {
                 for (InterpretationNode no : o.orInterpretationNodes) {
-                    addConflict(io, no, act, inputActs, v);
+                    addConflict(io, no, act, v);
                 }
             }
         }

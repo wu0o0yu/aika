@@ -181,7 +181,6 @@ public class RecurrentIdTest {
                             new Activation.Builder()
                                     .setRange(r)
                                     .setRelationalId(i)
-                                    .setInterpretation(doc.bottom)
                     );
                 }
             }

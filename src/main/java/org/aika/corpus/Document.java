@@ -544,8 +544,11 @@ public class Document implements Comparable<Document> {
             for(Candidate c: queue) {
                 if(c.bestChildNode != null) {
                     c.bestChildNode.setFinalState();
-
-                    c.refinement.finalState = c.bestChildNode.getDecision();
+                    if(c.refinement.inputState == UNKNOWN) {
+                        c.refinement.finalState = c.bestChildNode.getDecision();
+                    } else {
+                        c.refinement.finalState = c.refinement.inputState;
+                    }
                 }
             }
         }

@@ -350,8 +350,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
         boolean precondition = checkPrecondition();
 
-        alreadySelected = precondition && !candidate.isConflicting();
-        alreadyExcluded = !precondition || checkExcluded(candidate.refinement);
+        alreadySelected = precondition && !candidate.isConflicting() || candidate.refinement.inputState == SELECTED;
+        alreadyExcluded = !precondition || checkExcluded(candidate.refinement) || candidate.refinement.inputState == EXCLUDED;
 
         if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
             dumpDebugState();

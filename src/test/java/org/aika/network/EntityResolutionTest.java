@@ -100,11 +100,11 @@ public class EntityResolutionTest {
         Assert.assertNotNull(eJaguar.get().getFirstActivation(doc));
         Assert.assertNotNull(ePuma.get().getFirstActivation(doc));
 
-        Assert.assertEquals(0, eJaguar.get().getFirstActivation(doc).key.interpretation.primId);
-        Assert.assertEquals(1, ePuma.get().getFirstActivation(doc).key.interpretation.primId);
+        Assert.assertEquals(1, eJaguar.get().getFirstActivation(doc).key.interpretation.primId);
+        Assert.assertEquals(3, ePuma.get().getFirstActivation(doc).key.interpretation.primId);
 
-        Assert.assertEquals(doc.bottom, eJaguar.get().getFirstActivation(doc).key.interpretation.orInterpretationNodes.iterator().next());
-        Assert.assertEquals(doc.bottom, ePuma.get().getFirstActivation(doc).key.interpretation.orInterpretationNodes.iterator().next());
+        Assert.assertEquals(0, eJaguar.get().getFirstActivation(doc).key.interpretation.orInterpretationNodes.iterator().next().primId);
+        Assert.assertEquals(2, ePuma.get().getFirstActivation(doc).key.interpretation.orInterpretationNodes.iterator().next().primId);
 
         Assert.assertEquals(1, eJaguar.get().getFirstActivation(doc).key.interpretation.orInterpretationNodes.size());
         Assert.assertEquals(1, ePuma.get().getFirstActivation(doc).key.interpretation.orInterpretationNodes.size());
