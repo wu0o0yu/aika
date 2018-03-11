@@ -18,6 +18,7 @@ package org.aika.lattice;
 
 
 import org.aika.*;
+import org.aika.corpus.Conflicts;
 import org.aika.corpus.Document;
 import org.aika.neuron.*;
 import org.aika.training.PatternDiscovery.Config;
@@ -88,7 +89,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     private NodeActivation.Key computeActivationKey(Activation iAct) {
         NodeActivation.Key ak = iAct.key;
-        if ((key.absoluteRid != null && key.absoluteRid != ak.rid) || ak.interpretation.isConflicting(ak.interpretation.doc.visitedCounter++))
+        if ((key.absoluteRid != null && key.absoluteRid != ak.rid))
             return null;
 
         return new NodeActivation.Key(
@@ -187,7 +188,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                     NodeActivation secondAct = secondNode.getInputNodeActivation(secondIAct);
                     if(secondAct != null) {
                         InterpretationNode o = InterpretationNode.add(doc, true, ak.interpretation, secondIAct.key.interpretation);
-                        if (o != null) {
+                        if (!Conflicts.isConflicting(iAct, secondIAct)) {
                             Node.addActivation(doc,
                                     new NodeActivation.Key(
                                             nlp,

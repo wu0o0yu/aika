@@ -154,7 +154,6 @@ public class OrNode extends Node<OrNode, Activation> {
 
     @Override
     public void apply(Activation act) {
-        OrNode.processCandidate(this, act, false);
     }
 
 
@@ -169,9 +168,7 @@ public class OrNode extends Node<OrNode, Activation> {
         parentNode.lock.acquireReadLock();
         if(parentNode.orChildren != null) {
             for (OrEntry oe : parentNode.orChildren) {
-                if (!ak.interpretation.isConflicting(doc.visitedCounter++)) {
-                    oe.node.get(doc).addActivation(doc, oe.ridOffset, inputAct);
-                }
+                oe.node.get(doc).addActivation(doc, oe.ridOffset, inputAct);
             }
         }
         parentNode.lock.releaseReadLock();

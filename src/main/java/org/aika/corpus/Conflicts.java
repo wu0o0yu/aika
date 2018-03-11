@@ -32,8 +32,16 @@ import static org.aika.neuron.Linker.Direction.INPUT;
  */
 public class Conflicts {
 
-    public SortedMap<Key, Conflict> primary = new TreeMap<>();
-    public Map<Key, Conflict> secondary = new TreeMap<>();
+    public SortedSet<InterpretationNode> primary = new TreeSet<>();
+    public Set<InterpretationNode> secondary = new TreeSet<>();
+
+
+    public static boolean isConflicting(Activation a, Activation b) {
+        if(a.key.interpretation.conflicts.secondary.contains(b.key.interpretation)) return true;
+        if(b.key.interpretation.conflicts.secondary.contains(a.key.interpretation)) return true;
+
+        return false;
+    }
 
 
     public static void linkConflicts(Activation act, long v, Direction dir) {
@@ -44,20 +52,20 @@ public class Conflicts {
 
                 markConflicts(iAct, oAct, v);
 
-                addConflict(oAct, iAct, iAct, v);
+                addConflict(oAct, iAct, v);
             }
         }
     }
 
 
-    private static void addConflict(Activation oAct, Activation iAct, NodeActivation act, long v) {
+    private static void addConflict(Activation oAct, Activation iAct, long v) {
         if (iAct.key.interpretation.markedConflict == v) {
             if (iAct != oAct) {
-                add(act, oAct.key.interpretation, iAct.key.interpretation);
+                add(oAct.key.interpretation, iAct.key.interpretation);
             }
         } else {
             for (Activation.SynapseActivation sa : iAct.neuronInputs) {
-                addConflict(oAct, sa.input, act, v);
+                addConflict(oAct, sa.input, v);
             }
         }
     }
@@ -82,60 +90,18 @@ public class Conflicts {
 
     private static void collectConflicting(Collection<InterpretationNode> results, InterpretationNode n) {
         assert n.primId >= 0;
-        n.conflicts.primary.values().forEach(c -> c.secondary.collectPrimitiveNodes(results, n.doc.visitedCounter++));
-        n.conflicts.secondary.values().forEach(c -> results.add(c.primary));
+        results.addAll(n.conflicts.primary);
+        results.addAll(n.conflicts.secondary);
     }
 
 
-    public static void add(NodeActivation act, InterpretationNode primary, InterpretationNode secondary) {
-        Key ck = new Key(secondary, act);
-        Conflict c = primary.conflicts.primary.get(ck);
-        if(c == null) {
-            c = new Conflict(act, primary, secondary, InterpretationNode.add(primary.doc, false, primary, secondary));
-
-            c.conflict.isConflict++;
-
-            primary.conflicts.primary.put(ck, c);
-            secondary.conflicts.secondary.put(new Key(primary, act), c);
-        }
+    public static void add(InterpretationNode primary, InterpretationNode secondary) {
+        primary.conflicts.primary.add(secondary);
+        secondary.conflicts.secondary.add(primary);
     }
 
 
     public boolean hasConflicts() {
         return !primary.isEmpty() || !secondary.isEmpty();
-    }
-
-
-    public static class Conflict {
-        public NodeActivation act;
-        public InterpretationNode primary;
-        public InterpretationNode secondary;
-        public InterpretationNode conflict;
-
-
-        public Conflict(NodeActivation act, InterpretationNode primary, InterpretationNode secondary, InterpretationNode conflict) {
-            this.act = act;
-            this.primary = primary;
-            this.secondary = secondary;
-            this.conflict = conflict;
-        }
-    }
-
-
-    public static class Key implements Comparable<Key> {
-        public InterpretationNode o;
-        public NodeActivation act;
-
-        public Key(InterpretationNode o, NodeActivation act) {
-            this.o = o;
-            this.act = act;
-        }
-
-        @Override
-        public int compareTo(Key k) {
-            int r = o.compareTo(k.o);
-            if(r != 0) return r;
-            return NodeActivation.compare(act, k.act);
-        }
     }
 }
