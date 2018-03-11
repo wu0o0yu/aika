@@ -195,7 +195,7 @@ public class Document implements Comparable<Document> {
 
         for(Activation act: INCREMENTAL_MODE ? addedActivations: activationsByRangeBegin.values()) {
             InterpretationNode cn = act.key.interpretation;
-            if (cn.state == UNKNOWN && cn.activation.upperBound > 0.0) {
+            if (cn.decision == UNKNOWN && cn.activation.upperBound > 0.0) {
                 SearchNode.invalidateCachedDecision(cn);
                 tmp.add(new Candidate(cn, i++));
             }
@@ -491,7 +491,7 @@ public class Document implements Comparable<Document> {
 
 
         public void add(int round, Activation act) {
-            if(act.rounds.isQueued(round) || act.key.interpretation.state == Decision.UNKNOWN) return;
+            if(act.rounds.isQueued(round) || act.key.interpretation.decision == Decision.UNKNOWN) return;
 
             TreeSet<Activation> q;
             if(round < queue.size()) {
@@ -544,10 +544,10 @@ public class Document implements Comparable<Document> {
             for(Candidate c: queue) {
                 if(c.bestChildNode != null) {
                     c.bestChildNode.setFinalState();
-                    if(c.refinement.inputState == UNKNOWN) {
-                        c.refinement.finalState = c.bestChildNode.getDecision();
+                    if(c.refinement.inputDecision == UNKNOWN) {
+                        c.refinement.finalDecision = c.bestChildNode.getDecision();
                     } else {
-                        c.refinement.finalState = c.refinement.inputState;
+                        c.refinement.finalDecision = c.refinement.inputDecision;
                     }
                 }
             }
@@ -560,7 +560,7 @@ public class Document implements Comparable<Document> {
                 .flatMap(n -> n.getActivations(this).stream())
                 .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)
                 .forEach(act -> {
-                    log.error(act.id + " " + act.key + " " + act.key.interpretation.state + " " + act.rounds);
+                    log.error(act.id + " " + act.key + " " + act.key.interpretation.decision + " " + act.rounds);
                     log.error(act.linksToString());
                     log.error("");
                 });

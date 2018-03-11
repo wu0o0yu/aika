@@ -73,8 +73,6 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     public void addActivation(Document doc, Integer ridOffset, NodeActivation inputAct) {
-        if(checkSelfReferencing(doc, inputAct)) return;
-
         Key ak = inputAct.key;
         Range r = ak.range;
         Integer rid = Utils.nullSafeSub(ak.rid, true, ridOffset, false);
@@ -99,13 +97,6 @@ public class OrNode extends Node<OrNode, Activation> {
                 ),
                 Collections.singleton(inputAct)
         );
-    }
-
-
-    private boolean checkSelfReferencing(Document doc, NodeActivation inputAct) {
-        InterpretationNode o = lookupOrOption(doc, inputAct.key.range, false);
-        if(o == null) return false;
-        return inputAct.key.interpretation.contains(o, true);
     }
 
 

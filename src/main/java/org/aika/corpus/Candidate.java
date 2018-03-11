@@ -40,21 +40,10 @@ public class Candidate  implements Comparable<Candidate> {
         this.refinement = ref;
         this.id = id;
         ref.candidate = this;
-        if (ref.activation != null) {
-            sequence = ref.activation.getSequence();
-            minBegin = ref.activation.key.range.begin;
-            maxEnd = ref.activation.key.range.end;
-            minRid = ref.activation.key.rid;
-        } else {
-            for (NodeActivation act : ref.getNodeActivations()) {
-                sequence = Math.max(sequence, ref.activation.getSequence());
-                if (act.key.range != null) {
-                    minBegin = Math.min(minBegin, act.key.range.begin);
-                    maxEnd = Math.max(maxEnd, act.key.range.end);
-                }
-                minRid = Utils.nullSafeMin(minRid, act.key.rid);
-            }
-        }
+        sequence = ref.activation.getSequence();
+        minBegin = ref.activation.key.range.begin;
+        maxEnd = ref.activation.key.range.end;
+        minRid = ref.activation.key.rid;
     }
 
 

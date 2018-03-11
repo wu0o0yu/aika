@@ -113,7 +113,7 @@ public final class Activation extends NodeActivation<OrNode> {
                 neuronOutputs.add(sa);
                 break;
             case OUTPUT:
-                if(sa.input.key.interpretation.state == SELECTED) {
+                if(sa.input.key.interpretation.decision == SELECTED) {
                     selectedNeuronInputs.add(sa);
                 }
                 neuronInputs.add(sa);
@@ -166,7 +166,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public State computeValueAndWeight(int round) {
-        Decision c = key.interpretation.state;
+        Decision c = key.interpretation.decision;
 
         INeuron n = getINeuron();
         double[] sum = {n.biasSum, 0.0};
@@ -308,7 +308,7 @@ public final class Activation extends NodeActivation<OrNode> {
         State is = State.ZERO;
         if (s.key.isRecurrent) {
             if (!s.isNegative() || !checkSelfReferencing(o, this, true, 0)) {
-                is = round == 0 ? getInitialState(io.state) : rounds.get(round - 1);
+                is = round == 0 ? getInitialState(io.decision) : rounds.get(round - 1);
             }
         } else {
             is = rounds.get(round);
@@ -581,7 +581,7 @@ public final class Activation extends NodeActivation<OrNode> {
         sb.append(id + " - ");
 
         if(sn != null) {
-            sb.append("FS:" + key.interpretation.finalState + " S:" + key.interpretation.state + " ");
+            sb.append("FS:" + key.interpretation.finalDecision + " S:" + key.interpretation.decision + " ");
             sb.append(sequence + " ");
         }
 
@@ -661,7 +661,7 @@ public final class Activation extends NodeActivation<OrNode> {
         StateChange sc = currentStateChange;
 
         sc.newRounds = rounds.copy();
-        sc.newState = key.interpretation.state;
+        sc.newState = key.interpretation.decision;
         doc.fsQueue.add(key.interpretation.candidate);
     }
 

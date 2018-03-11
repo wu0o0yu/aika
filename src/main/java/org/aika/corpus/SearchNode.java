@@ -190,12 +190,12 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private boolean isModified() {
         for (StateChange sc : modifiedActs.values()) {
-            if (sc.getActivation().markedDirty > visited || sc.newState != sc.getActivation().key.interpretation.state) {
+            if (sc.getActivation().markedDirty > visited || sc.newState != sc.getActivation().key.interpretation.decision) {
                 return true;
             }
             if(sc.newRounds.isActive()) {
                 for (SynapseActivation sa : sc.getActivation().neuronOutputs) {
-                    if (sa.output.key.interpretation.state != UNKNOWN &&
+                    if (sa.output.key.interpretation.decision != UNKNOWN &&
                             sa.output.markedDirty > visited) {
                         return true;
                     }
@@ -350,8 +350,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
         boolean precondition = checkPrecondition();
 
-        alreadySelected = precondition && !candidate.isConflicting() || candidate.refinement.inputState == SELECTED;
-        alreadyExcluded = !precondition || checkExcluded(candidate.refinement) || candidate.refinement.inputState == EXCLUDED;
+        alreadySelected = precondition && !candidate.isConflicting() || candidate.refinement.inputDecision == SELECTED;
+        alreadyExcluded = !precondition || checkExcluded(candidate.refinement) || candidate.refinement.inputDecision == EXCLUDED;
 
         if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
             dumpDebugState();
@@ -439,7 +439,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean checkPrecondition() {
-        Set soin = candidate.refinement.selectedOrInterpretationNodes;
+        Set soin = candidate.refinement.activation.selectedNeuronInputs;
         return soin != null && !soin.isEmpty();
     }
 
@@ -493,7 +493,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private boolean checkExcluded(InterpretationNode ref) {
         for (InterpretationNode cn : Conflicts.getConflicting(ref)) {
-            if (cn.state == SELECTED) return true;
+            if (cn.decision == SELECTED) return true;
         }
         return false;
     }

@@ -313,11 +313,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         Key ak = act.key;
         Document doc = act.doc;
 
-        if (ak.interpretation.nodeActivations == null) {
-            ak.interpretation.nodeActivations = new TreeMap<>();
-        }
-        ak.interpretation.nodeActivations.put(ak, act);
-
         ThreadState th = ak.node.getThreadState(doc.threadId, true);
         if (th.activations.isEmpty()) {
             doc.activatedNodes.add(ak.node);

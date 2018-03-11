@@ -17,8 +17,6 @@
 package org.aika.corpus;
 
 
-import org.aika.lattice.NodeActivation;
-import org.aika.lattice.NodeActivation.Key;
 import org.aika.neuron.Activation;
 import org.aika.Utils;
 import org.aika.corpus.SearchNode.Decision;
@@ -44,7 +42,36 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     public static final InterpretationNode MIN = new InterpretationNode(null, -1, 0, 0);
     public static final InterpretationNode MAX = new InterpretationNode(null, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
 
+
+
     public static int MAX_SELF_REFERENCING_DEPTH = 5;
+    public Decision inputDecision = Decision.UNKNOWN;
+    public Decision decision = Decision.UNKNOWN;
+    public Decision finalDecision = Decision.UNKNOWN;
+    public Candidate candidate;
+    public Conflicts conflicts = new Conflicts();
+    public long markedConflict;
+    long visitedState;
+
+
+
+    public void setState(Decision newState, long v) {
+        if(inputDecision != Decision.UNKNOWN && newState != inputDecision) return;
+
+        if (newState == Decision.UNKNOWN && v != visitedState) return;
+
+        if(activation != null && (decision == Decision.SELECTED != (newState == Decision.SELECTED))) {
+            activation.adjustSelectedNeuronInputs(newState);
+        }
+
+        decision = newState;
+        visitedState = v;
+
+        changeSelectedRecursive(doc.visitedCounter++);
+    }
+
+
+
 
     public final int primId;
     public int minPrim = -1;
@@ -76,31 +103,20 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     private long visitedGetState;
     private long visitedChangeSelected;
 
-    public long markedConflict;
 
     private int numberInnerInputs = 0;
     private int largestCommonSubsetCount = 0;
     private int numberOfInputsComputeChildren = 0;
 
-    long visitedState;
-    public Decision inputState = Decision.UNKNOWN;
-    public Decision state = Decision.UNKNOWN;
-    public Decision finalState = Decision.UNKNOWN;
 
     public boolean isSelected;
 
     public final Document doc;
     public Activation activation;
-    public Candidate candidate;
 
     private static InterpretationNode[] EMPTY_INTERPRETATION_RELATIONS = new InterpretationNode[0];
     public InterpretationNode[] parents = EMPTY_INTERPRETATION_RELATIONS;
     public InterpretationNode[] children = EMPTY_INTERPRETATION_RELATIONS;
-
-    public int isConflict = -1;
-    public Conflicts conflicts = new Conflicts();
-
-    public NavigableMap<Key, NodeActivation> nodeActivations;
 
 
     public enum Relation {
@@ -123,10 +139,10 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     }
 
 
-    public InterpretationNode(Document doc, int primId, int id, int length, Decision s) {
+    public InterpretationNode(Document doc, int primId, int id, int length, Decision d) {
         this(doc, primId, id);
         this.length = length;
-        this.state = s;
+        this.decision = d;
     }
 
 
@@ -142,21 +158,6 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
         this.id = id;
     }
 
-
-    public void setState(Decision newState, long v) {
-        if(inputState != Decision.UNKNOWN && newState != inputState) return;
-
-        if (newState == Decision.UNKNOWN && v != visitedState) return;
-
-        if(activation != null && (state == Decision.SELECTED != (newState == Decision.SELECTED))) {
-            activation.adjustSelectedNeuronInputs(newState);
-        }
-
-        state = newState;
-        visitedState = v;
-
-        changeSelectedRecursive(doc.visitedCounter++);
-    }
 
 
     private void changeSelectedRecursive(long v) {
@@ -198,7 +199,7 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
 
     public boolean isSelected(long v) {
-        if(primId >= 0) return state == Decision.SELECTED;
+        if(primId >= 0) return decision == Decision.SELECTED;
 
         if(visitedGetState == v) return true;
         visitedGetState = v;
@@ -277,11 +278,6 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     }
 
 
-    public Collection<NodeActivation> getNodeActivations() {
-        return nodeActivations != null ? nodeActivations.values() : Collections.emptySet();
-    }
-
-
     public static InterpretationNode add(Document doc, boolean nonConflicting, InterpretationNode... input) {
         ArrayList<InterpretationNode> in = new ArrayList<>();
         for (InterpretationNode n : input) {
@@ -302,7 +298,6 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
         if (inputs.size() == 1 || (inputs.size() == 2 && inputs.get(0) == inputs.get(1))) {
             InterpretationNode n = inputs.get(0);
-            if (nonConflicting && n.isConflicting(doc.visitedCounter++)) return null;
             return n;
         }
 
@@ -312,16 +307,7 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
 
         if (parents.size() == 1) {
             InterpretationNode n = parents.get(0);
-            if (nonConflicting && n.isConflicting(doc.visitedCounter++)) return null;
             return n;
-        }
-
-        if (nonConflicting) {
-            for (InterpretationNode p : parents) {
-                if (p.isConflicting(doc.visitedCounter++)) {
-                    return null;
-                }
-            }
         }
 
         InterpretationNode n = new InterpretationNode(doc, -1, doc.interpretationIdCounter++);
@@ -571,27 +557,6 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
     }
 
 
-    public boolean isConflicting(long v) {
-        if (isConflict >= 0) {
-            return true;
-        } else if(conflictsAllowed()) {
-            if(visitedIsConflicting == v) return false;
-            visitedIsConflicting = v;
-
-            for(InterpretationNode p : parents) {
-                if(p.isConflicting(v)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-
-    private boolean conflictsAllowed() {
-        return nodeActivations == null || nodeActivations.isEmpty();
-    }
-
 
     public String toString() {
         if(this == MIN) return "MIN_INTERPRETATION";
@@ -612,7 +577,7 @@ public class InterpretationNode implements Comparable<InterpretationNode> {
             if(!f1) sb.append(",");
             f1 = false;
             sb.append(n.primId);
-            sb.append(n.finalState.s);
+            sb.append(n.finalDecision.s);
             if(!level && n.orInterpretationNodes != null) {
                 sb.append("[");
                 boolean f2 = true;
