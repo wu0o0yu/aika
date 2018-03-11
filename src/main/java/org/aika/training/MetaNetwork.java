@@ -117,7 +117,7 @@ public class MetaNetwork {
 
     private static boolean checkForNewlyCreatedActivations(Activation sAct) {
         for(SynapseActivation sa: sAct.neuronInputs) {
-            if(sa.input.key.interpretation.finalDecision == UNKNOWN) {
+            if(sa.input.finalDecision == UNKNOWN) {
                 return false;
             }
         }

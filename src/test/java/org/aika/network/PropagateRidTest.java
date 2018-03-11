@@ -55,7 +55,7 @@ public class PropagateRidTest {
                         .setRelationalId(10)
         );
 
-        Assert.assertEquals(5, Selector.get(doc, pA.get(), null, null, null, null, null).key.rid.intValue());
+        Assert.assertEquals(5, Selector.get(doc, pA.get(), null, null, null).key.rid.intValue());
 
     }
 }

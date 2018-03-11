@@ -66,8 +66,6 @@ public class Document implements Comparable<Document> {
     public int searchNodeIdCounter = 0;
     public int searchStepCounter = 0;
 
-    public InterpretationNode bottom = new InterpretationNode(this, -1, 0, 0, Decision.SELECTED);
-
     public Model model;
     public int threadId;
 
@@ -114,8 +112,6 @@ public class Document implements Comparable<Document> {
         int r = Range.compare(act1.key.range, act2.key.range, false);
         if (r != 0) return r;
         r = Utils.compareInteger(act1.key.rid, act2.key.rid);
-        if (r != 0) return r;
-        r = act1.key.interpretation.compareTo(act2.key.interpretation);
         if (r != 0) return r;
         return act1.key.node.compareTo(act2.key.node);
     };
@@ -194,10 +190,9 @@ public class Document implements Comparable<Document> {
         }
 
         for(Activation act: INCREMENTAL_MODE ? addedActivations: activationsByRangeBegin.values()) {
-            InterpretationNode cn = act.key.interpretation;
-            if (cn.decision == UNKNOWN && cn.activation.upperBound > 0.0) {
-                SearchNode.invalidateCachedDecision(cn);
-                tmp.add(new Candidate(cn, i++));
+            if (act.decision == UNKNOWN && act.upperBound > 0.0) {
+                SearchNode.invalidateCachedDecision(act);
+                tmp.add(new Candidate(act, i++));
             }
         }
 
@@ -214,7 +209,7 @@ public class Document implements Comparable<Document> {
                     c.id = candidates.size();
                     candidates.add(c);
 
-                    c.refinement.activation.markedHasCandidate = v;
+                    c.refinement.markedHasCandidate = v;
                     break;
                 }
             }
@@ -345,7 +340,7 @@ public class Document implements Comparable<Document> {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         for (INeuron n : activatedNeurons) {
-            Stream<Activation> s = Selector.select(this, n, null, null, null, null, InterpretationNode.Relation.CONTAINED_IN);
+            Stream<Activation> s = Selector.select(this, n, null, null, null);
             acts.addAll(s.collect(Collectors.toList()));
         }
 
@@ -491,7 +486,7 @@ public class Document implements Comparable<Document> {
 
 
         public void add(int round, Activation act) {
-            if(act.rounds.isQueued(round) || act.key.interpretation.decision == Decision.UNKNOWN) return;
+            if(act.rounds.isQueued(round) || act.decision == Decision.UNKNOWN) return;
 
             TreeSet<Activation> q;
             if(round < queue.size()) {
@@ -511,7 +506,7 @@ public class Document implements Comparable<Document> {
             long v = visitedCounter++;
 
             if(sn.getParent() != null && sn.getParent().candidate != null) {
-                add(sn.getParent().candidate.refinement.activation);
+                add(sn.getParent().candidate.refinement);
             }
 
             Weight delta = Weight.ZERO;
@@ -560,7 +555,7 @@ public class Document implements Comparable<Document> {
                 .flatMap(n -> n.getActivations(this).stream())
                 .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)
                 .forEach(act -> {
-                    log.error(act.id + " " + act.key + " " + act.key.interpretation.decision + " " + act.rounds);
+                    log.error(act.id + " " + act.key + " " + act.decision + " " + act.rounds);
                     log.error(act.linksToString());
                     log.error("");
                 });

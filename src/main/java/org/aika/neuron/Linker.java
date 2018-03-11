@@ -163,9 +163,8 @@ public class Linker {
                 if(rAct.filter(null,
                         computeTargetRID(act, dir, sk),
                         act.key.range,
-                        dir == INPUT ? sk.rangeMatch.invert() : sk.rangeMatch,
-                        null,
-                        null)) {
+                        dir == INPUT ? sk.rangeMatch.invert() : sk.rangeMatch
+                )) {
                     Activation.SynapseActivation sa = new Activation.SynapseActivation(s, iAct, oAct);
                     iAct.addSynapseActivation(INPUT, sa);
                     oAct.addSynapseActivation(OUTPUT, sa);
@@ -198,9 +197,7 @@ public class Linker {
                 n,
                 computeTargetRID(act, dir, sk),
                 act.key.range,
-                dir == INPUT ? sk.rangeMatch.invert() : sk.rangeMatch,
-                null,
-                null
+                dir == INPUT ? sk.rangeMatch.invert() : sk.rangeMatch
         );
 
         tmp.forEach(rAct -> {

@@ -21,7 +21,6 @@ import org.aika.neuron.*;
 import org.aika.corpus.Range.Relation;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
@@ -77,7 +76,7 @@ public class NegationTest {
         inA.addInput(doc, 0, 11, 0);
 
         System.out.println(doc.activationsToString(false, true));
-        Assert.assertNotNull(Selector.get(doc, abcN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
+        Assert.assertNotNull(Selector.get(doc, abcN.get(), null, new Range(0, 11), Relation.EQUALS));
 
         inB.addInput(doc,
                 new Activation.Builder()
@@ -93,7 +92,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, true));
 
-        Assert.assertNotNull(Selector.get(doc, abcN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
+        Assert.assertNotNull(Selector.get(doc, abcN.get(), null, new Range(0, 11), Relation.EQUALS));
     }
 
 
@@ -204,10 +203,7 @@ public class NegationTest {
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
-        inS.addInput(doc,
-                new Activation.Builder()
-                        .setRange(3, 8)
-        );
+        inS.addInput(doc, 3, 8);
 
         System.out.println(doc.activationsToString(false, true));
 
@@ -215,7 +211,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, true));
 
-        Assert.assertNotNull(Selector.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
+        Assert.assertNotNull(Selector.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS));
 
         doc.clearActivations();
     }
@@ -273,7 +269,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, true));
 
-        Assert.assertNotNull(Selector.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
+        Assert.assertNotNull(Selector.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS));
 
         doc.clearActivations();
     }
@@ -331,7 +327,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, true));
 
-        Assert.assertNotNull(Selector.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS, null, null));
+        Assert.assertNotNull(Selector.get(doc, outN.get(), null, new Range(0, 11), Relation.EQUALS));
 
         doc.clearActivations();
     }
@@ -418,8 +414,8 @@ public class NegationTest {
 
             System.out.println(doc.activationsToString(false, true));
 
-            Assert.assertNotNull(Selector.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null));
-            Assert.assertEquals(2, Selector.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null).key.interpretation.orInterpretationNodes.size());
+            Assert.assertNotNull(Selector.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS));
+            Assert.assertEquals(2, Selector.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS).neuronInputs.size());
 
             doc.clearActivations();
         }
@@ -435,10 +431,10 @@ public class NegationTest {
             System.out.println(doc.activationsToString(false, true));
 
 //            Assert.assertNotNull(Selector.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
-            Assert.assertNotNull(Selector.get(doc, inS.get(), null, new Range(0, 9), Relation.EQUALS, null, null));
+            Assert.assertNotNull(Selector.get(doc, inS.get(), null, new Range(0, 9), Relation.EQUALS));
 //            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.interpretation.orInterprNodes.size());
-            Assert.assertEquals(1, Selector.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS, null, null).key.interpretation.orInterpretationNodes.size());
-            Assert.assertEquals(1, Selector.get(doc, inS.get(), null, new Range(0, 9), Relation.EQUALS, null, null).key.interpretation.orInterpretationNodes.size());
+            Assert.assertEquals(1, Selector.get(doc, inS.get(), null, new Range(0, 6), Relation.EQUALS).neuronInputs.size());
+            Assert.assertEquals(1, Selector.get(doc, inS.get(), null, new Range(0, 9), Relation.EQUALS).neuronInputs.size());
 
             doc.clearActivations();
         }

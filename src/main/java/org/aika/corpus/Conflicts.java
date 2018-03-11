@@ -32,13 +32,13 @@ import static org.aika.neuron.Linker.Direction.INPUT;
  */
 public class Conflicts {
 
-    public SortedSet<InterpretationNode> primary = new TreeSet<>();
-    public Set<InterpretationNode> secondary = new TreeSet<>();
+    public SortedSet<Activation> primary = new TreeSet<>();
+    public Set<Activation> secondary = new TreeSet<>();
 
 
     public static boolean isConflicting(Activation a, Activation b) {
-        if(a.key.interpretation.conflicts.secondary.contains(b.key.interpretation)) return true;
-        if(b.key.interpretation.conflicts.secondary.contains(a.key.interpretation)) return true;
+        if(a.conflicts.secondary.contains(b)) return true;
+        if(b.conflicts.secondary.contains(a)) return true;
 
         return false;
     }
@@ -59,9 +59,9 @@ public class Conflicts {
 
 
     private static void addConflict(Activation oAct, Activation iAct, long v) {
-        if (iAct.key.interpretation.markedConflict == v) {
+        if (iAct.markedConflict == v) {
             if (iAct != oAct) {
-                add(oAct.key.interpretation, iAct.key.interpretation);
+                add(oAct, iAct);
             }
         } else {
             for (Activation.SynapseActivation sa : iAct.neuronInputs) {
@@ -72,30 +72,29 @@ public class Conflicts {
 
 
     private static void markConflicts(Activation iAct, Activation oAct, long v) {
-        oAct.key.interpretation.markedConflict = v;
+        oAct.markedConflict = v;
         for (Activation.SynapseActivation sa : iAct.neuronOutputs) {
             if (sa.synapse.key.isRecurrent && sa.synapse.isNegative()) {
-                sa.output.key.interpretation.markedConflict = v;
+                sa.output.markedConflict = v;
             }
         }
     }
 
 
-    public static Collection<InterpretationNode> getConflicting(InterpretationNode n) {
-        ArrayList<InterpretationNode> conflicts = new ArrayList<>();
+    public static Collection<Activation> getConflicting(Activation n) {
+        ArrayList<Activation> conflicts = new ArrayList<>();
         Conflicts.collectConflicting(conflicts, n);
         return conflicts;
     }
 
 
-    private static void collectConflicting(Collection<InterpretationNode> results, InterpretationNode n) {
-        assert n.primId >= 0;
+    private static void collectConflicting(Collection<Activation> results, Activation n) {
         results.addAll(n.conflicts.primary);
         results.addAll(n.conflicts.secondary);
     }
 
 
-    public static void add(InterpretationNode primary, InterpretationNode secondary) {
+    public static void add(Activation primary, Activation secondary) {
         primary.conflicts.primary.add(secondary);
         secondary.conflicts.secondary.add(primary);
     }

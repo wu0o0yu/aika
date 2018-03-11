@@ -100,14 +100,14 @@ public class EntityResolutionTest {
         Assert.assertNotNull(eJaguar.get().getFirstActivation(doc));
         Assert.assertNotNull(ePuma.get().getFirstActivation(doc));
 
-        Assert.assertEquals(1, eJaguar.get().getFirstActivation(doc).key.interpretation.primId);
-        Assert.assertEquals(3, ePuma.get().getFirstActivation(doc).key.interpretation.primId);
+        Assert.assertEquals(2, eJaguar.get().getFirstActivation(doc).id);
+        Assert.assertEquals(6, ePuma.get().getFirstActivation(doc).id);
 
-        Assert.assertEquals(0, eJaguar.get().getFirstActivation(doc).key.interpretation.orInterpretationNodes.iterator().next().primId);
-        Assert.assertEquals(2, ePuma.get().getFirstActivation(doc).key.interpretation.orInterpretationNodes.iterator().next().primId);
+        Assert.assertEquals(0, eJaguar.get().getFirstActivation(doc).neuronInputs.iterator().next().input.id);
+        Assert.assertEquals(4, ePuma.get().getFirstActivation(doc).neuronInputs.iterator().next().input.id);
 
-        Assert.assertEquals(1, eJaguar.get().getFirstActivation(doc).key.interpretation.orInterpretationNodes.size());
-        Assert.assertEquals(1, ePuma.get().getFirstActivation(doc).key.interpretation.orInterpretationNodes.size());
+        Assert.assertEquals(1, eJaguar.get().getFirstActivation(doc).neuronInputs.size());
+        Assert.assertEquals(1, ePuma.get().getFirstActivation(doc).neuronInputs.size());
     }
 
 

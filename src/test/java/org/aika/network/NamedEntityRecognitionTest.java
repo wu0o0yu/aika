@@ -240,7 +240,6 @@ public class NamedEntityRecognitionTest {
         for(Activation act: surnameCategory.getFinalActivations(doc)) {
             System.out.print(act.key.range + " ");
             System.out.print(act.key.rid + " ");
-            System.out.print(act.key.interpretation + " ");
             System.out.print(act.getLabel() + " ");
             System.out.print(act.getFinalState().value);
         }

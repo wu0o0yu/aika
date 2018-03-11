@@ -19,7 +19,6 @@ package org.aika.network;
 
 import org.aika.neuron.*;
 import org.aika.corpus.Document;
-import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Relation;
 import org.aika.lattice.InputNode;
@@ -49,7 +48,7 @@ public class TestHelper {
         );
     }
 
-    public static Activation get(Document doc, INeuron n, Range r, InterpretationNode o) {
-        return Selector.get(doc, n, null, r, Relation.CONTAINS, o, InterpretationNode.Relation.EQUALS);
+    public static Activation get(Document doc, INeuron n, Range r) {
+        return Selector.get(doc, n, null, r, Relation.CONTAINS);
     }
 }

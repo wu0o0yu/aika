@@ -108,7 +108,6 @@ public class OverlappingOrTest {
         INeuron n = pattern.get();
         for(NodeActivation act: n.getActivations(doc)) {
             System.out.println("Text Range: " + act.key.range);
-            System.out.println("Option: " + act.key.interpretation);
             System.out.println("Node: " + act.key.node);
             System.out.println("Rid: " + act.key.rid);
 //            System.out.println("Activation weight: " + act.finalState.value);

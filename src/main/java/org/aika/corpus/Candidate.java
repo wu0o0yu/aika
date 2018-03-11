@@ -23,7 +23,7 @@ public class Candidate  implements Comparable<Candidate> {
     public SearchNode cachedSearchNode;
     public SearchNode bestChildNode;
 
-    public InterpretationNode refinement;
+    public Activation refinement;
 
     int[] debugCounts = new int[3];
     int[] debugDecisionCounts = new int[3];
@@ -36,14 +36,14 @@ public class Candidate  implements Comparable<Candidate> {
     Integer minRid;
     public boolean queued;
 
-    public Candidate(InterpretationNode ref, int id) {
+    public Candidate(Activation ref, int id) {
         this.refinement = ref;
         this.id = id;
         ref.candidate = this;
-        sequence = ref.activation.getSequence();
-        minBegin = ref.activation.key.range.begin;
-        maxEnd = ref.activation.key.range.end;
-        minRid = ref.activation.key.rid;
+        sequence = ref.getSequence();
+        minBegin = ref.key.range.begin;
+        maxEnd = ref.key.range.end;
+        minRid = ref.key.rid;
     }
 
 
@@ -53,7 +53,7 @@ public class Candidate  implements Comparable<Candidate> {
 
 
     public boolean checkDependenciesSatisfied(long v) {
-        for (Activation.SynapseActivation sa : refinement.activation.neuronInputs) {
+        for (Activation.SynapseActivation sa : refinement.neuronInputs) {
             if (sa.input.markedHasCandidate != v && !sa.synapse.key.isRecurrent && sa.input.upperBound > 0.0) return false;
         }
         return true;
@@ -72,9 +72,8 @@ public class Candidate  implements Comparable<Candidate> {
                 " SIM-COMPUTED:" + debugComputed[1] +
                 " MODIFIED:" + debugComputed[2] +
                 " ACT-ID:" + refinement.id +
-                " " + refinement.activation.key.range +
-                " " + refinement.activation.key.interpretation +
-                " " + refinement.activation.getLabel();
+                " " + refinement.key.range +
+                " " + refinement.getLabel();
     }
 
 

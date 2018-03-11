@@ -73,7 +73,7 @@ public class RecurrentIdTest {
         inA.addInput(doc, 0, 1, 20);
         inB.addInput(doc, 0, 1, 21);
 
-        Activation outC1 = Selector.get(doc, outC, 20, new Range(0, 1), Relation.CONTAINS, null, null);
+        Activation outC1 = Selector.get(doc, outC, 20, new Range(0, 1), Relation.CONTAINS);
 
         System.out.println(doc.activationsToString(false, true));
 
@@ -124,7 +124,7 @@ public class RecurrentIdTest {
         inB.addInput(doc, 0, 1, 10);
         inC.addInput(doc, 0, 1, 16);
 
-        Activation outD1 = Selector.get(doc, outD, 10, new Range(0, 1), Relation.EQUALS, null, null);
+        Activation outD1 = Selector.get(doc, outD, 10, new Range(0, 1), Relation.EQUALS);
 
         Assert.assertNotNull(outD1);
     }

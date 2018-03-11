@@ -182,12 +182,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public Activation addInput(Document doc, Activation.Builder input) {
         assert input.range.begin <= input.range.end;
 
-        InterpretationNode interpr = InterpretationNode.addPrimitive(doc);
-        interpr.inputDecision = SearchNode.Decision.SELECTED;
-        interpr.finalDecision = interpr.inputDecision;
-        interpr.setDecision(interpr.inputDecision, doc.visitedCounter++);
-
-        Activation.Key ak = new Activation.Key(node.get(doc), input.range, input.rid, interpr);
+        Activation.Key ak = new Activation.Key(node.get(doc), input.range, input.rid);
 
         Activation act = Selector.get(doc, this, ak);
         if(act == null) {
@@ -201,6 +196,11 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         act.inputValue = input.value;
         act.upperBound = input.value;
         act.lowerBound = input.value;
+
+        act.inputDecision = SearchNode.Decision.SELECTED;
+        act.finalDecision = act.inputDecision;
+        act.setDecision(act.inputDecision, doc.visitedCounter++);
+
 
         act.setTargetValue(input.targetValue);
 
