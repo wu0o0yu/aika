@@ -135,7 +135,7 @@ public class SearchNode implements Comparable<SearchNode> {
             csn = c.cachedSearchNode;
 
             if (csn == null || csn.getDecision() != getDecision()) {
-                Activation act = c.refinement;
+                Activation act = c.activation;
                 act.markDirty(visited);
                 for (SynapseActivation sa : act.neuronOutputs) {
                     sa.output.markDirty(visited);
@@ -350,8 +350,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
         boolean precondition = checkPrecondition();
 
-        alreadySelected = precondition && !candidate.isConflicting() || candidate.refinement.inputDecision == SELECTED;
-        alreadyExcluded = !precondition || checkExcluded(candidate.refinement) || candidate.refinement.inputDecision == EXCLUDED;
+        alreadySelected = precondition && !candidate.isConflicting() || candidate.activation.inputDecision == SELECTED;
+        alreadyExcluded = !precondition || checkExcluded(candidate.activation) || candidate.activation.inputDecision == EXCLUDED;
 
         if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
             dumpDebugState();
@@ -372,7 +372,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private boolean prepareSelectStep(Document doc) {
         if(alreadyExcluded || skip == SELECTED || getCachedDecision() == Decision.EXCLUDED) return false;
 
-        candidate.refinement.setDecision(SELECTED, visited);
+        candidate.activation.setDecision(SELECTED, visited);
 
         if (candidate.cachedDecision == UNKNOWN) {
             invalidateCachedDecisions();
@@ -389,7 +389,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private boolean prepareExcludeStep(Document doc) {
         if(alreadySelected || skip == EXCLUDED || getCachedDecision() == Decision.SELECTED) return false;
 
-        candidate.refinement.setDecision(EXCLUDED, visited);
+        candidate.activation.setDecision(EXCLUDED, visited);
 
         excludedChild = new SearchNode(doc, selectedParent, this, level + 1);
 
@@ -402,8 +402,8 @@ public class SearchNode implements Comparable<SearchNode> {
     private void postReturn(SearchNode child) {
         child.changeState(Activation.Mode.OLD);
 
-        candidate.refinement.setDecision(UNKNOWN, visited);
-        candidate.refinement.rounds.reset();
+        candidate.activation.setDecision(UNKNOWN, visited);
+        candidate.activation.rounds.reset();
     }
 
 
@@ -439,13 +439,13 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean checkPrecondition() {
-        Set soin = candidate.refinement.selectedNeuronInputs;
+        Set soin = candidate.activation.selectedNeuronInputs;
         return soin != null && !soin.isEmpty();
     }
 
 
     private void invalidateCachedDecisions() {
-        for (SynapseActivation sa : candidate.refinement.neuronOutputs) {
+        for (SynapseActivation sa : candidate.activation.neuronOutputs) {
             if (!sa.synapse.isNegative()) {
                 invalidateCachedDecision(sa.output);
             }
@@ -500,13 +500,13 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
 
-    public String pathToString(Document doc) {
-        return (selectedParent != null ? selectedParent.pathToString(doc) : "") + " - " + toString(doc);
+    public String pathToString() {
+        return (selectedParent != null ? selectedParent.pathToString() : "") + " - " + toString();
     }
 
 
-    public String toString(Document doc) {
-        return candidate.refinement.id + " Decision:" + getDecision();
+    public String toString() {
+        return candidate.activation.id + " Decision:" + getDecision();
     }
 
 

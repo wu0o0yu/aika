@@ -209,7 +209,7 @@ public class Document implements Comparable<Document> {
                     c.id = candidates.size();
                     candidates.add(c);
 
-                    c.refinement.markedHasCandidate = v;
+                    c.activation.markedHasCandidate = v;
                     break;
                 }
             }
@@ -506,7 +506,7 @@ public class Document implements Comparable<Document> {
             long v = visitedCounter++;
 
             if(sn.getParent() != null && sn.getParent().candidate != null) {
-                add(sn.getParent().candidate.refinement);
+                add(sn.getParent().candidate.activation);
             }
 
             Weight delta = Weight.ZERO;
@@ -539,10 +539,10 @@ public class Document implements Comparable<Document> {
             for(Candidate c: queue) {
                 if(c.bestChildNode != null) {
                     c.bestChildNode.setFinalState();
-                    if(c.refinement.inputDecision == UNKNOWN) {
-                        c.refinement.finalDecision = c.bestChildNode.getDecision();
+                    if(c.activation.inputDecision == UNKNOWN) {
+                        c.activation.finalDecision = c.bestChildNode.getDecision();
                     } else {
-                        c.refinement.finalDecision = c.refinement.inputDecision;
+                        c.activation.finalDecision = c.activation.inputDecision;
                     }
                 }
             }

@@ -38,6 +38,7 @@ import static org.aika.neuron.INeuron.ALLOW_WEAK_NEGATIVE_WEIGHTS;
  */
 public final class Activation extends NodeActivation<OrNode> {
     public static final Comparator<Activation> ACTIVATION_ID_COMP = Comparator.comparingInt(act -> act.id);
+    public static int MAX_SELF_REFERENCING_DEPTH = 5;
 
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
@@ -69,7 +70,6 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
 
-    public static int MAX_SELF_REFERENCING_DEPTH = 5;
     public Decision inputDecision = Decision.UNKNOWN;
     public Decision decision = Decision.UNKNOWN;
     public Decision finalDecision = Decision.UNKNOWN;
