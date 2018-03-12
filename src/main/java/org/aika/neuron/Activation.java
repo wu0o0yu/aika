@@ -76,7 +76,7 @@ public final class Activation extends NodeActivation<OrNode> {
     public Candidate candidate;
     public Conflicts conflicts = new Conflicts();
     public long markedConflict;
-    long visitedState;
+    private long visitedState;
 
 
     public Activation(int id, Document doc, Key key) {
