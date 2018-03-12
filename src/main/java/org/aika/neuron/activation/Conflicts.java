@@ -63,7 +63,9 @@ public class Conflicts {
             }
         } else {
             for (Activation.SynapseActivation sa : iAct.neuronInputs) {
-                addConflict(oAct, sa.input, v);
+                if(!sa.synapse.key.isRecurrent) {
+                    addConflict(oAct, sa.input, v);
+                }
             }
         }
     }
