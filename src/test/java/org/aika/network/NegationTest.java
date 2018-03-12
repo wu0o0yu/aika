@@ -197,7 +197,7 @@ public class NegationTest {
                         .setNeuron(inS)
                         .setWeight(-1.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
+                        .setRecurrent(true)
                         .setRangeMatch(NONE)
         );
 
@@ -252,7 +252,7 @@ public class NegationTest {
                         .setNeuron(inS)
                         .setWeight(-1.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
+                        .setRecurrent(true)
                         .setRangeMatch(Relation.CONTAINS)
         );
 

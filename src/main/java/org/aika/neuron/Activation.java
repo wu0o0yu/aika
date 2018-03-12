@@ -243,7 +243,7 @@ public final class Activation extends NodeActivation<OrNode> {
             if (iAct == this) continue;
 
             if (s.isNegative()) {
-                if (!checkSelfReferencing(this, iAct, false, 0)) {
+                if (!s.key.isRecurrent && !checkSelfReferencing(this, iAct, false, 0)) {
                     ub += iAct.lowerBound * s.weight;
                 }
 
