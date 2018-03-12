@@ -150,7 +150,7 @@ public final class Activation extends NodeActivation<OrNode> {
             if (propagate) {
                 if(round > Document.MAX_ROUND) {
                     log.error("Error: Maximum number of rounds reached. The network might be oscillating.");
-                    log.info(doc.activationsToString(sn, true, true));
+                    log.info(doc.activationsToString(true, true));
 
                     doc.dumpOscillatingActivations();
                     throw new RuntimeException("Maximum number of rounds reached. The network might be oscillating.");
@@ -592,14 +592,13 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    public String toString(SearchNode sn, boolean withTextSnippet, boolean withLogic) {
+    public String toString(boolean withTextSnippet, boolean withLogic) {
         StringBuilder sb = new StringBuilder();
         sb.append(id + " - ");
 
-        if(sn != null) {
-            sb.append("FS:" + finalDecision + " S:" + decision + " ");
-            sb.append(sequence + " ");
-        }
+        sb.append("ID:" + inputDecision + " ");
+        sb.append("D:" + decision + " ");
+        sb.append("FD:" + finalDecision + " - ");
 
         sb.append(key.range);
 

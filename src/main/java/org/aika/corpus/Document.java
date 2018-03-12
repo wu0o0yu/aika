@@ -331,12 +331,7 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public String activationsToString(boolean withTextSnipped, boolean withLogic) {
-        return activationsToString(null, withTextSnipped, withLogic);
-    }
-
-
-    public String activationsToString(SearchNode sn, boolean withTextSnippet, boolean withLogic) {
+    public String activationsToString(boolean withTextSnippet, boolean withLogic) {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         for (INeuron n : activatedNeurons) {
@@ -347,10 +342,9 @@ public class Document implements Comparable<Document> {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Activation ID -");
-        sb.append((sn != null ? " Interpr. Node State | SequenceNr. |" : ""));
+        sb.append(" Input Decision | Current Decision | Final Decision -");
         sb.append(" Range" + (withTextSnippet ? " | Text Snippet" : ""));
         sb.append(" -");
-        sb.append(" Interpr. Node -");
         sb.append(" Neuron Label -");
         sb.append((withLogic ? " Logic Layer -" : ""));
         sb.append(" Relational ID (Word Pos.) -");
@@ -367,7 +361,7 @@ public class Document implements Comparable<Document> {
                 continue;
             }
 
-            sb.append(act.toString(sn, withTextSnippet, withLogic));
+            sb.append(act.toString(withTextSnippet, withLogic));
             sb.append("\n");
         }
 
