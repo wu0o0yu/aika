@@ -23,8 +23,6 @@ import org.aika.neuron.Linker.Direction;
 
 import java.util.*;
 
-import static org.aika.corpus.SearchNode.Decision.SELECTED;
-import static org.aika.corpus.InterpretationNode.checkSelfReferencing;
 import static org.aika.neuron.Linker.Direction.INPUT;
 
 /**
@@ -34,8 +32,16 @@ import static org.aika.neuron.Linker.Direction.INPUT;
  */
 public class Conflicts {
 
-    public SortedMap<Key, Conflict> primary = new TreeMap<>();
-    public Map<Key, Conflict> secondary = new TreeMap<>();
+    public SortedSet<Activation> primary = new TreeSet<>();
+    public Set<Activation> secondary = new TreeSet<>();
+
+
+    public static boolean isConflicting(Activation a, Activation b) {
+        if(a.conflicts.secondary.contains(b)) return true;
+        if(b.conflicts.secondary.contains(a)) return true;
+
+        return false;
+    }
 
 
     public static void linkConflicts(Activation act, long v, Direction dir) {
@@ -46,100 +52,55 @@ public class Conflicts {
 
                 markConflicts(iAct, oAct, v);
 
-                addConflict(oAct.key.interpretation, iAct.key.interpretation, iAct, Collections.singleton(act), v);
+                addConflict(oAct, iAct, v);
             }
         }
     }
 
 
-    private static void addConflict(InterpretationNode io, InterpretationNode o, NodeActivation act, Collection<NodeActivation> inputActs, long v) {
-        if (o.markedConflict == v) {
-            if (!checkSelfReferencing(o, io, false, 0)) {
-                add(act, io, o);
+    private static void addConflict(Activation oAct, Activation iAct, long v) {
+        if (iAct.markedConflict == v) {
+            if (iAct != oAct) {
+                add(oAct, iAct);
             }
         } else {
-            if(o.orInterpretationNodes != null) {
-                for (InterpretationNode no : o.orInterpretationNodes) {
-                    addConflict(io, no, act, inputActs, v);
-                }
+            for (Activation.SynapseActivation sa : iAct.neuronInputs) {
+                addConflict(oAct, sa.input, v);
             }
         }
     }
 
 
     private static void markConflicts(Activation iAct, Activation oAct, long v) {
-        oAct.key.interpretation.markedConflict = v;
+        oAct.markedConflict = v;
         for (Activation.SynapseActivation sa : iAct.neuronOutputs) {
             if (sa.synapse.key.isRecurrent && sa.synapse.isNegative()) {
-                sa.output.key.interpretation.markedConflict = v;
+                sa.output.markedConflict = v;
             }
         }
     }
 
 
-    public static Collection<InterpretationNode> getConflicting(InterpretationNode n) {
-        ArrayList<InterpretationNode> conflicts = new ArrayList<>();
+    public static Collection<Activation> getConflicting(Activation n) {
+        ArrayList<Activation> conflicts = new ArrayList<>();
         Conflicts.collectConflicting(conflicts, n);
         return conflicts;
     }
 
 
-    private static void collectConflicting(Collection<InterpretationNode> results, InterpretationNode n) {
-        assert n.primId >= 0;
-        n.conflicts.primary.values().forEach(c -> c.secondary.collectPrimitiveNodes(results, n.doc.visitedCounter++));
-        n.conflicts.secondary.values().forEach(c -> results.add(c.primary));
+    private static void collectConflicting(Collection<Activation> results, Activation n) {
+        results.addAll(n.conflicts.primary);
+        results.addAll(n.conflicts.secondary);
     }
 
 
-    public static void add(NodeActivation act, InterpretationNode primary, InterpretationNode secondary) {
-        Key ck = new Key(secondary, act);
-        Conflict c = primary.conflicts.primary.get(ck);
-        if(c == null) {
-            c = new Conflict(act, primary, secondary, InterpretationNode.add(primary.doc, false, primary, secondary));
-
-            c.conflict.isConflict++;
-
-            primary.conflicts.primary.put(ck, c);
-            secondary.conflicts.secondary.put(new Key(primary, act), c);
-        }
+    public static void add(Activation primary, Activation secondary) {
+        primary.conflicts.primary.add(secondary);
+        secondary.conflicts.secondary.add(primary);
     }
 
 
     public boolean hasConflicts() {
         return !primary.isEmpty() || !secondary.isEmpty();
-    }
-
-
-    public static class Conflict {
-        public NodeActivation act;
-        public InterpretationNode primary;
-        public InterpretationNode secondary;
-        public InterpretationNode conflict;
-
-
-        public Conflict(NodeActivation act, InterpretationNode primary, InterpretationNode secondary, InterpretationNode conflict) {
-            this.act = act;
-            this.primary = primary;
-            this.secondary = secondary;
-            this.conflict = conflict;
-        }
-    }
-
-
-    public static class Key implements Comparable<Key> {
-        public InterpretationNode o;
-        public NodeActivation act;
-
-        public Key(InterpretationNode o, NodeActivation act) {
-            this.o = o;
-            this.act = act;
-        }
-
-        @Override
-        public int compareTo(Key k) {
-            int r = o.compareTo(k.o);
-            if(r != 0) return r;
-            return NodeActivation.compare(act, k.act);
-        }
     }
 }

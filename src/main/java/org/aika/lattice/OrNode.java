@@ -23,7 +23,6 @@ import org.aika.corpus.Document;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Selector;
 import org.aika.training.PatternDiscovery.Config;
-import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.Activation;
@@ -65,16 +64,11 @@ public class OrNode extends Node<OrNode, Activation> {
 
     @Override
     public Activation createActivation(Document doc, NodeActivation.Key ak) {
-        Activation act = new Activation(doc.activationIdCounter++, doc, ak);
-        ak.interpretation.activation = act;
-
-        return act;
+        return new Activation(doc.activationIdCounter++, doc, ak);
     }
 
 
     public void addActivation(Document doc, Integer ridOffset, NodeActivation inputAct) {
-        if(checkSelfReferencing(doc, inputAct)) return;
-
         Key ak = inputAct.key;
         Range r = ak.range;
         Integer rid = Utils.nullSafeSub(ak.rid, true, ridOffset, false);
@@ -87,25 +81,19 @@ public class OrNode extends Node<OrNode, Activation> {
 
         if(r.begin == Integer.MIN_VALUE || r.end == Integer.MAX_VALUE) return;
 
-        InterpretationNode no = lookupOrOption(doc, r, true);
+        Activation no = lookupOrOption(doc, r, true);
 
-        addActivation(
-                doc,
-                new Key(
-                        this,
-                        r,
-                        rid,
-                        no
-                ),
-                Collections.singleton(inputAct)
-        );
-    }
-
-
-    private boolean checkSelfReferencing(Document doc, NodeActivation inputAct) {
-        InterpretationNode o = lookupOrOption(doc, inputAct.key.range, false);
-        if(o == null) return false;
-        return inputAct.key.interpretation.contains(o, true);
+        if(no == null) {
+            addActivation(
+                    doc,
+                    new Key(
+                            this,
+                            r,
+                            rid
+                    ),
+                    Collections.singleton(inputAct)
+            );
+        }
     }
 
 
@@ -130,10 +118,6 @@ public class OrNode extends Node<OrNode, Activation> {
 
         act.link(inputActs);
 
-        for(NodeActivation iAct: inputActs) {
-            act.key.interpretation.addOrInterpretationNode(iAct.key.interpretation);
-        }
-
         neuron.get(doc).register(act);
 
         return act;
@@ -154,7 +138,6 @@ public class OrNode extends Node<OrNode, Activation> {
 
     @Override
     public void apply(Activation act) {
-        OrNode.processCandidate(this, act, false);
     }
 
 
@@ -169,9 +152,7 @@ public class OrNode extends Node<OrNode, Activation> {
         parentNode.lock.acquireReadLock();
         if(parentNode.orChildren != null) {
             for (OrEntry oe : parentNode.orChildren) {
-                if (!ak.interpretation.isConflicting(doc.visitedCounter++)) {
-                    oe.node.get(doc).addActivation(doc, oe.ridOffset, inputAct);
-                }
+                oe.node.get(doc).addActivation(doc, oe.ridOffset, inputAct);
             }
         }
         parentNode.lock.releaseReadLock();
@@ -179,24 +160,12 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     // TODO: RID
-    public InterpretationNode lookupOrOption(Document doc, Range r, boolean create) {
-        Activation act = Selector.select(doc, neuron.get(), null, r, Range.Relation.EQUALS, null, null)
+    public Activation lookupOrOption(Document doc, Range r, boolean create) {
+        Activation act = Selector.select(doc, neuron.get(), null, r, Range.Relation.EQUALS)
                 .findFirst()
                 .orElse(null);
 
-        if(act != null) {
-            return act.key.interpretation;
-        }
-
-        ThreadState<OrNode, Activation> th = getThreadState(doc.threadId, false);
-        if(th != null) {
-            for (Key<OrNode> ak : th.added.keySet()) {
-                if (Range.compare(ak.range, r) == 0) {
-                    return ak.interpretation;
-                }
-            }
-        }
-        return create ? InterpretationNode.addPrimitive(doc) : null;
+        return act;
     }
 
 

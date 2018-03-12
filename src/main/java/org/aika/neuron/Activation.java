@@ -1,10 +1,7 @@
 package org.aika.neuron;
 
 import org.aika.Utils;
-import org.aika.corpus.Document;
-import org.aika.corpus.InterpretationNode;
-import org.aika.corpus.Range;
-import org.aika.corpus.SearchNode;
+import org.aika.corpus.*;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
@@ -17,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import static org.aika.corpus.SearchNode.Decision.SELECTED;
-import static org.aika.corpus.InterpretationNode.checkSelfReferencing;
 import static org.aika.neuron.Activation.State.DIR;
 import static org.aika.neuron.Activation.State.REC;
 import static org.aika.neuron.Activation.SynapseActivation.INPUT_COMP;
@@ -42,9 +38,11 @@ import static org.aika.neuron.INeuron.ALLOW_WEAK_NEGATIVE_WEIGHTS;
  */
 public final class Activation extends NodeActivation<OrNode> {
     public static final Comparator<Activation> ACTIVATION_ID_COMP = Comparator.comparingInt(act -> act.id);
+    public static int MAX_SELF_REFERENCING_DEPTH = 5;
 
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
+    public TreeSet<SynapseActivation> selectedNeuronInputs = new TreeSet<>(INPUT_COMP);
     public TreeSet<SynapseActivation> neuronInputs = new TreeSet<>(INPUT_COMP);
     public TreeSet<SynapseActivation> neuronOutputs = new TreeSet<>(OUTPUT_COMP);
 
@@ -69,6 +67,16 @@ public final class Activation extends NodeActivation<OrNode> {
     public double errorSignal;
     public Double targetValue;
     public Double inputValue;
+
+
+
+    public Decision inputDecision = Decision.UNKNOWN;
+    public Decision decision = Decision.UNKNOWN;
+    public Decision finalDecision = Decision.UNKNOWN;
+    public Candidate candidate;
+    public Conflicts conflicts = new Conflicts();
+    public long markedConflict;
+    private long visitedState;
 
 
     public Activation(int id, Document doc, Key key) {
@@ -112,6 +120,9 @@ public final class Activation extends NodeActivation<OrNode> {
                 neuronOutputs.add(sa);
                 break;
             case OUTPUT:
+                if(sa.input.decision == SELECTED) {
+                    selectedNeuronInputs.add(sa);
+                }
                 neuronInputs.add(sa);
                 break;
         }
@@ -139,7 +150,7 @@ public final class Activation extends NodeActivation<OrNode> {
             if (propagate) {
                 if(round > Document.MAX_ROUND) {
                     log.error("Error: Maximum number of rounds reached. The network might be oscillating.");
-                    log.info(doc.activationsToString(sn, true, true));
+                    log.info(doc.activationsToString(true, true));
 
                     doc.dumpOscillatingActivations();
                     throw new RuntimeException("Maximum number of rounds reached. The network might be oscillating.");
@@ -162,8 +173,6 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public State computeValueAndWeight(int round) {
-        Decision c = key.interpretation.state;
-
         INeuron n = getINeuron();
         double[] sum = {n.biasSum, 0.0};
 
@@ -190,13 +199,13 @@ public final class Activation extends NodeActivation<OrNode> {
 
         // Compute only the recurrent part is above the threshold.
         Weight newWeight = Weight.create(
-                c == SELECTED ? (sum[DIR] + n.negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC] - n.negRecSum : 0.0,
+                decision == SELECTED ? (sum[DIR] + n.negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC] - n.negRecSum : 0.0,
                 (sum[DIR] + n.negRecSum) < 0.0 ? Math.max(0.0, sum[DIR] + n.negRecSum + n.maxRecurrentSum) : n.maxRecurrentSum
         );
 
         return new State(
-                c == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? currentActValue : 0.0,
-                c == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? fired : -1,
+                decision == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? currentActValue : 0.0,
+                decision == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? fired : -1,
                 newWeight
         );
     }
@@ -234,7 +243,7 @@ public final class Activation extends NodeActivation<OrNode> {
             if (iAct == this) continue;
 
             if (s.isNegative()) {
-                if (!checkSelfReferencing(key.interpretation, iAct.key.interpretation, false, 0) && key.interpretation.contains(iAct.key.interpretation, true)) {
+                if (!s.key.isRecurrent && !checkSelfReferencing(this, iAct, false, 0)) {
                     ub += iAct.lowerBound * s.weight;
                 }
 
@@ -261,7 +270,6 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     private List<InputState> getInputStates(int round) {
-        InterpretationNode o = key.interpretation;
         ArrayList<InputState> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
         InputState maxInputState = null;
@@ -274,7 +282,7 @@ public final class Activation extends NodeActivation<OrNode> {
                 maxInputState = null;
             }
 
-            State s = sa.input.getInputState(round, o, sa.synapse);
+            State s = sa.input.getInputState(round, this, sa.synapse);
             if (maxInputState == null || maxInputState.s.value < s.value) {
                 maxInputState = new InputState(sa, s);
             }
@@ -299,13 +307,11 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    private State getInputState(int round, InterpretationNode o, Synapse s) {
-        InterpretationNode io = key.interpretation;
-
+    private State getInputState(int round, Activation act, Synapse s) {
         State is = State.ZERO;
         if (s.key.isRecurrent) {
-            if (!s.isNegative() || !checkSelfReferencing(o, io, true, 0)) {
-                is = round == 0 ? getInitialState(io.state) : rounds.get(round - 1);
+            if (!s.isNegative() || !checkSelfReferencing(act, this, true, 0)) {
+                is = round == 0 ? getInitialState(decision) : rounds.get(round - 1);
             }
         } else {
             is = rounds.get(round);
@@ -336,6 +342,45 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
+    public void adjustSelectedNeuronInputs(Decision d) {
+        for(SynapseActivation sa: neuronOutputs) {
+            if(d == SELECTED) {
+                sa.output.selectedNeuronInputs.add(sa);
+            } else {
+                sa.output.selectedNeuronInputs.remove(sa);
+            }
+        }
+    }
+
+
+    public static boolean checkSelfReferencing(Activation nx, Activation ny, boolean onlySelected, int depth) {
+        if (nx == ny) return true;
+
+        if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
+
+        Set<SynapseActivation> inputs = onlySelected ? ny.selectedNeuronInputs : ny.neuronInputs;
+        for (SynapseActivation sa: inputs) {
+            if (checkSelfReferencing(nx, sa.input, onlySelected, depth + 1)) return true;
+        }
+
+        return false;
+    }
+
+
+    public void setDecision(Decision newDecision, long v) {
+        if(inputDecision != Decision.UNKNOWN && newDecision != inputDecision) return;
+
+        if (newDecision == Decision.UNKNOWN && v != visitedState) return;
+
+        if(decision == Decision.SELECTED != (newDecision == Decision.SELECTED)) {
+            adjustSelectedNeuronInputs(newDecision);
+        }
+
+        decision = newDecision;
+        visitedState = v;
+    }
+
+
     public boolean isFinalActivation() {
         return getFinalState().value > 0.0;
     }
@@ -346,11 +391,10 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    public <T extends Node> boolean filter(T n, Integer rid, Range r, Range.Relation rr, InterpretationNode o, InterpretationNode.Relation or) {
+    public <T extends Node> boolean filter(T n, Integer rid, Range r, Range.Relation rr) {
         return (n == null || key.node == n) &&
                 (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) &&
-                (r == null || rr == null || rr.compare(key.range, r)) &&
-                (o == null || or.compare(key.interpretation, o));
+                (r == null || rr == null || rr.compare(key.range, r));
     }
 
 
@@ -548,14 +592,13 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    public String toString(SearchNode sn, boolean withTextSnippet, boolean withLogic) {
+    public String toString(boolean withTextSnippet, boolean withLogic) {
         StringBuilder sb = new StringBuilder();
         sb.append(id + " - ");
 
-        if(sn != null) {
-            sb.append("FS:" + key.interpretation.finalState + " S:" + key.interpretation.state + " ");
-            sb.append(sequence + " ");
-        }
+        sb.append("ID:" + inputDecision + " ");
+        sb.append("D:" + decision + " ");
+        sb.append("FD:" + finalDecision + " - ");
 
         sb.append(key.range);
 
@@ -568,9 +611,6 @@ public final class Activation extends NodeActivation<OrNode> {
             }
             sb.append("\"");
         }
-        sb.append(" - ");
-
-        sb.append(key.interpretation);
         sb.append(" - ");
 
         sb.append(withLogic ? key.node.toString() : key.node.getNeuronLabel());
@@ -633,8 +673,8 @@ public final class Activation extends NodeActivation<OrNode> {
         StateChange sc = currentStateChange;
 
         sc.newRounds = rounds.copy();
-        sc.newState = key.interpretation.state;
-        doc.fsQueue.add(key.interpretation.candidate);
+        sc.newState = decision;
+        doc.fsQueue.add(candidate);
     }
 
 
@@ -675,7 +715,6 @@ public final class Activation extends NodeActivation<OrNode> {
     public static class Builder {
         public Range range;
         public Integer rid;
-        public InterpretationNode interpretation;
         public double value = 1.0;
         public Double targetValue;
         public int fired;
@@ -693,11 +732,6 @@ public final class Activation extends NodeActivation<OrNode> {
 
         public Builder setRelationalId(Integer rid) {
             this.rid = rid;
-            return this;
-        }
-
-        public Builder setInterpretation(InterpretationNode interpretation) {
-            this.interpretation = interpretation;
             return this;
         }
 

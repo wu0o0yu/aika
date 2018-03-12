@@ -17,17 +17,16 @@
 package org.aika.lattice;
 
 
-import org.aika.neuron.Neuron;
-import org.aika.lattice.NodeActivation.Key;
 import org.aika.Model;
 import org.aika.Provider;
 import org.aika.Utils;
 import org.aika.corpus.Document;
-import org.aika.training.PatternDiscovery.Config;
-import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
+import org.aika.lattice.NodeActivation.Key;
 import org.aika.neuron.INeuron;
+import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
+import org.aika.training.PatternDiscovery.Config;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -228,19 +227,15 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         if(act.repropagateV != null && act.repropagateV != nlp.markedCreated) return;
 
         Key ak = act.key;
-        InterpretationNode o = InterpretationNode.add(doc, true, ak.interpretation, secondAct.key.interpretation);
-        if (o != null) {
-            Node.addActivation(
-                    doc,
-                    new Key(
-                            nlp,
-                            Range.mergeRange(ak.range, secondAct.key.range),
-                            Utils.nullSafeMin(ak.rid, secondAct.key.rid),
-                            o
-                    ),
-                    prepareInputActs(act, secondAct)
-            );
-        }
+        Node.addActivation(
+                doc,
+                new Key(
+                        nlp,
+                        Range.mergeRange(ak.range, secondAct.key.range),
+                        Utils.nullSafeMin(ak.rid, secondAct.key.rid)
+                ),
+                prepareInputActs(act, secondAct)
+        );
     }
 
 

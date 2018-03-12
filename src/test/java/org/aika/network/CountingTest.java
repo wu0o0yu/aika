@@ -77,9 +77,7 @@ public class CountingTest {
 
 
         inA.addInput(doc, 0, 1);
-        inA.addInput(doc, 0, 1);
         inA.addInput(doc, 2, 3);
-        inA.addInput(doc, 3, 4);
         inA.addInput(doc, 3, 4);
         inA.addInput(doc, 5, 6);
         inA.addInput(doc, 6, 7);

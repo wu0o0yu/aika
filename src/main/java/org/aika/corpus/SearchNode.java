@@ -135,7 +135,7 @@ public class SearchNode implements Comparable<SearchNode> {
             csn = c.cachedSearchNode;
 
             if (csn == null || csn.getDecision() != getDecision()) {
-                Activation act = c.refinement.activation;
+                Activation act = c.activation;
                 act.markDirty(visited);
                 for (SynapseActivation sa : act.neuronOutputs) {
                     sa.output.markDirty(visited);
@@ -190,12 +190,12 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private boolean isModified() {
         for (StateChange sc : modifiedActs.values()) {
-            if (sc.getActivation().markedDirty > visited || sc.newState != sc.getActivation().key.interpretation.state) {
+            if (sc.getActivation().markedDirty > visited || sc.newState != sc.getActivation().decision) {
                 return true;
             }
             if(sc.newRounds.isActive()) {
                 for (SynapseActivation sa : sc.getActivation().neuronOutputs) {
-                    if (sa.output.key.interpretation.state != UNKNOWN &&
+                    if (sa.output.decision != UNKNOWN &&
                             sa.output.markedDirty > visited) {
                         return true;
                     }
@@ -350,8 +350,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
         boolean precondition = checkPrecondition();
 
-        alreadySelected = precondition && !candidate.isConflicting();
-        alreadyExcluded = !precondition || checkExcluded(candidate.refinement);
+        alreadySelected = precondition && !candidate.isConflicting() || candidate.activation.inputDecision == SELECTED;
+        alreadyExcluded = !precondition || checkExcluded(candidate.activation) || candidate.activation.inputDecision == EXCLUDED;
 
         if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
             dumpDebugState();
@@ -372,7 +372,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private boolean prepareSelectStep(Document doc) {
         if(alreadyExcluded || skip == SELECTED || getCachedDecision() == Decision.EXCLUDED) return false;
 
-        candidate.refinement.setState(SELECTED, visited);
+        candidate.activation.setDecision(SELECTED, visited);
 
         if (candidate.cachedDecision == UNKNOWN) {
             invalidateCachedDecisions();
@@ -389,7 +389,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private boolean prepareExcludeStep(Document doc) {
         if(alreadySelected || skip == EXCLUDED || getCachedDecision() == Decision.SELECTED) return false;
 
-        candidate.refinement.setState(EXCLUDED, visited);
+        candidate.activation.setDecision(EXCLUDED, visited);
 
         excludedChild = new SearchNode(doc, selectedParent, this, level + 1);
 
@@ -402,8 +402,8 @@ public class SearchNode implements Comparable<SearchNode> {
     private void postReturn(SearchNode child) {
         child.changeState(Activation.Mode.OLD);
 
-        candidate.refinement.setState(UNKNOWN, visited);
-        candidate.refinement.activation.rounds.reset();
+        candidate.activation.setDecision(UNKNOWN, visited);
+        candidate.activation.rounds.reset();
     }
 
 
@@ -439,21 +439,21 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean checkPrecondition() {
-        Set soin = candidate.refinement.selectedOrInterpretationNodes;
+        Set soin = candidate.activation.selectedNeuronInputs;
         return soin != null && !soin.isEmpty();
     }
 
 
     private void invalidateCachedDecisions() {
-        for (SynapseActivation sa : candidate.refinement.activation.neuronOutputs) {
+        for (SynapseActivation sa : candidate.activation.neuronOutputs) {
             if (!sa.synapse.isNegative()) {
-                invalidateCachedDecision(sa.output.key.interpretation);
+                invalidateCachedDecision(sa.output);
             }
         }
     }
 
 
-    public static void invalidateCachedDecision(InterpretationNode n) {
+    public static void invalidateCachedDecision(Activation n) {
         Candidate pos = n.candidate;
         if (pos != null) {
             if (pos.cachedDecision == Decision.EXCLUDED) {
@@ -461,7 +461,7 @@ public class SearchNode implements Comparable<SearchNode> {
             }
         }
 
-        for (InterpretationNode c : Conflicts.getConflicting(n)) {
+        for (Activation c : Conflicts.getConflicting(n)) {
             Candidate neg = c.candidate;
             if (neg != null) {
                 if (neg.cachedDecision == Decision.SELECTED) {
@@ -491,31 +491,22 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean checkExcluded(InterpretationNode ref) {
-        for (InterpretationNode cn : Conflicts.getConflicting(ref)) {
-            if (cn.state == SELECTED) return true;
+    private boolean checkExcluded(Activation ref) {
+        for (Activation cn : Conflicts.getConflicting(ref)) {
+            if (cn.decision == SELECTED) return true;
         }
         return false;
     }
 
 
 
-    public String pathToString(Document doc) {
-        return (selectedParent != null ? selectedParent.pathToString(doc) : "") + " - " + toString(doc);
+    public String pathToString() {
+        return (selectedParent != null ? selectedParent.pathToString() : "") + " - " + toString();
     }
 
 
-    public String toString(Document doc) {
-        TreeSet<InterpretationNode> tmp = new TreeSet<>();
-        candidate.refinement.collectPrimitiveNodes(tmp, doc.interpretationIdCounter++);
-        StringBuilder sb = new StringBuilder();
-        for (InterpretationNode n : tmp) {
-            sb.append(n.primId);
-            sb.append(" Decision:" + getDecision());
-            sb.append(", ");
-        }
-
-        return sb.toString();
+    public String toString() {
+        return candidate.activation.id + " Decision:" + getDecision();
     }
 
 

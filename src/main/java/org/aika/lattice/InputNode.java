@@ -18,10 +18,10 @@ package org.aika.lattice;
 
 
 import org.aika.*;
+import org.aika.corpus.Conflicts;
 import org.aika.corpus.Document;
 import org.aika.neuron.*;
 import org.aika.training.PatternDiscovery.Config;
-import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Mapping;
 import org.aika.lattice.AndNode.Refinement;
@@ -88,14 +88,13 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     private NodeActivation.Key computeActivationKey(Activation iAct) {
         NodeActivation.Key ak = iAct.key;
-        if ((key.absoluteRid != null && key.absoluteRid != ak.rid) || ak.interpretation.isConflicting(ak.interpretation.doc.visitedCounter++))
+        if ((key.absoluteRid != null && key.absoluteRid != ak.rid))
             return null;
 
         return new NodeActivation.Key(
                 this,
                 key.rangeOutput.map(ak.range),
-                key.relativeRid != null ? ak.rid : null,
-                ak.interpretation
+                key.relativeRid != null ? ak.rid : null
         );
     }
 
@@ -178,16 +177,13 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                 secondNode.inputNeuron.get(),
                 secondRid,
                 iak.range,
-                Range.Relation.createQuery(firstNode.key.rangeMatch, secondNode.key.rangeOutput, firstNode.key.rangeOutput, secondNode.key.rangeMatch),
-                null,
-                null
+                Range.Relation.createQuery(firstNode.key.rangeMatch, secondNode.key.rangeOutput, firstNode.key.rangeOutput, secondNode.key.rangeMatch)
         );
 
         s.forEach(secondIAct -> {
                     NodeActivation secondAct = secondNode.getInputNodeActivation(secondIAct);
                     if(secondAct != null) {
-                        InterpretationNode o = InterpretationNode.add(doc, true, ak.interpretation, secondIAct.key.interpretation);
-                        if (o != null) {
+                        if (!Conflicts.isConflicting(iAct, secondIAct)) {
                             Node.addActivation(doc,
                                     new NodeActivation.Key(
                                             nlp,
@@ -195,8 +191,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                                                     firstNode.key.rangeOutput.map(iak.range),
                                                     secondNode.key.rangeOutput.map(secondIAct.key.range)
                                             ),
-                                            Utils.nullSafeMin(ak.rid, secondAct.key.rid),
-                                            o
+                                            Utils.nullSafeMin(ak.rid, secondAct.key.rid)
                                     ),
                                     AndNode.prepareInputActs(act, secondAct)
                             );

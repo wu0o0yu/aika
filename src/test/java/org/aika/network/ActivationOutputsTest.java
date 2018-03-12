@@ -21,7 +21,6 @@ import org.aika.neuron.*;
 import org.aika.neuron.Activation.SynapseActivation;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Operator;
 import org.aika.lattice.InputNode;
@@ -78,21 +77,21 @@ public class ActivationOutputsTest {
         inA.addInput(doc, 0, 1, 0);
         inB.addInput(doc, 0, 1, 0);
 
-        Activation inA1 = TestHelper.get(doc, inA.get(), new Range(0, 1), doc.bottom);
-        Activation inB1 = TestHelper.get(doc, inB.get(), new Range(0, 1), doc.bottom);
+        Activation inA1 = TestHelper.get(doc, inA.get(), new Range(0, 1));
+        Activation inB1 = TestHelper.get(doc, inB.get(), new Range(0, 1));
 
-        Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, TestHelper.get(doc, pAB.get(), new Range(0, 1), null)));
-        Assert.assertTrue(containsOutputActivation(inB1.neuronOutputs, TestHelper.get(doc, pAB.get(), new Range(0, 1), null)));
+        Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, TestHelper.get(doc, pAB.get(), new Range(0, 1))));
+        Assert.assertTrue(containsOutputActivation(inB1.neuronOutputs, TestHelper.get(doc, pAB.get(), new Range(0, 1))));
 
-        Activation actAB = TestHelper.get(doc, pAB.get(), new Range(0, 1), null);
+        Activation actAB = TestHelper.get(doc, pAB.get(), new Range(0, 1));
         Assert.assertEquals(
-                TestHelper.get(doc, inA.get(), new Range(0, 1), null),
+                TestHelper.get(doc, inA.get(), new Range(0, 1)),
                 selectInputActivation(actAB.neuronInputs, inA.get().node.get())
         );
 
-        actAB = TestHelper.get(doc, pAB.get(), new Range(0, 1), null);
+        actAB = TestHelper.get(doc, pAB.get(), new Range(0, 1));
         Assert.assertEquals(
-                TestHelper.get(doc,inB.get(), new Range(0, 1), null),
+                TestHelper.get(doc,inB.get(), new Range(0, 1)),
                 selectInputActivation(actAB.neuronInputs, inB.get().node.get())
         );
 
@@ -106,18 +105,18 @@ public class ActivationOutputsTest {
                         Range.Output.DIRECT)
         );
 
-        Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, TestHelper.get(doc, pAB.get(), new Range(0, 1), null)));
-        Assert.assertTrue(containsOutputActivation(inB1.neuronOutputs, TestHelper.get(doc, pAB.get(), new Range(0, 1), null)));
+        Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, TestHelper.get(doc, pAB.get(), new Range(0, 1))));
+        Assert.assertTrue(containsOutputActivation(inB1.neuronOutputs, TestHelper.get(doc, pAB.get(), new Range(0, 1))));
 
-        actAB = TestHelper.get(doc, pAB.get(), new Range(0, 1), null);
+        actAB = TestHelper.get(doc, pAB.get(), new Range(0, 1));
         Assert.assertEquals(
-                TestHelper.get(doc, inA.get(), new Range(0, 1), null),
+                TestHelper.get(doc, inA.get(), new Range(0, 1)),
                 selectInputActivation(actAB.neuronInputs, inA.get().node.get())
         );
 
-        actAB = TestHelper.get(doc, pAB.get(), new Range(0, 1), null);
+        actAB = TestHelper.get(doc, pAB.get(), new Range(0, 1));
         Assert.assertEquals(
-                TestHelper.get(doc, inB.get(), new Range(0, 1), null),
+                TestHelper.get(doc, inB.get(), new Range(0, 1)),
                 selectInputActivation(actAB.neuronInputs, inB.get().node.get())
         );
     }
@@ -159,14 +158,12 @@ public class ActivationOutputsTest {
         ).get();
 
 
-        InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
         inA.addInput(doc, new Activation.Builder()
                 .setRange(0, 1)
                 .setRelationalId(0)
-                .setInterpretation(o1)
         );
 
-        Activation outB1 = Selector.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
+        Activation outB1 = Selector.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS);
         Assert.assertTrue(containsOutputActivation(inA.get().getFirstActivation(doc).neuronOutputs, outB1));
     }
 
@@ -193,10 +190,9 @@ public class ActivationOutputsTest {
                 new Activation.Builder()
                         .setRange(0, 1)
                         .setRelationalId(0)
-                        .setInterpretation(InterpretationNode.addPrimitive(doc))
         );
 
-        Activation outB1 = Selector.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
+        Activation outB1 = Selector.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS);
 
         Assert.assertTrue(containsOutputActivation(inA.get().getFirstActivation(doc).neuronOutputs, outB1));
     }
@@ -221,15 +217,13 @@ public class ActivationOutputsTest {
         ).get();
 
 
-        InterpretationNode o1 = InterpretationNode.addPrimitive(doc);
         inA.addInput(doc,
                 new Activation.Builder()
                         .setRange(0, 1)
                         .setRelationalId(0)
-                        .setInterpretation(o1)
         );
 
-        Activation outB1 = Selector.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS, null, null);
+        Activation outB1 = Selector.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS);
 
         Assert.assertTrue(containsOutputActivation(inA.get().getFirstActivation(doc).neuronOutputs, outB1));
     }

@@ -23,7 +23,7 @@ public class Candidate  implements Comparable<Candidate> {
     public SearchNode cachedSearchNode;
     public SearchNode bestChildNode;
 
-    public InterpretationNode refinement;
+    public Activation activation;
 
     int[] debugCounts = new int[3];
     int[] debugDecisionCounts = new int[3];
@@ -31,40 +31,24 @@ public class Candidate  implements Comparable<Candidate> {
 
     int id;
     int sequence = 0;
-    int minBegin;
-    int maxEnd;
-    Integer minRid;
+
     public boolean queued;
 
-    public Candidate(InterpretationNode ref, int id) {
-        this.refinement = ref;
+    public Candidate(Activation act, int id) {
+        this.activation = act;
         this.id = id;
-        ref.candidate = this;
-        if (ref.activation != null) {
-            sequence = ref.activation.getSequence();
-            minBegin = ref.activation.key.range.begin;
-            maxEnd = ref.activation.key.range.end;
-            minRid = ref.activation.key.rid;
-        } else {
-            for (NodeActivation act : ref.getNodeActivations()) {
-                sequence = Math.max(sequence, ref.activation.getSequence());
-                if (act.key.range != null) {
-                    minBegin = Math.min(minBegin, act.key.range.begin);
-                    maxEnd = Math.max(maxEnd, act.key.range.end);
-                }
-                minRid = Utils.nullSafeMin(minRid, act.key.rid);
-            }
-        }
+        act.candidate = this;
+        sequence = act.getSequence();
     }
 
 
     public boolean isConflicting() {
-        return refinement.conflicts.hasConflicts();
+        return activation.conflicts.hasConflicts();
     }
 
 
     public boolean checkDependenciesSatisfied(long v) {
-        for (Activation.SynapseActivation sa : refinement.activation.neuronInputs) {
+        for (Activation.SynapseActivation sa : activation.neuronInputs) {
             if (sa.input.markedHasCandidate != v && !sa.synapse.key.isRecurrent && sa.input.upperBound > 0.0) return false;
         }
         return true;
@@ -82,10 +66,9 @@ public class Candidate  implements Comparable<Candidate> {
                 " SIM-CACHED:" + debugComputed[0] +
                 " SIM-COMPUTED:" + debugComputed[1] +
                 " MODIFIED:" + debugComputed[2] +
-                " ACT-ID:" + refinement.id +
-                " " + refinement.activation.key.range +
-                " " + refinement.activation.key.interpretation +
-                " " + refinement.activation.getLabel();
+                " ACT-ID:" + activation.id +
+                " " + activation.key.range +
+                " " + activation.getLabel();
     }
 
 
@@ -94,15 +77,15 @@ public class Candidate  implements Comparable<Candidate> {
         if(!isConflicting() && c.isConflicting()) return -1;
         if(isConflicting() && !c.isConflicting()) return 1;
 
-        int r = Integer.compare(minBegin, c.minBegin);
+        int r = Integer.compare(activation.key.range.begin, c.activation.key.range.begin);
         if (r != 0) return r;
-        r = Integer.compare(maxEnd, c.maxEnd);
+        r = Integer.compare(activation.key.range.end, c.activation.key.range.end);
         if (r != 0) return r;
 
         r = Integer.compare(sequence, c.sequence);
         if (r != 0) return r;
 
-        r = Utils.compareInteger(minRid, c.minRid);
+        r = Utils.compareInteger(activation.key.rid, c.activation.key.rid);
         if (r != 0) return r;
         return Integer.compare(id, c.id);
     }

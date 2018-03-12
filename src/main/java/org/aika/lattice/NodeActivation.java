@@ -19,7 +19,6 @@ package org.aika.lattice;
 
 import org.aika.Utils;
 import org.aika.corpus.Document;
-import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 
 import java.util.*;
@@ -47,10 +46,10 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     }
 
 
-    public NodeActivation(int id, Document doc, T n, Range pos, Integer rid, InterpretationNode o) {
+    public NodeActivation(int id, Document doc, T n, Range pos, Integer rid) {
         this.id = id;
         this.doc = doc;
-        key = new Key<>(n, pos, rid, o);
+        key = new Key<>(n, pos, rid);
     }
 
 
@@ -94,14 +93,12 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
         public final T node;
         public final Range range;
         public final Integer rid;
-        public final InterpretationNode interpretation;
 
 
-        public Key(T node, Range range, Integer rid, InterpretationNode interpretation) {
+        public Key(T node, Range range, Integer rid) {
             this.node = node;
             this.range = range;
             this.rid = rid;
-            this.interpretation = interpretation;
         }
 
 
@@ -112,13 +109,12 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
             x = Range.compare(range, k.range, false);
             if(x != 0) return x;
             x = Utils.compareInteger(rid, k.rid);
-            if(x != 0) return x;
-            return interpretation.compareTo(k.interpretation);
+            return x;
         }
 
 
         public String toString() {
-            return (node != null ? node.getNeuronLabel() : "") + " " + range + " " + rid + " " + interpretation;
+            return (node != null ? node.getNeuronLabel() : "") + " " + range + " " + rid;
         }
     }
 }

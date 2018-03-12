@@ -20,7 +20,6 @@ package org.aika.lattice;
 import org.aika.neuron.*;
 import org.aika.Model;
 import org.aika.corpus.Document;
-import org.aika.corpus.InterpretationNode;
 import org.aika.corpus.Range;
 import org.aika.corpus.Range.Relation;
 import org.aika.network.TestHelper;
@@ -56,15 +55,15 @@ public class ActivationsTest {
         inA.addInput(doc, 0, 1, 0);
         inA.addInput(doc, 2, 3, 0);
 
-        Assert.assertNotNull(TestHelper.get(doc, pA.get(), new Range(0, 1), null));
-        Assert.assertNull(TestHelper.get(doc, pA.get(), new Range(1, 2), null));
-        Assert.assertNotNull(TestHelper.get(doc, pA.get(), new Range(2, 3), null));
+        Assert.assertNotNull(TestHelper.get(doc, pA.get(), new Range(0, 1)));
+        Assert.assertNull(TestHelper.get(doc, pA.get(), new Range(1, 2)));
+        Assert.assertNotNull(TestHelper.get(doc, pA.get(), new Range(2, 3)));
 
         inA.addInput(doc, 1, 2);
 
-        Assert.assertEquals(Selector.get(doc, pA.get(), null, new Range(0, 1), Relation.EQUALS, doc.bottom, InterpretationNode.Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(0, 1), doc.bottom));
-        Assert.assertEquals(Selector.get(doc, pA.get(), null, new Range(1, 2), Relation.EQUALS, doc.bottom, InterpretationNode.Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(1, 2), doc.bottom));
-        Assert.assertEquals(Selector.get(doc, pA.get(), null, new Range(2, 3), Relation.EQUALS, doc.bottom, InterpretationNode.Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(2, 3), doc.bottom));
+        Assert.assertEquals(Selector.get(doc, pA.get(), null, new Range(0, 1), Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(0, 1)));
+        Assert.assertEquals(Selector.get(doc, pA.get(), null, new Range(1, 2), Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(1, 2)));
+        Assert.assertEquals(Selector.get(doc, pA.get(), null, new Range(2, 3), Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(2, 3)));
     }
 
 
@@ -77,15 +76,15 @@ public class ActivationsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList());
+        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0), Collections.emptyList());
 
-        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList());
+        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0), Collections.emptyList());
 
-        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList());
+        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0), Collections.emptyList());
 
-        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList());
+        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0), Collections.emptyList());
 
-        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0, doc.bottom), Collections.emptyList());
+        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0), Collections.emptyList());
 
  //       Assert.assertEquals(1, Activation.get(t, inNode, new Range(0, 1), doc.bottom).key.fired);
     }
