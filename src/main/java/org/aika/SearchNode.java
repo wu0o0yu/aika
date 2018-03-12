@@ -14,22 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aika.corpus;
+package org.aika;
 
 
-import org.aika.Utils;
-import org.aika.neuron.Activation.StateChange;
-import org.aika.neuron.Activation.SynapseActivation;
-import org.aika.neuron.Activation;
+import org.aika.neuron.activation.Activation;
+import org.aika.neuron.activation.Activation.StateChange;
+import org.aika.neuron.activation.Activation.SynapseActivation;
 import org.aika.neuron.INeuron;
+import org.aika.neuron.activation.Candidate;
+import org.aika.neuron.activation.Conflicts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.aika.corpus.SearchNode.Decision.SELECTED;
-import static org.aika.corpus.SearchNode.Decision.EXCLUDED;
-import static org.aika.corpus.SearchNode.Decision.UNKNOWN;
-import static org.aika.neuron.Activation.ACTIVATION_ID_COMP;
-import static org.aika.neuron.Activation.Mode.NEW;
+import static org.aika.SearchNode.Decision.SELECTED;
+import static org.aika.SearchNode.Decision.EXCLUDED;
+import static org.aika.SearchNode.Decision.UNKNOWN;
+import static org.aika.neuron.activation.Activation.ACTIVATION_ID_COMP;
+import static org.aika.neuron.activation.Activation.Mode.NEW;
 
 import java.util.*;
 

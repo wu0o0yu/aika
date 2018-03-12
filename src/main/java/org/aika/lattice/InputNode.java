@@ -18,12 +18,14 @@ package org.aika.lattice;
 
 
 import org.aika.*;
-import org.aika.corpus.Conflicts;
-import org.aika.corpus.Document;
+import org.aika.neuron.activation.Conflicts;
+import org.aika.Document;
 import org.aika.neuron.*;
+import org.aika.neuron.activation.Activation;
+import org.aika.neuron.activation.Selector;
 import org.aika.training.PatternDiscovery.Config;
-import org.aika.corpus.Range;
-import org.aika.corpus.Range.Mapping;
+import org.aika.neuron.activation.Range;
+import org.aika.neuron.activation.Range.Mapping;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.Synapse.Key;
 

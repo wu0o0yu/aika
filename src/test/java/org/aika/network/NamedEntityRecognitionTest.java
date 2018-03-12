@@ -20,14 +20,14 @@ package org.aika.network;
 import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.neuron.Neuron;
-import org.aika.neuron.Activation;
-import org.aika.corpus.Document;
+import org.aika.neuron.activation.Activation;
+import org.aika.Document;
 import org.aika.neuron.INeuron;
 import org.junit.Test;
 
 import java.util.HashMap;
 
-import static org.aika.corpus.Range.Relation.*;
+import static org.aika.neuron.activation.Range.Relation.*;
 
 /**
  *

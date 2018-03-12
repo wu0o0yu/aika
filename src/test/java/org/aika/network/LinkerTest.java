@@ -1,16 +1,16 @@
 package org.aika.network;
 
-import org.aika.corpus.Document;
-import org.aika.corpus.Range;
+import org.aika.Document;
+import org.aika.neuron.activation.Range;
 import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.neuron.Neuron;
-import org.aika.corpus.Range.Relation;
+import org.aika.neuron.activation.Range.Relation;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.aika.corpus.Range.Operator.*;
+import static org.aika.neuron.activation.Range.Operator.*;
 
 public class LinkerTest {
 

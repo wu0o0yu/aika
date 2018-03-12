@@ -17,8 +17,8 @@
 package org.aika.training;
 
 
-import org.aika.corpus.Document;
-import org.aika.neuron.Activation;
+import org.aika.Document;
+import org.aika.neuron.activation.Activation;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
 import org.aika.training.SynapseEvaluation.Result;

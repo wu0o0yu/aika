@@ -1,6 +1,6 @@
 package org.aika.training;
 
-import org.aika.neuron.Activation;
+import org.aika.neuron.activation.Activation;
 import org.aika.neuron.Synapse;
 
 public interface SynapseEvaluation {

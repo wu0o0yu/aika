@@ -17,7 +17,6 @@
 package org.aika;
 
 
-import org.aika.corpus.Document;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.INeuron;

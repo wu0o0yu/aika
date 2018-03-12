@@ -17,13 +17,12 @@
 package org.aika.training;
 
 
-import org.aika.corpus.SearchNode;
 import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.neuron.Neuron;
-import org.aika.corpus.Document;
-import org.aika.neuron.Activation;
-import org.aika.neuron.Activation.SynapseActivation;
+import org.aika.Document;
+import org.aika.neuron.activation.Activation;
+import org.aika.neuron.activation.Activation.SynapseActivation;
 import org.aika.neuron.INeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.aika.corpus.SearchNode.Decision.EXCLUDED;
-import static org.aika.corpus.SearchNode.Decision.UNKNOWN;
+import static org.aika.SearchNode.Decision.UNKNOWN;
 
 
 /**

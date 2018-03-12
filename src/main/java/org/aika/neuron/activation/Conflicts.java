@@ -14,16 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aika.corpus;
+package org.aika.neuron.activation;
 
 
-import org.aika.lattice.NodeActivation;
-import org.aika.neuron.Activation;
-import org.aika.neuron.Linker.Direction;
+import org.aika.neuron.activation.Linker.Direction;
 
 import java.util.*;
 
-import static org.aika.neuron.Linker.Direction.INPUT;
+import static org.aika.neuron.activation.Linker.Direction.INPUT;
 
 /**
  * The class {@code Conflicts} handles between different interpretation options for a given text.

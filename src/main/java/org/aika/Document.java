@@ -14,18 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aika.corpus;
+package org.aika;
 
 
-import org.aika.*;
 import org.aika.lattice.*;
 import org.aika.lattice.Node.ThreadState;
-import org.aika.neuron.Activation;
-import org.aika.neuron.INeuron;
-import org.aika.corpus.SearchNode.Weight;
-import org.aika.corpus.SearchNode.Decision;
-import org.aika.neuron.Selector;
-import org.aika.neuron.Synapse;
+import org.aika.neuron.*;
+import org.aika.neuron.activation.*;
+import org.aika.SearchNode.Weight;
+import org.aika.SearchNode.Decision;
 import org.aika.training.SupervisedTraining;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +31,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.aika.corpus.SearchNode.Decision.UNKNOWN;
+import static org.aika.SearchNode.Decision.UNKNOWN;
 
 
 /**

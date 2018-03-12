@@ -19,13 +19,13 @@ package org.aika.lattice;
 
 import org.aika.*;
 import org.aika.lattice.NodeActivation.Key;
-import org.aika.corpus.Document;
+import org.aika.Document;
 import org.aika.neuron.Neuron;
-import org.aika.neuron.Selector;
+import org.aika.neuron.activation.Selector;
 import org.aika.training.PatternDiscovery.Config;
-import org.aika.corpus.Range;
+import org.aika.neuron.activation.Range;
 import org.aika.lattice.AndNode.Refinement;
-import org.aika.neuron.Activation;
+import org.aika.neuron.activation.Activation;
 import org.aika.neuron.INeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

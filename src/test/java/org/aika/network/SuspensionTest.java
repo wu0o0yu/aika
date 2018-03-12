@@ -18,9 +18,9 @@ package org.aika.network;
 
 
 import org.aika.*;
-import org.aika.corpus.Document;
+import org.aika.Document;
 import org.aika.neuron.INeuron;
-import org.aika.corpus.Range.Relation;
+import org.aika.neuron.activation.Range.Relation;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;

@@ -18,12 +18,12 @@ package org.aika.network;
 
 
 import org.aika.neuron.Neuron;
-import org.aika.corpus.Range;
+import org.aika.neuron.activation.Range;
 import org.aika.lattice.NodeActivation;
 import org.aika.neuron.Synapse;
 import org.aika.Model;
-import org.aika.corpus.Document;
-import org.aika.corpus.Range.Operator;
+import org.aika.Document;
+import org.aika.neuron.activation.Range.Operator;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;

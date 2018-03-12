@@ -19,7 +19,9 @@ package org.aika.network;
 
 import org.aika.neuron.*;
 import org.aika.Model;
-import org.aika.corpus.Document;
+import org.aika.Document;
+import org.aika.neuron.activation.Activation;
+import org.aika.neuron.activation.Selector;
 import org.junit.Assert;
 import org.junit.Test;
 

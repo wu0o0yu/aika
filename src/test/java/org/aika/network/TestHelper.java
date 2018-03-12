@@ -18,10 +18,12 @@ package org.aika.network;
 
 
 import org.aika.neuron.*;
-import org.aika.corpus.Document;
-import org.aika.corpus.Range;
-import org.aika.corpus.Range.Relation;
+import org.aika.Document;
+import org.aika.neuron.activation.Range;
+import org.aika.neuron.activation.Range.Relation;
 import org.aika.lattice.InputNode;
+import org.aika.neuron.activation.Activation;
+import org.aika.neuron.activation.Selector;
 
 /**
  *

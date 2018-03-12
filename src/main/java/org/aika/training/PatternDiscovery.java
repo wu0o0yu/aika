@@ -17,7 +17,7 @@
 package org.aika.training;
 
 
-import org.aika.corpus.Document;
+import org.aika.Document;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 

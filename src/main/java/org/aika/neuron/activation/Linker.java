@@ -14,20 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aika.neuron;
+package org.aika.neuron.activation;
 
 import org.aika.Utils;
-import org.aika.corpus.Conflicts;
-import org.aika.corpus.Document;
-import org.aika.corpus.Range;
+import org.aika.Document;
+import org.aika.neuron.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.NavigableMap;
 import java.util.stream.Stream;
 
-import static org.aika.neuron.Linker.Direction.INPUT;
-import static org.aika.neuron.Linker.Direction.OUTPUT;
+import static org.aika.neuron.activation.Linker.Direction.INPUT;
+import static org.aika.neuron.activation.Linker.Direction.OUTPUT;
 
 /**
  * The {@code Linker} class is responsible for for the linkage of neuron activations. These links mirror the synapses between

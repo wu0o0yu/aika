@@ -14,12 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aika.corpus;
+package org.aika.network;
 
+import org.aika.Document;
+import org.aika.neuron.activation.Range;
 import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.neuron.Neuron;
-import org.aika.corpus.Range.Relation;
+import org.aika.neuron.activation.Range.Relation;
 import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Ignore;

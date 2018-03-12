@@ -20,7 +20,7 @@ package org.aika.network;
 import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.neuron.Neuron;
-import org.aika.corpus.Document;
+import org.aika.Document;
 import org.aika.neuron.INeuron;
 import org.junit.Test;
 

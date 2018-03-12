@@ -18,8 +18,8 @@ package org.aika.lattice;
 
 
 import org.aika.*;
-import org.aika.corpus.Range.Relation;
-import org.aika.corpus.Document;
+import org.aika.neuron.activation.Range.Relation;
+import org.aika.Document;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.network.TestHelper;
 import org.aika.neuron.INeuron;

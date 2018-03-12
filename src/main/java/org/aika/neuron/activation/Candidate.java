@@ -1,9 +1,8 @@
-package org.aika.corpus;
+package org.aika.neuron.activation;
 
+import org.aika.SearchNode;
 import org.aika.Utils;
-import org.aika.lattice.NodeActivation;
-import org.aika.neuron.Activation;
-import org.aika.corpus.SearchNode.Decision;
+import org.aika.SearchNode.Decision;
 
 
 
@@ -25,11 +24,11 @@ public class Candidate  implements Comparable<Candidate> {
 
     public Activation activation;
 
-    int[] debugCounts = new int[3];
-    int[] debugDecisionCounts = new int[3];
-    int[] debugComputed = new int[3];
+    public int[] debugCounts = new int[3];
+    public int[] debugDecisionCounts = new int[3];
+    public int[] debugComputed = new int[3];
 
-    int id;
+    public int id;
     int sequence = 0;
 
     public boolean queued;

@@ -1,8 +1,6 @@
 package org.aika;
 
 
-import org.aika.corpus.Document;
-
 import java.io.*;
 import java.lang.ref.WeakReference;
 import java.util.zip.GZIPInputStream;

@@ -18,7 +18,7 @@ package org.aika.network;
 
 
 import org.aika.*;
-import org.aika.corpus.Document;
+import org.aika.Document;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
 import org.aika.training.PatternDiscovery;
@@ -32,7 +32,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static org.aika.corpus.Range.Relation.EQUALS;
+import static org.aika.neuron.activation.Range.Relation.EQUALS;
 
 /**
  *

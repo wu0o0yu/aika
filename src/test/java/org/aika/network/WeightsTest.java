@@ -14,17 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aika.corpus;
+package org.aika.network;
 
 
+import org.aika.Document;
 import org.aika.neuron.Synapse;
 import org.aika.Model;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.INeuron;
 import org.junit.Test;
 
-import static org.aika.corpus.Range.Relation.CONTAINED_IN;
-import static org.aika.corpus.Range.Relation.EQUALS;
+import static org.aika.neuron.activation.Range.Relation.CONTAINED_IN;
+import static org.aika.neuron.activation.Range.Relation.EQUALS;
 
 /**
  *

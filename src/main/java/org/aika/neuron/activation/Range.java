@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aika.corpus;
+package org.aika.neuron.activation;
 
 import org.aika.Model;
 import org.aika.Utils;
@@ -26,8 +26,7 @@ import java.io.IOException;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import static org.aika.corpus.Range.Mapping.BEGIN;
-import static org.aika.corpus.Range.Mapping.END;
+import static org.aika.neuron.activation.Range.Mapping.BEGIN;
 
 
 /**

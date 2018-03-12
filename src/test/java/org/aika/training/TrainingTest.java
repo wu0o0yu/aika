@@ -18,10 +18,10 @@ package org.aika.training;
 
 import org.aika.Model;
 import org.aika.neuron.Neuron;
-import org.aika.corpus.Document;
-import org.aika.corpus.Range;
-import org.aika.corpus.Range.Relation;
-import org.aika.neuron.Activation;
+import org.aika.Document;
+import org.aika.neuron.activation.Range;
+import org.aika.neuron.activation.Range.Relation;
+import org.aika.neuron.activation.Activation;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;

@@ -18,8 +18,8 @@ package org.aika.lattice;
 
 
 import org.aika.Utils;
-import org.aika.corpus.Document;
-import org.aika.corpus.Range;
+import org.aika.Document;
+import org.aika.neuron.activation.Range;
 
 import java.util.*;
 

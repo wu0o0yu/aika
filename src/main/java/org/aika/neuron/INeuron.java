@@ -18,13 +18,16 @@ package org.aika.neuron;
 
 
 import org.aika.*;
-import org.aika.neuron.Activation.State;
-import org.aika.corpus.*;
-import org.aika.corpus.SearchNode.Weight;
+import org.aika.neuron.activation.Activation;
+import org.aika.neuron.activation.Activation.State;
+import org.aika.SearchNode;
+import org.aika.SearchNode.Weight;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.Synapse.Key;
+import org.aika.neuron.activation.Linker;
+import org.aika.neuron.activation.Selector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

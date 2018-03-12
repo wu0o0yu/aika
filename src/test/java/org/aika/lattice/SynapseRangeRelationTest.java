@@ -17,21 +17,21 @@
 package org.aika.lattice;
 
 
-import org.aika.neuron.Linker;
+import org.aika.neuron.activation.Linker;
 import org.aika.neuron.Neuron;
 import org.aika.lattice.NodeActivation.Key;
-import org.aika.neuron.Activation;
-import org.aika.neuron.Activation.SynapseActivation;
+import org.aika.neuron.activation.Activation;
+import org.aika.neuron.activation.Activation.SynapseActivation;
 import org.aika.Model;
-import org.aika.corpus.Document;
-import org.aika.corpus.Range;
+import org.aika.Document;
+import org.aika.neuron.activation.Range;
 import org.aika.neuron.Synapse;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Collections;
 
-import static org.aika.neuron.Activation.SynapseActivation.INPUT_COMP;
+import static org.aika.neuron.activation.Activation.SynapseActivation.INPUT_COMP;
 
 /**
  *

@@ -21,8 +21,10 @@ import org.aika.ActivationFunction;
 import org.aika.Model;
 import org.aika.Provider;
 import org.aika.ReadWriteLock;
-import org.aika.corpus.Document;
+import org.aika.Document;
 import org.aika.lattice.InputNode;
+import org.aika.neuron.activation.Activation;
+import org.aika.neuron.activation.Linker;
 
 import java.util.*;
 
@@ -54,8 +56,8 @@ public class Neuron extends Provider<INeuron> {
 
     public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(IM_INPUT_SYNAPSE_COMP);
     public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(IM_OUTPUT_SYNAPSE_COMP);
-    int[] inputSortGroupCounts = new int[4];
-    int[] outputSortGroupCounts = new int[4];
+    public int[] inputSortGroupCounts = new int[4];
+    public int[] outputSortGroupCounts = new int[4];
 
 
     public Neuron(Model m, int id) {

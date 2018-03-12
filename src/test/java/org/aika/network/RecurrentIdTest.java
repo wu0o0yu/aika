@@ -18,10 +18,12 @@ package org.aika.network;
 
 
 import org.aika.neuron.*;
-import org.aika.corpus.Range.Relation;
+import org.aika.neuron.activation.Range.Relation;
 import org.aika.Model;
-import org.aika.corpus.Document;
-import org.aika.corpus.Range;
+import org.aika.Document;
+import org.aika.neuron.activation.Range;
+import org.aika.neuron.activation.Activation;
+import org.aika.neuron.activation.Selector;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,7 +31,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.aika.corpus.Range.Operator.*;
+import static org.aika.neuron.activation.Range.Operator.*;
 
 
 /**

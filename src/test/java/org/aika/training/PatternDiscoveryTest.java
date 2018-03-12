@@ -18,14 +18,14 @@ package org.aika.training;
 
 
 import org.aika.*;
-import org.aika.corpus.Document;
+import org.aika.Document;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.neuron.Neuron;
 import org.aika.training.PatternDiscovery.Config;
-import org.aika.corpus.Range;
+import org.aika.neuron.activation.Range;
 import org.aika.lattice.AndNode.Refinement;
 import org.aika.network.TestHelper;
 import org.aika.neuron.Synapse;
@@ -35,11 +35,10 @@ import org.junit.Test;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Arrays;
 
-import static org.aika.corpus.Range.Operator.EQUALS;
-import static org.aika.corpus.Range.Operator.GREATER_THAN_EQUAL;
-import static org.aika.corpus.Range.Operator.LESS_THAN_EQUAL;
+import static org.aika.neuron.activation.Range.Operator.EQUALS;
+import static org.aika.neuron.activation.Range.Operator.GREATER_THAN_EQUAL;
+import static org.aika.neuron.activation.Range.Operator.LESS_THAN_EQUAL;
 
 /**
  *

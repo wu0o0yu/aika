@@ -18,22 +18,24 @@ package org.aika.network;
 
 
 import org.aika.neuron.*;
-import org.aika.neuron.Activation.SynapseActivation;
+import org.aika.neuron.activation.Activation;
+import org.aika.neuron.activation.Activation.SynapseActivation;
 import org.aika.Model;
-import org.aika.corpus.Document;
-import org.aika.corpus.Range;
-import org.aika.corpus.Range.Operator;
+import org.aika.Document;
+import org.aika.neuron.activation.Range;
+import org.aika.neuron.activation.Range.Operator;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
+import org.aika.neuron.activation.Selector;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Set;
 
-import static org.aika.corpus.Range.Relation.EQUALS;
-import static org.aika.corpus.Range.Operator.GREATER_THAN_EQUAL;
-import static org.aika.corpus.Range.Operator.LESS_THAN_EQUAL;
-import static org.aika.corpus.Range.Operator.NONE;
+import static org.aika.neuron.activation.Range.Relation.EQUALS;
+import static org.aika.neuron.activation.Range.Operator.GREATER_THAN_EQUAL;
+import static org.aika.neuron.activation.Range.Operator.LESS_THAN_EQUAL;
+import static org.aika.neuron.activation.Range.Operator.NONE;
 
 
 /**

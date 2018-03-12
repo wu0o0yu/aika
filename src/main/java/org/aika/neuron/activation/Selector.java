@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aika.neuron;
+package org.aika.neuron.activation;
 
-import org.aika.corpus.Document;
-import org.aika.corpus.Range;
+import org.aika.Document;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
+import org.aika.neuron.INeuron;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Stream;
 
-import static org.aika.corpus.Range.Operator.EQUALS;
+import static org.aika.neuron.activation.Range.Operator.EQUALS;
 import static org.aika.lattice.Node.MAX_NODE;
 import static org.aika.lattice.Node.MIN_NODE;
 
