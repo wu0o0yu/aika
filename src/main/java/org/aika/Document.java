@@ -58,7 +58,6 @@ public class Document implements Comparable<Document> {
     private final String content;
 
     public long visitedCounter = 1;
-    public int interpretationIdCounter = 1;
     public int activationIdCounter = 0;
     public int searchNodeIdCounter = 0;
     public int searchStepCounter = 0;
@@ -324,11 +323,11 @@ public class Document implements Comparable<Document> {
 
 
     public String activationsToString() {
-        return activationsToString(false, false);
+        return activationsToString(true, false, false);
     }
 
 
-    public String activationsToString(boolean withTextSnippet, boolean withLogic) {
+    public String activationsToString(boolean finalOnly, boolean withTextSnippet, boolean withLogic) {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         for (INeuron n : activatedNeurons) {
@@ -339,15 +338,22 @@ public class Document implements Comparable<Document> {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Activation ID -");
-        sb.append(" Input Decision | Current Decision | Final Decision -");
+        if(finalOnly) {
+            sb.append(" Final Decision -");
+        } else {
+            sb.append(" Decision -");
+        }
         sb.append(" Range" + (withTextSnippet ? " | Text Snippet" : ""));
         sb.append(" -");
         sb.append(" Neuron Label -");
         sb.append((withLogic ? " Logic Layer -" : ""));
         sb.append(" Relational ID (Word Pos.) -");
         sb.append(" Upper Bound -");
-        sb.append(" Simulation Rounds [Round | Value | Weight | Norm] -");
-        sb.append(" Final Value | Final Weight | Final Norm -");
+        if(finalOnly) {
+            sb.append(" Final Value | Final Weight | Final Norm -");
+        } else {
+            sb.append(" Simulation Rounds [Round | Value | Weight | Norm] -");
+        }
         sb.append(" Input Value |");
         sb.append(" Target Value");
         sb.append("\n");
@@ -358,7 +364,7 @@ public class Document implements Comparable<Document> {
                 continue;
             }
 
-            sb.append(act.toString(withTextSnippet, withLogic));
+            sb.append(act.toString(finalOnly, withTextSnippet, withLogic));
             sb.append("\n");
         }
 
@@ -413,7 +419,7 @@ public class Document implements Comparable<Document> {
                 if(log.isDebugEnabled()) {
                     log.debug("QueueId:" + th.queueId);
                     log.debug(n.toString() + "\n");
-                    log.debug("\n" + activationsToString( true, true));
+                    log.debug("\n" + activationsToString( false, true, true));
                 }
             }
         }
@@ -454,8 +460,6 @@ public class Document implements Comparable<Document> {
 
 
     public class ValueQueue {
-
-
         public final ArrayList<TreeSet<Activation>> queue = new ArrayList<>();
 
         public void propagateActivationValue(int round, Activation act)  {
@@ -551,5 +555,4 @@ public class Document implements Comparable<Document> {
                     log.error("");
                 });
     }
-
 }

@@ -39,6 +39,6 @@ public class TestNextWord {
         inA.addInput(doc, 0, 5);
         inB.addInput(doc, 5, 10);
 
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(false, false, true));
     }
 }

@@ -303,7 +303,7 @@ public class InterpretationSearchTest {
 
         doc.process();
 
-        System.out.println(doc.activationsToString(true, true));
+        System.out.println(doc.activationsToString(true, true, true));
 
         Assert.assertFalse(nD.getFinalActivations(doc).isEmpty());
     }
@@ -384,7 +384,7 @@ public class InterpretationSearchTest {
 
 //        doc.process();
 
-        System.out.println(doc.activationsToString(true, true));
+        System.out.println(doc.activationsToString(true, true, true));
 
 
         // Complete the model
@@ -452,7 +452,7 @@ public class InterpretationSearchTest {
         doc.propagate();
         doc.process();
 
-        System.out.println(doc.activationsToString(true, true));
+        System.out.println(doc.activationsToString(true, true, true));
 
         Assert.assertFalse(nD.getFinalActivations(doc).isEmpty());
 

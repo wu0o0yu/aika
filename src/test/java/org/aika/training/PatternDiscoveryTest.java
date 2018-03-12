@@ -464,7 +464,7 @@ public class PatternDiscoveryTest {
 
             doc.process();
 
-            System.out.println(doc.activationsToString(true, true));
+            System.out.println(doc.activationsToString(true, true, true));
 
 //            Assert.assertNotNull(inA.get().outputNodes.firstEntry().getValue().get().andChildren.firstEntry().getValue().get().getFirstActivation(doc));
 

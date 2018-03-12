@@ -233,7 +233,7 @@ public class NamedEntityRecognitionTest {
         // Search for the best interpretation of this text.
         doc.process();
 
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(true, false, true));
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");

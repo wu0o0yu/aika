@@ -78,6 +78,6 @@ public class OrOptionsTest {
         doc.propagate();
 
 
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(true, false, true));
     }
 }

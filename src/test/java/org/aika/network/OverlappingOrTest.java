@@ -88,7 +88,7 @@ public class OverlappingOrTest {
 
         Document doc = m.createDocument("a b c d e ", 0);
 
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(false, false, true));
 
         int wordPos = 0;
         for(int i = 0; i < doc.length(); i++) {
@@ -96,7 +96,7 @@ public class OverlappingOrTest {
             if(c != ' ') {
                 inputNeurons.get(c).addInput(doc, i, i + 1, wordPos++);
             }
-            System.out.println(doc.activationsToString(false, true));
+            System.out.println(doc.activationsToString(false, false, true));
         }
 
         // Computes the selected option
@@ -104,18 +104,8 @@ public class OverlappingOrTest {
 
         Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).activations.size());
 
-        System.out.println("Output activation:");
-        INeuron n = pattern.get();
-        for(NodeActivation act: n.getActivations(doc)) {
-            System.out.println("Text Range: " + act.key.range);
-            System.out.println("Node: " + act.key.node);
-            System.out.println("Rid: " + act.key.rid);
-//            System.out.println("Activation weight: " + act.finalState.value);
-            System.out.println();
-        }
-
         System.out.println("All activations:");
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(true, true, true));
         System.out.println();
 
         doc.clearActivations();

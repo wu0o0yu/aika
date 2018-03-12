@@ -178,7 +178,7 @@ public class MutualExclusionTest {
         // Computes the selected option
         doc.process();
 
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(true, false, true));
 
         Assert.assertTrue(pA.getFinalActivations(doc).isEmpty());
         Assert.assertFalse(pB.getFinalActivations(doc).isEmpty());

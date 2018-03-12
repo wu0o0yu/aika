@@ -152,7 +152,7 @@ public final class Activation extends NodeActivation<OrNode> {
             if (propagate) {
                 if(round > Document.MAX_ROUND) {
                     log.error("Error: Maximum number of rounds reached. The network might be oscillating.");
-                    log.info(doc.activationsToString(true, true));
+                    log.info(doc.activationsToString(false, true, true));
 
                     doc.dumpOscillatingActivations();
                     throw new RuntimeException("Maximum number of rounds reached. The network might be oscillating.");
@@ -594,13 +594,12 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    public String toString(boolean withTextSnippet, boolean withLogic) {
+
+    public String toString(boolean finalOnly, boolean withTextSnippet, boolean withLogic) {
         StringBuilder sb = new StringBuilder();
         sb.append(id + " - ");
 
-        sb.append("ID:" + inputDecision + " ");
-        sb.append("D:" + decision + " ");
-        sb.append("FD:" + finalDecision + " - ");
+        sb.append((finalOnly ? finalDecision : decision) + " - ");
 
         sb.append(key.range);
 
@@ -624,14 +623,16 @@ public final class Activation extends NodeActivation<OrNode> {
         sb.append(Utils.round(upperBound));
 
         sb.append(" - ");
-        for (Map.Entry<Integer, State> me : rounds.rounds.entrySet()) {
-            State s = me.getValue();
-            sb.append("[R: " + me.getKey() + " " + s + "]");
-        }
-
-        if (isFinalActivation()) {
-            State fs = getFinalState();
-            sb.append(" - Final: " + fs);
+        if(finalOnly) {
+            if (isFinalActivation()) {
+                State fs = getFinalState();
+                sb.append(fs);
+            }
+        } else {
+            for (Map.Entry<Integer, State> me : rounds.rounds.entrySet()) {
+                State s = me.getValue();
+                sb.append("[R: " + me.getKey() + " " + s + "]");
+            }
         }
 
         if (inputValue != null) {

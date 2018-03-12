@@ -159,7 +159,7 @@ public class TrainingTest {
 
             doc.process();
 
-            System.out.println(doc.activationsToString(false, true));
+            System.out.println(doc.activationsToString(true, false, true));
             Assert.assertFalse(outC.getFinalActivations(doc).isEmpty());
 
             doc.clearActivations();

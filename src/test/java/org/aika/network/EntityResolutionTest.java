@@ -85,16 +85,16 @@ public class EntityResolutionTest {
 
         wJaguar.addInput(doc, 0, 6);
 
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(false, false, true));
 
         wPuma.addInput(doc, 7, 11);
 
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(false, false, true));
 
         System.out.println("Process");
         doc.process();
 
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(true, false, true));
 
 
         Assert.assertNotNull(eJaguar.get().getFirstActivation(doc));
@@ -285,16 +285,16 @@ public class EntityResolutionTest {
 
         wJaguar.addInput(doc, 0, 6);
 
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(false, false, true));
 
         wPuma.addInput(doc, 7, 11);
 
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(false, false, true));
 
         System.out.println("Process");
         doc.process();
 
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(true, false, true));
 
 
         Assert.assertNotNull(eJaguar.get().getFirstActivation(doc));

@@ -114,7 +114,7 @@ public class SimplePatternMatchingTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(true, false, true));
         System.out.println();
 
         doc.clearActivations();
@@ -205,7 +205,7 @@ public class SimplePatternMatchingTest {
         }
 
         System.out.println("All activations:");
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(true, false, true));
         System.out.println();
 
         doc.clearActivations();

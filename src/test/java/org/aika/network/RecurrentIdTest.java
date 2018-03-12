@@ -77,7 +77,7 @@ public class RecurrentIdTest {
 
         Activation outC1 = Selector.get(doc, outC, 20, new Range(0, 1), Relation.CONTAINS);
 
-        System.out.println(doc.activationsToString(false, true));
+        System.out.println(doc.activationsToString(false, false, true));
 
         Assert.assertNotNull(outC1);
     }
