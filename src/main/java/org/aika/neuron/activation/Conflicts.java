@@ -17,6 +17,7 @@
 package org.aika.neuron.activation;
 
 
+import org.aika.neuron.INeuron;
 import org.aika.neuron.activation.Linker.Direction;
 
 import java.util.*;
@@ -48,8 +49,6 @@ public class Conflicts {
                 Activation oAct = (dir == INPUT ? act : sa.output);
                 Activation iAct = (dir == INPUT ? sa.input : act);
 
-                markConflicts(iAct, oAct, v);
-
                 addConflict(oAct, iAct, v);
             }
         }
@@ -57,25 +56,17 @@ public class Conflicts {
 
 
     private static void addConflict(Activation oAct, Activation iAct, long v) {
-        if (iAct.markedConflict == v) {
-            if (iAct != oAct) {
-                add(oAct, iAct);
-            }
+        if(oAct == iAct) {
+            return;
+        }
+
+        if (iAct.getINeuron().type != INeuron.Type.INHIBITORY) {
+            add(oAct, iAct);
         } else {
             for (Activation.SynapseActivation sa : iAct.neuronInputs) {
                 if(!sa.synapse.key.isRecurrent) {
                     addConflict(oAct, sa.input, v);
                 }
-            }
-        }
-    }
-
-
-    private static void markConflicts(Activation iAct, Activation oAct, long v) {
-        oAct.markedConflict = v;
-        for (Activation.SynapseActivation sa : iAct.neuronOutputs) {
-            if (sa.synapse.key.isRecurrent && sa.synapse.isNegative()) {
-                sa.output.markedConflict = v;
             }
         }
     }

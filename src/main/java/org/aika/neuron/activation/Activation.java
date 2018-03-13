@@ -354,13 +354,20 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public static boolean checkSelfReferencing(Activation nx, Activation ny, boolean onlySelected, int depth) {
-        if (nx == ny) return true;
+        if (nx == ny) {
+            return true;
+        }
 
-        if (depth > MAX_SELF_REFERENCING_DEPTH) return false;
+        if (depth > MAX_SELF_REFERENCING_DEPTH) {
+            return false;
+        }
 
-        Set<SynapseActivation> inputs = onlySelected ? ny.selectedNeuronInputs : ny.neuronInputs;
-        for (SynapseActivation sa: inputs) {
-            if (checkSelfReferencing(nx, sa.input, onlySelected, depth + 1)) return true;
+        for (SynapseActivation sa: onlySelected ? ny.selectedNeuronInputs : ny.neuronInputs) {
+            if(!sa.synapse.key.isRecurrent) {
+                if (checkSelfReferencing(nx, sa.input, onlySelected, depth + 1)) {
+                    return true;
+                }
+            }
         }
 
         return false;
