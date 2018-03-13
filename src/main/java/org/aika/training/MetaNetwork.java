@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.aika.SearchNode.Decision.UNKNOWN;
+import static org.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
 
 
 /**

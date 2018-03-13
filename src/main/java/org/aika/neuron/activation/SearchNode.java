@@ -14,21 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.aika;
+package org.aika.neuron.activation;
 
 
-import org.aika.neuron.activation.Activation;
+import org.aika.Document;
+import org.aika.Utils;
 import org.aika.neuron.activation.Activation.StateChange;
 import org.aika.neuron.activation.Activation.SynapseActivation;
 import org.aika.neuron.INeuron;
-import org.aika.neuron.activation.Candidate;
-import org.aika.neuron.activation.Conflicts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.aika.SearchNode.Decision.SELECTED;
-import static org.aika.SearchNode.Decision.EXCLUDED;
-import static org.aika.SearchNode.Decision.UNKNOWN;
+import static org.aika.neuron.activation.SearchNode.Decision.SELECTED;
+import static org.aika.neuron.activation.SearchNode.Decision.EXCLUDED;
+import static org.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
 import static org.aika.neuron.activation.Activation.ACTIVATION_ID_COMP;
 import static org.aika.neuron.activation.Activation.Mode.NEW;
 
@@ -58,11 +57,11 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public int id;
 
-    public SearchNode excludedParent;
-    public SearchNode selectedParent;
+    SearchNode excludedParent;
+    SearchNode selectedParent;
 
-    public long visited;
-    Candidate candidate;
+    long visited;
+    public Candidate candidate;
     int level;
 
     DebugState debugState;
@@ -88,7 +87,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
     Weight weightDelta = Weight.ZERO;
-    Weight accumulatedWeight = Weight.ZERO;
+    public Weight accumulatedWeight = Weight.ZERO;
 
     public Map<Activation, StateChange> modifiedActs = new TreeMap<>(ACTIVATION_ID_COMP);
 

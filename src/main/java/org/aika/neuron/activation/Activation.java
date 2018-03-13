@@ -1,21 +1,20 @@
 package org.aika.neuron.activation;
 
 import org.aika.Document;
-import org.aika.SearchNode;
 import org.aika.Utils;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.*;
 import org.aika.neuron.activation.Linker.Direction;
-import org.aika.SearchNode.Weight;
-import org.aika.SearchNode.Decision;
+import org.aika.neuron.activation.SearchNode.Weight;
+import org.aika.neuron.activation.SearchNode.Decision;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-import static org.aika.SearchNode.Decision.SELECTED;
+import static org.aika.neuron.activation.SearchNode.Decision.SELECTED;
 import static org.aika.neuron.activation.Activation.State.DIR;
 import static org.aika.neuron.activation.Activation.State.REC;
 import static org.aika.neuron.activation.Activation.SynapseActivation.INPUT_COMP;
@@ -69,7 +68,6 @@ public final class Activation extends NodeActivation<OrNode> {
     public double errorSignal;
     public Double targetValue;
     public Double inputValue;
-
 
 
     public Decision inputDecision = Decision.UNKNOWN;

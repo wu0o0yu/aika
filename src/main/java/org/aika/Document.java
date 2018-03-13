@@ -21,8 +21,8 @@ import org.aika.lattice.*;
 import org.aika.lattice.Node.ThreadState;
 import org.aika.neuron.*;
 import org.aika.neuron.activation.*;
-import org.aika.SearchNode.Weight;
-import org.aika.SearchNode.Decision;
+import org.aika.neuron.activation.SearchNode.Weight;
+import org.aika.neuron.activation.SearchNode.Decision;
 import org.aika.training.SupervisedTraining;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.aika.SearchNode.Decision.UNKNOWN;
+import static org.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
 
 
 /**

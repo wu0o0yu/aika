@@ -1,8 +1,7 @@
 package org.aika.neuron.activation;
 
-import org.aika.SearchNode;
 import org.aika.Utils;
-import org.aika.SearchNode.Decision;
+import org.aika.neuron.activation.SearchNode.Decision;
 
 
 
