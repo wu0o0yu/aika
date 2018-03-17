@@ -147,7 +147,6 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     public static void processCandidate(Node<?, ? extends NodeActivation<?>> parentNode, NodeActivation inputAct, boolean train) {
-        Key ak = inputAct.key;
         Document doc = inputAct.doc;
         parentNode.lock.acquireReadLock();
         if(parentNode.orChildren != null) {
