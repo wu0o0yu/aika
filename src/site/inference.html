@@ -47,8 +47,69 @@
 		<div class="features">
 			<h1>How it works</h1>
 			<p>
+			<h2>The Neural Network</h2>
+			<p>
+				At the heart, Aika is a neural network simulation algorithm. It uses neurons to represent a wide variety of
+				linguistic concepts and information and connects them via synapses. In contrast to most other neural
+				network architectures, Aika does not employ layers to structure its network. Synapses can connect arbitrary
+				neurons with each other, but the network is not fully connected either. </br>
+				As with other artificial neural networks these
+				synapses are weighted. By choosing the weights and bias accordingly neurons can take on the characteristics
+				of boolean logic gates such as an and-gate or an or-gate. To compute the activation value of a neuron, the weighted sum over its input synapses
+				is computed. Then a bias value is added to this sum and the result is sent through an activation function.
+				In Aika this activation function is chosen in a way that it clearly distinguishes between active neurons
+				and inactive neurons. Only activated neurons are processed. These activations are expressed not only by a real
+				valued number but also by an activation object.
+			</p>
 
-			<h2>Artificial neural networks vs. frequent pattern mining</h2>
+			<h2>Activations</h2>
+			<p>
+				The advantage of these activation objects is that, through them, we are able to cope with the relational
+				structure of natural language text by making the activation relate to a specific segment of text. In a way
+				these activations can be seen as text annotations that specify a start character and an end character
+				or the word position (relational id). </br>
+				Words, phrases and sentences are in a relation to each other through
+				their sequential order. The assignment of text ranges and word positions to activations is a simple yet
+				powerful representation of the relational structure of text and avoids some of the shortcomings of other
+				representations such as bag of words or sliding window.
+				Since these activations are propagated along through the network, synapses need to be able to manipulate
+				the text range and the word position while the activation is passed on to the next neuron.
+			</p>
+
+			<h2>Interpretations</h2>
+			<p>
+				One common problem when processing text is that of cyclic dependencies. In the example 'jackson cook' it is impossible
+				to decide which word has to be resolved first, the forename or the surname, since both depend on each other. The word
+				jackson can be recognized as a forename when the next word is a surname and the word cook can be recognized as a surname when the
+				previous word is a forename.
+				To tackle this problem Aika employs <a href="https://en.wikipedia.org/wiki/Non-monotonic_logic" rel="nofollow">non-monotonic logic</a> and
+				is therefore able to derive interpretations that are mutually exclusive. These interpretations are then weighted and only the strongest interpretation
+				is returned as the result. Consider the following network as an example, in which the different linguistic concepts are represented by individual neurons.
+			</p>
+			<p>
+				<img src="images/example-diagram.svg"/>
+			</p>
+
+			<p>
+				This network is able to determine whether a word, which has been recognized in a text, is a forename, surname, city name, or profession. If for instance the
+				word "jackson" has been recognized in a text, it will trigger further activations in the two jackson entity neurons. Since both are connected through the
+				suppressing neuron only one of them can be active in the end. Aika will therefore generate two interpretations. But these
+				interpretations are not limited to a single neuron. For instance if the word neuron cook gets activated too, then the jackson forename entity and the cook surname
+				entity will be part of the same interpretation. The forename and surname category links in this example form a positive feedback loop which reinforces this interpretation.
+			</p>
+			<p>
+				New interpretations are spawned if both input and output of a negative recurrent synapse get activated. In this case a conflict is
+				generated. If there are no conflicts during the processing of a input data set, only one interpretation
+				will exist and the search for the best interpretation will end pretty quickly.
+				On the other hand, if there are several conflicts between activations, then a search needs to be performed which
+				selects or excludes individual activations and tests how these changes affect the overall weights sum of
+				all activations. The necessary weights are computed for each activation by the following formula:
+
+			</p>
+
+			<h2>The Pattern Lattice</h2>
+			One design goal of the Aika algorithm was to be able to efficiently compute huge networks. This is, however,
+			only possible if only a fraction of the neurons need to be computed for any given input data set.
 			<p>
 				So how do an <a href="https://en.wikipedia.org/wiki/Artificial_neural_network" rel="nofollow">artificial neural network</a> and a <a href="http://www.charuaggarwal.net/freqbook.pdf" rel="nofollow">frequent pattern mining</a> algorithm fit together? Well, ANNs basically consist of neurons that compute an output value based on the weighted sum of their inputs.
 				These neurons can be reformulated as a set of boolean operations.
@@ -81,52 +142,6 @@
 			</p>
 
 			<img src="images/network.svg"/>
-
-			<h2>Activations</h2>
-			<p>
-				Another advantage of having a discrete representation of a neural network is that we are able to assign
-				a specific text segment, a word position (relational id) and a
-				specific interpretation option to each activation and propagate them along through the network. This accommodates for the
-				fact that processing text is an inherently relational task. Words,
-				phrases and sentences are in a relation to each other through their sequential order. The assignment of text
-				ranges and word positions to activations is a simple yet powerful representation of the relational structure of text and avoids
-				some of the shortcomings of other representations such as bag of words or sliding window. In Aika the
-				synapses are able to manipulate the text range and the word position while the activation is passed on to the next neuron.
-			</p>
-
-			<h2>Interpretations</h2>
-			<p>
-				One common problem when processing text is that of cyclic dependencies. In the example 'jackson cook' it is impossible
-				to decide which word has to be resolved first, the forename or the surname, since both depend on each other. The word
-				jackson can be recognized as a forename when the next word is a surname and the word cook can be recognized as a surname when the
-				previous word is a forename.
-				To tackle this problem Aika employs <a href="https://en.wikipedia.org/wiki/Non-monotonic_logic" rel="nofollow">non-monotonic logic</a> and
-				is therefore able to derive interpretations that are mutually exclusive. These interpretations are then weighted and only the strongest interpretation
-				is returned as the result. Consider the following network as an example, in which the different linguistic concepts are represented by individual neurons.
-			</p>
-			<p>
-				<img src="images/example-diagram.svg"/>
-			</p>
-
-			<p>
-				This network is able to determine whether a word, which has been recognized in a text, is a surname, city name, or profession. If for instance the
-				word "jackson" has been recognized in a text, it will trigger further activations in the two jackson entity neurons. Since both are connected through the
-				suppressing neuron only one of them can be active in the end. Aika will therefore generate two interpretations. But these
-				interpretations are not limited to a single neuron. For instance if the word neuron cook gets activated too, then the jackson forename entity and the cook surname
-				entity will be part of the same interpretation. The forename and surname category links in this example form a positive feedback loop which reinforces this interpretation.
-			</p>
-			<p>
-				In order to be able to generate these interpretations, Aika annotates all activations
-				that are emitted by a neuron with a primitive option number. These primitive option numbers are then propagated through the network along with the neuron activations. If such an primitive option number arrives at the
-				input of a negation node, a conflict is generated between the input option number (or the set of input option numbers) and the output option number generated by the current neuron. All activations
-				whose set of option numbers contain such a conflict are then removed from the network.
-			</p>
-
-			<p>
-				The primitive option numbers accumulate while they are propagated through the network. Such a set of primitive option numbers is then called an option. To determine the best interpretation of a given word, a good starting point is to simply select the option with the highest sum of associated activation weights. However, there might be better interpretations consisting of not just one but several options.
-				These options must not conflict with each other, which makes it difficult to efficiently determine the best interpretation. In order to find the best interpretation, a binary search tree is traversed, in which one child node is an expansion
-				of the so far determined interpretation and the other child node is the conflicting path. The search will retrieve the set of options with the highest weight sum. If no conflicts exist, this will simply be the set of all options.
-			</p>
 
 
 		</div>
