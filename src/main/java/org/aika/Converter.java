@@ -161,7 +161,6 @@ public class Converter {
 
     private void initInputNodesAndComputeWeightSums() {
         double[][] sumDelta = new double[2][2];
-        double maxRecurrentSumDelta = 0.0;
 
 //        neuron.biasSum = 0.0;
         for (Synapse s : modifiedSynapses) {
@@ -181,10 +180,6 @@ public class Converter {
             }
 
             if(!s.inactive) {
-                if (s.key.isRecurrent) {
-                    maxRecurrentSumDelta += Math.abs(s.getNewWeight()) - Math.abs(s.weight);
-                }
-
                 sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
                 sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.getNewWeight();
 
@@ -220,7 +215,6 @@ public class Converter {
 
         assert Double.isFinite(neuron.biasSum);
 
-        neuron.maxRecurrentSum += maxRecurrentSumDelta;
         neuron.posDirSum += sumDelta[DIRECT][POSITIVE];
         neuron.negDirSum += sumDelta[DIRECT][NEGATIVE];
         neuron.negRecSum += sumDelta[RECURRENT][NEGATIVE];

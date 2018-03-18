@@ -60,14 +60,19 @@
 				synapses are weighted. By choosing the weights and bias accordingly neurons can take on the characteristics
 				of boolean logic gates such as an and-gate or an or-gate. To compute the activation value of a neuron, the
 				weighted sum over its input synapses is computed. Then a bias value \(b\) is added to this sum and the result is
-				sent through an activation function.
+				sent through an activation function \(\varphi\).
 
 			<div style="text-align:center"><img src="images/neuron.svg" width="60%" height="60%"/></div>
 
-				$$y = \theta \Bigg({b + \sum\limits_{i=0}^N{x_i w_i}}\Bigg)$$
+				$$y_j = \varphi \Bigg({b_j + \sum\limits_{i=0}^N{x_i w_{ij}}}\Bigg)$$
 
+				Depending on the type of neuron, different activation functions can be used. One commonly used activation function
+				is the positive half of the \(tanh()\) function.
 
-				In Aika this activation function is chosen in a way that it clearly distinguishes between active neurons
+				\[\varphi = \Bigg \{ {0 \atop tanh(x)} {: x <= 0 \atop : x > 0}\]
+
+			<div style="text-align:center"><img src="images/tanh-diagramm.png" width="60%" height="60%"/></div>
+				In Aika the activation function is chosen in a way that it clearly distinguishes between active
 				and inactive neurons. Only activated neurons are processed. These activations are expressed not only by a real
 				valued number but also by an activation object.
 			</p>
@@ -150,7 +155,7 @@
 				pattern lattice is a directed acyclic graph containing all subpatterns of a given pattern.
 			</p>
 
-			<img src="images/lattice.svg"/>
+			<img src="images/lattice.svg" width="30%" height="30%"/>
 
 			<p>
 				An advantage of this representation is that it greatly reduces the computational costs. In a classical
@@ -162,7 +167,7 @@
 				lattice is limited. Otherwise too many logic nodes would be generated.
 			</p>
 
-			<img src="images/network.svg"/>
+			<img src="images/network.svg" width="70%" height="70%"/>
 
 
 		</div>

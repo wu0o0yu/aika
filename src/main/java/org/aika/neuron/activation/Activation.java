@@ -197,11 +197,11 @@ public final class Activation extends NodeActivation<OrNode> {
 
         maxActValue = Math.max(maxActValue, currentActValue);
 
+        double w = Math.max(0.0, drSum - Math.max(0.0, sum[DIR] + n.negRecSum));
+        double norm = Math.max(0.0, (n.posRecSum - n.negRecSum) + Math.min(0.0, sum[DIR] + n.negRecSum));
+
         // Compute only the recurrent part is above the threshold.
-        Weight newWeight = Weight.create(
-                decision == SELECTED ? (sum[DIR] + n.negRecSum) < 0.0 ? Math.max(0.0, drSum) : sum[REC] - n.negRecSum : 0.0,
-                (sum[DIR] + n.negRecSum) < 0.0 ? Math.max(0.0, sum[DIR] + n.negRecSum + n.maxRecurrentSum) : n.maxRecurrentSum
-        );
+        Weight newWeight = Weight.create(decision == SELECTED ? w : 0.0, norm);
 
         return new State(
                 decision == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? currentActValue : 0.0,
