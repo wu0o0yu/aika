@@ -286,6 +286,7 @@ public class Neuron extends Provider<INeuron> {
         }
     }
 
+
     public void removeInMemoryInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryInputSynapses.remove(s);

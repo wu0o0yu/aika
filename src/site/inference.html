@@ -17,6 +17,9 @@
 		ga('send', 'pageview');
 
 	</script>
+	<script type="text/javascript" async
+			src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+	</script>
 </head>
 <body>
 <div id="header">
@@ -53,10 +56,17 @@
 				linguistic concepts and information and connects them via synapses. In contrast to most other neural
 				network architectures, Aika does not employ layers to structure its network. Synapses can connect arbitrary
 				neurons with each other, but the network is not fully connected either. </br>
-				As with other artificial neural networks these
+				Like other artificial neural networks these
 				synapses are weighted. By choosing the weights and bias accordingly neurons can take on the characteristics
-				of boolean logic gates such as an and-gate or an or-gate. To compute the activation value of a neuron, the weighted sum over its input synapses
-				is computed. Then a bias value is added to this sum and the result is sent through an activation function.
+				of boolean logic gates such as an and-gate or an or-gate. To compute the activation value of a neuron, the
+				weighted sum over its input synapses is computed. Then a bias value \(b\) is added to this sum and the result is
+				sent through an activation function.
+
+			<div style="text-align:center"><img src="images/neuron.svg" width="60%" height="60%"/></div>
+
+				$$y = \theta \Bigg({b + \sum\limits_{i=0}^N{x_i w_i}}\Bigg)$$
+
+
 				In Aika this activation function is chosen in a way that it clearly distinguishes between active neurons
 				and inactive neurons. Only activated neurons are processed. These activations are expressed not only by a real
 				valued number but also by an activation object.
@@ -108,25 +118,31 @@
 			</p>
 
 			<h2>The Pattern Lattice</h2>
-			One design goal of the Aika algorithm was to be able to efficiently simulate huge networks. This is, however,
-			only possible if only a fraction of the neurons need to be computed for any given input data set. One
-			precondition to achieve this is the earlier mentioned distinction between active neurons and inactive neurons.
-			If one neuron gets activated then only those outgoing neurons need to be computed that would exceed their
-			threshold based on this new input. Depending on the synapse weights and bias settings of this outgoing it
-			may either fire directly (or-gate like neurons) or it may require other input neurons to fire first (and-gate
-			like neurons). If the neuron is an and-gate like neuron then there is a efficient way to touch the
 			<p>
+				One design goal of the Aika algorithm was to be able to efficiently simulate huge networks. This is, however,
+				only possible if only a fraction of the neurons need to be computed for any given input data set. One
+				precondition to achieve this goal is the earlier mentioned distinction between active and inactive neurons.
+				If one neuron gets activated then only those outgoing neurons need to be computed that would exceed their
+				threshold based on this new input. Depending on the synapse weights and bias settings of the outgoing it
+				may either fire directly (for or-gate like neurons) or it may require other input neurons to fire first
+				(for and-gate like neurons). If the neuron is an and-gate like neuron then there is a efficient way to
+				very specifically determine only those outgoing neurons that may be activated by a new input signal.
+
 				So how do an <a href="https://en.wikipedia.org/wiki/Artificial_neural_network" rel="nofollow">artificial neural network</a> and a <a href="http://www.charuaggarwal.net/freqbook.pdf" rel="nofollow">frequent pattern mining</a> algorithm fit together? Well, ANNs basically consist of neurons that compute an output value based on the weighted sum of their inputs.
 				These neurons can be reformulated as a set of boolean operations.
 
 				For example, the following <a href="https://en.wikipedia.org/wiki/Artificial_neuron" rel="nofollow">neuron</a> utilizing the <a href="https://de.wikipedia.org/wiki/Heaviside-Funktion" rel="nofollow">heaviside transfer function</a> (1 if x > 0 otherwise 0)
 			</p>
-			<img src="images/equ-1.svg"/>
-			<img src="images/equ-2.svg"/>
+
+			$$b = -0.5$$
+			$$w_0 = 1.0$$
+			$$w_1 = 0.3$$
+			$$w_2 = 0.3$$
+			$$y = \theta \Bigg({b + \sum\limits_{i=0}^N{x_i w_i}}\Bigg)$$
 			<p>
 				can also be written as boolean equation
 			</p>
-			<img src="images/equ-3.svg"/>
+			$$y = x_0 \vee (x_1 \wedge x_2)$$
 
 			<p>
 				So it is easy to see that the neuron's weighted sum can be reformulated as a <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form" rel="nofollow">disjunctive normal form</a> boolean equation, meaning that we always
