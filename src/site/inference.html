@@ -108,8 +108,13 @@
 			</p>
 
 			<h2>The Pattern Lattice</h2>
-			One design goal of the Aika algorithm was to be able to efficiently compute huge networks. This is, however,
-			only possible if only a fraction of the neurons need to be computed for any given input data set.
+			One design goal of the Aika algorithm was to be able to efficiently simulate huge networks. This is, however,
+			only possible if only a fraction of the neurons need to be computed for any given input data set. One
+			precondition to achieve this is the earlier mentioned distinction between active neurons and inactive neurons.
+			If one neuron gets activated then only those outgoing neurons need to be computed that would exceed their
+			threshold based on this new input. Depending on the synapse weights and bias settings of this outgoing it
+			may either fire directly (or-gate like neurons) or it may require other input neurons to fire first (and-gate
+			like neurons). If the neuron is an and-gate like neuron then there is a efficient way to touch the
 			<p>
 				So how do an <a href="https://en.wikipedia.org/wiki/Artificial_neural_network" rel="nofollow">artificial neural network</a> and a <a href="http://www.charuaggarwal.net/freqbook.pdf" rel="nofollow">frequent pattern mining</a> algorithm fit together? Well, ANNs basically consist of neurons that compute an output value based on the weighted sum of their inputs.
 				These neurons can be reformulated as a set of boolean operations.
