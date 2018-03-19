@@ -62,7 +62,7 @@
 				weighted sum over its input synapses is computed. Then a bias value \(b\) is added to this sum and the result is
 				sent through an activation function \(\varphi\).
 
-			<div style="text-align:center"><img src="images/neuron.svg" width="60%" height="60%"/></div>
+			<div style="text-align:center; width:100%"><img src="images/neuron.svg" width="60%" height="60%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
 
 				$$y_j = \varphi \Bigg({b_j + \sum\limits_{i=0}^N{x_i w_{ij}}}\Bigg)$$
 
@@ -71,7 +71,7 @@
 
 				\[\varphi = \Bigg \{ {0 \atop tanh(x)} {: x <= 0 \atop : x > 0}\]
 
-			<div style="text-align:center"><img src="images/tanh-diagramm.png" width="60%" height="60%"/></div>
+			<div style="text-align:center; width:100%"><img src="images/tanh-diagramm.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
 				In Aika the activation function is chosen in a way that it clearly distinguishes between active
 				and inactive neurons. Only activated neurons are processed. These activations are expressed not only by a real
 				valued number but also by an activation object.
@@ -102,7 +102,7 @@
 				is returned as the result. Consider the following network as an example, in which the different linguistic concepts are represented by individual neurons.
 			</p>
 			<p>
-				<img src="images/example-diagram.svg"/>
+			<div style="text-align:center; width:100%"><img src="images/example-diagram.svg" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
 			</p>
 
 			<p>
@@ -155,7 +155,7 @@
 				pattern lattice is a directed acyclic graph containing all subpatterns of a given pattern.
 			</p>
 
-			<img src="images/lattice.svg" width="30%" height="30%"/>
+			<div style="text-align:center; width:100%"><img src="images/lattice.svg" width="30%" height="30%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
 
 			<p>
 				An advantage of this representation is that it greatly reduces the computational costs. In a classical
@@ -167,7 +167,7 @@
 				lattice is limited. Otherwise too many logic nodes would be generated.
 			</p>
 
-			<img src="images/network.svg" width="70%" height="70%"/>
+			<div style="text-align:center; width:100%"><img src="images/network.svg" width="70%" height="70%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
 
 
 		</div>
