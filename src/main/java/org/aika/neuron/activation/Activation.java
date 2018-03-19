@@ -54,7 +54,6 @@ public final class Activation extends NodeActivation<OrNode> {
 
     public Rounds rounds = new Rounds();
     public Rounds finalRounds = rounds;
-    public double maxActValue = 0.0;
 
     public boolean ubQueued = false;
     public boolean isQueued = false;
@@ -197,9 +196,6 @@ public final class Activation extends NodeActivation<OrNode> {
         }
 
         double currentActValue = n.activationFunction.f(sum);
-
-        maxActValue = Math.max(maxActValue, currentActValue);
-
         double norm = Math.min(-n.negRecSum, sum - negRecSum);
 
         // Compute only the recurrent part is above the threshold.
