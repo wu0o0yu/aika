@@ -174,7 +174,8 @@ public final class Activation extends NodeActivation<OrNode> {
 
     public State computeValueAndWeight(int round) {
         INeuron n = getINeuron();
-        double[] sum = {n.biasSum, 0.0};
+        double sum = n.biasSum;
+        double negRecSum = 0.0;
 
         int fired = -1;
 
@@ -184,24 +185,28 @@ public final class Activation extends NodeActivation<OrNode> {
 
             if (iAct == this) continue;
 
-            int t = s.key.isRecurrent ? REC : DIR;
-            sum[t] += is.s.value * s.weight;
+            double x = is.s.value * s.weight;
+            sum += x;
+            if(s.key.isRecurrent && s.isNegative()) {
+                negRecSum += x;
+            }
 
-            if (!s.key.isRecurrent && !s.isNegative() && sum[DIR] + sum[REC] >= 0.0 && fired < 0) {
+            if (!s.key.isRecurrent && !s.isNegative() && sum >= 0.0 && fired < 0) {
                 fired = iAct.rounds.get(round).fired + 1;
             }
         }
 
-        double drSum = sum[DIR] + sum[REC];
-        double currentActValue = n.activationFunction.f(drSum);
+        double currentActValue = n.activationFunction.f(sum);
 
         maxActValue = Math.max(maxActValue, currentActValue);
 
-        double w = Math.max(0.0, drSum - Math.max(0.0, sum[DIR] + n.negRecSum));
-        double norm = Math.max(0.0, (n.posRecSum - n.negRecSum) + Math.min(0.0, sum[DIR] + n.negRecSum));
+        double norm = Math.min(-n.negRecSum, sum - negRecSum);
 
         // Compute only the recurrent part is above the threshold.
-        Weight newWeight = Weight.create(decision == SELECTED ? w : 0.0, norm);
+        Weight newWeight = Weight.create(
+                decision == SELECTED ? Math.max(0.0, negRecSum + norm) : 0.0,
+                Math.max(0.0, norm)
+        );
 
         return new State(
                 decision == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? currentActValue : 0.0,
