@@ -52,7 +52,7 @@
 			<p>
 			<h2>The Neural Network</h2>
 			<p>
-				At the heart, Aika is a neural network simulation algorithm. It uses neurons to represent a wide variety of
+				Basically, Aika is a neural network simulation algorithm. It uses neurons to represent a wide variety of
 				linguistic concepts and information and connects them via synapses. In contrast to most other neural
 				network architectures, Aika does not employ layers to structure its network. Synapses can connect arbitrary
 				neurons with each other, but the network is not fully connected either. </br>
@@ -64,12 +64,13 @@
 
 			<div style="text-align:center; width:100%"><img src="images/neuron.svg" width="60%" height="60%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
 
-				$$y_j = \varphi \Bigg({b_j + \sum\limits_{i=0}^N{x_i w_{ij}}}\Bigg)$$
+				$$net_j = {b_j + \sum\limits_{i=0}^N{x_i w_{ij}}}$$
+				$$y_j = \varphi (net_j)$$
 
 				Depending on the type of neuron, different activation functions can be used. One commonly used activation function
 				is the positive half of the \(tanh()\) function.
 
-				\[\varphi = \Bigg \{ {0 \atop tanh(x)} {: x <= 0 \atop : x > 0}\]
+				\[\varphi(x) = \Bigg \{ {0 \atop tanh(x)} {: x \leq 0 \atop : x > 0}\]
 
 			<div style="text-align:center; width:100%"><img src="images/tanh-diagramm.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
 				In Aika the activation function is chosen in a way that it clearly distinguishes between active
@@ -119,6 +120,14 @@
 				On the other hand, if there are several conflicts between activations, then a search needs to be performed which
 				selects or excludes individual activations and tests how these changes affect the overall weights sum of
 				all activations. The necessary weights are computed for each activation by the following formula:
+
+				$$f = {\sum\limits_{j \in Acts}{h_j + norm_j} \over \sum\limits_{j \in Acts}{norm_j}}$$
+
+				$$norm_j = \min (-g_j, net_j - h_j)$$
+
+				$$g_j = \sum\limits_{i = 0, w_{ij} < 0.0}^N{w_{ij}}$$
+
+				$$h_j = \sum\limits_{i = 0, w_{ij} < 0.0}^N{x_i w_{ij}}$$
 
 			</p>
 
