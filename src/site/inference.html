@@ -50,20 +50,22 @@
 		<div class="features">
 			<h1>How it works</h1>
 			<p>
-			<h2>The Neural Network</h2>
+			<h2>The Artificial Neural Network</h2>
 			<p>
 				Aika is a neural network simulation algorithm, that uses neurons to represent a wide variety of
-				linguistic concepts and information and connects them via synapses. In contrast to most other neural
+				linguistic concepts and connects them via synapses. In contrast to most other neural
 				network architectures, Aika does not employ layers to structure its network. Synapses can connect arbitrary
-				neurons with each other, but the network is not fully connected either. </br>
+				neurons with each other, but the network is not fully connected either. <br/>
 				Like other artificial neural networks the synapses are weighted. By choosing the weights and and the threshold
 				(i.e. the bias) accordingly neurons can take on the characteristics of boolean logic gates such as an
 				and-gate or an or-gate. To compute the activation value of a neuron, the weighted sum over its input
 				synapses is computed. Then the bias value \(b\) is added to this sum and the result is
 				sent through an activation function \(\varphi\).
-
-				<div style="text-align:center; width:100%"><img src="images/neuron.svg" width="60%" height="60%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
-
+            </p>
+            <div style="text-align:center; width:100%">
+                <img src="images/neuron.svg" width="60%" height="60%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+            </div>
+            <p>
 				$$net_j = {b_j + \sum\limits_{i=0}^N{x_i w_{ij}}}$$
 				$$y_j = \varphi (net_j)$$
 
@@ -71,9 +73,11 @@
 				in Aika is the positive half of the \(tanh()\) function.
 
 				\[\varphi(x) = \Bigg \{ {0 \atop tanh(x)} {: x \leq 0 \atop : x > 0}\]
-
-				<div style="text-align:center; width:100%"><img src="images/tanh-diagramm.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
-
+            </p>
+            <div style="text-align:center; width:100%">
+                <img src="images/tanh-diagramm.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+            </div>
+            <p>
 				The activation functions are chosen in a way that they clearly distinguish between active
 				and inactive neurons. Only activated neurons are processed. These activations are expressed not only by a real
 				valued number but also by an activation object.
@@ -104,9 +108,10 @@
 				are then weighted and only the strongest interpretation is returned as the result. Consider the following
 				network as an example, in which the different linguistic concepts are represented by individual neurons.
 			</p>
-			<p>
-				<div style="text-align:center; width:100%"><img src="images/example-diagram.svg" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
-			</p>
+
+            <div style="text-align:center; width:100%">
+                <img src="images/example-diagram.svg" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+            </div>
 
 			<p>
 				This network is able to determine whether a word, which has been recognized in a text, is a forename,
@@ -120,40 +125,102 @@
 			</p>
 			<p>
 				New interpretations are spawned if both input and output of a negative recurrent synapse get activated.
-				In this case a conflict is generated. If there are no conflicts during the processing of a input data
+				In this case a conflict is generated. If there are no conflicts during the processing of an input data
 				set, only one interpretation will exist and the search for the best interpretation will end immediately.
 				On the other hand, if there are several conflicts between activations, then a search needs to be
 				performed which selects or excludes individual activations and tests how these changes affect the
-				overall weights sum of all activations. This sum is also called the objective function and can be stated
-				in the following way:
+				overall weights sum of all activations. This sum is also called the objective function \(f\) and can be
+                stated in the following way:
 
 				$$f = {\sum\limits_{j \in Acts}{h_j + norm_j} \over \sum\limits_{j \in Acts}{norm_j}}$$
 
 				$$norm_j = \min (-g_j, net_j - h_j)$$
 
-				$$g_j = \sum\limits_{i = 0, w_{ij} < 0.0}^N{w_{ij}}$$
+				$$g_j = \sum\limits_{i = 0, w_{ij} < 0}^N{w_{ij}}$$
 
-				$$h_j = \sum\limits_{i = 0, w_{ij} < 0.0}^N{x_i w_{ij}}$$
+				$$h_j = \sum\limits_{i = 0, w_{ij} < 0}^N{x_i w_{ij}}$$
 
 				The intention behind this objective function is to measure a neurons ability to overcome the inhibiting
 				input signals of other neurons.
 			</p>
+            <h2>Synapses</h2>
+            <p>
+                Synapses in Aika consist not just of a weight value but also properties to manipulate the text range or
+                the word position. The complete list of synapse properties looks as follows:
+            </p>
 
-			<h2>The Pattern Lattice</h2>
+                <div class="prettyprint-code">
+                    <pre class="prettyprint">
+				        <code class="language-java">
+                new Synapse.Builder()
+                        .setNeuron(inputNeuron)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRelativeRid(0)
+                        .setRecurrent(false)
+                        .setRangeMatch(
+                            Relation.create(
+                                Operator.EQUALS, // A
+                                Operator.NONE,   // B
+                                Operator.EQUALS, // C
+                                Operator.NONE    // D
+                            )
+                        )
+                        .setRangeOutput(true, true),
+                        </code>
+			        </pre>
+                </div>
+            <p>
+                Unlike other ANNs, Aika allows to specify a bias value per synapse. These bias values are simply summed
+                up and added to the neurons bias value. <br/>
+                The property relative rid specifies the relative difference between the relational id (rid) of the input
+                activation and the output activation. The relational id is usually used store the word position, but
+                might be used for other purposes as well. <br/>
+                The property recurrent states whether this synapse is a feedback loop or not. Depending on the weight
+                of this synapse such a feedback loop might either be positive or negative. This property is an important
+                indicator for the interpretation search. <br/>
+                The property range match compares the input activation range with the output activation range. A range
+                simply describes the start and end character within the documents text. The range match consists of four
+                character position comparisons.
+            </p>
+
+            <div style="text-align:center; width:100%">
+                <img src="images/range-match.svg" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+            </div>
+            <p>
+                The last property is the range output which consists of two boolean values. If these are set to true,
+                then either the range begin or the range end are propagated to the output activation.
+            </p>
+
+            <h2>The Pattern Lattice</h2>
 			<p>
-				One design goal of the Aika algorithm was to be able to efficiently simulate huge networks. This is, however,
-				only possible if only a fraction of the neurons need to be computed for any given input data set. One
-				precondition to achieve this goal is the earlier mentioned distinction between active and inactive neurons.
-				If one neuron gets activated then only those outgoing neurons need to be computed that would exceed their
-				threshold based on this new input. Depending on the synapse weights and bias settings of the outgoing it
-				may either fire directly (for or-gate like neurons) or it may require other input neurons to fire first
-				(for and-gate like neurons). If the neuron is an and-gate like neuron then there is a efficient way to
-				very specifically determine only those outgoing neurons that may be activated by a new input signal.
+				One design goal of the Aika algorithm is to be able to efficiently simulate huge networks. This, however,
+				is only possible if only a fraction of the neurons needs to be computed for any given input data set. One
+				prerequisite to achieve this goal is the earlier mentioned distinction between active and inactive neurons.
+				If one neuron gets activated then only those outgoing neurons are required to be computed, that would
+                exceed their threshold based on this new input. Depending on the synapse weights and bias settings of
+                the outgoing neuron it may either fire directly (for or-gate like neurons) or it may require other input
+                neurons to fire first (for and-gate like neurons). If the neuron is an and-gate like neuron then there
+                is a efficient way to determine only those outgoing neurons that may be activated by a new input signal.
+                <br/> That is where the <a href="https://en.wikipedia.org/wiki/Lattice_(order)" rel="nofollow">pattern lattice</a>
+                comes into play. The pattern lattice is used to store all sub patterns of a given input pattern. If
+                for instance a neuron requires the inputs \(A\), \(B\) and \(C\) to be activated before the neuron itself can be
+                fired, then the following pattern lattice would emerge.
+            </p>
+                <div style="text-align:center; width:100%">
+                    <img src="images/lattice.svg" width="30%" height="30%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+                </div>
+            <p>
+                As with the neural network, activations can be propagated within the pattern lattice as well. If only
+                the two inputs \(A\) and \(B\) are activated by an incoming signal, then the pattern node \(AB\) would
+                be activated as well, but not the pattern node \(ABC\). The advantage of this data structure is that
+                only minimal refinements have to be tested from one level in the pattern lattice to the next. If all
+                neurons that depend on input \(A\) would be tested directly then the number of outgoing neurons might
+                be very large and many unnecessary computations would have to be performed.
 
-				So how do an <a href="https://en.wikipedia.org/wiki/Artificial_neural_network" rel="nofollow">artificial neural network</a> and a <a href="http://www.charuaggarwal.net/freqbook.pdf" rel="nofollow">frequent pattern mining</a> algorithm fit together? Well, ANNs basically consist of neurons that compute an output value based on the weighted sum of their inputs.
-				These neurons can be reformulated as a set of boolean operations.
-
-				For example, the following <a href="https://en.wikipedia.org/wiki/Artificial_neuron" rel="nofollow">neuron</a> utilizing the <a href="https://de.wikipedia.org/wiki/Heaviside-Funktion" rel="nofollow">heaviside transfer function</a> (1 if x > 0 otherwise 0)
+                But before we can build the pattern lattice, we first have to convert the weighted inputs of a neuron
+                into a boolean representation. For the sake of simplicity, let us consider a neuron with a heaviside
+                activation function (\(\theta(x) = 1\) if \(x > 0\) otherwise \(0\)).
 			</p>
 
 			$$b = -0.5$$
@@ -162,32 +229,23 @@
 			$$w_2 = 0.3$$
 			$$y = \theta \Bigg({b + \sum\limits_{i=0}^N{x_i w_i}}\Bigg)$$
 			<p>
-				can also be written as boolean equation
+				This example neuron can then be reformulated into a disjunctive normal form boolean expression:
 			</p>
 			$$y = x_0 \vee (x_1 \wedge x_2)$$
 
-			<p>
-				So it is easy to see that the neuron's weighted sum can be reformulated as a <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form" rel="nofollow">disjunctive normal form</a> boolean equation, meaning that we always
-				get a set of conjunctions that are connected by a disjunction. Now, the trick to bring the two machine learning approaches together is to store these conjunctions as nodes within a <a href="https://en.wikipedia.org/wiki/Lattice_(order)" rel="nofollow">pattern lattice</a>. A
-				pattern lattice is a directed acyclic graph containing all subpatterns of a given pattern.
-			</p>
+            <p>
+                A boolean expression in disjunctive normal form consists of a set of conjunctions that are connected by
+                a disjunction. That means we can store these conjunctions as nodes within the pattern lattice and connect them
+                by disjunction node. The activation of this disjunction node is then the precondition before the associated
+                neuron can be activated. So the weighted sum of the neuron still needs to be computed, but only when the
+                disjunction node gets activated. Another advantage of the pattern lattice is that large parts of the lattice
+                can be shared by multiple neurons.
+            </p>
 
-			<div style="text-align:center; width:100%"><img src="images/lattice.svg" width="30%" height="30%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
-
-			<p>
-				An advantage of this representation is that it greatly reduces the computational costs. In a classical
-				neural network the weighted sums of all neurons would have to be computed. This requires
-				a lot of computational power if the network is large. Aika on the other hand does not even touch a neuron if it
-				has no chance of being activated. Activations must first pass a few layers of logic nodes within the
-				pattern lattice before the activation of a neuron output is even considered. Each layer filters out activations that
-				are unable to activate a neuron output. Though the depth of the pattern
-				lattice is limited. Otherwise too many logic nodes would be generated.
-			</p>
-
-			<div style="text-align:center; width:100%"><img src="images/network.svg" width="70%" height="70%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
-
-
-		</div>
+            <div style="text-align:center; width:100%">
+                <img src="images/network.svg" width="70%" height="70%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+            </div>
+        </div>
 	</div>
 </body>
 </html>
