@@ -52,74 +52,80 @@
 			<p>
 			<h2>The Neural Network</h2>
 			<p>
-				Basically, Aika is a neural network simulation algorithm. It uses neurons to represent a wide variety of
+				Aika is a neural network simulation algorithm, that uses neurons to represent a wide variety of
 				linguistic concepts and information and connects them via synapses. In contrast to most other neural
 				network architectures, Aika does not employ layers to structure its network. Synapses can connect arbitrary
 				neurons with each other, but the network is not fully connected either. </br>
-				Like other artificial neural networks these
-				synapses are weighted. By choosing the weights and bias accordingly neurons can take on the characteristics
-				of boolean logic gates such as an and-gate or an or-gate. To compute the activation value of a neuron, the
-				weighted sum over its input synapses is computed. Then a bias value \(b\) is added to this sum and the result is
+				Like other artificial neural networks the synapses are weighted. By choosing the weights and and the threshold
+				(i.e. the bias) accordingly neurons can take on the characteristics of boolean logic gates such as an
+				and-gate or an or-gate. To compute the activation value of a neuron, the weighted sum over its input
+				synapses is computed. Then the bias value \(b\) is added to this sum and the result is
 				sent through an activation function \(\varphi\).
 
-			<div style="text-align:center; width:100%"><img src="images/neuron.svg" width="60%" height="60%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
+				<div style="text-align:center; width:100%"><img src="images/neuron.svg" width="60%" height="60%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
 
 				$$net_j = {b_j + \sum\limits_{i=0}^N{x_i w_{ij}}}$$
 				$$y_j = \varphi (net_j)$$
 
 				Depending on the type of neuron, different activation functions can be used. One commonly used activation function
-				is the positive half of the \(tanh()\) function.
+				in Aika is the positive half of the \(tanh()\) function.
 
 				\[\varphi(x) = \Bigg \{ {0 \atop tanh(x)} {: x \leq 0 \atop : x > 0}\]
 
-			<div style="text-align:center; width:100%"><img src="images/tanh-diagramm.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
-				In Aika the activation function is chosen in a way that it clearly distinguishes between active
+				<div style="text-align:center; width:100%"><img src="images/tanh-diagramm.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
+
+				The activation functions are chosen in a way that they clearly distinguish between active
 				and inactive neurons. Only activated neurons are processed. These activations are expressed not only by a real
 				valued number but also by an activation object.
 			</p>
 
 			<h2>Activations</h2>
 			<p>
-				The advantage of these activation objects is that, through them, we are able to cope with the relational
+				The advantage of having activation objects is that, through them, we are able to cope with the relational
 				structure of natural language text by making the activation relate to a specific segment of text. In a way
 				these activations can be seen as text annotations that specify a start character and an end character
-				or the word position (relational id). </br>
+				or the position of a word (relational id). </br>
 				Words, phrases and sentences are in a relation to each other through
 				their sequential order. The assignment of text ranges and word positions to activations is a simple yet
 				powerful representation of the relational structure of text and avoids some of the shortcomings of other
 				representations such as bag of words or sliding window.
 				Since these activations are propagated along through the network, synapses need to be able to manipulate
-				the text range and the word position while the activation is passed on to the next neuron.
+				the text range and the word position while the activations are passed on to the next neuron.
 			</p>
 
 			<h2>Interpretations</h2>
 			<p>
-				One common problem when processing text is that of cyclic dependencies. In the example 'jackson cook' it is impossible
-				to decide which word has to be resolved first, the forename or the surname, since both depend on each other. The word
-				jackson can be recognized as a forename when the next word is a surname and the word cook can be recognized as a surname when the
-				previous word is a forename.
-				To tackle this problem Aika employs <a href="https://en.wikipedia.org/wiki/Non-monotonic_logic" rel="nofollow">non-monotonic logic</a> and
-				is therefore able to derive interpretations that are mutually exclusive. These interpretations are then weighted and only the strongest interpretation
-				is returned as the result. Consider the following network as an example, in which the different linguistic concepts are represented by individual neurons.
+				One common problem when processing text is that of cyclic dependencies. In the example 'jackson cook' it
+				is impossible to decide which word has to be resolved first, the forename or the surname, since both
+				depend on each other. The word jackson can be recognized as a forename when the next word is a surname
+				and the word cook can be recognized as a surname when the previous word is a forename.
+				To tackle this problem Aika employs <a href="https://en.wikipedia.org/wiki/Non-monotonic_logic" rel="nofollow">non-monotonic logic</a>
+				and is therefore able to derive multiple interpretations that are mutually exclusive. These interpretations
+				are then weighted and only the strongest interpretation is returned as the result. Consider the following
+				network as an example, in which the different linguistic concepts are represented by individual neurons.
 			</p>
 			<p>
-			<div style="text-align:center; width:100%"><img src="images/example-diagram.svg" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
+				<div style="text-align:center; width:100%"><img src="images/example-diagram.svg" style="float:none; margin-left:auto; margin-right:auto; display:block"/></div>
 			</p>
 
 			<p>
-				This network is able to determine whether a word, which has been recognized in a text, is a forename, surname, city name, or profession. If for instance the
-				word "jackson" has been recognized in a text, it will trigger further activations in the two jackson entity neurons. Since both are connected through the
-				suppressing neuron only one of them can be active in the end. Aika will therefore generate two interpretations. But these
-				interpretations are not limited to a single neuron. For instance if the word neuron cook gets activated too, then the jackson forename entity and the cook surname
-				entity will be part of the same interpretation. The forename and surname category links in this example form a positive feedback loop which reinforces this interpretation.
+				This network is able to determine whether a word, which has been recognized in a text, is a forename,
+				surname, city name, or profession. If for instance the word "jackson" has been recognized in a text, it
+				will trigger further activations in the two jackson entity neurons. Since both are connected through the
+				suppressing neuron only one of them can be active in the end. Aika will therefore generate two
+				interpretations. But these interpretations are not limited to a single neuron. For instance if the word
+				neuron cook gets activated too, then the jackson forename entity and the cook surname entity will be
+				part of the same interpretation. The forename and surname category links in this example form a positive
+				feedback loop which reinforces this interpretation.
 			</p>
 			<p>
-				New interpretations are spawned if both input and output of a negative recurrent synapse get activated. In this case a conflict is
-				generated. If there are no conflicts during the processing of a input data set, only one interpretation
-				will exist and the search for the best interpretation will end pretty quickly.
-				On the other hand, if there are several conflicts between activations, then a search needs to be performed which
-				selects or excludes individual activations and tests how these changes affect the overall weights sum of
-				all activations. The necessary weights are computed for each activation by the following formula:
+				New interpretations are spawned if both input and output of a negative recurrent synapse get activated.
+				In this case a conflict is generated. If there are no conflicts during the processing of a input data
+				set, only one interpretation will exist and the search for the best interpretation will end immediately.
+				On the other hand, if there are several conflicts between activations, then a search needs to be
+				performed which selects or excludes individual activations and tests how these changes affect the
+				overall weights sum of all activations. This sum is also called the objective function and can be stated
+				in the following way:
 
 				$$f = {\sum\limits_{j \in Acts}{h_j + norm_j} \over \sum\limits_{j \in Acts}{norm_j}}$$
 
@@ -129,6 +135,8 @@
 
 				$$h_j = \sum\limits_{i = 0, w_{ij} < 0.0}^N{x_i w_{ij}}$$
 
+				The intention behind this objective function is to measure a neurons ability to overcome the inhibiting
+				input signals of other neurons.
 			</p>
 
 			<h2>The Pattern Lattice</h2>
