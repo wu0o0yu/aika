@@ -145,6 +145,8 @@
 
 				$$net_j^{\neg r} = b_j + \sum\limits_{i = 0, w_{ij} \notin Recurrent}^N{x_i w_{ij}}$$
 
+				The values \(g_j^{r+}\) and \(g_j^{r-}\) are simply the sum of all positive or negative feedback synapses.
+				The value \(net_j^{\neg r}\) is the non recurrent part of the neurons weighted sum.
 				The intention behind this objective function is to measure a neurons ability to overcome the inhibiting
 				input signals of other neurons.
 			</p>
