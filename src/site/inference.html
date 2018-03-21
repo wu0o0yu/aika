@@ -57,8 +57,8 @@
 				linguistic concepts and connects them via synapses. In contrast to most other neural
 				network architectures, Aika does not employ layers to structure its network. Synapses can connect arbitrary
 				neurons with each other, but the network is not fully connected either. <br/>
-				Like other artificial neural networks (ANN) the synapses are weighted. By choosing the weights and and the threshold
-				(i.e. the bias) accordingly neurons can take on the characteristics of boolean logic gates such as an
+				Like other artificial neural networks (ANN) the synapses are weighted. By choosing the weights and the threshold
+				(i.e. the bias) accordingly, neurons can take on the characteristics of boolean logic gates such as an
 				and-gate or an or-gate. To compute the activation value of a neuron, the weighted sum over its input
 				synapses is computed. Then the bias value \(b\) is added to this sum and the result is
 				sent through an activation function \(\varphi\).
@@ -128,7 +128,7 @@
 				In this case a conflict is generated. An interpretation is a conflict free set of activations. Therefore,
 				if there are no conflicts during the processing of an input data set, only one interpretation will exist
 				and the search for the best interpretation will end immediately.
-				On the other hand, if there are several conflicts between activations, then a search needs to be
+				On the other hand, if there are several conflicts between activations, a search needs to be
 				performed which selects or excludes individual activations and tests how these changes affect the
 				overall weights sum of all activations. This sum is also called the objective function \(f\) and can be
                 stated in the following way:
@@ -151,7 +151,7 @@
 
 			<p>
 				To reduce costs of the interpretation search several optimizations have been implemented, so that the
-				search avoids branches in the search tree that have already been computed. Furthermore, the computation
+				search avoids to follow branches that have already been computed. Furthermore, the computation
 				results in each search node are cached if possible. A stack trace of the resulting search tree looks as
 				shown in the following box.
 				This list shows a single path from a leaf node to the root node. Each search node is associated with a
@@ -166,42 +166,42 @@
 			<div class="prettyprint-code">
                     <pre class="prettyprint">
 				        <code class="language-java">
-	7 ACT-ID:23 RANGE:(12,16) C-surname
+	7 RANGE:(12,16) C-surname
 	AW:9.998 AN:20.3 DW:9.998 DN:0.0
 	LIMITED DECISION:SELECTED CONFLICT:false LIMITED:5 CACHED:0 EXPLORE:0 SELECTED:2 EXCLUDED:3
 	SIM-CACHED:0 SIM-COMPUTED:5 MODIFIED:1
 
-	6 ACT-ID:20 RANGE:(12,16) SUPPR
+	6 RANGE:(12,16) INHIBIT
 	AW:0.0 AN:20.3 DW:0.0 DN:0.0
 	LIMITED DECISION:SELECTED CONFLICT:false LIMITED:5 CACHED:0 EXPLORE:0 SELECTED:4 EXCLUDED:1
 	SIM-CACHED:0 SIM-COMPUTED:5 MODIFIED:2
 
-	5 ACT-ID:18 RANGE:(12,16) E-cook (surname)
+	5 RANGE:(12,16) E-cook (surname)
 	AW:0.0 AN:20.3 DW:0.0 DN:5.0
 	CACHED  DECISION:SELECTED CONFLICT:true  LIMITED:2 CACHED:1 EXPLORE:1 SELECTED:2 EXCLUDED:3
 	SIM-CACHED:0 SIM-COMPUTED:5 MODIFIED:1
 
-	4 ACT-ID:16 RANGE:(12,16) E-cook (profession)
+	4 RANGE:(12,16) E-cook (profession)
 	AW:0.0 AN:15.3 DW:0.0 DN:4.5
 	EXPLORE DECISION:EXCLUDED CONFLICT:true  LIMITED:0 CACHED:0 EXPLORE:2 SELECTED:2 EXCLUDED:2
 	SIM-CACHED:0 SIM-COMPUTED:4 MODIFIED:0
 
-	3 ACT-ID:10 RANGE:(4,11)  C-forename
+	3 RANGE:(4,11)  C-forename
 	AW:0.0 AN:10.8 DW:0.0 DN:0.0
 	LIMITED DECISION:SELECTED CONFLICT:false LIMITED:2 CACHED:0 EXPLORE:0 SELECTED:1 EXCLUDED:1
 	SIM-CACHED:0 SIM-COMPUTED:2 MODIFIED:0
 
-	2 ACT-ID:7  RANGE:(4,11)  SUPPR
+	2 RANGE:(4,11)  INHIBIT
 	AW:0.0 AN:10.8 DW:0.0 DN:0.0
 	LIMITED DECISION:SELECTED CONFLICT:false LIMITED:2 CACHED:0 EXPLORE:0 SELECTED:2 EXCLUDED:0
 	SIM-CACHED:0 SIM-COMPUTED:2 MODIFIED:1
 
-	1 ACT-ID:5  RANGE:(4,11)  E-jackson (forename)
+	1 RANGE:(4,11)  E-jackson (forename)
 	AW:0.0 AN:10.8 DW:0.0 DN:5.0
 	EXPLORE DECISION:SELECTED CONFLICT:true  LIMITED:1 CACHED:0 EXPLORE:1 SELECTED:1 EXCLUDED:1
 	SIM-CACHED:0 SIM-COMPUTED:2 MODIFIED:0
 
-	0 ACT-ID:3  RANGE:(4,11)  E-jackson (city)
+	0 RANGE:(4,11)  E-jackson (city)
 	AW:0.0 AN:5.8 DW:0.0 DN:5.8
 	EXPLORE DECISION:EXCLUDED CONFLICT:true  LIMITED:0 CACHED:0 EXPLORE:1 SELECTED:1 EXCLUDED:1
 	SIM-CACHED:0 SIM-COMPUTED:2 MODIFIED:0
@@ -255,12 +255,13 @@
             </div>
             <p>
                 The last property is the range output which consists of two boolean values. If these are set to true,
-                then either the range begin or the range end are propagated to the output activation.
+                either the range begin or the range end are propagated to the output activation.
             </p>
 
             <h2>The Pattern Lattice</h2>
 			<p>
-				One design goal of the Aika algorithm is to be able to efficiently simulate huge networks. This, however,
+				One design goal of the Aika algorithm is, to be able to efficiently simulate huge networks with millions
+				of neurons. This, however,
 				is only possible if only a fraction of the neurons needs to be computed for any given input data set. One
 				prerequisite to achieve this goal is the earlier mentioned distinction between active and inactive neurons.
 				If one neuron gets activated then only those outgoing neurons are required to be computed, that would
@@ -268,7 +269,7 @@
                 the outgoing neuron it may either fire directly (for or-gate like neurons) or it may require other input
                 neurons to fire first (for and-gate like neurons). If the neuron is an and-gate like neuron then there
                 is a efficient way to determine only those outgoing neurons that may be activated by a new input signal.
-                <br/> That is where the <a href="https://en.wikipedia.org/wiki/Lattice_(order)" rel="nofollow">pattern lattice</a>
+                <br/> This is where the <a href="https://en.wikipedia.org/wiki/Lattice_(order)" rel="nofollow">pattern lattice</a>
                 comes into play. The pattern lattice is used to store all sub patterns of a given input pattern. If
                 for instance a neuron requires the inputs \(A\), \(B\) and \(C\) to be activated before the neuron itself can be
                 fired, then the following pattern lattice would emerge.
@@ -286,7 +287,7 @@
 
                 But before we can build the pattern lattice, we first have to convert the weighted inputs of a neuron
                 into a boolean representation. Here we only need to distinguish between active and inactive neurons.
-				Therefore let us consider a neuron with a heaviside activation function (\(\theta(x) = 1\) if \(x > 0\) otherwise \(0\)).
+				Hence let us consider a neuron with a heaviside activation function (\(\theta(x) = 1\) if \(x > 0\) otherwise \(0\)).
 			</p>
 
 			$$b = -0.5$$
