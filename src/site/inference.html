@@ -132,13 +132,17 @@
 				overall weights sum of all activations. This sum is also called the objective function \(f\) and can be
                 stated in the following way:
 
-				$$f = {\sum\limits_{j \in Acts}{h_j + norm_j} \over \sum\limits_{j \in Acts}{norm_j}}$$
+				$$f = {\sum\limits_{j \in Acts}{weight_j} \over \sum\limits_{j \in Acts}{norm_j}}$$
 
-				$$norm_j = \min (-g_j, net_j - h_j)$$
+				$$weight_j = \min (-g_j^{-r}, net_j)$$
 
-				$$g_j = \sum\limits_{i = 0, w_{ij} < 0}^N{w_{ij}}$$
+				$$norm_j = \min (-g_j^{-r}, net_j^{nr} + g_j^{+r})$$
 
-				$$h_j = \sum\limits_{i = 0, w_{ij} < 0}^N{x_i w_{ij}}$$
+				$$g_j^{+r} = \sum\limits_{i = 0, w_{ij} \geq 0, w_{ij} \notin Recurrent}^N{w_{ij}}$$
+
+				$$g_j^{-r} = \sum\limits_{i = 0, w_{ij} < 0, w_{ij} \in Recurrent}^N{w_{ij}}$$
+
+				$$net_j^{nr} = b_j + \sum\limits_{i = 0, w_{ij} \notin Recurrent}^N{x_i w_{ij}}$$
 
 				The intention behind this objective function is to measure a neurons ability to overcome the inhibiting
 				input signals of other neurons.
