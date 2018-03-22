@@ -71,12 +71,13 @@
 				$$y_j = \varphi (net_j)$$
 
 				Depending on the type of neuron, different activation functions can be used. One commonly used activation function
-				in Aika is the positive half of the \(\tanh()\) function.
+				in Aika is the <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)">rectified</a> tangens
+				hyperbolicus function, which is basically the positive half of the \(\tanh()\) function.
 
 				\[\varphi(x) = \Bigg \{ {0 \atop \tanh(x)} {: x \leq 0 \atop : x > 0}\]
             </p>
             <div style="text-align:center; width:100%">
-                <img src="images/tanh-diagramm.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+                <img src="images/tanh-diagram.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
             </div>
             <p>
 				The activation functions are chosen in a way that they clearly distinguish between active
@@ -277,17 +278,27 @@
 				inhibitory interneurons with short axons which form circuits with nearby neurons. <br/>
 				Those two types of neurons also have a different electrical signature. Stellate cells usually react to
 				a constant depolarising current by firing action potentials. This occurs with a relatively constant frequency
-				during the entire stimulus. Most pyramidal cells on the other hand are unable to maintain a constant firing
+				during the entire stimulus. In contrast to that most pyramidal cells are unable to maintain a constant firing
 				rate. Instead, they are firing quickly at the beginning of the stimulus and then reduce the frequency even
 				if the stimulus stays strong. This slowdown over time is called adaption. <br/>
 				Aika tries to mimic this behaviour by using different activation functions for the different types of
-				neurons. Since Aika is not a spiking neural network like biological role model, we only have the neurons
-				activation value which roughly can be interpreted as the frequency of a spiking neuron. In a sense the
-				earlier described activation function based on the upper half of the \(\tanh()\) quite nicely captures
+				neurons. Since Aika is not a spiking neural network like a biological neural network, we only have the neurons
+				activation value which can roughly be interpreted as the firing frequency of a spiking neuron. In a sense the
+				earlier described activation function based on the rectified tanh function quite nicely captures
 				the adaption behaviour of a pyramidal cell. An increase of a weak signal has a strong effect on the
 				neurons output, while an increase on an already strong signal has almost no effect. Furthermore, if the
 				input of the neuron does not surpass a certain threshold then the neuron will not fire at all.
+				For inhibitory neurons Aika uses the rectified linear unit function (ReLU).
+			</p>
 
+				$$y = \max(0, x)$$
+
+			<div style="text-align:center; width:100%">
+				<img src="images/relu-diagram.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+			</div>
+			<p>
+				Especially for strongly disjunctive neurons like the inhibitory neuron, ReLU has the advantage of
+				propagating its input signal exactly as it is, without distortion or loss of information.
 			</p>
 
 			<h2>The Pattern Lattice</h2>
