@@ -71,8 +71,8 @@
 				$$y_j = \varphi (net_j)$$
 
 				Depending on the type of neuron, different activation functions can be used. One commonly used activation function
-				in Aika is the <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)">rectified</a> tangens
-				hyperbolicus function, which is basically the positive half of the \(\tanh()\) function.
+				in Aika is the <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)">rectified</a>
+				hyperbolic tangent function, which is basically the positive half of the \(\tanh()\) function.
 
 				\[\varphi(x) = \Bigg \{ {0 \atop \tanh(x)} {: x \leq 0 \atop : x > 0}\]
             </p>
@@ -278,7 +278,7 @@
 				inhibitory interneurons with short axons which form circuits with nearby neurons. <br/>
 				Those two types of neurons also have a different electrical signature. Stellate cells usually react to
 				a constant depolarising current by firing action potentials. This occurs with a relatively constant frequency
-				during the entire stimulus. In contrast to that most pyramidal cells are unable to maintain a constant firing
+				during the entire stimulus. In contrast, most pyramidal cells are unable to maintain a constant firing
 				rate. Instead, they are firing quickly at the beginning of the stimulus and then reduce the frequency even
 				if the stimulus stays strong. This slowdown over time is called adaption. <br/>
 				Aika tries to mimic this behaviour by using different activation functions for the different types of
