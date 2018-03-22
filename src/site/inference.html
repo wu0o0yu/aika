@@ -71,9 +71,9 @@
 				$$y_j = \varphi (net_j)$$
 
 				Depending on the type of neuron, different activation functions can be used. One commonly used activation function
-				in Aika is the positive half of the \(tanh()\) function.
+				in Aika is the positive half of the \(\tanh()\) function.
 
-				\[\varphi(x) = \Bigg \{ {0 \atop tanh(x)} {: x \leq 0 \atop : x > 0}\]
+				\[\varphi(x) = \Bigg \{ {0 \atop \tanh(x)} {: x \leq 0 \atop : x > 0}\]
             </p>
             <div style="text-align:center; width:100%">
                 <img src="images/tanh-diagramm.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
@@ -155,7 +155,7 @@
 				To reduce costs of the interpretation search several optimizations have been implemented, so that the
 				search avoids to follow branches that have already been computed. Furthermore, the computation
 				results in each search node are cached if possible. A stack trace of the resulting search tree looks as
-				shown in the following box.
+				shown in the box below.
 				This list shows a single path from a leaf node to the root node. Each search node is associated with a
 				single activation. The nodes are ordered in a way, that the causality of non recurrent synapses is
 				respected. Depending on the path each activation is either selected or excluded. Decisions on
@@ -257,16 +257,46 @@
             </div>
             <p>
                 The last property is the range output which consists of two boolean values. If these are set to true,
-                either the range begin or the range end are propagated to the output activation.
+                either the range begin or the range end are propagated to the output activation. <br/>
+
+				Depending on the weight of the synapse and the bias sum of the outgoing neuron, Aika distinguishes two
+				types synapses: conjunctive synapses and disjunctive synapses. Conjunctive synapses are stored in the
+				output neuron as inputs and disjunctive synapses are stored in the input neuron as outputs. The reason
+				for this is that disjunctive neurons like the inhibitory neuron or the category neurons may have a huge
+				number of input synapses, which makes it expensive to load them from disk. By storing those synapses on
+				the input neuron side, only those synapses need to stay in memory, that are needed by an currently
+				activated input neuron.
             </p>
 
-            <h2>The Pattern Lattice</h2>
+			<h2>Neuron Types</h2>
+			<p>
+				There are two main types of neurons in Aika: excitatory neurons and inhibitory neurons. The biological
+				role models for those neurons are the spiny pyramidal cell and the aspiny stellate cell in the cerebral
+				cortex. The pyramidal cells usually exhibit an excitatory characteristic and some of them possess long
+				ranging axons that connect to other parts of the brain. The stellate cells on the other hand are usually
+				inhibitory interneurons with short axons which form circuits with nearby neurons. <br/>
+				Those two types of neurons also have a different electrical signature. Stellate cells usually react to
+				a constant depolarising current by firing action potentials. This occurs with a relatively constant frequency
+				during the entire stimulus. Most pyramidal cells on the other hand are unable to maintain a constant firing
+				rate. Instead, they are firing quickly at the beginning of the stimulus and then reduce the frequency even
+				if the stimulus stays strong. This slowdown over time is called adaption. <br/>
+				Aika tries to mimic this behaviour by using different activation functions for the different types of
+				neurons. Since Aika is not a spiking neural network like biological role model, we only have the neurons
+				activation value which roughly can be interpreted as the frequency of a spiking neuron. In a sense the
+				earlier described activation function based on the upper half of the \(\tanh()\) quite nicely captures
+				the adaption behaviour of a pyramidal cell. An increase of a weak signal has a strong effect on the
+				neurons output, while an increase on an already strong signal has almost no effect. Furthermore, if the
+				input of the neuron does not surpass a certain threshold then the neuron will not fire at all.
+
+			</p>
+
+			<h2>The Pattern Lattice</h2>
 			<p>
 				One design goal of the Aika algorithm is, to be able to efficiently simulate huge networks with millions
 				of neurons. This, however,
 				is only possible if only a fraction of the neurons needs to be computed for any given input data set. One
 				prerequisite to achieve this goal is the earlier mentioned distinction between active and inactive neurons.
-				If one neuron gets activated then only those outgoing neurons are required to be computed, that would
+				If one neuron gets activated, only those outgoing neurons are required to be computed, that would
                 exceed their threshold based on this new input. Depending on the synapse weights and bias settings of
                 the outgoing neuron it may either fire directly (for or-gate like neurons) or it may require other input
                 neurons to fire first (for and-gate like neurons). If the neuron is an and-gate like neuron then there
