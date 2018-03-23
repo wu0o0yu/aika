@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Vision - Aika</title>
+	<title>Training - Aika</title>
 	<link rel="stylesheet" href="css/style.css" type="text/css">
 	<link rel="shortcut icon" href="images/favicon.png" />
 
@@ -72,7 +72,11 @@
 			When training large neural networks, you quickly come across the problem that the number synapses grows
 			quadratic with the number of neurons. Even for a rather small network with a million neurons, the number of
 			synapses would grow to up to a trillion if you were about to connect all neurons. Even testing if a synapse
-			should be created between two neurons can easily become too expensive.
+			should be created between two neurons can easily become too expensive. It would also be desirable to generate
+			new neurons only when they needed instead of randomly before starting to train the network. <br/>
+			To solve these problems, Aika introduces a meta layer to its network. The neurons and synapses from this meta
+			layer are used to instantiate new neurons and synapses within Aikas neural network. The meta layer consists
+			just of an additional set of parameters to some of the neurons and synapses.
 		</p>
 
 		<h2>Frequent Pattern Discovery</h2>
