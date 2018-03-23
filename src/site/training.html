@@ -85,9 +85,12 @@
 			that networks based on the Hebb rule are unstable.
 
 		</p>
-			$$\Delta w_{ij} = \alpha \sigma_{ij} x_i (1 - y_j) y_j {o_j \over g_j^+} $$
+			$$\Delta w_{ij} = \alpha \sigma_{ij} x_i (1 - y_j) y_j {net_j \over g_j^+} $$
 
 			$$g_j^+ = b_j + \sum\limits_{i=0,w_{ij} > 0.0}^N{w_{ij}}$$
+
+			$$\forall_{i, j: x_i \leq 0, y_j > 0, conj(w_{ij})} \Delta w_{ij} = -\alpha \sigma_{ij} y_j$$
+			$$\forall_{i, j: x_i > 0, y_j \leq 0, disj(w_{ij})} \Delta w_{ij} = -\alpha \sigma_{ij} x_i$$
 		<p>
 			Another learning mechanism that can be derived from the interpretations is the following. Since only the
 			strongest interpretation is chosen
