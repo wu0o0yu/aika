@@ -17,6 +17,9 @@
 		ga('send', 'pageview');
 
 	</script>
+	<script type="text/javascript" async
+			src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+	</script>
 </head>
 <body>
 <div id="header">
@@ -55,17 +58,32 @@
 
 		<h2>Long-Term Potentiation and Long-Term Depression</h2>
 		<p>
-			Long-term potentiation and long-term depression are two lerning mechanisms that occur naturally in the brain.
+			Long-term potentiation and long-term depression are two learning mechanisms that occur naturally in the brain.
 			Long-term potentiation (LTP) is the process of a persistent strengthening of synapses based on recent
-			patterns of activity. It gave rise to Hebbs learning rule which can be summarized by the expression "What
-			fires together wires together".
-
-			The weakness of Hebbs learning rule is that the strengh of synapses will increase infinitely.
-
-			These are patterns of synaptic activity that produce a long-lasting increase in signal
+			patterns of activity. These are patterns of synaptic activity that produce a long-lasting increase in signal
 			transmission between two neurons. The opposite of LTP is long-term depression, which produces a long-lasting
-			decrease in synaptic strength."
+			decrease in synaptic strength. <br/>
+
+			LTP also gave rise to Hebbs learning rule which can be summarized by the expression "What fires together
+			wires together". <br/>
+
+			The following is a formulaic description of Hebbian learning:
+
+			$$\Delta w_{ij} = \eta x_i y_j$$
+
+			Where \(\eta \) is the learn rate, \(x_i \) is the input activation value and \(y_j \) is the output
+			activation value.
+			The weakness of Hebbs learning rule is that the strength of synapses will increase infinitely, which means
+			that networks based on the Hebb rule are unstable.
+
 		</p>
+		<p>
+			Another learning mechanism that can be derived from the interpretations is the following. Since only the
+			strongest interpretation is chosen
+			and all other interpretations are suppressed, we have a convenient way to automatically generate our
+			supervised training data.
+		</p>
+
 
 		<h2>Meta-Synapses and Meta-Neurons</h2>
 		<p>
@@ -82,43 +100,11 @@
 		<h2>Frequent Pattern Discovery</h2>
 
 		<p>
-
-			Since Aika is using a pattern lattice as underlying data structure for neurons, we do not depend solely on
-			<a href="https://en.wikipedia.org/wiki/Backpropagation" rel="nofollow">backpropagation</a> as a training
-			method for new neurons.
-			Now we are able to enumerate all frequent patterns and use them to generate new neurons. Therefore, we do
-			not have to retrain existing neurons and risk losing the conceptual knowledge
-			they have already accumulated. Frequent patterns are also much easier to comprehend for humans than the
-			weights of conventional ANNs. This is a form of unsupervised learning.
-		</p>
-		<p>
-			Another learning mechanism that can be derived from the interpretations is the following. Since only the
-			strongest interpretation is chosen
-			and all other interpretations are suppressed, we have a convenient way to automatically generate our
-			supervised training data.
-		</p>
-
-		<p>
-
-			But there are also other
-			ways that Aika could be trained. Since Aika selects one interpretation of a text and suppresses all
-			others, we have an easy way of generating our supervised training data by labeling the suppressed options as
-			negative examples.
-			<br/>
-			Another training mechanism that
-			could be implemented is to use Aikas Frequent Pattern Lattice to search for statistically significant
-			patterns and generate new neurons based on them. This would be an unsupervised training method that could be
-			used to
-			find syllables, words, commonly used phrases or other kinds of patterns in a text.
-			<br/>
-			It should also
-			be possible to apply <a href="http://adios.tau.ac.il/algorithm.html">grammar induction</a> methods. For
-			instance if there are several significant patterns
-			in the pattern lattice that share a common unsignificant parent pattern. In this case a new neuron that
-			consists of a disjunction of the original patterns could be introduced. This way not only conjunctions like
-			patterns could be
-			trained but also disjunctions.
-		</p>
+			Since Aika is using a pattern lattice as underlying data structure for neurons, we might be able to use this
+			pattern lattice as an unsupervised training method for the network.
+			The pattern lattice allows to enumerate all frequent or otherwise statistically interesting patterns
+			and use them to generate new neurons. Therefore, we do not have to retrain existing neurons and risk losing
+			the conceptual knowledge they have already accumulated.
 		</p>
 	</div>
 
