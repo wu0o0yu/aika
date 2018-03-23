@@ -55,6 +55,14 @@
 			concepts that Aika brings together.
 		</p>
 		<h2>Supervised Learning with the Delta-Rule</h2>
+		<p>
+			A standard training method that can be used for the Aika network as well is the delta rule.
+		</p>
+		$$\Delta w_{ij} = \alpha (t_j - y_j) x_i$$
+		<p>
+			Where \(\alpha \) is the learn rate, \(t_j \) is the target output value, \(x_i \) is the input activation value
+			and \(y_j \) is the actual output activation value.
+		</p>
 
 		<h2>Long-Term Potentiation and Long-Term Depression</h2>
 		<p>
@@ -68,10 +76,10 @@
 			wires together". <br/>
 
 			The following is a formulaic description of Hebbian learning:
-
-			$$\Delta w_{ij} = \eta x_i y_j$$
-
-			Where \(\eta \) is the learn rate, \(x_i \) is the input activation value and \(y_j \) is the output
+		</p>
+			$$\Delta w_{ij} = \alpha x_i y_j$$
+		<p>
+			Where \(\alpha \) is the learn rate, \(x_i \) is the input activation value and \(y_j \) is the output
 			activation value.
 			The weakness of Hebbs learning rule is that the strength of synapses will increase infinitely, which means
 			that networks based on the Hebb rule are unstable.
