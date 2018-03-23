@@ -76,19 +76,17 @@
 				<code class="language-java">
     Neuron forenameCategory = m.createNeuron("C-forename");
     Neuron surnameCategory = m.createNeuron("C-surname");
-    Neuron suppressingN = m.createNeuron("SUPPR");
+    Neuron inhibitingN = m.createNeuron("INHIB");
                 </code>
 			</pre>
             </div>
 
             Now, the following code snippet is the crucial section of this example. It shows how the first entity neuron is created and connected by its input synapses.
 The entity neurons represent the concrete meanings of the input words. As can be seen here the individual inputs have a few more properties than we are used to from other
-neural networks. The reason for this is that Aika not only propagates the input activation value to the next neuron but also the text range, the word position and the interpretation option.
-To avoid having to compute the neurons bias manually, we can use the <i>initAndNeuron</i> helper function for that. But in order to compute the bias it needs to know the
-required minimum input activation (<i>setBias</i>) of each input.
+neural networks. The reason for this is that Aika not only propagates the input activation value to the next neuron but also the text range, the word position.
             <br/>
             This entity neuron has three inputs. The first one simply checks if the word 'cook' occurred in the text. The second one is a positive feedback loop and checks if the previous word
-            was a forename. The last one is a negative feedback loop. It makes sure that only one entity is assigned to each word.
+            was a forename. The last one is a negative feedback loop. It makes sure that only one meaning is assigned to each word.
             <br/>
             The other entity neurons are created in a similar fashion which is therefore not shown here.
 
@@ -98,33 +96,36 @@ required minimum input activation (<i>setBias</i>) of each input.
     Neuron cookSurnameEntity = Neuron.init(
             m.createNeuron("E-cook (surname)"),
             3.0, // adjusts the bias
+            RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+            INeuron.Type.EXCITATORY,
             new Synapse.Builder() // Requires the word to be recognized
                     .setNeuron(inputNeurons.get("cook"))
                     .setWeight(10.0)
-                 // This input requires the input activation to have an
-                 // activation value of at least 0.9
-                    .setBias(-9.0)
+                    // This input requires the input activation to have an
+                    // activation value of at least 0.9
+                    .setBias(-10.0)
                     .setRelativeRid(0) // references the current word
                     .setRecurrent(false)
                     .setRangeMatch(EQUALS)
-                    .setRangeOutput(true), // propagate the range of this input
+                    .setRangeOutput(true),
             new Synapse.Builder() // The previous word needs to be a forename
                     .setNeuron(forenameCategory)
-                    .setWeight(10.0)
-                    .setBias(-9.0)
+                    .setWeight(5.0)
+                    .setBias(0.0)
                     .setRelativeRid(-1) // references the previous word
                     .setRecurrent(true) // this input is a positive feedback loop
-                    .setRangeMatch(NONE),
+                    .setRangeMatch(NONE)
+                    .setRangeOutput(false),
 
-            // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
-            // self suppression taking place even though 'E-cook (surname)' is also contained
-            // in suppressingN.
+                    // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
+                    // self suppression taking place even though 'E-cook (surname)' is also contained
+                    // in the inhibitingN.
             new Synapse.Builder()
-                    .setNeuron(suppressingN)
-                    .setWeight(-20.0)
+                    .setNeuron(inhibitingN)
+                    .setWeight(-100.0)
                     .setBias(0.0)
                     .setRecurrent(true) // this input is a negative feedback loop
-                    .setRangeMatch(CONTAINED_IN)
+                    .setRangeMatch(CONTAINS)
     );
                 </code>
 			</pre>
@@ -134,19 +135,27 @@ required minimum input activation (<i>setBias</i>) of each input.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    Neuron.init(forenameCategory, 0.0,
-            new Synapse.Builder() // In this example, only one forename is considered.
+    Neuron.init(
+            forenameCategory,
+            0.0,
+            RECTIFIED_LINEAR_UNIT_KEY,
+            INeuron.Type.EXCITATORY,
+            new Synapse.Builder() // In this example there is only one forename considered.
                     .setNeuron(jacksonForenameEntity)
-                    .setWeight(10.0)
+                    .setWeight(1.0)
                     .setBias(0.0)
                     .setRelativeRid(0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
     );
-    Neuron.init(surnameCategory, 0.0,
+    Neuron.init(
+            surnameCategory,
+            0.0,
+            RECTIFIED_LINEAR_UNIT_KEY,
+            INeuron.Type.EXCITATORY,
             new Synapse.Builder()
                     .setNeuron(cookSurnameEntity)
-                    .setWeight(10.0)
+                    .setWeight(1.0)
                     .setBias(0.0)
                     .setRelativeRid(0)
                     .setRangeMatch(EQUALS)
@@ -160,32 +169,35 @@ required minimum input activation (<i>setBias</i>) of each input.
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    Neuron.init(suppressingN, 0.0,
-            new Synapse.Builder()
-                    .setNeuron(cookProfessionEntity)
-                    .setWeight(10.0)
+    Neuron.init(
+            inhibitingN,
+            0.0,
+            RECTIFIED_LINEAR_UNIT_KEY,
+            INeuron.Type.INHIBITORY,
+            new Synapse.Builder().setNeuron(cookProfessionEntity)
+                    .setWeight(1.0)
                     .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Synapse.Builder()
                     .setNeuron(cookSurnameEntity)
-                    .setWeight(10.0)
+                    .setWeight(1.0)
                     .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Synapse.Builder()
                     .setNeuron(jacksonCityEntity)
-                    .setWeight(10.0)
+                    .setWeight(1.0)
                     .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Synapse.Builder()
                     .setNeuron(jacksonForenameEntity)
-                    .setWeight(10.0)
+                    .setWeight(1.0)
                     .setBias(0.0)
                     .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
-    );
+        );
                 </code>
 			</pre>
             </div>
@@ -202,35 +214,21 @@ Now that the model is complete, we can start processing an actual text.
     for(String w: doc.getContent().split(" ")) {
         int j = i + w.length();
 
-        inputNeurons.get(w).addInput(doc,
-                    new Activation.Builder()
-                        .setRange(i, j)
-                        .setRelationalId(wordPos)
-                    );
-
+        // Feed the individual words as inputs into the network.
+        inputNeurons.get(w).addInput(doc, i, j, wordPos);
         i = j + 1;
         wordPos++;
     }
 
     // Search for the best interpretation of this text.
     doc.process();
-                </code>
-			</pre>
-            </div>
 
-            <div class="prettyprint-code">
-            <pre class="prettyprint">
-				<code class="language-java">
     System.out.println(doc.activationsToString());
-    System.out.println();
-
-    System.out.println("Final interpretation: " + doc.bestInterpretation.toString());
 
     doc.clearActivations();
                 </code>
 			</pre>
             </div>
-
 The output of this example looks as following. Each line in the table represents a neuron activation. The first column specifies the text range this activation relates to. The second one specifies the interpretation option. These can be interpreted as follows. First there is the option id emmited by the current neuron. Behind that in rectangular brackets follows a list of linked options the current option depends on.
             <div class="prettyprint-code">
             <pre class="prettyprint">
