@@ -82,13 +82,27 @@
 			Where \(\alpha \) is the learn rate, \(x_i \) is the input activation value and \(y_j \) is the output
 			activation value.
 			The weakness of Hebbs learning rule is that the strength of synapses will increase infinitely, which means
-			that networks based on the Hebb rule are unstable.
+			that networks based on the Hebb rule are unstable. <br/>
 
+			The attempt to model LTP in Aika looks as follows:
 		</p>
 			$$\Delta w_{ij} = \alpha \sigma_{ij} x_i (1 - y_j) y_j {net_j \over g_j^+} $$
 
 			$$g_j^+ = b_j + \sum\limits_{i=0,w_{ij} > 0.0}^N{w_{ij}}$$
 
+		<p>
+			Where \(\alpha \) is the learn rate, \(net_j\) is the weighted sum and \(g_j^+\) is the sum of all positive
+			weights. The term \((1 - y_j) \) is used to limit the strength of the synapse and prevent it from growing
+			indefinitely. The term \(net_j \over g_j^+ \) measures how well the current input pattern matches the
+			already trained pattern of the outgoing neuron.
+			The \(\sigma_{ij} \) parameter is optional and allows to specify a significance for the synapse. An
+			implementation may look like this:
+		</p>
+			$$\sigma_{ij} = (f_i f_j)^\eta$$
+		<p>
+			In this formula the values \(f_i \) and \(f_j \) are the activation frequencies of the input and the output
+			neuron. \(\eta\) is used to adjust the strength of the significance parameter.
+		</p>
 			$$\forall_{i, j: x_i \leq 0, y_j > 0, disj(w_{ij})} \Delta w_{ij} = -\alpha \sigma_{ij} y_j$$
 			$$\forall_{i, j: x_i > 0, y_j \leq 0, conj(w_{ij})} \Delta w_{ij} = -\alpha \sigma_{ij} x_i$$
 		<p>
