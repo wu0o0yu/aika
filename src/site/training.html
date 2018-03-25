@@ -116,13 +116,25 @@
 		<h2>Meta-Synapses and Meta-Neurons</h2>
 		<p>
 			When training large neural networks, you quickly come across the problem that the number synapses grows
-			quadratic with the number of neurons. Even for a rather small network with a million neurons, the number of
-			synapses would grow to up to a trillion if you were about to connect all neurons. Even testing if a synapse
+			quadratic with the number of neurons in a fully connected network. Even for a rather small network with a
+			million neurons, the number of synapses would grow to up to a trillion if you were about to connect all
+			neurons. Even testing if a synapse
 			should be created between two neurons can easily become too expensive. It would also be desirable to generate
 			new neurons only when they are needed instead of randomly before starting to train the network. <br/>
 			To solve these problems, Aika introduces a meta layer to its network. The neurons and synapses from this meta
 			layer are used to instantiate new neurons and synapses within Aikas neural network. The meta layer consists
 			just of an additional set of parameters to some of the neurons and synapses.
+			A meta-neuron can be activated just like any other neuron, but when the meta-neuron is activated a new neuron
+			is generated from the meta parameters and meta-synapses of this neuron. To prevent that a new neuron is
+			generated, even though another neuron representing this information already exists, a feedback loop with an
+			inhibiting neuron is needed. This feedback loop allows to suppress the meta-neuron if the information that
+			it is supposed to learn is already known to the network.
+			The input synapses of the meta-neuron can regular synapses, a combination of a regular synapse and a meta
+			synapse or a pure meta-synapse. A pure meta-synapse would have no effect on the activation of the meta
+			neuron. It is just used to create the new neuron.
+			Another special feature of input meta-synapses is that when they connect to an inhibitory neuron, the resulting
+			generated synapse will not connect to the inhibitory itself, but to the excitatory neuron that activated the
+			inhibitory neuron.
 		</p>
 
 		<h2>Frequent Pattern Discovery</h2>
