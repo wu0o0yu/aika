@@ -96,7 +96,7 @@ public class MetaNetworkTest {
         entityMetaN = model.createNeuron("M-ENTITY");
 
 
-        MetaNetwork.initMetaNeuron(model, phraseMetaN, 4.0, 6.0,
+        MetaNetwork.initMetaNeuron(phraseMetaN, 4.0, 6.0,
                 new Synapse.Builder()
                         .setNeuron(keyPhraseHint)
                         .setWeight(40.0)
@@ -144,7 +144,7 @@ public class MetaNetworkTest {
                         .setRangeMatch(OVERLAPS)
         );
 
-        MetaNetwork.initMetaNeuron(model, entityMetaN, 5.0, 10.0,
+        MetaNetwork.initMetaNeuron(entityMetaN, 5.0, 10.0,
                 new Synapse.Builder()
                         .setNeuron(keyPhraseHint)
                         .setWeight(40.0)

@@ -17,6 +17,7 @@
 		ga('send', 'pageview');
 
 	</script>
+	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 	<script type="text/javascript" async
 			src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
 	</script>
@@ -61,7 +62,8 @@
 		$$\Delta w_{ij} = \alpha (t_j - y_j) x_i$$
 		<p>
 			Where \(\alpha \) is the learn rate, \(t_j \) is the target output value, \(x_i \) is the input activation value
-			and \(y_j \) is the actual output activation value.
+			and \(y_j \) is the actual output activation value. \(\Delta w_{ij}\) is the change that is added to the
+			synapse weight after each training round.
 		</p>
 
 		<h2>Long-Term Potentiation and Long-Term Depression</h2>
@@ -129,14 +131,43 @@
 			generated, even though another neuron representing this information already exists, a feedback loop with an
 			inhibiting neuron is needed. This feedback loop allows to suppress the meta-neuron if the information that
 			it is supposed to learn is already known to the network.
-			The input synapses of the meta-neuron can regular synapses, a combination of a regular synapse and a meta
+			The input synapses of the meta-neuron can be regular synapses, a combination of a regular synapse and a meta
 			synapse or a pure meta-synapse. A pure meta-synapse would have no effect on the activation of the meta
 			neuron. It is just used to create the new neuron.
+		</p>
+		<div style="text-align:center; width:100%">
+			<img src="images/meta-network-1.svg" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+		</div>
+		<p>
 			Another special feature of input meta-synapses is that when they connect to an inhibitory neuron, the resulting
 			generated synapse will not connect to the inhibitory itself, but to the excitatory neuron that activated the
 			inhibitory neuron. The purpose of this feature is to allow meta-synapses to define connections between
 			abstract categories. However, the resulting synapse connects the concrete instances of these categories.
 		</p>
+		<div style="text-align:center; width:100%">
+			<img src="images/meta-network-2.svg" width="45%" height="45%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+		</div>
+		<p>
+			Meta-neurons can be created using the method MetaNetwork.initMetaNeuron(). Synapses are added to this meta
+			neuron in the following way:
+		</p>
+		<div class="prettyprint-code">
+        	<pre class="prettyprint">
+				<code class="language-java">
+			new MetaSynapse.Builder()
+				.setNeuron(wordInhib)
+				.setWeight(20.0)
+				.setBias(-20.0)
+				.setRelativeRid(0)
+				.setRangeMatch(EQUALS)
+				.setRangeOutput(false),
+				.setMetaWeight(20.0)
+				.setMetaBias(-20.0)
+				.setMetaRelativeRid(true)
+        		</code>
+			</pre>
+		</div>
+
 
 		<h2>Frequent Pattern Discovery</h2>
 
@@ -145,7 +176,8 @@
 			pattern lattice as an unsupervised training method for the network.
 			The pattern lattice allows to enumerate all frequent or otherwise statistically interesting patterns
 			and use them to generate new neurons. Therefore, we do not have to retrain existing neurons and risk losing
-			the conceptual knowledge they have already accumulated.
+			the conceptual knowledge they have already accumulated. <br/>
+			The pattern discovery process can be started by calling the discover method in the PatternDiscovery class.
 		</p>
 	</div>
 

@@ -229,7 +229,7 @@ public class MetaNetwork {
     }
 
 
-    public static Neuron initMetaNeuron(Model m, Neuron n, double bias, double metaBias, Synapse.Builder... inputs) {
+    public static Neuron initMetaNeuron(Neuron n, double bias, double metaBias, Synapse.Builder... inputs) {
         n.get().metaBias = metaBias;
         return Neuron.init(n, bias, INeuron.Type.META, inputs);
     }
