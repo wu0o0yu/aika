@@ -224,12 +224,11 @@ public class Document implements Comparable<Document> {
      * network. It performs the search for the best interpretation.
      */
     public void process() {
-        processInternal();
-        fsQueue.prepareFinalState();
+        process(null);
     }
 
 
-    private void processInternal() {
+    public void process(Long timeoutInMilliSeconds) throws SearchNode.TimeoutException {
         inputNeuronActivations.forEach(act -> vQueue.propagateActivationValue(0, act));
 
         generateCandidates();
@@ -240,7 +239,9 @@ public class Document implements Comparable<Document> {
             selectedSearchNode = new SearchNode(this, null, null, 0);
         }
 
-        SearchNode.searchIterative(this, selectedSearchNode, visitedCounter++);
+        SearchNode.search(this, selectedSearchNode, visitedCounter++, timeoutInMilliSeconds);
+
+        fsQueue.prepareFinalState();
     }
 
 

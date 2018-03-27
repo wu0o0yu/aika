@@ -31,6 +31,7 @@ import static org.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
 import static org.aika.neuron.activation.Activation.ACTIVATION_ID_COMP;
 import static org.aika.neuron.activation.Activation.Mode.NEW;
 
+import java.sql.Time;
 import java.util.*;
 
 /**
@@ -284,9 +285,10 @@ public class SearchNode implements Comparable<SearchNode> {
      * @param doc
      * @param root
      */
-    public static void searchIterative(Document doc, SearchNode root, long v) {
+    public static void search(Document doc, SearchNode root, long v, Long timeoutInMilliSeconds) throws TimeoutException {
         SearchNode sn = root;
         Weight returnWeight = null;
+        long startTime = System.currentTimeMillis();
 
         do {
             if (sn.processVisited != v) {
@@ -297,6 +299,10 @@ public class SearchNode implements Comparable<SearchNode> {
             switch(sn.step) {
                 case INIT:
                     if (sn.level >= doc.candidates.size()) {
+                        if(timeoutInMilliSeconds != null && System.currentTimeMillis() > startTime + timeoutInMilliSeconds) {
+                            throw new TimeoutException("Interpretation search took too long: " + (System.currentTimeMillis() - startTime) + "ms");
+                        }
+
                         returnWeight = sn.processResult(doc);
                         sn.step = Step.FINAL;
                         sn = sn.getParent();
@@ -590,6 +596,14 @@ public class SearchNode implements Comparable<SearchNode> {
 
         public String toString() {
             return "W:" + Utils.round(w) + " N:" + Utils.round(n);
+        }
+    }
+
+
+    public static class TimeoutException extends RuntimeException {
+
+        public TimeoutException(String message) {
+            super(message);
         }
     }
 
