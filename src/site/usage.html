@@ -49,11 +49,13 @@
             <h1>Usage</h1>
 
             <h3>Named Entity Recognition / Entity Resolution example</h3>
-            This example demonstrates the recognition of the words 'jackson cook' as forename and surname.
-            If these words would have occurred independently, they would have been recognized as city or
-            profession based on the example code. The complete code for this example can be found in the class <a href="https://github.com/aika-algorithm/aika/blob/master/src/test/java/org/aika/network/NamedEntityRecognitionTest.java">NamedEntityRecognitionTest</a>.
-            <br/>
-            Now, the first step is to create an empty model. The following map is used as a dictionary to look up the individual word input neurons.
+            <p>
+                This example demonstrates the recognition of the words 'jackson cook' as forename and surname.
+                If these words would have occurred independently, they would have been recognized as city or
+                profession based on the example code. The complete code for this example can be found in the class <a href="https://github.com/aika-algorithm/aika/blob/master/src/test/java/org/aika/network/NamedEntityRecognitionTest.java">NamedEntityRecognitionTest</a>.
+                <br/>
+                Now, the first step is to create an empty model. The following map is used as a dictionary to look up the individual word input neurons.
+            </p>
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
@@ -69,8 +71,9 @@
                 </code>
 			</pre>
             </div>
-
-            These three neurons are just placeholders that will be wired up later on.
+            <p>
+                These three neurons are just placeholders that will be wired up later on.
+            </p>
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
@@ -81,15 +84,16 @@
 			</pre>
             </div>
 
-            The following code snippet is the crucial section of this example. It shows how the first entity neuron is created and connected by its input synapses.
-            The entity neurons represent the concrete meanings of the input words. As can be seen here the individual inputs have a few more properties than we are used to from other
-            neural networks. The reason for this is that Aika not only propagates the input activation value to the next neuron but also the text range, the word position.
-            <br/>
-            This entity neuron has three inputs. The first one simply checks if the word 'cook' occurred in the text. The second one is a positive feedback loop and checks if the previous word
-            was a forename. The last one is a negative feedback loop. It makes sure that only one meaning is assigned to each word.
-            <br/>
-            The other entity neurons are created in a similar fashion which is therefore not shown here.
-
+            <p>
+                The following code snippet is the crucial section of this example. It shows how the first entity neuron is created and connected by its input synapses.
+                The entity neurons represent the concrete meanings of the input words. As can be seen here the individual inputs have a few more properties than we are used to from other
+                neural networks. The reason for this is that Aika not only propagates the input activation value to the next neuron but also the text range, the word position.
+                <br/>
+                This entity neuron has three inputs. The first one simply checks if the word 'cook' occurred in the text. The second one is a positive feedback loop and checks if the previous word
+                was a forename. The last one is a negative feedback loop. It makes sure that only one meaning is assigned to each word.
+                <br/>
+                The other entity neurons are created in a similar fashion which is therefore not shown here.
+            </p>
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
@@ -130,8 +134,9 @@
                 </code>
 			</pre>
             </div>
-
-            The category neurons in this example only have input. For a real application there would be a long list of inputs.
+            <p>
+                The category neurons in this example only have input. For a real application there would be a long list of inputs.
+            </p>
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
@@ -164,8 +169,9 @@
                 </code>
 			</pre>
             </div>
-
-            The last neuron is the suppressing neuron. It is used as a mediator in order to avoid having to connect all of these neurons with each other. Self suppression does not take place.
+            <p>
+                The last neuron is the suppressing neuron. It is used as a mediator in order to avoid having to connect all of these neurons with each other. Self suppression does not take place.
+            </p>
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
@@ -201,9 +207,9 @@
                 </code>
 			</pre>
             </div>
-
-Now that the model is complete, we can start processing an actual text.
-
+            <p>
+                Now that the model is complete, we can start processing an actual text.
+            </p>
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
@@ -229,7 +235,9 @@ Now that the model is complete, we can start processing an actual text.
                 </code>
 			</pre>
             </div>
+            <p>
 The output of this example looks as following. Each line in the table represents a neuron activation.
+            </p>
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
