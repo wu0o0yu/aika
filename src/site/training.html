@@ -63,13 +63,31 @@
 		<p>
 			Where \(\alpha \) is the learn rate, \(t_j \) is the target output value, \(x_i \) is the input activation value
 			and \(y_j \) is the actual output activation value. \(\Delta w_{ij}\) is the change that is added to the
-			synapse weight after each training round.
+			synapse weight after each training round. <br/>
+			To perform supervised training on an input data set, the target values have to be assigned to the output
+			activations. This can be done in the following way:
+
+		</p>
+		<div class="prettyprint-code">
+        	<pre class="prettyprint">
+				<code class="language-java">
+			out.addInput(doc,
+				new Activation.Builder()
+					.setRange(0, 3)
+					.setValue(0.0)
+					.setTargetValue(1.0)
+			);
+        		</code>
+			</pre>
+		</div>
+		<p>
+			The actual training is the started using the method call doc.supervisedTraining.train().
 		</p>
 
 		<h2>Long-Term Potentiation and Long-Term Depression</h2>
 		<p>
-			Long-term potentiation and long-term depression are two learning mechanisms that occur naturally in the brain.
-			Long-term potentiation (LTP) is the process of a persistent strengthening of synapses based on recent
+			Long-term Potentiation and Long-Term Depression are two learning mechanisms that occur naturally in the brain.
+			Long-term Potentiation (LTP) is the process of a persistent strengthening of synapses based on recent
 			patterns of activity. These are patterns of synaptic activity that produce a long-lasting increase in signal
 			transmission between two neurons. The opposite of LTP is long-term depression, which produces a long-lasting
 			decrease in synaptic strength. <br/>
@@ -88,12 +106,15 @@
 
 			The attempt to model LTP in Aika looks as follows:
 		</p>
-			$$\Delta w_{ij} = \alpha \sigma_{ij} x_i (1 - y_j) y_j {net_j \over g_j^+} $$
+			$$\Delta w_{ij} = \alpha \sigma_{ij} x_i (1 - y_j) y_j h_j$$
+
+			$$h_j = \Bigg \{ {{net_j \over g_j^+} \atop 1} {: conj(w_{ij}) \atop : disj(w_{ij})} $$
 
 			$$g_j^+ = b_j + \sum\limits_{i=0,w_{ij} > 0.0}^N{w_{ij}}$$
 
 		<p>
-			Where \(\alpha \) is the learn rate, \(net_j\) is the weighted sum and \(g_j^+\) is the sum of all positive
+			Where \(\alpha \) is the learn rate, \(h_j\) is a measure for the pattern match of conjunctive synapses.
+			\(net_j\) is the weighted sum and \(g_j^+\) is the sum of all positive
 			weights. The term \((1 - y_j) \) is used to limit the strength of the synapse and prevent it from growing
 			indefinitely. The term \(net_j \over g_j^+ \) measures how well the current input pattern matches the
 			already trained pattern of the outgoing neuron.
@@ -103,17 +124,24 @@
 			$$\sigma_{ij} = (f_i f_j)^\eta$$
 		<p>
 			In this formula the values \(f_i \) and \(f_j \) are the activation frequencies of the input and the output
-			neuron. \(\eta\) is used to adjust the strength of the significance parameter.
+			neuron. \(\eta\) is used to adjust the strength of the significance parameter. <br/>
+			Long-term Depression (LTD) comes into play when the incoming and outgoing neurons of a synapse do not fire
+			at the same time. But the weakening effect of LTD depends on whether the synapse has an conjunctive or an
+			disjunctive characteristic. Conjunctive synapses are only weakened when the input neuron is inactive and the
+			output neuron is active. Disjunctive synapses are handled the other way around. <br/>
+			Conjunctive synapses are usually used in excitatory neurons to detect a pattern. This means that if an input
+			feature is not present in the training data set but the pattern neuron is activated nevertheless, that the
+			responsible input synapse is going to be weakened. <br/>
+			With disjunctive synapses the output neuron usually fire as soon as the input neuron is activated. But it
+			might be suppressed by another negative input synapse. In this case the input neuron of a disjunctive synapse
+			will fire but not the output synapse, which means the synapse is going to be weakened.
 		</p>
 			$$\forall_{i, j: x_i \leq 0, y_j > 0, disj(w_{ij})} \Delta w_{ij} = -\alpha \sigma_{ij} y_j$$
 			$$\forall_{i, j: x_i > 0, y_j \leq 0, conj(w_{ij})} \Delta w_{ij} = -\alpha \sigma_{ij} x_i$$
-		<p>
-			Another learning mechanism that can be derived from the interpretations is the following. Since only the
-			strongest interpretation is chosen
-			and all other interpretations are suppressed, we have a convenient way to automatically generate our
-			supervised training data.
-		</p>
 
+		<p>
+			Both LTP and LTD can be performed on a training document using the method LongTermLearning.train().
+		</p>
 
 		<h2>Meta-Synapses and Meta-Neurons</h2>
 		<p>
@@ -167,7 +195,10 @@
         		</code>
 			</pre>
 		</div>
-
+		<p>
+			To generate new neurons and synapses based on an already processed training document, the method
+			MetaNetwork.train() needs to be called.
+		</p>
 
 		<h2>Frequent Pattern Discovery</h2>
 

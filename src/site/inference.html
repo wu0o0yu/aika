@@ -307,9 +307,9 @@
 			<h2>The Pattern Lattice</h2>
 			<p>
 				One design goal of the Aika algorithm is, to be able to efficiently simulate huge networks with millions
-				of neurons. This, however,
-				is only possible if only a fraction of the neurons needs to be computed for any given input data set. One
-				prerequisite to achieve this goal is the earlier mentioned distinction between active and inactive neurons.
+				of neurons. However, this is only possible if only a very small part of the neurons become active for
+				any given input data set. One
+				prerequisite for achieving this goal is the earlier mentioned distinction between active and inactive neurons.
 				If one neuron gets activated, only those outgoing neurons are required to be computed, that would
                 exceed their threshold based on this new input. Depending on the synapse weights and bias settings of
                 the outgoing neuron it may either fire directly (for or-gate like neurons) or it may require other input

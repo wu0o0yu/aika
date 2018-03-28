@@ -31,6 +31,8 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT_KEY;
+
 /**
  *
  * @author Lukas Molzberger
@@ -140,36 +142,37 @@ public class SimplePatternMatchingTest {
         // is relative or absolute.
         Neuron pattern = Neuron.init(
                 m.createNeuron("BCDE"),
-                0.4,
+                5.0,
+                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(inputNeurons.get('b'))
-                        .setWeight(1.0)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setRelativeRid(0)
-                        .setBias(-0.9)
                         .setRangeMatch(Operator.EQUALS, Operator.GREATER_THAN_EQUAL)
                         .setRangeOutput(true, false),
                 new Synapse.Builder()
                         .setNeuron(inputNeurons.get('c'))
-                        .setWeight(1.0)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setRelativeRid(1)
-                        .setBias(-0.9)
                         .setRangeMatch(Range.Relation.CONTAINS),
                 new Synapse.Builder()
                         .setNeuron(inputNeurons.get('d'))
-                        .setWeight(1.0)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setRelativeRid(2)
-                        .setBias(-0.9)
                         .setRangeMatch(Range.Relation.CONTAINS),
                 new Synapse.Builder()
                         .setNeuron(inputNeurons.get('e'))
-                        .setWeight(1.0)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setRelativeRid(3)
-                        .setBias(-0.9)
                         .setRangeMatch(Operator.LESS_THAN_EQUAL, Operator.EQUALS)
                         .setRangeOutput(false, true)
         );
@@ -189,7 +192,7 @@ public class SimplePatternMatchingTest {
             }
         }
 
-        // Computes the selected option
+        // Computes the best interpretation
         doc.process();
 
         Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).activations.size());

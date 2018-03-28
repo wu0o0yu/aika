@@ -43,7 +43,7 @@ public class NamedEntityRecognitionTest {
     // even though each individual word would have been recognized as city or profession
     // respectively.
     @Test
-    public void testNamedEntityRecognitionWithoutCounterNeuron() {
+    public void testNamedEntityRecognition() {
         Model m = new Model(null, 1); // number of threads
 
         Neuron forenameCategory = m.createNeuron("C-forename");
