@@ -131,10 +131,10 @@
 			output neuron is active. Disjunctive synapses are handled the other way around. <br/>
 			Conjunctive synapses are usually used in excitatory neurons to detect a pattern. This means that if an input
 			feature is not present in the training data set but the pattern neuron is activated nevertheless, that the
-			responsible input synapse is going to be weakened. <br/>
+			responsible input synapse will be weakened. <br/>
 			With disjunctive synapses the output neuron usually fire as soon as the input neuron is activated. But it
 			might be suppressed by another negative input synapse. In this case the input neuron of a disjunctive synapse
-			will fire but not the output synapse, which means the synapse is going to be weakened.
+			will fire but not the output neuron, which means the synapse will be weakened.
 		</p>
 			$$\forall_{i, j: x_i \leq 0, y_j > 0, disj(w_{ij})} \Delta w_{ij} = -\alpha \sigma_{ij} y_j$$
 			$$\forall_{i, j: x_i > 0, y_j \leq 0, conj(w_{ij})} \Delta w_{ij} = -\alpha \sigma_{ij} x_i$$
@@ -169,7 +169,9 @@
 		<p>
 			Another special feature of input meta-synapses is that when they connect to an inhibitory neuron, the resulting
 			generated synapse will not connect to the inhibitory itself, but to the excitatory neuron that activated the
-			inhibitory neuron. The purpose of this feature is to allow meta-synapses to define connections between
+			inhibitory neuron. In this case the synapse between inhibitory neuron and the meta-neuron is positive, event
+			though outgoing synapses of inhibitory neurons are usually negative. The purpose of this feature is to allow
+			meta-synapses to define connections between
 			abstract categories. However, the resulting synapse connects the concrete instances of these categories.
 		</p>
 		<div style="text-align:center; width:100%">

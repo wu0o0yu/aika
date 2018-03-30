@@ -70,7 +70,7 @@
 				$$net_j = {b_j + \sum\limits_{i=0}^N{x_i w_{ij}}}$$
 				$$y_j = \varphi (net_j)$$
 
-				Depending on the type of neuron, different activation functions can be used. One commonly used activation function
+				Depending on the type of neuron, different activation functions are used. One commonly used activation function
 				in Aika is the <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)">rectified</a>
 				hyperbolic tangent function, which is basically the positive half of the \(\tanh()\) function.
 
@@ -89,13 +89,13 @@
 			<p>
 				The advantage of having activation objects is that, through them, we are able to cope with the relational
 				structure of natural language text by making the activation relate to a specific segment of text. In a way
-				these activations can be seen as text annotations that specify a start character and an end character
+				these activations can be seen as text annotations that specify either the start and end character
 				or the position of a word (relational id). </br>
 				Words, phrases and sentences are in a relation to each other through
 				their sequential order. The assignment of text ranges and word positions to activations is a simple yet
 				powerful representation of the relational structure of text and avoids some of the shortcomings of other
 				representations such as bag of words or sliding window.
-				Since these activations are propagated along through the network, synapses need to be able to manipulate
+				Since the activations are propagated along through the network, synapses need to be able to manipulate
 				the text range and the word position while the activations are passed on to the next neuron.
 			</p>
 
@@ -113,9 +113,9 @@
 				text, is a forename, surname, city name, or profession. If for instance the word "jackson" has been
 				recognized in a text, it
 				will trigger further activations in the two jackson entity neurons. Since both are connected through the
-				suppressing neuron only one of them can be active in the end. Aika will therefore generate two
+				inhibiting neuron only one of them can be active in the end. Aika will therefore generate two
 				interpretations. But these interpretations are not limited to a single neuron. For instance if the word
-				neuron cook gets activated too, then the jackson forename entity and the cook surname entity will be
+				neuron cook gets activated too, the jackson forename entity and the cook surname entity will be
 				part of the same interpretation. The forename and surname category links in this example form a positive
 				feedback loop which reinforces this interpretation.
 			</p>
@@ -129,7 +129,7 @@
 				In this case a conflict is generated. An interpretation is a conflict free set of activations. Therefore,
 				if there are no conflicts during the processing of an input data set, only one interpretation will exist
 				and the search for the best interpretation will end immediately.
-				On the other hand, if there are several conflicts between activations, a search needs to be
+				On the other hand, if there are conflicts between activations, a search needs to be
 				performed which selects or excludes individual activations and tests how these changes affect the
 				overall weights sum of all activations. This sum is also called the objective function \(f\) and can be
                 stated in the following way:
@@ -261,7 +261,7 @@
             </div>
             <p>
                 The last property is the range output which consists of two boolean values. If these are set to true,
-                either the range begin or the range end are propagated to the output activation. <br/>
+                the range begin and the range end are propagated to the output activation. <br/>
 
 				Depending on the weight of the synapse and the bias sum of the outgoing neuron, Aika distinguishes two
 				types synapses: conjunctive synapses and disjunctive synapses. Conjunctive synapses are stored in the
@@ -328,10 +328,10 @@
                 the two inputs \(A\) and \(B\) are activated by an incoming signal, then the pattern node \(AB\) would
                 be activated as well, but not the pattern node \(ABC\). The advantage of this data structure is that
                 only minimal refinements have to be tested from one level in the pattern lattice to the next. If all
-                neurons that depend on input \(A\) would be tested directly then the number of outgoing neurons might
-                be very large and many unnecessary computations would have to be performed.
+                neurons that depend on input \(A\) would be tested directly, the number of outgoing neurons might
+                be so large that many unnecessary computations would have to be performed.
 
-                But before we can build the pattern lattice, we first have to convert the weighted inputs of a neuron
+                But before we can build the pattern lattice, we first have to convert the weighted inputs of the neuron
                 into a boolean representation. Here we only need to distinguish between active and inactive neurons.
 				Hence let us consider a neuron with a heaviside activation function (\(\theta(x) = 1\) if \(x > 0\) otherwise \(0\)).
 			</p>
