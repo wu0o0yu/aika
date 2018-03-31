@@ -193,7 +193,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         register(act);
 
-        State s = new State(input.value, input.fired, Weight.ZERO);
+        State s = new State(input.value, 0.0, input.fired, Weight.ZERO);
         act.rounds.set(0, s);
         act.inputValue = input.value;
         act.upperBound = input.value;
