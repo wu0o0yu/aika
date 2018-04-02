@@ -249,8 +249,9 @@ public class Linker {
 
     public static boolean testRelationMatch(Synapse s, Activation iAct, Activation oAct) {
         for(Synapse.Relation sr: s.relations) {
-            Activation.SynapseActivation linkedSa = lookupSynapse(oAct, sr.linkedSynapse);
-            if(!testRelationMatch(sr.type, iAct, linkedSa.input)) return false;
+            Activation.SynapseActivation linkedSA = lookupSynapse(oAct, sr.linkedSynapse);
+            if(linkedSA == null) return true;
+            if(!testRelationMatch(sr.type, iAct, linkedSA.input)) return false;
         }
         return true;
     }

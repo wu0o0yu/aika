@@ -27,9 +27,7 @@ import org.aika.neuron.activation.Selector;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static org.aika.neuron.activation.Range.Operator.*;
 
@@ -145,7 +143,7 @@ public class RecurrentIdTest {
         String[] testWords = {"Hüttenheim"};
 
         for (String word : testWords) {
-            Set<Synapse.Builder> inputs = new TreeSet<>();
+            List<Synapse.Builder> inputs = new ArrayList<>();
             for (int i = 0; i < word.length(); i++) {
                 char c = word.toLowerCase().charAt(i);
 

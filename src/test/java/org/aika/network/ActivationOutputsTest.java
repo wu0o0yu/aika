@@ -170,35 +170,6 @@ public class ActivationOutputsTest {
     }
 
 
-    @Test
-    public void simpleAddActivationTest2() {
-        Model m = new Model();
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
-
-        Neuron inA = m.createNeuron("A");
-
-        INeuron outB = Neuron.init(m.createNeuron("B"), 0.5, INeuron.Type.EXCITATORY,
-                new Synapse.Builder()
-                        .setNeuron(inA)
-                        .setWeight(1.0)
-                        .setBias(-1.0)
-                        .setRelativeRid(0)
-                        .setRecurrent(false)
-                        .setRangeOutput(true)
-        ).get();
-
-
-        inA.addInput(doc,
-                new Activation.Builder()
-                        .setRange(0, 1)
-                        .setRelationalId(0)
-        );
-
-        Activation outB1 = Selector.get(doc, outB, null, new Range(0, 1), Range.Relation.CONTAINS);
-
-        Assert.assertTrue(containsOutputActivation(inA.get().getFirstActivation(doc).neuronOutputs, outB1));
-    }
-
 
     @Test
     public void removeRemoveDestinationActivation() {
