@@ -74,8 +74,8 @@ public final class Activation extends NodeActivation<OrNode> {
     public Decision finalDecision = Decision.UNKNOWN;
     public Candidate candidate;
     public Conflicts conflicts = new Conflicts();
-    public long markedConflict;
     private long visitedState;
+    public long markedAncestor;
 
 
     public Activation(int id, Document doc, Key key) {

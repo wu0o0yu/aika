@@ -121,7 +121,7 @@ public class Neuron extends Provider<INeuron> {
      * @return
      */
     public static Neuron init(Neuron n, double bias, INeuron.Type type, Synapse.Builder... inputs) {
-        return init(n, bias, type, new TreeSet<>(Arrays.asList(inputs)));
+        return init(n, bias, type, new ArrayList<>(Arrays.asList(inputs)));
     }
 
 
@@ -134,7 +134,7 @@ public class Neuron extends Provider<INeuron> {
      * @return
      */
     public static Neuron init(Document doc, Neuron n, double bias, INeuron.Type type, Synapse.Builder... inputs) {
-        return init(doc, n, bias, null, type, new TreeSet<>(Arrays.asList(inputs)));
+        return init(doc, n, bias, null, type, new ArrayList<>(Arrays.asList(inputs)));
     }
 
 
@@ -147,7 +147,7 @@ public class Neuron extends Provider<INeuron> {
      * @return
      */
     public static Neuron init(Neuron n, double bias, String activationFunctionKey, INeuron.Type type, Synapse.Builder... inputs) {
-        return init(n, bias, activationFunctionKey, type, new TreeSet<>(Arrays.asList(inputs)));
+        return init(n, bias, activationFunctionKey, type, new ArrayList<>(Arrays.asList(inputs)));
     }
 
 
@@ -160,7 +160,7 @@ public class Neuron extends Provider<INeuron> {
      * @return
      */
     public static Neuron init(Document doc, Neuron n, double bias, String activationFunctionKey, INeuron.Type type, Synapse.Builder... inputs) {
-        return init(doc, n, bias, activationFunctionKey, type, new TreeSet<>(Arrays.asList(inputs)));
+        return init(doc, n, bias, activationFunctionKey, type, new ArrayList<>(Arrays.asList(inputs)));
     }
 
 
@@ -173,7 +173,7 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Neuron n, double bias, INeuron.Type type, Collection<Synapse.Builder> inputs) {
+    public static Neuron init(Neuron n, double bias, INeuron.Type type, List<Synapse.Builder> inputs) {
         return init(n, bias, null, type, inputs);
     }
 
@@ -186,7 +186,7 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Neuron n, double bias, String activationFunctionKey, INeuron.Type type, Collection<Synapse.Builder> inputs) {
+    public static Neuron init(Neuron n, double bias, String activationFunctionKey, INeuron.Type type, List<Synapse.Builder> inputs) {
         if(n.init(bias, activationFunctionKey, type, inputs)) return n;
         return null;
     }
@@ -199,7 +199,7 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Document doc, Neuron n, double bias, String activationFunctionKey, INeuron.Type type, Collection<Synapse.Builder> inputs) {
+    public static Neuron init(Document doc, Neuron n, double bias, String activationFunctionKey, INeuron.Type type, List<Synapse.Builder> inputs) {
         if(n.init(doc, bias, activationFunctionKey, type, inputs)) return n;
         return null;
     }
@@ -212,19 +212,33 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public boolean init(double bias, String activationFunctionKey, INeuron.Type type, Collection<Synapse.Builder> inputs) {
+    public boolean init(double bias, String activationFunctionKey, INeuron.Type type, List<Synapse.Builder> inputs) {
         return init((Document) null, bias, activationFunctionKey, type, inputs);
     }
 
 
-    public boolean init(Document doc, double bias, String activationFunctionKey, INeuron.Type type, Collection<Synapse.Builder> inputs) {
-        List<Synapse> is = new ArrayList<>();
+    public boolean init(Document doc, double bias, String activationFunctionKey, INeuron.Type type, List<Synapse.Builder> inputs) {
+        ArrayList<Synapse> is = new ArrayList<>();
+        Map<Integer, Synapse> synapseIds = new TreeMap<>();
 
         for (Synapse.Builder input : inputs) {
             Synapse s = input.getSynapse(this);
             s.update(doc, input.weight, input.bias);
+            if(input.synapseId != null) {
+                synapseIds.put(input.synapseId, s);
+            }
             is.add(s);
         }
+
+        int i = 0;
+        for (Synapse.Builder input : inputs) {
+            Synapse s = is.get(i);
+            for(Synapse.Builder.BuilderRelation br: input.synapseRelations) {
+                s.relations.add(new Synapse.Relation(br.type, synapseIds.get(br.id)));
+            }
+            i++;
+        }
+
 
         if(activationFunctionKey != null) {
             ActivationFunction af = model.activationFunctions.get(activationFunctionKey);

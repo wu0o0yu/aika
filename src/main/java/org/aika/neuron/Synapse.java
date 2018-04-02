@@ -20,7 +20,6 @@ package org.aika.neuron;
 import org.aika.*;
 import org.aika.Document;
 import org.aika.neuron.activation.Range;
-import org.aika.neuron.activation.Range.Relation;
 import org.aika.neuron.activation.Range.Output;
 import org.aika.neuron.activation.Range.Mapping;
 import org.aika.lattice.InputNode;
@@ -30,9 +29,7 @@ import org.aika.training.MetaSynapse;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * The {@code Synapse} class connects two neurons with each other. When propagating an activation signal, the
@@ -84,6 +81,7 @@ public class Synapse implements Writable {
     public Provider<InputNode> inputNode;
 
     public Key key;
+    public List<Relation> relations = new ArrayList<>();
 
 
     public boolean inactive;
@@ -387,7 +385,7 @@ public class Synapse implements Writable {
         public boolean isRecurrent;
         public Integer relativeRid;
         public Integer absoluteRid;
-        public Relation rangeMatch;
+        public Range.Relation rangeMatch;
         public Output rangeOutput;
 
         private boolean minKey = false;
@@ -403,7 +401,7 @@ public class Synapse implements Writable {
         }
 
 
-        public Key(boolean minKey, boolean maxKey, Integer relativeRid, Relation rangeMatch) {
+        public Key(boolean minKey, boolean maxKey, Integer relativeRid, Range.Relation rangeMatch) {
             this.minKey = minKey;
             this.maxKey = maxKey;
             this.relativeRid = relativeRid;
@@ -411,7 +409,7 @@ public class Synapse implements Writable {
         }
 
 
-        public Key(boolean isRecurrent, Integer relativeRid, Integer absoluteRid, Relation rangeMatch, Output rangeOutput) {
+        public Key(boolean isRecurrent, Integer relativeRid, Integer absoluteRid, Range.Relation rangeMatch, Output rangeOutput) {
             this.isRecurrent = isRecurrent;
             this.relativeRid = relativeRid;
             this.absoluteRid = absoluteRid;
@@ -449,7 +447,7 @@ public class Synapse implements Writable {
             isRecurrent = in.readBoolean();
             if(in.readBoolean()) relativeRid = (int) in.readByte();
             if(in.readBoolean()) absoluteRid = (int) in.readByte();
-            rangeMatch = Relation.read(in, m);
+            rangeMatch = Range.Relation.read(in, m);
             rangeOutput = Output.read(in, m);
         }
 
@@ -491,6 +489,25 @@ public class Synapse implements Writable {
     }
 
 
+
+    public static class Relation {
+        public Type type;
+
+        public Synapse linkedSynapse;
+
+        public enum Type  {
+            COMMON_ANCESTOR,
+            CONTAINS,
+            CONTAINED_IN
+        }
+
+        public Relation(Type type, Synapse s) {
+            this.type = type;
+            linkedSynapse = s;
+        }
+    }
+
+
     /**
      * The {@code Builder} class is just a helper class which is used to initialize a neuron. Most of the parameters of this class
      * will be mapped to a input synapse for this neuron.
@@ -503,11 +520,14 @@ public class Synapse implements Writable {
         public double weight;
         public double bias;
 
-        public Relation rangeMatch = Relation.NONE;
+        public Range.Relation rangeMatch = Range.Relation.NONE;
         public Output rangeOutput = Output.NONE;
 
         public Integer relativeRid;
         public Integer absoluteRid;
+
+        public Integer synapseId;
+        public Collection<BuilderRelation> synapseRelations = new ArrayList<>();
 
 
         /**
@@ -592,7 +612,7 @@ public class Synapse implements Writable {
          * @param rr
          * @return
          */
-        public Builder setRangeMatch(Relation rr) {
+        public Builder setRangeMatch(Range.Relation rr) {
             rangeMatch = rr;
             return this;
         }
@@ -663,6 +683,18 @@ public class Synapse implements Writable {
         }
 
 
+        public Builder setSynapseId(int synapseId) {
+            this.synapseId = synapseId;
+            return this;
+        }
+
+
+        public Builder addSynapseRelation(Relation.Type type, int synapseId) {
+            synapseRelations.add(new BuilderRelation(type, synapseId));
+            return this;
+        }
+
+
         public Synapse getSynapse(Neuron outputNeuron) {
             Synapse s = new Synapse(
                     neuron,
@@ -698,6 +730,17 @@ public class Synapse implements Writable {
             if (r != 0) return r;
             r = rangeOutput.compareTo(in.rangeOutput);
             return r;
+        }
+
+
+        static class BuilderRelation {
+            Relation.Type type;
+            int id;
+
+            public BuilderRelation(Relation.Type type, int id) {
+                this.type = type;
+                this.id = id;
+            }
         }
     }
 }
