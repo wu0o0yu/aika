@@ -82,6 +82,7 @@ public class Synapse implements Writable {
 
     public Key key;
     public List<Relation> relations = new ArrayList<>();
+    public DistanceFunction distanceFunction = null;
 
 
     public boolean inactive;
@@ -292,6 +293,11 @@ public class Synapse implements Writable {
 
         key.write(out);
 
+        out.writeBoolean(distanceFunction != null);
+        if(distanceFunction != null) {
+            out.writeUTF(distanceFunction.name());
+        }
+
         out.writeDouble(weight);
         out.writeDouble(bias);
 
@@ -311,6 +317,10 @@ public class Synapse implements Writable {
         inputNode = m.lookupNodeProvider(in.readInt());
 
         key = lookupKey(Key.read(in, m));
+
+        if(in.readBoolean()) {
+            distanceFunction = DistanceFunction.valueOf(in.readUTF());
+        }
 
         weight = in.readDouble();
         bias = in.readDouble();

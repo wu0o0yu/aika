@@ -185,6 +185,10 @@ public final class Activation extends NodeActivation<OrNode> {
             if (iAct == this) continue;
 
             double x = is.s.value * s.weight;
+            if(s.distanceFunction != null) {
+                x *= s.distanceFunction.f(iAct, this);
+            }
+
             sum += x;
             if(!s.key.isRecurrent) {
                 sumDir += x;
@@ -241,19 +245,25 @@ public final class Activation extends NodeActivation<OrNode> {
             if(s.inactive) {
                 continue;
             }
+
             Activation iAct = sa.input;
 
             if (iAct == this) continue;
 
+            double x = s.weight;
+            if(s.distanceFunction != null) {
+                x *= s.distanceFunction.f(iAct, this);
+            }
+
             if (s.isNegative()) {
                 if (!s.key.isRecurrent && !checkSelfReferencing(this, iAct, false, 0)) {
-                    ub += iAct.lowerBound * s.weight;
+                    ub += iAct.lowerBound * x;
                 }
 
-                lb += s.weight;
+                lb += x;
             } else {
-                ub += iAct.upperBound * s.weight;
-                lb += iAct.lowerBound * s.weight;
+                ub += iAct.upperBound * x;
+                lb += iAct.lowerBound * x;
             }
         }
 
