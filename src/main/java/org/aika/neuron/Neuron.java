@@ -146,8 +146,8 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Neuron n, double bias, String activationFunctionKey, INeuron.Type type, Synapse.Builder... inputs) {
-        return init(n, bias, activationFunctionKey, type, new ArrayList<>(Arrays.asList(inputs)));
+    public static Neuron init(Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Synapse.Builder... inputs) {
+        return init(n, bias, activationFunction, type, new ArrayList<>(Arrays.asList(inputs)));
     }
 
 
@@ -159,8 +159,8 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Document doc, Neuron n, double bias, String activationFunctionKey, INeuron.Type type, Synapse.Builder... inputs) {
-        return init(doc, n, bias, activationFunctionKey, type, new ArrayList<>(Arrays.asList(inputs)));
+    public static Neuron init(Document doc, Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Synapse.Builder... inputs) {
+        return init(doc, n, bias, activationFunction, type, new ArrayList<>(Arrays.asList(inputs)));
     }
 
 
@@ -186,8 +186,8 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Neuron n, double bias, String activationFunctionKey, INeuron.Type type, List<Synapse.Builder> inputs) {
-        if(n.init(bias, activationFunctionKey, type, inputs)) return n;
+    public static Neuron init(Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, List<Synapse.Builder> inputs) {
+        if(n.init(bias, activationFunction, type, inputs)) return n;
         return null;
     }
 
@@ -199,8 +199,8 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Document doc, Neuron n, double bias, String activationFunctionKey, INeuron.Type type, List<Synapse.Builder> inputs) {
-        if(n.init(doc, bias, activationFunctionKey, type, inputs)) return n;
+    public static Neuron init(Document doc, Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, List<Synapse.Builder> inputs) {
+        if(n.init(doc, bias, activationFunction, type, inputs)) return n;
         return null;
     }
 
@@ -212,12 +212,12 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public boolean init(double bias, String activationFunctionKey, INeuron.Type type, List<Synapse.Builder> inputs) {
-        return init((Document) null, bias, activationFunctionKey, type, inputs);
+    public boolean init(double bias, ActivationFunction activationFunction, INeuron.Type type, List<Synapse.Builder> inputs) {
+        return init((Document) null, bias, activationFunction, type, inputs);
     }
 
 
-    public boolean init(Document doc, double bias, String activationFunctionKey, INeuron.Type type, List<Synapse.Builder> inputs) {
+    public boolean init(Document doc, double bias, ActivationFunction activationFunction, INeuron.Type type, List<Synapse.Builder> inputs) {
         ArrayList<Synapse> is = new ArrayList<>();
         Map<Integer, Synapse> synapseIds = new TreeMap<>();
 
@@ -240,11 +240,9 @@ public class Neuron extends Provider<INeuron> {
         }
 
 
-        if(activationFunctionKey != null) {
-            ActivationFunction af = model.activationFunctions.get(activationFunctionKey);
+        if(activationFunction != null) {
             INeuron in = get();
-            in.activationFunction = af;
-            in.activationFunctionKey = activationFunctionKey;
+            in.activationFunction = activationFunction;
         }
 
         if(type != null) {

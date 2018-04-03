@@ -184,11 +184,11 @@ public class MetaNetworkTest {
         );
 
 
-        Neuron.init(wordSuppr, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT_KEY, INeuron.Type.INHIBITORY);
+        Neuron.init(wordSuppr, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
 
-        Neuron.init(phraseSuppr, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT_KEY, INeuron.Type.INHIBITORY);
+        Neuron.init(phraseSuppr, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
 
-        Neuron.init(entitySuppr, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT_KEY, INeuron.Type.INHIBITORY,
+        Neuron.init(entitySuppr, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY,
                 new MetaSynapse.Builder()
                         .setMetaWeight(1.0)
                         .setMetaBias(0.0)

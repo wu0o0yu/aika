@@ -63,7 +63,6 @@ public class Model {
     public WeakHashMap<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
     public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
 
-    public Map<String, ActivationFunction> activationFunctions = new TreeMap<>();
 
     public int defaultThreadId = 0;
 
@@ -86,10 +85,6 @@ public class Model {
         lastCleanup = new int[numberOfThreads];
         docs = new Document[numberOfThreads];
         suspensionHook = sh;
-
-        registerActivationFunction(RECTIFIED_SCALED_LOGISTIC_SIGMOID_KEY, RECTIFIED_SCALED_LOGISTIC_SIGMOID);
-        registerActivationFunction(RECTIFIED_HYPERBOLIC_TANGENT_KEY, RECTIFIED_HYPERBOLIC_TANGENT);
-        registerActivationFunction(RECTIFIED_LINEAR_UNIT_KEY, RECTIFIED_LINEAR_UNIT);
     }
 
 
@@ -128,11 +123,6 @@ public class Model {
 
     public void setAndNodeCheck(AndNodeCheck andNodeCheck) {
         this.andNodeCheck = andNodeCheck;
-    }
-
-
-    public void registerActivationFunction(String key, ActivationFunction af) {
-        activationFunctions.put(key, af);
     }
 
 

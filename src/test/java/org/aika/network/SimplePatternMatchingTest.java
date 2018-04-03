@@ -31,7 +31,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT_KEY;
+import static org.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 
 /**
  *
@@ -143,7 +143,7 @@ public class SimplePatternMatchingTest {
         Neuron pattern = Neuron.init(
                 m.createNeuron("BCDE"),
                 5.0,
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(inputNeurons.get('b'))

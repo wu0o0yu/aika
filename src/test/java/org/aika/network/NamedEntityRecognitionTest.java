@@ -29,8 +29,8 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
-import static org.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT_KEY;
-import static org.aika.ActivationFunction.RECTIFIED_LINEAR_UNIT_KEY;
+import static org.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static org.aika.ActivationFunction.RECTIFIED_LINEAR_UNIT;
 import static org.aika.neuron.activation.Range.Relation.*;
 
 /**
@@ -69,7 +69,7 @@ public class NamedEntityRecognitionTest {
         Neuron cookSurnameEntity = Neuron.init(
                 m.createNeuron("E-cook (surname)"),
                 3.0, // adjusts the bias
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder() // Requires the word to be recognized
                         .setNeuron(inputNeurons.get("cook"))
@@ -104,7 +104,7 @@ public class NamedEntityRecognitionTest {
         Neuron cookProfessionEntity = Neuron.init(
                 m.createNeuron("E-cook (profession)"),
                 5.0,
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(inputNeurons.get("cook"))
@@ -124,7 +124,7 @@ public class NamedEntityRecognitionTest {
         Neuron jacksonForenameEntity = Neuron.init(
                 m.createNeuron("E-jackson (forename)"),
                 3.0,
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(inputNeurons.get("jackson"))
@@ -152,7 +152,7 @@ public class NamedEntityRecognitionTest {
         Neuron jacksonCityEntity = Neuron.init(
                 m.createNeuron("E-jackson (city)"),
                 5.0,
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(inputNeurons.get("jackson"))
@@ -172,7 +172,7 @@ public class NamedEntityRecognitionTest {
         Neuron.init(
                 forenameCategory,
                 0.0,
-                RECTIFIED_LINEAR_UNIT_KEY,
+                RECTIFIED_LINEAR_UNIT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder() // In this example there is only one forename considered.
                         .setNeuron(jacksonForenameEntity)
@@ -185,7 +185,7 @@ public class NamedEntityRecognitionTest {
         Neuron.init(
                 surnameCategory,
                 0.0,
-                RECTIFIED_LINEAR_UNIT_KEY,
+                RECTIFIED_LINEAR_UNIT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(cookSurnameEntity)
@@ -199,7 +199,7 @@ public class NamedEntityRecognitionTest {
         Neuron.init(
                 inhibitingN,
                 0.0,
-                RECTIFIED_LINEAR_UNIT_KEY,
+                RECTIFIED_LINEAR_UNIT,
                 INeuron.Type.INHIBITORY,
                 new Synapse.Builder().setNeuron(cookProfessionEntity)
                         .setWeight(1.0)

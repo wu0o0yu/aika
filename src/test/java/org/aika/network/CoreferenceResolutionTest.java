@@ -11,7 +11,8 @@ import org.junit.Before;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.aika.ActivationFunction.RECTIFIED_LINEAR_UNIT_KEY;
+import static org.aika.ActivationFunction.RECTIFIED_LINEAR_UNIT;
+import static org.aika.neuron.INeuron.Type.INHIBITORY;
 import static org.aika.neuron.activation.Range.Relation.EQUALS;
 import static org.aika.neuron.activation.Range.Relation.NONE;
 
@@ -43,16 +44,16 @@ public class CoreferenceResolutionTest {
         m = new Model();
 
         maleNameN = m.createNeuron("C-Male Name");
-        Neuron.init(maleNameN, 0.0, RECTIFIED_LINEAR_UNIT_KEY, INeuron.Type.INHIBITORY);
+        Neuron.init(maleNameN, 0.0, RECTIFIED_LINEAR_UNIT, INHIBITORY);
 
         malePronounN = m.createNeuron("C-Male Pronoun");
-        Neuron.init(malePronounN, 0.0, RECTIFIED_LINEAR_UNIT_KEY, INeuron.Type.INHIBITORY);
+        Neuron.init(malePronounN, 0.0, RECTIFIED_LINEAR_UNIT, INHIBITORY);
 
         femaleNameN = m.createNeuron("C-Female Name");
-        Neuron.init(femaleNameN, 0.0, RECTIFIED_LINEAR_UNIT_KEY, INeuron.Type.INHIBITORY);
+        Neuron.init(femaleNameN, 0.0, RECTIFIED_LINEAR_UNIT, INHIBITORY);
 
         femalePronounN = m.createNeuron("C-Female Pronoun");
-        Neuron.init(femalePronounN, 0.0, RECTIFIED_LINEAR_UNIT_KEY, INeuron.Type.INHIBITORY);
+        Neuron.init(femalePronounN, 0.0, RECTIFIED_LINEAR_UNIT, INHIBITORY);
 
         addWords(pronouns[0], malePronounN);
         addWords(pronouns[1], femalePronounN);

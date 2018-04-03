@@ -26,8 +26,7 @@ import org.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT_KEY;
-import static org.aika.ActivationFunction.RECTIFIED_LINEAR_UNIT_KEY;
+import static org.aika.ActivationFunction.*;
 
 
 /**
@@ -74,7 +73,7 @@ public class MutualExclusionTest {
         Neuron pA = Neuron.init(
                 m.createNeuron("A"),
                 3.0,
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(inA)
@@ -94,7 +93,7 @@ public class MutualExclusionTest {
         Neuron pB = Neuron.init(
                 m.createNeuron("B"),
                 5.0,
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(inB)
@@ -114,7 +113,7 @@ public class MutualExclusionTest {
         Neuron pC = Neuron.init(
                 m.createNeuron("C"),
                 2.0,
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(inC)
@@ -135,7 +134,7 @@ public class MutualExclusionTest {
         Neuron.init(
                 inhibN,
                 0.0,
-                RECTIFIED_LINEAR_UNIT_KEY,
+                RECTIFIED_LINEAR_UNIT,
                 INeuron.Type.INHIBITORY,
                 new Synapse.Builder()
                         .setNeuron(pA)
@@ -162,7 +161,7 @@ public class MutualExclusionTest {
 
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
                 0.0,
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setNeuron(pB)

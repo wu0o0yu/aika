@@ -89,7 +89,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public Writable statistic;
 
     public ActivationFunction activationFunction = ActivationFunction.RECTIFIED_SCALED_LOGISTIC_SIGMOID;
-    public String activationFunctionKey = ActivationFunction.RECTIFIED_SCALED_LOGISTIC_SIGMOID_KEY;
 
 
     // A synapse is stored only in one direction, depending on the synapse weight.
@@ -324,7 +323,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         out.writeDouble(requiredSum);
         out.writeInt(numDisjunctiveSynapses);
 
-        out.writeUTF(activationFunctionKey);
+        out.writeUTF(activationFunction.name());
 
         out.writeInt(outputNodes.size());
         for (Map.Entry<Key, Provider<InputNode>> me : outputNodes.entrySet()) {
@@ -382,8 +381,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         requiredSum = in.readDouble();
         numDisjunctiveSynapses = in.readInt();
 
-        activationFunctionKey = in.readUTF();
-        activationFunction = m.activationFunctions.get(activationFunctionKey);
+        activationFunction = ActivationFunction.valueOf(in.readUTF());
 
         int s = in.readInt();
         for (int i = 0; i < s; i++) {

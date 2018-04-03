@@ -121,7 +121,7 @@ public class GenerateTextTest {
 
 
         // All outputs suppress each other.
-        Neuron.init(suppr, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT_KEY, INeuron.Type.INHIBITORY,
+        Neuron.init(suppr, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY,
                 new Synapse.Builder()
                         .setNeuron(outA)
                         .setWeight(1.0)
