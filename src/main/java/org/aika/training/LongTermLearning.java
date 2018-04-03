@@ -18,6 +18,7 @@ package org.aika.training;
 
 
 import org.aika.Document;
+import org.aika.Utils;
 import org.aika.neuron.activation.Activation;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Synapse;
@@ -100,6 +101,11 @@ public class LongTermLearning {
     }
 
 
+    private static double hConj(Activation act) {
+        INeuron n = act.getINeuron();
+        return act.getFinalState().net / (n.biasSum + n.posDirSum + n.posRecSum);
+    }
+
     /**
      * The long-term potentiation algorithm is a variant of the Hebb learning rule.
      *
@@ -110,9 +116,9 @@ public class LongTermLearning {
     public static void longTermPotentiation(Document doc, Config config, Activation act) {
         INeuron n = act.getINeuron();
 
-        double maxActValue = n.activationFunction.f(n.biasSum + n.posDirSum + n.posRecSum);
-        double m = maxActValue > 0.0 ? Math.max(1.0, act.getFinalState().value / maxActValue) : 1.0;
-        double x = config.ltpLearnRate * (1.0 - act.getFinalState().value) * m;
+        double iv = Utils.nullSafeMax(act.getFinalState().value, act.targetValue);
+
+        double x = config.ltpLearnRate * (1.0 - act.getFinalState().value) * iv;
 
         if(config.createNewSynapses) {
             doc.getActivations()
@@ -137,7 +143,9 @@ public class LongTermLearning {
 
         if(r == null) return;
 
-        double sDelta = iAct.getFinalState().value * x * r.significance;
+        double h = s.isConjunction(false, false) ? hConj(act) : 1.0;
+
+        double sDelta = iAct.getFinalState().value * x * r.significance * h;
 
         if(sDelta > 0.0) {
             Synapse synapse = Synapse.createOrLookup(act.doc, r.synapseKey, iAct.getNeuron(), act.getNeuron());

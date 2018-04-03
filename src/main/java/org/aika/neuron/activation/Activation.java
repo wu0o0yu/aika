@@ -132,7 +132,7 @@ public final class Activation extends NodeActivation<OrNode> {
         Weight delta = Weight.ZERO;
         State s;
         if(inputValue != null) {
-            s = new State(inputValue, 0, Weight.ZERO);
+            s = new State(inputValue, 0.0, 0, Weight.ZERO);
         } else {
             s = computeValueAndWeight(round);
         }
@@ -173,8 +173,8 @@ public final class Activation extends NodeActivation<OrNode> {
 
     public State computeValueAndWeight(int round) {
         INeuron n = getINeuron();
-        double sum = n.biasSum;
-        double sumDir = n.biasSum;
+        double net = n.biasSum;
+        double netDir = n.biasSum;
 
         int fired = -1;
 
@@ -185,20 +185,20 @@ public final class Activation extends NodeActivation<OrNode> {
             if (iAct == this) continue;
 
             double x = is.s.value * s.weight;
-            sum += x;
+            net += x;
             if(!s.key.isRecurrent) {
-                sumDir += x;
+                netDir += x;
             }
 
-            if (!s.key.isRecurrent && !s.isNegative() && sum >= 0.0 && fired < 0) {
+            if (!s.key.isRecurrent && !s.isNegative() && net >= 0.0 && fired < 0) {
                 fired = iAct.rounds.get(round).fired + 1;
             }
         }
 
-        double currentActValue = n.activationFunction.f(sum);
+        double currentActValue = n.activationFunction.f(net);
 
-        double w = Math.min(-n.negRecSum, sum);
-        double norm = Math.min(-n.negRecSum, sumDir + n.posRecSum);
+        double w = Math.min(-n.negRecSum, net);
+        double norm = Math.min(-n.negRecSum, netDir + n.posRecSum);
 
         // Compute only the recurrent part is above the threshold.
         Weight newWeight = Weight.create(
@@ -206,11 +206,21 @@ public final class Activation extends NodeActivation<OrNode> {
                 Math.max(0.0, norm)
         );
 
-        return new State(
-                decision == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? currentActValue : 0.0,
-                decision == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS ? fired : -1,
-                newWeight
-        );
+        if(decision == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS) {
+            return new State(
+                    currentActValue,
+                    net,
+                    -1,
+                    newWeight
+            );
+        } else {
+            return new State(
+                    0.0,
+                    0.0,
+                    -1,
+                    newWeight
+            );
+        }
     }
 
 
@@ -265,6 +275,7 @@ public final class Activation extends NodeActivation<OrNode> {
     private static State getInitialState(Decision c) {
         return new State(
                 c == SELECTED ? 1.0 : 0.0,
+                0.0,
                 0,
                 Weight.ZERO
         );
@@ -564,15 +575,17 @@ public final class Activation extends NodeActivation<OrNode> {
         public static final int REC = 1;
 
         public final double value;
+        public final double net;
 
         public final int fired;
         public final Weight weight;
 
-        public static final State ZERO = new State(0.0, -1, Weight.ZERO);
+        public static final State ZERO = new State(0.0, 0.0, -1, Weight.ZERO);
 
-        public State(double value, int fired, Weight weight) {
+        public State(double value, double net, int fired, Weight weight) {
             assert !Double.isNaN(value);
             this.value = value;
+            this.net = net;
             this.fired = fired;
             this.weight = weight;
         }
