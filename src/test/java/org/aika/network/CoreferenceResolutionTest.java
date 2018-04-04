@@ -1,12 +1,12 @@
 package org.aika.network;
 
-import org.aika.ActivationFunction;
+import org.aika.Document;
 import org.aika.Model;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-import org.aika.neuron.activation.Range;
 import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -15,6 +15,7 @@ import static org.aika.ActivationFunction.RECTIFIED_LINEAR_UNIT;
 import static org.aika.neuron.INeuron.Type.INHIBITORY;
 import static org.aika.neuron.activation.Range.Relation.EQUALS;
 import static org.aika.neuron.activation.Range.Relation.NONE;
+
 
 public class CoreferenceResolutionTest {
 
@@ -40,7 +41,7 @@ public class CoreferenceResolutionTest {
 
 
     @Before
-    void init() {
+    public void init() {
         m = new Model();
 
         maleNameN = m.createNeuron("C-Male Name");
@@ -112,6 +113,36 @@ public class CoreferenceResolutionTest {
                 );
             }
         }
+    }
+
+
+    public Document parse(String txt) {
+        Document doc = m.createDocument(txt);
+
+        int i = 0;
+        for(String word: txt.split(" ")) {
+            int j = i + word.length();
+            Neuron wn = dictionary.get(word);
+            if(wn != null) {
+                wn.addInput(doc, i, j);
+            }
+
+            i = j + 1;
+        }
+
+        doc.process();
+
+        return doc;
+    }
+
+
+    @Test
+    public void testCoref() {
+        String txt = "john and lisa went to a sea park he saw dolphins lisa met richard he also visited the seapark";
+
+        Document doc = parse(txt);
+
+        System.out.println(doc.activationsToString(true, true, true));
     }
 
 }
