@@ -143,16 +143,21 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     @Override
     void apply(NodeActivation act) {
 
-        lock.acquireReadLock();
-        if (andChildren != null) {
-            andChildren.forEach((ref, cn) -> {
-                InputNode in = ref.input.getIfNotSuspended();
-                if (in != null) {
-                    addNextLevelActivations(in, ref, cn, act);
-                }
-            });
+        try {
+            lock.acquireReadLock();
+            if (andChildren != null) {
+                andChildren.forEach((ref, cn) -> {
+                    InputNode in = ref.input.getIfNotSuspended();
+                    if (in != null) {
+                        addNextLevelActivations(in, ref, cn, act);
+                    }
+                });
+            }
+        } catch(Exception e) {
+            throw e;
+        } finally {
+            lock.releaseReadLock();
         }
-        lock.releaseReadLock();
 
         OrNode.processCandidate(this, act, false);
     }

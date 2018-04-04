@@ -16,6 +16,7 @@
  */
 package org.aika;
 
+import com.sun.xml.internal.ws.api.message.ExceptionHasMessage;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
@@ -170,35 +171,38 @@ public class Converter {
 
             INeuron in = s.input.get();
             in.lock.acquireWriteLock();
-
-            if (s.inputNode == null) {
-                InputNode iNode = InputNode.add(model, s.key.createInputNodeKey(), s.input.get());
-                iNode.setModified();
-                iNode.setSynapse(s);
-                iNode.postCreate(doc);
-                s.inputNode = iNode.provider;
-            }
-
-            if(!s.inactive) {
-                sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
-                sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.getNewWeight();
-
-                if(s.isConjunction(false, true) && !s.isConjunction(true, true)) {
-                    neuron.numDisjunctiveSynapses++;
+            try {
+                if (s.inputNode == null) {
+                    InputNode iNode = InputNode.add(model, s.key.createInputNodeKey(), s.input.get());
+                    iNode.setModified();
+                    iNode.setSynapse(s);
+                    iNode.postCreate(doc);
+                    s.inputNode = iNode.provider;
                 }
+
+                if (!s.inactive) {
+                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
+                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.getNewWeight();
+
+                    if (s.isConjunction(false, true) && !s.isConjunction(true, true)) {
+                        neuron.numDisjunctiveSynapses++;
+                    }
+                }
+
+                s.weight += s.weightDelta;
+                s.weightDelta = 0.0;
+
+                s.bias += s.biasDelta;
+                s.biasDelta = 0.0;
+
+                if (doc != null) {
+                    s.committedInDoc = doc.id;
+                }
+            } catch(Exception e) {
+                throw e;
+            } finally {
+                in.lock.releaseWriteLock();
             }
-
-            s.weight += s.weightDelta;
-            s.weightDelta = 0.0;
-
-            s.bias += s.biasDelta;
-            s.biasDelta = 0.0;
-
-            if(doc != null) {
-                s.committedInDoc = doc.id;
-            }
-
-            in.lock.releaseWriteLock();
 
             if(s.toBeDeleted) {
                 s.unlink();
