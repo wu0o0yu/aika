@@ -163,7 +163,7 @@ public class Linker {
                         computeTargetRID(act, dir, sk),
                         act.key.range,
                         dir == INPUT ? sk.rangeMatch.invert() : sk.rangeMatch
-                ) && testRelationMatch(s, iAct, oAct)) {
+                ) && testRelation(s, iAct, oAct)) {
                     Activation.SynapseActivation sa = new Activation.SynapseActivation(s, iAct, oAct);
                     iAct.addSynapseActivation(INPUT, sa);
                     oAct.addSynapseActivation(OUTPUT, sa);
@@ -203,7 +203,7 @@ public class Linker {
             Activation oAct = (dir == INPUT ? act : rAct);
             Activation iAct = (dir == INPUT ? rAct : act);
 
-            if(testRelationMatch(s, iAct, oAct)) {
+            if(testRelation(s, iAct, oAct)) {
                 Activation.SynapseActivation sa = new Activation.SynapseActivation(s, iAct, oAct);
                 iAct.addSynapseActivation(INPUT, sa);
                 oAct.addSynapseActivation(OUTPUT, sa);
@@ -247,83 +247,17 @@ public class Linker {
     }
 
 
-    public static boolean testRelationMatch(Synapse s, Activation iAct, Activation oAct) {
-        for(Synapse.Relation sr: s.relations) {
+    public static boolean testRelation(Synapse s, Activation iAct, Activation oAct) {
+        for(Relation sr: s.relations) {
             Activation.SynapseActivation linkedSA = lookupSynapse(oAct, sr.linkedSynapse);
             if(linkedSA == null) return true;
-            if(!testRelationMatch(sr.type, iAct, linkedSA.input)) return false;
+            if(!sr.test(iAct, linkedSA.input)) return false;
         }
         return true;
     }
 
 
-    public static boolean testRelationMatch(Synapse.Relation.Type type, Activation act, Activation linkedAct) {
-        switch(type) {
-            case COMMON_ANCESTOR:
-                return hasCommonAncestor(act, linkedAct);
-            case CONTAINS:
-                return contains(act, linkedAct, act.doc.visitedCounter++);
-            case CONTAINED_IN:
-                return contains(linkedAct, act, act.doc.visitedCounter++);
-        }
-        return true;
-    }
-
-
-    private static boolean contains(Activation actA, Activation actB, long v) {
-        if(actA.visited == v) return false;
-        actA.visited = v;
-
-        if(actA == actB) return true;
-
-        for(Activation.SynapseActivation sa: actA.neuronInputs) {
-            if(!sa.synapse.key.isRecurrent) {
-                if(contains(sa.input, actB, v)) return true;
-            }
-        }
-        return false;
-    }
-
-
-
-
-    private static boolean hasCommonAncestor(Activation act, Activation linkedAct) {
-        long v = act.doc.visitedCounter++;
-        markAncestors(linkedAct, v);
-        return hasCommonAncestor(act, v, act.doc.visitedCounter++);
-    }
-
-
-    private static void markAncestors(Activation act, long v) {
-        if(act.visited == v) return;
-        act.visited = v;
-
-        act.markedAncestor = v;
-
-        for(Activation.SynapseActivation sa: act.neuronInputs) {
-            if(!sa.synapse.key.isRecurrent) {
-                markAncestors(sa.input, v);
-            }
-        }
-    }
-
-
-    private static boolean hasCommonAncestor(Activation act, long v1, long v2) {
-        if(act.visited == v2) return false;
-        act.visited = v2;
-
-        if(act.markedAncestor == v1) return true;
-
-        for(Activation.SynapseActivation sa: act.neuronInputs) {
-            if(!sa.synapse.key.isRecurrent) {
-                if(hasCommonAncestor(sa.input, v1, v2)) return true;
-            }
-        }
-        return false;
-    }
-
-
-    private static Activation.SynapseActivation lookupSynapse(Activation oAct, Synapse s) {
+    public static Activation.SynapseActivation lookupSynapse(Activation oAct, Synapse s) {
         for(Activation.SynapseActivation sa: oAct.neuronInputs) {
             if(sa.synapse == s) {
                 return sa;

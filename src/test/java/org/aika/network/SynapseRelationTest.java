@@ -6,13 +6,10 @@ import org.aika.Model;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Neuron;
 import org.aika.neuron.Synapse;
-import org.aika.neuron.activation.Activation;
-import org.aika.neuron.activation.Range;
-import org.aika.neuron.activation.Selector;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.aika.neuron.Synapse.Relation.Type.COMMON_ANCESTOR;
+import static org.aika.neuron.Relation.InstanceRelation.Type.COMMON_ANCESTOR;
 
 public class SynapseRelationTest {
 
@@ -50,7 +47,7 @@ public class SynapseRelationTest {
                         .setRecurrent(false)
                         .setRangeOutput(true)
                         .setSynapseId(0)
-                        .addSynapseRelation(COMMON_ANCESTOR, 1),
+                        .addInstanceRelation(COMMON_ANCESTOR, 1),
                 new Synapse.Builder()
                         .setNeuron(nC)
                         .setWeight(10.0)
@@ -58,7 +55,7 @@ public class SynapseRelationTest {
                         .setRecurrent(false)
                         .setRangeOutput(false)
                         .setSynapseId(1)
-                        .addSynapseRelation(COMMON_ANCESTOR, 0)
+                        .addInstanceRelation(COMMON_ANCESTOR, 0)
         );
 
 
@@ -88,7 +85,7 @@ public class SynapseRelationTest {
                         .setRecurrent(false)
                         .setRangeOutput(true)
                         .setSynapseId(0)
-                        .addSynapseRelation(COMMON_ANCESTOR, 1),
+                        .addInstanceRelation(COMMON_ANCESTOR, 1),
                 new Synapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0)
@@ -96,7 +93,7 @@ public class SynapseRelationTest {
                         .setRecurrent(false)
                         .setRangeOutput(false)
                         .setSynapseId(1)
-                        .addSynapseRelation(COMMON_ANCESTOR, 0)
+                        .addInstanceRelation(COMMON_ANCESTOR, 0)
         );
 
 

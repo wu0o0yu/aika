@@ -500,24 +500,6 @@ public class Synapse implements Writable {
 
 
 
-    public static class Relation {
-        public Type type;
-
-        public Synapse linkedSynapse;
-
-        public enum Type  {
-            COMMON_ANCESTOR,
-            CONTAINS,
-            CONTAINED_IN
-        }
-
-        public Relation(Type type, Synapse s) {
-            this.type = type;
-            linkedSynapse = s;
-        }
-    }
-
-
     /**
      * The {@code Builder} class is just a helper class which is used to initialize a neuron. Most of the parameters of this class
      * will be mapped to a input synapse for this neuron.
@@ -537,7 +519,8 @@ public class Synapse implements Writable {
         public Integer absoluteRid;
 
         public Integer synapseId;
-        public Collection<BuilderRelation> synapseRelations = new ArrayList<>();
+        public Collection<BuilderInstanceRelation> instanceRelations = new ArrayList<>();
+        public Collection<BuilderRangeRelation> rangeRelations = new ArrayList<>();
 
 
         /**
@@ -699,8 +682,14 @@ public class Synapse implements Writable {
         }
 
 
-        public Builder addSynapseRelation(Relation.Type type, int synapseId) {
-            synapseRelations.add(new BuilderRelation(type, synapseId));
+        public Builder addInstanceRelation(Relation.InstanceRelation.Type type, int synapseId) {
+            instanceRelations.add(new BuilderInstanceRelation(type, synapseId));
+            return this;
+        }
+
+
+        public Builder addRangeRelation(Range.Relation relation, int synapseId) {
+            rangeRelations.add(new BuilderRangeRelation(relation, synapseId));
             return this;
         }
 
@@ -743,12 +732,23 @@ public class Synapse implements Writable {
         }
 
 
-        static class BuilderRelation {
-            Relation.Type type;
+        static class BuilderInstanceRelation {
+            Relation.InstanceRelation.Type type;
             int id;
 
-            public BuilderRelation(Relation.Type type, int id) {
+            public BuilderInstanceRelation(Relation.InstanceRelation.Type type, int id) {
                 this.type = type;
+                this.id = id;
+            }
+        }
+
+
+        static class BuilderRangeRelation {
+            Range.Relation relation;
+            int id;
+
+            public BuilderRangeRelation(Range.Relation relation, int id) {
+                this.relation = relation;
                 this.id = id;
             }
         }

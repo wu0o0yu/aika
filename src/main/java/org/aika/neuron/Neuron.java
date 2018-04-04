@@ -233,8 +233,11 @@ public class Neuron extends Provider<INeuron> {
         int i = 0;
         for (Synapse.Builder input : inputs) {
             Synapse s = is.get(i);
-            for(Synapse.Builder.BuilderRelation br: input.synapseRelations) {
-                s.relations.add(new Synapse.Relation(br.type, synapseIds.get(br.id)));
+            for(Synapse.Builder.BuilderInstanceRelation bir: input.instanceRelations) {
+                s.relations.add(new Relation.InstanceRelation(bir.type, synapseIds.get(bir.id)));
+            }
+            for(Synapse.Builder.BuilderRangeRelation brr: input.rangeRelations) {
+                s.relations.add(new Relation.RangeRelation(brr.relation, synapseIds.get(brr.id)));
             }
             i++;
         }
