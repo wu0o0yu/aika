@@ -16,7 +16,6 @@
  */
 package org.aika;
 
-import com.sun.xml.internal.ws.api.message.ExceptionHasMessage;
 import org.aika.lattice.AndNode;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
