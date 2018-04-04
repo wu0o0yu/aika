@@ -393,8 +393,6 @@ public class Synapse implements Writable {
         public static final Key MAX_KEY = new Key(false, true);
 
         public boolean isRecurrent;
-        public Integer relativeRid;
-        public Integer absoluteRid;
         public Range.Relation rangeMatch;
         public Output rangeOutput;
 
@@ -411,42 +409,28 @@ public class Synapse implements Writable {
         }
 
 
-        public Key(boolean minKey, boolean maxKey, Integer relativeRid, Range.Relation rangeMatch) {
+        public Key(boolean minKey, boolean maxKey, Range.Relation rangeMatch) {
             this.minKey = minKey;
             this.maxKey = maxKey;
-            this.relativeRid = relativeRid;
             this.rangeMatch = rangeMatch;
         }
 
 
-        public Key(boolean isRecurrent, Integer relativeRid, Integer absoluteRid, Range.Relation rangeMatch, Output rangeOutput) {
+        public Key(boolean isRecurrent, Range.Relation rangeMatch, Output rangeOutput) {
             this.isRecurrent = isRecurrent;
-            this.relativeRid = relativeRid;
-            this.absoluteRid = absoluteRid;
             this.rangeMatch = rangeMatch;
             this.rangeOutput = rangeOutput;
         }
 
 
         public Key createInputNodeKey() {
-            return relativeRid != null ?
-                    new Key(
-                            isRecurrent,
-                            0,
-                            absoluteRid,
-                            rangeMatch,
-                            rangeOutput
-                    ) : this;
+            return this;
         }
 
 
         @Override
         public void write(DataOutput out) throws IOException {
             out.writeBoolean(isRecurrent);
-            out.writeBoolean(relativeRid != null);
-            if(relativeRid != null) out.writeByte(relativeRid);
-            out.writeBoolean(absoluteRid != null);
-            if(absoluteRid != null) out.writeByte(absoluteRid);
             rangeMatch.write(out);
             rangeOutput.write(out);
         }
@@ -455,8 +439,6 @@ public class Synapse implements Writable {
         @Override
         public void readFields(DataInput in, Model m) throws IOException {
             isRecurrent = in.readBoolean();
-            if(in.readBoolean()) relativeRid = (int) in.readByte();
-            if(in.readBoolean()) absoluteRid = (int) in.readByte();
             rangeMatch = Range.Relation.read(in, m);
             rangeOutput = Output.read(in, m);
         }
@@ -473,7 +455,7 @@ public class Synapse implements Writable {
             if(this.minKey) return "MIN_KEY";
             if(this.maxKey) return "MAX_KEY";
 
-            return relativeRid + " B:" + rangeOutput.begin + " E:" + rangeOutput.end;
+            return rangeOutput.begin + " E:" + rangeOutput.end;
         }
 
 
@@ -487,10 +469,6 @@ public class Synapse implements Writable {
             else if(!maxKey && k.maxKey) return -1;
 
             int r = Boolean.compare(isRecurrent, k.isRecurrent);
-            if(r != 0) return r;
-            r = Utils.compareInteger(relativeRid, k.relativeRid);
-            if(r != 0) return r;
-            r = Utils.compareInteger(absoluteRid, k.absoluteRid);
             if(r != 0) return r;
             r = rangeMatch.compareTo(k.rangeMatch);
             if(r != 0) return r;
@@ -700,8 +678,6 @@ public class Synapse implements Writable {
                     outputNeuron,
                     new Synapse.Key(
                             recurrent,
-                            relativeRid,
-                            absoluteRid,
                             rangeMatch,
                             rangeOutput
                     )
