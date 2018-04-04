@@ -698,7 +698,6 @@ public final class Activation extends NodeActivation<OrNode> {
 
         sc.newRounds = rounds.copy();
         sc.newState = decision;
-        doc.fsQueue.add(candidate);
     }
 
 
@@ -716,18 +715,6 @@ public final class Activation extends NodeActivation<OrNode> {
 
         public void restoreState(Mode m) {
             rounds = (m == Mode.OLD ? oldRounds : newRounds).copy();
-        }
-
-        public void setFinalState() {
-            if (isFinalActivation()) {
-                doc.finallyActivatedNeurons.remove(getINeuron());
-            }
-
-            finalRounds = newRounds.copy();
-
-            if (isFinalActivation()) {
-                doc.finallyActivatedNeurons.add(getINeuron());
-            }
         }
 
         public Activation getActivation() {

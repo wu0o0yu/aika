@@ -68,7 +68,6 @@ public class Document implements Comparable<Document> {
     public Queue queue = new Queue();
     public ValueQueue vQueue = new ValueQueue();
     public UpperBoundQueue ubQueue = new UpperBoundQueue();
-    public FinalStateQueue fsQueue = new FinalStateQueue();
 
     public TreeSet<Node> activatedNodes = new TreeSet<>();
     public TreeSet<INeuron> activatedNeurons = new TreeSet<>();
@@ -241,7 +240,11 @@ public class Document implements Comparable<Document> {
 
         SearchNode.search(this, selectedSearchNode, visitedCounter++, timeoutInMilliSeconds);
 
-        fsQueue.prepareFinalState();
+        for(Activation act: activationsByRangeBegin.values()) {
+            if(act.isFinalActivation()) {
+                finallyActivatedNeurons.add(act.getINeuron());
+            }
+        }
     }
 
 
@@ -516,32 +519,6 @@ public class Document implements Comparable<Document> {
                 }
             }
             return delta;
-        }
-    }
-
-
-    public class FinalStateQueue {
-        private ArrayList<Candidate> queue = new ArrayList<>();
-
-        public void add(Candidate c) {
-            if(!c.queued) {
-                queue.add(c);
-                c.queued = true;
-            }
-        }
-
-
-        public void prepareFinalState() {
-            for(Candidate c: queue) {
-                if(c.bestChildNode != null) {
-                    c.bestChildNode.setFinalState();
-                    if(c.activation.inputDecision == UNKNOWN) {
-                        c.activation.finalDecision = c.bestChildNode.getDecision();
-                    } else {
-                        c.activation.finalDecision = c.activation.inputDecision;
-                    }
-                }
-            }
         }
     }
 

@@ -87,7 +87,7 @@ public class SearchNode implements Comparable<SearchNode> {
         EXPLORE
     }
 
-    Weight weightDelta = Weight.ZERO;
+    Weight weightDelta;
     public Weight accumulatedWeight = Weight.ZERO;
 
     public Map<Activation, StateChange> modifiedActs = new TreeMap<>(ACTIVATION_ID_COMP);
@@ -483,12 +483,25 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if (level > doc.selectedSearchNode.level || accNW > getSelectedAccumulatedWeight(doc)) {
             doc.selectedSearchNode = this;
+            storeFinalState(this);
             bestPath = true;
         } else {
             bestPath = false;
         }
 
         return accumulatedWeight;
+    }
+
+
+    private static void storeFinalState(SearchNode sn) {
+        while(sn != null) {
+            if(sn.candidate != null) {
+                Activation act = sn.candidate.activation;
+                act.finalRounds = act.rounds.copy();
+                act.finalDecision = act.decision;
+            }
+            sn = sn.getParent();
+        }
     }
 
 
@@ -519,12 +532,6 @@ public class SearchNode implements Comparable<SearchNode> {
     public void changeState(Activation.Mode m) {
         for (StateChange sc : modifiedActs.values()) {
             sc.restoreState(m);
-        }
-    }
-
-    public void setFinalState() {
-        for (StateChange sc : modifiedActs.values()) {
-            sc.setFinalState();
         }
     }
 
