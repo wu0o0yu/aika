@@ -83,6 +83,13 @@ public class Utils {
     }
 
 
+    public static Double nullSafeMax(Double a, Double b) {
+        if(a == null) return b;
+        if(b == null) return a;
+        return Math.max(a, b);
+    }
+
+
     public static String collapseText(String txt, int length) {
         if (txt.length() <= 2 * length) {
             return txt;
