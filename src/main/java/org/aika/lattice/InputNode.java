@@ -153,8 +153,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                     }
                 });
             }
-        } catch(Exception e) {
-            throw e;
         } finally {
             lock.releaseReadLock();
         }

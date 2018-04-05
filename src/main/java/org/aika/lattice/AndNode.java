@@ -126,8 +126,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                             }
                         }
                     }
-                } catch(Exception e) {
-                    throw e;
                 } finally {
                     pn.lock.releaseReadLock();
                 }
@@ -159,8 +157,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                         }
                     }
                 }
-            } catch(Exception e) {
-                throw e;
             } finally {
                 pn.lock.releaseReadLock();
             }
@@ -222,8 +218,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                     }
                 }
 
-            } catch(Exception e) {
-                throw e;
             } finally {
                 for (Provider<? extends Node> pn : parentsForLocking) {
                     pn.get().lock.releaseWriteLock();

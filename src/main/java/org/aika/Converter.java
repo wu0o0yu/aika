@@ -197,8 +197,6 @@ public class Converter {
                 if (doc != null) {
                     s.committedInDoc = doc.id;
                 }
-            } catch(Exception e) {
-                throw e;
             } finally {
                 in.lock.releaseWriteLock();
             }

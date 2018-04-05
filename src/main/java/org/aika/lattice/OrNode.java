@@ -155,8 +155,6 @@ public class OrNode extends Node<OrNode, Activation> {
                     oe.node.get(doc).addActivation(doc, oe.ridOffset, inputAct);
                 }
             }
-        } catch(Exception e) {
-            throw e;
         } finally {
             parentNode.lock.releaseReadLock();
         }
@@ -244,8 +242,6 @@ public class OrNode extends Node<OrNode, Activation> {
             lock.acquireReadLock();
             removeParents(threadId, true);
             removeParents(threadId, false);
-        } catch(Exception e) {
-            throw e;
         } finally {
             lock.releaseReadLock();
         }
