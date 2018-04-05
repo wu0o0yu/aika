@@ -181,7 +181,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
         Stream<Activation> s = Selector.select(
                 th,
-                secondNode.inputNeuron.get(),
+                secondNode.inputNeuron.get(doc),
                 secondRid,
                 iak.range,
                 Range.Relation.createQuery(firstNode.key.rangeMatch, secondNode.key.rangeOutput, firstNode.key.rangeOutput, secondNode.key.rangeMatch)
