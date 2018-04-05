@@ -21,6 +21,7 @@ import org.aika.Model;
 import org.aika.Provider;
 import org.aika.Utils;
 import org.aika.Document;
+import org.aika.neuron.Relation;
 import org.aika.neuron.activation.Range;
 import org.aika.lattice.NodeActivation.Key;
 import org.aika.neuron.INeuron;
@@ -409,41 +410,30 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         public static Refinement MIN = new Refinement(null, null);
         public static Refinement MAX = new Refinement(null, null);
 
-        public Integer rid;
+        public Relation rel;
         public Provider<InputNode> input;
 
         private Refinement() {}
 
-        public Refinement(Integer rid, Provider<InputNode> input) {
-            this.rid = rid;
-            this.input = input;
-        }
 
-        public Refinement(Integer rid, Integer offset, Provider<InputNode> input) {
-            if(offset == null && rid != null) this.rid = 0;
-            else if(offset == null || rid == null) this.rid = null;
-            else this.rid = rid - offset;
+        public Refinement(Relation rel, Provider<InputNode> input) {
+            this.rel = rel;
             this.input = input;
         }
 
 
-        public Integer getOffset() {
-            return rid != null ? Math.min(0, rid) : null;
+        public Relation getRelation() {
+            return rel;
         }
 
 
-        public Integer getRelativePosition() {
-            return rid != null ? Math.max(0, rid) : null;
-        }
-
-
-        public Synapse getSynapse(Integer offset, Neuron n) {
-            return input.get().getSynapse(Utils.nullSafeAdd(getRelativePosition(), false, offset, false), n);
+        public Synapse getSynapse(Neuron n) {
+            return input.get().getSynapse(rel, n);
         }
 
 
         public String toString() {
-            return "(" + (rid != null ? rid + ":" : "") + input.get().logicToString() + ")";
+            return "(" + rel + input.get().logicToString() + ")";
         }
 
 

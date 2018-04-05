@@ -4,7 +4,7 @@ package org.aika.neuron;
 import org.aika.neuron.activation.Activation;
 import org.aika.neuron.activation.Range;
 
-public abstract class Relation {
+public abstract class Relation implements Comparable<Relation> {
 
     public Synapse linkedSynapse;
 

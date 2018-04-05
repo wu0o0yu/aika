@@ -253,15 +253,10 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    @Override
-    public double computeSynapseWeightSum(Integer offset, INeuron n) {
-        return n.biasSum + Math.abs(getSynapse(key.relativeRid == null ? null : offset, n.provider).weight);
-    }
 
-
-    public Synapse getSynapse(Integer rid, Neuron outputNeuron) {
+    public Synapse getSynapse(Relation rel, Neuron outputNeuron) {
         synapseLock.acquireReadLock();
-        Synapse s = synapses != null ? synapses.get(new SynapseKey(rid, outputNeuron)) : null;
+        Synapse s = synapses != null ? synapses.get(new SynapseKey(rel, outputNeuron)) : null;
         synapseLock.releaseReadLock();
         return s;
     }
@@ -350,28 +345,28 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    private static class SynapseKey implements Writable, Comparable<SynapseKey> {
-        Integer rid;
+    private static class SynapseKey implements Comparable<SynapseKey> {
+        Relation rel;
         Neuron neuron;
 
         private SynapseKey() {
         }
 
 
-        public SynapseKey(Integer rid, Neuron neuron) {
-            this.rid = rid;
+        public SynapseKey(Relation rel, Neuron neuron) {
+            this.rel = rel;
             this.neuron = neuron;
         }
 
 
         @Override
         public int compareTo(SynapseKey sk) {
-            int r = Utils.compareInteger(rid, sk.rid);
+            int r = rel.compareTo(sk.rel);
             if (r != 0) return r;
             return neuron.compareTo(sk.neuron);
         }
 
-
+/*
         public static SynapseKey read(DataInput in, Model m) throws IOException {
             SynapseKey sk = new SynapseKey();
             sk.readFields(in, m);
@@ -396,5 +391,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
             }
             neuron = m.lookupNeuron(in.readInt());
         }
+        */
     }
 }
