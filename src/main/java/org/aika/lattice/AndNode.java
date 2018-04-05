@@ -108,24 +108,29 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         if (andChildren != null) {
             for (NodeActivation<?> pAct : act.inputs.values()) {
                 Node<?, NodeActivation<?>> pn = pAct.key.node;
-                pn.lock.acquireReadLock();
-                Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.node.provider, act.key.rid, pAct.key.rid));
-                if (ref != null) {
-                    for (NodeActivation secondAct : pAct.outputs.values()) {
-                        if (act != secondAct) {
-                            Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
-                            if (secondRef != null) {
-                                Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
+                try {
+                    pn.lock.acquireReadLock();
+                    Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.node.provider, act.key.rid, pAct.key.rid));
+                    if (ref != null) {
+                        for (NodeActivation secondAct : pAct.outputs.values()) {
+                            if (act != secondAct) {
+                                Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
+                                if (secondRef != null) {
+                                    Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
-                                Provider<AndNode> nlp = getAndChild(nRef);
-                                if (nlp != null) {
-                                    addNextLevelActivation(act, secondAct, nlp);
+                                    Provider<AndNode> nlp = getAndChild(nRef);
+                                    if (nlp != null) {
+                                        addNextLevelActivation(act, secondAct, nlp);
+                                    }
                                 }
                             }
                         }
                     }
+                } catch(Exception e) {
+                    throw e;
+                } finally {
+                    pn.lock.releaseReadLock();
                 }
-                pn.lock.releaseReadLock();
             }
         }
 
@@ -138,22 +143,27 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         Document doc = act.doc;
         for(NodeActivation<?> pAct: act.inputs.values()) {
             Node<?, NodeActivation<?>> pn = pAct.key.node;
-            pn.lock.acquireReadLock();
-            Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.node.provider, act.key.rid, pAct.key.rid));
-            for(NodeActivation secondAct: pAct.outputs.values()) {
-                if(secondAct.key.node instanceof AndNode) {
-                    if (act != secondAct && config.checkExpandable.evaluate(secondAct)) {
-                        Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
-                        Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
+            try {
+                pn.lock.acquireReadLock();
+                Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.node.provider, act.key.rid, pAct.key.rid));
+                for (NodeActivation secondAct : pAct.outputs.values()) {
+                    if (secondAct.key.node instanceof AndNode) {
+                        if (act != secondAct && config.checkExpandable.evaluate(secondAct)) {
+                            Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
+                            Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
 
-                        AndNode nln = createNextLevelNode(doc.model, doc.threadId, doc, this, nRef, config);
-                        if(nln != null) {
-                            nln.isDiscovered = true;
+                            AndNode nln = createNextLevelNode(doc.model, doc.threadId, doc, this, nRef, config);
+                            if (nln != null) {
+                                nln.isDiscovered = true;
+                            }
                         }
                     }
                 }
+            } catch(Exception e) {
+                throw e;
+            } finally {
+                pn.lock.releaseReadLock();
             }
-            pn.lock.releaseReadLock();
         }
     }
 
@@ -195,24 +205,29 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         if (parents != null) {
             // Locking needs to take place in a predefined order.
             TreeSet<? extends Provider<? extends Node>> parentsForLocking = new TreeSet(parents.values());
-            for(Provider<? extends Node> pn: parentsForLocking) {
-                pn.get().lock.acquireWriteLock();
-            }
-
-            if(n.andChildren == null || !n.andChildren.containsKey(ref)) {
-                nln = new AndNode(m, n.level + 1, parents);
-
-                if(config == null || config.checkValidPattern.evaluate(nln)) {
-                    nln.init();
-                    nln.postCreate(doc);
-                } else {
-                    m.removeProvider(nln.provider);
-                    nln = null;
+            try {
+                for (Provider<? extends Node> pn : parentsForLocking) {
+                    pn.get().lock.acquireWriteLock();
                 }
-            }
 
-            for(Provider<? extends Node> pn: parentsForLocking) {
-                pn.get().lock.releaseWriteLock();
+                if (n.andChildren == null || !n.andChildren.containsKey(ref)) {
+                    nln = new AndNode(m, n.level + 1, parents);
+
+                    if (config == null || config.checkValidPattern.evaluate(nln)) {
+                        nln.init();
+                        nln.postCreate(doc);
+                    } else {
+                        m.removeProvider(nln.provider);
+                        nln = null;
+                    }
+                }
+
+            } catch(Exception e) {
+                throw e;
+            } finally {
+                for (Provider<? extends Node> pn : parentsForLocking) {
+                    pn.get().lock.releaseWriteLock();
+                }
             }
         }
 

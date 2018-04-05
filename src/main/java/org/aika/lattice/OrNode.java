@@ -148,13 +148,18 @@ public class OrNode extends Node<OrNode, Activation> {
 
     public static void processCandidate(Node<?, ? extends NodeActivation<?>> parentNode, NodeActivation inputAct, boolean train) {
         Document doc = inputAct.doc;
-        parentNode.lock.acquireReadLock();
-        if(parentNode.orChildren != null) {
-            for (OrEntry oe : parentNode.orChildren) {
-                oe.node.get(doc).addActivation(doc, oe.ridOffset, inputAct);
+        try {
+            parentNode.lock.acquireReadLock();
+            if (parentNode.orChildren != null) {
+                for (OrEntry oe : parentNode.orChildren) {
+                    oe.node.get(doc).addActivation(doc, oe.ridOffset, inputAct);
+                }
             }
+        } catch(Exception e) {
+            throw e;
+        } finally {
+            parentNode.lock.releaseReadLock();
         }
-        parentNode.lock.releaseReadLock();
     }
 
 
@@ -235,10 +240,15 @@ public class OrNode extends Node<OrNode, Activation> {
 
         super.remove();
 
-        lock.acquireReadLock();
-        removeParents(threadId, true);
-        removeParents(threadId, false);
-        lock.releaseReadLock();
+        try {
+            lock.acquireReadLock();
+            removeParents(threadId, true);
+            removeParents(threadId, false);
+        } catch(Exception e) {
+            throw e;
+        } finally {
+            lock.releaseReadLock();
+        }
     }
 
 

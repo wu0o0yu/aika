@@ -143,16 +143,21 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     @Override
     void apply(NodeActivation act) {
 
-        lock.acquireReadLock();
-        if (andChildren != null) {
-            andChildren.forEach((ref, cn) -> {
-                InputNode in = ref.input.getIfNotSuspended();
-                if (in != null) {
-                    addNextLevelActivations(in, ref, cn, act);
-                }
-            });
+        try {
+            lock.acquireReadLock();
+            if (andChildren != null) {
+                andChildren.forEach((ref, cn) -> {
+                    InputNode in = ref.input.getIfNotSuspended();
+                    if (in != null) {
+                        addNextLevelActivations(in, ref, cn, act);
+                    }
+                });
+            }
+        } catch(Exception e) {
+            throw e;
+        } finally {
+            lock.releaseReadLock();
         }
-        lock.releaseReadLock();
 
         OrNode.processCandidate(this, act, false);
     }
@@ -176,7 +181,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
         Stream<Activation> s = Selector.select(
                 th,
-                secondNode.inputNeuron.get(),
+                secondNode.inputNeuron.get(doc),
                 secondRid,
                 iak.range,
                 Range.Relation.createQuery(firstNode.key.rangeMatch, secondNode.key.rangeOutput, firstNode.key.rangeOutput, secondNode.key.rangeMatch)
