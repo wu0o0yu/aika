@@ -114,14 +114,12 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         public TreeMap<Activation.Key, Activation> activations;
         public TreeMap<Activation.Key, Activation> activationsEnd;
-        public TreeMap<Activation.Key, Activation> activationsRid;
         public int minLength = Integer.MAX_VALUE;
         public int maxLength = 0;
 
         public ThreadState() {
             activations = new TreeMap<>(BEGIN_COMP);
             activationsEnd = new TreeMap<>(END_COMP);
-            activationsRid = new TreeMap<>(RID_COMP);
         }
     }
 

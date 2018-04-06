@@ -43,20 +43,16 @@ public class Linker {
 
     public enum SortGroup {
         RANGE_BEGIN(
-                new Synapse.Key(true, false, null, Range.Relation.BEGIN_EQUALS),
-                new Synapse.Key(false, true, null, Range.Relation.BEGIN_EQUALS)
+                new Synapse.Key(true, false, Range.Relation.BEGIN_EQUALS),
+                new Synapse.Key(false, true, Range.Relation.BEGIN_EQUALS)
         ),
         RANGE_END(
-                new Synapse.Key(true, false, null, Range.Relation.END_EQUALS),
-                new Synapse.Key(false, true, null, Range.Relation.END_EQUALS)
-        ),
-        RID_ZERO(
-                new Synapse.Key(true, false, 0, Range.Relation.NONE),
-                new Synapse.Key(false, true, 0, Range.Relation.NONE)
+                new Synapse.Key(true, false, Range.Relation.END_EQUALS),
+                new Synapse.Key(false, true, Range.Relation.END_EQUALS)
         ),
         OTHERS(
-                new Synapse.Key(true, false, null, Range.Relation.NONE),
-                new Synapse.Key(false, true, null, Range.Relation.NONE)
+                new Synapse.Key(true, false, Range.Relation.NONE),
+                new Synapse.Key(false, true, Range.Relation.NONE)
         );
 
         Synapse begin;
@@ -76,7 +72,6 @@ public class Linker {
         public static SortGroup getSortGroup(Synapse.Key k) {
             if(k.rangeMatch.beginToBegin == Range.Operator.EQUALS) return SortGroup.RANGE_BEGIN;
             else if(k.rangeMatch.endToEnd == Range.Operator.EQUALS) return SortGroup.RANGE_END;
-            else if(k.relativeRid != null && k.relativeRid == 0) return SortGroup.RID_ZERO;
             else return SortGroup.OTHERS;
         }
 
@@ -87,8 +82,6 @@ public class Linker {
                     return ak.range.begin != Integer.MIN_VALUE;
                 case RANGE_END:
                     return ak.range.end != Integer.MAX_VALUE;
-                case RID_ZERO:
-                    return ak.rid != null;
                 default:
                     return true;
             }
@@ -130,7 +123,7 @@ public class Linker {
             return;
         }
 
-        for(SortGroup sg: new SortGroup[] {SortGroup.RANGE_BEGIN, SortGroup.RANGE_END, SortGroup.RID_ZERO}) {
+        for(SortGroup sg: new SortGroup[] {SortGroup.RANGE_BEGIN, SortGroup.RANGE_END}) {
             if(sortGroupCounts[sg.ordinal()] > 0) {
                 link(act, dir, sg, syns);
             }

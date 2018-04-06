@@ -90,13 +90,10 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     private NodeActivation.Key computeActivationKey(Activation iAct) {
         NodeActivation.Key ak = iAct.key;
-        if ((key.absoluteRid != null && key.absoluteRid != ak.rid))
-            return null;
 
         return new NodeActivation.Key(
                 this,
-                key.rangeOutput.map(ak.range),
-                key.relativeRid != null ? ak.rid : null
+                key.rangeOutput.map(ak.range)
         );
     }
 
@@ -175,12 +172,12 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         Activation.Key ak = act.key;
         Activation.Key iak = iAct.key;
         InputNode firstNode = ((InputNode) ak.node);
-        Integer secondRid = Utils.nullSafeAdd(ak.rid, false, ref.rid, false);
 
         Stream<Activation> s = Selector.select(
                 th,
                 secondNode.inputNeuron.get(doc),
-                secondRid,
+                ref.rel,
+                iAct,
                 iak.range,
                 Range.Relation.createQuery(firstNode.key.rangeMatch, secondNode.key.rangeOutput, firstNode.key.rangeOutput, secondNode.key.rangeMatch)
         );
@@ -195,8 +192,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
                                             Range.mergeRange(
                                                     firstNode.key.rangeOutput.map(iak.range),
                                                     secondNode.key.rangeOutput.map(secondIAct.key.range)
-                                            ),
-                                            Utils.nullSafeMin(ak.rid, secondAct.key.rid)
+                                            )
                                     ),
                                     AndNode.prepareInputActs(act, secondAct)
                             );

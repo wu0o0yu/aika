@@ -107,28 +107,21 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     @Override
     void apply(NodeActivation<AndNode> act) {
         if (andChildren != null) {
-            for (NodeActivation<?> pAct : act.inputs.values()) {
-                Node<?, NodeActivation<?>> pn = pAct.key.node;
-                try {
-                    pn.lock.acquireReadLock();
-                    Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.node.provider, act.key.rid, pAct.key.rid));
-                    if (ref != null) {
-                        for (NodeActivation secondAct : pAct.outputs.values()) {
-                            if (act != secondAct) {
-                                Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
-                                if (secondRef != null) {
-                                    Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
+            for (Map.Entry<Refinement, NodeActivation<?>> fme : act.inputs.entrySet()) {
+                Refinement ref = fme.getKey();
+                NodeActivation<?> pAct = fme.getValue();
 
-                                    Provider<AndNode> nlp = getAndChild(nRef);
-                                    if (nlp != null) {
-                                        addNextLevelActivation(act, secondAct, nlp);
-                                    }
-                                }
-                            }
+                for (Map.Entry<Refinement, NodeActivation<?>> sme : pAct.outputs.entrySet()) {
+                    Refinement secondRef = sme.getKey();
+                    NodeActivation secondAct = sme.getValue();
+                    if (act != secondAct) {
+                        Refinement nRef = new Refinement(secondRef.rel, ref.getOffset(), secondRef.input);
+
+                        Provider<AndNode> nlp = getAndChild(nRef);
+                        if (nlp != null) {
+                            addNextLevelActivation(act, secondAct, nlp);
                         }
                     }
-                } finally {
-                    pn.lock.releaseReadLock();
                 }
             }
         }
@@ -140,26 +133,23 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     @Override
     public void discover(NodeActivation<AndNode> act, Config config) {
         Document doc = act.doc;
-        for(NodeActivation<?> pAct: act.inputs.values()) {
-            Node<?, NodeActivation<?>> pn = pAct.key.node;
-            try {
-                pn.lock.acquireReadLock();
-                Refinement ref = pn.reverseAndChildren.get(new ReverseAndRefinement(act.key.node.provider, act.key.rid, pAct.key.rid));
-                for (NodeActivation secondAct : pAct.outputs.values()) {
-                    if (secondAct.key.node instanceof AndNode) {
-                        if (act != secondAct && config.checkExpandable.evaluate(secondAct)) {
-                            Refinement secondRef = pn.reverseAndChildren.get(new ReverseAndRefinement(secondAct.key.node.provider, secondAct.key.rid, pAct.key.rid));
-                            Refinement nRef = new Refinement(secondRef.rid, ref.getOffset(), secondRef.input);
+        for(Map.Entry<Refinement, NodeActivation<?>> fme : act.inputs.entrySet()) {
+            Refinement ref = fme.getKey();
+            NodeActivation<?> pAct = fme.getValue();
+            for (Map.Entry<Refinement, NodeActivation<?>> sme : pAct.outputs.entrySet()) {
+                Refinement secondRef = sme.getKey();
+                NodeActivation secondAct = sme.getValue();
 
-                            AndNode nln = createNextLevelNode(doc.model, doc.threadId, doc, this, nRef, config);
-                            if (nln != null) {
-                                nln.isDiscovered = true;
-                            }
+                if (secondAct.key.node instanceof AndNode) {
+                    if (act != secondAct && config.checkExpandable.evaluate(secondAct)) {
+                        Refinement nRef = new Refinement(secondRef.rel, ref.getOffset(), secondRef.input);
+
+                        AndNode nln = createNextLevelNode(doc.model, doc.threadId, doc, this, nRef, config);
+                        if (nln != null) {
+                            nln.isDiscovered = true;
                         }
                     }
                 }
-            } finally {
-                pn.lock.releaseReadLock();
             }
         }
     }
@@ -202,10 +192,10 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         if (parents != null) {
             // Locking needs to take place in a predefined order.
             TreeSet<? extends Provider<? extends Node>> parentsForLocking = new TreeSet(parents.values());
+            for (Provider<? extends Node> pn : parentsForLocking) {
+                pn.get().lock.acquireWriteLock();
+            }
             try {
-                for (Provider<? extends Node> pn : parentsForLocking) {
-                    pn.get().lock.acquireWriteLock();
-                }
 
                 if (n.andChildren == null || !n.andChildren.containsKey(ref)) {
                     nln = new AndNode(m, n.level + 1, parents);
@@ -401,23 +391,30 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
      *
      */
     public static class Refinement implements Comparable<Refinement> {
-        public static Refinement MIN = new Refinement(null, null);
-        public static Refinement MAX = new Refinement(null, null);
+        public static Refinement MIN = new Refinement(null, 0, null);
+        public static Refinement MAX = new Refinement(null, 0, null);
 
         public Relation rel;
+        public int offset;
         public Provider<InputNode> input;
 
         private Refinement() {}
 
 
-        public Refinement(Relation rel, Provider<InputNode> input) {
+        public Refinement(Relation rel, int offset, Provider<InputNode> input) {
             this.rel = rel;
+            this.offset = offset;
             this.input = input;
         }
 
 
         public Relation getRelation() {
             return rel;
+        }
+
+
+        public int getOffset() {
+            return offset;
         }
 
 

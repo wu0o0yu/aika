@@ -421,9 +421,9 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    public <T extends Node> boolean filter(T n, Integer rid, Range r, Range.Relation rr) {
+    public <T extends Node> boolean filter(T n, Relation rel, Activation linkedAct, Range r, Range.Relation rr) {
         return (n == null || key.node == n) &&
-                (rid == null || (key.rid != null && key.rid.intValue() == rid.intValue())) &&
+                (rel == null || linkedAct == null || (rel.test(this, linkedAct))) &&
                 (r == null || rr == null || rr.compare(key.range, r));
     }
 
@@ -645,9 +645,6 @@ public final class Activation extends NodeActivation<OrNode> {
         sb.append(" - ");
 
         sb.append(withLogic ? key.node.toString() : key.node.getNeuronLabel());
-
-        sb.append(" - RID:");
-        sb.append(key.rid);
 
         sb.append(" - UB:");
         sb.append(Utils.round(upperBound));

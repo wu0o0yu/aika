@@ -87,11 +87,7 @@ public class Document implements Comparable<Document> {
         if (r != 0) return r;
         return ak1.compareTo(ak2);
     });
-    public TreeMap<NodeActivation.Key, Activation> activationsByRid = new TreeMap<>((ak1, ak2) -> {
-        int r = Integer.compare(ak1.rid, ak2.rid);
-        if (r != 0) return r;
-        return ak1.compareTo(ak2);
-    });
+
     public TreeSet<Node> addedNodes = new TreeSet<>();
     public ArrayList<NodeActivation> addedNodeActivations = new ArrayList<>();
     public ArrayList<Activation> addedActivations = new ArrayList<>();
@@ -105,8 +101,6 @@ public class Document implements Comparable<Document> {
 
     public static Comparator<NodeActivation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
         int r = Range.compare(act1.key.range, act2.key.range, false);
-        if (r != 0) return r;
-        r = Utils.compareInteger(act1.key.rid, act2.key.rid);
         if (r != 0) return r;
         return act1.key.node.compareTo(act2.key.node);
     };
@@ -335,7 +329,7 @@ public class Document implements Comparable<Document> {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         for (INeuron n : activatedNeurons) {
-            Stream<Activation> s = Selector.select(this, n, null, null, null);
+            Stream<Activation> s = Selector.select(this, n, null, null, null, null);
             acts.addAll(s.collect(Collectors.toList()));
         }
 

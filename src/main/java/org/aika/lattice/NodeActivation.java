@@ -20,6 +20,7 @@ package org.aika.lattice;
 import org.aika.Utils;
 import org.aika.Document;
 import org.aika.neuron.activation.Range;
+import org.aika.lattice.AndNode.Refinement;
 
 import java.util.*;
 
@@ -35,8 +36,8 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     public long visited = -1;
     public Long repropagateV;
 
-    public TreeMap<Key, NodeActivation<?>> inputs = new TreeMap<>();
-    public TreeMap<Key, NodeActivation<?>> outputs = new TreeMap<>();
+    public TreeMap<Refinement, NodeActivation<?>> inputs = new TreeMap<>();
+    public TreeMap<Refinement, NodeActivation<?>> outputs = new TreeMap<>();
 
 
     public NodeActivation(int id, Document doc, Key<T> key) {
@@ -46,10 +47,10 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     }
 
 
-    public NodeActivation(int id, Document doc, T n, Range pos, Integer rid) {
+    public NodeActivation(int id, Document doc, T n, Range pos) {
         this.id = id;
         this.doc = doc;
-        key = new Key<>(n, pos, rid);
+        key = new Key<>(n, pos);
     }
 
 
@@ -92,13 +93,10 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     public static final class Key<T extends Node> implements Comparable<Key> {
         public final T node;
         public final Range range;
-        public final Integer rid;
 
-
-        public Key(T node, Range range, Integer rid) {
+        public Key(T node, Range range) {
             this.node = node;
             this.range = range;
-            this.rid = rid;
         }
 
 
@@ -107,14 +105,13 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
             int x = node.compareTo(k.node);
             if(x != 0) return x;
             x = Range.compare(range, k.range, false);
-            if(x != 0) return x;
-            x = Utils.compareInteger(rid, k.rid);
+
             return x;
         }
 
 
         public String toString() {
-            return (node != null ? node.getNeuronLabel() : "") + " " + range + " " + rid;
+            return (node != null ? node.getNeuronLabel() : "") + " " + range;
         }
     }
 }

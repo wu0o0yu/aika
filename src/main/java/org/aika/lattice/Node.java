@@ -157,8 +157,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     abstract A createActivation(Document doc, Key ak);
 
-    public abstract double computeSynapseWeightSum(Integer offset, INeuron n);
-
     abstract void apply(A act);
 
     public abstract void discover(NodeActivation<T> act, Config config);
@@ -190,31 +188,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public static final Comparator<NodeActivation.Key> BEGIN_COMP = (k1, k2) -> {
-        int r;
-        r = Range.compare(k1.range, k2.range, false);
-        if (r != 0) return r;
-        r = Utils.compareInteger(k1.rid, k2.rid);
-        return r;
-    };
+    public static final Comparator<NodeActivation.Key> BEGIN_COMP = (k1, k2) -> Range.compare(k1.range, k2.range, false);
 
 
-    public static final Comparator<NodeActivation.Key> END_COMP = (k1, k2) -> {
-        int r;
-        r = Range.compare(k1.range, k2.range, true);
-        if (r != 0) return r;
-        r = Utils.compareInteger(k1.rid, k2.rid);
-        return r;
-    };
-
-
-    public static final Comparator<NodeActivation.Key> RID_COMP = (k1, k2) -> {
-        int r;
-        r = Utils.compareInteger(k1.rid, k2.rid);
-        if (r != 0) return r;
-        r = Range.compare(k1.range, k2.range, false);
-        return r;
-    };
+    public static final Comparator<NodeActivation.Key> END_COMP = (k1, k2) -> Range.compare(k1.range, k2.range, true);
 
 
     public void postCreate(Document doc) {

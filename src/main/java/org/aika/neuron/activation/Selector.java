@@ -20,6 +20,7 @@ import org.aika.Document;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.neuron.INeuron;
+import org.aika.neuron.Relation;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -38,54 +39,39 @@ import static org.aika.lattice.Node.MIN_NODE;
 public class Selector {
 
 
-    public static Activation get(Document doc, INeuron n, Integer rid, Range r, Range.Relation rr) {
-        Stream<Activation> s = select(doc, n, rid, r, rr);
+    public static Activation get(Document doc, INeuron n, Range r, Range.Relation rr) {
+        Stream<Activation> s = select(doc, n, null, null, r, rr);
         return s.findFirst()
                 .orElse(null);
     }
 
 
     public static Activation get(Document doc, INeuron n, NodeActivation.Key ak) {
-        return get(doc, n, ak.rid, ak.range, Range.Relation.EQUALS);
+        return get(doc, n, ak.range, Range.Relation.EQUALS);
     }
 
 
-    public static Stream<Activation> select(Document doc, INeuron n, Integer rid, Range r, Range.Relation rr) {
+    public static Stream<Activation> select(Document doc, INeuron n, Relation rel, Activation linkedAct, Range r, Range.Relation rr) {
         INeuron.ThreadState th = n.getThreadState(doc.threadId, false);
         if (th == null) return Stream.empty();
-        return select(th, n, rid, r, rr);
+        return select(th, n, rel, linkedAct, r, rr);
     }
 
 
-    public static Stream<Activation> select(INeuron.ThreadState th, INeuron n, Integer rid, Range r, Range.Relation rr) {
+    public static Stream<Activation> select(INeuron.ThreadState th, INeuron n, Relation rel, Activation linkedAct, Range r, Range.Relation rr) {
         Stream<Activation> results;
         int s = th.activations.size();
 
         if (s == 0) return Stream.empty();
         else if (s == 1) {
             results = th.activations.values().stream();
-        } else if (rid != null) {
-            results = getActivationsByRid(th, n, rid).stream();
         } else if(rr != null) {
             results = getActivationsByRange(th, n, r, rr).stream();
         } else {
             results = th.activations.values().stream();
         }
 
-        return results.filter(act -> act.filter(n.node.get(), rid, r, rr));
-    }
-
-
-    private static Collection<Activation> getActivationsByRid(INeuron.ThreadState th, INeuron n, Integer rid) {
-        Node node = n.node.get();
-        NodeActivation.Key bk = new NodeActivation.Key(node, Range.MIN, rid);
-        NodeActivation.Key ek = new NodeActivation.Key(node, Range.MAX, rid);
-
-        if (th.activationsRid != null) {
-            return th.activationsRid.subMap(bk, true, ek, true).values();
-        } else {
-            return Collections.EMPTY_LIST;
-        }
+        return results.filter(act -> act.filter(n.node.get(), rel, linkedAct, r, rr));
     }
 
 
@@ -133,9 +119,9 @@ public class Selector {
         }
 
         return th.activations.subMap(
-                new NodeActivation.Key(node, new Range(fromKey, Integer.MIN_VALUE), null),
+                new NodeActivation.Key(node, new Range(fromKey, Integer.MIN_VALUE)),
                 fromInclusive,
-                new NodeActivation.Key(node, new Range(toKey, Integer.MAX_VALUE), Integer.MAX_VALUE),
+                new NodeActivation.Key(node, new Range(toKey, Integer.MAX_VALUE)),
                 toInclusive
         ).values();
     }
@@ -167,9 +153,9 @@ public class Selector {
         }
 
         return th.activationsEnd.subMap(
-                new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, fromKey), null),
+                new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, fromKey)),
                 fromInclusive,
-                new NodeActivation.Key(node, new Range(Integer.MAX_VALUE, toKey), Integer.MAX_VALUE),
+                new NodeActivation.Key(node, new Range(Integer.MAX_VALUE, toKey)),
                 toInclusive
         ).values();
     }
@@ -203,9 +189,9 @@ public class Selector {
         if(fromKey > toKey) return Collections.EMPTY_LIST;
 
         return th.activations.subMap(
-                new NodeActivation.Key(node, new Range(fromKey, Integer.MIN_VALUE), null),
+                new NodeActivation.Key(node, new Range(fromKey, Integer.MIN_VALUE)),
                 fromInclusive,
-                new NodeActivation.Key(node, new Range(toKey, Integer.MAX_VALUE), null),
+                new NodeActivation.Key(node, new Range(toKey, Integer.MAX_VALUE)),
                 toInclusive
         ).values();
     }
@@ -239,9 +225,9 @@ public class Selector {
         if(fromKey > toKey) return Collections.EMPTY_LIST;
 
         return th.activationsEnd.subMap(
-                new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, fromKey), null),
+                new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, fromKey)),
                 fromInclusive,
-                new NodeActivation.Key(node, new Range(Integer.MAX_VALUE, toKey), null),
+                new NodeActivation.Key(node, new Range(Integer.MAX_VALUE, toKey)),
                 toInclusive
         ).values();
     }
@@ -253,17 +239,17 @@ public class Selector {
         if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS) {
             int key = rr.beginToBegin == EQUALS ? r.begin : r.end;
             return th.activations.subMap(
-                    new NodeActivation.Key(node, new Range(key, Integer.MIN_VALUE), null),
+                    new NodeActivation.Key(node, new Range(key, Integer.MIN_VALUE)),
                     true,
-                    new NodeActivation.Key(node, new Range(key, Integer.MAX_VALUE), Integer.MAX_VALUE),
+                    new NodeActivation.Key(node, new Range(key, Integer.MAX_VALUE)),
                     true
             ).values();
         } else if(rr.endToEnd == EQUALS || rr.endToBegin == EQUALS) {
             int key = rr.endToEnd == EQUALS ? r.end : r.begin;
             return th.activationsEnd.subMap(
-                    new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, key), null),
+                    new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, key)),
                     true,
-                    new NodeActivation.Key(node, new Range(Integer.MAX_VALUE, key), Integer.MAX_VALUE),
+                    new NodeActivation.Key(node, new Range(Integer.MAX_VALUE, key)),
                     true
             ).values();
         }
@@ -274,22 +260,16 @@ public class Selector {
     public static Collection<Activation> select(Linker.SortGroup sortGroup, Activation act) {
         switch(sortGroup) {
             case RANGE_BEGIN: {
-                NodeActivation.Key bk = new NodeActivation.Key(MIN_NODE, new Range(act.key.range.begin, Integer.MIN_VALUE), Integer.MIN_VALUE);
-                NodeActivation.Key ek = new NodeActivation.Key(MAX_NODE, new Range(act.key.range.begin, Integer.MAX_VALUE), Integer.MAX_VALUE);
+                NodeActivation.Key bk = new NodeActivation.Key(MIN_NODE, new Range(act.key.range.begin, Integer.MIN_VALUE));
+                NodeActivation.Key ek = new NodeActivation.Key(MAX_NODE, new Range(act.key.range.begin, Integer.MAX_VALUE));
 
                 return act.doc.activationsByRangeBegin.subMap(bk, true, ek, true).values();
             }
             case RANGE_END: {
-                NodeActivation.Key bk = new NodeActivation.Key(MIN_NODE, new Range(Integer.MIN_VALUE, act.key.range.end), Integer.MIN_VALUE);
-                NodeActivation.Key ek = new NodeActivation.Key(MAX_NODE, new Range(Integer.MAX_VALUE, act.key.range.end), Integer.MAX_VALUE);
+                NodeActivation.Key bk = new NodeActivation.Key(MIN_NODE, new Range(Integer.MIN_VALUE, act.key.range.end));
+                NodeActivation.Key ek = new NodeActivation.Key(MAX_NODE, new Range(Integer.MAX_VALUE, act.key.range.end));
 
                 return act.doc.activationsByRangeEnd.subMap(bk, true, ek, true).values();
-            }
-            case RID_ZERO: {
-                NodeActivation.Key bk = new NodeActivation.Key(MIN_NODE, Range.MIN, act.key.rid);
-                NodeActivation.Key ek = new NodeActivation.Key(MAX_NODE, Range.MAX, act.key.rid);
-
-                return act.doc.activationsByRid.subMap(bk, true, ek, true).values();
             }
             default:
                 throw new RuntimeException("Unsupported Sort Group.");

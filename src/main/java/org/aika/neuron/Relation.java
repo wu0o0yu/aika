@@ -4,6 +4,8 @@ package org.aika.neuron;
 import org.aika.neuron.activation.Activation;
 import org.aika.neuron.activation.Range;
 
+import static org.aika.neuron.Synapse.INPUT_SYNAPSE_COMP;
+
 public abstract class Relation implements Comparable<Relation> {
 
     public Synapse linkedSynapse;
@@ -91,6 +93,18 @@ public abstract class Relation implements Comparable<Relation> {
             }
             return false;
         }
+
+
+        @Override
+        public int compareTo(Relation rel) {
+            if(rel instanceof RangeRelation) return 1;
+            InstanceRelation ir = (InstanceRelation) rel;
+
+            int r = type.compareTo(ir.type);
+            if(r != 0) return r;
+
+            return INPUT_SYNAPSE_COMP.compare(linkedSynapse, rel.linkedSynapse);
+        }
     }
 
 
@@ -107,5 +121,18 @@ public abstract class Relation implements Comparable<Relation> {
         public boolean test(Activation act, Activation linkedAct) {
             return relation.compare(act.key.range, linkedAct.key.range);
         }
+
+
+        @Override
+        public int compareTo(Relation rel) {
+            if(rel instanceof InstanceRelation) return -1;
+            RangeRelation rr = (RangeRelation) rel;
+
+            int r = relation.compareTo(rr.relation);
+            if(r != 0) return r;
+
+            return INPUT_SYNAPSE_COMP.compare(linkedSynapse, rel.linkedSynapse);
+        }
     }
+
 }
