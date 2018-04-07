@@ -731,7 +731,6 @@ public final class Activation extends NodeActivation<OrNode> {
 
     public static class Builder {
         public Range range;
-        public Integer rid;
         public double value = 1.0;
         public Double targetValue;
         public int fired;
@@ -744,11 +743,6 @@ public final class Activation extends NodeActivation<OrNode> {
 
         public Builder setRange(Range range) {
             this.range = range;
-            return this;
-        }
-
-        public Builder setRelationalId(Integer rid) {
-            this.rid = rid;
             return this;
         }
 

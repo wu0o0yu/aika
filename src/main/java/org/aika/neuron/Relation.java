@@ -4,11 +4,8 @@ package org.aika.neuron;
 import org.aika.neuron.activation.Activation;
 import org.aika.neuron.activation.Range;
 
-import static org.aika.neuron.Synapse.INPUT_SYNAPSE_COMP;
 
 public abstract class Relation implements Comparable<Relation> {
-
-    public Synapse linkedSynapse;
 
 
     public abstract boolean test(Activation act, Activation linkedAct);
@@ -24,9 +21,8 @@ public abstract class Relation implements Comparable<Relation> {
             CONTAINED_IN
         }
 
-        public InstanceRelation(Type type, Synapse s) {
+        public InstanceRelation(Type type) {
             this.type = type;
-            linkedSynapse = s;
         }
 
 
@@ -100,10 +96,7 @@ public abstract class Relation implements Comparable<Relation> {
             if(rel instanceof RangeRelation) return 1;
             InstanceRelation ir = (InstanceRelation) rel;
 
-            int r = type.compareTo(ir.type);
-            if(r != 0) return r;
-
-            return INPUT_SYNAPSE_COMP.compare(linkedSynapse, rel.linkedSynapse);
+            return type.compareTo(ir.type);
         }
     }
 
@@ -111,9 +104,8 @@ public abstract class Relation implements Comparable<Relation> {
     public static class RangeRelation extends Relation {
         Range.Relation relation;
 
-        public RangeRelation(Range.Relation relation, Synapse s) {
+        public RangeRelation(Range.Relation relation) {
             this.relation = relation;
-            linkedSynapse = s;
         }
 
 
@@ -128,10 +120,7 @@ public abstract class Relation implements Comparable<Relation> {
             if(rel instanceof InstanceRelation) return -1;
             RangeRelation rr = (RangeRelation) rel;
 
-            int r = relation.compareTo(rr.relation);
-            if(r != 0) return r;
-
-            return INPUT_SYNAPSE_COMP.compare(linkedSynapse, rel.linkedSynapse);
+            return relation.compareTo(rr.relation);
         }
     }
 

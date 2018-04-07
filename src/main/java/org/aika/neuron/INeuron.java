@@ -181,7 +181,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public Activation addInput(Document doc, Activation.Builder input) {
         assert input.range.begin <= input.range.end;
 
-        Activation.Key ak = new Activation.Key(node.get(doc), input.range, input.rid);
+        Activation.Key ak = new Activation.Key(node.get(doc), input.range);
 
         Activation act = Selector.get(doc, this, ak);
         if(act == null) {
@@ -277,7 +277,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         th.activations.clear();
 
         if (th.activationsEnd != null) th.activationsEnd.clear();
-        if (th.activationsRid != null) th.activationsRid.clear();
     }
 
 
@@ -496,17 +495,11 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             TreeMap<NodeActivation.Key, Activation> actEnd = th.activationsEnd;
             if (actEnd != null) actEnd.put(ak, act);
 
-            TreeMap<NodeActivation.Key, Activation> actRid = th.activationsRid;
-            if (actRid != null) actRid.put(ak, act);
-
             if (ak.range.begin != Integer.MIN_VALUE) {
                 doc.activationsByRangeBegin.put(ak, act);
             }
             if (ak.range.end != Integer.MAX_VALUE) {
                 doc.activationsByRangeEnd.put(ak, act);
-            }
-            if (ak.rid != null) {
-                doc.activationsByRid.put(ak, act);
             }
 
             doc.addedActivations.add(act);
@@ -561,8 +554,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         for (Synapse s : is) {
             sb.append(", ");
             sb.append(Utils.round(s.weight));
-            sb.append(":");
-            sb.append(s.key.relativeRid);
             sb.append(":");
             sb.append(s.input.toString());
         }

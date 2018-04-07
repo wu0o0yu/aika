@@ -81,7 +81,7 @@ public class Synapse implements Writable {
     public Provider<InputNode> inputNode;
 
     public Key key;
-    public List<Relation> relations = new ArrayList<>();
+    public Map<Synapse, Relation> relations = new TreeMap<>();
     public DistanceFunction distanceFunction = null;
 
 
@@ -497,8 +497,7 @@ public class Synapse implements Writable {
         public Integer absoluteRid;
 
         public Integer synapseId;
-        public Collection<BuilderInstanceRelation> instanceRelations = new ArrayList<>();
-        public Collection<BuilderRangeRelation> rangeRelations = new ArrayList<>();
+        public Map<Integer, Relation> relations = new TreeMap<>();
 
 
         /**
@@ -661,13 +660,13 @@ public class Synapse implements Writable {
 
 
         public Builder addInstanceRelation(Relation.InstanceRelation.Type type, int synapseId) {
-            instanceRelations.add(new BuilderInstanceRelation(type, synapseId));
+            relations.put(synapseId, new Relation.InstanceRelation(type));
             return this;
         }
 
 
         public Builder addRangeRelation(Range.Relation relation, int synapseId) {
-            rangeRelations.add(new BuilderRangeRelation(relation, synapseId));
+            relations.put(synapseId, new Relation.RangeRelation(relation));
             return this;
         }
 
@@ -705,28 +704,6 @@ public class Synapse implements Writable {
             if (r != 0) return r;
             r = rangeOutput.compareTo(in.rangeOutput);
             return r;
-        }
-
-
-        static class BuilderInstanceRelation {
-            Relation.InstanceRelation.Type type;
-            int id;
-
-            public BuilderInstanceRelation(Relation.InstanceRelation.Type type, int id) {
-                this.type = type;
-                this.id = id;
-            }
-        }
-
-
-        static class BuilderRangeRelation {
-            Range.Relation relation;
-            int id;
-
-            public BuilderRangeRelation(Range.Relation relation, int id) {
-                this.relation = relation;
-                this.id = id;
-            }
         }
     }
 }

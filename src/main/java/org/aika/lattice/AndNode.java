@@ -178,7 +178,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public static AndNode createNextLevelNode(Model m, int threadId, Document doc, Node n, Refinement ref, Config config) {
+    public static AndNode createNextLevelNode(Model m, int threadId, Document doc, Node n, Provider<InputNode> refInput, Map<Synapse, Relation> refInputRelations, Config config) {
         Provider<AndNode> pnln = n.getAndChild(ref);
         if(pnln != null) {
             return config != null ? null : pnln.get();
