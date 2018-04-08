@@ -52,7 +52,6 @@ public class OrNode extends Node<OrNode, Activation> {
     public TreeMap<Integer, TreeSet<Provider<Node>>> allParents = new TreeMap<>();
 
     public Neuron neuron = null;
-    public Node requiredNode;
 
     public OrNode() {}
 

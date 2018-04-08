@@ -21,6 +21,7 @@ import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.OrNode;
 import org.aika.neuron.INeuron;
+import org.aika.neuron.Relation;
 import org.aika.neuron.Synapse;
 
 import java.util.*;
@@ -81,8 +82,7 @@ public class Converter {
             }
         }
 
-        Integer offset = null;
-        Node requiredNode = null;
+        NodeContext nodeContext = null;
         boolean noFurtherRefinement = false;
         TreeSet<Synapse> reqSyns = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
         double sum = 0.0;
@@ -102,8 +102,7 @@ public class Converter {
                 neuron.requiredSum += s.weight;
                 reqSyns.add(s);
 
-                requiredNode = getNextLevelNode(offset, requiredNode, s);
-                offset = Utils.nullSafeMin(s.key.relativeRid, offset);
+                nodeContext = expandNode(nodeContext, s);
 
                 i++;
 
@@ -117,9 +116,6 @@ public class Converter {
             }
 
             outputNode.removeParents(threadId, false);
-            if (requiredNode != outputNode.requiredNode) {
-                outputNode.requiredNode = requiredNode;
-            }
 
             if (noFurtherRefinement || i == MAX_AND_NODE_SIZE) {
                 outputNode.addInput(offset, threadId, requiredNode, false);
@@ -131,8 +127,8 @@ public class Converter {
                     }
 
                     if (!reqSyns.contains(s)) {
-                        Node nln;
-                        nln = getNextLevelNode(offset, requiredNode, s);
+                        NodeContext nln;
+                        nln = expandNode(nodeContext, s);
 
                         Integer nOffset = Utils.nullSafeMin(s.key.relativeRid, offset);
                         outputNode.addInput(nOffset, threadId, nln, false);
@@ -225,13 +221,38 @@ public class Converter {
     }
 
 
-    private Node getNextLevelNode(Integer offset, Node requiredNode, Synapse s) {
-        Node nln;
-        if (requiredNode == null) {
-            nln = s.inputNode.get();
+    private NodeContext expandNode(NodeContext nc, Synapse s) {
+        NodeContext nln = new NodeContext();
+        if (nc == null) {
+            nln.node = s.inputNode.get();
+            nln.offsets = new Synapse[] {s};
         } else {
-            nln = AndNode.createNextLevelNode(model, threadId, doc, requiredNode, new AndNode.Refinement(s.key.relativeRid, offset, s.inputNode), null);
+            Relation[] relations = new Relation[nln.offsets.length];
+            for(int i = 0; i < nc.offsets.length; i++) {
+                Synapse linkedSynapse = nc.offsets[i];
+                relations[i] = s.relations.get(linkedSynapse);
+            }
+
+            AndNode.Refinement ref = new AndNode.Refinement(relations, s.inputNode);
+            nln.node = AndNode.createNextLevelNode(model, threadId, doc, nc.node, ref, null);
+
+            nln.offsets = new Synapse[nc.offsets.length + 1];
+            for(int i = 0; i < nc.offsets.length; i++) {
+                nln.offsets[ref.offsets[i]] = nc.offsets[i];
+            }
+            for(int i = 0; i < nln.offsets.length; i++) {
+                if(nln.offsets[i] == null) {
+                    nln.offsets[i] = s;
+                }
+            }
         }
         return nln;
+    }
+
+
+    private class NodeContext {
+        Node node;
+
+        Synapse[] offsets;
     }
 }

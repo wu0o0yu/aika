@@ -178,7 +178,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public static AndNode createNextLevelNode(Model m, int threadId, Document doc, Node n, Provider<InputNode> refInput, Map<Synapse, Relation> refInputRelations, Config config) {
+    public static AndNode createNextLevelNode(Model m, int threadId, Document doc, Node n, Refinement ref, Config config) {
         Provider<AndNode> pnln = n.getAndChild(ref);
         if(pnln != null) {
             return config != null ? null : pnln.get();
@@ -391,30 +391,19 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
      *
      */
     public static class Refinement implements Comparable<Refinement> {
-        public static Refinement MIN = new Refinement(null, 0, null);
-        public static Refinement MAX = new Refinement(null, 0, null);
+        public static Refinement MIN = new Refinement(null, null);
+        public static Refinement MAX = new Refinement(null, null);
 
-        public Relation rel;
-        public int offset;
+        public Relation[] relations;
+        public Integer[] offsets;  // input offsets -> output offsets
         public Provider<InputNode> input;
 
         private Refinement() {}
 
 
-        public Refinement(Relation rel, int offset, Provider<InputNode> input) {
-            this.rel = rel;
-            this.offset = offset;
+        public Refinement(Relation[] relations, Provider<InputNode> input) {
+            this.relations = relations;
             this.input = input;
-        }
-
-
-        public Relation getRelation() {
-            return rel;
-        }
-
-
-        public int getOffset() {
-            return offset;
         }
 
 
