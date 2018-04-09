@@ -27,7 +27,6 @@ import org.aika.training.PatternDiscovery.Config;
 import org.aika.neuron.activation.Range;
 import org.aika.neuron.activation.Range.Mapping;
 import org.aika.lattice.AndNode.Refinement;
-import org.aika.neuron.Synapse.Key;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -45,13 +44,7 @@ import java.util.stream.Stream;
  */
 public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
-    public Key key;
     public Neuron inputNeuron;
-
-    // Key: Output Neuron
-    public Map<SynapseKey, Synapse> synapses;
-
-    public ReadWriteLock synapseLock = new ReadWriteLock();
 
 
     private long visitedDiscover;
@@ -60,22 +53,20 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     public InputNode() {
     }
 
-    public InputNode(Model m, Key key) {
+    public InputNode(Model m) {
         super(m, 1);
-        this.key = Synapse.lookupKey(key);
     }
 
 
-    public static InputNode add(Model m, Key key, INeuron input) {
-        Provider<InputNode> pin = (input != null ? input.outputNodes.get(key) : null);
-        if (pin != null) {
-            return pin.get();
+    public static InputNode add(Model m, INeuron input) {
+        if (input.outputNode != null) {
+            return input.outputNode.get();
         }
-        InputNode in = new InputNode(m, key);
+        InputNode in = new InputNode(m);
 
         if (input != null && in.inputNeuron == null) {
             in.inputNeuron = input.provider;
-            input.outputNodes.put(key, in.provider);
+            input.outputNode = in.provider;
             input.setModified();
         }
         return in;
@@ -83,36 +74,20 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    protected NodeActivation<InputNode> createActivation(Document doc, NodeActivation.Key ak) {
-        return new NodeActivation<>(doc.activationIdCounter++, doc, ak);
+    protected NodeActivation<InputNode> createActivation(Document doc) {
+        return new NodeActivation<>(doc.activationIdCounter++, doc, this);
     }
 
 
-    private NodeActivation.Key computeActivationKey(Activation iAct) {
-        NodeActivation.Key ak = iAct.key;
-
-        return new NodeActivation.Key(
-                this,
-                key.rangeOutput.map(ak.range)
-        );
-    }
-
-
-    public void addActivation(Document doc, Activation inputAct) {
+    public void addActivation(Activation inputAct) {
         if(inputAct.repropagateV != null && inputAct.repropagateV != markedCreated) return;
 
-        NodeActivation.Key ak = computeActivationKey(inputAct);
-
-        if (ak != null) {
-            addActivation(doc, ak, Collections.singleton(inputAct));
-        }
+        addActivation(inputAct.doc, Collections.singleton(inputAct));
     }
 
 
     public void propagate(NodeActivation act) {
-        if (!key.isRecurrent) {
-            apply(act);
-        }
+        apply(act);
     }
 
 
@@ -129,7 +104,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     @Override
     Collection<Refinement> collectNodeAndRefinements(Refinement newRef) {
         List<Refinement> result = new ArrayList<>(2);
-        result.add(new Refinement(key.relativeRid, newRef.rid, provider));
+        result.add(new Refinement(new Relation[]{newRef.relations[0].invert()}, provider));
         result.add(newRef);
         return result;
     }
@@ -165,37 +140,21 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
         Activation iAct = (Activation) act.inputs.firstEntry().getValue();
         AndNode nlp = pnlp.get(doc);
-        if(nlp.combinatorialExpensive) return;
 
         if(act.repropagateV != null && act.repropagateV != nlp.markedCreated) return;
-
-        Activation.Key ak = act.key;
-        Activation.Key iak = iAct.key;
-        InputNode firstNode = ((InputNode) ak.node);
 
         Stream<Activation> s = Selector.select(
                 th,
                 secondNode.inputNeuron.get(doc),
-                ref.rel,
-                iAct,
-                iak.range,
-                Range.Relation.createQuery(firstNode.key.rangeMatch, secondNode.key.rangeOutput, firstNode.key.rangeOutput, secondNode.key.rangeMatch)
+                ref.relations[0],
+                iAct
         );
 
         s.forEach(secondIAct -> {
                     NodeActivation secondAct = secondNode.getInputNodeActivation(secondIAct);
                     if(secondAct != null) {
                         if (!Conflicts.isConflicting(iAct, secondIAct)) {
-                            Node.addActivation(doc,
-                                    new NodeActivation.Key(
-                                            nlp,
-                                            Range.mergeRange(
-                                                    firstNode.key.rangeOutput.map(iak.range),
-                                                    secondNode.key.rangeOutput.map(secondIAct.key.range)
-                                            )
-                                    ),
-                                    AndNode.prepareInputActs(act, secondAct)
-                            );
+                            nlp.addActivation(doc, AndNode.prepareInputActs(act, secondAct));
                         }
                     }
                 }
@@ -206,7 +165,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
     private NodeActivation getInputNodeActivation(Activation act) {
         for(NodeActivation inAct: act.outputs.values()) {
-            if(inAct.key.node == this) return inAct;
+            if(inAct.node == this) return inAct;
         }
         return null;
     }
@@ -247,34 +206,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-
-    public Synapse getSynapse(Relation rel, Neuron outputNeuron) {
-        synapseLock.acquireReadLock();
-        Synapse s = synapses != null ? synapses.get(new SynapseKey(rel, outputNeuron)) : null;
-        synapseLock.releaseReadLock();
-        return s;
-    }
-
-
-    public void setSynapse(Synapse s) {
-        synapseLock.acquireWriteLock();
-        if (synapses == null) {
-            synapses = new TreeMap<>();
-        }
-        synapses.put(new SynapseKey(s.key.relativeRid, s.output), s);
-        synapseLock.releaseWriteLock();
-    }
-
-
-    public void removeSynapse(Synapse s) {
-        if(synapses != null) {
-            synapseLock.acquireWriteLock();
-            synapses.remove(new SynapseKey(s.key.relativeRid, s.output));
-            synapseLock.releaseWriteLock();
-        }
-    }
-
-
     @Override
     public void cleanup() {
     }
@@ -290,9 +221,8 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     public String logicToString() {
         StringBuilder sb = new StringBuilder();
         sb.append("I");
-        sb.append(key.isRecurrent ? "R" : "");
 
-        sb.append(getRangeBrackets(key.rangeOutput.begin));
+        sb.append("[");
 
         if (inputNeuron != null) {
             sb.append(inputNeuron.id);
@@ -302,16 +232,11 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
             }
         }
 
-        sb.append(getRangeBrackets(key.rangeOutput.end));
+        sb.append("]");
 
         return sb.toString();
     }
 
-
-    private String getRangeBrackets(Mapping rs) {
-        if (rs == Mapping.NONE) return "|";
-        return rs == Mapping.BEGIN ? "[" : "]";
-    }
 
 
     @Override
@@ -319,7 +244,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         out.writeBoolean(false);
         out.writeChar('I');
         super.write(out);
-        key.write(out);
 
         out.writeBoolean(inputNeuron != null);
         if (inputNeuron != null) {
@@ -331,7 +255,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
-        key = Synapse.lookupKey(Key.read(in, m));
 
         if (in.readBoolean()) {
             inputNeuron = m.lookupNeuron(in.readInt());
@@ -359,32 +282,5 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
             if (r != 0) return r;
             return neuron.compareTo(sk.neuron);
         }
-
-/*
-        public static SynapseKey read(DataInput in, Model m) throws IOException {
-            SynapseKey sk = new SynapseKey();
-            sk.readFields(in, m);
-            return sk;
-        }
-
-
-        @Override
-        public void write(DataOutput out) throws IOException {
-            out.writeBoolean(rid != null);
-            if (rid != null) {
-                out.writeInt(rid);
-            }
-            out.writeInt(neuron.id);
-        }
-
-
-        @Override
-        public void readFields(DataInput in, Model m) throws IOException {
-            if (in.readBoolean()) {
-                rid = in.readInt();
-            }
-            neuron = m.lookupNeuron(in.readInt());
-        }
-        */
     }
 }

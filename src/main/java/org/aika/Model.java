@@ -18,6 +18,7 @@ package org.aika;
 
 
 import org.aika.lattice.AndNode;
+import org.aika.lattice.InputNode;
 import org.aika.lattice.Node;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Neuron;
@@ -53,8 +54,6 @@ public class Model {
 
     public StatisticFactory nodeStatisticFactory;
     public StatisticFactory neuronStatisticFactory;
-
-    public AndNodeCheck andNodeCheck;
 
     public AtomicInteger docIdCounter = new AtomicInteger(0);
     public AtomicInteger currentId = new AtomicInteger(0);
@@ -117,27 +116,23 @@ public class Model {
     }
 
 
-    public AndNodeCheck getAndNodeCheck() {
-        return andNodeCheck;
-    }
-
-    public void setAndNodeCheck(AndNodeCheck andNodeCheck) {
-        this.andNodeCheck = andNodeCheck;
-    }
-
-
     public Neuron createNeuron() {
-        return new INeuron(this).provider;
+        return createNeuron(null);
     }
 
 
     public Neuron createNeuron(String label) {
-        return new INeuron(this, label).provider;
+        return createNeuron(label, null);
     }
 
 
     public Neuron createNeuron(String label, String outputText) {
-        return new INeuron(this, label, outputText).provider;
+        INeuron n = new INeuron(this, label, outputText);
+
+        InputNode iNode = InputNode.add(this, n);
+        iNode.setModified();
+
+        return n.provider;
     }
 
 
@@ -260,12 +255,4 @@ public class Model {
 
         Writable createStatisticObject();
     }
-
-
-    public interface AndNodeCheck {
-
-        boolean checkIfCombinatorialExpensive(AndNode n);
-    }
-
-
 }

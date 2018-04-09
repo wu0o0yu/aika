@@ -10,6 +10,8 @@ public abstract class Relation implements Comparable<Relation> {
 
     public abstract boolean test(Activation act, Activation linkedAct);
 
+    public abstract Relation invert();
+
 
     public static class InstanceRelation extends Relation {
         public Type type;
@@ -40,6 +42,20 @@ public abstract class Relation implements Comparable<Relation> {
         }
 
 
+        @Override
+        public Relation invert() {
+            switch(type) {
+                case COMMON_ANCESTOR:
+                    return this;
+                case CONTAINS:
+                    return new InstanceRelation(Type.CONTAINED_IN);
+                case CONTAINED_IN:
+                    return new InstanceRelation(Type.CONTAINS);
+            }
+            return null;
+        }
+
+
         private static boolean contains(Activation actA, Activation actB, long v) {
             if(actA.visited == v) return false;
             actA.visited = v;
@@ -47,7 +63,7 @@ public abstract class Relation implements Comparable<Relation> {
             if(actA == actB) return true;
 
             for(Activation.SynapseActivation sa: actA.neuronInputs) {
-                if(!sa.synapse.key.isRecurrent) {
+                if(!sa.synapse.isRecurrent) {
                     if(contains(sa.input, actB, v)) return true;
                 }
             }
@@ -69,7 +85,7 @@ public abstract class Relation implements Comparable<Relation> {
             act.markedAncestor = v;
 
             for(Activation.SynapseActivation sa: act.neuronInputs) {
-                if(!sa.synapse.key.isRecurrent) {
+                if(!sa.synapse.isRecurrent) {
                     markAncestors(sa.input, v);
                 }
             }
@@ -83,7 +99,7 @@ public abstract class Relation implements Comparable<Relation> {
             if(act.markedAncestor == v1) return true;
 
             for(Activation.SynapseActivation sa: act.neuronInputs) {
-                if(!sa.synapse.key.isRecurrent) {
+                if(!sa.synapse.isRecurrent) {
                     if(hasCommonAncestor(sa.input, v1, v2)) return true;
                 }
             }
@@ -111,7 +127,12 @@ public abstract class Relation implements Comparable<Relation> {
 
         @Override
         public boolean test(Activation act, Activation linkedAct) {
-            return relation.compare(act.key.range, linkedAct.key.range);
+            return relation.compare(act.range, linkedAct.range);
+        }
+
+        @Override
+        public Relation invert() {
+            return new RangeRelation(relation.invert());
         }
 
 

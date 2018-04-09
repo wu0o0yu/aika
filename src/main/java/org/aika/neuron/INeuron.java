@@ -18,16 +18,12 @@ package org.aika.neuron;
 
 
 import org.aika.*;
-import org.aika.neuron.activation.Activation;
+import org.aika.neuron.activation.*;
 import org.aika.neuron.activation.Activation.State;
-import org.aika.neuron.activation.SearchNode;
 import org.aika.neuron.activation.SearchNode.Weight;
 import org.aika.lattice.InputNode;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
-import org.aika.neuron.Synapse.Key;
-import org.aika.neuron.activation.Linker;
-import org.aika.neuron.activation.Selector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +91,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public TreeMap<Synapse, Synapse> inputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
     public TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
 
-    public TreeMap<Key, Provider<InputNode>> outputNodes = new TreeMap<>();
+    public Provider<InputNode> outputNode;
 
     public Provider<OrNode> node;
 
@@ -112,14 +108,14 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public static class ThreadState {
         public long lastUsed;
 
-        public TreeMap<Activation.Key, Activation> activations;
-        public TreeMap<Activation.Key, Activation> activationsEnd;
+        public TreeMap<Range, Activation> activations;
+        public TreeMap<Range, Activation> activationsEnd;
         public int minLength = Integer.MAX_VALUE;
         public int maxLength = 0;
 
         public ThreadState() {
-            activations = new TreeMap<>(BEGIN_COMP);
-            activationsEnd = new TreeMap<>(END_COMP);
+            activations = new TreeMap<>(Range.BEGIN_COMP);
+            activationsEnd = new TreeMap<>(Range.END_COMP);
         }
     }
 
@@ -181,11 +177,10 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public Activation addInput(Document doc, Activation.Builder input) {
         assert input.range.begin <= input.range.end;
 
-        Activation.Key ak = new Activation.Key(node.get(doc), input.range);
-
-        Activation act = Selector.get(doc, this, ak);
+        Activation act = Selector.get(doc, this, input.range);
         if(act == null) {
-            act = node.get(doc).createActivation(doc, ak);
+            act = node.get(doc).createActivation(doc);
+            act.range = input.range;
         }
 
         register(act);
@@ -239,9 +234,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     public void propagate(Activation act) {
         Document doc = act.doc;
-        for (Provider<InputNode> out : outputNodes.values()) {
-            out.get(doc).addActivation(doc, act);
-        }
+        outputNode.get(doc).addActivation(act);
     }
 
 
@@ -322,11 +315,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         out.writeUTF(activationFunction.name());
 
-        out.writeInt(outputNodes.size());
-        for (Map.Entry<Key, Provider<InputNode>> me : outputNodes.entrySet()) {
-            me.getKey().write(out);
-            out.writeInt(me.getValue().id);
-        }
+        out.writeInt(outputNode.id);
 
         out.writeBoolean(node != null);
         if (node != null) {
@@ -380,12 +369,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         activationFunction = ActivationFunction.valueOf(in.readUTF());
 
-        int s = in.readInt();
-        for (int i = 0; i < s; i++) {
-            Key k = Key.read(in, m);
-            Provider<InputNode> n = m.lookupNodeProvider(in.readInt());
-            outputNodes.put(k, n);
-        }
+        outputNode = m.lookupNodeProvider(in.readInt());
 
         if (in.readBoolean()) {
             Integer nId = in.readInt();
@@ -492,13 +476,13 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
             th.activations.put(ak, act);
 
-            TreeMap<NodeActivation.Key, Activation> actEnd = th.activationsEnd;
+            TreeMap<ActKey, Activation> actEnd = th.activationsEnd;
             if (actEnd != null) actEnd.put(ak, act);
 
-            if (ak.range.begin != Integer.MIN_VALUE) {
+            if (act.range.begin != Integer.MIN_VALUE) {
                 doc.activationsByRangeBegin.put(ak, act);
             }
-            if (ak.range.end != Integer.MAX_VALUE) {
+            if (act.range.end != Integer.MAX_VALUE) {
                 doc.activationsByRangeEnd.put(ak, act);
             }
 

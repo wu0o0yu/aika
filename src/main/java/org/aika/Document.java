@@ -77,16 +77,26 @@ public class Document implements Comparable<Document> {
 
     public SupervisedTraining supervisedTraining = new SupervisedTraining(this);
 
-    public TreeMap<NodeActivation.Key, Activation> activationsByRangeBegin = new TreeMap<>((ak1, ak2) -> {
+    public TreeMap<ActKey, Activation> activationsByRangeBegin = new TreeMap<>((ak1, ak2) -> {
         int r = Integer.compare(ak1.range.begin, ak2.range.begin);
         if (r != 0) return r;
-        return ak1.compareTo(ak2);
+        return ak1.node.compareTo(ak2.node);
     });
-    public TreeMap<NodeActivation.Key, Activation> activationsByRangeEnd = new TreeMap<>((ak1, ak2) -> {
+    public TreeMap<ActKey, Activation> activationsByRangeEnd = new TreeMap<>((ak1, ak2) -> {
         int r = Integer.compare(ak1.range.end, ak2.range.end);
         if (r != 0) return r;
-        return ak1.compareTo(ak2);
+        return ak1.node.compareTo(ak2.node);
     });
+
+    private static class ActKey {
+        Range range;
+        Node node;
+
+        public ActKey(Range range, Node node) {
+            this.range = range;
+            this.node = node;
+        }
+    }
 
     public TreeSet<Node> addedNodes = new TreeSet<>();
     public ArrayList<NodeActivation> addedNodeActivations = new ArrayList<>();

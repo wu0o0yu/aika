@@ -23,6 +23,7 @@ import org.aika.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -35,6 +36,18 @@ import static org.aika.neuron.activation.Range.Mapping.BEGIN;
  * @author Lukas Molzberger
  */
 public class Range {
+
+    public static Comparator<Range> BEGIN_COMP = (r1, r2) -> {
+        int r = Integer.compare(r1.begin, r2.begin);
+        if(r != 0) return r;
+        return Integer.compare(r1.end, r2.end);
+    };
+
+    public static Comparator<Range> END_COMP = (r1, r2) -> {
+        int r = Integer.compare(r1.end, r2.end);
+        if(r != 0) return r;
+        return Integer.compare(r1.begin, r2.begin);
+    };
 
     public static final Range MIN = new Range(Integer.MIN_VALUE, Integer.MIN_VALUE);
     public static final Range MAX = new Range(Integer.MAX_VALUE, Integer.MAX_VALUE);

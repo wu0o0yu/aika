@@ -86,8 +86,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public static class ThreadState<T extends Node, A extends NodeActivation> {
         public long lastUsed;
 
-        public NavigableMap<Key<T>, Set<NodeActivation<?>>> added;
-        public TreeMap<Key, A> activations;
+        public List<Collection<NodeActivation<?>>> added;
+        public List<A> activations;
 
         public long visited;
 
@@ -98,8 +98,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         private RidVisited[] ridVisited = new RidVisited[2 * MAX_RELATIVE_RID];
 
         public ThreadState() {
-            added = new TreeMap<>();
-            activations = new TreeMap<>(BEGIN_COMP);
+            added = new ArrayList<>();
+            activations = new ArrayList<>();
         }
 
 
@@ -155,7 +155,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    abstract A createActivation(Document doc, Key ak);
+    abstract A createActivation(Document doc);
 
     abstract void apply(A act);
 
@@ -186,12 +186,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             statistic = m.nodeStatisticFactory.createStatisticObject();
         }
     }
-
-
-    public static final Comparator<NodeActivation.Key> BEGIN_COMP = (k1, k2) -> Range.compare(k1.range, k2.range, false);
-
-
-    public static final Comparator<NodeActivation.Key> END_COMP = (k1, k2) -> Range.compare(k1.range, k2.range, true);
 
 
     public void postCreate(Document doc) {
@@ -265,10 +259,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    A processActivation(Document doc, Key<T> ak, Collection<NodeActivation> inputActs) {
-        if (log.isDebugEnabled()) {
-            log.debug("add: " + ak + " - " + ak.node);
-        }
+    A processActivation(Document doc, Collection<NodeActivation> inputActs) {
 
         A act = createActivation(doc, ak);
 
@@ -303,11 +294,11 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      */
     public void processChanges(Document doc) {
         ThreadState th = getThreadState(doc.threadId, true);
-        NavigableMap<Key<T>, Collection<NodeActivation>> tmpAdded = th.added;
+        List<Collection<NodeActivation>> tmpAdded = th.added;
 
-        th.added = new TreeMap<>();
+        th.added = new ArrayList<>();
 
-        tmpAdded.forEach((ak, iActs) -> processActivation(doc, ak, iActs));
+        tmpAdded.forEach(iActs -> processActivation(doc, iActs));
     }
 
 
@@ -318,18 +309,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * is called.
      *
      * @param doc
-     * @param ak
+
      * @param inputActs
      */
-    public static <T extends Node, A extends NodeActivation<T>> void addActivation(Document doc, Key<T> ak, Collection<NodeActivation<?>> inputActs) {
-        ThreadState<T, A> th = ak.node.getThreadState(doc.threadId, true);
-        Set<NodeActivation<?>> iActs = th.added.get(ak);
-        if (iActs == null) {
-            iActs = new TreeSet<>();
-            th.added.put(ak, iActs);
-        }
-        iActs.addAll(inputActs);
-        doc.queue.add(ak.node);
+    public void addActivation(Document doc, Collection<NodeActivation<?>> inputActs) {
+        ThreadState<T, A> th = getThreadState(doc.threadId, true);
+        th.added.add(inputActs);
+        doc.queue.add(this);
     }
 
 
@@ -411,7 +397,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public Collection<A> getActivations(Document doc) {
         ThreadState<T, A> th = getThreadState(doc.threadId, false);
         if (th == null) return Collections.EMPTY_LIST;
-        return th.activations.values();
+        return th.activations;
     }
 
 

@@ -64,23 +64,25 @@ public class Synapse implements Writable {
     public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = (s1, s2) -> {
         int r = s1.input.compareTo(s2.input);
         if (r != 0) return r;
-        return s1.key.compareTo(s2.key);
+        return s1.rangeOutput.compareTo(s2.rangeOutput);
     };
 
 
     public static final Comparator<Synapse> OUTPUT_SYNAPSE_COMP = (s1, s2) -> {
         int r = s1.output.compareTo(s2.output);
         if (r != 0) return r;
-        return s1.key.compareTo(s2.key);
+        return s1.rangeOutput.compareTo(s2.rangeOutput);
     };
 
 
     public Neuron input;
     public Neuron output;
 
-    public Provider<InputNode> inputNode;
+    public int id;
+    public boolean isRecurrent;
+    public Output rangeOutput;
 
-    public Key key;
+
     public Map<Synapse, Relation> relations = new TreeMap<>();
     public DistanceFunction distanceFunction = null;
 
@@ -119,15 +121,17 @@ public class Synapse implements Writable {
     public Synapse() {}
 
 
-    public Synapse(Neuron input, Neuron output) {
+    public Synapse(int synapseId, Neuron input, Neuron output) {
+        this.id = synapseId;
         this.input = input;
         this.output = output;
     }
 
 
-    public Synapse(Neuron input, Neuron output, Key key) {
-        this(input, output);
-        this.key = lookupKey(key);
+    public Synapse(int synapseId, Neuron input, Neuron output, boolean isRecurrent, Output rangeOutput) {
+        this(synapseId, input, output);
+        this.isRecurrent = isRecurrent;
+        this.rangeOutput = rangeOutput;
     }
 
 
@@ -147,6 +151,7 @@ public class Synapse implements Writable {
 
         out.provider.lock.acquireWriteLock();
         out.provider.inMemoryInputSynapses.put(this, this);
+        out.provider.inputSynapsesById.put(id, this);
         out.provider.inputSortGroupCounts[Linker.SortGroup.getSortGroup(key).ordinal()]++;
         out.provider.lock.releaseWriteLock();
 
@@ -209,6 +214,7 @@ public class Synapse implements Writable {
 
         out.provider.lock.acquireWriteLock();
         out.provider.inMemoryInputSynapses.remove(this);
+        out.provider.inputSynapsesById.remove(id);
         out.provider.inputSortGroupCounts[Linker.SortGroup.getSortGroup(key).ordinal()]--;
         out.provider.lock.releaseWriteLock();
 
@@ -281,7 +287,7 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S OW:" + weight + " NW:" + (weight + weightDelta) + " " + key + " " +  input + "->" + output;
+        return "S OW:" + weight + " NW:" + (weight + weightDelta) + " rec:" + isRecurrent + " o:" + rangeOutput + " " +  input + "->" + output;
     }
 
 
@@ -289,9 +295,9 @@ public class Synapse implements Writable {
     public void write(DataOutput out) throws IOException {
         out.writeInt(input.id);
         out.writeInt(output.id);
-        out.writeInt(inputNode.id);
 
-        key.write(out);
+        out.writeBoolean(isRecurrent);
+        rangeOutput.write(out);
 
         out.writeBoolean(distanceFunction != null);
         if(distanceFunction != null) {
@@ -314,9 +320,9 @@ public class Synapse implements Writable {
     public void readFields(DataInput in, Model m) throws IOException {
         input = m.lookupNeuron(in.readInt());
         output = m.lookupNeuron(in.readInt());
-        inputNode = m.lookupNodeProvider(in.readInt());
 
-        key = lookupKey(Key.read(in, m));
+        isRecurrent = in.readBoolean();
+        rangeOutput = Range.Output.read(in, m);
 
         if(in.readBoolean()) {
             distanceFunction = DistanceFunction.valueOf(in.readUTF());
@@ -341,38 +347,17 @@ public class Synapse implements Writable {
     }
 
 
-    static Map<Key, Key> keyMap = new TreeMap<>();
 
-    public static Key lookupKey(Key k) {
-        if(k.minKey || k.maxKey) return k;
-
-        Key rk = keyMap.get(k);
-        if(rk == null) {
-            keyMap.put(k, k);
-            rk = k;
-        }
-        return rk;
-    }
-
-
-    public static Synapse createOrLookup(Document doc, Key synapseKey, Neuron inputNeuron, Neuron outputNeuron) {
-        Provider<InputNode> inp = inputNeuron.get().outputNodes.get(synapseKey.createInputNodeKey());
-        Synapse synapse = null;
-        InputNode in = null;
-        if(inp != null) {
-            in = inp.get();
-            synapse = in.getSynapse(synapseKey.relativeRid, outputNeuron);
-        }
+    public static Synapse createOrLookup(Document doc, int synapseId, boolean isRecurrent, Output rangeOutput, Neuron inputNeuron, Neuron outputNeuron) {
+        Synapse synapse = outputNeuron.getSynapseById(synapseId);
 
         if(synapse == null) {
-            synapse = new Synapse(inputNeuron, outputNeuron, synapseKey);
+            synapse = new Synapse(synapseId, inputNeuron, outputNeuron, isRecurrent, rangeOutput);
 
-            if(in == null) {
-                in = InputNode.add(outputNeuron.model, synapseKey.createInputNodeKey(), synapse.input.get());
-            }
-            in.setSynapse(synapse);
             synapse.link();
-            synapse.createdInDoc = doc.id;
+            if(doc != null) {
+                synapse.createdInDoc = doc.id;
+            }
         }
         return synapse;
     }
@@ -385,95 +370,6 @@ public class Synapse implements Writable {
 
     public double getNewBias() {
         return bias + biasDelta;
-    }
-
-
-    public static class Key implements Comparable<Key>, Writable {
-        public static final Key MIN_KEY = new Key(true, false);
-        public static final Key MAX_KEY = new Key(false, true);
-
-        public boolean isRecurrent;
-        public Range.Relation rangeMatch;
-        public Output rangeOutput;
-
-        private boolean minKey = false;
-        private boolean maxKey = false;
-
-
-        public Key() {}
-
-
-        public Key(boolean minKey, boolean maxKey) {
-            this.minKey = minKey;
-            this.maxKey = maxKey;
-        }
-
-
-        public Key(boolean minKey, boolean maxKey, Range.Relation rangeMatch) {
-            this.minKey = minKey;
-            this.maxKey = maxKey;
-            this.rangeMatch = rangeMatch;
-        }
-
-
-        public Key(boolean isRecurrent, Range.Relation rangeMatch, Output rangeOutput) {
-            this.isRecurrent = isRecurrent;
-            this.rangeMatch = rangeMatch;
-            this.rangeOutput = rangeOutput;
-        }
-
-
-        public Key createInputNodeKey() {
-            return this;
-        }
-
-
-        @Override
-        public void write(DataOutput out) throws IOException {
-            out.writeBoolean(isRecurrent);
-            rangeMatch.write(out);
-            rangeOutput.write(out);
-        }
-
-
-        @Override
-        public void readFields(DataInput in, Model m) throws IOException {
-            isRecurrent = in.readBoolean();
-            rangeMatch = Range.Relation.read(in, m);
-            rangeOutput = Output.read(in, m);
-        }
-
-
-        public static Key read(DataInput in, Model m) throws IOException {
-            Key k = new Key();
-            k.readFields(in, m);
-            return k;
-        }
-
-
-        public String toString() {
-            if(this.minKey) return "MIN_KEY";
-            if(this.maxKey) return "MAX_KEY";
-
-            return rangeOutput.begin + " E:" + rangeOutput.end;
-        }
-
-
-        @Override
-        public int compareTo(Key k) {
-            if(this == k) return 0;
-
-            if(minKey && !k.minKey) return -1;
-            else if(!minKey && k.minKey) return 1;
-            if(maxKey && !k.maxKey) return 1;
-            else if(!maxKey && k.maxKey) return -1;
-
-            int r = Boolean.compare(isRecurrent, k.isRecurrent);
-            if(r != 0) return r;
-            r = rangeMatch.compareTo(k.rangeMatch);
-            if(r != 0) return r;
-            return rangeOutput.compareTo(k.rangeOutput);
-        }
     }
 
 
@@ -672,23 +568,7 @@ public class Synapse implements Writable {
 
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            Synapse s = new Synapse(
-                    neuron,
-                    outputNeuron,
-                    new Synapse.Key(
-                            recurrent,
-                            rangeMatch,
-                            rangeOutput
-                    )
-            );
-
-            Synapse os = outputNeuron.get().inputSynapses.get(s);
-            if(os != null) return os;
-
-            os = neuron.get().outputSynapses.get(s);
-            if(os != null) return os;
-
-            return s;
+            return createOrLookup(null, synapseId, recurrent, rangeOutput, neuron, outputNeuron);
         }
 
 

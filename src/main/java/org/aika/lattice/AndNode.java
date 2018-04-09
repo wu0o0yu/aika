@@ -49,9 +49,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
     public SortedMap<Refinement, Provider<? extends Node>> parents = new TreeMap<>();
 
-    public boolean combinatorialExpensive = false;
-    public int numCombExpParents = 0;
-
     public AndNode() {}
 
 
@@ -68,22 +65,16 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
             pn.addAndChild(ref, provider);
             pn.setModified();
-
-            if(level > 2 && ((AndNode) pn).combinatorialExpensive) numCombExpParents++;
-        }
-
-        if(provider.model.getAndNodeCheck() != null) {
-            combinatorialExpensive = provider.model.getAndNodeCheck().checkIfCombinatorialExpensive(this);
         }
     }
 
 
-    NodeActivation<AndNode> processActivation(Document doc, Key<AndNode> ak, Collection<NodeActivation> inputActs) {
-        if(inputActs.size() + numCombExpParents != level) {
+    NodeActivation<AndNode> processActivation(Document doc, Collection<NodeActivation> inputActs) {
+        if(inputActs.size() != level) { // TODO
             return null;
         }
 
-        return super.processActivation(doc, ak, inputActs);
+        return super.processActivation(doc, inputActs);
     }
 
 
@@ -282,12 +273,21 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         List<Refinement> inputs = new ArrayList<>(parents.size() + 1);
         inputs.add(newRef);
 
-        int numRidRefs = 0;
-        for(Refinement ref: parents.keySet()) {
-            if(ref.rid != null) numRidRefs++;
-        }
 
         for(Refinement ref: parents.keySet()) {
+            boolean required = false;
+            for(int i = 0; i < ref.offsets.length; i++) {
+                int j = ref.offsets[i];
+                if(newRef.relations[j] != null) required = true;
+            }
+
+            for(int i = 0; i < ref.relations.length; i++) {
+
+            }
+
+            inputs.add(new Refinement(ref.input));
+
+
             if(newRef.rid != null && newRef.rid != null && (newRef.rid < 0 || numRidRefs == 1)) {
                 inputs.add(new Refinement(ref.getRelativePosition(), newRef.rid, ref.input));
             } else if(ref.rid != null && newRef.rid != null && ref.getOffset() < 0) {
@@ -313,20 +313,10 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    @Override
-    public double computeSynapseWeightSum(Integer offset, INeuron n) {
-        double sum = n.biasSum;
-        for(Refinement ref: parents.keySet()) {
-            Synapse s = ref.getSynapse(offset, n.provider);
-            sum += Math.abs(s.weight);
-        }
-        return sum;
-    }
-
 
     @Override
-    protected NodeActivation<AndNode> createActivation(Document doc, NodeActivation.Key ak) {
-        return new NodeActivation<>(doc.activationIdCounter++, doc, ak);
+    protected NodeActivation<AndNode> createActivation(Document doc) {
+        return new NodeActivation<>(doc.activationIdCounter++, doc, this);
     }
 
 
@@ -404,11 +394,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         public Refinement(Relation[] relations, Provider<InputNode> input) {
             this.relations = relations;
             this.input = input;
-        }
-
-
-        public Synapse getSynapse(Neuron n) {
-            return input.get().getSynapse(rel, n);
         }
 
 

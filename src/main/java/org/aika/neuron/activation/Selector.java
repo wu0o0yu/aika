@@ -46,32 +46,30 @@ public class Selector {
     }
 
 
-    public static Activation get(Document doc, INeuron n, NodeActivation.Key ak) {
-        return get(doc, n, ak.range, Range.Relation.EQUALS);
+    public static Activation get(Document doc, INeuron n, Range r) {
+        return get(doc, n, r, Range.Relation.EQUALS);
     }
 
 
-    public static Stream<Activation> select(Document doc, INeuron n, Relation rel, Activation linkedAct, Range r, Range.Relation rr) {
+    public static Stream<Activation> select(Document doc, INeuron n, Relation rel, Activation linkedAct) {
         INeuron.ThreadState th = n.getThreadState(doc.threadId, false);
         if (th == null) return Stream.empty();
-        return select(th, n, rel, linkedAct, r, rr);
+        return select(th, n, rel, linkedAct);
     }
 
 
-    public static Stream<Activation> select(INeuron.ThreadState th, INeuron n, Relation rel, Activation linkedAct, Range r, Range.Relation rr) {
+    public static Stream<Activation> select(INeuron.ThreadState th, INeuron n, Relation rel, Activation linkedAct) {
         Stream<Activation> results;
         int s = th.activations.size();
 
         if (s == 0) return Stream.empty();
         else if (s == 1) {
             results = th.activations.values().stream();
-        } else if(rr != null) {
-            results = getActivationsByRange(th, n, r, rr).stream();
         } else {
             results = th.activations.values().stream();
         }
 
-        return results.filter(act -> act.filter(n.node.get(), rel, linkedAct, r, rr));
+        return results.filter(act -> act.filter(n.node.get(), rel, linkedAct));
     }
 
 

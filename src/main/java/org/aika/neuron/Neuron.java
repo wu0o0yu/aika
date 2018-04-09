@@ -54,6 +54,7 @@ public class Neuron extends Provider<INeuron> {
         return Synapse.OUTPUT_SYNAPSE_COMP.compare(sa, sb);
     };
 
+    public NavigableMap<Integer, Synapse> inputSynapsesById = new TreeMap<>();
     public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(IM_INPUT_SYNAPSE_COMP);
     public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(IM_OUTPUT_SYNAPSE_COMP);
     public int[] inputSortGroupCounts = new int[4];
@@ -73,6 +74,7 @@ public class Neuron extends Provider<INeuron> {
         return get().label;
     }
 
+
     /**
      * Propagate an input activation into the network.
      *
@@ -81,22 +83,9 @@ public class Neuron extends Provider<INeuron> {
      * @param end   The range end
      */
     public Activation addInput(Document doc, int begin, int end) {
-        return addInput(doc, begin, end, null);
-    }
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc   The current document
-     * @param begin The range begin
-     * @param end   The range end
-     * @param relationalId
-     */
-    public Activation addInput(Document doc, int begin, int end, Integer relationalId) {
         return addInput(doc,
                 new Activation.Builder()
                         .setRange(begin, end)
-                        .setRelationalId(relationalId)
         );
     }
 
@@ -269,6 +258,10 @@ public class Neuron extends Provider<INeuron> {
 
 
 
+    public Synapse getSynapseById(int synapseId) {
+        return inputSynapsesById.get(synapseId);
+    }
+
     /**
      * {@code getFinalActivations} is a convenience method to retrieve all activations of the given neuron that
      * are part of the final interpretation. Before calling this method, the {@code doc.process()} needs to
@@ -289,13 +282,6 @@ public class Neuron extends Provider<INeuron> {
         inMemoryInputSynapses.put(s, s);
         inputSortGroupCounts[Linker.SortGroup.getSortGroup(s.key).ordinal()]++;
         lock.releaseWriteLock();
-
-        if(!s.input.isSuspended()) {
-            InputNode iNode = s.inputNode.get();
-            if (iNode != null) {
-                iNode.setSynapse(s);
-            }
-        }
     }
 
 
@@ -304,13 +290,6 @@ public class Neuron extends Provider<INeuron> {
         inMemoryInputSynapses.remove(s);
         inputSortGroupCounts[Linker.SortGroup.getSortGroup(s.key).ordinal()]--;
         lock.releaseWriteLock();
-
-        if(!s.input.isSuspended()) {
-            InputNode iNode = s.inputNode.getIfNotSuspended();
-            if (iNode != null) {
-                iNode.removeSynapse(s);
-            }
-        }
     }
 
 
@@ -319,13 +298,6 @@ public class Neuron extends Provider<INeuron> {
         inMemoryOutputSynapses.put(s, s);
         outputSortGroupCounts[Linker.SortGroup.getSortGroup(s.key).ordinal()]++;
         lock.releaseWriteLock();
-
-        if(!s.output.isSuspended()) {
-            InputNode iNode = s.inputNode.get();
-            if (iNode != null) {
-                iNode.setSynapse(s);
-            }
-        }
     }
 
 
@@ -334,13 +306,6 @@ public class Neuron extends Provider<INeuron> {
         inMemoryOutputSynapses.remove(s);
         outputSortGroupCounts[Linker.SortGroup.getSortGroup(s.key).ordinal()]--;
         lock.releaseWriteLock();
-
-        if(!s.output.isSuspended()) {
-            InputNode iNode = s.inputNode.getIfNotSuspended();
-            if (iNode != null) {
-                iNode.setSynapse(s);
-            }
-        }
     }
 
     public String toString() {
@@ -349,4 +314,5 @@ public class Neuron extends Provider<INeuron> {
 
         return super.toString();
     }
+
 }

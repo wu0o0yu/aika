@@ -43,6 +43,9 @@ public final class Activation extends NodeActivation<OrNode> {
 
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
+    public Range range;
+
+
     public TreeSet<SynapseActivation> selectedNeuronInputs = new TreeSet<>(INPUT_COMP);
     public TreeSet<SynapseActivation> neuronInputs = new TreeSet<>(INPUT_COMP);
     public TreeSet<SynapseActivation> neuronOutputs = new TreeSet<>(OUTPUT_COMP);
@@ -78,8 +81,9 @@ public final class Activation extends NodeActivation<OrNode> {
     public long markedAncestor;
 
 
-    public Activation(int id, Document doc, Key key) {
-        super(id, doc, key);
+
+    public Activation(int id, Document doc, OrNode n) {
+        super(id, doc, n);
     }
 
 
@@ -99,7 +103,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public String getText() {
-        return doc.getText(key.range);
+        return doc.getText(range);
     }
 
 
@@ -109,7 +113,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public Neuron getNeuron() {
-        return key.node.neuron;
+        return node.neuron;
     }
 
 
@@ -189,11 +193,11 @@ public final class Activation extends NodeActivation<OrNode> {
                 x *= s.distanceFunction.f(iAct, this);
             }
             net += x;
-            if(!s.key.isRecurrent) {
+            if(!s.isRecurrent) {
                 netDir += x;
             }
 
-            if (!s.key.isRecurrent && !s.isNegative() && net >= 0.0 && fired < 0) {
+            if (!s.isRecurrent && !s.isNegative() && net >= 0.0 && fired < 0) {
                 fired = iAct.rounds.get(round).fired + 1;
             }
         }
@@ -265,7 +269,7 @@ public final class Activation extends NodeActivation<OrNode> {
             }
 
             if (s.isNegative()) {
-                if (!s.key.isRecurrent && !checkSelfReferencing(this, iAct, false, 0)) {
+                if (!s.isRecurrent && !checkSelfReferencing(this, iAct, false, 0)) {
                     ub += iAct.lowerBound * x;
                 }
 
@@ -332,7 +336,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
     private State getInputState(int round, Activation act, Synapse s) {
         State is = State.ZERO;
-        if (s.key.isRecurrent) {
+        if (s.isRecurrent) {
             if (!s.isNegative() || !checkSelfReferencing(act, this, true, 0)) {
                 is = round == 0 ? getInitialState(decision) : rounds.get(round - 1);
             }
@@ -386,7 +390,7 @@ public final class Activation extends NodeActivation<OrNode> {
         }
 
         for (SynapseActivation sa: onlySelected ? ny.selectedNeuronInputs : ny.neuronInputs) {
-            if(!sa.synapse.key.isRecurrent) {
+            if(!sa.synapse.isRecurrent) {
                 if (checkSelfReferencing(nx, sa.input, onlySelected, depth + 1)) {
                     return true;
                 }
@@ -421,10 +425,9 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    public <T extends Node> boolean filter(T n, Relation rel, Activation linkedAct, Range r, Range.Relation rr) {
-        return (n == null || key.node == n) &&
-                (rel == null || linkedAct == null || (rel.test(this, linkedAct))) &&
-                (r == null || rr == null || rr.compare(key.range, r));
+    public <T extends Node> boolean filter(T n, Relation rel, Activation linkedAct) {
+        return (n == null || node == n) &&
+                (rel == null || linkedAct == null || (rel.test(this, linkedAct)));
     }
 
 
@@ -432,7 +435,7 @@ public final class Activation extends NodeActivation<OrNode> {
         if (sequence != null) return sequence;
 
         sequence = 0;
-        neuronInputs.stream().filter(sa -> !sa.synapse.key.isRecurrent).forEach(sa -> sequence = Math.max(sequence, sa.input.getSequence() + 1));
+        neuronInputs.stream().filter(sa -> !sa.synapse.isRecurrent).forEach(sa -> sequence = Math.max(sequence, sa.input.getSequence() + 1));
         return sequence;
     }
 
@@ -615,7 +618,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public String toString() {
-        return key + " -" +
+        return range + " - " + node + " -" +
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
                 (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +
@@ -631,20 +634,20 @@ public final class Activation extends NodeActivation<OrNode> {
 
         sb.append((finalOnly ? finalDecision : decision) + " - ");
 
-        sb.append(key.range);
+        sb.append(range);
 
         if(withTextSnippet) {
             sb.append(" \"");
-            if(key.node.neuron.get().outputText != null) {
-                sb.append(Utils.collapseText(key.node.neuron.get().outputText, 7));
+            if(node.neuron.get().outputText != null) {
+                sb.append(Utils.collapseText(node.neuron.get().outputText, 7));
             } else {
-                sb.append(Utils.collapseText(doc.getText(key.range), 7));
+                sb.append(Utils.collapseText(doc.getText(range), 7));
             }
             sb.append("\"");
         }
         sb.append(" - ");
 
-        sb.append(withLogic ? key.node.toString() : key.node.getNeuronLabel());
+        sb.append(withLogic ? node.toString() : node.getNeuronLabel());
 
         sb.append(" - UB:");
         sb.append(Utils.round(upperBound));

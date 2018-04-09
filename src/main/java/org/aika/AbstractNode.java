@@ -20,6 +20,7 @@ import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.neuron.INeuron;
 import org.aika.neuron.Neuron;
+import org.aika.neuron.Synapse;
 
 import java.io.DataInput;
 import java.io.IOException;

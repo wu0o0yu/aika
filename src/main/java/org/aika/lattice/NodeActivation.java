@@ -29,7 +29,7 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
 
     public final int id;
 
-    public final Key<T> key;
+    public final T node;
 
     public final Document doc;
 
@@ -40,18 +40,12 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     public TreeMap<Refinement, NodeActivation<?>> outputs = new TreeMap<>();
 
 
-    public NodeActivation(int id, Document doc, Key<T> key) {
+    public NodeActivation(int id, Document doc, T node) {
         this.id = id;
         this.doc = doc;
-        this.key = key;
+        this.node = node;
     }
 
-
-    public NodeActivation(int id, Document doc, T n, Range pos) {
-        this.id = id;
-        this.doc = doc;
-        key = new Key<>(n, pos);
-    }
 
 
     public void link(Collection<NodeActivation> inputActs) {
@@ -61,19 +55,6 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
         }
     }
 
-
-    public String toString(Document doc) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<ACT ");
-        sb.append(",(");
-        sb.append(key.range);
-        sb.append("),");
-        sb.append(doc.getContent().substring(Math.max(0, key.range.begin - 3), Math.min(doc.length(), key.range.end + 3)));
-        sb.append(",");
-        sb.append(key.node);
-        sb.append(">");
-        return sb.toString();
-    }
 
 
     @Override
@@ -87,31 +68,5 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
         if(a == null && b != null) return -1;
         if(a != null && b == null) return 1;
         return a.compareTo(b);
-    }
-
-
-    public static final class Key<T extends Node> implements Comparable<Key> {
-        public final T node;
-        public final Range range;
-
-        public Key(T node, Range range) {
-            this.node = node;
-            this.range = range;
-        }
-
-
-        @Override
-        public int compareTo(Key k) {
-            int x = node.compareTo(k.node);
-            if(x != 0) return x;
-            x = Range.compare(range, k.range, false);
-
-            return x;
-        }
-
-
-        public String toString() {
-            return (node != null ? node.getNeuronLabel() : "") + " " + range;
-        }
     }
 }

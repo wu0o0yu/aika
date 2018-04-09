@@ -167,17 +167,9 @@ public class Converter {
             INeuron in = s.input.get();
             in.lock.acquireWriteLock();
             try {
-                if (s.inputNode == null) {
-                    InputNode iNode = InputNode.add(model, s.key.createInputNodeKey(), s.input.get());
-                    iNode.setModified();
-                    iNode.setSynapse(s);
-                    iNode.postCreate(doc);
-                    s.inputNode = iNode.provider;
-                }
-
                 if (!s.inactive) {
-                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
-                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.getNewWeight();
+                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
+                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.getNewWeight();
 
                     if (s.isConjunction(false, true) && !s.isConjunction(true, true)) {
                         neuron.numDisjunctiveSynapses++;
@@ -224,7 +216,7 @@ public class Converter {
     private NodeContext expandNode(NodeContext nc, Synapse s) {
         NodeContext nln = new NodeContext();
         if (nc == null) {
-            nln.node = s.inputNode.get();
+            nln.node = s.input.get().outputNode.get();
             nln.offsets = new Synapse[] {s};
         } else {
             Relation[] relations = new Relation[nln.offsets.length];
@@ -233,7 +225,7 @@ public class Converter {
                 relations[i] = s.relations.get(linkedSynapse);
             }
 
-            AndNode.Refinement ref = new AndNode.Refinement(relations, s.inputNode);
+            AndNode.Refinement ref = new AndNode.Refinement(relations, s.input.get().outputNode);
             nln.node = AndNode.createNextLevelNode(model, threadId, doc, nc.node, ref, null);
 
             nln.offsets = new Synapse[nc.offsets.length + 1];
