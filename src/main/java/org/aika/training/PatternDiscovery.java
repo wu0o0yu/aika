@@ -75,25 +75,11 @@ public class PatternDiscovery {
 
     public static class Config {
         public RefinementFactory refinementFactory;
-        public ActivationEvaluation checkExpandable;
         public Counter counter;
 
 
         public Config setRefinementFactory(RefinementFactory refinementFactory) {
             this.refinementFactory = refinementFactory;
-            return this;
-        }
-
-
-        /**
-         * This callback checks whether the current pattern might be refined to an even larger pattern.
-         * If frequency is the criterion, then infrequent are not expandable.
-         *
-         * @param checkExpandable
-         * @return
-         */
-        public Config setCheckExpandable(ActivationEvaluation checkExpandable) {
-            this.checkExpandable = checkExpandable;
             return this;
         }
 
@@ -121,7 +107,6 @@ public class PatternDiscovery {
         doc.getAllActivationsStream().forEach(act -> config.counter.count(act));
 
         doc.getAllActivationsStream()
-                .filter(act -> config.checkExpandable.evaluate(act))
                 .forEach(act -> act.node.discover(act, config));
 
         doc.propagate();

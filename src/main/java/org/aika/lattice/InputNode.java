@@ -101,7 +101,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    public RefValue extend(int threadId, Document doc, Refinement ref, Config config) {
+    public RefValue extend(int threadId, Document doc, Refinement ref) {
         RefValue rv = getAndChild(ref);
         if(rv != null) {
             return rv;
@@ -115,7 +115,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         rv = new RefValue(new Integer[] {0}, 1, provider);
         parents.put(ref, rv);
 
-        return AndNode.createAndNode(provider.model, doc, config, parents, level + 1) ? rv : null;
+        return AndNode.createAndNode(provider.model, doc, parents, level + 1) ? rv : null;
     }
 
 
@@ -195,7 +195,7 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
                         if (in.visitedDiscover != v) {
                             in.visitedDiscover = v;
-                            AndNode nln = extend(doc.threadId, doc, ref, config).child.get();
+                            AndNode nln = extend(doc.threadId, doc, ref).child.get();
 
                             if (nln != null) {
                                 nln.isDiscovered = true;
@@ -211,7 +211,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     @Override
     public void cleanup() {
     }
-
 
 
     public String logicToString() {
@@ -254,29 +253,6 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
         if (in.readBoolean()) {
             inputNeuron = m.lookupNeuron(in.readInt());
-        }
-    }
-
-
-    private static class SynapseKey implements Comparable<SynapseKey> {
-        Relation rel;
-        Neuron neuron;
-
-        private SynapseKey() {
-        }
-
-
-        public SynapseKey(Relation rel, Neuron neuron) {
-            this.rel = rel;
-            this.neuron = neuron;
-        }
-
-
-        @Override
-        public int compareTo(SynapseKey sk) {
-            int r = rel.compareTo(sk.rel);
-            if (r != 0) return r;
-            return neuron.compareTo(sk.neuron);
         }
     }
 }

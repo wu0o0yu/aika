@@ -20,7 +20,6 @@ package org.aika.lattice;
 import org.aika.*;
 import org.aika.neuron.Relation;
 import org.aika.neuron.activation.Range;
-import org.aika.lattice.NodeActivation.Key;
 import org.aika.training.PatternDiscovery.Config;
 
 import java.io.DataInput;
@@ -120,18 +119,13 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     @Override
     public void discover(NodeActivation<AndNode> act, Config config) {
         Document doc = act.doc;
-        for(Map.Entry<Refinement, NodeActivation<?>> fme : act.inputs.entrySet()) {
-            Refinement ref = fme.getKey();
-            NodeActivation<?> pAct = fme.getValue();
-            for (Map.Entry<Refinement, NodeActivation<?>> sme : pAct.outputs.entrySet()) {
-                Refinement secondRef = sme.getKey();
-                NodeActivation secondAct = sme.getValue();
-
+        for(NodeActivation<?> pAct : act.inputs.values()) {
+            for (NodeActivation<?> secondAct : pAct.outputs.values()) {
                 if (secondAct.node instanceof AndNode) {
-                    if (act != secondAct && config.checkExpandable.evaluate(secondAct)) {
-                        Refinement nRef = new Refinement(secondRef.rel, ref.getOffset(), secondRef.input);
+                    if (act != secondAct) {
+                        Refinement nRef = config.refinementFactory.create(act, secondAct);
 
-                        AndNode nln = createNextLevelNode(doc.model, doc.threadId, doc, this, nRef, config);
+                        AndNode nln = extend(doc.threadId, doc, nRef).child.get();
                         if (nln != null) {
                             nln.isDiscovered = true;
                         }
@@ -142,10 +136,10 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public RefValue extend(int threadId, Document doc, Refinement ref, Config config) {
+    public RefValue extend(int threadId, Document doc, Refinement ref) {
         RefValue rv = getAndChild(ref);
         if(rv != null) {
-            return config != null ? null : rv;
+            return rv;
         }
 
         Integer[] offsets = new Integer[level];
@@ -170,7 +164,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
             Refinement npRef = new Refinement(npRelations, ref.input);
 
-            RefValue npRV = pn.extend(threadId, doc, npRef, config);
+            RefValue npRV = pn.extend(threadId, doc, npRef);
 
             Relation[] nRelations = new Relation[pRef.relations.length + 1];
             for(int i = 0; i < pRef.relations.length; i++) {
@@ -199,12 +193,12 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         rv = new RefValue(offsets, level, provider);
         parents.put(ref, rv);
 
-        return createAndNode(provider.model, doc, config, parents, level + 1) ? rv : null;
+        return createAndNode(provider.model, doc, parents, level + 1) ? rv : null;
     }
 
 
 
-    static boolean createAndNode(Model m, Document doc, Config config, SortedMap<Refinement, RefValue> parents, int level) {
+    static boolean createAndNode(Model m, Document doc, SortedMap<Refinement, RefValue> parents, int level) {
         if (parents != null) {
             // Locking needs to take place in a predefined order.
             TreeSet<? extends Provider<? extends Node>> parentsForLocking = new TreeSet(parents.values());
@@ -214,13 +208,8 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             try {
                 AndNode nln = new AndNode(m, level, parents);
 
-                if (config == null || config.refinementFactory.create(nln)) {
-                    nln.init();
-                    nln.postCreate(doc);
-                } else {
-                    m.removeProvider(nln.provider);
-                    return false;
-                }
+                nln.init();
+                nln.postCreate(doc);
             } finally {
                 for (Provider<? extends Node> pn : parentsForLocking) {
                     pn.get().lock.releaseWriteLock();

@@ -109,7 +109,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public abstract RefValue extend(int threadId, Document doc, AndNode.Refinement ref, Config config);
+    public abstract RefValue extend(int threadId, Document doc, AndNode.Refinement ref);
 
     abstract A createActivation(Document doc);
 
