@@ -18,13 +18,10 @@ package org.aika.lattice;
 
 
 import org.aika.*;
-import org.aika.lattice.NodeActivation.Key;
 import org.aika.Document;
 import org.aika.training.PatternDiscovery.Config;
-import org.aika.neuron.activation.Range;
-import org.aika.lattice.AndNode.Refinement;
-import org.aika.lattice.OrNode.OrEntry;
-import org.aika.neuron.INeuron;
+import org.aika.lattice.AndNode.RefValue;
+import org.aika.lattice.OrNode.Refinement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,17 +47,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Lukas Molzberger
  */
 public abstract class Node<T extends Node, A extends NodeActivation<T>> extends AbstractNode<Provider<T>, A> implements Comparable<Node> {
-    public static int MAX_RELATIVE_RID = 25;
 
     public static final Node MIN_NODE = new InputNode();
     public static final Node MAX_NODE = new InputNode();
 
     private static final Logger log = LoggerFactory.getLogger(Node.class);
 
-    public TreeMap<ReverseAndRefinement, Refinement> reverseAndChildren;
-    public TreeMap<Refinement, Provider<AndNode>> andChildren;
-    public TreeSet<OrEntry> orChildren;
-    public TreeSet<OrEntry> allOrChildren;
+    public TreeMap<AndNode.Refinement, RefValue> andChildren;
+    public TreeSet<Refinement> orChildren;
+    public TreeSet<Refinement> allOrChildren;
 
     public int level;
 
@@ -94,51 +89,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         public boolean isQueued = false;
         public long queueId;
 
-        private RidVisited nullRidVisited;
-        private RidVisited[] ridVisited = new RidVisited[2 * MAX_RELATIVE_RID];
-
         public ThreadState() {
             added = new ArrayList<>();
             activations = new ArrayList<>();
         }
-
-
-        public RidVisited lookupVisited(Integer offset) throws RidOutOfRange {
-            if (offset != null && (offset >= MAX_RELATIVE_RID || offset <= -MAX_RELATIVE_RID)) {
-                log.warn("RID too large:" + offset);
-                throw new RidOutOfRange("RID too large:" + offset);
-            }
-
-            if (offset == null) {
-                if (nullRidVisited == null) {
-                    nullRidVisited = new RidVisited();
-                }
-                return nullRidVisited;
-            } else {
-                RidVisited v = ridVisited[offset + MAX_RELATIVE_RID];
-                if (v == null) {
-                    v = new RidVisited();
-                    ridVisited[offset + MAX_RELATIVE_RID] = v;
-                }
-                return v;
-            }
-        }
-
-        public static class RidOutOfRange extends Exception {
-            public RidOutOfRange(String s) {
-                super(s);
-            }
-        }
-    }
-
-
-    /**
-     * Aika extensively uses graph coloring techniques. When traversing the logic node lattice, nodes will be
-     * marked in order to avoid having to visit the same node twice. To avoid having to reset each mark Aika uses the
-     * counter {@code Node.visitedCounter} to set a new mark each time.
-     */
-    public static class RidVisited {
-        public long computeParents = -1;
     }
 
 
@@ -155,17 +109,15 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
+    public abstract RefValue extend(int threadId, Document doc, AndNode.Refinement ref, Config config);
+
     abstract A createActivation(Document doc);
 
     abstract void apply(A act);
 
     public abstract void discover(NodeActivation<T> act, Config config);
 
-    abstract Collection<Refinement> collectNodeAndRefinements(Refinement newRef);
-
     public abstract void reprocessInputs(Document doc);
-
-    abstract boolean contains(Refinement ref);
 
     public abstract void cleanup();
 
@@ -196,7 +148,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void addOrChild(OrEntry oe, boolean all) {
+    void addOrChild(Refinement oe, boolean all) {
         lock.acquireWriteLock();
         if(all) {
             if (allOrChildren == null) {
@@ -213,7 +165,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void removeOrChild(OrEntry oe, boolean all) {
+    void removeOrChild(Refinement oe, boolean all) {
         lock.acquireWriteLock();
         if(all) {
             if (allOrChildren != null) {
@@ -234,26 +186,22 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void addAndChild(Refinement ref, Provider<AndNode> child) {
+    void addAndChild(AndNode.Refinement ref, RefValue child) {
         if (andChildren == null) {
             andChildren = new TreeMap<>();
-            reverseAndChildren = new TreeMap<>();
         }
 
-        Provider<AndNode> n = andChildren.put(ref, child);
+        RefValue n = andChildren.put(ref, child);
         assert n == null;
-        reverseAndChildren.put(new ReverseAndRefinement(child, ref.rid, 0), ref);
     }
 
 
-    void removeAndChild(Refinement ref) {
+    void removeAndChild(AndNode.Refinement ref) {
         if (andChildren != null) {
-            Provider<AndNode> child = andChildren.remove(ref);
-            reverseAndChildren.remove(new ReverseAndRefinement(child, ref.rid, 0));
+            andChildren.remove(ref);
 
             if (andChildren.isEmpty()) {
                 andChildren = null;
-                reverseAndChildren = null;
             }
         }
     }
@@ -261,7 +209,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     A processActivation(Document doc, Collection<NodeActivation> inputActs) {
 
-        A act = createActivation(doc, ak);
+        A act = createActivation(doc);
 
         register(act);
 
@@ -274,14 +222,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public void register(A act) {
-        Key ak = act.key;
         Document doc = act.doc;
 
-        ThreadState th = ak.node.getThreadState(doc.threadId, true);
+        ThreadState th = act.node.getThreadState(doc.threadId, true);
         if (th.activations.isEmpty()) {
-            doc.activatedNodes.add(ak.node);
+            doc.activatedNodes.add(act.node);
         }
-        th.activations.put(ak, act);
+        th.activations.add(act);
 
         doc.addedNodeActivations.add(act);
     }
@@ -319,40 +266,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    boolean computeAndParents(Model m, int threadId, Document doc, Integer offset, SortedSet<Refinement> inputs, Map<Refinement, Provider<? extends Node>> parents, Config config, long v) throws ThreadState.RidOutOfRange {
-        RidVisited nv = getThreadState(threadId, true).lookupVisited(offset);
-        if (nv.computeParents == v) return true;
-        nv.computeParents = v;
-
-        if (inputs.size() == 1) {
-            parents.put(inputs.first(), provider);
-            return true;
-        }
-
-        for (Refinement ref : inputs) {
-            SortedSet<Refinement> childInputs = new TreeSet<>(inputs);
-            childInputs.remove(ref);
-
-            Refinement nRef = new Refinement(ref.getRelativePosition(), offset, ref.input);
-            lock.acquireReadLock();
-            Provider<AndNode> cp = andChildren != null ? andChildren.get(nRef) : null;
-            lock.releaseReadLock();
-
-            if (cp == null) {
-                if (config != null) return false;
-                cp = AndNode.createNextLevelNode(m, threadId, doc, this, nRef, config).provider;
-                if (cp == null) return false;
-            }
-
-            Integer nOffset = Utils.nullSafeMin(ref.getRelativePosition(), offset);
-            if (!cp.get().computeAndParents(m, threadId, doc, nOffset, childInputs, parents, config, v)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
     public void remove() {
         assert !isRemoved;
 
@@ -361,7 +274,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         lock.acquireWriteLock();
         setModified();
         while (andChildren != null && !andChildren.isEmpty()) {
-            andChildren.firstEntry().getValue().get().remove();
+            andChildren.firstEntry().getValue().child.get().remove();
         }
 
         while (orChildren != null && !orChildren.isEmpty()) {
@@ -373,9 +286,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    Provider<AndNode> getAndChild(Refinement ref) {
+    RefValue getAndChild(AndNode.Refinement ref) {
         lock.acquireReadLock();
-        Provider<AndNode> result = andChildren != null ? andChildren.get(ref) : null;
+        RefValue result = andChildren != null ? andChildren.get(ref) : null;
         lock.releaseReadLock();
         return result;
     }
@@ -465,7 +378,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         if (andChildren != null) {
             out.writeInt(andChildren.size());
-            for (Map.Entry<Refinement, Provider<AndNode>> me : andChildren.entrySet()) {
+            for (Map.Entry<AndNode.Refinement, RefValue> me : andChildren.entrySet()) {
                 me.getKey().write(out);
                 out.writeInt(me.getValue().id);
             }
@@ -475,7 +388,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         if (orChildren != null) {
             out.writeInt(orChildren.size());
-            for (OrEntry oe : orChildren) {
+            for (Refinement oe : orChildren) {
                 oe.write(out);
             }
         } else {
@@ -499,7 +412,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         int s = in.readInt();
         for (int i = 0; i < s; i++) {
-            addAndChild(Refinement.read(in, m), m.lookupNodeProvider(in.readInt()));
+            addAndChild(AndNode.Refinement.read(in, m), m.lookupNodeProvider(in.readInt()));
         }
 
         s = in.readInt();
@@ -507,7 +420,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             if (orChildren == null) {
                 orChildren = new TreeSet<>();
             }
-            orChildren.add(OrEntry.read(in, m));
+            orChildren.add(Refinement.read(in, m));
         }
 
         threads = new ThreadState[m.numberOfThreads];
@@ -532,23 +445,5 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         n.readFields(in, p.model);
         return n;
-    }
-
-
-    static class ReverseAndRefinement implements Comparable<ReverseAndRefinement> {
-        boolean dir;
-        Provider node;
-
-        public ReverseAndRefinement(Provider n, Integer a, Integer b) {
-            this.node = n;
-            this.dir = Utils.compareNullSafe(a, b);
-        }
-
-        @Override
-        public int compareTo(ReverseAndRefinement rar) {
-            int r = node.compareTo(rar.node);
-            if (r != 0) return r;
-            return Boolean.compare(dir, rar.dir);
-        }
     }
 }

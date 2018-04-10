@@ -17,16 +17,10 @@
 package org.aika.lattice;
 
 
-import org.aika.Model;
-import org.aika.Provider;
-import org.aika.Utils;
-import org.aika.Document;
+import org.aika.*;
 import org.aika.neuron.Relation;
 import org.aika.neuron.activation.Range;
 import org.aika.lattice.NodeActivation.Key;
-import org.aika.neuron.INeuron;
-import org.aika.neuron.Neuron;
-import org.aika.neuron.Synapse;
 import org.aika.training.PatternDiscovery.Config;
 
 import java.io.DataInput;
@@ -47,23 +41,25 @@ import java.util.*;
 public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
-    public SortedMap<Refinement, Provider<? extends Node>> parents = new TreeMap<>();
+    public SortedMap<Refinement, RefValue> parents = new TreeMap<>();
 
     public AndNode() {}
 
 
-    public AndNode(Model m, int level, SortedMap<Refinement, Provider<? extends Node>> parents) {
+    public AndNode(Model m, int level, SortedMap<Refinement, RefValue> parents) {
         super(m, level);
         this.parents = parents;
     }
 
 
     private void init() {
-        for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
+        for(Map.Entry<Refinement, RefValue> me: parents.entrySet()) {
             Refinement ref = me.getKey();
-            Node pn = me.getValue().get();
+            RefValue rv = me.getValue();
+            rv.child = provider;
+            Node pn = rv.parent.get();
 
-            pn.addAndChild(ref, provider);
+            pn.addAndChild(ref, rv);
             pn.setModified();
         }
     }
@@ -88,8 +84,8 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         if(!isRemoved && !isRequired()) {
             remove();
 
-            for(Provider<? extends Node> p: parents.values()) {
-                p.get().cleanup();
+            for(RefValue p: parents.values()) {
+                p.parent.get().cleanup();
             }
         }
     }
@@ -108,9 +104,9 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                     if (act != secondAct) {
                         Refinement nRef = new Refinement(secondRef.rel, ref.getOffset(), secondRef.input);
 
-                        Provider<AndNode> nlp = getAndChild(nRef);
+                        RefValue nlp = getAndChild(nRef);
                         if (nlp != null) {
-                            addNextLevelActivation(act, secondAct, nlp);
+                            addNextLevelActivation(act, secondAct, nlp.child);
                         }
                     }
                 }
@@ -131,7 +127,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                 Refinement secondRef = sme.getKey();
                 NodeActivation secondAct = sme.getValue();
 
-                if (secondAct.key.node instanceof AndNode) {
+                if (secondAct.node instanceof AndNode) {
                     if (act != secondAct && config.checkExpandable.evaluate(secondAct)) {
                         Refinement nRef = new Refinement(secondRef.rel, ref.getOffset(), secondRef.input);
 
@@ -146,40 +142,69 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    @Override
-    boolean contains(Refinement ref) {
-        // Check if this refinement is already present in this and-node.
-        if(ref.rid == null || ref.rid >= 0) {
-            boolean flag = false;
-            lock.acquireReadLock();
-            if(ref.rid == null || ref.rid > 0) {
-                flag = parents.containsKey(ref);
-            } else if(ref.rid == 0) {
-                for(Refinement pRef: parents.keySet()) {
-                    if((pRef.rid == null || pRef.rid <= 0) && pRef.input == ref.input) {
-                        flag = true;
-                        break;
-                    }
+    public RefValue extend(int threadId, Document doc, Refinement ref, Config config) {
+        RefValue rv = getAndChild(ref);
+        if(rv != null) {
+            return config != null ? null : rv;
+        }
+
+        Integer[] offsets = new Integer[level];
+        for(int i = 0; i < offsets.length; i++) {
+            offsets[i] = i;
+        }
+
+        SortedMap<Refinement, RefValue> parents = new TreeMap<>();
+
+        for(Map.Entry<Refinement, RefValue> me: parents.entrySet()) {
+            Refinement pRef = me.getKey();
+            RefValue pRV = me.getValue();
+            Node pn = pRV.parent.get(doc);
+
+            Relation[] npRelations = new Relation[ref.relations.length - 1];
+            for(int i = 0; i < ref.relations.length; i++) {
+                Integer j = pRV.reverseOffsets[i];
+                if(j != null) {
+                    npRelations[j] = ref.relations[i];
                 }
             }
-            lock.releaseReadLock();
-            return flag;
+
+            Refinement npRef = new Refinement(npRelations, ref.input);
+
+            RefValue npRV = pn.extend(threadId, doc, npRef, config);
+
+            Relation[] nRelations = new Relation[pRef.relations.length + 1];
+            for(int i = 0; i < pRef.relations.length; i++) {
+                int j = npRV.offsets[i];
+                nRelations[j] = pRef.relations[i];
+            }
+
+            Relation rel = ref.relations[pRV.refOffset];
+            if(rel != null) {
+                nRelations[npRV.refOffset] = rel.invert();
+            }
+
+            Refinement nRef = new Refinement(nRelations, pRef.input);
+
+            Integer[] nOffsets = new Integer[npRV.offsets.length + 1];
+            for(int i = 0; i < pRV.reverseOffsets.length; i++) {
+                Integer j = pRV.reverseOffsets[i];
+                if(j != null) {
+                    nOffsets[npRV.offsets[j]] = i;
+                }
+            }
+
+            parents.put(nRef, new RefValue(nOffsets, offsets[pRV.refOffset], pn.provider));
         }
-        return false;
+
+        rv = new RefValue(offsets, level, provider);
+        parents.put(ref, rv);
+
+        return createAndNode(provider.model, doc, config, parents, level + 1) ? rv : null;
     }
 
 
-    public static AndNode createNextLevelNode(Model m, int threadId, Document doc, Node n, Refinement ref, Config config) {
-        Provider<AndNode> pnln = n.getAndChild(ref);
-        if(pnln != null) {
-            return config != null ? null : pnln.get();
-        }
 
-        if(n.contains(ref)) return null;
-
-        SortedMap<Refinement, Provider<? extends Node>> parents = computeNextLevelParents(m, threadId, doc, n, ref, config);
-
-        AndNode nln = null;
+    static boolean createAndNode(Model m, Document doc, Config config, SortedMap<Refinement, RefValue> parents, int level) {
         if (parents != null) {
             // Locking needs to take place in a predefined order.
             TreeSet<? extends Provider<? extends Node>> parentsForLocking = new TreeSet(parents.values());
@@ -187,19 +212,15 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                 pn.get().lock.acquireWriteLock();
             }
             try {
+                AndNode nln = new AndNode(m, level, parents);
 
-                if (n.andChildren == null || !n.andChildren.containsKey(ref)) {
-                    nln = new AndNode(m, n.level + 1, parents);
-
-                    if (config == null || config.checkValidPattern.evaluate(nln)) {
-                        nln.init();
-                        nln.postCreate(doc);
-                    } else {
-                        m.removeProvider(nln.provider);
-                        nln = null;
-                    }
+                if (config == null || config.refinementFactory.create(nln)) {
+                    nln.init();
+                    nln.postCreate(doc);
+                } else {
+                    m.removeProvider(nln.provider);
+                    return false;
                 }
-
             } finally {
                 for (Provider<? extends Node> pn : parentsForLocking) {
                     pn.get().lock.releaseWriteLock();
@@ -207,7 +228,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             }
         }
 
-        return nln;
+        return true;
     }
 
 
@@ -234,7 +255,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
         super.changeNumberOfNeuronRefs(threadId, v, d);
 
-        parents.values().forEach(n -> n.get().changeNumberOfNeuronRefs(threadId, v, d));
+        parents.values().forEach(rv -> rv.parent.get().changeNumberOfNeuronRefs(threadId, v, d));
     }
 
 
@@ -246,68 +267,13 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public static SortedMap<Refinement, Provider<? extends Node>> computeNextLevelParents(Model m, int threadId, Document doc, Node pa, Refinement ref, Config config) {
-        Collection<Refinement> refinements = pa.collectNodeAndRefinements(ref);
-
-        long v = m.visitedCounter.addAndGet(1);
-        SortedMap<Refinement, Provider<? extends Node>> parents = new TreeMap<>();
-
-        for(Refinement pRef: refinements) {
-            SortedSet<Refinement> childInputs = new TreeSet<>(refinements);
-            childInputs.remove(pRef);
-            try {
-                if (!pRef.input.get().computeAndParents(m, threadId, doc, pRef.getRelativePosition(), childInputs, parents, config, v)) {
-                    return null;
-                }
-            } catch(ThreadState.RidOutOfRange e) {
-                return null;
-            }
-        }
-
-        return parents;
-    }
-
-
-    @Override
-    Collection<Refinement> collectNodeAndRefinements(Refinement newRef) {
-        List<Refinement> inputs = new ArrayList<>(parents.size() + 1);
-        inputs.add(newRef);
-
-
-        for(Refinement ref: parents.keySet()) {
-            boolean required = false;
-            for(int i = 0; i < ref.offsets.length; i++) {
-                int j = ref.offsets[i];
-                if(newRef.relations[j] != null) required = true;
-            }
-
-            for(int i = 0; i < ref.relations.length; i++) {
-
-            }
-
-            inputs.add(new Refinement(ref.input));
-
-
-            if(newRef.rid != null && newRef.rid != null && (newRef.rid < 0 || numRidRefs == 1)) {
-                inputs.add(new Refinement(ref.getRelativePosition(), newRef.rid, ref.input));
-            } else if(ref.rid != null && newRef.rid != null && ref.getOffset() < 0) {
-                inputs.add(new Refinement(0, Math.min(-ref.getOffset(), newRef.getRelativePosition()) , ref.input));
-            } else {
-                inputs.add(ref);
-            }
-        }
-
-        return inputs;
-    }
-
-
     @Override
     public void reprocessInputs(Document doc) {
-        for(Provider<? extends Node> pp: parents.values()) {
-            Node<?, NodeActivation<?>> pn = pp.get();
+        for(RefValue pp: parents.values()) {
+            Node<?, NodeActivation<?>> pn = pp.parent.get();
             for(NodeActivation act : pn.getActivations(doc)) {
                 act.repropagateV = markedCreated;
-                act.key.node.propagate(act);
+                act.node.propagate(act);
             }
         }
     }
@@ -324,8 +290,8 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     public void remove() {
         super.remove();
 
-        for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
-            Node pn = me.getValue().get();
+        for(Map.Entry<Refinement, RefValue> me: parents.entrySet()) {
+            Node pn = me.getValue().parent.get();
             pn.lock.acquireWriteLock();
             pn.removeAndChild(me.getKey());
             pn.setModified();
@@ -357,9 +323,9 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         super.write(out);
 
         out.writeInt(parents.size());
-        for(Map.Entry<Refinement, Provider<? extends Node>> me: parents.entrySet()) {
+        for(Map.Entry<Refinement, RefValue> me: parents.entrySet()) {
             me.getKey().write(out);
-            out.writeInt(me.getValue().id);
+            me.getValue().write(out);
         }
     }
 
@@ -371,8 +337,8 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
             Refinement ref = Refinement.read(in, m);
-            Provider<? extends Node> pn = m.lookupNodeProvider(in.readInt());
-            parents.put(ref, pn);
+            RefValue rv = RefValue.read(in, m);
+            parents.put(ref, rv);
         }
     }
 
@@ -380,12 +346,11 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     /**
      *
      */
-    public static class Refinement implements Comparable<Refinement> {
+    public static class Refinement implements Comparable<Refinement>, Writable {
         public static Refinement MIN = new Refinement(null, null);
         public static Refinement MAX = new Refinement(null, null);
 
         public Relation[] relations;
-        public Integer[] offsets;  // input offsets -> output offsets
         public Provider<InputNode> input;
 
         private Refinement() {}
@@ -398,23 +363,42 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
         public String toString() {
-            return "(" + rel + input.get().logicToString() + ")";
+            StringBuilder sb = new StringBuilder();
+            sb.append("(");
+            for(int i = 0; i < relations.length; i++) {
+                Relation rel = relations[i];
+                if(rel != null) {
+                    sb.append(i + ":" + rel + ", ");
+                }
+            }
+            sb.append(input.get().logicToString());
+            sb.append(")");
+            return sb.toString();
         }
 
 
         public void write(DataOutput out) throws IOException {
-            out.writeBoolean(rid != null);
-            if(rid != null) out.writeInt(rid);
+            out.writeInt(relations.length);
+            for(int i = 0; i < relations.length; i++) {
+                Relation rel = relations[i];
+                out.writeBoolean(rel != null);
+                if(rel != null) {
+                    rel.write(out);
+                }
+            }
             out.writeInt(input.id);
         }
 
 
-        public boolean readFields(DataInput in, Model m) throws IOException {
-            if(in.readBoolean()) {
-                rid = in.readInt();
+        public void readFields(DataInput in, Model m) throws IOException {
+            int l = in.readInt();
+            relations = new Relation[l];
+            for(int i = 0; i < l; i++) {
+                if(in.readBoolean()) {
+                    relations[i] = Relation.read(in, m);
+                }
             }
             input = m.lookupNodeProvider(in.readInt());
-            return true;
         }
 
 
@@ -432,7 +416,79 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
             int r = input.compareTo(ref.input);
             if(r != 0) return r;
-            return Utils.compareInteger(rid, ref.rid);
+
+            r = Integer.compare(relations.length, ref.relations.length);
+            if(r != 0) return r;
+
+            for(int i = 0; i < relations.length; i++) {
+                Relation ra = relations[i];
+                Relation rb = ref.relations[i];
+
+                if(ra == null && rb != null) return -1;
+                if(ra != null && rb == null) return 1;
+
+                r = ra.compareTo(rb);
+                if(r != 0) return r;
+            }
+            return 0;
+        }
+    }
+
+
+    public static class RefValue implements Writable {
+        public Integer[] offsets;  // input offsets -> output offsets
+        public Integer[] reverseOffsets;  // output offsets -> input offsets
+        public int refOffset;
+        public Provider<? extends Node> parent;
+        public Provider<AndNode> child;
+
+        private RefValue() {}
+
+        public RefValue(Integer[] offsets, int refOffset, Provider<? extends Node> parent) {
+            this.offsets = offsets;
+            reverseOffsets = new Integer[offsets.length + 1];
+            for(int i = 0; i < offsets.length; i++) {
+                reverseOffsets[offsets[i]] = i;
+            }
+
+            this.refOffset = refOffset;
+            this.parent = parent;
+        }
+
+        @Override
+        public void write(DataOutput out) throws IOException {
+            out.writeInt(offsets.length);
+            for(int i = 0; i < offsets.length; i++) {
+                Integer ofs = offsets[i];
+                out.writeBoolean(ofs != null);
+                out.writeInt(ofs);
+            }
+            out.writeInt(refOffset);
+            out.writeInt(parent.id);
+            out.writeInt(child.id);
+        }
+
+        public static RefValue read(DataInput in, Model m)  throws IOException {
+            RefValue rv = new RefValue();
+            rv.readFields(in, m);
+            return rv;
+        }
+
+        @Override
+        public void readFields(DataInput in, Model m) throws IOException {
+            int l = in.readInt();
+            offsets = new Integer[l];
+            reverseOffsets = new Integer[l + 1];
+            for(int i = 0; i < l; i++) {
+                if(in.readBoolean()) {
+                    Integer ofs = in.readInt();
+                    offsets[i] = ofs;
+                    reverseOffsets[ofs] = i;
+                }
+            }
+            refOffset = in.readInt();
+            parent = m.lookupNodeProvider(in.readInt());
+            child = m.lookupNodeProvider(in.readInt());
         }
     }
 

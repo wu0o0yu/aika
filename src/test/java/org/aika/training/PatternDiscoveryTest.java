@@ -112,7 +112,7 @@ public class PatternDiscoveryTest {
         Config config = new Config()
                 .setCounter(act -> count(act))
                 .setCheckExpandable(act -> ((NodeStatistic) act.key.node.statistic).frequency >= 1)
-                .setCheckValidPattern(n -> checkRidRange(n, 1));
+                .setRefinementFactory(n -> checkRidRange(n, 1));
 
         PatternDiscovery.discover(doc, config);
 
@@ -442,7 +442,7 @@ public class PatternDiscoveryTest {
         Config config = new Config()
                 .setCounter(act -> count(act))
                 .setCheckExpandable(act -> ((NodeStatistic) act.key.node.statistic).frequency >= 1)
-                .setCheckValidPattern(n -> checkRidRange(n, 2));
+                .setRefinementFactory(n -> checkRidRange(n, 2));
         {
             Document doc = m.createDocument("ab", 0);
 

@@ -1,16 +1,25 @@
 package org.aika.neuron;
 
 
+import org.aika.Model;
+import org.aika.Writable;
 import org.aika.neuron.activation.Activation;
 import org.aika.neuron.activation.Range;
 
+import java.io.DataInput;
 
-public abstract class Relation implements Comparable<Relation> {
+
+public abstract class Relation implements Comparable<Relation>, Writable {
 
 
     public abstract boolean test(Activation act, Activation linkedAct);
 
     public abstract Relation invert();
+
+
+    public static Relation read(DataInput in, Model m) {
+        return null;
+    }
 
 
     public static class InstanceRelation extends Relation {

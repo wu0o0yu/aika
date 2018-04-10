@@ -579,7 +579,7 @@ public final class Activation extends NodeActivation<OrNode> {
 
     /**
      * A <code>State</code> object contains the activation value of an activation object that belongs to a neuron.
-     * It furthermore contains a weight that is used to evaluate the interpretations during the search for the best
+     * It furthermore contains a weight that is used to create the interpretations during the search for the best
      * interpretation.
      */
     public static class State {

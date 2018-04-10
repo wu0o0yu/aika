@@ -109,10 +109,10 @@ public class Document implements Comparable<Document> {
     public long createV;
 
 
-    public static Comparator<NodeActivation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
-        int r = Range.compare(act1.key.range, act2.key.range, false);
+    public static Comparator<Activation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
+        int r = Range.compare(act1.range, act2.range, false);
         if (r != 0) return r;
-        return act1.key.node.compareTo(act2.key.node);
+        return act1.node.compareTo(act2.node);
     };
 
 
@@ -274,7 +274,7 @@ public class Document implements Comparable<Document> {
      * It applies the weight and bias delta values and reflects the changes in the logic node structure.
      */
     public void commit() {
-        modifiedWeights.forEach((n, inputSyns) -> Converter.convert(model, threadId, this, n, inputSyns));
+        modifiedWeights.forEach((n, inputSyns) -> Converter.convert(threadId, this, n, inputSyns));
         modifiedWeights.clear();
     }
 
@@ -322,7 +322,7 @@ public class Document implements Comparable<Document> {
                 .filter(n -> n.outputText != null)
                 .forEach(n -> {
             for (Activation act : n.getFinalActivations(this)) {
-                sb.replace(act.key.range.begin, act.key.range.end, n.outputText);
+                sb.replace(act.range.begin, act.range.end, n.outputText);
             }
         });
 
@@ -339,8 +339,7 @@ public class Document implements Comparable<Document> {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         for (INeuron n : activatedNeurons) {
-            Stream<Activation> s = Selector.select(this, n, null, null, null, null);
-            acts.addAll(s.collect(Collectors.toList()));
+            acts.addAll(n.getActivations(this));
         }
 
         StringBuilder sb = new StringBuilder();
@@ -472,7 +471,7 @@ public class Document implements Comparable<Document> {
 
         public void propagateActivationValue(int round, Activation act)  {
             for(Activation.SynapseActivation sa: act.neuronOutputs) {
-                int r = sa.synapse.key.isRecurrent ? round + 1 : round;
+                int r = sa.synapse.isRecurrent ? round + 1 : round;
                 add(r, sa.output);
             }
         }
@@ -481,7 +480,7 @@ public class Document implements Comparable<Document> {
         private void add(Activation act) {
             add(0, act);
             for (Activation.SynapseActivation sa : act.neuronOutputs) {
-                if (sa.synapse.key.isRecurrent) {
+                if (sa.synapse.isRecurrent) {
                     add(0, sa.output);
                 }
             }
@@ -532,7 +531,7 @@ public class Document implements Comparable<Document> {
                 .flatMap(n -> n.getActivations(this).stream())
                 .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)
                 .forEach(act -> {
-                    log.error(act.id + " " + act.key + " " + act.decision + " " + act.rounds);
+                    log.error(act.id + " " + act.range + " " + act.decision + " " + act.rounds);
                     log.error(act.linksToString());
                     log.error("");
                 });

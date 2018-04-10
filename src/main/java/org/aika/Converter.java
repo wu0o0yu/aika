@@ -42,7 +42,6 @@ public class Converter {
         return Synapse.INPUT_SYNAPSE_COMP.compare(s1, s2);
     };
 
-    private Model model;
     private int threadId;
     private INeuron neuron;
     private Document doc;
@@ -50,13 +49,12 @@ public class Converter {
     private Collection<Synapse> modifiedSynapses;
 
 
-    public static boolean convert(Model m, int threadId, Document doc, INeuron neuron, Collection<Synapse> modifiedSynapses) {
-        return new Converter(m, threadId, doc, neuron, modifiedSynapses).convert();
+    public static boolean convert(int threadId, Document doc, INeuron neuron, Collection<Synapse> modifiedSynapses) {
+        return new Converter(threadId, doc, neuron, modifiedSynapses).convert();
     }
 
 
-    private Converter(Model model, int threadId, Document doc, INeuron neuron, Collection<Synapse> modifiedSynapses) {
-        this.model = model;
+    private Converter(int threadId, Document doc, INeuron neuron, Collection<Synapse> modifiedSynapses) {
         this.doc = doc;
         this.neuron = neuron;
         this.threadId = threadId;
@@ -226,11 +224,12 @@ public class Converter {
             }
 
             AndNode.Refinement ref = new AndNode.Refinement(relations, s.input.get().outputNode);
-            nln.node = AndNode.createNextLevelNode(model, threadId, doc, nc.node, ref, null);
+            AndNode.RefValue rv = nc.node.extend(threadId, doc, ref, null);
+            nln.node = rv.child.get(doc);
 
             nln.offsets = new Synapse[nc.offsets.length + 1];
             for(int i = 0; i < nc.offsets.length; i++) {
-                nln.offsets[ref.offsets[i]] = nc.offsets[i];
+                nln.offsets[rv.offsets[i]] = nc.offsets[i];
             }
             for(int i = 0; i < nln.offsets.length; i++) {
                 if(nln.offsets[i] == null) {

@@ -18,6 +18,7 @@ package org.aika.training;
 
 
 import org.aika.Document;
+import org.aika.lattice.AndNode;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 
@@ -28,7 +29,7 @@ import org.aika.lattice.NodeActivation;
  */
 public class PatternDiscovery {
 
-    public interface PatternEvaluation {
+    public interface RefinementFactory {
 
         /**
          * Check if <code>node</code> is an interesting pattern that might be considered for further processing.
@@ -36,11 +37,11 @@ public class PatternDiscovery {
          * This property is required to be monotonic over the size of the pattern. In other words, if a pattern is
          * interesting, then all its sub patterns also need to be interesting.
          *
-         * @param n
+         * @param act
          * @return
          */
 
-        boolean evaluate(Node n);
+        AndNode.Refinement create(NodeActivation act, NodeActivation secondAct);
     }
 
 
@@ -73,13 +74,13 @@ public class PatternDiscovery {
 
 
     public static class Config {
-        public PatternEvaluation checkValidPattern;
+        public RefinementFactory refinementFactory;
         public ActivationEvaluation checkExpandable;
         public Counter counter;
 
 
-        public Config setCheckValidPattern(PatternEvaluation checkValidPattern) {
-            this.checkValidPattern = checkValidPattern;
+        public Config setRefinementFactory(RefinementFactory refinementFactory) {
+            this.refinementFactory = refinementFactory;
             return this;
         }
 
@@ -121,7 +122,7 @@ public class PatternDiscovery {
 
         doc.getAllActivationsStream()
                 .filter(act -> config.checkExpandable.evaluate(act))
-                .forEach(act -> act.key.node.discover(act, config));
+                .forEach(act -> act.node.discover(act, config));
 
         doc.propagate();
 

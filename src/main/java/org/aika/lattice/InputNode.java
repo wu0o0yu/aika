@@ -25,8 +25,8 @@ import org.aika.neuron.activation.Activation;
 import org.aika.neuron.activation.Selector;
 import org.aika.training.PatternDiscovery.Config;
 import org.aika.neuron.activation.Range;
-import org.aika.neuron.activation.Range.Mapping;
 import org.aika.lattice.AndNode.Refinement;
+import org.aika.lattice.AndNode.RefValue;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -101,13 +101,23 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
     }
 
 
-    @Override
-    Collection<Refinement> collectNodeAndRefinements(Refinement newRef) {
-        List<Refinement> result = new ArrayList<>(2);
-        result.add(new Refinement(new Relation[]{newRef.relations[0].invert()}, provider));
-        result.add(newRef);
-        return result;
+    public RefValue extend(int threadId, Document doc, Refinement ref, Config config) {
+        RefValue rv = getAndChild(ref);
+        if(rv != null) {
+            return rv;
+        }
+
+        SortedMap<Refinement, RefValue> parents = new TreeMap<>();
+
+        Refinement mirrorRef = new Refinement(new Relation[]{ref.relations[0].invert()}, provider);
+        parents.put(mirrorRef, new RefValue(new Integer[] {1}, 0, ref.input));
+
+        rv = new RefValue(new Integer[] {0}, 1, provider);
+        parents.put(ref, rv);
+
+        return AndNode.createAndNode(provider.model, doc, config, parents, level + 1) ? rv : null;
     }
+
 
     /**
      * @param act
@@ -118,10 +128,10 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         try {
             lock.acquireReadLock();
             if (andChildren != null) {
-                andChildren.forEach((ref, cn) -> {
+                andChildren.forEach((ref, rv) -> {
                     InputNode in = ref.input.getIfNotSuspended();
                     if (in != null) {
-                        addNextLevelActivations(in, ref, cn, act);
+                        addNextLevelActivations(in, ref, rv.child, act);
                     }
                 });
             }
@@ -178,21 +188,19 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
         Document doc = act.doc;
         doc.getFinalActivations().forEach(secondNAct -> {
             for (NodeActivation secondAct : secondNAct.outputs.values()) {
-                Refinement ref = new Refinement(secondAct.key.rid, act.key.rid, (Provider<InputNode>) secondAct.key.node.provider);
-                InputNode in = ref.input.get(doc);
-                Range.Relation rm = Range.Relation.createQuery(key.rangeMatch, in.key.rangeOutput, key.rangeOutput, in.key.rangeMatch);
+                if(act != secondAct) {
+                    Refinement ref = config.refinementFactory.create(act, secondAct);
+                    if (ref != null) {
+                        InputNode in = ref.input.get(doc);
 
-                if (act != secondAct &&
-                        this != in &&
-                        in.visitedDiscover != v &&
-                        !in.key.isRecurrent &&
-                        rm.compare(secondAct.key.range, act.key.range)
-                        ) {
-                    in.visitedDiscover = v;
-                    AndNode nln = AndNode.createNextLevelNode(doc.model, doc.threadId, doc, this, ref, config);
+                        if (in.visitedDiscover != v) {
+                            in.visitedDiscover = v;
+                            AndNode nln = extend(doc.threadId, doc, ref, config).child.get();
 
-                    if (nln != null) {
-                        nln.isDiscovered = true;
+                            if (nln != null) {
+                                nln.isDiscovered = true;
+                            }
+                        }
                     }
                 }
             }
@@ -201,21 +209,9 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
 
     @Override
-    boolean contains(Refinement ref) {
-        return this == ref.input.get() && Utils.compareInteger(key.relativeRid, ref.rid) == 0;
-    }
-
-
-    @Override
     public void cleanup() {
     }
 
-
-    @Override
-    public void remove() {
-        inputNeuron.get().outputNodes.remove(key);
-        super.remove();
-    }
 
 
     public String logicToString() {

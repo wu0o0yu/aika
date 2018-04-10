@@ -18,15 +18,13 @@ package org.aika.lattice;
 
 
 import org.aika.*;
-import org.aika.lattice.NodeActivation.Key;
 import org.aika.Document;
 import org.aika.neuron.Neuron;
+import org.aika.neuron.Relation;
 import org.aika.neuron.activation.Selector;
 import org.aika.training.PatternDiscovery.Config;
 import org.aika.neuron.activation.Range;
-import org.aika.lattice.AndNode.Refinement;
 import org.aika.neuron.activation.Activation;
-import org.aika.neuron.INeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +60,14 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
+    public AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref, Config config) {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
     public Activation createActivation(Document doc) {
-        return new Activation(doc.activationIdCounter++, doc);
+        return new Activation(doc.activationIdCounter++, doc, this);
     }
 
 
@@ -101,11 +105,7 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    Activation processActivation(Document doc, Key<OrNode> ak, Collection<NodeActivation> inputActs) {
-        if (log.isDebugEnabled()) {
-            log.debug("add: " + ak + " - " + ak.node);
-        }
-
+    Activation processActivation(Document doc, Collection<NodeActivation> inputActs) {
         Activation act = Selector.get(doc,  neuron.get(), ak);
         if (act == null) {
             act = createActivation(doc, ak);
@@ -120,12 +120,6 @@ public class OrNode extends Node<OrNode, Activation> {
         neuron.get(doc).register(act);
 
         return act;
-    }
-
-
-    @Override
-    public double computeSynapseWeightSum(Integer offset, INeuron n) {
-        throw new UnsupportedOperationException();
     }
 
 
@@ -150,7 +144,7 @@ public class OrNode extends Node<OrNode, Activation> {
         try {
             parentNode.lock.acquireReadLock();
             if (parentNode.orChildren != null) {
-                for (OrEntry oe : parentNode.orChildren) {
+                for (Refinement oe : parentNode.orChildren) {
                     oe.node.get(doc).addActivation(doc, oe.ridOffset, inputAct);
                 }
             }
@@ -171,19 +165,13 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    Set<Refinement> collectNodeAndRefinements(Refinement newRef) {
-        throw new UnsupportedOperationException();
-    }
-
-
-    @Override
     public void reprocessInputs(Document doc) {
         for(TreeSet<Provider<Node>> ppSet: parents.values()) {
             for(Provider<Node> pp: ppSet) {
                 Node<?, NodeActivation<?>> pn = pp.get();
                 for (NodeActivation act : pn.getActivations(doc)) {
                     act.repropagateV = markedCreated;
-                    act.key.node.propagate(act);
+                    act.node.propagate(act);
                 }
             }
         }
@@ -193,7 +181,7 @@ public class OrNode extends Node<OrNode, Activation> {
     public void addInput(Integer ridOffset, int threadId, Node in, boolean all) {
         in.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), 1);
         in.lock.acquireWriteLock();
-        in.addOrChild(new OrEntry(ridOffset, provider), all);
+        in.addOrChild(new Refinement(ridOffset, provider), all);
         in.setModified();
         in.lock.releaseWriteLock();
 
@@ -214,7 +202,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
     public void removeInput(Integer ridOffset, int threadId, Node in, boolean all) {
         in.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), -1);
-        in.removeOrChild(new OrEntry(ridOffset, provider), all);
+        in.removeOrChild(new Refinement(ridOffset, provider), all);
         in.setModified();
         lock.acquireWriteLock();
         setModified();
@@ -252,17 +240,11 @@ public class OrNode extends Node<OrNode, Activation> {
             for(Provider<Node> p: me.getValue()) {
                 Node pn = p.get();
                 pn.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), -1);
-                pn.removeOrChild(new OrEntry(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, provider), all);
+                pn.removeOrChild(new Refinement(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, provider), all);
                 pn.setModified();
             }
         }
         (all ? allParents : parents).clear();
-    }
-
-
-    @Override
-    boolean contains(Refinement ref) {
-        throw new UnsupportedOperationException();
     }
 
 
@@ -345,25 +327,29 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    static class OrEntry implements Comparable<OrEntry>, Writable {
-        public Integer ridOffset;
+    static class Refinement implements Comparable<Refinement>, Writable {
+        public Integer[] offsets;
         public Provider<OrNode> node;
 
 
-        private OrEntry() {}
+        private Refinement() {}
 
 
-        public OrEntry(Integer ridOffset, Provider<OrNode> node) {
-            this.ridOffset = ridOffset;
+        public Refinement(Integer[] offsets, Provider<OrNode> node) {
+            this.offsets = offsets;
             this.node = node;
         }
 
 
         @Override
         public void write(DataOutput out) throws IOException {
-            out.writeBoolean(ridOffset != null);
-            if(ridOffset != null) {
-                out.writeInt(ridOffset);
+            out.writeInt(offsets.length);
+            for(int i = 0; i < offsets.length; i++) {
+                Integer ofs = offsets[i];
+                out.writeBoolean(ofs != null);
+                if(ofs != null) {
+                    out.writeInt(ofs);
+                }
             }
             out.writeInt(node.id);
         }
@@ -371,24 +357,34 @@ public class OrNode extends Node<OrNode, Activation> {
 
         @Override
         public void readFields(DataInput in, Model m) throws IOException {
-            if(in.readBoolean()) {
-                ridOffset = in.readInt();
+            int l = in.readInt();
+            offsets = new Integer[l];
+            for(int i = 0; i < l; i++) {
+                if(in.readBoolean()) {
+                    offsets[i] = in.readInt();
+                }
             }
+
             node = m.lookupNodeProvider(in.readInt());
         }
 
 
-        public static OrEntry read(DataInput in, Model m) throws IOException {
-            OrEntry n = new OrEntry();
+        public static Refinement read(DataInput in, Model m) throws IOException {
+            Refinement n = new Refinement();
             n.readFields(in, m);
             return n;
         }
 
 
         @Override
-        public int compareTo(OrEntry on) {
-            int r = Utils.compareInteger(ridOffset, on.ridOffset);
+        public int compareTo(Refinement on) {
+            int r = Integer.compare(offsets.length, on.offsets.length);
             if(r != 0) return r;
+
+            for(int i = 0; i < offsets.length; i++) {
+                r = Utils.compareInteger(offsets[i], on.offsets[i]);
+                if(r != 0) return r;
+            }
             return node.compareTo(on.node);
         }
     }
