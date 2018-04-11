@@ -264,7 +264,9 @@ public class Model {
         synchronized (activeProviders) {
             activeProviders.remove(p.id);
         }
-        providers.remove(p.id);
+        synchronized (providers) {
+            providers.remove(p.id);
+        }
     }
 
 
