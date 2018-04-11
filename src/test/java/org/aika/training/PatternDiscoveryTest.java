@@ -69,9 +69,11 @@ public class PatternDiscoveryTest {
 
 
     public void resetFrequency(Model m) {
-        for (Provider<? extends AbstractNode> p : m.activeProviders.values()) {
-            if (p != null && p.get() instanceof Node) {
-                ((NodeStatistic) ((Node) p.get()).statistic).frequency = 0;
+        synchronized (m.activeProviders) {
+            for (Provider<? extends AbstractNode> p : m.activeProviders.values()) {
+                if (p != null && p.get() instanceof Node) {
+                    ((NodeStatistic) ((Node) p.get()).statistic).frequency = 0;
+                }
             }
         }
     }
