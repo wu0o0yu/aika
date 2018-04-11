@@ -25,7 +25,7 @@ import org.aika.lattice.AndNode.Refinement;
 import java.util.*;
 
 
-public class NodeActivation<T extends Node> implements Comparable<NodeActivation> {
+public class NodeActivation<T extends Node> {
 
     public final int id;
 
@@ -47,26 +47,10 @@ public class NodeActivation<T extends Node> implements Comparable<NodeActivation
     }
 
 
-
-    public void link(Collection<NodeActivation> inputActs) {
-        for(NodeActivation iAct: inputActs) {
-            inputs.put(iAct.key, iAct);
-            iAct.outputs.put(key, this);
+    public void link(Map<Refinement, NodeActivation> inputActs) {
+        for(Map.Entry<Refinement, NodeActivation> me: inputActs.entrySet()) {
+            inputs.put(me.getKey(), me.getValue());
+            me.getValue().outputs.put(me.getKey(), this);
         }
-    }
-
-
-
-    @Override
-    public int compareTo(NodeActivation act) {
-        return key.compareTo(act.key);
-    }
-
-
-    public static int compare(NodeActivation a, NodeActivation b) {
-        if(a == b) return 0;
-        if(a == null && b != null) return -1;
-        if(a != null && b == null) return 1;
-        return a.compareTo(b);
     }
 }

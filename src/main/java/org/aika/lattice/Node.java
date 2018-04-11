@@ -380,7 +380,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             out.writeInt(andChildren.size());
             for (Map.Entry<AndNode.Refinement, RefValue> me : andChildren.entrySet()) {
                 me.getKey().write(out);
-                out.writeInt(me.getValue().id);
+                me.getValue().write(out);
             }
         } else {
             out.writeInt(0);
@@ -412,7 +412,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         int s = in.readInt();
         for (int i = 0; i < s; i++) {
-            addAndChild(AndNode.Refinement.read(in, m), m.lookupNodeProvider(in.readInt()));
+            addAndChild(AndNode.Refinement.read(in, m), AndNode.RefValue.read(in, m));
         }
 
         s = in.readInt();

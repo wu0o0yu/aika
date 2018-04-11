@@ -96,12 +96,19 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             for (Map.Entry<Refinement, NodeActivation<?>> fme : act.inputs.entrySet()) {
                 Refinement ref = fme.getKey();
                 NodeActivation<?> pAct = fme.getValue();
+                RefValue rv = <- ref;
 
                 for (Map.Entry<Refinement, NodeActivation<?>> sme : pAct.outputs.entrySet()) {
                     Refinement secondRef = sme.getKey();
                     NodeActivation secondAct = sme.getValue();
                     if (act != secondAct) {
-                        Refinement nRef = new Refinement(secondRef.rel, ref.getOffset(), secondRef.input);
+                        Relation[] relations = new Relation[secondRef.relations.length + 1];
+                        for(int i = 0; i < secondRef.relations.length; i++) {
+                            relations[rv.offsets[i]] = secondRef.relations[i];
+                        }
+
+
+                        Refinement nRef = new Refinement(relations, secondRef.input);
 
                         RefValue nlp = getAndChild(nRef);
                         if (nlp != null) {
@@ -227,14 +234,8 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         AndNode nlp = pnlp.get(doc);
         if(act.repropagateV != null && act.repropagateV != nlp.markedCreated) return;
 
-        Key ak = act.key;
-        Node.addActivation(
+        nlp.addActivation(
                 doc,
-                new Key(
-                        nlp,
-                        Range.mergeRange(ak.range, secondAct.key.range),
-                        Utils.nullSafeMin(ak.rid, secondAct.key.rid)
-                ),
                 prepareInputActs(act, secondAct)
         );
     }
@@ -336,8 +337,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
      *
      */
     public static class Refinement implements Comparable<Refinement>, Writable {
-        public static Refinement MIN = new Refinement(null, null);
-        public static Refinement MAX = new Refinement(null, null);
 
         public Relation[] relations;
         public Provider<InputNode> input;
@@ -400,9 +399,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
         @Override
         public int compareTo(Refinement ref) {
-            if(this == MIN || ref == MAX) return -1;
-            if(this == MAX || ref == MIN) return 1;
-
             int r = input.compareTo(ref.input);
             if(r != 0) return r;
 
