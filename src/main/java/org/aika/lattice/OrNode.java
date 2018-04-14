@@ -60,7 +60,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref, Config config) {
+    public AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref) {
         throw new UnsupportedOperationException();
     }
 
@@ -135,7 +135,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public void discover(NodeActivation act, Config config) {
+    public void discover(Activation act, Config config) {
     }
 
 
@@ -387,5 +387,29 @@ public class OrNode extends Node<OrNode, Activation> {
             }
             return node.compareTo(on.node);
         }
+    }
+
+
+    public static class RefValue {
+
+    }
+
+
+    public static class OrActivation extends NodeActivation<OrNode> {
+
+        public Map<Integer, Link> inputs = new TreeMap<>();
+
+        public OrActivation(int id, Document doc, OrNode node) {
+            super(id, doc, node);
+        }
+    }
+
+
+    public static class Link {
+        Refinement ref;
+        RefValue rv;
+
+        NodeActivation<?> input;
+        Activation output;
     }
 }

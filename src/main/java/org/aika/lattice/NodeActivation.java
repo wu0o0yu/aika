@@ -36,21 +36,14 @@ public class NodeActivation<T extends Node> {
     public long visited = -1;
     public Long repropagateV;
 
-    public TreeMap<Refinement, NodeActivation<?>> inputs = new TreeMap<>();
-    public TreeMap<Refinement, NodeActivation<?>> outputs = new TreeMap<>();
+    public TreeMap<Integer, AndNode.Link> outputsToAndNode = new TreeMap<>();
+    public TreeMap<Integer, OrNode.Link> outputsToOrNode = new TreeMap<>();
+    public InputNode.Link outputToInputNode;
 
 
     public NodeActivation(int id, Document doc, T node) {
         this.id = id;
         this.doc = doc;
         this.node = node;
-    }
-
-
-    public void link(Map<Refinement, NodeActivation> inputActs) {
-        for(Map.Entry<Refinement, NodeActivation> me: inputActs.entrySet()) {
-            inputs.put(me.getKey(), me.getValue());
-            me.getValue().outputs.put(me.getKey(), this);
-        }
     }
 }

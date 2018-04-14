@@ -21,6 +21,7 @@ import org.aika.*;
 import org.aika.neuron.Relation;
 import org.aika.neuron.activation.Range;
 import org.aika.training.PatternDiscovery.Config;
+import org.aika.lattice.AndNode.AndActivation;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -37,7 +38,7 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
+public class AndNode extends Node<AndNode, AndActivation> {
 
 
     public SortedMap<Refinement, RefValue> parents = new TreeMap<>();
@@ -64,16 +65,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    NodeActivation<AndNode> processActivation(Document doc, Collection<NodeActivation> inputActs) {
-        if(inputActs.size() != level) { // TODO
-            return null;
-        }
-
-        return super.processActivation(doc, inputActs);
-    }
-
-
-    public void propagate(NodeActivation act) {
+    public void propagate(AndActivation act) {
         apply(act);
     }
 
@@ -91,29 +83,32 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
     @Override
-    void apply(NodeActivation<AndNode> act) {
+    void apply(AndActivation act) {
         if (andChildren != null) {
-            for (Map.Entry<Refinement, NodeActivation<?>> fme : act.inputs.entrySet()) {
-                Refinement ref = fme.getKey();
-                NodeActivation<?> pAct = fme.getValue();
-                RefValue rv = <- ref;
+            for (Link fl : act.inputs.values()) {
+                Refinement ref = fl.ref;
+                RefValue rv = fl.rv;
+                NodeActivation<?> pAct = fl.input;
 
-                for (Map.Entry<Refinement, NodeActivation<?>> sme : pAct.outputs.entrySet()) {
-                    Refinement secondRef = sme.getKey();
-                    NodeActivation secondAct = sme.getValue();
+                for (Link sl : pAct.outputsToAndNode.values()) {
+                    Refinement secondRef = sl.ref;
+                    NodeActivation secondAct = sl.output;
                     if (act != secondAct) {
-                        Relation[] relations = new Relation[secondRef.relations.length + 1];
-                        for(int i = 0; i < secondRef.relations.length; i++) {
-                            relations[rv.offsets[i]] = secondRef.relations[i];
+                        Relation[] relations = new Relation[secondRef.relations.length() + 1];
+                        for(int i = 0; i < secondRef.relations.length(); i++) {
+                            relations[rv.offsets[i]] = secondRef.relations.get(i);
                         }
 
+                        lock.acquireReadLock();
+                        for(Map.Entry<Refinement, RefValue> me: andChildren.subMap(
+                                new Refinement(RelationsMap.MIN, secondRef.input),
+                                new Refinement(RelationsMap.MAX, secondRef.input)).entrySet()) {
+                            Refinement nRef = me.getKey();
+                            RefValue nRv = me.getValue();
 
-                        Refinement nRef = new Refinement(relations, secondRef.input);
-
-                        RefValue nlp = getAndChild(nRef);
-                        if (nlp != null) {
-                            addNextLevelActivation(act, secondAct, nlp.child);
+                            addNextLevelActivation(act, secondAct, nRv.child);
                         }
+                        lock.releaseReadLock();
                     }
                 }
             }
@@ -123,11 +118,25 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    @Override
-    public void discover(NodeActivation<AndNode> act, Config config) {
+    private static void addNextLevelActivation(NodeActivation<AndNode> act, NodeActivation<AndNode> secondAct, Provider<AndNode> pnlp) {
+        // TODO: check if the activation already exists
         Document doc = act.doc;
-        for(NodeActivation<?> pAct : act.inputs.values()) {
-            for (NodeActivation<?> secondAct : pAct.outputs.values()) {
+        AndNode nlp = pnlp.get(doc);
+        if(act.repropagateV != null && act.repropagateV != nlp.markedCreated) return;
+
+        nlp.addActivation(
+                doc,
+                prepareInputActs(act, secondAct)
+        );
+    }
+
+
+    @Override
+    public void discover(AndActivation act, Config config) {
+        Document doc = act.doc;
+        for(Link fl : act.inputs.values()) {
+            for (Link sl : fl.input.outputsToAndNode.values()) {
+                AndActivation secondAct = sl.output;
                 if (secondAct.node instanceof AndNode) {
                     if (act != secondAct) {
                         Refinement nRef = config.refinementFactory.create(act, secondAct);
@@ -228,19 +237,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
     }
 
 
-    public static void addNextLevelActivation(NodeActivation<AndNode> act, NodeActivation<AndNode> secondAct, Provider<AndNode> pnlp) {
-        // TODO: check if the activation already exists
-        Document doc = act.doc;
-        AndNode nlp = pnlp.get(doc);
-        if(act.repropagateV != null && act.repropagateV != nlp.markedCreated) return;
-
-        nlp.addActivation(
-                doc,
-                prepareInputActs(act, secondAct)
-        );
-    }
-
-
     @Override
     public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
         super.changeNumberOfNeuronRefs(threadId, v, d);
@@ -266,13 +262,6 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                 act.node.propagate(act);
             }
         }
-    }
-
-
-
-    @Override
-    protected NodeActivation<AndNode> createActivation(Document doc) {
-        return new NodeActivation<>(doc.activationIdCounter++, doc, this);
     }
 
 
@@ -338,13 +327,13 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
      */
     public static class Refinement implements Comparable<Refinement>, Writable {
 
-        public Relation[] relations;
+        public RelationsMap relations;
         public Provider<InputNode> input;
 
         private Refinement() {}
 
 
-        public Refinement(Relation[] relations, Provider<InputNode> input) {
+        public Refinement(RelationsMap relations, Provider<InputNode> input) {
             this.relations = relations;
             this.input = input;
         }
@@ -353,12 +342,7 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("(");
-            for(int i = 0; i < relations.length; i++) {
-                Relation rel = relations[i];
-                if(rel != null) {
-                    sb.append(i + ":" + rel + ", ");
-                }
-            }
+            sb.append(relations);
             sb.append(input.get().logicToString());
             sb.append(")");
             return sb.toString();
@@ -366,26 +350,14 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
 
 
         public void write(DataOutput out) throws IOException {
-            out.writeInt(relations.length);
-            for(int i = 0; i < relations.length; i++) {
-                Relation rel = relations[i];
-                out.writeBoolean(rel != null);
-                if(rel != null) {
-                    rel.write(out);
-                }
-            }
+            relations.write(out);
             out.writeInt(input.id);
         }
 
 
         public void readFields(DataInput in, Model m) throws IOException {
             int l = in.readInt();
-            relations = new Relation[l];
-            for(int i = 0; i < l; i++) {
-                if(in.readBoolean()) {
-                    relations[i] = Relation.read(in, m);
-                }
-            }
+            relations = RelationsMap.read(in, m);
             input = m.lookupNodeProvider(in.readInt());
         }
 
@@ -402,12 +374,77 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
             int r = input.compareTo(ref.input);
             if(r != 0) return r;
 
-            r = Integer.compare(relations.length, ref.relations.length);
+            return relations.compareTo(ref.relations);
+        }
+    }
+
+
+    public static class RelationsMap implements Comparable<RelationsMap>, Writable {
+
+        public static final RelationsMap MIN = new RelationsMap();
+        public static final RelationsMap MAX = new RelationsMap();
+
+        public Relation[] relations;
+
+
+        public RelationsMap() {}
+
+
+        public RelationsMap(Relation[] relations) {
+            this.relations = relations;
+        }
+
+
+        public void write(DataOutput out) throws IOException {
+            out.writeInt(relations.length);
+            for(int i = 0; i < relations.length; i++) {
+                Relation rel = relations[i];
+                out.writeBoolean(rel != null);
+                if(rel != null) {
+                    rel.write(out);
+                }
+            }
+        }
+
+
+        public void readFields(DataInput in, Model m) throws IOException {
+            int l = in.readInt();
+            relations = new Relation[l];
+            for(int i = 0; i < l; i++) {
+                if(in.readBoolean()) {
+                    relations[i] = Relation.read(in, m);
+                }
+            }
+        }
+
+
+        public static RelationsMap read(DataInput in, Model m) throws IOException {
+            RelationsMap k = new RelationsMap();
+            k.readFields(in, m);
+            return k;
+        }
+
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < relations.length; i++) {
+                Relation rel = relations[i];
+                if(rel != null) {
+                    sb.append(i + ":" + rel + ", ");
+                }
+            }
+            return sb.toString();
+        }
+
+
+        @Override
+        public int compareTo(RelationsMap rm) {
+            int r = Integer.compare(relations.length, rm.relations.length);
             if(r != 0) return r;
 
             for(int i = 0; i < relations.length; i++) {
                 Relation ra = relations[i];
-                Relation rb = ref.relations[i];
+                Relation rb = rm.relations[i];
 
                 if(ra == null && rb != null) return -1;
                 if(ra != null && rb == null) return 1;
@@ -416,6 +453,14 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
                 if(r != 0) return r;
             }
             return 0;
+        }
+
+        public int length() {
+            return relations.length;
+        }
+
+        public Relation get(int i) {
+            return relations[i];
         }
     }
 
@@ -477,4 +522,33 @@ public class AndNode extends Node<AndNode, NodeActivation<AndNode>> {
         }
     }
 
+
+    public static class AndActivation extends NodeActivation<AndNode> {
+
+        public Map<Integer, Link> inputs = new TreeMap<>();
+
+        public AndActivation(int id, Document doc, AndNode node) {
+            super(id, doc, node);
+        }
+
+        public void link(Refinement ref, RefValue rv, NodeActivation<?> input) {
+            inputs.put(input.id, new Link(ref, rv, input, this));
+        }
+    }
+
+
+    public static class Link {
+        Refinement ref;
+        RefValue rv;
+
+        NodeActivation<?> input;
+        AndActivation output;
+
+        public Link(Refinement ref, RefValue rv, NodeActivation<?> input, AndActivation output) {
+            this.ref = ref;
+            this.rv = rv;
+            this.input = input;
+            this.output = output;
+        }
+    }
 }

@@ -5,6 +5,7 @@ import org.aika.Utils;
 import org.aika.lattice.Node;
 import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
+import org.aika.lattice.OrNode.OrActivation;
 import org.aika.neuron.*;
 import org.aika.neuron.activation.Linker.Direction;
 import org.aika.neuron.activation.SearchNode.Weight;
@@ -37,7 +38,7 @@ import static org.aika.neuron.INeuron.ALLOW_WEAK_NEGATIVE_WEIGHTS;
  *
  * @author Lukas Molzberger
  */
-public final class Activation extends NodeActivation<OrNode> {
+public final class Activation extends OrActivation {
     public static final Comparator<Activation> ACTIVATION_ID_COMP = Comparator.comparingInt(act -> act.id);
     public static int MAX_SELF_REFERENCING_DEPTH = 5;
 

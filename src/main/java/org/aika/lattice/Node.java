@@ -81,7 +81,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public static class ThreadState<T extends Node, A extends NodeActivation> {
         public long lastUsed;
 
-        public List<Collection<NodeActivation<?>>> added;
+        public List<A> added;
         public List<A> activations;
 
         public long visited;
@@ -111,11 +111,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public abstract RefValue extend(int threadId, Document doc, AndNode.Refinement ref);
 
-    abstract A createActivation(Document doc);
-
     abstract void apply(A act);
 
-    public abstract void discover(NodeActivation<T> act, Config config);
+    public abstract void discover(A act, Config config);
 
     public abstract void reprocessInputs(Document doc);
 
@@ -207,16 +205,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    A processActivation(Document doc, Collection<NodeActivation> inputActs) {
-
-        A act = createActivation(doc);
-
+    A processActivation(A act) {
         register(act);
-
-        act.link(inputActs);
-
         propagate(act);
-
         return act;
     }
 
@@ -225,9 +216,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         Document doc = act.doc;
 
         ThreadState th = act.node.getThreadState(doc.threadId, true);
-        if (th.activations.isEmpty()) {
-            doc.activatedNodes.add(act.node);
-        }
         th.activations.add(act);
 
         doc.addedNodeActivations.add(act);
@@ -241,11 +229,11 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      */
     public void processChanges(Document doc) {
         ThreadState th = getThreadState(doc.threadId, true);
-        List<Collection<NodeActivation>> tmpAdded = th.added;
+        List<A> tmpAdded = th.added;
 
         th.added = new ArrayList<>();
 
-        tmpAdded.forEach(iActs -> processActivation(doc, iActs));
+        tmpAdded.forEach(act -> processActivation(act));
     }
 
 
@@ -255,21 +243,17 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * queue in the document. The activation will be added when the method {@code Node.processChanges(Document doc)}
      * is called.
      *
-     * @param doc
-
-     * @param inputActs
+     * @param act
      */
-    public void addActivation(Document doc, Collection<NodeActivation<?>> inputActs) {
-        ThreadState<T, A> th = getThreadState(doc.threadId, true);
-        th.added.add(inputActs);
-        doc.queue.add(this);
+    public void addActivation(A act) {
+        ThreadState<T, A> th = getThreadState(act.doc.threadId, true);
+        th.added.add(act);
+        act.doc.queue.add(this);
     }
 
 
     public void remove() {
         assert !isRemoved;
-
-        clearActivations();
 
         lock.acquireWriteLock();
         setModified();
@@ -283,14 +267,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         lock.releaseWriteLock();
 
         isRemoved = true;
-    }
-
-
-    RefValue getAndChild(AndNode.Refinement ref) {
-        lock.acquireReadLock();
-        RefValue result = andChildren != null ? andChildren.get(ref) : null;
-        lock.releaseReadLock();
-        return result;
     }
 
 
@@ -313,26 +289,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         return th.activations;
     }
 
-
-    public void clearActivations(Document doc) {
-        clearActivations(doc.threadId);
-    }
-
-
-    public void clearActivations(int threadId) {
-        ThreadState th = getThreadState(threadId, false);
-        if (th == null) return;
-        th.activations.clear();
-
-        th.added.clear();
-    }
-
-
-    public void clearActivations() {
-        for (int i = 0; i < provider.model.numberOfThreads; i++) {
-            clearActivations(i);
-        }
-    }
 
 
     public String getNeuronLabel() {
