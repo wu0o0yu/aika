@@ -20,8 +20,7 @@ package org.aika.lattice;
 import org.aika.*;
 import org.aika.Document;
 import org.aika.neuron.Neuron;
-import org.aika.neuron.Relation;
-import org.aika.neuron.activation.Selector;
+import org.aika.neuron.Synapse;
 import org.aika.training.PatternDiscovery.Config;
 import org.aika.neuron.activation.Range;
 import org.aika.neuron.activation.Activation;
@@ -45,9 +44,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
     private static final Logger log = LoggerFactory.getLogger(OrNode.class);
 
-    // Hack: Integer.MIN_VALUE represents the null key
-    public TreeMap<Integer, TreeSet<Provider<Node>>> parents = new TreeMap<>();
-    public TreeMap<Integer, TreeSet<Provider<Node>>> allParents = new TreeMap<>();
+    public TreeSet<OrEntry> parents = new TreeSet<>();
 
     public Neuron neuron = null;
 
@@ -65,38 +62,37 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    @Override
-    public Activation createActivation(Document doc) {
-        return new Activation(doc.activationIdCounter++, doc, this);
-    }
+    public void addInputActivation(OrEntry oe, NodeActivation inputAct) {
+        Document doc = inputAct.doc;
 
+        int begin = Integer.MIN_VALUE;
+        int end = Integer.MAX_VALUE;
 
-    public void addActivation(Document doc, Integer ridOffset, NodeActivation inputAct) {
-        Key ak = inputAct.key;
-        Range r = ak.range;
-        Integer rid = Utils.nullSafeSub(ak.rid, true, ridOffset, false);
+        for(int i = 0; i < oe.synapseIds.length; i++) {
+            int synapseId = oe.synapseIds[i];
+
+            Synapse s = neuron.getSynapseById(synapseId);
+            s.rangeOutput.begin
+        }
+
+        Range r = new Range(begin, end);
 
         if(neuron.get(doc).outputText != null) {
-            int begin = r.begin != Integer.MIN_VALUE ? r.begin : 0;
-            int end = r.end != Integer.MAX_VALUE ? r.end : begin + neuron.get(doc).outputText.length();
+            begin = r.begin != Integer.MIN_VALUE ? r.begin : 0;
+            end = r.end != Integer.MAX_VALUE ? r.end : begin + neuron.get(doc).outputText.length();
             r = new Range(begin, end);
         }
 
         if(r.begin == Integer.MIN_VALUE || r.end == Integer.MAX_VALUE) return;
 
-        Activation no = lookupOrOption(doc, r, true);
+        Activation act = neuron.get(doc).getThreadState(doc.threadId, true).activations.get(r);
 
-        if(no == null) {
-            addActivation(
-                    doc,
-                    new Key(
-                            this,
-                            r,
-                            rid
-                    ),
-                    Collections.singleton(inputAct)
-            );
+        if(act == null) {
+            act = new Activation(doc.activationIdCounter++, doc, this);
+            addActivation(act);
         }
+
+        act.link(, inputAct);
     }
 
 
@@ -105,21 +101,9 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    Activation processActivation(Document doc, Collection<NodeActivation> inputActs) {
-        Activation act = Selector.get(doc,  neuron.get(), ak);
-        if (act == null) {
-            act = createActivation(doc, ak);
-
-            register(act);
-
-            propagate(act);
-        }
-
-        act.link(inputActs);
-
-        neuron.get(doc).register(act);
-
-        return act;
+    void processActivation(Activation act) {
+        super.processActivation(act);
+        neuron.get(act.doc).register(act);
     }
 
 
@@ -131,11 +115,13 @@ public class OrNode extends Node<OrNode, Activation> {
 
     @Override
     public void apply(Activation act) {
+        throw new UnsupportedOperationException();
     }
 
 
     @Override
     public void discover(Activation act, Config config) {
+        throw new UnsupportedOperationException();
     }
 
 
@@ -144,8 +130,8 @@ public class OrNode extends Node<OrNode, Activation> {
         try {
             parentNode.lock.acquireReadLock();
             if (parentNode.orChildren != null) {
-                for (Refinement oe : parentNode.orChildren) {
-                    oe.node.get(doc).addActivation(doc, oe.ridOffset, inputAct);
+                for (OrEntry oe : parentNode.orChildren) {
+                    oe.child.get(doc).addInputActivation(oe, inputAct);
                 }
             }
         } finally {
@@ -154,70 +140,30 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    // TODO: RID
-    public Activation lookupOrOption(Document doc, Range r, boolean create) {
-        Activation act = Selector.select(doc, neuron.get(), null, r, Range.Relation.EQUALS)
-                .findFirst()
-                .orElse(null);
-
-        return act;
-    }
-
-
     @Override
     public void reprocessInputs(Document doc) {
-        for(TreeSet<Provider<Node>> ppSet: parents.values()) {
-            for(Provider<Node> pp: ppSet) {
-                Node<?, NodeActivation<?>> pn = pp.get();
-                for (NodeActivation act : pn.getActivations(doc)) {
-                    act.repropagateV = markedCreated;
-                    act.node.propagate(act);
-                }
+        for (OrEntry oe : parents) {
+            Node<?, NodeActivation<?>> pn = oe.parent.get();
+            for (NodeActivation act : pn.getActivations(doc)) {
+                act.repropagateV = markedCreated;
+                act.node.propagate(act);
             }
         }
     }
 
 
-    public void addInput(Integer ridOffset, int threadId, Node in, boolean all) {
+    public void addInput(int[] synapseIds, int threadId, Node in) {
         in.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), 1);
-        in.lock.acquireWriteLock();
-        in.addOrChild(new Refinement(ridOffset, provider), all);
+
+        OrEntry oe = new OrEntry(synapseIds, in.provider, provider);
+        in.addOrChild(oe);
         in.setModified();
-        in.lock.releaseWriteLock();
 
         lock.acquireWriteLock();
         setModified();
-        Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
-        TreeMap<Integer, TreeSet<Provider<Node>>> p = all ? allParents : parents;
-
-        TreeSet<Provider<Node>> pn = p.get(key);
-        if(pn == null) {
-            pn = new TreeSet();
-            p.put(key, pn);
-        }
-        pn.add(in.provider);
+        parents.add(oe);
         lock.releaseWriteLock();
     }
-
-
-    public void removeInput(Integer ridOffset, int threadId, Node in, boolean all) {
-        in.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), -1);
-        in.removeOrChild(new Refinement(ridOffset, provider), all);
-        in.setModified();
-        lock.acquireWriteLock();
-        setModified();
-        Integer key = ridOffset != null ? ridOffset : Integer.MIN_VALUE;
-        TreeMap<Integer, TreeSet<Provider<Node>>> p = all ? allParents : parents;
-        TreeSet<Provider<Node>> pn = p.get(key);
-        if(pn != null) {
-            pn.remove(in.provider);
-            if(pn.isEmpty() && ridOffset != null) {
-                p.remove(key);
-            }
-        }
-        lock.releaseWriteLock();
-    }
-
 
 
     void remove(int threadId) {
@@ -227,24 +173,21 @@ public class OrNode extends Node<OrNode, Activation> {
 
         try {
             lock.acquireReadLock();
-            removeParents(threadId, true);
-            removeParents(threadId, false);
+            removeParents(threadId);
         } finally {
             lock.releaseReadLock();
         }
     }
 
 
-    public void removeParents(int threadId, boolean all) {
-        for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: (all ? allParents : parents).entrySet()) {
-            for(Provider<Node> p: me.getValue()) {
-                Node pn = p.get();
-                pn.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), -1);
-                pn.removeOrChild(new Refinement(me.getKey() != Integer.MIN_VALUE ? me.getKey() : null, provider), all);
-                pn.setModified();
-            }
+    public void removeParents(int threadId) {
+        for (OrEntry oe : parents) {
+            Node pn = oe.parent.get();
+            pn.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), -1);
+            pn.removeOrChild(oe);
+            pn.setModified();
         }
-        (all ? allParents : parents).clear();
+        parents.clear();
     }
 
 
@@ -259,22 +202,18 @@ public class OrNode extends Node<OrNode, Activation> {
         sb.append("OR[");
         boolean first = true;
         int i = 0;
-        for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: parents.entrySet()) {
-            for (Provider<Node> pn : me.getValue()) {
-                if (!first) {
-                    sb.append(",");
-                }
-                first = false;
-                sb.append(me.getKey() != Integer.MIN_VALUE ? me.getKey() : "X");
-                sb.append(":");
-                sb.append(pn.get().logicToString());
-                if (i > 2) {
-                    sb.append(",...");
-                    break;
-                }
-
-                i++;
+        for(OrEntry oe : parents) {
+            if (!first) {
+                sb.append(",");
             }
+            first = false;
+            sb.append(oe.parent.get().logicToString());
+            if (i > 2) {
+                sb.append(",...");
+                break;
+            }
+
+            i++;
         }
 
         sb.append("]");
@@ -327,89 +266,95 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    static class Refinement implements Comparable<Refinement>, Writable {
-        public Integer[] offsets;
-        public Provider<OrNode> node;
+    public static class OrEntry implements Comparable<OrEntry>, Writable {
+        public int[] synapseIds;
+        public Provider<? extends Node> parent;
+        public Provider<OrNode> child;
 
+        private OrEntry() {}
 
-        private Refinement() {}
-
-
-        public Refinement(Integer[] offsets, Provider<OrNode> node) {
-            this.offsets = offsets;
-            this.node = node;
+        public OrEntry(int[] synapseIds, Provider<? extends Node> parent, Provider<OrNode> child) {
+            this.synapseIds = synapseIds;
+            this.parent = parent;
+            this.child = child;
         }
-
 
         @Override
         public void write(DataOutput out) throws IOException {
-            out.writeInt(offsets.length);
-            for(int i = 0; i < offsets.length; i++) {
-                Integer ofs = offsets[i];
+            out.writeInt(synapseIds.length);
+            for(int i = 0; i < synapseIds.length; i++) {
+                Integer ofs = synapseIds[i];
                 out.writeBoolean(ofs != null);
-                if(ofs != null) {
-                    out.writeInt(ofs);
-                }
+                out.writeInt(ofs);
             }
-            out.writeInt(node.id);
+            out.writeInt(parent.id);
+            out.writeInt(child.id);
         }
 
+        public static OrEntry read(DataInput in, Model m)  throws IOException {
+            OrEntry rv = new OrEntry();
+            rv.readFields(in, m);
+            return rv;
+        }
 
         @Override
         public void readFields(DataInput in, Model m) throws IOException {
             int l = in.readInt();
-            offsets = new Integer[l];
+            synapseIds = new int[l];
             for(int i = 0; i < l; i++) {
                 if(in.readBoolean()) {
-                    offsets[i] = in.readInt();
+                    Integer ofs = in.readInt();
+                    synapseIds[i] = ofs;
                 }
             }
-
-            node = m.lookupNodeProvider(in.readInt());
-        }
-
-
-        public static Refinement read(DataInput in, Model m) throws IOException {
-            Refinement n = new Refinement();
-            n.readFields(in, m);
-            return n;
+            parent = m.lookupNodeProvider(in.readInt());
+            child = m.lookupNodeProvider(in.readInt());
         }
 
 
         @Override
-        public int compareTo(Refinement on) {
-            int r = Integer.compare(offsets.length, on.offsets.length);
+        public int compareTo(OrEntry oe) {
+            int r = child.compareTo(oe.child);
             if(r != 0) return r;
 
-            for(int i = 0; i < offsets.length; i++) {
-                r = Utils.compareInteger(offsets[i], on.offsets[i]);
+            r = parent.compareTo(oe.parent);
+            if(r != 0) return r;
+
+            r = Integer.compare(synapseIds.length, oe.synapseIds.length);
+            if(r != 0) return r;
+
+            for(int i = 0; i < synapseIds.length; i++) {
+                r = Integer.compare(synapseIds[i], oe.synapseIds[i]);
                 if(r != 0) return r;
             }
-            return node.compareTo(on.node);
+            return 0;
         }
     }
 
 
-    public static class RefValue {
-
-    }
-
-
     public static class OrActivation extends NodeActivation<OrNode> {
-
         public Map<Integer, Link> inputs = new TreeMap<>();
 
         public OrActivation(int id, Document doc, OrNode node) {
             super(id, doc, node);
         }
+
+        public void link(OrEntry oe, NodeActivation<?> input) {
+            inputs.put(input.id, new Link(oe, input, this));
+        }
     }
 
 
     public static class Link {
-        Refinement ref;
-        RefValue rv;
+        OrEntry oe;
 
         NodeActivation<?> input;
-        Activation output;
+        OrActivation output;
+
+        public Link(OrEntry oe, NodeActivation<?> input, OrActivation output) {
+            this.oe = oe;
+            this.input = input;
+            this.output = output;
+        }
     }
 }

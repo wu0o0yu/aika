@@ -69,13 +69,13 @@ public class Converter {
 
         if(neuron.biasSum + neuron.posDirSum + neuron.posRecSum <= 0.0) {
             neuron.requiredSum = neuron.posDirSum + neuron.posRecSum;
-            outputNode.removeParents(threadId, false);
+            outputNode.removeParents(threadId);
             return false;
         }
 
         TreeSet<Synapse> tmp = new TreeSet<>(SYNAPSE_COMP);
         for(Synapse s: neuron.inputSynapses.values()) {
-            if(!s.isNegative() && !s.key.isRecurrent && !s.inactive) {
+            if(!s.isNegative() && !s.isRecurrent && !s.inactive) {
                 tmp.add(s);
             }
         }
@@ -113,10 +113,10 @@ public class Converter {
                 }
             }
 
-            outputNode.removeParents(threadId, false);
+            outputNode.removeParents(threadId);
 
             if (noFurtherRefinement || i == MAX_AND_NODE_SIZE) {
-                outputNode.addInput(offset, threadId, requiredNode, false);
+                outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node);
             } else {
                 for (Synapse s : tmp) {
                     boolean belowThreshold = sum + s.weight + remainingSum + neuron.posRecSum + neuron.biasSum <= 0.0;
@@ -127,9 +127,7 @@ public class Converter {
                     if (!reqSyns.contains(s)) {
                         NodeContext nln;
                         nln = expandNode(nodeContext, s);
-
-                        Integer nOffset = Utils.nullSafeMin(s.key.relativeRid, offset);
-                        outputNode.addInput(nOffset, threadId, nln, false);
+                        outputNode.addInput(nln.getSynapseIds(), threadId, nln.node);
                         remainingSum -= s.weight;
                     }
                 }
@@ -137,9 +135,7 @@ public class Converter {
         } else {
             for (Synapse s : modifiedSynapses) {
                 if (s.weight + neuron.posRecSum + neuron.biasSum > 0.0) {
-                    Node nln = s.inputNode.get();
-                    offset = s.key.relativeRid;
-                    outputNode.addInput(offset, threadId, nln, false);
+                    outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node);
                 }
             }
         }
@@ -223,8 +219,8 @@ public class Converter {
                 relations[i] = s.relations.get(linkedSynapse);
             }
 
-            AndNode.Refinement ref = new AndNode.Refinement(relations, s.input.get().outputNode);
-            AndNode.RefValue rv = nc.node.extend(threadId, doc, ref, null);
+            AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.input.get().outputNode);
+            AndNode.RefValue rv = nc.node.extend(threadId, doc, ref);
             nln.node = rv.child.get(doc);
 
             nln.offsets = new Synapse[nc.offsets.length + 1];
@@ -245,5 +241,13 @@ public class Converter {
         Node node;
 
         Synapse[] offsets;
+
+        int[] getSynapseIds() {
+            int[] result = new int[offsets.length];
+            for(int i = 0; i < result.length; i++) {
+                result[i] = offsets[i].id;
+            }
+            return result;
+        }
     }
 }

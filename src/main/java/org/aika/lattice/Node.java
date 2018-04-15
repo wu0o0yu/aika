@@ -21,7 +21,6 @@ import org.aika.*;
 import org.aika.Document;
 import org.aika.training.PatternDiscovery.Config;
 import org.aika.lattice.AndNode.RefValue;
-import org.aika.lattice.OrNode.Refinement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,9 +52,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     private static final Logger log = LoggerFactory.getLogger(Node.class);
 
-    public TreeMap<AndNode.Refinement, RefValue> andChildren;
-    public TreeSet<Refinement> orChildren;
-    public TreeSet<Refinement> allOrChildren;
+    public TreeMap<AndNode.Refinement, AndNode.RefValue> andChildren;
+    public TreeSet<OrNode.OrEntry> orChildren;
 
     public int level;
 
@@ -146,38 +144,22 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void addOrChild(Refinement oe, boolean all) {
+    void addOrChild(OrNode.OrEntry rv) {
         lock.acquireWriteLock();
-        if(all) {
-            if (allOrChildren == null) {
-                allOrChildren = new TreeSet<>();
-            }
-            allOrChildren.add(oe);
-        } else {
-            if (orChildren == null) {
-                orChildren = new TreeSet<>();
-            }
-            orChildren.add(oe);
+        if (orChildren == null) {
+            orChildren = new TreeSet<>();
         }
+        orChildren.add(rv);
         lock.releaseWriteLock();
     }
 
 
-    void removeOrChild(Refinement oe, boolean all) {
+    void removeOrChild(OrNode.OrEntry rv) {
         lock.acquireWriteLock();
-        if(all) {
-            if (allOrChildren != null) {
-                allOrChildren.remove(oe);
-                if (allOrChildren.isEmpty()) {
-                    allOrChildren = null;
-                }
-            }
-        } else {
-            if (orChildren != null) {
-                orChildren.remove(oe);
-                if (orChildren.isEmpty()) {
-                    orChildren = null;
-                }
+        if (orChildren != null) {
+            orChildren.remove(rv);
+            if (orChildren.isEmpty()) {
+                orChildren = null;
             }
         }
         lock.releaseWriteLock();
@@ -205,10 +187,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    A processActivation(A act) {
+    void processActivation(A act) {
         register(act);
         propagate(act);
-        return act;
     }
 
 
@@ -262,7 +243,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
 
         while (orChildren != null && !orChildren.isEmpty()) {
-            orChildren.pollFirst().node.get().remove();
+            orChildren.pollFirst().child.get().remove();
         }
         lock.releaseWriteLock();
 
@@ -352,7 +333,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         if (orChildren != null) {
             out.writeInt(orChildren.size());
-            for (Refinement oe : orChildren) {
+            for (OrNode.OrEntry oe : orChildren) {
                 oe.write(out);
             }
         } else {
@@ -384,7 +365,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             if (orChildren == null) {
                 orChildren = new TreeSet<>();
             }
-            orChildren.add(Refinement.read(in, m));
+            orChildren.add(OrNode.OrEntry.read(in, m));
         }
 
         threads = new ThreadState[m.numberOfThreads];
