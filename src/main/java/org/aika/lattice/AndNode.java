@@ -85,6 +85,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
     @Override
     void apply(AndActivation act) {
         if (andChildren != null) {
+            TreeMap<Refinement, AndActivation> results = null;
             for (Link fl : act.inputs.values()) {
                 Refinement ref = fl.ref;
                 RefValue rv = fl.rv;
@@ -92,6 +93,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
                 for (Link sl : pAct.outputsToAndNode.values()) {
                     Refinement secondRef = sl.ref;
+                    RefValue secondRv = sl.rv;
                     NodeActivation secondAct = sl.output;
                     if (act != secondAct) {
                         Relation[] relations = new Relation[secondRef.relations.length() + 1];
@@ -105,11 +107,35 @@ public class AndNode extends Node<AndNode, AndActivation> {
                                 new Refinement(RelationsMap.MAX, secondRef.input)).entrySet()) {
                             Refinement nRef = me.getKey();
                             RefValue nRv = me.getValue();
+                            if(nRef.contains(secondRef, rv)) {
+                                if(results == null) {
+                                    results = new TreeMap<>();
+                                }
 
-                            addNextLevelActivation(act, secondAct, nRv.child);
+                                AndActivation nln = results.get(nRef);
+                                if(nln == null) {
+                                    nln = new AndActivation(act.doc.activationIdCounter++, act.doc, nRv.child.get(act.doc));
+                                    nln.link(nRef, nRv, act);
+                                    results.put(nRef, nln);
+                                }
+
+                                for(Map.Entry<Refinement, RefValue> mea: nln.node.parents.entrySet()) {
+                                    Refinement secondNRef = mea.getKey();
+                                    RefValue secondNRv = mea.getValue();
+                                    if(secondNRv.parent.get(act.doc) == secondAct.node && secondNRef.contains(ref, secondRv)) {
+                                        nln.link(secondNRef, secondNRv, secondAct);
+                                        break;
+                                    }
+                                }
+                            }
                         }
                         lock.releaseReadLock();
                     }
+                }
+            }
+            if(results != null) {
+                for(AndActivation nlAct: results.values()) {
+                    nlAct.node.addActivation(nlAct);
                 }
             }
         }
@@ -117,18 +143,6 @@ public class AndNode extends Node<AndNode, AndActivation> {
         OrNode.processCandidate(this, act, false);
     }
 
-
-    private static void addNextLevelActivation(NodeActivation<AndNode> act, NodeActivation<AndNode> secondAct, Provider<AndNode> pnlp) {
-        // TODO: check if the activation already exists
-        Document doc = act.doc;
-        AndNode nlp = pnlp.get(doc);
-        if(act.repropagateV != null && act.repropagateV != nlp.markedCreated) return;
-
-        nlp.addActivation(
-                doc,
-                prepareInputActs(act, secondAct)
-        );
-    }
 
 
     @Override
@@ -375,6 +389,21 @@ public class AndNode extends Node<AndNode, AndActivation> {
             if(r != 0) return r;
 
             return relations.compareTo(ref.relations);
+        }
+
+        public boolean contains(Refinement ref, RefValue rv) {
+            for(int i = 0; i < ref.relations.length(); i++) {
+                Relation ra = ref.relations.get(i);
+                Relation rb = relations.get(rv.offsets[i]);
+
+                if((ra == null && rb != null) || (ra != null && rb == null)) return false;
+
+                if(ra != null && rb != null && ra.compareTo(rb) != 0) {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 
