@@ -270,6 +270,14 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
+    RefValue getAndChild(AndNode.Refinement ref) {
+        lock.acquireReadLock();
+        RefValue result = andChildren != null ? andChildren.get(ref) : null;
+        lock.releaseReadLock();
+        return result;
+    }
+
+
     public boolean isRequired() {
         return numberOfNeuronRefs.get() > 0 || isDiscovered;
     }

@@ -184,30 +184,30 @@ public class AndNode extends Node<AndNode, AndActivation> {
             RefValue pRV = me.getValue();
             Node pn = pRV.parent.get(doc);
 
-            Relation[] npRelations = new Relation[ref.relations.length - 1];
-            for(int i = 0; i < ref.relations.length; i++) {
+            Relation[] npRelations = new Relation[ref.relations.length() - 1];
+            for(int i = 0; i < ref.relations.length(); i++) {
                 Integer j = pRV.reverseOffsets[i];
                 if(j != null) {
-                    npRelations[j] = ref.relations[i];
+                    npRelations[j] = ref.relations.get(i);
                 }
             }
 
-            Refinement npRef = new Refinement(npRelations, ref.input);
+            Refinement npRef = new Refinement(new RelationsMap(npRelations), ref.input);
 
             RefValue npRV = pn.extend(threadId, doc, npRef);
 
-            Relation[] nRelations = new Relation[pRef.relations.length + 1];
-            for(int i = 0; i < pRef.relations.length; i++) {
+            Relation[] nRelations = new Relation[pRef.relations.length() + 1];
+            for(int i = 0; i < pRef.relations.length(); i++) {
                 int j = npRV.offsets[i];
-                nRelations[j] = pRef.relations[i];
+                nRelations[j] = pRef.relations.get(i);
             }
 
-            Relation rel = ref.relations[pRV.refOffset];
+            Relation rel = ref.relations.get(pRV.refOffset);
             if(rel != null) {
                 nRelations[npRV.refOffset] = rel.invert();
             }
 
-            Refinement nRef = new Refinement(nRelations, pRef.input);
+            Refinement nRef = new Refinement(new RelationsMap(nRelations), pRef.input);
 
             Integer[] nOffsets = new Integer[npRV.offsets.length + 1];
             for(int i = 0; i < pRV.reverseOffsets.length; i++) {
