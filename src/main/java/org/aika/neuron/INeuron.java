@@ -22,7 +22,6 @@ import org.aika.neuron.activation.*;
 import org.aika.neuron.activation.Activation.State;
 import org.aika.neuron.activation.SearchNode.Weight;
 import org.aika.lattice.InputNode;
-import org.aika.lattice.NodeActivation;
 import org.aika.lattice.OrNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.aika.lattice.Node.*;
 
 /**
  * The {@code INeuron} class represents a internal neuron implementation in Aikas neural network and is connected to other neurons through
@@ -462,32 +460,30 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
 
     public void register(Activation act) {
-        NodeActivation.Key<OrNode> ak = act.key;
-
         Document doc = act.doc;
-        INeuron.ThreadState th = ak.node.neuron.get().getThreadState(doc.threadId, true);
-        if(!th.activations.containsKey(ak)) {
-            if (th.activations.isEmpty()) {
-                doc.activatedNeurons.add(ak.node.neuron.get());
-            }
+        INeuron.ThreadState th = act.node.neuron.get().getThreadState(doc.threadId, true);
 
-            th.minLength = Math.min(th.minLength, ak.range.length());
-            th.maxLength = Math.max(th.maxLength, ak.range.length());
-
-            th.activations.put(ak, act);
-
-            TreeMap<ActKey, Activation> actEnd = th.activationsEnd;
-            if (actEnd != null) actEnd.put(ak, act);
-
-            if (act.range.begin != Integer.MIN_VALUE) {
-                doc.activationsByRangeBegin.put(ak, act);
-            }
-            if (act.range.end != Integer.MAX_VALUE) {
-                doc.activationsByRangeEnd.put(ak, act);
-            }
-
-            doc.addedActivations.add(act);
+        if (th.activations.isEmpty()) {
+            doc.activatedNeurons.add(act.node.neuron.get());
         }
+
+        th.minLength = Math.min(th.minLength, act.range.length());
+        th.maxLength = Math.max(th.maxLength, act.range.length());
+
+        th.activations.put(act.range, act);
+
+        TreeMap<Range, Activation> actEnd = th.activationsEnd;
+        if (actEnd != null) actEnd.put(act.range, act);
+
+        Document.ActKey ak = new Document.ActKey(act.range, act.node);
+        if (act.range.begin != Integer.MIN_VALUE) {
+            doc.activationsByRangeBegin.put(ak, act);
+        }
+        if (act.range.end != Integer.MAX_VALUE) {
+            doc.activationsByRangeEnd.put(ak, act);
+        }
+
+        doc.addedActivations.add(act);
 
         Linker.link(act);
     }
@@ -503,7 +499,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         // s.link requires an updated n.biasSumDelta value.
         modifiedSynapses.forEach(s -> s.link());
 
-        return Converter.convert(m, threadId, doc, n, modifiedSynapses);
+        return Converter.convert(threadId, doc, n, modifiedSynapses);
     }
 
 

@@ -21,7 +21,6 @@ import org.aika.*;
 import org.aika.neuron.activation.Conflicts;
 import org.aika.Document;
 import org.aika.neuron.*;
-import org.aika.lattice.OrNode.OrActivation;
 import org.aika.lattice.AndNode.AndActivation;
 import org.aika.lattice.InputNode.InputActivation;
 import org.aika.neuron.activation.Activation;
@@ -107,7 +106,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         SortedMap<Refinement, RefValue> parents = new TreeMap<>();
 
-        Refinement mirrorRef = new Refinement(new Relation[]{ref.relations[0].invert()}, provider);
+        Refinement mirrorRef = new Refinement(new AndNode.RelationsMap(new Relation[]{ref.relations.get(0).invert()}), provider);
         parents.put(mirrorRef, new RefValue(new Integer[] {1}, 0, ref.input));
 
         rv = new RefValue(new Integer[] {0}, 1, provider);
@@ -152,7 +151,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         Stream<Activation> s = Selector.select(
                 th,
                 secondNode.inputNeuron.get(doc),
-                ref.relations[0],
+                ref.relations.get(0),
                 iAct
         );
 

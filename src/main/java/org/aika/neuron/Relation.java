@@ -7,6 +7,8 @@ import org.aika.neuron.activation.Activation;
 import org.aika.neuron.activation.Range;
 
 import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 
 public abstract class Relation implements Comparable<Relation>, Writable {
@@ -17,20 +19,25 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public abstract Relation invert();
 
 
-    public static Relation read(DataInput in, Model m) {
-        return null;
+    public static Relation read(DataInput in, Model m) throws IOException {
+        if(in.readBoolean()) {
+            return InstanceRelation.read(in, m);
+        } else {
+            return RangeRelation.read(in, m);
+        }
     }
 
 
     public static class InstanceRelation extends Relation {
         public Type type;
 
-
         public enum Type  {
             COMMON_ANCESTOR,
             CONTAINS,
             CONTAINED_IN
         }
+
+        InstanceRelation() {}
 
         public InstanceRelation(Type type) {
             this.type = type;
@@ -116,6 +123,23 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
 
+
+        @Override
+        public void write(DataOutput out) throws IOException {
+            out.writeBoolean(true);
+        }
+
+        @Override
+        public void readFields(DataInput in, Model m) throws IOException {
+
+        }
+
+        public static InstanceRelation read(DataInput in, Model m) throws IOException {
+            InstanceRelation ir = new InstanceRelation();
+            ir.readFields(in, m);
+            return ir;
+        }
+
         @Override
         public int compareTo(Relation rel) {
             if(rel instanceof RangeRelation) return 1;
@@ -128,6 +152,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public static class RangeRelation extends Relation {
         Range.Relation relation;
+
+        RangeRelation() {}
 
         public RangeRelation(Range.Relation relation) {
             this.relation = relation;
@@ -152,6 +178,22 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
             return relation.compareTo(rr.relation);
         }
-    }
 
+        @Override
+        public void write(DataOutput out) throws IOException {
+            out.writeBoolean(false);
+            relation.write(out);
+        }
+
+        @Override
+        public void readFields(DataInput in, Model m) throws IOException {
+            relation = Range.Relation.read(in, m);
+        }
+
+        public static RangeRelation read(DataInput in, Model m) throws IOException {
+            RangeRelation rr = new RangeRelation();
+            rr.readFields(in, m);
+            return rr;
+        }
+    }
 }

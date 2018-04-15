@@ -87,7 +87,7 @@ public class Document implements Comparable<Document> {
         return ak1.node.compareTo(ak2.node);
     });
 
-    private static class ActKey {
+    public static class ActKey {
         Range range;
         Node node;
 

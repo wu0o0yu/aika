@@ -457,13 +457,13 @@ public final class Activation extends OrActivation {
         public static Comparator<SynapseActivation> INPUT_COMP = (sa1, sa2) -> {
             int r = Synapse.INPUT_SYNAPSE_COMP.compare(sa1.synapse, sa2.synapse);
             if (r != 0) return r;
-            return sa1.input.compareTo(sa2.input);
+            return Integer.compare(sa1.input.id, sa2.input.id);
         };
 
         public static Comparator<SynapseActivation> OUTPUT_COMP = (sa1, sa2) -> {
             int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(sa1.synapse, sa2.synapse);
             if (r != 0) return r;
-            return sa1.output.compareTo(sa2.output);
+            return Integer.compare(sa1.output.id, sa2.output.id);
         };
 
 

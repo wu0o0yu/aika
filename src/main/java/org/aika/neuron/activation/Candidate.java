@@ -47,7 +47,7 @@ public class Candidate  implements Comparable<Candidate> {
 
     public boolean checkDependenciesSatisfied(long v) {
         for (Activation.SynapseActivation sa : activation.neuronInputs) {
-            if (sa.input.markedHasCandidate != v && !sa.synapse.key.isRecurrent && sa.input.upperBound > 0.0) return false;
+            if (sa.input.markedHasCandidate != v && !sa.synapse.isRecurrent && sa.input.upperBound > 0.0) return false;
         }
         return true;
     }
@@ -65,7 +65,7 @@ public class Candidate  implements Comparable<Candidate> {
                 " SIM-COMPUTED:" + debugComputed[1] +
                 " MODIFIED:" + debugComputed[2] +
                 " ACT-ID:" + activation.id +
-                " " + activation.key.range +
+                " " + activation.range +
                 " " + activation.getLabel();
     }
 
@@ -75,16 +75,14 @@ public class Candidate  implements Comparable<Candidate> {
         if(!isConflicting() && c.isConflicting()) return -1;
         if(isConflicting() && !c.isConflicting()) return 1;
 
-        int r = Integer.compare(activation.key.range.begin, c.activation.key.range.begin);
+        int r = Integer.compare(activation.range.begin, c.activation.range.begin);
         if (r != 0) return r;
-        r = Integer.compare(activation.key.range.end, c.activation.key.range.end);
+        r = Integer.compare(activation.range.end, c.activation.range.end);
         if (r != 0) return r;
 
         r = Integer.compare(sequence, c.sequence);
         if (r != 0) return r;
 
-        r = Utils.compareInteger(activation.key.rid, c.activation.key.rid);
-        if (r != 0) return r;
         return Integer.compare(id, c.id);
     }
 }

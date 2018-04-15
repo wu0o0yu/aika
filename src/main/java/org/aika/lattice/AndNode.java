@@ -19,7 +19,6 @@ package org.aika.lattice;
 
 import org.aika.*;
 import org.aika.neuron.Relation;
-import org.aika.neuron.activation.Range;
 import org.aika.training.PatternDiscovery.Config;
 import org.aika.lattice.AndNode.AndActivation;
 
