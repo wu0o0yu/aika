@@ -19,13 +19,14 @@ package org.aika.lattice;
 
 import org.aika.Utils;
 import org.aika.Document;
+import org.aika.neuron.activation.Activation;
 import org.aika.neuron.activation.Range;
 import org.aika.lattice.AndNode.Refinement;
 
 import java.util.*;
 
 
-public class NodeActivation<T extends Node> {
+public abstract class NodeActivation<T extends Node> {
 
     public final int id;
 
@@ -46,4 +47,6 @@ public class NodeActivation<T extends Node> {
         this.doc = doc;
         this.node = node;
     }
+
+    public abstract Activation getInputActivation(int i);
 }

@@ -39,18 +39,6 @@ import static org.aika.lattice.Node.MIN_NODE;
 public class Selector {
 
 
-    public static Activation get(Document doc, INeuron n, Range r, Range.Relation rr) {
-        Stream<Activation> s = select(doc, n, null, null, r, rr);
-        return s.findFirst()
-                .orElse(null);
-    }
-
-
-    public static Activation get(Document doc, INeuron n, Range r) {
-        return get(doc, n, r, Range.Relation.EQUALS);
-    }
-
-
     public static Stream<Activation> select(Document doc, INeuron n, Relation rel, Activation linkedAct) {
         INeuron.ThreadState th = n.getThreadState(doc.threadId, false);
         if (th == null) return Stream.empty();
@@ -117,9 +105,9 @@ public class Selector {
         }
 
         return th.activations.subMap(
-                new NodeActivation.Key(node, new Range(fromKey, Integer.MIN_VALUE)),
+                new Range(fromKey, Integer.MIN_VALUE),
                 fromInclusive,
-                new NodeActivation.Key(node, new Range(toKey, Integer.MAX_VALUE)),
+                new Range(toKey, Integer.MAX_VALUE),
                 toInclusive
         ).values();
     }
@@ -151,9 +139,9 @@ public class Selector {
         }
 
         return th.activationsEnd.subMap(
-                new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, fromKey)),
+                new Range(Integer.MIN_VALUE, fromKey),
                 fromInclusive,
-                new NodeActivation.Key(node, new Range(Integer.MAX_VALUE, toKey)),
+                new Range(Integer.MAX_VALUE, toKey),
                 toInclusive
         ).values();
     }
@@ -187,9 +175,9 @@ public class Selector {
         if(fromKey > toKey) return Collections.EMPTY_LIST;
 
         return th.activations.subMap(
-                new NodeActivation.Key(node, new Range(fromKey, Integer.MIN_VALUE)),
+                new Range(fromKey, Integer.MIN_VALUE),
                 fromInclusive,
-                new NodeActivation.Key(node, new Range(toKey, Integer.MAX_VALUE)),
+                new Range(toKey, Integer.MAX_VALUE),
                 toInclusive
         ).values();
     }
@@ -223,9 +211,9 @@ public class Selector {
         if(fromKey > toKey) return Collections.EMPTY_LIST;
 
         return th.activationsEnd.subMap(
-                new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, fromKey)),
+                new Range(Integer.MIN_VALUE, fromKey),
                 fromInclusive,
-                new NodeActivation.Key(node, new Range(Integer.MAX_VALUE, toKey)),
+                new Range(Integer.MAX_VALUE, toKey),
                 toInclusive
         ).values();
     }
@@ -237,17 +225,17 @@ public class Selector {
         if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS) {
             int key = rr.beginToBegin == EQUALS ? r.begin : r.end;
             return th.activations.subMap(
-                    new NodeActivation.Key(node, new Range(key, Integer.MIN_VALUE)),
+                    new Range(key, Integer.MIN_VALUE),
                     true,
-                    new NodeActivation.Key(node, new Range(key, Integer.MAX_VALUE)),
+                    new Range(key, Integer.MAX_VALUE),
                     true
             ).values();
         } else if(rr.endToEnd == EQUALS || rr.endToBegin == EQUALS) {
             int key = rr.endToEnd == EQUALS ? r.end : r.begin;
             return th.activationsEnd.subMap(
-                    new NodeActivation.Key(node, new Range(Integer.MIN_VALUE, key)),
+                    new Range(Integer.MIN_VALUE, key),
                     true,
-                    new NodeActivation.Key(node, new Range(Integer.MAX_VALUE, key)),
+                    new Range(Integer.MAX_VALUE, key),
                     true
             ).values();
         }
@@ -258,14 +246,14 @@ public class Selector {
     public static Collection<Activation> select(Linker.SortGroup sortGroup, Activation act) {
         switch(sortGroup) {
             case RANGE_BEGIN: {
-                NodeActivation.Key bk = new NodeActivation.Key(MIN_NODE, new Range(act.key.range.begin, Integer.MIN_VALUE));
-                NodeActivation.Key ek = new NodeActivation.Key(MAX_NODE, new Range(act.key.range.begin, Integer.MAX_VALUE));
+                Document.ActKey bk = new Document.ActKey(new Range(act.range.begin, Integer.MIN_VALUE), MIN_NODE);
+                Document.ActKey ek = new Document.ActKey(new Range(act.range.begin, Integer.MAX_VALUE), MAX_NODE);
 
                 return act.doc.activationsByRangeBegin.subMap(bk, true, ek, true).values();
             }
             case RANGE_END: {
-                NodeActivation.Key bk = new NodeActivation.Key(MIN_NODE, new Range(Integer.MIN_VALUE, act.key.range.end));
-                NodeActivation.Key ek = new NodeActivation.Key(MAX_NODE, new Range(Integer.MAX_VALUE, act.key.range.end));
+                Document.ActKey bk = new Document.ActKey(new Range(Integer.MIN_VALUE, act.range.end), MIN_NODE);
+                Document.ActKey ek = new Document.ActKey(new Range(Integer.MAX_VALUE, act.range.end), MAX_NODE);
 
                 return act.doc.activationsByRangeEnd.subMap(bk, true, ek, true).values();
             }

@@ -205,16 +205,6 @@ public class Linker {
     }
 
 
-    private static Integer computeTargetRID(Activation act, Direction dir, Synapse.Key sk) {
-        switch (dir) {
-            case INPUT:
-                return sk.absoluteRid != null ? sk.absoluteRid : Utils.nullSafeAdd(act.key.rid, false, sk.relativeRid, false);
-            case OUTPUT:
-                return Utils.nullSafeSub(act.key.rid, false, sk.relativeRid, false);
-        }
-        return null;
-    }
-
 
     private static Collection<Synapse> getActiveSynapses(Document doc, Direction dir, NavigableMap<Synapse, Synapse> syns) {
         ArrayList<Synapse> results = new ArrayList<>();

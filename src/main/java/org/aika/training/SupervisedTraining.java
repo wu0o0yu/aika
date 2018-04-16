@@ -169,7 +169,7 @@ public class SupervisedTraining {
 
             int r = Integer.compare(fs2.fired, fs1.fired);
             if (r != 0) return r;
-            return act1.key.compareTo(act2.key);
+            return Integer.compare(act1.id, act2.id);
         });
 
         private long queueIdCounter = 0;

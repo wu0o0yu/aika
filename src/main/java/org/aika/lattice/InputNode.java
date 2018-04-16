@@ -253,6 +253,11 @@ public class InputNode extends Node<InputNode, InputActivation> {
         public InputActivation(int id, Document doc, InputNode node) {
             super(id, doc, node);
         }
+
+        public Activation getInputActivation(int i) {
+            assert i == 0;
+            return input.input;
+        }
     }
 
 

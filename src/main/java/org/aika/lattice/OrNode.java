@@ -72,7 +72,20 @@ public class OrNode extends Node<OrNode, Activation> {
             int synapseId = oe.synapseIds[i];
 
             Synapse s = neuron.getSynapseById(synapseId);
-            s.rangeOutput.begin
+            if(s.rangeOutput.begin != Range.Mapping.NONE || s.rangeOutput.end != Range.Mapping.NONE) {
+                Activation iAct = inputAct.getInputActivation(i);
+
+                if(s.rangeOutput.begin == Range.Mapping.BEGIN) {
+                    begin = iAct.range.begin;
+                } else if(s.rangeOutput.end == Range.Mapping.BEGIN) {
+                    begin = iAct.range.end;
+                }
+                if(s.rangeOutput.end == Range.Mapping.END) {
+                    end = iAct.range.end;
+                } else if(s.rangeOutput.begin == Range.Mapping.END) {
+                    end = iAct.range.begin;
+                }
+            }
         }
 
         Range r = new Range(begin, end);
@@ -92,7 +105,7 @@ public class OrNode extends Node<OrNode, Activation> {
             addActivation(act);
         }
 
-        act.link(, inputAct);
+        act.link(oe, inputAct);
     }
 
 
@@ -230,12 +243,8 @@ public class OrNode extends Node<OrNode, Activation> {
         out.writeInt(neuron.id);
 
         out.writeInt(parents.size());
-        for(Map.Entry<Integer, TreeSet<Provider<Node>>> me: parents.entrySet()) {
-            out.writeInt(me.getKey());
-            out.writeInt(me.getValue().size());
-            for(Provider<Node> pn: me.getValue()) {
-                out.writeInt(pn.id);
-            }
+        for(OrEntry oe: parents) {
+            oe.write(out);
         }
     }
 
@@ -248,14 +257,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
-            TreeSet<Provider<Node>> ridParents = new TreeSet<>();
-            Integer ridOffset = in.readInt();
-            parents.put(ridOffset, ridParents);
-
-            int sa = in.readInt();
-            for(int j = 0; j < sa; j++) {
-                ridParents.add(m.lookupNodeProvider(in.readInt()));
-            }
+            parents.add(OrEntry.read(in, m));
         }
     }
 
@@ -339,8 +341,15 @@ public class OrNode extends Node<OrNode, Activation> {
             super(id, doc, node);
         }
 
+        @Override
+        public Activation getInputActivation(int i) {
+            throw new UnsupportedOperationException();
+        }
+
         public void link(OrEntry oe, NodeActivation<?> input) {
-            inputs.put(input.id, new Link(oe, input, this));
+            Link l = new Link(oe, input, this);
+            inputs.put(input.id, l);
+            input.outputsToOrNode.put(id, l);
         }
     }
 

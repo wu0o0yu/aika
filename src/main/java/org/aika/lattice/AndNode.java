@@ -19,6 +19,7 @@ package org.aika.lattice;
 
 import org.aika.*;
 import org.aika.neuron.Relation;
+import org.aika.neuron.activation.Activation;
 import org.aika.training.PatternDiscovery.Config;
 import org.aika.lattice.AndNode.AndActivation;
 
@@ -85,7 +86,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
     void apply(AndActivation act) {
         if (andChildren != null) {
             TreeMap<Refinement, AndActivation> results = null;
-            for (Link fl : act.inputs.values()) {
+            for (Link fl : act.inputs) {
                 Refinement ref = fl.ref;
                 RefValue rv = fl.rv;
                 NodeActivation<?> pAct = fl.input;
@@ -147,7 +148,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
     @Override
     public void discover(AndActivation act, Config config) {
         Document doc = act.doc;
-        for(Link fl : act.inputs.values()) {
+        for(Link fl : act.inputs) {
             for (Link sl : fl.input.outputsToAndNode.values()) {
                 AndActivation secondAct = sl.output;
                 if (secondAct.node instanceof AndNode) {
@@ -553,14 +554,22 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
     public static class AndActivation extends NodeActivation<AndNode> {
 
-        public Map<Integer, Link> inputs = new TreeMap<>();
+        public Link[] inputs;
 
         public AndActivation(int id, Document doc, AndNode node) {
             super(id, doc, node);
+            inputs = new Link[node.level];
         }
 
         public void link(Refinement ref, RefValue rv, NodeActivation<?> input) {
-            inputs.put(input.id, new Link(ref, rv, input, this));
+            Link l = new Link(ref, rv, input, this);
+            inputs[rv.refOffset] = l;
+            input.outputsToAndNode.put(id, l);
+        }
+
+        public Activation getInputActivation(int i) {
+            Link l = inputs[i];
+            return l.input.getInputActivation(l.rv.reverseOffsets[i]);
         }
     }
 

@@ -6,7 +6,7 @@ import org.aika.neuron.activation.Activation;
 public enum DistanceFunction {
 
     NONE((iAct, oAct) -> 1),
-    SIGMOID((iAct, oAct) -> Utils.sigmoid(((double) (oAct.key.range.begin - iAct.key.range.begin) + 40) / 10.0));
+    SIGMOID((iAct, oAct) -> Utils.sigmoid(((double) (oAct.range.begin - iAct.range.begin) + 40) / 10.0));
 
     Function f;
 

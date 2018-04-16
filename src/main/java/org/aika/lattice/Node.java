@@ -19,6 +19,7 @@ package org.aika.lattice;
 
 import org.aika.*;
 import org.aika.Document;
+import org.aika.neuron.activation.Activation;
 import org.aika.training.PatternDiscovery.Config;
 import org.aika.lattice.AndNode.RefValue;
 import org.slf4j.Logger;
@@ -105,7 +106,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         th.lastUsed = provider.model.docIdCounter.get();
         return th;
     }
-
 
     public abstract RefValue extend(int threadId, Document doc, AndNode.Refinement ref);
 

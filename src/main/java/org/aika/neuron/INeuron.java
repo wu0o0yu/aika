@@ -175,9 +175,9 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public Activation addInput(Document doc, Activation.Builder input) {
         assert input.range.begin <= input.range.end;
 
-        Activation act = Selector.get(doc, this, input.range);
+        Activation act = getThreadState(doc.threadId, true).activations.get(input.range);
         if(act == null) {
-            act = node.get(doc).createActivation(doc);
+            act = new Activation(doc.activationIdCounter++, doc, node.get(doc));
             act.range = input.range;
         }
 
