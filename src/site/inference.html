@@ -87,7 +87,7 @@
 
 			<h2>Activations</h2>
 			<p>
-				The advantage of having activation objects is that, through them, we are able to cope with the relational
+				The advantage of having activation objects is that, through them, Aika is able to cope with the relational
 				structure of natural language text by making the activation relate to a specific segment of text. In a way
 				these activations can be seen as text annotations that specify either the start and end character
 				or the position of a word (relational id). </br>
@@ -314,7 +314,7 @@
                 exceed their threshold based on this new input. Depending on the synapse weights and bias settings of
                 the outgoing neuron it may either fire directly (for or-gate like neurons) or it may require other input
                 neurons to fire first (for and-gate like neurons). If the neuron is an and-gate like neuron then there
-                is a efficient way to determine only those outgoing neurons that might be activated by a new input signal.
+                is an efficient way to determine only those outgoing neurons that might be activated by a new input signal.
                 <br/> This is where the <a href="https://en.wikipedia.org/wiki/Lattice_(order)" rel="nofollow">pattern lattice</a>
                 comes into play. The pattern lattice is used to store all sub patterns of a given input pattern. If
                 for instance a neuron requires the inputs \(A\), \(B\) and \(C\) to be activated before the neuron itself can be
@@ -328,8 +328,8 @@
                 the two inputs \(A\) and \(B\) are activated by an incoming signal, then the pattern node \(AB\) would
                 be activated as well, but not the pattern node \(ABC\). The advantage of this data structure is that
                 only minimal refinements have to be tested from one level in the pattern lattice to the next. If all
-                neurons that depend on input \(A\) would be tested directly, the number of outgoing neurons might
-                be so large that many unnecessary computations would have to be performed.
+				neurons dependent on input \(A\) were tested directly, the number of outgoing neurons might be so
+				large that many unnecessary calculations would be required.
 
                 But before we can build the pattern lattice, we first have to convert the weighted inputs of the neuron
                 into a boolean representation. Here we only need to distinguish between active and inactive neurons.
