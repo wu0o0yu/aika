@@ -2,6 +2,7 @@ package org.aika.training;
 
 import org.aika.neuron.activation.Activation;
 import org.aika.neuron.Synapse;
+import org.aika.neuron.activation.Range;
 
 public interface SynapseEvaluation {
 
@@ -53,13 +54,13 @@ public interface SynapseEvaluation {
     }
 
     class Result {
-        public Result(Synapse.Key synapseKey, double significance, DeleteMode deleteMode) {
-            this.synapseKey = synapseKey;
+        public Result(Range.Output rangeOutput, double significance, DeleteMode deleteMode) {
+            this.rangeOutput = rangeOutput;
             this.significance = significance;
             this.deleteMode = deleteMode;
         }
 
-        public Synapse.Key synapseKey;
+        public Range.Output rangeOutput;
         public double significance;
         public DeleteMode deleteMode;
     }

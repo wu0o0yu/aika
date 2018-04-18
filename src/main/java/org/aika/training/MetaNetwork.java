@@ -218,17 +218,6 @@ public class MetaNetwork {
     }
 
 
-
-    private static Integer computeRidOffset(Activation mAct) {
-        for (Activation.SynapseActivation sa : mAct.getFinalInputActivations()) {
-            if(sa.synapse.key.relativeRid != null && sa.input.key.rid != null) {
-                return sa.input.key.rid - sa.synapse.key.relativeRid;
-            }
-        }
-        return null;
-    }
-
-
     public static Neuron initMetaNeuron(Neuron n, double bias, double metaBias, Synapse.Builder... inputs) {
         n.get().metaBias = metaBias;
         return Neuron.init(n, bias, INeuron.Type.META, inputs);

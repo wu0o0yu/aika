@@ -76,12 +76,12 @@ public class Linker {
         }
 
 
-        public boolean checkActivation(Activation.Key ak) {
+        public boolean checkActivation(Activation act) {
             switch(this) {
                 case RANGE_BEGIN:
-                    return ak.range.begin != Integer.MIN_VALUE;
+                    return act.range.begin != Integer.MIN_VALUE;
                 case RANGE_END:
-                    return ak.range.end != Integer.MAX_VALUE;
+                    return act.range.end != Integer.MAX_VALUE;
                 default:
                     return true;
             }
@@ -231,7 +231,7 @@ public class Linker {
 
 
     public static boolean testRelation(Synapse s, Activation iAct, Activation oAct) {
-        for(Relation sr: s.relations) {
+        for(Relation sr: s.relations.values()) {
             Activation.SynapseActivation linkedSA = lookupSynapse(oAct, sr.linkedSynapse);
             if(linkedSA == null) return true;
             if(!sr.test(iAct, linkedSA.input)) return false;

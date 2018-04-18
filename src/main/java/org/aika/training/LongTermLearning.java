@@ -123,7 +123,7 @@ public class LongTermLearning {
         if(config.createNewSynapses) {
             doc.getActivations()
                     .filter(iAct -> iAct.targetValue == null ? iAct.isFinalActivation() : iAct.targetValue > 0.0)
-                    .filter(iAct -> iAct.key.node != act.key.node)
+                    .filter(iAct -> iAct.node != act.node)
                     .forEach(iAct -> {
                 synapseLTP(config, null, iAct, act, x);
             });
