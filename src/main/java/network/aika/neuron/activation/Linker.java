@@ -17,15 +17,16 @@
 package network.aika.neuron.activation;
 
 import network.aika.Document;
+import network.aika.lattice.Node;
+import network.aika.lattice.OrNode;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.*;
+import network.aika.neuron.activation.Activation.SynapseActivation;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.NavigableMap;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Linker.Direction.INPUT;
@@ -39,57 +40,14 @@ import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
  */
 public class Linker {
 
+
+    ArrayDeque<Activation.SynapseActivation> queue = new ArrayDeque<>();
+
     public enum Direction {
         INPUT,
         OUTPUT
     }
 
-    public enum SortGroup {
-        RANGE_BEGIN(
-                new Synapse.Key(true, false, Range.Relation.BEGIN_EQUALS),
-                new Synapse.Key(false, true, Range.Relation.BEGIN_EQUALS)
-        ),
-        RANGE_END(
-                new Synapse.Key(true, false, Range.Relation.END_EQUALS),
-                new Synapse.Key(false, true, Range.Relation.END_EQUALS)
-        ),
-        OTHERS(
-                new Synapse.Key(true, false, Range.Relation.NONE),
-                new Synapse.Key(false, true, Range.Relation.NONE)
-        );
-
-        Synapse begin;
-        Synapse end;
-
-        SortGroup(Synapse.Key beginKey, Synapse.Key endKey) {
-            this.begin = new Synapse(Neuron.MIN_NEURON, Neuron.MIN_NEURON, beginKey);
-            this.end = new Synapse(Neuron.MAX_NEURON, Neuron.MAX_NEURON, endKey);
-        }
-
-
-        public static int compare(Synapse.Key ka, Synapse.Key kb) {
-            return getSortGroup(ka).compareTo(getSortGroup(kb));
-        }
-
-
-        public static SortGroup getSortGroup(Synapse.Key k) {
-            if(k.rangeMatch.beginToBegin == Range.Operator.EQUALS) return SortGroup.RANGE_BEGIN;
-            else if(k.rangeMatch.endToEnd == Range.Operator.EQUALS) return SortGroup.RANGE_END;
-            else return SortGroup.OTHERS;
-        }
-
-
-        public boolean checkActivation(Activation act) {
-            switch(this) {
-                case RANGE_BEGIN:
-                    return act.range.begin != Integer.MIN_VALUE;
-                case RANGE_END:
-                    return act.range.end != Integer.MAX_VALUE;
-                default:
-                    return true;
-            }
-        }
-    }
 
 
     /**
@@ -102,8 +60,8 @@ public class Linker {
         INeuron n = act.getINeuron();
         n.lock.acquireReadLock();
         n.provider.lock.acquireReadLock();
-        link(act, INPUT);
-        link(act, OUTPUT);
+        linkInput(act);
+        linkRelated(act);
         n.provider.lock.releaseReadLock();
         n.lock.releaseReadLock();
 
@@ -113,33 +71,59 @@ public class Linker {
     }
 
 
-    private static void link(Activation act, Direction dir) {
-        Neuron n = act.getNeuron();
-        NavigableMap<Synapse, Synapse> syns = (dir == INPUT ? n.inMemoryInputSynapses : n.inMemoryOutputSynapses);
-        int[] sortGroupCounts = (dir == INPUT ? n.inputSortGroupCounts : n.outputSortGroupCounts);
+    private void linkInput(Activation act) {
+        for(OrNode.Link ol: act.inputs.values()) {
+            for(int i = 0; i < ol.oe.synapseIds.length; i++) {
+                int synId = ol.oe.synapseIds[i];
+                Synapse s = act.node.neuron.getSynapseById(synId);
+                Activation iAct = ol.input.getInputActivation(i);
 
-        if(syns.isEmpty()) return;
-
-        if (syns.size() < 10) {
-            // No need for further optimizations.
-            linkOthers(act, dir, syns.values());
-            return;
-        }
-
-        for(SortGroup sg: new SortGroup[] {SortGroup.RANGE_BEGIN, SortGroup.RANGE_END}) {
-            if(sortGroupCounts[sg.ordinal()] > 0) {
-                link(act, dir, sg, syns);
+                link(s, iAct, act);
             }
         }
+    }
 
-        NavigableMap<Synapse, Synapse> remainingSyns = syns.subMap(SortGroup.OTHERS.begin, true, SortGroup.OTHERS.end, true);
-        if(remainingSyns.isEmpty()) return;
 
-        // Optimization in case the set of synapses is very large
-        if (act.doc.activatedNeurons.size() * 20 > sortGroupCounts[SortGroup.OTHERS.ordinal()]) {
-            linkOthers(act, dir, remainingSyns.values());
-        } else {
-            linkOthers(act, dir, getActiveSynapses(act.doc, dir, remainingSyns));
+
+    private void linkRelated(Activation act) {
+        Document doc = act.doc;
+        for(int da = 0; da < 2; da++) {
+            int p = da == 0 ? act.range.begin : act.range.end;
+
+            for(int db = 0; db < 2; db++) {
+                SortedMap<Document.ActKey, Activation> acts = db == 0 ?
+                        doc.activationsByRangeBegin.subMap(
+                                new Document.ActKey(new Range(p, Integer.MIN_VALUE), Node.MIN_NODE),
+                                new Document.ActKey(new Range(p, Integer.MAX_VALUE), Node.MAX_NODE)) :
+                        doc.activationsByRangeEnd.subMap(
+                                new Document.ActKey(new Range(Integer.MIN_VALUE, p), Node.MIN_NODE),
+                                new Document.ActKey(new Range(Integer.MAX_VALUE, p), Node.MAX_NODE));
+
+                for(Activation rAct: acts.values()) {
+                    for(SynapseActivation sa: rAct.neuronOutputs) {
+                        for(Map.Entry<Synapse, Relation> me: sa.synapse.relations.entrySet()) {
+                            Synapse s = me.getKey();
+                            Relation r = me.getValue();
+
+                            if(s.input == act.node.neuron && r.test(rAct, act)) {
+                                link(s, act, sa.output);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    private void link(Synapse s, Activation iAct, Activation oAct) {
+        SynapseActivation sa = new SynapseActivation(s, iAct, oAct);
+        if(!oAct.neuronInputs.contains(sa)) {
+            iAct.addSynapseActivation(INPUT, sa);
+            oAct.addSynapseActivation(OUTPUT, sa);
+
+            queue.add(sa);
         }
     }
 

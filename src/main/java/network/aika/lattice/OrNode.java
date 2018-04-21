@@ -356,10 +356,10 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     public static class Link {
-        OrEntry oe;
+        public OrEntry oe;
 
-        NodeActivation<?> input;
-        OrActivation output;
+        public NodeActivation<?> input;
+        public OrActivation output;
 
         public Link(OrEntry oe, NodeActivation<?> input, OrActivation output) {
             this.oe = oe;
