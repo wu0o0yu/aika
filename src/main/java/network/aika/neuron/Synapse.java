@@ -146,13 +146,11 @@ public class Synapse implements Writable {
 
         in.provider.lock.acquireWriteLock();
         in.provider.inMemoryOutputSynapses.put(this, this);
-        in.provider.outputSortGroupCounts[Linker.SortGroup.getSortGroup(key).ordinal()]++;
         in.provider.lock.releaseWriteLock();
 
         out.provider.lock.acquireWriteLock();
         out.provider.inMemoryInputSynapses.put(this, this);
         out.provider.inputSynapsesById.put(id, this);
-        out.provider.inputSortGroupCounts[Linker.SortGroup.getSortGroup(key).ordinal()]++;
         out.provider.lock.releaseWriteLock();
 
         removeLinkInternal(in, out);
@@ -209,13 +207,11 @@ public class Synapse implements Writable {
 
         in.provider.lock.acquireWriteLock();
         in.provider.inMemoryOutputSynapses.remove(this);
-        in.provider.outputSortGroupCounts[Linker.SortGroup.getSortGroup(key).ordinal()]--;
         in.provider.lock.releaseWriteLock();
 
         out.provider.lock.acquireWriteLock();
         out.provider.inMemoryInputSynapses.remove(this);
         out.provider.inputSynapsesById.remove(id);
-        out.provider.inputSortGroupCounts[Linker.SortGroup.getSortGroup(key).ordinal()]--;
         out.provider.lock.releaseWriteLock();
 
         removeLinkInternal(in, out);

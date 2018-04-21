@@ -1,7 +1,9 @@
 package network.aika.neuron;
 
 
+import network.aika.Document;
 import network.aika.Model;
+import network.aika.lattice.Node;
 import network.aika.neuron.activation.Activation;
 import network.aika.Writable;
 import network.aika.neuron.activation.Range;
@@ -9,6 +11,7 @@ import network.aika.neuron.activation.Range;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Collection;
 
 
 public abstract class Relation implements Comparable<Relation>, Writable {
@@ -26,6 +29,10 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             return RangeRelation.read(in, m);
         }
     }
+
+    public abstract boolean isExact();
+
+    public abstract Collection<Activation> getLinkedActivationCandidates(Activation input);
 
 
     public static class InstanceRelation extends Relation {
@@ -141,6 +148,16 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         @Override
+        public boolean isExact() {
+            return false;
+        }
+
+        @Override
+        public Collection<Activation> getLinkedActivationCandidates(Activation input) {
+            return null;
+        }
+
+        @Override
         public int compareTo(Relation rel) {
             if(rel instanceof RangeRelation) return 1;
             InstanceRelation ir = (InstanceRelation) rel;
@@ -194,6 +211,33 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             RangeRelation rr = new RangeRelation();
             rr.readFields(in, m);
             return rr;
+        }
+
+        @Override
+        public boolean isExact() {
+            return relation.beginToBegin == Range.Operator.EQUALS ||
+                    relation.beginToEnd == Range.Operator.EQUALS ||
+                    relation.endToBegin == Range.Operator.EQUALS ||
+                    relation.endToEnd == Range.Operator.EQUALS;
+        }
+
+        @Override
+        public Collection<Activation> getLinkedActivationCandidates(Activation input) {
+            int p = relation.beginToBegin == Range.Operator.EQUALS ||
+                    relation.beginToEnd == Range.Operator.EQUALS ?
+                    input.range.begin :
+                    input.range.end;
+
+            return relation.beginToBegin == Range.Operator.EQUALS ||
+                    relation.endToBegin == Range.Operator.EQUALS ?
+                    input.doc.activationsByRangeBegin.subMap(
+                            new Document.ActKey(new Range(p, Integer.MIN_VALUE), Node.MIN_NODE),
+                            new Document.ActKey(new Range(p, Integer.MAX_VALUE), Node.MAX_NODE)
+                            ).values() :
+                    input.doc.activationsByRangeEnd.subMap(
+                            new Document.ActKey(new Range(Integer.MIN_VALUE, p), Node.MIN_NODE),
+                            new Document.ActKey(new Range(Integer.MAX_VALUE, p), Node.MAX_NODE)
+                    ).values();
         }
     }
 }

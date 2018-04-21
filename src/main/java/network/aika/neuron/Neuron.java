@@ -41,23 +41,9 @@ public class Neuron extends Provider<INeuron> {
 
     public ReadWriteLock lock = new ReadWriteLock();
 
-    private static final Comparator<Synapse> IM_INPUT_SYNAPSE_COMP = (sa, sb) -> {
-        int r = Linker.SortGroup.compare(sa.key, sb.key);
-        if(r != 0) return r;
-        return Synapse.INPUT_SYNAPSE_COMP.compare(sa, sb);
-    };
-
-    private static final Comparator<Synapse> IM_OUTPUT_SYNAPSE_COMP = (sa, sb) -> {
-        int r = Linker.SortGroup.compare(sa.key, sb.key);
-        if(r != 0) return r;
-        return Synapse.OUTPUT_SYNAPSE_COMP.compare(sa, sb);
-    };
-
     public NavigableMap<Integer, Synapse> inputSynapsesById = new TreeMap<>();
-    public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(IM_INPUT_SYNAPSE_COMP);
-    public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(IM_OUTPUT_SYNAPSE_COMP);
-    public int[] inputSortGroupCounts = new int[4];
-    public int[] outputSortGroupCounts = new int[4];
+    public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
+    public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
 
 
     public Neuron(Model m, int id) {
@@ -279,7 +265,6 @@ public class Neuron extends Provider<INeuron> {
     public void addInMemoryInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryInputSynapses.put(s, s);
-        inputSortGroupCounts[Linker.SortGroup.getSortGroup(s.key).ordinal()]++;
         lock.releaseWriteLock();
     }
 
@@ -287,7 +272,6 @@ public class Neuron extends Provider<INeuron> {
     public void removeInMemoryInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryInputSynapses.remove(s);
-        inputSortGroupCounts[Linker.SortGroup.getSortGroup(s.key).ordinal()]--;
         lock.releaseWriteLock();
     }
 
@@ -295,7 +279,6 @@ public class Neuron extends Provider<INeuron> {
     public void addInMemoryOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryOutputSynapses.put(s, s);
-        outputSortGroupCounts[Linker.SortGroup.getSortGroup(s.key).ordinal()]++;
         lock.releaseWriteLock();
     }
 
@@ -303,7 +286,6 @@ public class Neuron extends Provider<INeuron> {
     public void removeInMemoryOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryOutputSynapses.remove(s);
-        outputSortGroupCounts[Linker.SortGroup.getSortGroup(s.key).ordinal()]--;
         lock.releaseWriteLock();
     }
 
