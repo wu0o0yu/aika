@@ -67,16 +67,7 @@ public class OrOptionsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        Range r = new Range(0, 10);
-        Node.addActivation(doc, new NodeActivation.Key(inA.get().node.get(), r, 0), Collections.emptySet());
-        doc.propagate();
-
-        Node.addActivation(doc, new NodeActivation.Key(inA.get().node.get(), r, 0), Collections.emptySet());
-        doc.propagate();
-
-        Node.addActivation(doc, new NodeActivation.Key(inA.get().node.get(), r, 0), Collections.emptySet());
-        doc.propagate();
-
+        inA.addInput(doc, 0, 10);
 
         System.out.println(doc.activationsToString(true, false, true));
     }

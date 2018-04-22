@@ -136,7 +136,7 @@ public class SupervisedTraining {
     public void updateErrorSignal(Activation act) {
         if(act.errorSignal != 0.0) {
             errorSignalActivations.add(act);
-            for (Activation.SynapseActivation sa : act.neuronInputs) {
+            for (Activation.SynapseActivation sa : act.neuronInputs.values()) {
                 queue.add(sa.input);
             }
         }
@@ -153,7 +153,7 @@ public class SupervisedTraining {
         }
         double deltaW = x * r.significance * iAct.getFinalState().value;
 
-        Synapse synapse = Synapse.createOrLookup(doc, r.synapseKey, inputNeuron.provider, n.provider);
+        Synapse synapse = Synapse.createOrLookup(doc, r.synapseId, r.isRecurrent, r.rangeOutput, inputNeuron.provider, n.provider);
 
         synapse.updateDelta(doc, deltaW, 0.0);
 

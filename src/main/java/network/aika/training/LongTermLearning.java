@@ -128,7 +128,7 @@ public class LongTermLearning {
                 synapseLTP(config, null, iAct, act, x);
             });
         } else {
-            act.neuronInputs
+            act.neuronInputs.values()
                     .stream()
                     .filter(sa -> sa.input.targetValue == null ? sa.input.isFinalActivation() : sa.input.targetValue > 0.0)
                     .forEach(sa -> {
@@ -148,7 +148,7 @@ public class LongTermLearning {
         double sDelta = iAct.getFinalState().value * x * r.significance * h;
 
         if(sDelta > 0.0) {
-            Synapse synapse = Synapse.createOrLookup(act.doc, r.synapseKey, iAct.getNeuron(), act.getNeuron());
+            Synapse synapse = Synapse.createOrLookup(act.doc, r.synapseId, r.isRecurrent, r.rangeOutput, iAct.getNeuron(), act.getNeuron());
 
             synapse.updateDelta(act.doc, sDelta, -config.beta * sDelta);
         }
@@ -173,7 +173,7 @@ public class LongTermLearning {
         INeuron n = act.getINeuron();
 
         Set<Synapse> actSyns = new TreeSet<>(dir ? Synapse.OUTPUT_SYNAPSE_COMP : Synapse.INPUT_SYNAPSE_COMP);
-        (dir ? act.neuronOutputs : act.neuronInputs)
+        (dir ? act.neuronOutputs : act.neuronInputs.values())
                 .forEach(sa -> {
                     Activation rAct = dir ? sa.output : sa.input;
                     if(rAct.targetValue == null ? rAct.isFinalActivation() : rAct.targetValue > 0.0) {

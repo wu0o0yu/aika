@@ -79,7 +79,7 @@ public class Linker {
                 Activation iAct = ol.input.getInputActivation(i);
                 SynapseActivation sa = link(s, iAct, act);
 
-                ol.input.node.
+                ol.oe.
             }
         }
         process();
@@ -102,9 +102,9 @@ public class Linker {
     }
 
 
-    public static void lateLinking(Document doc) {
+    public void lateLinking() {
         for(Activation act: doc.activationsByRangeBegin.values()) {
-            for(SynapseActivation sa: act.neuronInputs) {
+            for(SynapseActivation sa: act.neuronInputs.values()) {
                 doc.linker.addToQueue(sa);
             }
         }

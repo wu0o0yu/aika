@@ -62,22 +62,6 @@ public class Range {
     }
 
 
-    public static Range mergeRange(Range ra, Range rb) {
-        return new Range(
-                ra.begin != Integer.MIN_VALUE ? ra.begin : rb.begin,
-                ra.end != Integer.MAX_VALUE ? ra.end : rb.end
-        );
-    }
-
-
-    public static Range getOutputRange(Range r, boolean[] ro) {
-        return new Range(
-                ro[0] ? r.begin : null,
-                ro[1] ? r.end : null
-        );
-    }
-
-
     @Deprecated
     public static boolean overlaps(Range ra, Range rb) {
         return !(Utils.compareInteger(ra.end, rb.begin) <= 0 || Utils.compareInteger(rb.end, ra.begin) <= 0);
@@ -186,42 +170,6 @@ public class Range {
 
         public static Relation create(Operator beginToBegin, Operator endToEnd) {
             return create(beginToBegin, Operator.NONE, endToEnd, Operator.NONE);
-        }
-
-
-        public static Relation createQuery(Relation ra, Output ob, Output oa, Relation rb) {
-            Relation r = new Relation();
-
-            if(ob.begin != Mapping.NONE) {
-                r.beginToBegin = ob.begin == BEGIN ? ra.beginToBegin : ra.beginToEnd;
-            }
-            if(ob.end != Mapping.NONE) {
-                r.beginToEnd = ob.end == BEGIN ? ra.beginToBegin : ra.beginToEnd;
-            }
-            if(ob.begin != Mapping.NONE) {
-                r.endToBegin = ob.begin == BEGIN ? ra.endToBegin : ra.endToEnd;
-            }
-            if(ob.end != Mapping.NONE) {
-                r.endToEnd = ob.end == BEGIN ? ra.endToBegin : ra.endToEnd;
-            }
-
-            Output ioa = oa.invert();
-            Relation irb = rb.invert();
-
-            if(ioa.begin != Mapping.NONE) {
-                r.beginToBegin = ioa.begin == BEGIN ? irb.beginToBegin : irb.endToBegin;
-            }
-            if(ioa.begin != Mapping.NONE) {
-                r.beginToEnd = ioa.begin == BEGIN ? irb.beginToEnd : irb.endToEnd;
-            }
-            if(ioa.end != Mapping.NONE) {
-                r.endToBegin = ioa.end == BEGIN ? irb.beginToBegin : irb.endToBegin;
-            }
-            if(ioa.end != Mapping.NONE) {
-                r.endToEnd = ioa.end == BEGIN ? irb.beginToEnd : irb.endToEnd;
-            }
-
-            return r;
         }
 
 

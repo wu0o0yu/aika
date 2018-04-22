@@ -36,13 +36,6 @@ import static network.aika.neuron.activation.Range.Operator.EQUALS;
 public class Selector {
 
 
-    public static Stream<Activation> select(Document doc, INeuron n, Relation rel, Activation linkedAct) {
-        INeuron.ThreadState th = n.getThreadState(doc.threadId, false);
-        if (th == null) return Stream.empty();
-        return select(th, n, rel, linkedAct);
-    }
-
-
     public static Stream<Activation> select(INeuron.ThreadState th, INeuron n, Relation rel, Activation linkedAct) {
         Stream<Activation> results;
         int s = th.activations.size();
@@ -61,7 +54,7 @@ public class Selector {
     public static Collection<Activation> getActivationsByRange(INeuron.ThreadState th, INeuron n, Range r, Range.Relation rr) {
         Node node = n.node.get();
         if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS || rr.endToBegin == EQUALS || rr.endToEnd == EQUALS) {
-            return getActivationsByRangeEquals(th, n, r, rr);
+            return getActivationsByRangeEquals(th, r, rr);
         } else if (((rr.beginToBegin.isGreaterThanOrGreaterThanEqual() || rr.beginToEnd.isGreaterThanOrGreaterThanEqual())) && r.begin <= r.end) {
             return getActivationsByRangeBeginGreaterThan(th, r, rr, node);
         } else if (((rr.endToEnd.isGreaterThanOrGreaterThanEqual() || rr.endToBegin.isGreaterThanOrGreaterThanEqual())) && r.begin >= r.end) {
@@ -217,8 +210,7 @@ public class Selector {
 
 
 
-    public static Collection<Activation> getActivationsByRangeEquals(INeuron.ThreadState th, INeuron n, Range r, Range.Relation rr) {
-        Node node = n.node.get();
+    public static Collection<Activation> getActivationsByRangeEquals(INeuron.ThreadState th, Range r, Range.Relation rr) {
         if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS) {
             int key = rr.beginToBegin == EQUALS ? r.begin : r.end;
             return th.activations.subMap(
@@ -237,25 +229,5 @@ public class Selector {
             ).values();
         }
         throw new RuntimeException("Invalid Range Relation");
-    }
-
-
-    public static Collection<Activation> select(Linker.SortGroup sortGroup, Activation act) {
-        switch(sortGroup) {
-            case RANGE_BEGIN: {
-                Document.ActKey bk = new Document.ActKey(new Range(act.range.begin, Integer.MIN_VALUE), Node.MIN_NODE);
-                Document.ActKey ek = new Document.ActKey(new Range(act.range.begin, Integer.MAX_VALUE), Node.MAX_NODE);
-
-                return act.doc.activationsByRangeBegin.subMap(bk, true, ek, true).values();
-            }
-            case RANGE_END: {
-                Document.ActKey bk = new Document.ActKey(new Range(Integer.MIN_VALUE, act.range.end), Node.MIN_NODE);
-                Document.ActKey ek = new Document.ActKey(new Range(Integer.MAX_VALUE, act.range.end), Node.MAX_NODE);
-
-                return act.doc.activationsByRangeEnd.subMap(bk, true, ek, true).values();
-            }
-            default:
-                throw new RuntimeException("Unsupported Sort Group.");
-        }
     }
 }

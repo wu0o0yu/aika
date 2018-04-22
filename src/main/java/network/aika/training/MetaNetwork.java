@@ -48,8 +48,6 @@ public class MetaNetwork {
     private static final Logger log = LoggerFactory.getLogger(MetaNetwork.class);
 
     public static void train(Document doc) {
-        long v = doc.visitedCounter++;
-
         Map<Activation, List<Target>> metaActivations = new TreeMap<>();
 
         List<INeuron> inhibitoryNeurons = doc.finallyActivatedNeurons
@@ -68,7 +66,7 @@ public class MetaNetwork {
                     boolean newNeuron = false;
                     if (targetNeuron.get().type == INeuron.Type.META) {
                         newNeuron = true;
-                        targetNeuron = doc.model.createNeuron(n.label.substring(2) + "-" + doc.getText(act.key.range));
+                        targetNeuron = doc.model.createNeuron(n.label.substring(2) + "-" + doc.getText(act.range));
                         INeuron.update(doc.model, doc.threadId, doc, targetNeuron, n.bias, Collections.emptySet());
                     }
 
@@ -88,7 +86,7 @@ public class MetaNetwork {
 
         for(Map.Entry<Activation, List<Target>> me: metaActivations.entrySet()) {
             for(Target t: me.getValue()) {
-                transferMetaSynapses(doc, metaActivations, me.getKey(), t, v);
+                transferMetaSynapses(doc, metaActivations, me.getKey(), t);
             }
         }
     }
@@ -108,7 +106,7 @@ public class MetaNetwork {
 
 
     private static Activation getMetaNeuronAct(Activation inhibAct) {
-        for(Activation.SynapseActivation sa: inhibAct.neuronInputs) {
+        for(Activation.SynapseActivation sa: inhibAct.neuronInputs.values()) {
             if(sa.input.getINeuron().type == INeuron.Type.META) {
                 return sa.input;
             }
@@ -117,16 +115,15 @@ public class MetaNetwork {
     }
 
 
-    private static void transferMetaSynapses(Document doc, Map<Activation, List<Target>> metaActivations, Activation metaAct, Target t, long v) {
+    private static void transferMetaSynapses(Document doc, Map<Activation, List<Target>> metaActivations, Activation metaAct, Target t) {
         TreeSet<Synapse> inputSynapses = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
 
-        Integer ridOffset = computeRidOffset(metaAct);
         for (Activation.SynapseActivation sa : metaAct.getFinalInputActivations()) {
             MetaSynapse inputMetaSyanpse = sa.synapse.meta;
             Synapse.Key osk = sa.synapse.key;
 
             if (inputMetaSyanpse != null && (inputMetaSyanpse.metaWeight != 0.0 || inputMetaSyanpse.metaBias != 0.0)) {
-                Neuron ina = sa.input.key.node.neuron;
+                Neuron ina = sa.input.node.neuron;
 
                 List<Activation.SynapseActivation> inputs = ina.get().type == INeuron.Type.INHIBITORY && inputMetaSyanpse.metaWeight >= 0.0 ?
                         sa.input.getFinalInputActivations() :
@@ -134,18 +131,16 @@ public class MetaNetwork {
 
                 for(Activation.SynapseActivation isa: inputs) {
                     Neuron in = isa.input.getNeuron();
-                    Integer rid = isa.input.key.rid;
-                    Integer nRid = Utils.nullSafeSub(rid, false, ridOffset, false);
 
                     if(in.get(doc).type == INeuron.Type.META) {
                         List<Target> inputTargets = metaActivations.get(isa.input);
                         if(inputTargets != null) {
                             for (Target it : metaActivations.get(isa.input)) {
-                                createOrLookupSynapse(doc, t, inputSynapses, inputMetaSyanpse, osk, nRid, it.targetNeuron);
+                                createOrLookupSynapse(doc, t, inputSynapses, inputMetaSyanpse, osk, it.targetNeuron);
                             }
                         }
                     } else {
-                        createOrLookupSynapse(doc, t, inputSynapses, inputMetaSyanpse, osk, nRid, in);
+                        createOrLookupSynapse(doc, t, inputSynapses, inputMetaSyanpse, osk, in);
                     }
                 }
             }
@@ -166,9 +161,7 @@ public class MetaNetwork {
                             .setNeuron(t.targetNeuron)
                             .setWeight(inhibSS.metaWeight)
                             .setBias(inhibSS.metaBias)
-                            .setRelativeRid(inhibSynKey.relativeRid)
-                            .setAbsoluteRid(inhibSynKey.absoluteRid)
-                            .setRangeMatch(inhibSynKey.rangeMatch)
+                            .addRelations(inhibMetaLink.synapse.relations)
                             .setRangeOutput(inhibSynKey.rangeOutput)
             );
         }
@@ -176,14 +169,11 @@ public class MetaNetwork {
         doc.propagate();
     }
 
-    private static void createOrLookupSynapse(Document doc, Target t, TreeSet<Synapse> inputSynapses, MetaSynapse inputMetaSyanpse, Synapse.Key osk, Integer nRid, Neuron in) {
+
+    private static void createOrLookupSynapse(Document doc, Target t, TreeSet<Synapse> inputSynapses, MetaSynapse inputMetaSyanpse, Synapse.Key osk, Neuron in) {
         Synapse.Key nsk = new Synapse.Key(
+                osk.id,
                 osk.isRecurrent,
-                osk.relativeRid != null ?
-                        osk.relativeRid :
-                        (inputMetaSyanpse.metaRelativeRid ? nRid : null),
-                osk.absoluteRid,
-                osk.rangeMatch,
                 osk.rangeOutput
         );
 

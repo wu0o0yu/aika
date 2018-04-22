@@ -23,7 +23,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Linker;
-import network.aika.lattice.NodeActivation.Key;
 import network.aika.neuron.activation.Range;
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,24 +48,22 @@ public class SynapseRangeRelationTest {
                 in,
                 on,
                 new Synapse.Key(
+                        0,
                         false,
-                        null,
-                        null,
-                        Range.Relation.CONTAINS,
                         Range.Output.DIRECT
                 )
         );
         s.link();
 
-        Activation iAct0 = in.get().node.get().processActivation(doc, new Key(in.get().node.get(), new Range(1, 4), null), Collections.emptyList());
-        Activation iAct1 = in.get().node.get().processActivation(doc, new Key(in.get().node.get(), new Range(6, 7), null), Collections.emptyList());
-        Activation iAct2 = in.get().node.get().processActivation(doc, new Key(in.get().node.get(), new Range(10, 18), null), Collections.emptyList());
-        Activation oAct = on.get().node.get().processActivation(doc, new Key(on.get().node.get(), new Range(6, 7), null), Collections.emptyList());
+        Activation iAct0 = in.get().node.get().processActivation(new Activation(10, doc, new Range(1, 4), in.get().node.get()));
+        Activation iAct1 = in.get().node.get().processActivation(new Activation(11, doc, new Range(6, 7), in.get().node.get()));
+        Activation iAct2 = in.get().node.get().processActivation(new Activation(11, doc, new Range(10, 18), in.get().node.get()));
+        Activation oAct = on.get().node.get().processActivation(new Activation(11, doc, new Range(6, 7), on.get().node.get()));
 
         Linker.link(oAct);
 
         boolean f = false;
-        for(Activation.SynapseActivation sa: oAct.neuronInputs) {
+        for(Activation.SynapseActivation sa: oAct.neuronInputs.values()) {
             if(Activation.SynapseActivation.INPUT_COMP.compare(sa, new Activation.SynapseActivation(s, iAct1, oAct)) == 0) f = true;
         }
 

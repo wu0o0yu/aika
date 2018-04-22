@@ -24,6 +24,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.*;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Range;
 import network.aika.neuron.activation.Range.Relation;
 import network.aika.neuron.activation.Selector;
@@ -56,8 +57,8 @@ public class ActivationsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inA.addInput(doc, 0, 1, 0);
-        inA.addInput(doc, 2, 3, 0);
+        inA.addInput(doc, 0, 1);
+        inA.addInput(doc, 2, 3);
 
         Assert.assertNotNull(TestHelper.get(doc, pA.get(), new Range(0, 1)));
         Assert.assertNull(TestHelper.get(doc, pA.get(), new Range(1, 2)));
@@ -65,9 +66,9 @@ public class ActivationsTest {
 
         inA.addInput(doc, 1, 2);
 
-        Assert.assertEquals(Selector.get(doc, pA.get(), null, new Range(0, 1), Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(0, 1)));
-        Assert.assertEquals(Selector.get(doc, pA.get(), null, new Range(1, 2), Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(1, 2)));
-        Assert.assertEquals(Selector.get(doc, pA.get(), null, new Range(2, 3), Relation.EQUALS), TestHelper.get(doc, pA.get(), new Range(2, 3)));
+        Assert.assertEquals(pA.getActivation(doc, new Range(0, 1), false), TestHelper.get(doc, pA.get(), new Range(0, 1)));
+        Assert.assertEquals(pA.getActivation(doc, new Range(1, 2), false), TestHelper.get(doc, pA.get(), new Range(1, 2)));
+        Assert.assertEquals(pA.getActivation(doc, new Range(2, 3), false), TestHelper.get(doc, pA.get(), new Range(2, 3)));
     }
 
 
@@ -80,15 +81,15 @@ public class ActivationsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0), Collections.emptyList());
+        inNode.processActivation(new Activation(0, doc, new Range(0, 1), inNode));
 
-        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0), Collections.emptyList());
+        inNode.processActivation(new Activation(0, doc, new Range(0, 1), inNode));
 
-        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0), Collections.emptyList());
+        inNode.processActivation(new Activation(0, doc, new Range(0, 1), inNode));
 
-        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0), Collections.emptyList());
+        inNode.processActivation(new Activation(0, doc, new Range(0, 1), inNode));
 
-        inNode.processActivation(doc, new NodeActivation.Key(inNode, new Range(0, 1), 0), Collections.emptyList());
+        inNode.processActivation(new Activation(0, doc, new Range(0, 1), inNode));
 
  //       Assert.assertEquals(1, Activation.get(t, inNode, new Range(0, 1), doc.bottom).key.fired);
     }

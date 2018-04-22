@@ -239,17 +239,27 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-    public Collection<Activation> getActivations(Document doc) {
+    public Collection<Activation> getActivations(Document doc, boolean onlyFinal) {
         ThreadState th = getThreadState(doc.threadId, false);
         if (th == null) return Collections.EMPTY_LIST;
-        return th.activations.values();
+        return onlyFinal ?
+                th.activations
+                        .values()
+                        .stream()
+                        .filter(act -> act.isFinalActivation())
+                        .collect(Collectors.toList()) :
+                th.activations.values();
     }
 
 
-    public synchronized Activation getFirstActivation(Document doc) {
+    public Activation getActivation(Document doc, Range r, boolean onlyFinal) {
         ThreadState th = getThreadState(doc.threadId, false);
-        if (th == null || th.activations.isEmpty()) return null;
-        return th.activations.firstEntry().getValue();
+        if (th == null) return null;
+        Activation act = th.activations.get(r);
+        if(onlyFinal && !act.isFinalActivation()) {
+            return null;
+        }
+        return act;
     }
 
 
@@ -543,23 +553,4 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         sb.append(">");
         return sb.toString();
     }
-
-
-    /**
-     * {@code getFinalActivations} is a convenience method to retrieve all activations of the given neuron that
-     * are part of the final interpretation. Before calling this method, the {@code doc.process()} needs to
-     * be called first.
-     *
-     * @param doc The current document
-     * @return A collection with all final activations of this neuron.
-     */
-    public Stream<Activation> getFinalActivationsStream(Document doc) {
-        return getActivations(doc).stream().filter(act -> act.isFinalActivation());
-    }
-
-
-    public Collection<Activation> getFinalActivations(Document doc) {
-        return getFinalActivationsStream(doc).collect(Collectors.toList());
-    }
-
 }

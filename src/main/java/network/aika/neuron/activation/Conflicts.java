@@ -41,8 +41,8 @@ public class Conflicts {
 
 
     public static void linkConflicts(Activation act, long v, Linker.Direction dir) {
-        for (Activation.SynapseActivation sa : (dir == Linker.Direction.INPUT ? act.neuronInputs : act.neuronOutputs)) {
-            if(sa.synapse.isNegative() && sa.synapse.isRecurrent) {
+        for (Activation.SynapseActivation sa : (dir == Linker.Direction.INPUT ? act.neuronInputs.values() : act.neuronOutputs)) {
+            if(sa.synapse.isNegative() && sa.synapse.key.isRecurrent) {
                 Activation oAct = (dir == Linker.Direction.INPUT ? act : sa.output);
                 Activation iAct = (dir == Linker.Direction.INPUT ? sa.input : act);
 
@@ -60,8 +60,8 @@ public class Conflicts {
         if (iAct.getINeuron().type != INeuron.Type.INHIBITORY) {
             add(oAct, iAct);
         } else {
-            for (Activation.SynapseActivation sa : iAct.neuronInputs) {
-                if(!sa.synapse.isRecurrent) {
+            for (Activation.SynapseActivation sa : iAct.neuronInputs.values()) {
+                if(!sa.synapse.key.isRecurrent) {
                     addConflict(oAct, sa.input, v);
                 }
             }

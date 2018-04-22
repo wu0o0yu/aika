@@ -75,7 +75,7 @@ public class Document implements Comparable<Document> {
     public Queue queue = new Queue();
     public ValueQueue vQueue = new ValueQueue();
     public UpperBoundQueue ubQueue = new UpperBoundQueue();
-    public Linker linker = new Linker();
+    public Linker linker = new Linker(this);
 
     public TreeSet<INeuron> activatedNeurons = new TreeSet<>();
     public TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
@@ -156,14 +156,12 @@ public class Document implements Comparable<Document> {
 
 
     public Stream<Activation> getFinalActivations() {
-        return finallyActivatedNeurons.stream()
-                .flatMap(in -> in.getFinalActivationsStream(this));
+        return getActivations().filter(act -> act.isFinalActivation());
     }
 
 
     public Stream<Activation> getActivations() {
-        return activatedNeurons.stream()
-                .flatMap(in -> in.getActivations(this).stream());
+        return activationsByRangeBegin.values().stream();
     }
 
 
@@ -239,6 +237,8 @@ public class Document implements Comparable<Document> {
 
 
     public void process(Long timeoutInMilliSeconds) throws SearchNode.TimeoutException {
+        linker.lateLinking();
+
         inputNeuronActivations.forEach(act -> vQueue.propagateActivationValue(0, act));
 
         generateCandidates();
@@ -326,7 +326,7 @@ public class Document implements Comparable<Document> {
         finallyActivatedNeurons.stream()
                 .filter(n -> n.outputText != null)
                 .forEach(n -> {
-            for (Activation act : n.getFinalActivations(this)) {
+            for (Activation act : n.getActivations(this, true)) {
                 sb.replace(act.range.begin, act.range.end, n.outputText);
             }
         });
@@ -344,7 +344,7 @@ public class Document implements Comparable<Document> {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         for (INeuron n : activatedNeurons) {
-            acts.addAll(n.getActivations(this));
+            acts.addAll(n.getActivations(this, false));
         }
 
         StringBuilder sb = new StringBuilder();
@@ -476,7 +476,7 @@ public class Document implements Comparable<Document> {
 
         public void propagateActivationValue(int round, Activation act)  {
             for(Activation.SynapseActivation sa: act.neuronOutputs) {
-                int r = sa.synapse.isRecurrent ? round + 1 : round;
+                int r = sa.synapse.key.isRecurrent ? round + 1 : round;
                 add(r, sa.output);
             }
         }
@@ -485,7 +485,7 @@ public class Document implements Comparable<Document> {
         private void add(Activation act) {
             add(0, act);
             for (Activation.SynapseActivation sa : act.neuronOutputs) {
-                if (sa.synapse.isRecurrent) {
+                if (sa.synapse.key.isRecurrent) {
                     add(0, sa.output);
                 }
             }
@@ -533,7 +533,7 @@ public class Document implements Comparable<Document> {
 
     public void dumpOscillatingActivations() {
         activatedNeurons.stream()
-                .flatMap(n -> n.getActivations(this).stream())
+                .flatMap(n -> n.getActivations(this, false).stream())
                 .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)
                 .forEach(act -> {
                     log.error(act.id + " " + act.range + " " + act.decision + " " + act.rounds);

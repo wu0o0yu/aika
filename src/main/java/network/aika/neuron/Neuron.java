@@ -24,6 +24,7 @@ import network.aika.Model;
 import network.aika.Provider;
 import network.aika.ReadWriteLock;
 import network.aika.Document;
+import network.aika.neuron.activation.Range;
 
 import java.util.*;
 
@@ -255,10 +256,17 @@ public class Neuron extends Provider<INeuron> {
      * @param doc The current document
      * @return A collection with all final activations of this neuron.
      */
-    public Collection<Activation> getFinalActivations(Document doc) {
+    public Collection<Activation> getActivations(Document doc, boolean onlyFinal) {
         INeuron n = getIfNotSuspended();
         if(n == null) return Collections.emptyList();
-        return n.getFinalActivations(doc);
+        return n.getActivations(doc, onlyFinal);
+    }
+
+
+    public Activation getActivation(Document doc, Range r, boolean onlyFinal) {
+        INeuron n = getIfNotSuspended();
+        if(n == null) return null;
+        return n.getActivation(doc, r, onlyFinal);
     }
 
 

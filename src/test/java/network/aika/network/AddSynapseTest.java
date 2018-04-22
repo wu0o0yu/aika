@@ -51,7 +51,6 @@ public class AddSynapseTest {
                             .setWeight(10.0)
                             .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true)
-                            .setRelativeRid(0)
             );
         }
 
@@ -62,7 +61,6 @@ public class AddSynapseTest {
             in.addInput(doc,
                     new Activation.Builder()
                             .setRange(i * 2, (i * 2) + 1)
-                            .setRelationalId(i)
             );
 
             i++;
@@ -70,6 +68,6 @@ public class AddSynapseTest {
 
         doc.process();
 
-        Assert.assertEquals(4, n.getFinalActivations(doc).size());
+        Assert.assertEquals(4, n.getActivations(doc, true).size());
     }
 }

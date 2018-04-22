@@ -109,7 +109,6 @@ public class CoreferenceResolutionTest {
                                 .setWeight(1.0)
                                 .setRangeMatch(EQUALS)
                                 .setRangeOutput(true)
-                                .setRelativeRid(0)
                 );
             }
         }

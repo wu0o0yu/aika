@@ -64,23 +64,21 @@ public class Synapse implements Writable {
     public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = (s1, s2) -> {
         int r = s1.input.compareTo(s2.input);
         if (r != 0) return r;
-        return s1.rangeOutput.compareTo(s2.rangeOutput);
+        return s1.key.compareTo(s2.key);
     };
 
 
     public static final Comparator<Synapse> OUTPUT_SYNAPSE_COMP = (s1, s2) -> {
         int r = s1.output.compareTo(s2.output);
         if (r != 0) return r;
-        return s1.rangeOutput.compareTo(s2.rangeOutput);
+        return s1.key.compareTo(s2.key);
     };
 
 
     public Neuron input;
     public Neuron output;
 
-    public int id;
-    public boolean isRecurrent;
-    public Output rangeOutput;
+    public Key key;
 
 
     public Map<Synapse, Relation> relations = new TreeMap<>();
@@ -121,17 +119,10 @@ public class Synapse implements Writable {
     public Synapse() {}
 
 
-    public Synapse(int synapseId, Neuron input, Neuron output) {
-        this.id = synapseId;
+    public Synapse(Neuron input, Neuron output, Key key) {
+        this.key = lookupKey(key);
         this.input = input;
         this.output = output;
-    }
-
-
-    public Synapse(int synapseId, Neuron input, Neuron output, boolean isRecurrent, Output rangeOutput) {
-        this(synapseId, input, output);
-        this.isRecurrent = isRecurrent;
-        this.rangeOutput = rangeOutput;
     }
 
 
@@ -150,7 +141,7 @@ public class Synapse implements Writable {
 
         out.provider.lock.acquireWriteLock();
         out.provider.inMemoryInputSynapses.put(this, this);
-        out.provider.inputSynapsesById.put(id, this);
+        out.provider.inputSynapsesById.put(key.id, this);
         out.provider.lock.releaseWriteLock();
 
         removeLinkInternal(in, out);
@@ -211,7 +202,7 @@ public class Synapse implements Writable {
 
         out.provider.lock.acquireWriteLock();
         out.provider.inMemoryInputSynapses.remove(this);
-        out.provider.inputSynapsesById.remove(id);
+        out.provider.inputSynapsesById.remove(key.id);
         out.provider.lock.releaseWriteLock();
 
         removeLinkInternal(in, out);
@@ -283,7 +274,7 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S OW:" + weight + " NW:" + (weight + weightDelta) + " rec:" + isRecurrent + " o:" + rangeOutput + " " +  input + "->" + output;
+        return "S OW:" + weight + " NW:" + (weight + weightDelta) + " rec:" + key.isRecurrent + " o:" + key.rangeOutput + " " +  input + "->" + output;
     }
 
 
@@ -292,8 +283,7 @@ public class Synapse implements Writable {
         out.writeInt(input.id);
         out.writeInt(output.id);
 
-        out.writeBoolean(isRecurrent);
-        rangeOutput.write(out);
+        key.write(out);
 
         out.writeBoolean(distanceFunction != null);
         if(distanceFunction != null) {
@@ -317,8 +307,7 @@ public class Synapse implements Writable {
         input = m.lookupNeuron(in.readInt());
         output = m.lookupNeuron(in.readInt());
 
-        isRecurrent = in.readBoolean();
-        rangeOutput = Range.Output.read(in, m);
+        key = Key.read(in, m);
 
         if(in.readBoolean()) {
             distanceFunction = DistanceFunction.valueOf(in.readUTF());
@@ -348,7 +337,7 @@ public class Synapse implements Writable {
         Synapse synapse = outputNeuron.getSynapseById(synapseId);
 
         if(synapse == null) {
-            synapse = new Synapse(synapseId, inputNeuron, outputNeuron, isRecurrent, rangeOutput);
+            synapse = new Synapse(inputNeuron, outputNeuron, new Key(synapseId, isRecurrent, rangeOutput));
 
             synapse.link();
             if(doc != null) {
@@ -384,9 +373,6 @@ public class Synapse implements Writable {
 
         public Range.Relation rangeMatch = Range.Relation.NONE;
         public Output rangeOutput = Output.NONE;
-
-        public Integer relativeRid;
-        public Integer absoluteRid;
 
         public Integer synapseId;
         public Map<Integer, Relation> relations = new TreeMap<>();
@@ -443,28 +429,6 @@ public class Synapse implements Writable {
             return this;
         }
 
-        /**
-         * If the absolute relational id (rid) not null, then it is required to match the rid of input activation.
-         *
-         * @param absoluteRid
-         * @return
-         */
-        public Builder setAbsoluteRid(Integer absoluteRid) {
-            this.absoluteRid = absoluteRid;
-            return this;
-        }
-
-        /**
-         * The relative relational id (rid) determines the relative position of this inputs rid with respect to
-         * other inputs of this neuron.
-         *
-         * @param relativeRid
-         * @return
-         */
-        public Builder setRelativeRid(Integer relativeRid) {
-            this.relativeRid = relativeRid;
-            return this;
-        }
 
 
         /**
@@ -551,6 +515,14 @@ public class Synapse implements Writable {
         }
 
 
+        public Builder addRelations(Map<Synapse, Relation> relations) {
+            for(Map.Entry<Synapse, Relation> me: relations.entrySet()) {
+                this.relations.put(me.getKey().key.id, me.getValue());
+            }
+            return this;
+        }
+
+
         public Builder addInstanceRelation(Relation.InstanceRelation.Type type, int synapseId) {
             relations.put(synapseId, new Relation.InstanceRelation(type));
             return this;
@@ -574,12 +546,68 @@ public class Synapse implements Writable {
             if(r != 0) return r;
             r = rangeMatch.compareTo(in.rangeMatch);
             if(r != 0) return r;
-            r = Utils.compareInteger(relativeRid, in.relativeRid);
-            if (r != 0) return r;
-            r = Utils.compareInteger(absoluteRid, in.absoluteRid);
-            if (r != 0) return r;
             r = rangeOutput.compareTo(in.rangeOutput);
             return r;
+        }
+    }
+
+
+    static Map<Key, Key> keyMap = new TreeMap<>();
+
+    public static Key lookupKey(Key k) {
+        Key rk = keyMap.get(k);
+        if(rk == null) {
+            keyMap.put(k, k);
+            rk = k;
+        }
+        return rk;
+    }
+
+
+    public static class Key implements Comparable<Key>, Writable {
+        public int id;
+        public boolean isRecurrent;
+        public Output rangeOutput;
+
+        private Key() {}
+
+        public Key(int id, boolean isRecurrent, Output rangeOutput) {
+            this.id = id;
+            this.isRecurrent = isRecurrent;
+            this.rangeOutput = rangeOutput;
+        }
+
+
+        @Override
+        public int compareTo(Key k) {
+            int r = Integer.compare(id, k.id);
+            if(r == 0) return r;
+            r = Boolean.compare(isRecurrent, k.isRecurrent);
+            if(r == 0) return r;
+            r = rangeOutput.compareTo(k.rangeOutput);
+            return r;
+        }
+
+
+        public static Key read(DataInput in, Model m) throws IOException {
+            Key k = new Key();
+            k.readFields(in, m);
+            return k;
+        }
+
+
+        @Override
+        public void write(DataOutput out) throws IOException {
+            out.writeInt(id);
+            out.writeBoolean(isRecurrent);
+            rangeOutput.write(out);
+        }
+
+        @Override
+        public void readFields(DataInput in, Model m) throws IOException {
+            id = in.readInt();
+            isRecurrent = in.readBoolean();
+            rangeOutput = Range.Output.read(in, m);
         }
     }
 }

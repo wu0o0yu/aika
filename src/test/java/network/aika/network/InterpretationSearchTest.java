@@ -168,8 +168,8 @@ public class InterpretationSearchTest {
 
         System.out.println(doc.activationsToString());
 
-        Assert.assertTrue(eZimmermannCompany.getFinalActivations(doc).isEmpty());
-        Assert.assertFalse(eZimmermannSurname.getFinalActivations(doc).isEmpty());
+        Assert.assertTrue(eZimmermannCompany.getActivations(doc, true).isEmpty());
+        Assert.assertFalse(eZimmermannSurname.getActivations(doc, true).isEmpty());
 
         doc.clearActivations();
 
@@ -184,8 +184,8 @@ public class InterpretationSearchTest {
 
         System.out.println(doc.activationsToString());
 
-        Assert.assertEquals(0, eZimmermannCompany.getFinalActivations(doc).size());
-        Assert.assertEquals(2, eZimmermannSurname.getFinalActivations(doc).size());
+        Assert.assertEquals(0, eZimmermannCompany.getActivations(doc, true).size());
+        Assert.assertEquals(2, eZimmermannSurname.getActivations(doc, true).size());
 
         doc.clearActivations();
     }
@@ -305,7 +305,7 @@ public class InterpretationSearchTest {
 
         System.out.println(doc.activationsToString(true, true, true));
 
-        Assert.assertFalse(nD.getFinalActivations(doc).isEmpty());
+        Assert.assertFalse(nD.getActivations(doc, true).isEmpty());
     }
 
 
@@ -454,7 +454,7 @@ public class InterpretationSearchTest {
 
         System.out.println(doc.activationsToString(true, true, true));
 
-        Assert.assertFalse(nD.getFinalActivations(doc).isEmpty());
+        Assert.assertFalse(nD.getActivations(doc, true).isEmpty());
 
     }
 }

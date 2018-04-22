@@ -76,14 +76,14 @@ public class ConverterTest {
         );
 
         System.out.println(out.get().node.get().logicToString());
-        Assert.assertEquals(1, out.get().node.get().parents.firstEntry().getValue().size());
+        Assert.assertEquals(1, out.get().node.get().parents.size());
 
         out.get().setBias(-8.5);
-        Converter.convert(m, 0, null, out.get(), out.get().inputSynapses.values());
+        Converter.convert(0, null, out.get(), out.get().inputSynapses.values());
 
         System.out.println(out.get().node.get().logicToString());
 
-        Assert.assertEquals(1, out.get().node.get().parents.firstEntry().getValue().size());
+        Assert.assertEquals(1, out.get().node.get().parents.size());
     }
 
 
@@ -130,7 +130,7 @@ public class ConverterTest {
         );
 
         System.out.println(out.get().node.get().logicToString());
-        Assert.assertEquals(1, out.get().node.get().parents.firstEntry().getValue().size());
+        Assert.assertEquals(1, out.get().node.get().parents.size());
     }
 
 
@@ -186,14 +186,14 @@ public class ConverterTest {
 
         System.out.println(out.get().node.get().logicToString());
 
-        Assert.assertEquals(2, out.get().node.get().parents.firstEntry().getValue().size());
+        Assert.assertEquals(2, out.get().node.get().parents.size());
 
 
         inD.inMemoryOutputSynapses.firstEntry().getValue().weightDelta = -1.5f;
 
-        Converter.convert(m, 0, null, out.get(), out.get().inputSynapses.values());
+        Converter.convert( 0, null, out.get(), out.get().inputSynapses.values());
         System.out.println(out.get().node.get().logicToString());
-        Assert.assertEquals(1, out.get().node.get().parents.firstEntry().getValue().size());
+        Assert.assertEquals(1, out.get().node.get().parents.size());
 
     }
 
@@ -241,7 +241,7 @@ public class ConverterTest {
         );
 
         System.out.println(out.get().node.get().logicToString());
-        Assert.assertEquals(3, out.get().node.get().parents.firstEntry().getValue().size());
+        Assert.assertEquals(3, out.get().node.get().parents.size());
 
     }
 

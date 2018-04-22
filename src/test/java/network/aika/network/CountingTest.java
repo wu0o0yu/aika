@@ -20,6 +20,7 @@ package network.aika.network;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.Writable;
+import network.aika.lattice.AndNode;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.*;
@@ -88,15 +89,15 @@ public class CountingTest {
         doc.process();
         PatternDiscovery.discover(doc,
                 new Config()
-                        .setCheckExpandable(n -> false)
+                        .setRefinementFactory((act, secondAct) -> new AndNode.Refinement())
                         .setCounter(act -> count(act))
         );
-        Assert.assertEquals(6.0, ((NodeStatistic) outA.get().node.get().parents.get(Integer.MIN_VALUE).first().get().statistic).frequency, 0.001);
+        Assert.assertEquals(6.0, ((NodeStatistic) outA.get().node.get().parents.first().parent.get().statistic).frequency, 0.001);
     }
 
 
     public void count(NodeActivation act) {
-        NodeStatistic stat = ((NodeStatistic) act.key.node.statistic);
+        NodeStatistic stat = ((NodeStatistic) act.node.statistic);
 
         stat.frequency++;
     }
