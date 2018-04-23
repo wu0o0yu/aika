@@ -20,7 +20,6 @@ package network.aika.training;
 import network.aika.*;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.*;
 import network.aika.Document;
 import network.aika.lattice.AndNode;
 import network.aika.lattice.InputNode;
@@ -29,7 +28,6 @@ import network.aika.lattice.NodeActivation;
 import network.aika.training.PatternDiscovery.Config;
 import network.aika.neuron.activation.Range;
 import network.aika.lattice.AndNode.Refinement;
-import network.aika.network.TestHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -64,7 +62,7 @@ public class PatternDiscoveryTest {
 
 
     public void count(NodeActivation act) {
-        NodeStatistic stat = ((NodeStatistic) act.key.node.statistic);
+        NodeStatistic stat = ((NodeStatistic) act.node.statistic);
         stat.frequency += 1; //ts.activations.size();
     }
 
@@ -75,20 +73,6 @@ public class PatternDiscoveryTest {
                 ((NodeStatistic) ((Node) p.get()).statistic).frequency = 0;
             }
         }
-    }
-
-
-    private boolean checkRidRange(Node n, int x) {
-        if(n instanceof InputNode) return true;
-        AndNode an = (AndNode) n;
-
-        int maxRid = 0;
-        for(AndNode.Refinement ref: an.parents.keySet()) {
-            if(ref.rid != null) {
-                maxRid = Math.max(maxRid, ref.rid);
-            }
-        }
-        return maxRid < x;
     }
 
 
@@ -104,10 +88,10 @@ public class PatternDiscoveryTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        InputNode pANode = TestHelper.addOutputNode(doc, inA, 0, null, false);
-        InputNode pBNode = TestHelper.addOutputNode(doc, inB, 0, null, false);
-        InputNode pCNode = TestHelper.addOutputNode(doc, inC, 0, null, false);
-        InputNode pDNode = TestHelper.addOutputNode(doc, inD, 0, null, false);
+        InputNode pANode = inA.get().outputNode.get();
+        InputNode pBNode = inB.get().outputNode.get();
+        InputNode pCNode = inC.get().outputNode.get();
+        InputNode pDNode = inD.get().outputNode.get();
 
 
         Config config = new Config()
@@ -117,7 +101,7 @@ public class PatternDiscoveryTest {
 
         PatternDiscovery.discover(doc, config);
 
-        inA.addInput(doc, 0, 1, 0);
+        inA.addInput(doc, 0, 2);
 
         PatternDiscovery.discover(doc, config);
 
@@ -125,7 +109,7 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(null, pANode.andChildren);
 
 
-        inB.addInput(doc, 0, 1, 0);
+        inB.addInput(doc, 0, 2);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
@@ -133,7 +117,7 @@ public class PatternDiscoveryTest {
 //        Assert.assertEquals(0, pBNode.andChildren.size());
 
 
-        inB.addInput(doc, 2, 3, 1);
+        inB.addInput(doc, 2, 4);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
@@ -141,7 +125,7 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(1, pBNode.andChildren.size());
 
 
-        inA.addInput(doc, 2, 3, 1);
+        inA.addInput(doc, 2, 4);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
@@ -159,7 +143,7 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(pBNode.provider, pAB.parents.get(new Refinement(0, pANode.provider)));
 
 
-        inC.addInput(doc, 4, 5, 2);
+        inC.addInput(doc, 4, 6);
         PatternDiscovery.discover(doc, config);
 
         Assert.assertEquals(1, ((NodeStatistic) pCNode.statistic).frequency, 0.01);
@@ -168,7 +152,7 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(2, pAB.parents.size());
 
 
-        inB.addInput(doc, 4, 5, 2);
+        inB.addInput(doc, 4, 6);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
@@ -176,14 +160,14 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(2, pBNode.andChildren.size());
 
 
-        inB.addInput(doc, 6, 7, 3);
+        inB.addInput(doc, 6, 8);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
         Assert.assertEquals(4, ((NodeStatistic) pBNode.statistic).frequency, 0.01);
         Assert.assertEquals(2, pBNode.andChildren.size());
 
-        inC.addInput(doc, 6, 7, 3);
+        inC.addInput(doc, 6, 8);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
@@ -201,7 +185,7 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(pCNode.provider, pBC.parents.get(new Refinement(0, pBNode.provider)));
 
 
-        inA.addInput(doc, 4, 5, 2);
+        inA.addInput(doc, 4, 6);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
@@ -212,7 +196,7 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(2, pCNode.andChildren.size());
 
 
-        inA.addInput(doc, 8, 9, 4);
+        inA.addInput(doc, 8, 10);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
@@ -222,7 +206,7 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(2, pBNode.andChildren.size());
         Assert.assertEquals(2, pCNode.andChildren.size());
 
-        inC.addInput(doc, 8, 9, 4);
+        inC.addInput(doc, 8, 10);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
@@ -259,7 +243,7 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(pCNode.provider, pAC.parents.get(new Refinement(0, pANode.provider)));
 
 
-        inB.addInput(doc, 8, 9, 4);
+        inB.addInput(doc, 8, 10);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
@@ -283,18 +267,18 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(pBC.provider, pABC.parents.get(new Refinement(0, pANode.provider)));
 
 
-        inD.addInput(doc, 0, 1, 0);
+        inD.addInput(doc, 0, 2);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
-        inD.addInput(doc, 4, 5, 2);
+        inD.addInput(doc, 4, 6);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
-        inA.addInput(doc, 10, 11, 5);
-        inB.addInput(doc, 10, 11, 5);
-        inC.addInput(doc, 10, 11, 5);
-        inD.addInput(doc, 10, 11, 5);
+        inA.addInput(doc, 10, 12);
+        inB.addInput(doc, 10, 12);
+        inC.addInput(doc, 10, 12);
+        inD.addInput(doc, 10, 12);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
@@ -358,7 +342,7 @@ public class PatternDiscoveryTest {
 
 
 
-        inD.addInput(doc, 8, 9, 4);
+        inD.addInput(doc, 8, 10);
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
         resetFrequency(m);
@@ -447,8 +431,8 @@ public class PatternDiscoveryTest {
         {
             Document doc = m.createDocument("ab", 0);
 
-            inA.addInput(doc, 0, 1, 0);
-            inB.addInput(doc, 1, 2, 1);
+            inA.addInput(doc, 0, 1);
+            inB.addInput(doc, 1, 2);
 
             doc.process();
 
@@ -460,8 +444,8 @@ public class PatternDiscoveryTest {
         {
             Document doc = m.createDocument("ab", 0);
 
-            inA.addInput(doc, 0, 1, 0);
-            inB.addInput(doc, 1, 2, 1);
+            inA.addInput(doc, 0, 1);
+            inB.addInput(doc, 1, 2);
 
             doc.process();
 

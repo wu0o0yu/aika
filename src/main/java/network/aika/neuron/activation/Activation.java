@@ -458,7 +458,7 @@ public final class Activation extends OrActivation {
         public final Synapse synapse;
         public final Activation input;
         public final Activation output;
-        public Map<Synapse, Relation> unmatchedRelations;
+        public Map<Integer, Relation> unmatchedRelations;
 
         public static Comparator<SynapseActivation> INPUT_COMP = (sa1, sa2) -> {
             int r = Synapse.INPUT_SYNAPSE_COMP.compare(sa1.synapse, sa2.synapse);

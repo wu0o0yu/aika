@@ -50,119 +50,119 @@ public class InterpretationSearchTest {
 
         Neuron.init(eJoergSurname, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(wJoerg)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRelativeRid(0)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 1)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(false)
         );
         Neuron.init(eZimmermannCompany, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(wZimmermann)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRelativeRid(0)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 1)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(false)
         );
 
         Neuron.init(eJoergForename, 6.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(wJoerg)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRelativeRid(0)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.END_TO_BEGIN_EQUALS, 1)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(eZimmermannSurname)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRelativeRid(1)
                         .setRecurrent(true)
-                        .setRangeMatch(Relation.NONE)
                         .setRangeOutput(false),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
                         .setRangeOutput(false)
         );
 
         Neuron.init(eZimmermannSurname, 6.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(wZimmermann)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRelativeRid(0)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.BEGIN_TO_END_EQUALS, 1)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(eJoergForename)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRelativeRid(-1)
                         .setRecurrent(true)
-                        .setRangeMatch(Relation.NONE)
                         .setRangeOutput(false),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
                         .setRangeOutput(false)
         );
 
 
         Neuron.init(suppr, 0.0, INeuron.Type.INHIBITORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(eJoergForename)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(eJoergSurname)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(eZimmermannCompany)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(3)
                         .setNeuron(eZimmermannSurname)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
         Document doc = m.createDocument("Joerg Zimmermann");
 
-        wJoerg.addInput(doc, 0, 6, 0);
-        wZimmermann.addInput(doc, 6, 16, 1);
+        wJoerg.addInput(doc, 0, 6);
+        wZimmermann.addInput(doc, 6, 16);
 
         doc.process();
 
@@ -175,10 +175,10 @@ public class InterpretationSearchTest {
 
         doc = m.createDocument("Joerg Zimmermann Joerg Zimmermann");
 
-        wJoerg.addInput(doc, 0, 6, 0);
-        wZimmermann.addInput(doc, 6, 17, 1);
-        wJoerg.addInput(doc, 17, 23, 2);
-        wZimmermann.addInput(doc, 23, 33, 3);
+        wJoerg.addInput(doc, 0, 6);
+        wZimmermann.addInput(doc, 6, 17);
+        wJoerg.addInput(doc, 17, 23);
+        wZimmermann.addInput(doc, 23, 33);
 
         doc.process();
 
@@ -204,94 +204,99 @@ public class InterpretationSearchTest {
 
         Neuron nC = Neuron.init(m.createNeuron("C"), 6.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
         );
 
         Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(nF)
                         .setWeight(2.0)
                         .setBias(0.0)
-                        .setRangeMatch(Range.Relation.NONE),
+                        .addRangeRelation(Relation.NONE, 0),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
         );
 
         Neuron nE = Neuron.init(m.createNeuron("E"), 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
         );
 
         Neuron.init(nF, 6.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
         );
 
 
         Neuron.init(inhib, 0.0, INeuron.Type.INHIBITORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(nC)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(nD)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(nE)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(3)
                         .setNeuron(nF)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -327,49 +332,51 @@ public class InterpretationSearchTest {
 
         Neuron nC = Neuron.init(m.createNeuron("C"), 6.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
         );
 
         Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
         );
 
         inhib.addSynapse(
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(nC)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
         inhib.addSynapse(
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(nD)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -389,60 +396,64 @@ public class InterpretationSearchTest {
 
         // Complete the model
 
-        nD.addSynapse(doc, new Synapse.Builder()
-                .setNeuron(nF)
-                .setWeight(2.0)
-                .setBias(0.0)
-                .setRangeMatch(Range.Relation.NONE)
+        nD.addSynapse(doc,
+                new Synapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(nF)
+                        .setWeight(2.0)
+                        .setBias(0.0)
+                        .addRangeRelation(Range.Relation.NONE, 0)
         );
 
         Neuron.init(doc, nE, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
         );
 
         Neuron.init(doc, nF, 6.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
         );
 
         inhib.addSynapse(
                 doc,
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(nE)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
         inhib.addSynapse(
                 doc,
                 new Synapse.Builder()
+                        .setSynapseId(3)
                         .setNeuron(nF)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true)
         );
 

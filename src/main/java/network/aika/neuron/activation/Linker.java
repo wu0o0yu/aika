@@ -79,7 +79,11 @@ public class Linker {
                 Activation iAct = ol.input.getInputActivation(i);
                 SynapseActivation sa = link(s, iAct, act);
 
-                ol.oe.
+                for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+                    if(ol.oe.revSynapseIds.get(me.getValue()) != null) {
+                        sa.unmatchedRelations.remove(me.getKey());
+                    }
+                }
             }
         }
         process();
@@ -121,24 +125,24 @@ public class Linker {
 
     public void process() {
         for(SynapseActivation linkedSA: queue) {
-            for(Map.Entry<Synapse, Relation> me: linkedSA.unmatchedRelations.entrySet()) {
-                Synapse s = me.getKey();
+            for(Map.Entry<Integer, Relation> me: linkedSA.unmatchedRelations.entrySet()) {
+                Synapse s = linkedSA.output.getNeuron().getSynapseById(me.getKey());
                 Relation r = me.getValue();
                 INeuron.ThreadState ts = s.input.get().getThreadState(doc.threadId, true);
                 if(!r.isExact()) {
                     for(Activation iAct: ts.activations.values()) {
                         if(r.test(iAct, linkedSA.input)) {
                             SynapseActivation sa = link(s, iAct, linkedSA.output);
-                            sa.unmatchedRelations.remove(linkedSA.synapse);
-                            linkedSA.unmatchedRelations.remove(sa.synapse);
+                            sa.unmatchedRelations.remove(linkedSA.synapse.key.id);
+                            linkedSA.unmatchedRelations.remove(sa.synapse.key.id);
                         }
                     }
                 } else {
                     for(Activation iAct: r.getLinkedActivationCandidates(linkedSA.input)) {
                         if(iAct.getNeuron() == s.input && r.test(iAct, linkedSA.input)) {
                             SynapseActivation sa = link(s, iAct, linkedSA.output);
-                            sa.unmatchedRelations.remove(linkedSA.synapse);
-                            linkedSA.unmatchedRelations.remove(sa.synapse);
+                            sa.unmatchedRelations.remove(linkedSA.synapse.key.id);
+                            linkedSA.unmatchedRelations.remove(sa.synapse.key.id);
                         }
                     }
                 }

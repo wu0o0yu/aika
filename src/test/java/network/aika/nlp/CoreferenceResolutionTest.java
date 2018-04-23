@@ -1,4 +1,4 @@
-package network.aika.network;
+package network.aika.nlp;
 
 import network.aika.ActivationFunction;
 import network.aika.Document;
@@ -6,6 +6,7 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.activation.Range;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -67,36 +68,39 @@ public class CoreferenceResolutionTest {
 
         Neuron.init(maleCoref, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(malePronounN)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true, true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(maleNameN)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(NONE)
+                        .addRangeRelation(Range.Relation.NONE, 0)
 
         );
         Neuron.init(femaleCoref, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(femalePronounN)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true, true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(femaleNameN)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(NONE)
+                        .addRangeRelation(Range.Relation.NONE, 0)
 
         );
     }
 
 
     void addWords(String[] words, Neuron classN) {
+        int i = 0;
         for(String word: words) {
             Neuron wordN = m.createNeuron("W-" + word);
 
@@ -105,9 +109,9 @@ public class CoreferenceResolutionTest {
             if(classN != null) {
                 classN.addSynapse(
                         new Synapse.Builder()
+                                .setSynapseId(i++)
                                 .setNeuron(wordN)
                                 .setWeight(1.0)
-                                .setRangeMatch(EQUALS)
                                 .setRangeOutput(true)
                 );
             }

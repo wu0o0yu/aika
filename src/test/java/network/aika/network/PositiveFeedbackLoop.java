@@ -24,32 +24,34 @@ public class PositiveFeedbackLoop {
 
         Neuron.init(nC, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(nD)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(Range.Relation.EQUALS, 0)
         );
 
         Neuron.init(nD, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(nC)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(Range.Relation.EQUALS, 0)
         );
 
 
@@ -59,7 +61,7 @@ public class PositiveFeedbackLoop {
 
         doc.process();
 
-        Assert.assertFalse(nC.getFinalActivations(doc).isEmpty());
-        Assert.assertFalse(nD.getFinalActivations(doc).isEmpty());
+        Assert.assertFalse(nC.getActivations(doc, true).isEmpty());
+        Assert.assertFalse(nD.getActivations(doc, true).isEmpty());
     }
 }

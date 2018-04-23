@@ -46,33 +46,36 @@ public class ConverterTest {
                 -9.5,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(4.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .addRangeRelation(Relation.EQUALS, 1)
+                        .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(3.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .addRangeRelation(Relation.EQUALS, 2)
+                        .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .addRangeRelation(Relation.EQUALS, 3)
+                        .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(3)
                         .setNeuron(inD)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRangeOutput(true)
         );
 
         System.out.println(out.get().node.get().logicToString());
@@ -100,32 +103,35 @@ public class ConverterTest {
                 -5.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 1)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 2)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 3)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
+                        .setSynapseId(3)
                         .setNeuron(inD)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(Range.Output.DIRECT)
         );
 
@@ -148,39 +154,43 @@ public class ConverterTest {
                 -11.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(5.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 1)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(5.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 2)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 3)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
+                        .setSynapseId(3)
                         .setNeuron(inD)
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 4)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
+                        .setSynapseId(4)
                         .setNeuron(inE)
                         .setWeight(0.5f)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(Range.Output.DIRECT)
         );
 
@@ -211,33 +221,36 @@ public class ConverterTest {
                 -50.5,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .addRangeRelation(Relation.EQUALS, 1)
+                        .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(3.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .addRangeRelation(Relation.EQUALS, 2)
+                        .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .addRangeRelation(Relation.EQUALS, 3)
+                        .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(3)
                         .setNeuron(inD)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRangeOutput(true)
         );
 
         System.out.println(out.get().node.get().logicToString());

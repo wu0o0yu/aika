@@ -60,6 +60,7 @@ public class WeightsTest {
                 0.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inAA)
                         .setWeight(3.0)
                         .setRecurrent(false)
@@ -67,6 +68,7 @@ public class WeightsTest {
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inBA)
                         .setWeight(4.0)
                         .setRecurrent(false)
@@ -81,6 +83,7 @@ public class WeightsTest {
                 0.001,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(pOrA)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -88,6 +91,7 @@ public class WeightsTest {
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inCA)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -95,6 +99,7 @@ public class WeightsTest {
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(pSuppr)
                         .setWeight(-2.0)
                         .setRecurrent(true)
@@ -112,6 +117,7 @@ public class WeightsTest {
                 0.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inAB)
                         .setWeight(2.0)
                         .setRecurrent(false)
@@ -119,6 +125,7 @@ public class WeightsTest {
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inBB)
                         .setWeight(5.0)
                         .setRecurrent(false)
@@ -132,6 +139,7 @@ public class WeightsTest {
                 0.001,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(pOrB)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -139,6 +147,7 @@ public class WeightsTest {
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inCB)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -146,6 +155,7 @@ public class WeightsTest {
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(pSuppr)
                         .setWeight(-2.0)
                         .setRecurrent(true)
@@ -158,6 +168,7 @@ public class WeightsTest {
                 0.0,
                 INeuron.Type.INHIBITORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(pDA)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -165,6 +176,7 @@ public class WeightsTest {
                         .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(pDB)
                         .setWeight(1.0)
                         .setRecurrent(false)

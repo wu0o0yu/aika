@@ -61,27 +61,26 @@ public class OverlappingOrTest {
                 2.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(4.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
+                        .addRangeRelation(Relation.END_TO_BEGIN_EQUALS, 1)
                         .setBias(-4.0)
-                        .setRangeMatch(Operator.EQUALS, Operator.GREATER_THAN_EQUAL)
                         .setRangeOutput(Range.Output.BEGIN),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setRelativeRid(1)
-                        .setBias(0.0)
-                        .setRangeMatch(Relation.CONTAINS),
+                        .addRangeRelation(Relation.END_TO_BEGIN_EQUALS, 2)
+                        .setBias(0.0),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(4.0)
                         .setRecurrent(false)
-                        .setRelativeRid(2)
                         .setBias(-4.0)
-                        .setRangeMatch(Operator.LESS_THAN_EQUAL, Operator.EQUALS)
                         .setRangeOutput(Range.Output.END)
         );
 
@@ -93,7 +92,7 @@ public class OverlappingOrTest {
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).addInput(doc, i, i + 1, wordPos++);
+                inputNeurons.get(c).addInput(doc, i, i + 2);
             }
             System.out.println(doc.activationsToString(false, false, true));
         }

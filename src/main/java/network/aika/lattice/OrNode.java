@@ -272,6 +272,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
     public static class OrEntry implements Comparable<OrEntry>, Writable {
         public int[] synapseIds;
+        public TreeMap<Integer, Integer> revSynapseIds = new TreeMap<>();
         public Provider<? extends Node> parent;
         public Provider<OrNode> child;
 
@@ -279,6 +280,10 @@ public class OrNode extends Node<OrNode, Activation> {
 
         public OrEntry(int[] synapseIds, Provider<? extends Node> parent, Provider<OrNode> child) {
             this.synapseIds = synapseIds;
+            for(int ofs = 0; ofs < synapseIds.length; ofs++) {
+                revSynapseIds.put(synapseIds[ofs], ofs);
+            }
+
             this.parent = parent;
             this.child = child;
         }
@@ -309,6 +314,7 @@ public class OrNode extends Node<OrNode, Activation> {
                 if(in.readBoolean()) {
                     Integer ofs = in.readInt();
                     synapseIds[i] = ofs;
+                    revSynapseIds.put(ofs, i);
                 }
             }
             parent = m.lookupNodeProvider(in.readInt());

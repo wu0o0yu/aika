@@ -42,21 +42,22 @@ public class AddSynapseTest {
 
         TreeMap<String, Neuron> inputNeurons = new TreeMap<>();
 
+        int i = 0;
         for(String l: new String[] {"A", "B", "C", "D"}) {
             Neuron in = m.createNeuron(l);
             inputNeurons.put(l, in);
             n.addSynapse(
                     new Synapse.Builder()
+                            .setSynapseId(i++)
                             .setNeuron(in)
                             .setWeight(10.0)
-                            .setRangeMatch(Relation.EQUALS)
                             .setRangeOutput(true)
             );
         }
 
         Document doc = m.createDocument("                   ");
 
-        int i = 0;
+        i = 0;
         for(Neuron in: inputNeurons.values()) {
             in.addInput(doc,
                     new Activation.Builder()

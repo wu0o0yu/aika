@@ -22,6 +22,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Range;
 import network.aika.lattice.NodeActivation;
 import network.aika.neuron.activation.Range.Operator;
@@ -60,27 +61,26 @@ public class SimplePatternMatchingTest {
                 0.4,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setRelativeRid(0)
                         .setBias(-0.9)
-                        .setRangeMatch(Operator.EQUALS, Operator.GREATER_THAN_EQUAL)
+                        .setRecurrent(false)
+                        .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 1)
                         .setRangeOutput(true, false),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setRelativeRid(1)
                         .setBias(-0.9)
-                        .setRangeMatch(Range.Relation.CONTAINS),
+                        .setRecurrent(false)
+                        .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 2),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setRelativeRid(2)
                         .setBias(-0.9)
-                        .setRangeMatch(Operator.LESS_THAN_EQUAL, Operator.EQUALS)
+                        .setRecurrent(false)
                         .setRangeOutput(false, true)
         );
 
@@ -93,7 +93,7 @@ public class SimplePatternMatchingTest {
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).addInput(doc, i, i + 1, wordPos);
+                inputNeurons.get(c).addInput(doc, i, i + 2);
             } else {
                 wordPos++;
             }
@@ -107,10 +107,9 @@ public class SimplePatternMatchingTest {
 
         System.out.println("Output activation:");
         INeuron n = pattern.get();
-        for(NodeActivation act: n.getActivations(doc)) {
-            System.out.println("Text Range: " + act.key.range);
-            System.out.println("Node: " + act.key.node);
-            System.out.println("Rid: " + act.key.rid);
+        for(Activation act: n.getActivations(doc, false)) {
+            System.out.println("Text Range: " + act.range);
+            System.out.println("Node: " + act.node);
             System.out.println();
         }
 
@@ -145,34 +144,33 @@ public class SimplePatternMatchingTest {
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
-                        .setRangeMatch(Operator.EQUALS, Operator.GREATER_THAN_EQUAL)
+                        .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 1)
                         .setRangeOutput(true, false),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRelativeRid(1)
-                        .setRangeMatch(Range.Relation.CONTAINS),
+                        .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 2),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRelativeRid(2)
-                        .setRangeMatch(Range.Relation.CONTAINS),
+                        .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 3),
                 new Synapse.Builder()
+                        .setSynapseId(3)
                         .setNeuron(inputNeurons.get('e'))
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRelativeRid(3)
-                        .setRangeMatch(Operator.LESS_THAN_EQUAL, Operator.EQUALS)
                         .setRangeOutput(false, true)
         );
 
@@ -185,7 +183,7 @@ public class SimplePatternMatchingTest {
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).addInput(doc, i, i + 1, wordPos);
+                inputNeurons.get(c).addInput(doc, i, i + 2);
             } else {
                 wordPos++;
             }
@@ -199,10 +197,9 @@ public class SimplePatternMatchingTest {
 
         System.out.println("Output activation:");
         INeuron n = pattern.get();
-        for(NodeActivation act: n.getActivations(doc)) {
-            System.out.println("Text Range: " + act.key.range);
-            System.out.println("Node: " + act.key.node);
-            System.out.println("Rid: " + act.key.rid);
+        for(Activation act: n.getActivations(doc, false)) {
+            System.out.println("Text Range: " + act.range);
+            System.out.println("Node: " + act.node);
             System.out.println();
         }
 

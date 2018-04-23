@@ -22,6 +22,7 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.activation.Range;
 import org.junit.Test;
 
 import static network.aika.neuron.activation.Range.Relation.EQUALS;
@@ -44,11 +45,13 @@ public class SimpleWeightsTest {
                 0.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(0.3f)
                         .setRecurrent(false)
                         .setBias(0.0),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(0.4f)
                         .setRecurrent(false)
@@ -93,17 +96,19 @@ public class SimpleWeightsTest {
                 0.01,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(3.0)
-                        .setRecurrent(false)
                         .setBias(-3.0)
-                        .setRangeMatch(EQUALS)
+                        .setRecurrent(false)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(3.0)
-                        .setRecurrent(false)
                         .setBias(-3.0)
+                        .setRecurrent(false)
+                        .addRangeRelation(Range.Relation.EQUALS, 0)
         );
 
         {

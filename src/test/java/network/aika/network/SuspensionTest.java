@@ -23,7 +23,6 @@ import network.aika.Provider;
 import network.aika.SuspensionHook;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.*;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Range.Relation;
 import org.junit.Assert;
@@ -73,20 +72,19 @@ public class SuspensionTest {
                 5.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-9.0)
-                        .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setRangeMatch(Relation.BEGIN_EQUALS)
+                        .addRangeRelation(Relation.END_TO_BEGIN_EQUALS, 1)
                         .setRangeOutput(true, false),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-9.0)
-                        .setRelativeRid(null)
                         .setRecurrent(false)
-                        .setRangeMatch(Relation.END_EQUALS)
                         .setRangeOutput(false, true)
         );
 
@@ -95,11 +93,11 @@ public class SuspensionTest {
                 5.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(nC)
                         .setWeight(10.0)
                         .setBias(-9.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -112,16 +110,16 @@ public class SuspensionTest {
         Document doc = m.createDocument("Bla");
 
         inA = m.lookupNeuron(idA);
-        inA.addInput(doc, 0, 1, 0);
+        inA.addInput(doc, 0, 1);
 
         inB = m.lookupNeuron(idB);
-        inB.addInput(doc, 1, 2, 1);
+        inB.addInput(doc, 1, 2);
 
         doc.process();
 
         System.out.println(doc.activationsToString());
 
-        Assert.assertFalse(outD.getFinalActivations(doc).isEmpty());
+        Assert.assertFalse(outD.getActivations(doc, true).isEmpty());
     }
 
 

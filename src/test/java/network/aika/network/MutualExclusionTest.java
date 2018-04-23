@@ -75,18 +75,19 @@ public class MutualExclusionTest {
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(Range.Relation.EQUALS, 0)
         );
 
         Neuron pB = Neuron.init(
@@ -95,18 +96,19 @@ public class MutualExclusionTest {
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(Range.Relation.EQUALS, 0)
         );
 
         Neuron pC = Neuron.init(
@@ -115,18 +117,19 @@ public class MutualExclusionTest {
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inC)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(Range.Relation.EQUALS, 0)
         );
 
         // Finally addInput all the inputs to the suppressing neuron.
@@ -136,25 +139,25 @@ public class MutualExclusionTest {
                 ActivationFunction.RECTIFIED_LINEAR_UNIT,
                 INeuron.Type.INHIBITORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(pA)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(pB)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(pC)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -163,11 +166,11 @@ public class MutualExclusionTest {
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(pB)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -186,11 +189,11 @@ public class MutualExclusionTest {
 
         System.out.println(doc.activationsToString(true, false, true));
 
-        Assert.assertTrue(pA.getFinalActivations(doc).isEmpty());
-        Assert.assertFalse(pB.getFinalActivations(doc).isEmpty());
-        Assert.assertTrue(pC.getFinalActivations(doc).isEmpty());
+        Assert.assertTrue(pA.getActivations(doc, true).isEmpty());
+        Assert.assertFalse(pB.getActivations(doc, true).isEmpty());
+        Assert.assertTrue(pC.getActivations(doc, true).isEmpty());
 
-        Assert.assertFalse(outN.getFinalActivations(doc).isEmpty());
+        Assert.assertFalse(outN.getActivations(doc, true).isEmpty());
         doc.clearActivations();
     }
 }

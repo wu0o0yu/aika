@@ -74,7 +74,7 @@ public class Converter {
 
         TreeSet<Synapse> tmp = new TreeSet<>(SYNAPSE_COMP);
         for(Synapse s: neuron.inputSynapses.values()) {
-            if(!s.isNegative() && !s.isRecurrent && !s.inactive) {
+            if(!s.isNegative() && !s.key.isRecurrent && !s.inactive) {
                 tmp.add(s);
             }
         }
@@ -161,8 +161,8 @@ public class Converter {
             in.lock.acquireWriteLock();
             try {
                 if (!s.inactive) {
-                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
-                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.getNewWeight();
+                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
+                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.getNewWeight();
 
                     if (s.isConjunction(false, true) && !s.isConjunction(true, true)) {
                         neuron.numDisjunctiveSynapses++;
@@ -215,7 +215,7 @@ public class Converter {
             Relation[] relations = new Relation[nln.offsets.length];
             for(int i = 0; i < nc.offsets.length; i++) {
                 Synapse linkedSynapse = nc.offsets[i];
-                relations[i] = s.relations.get(linkedSynapse);
+                relations[i] = s.relations.get(linkedSynapse.key.id);
             }
 
             AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.input.get().outputNode);
@@ -244,7 +244,7 @@ public class Converter {
         int[] getSynapseIds() {
             int[] result = new int[offsets.length];
             for(int i = 0; i < result.length; i++) {
-                result[i] = offsets[i].id;
+                result[i] = offsets[i].key.id;
             }
             return result;
         }

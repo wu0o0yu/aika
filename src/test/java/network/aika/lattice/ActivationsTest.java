@@ -19,15 +19,11 @@ package network.aika.lattice;
 
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.network.TestHelper;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Range;
-import network.aika.neuron.activation.Range.Relation;
-import network.aika.neuron.activation.Selector;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,6 +44,7 @@ public class ActivationsTest {
 
         Neuron pA = Neuron.init(m.createNeuron("pA"), 0.5, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setBias(-1.0)
@@ -60,15 +57,15 @@ public class ActivationsTest {
         inA.addInput(doc, 0, 1);
         inA.addInput(doc, 2, 3);
 
-        Assert.assertNotNull(TestHelper.get(doc, pA.get(), new Range(0, 1)));
-        Assert.assertNull(TestHelper.get(doc, pA.get(), new Range(1, 2)));
-        Assert.assertNotNull(TestHelper.get(doc, pA.get(), new Range(2, 3)));
+        Assert.assertNotNull(pA.getActivation(doc, new Range(0, 1), false));
+        Assert.assertNull(pA.getActivation(doc, new Range(1, 2), false));
+        Assert.assertNotNull(pA.getActivation(doc, new Range(2, 3), false));
 
         inA.addInput(doc, 1, 2);
 
-        Assert.assertEquals(pA.getActivation(doc, new Range(0, 1), false), TestHelper.get(doc, pA.get(), new Range(0, 1)));
-        Assert.assertEquals(pA.getActivation(doc, new Range(1, 2), false), TestHelper.get(doc, pA.get(), new Range(1, 2)));
-        Assert.assertEquals(pA.getActivation(doc, new Range(2, 3), false), TestHelper.get(doc, pA.get(), new Range(2, 3)));
+        Assert.assertNotNull(pA.getActivation(doc, new Range(0, 1), false));
+        Assert.assertNotNull(pA.getActivation(doc, new Range(1, 2), false));
+        Assert.assertNotNull(pA.getActivation(doc, new Range(2, 3), false));
     }
 
 
@@ -90,8 +87,6 @@ public class ActivationsTest {
         inNode.processActivation(new Activation(0, doc, new Range(0, 1), inNode));
 
         inNode.processActivation(new Activation(0, doc, new Range(0, 1), inNode));
-
- //       Assert.assertEquals(1, Activation.get(t, inNode, new Range(0, 1), doc.bottom).key.fired);
     }
 
 }

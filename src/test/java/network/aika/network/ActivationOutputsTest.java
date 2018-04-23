@@ -35,6 +35,7 @@ import org.junit.Test;
 import java.util.Collection;
 import java.util.Set;
 
+import static network.aika.neuron.activation.Range.Relation.END_TO_BEGIN_EQUALS;
 import static network.aika.neuron.activation.Range.Relation.EQUALS;
 import static network.aika.neuron.activation.Range.Operator.GREATER_THAN_EQUAL;
 import static network.aika.neuron.activation.Range.Operator.LESS_THAN_EQUAL;
@@ -59,18 +60,19 @@ public class ActivationOutputsTest {
                 0.001,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeMatch(Operator.EQUALS, NONE)
+                        .addRangeRelation(END_TO_BEGIN_EQUALS, 1)
                         .setRangeOutput(Range.Output.BEGIN),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeMatch(NONE, Operator.EQUALS)
                         .setRangeOutput(Range.Output.END)
         );
 
@@ -80,37 +82,37 @@ public class ActivationOutputsTest {
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);
 
-        Activation inA1 = TestHelper.get(doc, inA.get(), new Range(0, 1));
-        Activation inB1 = TestHelper.get(doc, inB.get(), new Range(0, 1));
+        Activation inA1 = inA.getActivation(doc, new Range(0, 1), false);
+        Activation inB1 = inB.getActivation(doc, new Range(0, 1), false);
 
-        Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, TestHelper.get(doc, pAB.get(), new Range(0, 1))));
-        Assert.assertTrue(containsOutputActivation(inB1.neuronOutputs, TestHelper.get(doc, pAB.get(), new Range(0, 1))));
+        Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, pAB.getActivation(doc, new Range(0, 1), false)));
+        Assert.assertTrue(containsOutputActivation(inB1.neuronOutputs, pAB.getActivation(doc, new Range(0, 1), false)));
 
-        Activation actAB = TestHelper.get(doc, pAB.get(), new Range(0, 1));
+        Activation actAB = pAB.getActivation(doc, new Range(0, 1), false);
         Assert.assertEquals(
-                TestHelper.get(doc, inA.get(), new Range(0, 1)),
+                inA.getActivation(doc, new Range(0, 1), false),
                 selectInputActivation(actAB.neuronInputs.values(), inA.get().node.get())
         );
 
-        actAB = TestHelper.get(doc, pAB.get(), new Range(0, 1));
+        actAB = pAB.getActivation(doc, new Range(0, 1), false);
         Assert.assertEquals(
-                TestHelper.get(doc,inB.get(), new Range(0, 1)),
+                inB.getActivation(doc, new Range(0, 1), false),
                 selectInputActivation(actAB.neuronInputs.values(), inB.get().node.get())
         );
 
 
-        Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, TestHelper.get(doc, pAB.get(), new Range(0, 1))));
-        Assert.assertTrue(containsOutputActivation(inB1.neuronOutputs, TestHelper.get(doc, pAB.get(), new Range(0, 1))));
+        Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, pAB.getActivation(doc, new Range(0, 1), false)));
+        Assert.assertTrue(containsOutputActivation(inB1.neuronOutputs, pAB.getActivation(doc, new Range(0, 1), false)));
 
-        actAB = TestHelper.get(doc, pAB.get(), new Range(0, 1));
+        actAB = pAB.getActivation(doc, new Range(0, 1), false);
         Assert.assertEquals(
-                TestHelper.get(doc, inA.get(), new Range(0, 1)),
+                inA.getActivation(doc, new Range(0, 1), false),
                 selectInputActivation(actAB.neuronInputs.values(), inA.get().node.get())
         );
 
-        actAB = TestHelper.get(doc, pAB.get(), new Range(0, 1));
+        actAB = pAB.getActivation(doc, new Range(0, 1), false);
         Assert.assertEquals(
-                TestHelper.get(doc, inB.get(), new Range(0, 1)),
+                inB.getActivation(doc, new Range(0, 1), false),
                 selectInputActivation(actAB.neuronInputs.values(), inB.get().node.get())
         );
     }
@@ -143,6 +145,7 @@ public class ActivationOutputsTest {
 
         INeuron outB = Neuron.init(m.createNeuron("B"), 0.5, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setBias(-1.0)
@@ -170,11 +173,11 @@ public class ActivationOutputsTest {
 
         INeuron outB = Neuron.init(m.createNeuron("B"), 0.001, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         ).get();
 

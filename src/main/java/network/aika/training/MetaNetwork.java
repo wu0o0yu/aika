@@ -56,7 +56,7 @@ public class MetaNetwork {
                 .collect(Collectors.toList());
 
         for (INeuron n : inhibitoryNeurons) {
-            for (Activation inhibAct : n.getFinalActivations(doc)) {
+            for (Activation inhibAct : n.getActivations(doc, true)) {
                 for (Activation.SynapseActivation sa : inhibAct.getFinalInputActivations()) {
                     Activation act = sa.input;
                     Neuron targetNeuron = act.getNeuron();

@@ -208,9 +208,7 @@ public class Neuron extends Provider<INeuron> {
         int i = 0;
         for (Synapse.Builder input : inputs) {
             Synapse s = is.get(i);
-            for(Map.Entry<Integer, Relation> me: input.relations.entrySet()) {
-                s.relations.put(synapseIds.get(me.getKey()), me.getValue());
-            }
+            s.relations.putAll(input.relations);
             i++;
         }
 
@@ -241,7 +239,6 @@ public class Neuron extends Provider<INeuron> {
 
         INeuron.update(model, doc != null ? doc.threadId : model.defaultThreadId, doc, this, 0.0, Collections.singletonList(s));
     }
-
 
 
     public Synapse getSynapseById(int synapseId) {

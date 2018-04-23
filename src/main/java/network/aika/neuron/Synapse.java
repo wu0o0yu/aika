@@ -80,8 +80,9 @@ public class Synapse implements Writable {
 
     public Key key;
 
+    // synapseId -> relation
+    public Map<Integer, Relation> relations = new TreeMap<>();
 
-    public Map<Synapse, Relation> relations = new TreeMap<>();
     public DistanceFunction distanceFunction = null;
 
 
@@ -280,10 +281,16 @@ public class Synapse implements Writable {
 
     @Override
     public void write(DataOutput out) throws IOException {
+        key.write(out);
+
         out.writeInt(input.id);
         out.writeInt(output.id);
 
-        key.write(out);
+        out.writeInt(relations.size());
+        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
+            out.writeInt(me.getKey());
+            me.getValue().write(out);
+        }
 
         out.writeBoolean(distanceFunction != null);
         if(distanceFunction != null) {
@@ -304,10 +311,17 @@ public class Synapse implements Writable {
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
+        key = Key.read(in, m);
+
         input = m.lookupNeuron(in.readInt());
         output = m.lookupNeuron(in.readInt());
 
-        key = Key.read(in, m);
+        int l = in.readInt();
+        for(int i = 0; i < l; i++) {
+            int synId = in.readInt();
+            Relation r = Relation.read(in, m);
+            relations.put(synId, r);
+        }
 
         if(in.readBoolean()) {
             distanceFunction = DistanceFunction.valueOf(in.readUTF());
@@ -371,7 +385,6 @@ public class Synapse implements Writable {
         public double weight;
         public double bias;
 
-        public Range.Relation rangeMatch = Range.Relation.NONE;
         public Output rangeOutput = Output.NONE;
 
         public Integer synapseId;
@@ -426,34 +439,6 @@ public class Synapse implements Writable {
          */
         public Builder setBias(double bias) {
             this.bias = bias;
-            return this;
-        }
-
-
-
-        /**
-         * <code>setRangeMatch</code> is just a convenience function to call both
-         * <code>setBeginToBeginRangeMatch</code> and <code>setEndToEndRangeMatch</code> at the same time.
-         *
-         * @param rr
-         * @return
-         */
-        public Builder setRangeMatch(Range.Relation rr) {
-            rangeMatch = rr;
-            return this;
-        }
-
-
-        /**
-         * <code>setRangeMatch</code> is just a convenience function to call both
-         * <code>setBeginToBeginRangeMatch</code> and <code>setEndToEndRangeMatch</code> at the same time.
-         *
-         * @param beginToBegin
-         * @param endToEnd
-         * @return
-         */
-        public Builder setRangeMatch(Range.Operator beginToBegin, Range.Operator endToEnd) {
-            rangeMatch = Range.Relation.create(beginToBegin, endToEnd);
             return this;
         }
 
@@ -515,10 +500,8 @@ public class Synapse implements Writable {
         }
 
 
-        public Builder addRelations(Map<Synapse, Relation> relations) {
-            for(Map.Entry<Synapse, Relation> me: relations.entrySet()) {
-                this.relations.put(me.getKey().key.id, me.getValue());
-            }
+        public Builder addRelations(Map<Integer, Relation> relations) {
+            this.relations.putAll(relations);
             return this;
         }
 
@@ -542,12 +525,7 @@ public class Synapse implements Writable {
 
         @Override
         public int compareTo(Builder in) {
-            int r = neuron.compareTo(in.neuron);
-            if(r != 0) return r;
-            r = rangeMatch.compareTo(in.rangeMatch);
-            if(r != 0) return r;
-            r = rangeOutput.compareTo(in.rangeOutput);
-            return r;
+            return Integer.compare(synapseId, in.synapseId);
         }
     }
 

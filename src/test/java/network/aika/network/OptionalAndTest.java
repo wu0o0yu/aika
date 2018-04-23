@@ -45,11 +45,13 @@ public class OptionalAndTest {
                 0.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(wordEssen)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(wordHamburg)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -59,11 +61,13 @@ public class OptionalAndTest {
                 0.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(wordEssen)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(wordGehen)
                         .setWeight(1.0)
                         .setRecurrent(false)
@@ -75,16 +79,19 @@ public class OptionalAndTest {
                 0.001,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(hintNoun)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(upperCase)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-1.0)
                         .setRecurrent(true)
@@ -95,11 +102,13 @@ public class OptionalAndTest {
                 0.001,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(hintVerb)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(suppr)
                         .setWeight(-1.0)
                         .setRecurrent(true)
@@ -110,11 +119,13 @@ public class OptionalAndTest {
                 0.0,
                 INeuron.Type.INHIBITORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(noun)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(verb)
                         .setWeight(1.0)
                         .setBias(0.0)

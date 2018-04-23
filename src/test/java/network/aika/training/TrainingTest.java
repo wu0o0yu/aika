@@ -160,7 +160,7 @@ public class TrainingTest {
             doc.process();
 
             System.out.println(doc.activationsToString(true, false, true));
-            Assert.assertFalse(outC.getFinalActivations(doc).isEmpty());
+            Assert.assertFalse(outC.getActivations(doc,true).isEmpty());
 
             doc.clearActivations();
         }

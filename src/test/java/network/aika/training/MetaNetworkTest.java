@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static network.aika.neuron.activation.Range.Operator.*;
-import static network.aika.neuron.activation.Range.Relation.OVERLAPS;
+import static network.aika.neuron.activation.Range.Relation.*;
 
 public class MetaNetworkTest {
 
@@ -40,8 +40,8 @@ public class MetaNetworkTest {
 
         Document doc = model.createDocument(text);
 
-        parseWord(doc, 0, 5, 0, "Alan");
-        parseWord(doc, 5, 12, 1, "Smithee");
+        parseWord(doc, 0, 5, "Alan");
+        parseWord(doc, 5, 12, "Smithee");
 
         keyPhraseHint.addInput(doc, 0, 12);
 
@@ -97,76 +97,79 @@ public class MetaNetworkTest {
 
         MetaNetwork.initMetaNeuron(phraseMetaN, 4.0, 6.0,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(keyPhraseHint)
                         .setWeight(40.0)
                         .setBias(-40.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new MetaSynapse.Builder() // First word of the phrase
                         .setMetaWeight(20.0)
                         .setMetaBias(-20.0)
                         .setMetaRelativeRid(true)
+                        .setSynapseId(1)
                         .setNeuron(wordSuppr)
                         .setWeight(20.0)
                         .setBias(-20.0)
-                        .setRelativeRid(0)
-                        .setRangeMatch(EQUALS, GREATER_THAN_EQUAL)
+                        .addRangeRelation(BEGIN_EQUALS, 0)
+                        .setRangeOutput(true, false),
+                new MetaSynapse.Builder() // Words in the middle
+                        .setMetaWeight(10.0)
+                        .setMetaBias(-10.0)
+                        .setMetaRelativeRid(true)
+                        .setSynapseId(3)
+                        .setNeuron(wordSuppr)
+                        .setWeight(0.0)
+                        .setBias(0.0)
+                        .addRangeRelation(BEGIN_TO_END_EQUALS, 0)
                         .setRangeOutput(false),
                 new MetaSynapse.Builder() // Last word of the phrase
                         .setMetaWeight(20.0)
                         .setMetaBias(-20.0)
                         .setMetaRelativeRid(true)
+                        .setSynapseId(2)
                         .setNeuron(wordSuppr)
                         .setWeight(20.0)
                         .setBias(-20.0)
-                        .setRelativeRid(null)
-                        .setRangeMatch(LESS_THAN_EQUAL, EQUALS)
-                        .setRangeOutput(false),
-                new MetaSynapse.Builder() // Words in the middle
-                        .setMetaWeight(10.0)
-                        .setMetaBias(-10.0)
-                        .setMetaRelativeRid(true)
-                        .setNeuron(wordSuppr)
-                        .setWeight(0.0)
-                        .setBias(0.0)
-                        .setRelativeRid(null)
-                        .setRangeMatch(LESS_THAN, GREATER_THAN)
-                        .setRangeOutput(false),
+                        .addRangeRelation(BEGIN_TO_END_EQUALS, 1)
+                        .addRangeRelation(END_EQUALS, 0)
+                        .setRangeOutput(false, true),
                 new MetaSynapse.Builder()
                         .setMetaWeight(-100.0)
                         .setMetaBias(0.0)
+                        .setSynapseId(4)
                         .setNeuron(phraseSuppr)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRelativeRid(null)
-                        .setRangeMatch(OVERLAPS)
+                        .addRangeRelation(OVERLAPS, 1)
+                        .addRangeRelation(OVERLAPS, 2)
+                        .addRangeRelation(OVERLAPS, 3)
         );
 
         MetaNetwork.initMetaNeuron(entityMetaN, 5.0, 10.0,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(keyPhraseHint)
                         .setWeight(40.0)
                         .setBias(-40.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new MetaSynapse.Builder()
                         .setMetaWeight(40.0)
                         .setMetaBias(-40.0)
+                        .setSynapseId(1)
                         .setNeuron(phraseSuppr)
                         .setWeight(40.0)
                         .setBias(-40.0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new MetaSynapse.Builder()
                         .setMetaWeight(-100.0)
                         .setMetaBias(0.0)
+                        .setSynapseId(2)
                         .setNeuron(entitySuppr)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRelativeRid(null)
-                        .setRangeMatch(OVERLAPS)
+                        .addRangeRelation(OVERLAPS, 1)
         );
 
 
@@ -174,11 +177,10 @@ public class MetaNetworkTest {
                 new MetaSynapse.Builder()
                         .setMetaWeight(1.0)
                         .setMetaBias(0.0)
+                        .setSynapseId(0)
                         .setNeuron(phraseMetaN)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRelativeRid(0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -191,11 +193,10 @@ public class MetaNetworkTest {
                 new MetaSynapse.Builder()
                         .setMetaWeight(1.0)
                         .setMetaBias(0.0)
+                        .setSynapseId(0)
                         .setNeuron(entityMetaN)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRelativeRid(0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true)
         );
     }
@@ -217,6 +218,7 @@ public class MetaNetworkTest {
 
         suppr.addSynapse(
                 new Synapse.Builder()
+                        .setSynapseId()
                         .setNeuron(n)
                         .setWeight(1.0)
                         .setBias(0.0)
@@ -229,14 +231,14 @@ public class MetaNetworkTest {
     }
 
 
-    public void parseWord(Document doc, int begin, int end, int wordCount, String w) {
+    public void parseWord(Document doc, int begin, int end, String w) {
         Neuron inputNeuron = lookupWordNeuron("W-" + w.toLowerCase());
         if (inputNeuron != null) {
-            inputNeuron.addInput(doc, begin, end, wordCount);
+            inputNeuron.addInput(doc, begin, end);
         }
 
         if (Character.isUpperCase(w.charAt(0))) {
-            upperCaseN.addInput(doc, begin, end, wordCount);
+            upperCaseN.addInput(doc, begin, end);
         }
     }
 }

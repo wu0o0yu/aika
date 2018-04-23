@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.network;
+package network.aika.nlp;
 
 import network.aika.ActivationFunction;
 import network.aika.Document;
@@ -59,11 +59,13 @@ public class GenerateTextTest {
         // is not suppressed by another neuron. Output aaaaaaa may start a text.
         Neuron.init(outA, 4.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeOutput(Output.NONE),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(suppr)
                         .setWeight(-20.0)
                         .setBias(0.0)
@@ -76,11 +78,13 @@ public class GenerateTextTest {
         // Neuron outB has a slightly higher weight than outA.
         Neuron.init(outB, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeOutput(Output.NONE),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(suppr)
                         .setWeight(-20.0)
                         .setBias(0.0)
@@ -92,11 +96,13 @@ public class GenerateTextTest {
         // OutC is only activated if the previous word was outA.
         Neuron.init(outC, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(outA)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeOutput(Range.Mapping.END, NONE),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(suppr)
                         .setWeight(-20.0)
                         .setBias(0.0)
@@ -107,11 +113,13 @@ public class GenerateTextTest {
         // OutD is only activated if the previous word was outB.
         Neuron.init(outD, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(outB)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRangeOutput(Range.Mapping.END, NONE),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(suppr)
                         .setWeight(-20.0)
                         .setBias(0.0)
@@ -123,24 +131,28 @@ public class GenerateTextTest {
         // All outputs suppress each other.
         Neuron.init(suppr, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(outA)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(outB)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(outC)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(3)
                         .setNeuron(outD)
                         .setWeight(1.0)
                         .setBias(0.0)

@@ -67,10 +67,10 @@ public class CountingTest {
         Neuron inA = m.createNeuron("inA");
         Neuron outA = Neuron.init(m.createNeuron("nA"), 50.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(100.0)
                         .setBias(-47.5)
-                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
 
