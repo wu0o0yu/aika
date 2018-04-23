@@ -75,7 +75,7 @@ public class SuspensionTest {
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-9.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
                         .addRangeRelation(Relation.END_TO_BEGIN_EQUALS, 1)
                         .setRangeOutput(true, false),
@@ -83,7 +83,7 @@ public class SuspensionTest {
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-9.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeOutput(false, true)
         );

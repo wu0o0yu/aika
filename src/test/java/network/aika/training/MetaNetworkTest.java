@@ -218,12 +218,10 @@ public class MetaNetworkTest {
 
         suppr.addSynapse(
                 new Synapse.Builder()
-                        .setSynapseId()
+                        .setSynapseId(neurons.size())
                         .setNeuron(n)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRelativeRid(0)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true)
         );
 

@@ -70,7 +70,7 @@ public class GenerateTextTest {
                         .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Relation.OVERLAPS)
+                        .addRangeRelation(Relation.OVERLAPS, 0)
         );
 
         // Word bbb is only added to the resulting text if input b is active and this neuron
@@ -89,7 +89,7 @@ public class GenerateTextTest {
                         .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Relation.OVERLAPS)
+                        .addRangeRelation(Relation.OVERLAPS, 0)
         );
 
 
@@ -107,7 +107,7 @@ public class GenerateTextTest {
                         .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Relation.OVERLAPS)
+                        .addRangeRelation(Relation.OVERLAPS, 0)
         );
 
         // OutD is only activated if the previous word was outB.
@@ -124,7 +124,7 @@ public class GenerateTextTest {
                         .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Relation.OVERLAPS)
+                        .addRangeRelation(Relation.OVERLAPS, 0)
         );
 
 
@@ -135,28 +135,24 @@ public class GenerateTextTest {
                         .setNeuron(outA)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(outB)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(outC)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(outD)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 

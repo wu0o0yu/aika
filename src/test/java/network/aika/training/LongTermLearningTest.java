@@ -11,7 +11,7 @@ import org.junit.Test;
 
 public class LongTermLearningTest {
 
-
+/*
     @Test
     public void testLongTermPotentiationAndLongTermDepression() {
         Model m = new Model();
@@ -56,5 +56,5 @@ public class LongTermLearningTest {
                         })
         );
     }
-
+*/
 }

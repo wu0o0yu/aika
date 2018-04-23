@@ -47,13 +47,11 @@ public class TrainingTest {
         in.addInput(doc,
                 new Activation.Builder()
                         .setRange(0, 3)
-                        .setRelationalId(0)
                         .setValue(1.0)
         );
         Activation targetAct = out.addInput(doc,
                 new Activation.Builder()
                         .setRange(0, 3)
-                        .setRelationalId(0)
                         .setValue(0.0)
         );
 

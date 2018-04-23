@@ -22,9 +22,11 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.activation.Range;
 import org.junit.Test;
 
 import static network.aika.neuron.activation.Range.Relation.CONTAINED_IN;
+import static network.aika.neuron.activation.Range.Relation.END_EQUALS;
 import static network.aika.neuron.activation.Range.Relation.EQUALS;
 
 /**
@@ -63,17 +65,15 @@ public class WeightsTest {
                         .setSynapseId(0)
                         .setNeuron(inAA)
                         .setWeight(3.0)
-                        .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(EQUALS)
+                        .setRecurrent(false)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inBA)
                         .setWeight(4.0)
-                        .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(EQUALS)
+                        .setRecurrent(false)
                         .setRangeOutput(true)
         );
 
@@ -86,25 +86,24 @@ public class WeightsTest {
                         .setSynapseId(0)
                         .setNeuron(pOrA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
                         .setBias(-0.6)
-                        .setRangeMatch(EQUALS)
+                        .setRecurrent(false)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inCA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(EQUALS)
+                        .setRecurrent(false)
+                        .addRangeRelation(EQUALS, 0)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(pSuppr)
                         .setWeight(-2.0)
-                        .setRecurrent(true)
                         .setBias(0.0)
-                        .setRangeMatch(CONTAINED_IN)
+                        .setRecurrent(true)
+                        .addRangeRelation(CONTAINED_IN, 0)
         );
 
 
@@ -122,7 +121,6 @@ public class WeightsTest {
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -130,7 +128,7 @@ public class WeightsTest {
                         .setWeight(5.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(EQUALS)
+                        .addRangeRelation(EQUALS, 0)
                         .setRangeOutput(true)
         );
 
@@ -144,7 +142,6 @@ public class WeightsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-0.6)
-                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -152,7 +149,7 @@ public class WeightsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeMatch(EQUALS)
+                        .addRangeRelation(EQUALS, 0)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
@@ -160,7 +157,7 @@ public class WeightsTest {
                         .setWeight(-2.0)
                         .setRecurrent(true)
                         .setBias(0.0)
-                        .setRangeMatch(CONTAINED_IN)
+                        .addRangeRelation(CONTAINED_IN, 0)
         );
 
 
@@ -173,7 +170,6 @@ public class WeightsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -181,7 +177,6 @@ public class WeightsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeMatch(EQUALS)
                         .setRangeOutput(true)
         );
 

@@ -57,7 +57,6 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setBias(-45.0)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -65,16 +64,14 @@ public class WeakInputProcessingTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeMatch(Relation.EQUALS)
-                        .setRangeOutput(true),
+                        .addRangeRelation(Relation.EQUALS, 0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setRecurrent(true)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
-                        .setRangeOutput(true)
+                        .addRangeRelation(Relation.OVERLAPS, 0)
         );
 
         Neuron patternB = Neuron.init(
@@ -87,7 +84,6 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setBias(-45.0)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -95,7 +91,7 @@ public class WeakInputProcessingTest {
                         .setWeight(1.5f)
                         .setRecurrent(false)
                         .setBias(-1.5)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
@@ -103,7 +99,7 @@ public class WeakInputProcessingTest {
                         .setWeight(-60.0)
                         .setRecurrent(true)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
                         .setRangeOutput(true)
         );
 
@@ -117,7 +113,6 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setBias(-45.0)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -125,7 +120,7 @@ public class WeakInputProcessingTest {
                         .setWeight(0.5f)
                         .setRecurrent(false)
                         .setBias(-0.5)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
@@ -133,7 +128,7 @@ public class WeakInputProcessingTest {
                         .setWeight(-60.0)
                         .setRecurrent(true)
                         .setBias(0.0)
-                        .setRangeMatch(Relation.EQUALS)
+                        .addRangeRelation(Relation.EQUALS, 0)
                         .setRangeOutput(true)
         );
 
@@ -147,7 +142,6 @@ public class WeakInputProcessingTest {
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -155,7 +149,6 @@ public class WeakInputProcessingTest {
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
@@ -163,7 +156,6 @@ public class WeakInputProcessingTest {
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
