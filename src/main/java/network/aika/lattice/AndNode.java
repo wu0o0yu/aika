@@ -378,7 +378,6 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
 
         public void readFields(DataInput in, Model m) throws IOException {
-            int l = in.readInt();
             relations = RelationsMap.read(in, m);
             input = m.lookupNodeProvider(in.readInt());
         }

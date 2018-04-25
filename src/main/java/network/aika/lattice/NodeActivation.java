@@ -23,7 +23,7 @@ import network.aika.neuron.activation.Activation;
 import java.util.*;
 
 
-public abstract class NodeActivation<T extends Node> {
+public abstract class NodeActivation<T extends Node> implements Comparable<NodeActivation<T>> {
 
     public final int id;
 
@@ -46,4 +46,10 @@ public abstract class NodeActivation<T extends Node> {
     }
 
     public abstract Activation getInputActivation(int i);
+
+
+    @Override
+    public int compareTo(NodeActivation<T> act) {
+        return Integer.compare(id, act.id);
+    }
 }
