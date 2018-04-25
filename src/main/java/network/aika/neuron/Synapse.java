@@ -78,6 +78,8 @@ public class Synapse implements Writable {
     public Neuron input;
     public Neuron output;
 
+    public Integer id;
+
     public Key key;
 
     // synapseId -> relation
@@ -120,8 +122,9 @@ public class Synapse implements Writable {
     public Synapse() {}
 
 
-    public Synapse(Neuron input, Neuron output, Key key) {
+    public Synapse(Neuron input, Neuron output, Integer id, Key key) {
         this.key = lookupKey(key);
+        this.id = id;
         this.input = input;
         this.output = output;
     }
@@ -142,7 +145,7 @@ public class Synapse implements Writable {
 
         out.provider.lock.acquireWriteLock();
         out.provider.inMemoryInputSynapses.put(this, this);
-        out.provider.inputSynapsesById.put(key.id, this);
+        out.provider.inputSynapsesById.put(id, this);
         out.provider.lock.releaseWriteLock();
 
         removeLinkInternal(in, out);
@@ -156,6 +159,8 @@ public class Synapse implements Writable {
             isConjunction = false;
             in.setModified();
         }
+
+        out.numberOfInputSynapses++;
 
         (dir ? in : out).lock.releaseWriteLock();
         (dir ? out : in).lock.releaseWriteLock();
@@ -203,7 +208,7 @@ public class Synapse implements Writable {
 
         out.provider.lock.acquireWriteLock();
         out.provider.inMemoryInputSynapses.remove(this);
-        out.provider.inputSynapsesById.remove(key.id);
+        out.provider.inputSynapsesById.remove(id);
         out.provider.lock.releaseWriteLock();
 
         removeLinkInternal(in, out);
@@ -217,10 +222,12 @@ public class Synapse implements Writable {
         if(isConjunction(false, false)) {
             if(out.inputSynapses.remove(this) != null) {
                 out.setModified();
+                out.numberOfInputSynapses--;
             }
         } else {
             if(in.outputSynapses.remove(this) != null) {
                 in.setModified();
+                out.numberOfInputSynapses--;
             }
         }
     }
@@ -281,6 +288,7 @@ public class Synapse implements Writable {
 
     @Override
     public void write(DataOutput out) throws IOException {
+        out.writeInt(id);
         key.write(out);
 
         out.writeInt(input.id);
@@ -311,6 +319,7 @@ public class Synapse implements Writable {
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
+        id = in.readInt();
         key = Key.read(in, m);
 
         input = m.lookupNeuron(in.readInt());
@@ -347,11 +356,15 @@ public class Synapse implements Writable {
 
 
 
-    public static Synapse createOrLookup(Document doc, int synapseId, boolean isRecurrent, Output rangeOutput, Neuron inputNeuron, Neuron outputNeuron) {
-        Synapse synapse = outputNeuron.getSynapseById(synapseId);
+    public static Synapse createOrLookup(Document doc, Integer synapseId, Key k, Neuron inputNeuron, Neuron outputNeuron) {
+        Synapse ns = new Synapse(inputNeuron, outputNeuron, synapseId, k);
 
+        Synapse synapse = outputNeuron.inMemoryInputSynapses.get(ns);
         if(synapse == null) {
-            synapse = new Synapse(inputNeuron, outputNeuron, new Key(synapseId, isRecurrent, rangeOutput));
+            synapse = ns;
+            if(synapseId == null) {
+                synapse.id = outputNeuron.get(doc).numberOfInputSynapses;
+            }
 
             synapse.link();
             if(doc != null) {
@@ -519,7 +532,7 @@ public class Synapse implements Writable {
 
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            return createOrLookup(null, synapseId, recurrent, rangeOutput, neuron, outputNeuron);
+            return createOrLookup(null, synapseId, new Key(recurrent, rangeOutput), neuron, outputNeuron);
         }
 
 
@@ -543,14 +556,12 @@ public class Synapse implements Writable {
 
 
     public static class Key implements Comparable<Key>, Writable {
-        public int id;
         public boolean isRecurrent;
         public Output rangeOutput;
 
         private Key() {}
 
-        public Key(int id, boolean isRecurrent, Output rangeOutput) {
-            this.id = id;
+        public Key(boolean isRecurrent, Output rangeOutput) {
             this.isRecurrent = isRecurrent;
             this.rangeOutput = rangeOutput;
         }
@@ -558,9 +569,7 @@ public class Synapse implements Writable {
 
         @Override
         public int compareTo(Key k) {
-            int r = Integer.compare(id, k.id);
-            if(r == 0) return r;
-            r = Boolean.compare(isRecurrent, k.isRecurrent);
+            int r = Boolean.compare(isRecurrent, k.isRecurrent);
             if(r == 0) return r;
             r = rangeOutput.compareTo(k.rangeOutput);
             return r;
@@ -576,14 +585,12 @@ public class Synapse implements Writable {
 
         @Override
         public void write(DataOutput out) throws IOException {
-            out.writeInt(id);
             out.writeBoolean(isRecurrent);
             rangeOutput.write(out);
         }
 
         @Override
         public void readFields(DataInput in, Model m) throws IOException {
-            id = in.readInt();
             isRecurrent = in.readBoolean();
             rangeOutput = Range.Output.read(in, m);
         }

@@ -212,17 +212,18 @@ public class Converter {
             nln.node = s.input.get().outputNode.get();
             nln.offsets = new Synapse[] {s};
         } else {
+            nln.offsets = new Synapse[nc.offsets.length + 1];
+
             Relation[] relations = new Relation[nln.offsets.length];
             for(int i = 0; i < nc.offsets.length; i++) {
                 Synapse linkedSynapse = nc.offsets[i];
-                relations[i] = s.relations.get(linkedSynapse.key.id);
+                relations[i] = s.relations.get(linkedSynapse.id);
             }
 
             AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.input.get().outputNode);
             AndNode.RefValue rv = nc.node.extend(threadId, doc, ref);
             nln.node = rv.child.get(doc);
 
-            nln.offsets = new Synapse[nc.offsets.length + 1];
             for(int i = 0; i < nc.offsets.length; i++) {
                 nln.offsets[rv.offsets[i]] = nc.offsets[i];
             }
@@ -244,7 +245,7 @@ public class Converter {
         int[] getSynapseIds() {
             int[] result = new int[offsets.length];
             for(int i = 0; i < result.length; i++) {
-                result[i] = offsets[i].key.id;
+                result[i] = offsets[i].id;
             }
             return result;
         }

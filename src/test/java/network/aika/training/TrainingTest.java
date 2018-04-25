@@ -59,13 +59,9 @@ public class TrainingTest {
 
         doc.supervisedTraining.train(out.get(), targetAct, 0.01,
                 (s, iAct, oAct) -> new SynapseEvaluation.Result(
-                        new Synapse.Key(
-                                false,
-                                0,
-                                null,
-                                Relation.EQUALS,
-                                Range.Output.DIRECT
-                        )
+
+                        false,
+                        Range.Output.DIRECT
                         , 1.0
                         , NONE
                 )
@@ -77,7 +73,6 @@ public class TrainingTest {
         in.addInput(doc,
                 new Activation.Builder()
                         .setRange(0, 3)
-                        .setRelationalId(0)
                         .setValue(1.0)
         );
     }
@@ -122,13 +117,9 @@ public class TrainingTest {
                             .setLearnRate(2.0)
                             .setPerformBackpropagation(false)
                             .setSynapseEvaluation((s, iAct, oAct) ->
-                                    new SynapseEvaluation.Result(new Synapse.Key(
+                                    new SynapseEvaluation.Result(
                                             false,
-                                            0,
-                                            null,
-                                            Relation.EQUALS,
-                                            Range.Output.DIRECT
-                                    ),
+                                            Range.Output.DIRECT,
                                             1.0,
                                             NONE
                                     )

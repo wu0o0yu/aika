@@ -89,7 +89,7 @@ public class CountingTest {
         doc.process();
         PatternDiscovery.discover(doc,
                 new Config()
-                        .setRefinementFactory((act, secondAct) -> new AndNode.Refinement())
+                        .setRefinementFactory((act, secondAct) -> null)
                         .setCounter(act -> count(act))
         );
         Assert.assertEquals(6.0, ((NodeStatistic) outA.get().node.get().parents.first().parent.get().statistic).frequency, 0.001);

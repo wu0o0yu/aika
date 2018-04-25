@@ -120,7 +120,7 @@ public class MetaNetwork {
 
         for (Activation.SynapseActivation sa : metaAct.getFinalInputActivations()) {
             MetaSynapse inputMetaSyanpse = sa.synapse.meta;
-            Synapse.Key osk = sa.synapse.key;
+            Synapse os = sa.synapse;
 
             if (inputMetaSyanpse != null && (inputMetaSyanpse.metaWeight != 0.0 || inputMetaSyanpse.metaBias != 0.0)) {
                 Neuron ina = sa.input.node.neuron;
@@ -136,11 +136,11 @@ public class MetaNetwork {
                         List<Target> inputTargets = metaActivations.get(isa.input);
                         if(inputTargets != null) {
                             for (Target it : metaActivations.get(isa.input)) {
-                                createOrLookupSynapse(doc, t, inputSynapses, inputMetaSyanpse, osk, it.targetNeuron);
+                                createOrLookupSynapse(doc, t, inputSynapses, inputMetaSyanpse, os, it.targetNeuron);
                             }
                         }
                     } else {
-                        createOrLookupSynapse(doc, t, inputSynapses, inputMetaSyanpse, osk, in);
+                        createOrLookupSynapse(doc, t, inputSynapses, inputMetaSyanpse, os, in);
                     }
                 }
             }
@@ -170,14 +170,8 @@ public class MetaNetwork {
     }
 
 
-    private static void createOrLookupSynapse(Document doc, Target t, TreeSet<Synapse> inputSynapses, MetaSynapse inputMetaSyanpse, Synapse.Key osk, Neuron in) {
-        Synapse.Key nsk = new Synapse.Key(
-                osk.id,
-                osk.isRecurrent,
-                osk.rangeOutput
-        );
-
-        Synapse ns = new Synapse(in, t.targetNeuron, nsk);
+    private static void createOrLookupSynapse(Document doc, Target t, TreeSet<Synapse> inputSynapses, MetaSynapse inputMetaSyanpse, Synapse os, Neuron in) {
+        Synapse ns = new Synapse(in, t.targetNeuron, os.id, os.key);
         if (!ns.exists()) {
             ns.updateDelta(doc, inputMetaSyanpse.metaWeight, inputMetaSyanpse.metaBias);
 

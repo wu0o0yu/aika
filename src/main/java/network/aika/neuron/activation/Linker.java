@@ -133,16 +133,16 @@ public class Linker {
                     for(Activation iAct: ts.activations.values()) {
                         if(r.test(iAct, linkedSA.input)) {
                             SynapseActivation sa = link(s, iAct, linkedSA.output);
-                            sa.unmatchedRelations.remove(linkedSA.synapse.key.id);
-                            linkedSA.unmatchedRelations.remove(sa.synapse.key.id);
+                            sa.unmatchedRelations.remove(linkedSA.synapse.id);
+                            linkedSA.unmatchedRelations.remove(sa.synapse.id);
                         }
                     }
                 } else {
                     for(Activation iAct: r.getLinkedActivationCandidates(linkedSA.input)) {
                         if(iAct.getNeuron() == s.input && r.test(iAct, linkedSA.input)) {
                             SynapseActivation sa = link(s, iAct, linkedSA.output);
-                            sa.unmatchedRelations.remove(linkedSA.synapse.key.id);
-                            linkedSA.unmatchedRelations.remove(sa.synapse.key.id);
+                            sa.unmatchedRelations.remove(linkedSA.synapse.id);
+                            linkedSA.unmatchedRelations.remove(sa.synapse.id);
                         }
                     }
                 }

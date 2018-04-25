@@ -54,15 +54,13 @@ public interface SynapseEvaluation {
     }
 
     class Result {
-        public Result(int synapseId, boolean isRecurrent, Range.Output rangeOutput, double significance, DeleteMode deleteMode) {
-            this.synapseId = synapseId;
+        public Result(boolean isRecurrent, Range.Output rangeOutput, double significance, DeleteMode deleteMode) {
             this.isRecurrent = isRecurrent;
             this.rangeOutput = rangeOutput;
             this.significance = significance;
             this.deleteMode = deleteMode;
         }
 
-        public int synapseId;
         public boolean isRecurrent;
         public Range.Output rangeOutput;
         public double significance;

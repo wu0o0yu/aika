@@ -88,6 +88,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public ActivationFunction activationFunction = ActivationFunction.RECTIFIED_SCALED_LOGISTIC_SIGMOID;
 
 
+    public int numberOfInputSynapses = 0;
+
     // A synapse is stored only in one direction, depending on the synapse weight.
     public TreeMap<Synapse, Synapse> inputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
     public TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
@@ -333,6 +335,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             out.writeInt(node.id);
         }
 
+        out.writeInt(numberOfInputSynapses);
         for (Synapse s : inputSynapses.values()) {
             if (s.input != null) {
                 out.writeBoolean(true);
@@ -387,6 +390,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             node = m.lookupNodeProvider(nId);
         }
 
+        numberOfInputSynapses = in.readInt();
         while (in.readBoolean()) {
             Synapse syn = Synapse.read(in, m);
 

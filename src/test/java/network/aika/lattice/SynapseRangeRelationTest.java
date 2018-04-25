@@ -47,8 +47,8 @@ public class SynapseRangeRelationTest {
         Synapse s = new Synapse(
                 in,
                 on,
+                0,
                 new Synapse.Key(
-                        0,
                         false,
                         Range.Output.DIRECT
                 )
