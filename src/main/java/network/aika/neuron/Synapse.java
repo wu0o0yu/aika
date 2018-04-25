@@ -570,7 +570,7 @@ public class Synapse implements Writable {
         @Override
         public int compareTo(Key k) {
             int r = Boolean.compare(isRecurrent, k.isRecurrent);
-            if(r == 0) return r;
+            if(r != 0) return r;
             r = rangeOutput.compareTo(k.rangeOutput);
             return r;
         }

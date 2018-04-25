@@ -124,8 +124,7 @@ public class Converter {
                     }
 
                     if (!reqSyns.contains(s)) {
-                        NodeContext nln;
-                        nln = expandNode(nodeContext, s);
+                        NodeContext nln = expandNode(nodeContext, s);
                         outputNode.addInput(nln.getSynapseIds(), threadId, nln.node);
                         remainingSum -= s.weight;
                     }
@@ -134,7 +133,8 @@ public class Converter {
         } else {
             for (Synapse s : modifiedSynapses) {
                 if (s.weight + neuron.posRecSum + neuron.biasSum > 0.0) {
-                    outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node);
+                    NodeContext nln = expandNode(nodeContext, s);
+                    outputNode.addInput(nln.getSynapseIds(), threadId, nln.node);
                 }
             }
         }
@@ -214,7 +214,7 @@ public class Converter {
         } else {
             nln.offsets = new Synapse[nc.offsets.length + 1];
 
-            Relation[] relations = new Relation[nln.offsets.length];
+            Relation[] relations = new Relation[nc.offsets.length];
             for(int i = 0; i < nc.offsets.length; i++) {
                 Synapse linkedSynapse = nc.offsets[i];
                 relations[i] = s.relations.get(linkedSynapse.id);

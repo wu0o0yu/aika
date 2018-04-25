@@ -79,7 +79,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
      * @return
      */
     public T get(Document doc) {
-        return get(doc.id);
+        return doc != null ? get(doc.id) : get();
     }
 
 

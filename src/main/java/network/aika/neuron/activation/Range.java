@@ -173,6 +173,16 @@ public class Range {
         }
 
 
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("BB:" + beginToBegin.name() + ",");
+            sb.append("BE:" + beginToEnd.name() + ",");
+            sb.append("EB:" + endToBegin.name() + ",");
+            sb.append("EE:" + endToEnd.name());
+            return sb.toString();
+        }
+
+
         public boolean compare(Range ra, Range rb) {
             return beginToBegin.compare(ra.begin, rb.begin) &&
                     beginToEnd.compare(ra.begin, rb.end) &&
@@ -342,6 +352,17 @@ public class Range {
                     begin == Mapping.BEGIN ? Mapping.BEGIN : (end == Mapping.BEGIN ? Mapping.END : Mapping.NONE),
                     begin == Mapping.END ? Mapping.BEGIN : (end == Mapping.END ? Mapping.END : Mapping.NONE)
             );
+        }
+
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("O(");
+            sb.append(begin.name());
+            sb.append(",");
+            sb.append(end.name());
+            sb.append(")");
+            return sb.toString();
         }
 
 

@@ -182,6 +182,10 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             return relation.compare(act.range, linkedAct.range);
         }
 
+        public String toString() {
+            return "RR(" + relation + ")";
+        }
+
         @Override
         public Relation invert() {
             return new RangeRelation(relation.invert());

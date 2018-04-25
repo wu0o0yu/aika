@@ -45,7 +45,7 @@ import java.util.*;
 public class AndNode extends Node<AndNode, AndActivation> {
 
 
-    public SortedMap<Refinement, RefValue> parents = new TreeMap<>();
+    public SortedMap<Refinement, RefValue> parents;
 
     public AndNode() {}
 
@@ -235,7 +235,11 @@ public class AndNode extends Node<AndNode, AndActivation> {
     static boolean createAndNode(Model m, Document doc, SortedMap<Refinement, RefValue> parents, int level) {
         if (parents != null) {
             // Locking needs to take place in a predefined order.
-            TreeSet<? extends Provider<? extends Node>> parentsForLocking = new TreeSet(parents.values());
+            TreeSet<Provider<? extends Node>> parentsForLocking = new TreeSet();
+            for(RefValue rv: parents.values()) {
+                parentsForLocking.add(rv.parent);
+            }
+
             for (Provider<? extends Node> pn : parentsForLocking) {
                 pn.get().lock.acquireWriteLock();
             }
@@ -479,6 +483,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                 Relation ra = relations[i];
                 Relation rb = rm.relations[i];
 
+                if(ra == null && rb == null) continue;
                 if(ra == null && rb != null) return -1;
                 if(ra != null && rb == null) return 1;
 

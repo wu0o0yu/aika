@@ -199,16 +199,22 @@ public class Neuron extends Provider<INeuron> {
         for (Synapse.Builder input : inputs) {
             Synapse s = input.getSynapse(this);
             s.update(doc, input.weight, input.bias);
-            if(input.synapseId != null) {
-                synapseIds.put(input.synapseId, s);
-            }
+            assert input.synapseId != null;
+            Synapse os = synapseIds.put(input.synapseId, s);
+            assert os == null;
+
             is.add(s);
         }
 
         int i = 0;
         for (Synapse.Builder input : inputs) {
             Synapse s = is.get(i);
-            s.relations.putAll(input.relations);
+            for (Map.Entry<Integer, Relation> me : input.relations.entrySet()) {
+                s.relations.put(me.getKey(), me.getValue());
+                Synapse rs = s.output.getSynapseById(me.getKey());
+                Relation or = rs.relations.put(s.id, me.getValue().invert());
+                assert or == null;
+            }
             i++;
         }
 
