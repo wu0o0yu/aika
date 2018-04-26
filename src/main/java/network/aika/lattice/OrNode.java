@@ -102,7 +102,7 @@ public class OrNode extends Node<OrNode, Activation> {
         Activation act = neuron.get(doc).getThreadState(doc.threadId, true).activations.get(r);
 
         if(act == null) {
-            act = new Activation(doc.activationIdCounter++, doc, this);
+            act = new Activation(doc.activationIdCounter++, doc, r, this);
             addActivation(act);
         }
 

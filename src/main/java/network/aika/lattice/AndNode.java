@@ -25,6 +25,7 @@ import network.aika.neuron.Relation;
 import network.aika.neuron.activation.Activation;
 import network.aika.training.PatternDiscovery;
 import network.aika.*;
+import network.aika.lattice.InputNode.InputActivation;
 import network.aika.lattice.AndNode.AndActivation;
 
 import java.io.DataInput;
@@ -47,7 +48,9 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
     public SortedMap<Refinement, RefValue> parents;
 
-    public AndNode() {}
+    public AndNode() {
+        parents = new TreeMap<>();
+    }
 
 
     public AndNode(Model m, int level, SortedMap<Refinement, RefValue> parents) {
@@ -91,11 +94,13 @@ public class AndNode extends Node<AndNode, AndActivation> {
         if (andChildren != null) {
             TreeMap<Refinement, AndActivation> results = null;
             for (Link fl : act.inputs) {
+                InputActivation refAct = fl.refAct;
                 Refinement ref = fl.ref;
                 RefValue rv = fl.rv;
                 NodeActivation<?> pAct = fl.input;
 
                 for (Link sl : pAct.outputsToAndNode.values()) {
+                    InputActivation secondRefAct = sl.refAct;
                     Refinement secondRef = sl.ref;
                     RefValue secondRv = sl.rv;
                     NodeActivation secondAct = sl.output;
@@ -119,7 +124,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                                 AndActivation nln = results.get(nRef);
                                 if(nln == null) {
                                     nln = new AndActivation(act.doc.activationIdCounter++, act.doc, nRv.child.get(act.doc));
-                                    nln.link(nRef, nRv, act);
+                                    nln.link(nRef, nRv, secondRefAct, act);
                                     results.put(nRef, nln);
                                 }
 
@@ -127,7 +132,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                                     Refinement secondNRef = mea.getKey();
                                     RefValue secondNRv = mea.getValue();
                                     if(secondNRv.parent.get(act.doc) == secondAct.node && secondNRef.contains(ref, secondRv)) {
-                                        nln.link(secondNRef, secondNRv, secondAct);
+                                        nln.link(secondNRef, secondNRv, refAct, secondAct);
                                         break;
                                     }
                                 }
@@ -569,15 +574,15 @@ public class AndNode extends Node<AndNode, AndActivation> {
             inputs = new Link[node.level];
         }
 
-        public void link(Refinement ref, RefValue rv, NodeActivation<?> input) {
-            Link l = new Link(ref, rv, input, this);
+        public void link(Refinement ref, RefValue rv, InputActivation refAct, NodeActivation<?> input) {
+            Link l = new Link(ref, rv, refAct, input, this);
             inputs[rv.refOffset] = l;
             input.outputsToAndNode.put(id, l);
         }
 
         public Activation getInputActivation(int i) {
             Link l = inputs[i];
-            return l.input.getInputActivation(l.rv.reverseOffsets[i]);
+            return l.refAct.input.input;
         }
     }
 
@@ -587,11 +592,13 @@ public class AndNode extends Node<AndNode, AndActivation> {
         RefValue rv;
 
         NodeActivation<?> input;
+        InputActivation refAct;
         AndActivation output;
 
-        public Link(Refinement ref, RefValue rv, NodeActivation<?> input, AndActivation output) {
+        public Link(Refinement ref, RefValue rv, InputActivation refAct, NodeActivation<?> input, AndActivation output) {
             this.ref = ref;
             this.rv = rv;
+            this.refAct = refAct;
             this.input = input;
             this.output = output;
         }

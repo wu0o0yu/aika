@@ -79,9 +79,9 @@ public class Linker {
                 Activation iAct = ol.input.getInputActivation(i);
                 SynapseActivation sa = link(s, iAct, act);
 
-                for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
-                    if(ol.oe.revSynapseIds.get(me.getValue()) != null) {
-                        sa.unmatchedRelations.remove(me.getKey());
+                for(Integer ofs: s.relations.keySet()) {
+                    if(ol.oe.revSynapseIds.get(ofs) != null) {
+                        sa.unmatchedRelations.remove(ofs);
                     }
                 }
             }

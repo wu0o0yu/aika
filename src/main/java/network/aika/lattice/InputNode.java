@@ -81,13 +81,13 @@ public class InputNode extends Node<InputNode, InputActivation> {
     public void addActivation(Activation inputAct) {
         if(inputAct.repropagateV != null && inputAct.repropagateV != markedCreated) return;
 
-        InputActivation act = new InputActivation(inputAct.doc.activationIdCounter++, inputAct.doc, this);
+        InputActivation act = new InputActivation(inputAct.doc.activationIdCounter++, inputAct, this);
 
         addActivation(act);
     }
 
 
-    public void propagate(InputNode.InputActivation act) {
+    public void propagate(InputActivation act) {
         apply(act);
     }
 
@@ -165,9 +165,10 @@ public class InputNode extends Node<InputNode, InputActivation> {
                         if (!Conflicts.isConflicting(iAct, secondIAct)) {
                             AndActivation oAct = new AndActivation(doc.activationIdCounter++, doc, nln);
                             for(Map.Entry<Refinement, RefValue> me: nln.parents.entrySet()) {
-                                oAct.link(me.getKey(), me.getValue(), me.getKey() == ref ? secondAct : act);
+                                boolean match = me.getKey().compareTo(ref) == 0;
+                                oAct.link(me.getKey(), me.getValue(), match ? secondAct : act, match ? act : secondAct);
                             }
-                            nln.addActivation(new AndActivation(doc.activationIdCounter++, doc, nln));
+                            nln.addActivation(oAct);
                         }
                     }
                 }
@@ -254,8 +255,10 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         public Link input;
 
-        public InputActivation(int id, Document doc, InputNode node) {
-            super(id, doc, node);
+        public InputActivation(int id, Activation iAct, InputNode node) {
+            super(id, iAct.doc, node);
+            input = new Link(iAct, this);
+            iAct.outputToInputNode = input;
         }
 
         public Activation getInputActivation(int i) {
@@ -268,5 +271,10 @@ public class InputNode extends Node<InputNode, InputActivation> {
     public static class Link {
         Activation input;
         InputActivation output;
+
+        public Link(Activation iAct, InputActivation oAct) {
+            input = iAct;
+            output = oAct;
+        }
     }
 }
