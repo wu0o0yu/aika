@@ -207,33 +207,41 @@ public class Converter {
 
 
     private NodeContext expandNode(NodeContext nc, Synapse s) {
-        NodeContext nln = new NodeContext();
         if (nc == null) {
+            NodeContext nln = new NodeContext();
             nln.node = s.input.get().outputNode.get();
             nln.offsets = new Synapse[] {s};
+            return nln;
         } else {
-            nln.offsets = new Synapse[nc.offsets.length + 1];
-
+            boolean hasRelations = false;
             Relation[] relations = new Relation[nc.offsets.length];
             for(int i = 0; i < nc.offsets.length; i++) {
                 Synapse linkedSynapse = nc.offsets[i];
-                relations[i] = s.relations.get(linkedSynapse.id);
+                Relation r = s.relations.get(linkedSynapse.id);
+                relations[i] = r;
+                if(r != null) hasRelations = true;
             }
 
-            AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.input.get().outputNode);
-            AndNode.RefValue rv = nc.node.extend(threadId, doc, ref);
-            nln.node = rv.child.get(doc);
+            if(hasRelations) {
+                NodeContext nln = new NodeContext();
+                nln.offsets = new Synapse[nc.offsets.length + 1];
+                AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.input.get().outputNode);
+                AndNode.RefValue rv = nc.node.extend(threadId, doc, ref);
+                nln.node = rv.child.get(doc);
 
-            for(int i = 0; i < nc.offsets.length; i++) {
-                nln.offsets[rv.offsets[i]] = nc.offsets[i];
-            }
-            for(int i = 0; i < nln.offsets.length; i++) {
-                if(nln.offsets[i] == null) {
-                    nln.offsets[i] = s;
+                for (int i = 0; i < nc.offsets.length; i++) {
+                    nln.offsets[rv.offsets[i]] = nc.offsets[i];
                 }
+                for (int i = 0; i < nln.offsets.length; i++) {
+                    if (nln.offsets[i] == null) {
+                        nln.offsets[i] = s;
+                    }
+                }
+                return nln;
+            } else {
+                return null;
             }
         }
-        return nln;
     }
 
 

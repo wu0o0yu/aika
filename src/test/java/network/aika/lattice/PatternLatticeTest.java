@@ -263,27 +263,29 @@ public class PatternLatticeTest {
         Neuron inB = m.createNeuron("B");
         Neuron inC = m.createNeuron("C");
 
-        Neuron.init(m.createNeuron("ABC"),
+        Neuron nABC = Neuron.init(m.createNeuron("ABC"),
                 0.001,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
+                        .setBias(-1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0),
+                        .addRangeRelation(Relation.EQUALS, 1),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
+                        .setBias(-1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0),
+                        .addRangeRelation(Relation.EQUALS, 2),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(1.0)
-                        .setRecurrent(false)
                         .setBias(-1.0)
+                        .setRecurrent(false)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -291,5 +293,7 @@ public class PatternLatticeTest {
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);
         inC.addInput(doc, 0, 1);
+
+        Assert.assertFalse(nABC.getActivations(doc, false).isEmpty());
     }
 }
