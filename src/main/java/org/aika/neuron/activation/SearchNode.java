@@ -459,15 +459,15 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public static void invalidateCachedDecision(Activation n) {
-        Candidate pos = n.candidate;
+    public static void invalidateCachedDecision(Activation act) {
+        Candidate pos = act.candidate;
         if (pos != null) {
             if (pos.cachedDecision == Decision.EXCLUDED) {
                 pos.cachedDecision = UNKNOWN;
             }
         }
 
-        for (Activation c : Conflicts.getConflicting(n)) {
+        for (Activation c : act.getConflicts()) {
             Candidate neg = c.candidate;
             if (neg != null) {
                 if (neg.cachedDecision == Decision.SELECTED) {
@@ -511,7 +511,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean checkExcluded(Activation ref) {
-        for (Activation cn : Conflicts.getConflicting(ref)) {
+        for (Activation cn : ref.getConflicts()) {
             if (cn.decision == SELECTED) return true;
         }
         return false;

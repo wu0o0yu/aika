@@ -102,7 +102,6 @@ public class Linker {
      * @param act
      */
     public static void link(Activation act) {
-
         INeuron n = act.getINeuron();
         n.lock.acquireReadLock();
         n.provider.lock.acquireReadLock();
@@ -110,10 +109,6 @@ public class Linker {
         link(act, OUTPUT);
         n.provider.lock.releaseReadLock();
         n.lock.releaseReadLock();
-
-        long v = act.doc.visitedCounter++;
-        Conflicts.linkConflicts(act, v, INPUT);
-        Conflicts.linkConflicts(act, v, OUTPUT);
     }
 
 

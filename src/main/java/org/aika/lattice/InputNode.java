@@ -18,7 +18,6 @@ package org.aika.lattice;
 
 
 import org.aika.*;
-import org.aika.neuron.activation.Conflicts;
 import org.aika.Document;
 import org.aika.neuron.*;
 import org.aika.neuron.activation.Activation;
@@ -187,20 +186,18 @@ public class InputNode extends Node<InputNode, NodeActivation<InputNode>> {
 
         s.forEach(secondIAct -> {
                     NodeActivation secondAct = secondNode.getInputNodeActivation(secondIAct);
-                    if(secondAct != null) {
-                        if (!Conflicts.isConflicting(iAct, secondIAct)) {
-                            Node.addActivation(doc,
-                                    new NodeActivation.Key(
-                                            nlp,
-                                            Range.mergeRange(
-                                                    firstNode.key.rangeOutput.map(iak.range),
-                                                    secondNode.key.rangeOutput.map(secondIAct.key.range)
-                                            ),
-                                            Utils.nullSafeMin(ak.rid, secondAct.key.rid)
-                                    ),
-                                    AndNode.prepareInputActs(act, secondAct)
-                            );
-                        }
+                    if (secondAct != null) {
+                        Node.addActivation(doc,
+                                new NodeActivation.Key(
+                                        nlp,
+                                        Range.mergeRange(
+                                                firstNode.key.rangeOutput.map(iak.range),
+                                                secondNode.key.rangeOutput.map(secondIAct.key.range)
+                                        ),
+                                        Utils.nullSafeMin(ak.rid, secondAct.key.rid)
+                                ),
+                                AndNode.prepareInputActs(act, secondAct)
+                        );
                     }
                 }
         );

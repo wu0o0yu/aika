@@ -30,8 +30,6 @@ public class Candidate  implements Comparable<Candidate> {
     public int id;
     int sequence = 0;
 
-    public boolean queued;
-
     public Candidate(Activation act, int id) {
         this.activation = act;
         this.id = id;
@@ -41,7 +39,7 @@ public class Candidate  implements Comparable<Candidate> {
 
 
     public boolean isConflicting() {
-        return activation.conflicts.hasConflicts();
+        return !activation.getConflicts().isEmpty();
     }
 
 
