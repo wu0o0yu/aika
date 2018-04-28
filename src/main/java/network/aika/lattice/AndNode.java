@@ -232,7 +232,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
             }
             secondOffsets[secondParentRV.refOffset] = firstRefOffset;
 
-            nextLevelParents.put(secondRef, new RefValue(secondOffsets, firstOffsets[firstParentRV.refOffset], parentNode.provider));
+            nextLevelParents.put(secondRef, new RefValue(secondOffsets, firstOffsets[firstParentRV.refOffset], secondParentRV.child));
         }
 
         firstRV = new RefValue(firstOffsets, firstRefOffset, provider);
