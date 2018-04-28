@@ -175,64 +175,70 @@ public class AndNode extends Node<AndNode, AndActivation> {
     }
 
 
-    public RefValue extend(int threadId, Document doc, Refinement ref) {
-        RefValue rv = getAndChild(ref);
-        if(rv != null) {
-            return rv;
+    public RefValue extend(int threadId, Document doc, Refinement firstRef) {
+        RefValue firstRV = getAndChild(firstRef);
+        if(firstRV != null) {
+            return firstRV;
         }
 
-        Integer[] offsets = new Integer[level];
-        for(int i = 0; i < offsets.length; i++) {
-            offsets[i] = i;
+        int firstRefOffset = level;
+        Integer[] firstOffsets = new Integer[level];
+        for(int i = 0; i < firstOffsets.length; i++) {
+            firstOffsets[i] = i;
         }
 
-        SortedMap<Refinement, RefValue> parents = new TreeMap<>();
+        SortedMap<Refinement, RefValue> nextLevelParents = new TreeMap<>();
 
         for(Map.Entry<Refinement, RefValue> me: parents.entrySet()) {
-            Refinement pRef = me.getKey();
-            RefValue pRV = me.getValue();
-            Node pn = pRV.parent.get(doc);
+            Refinement firstParentRef = me.getKey();
+            RefValue firstParentRV = me.getValue();
+            Node parentNode = firstParentRV.parent.get(doc);
 
-            Relation[] npRelations = new Relation[ref.relations.length() - 1];
-            for(int i = 0; i < ref.relations.length(); i++) {
-                Integer j = pRV.reverseOffsets[i];
+            Relation[] secondParentRelations = new Relation[firstRef.relations.length() - 1];
+            for(int i = 0; i < firstRef.relations.length(); i++) {
+                Integer j = firstParentRV.reverseOffsets[i];
                 if(j != null) {
-                    npRelations[j] = ref.relations.get(i);
+                    secondParentRelations[j] = firstRef.relations.get(i);
                 }
             }
 
-            Refinement npRef = new Refinement(new RelationsMap(npRelations), ref.input);
+            Refinement secondParentRef = new Refinement(new RelationsMap(secondParentRelations), firstRef.input);
 
-            RefValue npRV = pn.extend(threadId, doc, npRef);
+            RefValue secondParentRV = parentNode.extend(threadId, doc, secondParentRef);
 
-            Relation[] nRelations = new Relation[pRef.relations.length() + 1];
-            for(int i = 0; i < pRef.relations.length(); i++) {
-                int j = npRV.offsets[i];
-                nRelations[j] = pRef.relations.get(i);
+            if(secondParentRV == null) {
+                continue;
             }
 
-            Relation rel = ref.relations.get(pRV.refOffset);
+            Relation[] secondRelations = new Relation[firstParentRef.relations.length() + 1];
+            for(int i = 0; i < firstParentRef.relations.length(); i++) {
+                int j = secondParentRV.offsets[i];
+                secondRelations[j] = firstParentRef.relations.get(i);
+            }
+
+            Relation rel = firstRef.relations.get(firstParentRV.refOffset);
             if(rel != null) {
-                nRelations[npRV.refOffset] = rel.invert();
+                secondRelations[secondParentRV.refOffset] = rel.invert();
             }
 
-            Refinement nRef = new Refinement(new RelationsMap(nRelations), pRef.input);
+            Refinement secondRef = new Refinement(new RelationsMap(secondRelations), firstParentRef.input);
 
-            Integer[] nOffsets = new Integer[npRV.offsets.length + 1];
-            for(int i = 0; i < pRV.reverseOffsets.length; i++) {
-                Integer j = pRV.reverseOffsets[i];
+            Integer[] secondOffsets = new Integer[secondParentRV.offsets.length + 1];
+            for(int i = 0; i < firstParentRV.reverseOffsets.length; i++) {
+                Integer j = firstParentRV.reverseOffsets[i];
                 if(j != null) {
-                    nOffsets[npRV.offsets[j]] = i;
+                    secondOffsets[secondParentRV.offsets[j]] = i;
                 }
             }
+            secondOffsets[secondParentRV.refOffset] = firstRefOffset;
 
-            parents.put(nRef, new RefValue(nOffsets, offsets[pRV.refOffset], pn.provider));
+            nextLevelParents.put(secondRef, new RefValue(secondOffsets, firstOffsets[firstParentRV.refOffset], parentNode.provider));
         }
 
-        rv = new RefValue(offsets, level, provider);
-        parents.put(ref, rv);
+        firstRV = new RefValue(firstOffsets, firstRefOffset, provider);
+        nextLevelParents.put(firstRef, firstRV);
 
-        return createAndNode(provider.model, doc, parents, level + 1) ? rv : null;
+        return createAndNode(provider.model, doc, nextLevelParents, level + 1) ? firstRV : null;
     }
 
 

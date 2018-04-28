@@ -100,20 +100,25 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
     public RefValue extend(int threadId, Document doc, Refinement ref) {
+        Relation rel = ref.relations.get(0);
+        if(rel == null) {
+            return null;
+        }
+
         RefValue rv = getAndChild(ref);
         if(rv != null) {
             return rv;
         }
 
-        SortedMap<Refinement, RefValue> parents = new TreeMap<>();
+        SortedMap<Refinement, RefValue> nlParents = new TreeMap<>();
 
-        Refinement mirrorRef = new Refinement(new AndNode.RelationsMap(new Relation[]{ref.relations.get(0).invert()}), provider);
-        parents.put(mirrorRef, new RefValue(new Integer[] {1}, 0, ref.input));
+        Refinement mirrorRef = new Refinement(new AndNode.RelationsMap(new Relation[]{rel.invert()}), provider);
+        nlParents.put(mirrorRef, new RefValue(new Integer[] {1}, 0, ref.input));
 
         rv = new RefValue(new Integer[] {0}, 1, provider);
-        parents.put(ref, rv);
+        nlParents.put(ref, rv);
 
-        return AndNode.createAndNode(provider.model, doc, parents, level + 1) ? rv : null;
+        return AndNode.createAndNode(provider.model, doc, nlParents, level + 1) ? rv : null;
     }
 
 
