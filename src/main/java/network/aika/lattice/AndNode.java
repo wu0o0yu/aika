@@ -94,6 +94,8 @@ public class AndNode extends Node<AndNode, AndActivation> {
         if (andChildren != null) {
             TreeMap<Refinement, AndActivation> results = null;
             for (Link fl : act.inputs) {
+                if(fl == null) continue;
+
                 InputActivation refAct = fl.refAct;
                 Refinement ref = fl.ref;
                 RefValue rv = fl.rv;
@@ -158,6 +160,8 @@ public class AndNode extends Node<AndNode, AndActivation> {
     public void discover(AndActivation act, PatternDiscovery.Config config) {
         Document doc = act.doc;
         for(Link fl : act.inputs) {
+            if(fl == null) continue;
+
             for (Link sl : fl.input.outputsToAndNode.values()) {
                 AndActivation secondAct = sl.output;
                 if (secondAct.node instanceof AndNode) {
