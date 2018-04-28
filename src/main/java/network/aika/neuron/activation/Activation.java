@@ -376,7 +376,7 @@ public final class Activation extends OrActivation {
 
     public Collection<Activation> getConflicts() {
         ArrayList<Activation> conflicts = new ArrayList<>();
-        for(SynapseActivation sa: neuronInputs) {
+        for(SynapseActivation sa: neuronInputs.values()) {
             if (sa.synapse.isNegative() && sa.synapse.key.isRecurrent) {
                 sa.input.collectIncomingConflicts(conflicts);
             }
@@ -390,7 +390,7 @@ public final class Activation extends OrActivation {
         if (getINeuron().type != INeuron.Type.INHIBITORY) {
             conflicts.add(this);
         } else {
-            for (Activation.SynapseActivation sa : neuronInputs) {
+            for (Activation.SynapseActivation sa : neuronInputs.values()) {
                 if (!sa.synapse.isNegative() && !sa.synapse.key.isRecurrent) {
                     sa.input.collectIncomingConflicts(conflicts);
                 }

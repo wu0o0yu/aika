@@ -24,9 +24,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Relation;
 import network.aika.neuron.activation.Activation;
 import network.aika.training.PatternDiscovery;
-import network.aika.*;
-import network.aika.neuron.activation.Conflicts;
-import network.aika.neuron.*;
 import network.aika.lattice.AndNode.AndActivation;
 import network.aika.lattice.InputNode.InputActivation;
 import network.aika.neuron.activation.Selector;
@@ -162,7 +159,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         s.forEach(secondIAct -> {
                     InputActivation secondAct = secondIAct.outputToInputNode.output;
                     if(secondAct != null) {
-                        if (!Conflicts.isConflicting(iAct, secondIAct)) {
+                    //    if (!Conflicts.isConflicting(iAct, secondIAct)) {
                             AndActivation oAct = new AndActivation(doc.activationIdCounter++, doc, nln);
                             for(Map.Entry<Refinement, RefValue> me: nln.parents.entrySet()) {
                                 boolean match = me.getKey().compareTo(ref) == 0;
@@ -170,7 +167,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
                             }
                             nln.addActivation(oAct);
                         }
-                    }
+                   // }
                 }
         );
     }

@@ -64,10 +64,6 @@ public class Linker {
         act.doc.linker.linkInput(act);
         n.provider.lock.releaseReadLock();
         n.lock.releaseReadLock();
-
-        long v = act.doc.visitedCounter++;
-        Conflicts.linkConflicts(act, v, INPUT);
-        Conflicts.linkConflicts(act, v, OUTPUT);
     }
 
 
