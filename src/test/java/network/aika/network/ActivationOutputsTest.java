@@ -65,7 +65,7 @@ public class ActivationOutputsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .addRangeRelation(END_TO_BEGIN_EQUALS, 1)
+                        .addRangeRelation(EQUALS, 1)
                         .setRangeOutput(Range.Output.BEGIN),
                 new Synapse.Builder()
                         .setSynapseId(1)

@@ -37,7 +37,7 @@ import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
 public class Linker {
 
     Document doc;
-    ArrayList<SynapseActivation> queue = new ArrayList<>();
+    ArrayDeque<SynapseActivation> queue = new ArrayDeque<>();
 
     public enum Direction {
         INPUT,
@@ -120,7 +120,8 @@ public class Linker {
 
 
     public void process() {
-        for(SynapseActivation linkedSA: queue) {
+        while(!queue.isEmpty()) {
+            SynapseActivation linkedSA = queue.pollFirst();
             for(Map.Entry<Integer, Relation> me: linkedSA.unmatchedRelations.entrySet()) {
                 Synapse s = linkedSA.output.getNeuron().getSynapseById(me.getKey());
                 Relation r = me.getValue();

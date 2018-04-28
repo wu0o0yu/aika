@@ -88,7 +88,6 @@ public class OverlappingOrTest {
 
         System.out.println(doc.activationsToString(false, false, true));
 
-        int wordPos = 0;
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
