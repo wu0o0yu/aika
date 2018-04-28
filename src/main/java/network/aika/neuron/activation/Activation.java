@@ -515,6 +515,10 @@ public final class Activation extends OrActivation {
             this.input = input;
             this.output = output;
         }
+
+        public String toString() {
+            return synapse + ": " + input + " --> " + output;
+        }
     }
 
 
