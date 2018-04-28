@@ -125,8 +125,10 @@ public class Converter {
 
                     if (!reqSyns.contains(s)) {
                         NodeContext nln = expandNode(nodeContext, s);
-                        outputNode.addInput(nln.getSynapseIds(), threadId, nln.node);
-                        remainingSum -= s.weight;
+                        if(nln != null) {
+                            outputNode.addInput(nln.getSynapseIds(), threadId, nln.node);
+                            remainingSum -= s.weight;
+                        }
                     }
                 }
             }
