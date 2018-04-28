@@ -26,6 +26,8 @@ import network.aika.neuron.activation.Range.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.TreeMap;
+
 import static network.aika.training.SynapseEvaluation.DeleteMode.NONE;
 
 /**
@@ -61,9 +63,10 @@ public class TrainingTest {
                 (s, iAct, oAct) -> new SynapseEvaluation.Result(
 
                         false,
-                        Range.Output.DIRECT
-                        , 1.0
-                        , NONE
+                        Range.Output.DIRECT,
+                        new TreeMap<>(),
+                        1.0,
+                        NONE
                 )
         );
 
@@ -120,6 +123,7 @@ public class TrainingTest {
                                     new SynapseEvaluation.Result(
                                             false,
                                             Range.Output.DIRECT,
+                                            new TreeMap<>(),
                                             1.0,
                                             NONE
                                     )

@@ -124,7 +124,7 @@ public class SynapseRelationTest {
             chars.put(c, rec);
         }
 
-        String word = "Hüttenheim";
+        String word = "Huettenheim";
 
 
         List<Synapse.Builder> inputs = new ArrayList<>();
@@ -156,7 +156,7 @@ public class SynapseRelationTest {
 
         System.out.println(n.get().node.get().logicToString());
 
-        Document doc = m.createDocument("abc Hüttenheim cba", 0);
+        Document doc = m.createDocument("abc Huettenheim cba", 0);
 
         for (int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().toLowerCase().charAt(i);

@@ -193,7 +193,6 @@ public class Neuron extends Provider<INeuron> {
 
 
     public boolean init(Document doc, double bias, ActivationFunction activationFunction, INeuron.Type type, List<Synapse.Builder> inputs) {
-        ArrayList<Synapse> is = new ArrayList<>();
         Map<Integer, Synapse> synapseIds = new TreeMap<>();
 
         for (Synapse.Builder input : inputs) {
@@ -202,22 +201,16 @@ public class Neuron extends Provider<INeuron> {
             assert input.synapseId != null;
             Synapse os = synapseIds.put(input.synapseId, s);
             assert os == null;
-
-            is.add(s);
         }
 
-        int i = 0;
         for (Synapse.Builder input : inputs) {
-            Synapse s = is.get(i);
+            Synapse s = synapseIds.get(input.synapseId);
             for (Map.Entry<Integer, Relation> me : input.relations.entrySet()) {
-                s.relations.put(me.getKey(), me.getValue());
                 Synapse rs = s.output.getSynapseById(me.getKey());
                 Relation or = rs.relations.put(s.id, me.getValue().invert());
                 assert or == null;
             }
-            i++;
         }
-
 
         if(activationFunction != null) {
             INeuron in = get();

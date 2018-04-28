@@ -148,7 +148,7 @@ public class LongTermLearning {
         double sDelta = iAct.getFinalState().value * x * r.significance * h;
 
         if(sDelta > 0.0) {
-            Synapse synapse = Synapse.createOrLookup(act.doc, null, new Synapse.Key(r.isRecurrent, r.rangeOutput), iAct.getNeuron(), act.getNeuron());
+            Synapse synapse = Synapse.createOrLookup(act.doc, null, new Synapse.Key(r.isRecurrent, r.rangeOutput), r.relations, iAct.getNeuron(), act.getNeuron());
 
             synapse.updateDelta(act.doc, sDelta, -config.beta * sDelta);
         }

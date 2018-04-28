@@ -18,8 +18,6 @@ package network.aika.neuron;
 
 
 import network.aika.*;
-import network.aika.neuron.activation.Linker;
-import network.aika.*;
 import network.aika.Document;
 import network.aika.neuron.activation.Range;
 import network.aika.neuron.activation.Range.Output;
@@ -64,15 +62,37 @@ public class Synapse implements Writable {
     public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = (s1, s2) -> {
         int r = s1.input.compareTo(s2.input);
         if (r != 0) return r;
-        return s1.key.compareTo(s2.key);
+        r = s1.key.compareTo(s2.key);
+        if (r != 0) return r;
+        return compareRelations(s1, s2);
     };
 
 
     public static final Comparator<Synapse> OUTPUT_SYNAPSE_COMP = (s1, s2) -> {
         int r = s1.output.compareTo(s2.output);
         if (r != 0) return r;
-        return s1.key.compareTo(s2.key);
+        r = s1.key.compareTo(s2.key);
+        if (r != 0) return r;
+        return compareRelations(s1, s2);
     };
+
+
+    private static int compareRelations(Synapse s1, Synapse s2) {
+        int r = Integer.compare(s1.relations.size(), s2.relations.size());
+        if(r != 0) return r;
+
+        Iterator<Map.Entry<Integer, Relation>> it1 = s1.relations.entrySet().iterator();
+        Iterator<Map.Entry<Integer, Relation>> it2 = s1.relations.entrySet().iterator();
+        while(it1.hasNext() && it2.hasNext()) {
+            Map.Entry<Integer, Relation> me1 = it1.next();
+            Map.Entry<Integer, Relation> me2 = it2.next();
+            r = Integer.compare(me1.getKey(), me2.getKey());
+            if(r != 0) return r;
+            r = me1.getValue().compareTo(me2.getValue());
+            if(r != 0) return r;
+        }
+        return 0;
+    }
 
 
     public Neuron input;
@@ -83,7 +103,7 @@ public class Synapse implements Writable {
     public Key key;
 
     // synapseId -> relation
-    public Map<Integer, Relation> relations = new TreeMap<>();
+    public Map<Integer, Relation> relations;
 
     public DistanceFunction distanceFunction = null;
 
@@ -122,8 +142,9 @@ public class Synapse implements Writable {
     public Synapse() {}
 
 
-    public Synapse(Neuron input, Neuron output, Integer id, Key key) {
+    public Synapse(Neuron input, Neuron output, Integer id, Key key, Map<Integer, Relation> relations) {
         this.key = lookupKey(key);
+        this.relations = relations;
         this.id = id;
         this.input = input;
         this.output = output;
@@ -356,8 +377,8 @@ public class Synapse implements Writable {
 
 
 
-    public static Synapse createOrLookup(Document doc, Integer synapseId, Key k, Neuron inputNeuron, Neuron outputNeuron) {
-        Synapse ns = new Synapse(inputNeuron, outputNeuron, synapseId, k);
+    public static Synapse createOrLookup(Document doc, Integer synapseId, Key k, Map<Integer, Relation> relations, Neuron inputNeuron, Neuron outputNeuron) {
+        Synapse ns = new Synapse(inputNeuron, outputNeuron, synapseId, k, relations);
 
         Synapse synapse = outputNeuron.inMemoryInputSynapses.get(ns);
         if(synapse == null) {
@@ -532,7 +553,7 @@ public class Synapse implements Writable {
 
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            return createOrLookup(null, synapseId, new Key(recurrent, rangeOutput), neuron, outputNeuron);
+            return createOrLookup(null, synapseId, new Key(recurrent, rangeOutput), relations, neuron, outputNeuron);
         }
 
 

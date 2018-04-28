@@ -171,7 +171,7 @@ public class MetaNetwork {
 
 
     private static void createOrLookupSynapse(Document doc, Target t, TreeSet<Synapse> inputSynapses, MetaSynapse inputMetaSyanpse, Synapse os, Neuron in) {
-        Synapse ns = new Synapse(in, t.targetNeuron, os.id, os.key);
+        Synapse ns = new Synapse(in, t.targetNeuron, os.id, os.key, os.relations);
         if (!ns.exists()) {
             ns.updateDelta(doc, inputMetaSyanpse.metaWeight, inputMetaSyanpse.metaBias);
 

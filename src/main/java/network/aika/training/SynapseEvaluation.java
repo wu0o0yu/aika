@@ -1,8 +1,11 @@
 package network.aika.training;
 
+import network.aika.neuron.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Range;
+
+import java.util.Map;
 
 public interface SynapseEvaluation {
 
@@ -54,15 +57,17 @@ public interface SynapseEvaluation {
     }
 
     class Result {
-        public Result(boolean isRecurrent, Range.Output rangeOutput, double significance, DeleteMode deleteMode) {
+        public Result(boolean isRecurrent, Range.Output rangeOutput, Map<Integer, Relation> relations, double significance, DeleteMode deleteMode) {
             this.isRecurrent = isRecurrent;
             this.rangeOutput = rangeOutput;
+            this.relations = relations;
             this.significance = significance;
             this.deleteMode = deleteMode;
         }
 
         public boolean isRecurrent;
         public Range.Output rangeOutput;
+        public Map<Integer, Relation> relations;
         public double significance;
         public DeleteMode deleteMode;
     }
