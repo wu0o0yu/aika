@@ -486,6 +486,11 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
         @Override
         public int compareTo(RelationsMap rm) {
+            if (this == MIN) return -1;
+            if (rm == MIN) return 1;
+            if (this == MAX) return 1;
+            if (rm == MAX) return -1;
+
             int r = Integer.compare(relations.length, rm.relations.length);
             if(r != 0) return r;
 
