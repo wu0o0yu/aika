@@ -77,7 +77,6 @@ public final class Activation extends OrActivation {
     public Decision decision = Decision.UNKNOWN;
     public Decision finalDecision = Decision.UNKNOWN;
     public Candidate candidate;
-    public Conflicts conflicts = new Conflicts();
     private long visitedState;
     public long markedAncestor;
 
@@ -372,6 +371,44 @@ public final class Activation extends OrActivation {
             }
         }
         return results;
+    }
+
+
+    public Collection<Activation> getConflicts() {
+        ArrayList<Activation> conflicts = new ArrayList<>();
+        for(SynapseActivation sa: neuronInputs) {
+            if (sa.synapse.isNegative() && sa.synapse.key.isRecurrent) {
+                sa.input.collectIncomingConflicts(conflicts);
+            }
+        }
+        collectOutgoingConflicts(conflicts);
+        return conflicts;
+    }
+
+
+    private void collectIncomingConflicts(ArrayList<Activation> conflicts) {
+        if (getINeuron().type != INeuron.Type.INHIBITORY) {
+            conflicts.add(this);
+        } else {
+            for (Activation.SynapseActivation sa : neuronInputs) {
+                if (!sa.synapse.isNegative() && !sa.synapse.key.isRecurrent) {
+                    sa.input.collectIncomingConflicts(conflicts);
+                }
+            }
+        }
+    }
+
+
+    private void collectOutgoingConflicts(ArrayList<Activation> conflicts) {
+        for(SynapseActivation sa: neuronOutputs) {
+            if (sa.output.getINeuron().type != INeuron.Type.INHIBITORY) {
+                if (sa.synapse.isNegative() && sa.synapse.key.isRecurrent) {
+                    conflicts.add(sa.output);
+                }
+            } else if (!sa.synapse.isNegative() && !sa.synapse.key.isRecurrent) {
+                sa.output.collectOutgoingConflicts(conflicts);
+            }
+        }
     }
 
 

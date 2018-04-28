@@ -9,6 +9,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Range;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
@@ -34,6 +35,7 @@ public class MetaNetworkTest {
     public Map<String, Neuron> neurons = new TreeMap<>();
 
 
+    @Ignore
     @Test
     public void testKeyPhraseRecognition() {
         String text = "Alan Smithee";

@@ -243,8 +243,12 @@ public class Model {
     }
 
     public void removeProvider(Provider p) {
-        activeProviders.remove(p.id);
-        providers.remove(p.id);
+        synchronized (activeProviders) {
+            activeProviders.remove(p.id);
+        }
+        synchronized (providers) {
+            providers.remove(p.id);
+        }
     }
 
 
