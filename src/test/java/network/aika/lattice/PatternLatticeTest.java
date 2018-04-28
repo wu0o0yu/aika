@@ -272,7 +272,8 @@ public class PatternLatticeTest {
                         .setWeight(1.0)
                         .setBias(-1.0)
                         .setRecurrent(false)
-                        .addRangeRelation(Relation.EQUALS, 1),
+                        .addRangeRelation(Relation.EQUALS, 1)
+                        .setRangeOutput(true, false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
@@ -286,6 +287,7 @@ public class PatternLatticeTest {
                         .setWeight(1.0)
                         .setBias(-1.0)
                         .setRecurrent(false)
+                        .setRangeOutput(false, true)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

@@ -593,7 +593,19 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
         public Activation getInputActivation(int i) {
             Link l = inputs[i];
-            return l.refAct.input.input;
+            if(l != null) {
+                return l.refAct.input.input;
+            } else {
+                for(int j = 0; j < inputs.length; j++) {
+                    if (j != i) {
+                        l = inputs[j];
+                        if(l != null) {
+                            return l.input.getInputActivation(l.rv.reverseOffsets[i]);
+                        }
+                    }
+                }
+                return null;
+            }
         }
     }
 
