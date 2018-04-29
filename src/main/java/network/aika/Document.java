@@ -343,9 +343,7 @@ public class Document implements Comparable<Document> {
     public String activationsToString(boolean finalOnly, boolean withTextSnippet, boolean withLogic) {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
-        for (INeuron n : activatedNeurons) {
-            acts.addAll(n.getActivations(this, false));
-        }
+        acts.addAll(activationsByRangeBegin.values());
 
         StringBuilder sb = new StringBuilder();
 

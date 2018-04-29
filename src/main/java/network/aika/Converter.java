@@ -25,6 +25,8 @@ import network.aika.neuron.Synapse;
 
 import java.util.*;
 
+import static network.aika.neuron.activation.Range.Mapping.NONE;
+
 /**
  * Converts the synapse weights of a neuron into a boolean logic representation of this neuron.
  *
@@ -36,9 +38,11 @@ public class Converter {
 
 
     public static Comparator<Synapse> SYNAPSE_COMP = (s1, s2) -> {
-        int r = Double.compare(s2.weight, s1.weight);
+        int r = Boolean.compare(s2.key.rangeOutput.begin != NONE, s1.key.rangeOutput.begin != NONE);
         if (r != 0) return r;
-        return Synapse.INPUT_SYNAPSE_COMP.compare(s1, s2);
+        r = Double.compare(s2.weight, s1.weight);
+        if (r != 0) return r;
+        return Integer.compare(s1.id, s2.id);
     };
 
     private int threadId;
@@ -72,12 +76,7 @@ public class Converter {
             return false;
         }
 
-        TreeSet<Synapse> tmp = new TreeSet<>(SYNAPSE_COMP);
-        for(Synapse s: neuron.inputSynapses.values()) {
-            if(!s.isNegative() && !s.key.isRecurrent && !s.inactive) {
-                tmp.add(s);
-            }
-        }
+        List<Synapse> candidates = prepareCandidates();
 
         NodeContext nodeContext = null;
         boolean noFurtherRefinement = false;
@@ -88,7 +87,7 @@ public class Converter {
         if(neuron.numDisjunctiveSynapses == 0) {
             double remainingSum = neuron.posDirSum;
             int i = 0;
-            for (Synapse s : tmp) {
+            for (Synapse s : candidates) {
                 final boolean isOptionalInput = sum + remainingSum - s.weight + neuron.posRecSum + neuron.biasSum > 0.0;
                 final boolean maxAndNodesReached = i >= MAX_AND_NODE_SIZE;
                 if (isOptionalInput || maxAndNodesReached) {
@@ -122,7 +121,7 @@ public class Converter {
             if (noFurtherRefinement || i == MAX_AND_NODE_SIZE) {
                 outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node);
             } else {
-                for (Synapse s : tmp) {
+                for (Synapse s : candidates) {
                     boolean belowThreshold = sum + s.weight + remainingSum + neuron.posRecSum + neuron.biasSum <= 0.0;
                     if (belowThreshold) {
                         break;
@@ -147,6 +146,41 @@ public class Converter {
         }
 
         return true;
+    }
+
+    private List<Synapse> prepareCandidates() {
+        Synapse syn = getBestSynapse(neuron.inputSynapses.values());
+
+        TreeSet<Integer> alreadyCollected = new TreeSet<>();
+        ArrayList<Synapse> selectedCandidates = new ArrayList<>();
+        TreeMap<Integer, Synapse> relatedSyns = new TreeMap<>();
+        while(syn != null && selectedCandidates.size() < MAX_AND_NODE_SIZE) {
+            selectedCandidates.add(syn);
+            alreadyCollected.add(syn.id);
+            for(Integer synId: syn.relations.keySet()) {
+                if(!alreadyCollected.contains(synId)) {
+                    relatedSyns.put(synId, syn.output.getSynapseById(synId));
+                }
+            }
+
+            syn = getBestSynapse(relatedSyns.values());
+            relatedSyns.remove(syn.id);
+        }
+
+        return selectedCandidates;
+    }
+
+
+    private Synapse getBestSynapse(Collection<Synapse> synapses) {
+        Synapse maxSyn = null;
+        for(Synapse s: synapses) {
+            if(!s.isNegative() && !s.key.isRecurrent && !s.inactive) {
+                if(maxSyn == null || SYNAPSE_COMP.compare(maxSyn, s) > 0) {
+                    maxSyn = s;
+                }
+            }
+        }
+        return maxSyn;
     }
 
 

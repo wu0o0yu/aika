@@ -167,6 +167,8 @@ public class SynapseRelationTest {
             }
         }
 
+        System.out.println(doc.activationsToString(false, true, true));
+
         assert n.get().getActivations(doc, false).size() >= 1;
     }
 
