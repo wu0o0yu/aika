@@ -139,7 +139,9 @@ public class Synapse implements Writable {
     public int createdInDoc;
     public int committedInDoc;
 
-    public Synapse() {}
+    public Synapse() {
+        relations = new TreeMap<>();
+    }
 
 
     public Synapse(Neuron input, Neuron output, Integer id, Key key, Map<Integer, Relation> relations) {

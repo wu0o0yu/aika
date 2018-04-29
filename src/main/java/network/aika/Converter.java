@@ -155,6 +155,7 @@ public class Converter {
         ArrayList<Synapse> selectedCandidates = new ArrayList<>();
         TreeMap<Integer, Synapse> relatedSyns = new TreeMap<>();
         while(syn != null && selectedCandidates.size() < MAX_AND_NODE_SIZE) {
+            relatedSyns.remove(syn.id);
             selectedCandidates.add(syn);
             alreadyCollected.add(syn.id);
             for(Integer synId: syn.relations.keySet()) {
@@ -164,7 +165,6 @@ public class Converter {
             }
 
             syn = getBestSynapse(relatedSyns.values());
-            relatedSyns.remove(syn.id);
         }
 
         return selectedCandidates;
