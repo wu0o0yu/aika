@@ -136,7 +136,7 @@ public class Linker {
                     }
                 } else {
                     for(Activation iAct: r.getLinkedActivationCandidates(linkedSA.input)) {
-                        if(iAct.getNeuron() == s.input && r.test(iAct, linkedSA.input)) {
+                        if(iAct.getNeuron() == s.input && r.test(linkedSA.input, iAct)) {
                             SynapseActivation sa = link(s, iAct, linkedSA.output);
                             sa.unmatchedRelations.remove(linkedSA.synapse.id);
                             linkedSA.unmatchedRelations.remove(sa.synapse.id);

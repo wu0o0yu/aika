@@ -208,6 +208,7 @@ public class Neuron extends Provider<INeuron> {
 
         Map<Integer, Synapse.Builder> synapseInputs = new TreeMap<>();
         for (Synapse.Builder input : inputs) {
+            assert input.synapseId != null;
             synapseInputs.put(input.synapseId, input);
         }
 
@@ -228,7 +229,6 @@ public class Neuron extends Provider<INeuron> {
         for (Synapse.Builder input : inputs) {
             Synapse s = input.getSynapse(this);
             s.update(doc, input.weight, input.bias);
-            assert input.synapseId != null;
             inputSynapses.add(s);
         }
 

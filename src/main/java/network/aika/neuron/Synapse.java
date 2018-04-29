@@ -82,7 +82,7 @@ public class Synapse implements Writable {
         if(r != 0) return r;
 
         Iterator<Map.Entry<Integer, Relation>> it1 = s1.relations.entrySet().iterator();
-        Iterator<Map.Entry<Integer, Relation>> it2 = s1.relations.entrySet().iterator();
+        Iterator<Map.Entry<Integer, Relation>> it2 = s2.relations.entrySet().iterator();
         while(it1.hasNext() && it2.hasNext()) {
             Map.Entry<Integer, Relation> me1 = it1.next();
             Map.Entry<Integer, Relation> me2 = it2.next();
@@ -167,9 +167,8 @@ public class Synapse implements Writable {
         out.provider.lock.acquireWriteLock();
         for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
             Synapse rs = out.provider.getSynapseById(me.getKey());
-            if(rs != null) {
-                rs.relations.put(id, me.getValue().invert());
-            }
+            assert rs != null;
+            rs.relations.put(id, me.getValue().invert());
         }
 
         out.provider.inMemoryInputSynapses.put(this, this);
