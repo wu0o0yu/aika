@@ -74,6 +74,19 @@ public class Neuron extends Provider<INeuron> {
         );
     }
 
+    /**
+     * Propagate an input activation into the network.
+     *
+     * @param doc   The current document
+     * @param r The range
+     */
+    public Activation addInput(Document doc, Range r) {
+        return addInput(doc,
+                new Activation.Builder()
+                        .setRange(r)
+        );
+    }
+
 
     /**
      * Propagate an input activation into the network.

@@ -92,7 +92,7 @@ public class SynapseRelationTest {
                         .setRecurrent(false)
                         .setBias(-1.0)
                         .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 2)
-                        .setRangeOutput(true),
+                        .setRangeOutput(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
@@ -108,7 +108,7 @@ public class SynapseRelationTest {
         inB.addInput(doc, 1, 2);
         inC.addInput(doc, 2, 3);
 
-        Activation outD1 = outD.getActivation(doc, new Range(0, 1), false);
+        Activation outD1 = outD.getActivation(doc, new Range(0, 3), false);
 
         Assert.assertNotNull(outD1);
     }
@@ -161,14 +161,9 @@ public class SynapseRelationTest {
         for (int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().toLowerCase().charAt(i);
 
-            Neuron rec = chars.get(c);
-            if (rec != null) {
-                Range r = new Range(i, doc.length());
-
-                rec.addInput(doc,
-                        new Activation.Builder()
-                                .setRange(r)
-                );
+            Neuron inputNeuron = chars.get(c);
+            if (inputNeuron != null) {
+                inputNeuron.addInput(doc, new Range(i, i + 1));
             }
         }
 
