@@ -67,7 +67,7 @@ public class MetaNetwork {
                     if (targetNeuron.get().type == INeuron.Type.META) {
                         newNeuron = true;
                         targetNeuron = doc.model.createNeuron(n.label.substring(2) + "-" + doc.getText(act.range));
-                        INeuron.update(doc.model, doc.threadId, doc, targetNeuron, n.bias, Collections.emptySet());
+                        INeuron.update(doc.threadId, doc, targetNeuron, n.bias, Collections.emptySet());
                     }
 
                     Activation metaNeuronAct = getMetaNeuronAct(inhibAct);
@@ -150,7 +150,7 @@ public class MetaNetwork {
             log.debug(showDelta(t.targetNeuron.get(), inputSynapses));
         }
 
-        INeuron.update(doc.model, doc.threadId, doc, t.targetNeuron, t.isNewNeuron ? metaAct.getINeuron().metaBias : 0.0, inputSynapses);
+        INeuron.update(doc.threadId, doc, t.targetNeuron, t.isNewNeuron ? metaAct.getINeuron().metaBias : 0.0, inputSynapses);
 
         if (t.isNewNeuron) {
             Activation.SynapseActivation inhibMetaLink = metaAct.getFinalOutputActivations().get(0);

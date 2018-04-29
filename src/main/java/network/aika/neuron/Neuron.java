@@ -18,7 +18,6 @@ package network.aika.neuron;
 
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Linker;
 import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.Provider;
@@ -193,24 +192,33 @@ public class Neuron extends Provider<INeuron> {
 
 
     public boolean init(Document doc, double bias, ActivationFunction activationFunction, INeuron.Type type, List<Synapse.Builder> inputs) {
-        Map<Integer, Synapse> synapseIds = new TreeMap<>();
 
+        Map<Integer, Synapse.Builder> synapseInputs = new TreeMap<>();
+        for (Synapse.Builder input : inputs) {
+            synapseInputs.put(input.synapseId, input);
+        }
+
+        for (Synapse.Builder input : inputs) {
+            for (Iterator<Map.Entry<Integer, Relation>> it = input.relations.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<Integer, Relation> me = it.next();
+
+                assert me.getKey() != input.synapseId;
+
+                if(me.getKey() > input.synapseId) {
+                    synapseInputs.get(me.getKey()).relations.put(input.synapseId, me.getValue().invert());
+                    it.remove();
+                }
+            }
+        }
+
+        List<Synapse> inputSynapses = new ArrayList<>();
         for (Synapse.Builder input : inputs) {
             Synapse s = input.getSynapse(this);
             s.update(doc, input.weight, input.bias);
             assert input.synapseId != null;
-            Synapse os = synapseIds.put(input.synapseId, s);
-            assert os == null;
+            inputSynapses.add(s);
         }
 
-        for (Synapse.Builder input : inputs) {
-            Synapse s = synapseIds.get(input.synapseId);
-            for (Map.Entry<Integer, Relation> me : input.relations.entrySet()) {
-                Synapse rs = s.output.getSynapseById(me.getKey());
-                Relation or = rs.relations.put(s.id, me.getValue().invert());
-                assert or == null;
-            }
-        }
 
         if(activationFunction != null) {
             INeuron in = get();
@@ -222,7 +230,7 @@ public class Neuron extends Provider<INeuron> {
             in.type = type;
         }
 
-        return INeuron.update(model, model.defaultThreadId, doc, this, bias, is);
+        return INeuron.update(model.defaultThreadId, doc, this, bias, inputSynapses);
     }
 
 
@@ -236,7 +244,7 @@ public class Neuron extends Provider<INeuron> {
 
         s.update(doc, input.weight, input.bias);
 
-        INeuron.update(model, doc != null ? doc.threadId : model.defaultThreadId, doc, this, 0.0, Collections.singletonList(s));
+        INeuron.update(doc != null ? doc.threadId : model.defaultThreadId, doc, this, 0.0, Collections.singletonList(s));
     }
 
 

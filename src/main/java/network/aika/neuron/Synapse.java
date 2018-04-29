@@ -165,6 +165,13 @@ public class Synapse implements Writable {
         in.provider.lock.releaseWriteLock();
 
         out.provider.lock.acquireWriteLock();
+        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
+            Synapse rs = out.provider.getSynapseById(me.getKey());
+            if(rs != null) {
+                rs.relations.put(id, me.getValue().invert());
+            }
+        }
+
         out.provider.inMemoryInputSynapses.put(this, this);
         out.provider.inputSynapsesById.put(id, this);
         out.provider.lock.releaseWriteLock();
