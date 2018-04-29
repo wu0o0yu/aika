@@ -180,6 +180,8 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
 
     public RefValue extend(int threadId, Document doc, Refinement firstRef) {
+        if(firstRef.relations.size() == 0) return null;
+
         RefValue firstRV = getAndChild(firstRef);
         if(firstRV != null) {
             return firstRV;
@@ -518,6 +520,15 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
         public Relation get(int i) {
             return relations[i];
+        }
+
+        public int size() {
+            if(relations.length == 0) return 0;
+            int count = 0;
+            for(int i = 0; i < relations.length; i++) {
+                if(relations[i] != null) count++;
+            }
+            return count;
         }
     }
 

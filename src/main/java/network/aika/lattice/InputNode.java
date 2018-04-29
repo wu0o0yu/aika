@@ -100,6 +100,8 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
     public RefValue extend(int threadId, Document doc, Refinement ref) {
+        if(ref.relations.size() == 0) return null;
+
         Relation rel = ref.relations.get(0);
         if(rel == null) {
             return null;

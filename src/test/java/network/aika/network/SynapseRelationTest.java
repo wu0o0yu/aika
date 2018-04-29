@@ -17,9 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static network.aika.neuron.Relation.InstanceRelation.Type.COMMON_ANCESTOR;
-import static network.aika.neuron.activation.Range.Operator.EQUALS;
-import static network.aika.neuron.activation.Range.Operator.GREATER_THAN_EQUAL;
-import static network.aika.neuron.activation.Range.Operator.LESS_THAN_EQUAL;
+import static network.aika.neuron.activation.Range.Operator.*;
 
 public class SynapseRelationTest {
 
@@ -146,6 +144,8 @@ public class SynapseRelationTest {
 
                 if(!end) {
                     s = s.addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, i + 1);
+                } else {
+                    s = s.addRangeRelation(Range.Relation.create(NONE, NONE, NONE, GREATER_THAN), 0);
                 }
 
                 inputs.add(s);
