@@ -168,6 +168,8 @@ public class ConverterTest {
                         .setRecurrent(false)
                         .setBias(0.0)
                         .addRangeRelation(Relation.EQUALS, 2)
+                        .addRangeRelation(Relation.EQUALS, 3)
+                        .addRangeRelation(Relation.EQUALS, 4)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
@@ -175,7 +177,6 @@ public class ConverterTest {
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .addRangeRelation(Relation.EQUALS, 3)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(3)
@@ -183,7 +184,6 @@ public class ConverterTest {
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .addRangeRelation(Relation.EQUALS, 4)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(4)
