@@ -79,12 +79,12 @@ public class OrNode extends Node<OrNode, Activation> {
 
                 if(s.key.rangeOutput.begin == Range.Mapping.BEGIN) {
                     begin = iAct.range.begin;
-                } else if(s.key.rangeOutput.end == Range.Mapping.BEGIN) {
+                } else if(s.key.rangeOutput.begin == Range.Mapping.END) {
                     begin = iAct.range.end;
                 }
                 if(s.key.rangeOutput.end == Range.Mapping.END) {
                     end = iAct.range.end;
-                } else if(s.key.rangeOutput.begin == Range.Mapping.END) {
+                } else if(s.key.rangeOutput.end == Range.Mapping.BEGIN) {
                     end = iAct.range.begin;
                 }
             }

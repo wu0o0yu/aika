@@ -63,13 +63,7 @@ public class Linker {
             int synId = ol.oe.synapseIds[i];
             Synapse s = act.node.neuron.getSynapseById(synId);
             Activation iAct = ol.input.getInputActivation(i);
-            SynapseActivation sa = link(s, iAct, act);
-
-            for (Integer ofs : s.relations.keySet()) {
-                if (ol.oe.revSynapseIds.get(ofs) != null) {
-                    sa.unmatchedRelations.remove(ofs);
-                }
-            }
+            link(s, iAct, act);
         }
         process();
         n.provider.lock.releaseReadLock();
@@ -84,11 +78,10 @@ public class Linker {
             return esa;
         }
 
-        sa.unmatchedRelations = new TreeMap<>(s.relations);
         iAct.addSynapseActivation(INPUT, sa);
         oAct.addSynapseActivation(OUTPUT, sa);
 
-        addToQueue(sa);
+        queue.add(sa);
         return sa;
     }
 
@@ -96,44 +89,30 @@ public class Linker {
     public void lateLinking() {
         for(Activation act: doc.activationsByRangeBegin.values()) {
             for(SynapseActivation sa: act.neuronInputs.values()) {
-                doc.linker.addToQueue(sa);
+                queue.add(sa);
             }
-
-
         }
         doc.linker.process();
-    }
-
-
-    public void addToQueue(SynapseActivation sa) {
-        if(sa.unmatchedRelations.size() > 0) {
-            queue.add(sa);
-        }
     }
 
 
     public void process() {
         while(!queue.isEmpty()) {
             SynapseActivation linkedSA = queue.pollFirst();
-            for(Iterator<Map.Entry<Integer, Relation>> it = linkedSA.unmatchedRelations.entrySet().iterator(); it.hasNext();) {
-                Map.Entry<Integer, Relation> me = it.next();
+            for(Map.Entry<Integer, Relation> me: linkedSA.synapse.relations.entrySet()) {
                 Synapse s = linkedSA.output.getNeuron().getSynapseById(me.getKey());
                 Relation r = me.getValue();
                 INeuron.ThreadState ts = s.input.get().getThreadState(doc.threadId, true);
                 if(!r.isExact()) {
                     for(Activation iAct: ts.activations.values()) {
                         if(r.test(linkedSA.input, iAct)) {
-                            SynapseActivation sa = link(s, iAct, linkedSA.output);
-                            sa.unmatchedRelations.remove(linkedSA.synapse.id);
-                            it.remove();
+                            link(s, iAct, linkedSA.output);
                         }
                     }
                 } else {
                     for(Activation iAct: r.getLinkedActivationCandidates(linkedSA.input)) {
                         if(iAct.getNeuron() == s.input && r.test(linkedSA.input, iAct)) {
-                            SynapseActivation sa = link(s, iAct, linkedSA.output);
-                            sa.unmatchedRelations.remove(linkedSA.synapse.id);
-                            it.remove();
+                            link(s, iAct, linkedSA.output);
                         }
                     }
                 }
