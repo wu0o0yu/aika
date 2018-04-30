@@ -49,37 +49,37 @@ public class EntityResolutionTest {
         Neuron ePuma = m.createNeuron("E-Puma");
 
 
-        Neuron.init(eJaguar, 2.0, INeuron.Type.EXCITATORY,
+        Neuron.init(eJaguar, 4.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wJaguar)
                         .setRecurrent(false)
                         .setWeight(5.0)
-                        .setBias(-4.75)
+                        .setBias(-5.0)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(ePuma)
                         .setRecurrent(true)
                         .setWeight(5.0)
-                        .setBias(-4.75)
+                        .setBias(-5.0)
                         .addRangeRelation(Range.Relation.NONE, 0)
         );
 
-        Neuron.init(ePuma, 2.0, INeuron.Type.EXCITATORY,
+        Neuron.init(ePuma, 4.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wPuma)
                         .setRecurrent(false)
                         .setWeight(5.0)
-                        .setBias(-4.75)
+                        .setBias(-5.0)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(eJaguar)
                         .setRecurrent(true)
                         .setWeight(5.0)
-                        .setBias(-4.75)
+                        .setBias(-5.0)
                         .addRangeRelation(Range.Relation.NONE, 0)
         );
 
@@ -109,8 +109,8 @@ public class EntityResolutionTest {
         Assert.assertEquals(0, eJaguar.getActivation(doc, new Range(0, 6), true).neuronInputs.values().iterator().next().input.id);
         Assert.assertEquals(4, ePuma.getActivation(doc, new Range(7, 11), true).neuronInputs.values().iterator().next().input.id);
 
-        Assert.assertEquals(1, eJaguar.getActivation(doc, new Range(0, 6), true).neuronInputs.size());
-        Assert.assertEquals(1, ePuma.getActivation(doc, new Range(7, 11), true).neuronInputs.size());
+        Assert.assertEquals(2, eJaguar.getActivation(doc, new Range(0, 6), true).neuronInputs.size());
+        Assert.assertEquals(2, ePuma.getActivation(doc, new Range(7, 11), true).neuronInputs.size());
     }
 
 
