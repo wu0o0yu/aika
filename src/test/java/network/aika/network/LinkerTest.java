@@ -48,13 +48,13 @@ public class LinkerTest {
                             .setSynapseId(0)
                             .setNeuron(na)
                             .setWeight(1.0)
-                            .setBias(0.0)
-                            .addRangeRelation(rr, 1),
+                            .setBias(0.0),
                     new Synapse.Builder()
                             .setSynapseId(1)
                             .setNeuron(nb)
                             .setWeight(10.0)
                             .setBias(-10.0)
+                            .addRangeRelation(rr, 0)
                             .setRangeOutput(true)
             );
 
@@ -66,6 +66,8 @@ public class LinkerTest {
                 nb.addInput(doc, rb.begin, rb.end);
                 na.addInput(doc, ra.begin, ra.end);
             }
+
+            doc.process();
 
             Assert.assertEquals(targetValue, !na.get().getActivations(doc, false).iterator().next().neuronOutputs.isEmpty());
         }

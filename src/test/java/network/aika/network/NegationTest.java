@@ -387,7 +387,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .addRangeRelation(Relation.END_TO_BEGIN_EQUALS, 1)
+                        .addRangeRelation(Relation.EQUALS, 1)
                         .setRangeOutput(BEGIN, Range.Mapping.NONE),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -402,8 +402,8 @@ public class NegationTest {
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setBias(0.0)
-                        .addRangeRelation(Relation.CONTAINS, 0)
-                        .addRangeRelation(Relation.CONTAINS, 1)
+                        .addRangeRelation(Relation.OVERLAPS, 0)
+                        .addRangeRelation(Relation.OVERLAPS, 1)
         );
 
         {

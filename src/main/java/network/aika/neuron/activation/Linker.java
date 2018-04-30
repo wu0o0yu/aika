@@ -128,7 +128,7 @@ public class Linker {
                 INeuron.ThreadState ts = s.input.get().getThreadState(doc.threadId, true);
                 if(!r.isExact()) {
                     for(Activation iAct: ts.activations.values()) {
-                        if(r.test(iAct, linkedSA.input)) {
+                        if(r.test(linkedSA.input, iAct)) {
                             SynapseActivation sa = link(s, iAct, linkedSA.output);
                             sa.unmatchedRelations.remove(linkedSA.synapse.id);
                             linkedSA.unmatchedRelations.remove(sa.synapse.id);
