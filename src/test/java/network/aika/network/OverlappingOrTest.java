@@ -66,6 +66,7 @@ public class OverlappingOrTest {
                         .setWeight(4.0)
                         .setRecurrent(false)
                         .addRangeRelation(Relation.END_TO_BEGIN_EQUALS, 1)
+                        .addRangeRelation(Relation.create(Operator.NONE, Operator.NONE, Operator.NONE, Operator.LESS_THAN), 2)
                         .setBias(-4.0)
                         .setRangeOutput(Range.Output.BEGIN),
                 new Synapse.Builder()
