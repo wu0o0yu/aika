@@ -32,6 +32,8 @@ import org.junit.Test;
 
 import static network.aika.neuron.activation.Range.Mapping.BEGIN;
 import static network.aika.neuron.activation.Range.Mapping.END;
+import static network.aika.neuron.activation.Range.Operator.GREATER_THAN;
+import static network.aika.neuron.activation.Range.Operator.LESS_THAN;
 import static network.aika.neuron.activation.Range.Relation.NONE;
 import static network.aika.neuron.activation.Range.Operator.EQUALS;
 
@@ -387,15 +389,15 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .addRangeRelation(Relation.EQUALS, 1)
-                        .setRangeOutput(BEGIN, Range.Mapping.NONE),
+                        .addRangeRelation(Relation.create(Range.Operator.NONE, Range.Operator.NONE, Range.Operator.NONE, GREATER_THAN), 1)
+                        .setRangeOutput(true, false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeOutput(Range.Mapping.NONE, END),
+                        .setRangeOutput(false, true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inS)
