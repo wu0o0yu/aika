@@ -50,39 +50,30 @@ public class Linker {
     }
 
 
-
     /**
-     * Adds the incoming and outgoing links between neuron activations.
+     * Adds the incoming links between neuron activations.
      *
      * @param act
      */
-    public static void link(Activation act) {
-
+    public void link(Activation act, OrNode.Link ol) {
         INeuron n = act.getINeuron();
         n.lock.acquireReadLock();
         n.provider.lock.acquireReadLock();
-        act.doc.linker.linkInput(act);
-        n.provider.lock.releaseReadLock();
-        n.lock.releaseReadLock();
-    }
+        for (int i = 0; i < ol.oe.synapseIds.length; i++) {
+            int synId = ol.oe.synapseIds[i];
+            Synapse s = act.node.neuron.getSynapseById(synId);
+            Activation iAct = ol.input.getInputActivation(i);
+            SynapseActivation sa = link(s, iAct, act);
 
-
-    private void linkInput(Activation act) {
-        for(OrNode.Link ol: act.inputs.values()) {
-            for(int i = 0; i < ol.oe.synapseIds.length; i++) {
-                int synId = ol.oe.synapseIds[i];
-                Synapse s = act.node.neuron.getSynapseById(synId);
-                Activation iAct = ol.input.getInputActivation(i);
-                SynapseActivation sa = link(s, iAct, act);
-
-                for(Integer ofs: s.relations.keySet()) {
-                    if(ol.oe.revSynapseIds.get(ofs) != null) {
-                        sa.unmatchedRelations.remove(ofs);
-                    }
+            for (Integer ofs : s.relations.keySet()) {
+                if (ol.oe.revSynapseIds.get(ofs) != null) {
+                    sa.unmatchedRelations.remove(ofs);
                 }
             }
         }
         process();
+        n.provider.lock.releaseReadLock();
+        n.lock.releaseReadLock();
     }
 
 
@@ -107,6 +98,8 @@ public class Linker {
             for(SynapseActivation sa: act.neuronInputs.values()) {
                 doc.linker.addToQueue(sa);
             }
+
+
         }
         doc.linker.process();
     }
@@ -145,7 +138,5 @@ public class Linker {
                 }
             }
         }
-        queue.clear();
     }
-
 }

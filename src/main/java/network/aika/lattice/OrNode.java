@@ -21,6 +21,7 @@ import network.aika.*;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Linker;
 import network.aika.training.PatternDiscovery;
 import network.aika.*;
 import network.aika.Document;
@@ -106,7 +107,8 @@ public class OrNode extends Node<OrNode, Activation> {
             addActivation(act);
         }
 
-        act.link(oe, inputAct);
+        Link ol = act.link(oe, inputAct);
+        act.doc.linker.link(act, ol);
     }
 
 
@@ -354,10 +356,11 @@ public class OrNode extends Node<OrNode, Activation> {
             throw new UnsupportedOperationException();
         }
 
-        public void link(OrEntry oe, NodeActivation<?> input) {
+        public Link link(OrEntry oe, NodeActivation<?> input) {
             Link l = new Link(oe, input, this);
             inputs.put(input.id, l);
             input.outputsToOrNode.put(id, l);
+            return l;
         }
     }
 

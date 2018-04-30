@@ -501,8 +501,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         }
 
         doc.addedActivations.add(act);
-
-        Linker.link(act);
     }
 
 
