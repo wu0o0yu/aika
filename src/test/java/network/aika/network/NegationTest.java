@@ -34,6 +34,7 @@ import static network.aika.neuron.activation.Range.Mapping.BEGIN;
 import static network.aika.neuron.activation.Range.Mapping.END;
 import static network.aika.neuron.activation.Range.Operator.GREATER_THAN;
 import static network.aika.neuron.activation.Range.Operator.LESS_THAN;
+import static network.aika.neuron.activation.Range.Relation.CONTAINS;
 import static network.aika.neuron.activation.Range.Relation.NONE;
 import static network.aika.neuron.activation.Range.Operator.EQUALS;
 
@@ -62,21 +63,21 @@ public class NegationTest {
                         .setWeight(10.0)
                         .setBias(-9.5)
                         .setRecurrent(false)
+                        .addRangeRelation(CONTAINS, 1)
+                        .addRangeRelation(CONTAINS, 2)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(-10.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .setRangeOutput(true),
+                        .setRecurrent(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(-10.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeOutput(true)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -94,7 +95,9 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, false, true));
 
-        Assert.assertNotNull(abcN.getActivation(doc, new Range(0, 11), true));
+        doc.process();
+
+        Assert.assertNotNull(abcN.getActivation(doc, new Range(0, 11), false));
     }
 
 

@@ -115,7 +115,8 @@ public class Linker {
     public void process() {
         while(!queue.isEmpty()) {
             SynapseActivation linkedSA = queue.pollFirst();
-            for(Map.Entry<Integer, Relation> me: linkedSA.unmatchedRelations.entrySet()) {
+            for(Iterator<Map.Entry<Integer, Relation>> it = linkedSA.unmatchedRelations.entrySet().iterator(); it.hasNext();) {
+                Map.Entry<Integer, Relation> me = it.next();
                 Synapse s = linkedSA.output.getNeuron().getSynapseById(me.getKey());
                 Relation r = me.getValue();
                 INeuron.ThreadState ts = s.input.get().getThreadState(doc.threadId, true);
@@ -124,7 +125,7 @@ public class Linker {
                         if(r.test(linkedSA.input, iAct)) {
                             SynapseActivation sa = link(s, iAct, linkedSA.output);
                             sa.unmatchedRelations.remove(linkedSA.synapse.id);
-                            linkedSA.unmatchedRelations.remove(sa.synapse.id);
+                            it.remove();
                         }
                     }
                 } else {
@@ -132,7 +133,7 @@ public class Linker {
                         if(iAct.getNeuron() == s.input && r.test(linkedSA.input, iAct)) {
                             SynapseActivation sa = link(s, iAct, linkedSA.output);
                             sa.unmatchedRelations.remove(linkedSA.synapse.id);
-                            linkedSA.unmatchedRelations.remove(sa.synapse.id);
+                            it.remove();
                         }
                     }
                 }
