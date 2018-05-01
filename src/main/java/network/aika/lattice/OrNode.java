@@ -67,8 +67,8 @@ public class OrNode extends Node<OrNode, Activation> {
     public void addInputActivation(OrEntry oe, NodeActivation inputAct) {
         Document doc = inputAct.doc;
 
-        int begin = Integer.MIN_VALUE;
-        int end = Integer.MAX_VALUE;
+        Integer begin = null;
+        Integer end = null;
 
         for(int i = 0; i < oe.synapseIds.length; i++) {
             int synapseId = oe.synapseIds[i];
@@ -77,16 +77,11 @@ public class OrNode extends Node<OrNode, Activation> {
             if(s.key.rangeOutput.begin != Range.Mapping.NONE || s.key.rangeOutput.end != Range.Mapping.NONE) {
                 Activation iAct = inputAct.getInputActivation(i);
 
-                if(s.key.rangeOutput.begin == Range.Mapping.BEGIN) {
-                    begin = iAct.range.begin;
-                } else if(s.key.rangeOutput.begin == Range.Mapping.END) {
-                    begin = iAct.range.end;
-                }
-                if(s.key.rangeOutput.end == Range.Mapping.END) {
-                    end = iAct.range.end;
-                } else if(s.key.rangeOutput.end == Range.Mapping.BEGIN) {
-                    end = iAct.range.begin;
-                }
+                Integer b = s.key.rangeOutput.begin.map(iAct.range);
+                if(b != null) begin = b;
+
+                Integer e = s.key.rangeOutput.end.map(iAct.range);
+                if(e != null) end = e;
             }
         }
 

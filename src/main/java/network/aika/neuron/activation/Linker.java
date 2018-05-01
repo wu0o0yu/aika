@@ -131,6 +131,13 @@ public class Linker {
 
 
     private void link(Activation rAct, Activation oAct, Synapse s, Relation r) {
+        Integer outputBegin = s.key.rangeOutput.begin.map(rAct.range);
+        Integer outputEnd = s.key.rangeOutput.end.map(rAct.range);
+
+        if(outputBegin != null && outputBegin != oAct.range.begin || outputEnd != null && outputEnd != oAct.range.end) {
+            return;
+        }
+
         if(!r.isExact()) {
             INeuron.ThreadState ts = s.input.get().getThreadState(doc.threadId, true);
             for(Activation iAct: ts.activations.values()) {
