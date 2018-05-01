@@ -167,11 +167,7 @@ public class Synapse implements Writable {
         in.provider.lock.releaseWriteLock();
 
         out.provider.lock.acquireWriteLock();
-        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
-            Synapse rs = out.provider.getSynapseById(me.getKey());
-            assert rs != null;
-            rs.relations.put(id, me.getValue().invert());
-        }
+        reverseLinkRelations(out);
 
         out.provider.inMemoryInputSynapses.put(this, this);
         out.provider.inputSynapsesById.put(id, this);
@@ -193,6 +189,25 @@ public class Synapse implements Writable {
 
         (dir ? in : out).lock.releaseWriteLock();
         (dir ? out : in).lock.releaseWriteLock();
+    }
+
+
+    private void reverseLinkRelations(INeuron out) {
+        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
+            int rId = me.getKey();
+            Map<Integer, Relation> rel;
+            if(rId >= 0) {
+                Synapse rs = out.provider.getSynapseById(rId);
+                assert rs != null;
+                rel = rs.relations;
+            } else {
+                if(out.outputRelations == null) {
+                    out.outputRelations = new TreeMap<>();
+                }
+                rel = out.outputRelations;
+            }
+            rel.put(id, me.getValue().invert());
+        }
     }
 
 
@@ -537,6 +552,7 @@ public class Synapse implements Writable {
 
 
         public Builder setSynapseId(int synapseId) {
+            assert synapseId >= 0;
             this.synapseId = synapseId;
             return this;
         }
@@ -549,12 +565,14 @@ public class Synapse implements Writable {
 
 
         public Builder addInstanceRelation(Relation.InstanceRelation.Type type, int synapseId) {
+            assert synapseId >= -1;
             relations.put(synapseId, new Relation.InstanceRelation(type));
             return this;
         }
 
 
         public Builder addRangeRelation(Range.Relation relation, int synapseId) {
+            assert synapseId >= -1;
             relations.put(synapseId, new Relation.RangeRelation(relation));
             return this;
         }

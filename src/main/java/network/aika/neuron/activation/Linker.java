@@ -59,15 +59,32 @@ public class Linker {
         INeuron n = act.getINeuron();
         n.lock.acquireReadLock();
         n.provider.lock.acquireReadLock();
+
+        linkOrNodeRelations(act, ol);
+
+        process();
+        n.provider.lock.releaseReadLock();
+        n.lock.releaseReadLock();
+    }
+
+
+    private void linkOrNodeRelations(Activation act, OrNode.Link ol) {
         for (int i = 0; i < ol.oe.synapseIds.length; i++) {
             int synId = ol.oe.synapseIds[i];
             Synapse s = act.node.neuron.getSynapseById(synId);
             Activation iAct = ol.input.getInputActivation(i);
             link(s, iAct, act);
         }
-        process();
-        n.provider.lock.releaseReadLock();
-        n.lock.releaseReadLock();
+    }
+
+    private void linkOutputRelations(Activation act) {
+        INeuron n = act.getINeuron();
+        if(n.outputRelations != null) {
+            for (Map.Entry<Integer, Relation> me : n.outputRelations.entrySet()) {
+                Synapse s = act.node.neuron.getSynapseById(me.getKey());
+                link(act, act, s, me.getValue());
+            }
+        }
     }
 
 
@@ -88,6 +105,8 @@ public class Linker {
 
     public void lateLinking() {
         for(Activation act: doc.activationsByRangeBegin.values()) {
+            linkOutputRelations(act);
+
             for(SynapseActivation sa: act.neuronInputs.values()) {
                 queue.add(sa);
             }
@@ -100,21 +119,29 @@ public class Linker {
         while(!queue.isEmpty()) {
             SynapseActivation linkedSA = queue.pollFirst();
             for(Map.Entry<Integer, Relation> me: linkedSA.synapse.relations.entrySet()) {
-                Synapse s = linkedSA.output.getNeuron().getSynapseById(me.getKey());
-                Relation r = me.getValue();
-                INeuron.ThreadState ts = s.input.get().getThreadState(doc.threadId, true);
-                if(!r.isExact()) {
-                    for(Activation iAct: ts.activations.values()) {
-                        if(r.test(linkedSA.input, iAct)) {
-                            link(s, iAct, linkedSA.output);
-                        }
-                    }
-                } else {
-                    for(Activation iAct: r.getLinkedActivationCandidates(linkedSA.input)) {
-                        if(iAct.getNeuron() == s.input && r.test(linkedSA.input, iAct)) {
-                            link(s, iAct, linkedSA.output);
-                        }
-                    }
+                int relId = me.getKey();
+                if(relId >= 0) {
+                    Synapse s = linkedSA.output.getNeuron().getSynapseById(relId);
+                    Relation r = me.getValue();
+                    link(linkedSA.input, linkedSA.output, s, r);
+                }
+            }
+        }
+    }
+
+
+    private void link(Activation rAct, Activation oAct, Synapse s, Relation r) {
+        if(!r.isExact()) {
+            INeuron.ThreadState ts = s.input.get().getThreadState(doc.threadId, true);
+            for(Activation iAct: ts.activations.values()) {
+                if(r.test(rAct, iAct)) {
+                    link(s, iAct, oAct);
+                }
+            }
+        } else {
+            for(Activation iAct: r.getLinkedActivationCandidates(rAct)) {
+                if(iAct.getNeuron() == s.input && r.test(rAct, iAct)) {
+                    link(s, iAct, oAct);
                 }
             }
         }

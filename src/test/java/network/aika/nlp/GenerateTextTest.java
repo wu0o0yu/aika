@@ -70,7 +70,7 @@ public class GenerateTextTest {
                         .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Relation.OVERLAPS, 0)
+                        .addRangeRelation(Relation.OVERLAPS, -1)
         );
 
         // Word bbb is only added to the resulting text if input b is active and this neuron
@@ -89,7 +89,7 @@ public class GenerateTextTest {
                         .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Relation.OVERLAPS, 0)
+                        .addRangeRelation(Relation.OVERLAPS, -1)
         );
 
 
@@ -107,7 +107,7 @@ public class GenerateTextTest {
                         .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Relation.OVERLAPS, 0)
+                        .addRangeRelation(Relation.OVERLAPS, -1)
         );
 
         // OutD is only activated if the previous word was outB.
@@ -124,7 +124,7 @@ public class GenerateTextTest {
                         .setWeight(-20.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Relation.OVERLAPS, 0)
+                        .addRangeRelation(Relation.OVERLAPS, -1)
         );
 
 

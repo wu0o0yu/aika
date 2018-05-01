@@ -90,6 +90,11 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     public int numberOfInputSynapses = 0;
 
+
+    // synapseId -> relation
+    public Map<Integer, Relation> outputRelations;
+
+
     // A synapse is stored only in one direction, depending on the synapse weight.
     public TreeMap<Synapse, Synapse> inputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
     public TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
@@ -350,6 +355,16 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             }
         }
         out.writeBoolean(false);
+
+        if(outputRelations != null) {
+            out.writeInt(outputRelations.size());
+            for (Map.Entry<Integer, Relation> me : outputRelations.entrySet()) {
+                out.writeInt(me.getKey());
+                me.getValue().write(out);
+            }
+        } else  {
+            out.writeInt(0);
+        }
     }
 
 
@@ -393,14 +408,22 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         numberOfInputSynapses = in.readInt();
         while (in.readBoolean()) {
             Synapse syn = Synapse.read(in, m);
-
             inputSynapses.put(syn, syn);
         }
 
         while (in.readBoolean()) {
             Synapse syn = Synapse.read(in, m);
-
             outputSynapses.put(syn, syn);
+        }
+
+        int l = in.readInt();
+        if(l > 0) {
+            outputRelations = new TreeMap<>();
+            for(int i = 0; i < l; i++) {
+                int synId = in.readInt();
+                Relation r = Relation.read(in, m);
+                outputRelations.put(synId, r);
+            }
         }
     }
 
