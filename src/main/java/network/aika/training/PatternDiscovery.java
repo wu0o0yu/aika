@@ -101,9 +101,9 @@ public class PatternDiscovery {
     public static void discover(Document doc, Config config) {
         doc.createV = doc.visitedCounter++;
 
-        doc.addedNodeActivations.clear();
-
         doc.getAllActivationsStream().forEach(act -> config.counter.count(act));
+
+        doc.addedNodeActivations.clear();
 
         doc.getAllActivationsStream()
                 .forEach(act -> act.node.discover(act, config));
