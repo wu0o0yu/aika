@@ -4,6 +4,7 @@ package network.aika.network;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
@@ -17,13 +18,15 @@ import java.util.HashMap;
 import java.util.List;
 
 import static network.aika.neuron.Relation.InstanceRelation.Type.COMMON_ANCESTOR;
+import static network.aika.neuron.Relation.InstanceRelation.Type.CONTAINED_IN;
+import static network.aika.neuron.Relation.InstanceRelation.Type.CONTAINS;
 import static network.aika.neuron.activation.Range.Operator.*;
 
-public class SynapseRelationTest {
+public class RelationsTest {
 
 
     @Test
-    public void testABPattern() {
+    public void testRangeRelation() {
         Model m = new Model();
 
         Neuron inA = m.createNeuron("A");
@@ -31,22 +34,22 @@ public class SynapseRelationTest {
 
 
         INeuron outC = Neuron.init(m.createNeuron("C"),
-                0.001,
+                5.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
-                        .setWeight(1.0)
+                        .setWeight(10.0)
                         .setRecurrent(false)
-                        .setBias(-1.0)
+                        .setBias(-10.0)
                         .addRangeRelation(Range.Relation.EQUALS, 1)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
-                        .setWeight(1.0)
+                        .setWeight(10.0)
                         .setRecurrent(false)
-                        .setBias(-1.0)
+                        .setBias(-10.0)
                         .setRangeOutput(true)
         ).get();
 
@@ -55,6 +58,57 @@ public class SynapseRelationTest {
 
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);
+
+        Activation outC1 = outC.getActivation(doc, new Range(0, 1), false);
+
+        System.out.println(doc.activationsToString(false, false, true));
+
+        Assert.assertNotNull(outC1);
+    }
+
+
+    @Test
+    public void testInstanceRelation() {
+        Model m = new Model();
+
+        Neuron inA = m.createNeuron("A");
+
+        INeuron inB = Neuron.init(m.createNeuron("B"),
+                5.0,
+                INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(inA)
+                        .setWeight(10.0)
+                        .setRecurrent(false)
+                        .setBias(-10.0)
+                        .setRangeOutput(true)
+        ).get();
+
+        INeuron outC = Neuron.init(m.createNeuron("C"),
+                5.0,
+                INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(inA)
+                        .setWeight(10.0)
+                        .setRecurrent(false)
+                        .setBias(-10.0)
+                        .addInstanceRelation(CONTAINED_IN, 1)
+                        .setRangeOutput(true),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(inB.provider)
+                        .setWeight(10.0)
+                        .setRecurrent(false)
+                        .setBias(-10.0)
+                        .setRangeOutput(true)
+        ).get();
+
+
+        Document doc = m.createDocument("aaaaaaaaaa", 0);
+
+        inA.addInput(doc, 0, 1);
 
         Activation outC1 = outC.getActivation(doc, new Range(0, 1), false);
 
