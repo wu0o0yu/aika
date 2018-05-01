@@ -1,6 +1,5 @@
 package network.aika.nlp;
 
-import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
@@ -13,6 +12,7 @@ import org.junit.Test;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static network.aika.ActivationFunction.RECTIFIED_LINEAR_UNIT;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.activation.Range.Relation.EQUALS;
 import static network.aika.neuron.activation.Range.Relation.NONE;
@@ -46,21 +46,21 @@ public class CoreferenceResolutionTest {
         m = new Model();
 
         maleNameN = m.createNeuron("C-Male Name");
-        Neuron.init(maleNameN, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INHIBITORY);
+        Neuron.init(maleNameN, 0.0, RECTIFIED_LINEAR_UNIT, INHIBITORY);
 
         malePronounN = m.createNeuron("C-Male Pronoun");
-        Neuron.init(malePronounN, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INHIBITORY);
+        Neuron.init(malePronounN, 0.0, RECTIFIED_LINEAR_UNIT, INHIBITORY);
 
         femaleNameN = m.createNeuron("C-Female Name");
-        Neuron.init(femaleNameN, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INHIBITORY);
+        Neuron.init(femaleNameN, 0.0, RECTIFIED_LINEAR_UNIT, INHIBITORY);
 
         femalePronounN = m.createNeuron("C-Female Pronoun");
-        Neuron.init(femalePronounN, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INHIBITORY);
+        Neuron.init(femalePronounN, 0.0, RECTIFIED_LINEAR_UNIT, INHIBITORY);
 
         addWords(pronouns[0], malePronounN);
         addWords(pronouns[1], femalePronounN);
         addWords(names[0], maleNameN);
-        addWords(names[1], femalePronounN);
+        addWords(names[1], femaleNameN);
 
 
         Neuron maleCoref = m.createNeuron("Male Coreference");
@@ -141,7 +141,7 @@ public class CoreferenceResolutionTest {
 
     @Test
     public void testCoref() {
-        String txt = "john and lisa went to a sea park he saw dolphins lisa met richard he also visited the seapark";
+        String txt = "john went jogging and lisa went swimming . he met her afterwards .";
 
         Document doc = parse(txt);
 
