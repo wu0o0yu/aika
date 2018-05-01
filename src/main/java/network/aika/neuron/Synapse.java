@@ -437,6 +437,8 @@ public class Synapse implements Writable {
      * @author Lukas Molzberger
      */
     public static class Builder implements Comparable<Builder> {
+        public static final int OUTPUT = -1;
+
         public boolean recurrent;
         public Neuron neuron;
         public double weight;
