@@ -72,14 +72,15 @@ public class CoreferenceResolutionTest {
                         .setNeuron(malePronounN)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeOutput(true, true),
+                        .setRangeOutput(true, true)
+                        .setIdentity(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(maleNameN)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .addRangeRelation(Range.Relation.NONE, 0)
-
+                        .setIdentity(true)
         );
         Neuron.init(femaleCoref, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
@@ -87,14 +88,15 @@ public class CoreferenceResolutionTest {
                         .setNeuron(femalePronounN)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeOutput(true, true),
+                        .setRangeOutput(true, true)
+                        .setIdentity(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(femaleNameN)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .addRangeRelation(Range.Relation.NONE, 0)
-
+                        .setIdentity(true)
         );
     }
 
@@ -142,6 +144,16 @@ public class CoreferenceResolutionTest {
     @Test
     public void testCoref() {
         String txt = "john went jogging and lisa went swimming . he met her afterwards .";
+
+        Document doc = parse(txt);
+
+        System.out.println(doc.activationsToString(true, true, true));
+    }
+
+
+    @Test
+    public void testCoref1() {
+        String txt = "john richard robert susan he";
 
         Document doc = parse(txt);
 

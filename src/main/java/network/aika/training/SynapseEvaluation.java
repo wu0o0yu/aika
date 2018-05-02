@@ -57,16 +57,14 @@ public interface SynapseEvaluation {
     }
 
     class Result {
-        public Result(boolean isRecurrent, Range.Output rangeOutput, Map<Integer, Relation> relations, double significance, DeleteMode deleteMode) {
-            this.isRecurrent = isRecurrent;
-            this.rangeOutput = rangeOutput;
+        public Result(Synapse.Key synapseKey, Map<Integer, Relation> relations, double significance, DeleteMode deleteMode) {
+            this.synapseKey = synapseKey;
             this.relations = relations;
             this.significance = significance;
             this.deleteMode = deleteMode;
         }
 
-        public boolean isRecurrent;
-        public Range.Output rangeOutput;
+        public Synapse.Key synapseKey;
         public Map<Integer, Relation> relations;
         public double significance;
         public DeleteMode deleteMode;

@@ -445,6 +445,7 @@ public class Synapse implements Writable {
         public double bias;
 
         public Output rangeOutput = Output.NONE;
+        public boolean identity;
 
         public Integer synapseId;
         public Map<Integer, Relation> relations = new TreeMap<>();
@@ -527,6 +528,12 @@ public class Synapse implements Writable {
         }
 
 
+        public Builder setIdentity(boolean identity) {
+            this.identity = identity;
+            return this;
+        }
+
+
         /**
          * <code>setRangeOutput</code> is just a convenience function to call <code>setBeginRangeOutput</code> and
          * <code>setEndRangeOutput</code> at the same time.
@@ -581,7 +588,7 @@ public class Synapse implements Writable {
 
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            return createOrLookup(null, synapseId, new Key(recurrent, rangeOutput), relations, neuron, outputNeuron);
+            return createOrLookup(null, synapseId, new Key(recurrent, rangeOutput, identity), relations, neuron, outputNeuron);
         }
 
 
@@ -607,12 +614,14 @@ public class Synapse implements Writable {
     public static class Key implements Comparable<Key>, Writable {
         public boolean isRecurrent;
         public Output rangeOutput;
+        public boolean identity;
 
         private Key() {}
 
-        public Key(boolean isRecurrent, Output rangeOutput) {
+        public Key(boolean isRecurrent, Output rangeOutput, boolean identity) {
             this.isRecurrent = isRecurrent;
             this.rangeOutput = rangeOutput;
+            this.identity = identity;
         }
 
 
@@ -621,6 +630,8 @@ public class Synapse implements Writable {
             int r = Boolean.compare(isRecurrent, k.isRecurrent);
             if(r != 0) return r;
             r = rangeOutput.compareTo(k.rangeOutput);
+            if(r != 0) return r;
+            r = Boolean.compare(identity, k.identity);
             return r;
         }
 
@@ -636,12 +647,14 @@ public class Synapse implements Writable {
         public void write(DataOutput out) throws IOException {
             out.writeBoolean(isRecurrent);
             rangeOutput.write(out);
+            out.writeBoolean(identity);
         }
 
         @Override
         public void readFields(DataInput in, Model m) throws IOException {
             isRecurrent = in.readBoolean();
             rangeOutput = Range.Output.read(in, m);
+            identity = in.readBoolean();
         }
     }
 }

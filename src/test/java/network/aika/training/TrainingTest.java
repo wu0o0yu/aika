@@ -61,9 +61,11 @@ public class TrainingTest {
 
         doc.supervisedTraining.train(out.get(), targetAct, 0.01,
                 (s, iAct, oAct) -> new SynapseEvaluation.Result(
-
-                        false,
-                        Range.Output.DIRECT,
+                        new Synapse.Key(
+                                false,
+                                Range.Output.DIRECT,
+                                false
+                        ),
                         new TreeMap<>(),
                         1.0,
                         NONE
@@ -121,8 +123,11 @@ public class TrainingTest {
                             .setPerformBackpropagation(false)
                             .setSynapseEvaluation((s, iAct, oAct) ->
                                     new SynapseEvaluation.Result(
-                                            false,
-                                            Range.Output.DIRECT,
+                                            new Synapse.Key(
+                                                    false,
+                                                    Range.Output.DIRECT,
+                                                    false
+                                            ),
                                             new TreeMap<>(),
                                             1.0,
                                             NONE

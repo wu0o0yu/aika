@@ -86,7 +86,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             if(actA == actB) return true;
 
             for(Activation.SynapseActivation sa: actA.neuronInputs.values()) {
-                if(!sa.synapse.key.isRecurrent) {
+                if(sa.synapse.key.identity) {
                     if(contains(sa.input, actB, v)) return true;
                 }
             }
@@ -108,7 +108,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             act.markedAncestor = v;
 
             for(Activation.SynapseActivation sa: act.neuronInputs.values()) {
-                if(!sa.synapse.key.isRecurrent) {
+                if(sa.synapse.key.identity) {
                     markAncestors(sa.input, v);
                 }
             }
@@ -122,7 +122,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             if(act.markedAncestor == v1) return true;
 
             for(Activation.SynapseActivation sa: act.neuronInputs.values()) {
-                if(!sa.synapse.key.isRecurrent) {
+                if(sa.synapse.key.identity) {
                     if(hasCommonAncestor(sa.input, v1, v2)) return true;
                 }
             }
@@ -235,12 +235,12 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             return relation.beginToBegin == Range.Operator.EQUALS ||
                     relation.endToBegin == Range.Operator.EQUALS ?
                     input.doc.activationsByRangeBegin.subMap(
-                            new Document.ActKey(new Range(p, Integer.MIN_VALUE), Node.MIN_NODE),
-                            new Document.ActKey(new Range(p, Integer.MAX_VALUE), Node.MAX_NODE)
+                            new Document.ActKey(new Range(p, Integer.MIN_VALUE), Node.MIN_NODE, Integer.MIN_VALUE),
+                            new Document.ActKey(new Range(p, Integer.MAX_VALUE), Node.MAX_NODE, Integer.MAX_VALUE)
                             ).values() :
                     input.doc.activationsByRangeEnd.subMap(
-                            new Document.ActKey(new Range(Integer.MIN_VALUE, p), Node.MIN_NODE),
-                            new Document.ActKey(new Range(Integer.MAX_VALUE, p), Node.MAX_NODE)
+                            new Document.ActKey(new Range(Integer.MIN_VALUE, p), Node.MIN_NODE, Integer.MIN_VALUE),
+                            new Document.ActKey(new Range(Integer.MAX_VALUE, p), Node.MAX_NODE, Integer.MAX_VALUE)
                     ).values();
         }
     }

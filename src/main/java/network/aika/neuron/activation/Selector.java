@@ -95,9 +95,9 @@ public class Selector {
         }
 
         return th.activations.subMap(
-                new Range(fromKey, Integer.MIN_VALUE),
+                new INeuron.ActKey(new Range(fromKey, Integer.MIN_VALUE), Integer.MIN_VALUE),
                 fromInclusive,
-                new Range(toKey, Integer.MAX_VALUE),
+                new INeuron.ActKey(new Range(toKey, Integer.MAX_VALUE), Integer.MAX_VALUE),
                 toInclusive
         ).values();
     }
@@ -129,9 +129,9 @@ public class Selector {
         }
 
         return th.activationsEnd.subMap(
-                new Range(Integer.MIN_VALUE, fromKey),
+                new INeuron.ActKey(new Range(Integer.MIN_VALUE, fromKey), Integer.MIN_VALUE),
                 fromInclusive,
-                new Range(Integer.MAX_VALUE, toKey),
+                new INeuron.ActKey(new Range(Integer.MAX_VALUE, toKey), Integer.MAX_VALUE),
                 toInclusive
         ).values();
     }
@@ -165,9 +165,9 @@ public class Selector {
         if(fromKey > toKey) return Collections.EMPTY_LIST;
 
         return th.activations.subMap(
-                new Range(fromKey, Integer.MIN_VALUE),
+                new INeuron.ActKey(new Range(fromKey, Integer.MIN_VALUE), Integer.MIN_VALUE),
                 fromInclusive,
-                new Range(toKey, Integer.MAX_VALUE),
+                new INeuron.ActKey(new Range(toKey, Integer.MAX_VALUE), Integer.MAX_VALUE),
                 toInclusive
         ).values();
     }
@@ -201,9 +201,9 @@ public class Selector {
         if(fromKey > toKey) return Collections.EMPTY_LIST;
 
         return th.activationsEnd.subMap(
-                new Range(Integer.MIN_VALUE, fromKey),
+                new INeuron.ActKey(new Range(Integer.MIN_VALUE, fromKey), Integer.MIN_VALUE),
                 fromInclusive,
-                new Range(Integer.MAX_VALUE, toKey),
+                new INeuron.ActKey(new Range(Integer.MAX_VALUE, toKey), Integer.MAX_VALUE),
                 toInclusive
         ).values();
     }
@@ -214,17 +214,17 @@ public class Selector {
         if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS) {
             int key = rr.beginToBegin == EQUALS ? r.begin : r.end;
             return th.activations.subMap(
-                    new Range(key, Integer.MIN_VALUE),
+                    new INeuron.ActKey(new Range(key, Integer.MIN_VALUE), Integer.MIN_VALUE),
                     true,
-                    new Range(key, Integer.MAX_VALUE),
+                    new INeuron.ActKey(new Range(key, Integer.MAX_VALUE), Integer.MAX_VALUE),
                     true
             ).values();
         } else if(rr.endToEnd == EQUALS || rr.endToBegin == EQUALS) {
             int key = rr.endToEnd == EQUALS ? r.end : r.begin;
             return th.activationsEnd.subMap(
-                    new Range(Integer.MIN_VALUE, key),
+                    new INeuron.ActKey(new Range(Integer.MIN_VALUE, key), Integer.MIN_VALUE),
                     true,
-                    new Range(Integer.MAX_VALUE, key),
+                    new INeuron.ActKey(new Range(Integer.MAX_VALUE, key), Integer.MAX_VALUE),
                     true
             ).values();
         }

@@ -116,14 +116,39 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public static class ThreadState {
         public long lastUsed;
 
-        public TreeMap<Range, Activation> activations;
-        public TreeMap<Range, Activation> activationsEnd;
+        public TreeMap<ActKey, Activation> activations;
+        public TreeMap<ActKey, Activation> activationsEnd;
         public int minLength = Integer.MAX_VALUE;
         public int maxLength = 0;
 
         public ThreadState() {
-            activations = new TreeMap<>(Range.BEGIN_COMP);
-            activationsEnd = new TreeMap<>(Range.END_COMP);
+            activations = new TreeMap<>(BEGIN_COMP);
+            activationsEnd = new TreeMap<>(END_COMP);
+        }
+    }
+
+
+    public static final Comparator<ActKey> BEGIN_COMP = (ak1, ak2) -> {
+        int r = Range.BEGIN_COMP.compare(ak1.r, ak2.r);
+        if(r != 0) return r;
+        return Integer.compare(ak1.actId, ak2.actId);
+    };
+
+
+    public static final Comparator<ActKey> END_COMP = (ak1, ak2) -> {
+        int r = Range.END_COMP.compare(ak1.r, ak2.r);
+        if(r != 0) return r;
+        return Integer.compare(ak1.actId, ak2.actId);
+    };
+
+
+    public static class ActKey {
+        Range r;
+        int actId;
+
+        public ActKey(Range r, int actId) {
+            this.r = r;
+            this.actId = actId;
         }
     }
 
@@ -510,17 +535,18 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         th.minLength = Math.min(th.minLength, act.range.length());
         th.maxLength = Math.max(th.maxLength, act.range.length());
 
-        th.activations.put(act.range, act);
+        ActKey ak = new ActKey(act.range, act.id);
+        th.activations.put(ak, act);
 
-        TreeMap<Range, Activation> actEnd = th.activationsEnd;
-        if (actEnd != null) actEnd.put(act.range, act);
+        TreeMap<ActKey, Activation> actEnd = th.activationsEnd;
+        if (actEnd != null) actEnd.put(ak, act);
 
-        Document.ActKey ak = new Document.ActKey(act.range, act.node);
+        Document.ActKey dak = new Document.ActKey(act.range, act.node, act.id);
         if (act.range.begin != Integer.MIN_VALUE) {
-            doc.activationsByRangeBegin.put(ak, act);
+            doc.activationsByRangeBegin.put(dak, act);
         }
         if (act.range.end != Integer.MAX_VALUE) {
-            doc.activationsByRangeEnd.put(ak, act);
+            doc.activationsByRangeEnd.put(dak, act);
         }
 
         doc.addedActivations.add(act);

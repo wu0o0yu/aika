@@ -18,6 +18,7 @@ package network.aika.lattice;
 
 
 import network.aika.*;
+import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -95,7 +96,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
         if(r.begin == Integer.MIN_VALUE || r.end == Integer.MAX_VALUE) return;
 
-        Activation act = neuron.get(doc).getThreadState(doc.threadId, true).activations.get(r);
+        Activation act = lookupActivation(doc, r);
 
         if(act == null) {
             act = new Activation(doc.activationIdCounter++, doc, r, this);
@@ -104,6 +105,13 @@ public class OrNode extends Node<OrNode, Activation> {
 
         Link ol = act.link(oe, inputAct);
         act.doc.linker.link(act, ol);
+    }
+
+    private Activation lookupActivation(Document doc, Range r) {
+        for(Activation act: neuron.get(doc).getThreadState(doc.threadId, true).activations.subMap(new INeuron.ActKey(r, Integer.MIN_VALUE), new INeuron.ActKey(r, Integer.MAX_VALUE)).values()) {
+            for()
+        }
+        return null;
     }
 
 

@@ -87,21 +87,28 @@ public class Document implements Comparable<Document> {
     public TreeMap<ActKey, Activation> activationsByRangeBegin = new TreeMap<>((ak1, ak2) -> {
         int r = Integer.compare(ak1.range.begin, ak2.range.begin);
         if (r != 0) return r;
-        return ak1.node.compareTo(ak2.node);
+        r = ak1.node.compareTo(ak2.node);
+        if (r != 0) return r;
+        return Integer.compare(ak1.actId, ak2.actId);
     });
+
     public TreeMap<ActKey, Activation> activationsByRangeEnd = new TreeMap<>((ak1, ak2) -> {
         int r = Integer.compare(ak1.range.end, ak2.range.end);
         if (r != 0) return r;
-        return ak1.node.compareTo(ak2.node);
+        r = ak1.node.compareTo(ak2.node);
+        if (r != 0) return r;
+        return Integer.compare(ak1.actId, ak2.actId);
     });
 
     public static class ActKey {
         Range range;
         Node node;
+        int actId;
 
-        public ActKey(Range range, Node node) {
+        public ActKey(Range range, Node node, int actId) {
             this.range = range;
             this.node = node;
+            this.actId = actId;
         }
     }
 
