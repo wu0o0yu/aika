@@ -96,7 +96,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
         if(r.begin == Integer.MIN_VALUE || r.end == Integer.MAX_VALUE) return;
 
-        Activation act = lookupActivation(doc, r);
+        Activation act = lookupActivation(doc, r, oe, inputAct);
 
         if(act == null) {
             act = new Activation(doc.activationIdCounter++, doc, r, this);
@@ -107,9 +107,24 @@ public class OrNode extends Node<OrNode, Activation> {
         act.doc.linker.link(act, ol);
     }
 
-    private Activation lookupActivation(Document doc, Range r) {
-        for(Activation act: neuron.get(doc).getThreadState(doc.threadId, true).activations.subMap(new INeuron.ActKey(r, Integer.MIN_VALUE), new INeuron.ActKey(r, Integer.MAX_VALUE)).values()) {
-            for()
+
+    private Activation lookupActivation(Document doc, Range r, OrEntry oe, NodeActivation inputAct) {
+        x: for(Activation act: neuron.get(doc).getThreadState(doc.threadId, true).activations.subMap(new INeuron.ActKey(r, Integer.MIN_VALUE), new INeuron.ActKey(r, Integer.MAX_VALUE)).values()) {
+            for(int i = 0; i < oe.synapseIds.length; i++) {
+                int synapseId = oe.synapseIds[i];
+                Synapse s = neuron.getSynapseById(synapseId);
+                if (s.key.identity) {
+                    Activation.SynapseActivation sa = act.neuronInputs.get(synapseId);
+                    if(sa != null) {
+                        Activation iActA = sa.input;
+                        Activation iActB = inputAct.getInputActivation(i);
+                        if(iActA != iActB) {
+                            continue x;
+                        }
+                    }
+                }
+            }
+            return act;
         }
         return null;
     }
