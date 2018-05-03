@@ -75,6 +75,8 @@ public final class Activation extends NodeActivation<OrNode> {
     public Candidate candidate;
     private long visitedState;
 
+    private List<Activation> conflicts;
+
 
     public Activation(int id, Document doc, Key key) {
         super(id, doc, key);
@@ -355,7 +357,11 @@ public final class Activation extends NodeActivation<OrNode> {
 
 
     public Collection<Activation> getConflicts() {
-        ArrayList<Activation> conflicts = new ArrayList<>();
+        if(conflicts != null) {
+            return conflicts;
+        }
+
+        conflicts = new ArrayList<>();
         for(SynapseActivation sa: neuronInputs) {
             if (sa.synapse.isNegative() && sa.synapse.key.isRecurrent) {
                 sa.input.collectIncomingConflicts(conflicts);
@@ -366,7 +372,7 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    private void collectIncomingConflicts(ArrayList<Activation> conflicts) {
+    private void collectIncomingConflicts(List<Activation> conflicts) {
         if (getINeuron().type != INeuron.Type.INHIBITORY) {
             conflicts.add(this);
         } else {
@@ -379,7 +385,7 @@ public final class Activation extends NodeActivation<OrNode> {
     }
 
 
-    private void collectOutgoingConflicts(ArrayList<Activation> conflicts) {
+    private void collectOutgoingConflicts(List<Activation> conflicts) {
         for(SynapseActivation sa: neuronOutputs) {
             if (sa.output.getINeuron().type != INeuron.Type.INHIBITORY) {
                 if (sa.synapse.isNegative() && sa.synapse.key.isRecurrent) {
