@@ -81,6 +81,7 @@ public class RelationsTest {
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setRecurrent(false)
+                        .setIdentity(true)
                         .setBias(-10.0)
                         .setRangeOutput(true)
         ).get();
@@ -229,7 +230,7 @@ public class RelationsTest {
 
 
     @Test
-    public void testSynapseRelation() {
+    public void testInstanceRelation1() {
         Model m = new Model();
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
@@ -242,6 +243,7 @@ public class RelationsTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
+                        .setIdentity(true)
                         .setRangeOutput(true)
         );
 
@@ -252,6 +254,7 @@ public class RelationsTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
+                        .setIdentity(true)
                         .setRangeOutput(true)
         );
 
@@ -286,7 +289,7 @@ public class RelationsTest {
     }
 
     @Test
-    public void testSynapseRelation1() {
+    public void testInstanceRelation2() {
         Model m = new Model();
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
