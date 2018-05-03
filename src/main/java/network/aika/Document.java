@@ -126,7 +126,9 @@ public class Document implements Comparable<Document> {
     public static Comparator<Activation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
         int r = Range.compare(act1.range, act2.range, false);
         if (r != 0) return r;
-        return act1.node.compareTo(act2.node);
+        r = act1.node.compareTo(act2.node);
+        if (r != 0) return r;
+        return Integer.compare(act1.id, act2.id);
     };
 
 
