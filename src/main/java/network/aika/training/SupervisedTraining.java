@@ -122,9 +122,9 @@ public class SupervisedTraining {
 
 
     public void computeBackpropagationErrorSignal(Activation act) {
-        for (Activation.SynapseActivation sa : act.neuronOutputs) {
-            Synapse s = sa.synapse;
-            Activation oAct = sa.output;
+        for (Activation.Link l : act.neuronOutputs) {
+            Synapse s = l.synapse;
+            Activation oAct = l.output;
 
             act.errorSignal += s.weight * oAct.errorSignal * (1.0 - act.getFinalState().value);
         }
@@ -136,8 +136,8 @@ public class SupervisedTraining {
     public void updateErrorSignal(Activation act) {
         if(act.errorSignal != 0.0) {
             errorSignalActivations.add(act);
-            for (Activation.SynapseActivation sa : act.neuronInputs.values()) {
-                queue.add(sa.input);
+            for (Activation.Link l : act.neuronInputs.values()) {
+                queue.add(l.input);
             }
         }
     }

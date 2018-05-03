@@ -19,6 +19,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Document;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Range;
 import network.aika.neuron.activation.Range.Output;
 import network.aika.neuron.activation.Range.Mapping;
@@ -657,4 +658,5 @@ public class Synapse implements Writable {
             identity = in.readBoolean();
         }
     }
+
 }

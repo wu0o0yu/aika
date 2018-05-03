@@ -482,18 +482,18 @@ public class Document implements Comparable<Document> {
         public final ArrayList<TreeSet<Activation>> queue = new ArrayList<>();
 
         public void propagateActivationValue(int round, Activation act)  {
-            for(Activation.SynapseActivation sa: act.neuronOutputs) {
-                int r = sa.synapse.key.isRecurrent ? round + 1 : round;
-                add(r, sa.output);
+            for(Activation.Link l: act.neuronOutputs) {
+                int r = l.synapse.key.isRecurrent ? round + 1 : round;
+                add(r, l.output);
             }
         }
 
 
         private void add(Activation act) {
             add(0, act);
-            for (Activation.SynapseActivation sa : act.neuronOutputs) {
-                if (sa.synapse.key.isRecurrent) {
-                    add(0, sa.output);
+            for (Activation.Link l : act.neuronOutputs) {
+                if (l.synapse.key.isRecurrent) {
+                    add(0, l.output);
                 }
             }
         }

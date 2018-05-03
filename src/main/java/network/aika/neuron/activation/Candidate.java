@@ -40,8 +40,8 @@ public class Candidate  implements Comparable<Candidate> {
 
 
     public boolean checkDependenciesSatisfied(long v) {
-        for (Activation.SynapseActivation sa : activation.neuronInputs.values()) {
-            if (sa.input.markedHasCandidate != v && !sa.synapse.key.isRecurrent && sa.input.upperBound > 0.0) return false;
+        for (Activation.Link l : activation.neuronInputs.values()) {
+            if (l.input.markedHasCandidate != v && !l.synapse.key.isRecurrent && l.input.upperBound > 0.0) return false;
         }
         return true;
     }

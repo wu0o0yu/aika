@@ -21,7 +21,7 @@ import network.aika.lattice.OrNode;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Relation;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation.SynapseActivation;
+import network.aika.neuron.activation.Activation.Link;
 
 import java.util.*;
 
@@ -37,7 +37,7 @@ import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
 public class Linker {
 
     Document doc;
-    ArrayDeque<SynapseActivation> queue = new ArrayDeque<>();
+    ArrayDeque<Link> queue = new ArrayDeque<>();
 
     public enum Direction {
         INPUT,
@@ -88,18 +88,18 @@ public class Linker {
     }
 
 
-    private SynapseActivation link(Synapse s, Activation iAct, Activation oAct) {
-        SynapseActivation sa = new SynapseActivation(s, iAct, oAct);
-        SynapseActivation esa = oAct.neuronInputs.get(sa);
-        if(esa != null) {
-            return esa;
+    private Link link(Synapse s, Activation iAct, Activation oAct) {
+        Link l = new Link(s, iAct, oAct);
+        Link el = oAct.neuronInputs.get(l);
+        if(el != null) {
+            return el;
         }
 
-        iAct.addSynapseActivation(INPUT, sa);
-        oAct.addSynapseActivation(OUTPUT, sa);
+        iAct.addSynapseActivation(INPUT, l);
+        oAct.addSynapseActivation(OUTPUT, l);
 
-        queue.add(sa);
-        return sa;
+        queue.add(l);
+        return l;
     }
 
 
@@ -107,8 +107,8 @@ public class Linker {
         for(Activation act: doc.activationsByRangeBegin.values()) {
             linkOutputRelations(act);
 
-            for(SynapseActivation sa: act.neuronInputs.values()) {
-                queue.add(sa);
+            for(Link l: act.neuronInputs.values()) {
+                queue.add(l);
             }
         }
         doc.linker.process();
@@ -117,13 +117,13 @@ public class Linker {
 
     public void process() {
         while(!queue.isEmpty()) {
-            SynapseActivation linkedSA = queue.pollFirst();
-            for(Map.Entry<Integer, Relation> me: linkedSA.synapse.relations.entrySet()) {
+            Link l = queue.pollFirst();
+            for(Map.Entry<Integer, Relation> me: l.synapse.relations.entrySet()) {
                 int relId = me.getKey();
                 if(relId >= 0) {
-                    Synapse s = linkedSA.output.getNeuron().getSynapseById(relId);
+                    Synapse s = l.output.getNeuron().getSynapseById(relId);
                     Relation r = me.getValue();
-                    link(linkedSA.input, linkedSA.output, s, r);
+                    link(l.input, l.output, s, r);
                 }
             }
         }

@@ -118,19 +118,19 @@ public class ActivationOutputsTest {
     }
 
 
-    private Activation selectInputActivation(Collection<Activation.SynapseActivation> acts, Node n) {
-        for(Activation.SynapseActivation sa: acts) {
-            if(sa.input.node.compareTo(n) == 0) {
-                return sa.input;
+    private Activation selectInputActivation(Collection<Activation.Link> acts, Node n) {
+        for(Activation.Link l: acts) {
+            if(l.input.node.compareTo(n) == 0) {
+                return l.input;
             }
         }
         return null;
     }
 
 
-    public boolean containsOutputActivation(Set<Activation.SynapseActivation> outputActivations, Activation oAct) {
-        for(Activation.SynapseActivation sa: outputActivations) {
-            if(sa.output == oAct) return true;
+    public boolean containsOutputActivation(Set<Activation.Link> outputActivations, Activation oAct) {
+        for(Activation.Link l: outputActivations) {
+            if(l.output == oAct) return true;
         }
         return false;
     }

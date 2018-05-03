@@ -133,8 +133,8 @@ public class SearchNode implements Comparable<SearchNode> {
             if (csn == null || csn.getDecision() != getDecision()) {
                 Activation act = c.activation;
                 act.markDirty(visited);
-                for (Activation.SynapseActivation sa : act.neuronOutputs) {
-                    sa.output.markDirty(visited);
+                for (Activation.Link l : act.neuronOutputs) {
+                    l.output.markDirty(visited);
                 }
             } else {
                 modified = csn.isModified();
@@ -190,9 +190,9 @@ public class SearchNode implements Comparable<SearchNode> {
                 return true;
             }
             if(sc.newRounds.isActive()) {
-                for (Activation.SynapseActivation sa : sc.getActivation().neuronOutputs) {
-                    if (sa.output.decision != UNKNOWN &&
-                            sa.output.markedDirty > visited) {
+                for (Activation.Link l : sc.getActivation().neuronOutputs) {
+                    if (l.output.decision != UNKNOWN &&
+                            l.output.markedDirty > visited) {
                         return true;
                     }
                 }
@@ -218,8 +218,8 @@ public class SearchNode implements Comparable<SearchNode> {
             Activation.StateChange scb = csn != null ? csn.modifiedActs.get(act) : null;
 
             if (sca == null || scb == null || !sca.newRounds.compare(scb.newRounds)) {
-                for (Activation.SynapseActivation sa : act.neuronOutputs) {
-                    sa.output.markDirty(visited);
+                for (Activation.Link l : act.neuronOutputs) {
+                    l.output.markDirty(visited);
                 }
             }
         });
@@ -446,9 +446,9 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private void invalidateCachedDecisions() {
-        for (Activation.SynapseActivation sa : candidate.activation.neuronOutputs) {
-            if (!sa.synapse.isNegative()) {
-                invalidateCachedDecision(sa.output);
+        for (Activation.Link l : candidate.activation.neuronOutputs) {
+            if (!l.synapse.isNegative()) {
+                invalidateCachedDecision(l.output);
             }
         }
     }

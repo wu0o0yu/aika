@@ -18,7 +18,6 @@ package network.aika.training;
 
 
 import network.aika.Document;
-import network.aika.Utils;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -57,8 +56,8 @@ public class MetaNetwork {
 
         for (INeuron n : inhibitoryNeurons) {
             for (Activation inhibAct : n.getActivations(doc, true)) {
-                for (Activation.SynapseActivation sa : inhibAct.getFinalInputActivations()) {
-                    Activation act = sa.input;
+                for (Activation.Link l : inhibAct.getFinalInputActivationLinks()) {
+                    Activation act = l.input;
                     Neuron targetNeuron = act.getNeuron();
 
                     doc.createV = doc.visitedCounter++;
@@ -106,9 +105,9 @@ public class MetaNetwork {
 
 
     private static Activation getMetaNeuronAct(Activation inhibAct) {
-        for(Activation.SynapseActivation sa: inhibAct.neuronInputs.values()) {
-            if(sa.input.getINeuron().type == INeuron.Type.META) {
-                return sa.input;
+        for(Activation.Link l: inhibAct.neuronInputs.values()) {
+            if(l.input.getINeuron().type == INeuron.Type.META) {
+                return l.input;
             }
         }
         return null;
@@ -118,18 +117,18 @@ public class MetaNetwork {
     private static void transferMetaSynapses(Document doc, Map<Activation, List<Target>> metaActivations, Activation metaAct, Target t) {
         TreeSet<Synapse> inputSynapses = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
 
-        for (Activation.SynapseActivation sa : metaAct.getFinalInputActivations()) {
-            MetaSynapse inputMetaSyanpse = sa.synapse.meta;
-            Synapse os = sa.synapse;
+        for (Activation.Link l : metaAct.getFinalInputActivationLinks()) {
+            MetaSynapse inputMetaSyanpse = l.synapse.meta;
+            Synapse os = l.synapse;
 
             if (inputMetaSyanpse != null && (inputMetaSyanpse.metaWeight != 0.0 || inputMetaSyanpse.metaBias != 0.0)) {
-                Neuron ina = sa.input.node.neuron;
+                Neuron ina = l.input.node.neuron;
 
-                List<Activation.SynapseActivation> inputs = ina.get().type == INeuron.Type.INHIBITORY && inputMetaSyanpse.metaWeight >= 0.0 ?
-                        sa.input.getFinalInputActivations() :
-                        Collections.singletonList(sa);
+                List<Activation.Link> inputs = ina.get().type == INeuron.Type.INHIBITORY && inputMetaSyanpse.metaWeight >= 0.0 ?
+                        l.input.getFinalInputActivationLinks() :
+                        Collections.singletonList(l);
 
-                for(Activation.SynapseActivation isa: inputs) {
+                for(Activation.Link isa: inputs) {
                     Neuron in = isa.input.getNeuron();
 
                     if(in.get(doc).type == INeuron.Type.META) {
@@ -153,7 +152,7 @@ public class MetaNetwork {
         INeuron.update(doc.threadId, doc, t.targetNeuron, t.isNewNeuron ? metaAct.getINeuron().metaBias : 0.0, inputSynapses);
 
         if (t.isNewNeuron) {
-            Activation.SynapseActivation inhibMetaLink = metaAct.getFinalOutputActivations().get(0);
+            Activation.Link inhibMetaLink = metaAct.getFinalOutputActivationLinks().get(0);
             Synapse.Key inhibSynKey = inhibMetaLink.synapse.key;
             MetaSynapse inhibSS = inhibMetaLink.synapse.meta;
             t.inhibNeuron.addSynapse(

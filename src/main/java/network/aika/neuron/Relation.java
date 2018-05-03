@@ -85,9 +85,9 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
             if(actA == actB) return true;
 
-            for(Activation.SynapseActivation sa: actA.neuronInputs.values()) {
-                if(sa.synapse.key.identity) {
-                    if(contains(sa.input, actB, v)) return true;
+            for(Activation.Link l: actA.neuronInputs.values()) {
+                if(l.synapse.key.identity) {
+                    if(contains(l.input, actB, v)) return true;
                 }
             }
             return false;
@@ -107,9 +107,9 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
             act.markedAncestor = v;
 
-            for(Activation.SynapseActivation sa: act.neuronInputs.values()) {
-                if(sa.synapse.key.identity) {
-                    markAncestors(sa.input, v);
+            for(Activation.Link l: act.neuronInputs.values()) {
+                if(l.synapse.key.identity) {
+                    markAncestors(l.input, v);
                 }
             }
         }
@@ -121,9 +121,9 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
             if(act.markedAncestor == v1) return true;
 
-            for(Activation.SynapseActivation sa: act.neuronInputs.values()) {
-                if(sa.synapse.key.identity) {
-                    if(hasCommonAncestor(sa.input, v1, v2)) return true;
+            for(Activation.Link l: act.neuronInputs.values()) {
+                if(l.synapse.key.identity) {
+                    if(hasCommonAncestor(l.input, v1, v2)) return true;
                 }
             }
             return false;

@@ -21,6 +21,7 @@ import network.aika.*;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Linker;
 import network.aika.training.PatternDiscovery;
@@ -100,7 +101,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
         if(act == null) {
             act = new Activation(doc.activationIdCounter++, doc, r, this);
-            addActivation(act);
+            processActivation(act);
         }
 
         Link ol = act.link(oe, inputAct);
@@ -110,15 +111,13 @@ public class OrNode extends Node<OrNode, Activation> {
 
     private Activation lookupActivation(Document doc, Range r, OrEntry oe, NodeActivation inputAct) {
         x: for(Activation act: neuron.get(doc).getThreadState(doc.threadId, true).activations.subMap(new INeuron.ActKey(r, Integer.MIN_VALUE), new INeuron.ActKey(r, Integer.MAX_VALUE)).values()) {
-            for(int i = 0; i < oe.synapseIds.length; i++) {
-                int synapseId = oe.synapseIds[i];
-                Synapse s = neuron.getSynapseById(synapseId);
-                if (s.key.identity) {
-                    Activation.SynapseActivation sa = act.neuronInputs.get(synapseId);
-                    if(sa != null) {
-                        Activation iActA = sa.input;
+            for(Activation.Link l: act.neuronInputs.values()) {
+                if (l.synapse.key.identity) {
+                    Activation iActA = l.input;
+                    Integer i = oe.revSynapseIds.get(l.synapse.id);
+                    if(i != null) {
                         Activation iActB = inputAct.getInputActivation(i);
-                        if(iActA != iActB) {
+                        if (iActA != iActB) {
                             continue x;
                         }
                     }
