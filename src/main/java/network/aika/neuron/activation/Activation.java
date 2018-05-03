@@ -80,6 +80,8 @@ public final class Activation extends OrActivation {
     public long markedAncestor;
 
 
+    private List<Activation> conflicts;
+
 
     public Activation(int id, Document doc, OrNode n) {
         super(id, doc, n);
@@ -374,6 +376,10 @@ public final class Activation extends OrActivation {
 
 
     public Collection<Activation> getConflicts() {
+        if(conflicts != null) {
+            return conflicts;
+        }
+
         ArrayList<Activation> conflicts = new ArrayList<>();
         for(Link l: neuronInputs.values()) {
             if (l.synapse.isNegative() && l.synapse.key.isRecurrent) {
@@ -385,7 +391,7 @@ public final class Activation extends OrActivation {
     }
 
 
-    private void collectIncomingConflicts(ArrayList<Activation> conflicts) {
+    private void collectIncomingConflicts(List<Activation> conflicts) {
         if (getINeuron().type != INeuron.Type.INHIBITORY) {
             conflicts.add(this);
         } else {
@@ -398,7 +404,7 @@ public final class Activation extends OrActivation {
     }
 
 
-    private void collectOutgoingConflicts(ArrayList<Activation> conflicts) {
+    private void collectOutgoingConflicts(List<Activation> conflicts) {
         for(Link l: neuronOutputs) {
             if (l.output.getINeuron().type != INeuron.Type.INHIBITORY) {
                 if (l.synapse.isNegative() && l.synapse.key.isRecurrent) {
