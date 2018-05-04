@@ -664,7 +664,21 @@ public final class Activation extends OrActivation {
             }
             sb.append("\"");
         }
-        sb.append(" - ");
+
+        sb.append(" (");
+        boolean first = true;
+        for(Link l: neuronInputs.values()) {
+            if(l.synapse.key.identity) {
+                if(!first) {
+                    sb.append(", ");
+                }
+
+                sb.append(l.input.id);
+
+                first = false;
+            }
+        }
+        sb.append(") - ");
 
         sb.append(withLogic ? node.toString() : node.getNeuronLabel());
 

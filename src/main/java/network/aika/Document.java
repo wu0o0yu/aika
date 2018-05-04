@@ -363,7 +363,7 @@ public class Document implements Comparable<Document> {
             sb.append(" Decision -");
         }
         sb.append(" Range" + (withTextSnippet ? " | Text Snippet" : ""));
-        sb.append(" -");
+        sb.append(" Identity -");
         sb.append(" Neuron Label -");
         sb.append((withLogic ? " Logic Layer -" : ""));
         sb.append(" Relational ID (Word Pos.) -");
