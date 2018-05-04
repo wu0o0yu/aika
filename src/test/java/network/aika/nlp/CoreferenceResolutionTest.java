@@ -66,6 +66,8 @@ public class CoreferenceResolutionTest {
         Neuron maleCoref = m.createNeuron("Male Coreference");
         Neuron femaleCoref = m.createNeuron("Female Coreference");
 
+        Neuron corefInhib = m.createNeuron("Coref Inhib");
+
         Neuron.init(maleCoref, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
@@ -80,7 +82,14 @@ public class CoreferenceResolutionTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .addRangeRelation(Range.Relation.NONE, 0)
-                        .setIdentity(true)
+                        .setIdentity(true),
+                new Synapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(corefInhib)
+                        .setWeight(-50.0)
+                        .setBias(0.0)
+                        .setRecurrent(true)
+                        .addRangeRelation(Range.Relation.EQUALS, 0)
         );
         Neuron.init(femaleCoref, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
@@ -96,7 +105,27 @@ public class CoreferenceResolutionTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .addRangeRelation(Range.Relation.NONE, 0)
-                        .setIdentity(true)
+                        .setIdentity(true),
+                new Synapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(corefInhib)
+                        .setWeight(-50.0)
+                        .setBias(0.0)
+                        .setRecurrent(true)
+                        .addRangeRelation(Range.Relation.EQUALS, 0)
+        );
+
+        Neuron.init(corefInhib, 0.0, RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY,
+                new Synapse.Builder()
+                        .setNeuron(maleCoref)
+                        .setWeight(1.0)
+                        .setBias(0.0)
+                        .setRangeOutput(true),
+                new Synapse.Builder()
+                        .setNeuron(femaleCoref)
+                        .setWeight(1.0)
+                        .setBias(0.0)
+                        .setRangeOutput(true)
         );
     }
 

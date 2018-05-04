@@ -206,10 +206,20 @@ public class Neuron extends Provider<INeuron> {
 
     public boolean init(Document doc, double bias, ActivationFunction activationFunction, INeuron.Type type, List<Synapse.Builder> inputs) {
 
+        int maxSynapseId = -1;
+        for (Synapse.Builder input : inputs) {
+            if(input.synapseId != null) {
+                maxSynapseId = Math.max(input.synapseId, maxSynapseId);
+            }
+        }
+
         Map<Integer, Synapse.Builder> synapseInputs = new TreeMap<>();
         for (Synapse.Builder input : inputs) {
-            assert input.synapseId != null;
-            synapseInputs.put(input.synapseId, input);
+            if(input.synapseId != null) {
+                synapseInputs.put(input.synapseId, input);
+            } else {
+                synapseInputs.put(++maxSynapseId, input);
+            }
         }
 
         for (Synapse.Builder input : inputs) {
