@@ -1,5 +1,6 @@
 package network.aika.training;
 
+import network.aika.DistanceFunction;
 import network.aika.neuron.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -57,15 +58,17 @@ public interface SynapseEvaluation {
     }
 
     class Result {
-        public Result(Synapse.Key synapseKey, Map<Integer, Relation> relations, double significance, DeleteMode deleteMode) {
+        public Result(Synapse.Key synapseKey, Map<Integer, Relation> relations, DistanceFunction distanceFunction, double significance, DeleteMode deleteMode) {
             this.synapseKey = synapseKey;
             this.relations = relations;
+            this.distanceFunction = distanceFunction;
             this.significance = significance;
             this.deleteMode = deleteMode;
         }
 
         public Synapse.Key synapseKey;
         public Map<Integer, Relation> relations;
+        public DistanceFunction distanceFunction;
         public double significance;
         public DeleteMode deleteMode;
     }

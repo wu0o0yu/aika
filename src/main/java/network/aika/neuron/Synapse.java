@@ -145,12 +145,13 @@ public class Synapse implements Writable {
     }
 
 
-    public Synapse(Neuron input, Neuron output, Integer id, Key key, Map<Integer, Relation> relations) {
+    public Synapse(Neuron input, Neuron output, Integer id, Key key, Map<Integer, Relation> relations, DistanceFunction distanceFunction) {
         this.key = lookupKey(key);
         this.relations = relations;
         this.id = id;
         this.input = input;
         this.output = output;
+        this.distanceFunction = distanceFunction;
     }
 
 
@@ -401,8 +402,8 @@ public class Synapse implements Writable {
 
 
 
-    public static Synapse createOrLookup(Document doc, Integer synapseId, Key k, Map<Integer, Relation> relations, Neuron inputNeuron, Neuron outputNeuron) {
-        Synapse ns = new Synapse(inputNeuron, outputNeuron, synapseId, k, relations);
+    public static Synapse createOrLookup(Document doc, Integer synapseId, Key k, Map<Integer, Relation> relations, DistanceFunction distFunc, Neuron inputNeuron, Neuron outputNeuron) {
+        Synapse ns = new Synapse(inputNeuron, outputNeuron, synapseId, k, relations, distFunc);
 
         Synapse synapse = outputNeuron.inMemoryInputSynapses.get(ns);
         if(synapse == null) {
@@ -444,6 +445,8 @@ public class Synapse implements Writable {
         public Neuron neuron;
         public double weight;
         public double bias;
+
+        public DistanceFunction distanceFunction;
 
         public Output rangeOutput = Output.NONE;
         public boolean identity;
@@ -500,6 +503,12 @@ public class Synapse implements Writable {
          */
         public Builder setBias(double bias) {
             this.bias = bias;
+            return this;
+        }
+
+
+        public Builder setDistanceFunction(DistanceFunction distFunc) {
+            this.distanceFunction = distFunc;
             return this;
         }
 
@@ -589,7 +598,7 @@ public class Synapse implements Writable {
 
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            return createOrLookup(null, synapseId, new Key(recurrent, rangeOutput, identity), relations, neuron, outputNeuron);
+            return createOrLookup(null, synapseId, new Key(recurrent, rangeOutput, identity), relations, distanceFunction, neuron, outputNeuron);
         }
 
 

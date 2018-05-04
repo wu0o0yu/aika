@@ -153,7 +153,7 @@ public class SupervisedTraining {
         }
         double deltaW = x * r.significance * iAct.getFinalState().value;
 
-        Synapse synapse = Synapse.createOrLookup(doc, null, r.synapseKey, r.relations, inputNeuron.provider, n.provider);
+        Synapse synapse = Synapse.createOrLookup(doc, null, r.synapseKey, r.relations, r.distanceFunction, inputNeuron.provider, n.provider);
 
         synapse.updateDelta(doc, deltaW, 0.0);
 

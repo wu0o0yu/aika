@@ -16,6 +16,7 @@
  */
 package network.aika.training;
 
+import network.aika.DistanceFunction;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
@@ -67,6 +68,7 @@ public class TrainingTest {
                                 false
                         ),
                         new TreeMap<>(),
+                        DistanceFunction.NONE,
                         1.0,
                         NONE
                 )
@@ -129,6 +131,7 @@ public class TrainingTest {
                                                     false
                                             ),
                                             new TreeMap<>(),
+                                            DistanceFunction.NONE,
                                             1.0,
                                             NONE
                                     )

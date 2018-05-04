@@ -1,5 +1,6 @@
 package network.aika.nlp;
 
+import network.aika.DistanceFunction;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
@@ -14,8 +15,6 @@ import java.util.TreeMap;
 
 import static network.aika.ActivationFunction.RECTIFIED_LINEAR_UNIT;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
-import static network.aika.neuron.activation.Range.Relation.EQUALS;
-import static network.aika.neuron.activation.Range.Relation.NONE;
 
 
 public class CoreferenceResolutionTest {
@@ -72,21 +71,22 @@ public class CoreferenceResolutionTest {
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(malePronounN)
-                        .setWeight(10.0)
-                        .setBias(-10.0)
+                        .setWeight(30.0)
+                        .setBias(-30.0)
                         .setRangeOutput(true, true)
                         .setIdentity(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(maleNameN)
-                        .setWeight(10.0)
-                        .setBias(-10.0)
+                        .setWeight(30.0)
+                        .setBias(-6.0)
+                        .setDistanceFunction(DistanceFunction.DEGRADING)
                         .addRangeRelation(Range.Relation.NONE, 0)
                         .setIdentity(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(corefInhib)
-                        .setWeight(-50.0)
+                        .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
                         .addRangeRelation(Range.Relation.EQUALS, 0)
@@ -95,21 +95,22 @@ public class CoreferenceResolutionTest {
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(femalePronounN)
-                        .setWeight(10.0)
-                        .setBias(-10.0)
+                        .setWeight(30.0)
+                        .setBias(-30.0)
                         .setRangeOutput(true, true)
                         .setIdentity(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(femaleNameN)
-                        .setWeight(10.0)
-                        .setBias(-10.0)
+                        .setWeight(30.0)
+                        .setBias(-6.0)
+                        .setDistanceFunction(DistanceFunction.DEGRADING)
                         .addRangeRelation(Range.Relation.NONE, 0)
                         .setIdentity(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(corefInhib)
-                        .setWeight(-50.0)
+                        .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
                         .addRangeRelation(Range.Relation.EQUALS, 0)
@@ -172,7 +173,7 @@ public class CoreferenceResolutionTest {
 
     @Test
     public void testCoref() {
-        String txt = "john went jogging and lisa went swimming . he met her afterwards .";
+        String txt = "john richard robert susan he";
 
         Document doc = parse(txt);
 
@@ -182,11 +183,10 @@ public class CoreferenceResolutionTest {
 
     @Test
     public void testCoref1() {
-        String txt = "john richard robert susan he";
+        String txt = "john went jogging and lisa went swimming . he met her afterwards .";
 
         Document doc = parse(txt);
 
         System.out.println(doc.activationsToString(true, true, true));
     }
-
 }
