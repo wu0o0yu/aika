@@ -290,11 +290,12 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public Activation getActivation(Document doc, Range r, boolean onlyFinal) {
         ThreadState th = getThreadState(doc.threadId, false);
         if (th == null) return null;
-        Map.Entry<ActKey, Activation> me = th.activations.higherEntry(new ActKey(r, Integer.MIN_VALUE));
-        if(me == null || !me.getValue().range.equals(r) || (onlyFinal && !me.getValue().isFinalActivation())) {
-            return null;
+        for(Map.Entry<ActKey, Activation> me : th.activations.subMap(new ActKey(r, Integer.MIN_VALUE), new ActKey(r, Integer.MAX_VALUE)).entrySet()) {
+            if (!onlyFinal || me.getValue().isFinalActivation()) {
+                return me.getValue();
+            }
         }
-        return me.getValue();
+        return null;
     }
 
 

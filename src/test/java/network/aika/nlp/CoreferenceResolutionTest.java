@@ -6,7 +6,9 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Range;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,6 +38,8 @@ public class CoreferenceResolutionTest {
     Neuron malePronounN;
     Neuron femaleNameN;
     Neuron femalePronounN;
+    Neuron maleCoRef;
+    Neuron femaleCoRef;
 
     Map<String, Neuron> dictionary = new TreeMap<>();
 
@@ -62,12 +66,12 @@ public class CoreferenceResolutionTest {
         addWords(names[1], femaleNameN);
 
 
-        Neuron maleCoref = m.createNeuron("Male Coreference");
-        Neuron femaleCoref = m.createNeuron("Female Coreference");
+        maleCoRef = m.createNeuron("Male Coreference");
+        femaleCoRef = m.createNeuron("Female Coreference");
 
         Neuron corefInhib = m.createNeuron("Coref Inhib");
 
-        Neuron.init(maleCoref, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(maleCoRef, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(malePronounN)
@@ -91,7 +95,7 @@ public class CoreferenceResolutionTest {
                         .setRecurrent(true)
                         .addRangeRelation(Range.Relation.EQUALS, 0)
         );
-        Neuron.init(femaleCoref, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(femaleCoRef, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(femalePronounN)
@@ -118,12 +122,12 @@ public class CoreferenceResolutionTest {
 
         Neuron.init(corefInhib, 0.0, RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY,
                 new Synapse.Builder()
-                        .setNeuron(maleCoref)
+                        .setNeuron(maleCoRef)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRangeOutput(true),
                 new Synapse.Builder()
-                        .setNeuron(femaleCoref)
+                        .setNeuron(femaleCoRef)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRangeOutput(true)
@@ -178,6 +182,17 @@ public class CoreferenceResolutionTest {
         Document doc = parse(txt);
 
         System.out.println(doc.activationsToString(true, true, true));
+
+        boolean found = false;
+        for(Activation.Link l: maleCoRef.getActivation(doc, new Range(26, 28), true).neuronInputs.values()) {
+            if(l.input.getText().equalsIgnoreCase("robert")) found = true;
+
+            Assert.assertFalse(l.input.getText().equalsIgnoreCase("john"));
+            Assert.assertFalse(l.input.getText().equalsIgnoreCase("richard"));
+            Assert.assertFalse(l.input.getText().equalsIgnoreCase("susan"));
+        }
+
+        Assert.assertTrue(found);
     }
 
 
