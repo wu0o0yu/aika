@@ -98,7 +98,9 @@ public class Linker {
         iAct.addSynapseActivation(INPUT, l);
         oAct.addSynapseActivation(OUTPUT, l);
 
-        queue.add(l);
+        if(!l.synapse.key.identity) {
+            queue.add(l);
+        }
         return l;
     }
 
@@ -108,7 +110,9 @@ public class Linker {
             linkOutputRelations(act);
 
             for(Link l: act.neuronInputs.values()) {
-                queue.add(l);
+                if(!l.synapse.key.identity) {
+                    queue.add(l);
+                }
             }
         }
         doc.linker.process();

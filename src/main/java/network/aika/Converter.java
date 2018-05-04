@@ -38,7 +38,10 @@ public class Converter {
 
 
     public static Comparator<Synapse> SYNAPSE_COMP = (s1, s2) -> {
-        int r = Boolean.compare(s2.key.rangeOutput.begin != NONE, s1.key.rangeOutput.begin != NONE);
+        int r = Boolean.compare(
+                s2.key.rangeOutput.begin != NONE || s2.key.rangeOutput.end != NONE || s2.key.identity,
+                s1.key.rangeOutput.begin != NONE || s1.key.rangeOutput.end != NONE || s1.key.identity
+        );
         if (r != 0) return r;
         r = Double.compare(s2.weight, s1.weight);
         if (r != 0) return r;
