@@ -98,9 +98,8 @@ public class Linker {
         iAct.addSynapseActivation(INPUT, l);
         oAct.addSynapseActivation(OUTPUT, l);
 
-        if(!l.synapse.key.identity) {
-            queue.add(l);
-        }
+        queue.add(l);
+
         return l;
     }
 
@@ -110,9 +109,7 @@ public class Linker {
             linkOutputRelations(act);
 
             for(Link l: act.neuronInputs.values()) {
-                if(!l.synapse.key.identity) {
-                    queue.add(l);
-                }
+                queue.add(l);
             }
         }
         doc.linker.process();
@@ -126,8 +123,10 @@ public class Linker {
                 int relId = me.getKey();
                 if(relId >= 0) {
                     Synapse s = l.output.getNeuron().getSynapseById(relId);
-                    Relation r = me.getValue();
-                    link(l.input, l.output, s, r);
+                    if(!s.key.identity) {
+                        Relation r = me.getValue();
+                        link(l.input, l.output, s, r);
+                    }
                 }
             }
         }
