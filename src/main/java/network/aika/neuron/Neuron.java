@@ -24,6 +24,7 @@ import network.aika.Provider;
 import network.aika.ReadWriteLock;
 import network.aika.Document;
 import network.aika.neuron.activation.Range;
+import network.aika.neuron.relation.Relation;
 
 import java.util.*;
 

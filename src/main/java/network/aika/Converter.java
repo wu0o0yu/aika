@@ -20,7 +20,7 @@ import network.aika.lattice.AndNode;
 import network.aika.lattice.Node;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.Relation;
+import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
 
 import java.util.*;

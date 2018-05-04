@@ -7,7 +7,7 @@ import network.aika.lattice.OrNode;
 import network.aika.lattice.OrNode.OrActivation;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Relation;
+import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.SearchNode.Weight;
 import network.aika.neuron.activation.SearchNode.Decision;
@@ -470,12 +470,6 @@ public final class Activation extends OrActivation {
 
     public State getFinalState() {
         return finalRounds.getLast();
-    }
-
-
-    public <T extends Node> boolean filter(T n, Relation rel, Activation linkedAct) {
-        return (n == null || node == n) &&
-                (rel == null || linkedAct == null || (rel.test(this, linkedAct)));
     }
 
 

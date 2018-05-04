@@ -21,10 +21,9 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.Provider;
 import network.aika.Writable;
-import network.aika.neuron.Relation;
+import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
 import network.aika.training.PatternDiscovery;
-import network.aika.*;
 import network.aika.lattice.InputNode.InputActivation;
 import network.aika.lattice.AndNode.AndActivation;
 

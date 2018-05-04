@@ -19,7 +19,7 @@ package network.aika.neuron.activation;
 import network.aika.Document;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.Relation;
+import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation.Link;
 
@@ -149,10 +149,8 @@ public class Linker {
                 }
             }
         } else {
-            for(Activation iAct: r.getLinkedActivationCandidates(rAct)) {
-                if(iAct.getNeuron() == s.input && r.test(rAct, iAct)) {
-                    link(s, iAct, oAct);
-                }
+            for(Activation iAct: r.getActivations(s.input.get(rAct.doc), rAct)) {
+                link(s, iAct, oAct);
             }
         }
     }

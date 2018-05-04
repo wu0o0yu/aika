@@ -20,19 +20,16 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Linker;
 import network.aika.neuron.activation.Range;
 import network.aika.neuron.activation.SearchNode;
-import network.aika.*;
-import network.aika.neuron.activation.*;
 import network.aika.lattice.InputNode;
+import network.aika.neuron.relation.Relation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 /**

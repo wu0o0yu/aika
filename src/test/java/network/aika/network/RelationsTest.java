@@ -4,12 +4,10 @@ package network.aika.network;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Range;
-import network.aika.neuron.activation.Selector;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,9 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static network.aika.neuron.Relation.InstanceRelation.Type.COMMON_ANCESTOR;
-import static network.aika.neuron.Relation.InstanceRelation.Type.CONTAINED_IN;
-import static network.aika.neuron.Relation.InstanceRelation.Type.CONTAINS;
+import static network.aika.neuron.relation.InstanceRelation.Type.COMMON_ANCESTOR;
+import static network.aika.neuron.relation.InstanceRelation.Type.CONTAINED_IN;
 import static network.aika.neuron.activation.Range.Operator.*;
 
 public class RelationsTest {

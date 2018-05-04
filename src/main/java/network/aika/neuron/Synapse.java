@@ -19,10 +19,12 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Document;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Range;
 import network.aika.neuron.activation.Range.Output;
 import network.aika.neuron.activation.Range.Mapping;
+import network.aika.neuron.relation.InstanceRelation;
+import network.aika.neuron.relation.RangeRelation;
+import network.aika.neuron.relation.Relation;
 import network.aika.training.MetaSynapse;
 
 import java.io.DataInput;
@@ -583,16 +585,16 @@ public class Synapse implements Writable {
         }
 
 
-        public Builder addInstanceRelation(Relation.InstanceRelation.Type type, int synapseId) {
+        public Builder addInstanceRelation(InstanceRelation.Type type, int synapseId) {
             assert synapseId >= -1;
-            relations.put(synapseId, new Relation.InstanceRelation(type));
+            relations.put(synapseId, new InstanceRelation(type));
             return this;
         }
 
 
         public Builder addRangeRelation(Range.Relation relation, int synapseId) {
             assert synapseId >= -1;
-            relations.put(synapseId, new Relation.RangeRelation(relation));
+            relations.put(synapseId, new RangeRelation(relation));
             return this;
         }
 

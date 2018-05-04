@@ -21,7 +21,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Relation;
+import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
 import network.aika.training.PatternDiscovery;
 import network.aika.lattice.AndNode.AndActivation;
@@ -156,14 +156,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         if(act.repropagateV != null && act.repropagateV != nln.markedCreated) return;
 
-        Stream<Activation> s = Selector.select(
-                th,
-                secondNode.inputNeuron.get(doc),
-                ref.relations.get(0),
-                iAct
-        );
-
-        s.forEach(secondIAct -> {
+        ref.relations.get(0).getActivations(secondNode.inputNeuron.get(doc), iAct).forEach(secondIAct -> {
                     InputActivation secondAct = secondIAct.outputToInputNode.output;
                     if(secondAct != null) {
                     //    if (!Conflicts.isConflicting(iAct, secondIAct)) {
