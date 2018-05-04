@@ -19,6 +19,7 @@ import static network.aika.neuron.relation.InstanceRelation.Type.COMMON_ANCESTOR
 import static network.aika.neuron.relation.InstanceRelation.Type.CONTAINED_IN;
 import static network.aika.neuron.activation.Range.Operator.*;
 
+
 public class RelationsTest {
 
 
