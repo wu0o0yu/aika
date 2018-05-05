@@ -78,6 +78,17 @@ public class PhraseStructureParsingTest {
             Neuron.init(n, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
         }
 
+        for(Neuron n: new Neuron[] {ART, N, ADJ, V, AUX}) {
+            n.addSynapse(new Synapse.Builder()
+                    .setNeuron(I)
+                    .setWeight(-100.0)
+                    .setBias(0.0)
+                    .setRecurrent(true)
+                    .addRangeRelation(OVERLAPS, OUTPUT)
+            );
+        }
+
+
         initOrNeuron(I, S, NP, VP, ART, N, ADJ, V, AUX);
         initOrNeuron(NP, NP_ART_ADJ_N, NP_ART_N, NP_ADJ_N);
         initOrNeuron(VP, VP_AUX_V_NP, VP_V_NP);
