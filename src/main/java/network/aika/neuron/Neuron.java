@@ -216,11 +216,10 @@ public class Neuron extends Provider<INeuron> {
 
         Map<Integer, Synapse.Builder> synapseInputs = new TreeMap<>();
         for (Synapse.Builder input : inputs) {
-            if(input.synapseId != null) {
-                synapseInputs.put(input.synapseId, input);
-            } else {
-                synapseInputs.put(++maxSynapseId, input);
+            if(input.synapseId == null) {
+                input.synapseId = ++maxSynapseId;
             }
+            synapseInputs.put(input.synapseId, input);
         }
 
         for (Synapse.Builder input : inputs) {
