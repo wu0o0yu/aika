@@ -149,7 +149,7 @@ public class Linker {
                 }
             }
         } else {
-            for(Activation iAct: r.getActivations(s.input.get(rAct.doc), rAct)) {
+            for(Activation iAct: r.invert().getActivations(s.input.get(rAct.doc), rAct)) {
                 link(s, iAct, oAct);
             }
         }

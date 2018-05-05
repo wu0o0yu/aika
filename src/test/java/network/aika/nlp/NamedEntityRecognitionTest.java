@@ -97,7 +97,7 @@ public class NamedEntityRecognitionTest {
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true) // this input is a negative feedback loop
-                        .addRangeRelation(CONTAINS, 0)
+                        .addRangeRelation(OVERLAPS, 0)
         );
 
         Neuron cookProfessionEntity = Neuron.init(
@@ -110,7 +110,6 @@ public class NamedEntityRecognitionTest {
                         .setNeuron(inputNeurons.get("cook"))
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -118,7 +117,7 @@ public class NamedEntityRecognitionTest {
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(CONTAINS, 0)
+                        .addRangeRelation(OVERLAPS, 0)
         );
 
         Neuron jacksonForenameEntity = Neuron.init(
@@ -131,14 +130,13 @@ public class NamedEntityRecognitionTest {
                         .setNeuron(inputNeurons.get("jackson"))
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .addRangeRelation(END_TO_BEGIN_EQUALS, 1)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(surnameCategory)
                         .setWeight(5.0)
                         .setBias(0.0)
+                        .addRangeRelation(BEGIN_TO_END_EQUALS, 0)
                         .setRecurrent(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
@@ -146,7 +144,7 @@ public class NamedEntityRecognitionTest {
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(CONTAINED_IN, 0)
+                        .addRangeRelation(OVERLAPS, 0)
         );
 
         Neuron jacksonCityEntity = Neuron.init(
@@ -167,7 +165,7 @@ public class NamedEntityRecognitionTest {
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(CONTAINED_IN, 0)
+                        .addRangeRelation(OVERLAPS, 0)
         );
 
         Neuron.init(
