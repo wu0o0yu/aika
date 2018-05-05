@@ -45,13 +45,12 @@ public class InstanceRelation extends Relation {
 
     private void collectCommonAncestor(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
         if(linkedAct.visited == v) return;
-        linkedAct.visited = v;
 
-        collectContainedIn(results, n, linkedAct, linkedAct.doc.visitedCounter++);
+        collectContains(results, n, linkedAct, v);
 
-        for(Activation.Link l: linkedAct.neuronOutputs) {
+        for(Activation.Link l: linkedAct.neuronInputs.values()) {
             if(l.synapse.key.identity) {
-                collectCommonAncestor(results, n, l.output, v);
+                collectCommonAncestor(results, n, l.input, v);
             }
         }
     }

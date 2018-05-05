@@ -283,8 +283,8 @@ public class RelationsTest {
         doc.process();
 
         Assert.assertFalse(nD.getActivations(doc, true).isEmpty());
-
     }
+
 
     @Test
     public void testInstanceRelation2() {
