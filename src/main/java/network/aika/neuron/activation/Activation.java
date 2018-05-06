@@ -383,35 +383,39 @@ public final class Activation extends OrActivation {
         ArrayList<Activation> conflicts = new ArrayList<>();
         for(Link l: neuronInputs.values()) {
             if (l.synapse.isNegative() && l.synapse.key.isRecurrent) {
-                l.input.collectIncomingConflicts(conflicts);
+                collectIncomingConflicts(conflicts, l.input);
             }
         }
-        collectOutgoingConflicts(conflicts);
+        collectOutgoingConflicts(conflicts, this);
         return conflicts;
     }
 
 
-    private void collectIncomingConflicts(List<Activation> conflicts) {
-        if (getINeuron().type != INeuron.Type.INHIBITORY) {
-            conflicts.add(this);
+    private void collectIncomingConflicts(List<Activation> conflicts, Activation act) {
+        if(act == this) return;
+
+        if (act.getINeuron().type != INeuron.Type.INHIBITORY) {
+            conflicts.add(act);
         } else {
-            for (Link l : neuronInputs.values()) {
+            for (Link l : act.neuronInputs.values()) {
                 if (!l.synapse.isNegative() && !l.synapse.key.isRecurrent) {
-                    l.input.collectIncomingConflicts(conflicts);
+                    collectIncomingConflicts(conflicts, l.input);
                 }
             }
         }
     }
 
 
-    private void collectOutgoingConflicts(List<Activation> conflicts) {
-        for(Link l: neuronOutputs) {
+    private void collectOutgoingConflicts(List<Activation> conflicts, Activation act) {
+        if(act == this) return;
+
+        for(Link l: act.neuronOutputs) {
             if (l.output.getINeuron().type != INeuron.Type.INHIBITORY) {
                 if (l.synapse.isNegative() && l.synapse.key.isRecurrent) {
                     conflicts.add(l.output);
                 }
             } else if (!l.synapse.isNegative() && !l.synapse.key.isRecurrent) {
-                l.output.collectOutgoingConflicts(conflicts);
+                collectOutgoingConflicts(conflicts, l.output);
             }
         }
     }
