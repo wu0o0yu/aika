@@ -183,7 +183,7 @@ public class PhraseStructureParsingTest {
             int j = i + word.length();
             Neuron wn = dictionary.get(word);
             if(wn != null) {
-                wn.addInput(doc, i, j);
+                wn.addInput(doc, i, j + 1);
             }
 
             i = j + 1;
