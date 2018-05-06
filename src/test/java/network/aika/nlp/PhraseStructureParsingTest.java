@@ -12,6 +12,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Range;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -198,11 +199,11 @@ public class PhraseStructureParsingTest {
 
     @Test
     public void parseSentence() {
-        Document doc = parse("the large can ");
-//        Document doc = parse("the large can can hold the water ");
+//        Document doc = parse("the large can ");
+        Document doc = parse("the large can can hold the water ");
 
         System.out.println(doc.activationsToString(true, true, true));
 
-        System.out.println();
+        Assert.assertNotNull(S.getActivation(doc, new Range(0, 33), true));
     }
 }
