@@ -185,11 +185,11 @@ public class CoreferenceResolutionTest {
 
         boolean found = false;
         for(Activation.Link l: maleCoRef.getActivation(doc, new Range(26, 29), true).neuronInputs.values()) {
-            if(l.input.getText().equalsIgnoreCase("robert")) found = true;
+            if(l.input.getText().equalsIgnoreCase("robert ")) found = true;
 
-            Assert.assertFalse(l.input.getText().equalsIgnoreCase("john"));
-            Assert.assertFalse(l.input.getText().equalsIgnoreCase("richard"));
-            Assert.assertFalse(l.input.getText().equalsIgnoreCase("susan"));
+            Assert.assertFalse(l.input.getText().equalsIgnoreCase("john "));
+            Assert.assertFalse(l.input.getText().equalsIgnoreCase("richard "));
+            Assert.assertFalse(l.input.getText().equalsIgnoreCase("susan "));
         }
 
         Assert.assertTrue(found);
