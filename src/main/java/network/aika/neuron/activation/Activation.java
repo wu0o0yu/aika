@@ -275,7 +275,7 @@ public final class Activation extends OrActivation {
             }
 
             if (s.isNegative()) {
-                if (!s.key.isRecurrent && !checkSelfReferencing(this, iAct, false, 0)) {
+                if (!s.key.isRecurrent && !checkSelfReferencing(iAct, false, 0)) {
                     ub += iAct.lowerBound * x;
                 }
 
@@ -343,7 +343,7 @@ public final class Activation extends OrActivation {
     private State getInputState(int round, Activation act, Synapse s) {
         State is = State.ZERO;
         if (s.key.isRecurrent) {
-            if (!s.isNegative() || !checkSelfReferencing(act, this, true, 0)) {
+            if (!s.isNegative() || !act.checkSelfReferencing(this, true, 0)) {
                 is = round == 0 ? getInitialState(decision) : rounds.get(round - 1);
             }
         } else {
@@ -432,8 +432,8 @@ public final class Activation extends OrActivation {
     }
 
 
-    public static boolean checkSelfReferencing(Activation nx, Activation ny, boolean onlySelected, int depth) {
-        if (nx == ny) {
+    public boolean checkSelfReferencing(Activation ny, boolean onlySelected, int depth) {
+        if (this == ny) {
             return true;
         }
 
@@ -443,7 +443,7 @@ public final class Activation extends OrActivation {
 
         for (Link l: onlySelected ? ny.selectedNeuronInputs : ny.neuronInputs.values()) {
             if(!l.synapse.key.isRecurrent) {
-                if (checkSelfReferencing(nx, l.input, onlySelected, depth + 1)) {
+                if (checkSelfReferencing(l.input, onlySelected, depth + 1)) {
                     return true;
                 }
             }
