@@ -163,7 +163,7 @@ public class CoreferenceResolutionTest {
             int j = i + word.length();
             Neuron wn = dictionary.get(word);
             if(wn != null) {
-                wn.addInput(doc, i, j);
+                wn.addInput(doc, i, j + 1);
             }
 
             i = j + 1;
@@ -184,7 +184,7 @@ public class CoreferenceResolutionTest {
         System.out.println(doc.activationsToString(true, true, true));
 
         boolean found = false;
-        for(Activation.Link l: maleCoRef.getActivation(doc, new Range(26, 28), true).neuronInputs.values()) {
+        for(Activation.Link l: maleCoRef.getActivation(doc, new Range(26, 29), true).neuronInputs.values()) {
             if(l.input.getText().equalsIgnoreCase("robert")) found = true;
 
             Assert.assertFalse(l.input.getText().equalsIgnoreCase("john"));

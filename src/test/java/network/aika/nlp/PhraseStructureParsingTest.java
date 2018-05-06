@@ -154,6 +154,7 @@ public class PhraseStructureParsingTest {
                         .setNeuron(inputs[i])
                         .setWeight(10.0)
                         .setBias(-10.0)
+                        .setIdentity(true)
                         .setRangeOutput(begin, end);
 
             if(!begin) {
@@ -197,7 +198,8 @@ public class PhraseStructureParsingTest {
 
     @Test
     public void parseSentence() {
-        Document doc = parse("the large can can hold the water ");
+        Document doc = parse("the large can ");
+//        Document doc = parse("the large can can hold the water ");
 
         System.out.println(doc.activationsToString(true, true, true));
 
