@@ -66,6 +66,7 @@ public final class Activation extends OrActivation {
     public long currentStateV;
     public StateChange currentStateChange;
     public long markedDirty;
+    public long markedPredecessor;
 
     public double errorSignal;
     public Double targetValue;
@@ -188,7 +189,10 @@ public final class Activation extends OrActivation {
 
         int fired = -1;
 
-        for (InputState is: getInputStates(round)) {
+        long v = doc.visitedCounter++;
+        markPredecessor(v);
+
+        for (InputState is: getInputStates(round, v)) {
             Synapse s = is.l.synapse;
             Activation iAct = is.l.input;
 
@@ -259,6 +263,9 @@ public final class Activation extends OrActivation {
         double ub = n.biasSum + n.posRecSum;
         double lb = n.biasSum + n.posRecSum;
 
+        long v = doc.visitedCounter++;
+        markPredecessor(v);
+
         for (Link l : neuronInputs.values()) {
             Synapse s = l.synapse;
             if(s.inactive) {
@@ -275,7 +282,7 @@ public final class Activation extends OrActivation {
             }
 
             if (s.isNegative()) {
-                if (!s.key.isRecurrent && !checkSelfReferencing(iAct, false, 0)) {
+                if (!s.key.isRecurrent && !iAct.checkSelfReferencing(false, 0, v)) {
                     ub += iAct.lowerBound * x;
                 }
 
@@ -302,7 +309,7 @@ public final class Activation extends OrActivation {
 
 
 
-    private List<InputState> getInputStates(int round) {
+    private List<InputState> getInputStates(int round, long v) {
         ArrayList<InputState> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
         InputState maxInputState = null;
@@ -315,7 +322,7 @@ public final class Activation extends OrActivation {
                 maxInputState = null;
             }
 
-            State s = l.input.getInputState(round, this, l.synapse);
+            State s = l.input.getInputState(round, l.synapse, v);
             if (maxInputState == null || maxInputState.s.value < s.value) {
                 maxInputState = new InputState(l, s);
             }
@@ -340,10 +347,10 @@ public final class Activation extends OrActivation {
     }
 
 
-    private State getInputState(int round, Activation act, Synapse s) {
+    private State getInputState(int round, Synapse s, long v) {
         State is = State.ZERO;
         if (s.key.isRecurrent) {
-            if (!s.isNegative() || !act.checkSelfReferencing(this, true, 0)) {
+            if (!s.isNegative() || !checkSelfReferencing(true, 0, v)) {
                 is = round == 0 ? getInitialState(decision) : rounds.get(round - 1);
             }
         } else {
@@ -380,42 +387,44 @@ public final class Activation extends OrActivation {
             return conflicts;
         }
 
-        ArrayList<Activation> conflicts = new ArrayList<>();
+        long v = doc.visitedCounter++;
+        markPredecessor(v);
+        conflicts = new ArrayList<>();
         for(Link l: neuronInputs.values()) {
             if (l.synapse.isNegative() && l.synapse.key.isRecurrent) {
-                collectIncomingConflicts(conflicts, l.input);
+                l.input.collectIncomingConflicts(conflicts, v);
             }
         }
-        collectOutgoingConflicts(conflicts, this);
+        collectOutgoingConflicts(conflicts, v);
         return conflicts;
     }
 
 
-    private void collectIncomingConflicts(List<Activation> conflicts, Activation act) {
-        if(act == this) return;
+    private void collectIncomingConflicts(List<Activation> conflicts, long v) {
+        if(markedPredecessor == v) return;
 
-        if (act.getINeuron().type != INeuron.Type.INHIBITORY) {
-            conflicts.add(act);
+        if (getINeuron().type != INeuron.Type.INHIBITORY) {
+            conflicts.add(this);
         } else {
-            for (Link l : act.neuronInputs.values()) {
+            for (Link l : neuronInputs.values()) {
                 if (!l.synapse.isNegative() && !l.synapse.key.isRecurrent) {
-                    collectIncomingConflicts(conflicts, l.input);
+                    l.input.collectIncomingConflicts(conflicts, v);
                 }
             }
         }
     }
 
 
-    private void collectOutgoingConflicts(List<Activation> conflicts, Activation act) {
-        if(act == this) return;
+    private void collectOutgoingConflicts(List<Activation> conflicts, long v) {
+        if(markedPredecessor == v) return;
 
-        for(Link l: act.neuronOutputs) {
+        for(Link l: neuronOutputs) {
             if (l.output.getINeuron().type != INeuron.Type.INHIBITORY) {
                 if (l.synapse.isNegative() && l.synapse.key.isRecurrent) {
                     conflicts.add(l.output);
                 }
             } else if (!l.synapse.isNegative() && !l.synapse.key.isRecurrent) {
-                collectOutgoingConflicts(conflicts, l.output);
+                l.output.collectOutgoingConflicts(conflicts, v);
             }
         }
     }
@@ -432,8 +441,8 @@ public final class Activation extends OrActivation {
     }
 
 
-    public boolean checkSelfReferencing(Activation ny, boolean onlySelected, int depth) {
-        if (this == ny) {
+    public boolean checkSelfReferencing(boolean onlySelected, int depth, long v) {
+        if (markedPredecessor == v) {
             return true;
         }
 
@@ -441,9 +450,9 @@ public final class Activation extends OrActivation {
             return false;
         }
 
-        for (Link l: onlySelected ? ny.selectedNeuronInputs : ny.neuronInputs.values()) {
+        for (Link l: onlySelected ? selectedNeuronInputs : neuronInputs.values()) {
             if(!l.synapse.key.isRecurrent) {
-                if (checkSelfReferencing(l.input, onlySelected, depth + 1)) {
+                if (l.input.checkSelfReferencing(onlySelected, depth + 1, v)) {
                     return true;
                 }
             }
@@ -488,6 +497,17 @@ public final class Activation extends OrActivation {
 
     public void markDirty(long v) {
         markedDirty = Math.max(markedDirty, v);
+    }
+
+
+    public void markPredecessor(long v) {
+        markedPredecessor = v;
+
+        for(Link l: neuronInputs.values()) {
+            if(!l.synapse.isNegative() && !l.synapse.key.isRecurrent) {
+                l.input.markPredecessor(v);
+            }
+        }
     }
 
 
