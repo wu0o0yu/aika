@@ -74,22 +74,23 @@ public class PhraseStructureParsingTest {
         AUX = m.createNeuron("Auxiliary");
 
 
-        for(Neuron n: new Neuron[] {I, S, NP, VP, ART, N, ADJ, V, AUX}) {
+        for(Neuron n: new Neuron[] {I, NP, VP}) {
             Neuron.init(n, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
         }
 
         for(Neuron n: new Neuron[] {ART, N, ADJ, V, AUX}) {
-            n.addSynapse(new Synapse.Builder()
-                    .setNeuron(I)
-                    .setWeight(-100.0)
-                    .setBias(0.0)
-                    .setRecurrent(true)
-                    .addRangeRelation(OVERLAPS, OUTPUT)
+            Neuron.init(n, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.EXCITATORY,
+                    new Synapse.Builder()
+                            .setNeuron(I)
+                            .setWeight(-10.0)
+                            .setBias(0.0)
+                            .setRecurrent(true)
+                            .addRangeRelation(OVERLAPS, OUTPUT)
             );
         }
 
 
-        initOrNeuron(I, S, NP, VP, ART, N, ADJ, V, AUX);
+        initOrNeuron(I, NP, VP, ART, N, ADJ, V, AUX);
         initOrNeuron(NP, NP_ART_ADJ_N, NP_ART_N, NP_ADJ_N);
         initOrNeuron(VP, VP_AUX_V_NP, VP_V_NP);
 
@@ -170,7 +171,7 @@ public class PhraseStructureParsingTest {
                     .addRangeRelation(OVERLAPS, OUTPUT)
         );
 
-        Neuron.init(andN, 5.0, INeuron.Type.EXCITATORY, synapses);
+        Neuron.init(andN, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, synapses);
     }
 
 
