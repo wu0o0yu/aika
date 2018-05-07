@@ -56,15 +56,8 @@ public class Linker {
      * @param act
      */
     public void link(Activation act, OrNode.Link ol) {
-        INeuron n = act.getINeuron();
-        n.lock.acquireReadLock();
-        n.provider.lock.acquireReadLock();
-
         linkOrNodeRelations(act, ol);
-
         process();
-        n.provider.lock.releaseReadLock();
-        n.lock.releaseReadLock();
     }
 
 
