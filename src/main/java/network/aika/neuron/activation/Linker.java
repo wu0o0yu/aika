@@ -81,22 +81,6 @@ public class Linker {
     }
 
 
-    private Link link(Synapse s, Activation iAct, Activation oAct) {
-        Link l = new Link(s, iAct, oAct);
-        Link el = oAct.neuronInputs.get(l);
-        if(el != null) {
-            return el;
-        }
-
-        iAct.addSynapseActivation(INPUT, l);
-        oAct.addSynapseActivation(OUTPUT, l);
-
-        queue.add(l);
-
-        return l;
-    }
-
-
     public void lateLinking() {
         for(Activation act: doc.activationsByRangeBegin.values()) {
             linkOutputRelations(act);
@@ -127,13 +111,6 @@ public class Linker {
 
 
     private void link(Activation rAct, Activation oAct, Synapse s, Relation r) {
-        Integer outputBegin = s.key.rangeOutput.begin.map(rAct.range);
-        Integer outputEnd = s.key.rangeOutput.end.map(rAct.range);
-
-        if(outputBegin != null && outputBegin != oAct.range.begin || outputEnd != null && outputEnd != oAct.range.end) {
-            return;
-        }
-
         if(!r.isExact()) {
             INeuron.ThreadState ts = s.input.get().getThreadState(doc.threadId, true);
             for(Activation iAct: ts.activations.values()) {
@@ -146,5 +123,28 @@ public class Linker {
                 link(s, iAct, oAct);
             }
         }
+    }
+
+
+    private void link(Synapse s, Activation iAct, Activation oAct) {
+        Integer outputBegin = s.key.rangeOutput.begin.map(iAct.range);
+        Integer outputEnd = s.key.rangeOutput.end.map(iAct.range);
+
+        if(outputBegin != null && outputBegin != oAct.range.begin || outputEnd != null && outputEnd != oAct.range.end) {
+            return;
+        }
+
+        Link l = new Link(s, iAct, oAct);
+        Link el = oAct.neuronInputs.get(l);
+        if(el != null) {
+            return;
+        }
+
+        iAct.addSynapseActivation(INPUT, l);
+        oAct.addSynapseActivation(OUTPUT, l);
+
+        queue.add(l);
+
+        return;
     }
 }
