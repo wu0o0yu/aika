@@ -67,7 +67,7 @@ public class Synapse implements Writable {
         if (r != 0) return r;
         r = s1.key.compareTo(s2.key);
         if (r != 0) return r;
-        return compareRelations(s1, s2);
+        return Integer.compare(s1.id, s2.id);
     };
 
 
@@ -76,26 +76,9 @@ public class Synapse implements Writable {
         if (r != 0) return r;
         r = s1.key.compareTo(s2.key);
         if (r != 0) return r;
-        return compareRelations(s1, s2);
+        return Integer.compare(s1.id, s2.id);
     };
 
-
-    private static int compareRelations(Synapse s1, Synapse s2) {
-        int r = Integer.compare(s1.relations.size(), s2.relations.size());
-        if(r != 0) return r;
-
-        Iterator<Map.Entry<Integer, Relation>> it1 = s1.relations.entrySet().iterator();
-        Iterator<Map.Entry<Integer, Relation>> it2 = s2.relations.entrySet().iterator();
-        while(it1.hasNext() && it2.hasNext()) {
-            Map.Entry<Integer, Relation> me1 = it1.next();
-            Map.Entry<Integer, Relation> me2 = it2.next();
-            r = Integer.compare(me1.getKey(), me2.getKey());
-            if(r != 0) return r;
-            r = me1.getValue().compareTo(me2.getValue());
-            if(r != 0) return r;
-        }
-        return 0;
-    }
 
 
     public Neuron input;
@@ -405,11 +388,25 @@ public class Synapse implements Writable {
 
 
     public static Synapse createOrLookup(Document doc, Integer synapseId, Key k, Map<Integer, Relation> relations, DistanceFunction distFunc, Neuron inputNeuron, Neuron outputNeuron) {
-        Synapse ns = new Synapse(inputNeuron, outputNeuron, synapseId, k, relations, distFunc);
+        outputNeuron.lock.acquireWriteLock();
+        inputNeuron.get(doc);
+        Synapse synapse = null;
+        if(synapseId != null) {
+            synapse = outputNeuron.inputSynapsesById.get(synapseId);
+        } else {
+            Map.Entry<Synapse, Synapse> me = outputNeuron.inMemoryInputSynapses.subMap(
+                    new Synapse(inputNeuron, outputNeuron, Integer.MIN_VALUE, k, null, null), true,
+                    new Synapse(inputNeuron, outputNeuron, Integer.MAX_VALUE, k, null, null), true
+            ).firstEntry();
+            if(me != null) {
+                synapse = me.getKey();
+            }
+        }
+        outputNeuron.lock.releaseWriteLock();
 
-        Synapse synapse = outputNeuron.inMemoryInputSynapses.get(ns);
         if(synapse == null) {
-            synapse = ns;
+            synapse = new Synapse(inputNeuron, outputNeuron, synapseId, k, relations, distFunc);
+
             if(synapseId == null) {
                 synapse.id = outputNeuron.get(doc).numberOfInputSynapses;
             }
