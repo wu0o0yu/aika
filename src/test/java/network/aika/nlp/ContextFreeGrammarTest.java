@@ -24,7 +24,7 @@ import static network.aika.neuron.Synapse.Builder.OUTPUT;
 import static network.aika.neuron.activation.Range.Relation.BEGIN_TO_END_EQUALS;
 import static network.aika.neuron.activation.Range.Relation.OVERLAPS;
 
-public class PhraseStructureParsingTest {
+public class ContextFreeGrammarTest {
 
 
     Model m;
@@ -96,14 +96,14 @@ public class PhraseStructureParsingTest {
         initOrNeuron(VP, VP_AUX_V_NP, VP_V_NP);
 
 
-        initAndNeuron(S, NP, VP);
+        initAndNeuron(S, 6.0, NP, VP);
 
-        initAndNeuron(NP_ART_ADJ_N, ART, ADJ, N);
-        initAndNeuron(NP_ART_N, ART, N);
-        initAndNeuron(NP_ADJ_N, ADJ, N);
+        initAndNeuron(NP_ART_ADJ_N, 9.0, ART, ADJ, N);
+        initAndNeuron(NP_ART_N, 6.0, ART, N);
+        initAndNeuron(NP_ADJ_N, 6.0, ADJ, N);
 
-        initAndNeuron(VP_AUX_V_NP, AUX, V, NP);
-        initAndNeuron(VP_V_NP, V, NP);
+        initAndNeuron(VP_AUX_V_NP, 9.0, AUX, V, NP);
+        initAndNeuron(VP_V_NP, 6.0, V, NP);
 
 
         initWord("the", ART);
@@ -143,7 +143,7 @@ public class PhraseStructureParsingTest {
     }
 
 
-    private void initAndNeuron(Neuron andN, Neuron... inputs) {
+    private void initAndNeuron(Neuron andN, double weight, Neuron... inputs) {
         ArrayList<Synapse.Builder> synapses = new ArrayList<>();
 
         for(int i = 0; i < inputs.length; i++) {
@@ -173,7 +173,7 @@ public class PhraseStructureParsingTest {
                     .addRangeRelation(OVERLAPS, OUTPUT)
         );
 
-        Neuron.init(andN, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, synapses);
+        Neuron.init(andN, weight, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, synapses);
     }
 
 
