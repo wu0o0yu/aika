@@ -236,7 +236,7 @@ public class Neuron extends Provider<INeuron> {
         }
 
         List<Synapse> inputSynapses = new ArrayList<>();
-        for (Synapse.Builder input : inputs) {
+        for (Synapse.Builder input : synapseInputs.values()) {
             Synapse s = input.getSynapse(this);
             s.update(doc, input.weight, input.bias);
             inputSynapses.add(s);
