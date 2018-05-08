@@ -102,6 +102,8 @@ public class OrNode extends Node<OrNode, Activation> {
         if(act == null) {
             act = new Activation(doc.activationIdCounter++, doc, r, this);
             processActivation(act);
+        } else {
+            propagate(act);
         }
 
         Link ol = act.link(oe, inputAct);
