@@ -172,12 +172,14 @@ public class InstanceRelation extends Relation {
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeBoolean(true);
+
+        out.writeUTF(type.name());
     }
 
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-
+        type = Type.valueOf(in.readUTF());
     }
 
 
