@@ -25,11 +25,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Candidate;
 import network.aika.neuron.activation.Range;
 import network.aika.neuron.activation.SearchNode;
-import network.aika.lattice.*;
 import network.aika.lattice.Node.ThreadState;
-import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.SearchNode.Weight;
 import network.aika.neuron.activation.SearchNode.Decision;
 import network.aika.training.SupervisedTraining;
 import org.slf4j.Logger;
@@ -388,7 +385,7 @@ public class Document implements Comparable<Document> {
         }
 
         if(selectedSearchNode != null) {
-            sb.append("\n Final SearchNode:" + selectedSearchNode.id + "  WeightSum:" + selectedSearchNode.accumulatedWeight.toString() + "\n");
+            sb.append("\n Final SearchNode:" + selectedSearchNode.id + "  WeightSum:" + selectedSearchNode.accumulatedWeight + "\n");
         }
         return sb.toString();
     }
@@ -516,21 +513,21 @@ public class Document implements Comparable<Document> {
         }
 
 
-        public Weight process(SearchNode sn) {
+        public double process(SearchNode sn) {
             long v = visitedCounter++;
 
             if(sn.getParent() != null && sn.getParent().candidate != null) {
                 add(sn.getParent().candidate.activation);
             }
 
-            Weight delta = Weight.ZERO;
+            double delta = 0.0;
             for(int round = 0; round < queue.size(); round++) {
                 TreeSet<Activation> q = queue.get(round);
                 while (!q.isEmpty()) {
                     Activation act = q.pollFirst();
                     act.rounds.setQueued(round, false);
 
-                    delta = delta.add(act.process(sn, round, v));
+                    delta += act.process(sn, round, v);
                 }
             }
             return delta;

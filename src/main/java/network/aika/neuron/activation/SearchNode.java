@@ -82,8 +82,8 @@ public class SearchNode implements Comparable<SearchNode> {
         EXPLORE
     }
 
-    Weight weightDelta;
-    public Weight accumulatedWeight = Weight.ZERO;
+    double weightDelta;
+    public double accumulatedWeight = 0.0;
 
     public Map<Activation, Activation.StateChange> modifiedActs = new TreeMap<>(Activation.ACTIVATION_ID_COMP);
 
@@ -94,8 +94,8 @@ public class SearchNode implements Comparable<SearchNode> {
     private boolean alreadyExcluded;
     private SearchNode selectedChild = null;
     private SearchNode excludedChild = null;
-    private Weight selectedWeight = Weight.ZERO;
-    private Weight excludedWeight = Weight.ZERO;
+    private double selectedWeight = 0.0;
+    private double excludedWeight = 0.0;
     private long processVisited;
     private boolean bestPath;
 
@@ -164,7 +164,7 @@ public class SearchNode implements Comparable<SearchNode> {
                 }
             } else {
                 weightDelta = doc.vQueue.process(this);
-                if (Math.abs(weightDelta.w - csn.weightDelta.w) > 0.00001 || !compareNewState(csn)) {
+                if (Math.abs(weightDelta - csn.weightDelta) > 0.00001 || !compareNewState(csn)) {
                     log.error("Cached search node activation do not match the newly computed results.");
                     log.info("Computed results:");
                     dumpDebugState();
@@ -179,7 +179,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         if (getParent() != null) {
-            accumulatedWeight = weightDelta.add(getParent().accumulatedWeight);
+            accumulatedWeight = weightDelta + getParent().accumulatedWeight;
         }
     }
 
@@ -261,10 +261,8 @@ public class SearchNode implements Comparable<SearchNode> {
             );
 
             decision = n.getDecision();
-            weights = " AW:" + Utils.round(n.accumulatedWeight.w) +
-                    " AN:" + Utils.round(n.accumulatedWeight.n) +
-                    " DW:" + Utils.round(n.weightDelta.w) +
-                    " DN:" + Utils.round(n.weightDelta.n);
+            weights = " AW:" + Utils.round(n.accumulatedWeight) +
+                    " DW:" + Utils.round(n.weightDelta);
 
             n = n.getParent();
         }
@@ -282,7 +280,7 @@ public class SearchNode implements Comparable<SearchNode> {
      */
     public static void search(Document doc, SearchNode root, long v, Long timeoutInMilliSeconds) throws TimeoutException {
         SearchNode sn = root;
-        Weight returnWeight = null;
+        double returnWeight = 0.0;
         long startTime = System.currentTimeMillis();
 
         do {
@@ -408,11 +406,11 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private Weight finalStep() {
+    private double finalStep() {
         Decision d;
         Decision cd = getCachedDecision();
         if(cd == UNKNOWN) {
-            d = alreadySelected || (!alreadyExcluded && selectedWeight.getNormWeight() >= excludedWeight.getNormWeight()) ? SELECTED : EXCLUDED;
+            d = alreadySelected || (!alreadyExcluded && selectedWeight >= excludedWeight) ? SELECTED : EXCLUDED;
 
             if (!alreadyExcluded) {
                 candidate.cachedDecision = d;
@@ -473,8 +471,8 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private Weight processResult(Document doc) {
-        double accNW = accumulatedWeight.getNormWeight();
+    private double processResult(Document doc) {
+        double accNW = accumulatedWeight;
 
         if (level > doc.selectedSearchNode.level || accNW > getSelectedAccumulatedWeight(doc)) {
             doc.selectedSearchNode = this;
@@ -501,7 +499,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private double getSelectedAccumulatedWeight(Document doc) {
-        return doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight.getNormWeight() : -1.0;
+        return doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight : -1.0;
     }
 
 
@@ -557,48 +555,6 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         candidate.debugCounts[debugState.ordinal()]++;
-    }
-
-
-    public static class Weight {
-        public final static Weight ZERO = new Weight(0.0, 0.0);
-
-        public final double w;
-        public final double n;
-
-        private Weight(double w, double n) {
-            this.w = w;
-            this.n = n;
-        }
-
-        public static Weight create(double w, double n) {
-            assert w >= 0.0 && n >= 0.0;
-            if (w == 0.0 && n == 0.0) return ZERO;
-            return new Weight(w, n);
-        }
-
-        public Weight add(Weight nw) {
-            if (nw == null || nw == ZERO) return this;
-            return new Weight(w + nw.w, n + nw.n);
-        }
-
-        public Weight sub(Weight nw) {
-            if (nw == null || nw == ZERO) return this;
-            return new Weight(w - nw.w, n - nw.n);
-        }
-
-        public double getNormWeight() {
-            return n > 0 ? w / n : 0.0;
-        }
-
-
-        public boolean equals(Weight nw) {
-            return (Math.abs(w - nw.w) <= INeuron.WEIGHT_TOLERANCE && Math.abs(n - nw.n) <= INeuron.WEIGHT_TOLERANCE);
-        }
-
-        public String toString() {
-            return "W:" + Utils.round(w) + " N:" + Utils.round(n);
-        }
     }
 
 

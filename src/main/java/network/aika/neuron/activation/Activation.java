@@ -2,14 +2,11 @@ package network.aika.neuron.activation;
 
 import network.aika.Document;
 import network.aika.Utils;
-import network.aika.lattice.Node;
 import network.aika.lattice.OrNode;
 import network.aika.lattice.OrNode.OrActivation;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.SearchNode.Weight;
 import network.aika.neuron.activation.SearchNode.Decision;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,11 +136,11 @@ public final class Activation extends OrActivation {
     }
 
 
-    public Weight process(SearchNode sn, int round, long v) {
-        Weight delta = Weight.ZERO;
+    public double process(SearchNode sn, int round, long v) {
+        double delta = 0.0;
         State s;
         if(inputValue != null) {
-            s = new State(inputValue, 0.0, 0, Weight.ZERO);
+            s = new State(inputValue, 0.0, 0, 0.0);
         } else {
             s = computeValueAndWeight(round);
         }
@@ -175,7 +172,7 @@ public final class Activation extends OrActivation {
             }
 
             if (rounds.getLastRound() != null && round >= rounds.getLastRound()) { // Consider only the final round.
-                delta = delta.add(s.weight.sub(oldState.weight));
+                delta += s.weight - oldState.weight;
             }
         }
         return delta;
@@ -215,13 +212,9 @@ public final class Activation extends OrActivation {
         double currentActValue = n.activationFunction.f(net);
 
         double w = Math.min(-n.negRecSum, net);
-        double norm = Math.min(-n.negRecSum, netDir + n.posRecSum);
 
         // Compute only the recurrent part is above the threshold.
-        Weight newWeight = Weight.create(
-                decision == SELECTED ? Math.max(0.0, w) : 0.0,
-                Math.max(0.0, norm)
-        );
+        double newWeight = decision == SELECTED ? Math.max(0.0, w) : 0.0;
 
         if(decision == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS) {
             return new State(
@@ -303,7 +296,7 @@ public final class Activation extends OrActivation {
                 c == SELECTED ? 1.0 : 0.0,
                 0.0,
                 0,
-                Weight.ZERO
+                0.0
         );
     }
 
@@ -627,11 +620,11 @@ public final class Activation extends OrActivation {
         public final double net;
 
         public final int fired;
-        public final Weight weight;
+        public final double weight;
 
-        public static final State ZERO = new State(0.0, 0.0, -1, Weight.ZERO);
+        public static final State ZERO = new State(0.0, 0.0, -1, 0.0);
 
-        public State(double value, double net, int fired, Weight weight) {
+        public State(double value, double net, int fired, double weight) {
             assert !Double.isNaN(value);
             this.value = value;
             this.net = net;
@@ -645,7 +638,7 @@ public final class Activation extends OrActivation {
         }
 
         public boolean equalsWithWeights(State s) {
-            return equals(s) && weight.equals(s.weight);
+            return equals(s) && Math.abs(weight - s.weight) <= INeuron.WEIGHT_TOLERANCE;
         }
 
         public String toString() {

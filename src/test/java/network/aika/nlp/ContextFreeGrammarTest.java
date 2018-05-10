@@ -81,10 +81,10 @@ public class ContextFreeGrammarTest {
         }
 
         for(Neuron n: new Neuron[] {ART, N, ADJ, V, AUX}) {
-            Neuron.init(n, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.EXCITATORY,
+            Neuron.init(n, 0.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
                     new Synapse.Builder()
                             .setNeuron(I)
-                            .setWeight(-10.0)
+                            .setWeight(-50.0)
                             .setBias(0.0)
                             .setRecurrent(true)
                             .addRangeRelation(OVERLAPS, OUTPUT)
@@ -125,7 +125,8 @@ public class ContextFreeGrammarTest {
             wordType.addSynapse(
                     new Synapse.Builder()
                             .setNeuron(wordN)
-                            .setWeight(1.0)
+                            .setWeight(3.0)
+                            .setBias(0.0)
                             .setRangeOutput(true)
             );
         }
@@ -200,6 +201,7 @@ public class ContextFreeGrammarTest {
 
     @Test
     public void parseSentence() {
+        SearchNode.ENABLE_CACHING = false;
 //        Document doc = parse("the large can ");
         Document doc = parse("the large can can hold the water ");
 
