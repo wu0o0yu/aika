@@ -137,20 +137,11 @@
 				overall weights sum of all activations. This sum is also called the objective function \(f\) and can be
                 stated in the following way:
 
-				$$f = {\sum\limits_{j \in Acts}{weight_j} \over \sum\limits_{j \in Acts}{norm_j}}$$
-
-				$$weight_j = \min (-g_j^{r-}, net_j)$$
-
-				$$norm_j = \min (-g_j^{r-}, net_j^{\neg r} + g_j^{r+})$$
-
-				$$g_j^{r+} = \sum\limits_{i = 0, w_{ij} \geq 0, w_{ij} \in Recurrent}^N{w_{ij}}$$
+				$$f = \sum\limits_{j \in Acts}{\min (-g_j^{r-}, net_j)}$$
 
 				$$g_j^{r-} = \sum\limits_{i = 0, w_{ij} < 0, w_{ij} \in Recurrent}^N{w_{ij}}$$
 
-				$$net_j^{\neg r} = b_j + \sum\limits_{i = 0, w_{ij} \notin Recurrent}^N{x_i w_{ij}}$$
-
-				The values \(g_j^{r+}\) and \(g_j^{r-}\) are simply the sum of all positive or negative feedback synapses.
-				The value \(net_j^{\neg r}\) is the non recurrent part of the neurons weighted sum.
+				The value \(g_j^{r-}\) is simply the sum of all negative feedback synapses.
 				The intention behind this objective function is to measure a neurons ability to overcome the inhibiting
 				input signals of other neurons.
 			</p>
