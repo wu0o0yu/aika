@@ -100,7 +100,7 @@ public class Linker {
                 int relId = me.getKey();
                 if(relId >= 0) {
                     Synapse s = l.output.getNeuron().getSynapseById(relId);
-                    if(!s.key.identity) {
+                    if(s != null && !s.key.identity) {
                         Relation r = me.getValue();
                         link(l.input, l.output, s, r);
                     }
