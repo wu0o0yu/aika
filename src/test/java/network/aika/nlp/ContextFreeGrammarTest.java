@@ -202,7 +202,6 @@ public class ContextFreeGrammarTest {
     @Test
     public void parseSentence() {
         SearchNode.ENABLE_CACHING = false;
-//        Document doc = parse("the large can ");
         Document doc = parse("the large can can hold the water ");
 
         System.out.println(doc.activationsToString(true, true, true));
