@@ -75,6 +75,7 @@ public class OrNode extends Node<OrNode, Activation> {
         for(int i = 0; i < oe.synapseIds.length; i++) {
             int synapseId = oe.synapseIds[i];
 
+            neuron.get(inputAct.doc);
             Synapse s = neuron.getSynapseById(synapseId);
             if(s.key.rangeOutput.begin != Range.Mapping.NONE || s.key.rangeOutput.end != Range.Mapping.NONE) {
                 Activation iAct = inputAct.getInputActivation(i);
