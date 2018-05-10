@@ -300,6 +300,7 @@ public class Neuron extends Provider<INeuron> {
     public void addInMemoryInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryInputSynapses.put(s, s);
+        inputSynapsesById.put(s.id, s);
         lock.releaseWriteLock();
     }
 
@@ -307,6 +308,7 @@ public class Neuron extends Provider<INeuron> {
     public void removeInMemoryInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryInputSynapses.remove(s);
+        inputSynapsesById.remove(s.id);
         lock.releaseWriteLock();
     }
 
