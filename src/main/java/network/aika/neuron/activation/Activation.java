@@ -182,7 +182,6 @@ public final class Activation extends OrActivation {
     public State computeValueAndWeight(int round) {
         INeuron n = getINeuron();
         double net = n.biasSum;
-        double netDir = n.biasSum;
 
         int fired = -1;
 
@@ -200,9 +199,6 @@ public final class Activation extends OrActivation {
                 x *= s.distanceFunction.f(iAct, this);
             }
             net += x;
-            if(!s.key.isRecurrent) {
-                netDir += x;
-            }
 
             if (!s.key.isRecurrent && !s.isNegative() && net >= 0.0 && fired < 0) {
                 fired = iAct.rounds.get(round).fired + 1;
