@@ -625,12 +625,12 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
 
     public static class Link {
-        Refinement ref;
-        RefValue rv;
+        public Refinement ref;
+        public RefValue rv;
 
-        NodeActivation<?> input;
-        InputActivation refAct;
-        AndActivation output;
+        public NodeActivation<?> input;
+        public InputActivation refAct;
+        public AndActivation output;
 
         public Link(Refinement ref, RefValue rv, InputActivation refAct, NodeActivation<?> input, AndActivation output) {
             this.ref = ref;
