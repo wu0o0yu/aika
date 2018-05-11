@@ -44,22 +44,6 @@ public class PatternDiscovery {
     }
 
 
-    public interface ActivationEvaluation {
-
-        /**
-         * Check if <code>node</code> is an interesting pattern that might be considered for further processing.
-         *
-         * This property is required to be monotonic over the size of the pattern. In other words, if a pattern is
-         * interesting, then all its sub patterns also need to be interesting.
-         *
-         * @param act
-         * @return
-         */
-
-        boolean evaluate(NodeActivation act);
-    }
-
-
     public interface Counter {
 
         /**
