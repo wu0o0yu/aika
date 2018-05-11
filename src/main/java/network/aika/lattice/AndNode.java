@@ -283,14 +283,6 @@ public class AndNode extends Node<AndNode, AndActivation> {
     }
 
 
-    public static Collection<NodeActivation<?>> prepareInputActs(NodeActivation<?> firstAct, NodeActivation<?> secondAct) {
-        List<NodeActivation<?>> inputActs = new ArrayList<>(2);
-        inputActs.add(firstAct);
-        inputActs.add(secondAct);
-        return inputActs;
-    }
-
-
     @Override
     public void reprocessInputs(Document doc) {
         for(RefValue pp: parents.values()) {
