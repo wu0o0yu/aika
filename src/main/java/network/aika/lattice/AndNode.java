@@ -165,7 +165,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                 AndActivation secondAct = sl.output;
                 if (secondAct.node instanceof AndNode) {
                     if (act != secondAct) {
-                        Refinement nRef = config.refinementFactory.create(act, secondAct);
+                        Refinement nRef = null; //config.refinementFactory.create(act, 0, secondAct); // TODO:
 
                         AndNode nln = extend(doc.threadId, doc, nRef).child.get();
                         if (nln != null) {
