@@ -35,7 +35,6 @@ public class MetaNetworkTest {
     public Map<String, Neuron> neurons = new TreeMap<>();
 
 
-    @Ignore
     @Test
     public void testKeyPhraseRecognition() {
         String text = "Alan Smithee";
@@ -107,7 +106,6 @@ public class MetaNetworkTest {
                 new MetaSynapse.Builder() // First word of the phrase
                         .setMetaWeight(20.0)
                         .setMetaBias(-20.0)
-                        .setMetaRelativeRid(true)
                         .setSynapseId(1)
                         .setNeuron(wordSuppr)
                         .setWeight(20.0)
@@ -117,7 +115,6 @@ public class MetaNetworkTest {
                 new MetaSynapse.Builder() // Words in the middle
                         .setMetaWeight(10.0)
                         .setMetaBias(-10.0)
-                        .setMetaRelativeRid(true)
                         .setSynapseId(3)
                         .setNeuron(wordSuppr)
                         .setWeight(0.0)
@@ -127,7 +124,6 @@ public class MetaNetworkTest {
                 new MetaSynapse.Builder() // Last word of the phrase
                         .setMetaWeight(20.0)
                         .setMetaBias(-20.0)
-                        .setMetaRelativeRid(true)
                         .setSynapseId(2)
                         .setNeuron(wordSuppr)
                         .setWeight(20.0)

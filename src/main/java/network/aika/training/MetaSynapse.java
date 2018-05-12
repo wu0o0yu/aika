@@ -35,21 +35,18 @@ public class MetaSynapse implements Writable {
 
     public double metaWeight;
     public double metaBias;
-    public boolean metaRelativeRid;
 
 
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeDouble(metaWeight);
         out.writeDouble(metaBias);
-        out.writeBoolean(metaRelativeRid);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         metaWeight = in.readDouble();
         metaBias = in.readDouble();
-        metaRelativeRid = in.readBoolean();
     }
 
 
@@ -61,7 +58,6 @@ public class MetaSynapse implements Writable {
 
         public double metaWeight;
         public double metaBias;
-        public boolean metaRelativeRid;
 
         public Builder setMetaWeight(double metaWeight) {
             this.metaWeight = metaWeight;
@@ -73,11 +69,6 @@ public class MetaSynapse implements Writable {
             return this;
         }
 
-        public Builder setMetaRelativeRid(boolean metaRelativeRid) {
-            this.metaRelativeRid = metaRelativeRid;
-            return this;
-        }
-
 
         public Synapse getSynapse(Neuron outputNeuron) {
             Synapse s = super.getSynapse(outputNeuron);
@@ -85,7 +76,6 @@ public class MetaSynapse implements Writable {
             MetaSynapse ss = new MetaSynapse();
             ss.metaWeight = metaWeight;
             ss.metaBias = metaBias;
-            ss.metaRelativeRid = metaRelativeRid;
             s.meta = ss;
             return s;
         }
