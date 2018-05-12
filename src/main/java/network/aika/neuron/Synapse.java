@@ -182,18 +182,21 @@ public class Synapse implements Writable {
     private void reverseLinkRelations(INeuron out) {
         for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
             int rId = me.getKey();
-            Map<Integer, Relation> rel;
+            Map<Integer, Relation> rel = null;
             if(rId >= 0) {
                 Synapse rs = out.provider.getSynapseById(rId);
-                assert rs != null;
-                rel = rs.relations;
+                if(rs != null) {
+                    rel = rs.relations;
+                }
             } else {
                 if(out.outputRelations == null) {
                     out.outputRelations = new TreeMap<>();
                 }
                 rel = out.outputRelations;
             }
-            rel.put(id, me.getValue().invert());
+            if(rel != null) {
+                rel.put(id, me.getValue().invert());
+            }
         }
     }
 

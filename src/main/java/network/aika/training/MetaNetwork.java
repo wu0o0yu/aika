@@ -22,6 +22,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.relation.Relation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,16 +116,16 @@ public class MetaNetwork {
 
 
     private static void transferMetaSynapses(Document doc, Map<Activation, List<Target>> metaActivations, Activation metaAct, Target t) {
-        TreeSet<Synapse> inputSynapses = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
+        TreeSet<Synapse> inputSynapses = new TreeSet<>((s1, s2) -> Integer.compare(s1.id, s2.id));
 
         for (Activation.Link l : metaAct.getFinalInputActivationLinks()) {
-            MetaSynapse inputMetaSyanpse = l.synapse.meta;
+            MetaSynapse inputMetaSynapse = l.synapse.meta;
             Synapse os = l.synapse;
 
-            if (inputMetaSyanpse != null && (inputMetaSyanpse.metaWeight != 0.0 || inputMetaSyanpse.metaBias != 0.0)) {
+            if (inputMetaSynapse != null && (inputMetaSynapse.metaWeight != 0.0 || inputMetaSynapse.metaBias != 0.0)) {
                 Neuron ina = l.input.node.neuron;
 
-                List<Activation.Link> inputs = ina.get().type == INeuron.Type.INHIBITORY && inputMetaSyanpse.metaWeight >= 0.0 ?
+                List<Activation.Link> inputs = ina.get().type == INeuron.Type.INHIBITORY && inputMetaSynapse.metaWeight >= 0.0 ?
                         l.input.getFinalInputActivationLinks() :
                         Collections.singletonList(l);
 
@@ -135,11 +136,11 @@ public class MetaNetwork {
                         List<Target> inputTargets = metaActivations.get(isa.input);
                         if(inputTargets != null) {
                             for (Target it : metaActivations.get(isa.input)) {
-                                createOrLookupSynapse(doc, t, inputSynapses, inputMetaSyanpse, os, it.targetNeuron);
+                                createOrLookupSynapse(doc, t, inputSynapses, inputMetaSynapse, os, it.targetNeuron, metaAct);
                             }
                         }
                     } else {
-                        createOrLookupSynapse(doc, t, inputSynapses, inputMetaSyanpse, os, in);
+                        createOrLookupSynapse(doc, t, inputSynapses, inputMetaSynapse, os, in, metaAct);
                     }
                 }
             }
@@ -169,17 +170,31 @@ public class MetaNetwork {
     }
 
 
-    private static void createOrLookupSynapse(Document doc, Target t, TreeSet<Synapse> inputSynapses, MetaSynapse inputMetaSyanpse, Synapse os, Neuron in) {
-        Synapse ns = new Synapse(in, t.targetNeuron, os.id, os.key, os.relations, os.distanceFunction);
+    private static void createOrLookupSynapse(Document doc, Target t, Collection<Synapse> inputSynapses, MetaSynapse inputMetaSynapse, Synapse os, Neuron in, Activation metaAct) {
+        Neuron metaN = metaAct.getNeuron();
+        Map<Integer, Relation> nRels = new TreeMap<>();
+        for(Map.Entry<Integer, Relation> me: os.relations.entrySet()) {
+            Integer relId = me.getKey();
+            if(relId >= 0) {
+                Synapse s = metaN.getSynapseById(me.getKey());
+                if (s.meta != null) {
+                    nRels.put(relId, me.getValue());
+                }
+            } else {
+                nRels.put(relId, me.getValue());
+            }
+        }
+
+        Synapse ns = new Synapse(in, t.targetNeuron, os.id, os.key, nRels, os.distanceFunction);
         if (!ns.exists()) {
-            ns.updateDelta(doc, inputMetaSyanpse.metaWeight, inputMetaSyanpse.metaBias);
+            ns.updateDelta(doc, inputMetaSynapse.metaWeight, inputMetaSynapse.metaBias);
 
             inputSynapses.add(ns);
         }
     }
 
 
-    public static String showDelta(INeuron n, Set<Synapse> synapses) {
+    public static String showDelta(INeuron n, Collection<Synapse> synapses) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("N: " + n.label + " ob:" + n.biasSum + " nb:" + (n.biasSum + n.biasSumDelta) + "\n");

@@ -112,15 +112,6 @@ public class MetaNetworkTest {
                         .setBias(-20.0)
                         .addRangeRelation(BEGIN_EQUALS, 0)
                         .setRangeOutput(true, false),
-                new MetaSynapse.Builder() // Words in the middle
-                        .setMetaWeight(10.0)
-                        .setMetaBias(-10.0)
-                        .setSynapseId(3)
-                        .setNeuron(wordSuppr)
-                        .setWeight(0.0)
-                        .setBias(0.0)
-                        .addRangeRelation(BEGIN_TO_END_EQUALS, 0)
-                        .setRangeOutput(false),
                 new MetaSynapse.Builder() // Last word of the phrase
                         .setMetaWeight(20.0)
                         .setMetaBias(-20.0)
@@ -134,14 +125,12 @@ public class MetaNetworkTest {
                 new MetaSynapse.Builder()
                         .setMetaWeight(-100.0)
                         .setMetaBias(0.0)
-                        .setSynapseId(4)
+                        .setSynapseId(3)
                         .setNeuron(phraseSuppr)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(OVERLAPS, 1)
-                        .addRangeRelation(OVERLAPS, 2)
-                        .addRangeRelation(OVERLAPS, 3)
+                        .addRangeRelation(OVERLAPS, Synapse.Builder.OUTPUT)
         );
 
         MetaNetwork.initMetaNeuron(entityMetaN, 5.0, 10.0,
