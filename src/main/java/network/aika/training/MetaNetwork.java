@@ -105,7 +105,7 @@ public class MetaNetwork {
 
 
     private static Activation getMetaNeuronAct(Activation inhibAct) {
-        for(Activation.Link l: inhibAct.neuronInputs.values()) {
+        for(Activation.Link l: inhibAct.getFinalInputActivationLinks()) {
             if(l.input.getINeuron().type == INeuron.Type.META) {
                 return l.input;
             }
