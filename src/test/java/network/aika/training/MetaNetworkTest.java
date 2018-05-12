@@ -138,8 +138,7 @@ public class MetaNetworkTest {
                         .setSynapseId(0)
                         .setNeuron(keyPhraseHint)
                         .setWeight(40.0)
-                        .setBias(-40.0)
-                        .setRangeOutput(true),
+                        .setBias(-40.0),
                 new MetaSynapse.Builder()
                         .setMetaWeight(40.0)
                         .setMetaBias(-40.0)
@@ -147,6 +146,7 @@ public class MetaNetworkTest {
                         .setNeuron(phraseSuppr)
                         .setWeight(40.0)
                         .setBias(-40.0)
+                        .addRangeRelation(Range.Relation.EQUALS, 0)
                         .setRangeOutput(true),
                 new MetaSynapse.Builder()
                         .setMetaWeight(-100.0)
