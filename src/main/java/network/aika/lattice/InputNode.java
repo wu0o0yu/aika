@@ -29,6 +29,7 @@ import network.aika.lattice.InputNode.InputActivation;
 import network.aika.neuron.activation.Selector;
 import network.aika.lattice.AndNode.Refinement;
 import network.aika.lattice.AndNode.RefValue;
+import network.aika.lattice.AndNode.RelationsMap;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -181,12 +182,16 @@ public class InputNode extends Node<InputNode, InputActivation> {
         doc.getFinalActivations().forEach(secondNAct -> {
             InputActivation secondAct = secondNAct.outputToInputNode.output;
             if (act != secondAct) {
-                Refinement ref = config.refinementFactory.create(act, secondAct);
-                if (ref != null) {
-                    InputNode in = ref.input.get(doc);
+                List<Relation> relations = config.refinementFactory.create(act, 0, secondAct, 0);
+                for(Relation r: relations) {
+                    InputNode in = secondAct.node;
 
-                    if (in.visitedDiscover != v) {
+                    if (in.visitedDiscover != v && r != null) {
                         in.visitedDiscover = v;
+
+                        RelationsMap rm = new RelationsMap(new Relation[] {r});
+                        Refinement ref = new Refinement(rm, in.provider);
+
                         AndNode nln = extend(doc.threadId, doc, ref).child.get();
 
                         if (nln != null) {

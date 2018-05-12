@@ -45,7 +45,7 @@ import static network.aika.neuron.activation.Range.Operator.LESS_THAN_EQUAL;
  */
 public class PatternDiscoveryTest {
 
-/*
+
     public static class NodeStatistic implements Writable {
         int frequency = 0;
 
@@ -78,6 +78,32 @@ public class PatternDiscoveryTest {
     }
 
 
+    @Test
+    public void simpleTest() {
+        Model m = new Model();
+        m.setNodeStatisticFactory(() -> new NodeStatistic());
+
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
+
+        Document doc = m.createDocument("a", 0);
+
+        inA.addInput(doc, 0, 1);
+        inB.addInput(doc, 0, 1);
+
+        Config config = new Config()
+                .setCounter(act -> count(act))
+                .setRefinementFactory((act, secondAct) -> {
+                    return new AndNode.Refinement(new AndNode.RelationsMap(), );
+                });
+        PatternDiscovery.discover(doc, config);
+
+
+        AndNode an = inA.get().outputNode.get().andChildren.firstEntry().getValue().child.get();
+        Assert.assertNotNull(an);
+    }
+
+/*
     @Test
     public void discoverPatterns() {
         Model m = new Model();
@@ -135,13 +161,13 @@ public class PatternDiscoveryTest {
 
         Assert.assertEquals(2, ((NodeStatistic) pBNode.statistic).frequency, 0.01);
 
-        AndNode pAB = pANode.andChildren.get(new Refinement(0, pBNode.provider)).get();
-        Assert.assertEquals(pAB.provider, pBNode.andChildren.get(new Refinement(0, pANode.provider)));
+        AndNode pAB = pANode.andChildren.get(getRefinement(pBNode)).child.get();
+        Assert.assertEquals(pAB.provider, pBNode.andChildren.get(getRefinement(pANode)));
 
         Assert.assertEquals(2, ((NodeStatistic) pAB.statistic).frequency, 0.01);
         Assert.assertEquals(2, pAB.parents.size());
-        Assert.assertEquals(pANode.provider, pAB.parents.get(new Refinement(0, pBNode.provider)));
-        Assert.assertEquals(pBNode.provider, pAB.parents.get(new Refinement(0, pANode.provider)));
+        Assert.assertEquals(pANode.provider, pAB.parents.get(getRefinement(pBNode)));
+        Assert.assertEquals(pBNode.provider, pAB.parents.get(getRefinement(pANode)));
 
 
         inC.addInput(doc, 4, 6);
@@ -177,13 +203,13 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(2, pBNode.andChildren.size());
         Assert.assertEquals(1, pCNode.andChildren.size());
 
-        AndNode pBC = pBNode.andChildren.get(new Refinement(0,pCNode.provider)).get();
-        Assert.assertEquals(pBC.provider, pCNode.andChildren.get(new Refinement(0, pBNode.provider)));
+        AndNode pBC = pBNode.andChildren.get(getRefinement(pCNode)).child.get();
+        Assert.assertEquals(pBC.provider, pCNode.andChildren.get(getRefinement(pBNode)));
 
         Assert.assertEquals(2, ((NodeStatistic) pBC.statistic).frequency, 0.01);
         Assert.assertEquals(2, pBC.parents.size());
-        Assert.assertEquals(pBNode.provider, pBC.parents.get(new Refinement(0, pCNode.provider)));
-        Assert.assertEquals(pCNode.provider, pBC.parents.get(new Refinement(0, pBNode.provider)));
+        Assert.assertEquals(pBNode.provider, pBC.parents.get(getRefinement(pCNode)));
+        Assert.assertEquals(pCNode.provider, pBC.parents.get(getRefinement(pBNode)));
 
 
         inA.addInput(doc, 4, 6);
@@ -218,13 +244,13 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(2, pBNode.andChildren.size());
         Assert.assertEquals(2, pCNode.andChildren.size());
 
-        AndNode pAC = pCNode.andChildren.get(new Refinement(0, pANode.provider)).get();
-        Assert.assertEquals(pAC.provider, pANode.andChildren.get(new Refinement(0, pCNode.provider)));
+        AndNode pAC = pCNode.andChildren.get(getRefinement(pANode)).child.get();
+        Assert.assertEquals(pAC.provider, pANode.andChildren.get(getRefinement(pCNode)));
 
         Assert.assertEquals(2, ((NodeStatistic) pAC.statistic).frequency, 0.01);
         Assert.assertEquals(2, pAC.parents.size());
-        Assert.assertEquals(pANode.provider, pAC.parents.get(new Refinement(0, pCNode.provider)));
-        Assert.assertEquals(pCNode.provider, pAC.parents.get(new Refinement(0, pANode.provider)));
+        Assert.assertEquals(pANode.provider, pAC.parents.get(getRefinement(pCNode)));
+        Assert.assertEquals(pCNode.provider, pAC.parents.get(getRefinement(pANode)));
 
 
         Assert.assertEquals(3, ((NodeStatistic) pCNode.statistic).frequency, 0.01);
@@ -240,8 +266,8 @@ public class PatternDiscoveryTest {
 
         Assert.assertEquals(2, ((NodeStatistic) pAC.statistic).frequency, 0.01);
         Assert.assertEquals(2, pAC.parents.size());
-        Assert.assertEquals(pANode.provider, pAC.parents.get(new Refinement(0, pCNode.provider)));
-        Assert.assertEquals(pCNode.provider, pAC.parents.get(new Refinement(0, pANode.provider)));
+        Assert.assertEquals(pANode.provider, pAC.parents.get(getRefinement(pCNode)));
+        Assert.assertEquals(pCNode.provider, pAC.parents.get(getRefinement(pANode)));
 
 
         inB.addInput(doc, 8, 10);
@@ -257,15 +283,15 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(1, pBC.andChildren.size());
         Assert.assertEquals(1, pAC.andChildren.size());
 
-        AndNode pABC = pAB.andChildren.get(new Refinement(0, pCNode.provider)).get();
-        Assert.assertEquals(pABC.provider, pAC.andChildren.get(new Refinement(0, pBNode.provider)));
-        Assert.assertEquals(pABC.provider, pBC.andChildren.get(new Refinement(0, pANode.provider)));
+        AndNode pABC = pAB.andChildren.get(getRefinement(pCNode)).child.get();
+        Assert.assertEquals(pABC.provider, pAC.andChildren.get(getRefinement(pBNode)));
+        Assert.assertEquals(pABC.provider, pBC.andChildren.get(getRefinement(pANode)));
 
 //        Assert.assertEquals(1, pABC.frequency, 0.01);
         Assert.assertEquals(3, pABC.parents.size());
-        Assert.assertEquals(pAB.provider, pABC.parents.get(new Refinement(0, pCNode.provider)));
-        Assert.assertEquals(pAC.provider, pABC.parents.get(new Refinement(0, pBNode.provider)));
-        Assert.assertEquals(pBC.provider, pABC.parents.get(new Refinement(0, pANode.provider)));
+        Assert.assertEquals(pAB.provider, pABC.parents.get(getRefinement(pCNode)));
+        Assert.assertEquals(pAC.provider, pABC.parents.get(getRefinement(pBNode)));
+        Assert.assertEquals(pBC.provider, pABC.parents.get(getRefinement(pANode)));
 
 
         inD.addInput(doc, 0, 2);
@@ -286,11 +312,11 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(3, pBNode.andChildren.size());
         Assert.assertEquals(3, pDNode.andChildren.size());
 
-        AndNode pAD = pANode.andChildren.get(new Refinement(0, pDNode.provider)).get();
-        Assert.assertEquals(pAD.provider, pDNode.andChildren.get(new Refinement(0, pANode.provider)));
+        AndNode pAD = pANode.andChildren.get(getRefinement(pDNode)).child.get();
+        Assert.assertEquals(pAD.provider, pDNode.andChildren.get(getRefinement(pANode)));
 
-        AndNode pBD = pBNode.andChildren.get(new Refinement(0, pDNode.provider)).get();
-        Assert.assertEquals(pBD.provider, pDNode.andChildren.get(new Refinement(0, pBNode.provider)));
+        AndNode pBD = pBNode.andChildren.get(getRefinement(pDNode)).child.get();
+        Assert.assertEquals(pBD.provider, pDNode.andChildren.get(getRefinement(pBNode)));
 
         Assert.assertEquals(3, ((NodeStatistic) pAD.statistic).frequency, 0.01);
         Assert.assertEquals(2, pAD.parents.size());
@@ -298,15 +324,15 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(3, ((NodeStatistic) pBD.statistic).frequency, 0.01);
         Assert.assertEquals(2, pBD.parents.size());
 
-        AndNode pABD = pAB.andChildren.get(new Refinement(0, pDNode.provider)).get();
-        Assert.assertEquals(pABD.provider, pAD.andChildren.get(new Refinement(0, pBNode.provider)));
-        Assert.assertEquals(pABD.provider, pBD.andChildren.get(new Refinement(0, pANode.provider)));
+        AndNode pABD = pAB.andChildren.get(getRefinement(pDNode)).child.get();
+        Assert.assertEquals(pABD.provider, pAD.andChildren.get(getRefinement(pBNode)));
+        Assert.assertEquals(pABD.provider, pBD.andChildren.get(getRefinement(pANode)));
 
 //        Assert.assertEquals(2, ((NodeStatistic) pABD.meta).frequency, 0.01);
         Assert.assertEquals(3, pABD.parents.size());
-        Assert.assertEquals(pAB.provider, pABD.parents.get(new Refinement(0, pDNode.provider)));
-        Assert.assertEquals(pAD.provider, pABD.parents.get(new Refinement(0, pBNode.provider)));
-        Assert.assertEquals(pBD.provider, pABD.parents.get(new Refinement(0, pANode.provider)));
+        Assert.assertEquals(pAB.provider, pABD.parents.get(getRefinement(pDNode)));
+        Assert.assertEquals(pAD.provider, pABD.parents.get(getRefinement(pBNode)));
+        Assert.assertEquals(pBD.provider, pABD.parents.get(getRefinement(pANode)));
 
         Assert.assertEquals(1, pABC.andChildren.size());
         Assert.assertEquals(1, pABD.andChildren.size());
@@ -316,11 +342,11 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(3, pBNode.andChildren.size());
         Assert.assertEquals(3, pDNode.andChildren.size());
 
-        pAD = pANode.andChildren.get(new Refinement(0, pDNode.provider)).get();
-        Assert.assertEquals(pAD.provider, pDNode.andChildren.get(new Refinement(0, pANode.provider)));
+        pAD = pANode.andChildren.get(getRefinement(pDNode)).child.get();
+        Assert.assertEquals(pAD.provider, pDNode.andChildren.get(getRefinement(pANode)));
 
-        pBD = pBNode.andChildren.get(new Refinement(0, pDNode.provider)).get();
-        Assert.assertEquals(pBD.provider, pDNode.andChildren.get(new Refinement(0, pBNode.provider)));
+        pBD = pBNode.andChildren.get(getRefinement(pDNode)).child.get();
+        Assert.assertEquals(pBD.provider, pDNode.andChildren.get(getRefinement(pBNode)));
 
         Assert.assertEquals(3, ((NodeStatistic) pAD.statistic).frequency, 0.01);
         Assert.assertEquals(2, pAD.parents.size());
@@ -328,15 +354,15 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(3, ((NodeStatistic) pBD.statistic).frequency, 0.01);
         Assert.assertEquals(2, pBD.parents.size());
 
-        pABD = pAB.andChildren.get(new Refinement(0, pDNode.provider)).get();
-        Assert.assertEquals(pABD.provider, pAD.andChildren.get(new Refinement(0, pBNode.provider)));
-        Assert.assertEquals(pABD.provider, pBD.andChildren.get(new Refinement(0, pANode.provider)));
+        pABD = pAB.andChildren.get(getRefinement(pDNode)).child.get();
+        Assert.assertEquals(pABD.provider, pAD.andChildren.get(getRefinement(pBNode)));
+        Assert.assertEquals(pABD.provider, pBD.andChildren.get(getRefinement(pANode)));
 
         Assert.assertEquals(3, ((NodeStatistic) pABD.statistic).frequency, 0.01);
         Assert.assertEquals(3, pABD.parents.size());
-        Assert.assertEquals(pAB.provider, pABD.parents.get(new Refinement(0, pDNode.provider)));
-        Assert.assertEquals(pAD.provider, pABD.parents.get(new Refinement(0, pBNode.provider)));
-        Assert.assertEquals(pBD.provider, pABD.parents.get(new Refinement(0, pANode.provider)));
+        Assert.assertEquals(pAB.provider, pABD.parents.get(getRefinement(pDNode)));
+        Assert.assertEquals(pAD.provider, pABD.parents.get(getRefinement(pBNode)));
+        Assert.assertEquals(pBD.provider, pABD.parents.get(getRefinement(pANode)));
 
         Assert.assertEquals(1, pABC.andChildren.size());
         Assert.assertEquals(1, pABD.andChildren.size());
@@ -351,7 +377,7 @@ public class PatternDiscoveryTest {
         resetFrequency(m);
         PatternDiscovery.discover(doc, config);
 
-        AndNode pACD = pAC.andChildren.get(new Refinement(0, pDNode.provider)).get();
+        AndNode pACD = pAC.andChildren.get(getRefinement(pDNode)).child.get();
 
         Assert.assertEquals(4, ((NodeStatistic) pAD.statistic).frequency, 0.01);
         Assert.assertEquals(2, pAD.parents.size());
@@ -359,29 +385,29 @@ public class PatternDiscoveryTest {
         Assert.assertEquals(4, ((NodeStatistic) pABD.statistic).frequency, 0.01);
         Assert.assertEquals(3, pABD.parents.size());
 
-        AndNode pCD = pDNode.andChildren.get(new Refinement(0, pCNode.provider)).get();
-        Assert.assertEquals(pCD.provider, pCNode.andChildren.get(new Refinement(0, pDNode.provider)));
+        AndNode pCD = pDNode.andChildren.get(getRefinement(pCNode)).child.get();
+        Assert.assertEquals(pCD.provider, pCNode.andChildren.get(getRefinement(pDNode)));
 
         Assert.assertEquals(3, ((NodeStatistic) pCD.statistic).frequency, 0.01);
 
-        pACD = pAC.andChildren.get(new Refinement(0, pDNode.provider)).get();
-        Assert.assertEquals(pACD.provider, pAD.andChildren.get(new Refinement(0, pCNode.provider)));
-        Assert.assertEquals(pACD.provider, pCD.andChildren.get(new Refinement(0, pANode.provider)));
+        pACD = pAC.andChildren.get(getRefinement(pDNode)).child.get();
+        Assert.assertEquals(pACD.provider, pAD.andChildren.get(getRefinement(pCNode)));
+        Assert.assertEquals(pACD.provider, pCD.andChildren.get(getRefinement(pANode)));
 
         Assert.assertEquals(3, ((NodeStatistic) pACD.statistic).frequency, 0.01);
         Assert.assertEquals(3, pACD.parents.size());
 
-        AndNode pBCD = pBC.andChildren.get(new Refinement(0, pDNode.provider)).get();
-        Assert.assertEquals(pBCD.provider, pBD.andChildren.get(new Refinement(0, pCNode.provider)));
-        Assert.assertEquals(pBCD.provider, pCD.andChildren.get(new Refinement(0, pBNode.provider)));
+        AndNode pBCD = pBC.andChildren.get(getRefinement(pDNode)).child.get();
+        Assert.assertEquals(pBCD.provider, pBD.andChildren.get(getRefinement(pCNode)));
+        Assert.assertEquals(pBCD.provider, pCD.andChildren.get(getRefinement(pBNode)));
 
         Assert.assertEquals(3, ((NodeStatistic) pACD.statistic).frequency, 0.01);
         Assert.assertEquals(3, pBCD.parents.size());
 
-        AndNode pABCD = pABC.andChildren.get(new Refinement(0, pDNode.provider)).get();
-        Assert.assertEquals(pABCD.provider, pABD.andChildren.get(new Refinement(0, pCNode.provider)));
-        Assert.assertEquals(pABCD.provider, pACD.andChildren.get(new Refinement(0, pBNode.provider)));
-        Assert.assertEquals(pABCD.provider, pBCD.andChildren.get(new Refinement(0, pANode.provider)));
+        AndNode pABCD = pABC.andChildren.get(getRefinement(pDNode)).child.get();
+        Assert.assertEquals(pABCD.provider, pABD.andChildren.get(getRefinement(pCNode)));
+        Assert.assertEquals(pABCD.provider, pACD.andChildren.get(getRefinement(pBNode)));
+        Assert.assertEquals(pABCD.provider, pBCD.andChildren.get(getRefinement(pANode)));
 
 // The Pattern ABC has no Activation yet, since it has just been created.
 //        Assert.assertEquals(1, pABCD.frequency, 0.01);
@@ -391,6 +417,10 @@ public class PatternDiscoveryTest {
 
 //        Assert.assertNull(TestHelper.get(doc, pCNode, new Range(0, 1), doc.bottom));
 
+    }
+
+    private Refinement getRefinement(InputNode pANode) {
+        return new Refinement(new AndNode.RelationsMap(), pANode.provider);
     }
 
 
@@ -403,32 +433,13 @@ public class PatternDiscoveryTest {
         Neuron inB = m.createNeuron("B");
 
 
-        InputNode.add(m,
-                new Synapse.Key(
-                        false,
-                        0,
-                        null,
-                        Range.Relation.create(EQUALS, GREATER_THAN_EQUAL),
-                        Range.Output.create(Range.Mapping.BEGIN, Range.Mapping.NONE)
-                ),
-                inA.get()
-        );
+        InputNode.add(m, inA.get());
 
-        InputNode.add(m,
-                new Synapse.Key(
-                        false,
-                        0,
-                        null,
-                        Range.Relation.create(LESS_THAN_EQUAL, EQUALS),
-                        Range.Output.create(Range.Mapping.NONE, Range.Mapping.END)
-                ),
-                inB.get()
-        );
+        InputNode.add(m, inB.get());
 
         Config config = new Config()
                 .setCounter(act -> count(act))
-                .setCheckExpandable(act -> ((NodeStatistic) act.key.node.statistic).frequency >= 1)
-                .setRefinementFactory(n -> checkRidRange(n, 2));
+                .setRefinementFactory((act, act2) -> ((NodeStatistic) act.node.statistic).frequency >= 1);
         {
             Document doc = m.createDocument("ab", 0);
 
@@ -458,6 +469,5 @@ public class PatternDiscoveryTest {
         }
 
     }
-
-    */
+*/
 }

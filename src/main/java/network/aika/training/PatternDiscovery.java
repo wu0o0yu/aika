@@ -20,6 +20,9 @@ package network.aika.training;
 import network.aika.Document;
 import network.aika.lattice.AndNode;
 import network.aika.lattice.NodeActivation;
+import network.aika.neuron.relation.Relation;
+
+import java.util.List;
 
 
 /**
@@ -40,7 +43,7 @@ public class PatternDiscovery {
          * @return
          */
 
-        AndNode.Refinement create(NodeActivation act, NodeActivation secondAct);
+        List<Relation> create(NodeActivation act, int x, NodeActivation secondAct, int secondX);
     }
 
 
