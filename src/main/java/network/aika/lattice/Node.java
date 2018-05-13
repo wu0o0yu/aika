@@ -197,9 +197,33 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         Document doc = act.doc;
 
         ThreadState th = act.node.getThreadState(doc.threadId, true);
+        if (th.activations.isEmpty()) {
+            doc.activatedNodes.add(act.node);
+        }
         th.activations.add(act);
 
         doc.addedNodeActivations.add(act);
+    }
+
+
+    public void clearActivations(Document doc) {
+        clearActivations(doc.threadId);
+    }
+
+
+    public void clearActivations(int threadId) {
+        ThreadState th = getThreadState(threadId, false);
+        if (th == null) return;
+        th.activations.clear();
+
+        th.added.clear();
+    }
+
+
+    public void clearActivations() {
+        for (int i = 0; i < provider.model.numberOfThreads; i++) {
+            clearActivations(i);
+        }
     }
 
 

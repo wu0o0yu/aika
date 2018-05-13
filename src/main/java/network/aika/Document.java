@@ -74,6 +74,7 @@ public class Document implements Comparable<Document> {
     public UpperBoundQueue ubQueue = new UpperBoundQueue();
     public Linker linker = new Linker(this);
 
+    public TreeSet<Node> activatedNodes = new TreeSet<>();
     public TreeSet<INeuron> activatedNeurons = new TreeSet<>();
     public TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
     public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
@@ -297,10 +298,12 @@ public class Document implements Comparable<Document> {
      */
     public void clearActivations() {
         activatedNeurons.forEach(n -> n.clearActivations(this));
+        activatedNodes.forEach(n -> n.clearActivations(this));
 
         addedActivations.clear();
         addedNodeActivations.clear();
         activatedNeurons.clear();
+        activatedNodes.clear();
         addedNodes.clear();
 
         if(model.lastCleanup[threadId] + CLEANUP_INTERVAL < id) {
