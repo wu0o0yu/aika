@@ -119,7 +119,7 @@
     Neuron cookSurnameEntity = Neuron.init(
             m.createNeuron("E-cook (surname)"),
             3.0, // adjusts the bias
-            RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+            RECTIFIED_HYPERBOLIC_TANGENT,
             EXCITATORY,
             new Synapse.Builder() // Requires the word to be recognized
                     .setSynapseId(0)
@@ -162,7 +162,7 @@
     Neuron.init(
             forenameCategory,
             0.0,
-            RECTIFIED_LINEAR_UNIT_KEY,
+            RECTIFIED_LINEAR_UNIT,
             EXCITATORY,
             new Synapse.Builder() // In this example there is only one forename considered.
                     .setSynapseId(0)
@@ -174,7 +174,7 @@
     Neuron.init(
             surnameCategory,
             0.0,
-            RECTIFIED_LINEAR_UNIT_KEY,
+            RECTIFIED_LINEAR_UNIT,
             EXCITATORY,
             new Synapse.Builder()
                     .setSynapseId(0)
@@ -195,7 +195,7 @@
     Neuron.init(
             inhibitingN,
             0.0,
-            RECTIFIED_LINEAR_UNIT_KEY,
+            RECTIFIED_LINEAR_UNIT,
             INHIBITORY,
             new Synapse.Builder().setNeuron(cookProfessionEntity)
                     .setSynapseId(0)
@@ -304,7 +304,7 @@ The output of this example looks as following. Each line in the table represents
         Neuron pA = Neuron.init(
                 m.createNeuron("A"),
                 3.0,
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
@@ -325,7 +325,7 @@ The output of this example looks as following. Each line in the table represents
         Neuron pB = Neuron.init(
                 m.createNeuron("B"),
                 5.0,
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
@@ -346,7 +346,7 @@ The output of this example looks as following. Each line in the table represents
         Neuron pC = Neuron.init(
                 m.createNeuron("C"),
                 2.0,
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
@@ -368,7 +368,7 @@ The output of this example looks as following. Each line in the table represents
         Neuron.init(
                 inhibN,
                 0.0,
-                RECTIFIED_LINEAR_UNIT_KEY,
+                RECTIFIED_LINEAR_UNIT,
                 INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
@@ -395,7 +395,7 @@ The output of this example looks as following. Each line in the table represents
 
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
                 0.0,
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 EXCITATORY,
                 new Synapse.Builder()
                          .setSynapseId(0)
@@ -473,7 +473,7 @@ The output of this example looks as following. Each line in the table represents
         Neuron pattern = Neuron.init(
                 m.createNeuron("BCDE"),
                 5.0,
-                RECTIFIED_HYPERBOLIC_TANGENT_KEY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
                 EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
