@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Aika: A novel text mining algorithm for processing semantic information</title>
+	<title>Aika: An Artificial Intelligence for Knowledge Acquisition</title>
 	<link rel="stylesheet" href="css/style.css" type="text/css">
 	<link rel="shortcut icon" href="images/favicon.png" />
 
@@ -40,6 +40,9 @@
 				<li>
 					<a href="resources.html">Resources</a>
 				</li>
+				<li>
+					<a href="https://github.com/aika-algorithm/aika">GitHub</a>
+				</li>
 			</ul>
 		</div>
 	</div>
@@ -49,21 +52,21 @@
 			<div>
 				<p>
 					<b>
-					Aika is a Java library that automatically extracts and annotates semantic information into text.
-					In case this information is ambiguous, Aika will generate several hypothetical interpretations concerning the meaning of the text and pick the most likely one.
-					The Aika algorithm is based on various ideas and approaches from the field of AI such as artificial neural networks, frequent pattern mining and
-					logic based expert systems. It can be applied to a broad spectrum of text analysis task and combines these concepts in a single algorithm.
+					Aika is an artificial neural network designed specifically for the processing of natural language texts.
+					A key feature of the Aika algorithm is the ability to evaluate and process various interpretations of the individual sections of a text.
+					Aika combines several ideas and approaches from the field of AI such as artificial neural networks, frequent pattern mining and
+					logic based expert systems. It can be applied to a broad spectrum of text analysis task such as word sense disambiguation,
+					entity resolution, named entity recognition, text classification and information extraction.
 					</b>
 				</p>
 				<p>
-					Aika allows to model linguistic concepts like words, word meanings (entities), categories (e.g. person name, city), grammatical word types and so on as neurons in a neural network.
+					Aika allows to model linguistic concepts like words, word meanings (entities), categories (e.g. person name, city), grammatical word types and so on as neurons in the neural network.
 					By choosing appropriate synapse weights, these neurons can take on different functions within the network. For
 					instance neurons whose synapse weights are chosen to mimic a logical AND can be used to match an exact phrase.
 					On the other hand neurons with an OR characteristic can be used to connect large lists of word entity neurons to determine a category like 'city' or 'profession'.
 				</p>
 				<p>
-					Aika is based on non-monotonic logic, meaning that it first draws tentative conclusions only.
-					In other words, Aika is able to generate multiple mutually exclusive interpretations of a word, phrase, or sentence,
+					Aika is able to generate multiple mutually exclusive interpretations of a word, phrase, or sentence,
 					and select the most likely interpretation.
 					For example a neuron representing a specific meaning of a given word can be linked through a negatively weighted synapse to
 					a neuron representing an alternative meaning of this word. In this case these neurons would exclude each other.

@@ -44,6 +44,9 @@
 			<li>
 				<a href="resources.html">Resources</a>
 			</li>
+            <li>
+                <a href="https://github.com/aika-algorithm/aika">GitHub</a>
+            </li>
 		</ul>
 	</div>
 </div>
@@ -87,7 +90,7 @@
 
 			<h2>Activations</h2>
 			<p>
-				The advantage of having activation objects is that, through them, we are able to cope with the relational
+				The advantage of having activation objects is that, through them, Aika is able to cope with the relational
 				structure of natural language text by making the activation relate to a specific segment of text. In a way
 				these activations can be seen as text annotations that specify either the start and end character
 				or the position of a word (relational id). </br>
@@ -134,20 +137,11 @@
 				overall weights sum of all activations. This sum is also called the objective function \(f\) and can be
                 stated in the following way:
 
-				$$f = {\sum\limits_{j \in Acts}{weight_j} \over \sum\limits_{j \in Acts}{norm_j}}$$
+				$$f = \sum\limits_{j \in Acts}{\min (-g_j, net_j)}$$
 
-				$$weight_j = \min (-g_j^{r-}, net_j)$$
+				$$g_j = \sum\limits_{i = 0, w_{ij} < 0, w_{ij} \in Recurrent}^N{w_{ij}}$$
 
-				$$norm_j = \min (-g_j^{r-}, net_j^{\neg r} + g_j^{r+})$$
-
-				$$g_j^{r+} = \sum\limits_{i = 0, w_{ij} \geq 0, w_{ij} \in Recurrent}^N{w_{ij}}$$
-
-				$$g_j^{r-} = \sum\limits_{i = 0, w_{ij} < 0, w_{ij} \in Recurrent}^N{w_{ij}}$$
-
-				$$net_j^{\neg r} = b_j + \sum\limits_{i = 0, w_{ij} \notin Recurrent}^N{x_i w_{ij}}$$
-
-				The values \(g_j^{r+}\) and \(g_j^{r-}\) are simply the sum of all positive or negative feedback synapses.
-				The value \(net_j^{\neg r}\) is the non recurrent part of the neurons weighted sum.
+				The value \(g_j\) is simply the sum of all negative feedback synapses.
 				The intention behind this objective function is to measure a neurons ability to overcome the inhibiting
 				input signals of other neurons.
 			</p>
@@ -217,51 +211,59 @@
 
             <h2>Synapses</h2>
             <p>
-                Synapses in Aika consist not just of a weight value but also properties to manipulate the text range or
-                the word position. The complete list of synapse properties looks as follows:
+                Synapses in Aika consist not just of a weight value but also properties that specify relations between
+				synapses. These relations can either be used to imply an constrained on the matching input text ranges or
+				the dependency structure of the input activations. Biological neurons seem to achieve such a relation
+				matching through the timing of the firing patterns of their action potentials. <br/>
+				The complete list of synapse properties looks as follows:
             </p>
 
                 <div class="prettyprint-code">
                     <pre class="prettyprint">
 				        <code class="language-java">
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inputNeuron)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setRangeMatch(
+                        .addRangeRelation((
                             Relation.create(
                                 Operator.EQUALS, // A
                                 Operator.NONE,   // B
                                 Operator.EQUALS, // C
                                 Operator.NONE    // D
-                            )
+                            ),
+							1
                         )
-                        .setRangeOutput(true, true),
+                        .setRangeOutput(true, true)
+                        .setIdentity(true)
+                        .addInstanceRelation(InstanceRelation.Type.COMMON_ANCESTOR, 2),
                         </code>
 			        </pre>
                 </div>
             <p>
                 Unlike other ANNs, Aika allows to specify a bias value per synapse. These bias values are simply summed
                 up and added to the neurons bias value. <br/>
-                The property relative rid specifies the relative difference between the relational id (rid) of the input
-                activation and the output activation. The relational id is usually used to store the word position, but
-                might be used for other purposes as well. <br/>
                 The property recurrent states whether this synapse is a feedback loop or not. Depending on the weight
                 of this synapse such a feedback loop might either be positive or negative. This property is an important
                 indicator for the interpretation search. <br/>
-                The property range match compares the input activation range with the output activation range. A range
-                simply describes the start and end character within the documents text. The range match consists of four
-                character position comparisons.
+                Range relations define a relation either to another synapse or to the output range of this activation.
+				The range relations consist of four comparison operations between the between the begin and end of the
+				current synapses input activation and the linked synapses input activation.
             </p>
 
             <div style="text-align:center; width:100%">
                 <img src="images/range-match.svg" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
             </div>
             <p>
-                The last property is the range output which consists of two boolean values. If these are set to true,
+                The next property is the range output which consists of two boolean values. If these are set to true,
                 the range begin and the range end are propagated to the output activation. <br/>
+
+				The last two properties are used to establish a dependency structure among activations. The instance
+				relation here defines whether this synapse and the linked synapse have a common ancestor or are
+				depending on each other in either direction. During the evaluation of this relation only those synapses
+				are followed which are marked with the identity flag.
 
 				Depending on the weight of the synapse and the bias sum of the outgoing neuron, Aika distinguishes two
 				types synapses: conjunctive synapses and disjunctive synapses. Conjunctive synapses are stored in the
@@ -314,7 +316,7 @@
                 exceed their threshold based on this new input. Depending on the synapse weights and bias settings of
                 the outgoing neuron it may either fire directly (for or-gate like neurons) or it may require other input
                 neurons to fire first (for and-gate like neurons). If the neuron is an and-gate like neuron then there
-                is a efficient way to determine only those outgoing neurons that might be activated by a new input signal.
+                is an efficient way to determine only those outgoing neurons that might be activated by a new input signal.
                 <br/> This is where the <a href="https://en.wikipedia.org/wiki/Lattice_(order)" rel="nofollow">pattern lattice</a>
                 comes into play. The pattern lattice is used to store all sub patterns of a given input pattern. If
                 for instance a neuron requires the inputs \(A\), \(B\) and \(C\) to be activated before the neuron itself can be
@@ -328,8 +330,8 @@
                 the two inputs \(A\) and \(B\) are activated by an incoming signal, then the pattern node \(AB\) would
                 be activated as well, but not the pattern node \(ABC\). The advantage of this data structure is that
                 only minimal refinements have to be tested from one level in the pattern lattice to the next. If all
-                neurons that depend on input \(A\) would be tested directly, the number of outgoing neurons might
-                be so large that many unnecessary computations would have to be performed.
+				neurons dependent on input \(A\) were tested directly, the number of outgoing neurons might be so
+				large that many unnecessary calculations would be required.
 
                 But before we can build the pattern lattice, we first have to convert the weighted inputs of the neuron
                 into a boolean representation. Here we only need to distinguish between active and inactive neurons.
