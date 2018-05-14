@@ -40,7 +40,7 @@ import java.util.Map;
 public class SimplePatternMatchingTest {
 
     @Test
-    public void testPatternMatching3() {
+    public void testPatternMatching1() {
         Model m = new Model();
 
         Map<Character, Neuron> inputNeurons = new HashMap<>();
@@ -122,7 +122,7 @@ public class SimplePatternMatchingTest {
 
 
     @Test
-    public void testPatternMatching4() {
+    public void testPatternMatching2() {
         Model m = new Model();
 
         Map<Character, Neuron> inputNeurons = new HashMap<>();
@@ -192,7 +192,7 @@ public class SimplePatternMatchingTest {
         // Computes the best interpretation
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).activations.size());
+        Assert.assertEquals(1, pattern.getActivations(doc, false).size());
 
 
         System.out.println("Output activation:");

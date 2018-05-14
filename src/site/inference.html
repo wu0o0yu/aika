@@ -211,9 +211,11 @@
 
             <h2>Synapses</h2>
             <p>
-                Synapses in Aika consist not just of a weight value but also properties to specify relations between
+                Synapses in Aika consist not just of a weight value but also properties that specify relations between
 				synapses. These relations can either be used to imply an constrained on the matching input text ranges or
-				the dependency structure of the input activations. The complete list of synapse properties looks as follows:
+				the dependency structure of the input activations. Biological neurons seem to achieve such a relation
+				matching through the timing of the firing patterns of their action potentials. <br/>
+				The complete list of synapse properties looks as follows:
             </p>
 
                 <div class="prettyprint-code">
@@ -246,17 +248,22 @@
                 The property recurrent states whether this synapse is a feedback loop or not. Depending on the weight
                 of this synapse such a feedback loop might either be positive or negative. This property is an important
                 indicator for the interpretation search. <br/>
-                The property range match compares the input activation range with the output activation range. A range
-                simply describes the start and end character within the documents text. The range match consists of four
-                character position comparisons.
+                Range relations define a relation either to another synapse or to the output range of this activation.
+				The range relations consist of four comparison operations between the between the begin and end of the
+				current synapses input activation and the linked synapses input activation.
             </p>
 
             <div style="text-align:center; width:100%">
                 <img src="images/range-match.svg" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
             </div>
             <p>
-                The last property is the range output which consists of two boolean values. If these are set to true,
+                The next property is the range output which consists of two boolean values. If these are set to true,
                 the range begin and the range end are propagated to the output activation. <br/>
+
+				The last two properties are used to establish a dependency structure among activations. The instance
+				relation here defines whether this synapse and the linked synapse have a common ancestor or are
+				depending on each other in either direction. During the evaluation of this relation only those synapses
+				are followed which are marked with the identity flag.
 
 				Depending on the weight of the synapse and the bias sum of the outgoing neuron, Aika distinguishes two
 				types synapses: conjunctive synapses and disjunctive synapses. Conjunctive synapses are stored in the

@@ -120,35 +120,35 @@
             m.createNeuron("E-cook (surname)"),
             3.0, // adjusts the bias
             RECTIFIED_HYPERBOLIC_TANGENT_KEY,
-            INeuron.Type.EXCITATORY,
+            EXCITATORY,
             new Synapse.Builder() // Requires the word to be recognized
+                    .setSynapseId(0)
                     .setNeuron(inputNeurons.get("cook"))
                     .setWeight(10.0)
                     // This input requires the input activation to have an
                     // activation value of at least 0.9
                     .setBias(-10.0)
-                    .setRelativeRid(0) // references the current word
                     .setRecurrent(false)
-                    .setRangeMatch(EQUALS)
                     .setRangeOutput(true),
             new Synapse.Builder() // The previous word needs to be a forename
+                    .setSynapseId(1)
                     .setNeuron(forenameCategory)
                     .setWeight(5.0)
                     .setBias(0.0)
-                    .setRelativeRid(-1) // references the previous word
+                    .addRangeRelation(END_TO_BEGIN_EQUALS, 0) // references the previous word
                     .setRecurrent(true) // this input is a positive feedback loop
-                    .setRangeMatch(NONE)
                     .setRangeOutput(false),
 
                     // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
                     // self suppression taking place even though 'E-cook (surname)' is also contained
                     // in the inhibitingN.
             new Synapse.Builder()
+                    .setSynapseId(2)
                     .setNeuron(inhibitingN)
                     .setWeight(-100.0)
                     .setBias(0.0)
                     .setRecurrent(true) // this input is a negative feedback loop
-                    .setRangeMatch(CONTAINS)
+                    .addRangeRelation(OVERLAPS, 0)
     );
                 </code>
 			</pre>
@@ -163,26 +163,24 @@
             forenameCategory,
             0.0,
             RECTIFIED_LINEAR_UNIT_KEY,
-            INeuron.Type.EXCITATORY,
+            EXCITATORY,
             new Synapse.Builder() // In this example there is only one forename considered.
+                    .setSynapseId(0)
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(1.0)
                     .setBias(0.0)
-                    .setRelativeRid(0)
-                    .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
     );
     Neuron.init(
             surnameCategory,
             0.0,
             RECTIFIED_LINEAR_UNIT_KEY,
-            INeuron.Type.EXCITATORY,
+            EXCITATORY,
             new Synapse.Builder()
+                    .setSynapseId(0)
                     .setNeuron(cookSurnameEntity)
                     .setWeight(1.0)
                     .setBias(0.0)
-                    .setRelativeRid(0)
-                    .setRangeMatch(EQUALS)
                     .setRangeOutput(true)
     );
                 </code>
@@ -198,30 +196,30 @@
             inhibitingN,
             0.0,
             RECTIFIED_LINEAR_UNIT_KEY,
-            INeuron.Type.INHIBITORY,
+            INHIBITORY,
             new Synapse.Builder().setNeuron(cookProfessionEntity)
+                    .setSynapseId(0)
                     .setWeight(1.0)
                     .setBias(0.0)
-                    .setRangeMatch(EQUALS)
-                    .setRangeOutput(true),
+                    .setRangeOutput(true, true),
             new Synapse.Builder()
+                    .setSynapseId(1)
                     .setNeuron(cookSurnameEntity)
                     .setWeight(1.0)
                     .setBias(0.0)
-                    .setRangeMatch(EQUALS)
-                    .setRangeOutput(true),
+                    .setRangeOutput(true, true),
             new Synapse.Builder()
+                    .setSynapseId(2)
                     .setNeuron(jacksonCityEntity)
                     .setWeight(1.0)
                     .setBias(0.0)
-                    .setRangeMatch(EQUALS)
-                    .setRangeOutput(true),
+                    .setRangeOutput(true, true),
             new Synapse.Builder()
+                    .setSynapseId(3)
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(1.0)
                     .setBias(0.0)
-                    .setRangeMatch(EQUALS)
-                    .setRangeOutput(true)
+                    .setRangeOutput(true, true)
         );
                 </code>
 			</pre>
@@ -235,14 +233,12 @@
     Document doc = m.createDocument("mr. jackson cook was born in new york ");
 
     int i = 0;
-    int wordPos = 0;
     for(String w: doc.getContent().split(" ")) {
         int j = i + w.length();
 
         // Feed the individual words as inputs into the network.
-        inputNeurons.get(w).addInput(doc, i, j, wordPos);
+        inputNeurons.get(w).addInput(doc, i, j);
         i = j + 1;
-        wordPos++;
     }
 
     // Search for the best interpretation of this text.
@@ -260,20 +256,20 @@ The output of this example looks as following. Each line in the table represents
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-// Activation ID - Final Decision - Range - Neuron Label - Relational ID (Word Pos.) - Upper Bound
+// Activation ID - Final Decision - Range - Neuron Label - Upper Bound
 // - Final Value | Final Weight | Final Norm - Input Value | Target Value
 
     ...
-7  - SELECTED - (4,11)  - INHIB                - RID:null - UB:2.0 - V:1.0 W:0.0 N:0.0
-3  - EXCLUDED - (4,11)  - E-jackson (city)     - RID:null - UB:1.0 -
-10 - SELECTED - (4,11)  - C-forename           - RID:1    - UB:1.0 - V:1.0 W:0.0 N:0.0
-1  - SELECTED - (4,11)  - W-jackson            - RID:1    - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
-5  - SELECTED - (4,11)  - E-jackson (forename) - RID:1    - UB:1.0 - V:1.0 W:8.0 N:8.0
-20 - SELECTED - (12,16) - INHIB                - RID:null - UB:2.0 - V:1.0 W:0.0 N:0.0
-16 - EXCLUDED - (12,16) - E-cook (profession)  - RID:null - UB:1.0 -
-23 - SELECTED - (12,16) - C-surname            - RID:2    - UB:1.0 - V:1.0 W:0.0 N:0.0
-14 - SELECTED - (12,16) - W-cook               - RID:2    - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
-18 - SELECTED - (12,16) - E-cook (surname)     - RID:2    - UB:1.0 - V:1.0 W:8.0 N:8.0
+7  - SELECTED - (4,11)  - INHIB                - UB:2.0 - V:1.0 W:0.0 N:0.0
+3  - EXCLUDED - (4,11)  - E-jackson (city)     - UB:1.0 -
+10 - SELECTED - (4,11)  - C-forename           - UB:1.0 - V:1.0 W:0.0 N:0.0
+1  - SELECTED - (4,11)  - W-jackson            - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
+5  - SELECTED - (4,11)  - E-jackson (forename) - UB:1.0 - V:1.0 W:8.0 N:8.0
+20 - SELECTED - (12,16) - INHIB                - UB:2.0 - V:1.0 W:0.0 N:0.0
+16 - EXCLUDED - (12,16) - E-cook (profession)  - UB:1.0 -
+23 - SELECTED - (12,16) - C-surname            - UB:1.0 - V:1.0 W:0.0 N:0.0
+14 - SELECTED - (12,16) - W-cook               - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
+18 - SELECTED - (12,16) - E-cook (surname)     - UB:1.0 - V:1.0 W:8.0 N:8.0
     ...
 
  Final SearchNode:27  WeightSum:W:16.0 N:26.0
@@ -309,60 +305,63 @@ The output of this example looks as following. Each line in the table represents
                 m.createNeuron("A"),
                 3.0,
                 RECTIFIED_HYPERBOLIC_TANGENT_KEY,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(EQUALS, 0)
         );
 
         Neuron pB = Neuron.init(
                 m.createNeuron("B"),
                 5.0,
                 RECTIFIED_HYPERBOLIC_TANGENT_KEY,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(EQUALS, 0)
         );
 
         Neuron pC = Neuron.init(
                 m.createNeuron("C"),
                 2.0,
                 RECTIFIED_HYPERBOLIC_TANGENT_KEY,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inC)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .setRangeMatch(Range.Relation.EQUALS)
+                        .addRangeRelation(EQUALS, 0)
         );
 
         // Finally addInput all the inputs to the suppressing neuron.
@@ -370,40 +369,40 @@ The output of this example looks as following. Each line in the table represents
                 inhibN,
                 0.0,
                 RECTIFIED_LINEAR_UNIT_KEY,
-                INeuron.Type.INHIBITORY,
+                INHIBITORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(pA)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(pB)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(pC)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
                 0.0,
                 RECTIFIED_HYPERBOLIC_TANGENT_KEY,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
+                         .setSynapseId(0)
                         .setNeuron(pB)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeMatch(Range.Relation.EQUALS)
                         .setRangeOutput(true)
         );
 
@@ -434,17 +433,17 @@ The output of this example looks as following. Each line in the table represents
 
 			<pre class="prettyprint">
 				<code class="language-java">
-// Activation ID - Final Decision - Range - Neuron Label - Relational ID (Word Pos.) - Upper Bound
+// Activation ID - Final Decision - Range - Neuron Label - Upper Bound
 // - Final Value | Final Weight | Final Norm - Input Value | Target Value
 
-0  - SELECTED - (0,1) - IN-A  - RID:null - UB:1.0   - V:1.0 W:0.0 N:0.0 - IV:1.0
-6  - SELECTED - (0,1) - IN-B  - RID:null - UB:1.0   - V:1.0 W:0.0 N:0.0 - IV:1.0
-11 - SELECTED - (0,1) - IN-C  - RID:null - UB:1.0   - V:1.0 W:0.0 N:0.0 - IV:1.0
-4  - SELECTED - (0,1) - INHIB - RID:null - UB:2.959 - V:1.0 W:0.0 N:0.0
-2  - EXCLUDED - (0,1) - A     - RID:null - UB:0.995 -
-8  - SELECTED - (0,1) - B     - RID:null - UB:1.0   - V:1.0 W:5.0 N:5.0
-13 - EXCLUDED - (0,1) - C     - RID:null - UB:0.964 -
-10 - SELECTED - (0,1) - OUT   - RID:null - UB:0.762 - V:0.762 W:0.0 N:0.0
+0  - SELECTED - (0,1) - IN-A  - UB:1.0   - V:1.0 W:0.0 N:0.0 - IV:1.0
+6  - SELECTED - (0,1) - IN-B  - UB:1.0   - V:1.0 W:0.0 N:0.0 - IV:1.0
+11 - SELECTED - (0,1) - IN-C  - UB:1.0   - V:1.0 W:0.0 N:0.0 - IV:1.0
+4  - SELECTED - (0,1) - INHIB - UB:2.959 - V:1.0 W:0.0 N:0.0
+2  - EXCLUDED - (0,1) - A     - UB:0.995 -
+8  - SELECTED - (0,1) - B     - UB:1.0   - V:1.0 W:5.0 N:5.0
+13 - EXCLUDED - (0,1) - C     - UB:0.964 -
+10 - SELECTED - (0,1) - OUT   - UB:0.762 - V:0.762 W:0.0 N:0.0
 
  Final SearchNode:10  WeightSum:W:5.0 N:10.0
 				</code>
@@ -471,44 +470,39 @@ The output of this example looks as following. Each line in the table represents
             inputNeurons.put(c, in);
         }
 
-        // Create a pattern neuron with the relational neurons as input. The numbers that are
-        // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
-        // of the inputs relative to each other. The following flag specifies whether this relativeRid
-        // is relative or absolute.
         Neuron pattern = Neuron.init(
                 m.createNeuron("BCDE"),
                 5.0,
                 RECTIFIED_HYPERBOLIC_TANGENT_KEY,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
+                        .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRelativeRid(0)
-                        .setRangeMatch(Operator.EQUALS, Operator.GREATER_THAN_EQUAL)
+                        .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 1)
                         .setRangeOutput(true, false),
                 new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRelativeRid(1)
-                        .setRangeMatch(Range.Relation.CONTAINS),
+                        .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 2),
                 new Synapse.Builder()
+                        .setSynapseId(2)
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRelativeRid(2)
-                        .setRangeMatch(Range.Relation.CONTAINS),
+                        .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 3),
                 new Synapse.Builder()
+                        .setSynapseId(3)
                         .setNeuron(inputNeurons.get('e'))
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRelativeRid(3)
-                        .setRangeMatch(Operator.LESS_THAN_EQUAL, Operator.EQUALS)
                         .setRangeOutput(false, true)
         );
 
@@ -517,28 +511,24 @@ The output of this example looks as following. Each line in the table represents
         Document doc = m.createDocument("a b c d e ", 0);
 
         // Then add the characters
-        int wordPos = 0;
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).addInput(doc, i, i + 1, wordPos);
-            } else {
-                wordPos++;
+                inputNeurons.get(c).addInput(doc, i, i + 1);
             }
         }
 
         // Computes the best interpretation
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).activations.size());
+        Assert.assertEquals(1, pattern.getActivations(doc, false).size());
 
 
         System.out.println("Output activation:");
         INeuron n = pattern.get();
-        for(NodeActivation act: n.getActivations(doc)) {
+        for(NodeActivation act: n.getActivations(doc, true)) {
             System.out.println("Text Range: " + act.key.range);
             System.out.println("Node: " + act.key.node);
-            System.out.println("Rid: " + act.key.rid);
             System.out.println();
         }
 
@@ -558,18 +548,17 @@ The output of this example looks as following. Each line in the table represents
 Output activation:
 Text Range: (2,9)
 Node: BCDE - OR[0:AND[(-1:I[3,b|),(1:I|5,c|),(2:I|7,d|),(3:I|9,e])]]
-Rid: 1
 
 All activations:
-//Activation ID - Final Decision - Range - Neuron Label - Relational ID (Word Pos.)
+//Activation ID - Final Decision - Range - Neuron Label
 //- Upper Bound - Final Value | Final Weight | Final Norm - Input Value | Target Value
 
-0  - SELECTED - (0,1) - a    - RID:0 - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
-1  - SELECTED - (2,3) - b    - RID:1 - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
-20 - SELECTED - (2,9) - BCDE - RID:1 - UB:1.0 - V:1.0 W:0.0 N:0.0
-3  - SELECTED - (4,5) - c    - RID:2 - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
-6  - SELECTED - (6,7) - d    - RID:3 - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
-11 - SELECTED - (8,9) - e    - RID:4 - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
+0  - SELECTED - (0,1) - a    - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
+1  - SELECTED - (2,3) - b    - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
+20 - SELECTED - (2,9) - BCDE - UB:1.0 - V:1.0 W:0.0 N:0.0
+3  - SELECTED - (4,5) - c    - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
+6  - SELECTED - (6,7) - d    - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
+11 - SELECTED - (8,9) - e    - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
 
  Final SearchNode:1  WeightSum:W:0.0 N:0.0
 				</code>
