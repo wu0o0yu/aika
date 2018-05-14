@@ -79,6 +79,35 @@
 
 			<h2>Release Notes</h2>
 
+			<h3>Aika Version 0.17 (2018-05-14)</h3>
+			<ul>
+				<li>
+					Introduction of synapse relations. Previously the relation between synapses was implicitly modeled
+					through word positions (RIDs). Now it is possible to explicitly model relations like: The end position of
+					input activation 1 equals to the begin position of input activation 2. Two types of relations are
+					currently supported, range relations and instance relations. Range relations compare the input
+					activation range of a given synapse with that of the linked synapse. Instance relations also compare
+					the input activations of two synapses, but instead of the ranges the dependency relations of these
+					activations are compared.
+				</li>
+				<li>
+					Removed the norm term from the interpretation objective function.
+				</li>
+				<li>
+					Introduced an optional distance function to synapses. It allows to model a weakening signal depending
+					on the distance of the activation ranges.
+				</li>
+				<li>
+					Example implementation of a context free grammar.
+				</li>
+				<li>
+					Example implementation for co-reference resolution.
+				</li>
+				<li>
+					Work on an syllable identification experiment based on the meta network implementation.
+				</li>
+			</ul>
+
 			<h3>Aika Version 0.15 (2018-03-16)</h3>
 			<ul>
 				<li>
