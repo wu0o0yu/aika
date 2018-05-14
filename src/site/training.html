@@ -188,15 +188,14 @@
         	<pre class="prettyprint">
 				<code class="language-java">
 			new MetaSynapse.Builder()
+				.setSynapseId(1)
 				.setNeuron(wordInhib)
 				.setWeight(20.0)
 				.setBias(-20.0)
-				.setRelativeRid(0)
-				.setRangeMatch(EQUALS)
-				.setRangeOutput(false),
+				.addRangeRelation(Range.Relation.BEGIN_TO_END_EQUALS, 0)
+				.setRangeOutput(false)
 				.setMetaWeight(20.0)
 				.setMetaBias(-20.0)
-				.setMetaRelativeRid(true)
         		</code>
 			</pre>
 		</div>

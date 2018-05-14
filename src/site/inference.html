@@ -211,37 +211,38 @@
 
             <h2>Synapses</h2>
             <p>
-                Synapses in Aika consist not just of a weight value but also properties to manipulate the text range or
-                the word position. The complete list of synapse properties looks as follows:
+                Synapses in Aika consist not just of a weight value but also properties to specify relations between
+				synapses. These relations can either be used to imply an constrained on the matching input text ranges or
+				the dependency structure of the input activations. The complete list of synapse properties looks as follows:
             </p>
 
                 <div class="prettyprint-code">
                     <pre class="prettyprint">
 				        <code class="language-java">
                 new Synapse.Builder()
+						.setSynapseId(0)
                         .setNeuron(inputNeuron)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRelativeRid(0)
                         .setRecurrent(false)
-                        .setRangeMatch(
+                        .addRangeRelation((
                             Relation.create(
                                 Operator.EQUALS, // A
                                 Operator.NONE,   // B
                                 Operator.EQUALS, // C
                                 Operator.NONE    // D
-                            )
+                            ),
+							1
                         )
-                        .setRangeOutput(true, true),
+                        .setRangeOutput(true, true)
+						.setIdentity(true)
+						.addInstanceRelation(InstanceRelation.Type.COMMON_ANCESTOR, 2),
                         </code>
 			        </pre>
                 </div>
             <p>
                 Unlike other ANNs, Aika allows to specify a bias value per synapse. These bias values are simply summed
                 up and added to the neurons bias value. <br/>
-                The property relative rid specifies the relative difference between the relational id (rid) of the input
-                activation and the output activation. The relational id is usually used to store the word position, but
-                might be used for other purposes as well. <br/>
                 The property recurrent states whether this synapse is a feedback loop or not. Depending on the weight
                 of this synapse such a feedback loop might either be positive or negative. This property is an important
                 indicator for the interpretation search. <br/>
