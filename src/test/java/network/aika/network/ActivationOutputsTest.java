@@ -25,21 +25,14 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Range;
-import network.aika.neuron.activation.Range.Operator;
-import network.aika.lattice.InputNode;
 import network.aika.lattice.Node;
-import network.aika.neuron.activation.Selector;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Collection;
 import java.util.Set;
 
-import static network.aika.neuron.activation.Range.Relation.END_TO_BEGIN_EQUALS;
 import static network.aika.neuron.activation.Range.Relation.EQUALS;
-import static network.aika.neuron.activation.Range.Operator.GREATER_THAN_EQUAL;
-import static network.aika.neuron.activation.Range.Operator.LESS_THAN_EQUAL;
-import static network.aika.neuron.activation.Range.Operator.NONE;
 
 
 /**

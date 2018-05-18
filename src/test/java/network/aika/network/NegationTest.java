@@ -26,7 +26,6 @@ import network.aika.neuron.*;
 import network.aika.neuron.activation.Range.Relation;
 import network.aika.neuron.activation.Range;
 import network.aika.lattice.OrNode;
-import network.aika.neuron.activation.Selector;
 import org.junit.Assert;
 import org.junit.Test;
 

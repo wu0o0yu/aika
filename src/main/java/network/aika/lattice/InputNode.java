@@ -29,7 +29,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.training.PatternDiscovery;
 import network.aika.lattice.AndNode.AndActivation;
 import network.aika.lattice.InputNode.InputActivation;
-import network.aika.neuron.activation.Selector;
 import network.aika.lattice.AndNode.Refinement;
 import network.aika.lattice.AndNode.RefValue;
 import network.aika.lattice.AndNode.RelationsMap;
