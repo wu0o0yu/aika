@@ -51,6 +51,7 @@ public final class Activation extends OrActivation {
 
     public double upperBound;
     public double lowerBound;
+    public double maxWeight;
 
     public Rounds rounds = new Rounds();
     public Rounds finalRounds = rounds;
@@ -211,6 +212,8 @@ public final class Activation extends OrActivation {
 
         // Compute only the recurrent part is above the threshold.
         double newWeight = decision == SELECTED ? Math.max(0.0, w) : 0.0;
+
+        maxWeight = Math.max(maxWeight, newWeight);
 
         if(decision == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS) {
             return new State(
@@ -691,6 +694,8 @@ public final class Activation extends OrActivation {
 
         sb.append(" - UB:");
         sb.append(Utils.round(upperBound));
+        sb.append(" MW:");
+        sb.append(Utils.round(maxWeight));
 
         sb.append(" - ");
         if(finalOnly) {
