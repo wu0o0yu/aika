@@ -88,7 +88,7 @@ public class RangeRelation extends Relation {
 
         Collection<Activation> results;
         if(isExact()) {
-            results =getActivationsByRangeEquals(th, r, relation);
+            results = getActivationsByRangeEquals(th, r, relation);
         } else if (((relation.beginToBegin.isGreaterThanOrGreaterThanEqual() || relation.beginToEnd.isGreaterThanOrGreaterThanEqual())) && r.begin <= r.end) {
             results = getActivationsByRangeBeginGreaterThan(th, r, relation);
         } else if (((relation.endToEnd.isGreaterThanOrGreaterThanEqual() || relation.endToBegin.isGreaterThanOrGreaterThanEqual())) && r.begin >= r.end) {
@@ -261,6 +261,28 @@ public class RangeRelation extends Relation {
                     new INeuron.ActKey(new Range(Integer.MIN_VALUE, key), Integer.MIN_VALUE),
                     true,
                     new INeuron.ActKey(new Range(Integer.MAX_VALUE, key), Integer.MAX_VALUE),
+                    true
+            ).values();
+        }
+        throw new RuntimeException("Invalid Range Relation");
+    }
+
+
+    public static Collection<Activation> getActivationsByRangeEquals(Document doc, Range r, Range.Relation rr) {
+        if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS) {
+            int key = rr.beginToBegin == EQUALS ? r.begin : r.end;
+            return doc.activationsByRangeBegin.subMap(
+                    new Document.ActKey(new Range(key, Integer.MIN_VALUE), Node.MIN_NODE, Integer.MIN_VALUE),
+                    true,
+                    new Document.ActKey(new Range(key, Integer.MAX_VALUE), Node.MAX_NODE, Integer.MAX_VALUE),
+                    true
+            ).values();
+        } else if(rr.endToEnd == EQUALS || rr.endToBegin == EQUALS) {
+            int key = rr.endToEnd == EQUALS ? r.end : r.begin;
+            return doc.activationsByRangeEnd.subMap(
+                    new Document.ActKey(new Range(Integer.MIN_VALUE, key), Node.MIN_NODE, Integer.MIN_VALUE),
+                    true,
+                    new Document.ActKey(new Range(Integer.MAX_VALUE, key), Node.MAX_NODE, Integer.MAX_VALUE),
                     true
             ).values();
         }

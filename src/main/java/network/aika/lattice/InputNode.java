@@ -19,8 +19,11 @@ package network.aika.lattice;
 
 import network.aika.Document;
 import network.aika.Model;
+import network.aika.Provider;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Range;
+import network.aika.neuron.relation.RangeRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
 import network.aika.training.PatternDiscovery;
@@ -37,6 +40,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.Range.Relation.*;
+
 
 /**
  * The {@code InputNode} class is the input layer for the boolean logic. The input-node has two sources of
@@ -49,6 +54,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
     public Neuron inputNeuron;
 
+    public TreeMap<AndNode.Refinement, AndNode.RefValue> nonExactAndChildren;
 
     private long visitedDiscover;
 
@@ -100,6 +106,36 @@ public class InputNode extends Node<InputNode, InputActivation> {
     }
 
 
+    void addAndChild(AndNode.Refinement ref, AndNode.RefValue child) {
+        super.addAndChild(ref, child);
+
+        if(!ref.relations.isExact()) {
+            if (nonExactAndChildren == null) {
+                nonExactAndChildren = new TreeMap<>();
+            }
+
+            AndNode.RefValue n = nonExactAndChildren.put(ref, child);
+            assert n == null;
+        }
+    }
+
+
+    void removeAndChild(AndNode.Refinement ref) {
+        super.removeAndChild(ref);
+
+        if(!ref.relations.isExact()) {
+            if (nonExactAndChildren != null) {
+                nonExactAndChildren.remove(ref);
+
+                if (nonExactAndChildren.isEmpty()) {
+                    nonExactAndChildren = null;
+                }
+            }
+        }
+    }
+
+
+
     public RefValue extend(int threadId, Document doc, Refinement ref) {
         if(ref.relations.size() == 0) return null;
 
@@ -133,18 +169,44 @@ public class InputNode extends Node<InputNode, InputActivation> {
         try {
             lock.acquireReadLock();
             if (andChildren != null) {
-                andChildren.forEach((ref, rv) -> {
-                    InputNode in = ref.input.getIfNotSuspended();
-                    if (in != null) {
-                        addNextLevelActivations(in, ref, rv.child.get(act.doc), act);
-                    }
-                });
+                TreeMap<AndNode.Refinement, AndNode.RefValue> children;
+                if(andChildren.size() > 10) {
+                    children = nonExactAndChildren;
+                    applyExactRelations(act);
+                } else {
+                    children = andChildren;
+                }
+
+                if(children != null) {
+                    children.forEach((ref, rv) -> {
+                        InputNode in = ref.input.getIfNotSuspended();
+                        if (in != null) {
+                            addNextLevelActivations(in, ref, rv.child.get(act.doc), act);
+                        }
+                    });
+                }
             }
         } finally {
             lock.releaseReadLock();
         }
 
         OrNode.processCandidate(this, act, false);
+    }
+
+
+    private void applyExactRelations(InputActivation act) {
+        Activation iAct = act.input.input;
+
+        for(Range.Relation rel: new Range.Relation[] {BEGIN_EQUALS, END_EQUALS, BEGIN_TO_END_EQUALS, END_TO_BEGIN_EQUALS}) {
+            for(Activation linkedAct: RangeRelation.getActivationsByRangeEquals(act.doc, iAct.range, rel)) {
+                Provider<InputNode> in = linkedAct.getINeuron().outputNode;
+                for (Map.Entry<AndNode.Refinement, AndNode.RefValue> me : andChildren.subMap(
+                        new Refinement(RelationsMap.MIN, in),
+                        new Refinement(RelationsMap.MAX, in)).entrySet()) {
+                    addNextLevelActivations(in.get(act.doc), me.getKey(), me.getValue().child.get(act.doc), act);
+                }
+            }
+        }
     }
 
 
