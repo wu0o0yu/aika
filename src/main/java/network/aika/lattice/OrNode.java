@@ -21,11 +21,8 @@ import network.aika.*;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Linker;
 import network.aika.training.PatternDiscovery;
-import network.aika.*;
 import network.aika.Document;
 import network.aika.neuron.activation.Range;
 import org.slf4j.Logger;
@@ -48,7 +45,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
     private static final Logger log = LoggerFactory.getLogger(OrNode.class);
 
-    public TreeSet<OrEntry> parents = new TreeSet<>();
+    public TreeSet<OrEntry> andParents = new TreeSet<>();
 
     public Neuron neuron = null;
 
@@ -179,7 +176,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
     @Override
     public void reprocessInputs(Document doc) {
-        for (OrEntry oe : parents) {
+        for (OrEntry oe : andParents) {
             Node<?, NodeActivation<?>> pn = oe.parent.get();
             for (NodeActivation act : pn.getActivations(doc)) {
                 act.repropagateV = markedCreated;
@@ -189,17 +186,19 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    public void addInput(int[] synapseIds, int threadId, Node in) {
+    public void addInput(int[] synapseIds, int threadId, Node in, boolean andMode) {
         in.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), 1);
 
         OrEntry oe = new OrEntry(synapseIds, in.provider, provider);
         in.addOrChild(oe);
         in.setModified();
 
-        lock.acquireWriteLock();
-        setModified();
-        parents.add(oe);
-        lock.releaseWriteLock();
+        if(andMode) {
+            lock.acquireWriteLock();
+            setModified();
+            andParents.add(oe);
+            lock.releaseWriteLock();
+        }
     }
 
 
@@ -218,13 +217,13 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     public void removeParents(int threadId) {
-        for (OrEntry oe : parents) {
+        for (OrEntry oe : andParents) {
             Node pn = oe.parent.get();
             pn.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), -1);
             pn.removeOrChild(oe);
             pn.setModified();
         }
-        parents.clear();
+        andParents.clear();
     }
 
 
@@ -239,7 +238,7 @@ public class OrNode extends Node<OrNode, Activation> {
         sb.append("OR[");
         boolean first = true;
         int i = 0;
-        for(OrEntry oe : parents) {
+        for(OrEntry oe : andParents) {
             if (!first) {
                 sb.append(",");
             }
@@ -266,8 +265,8 @@ public class OrNode extends Node<OrNode, Activation> {
 
         out.writeInt(neuron.id);
 
-        out.writeInt(parents.size());
-        for(OrEntry oe: parents) {
+        out.writeInt(andParents.size());
+        for(OrEntry oe: andParents) {
             oe.write(out);
         }
     }
@@ -281,7 +280,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
-            parents.add(OrEntry.read(in, m));
+            andParents.add(OrEntry.read(in, m));
         }
     }
 

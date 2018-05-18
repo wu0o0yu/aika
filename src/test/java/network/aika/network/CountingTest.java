@@ -20,10 +20,8 @@ package network.aika.network;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.Writable;
-import network.aika.lattice.AndNode;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.*;
 import network.aika.training.PatternDiscovery;
 import network.aika.training.PatternDiscovery.Config;
 import network.aika.lattice.NodeActivation;
@@ -34,8 +32,6 @@ import org.junit.Test;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-
-import static network.aika.neuron.activation.Range.Relation.EQUALS;
 
 /**
  *
@@ -92,7 +88,7 @@ public class CountingTest {
                         .setRefinementFactory((act, x, secondAct, secondX) -> null)
                         .setCounter(act -> count(act))
         );
-        Assert.assertEquals(6.0, ((NodeStatistic) outA.get().node.get().parents.first().parent.get().statistic).frequency, 0.001);
+        Assert.assertEquals(6.0, ((NodeStatistic) inA.get().outputNode.get().statistic).frequency, 0.001);
     }
 
 

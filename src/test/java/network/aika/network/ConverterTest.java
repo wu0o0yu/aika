@@ -79,14 +79,14 @@ public class ConverterTest {
         );
 
         System.out.println(out.get().node.get().logicToString());
-        Assert.assertEquals(1, out.get().node.get().parents.size());
+        Assert.assertEquals(1, out.get().node.get().andParents.size());
 
         out.get().setBias(-8.5);
         Converter.convert(0, null, out.get(), out.get().inputSynapses.values());
 
         System.out.println(out.get().node.get().logicToString());
 
-        Assert.assertEquals(1, out.get().node.get().parents.size());
+        Assert.assertEquals(1, out.get().node.get().andParents.size());
     }
 
 
@@ -136,7 +136,7 @@ public class ConverterTest {
         );
 
         System.out.println(out.get().node.get().logicToString());
-        Assert.assertEquals(1, out.get().node.get().parents.size());
+        Assert.assertEquals(1, inA.get().outputNode.get().orChildren.size());
     }
 
 
@@ -196,14 +196,14 @@ public class ConverterTest {
 
         System.out.println(out.get().node.get().logicToString());
 
-        Assert.assertEquals(2, out.get().node.get().parents.size());
+        Assert.assertEquals(2, out.get().node.get().andParents.size());
 
 
         inD.inMemoryOutputSynapses.firstEntry().getValue().weightDelta = -1.5f;
 
         Converter.convert( 0, null, out.get(), out.get().inputSynapses.values());
         System.out.println(out.get().node.get().logicToString());
-        Assert.assertEquals(1, out.get().node.get().parents.size());
+        Assert.assertEquals(1, out.get().node.get().andParents.size());
 
     }
 
@@ -254,7 +254,7 @@ public class ConverterTest {
         );
 
         System.out.println(out.get().node.get().logicToString());
-        Assert.assertEquals(3, out.get().node.get().parents.size());
+        Assert.assertEquals(3, out.get().node.get().andParents.size());
 
     }
 

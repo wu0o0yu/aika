@@ -122,7 +122,7 @@ public class Converter {
             outputNode.removeParents(threadId);
 
             if (noFurtherRefinement || i == MAX_AND_NODE_SIZE) {
-                outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node);
+                outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node, true);
             } else {
                 for (Synapse s : candidates) {
                     boolean belowThreshold = sum + s.weight + remainingSum + neuron.posRecSum + neuron.biasSum <= 0.0;
@@ -133,7 +133,7 @@ public class Converter {
                     if (!reqSyns.contains(s)) {
                         NodeContext nlNodeContext = expandNode(nodeContext, s);
                         if(nlNodeContext != null) {
-                            outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node);
+                            outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, true);
                             remainingSum -= s.weight;
                         }
                     }
@@ -143,7 +143,7 @@ public class Converter {
             for (Synapse s : modifiedSynapses) {
                 if (s.weight + neuron.posRecSum + neuron.biasSum > 0.0) {
                     NodeContext nlNodeContext = expandNode(nodeContext, s);
-                    outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node);
+                    outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
                 }
             }
         }
