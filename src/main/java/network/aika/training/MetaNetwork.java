@@ -106,12 +106,16 @@ public class MetaNetwork {
 
 
     private static Activation getMetaNeuronAct(Activation inhibAct) {
+        Activation maxMeta = null;
+
         for(Activation.Link l: inhibAct.getFinalInputActivationLinks()) {
             if(l.input.getINeuron().type == INeuron.Type.META) {
-                return l.input;
+                if(maxMeta == null || maxMeta.getFinalState().value < l.input.getFinalState().value) {
+                    maxMeta = l.input;
+                }
             }
         }
-        return null;
+        return maxMeta;
     }
 
 

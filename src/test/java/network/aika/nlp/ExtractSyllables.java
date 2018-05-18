@@ -26,7 +26,7 @@ public class ExtractSyllables {
 
     public Neuron documentN;
     public Neuron letterInhib;
-    public Neuron syllableInhib;
+    public Neuron syllableInhibAll;
 
     public Map<Character, Neuron> inputLetters = new HashMap<>();
 
@@ -37,9 +37,11 @@ public class ExtractSyllables {
         documentN = model.createNeuron("DOCUMENT");
 
         letterInhib = model.createNeuron("S-LETTER");
-        syllableInhib = model.createNeuron("S-SYLLABLE");
+        syllableInhibAll = model.createNeuron("S-SYLLABLE-ALL");
+        Neuron.init(syllableInhibAll, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
 
         for(int i = 2; i < 6; i++) {
+            Neuron syllableInhib = model.createNeuron("S-SYLLABLE-" + i);
             Neuron syllableMetaN = model.createNeuron("M-SYLLABLE-" + i);
 
             ArrayList<Synapse.Builder> inputs = new ArrayList<>();
@@ -49,8 +51,8 @@ public class ExtractSyllables {
                             .setMetaBias(-2.0)
                             .setSynapseId(0)
                             .setNeuron(letterInhib)
-                            .setWeight(10.0)
-                            .setBias(-10.0)
+                            .setWeight(2.0)
+                            .setBias(-2.0)
                             .setRangeOutput(true, false)
             );
             for (int j = 0; j < i - 2; j++) {
@@ -60,8 +62,8 @@ public class ExtractSyllables {
                                 .setMetaBias(-1.0)
                                 .setSynapseId(j + 1)
                                 .setNeuron(letterInhib)
-                                .setWeight(5.0)
-                                .setBias(-5.0)
+                                .setWeight(1.0)
+                                .setBias(-1.0)
                                 .addRangeRelation(BEGIN_TO_END_EQUALS, j)
                                 .setRangeOutput(false)
                 );
@@ -72,8 +74,8 @@ public class ExtractSyllables {
                             .setMetaBias(-2.0)
                             .setSynapseId(i - 1)
                             .setNeuron(letterInhib)
-                            .setWeight(10.0)
-                            .setBias(-10.0)
+                            .setWeight(2.0)
+                            .setBias(-2.0)
                             .addRangeRelation(BEGIN_TO_END_EQUALS, i - 2)
                             .setRangeOutput(false, true)
             );
@@ -89,13 +91,23 @@ public class ExtractSyllables {
                             .addRangeRelation(OVERLAPS, Synapse.Builder.OUTPUT)
             );
 
-            MetaNetwork.initMetaNeuron(syllableMetaN, 5.0, 2.0, inputs.toArray(new Synapse.Builder[inputs.size()]));
+            MetaNetwork.initMetaNeuron(syllableMetaN, 1.0, 1.5, inputs.toArray(new Synapse.Builder[inputs.size()]));
 
-            syllableInhib.addSynapse(
+            Neuron.init(syllableInhib, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY,
+                    new MetaSynapse.Builder()
+                    .setMetaWeight(1.0)
+                    .setMetaBias(0.0)
+                    .setNeuron(syllableMetaN)
+                    .setWeight(1.0)
+                    .setBias(0.0)
+                    .setRangeOutput(true)
+            );
+
+            syllableInhibAll.addSynapse(
                     new MetaSynapse.Builder()
                             .setMetaWeight(1.0)
                             .setMetaBias(0.0)
-                            .setNeuron(syllableMetaN)
+                            .setNeuron(syllableInhib)
                             .setWeight(1.0)
                             .setBias(0.0)
                             .setRangeOutput(true)
@@ -104,7 +116,6 @@ public class ExtractSyllables {
 
         Neuron.init(letterInhib, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
 
-        Neuron.init(syllableInhib, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
 
         for (char c: LETTERS.toCharArray()) {
             Neuron letterN = model.createNeuron("L-" + c);
