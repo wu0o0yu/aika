@@ -32,6 +32,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
+import static network.aika.lattice.InputNode.getRelations;
+
 /**
  * The {@code InputNode} and the {@code AndNode} classes together form a pattern lattice, containing all
  * possible substructures of any given conjunction. For example if we have the conjunction ABCD where A, B, C, D are
@@ -164,12 +166,20 @@ public class AndNode extends Node<AndNode, AndActivation> {
             for (Link sl : fl.input.outputsToAndNode.values()) {
                 AndActivation secondAct = sl.output;
                 if (secondAct.node instanceof AndNode) {
-                    if (act != secondAct) {
-                        Refinement nRef = null; //config.refinementFactory.create(act, 0, secondAct); // TODO:
+                    if (act != secondAct && config.candidateCheck.check(act, secondAct)) {
+                        Activation iAct = act.getInputActivation(fl.rv.refOffset);
+                        Activation secondIAct = secondAct.getInputActivation(sl.rv.refOffset);
 
-                        AndNode nln = extend(doc.threadId, doc, nRef).child.get();
-                        if (nln != null) {
-                            nln.isDiscovered = true;
+                        List<Relation> rels = InputNode.getRelations(iAct, secondIAct);
+                        rels.add(null);
+
+                        for(Relation rel: rels) {
+                            Refinement nRef = createRefinement(fl.rv, sl.ref, rel);
+
+                            AndNode nln = extend(doc.threadId, doc, nRef, true).child.get();
+                            if (nln != null) {
+                                nln.isDiscovered = true;
+                            }
                         }
                     }
                 }
@@ -178,7 +188,19 @@ public class AndNode extends Node<AndNode, AndActivation> {
     }
 
 
-    public RefValue extend(int threadId, Document doc, Refinement firstRef) {
+    private Refinement createRefinement(RefValue firstRV, Refinement secondRef, Relation rel) {
+        Relation[] srm = secondRef.relations.relations;
+        RelationsMap rm = new RelationsMap();
+        rm.relations = new Relation[srm.length + 1];
+        for (int i = 0; i < srm.length; i++) {
+            rm.relations[firstRV.offsets[i]] = srm[i];
+        }
+        rm.relations[firstRV.refOffset] = rel;
+        return new Refinement(rm, secondRef.input);
+    }
+
+
+    public RefValue extend(int threadId, Document doc, Refinement firstRef, boolean patterDiscovery) {
         if(firstRef.relations.size() == 0) return null;
 
         RefValue firstRV = getAndChild(firstRef);
@@ -209,7 +231,9 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
             Refinement secondParentRef = new Refinement(new RelationsMap(secondParentRelations), firstRef.input);
 
-            RefValue secondParentRV = parentNode.extend(threadId, doc, secondParentRef);
+            RefValue secondParentRV = patterDiscovery ?
+                    parentNode.getAndChild(secondParentRef) :
+                    parentNode.extend(threadId, doc, secondParentRef, patterDiscovery);
 
             if(secondParentRV == null) {
                 continue;

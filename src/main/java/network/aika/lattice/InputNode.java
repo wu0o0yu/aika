@@ -23,6 +23,7 @@ import network.aika.Provider;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Range;
+import network.aika.neuron.relation.InstanceRelation;
 import network.aika.neuron.relation.RangeRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
@@ -37,7 +38,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Range.Relation.*;
 
@@ -56,6 +56,20 @@ public class InputNode extends Node<InputNode, InputActivation> {
     public TreeMap<AndNode.Refinement, AndNode.RefValue> nonExactAndChildren;
 
     private long visitedDiscover;
+
+
+    public static final Relation[] CANDIDATE_RELATIONS = new Relation[] {
+        new RangeRelation(EQUALS),
+        new RangeRelation(BEGIN_TO_END_EQUALS),
+        new RangeRelation(END_TO_BEGIN_EQUALS),
+        new RangeRelation(BEGIN_EQUALS),
+        new RangeRelation(END_EQUALS),
+        new RangeRelation(CONTAINS),
+        new RangeRelation(CONTAINED_IN),
+        new InstanceRelation(InstanceRelation.Type.CONTAINS),
+        new InstanceRelation(InstanceRelation.Type.CONTAINED_IN),
+        new InstanceRelation(InstanceRelation.Type.COMMON_ANCESTOR)
+    };
 
 
     public InputNode() {
@@ -135,7 +149,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
 
-    public RefValue extend(int threadId, Document doc, Refinement ref) {
+    public RefValue extend(int threadId, Document doc, Refinement ref, boolean patterDiscovery) {
         if(ref.relations.size() == 0) return null;
 
         Relation rel = ref.relations.get(0);
@@ -237,23 +251,23 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
     @Override
     public void discover(InputActivation act, PatternDiscovery.Config config) {
-        long v = provider.model.visitedCounter.addAndGet(1);
+        if(!act.input.input.isFinalActivation()) {
+            return;
+        }
 
         Document doc = act.doc;
         doc.getFinalActivations().forEach(secondNAct -> {
             InputActivation secondAct = secondNAct.outputToInputNode.output;
-            if (act != secondAct) {
-                List<Relation> relations = config.refinementFactory.create(act, 0, secondAct, 0);
+            if (act != secondAct && act.id < secondAct.id && config.candidateCheck.check(act, secondAct)) {
+                List<Relation> relations = getRelations(act.input.input, secondNAct);
                 for(Relation r: relations) {
                     InputNode in = secondAct.node;
 
-                    if (in.visitedDiscover != v && r != null) {
-                        in.visitedDiscover = v;
-
+                    if (r != null) {
                         RelationsMap rm = new RelationsMap(new Relation[] {r});
                         Refinement ref = new Refinement(rm, in.provider);
 
-                        AndNode nln = extend(doc.threadId, doc, ref).child.get();
+                        AndNode nln = extend(doc.threadId, doc, ref, true).child.get();
 
                         if (nln != null) {
                             nln.isDiscovered = true;
@@ -262,6 +276,19 @@ public class InputNode extends Node<InputNode, InputActivation> {
                 }
             }
         });
+    }
+
+
+    public static List<Relation> getRelations(Activation act1, Activation act2) {
+        ArrayList<Relation> rels = new ArrayList<>();
+        for(Relation rel: CANDIDATE_RELATIONS) {
+            if(rel.test(act2, act1)) {
+                rels.add(rel);
+                break;
+            }
+        }
+
+        return rels;
     }
 
 
@@ -332,8 +359,8 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
     public static class Link {
-        Activation input;
-        InputActivation output;
+        public Activation input;
+        public InputActivation output;
 
         public Link(Activation iAct, InputActivation oAct) {
             input = iAct;

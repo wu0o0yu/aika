@@ -106,7 +106,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         return th;
     }
 
-    public abstract AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref);
+    public abstract AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref, boolean patterDiscovery);
 
     abstract void apply(A act);
 

@@ -85,7 +85,8 @@ public class CountingTest {
         doc.process();
         PatternDiscovery.discover(doc,
                 new Config()
-                        .setRefinementFactory((act, x, secondAct, secondX) -> null)
+                        .setCandidateCheck((act, secondAct) -> true)
+                        .setRefinementCheck(map -> true)
                         .setCounter(act -> count(act))
         );
         Assert.assertEquals(6.0, ((NodeStatistic) inA.get().outputNode.get().statistic).frequency, 0.001);

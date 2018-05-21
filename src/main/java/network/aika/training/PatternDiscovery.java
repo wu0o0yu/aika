@@ -20,9 +20,9 @@ package network.aika.training;
 import network.aika.Document;
 import network.aika.lattice.AndNode;
 import network.aika.lattice.NodeActivation;
-import network.aika.neuron.relation.Relation;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.SortedMap;
 
 
 /**
@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class PatternDiscovery {
 
-    public interface RefinementFactory {
+    public interface CandidateCheck {
 
         /**
          * Check if <code>node</code> is an interesting pattern that might be considered for further processing.
@@ -43,7 +43,13 @@ public class PatternDiscovery {
          * @return
          */
 
-        List<Relation> create(NodeActivation act, int x, NodeActivation secondAct, int secondX);
+        boolean check(NodeActivation act, NodeActivation secondAct);
+    }
+
+
+    public interface RefinementCheck {
+
+        boolean check(SortedMap<AndNode.Refinement, AndNode.RefValue> nextLevelParents);
     }
 
 
@@ -60,12 +66,18 @@ public class PatternDiscovery {
 
 
     public static class Config {
-        public RefinementFactory refinementFactory;
+        public CandidateCheck candidateCheck;
+        public RefinementCheck refinementCheck;
         public Counter counter;
 
 
-        public Config setRefinementFactory(RefinementFactory refinementFactory) {
-            this.refinementFactory = refinementFactory;
+        public Config setCandidateCheck(CandidateCheck candidateCheck) {
+            this.candidateCheck = candidateCheck;
+            return this;
+        }
+
+        public Config setRefinementCheck(RefinementCheck refinementCheck) {
+            this.refinementCheck = refinementCheck;
             return this;
         }
 
@@ -90,12 +102,12 @@ public class PatternDiscovery {
 
         doc.getAllActivationsStream().forEach(act -> config.counter.count(act));
 
+        ArrayList<NodeActivation> activations = new ArrayList<>(doc.addedNodeActivations);
         doc.addedNodeActivations.clear();
 
-        doc.getAllActivationsStream()
-                .forEach(act -> act.node.discover(act, config));
+        activations.forEach(act -> act.node.discover(act, config));
 
-        doc.propagate();
+//        doc.propagate();
 
         doc.addedNodeActivations.forEach(act -> config.counter.count(act));
     }

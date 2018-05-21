@@ -18,17 +18,15 @@ package network.aika.training;
 
 
 import network.aika.*;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
-import network.aika.Document;
 import network.aika.lattice.AndNode;
-import network.aika.lattice.InputNode;
+import network.aika.neuron.Neuron;
+import network.aika.Document;
 import network.aika.lattice.Node;
 import network.aika.lattice.NodeActivation;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.relation.RangeRelation;
 import network.aika.training.PatternDiscovery.Config;
 import network.aika.neuron.activation.Range;
-import network.aika.lattice.AndNode.Refinement;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,11 +34,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.stream.Collectors;
-
-import static network.aika.neuron.activation.Range.Operator.EQUALS;
-import static network.aika.neuron.activation.Range.Operator.GREATER_THAN_EQUAL;
-import static network.aika.neuron.activation.Range.Operator.LESS_THAN_EQUAL;
 
 /**
  *
@@ -82,28 +75,97 @@ public class PatternDiscoveryTest {
 
 
     @Test
-    public void simpleTest() {
+    public void testLevel2() {
         Model m = new Model();
         m.setNodeStatisticFactory(() -> new NodeStatistic());
 
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
 
-        Document doc = m.createDocument("a", 0);
+        {
+            Document doc = m.createDocument("ab", 0);
 
-        inA.addInput(doc, 0, 1);
-        inB.addInput(doc, 0, 1);
+            inA.addInput(doc, 0, 1);
+            inB.addInput(doc, 1, 2);
 
-        Config config = new Config()
-                .setCounter(act -> count(act))
-                .setRefinementFactory((act, x, secondAct, secondX) -> {
-                    return Collections.singletonList(new RangeRelation(Range.Relation.EQUALS));
-                });
-        PatternDiscovery.discover(doc, config);
+            Config config = new Config()
+                    .setCounter(act -> count(act))
+                    .setCandidateCheck((act, secondAct) -> true)
+                    .setRefinementCheck(map -> true);
+            PatternDiscovery.discover(doc, config);
+
+            AndNode an = inA.get().outputNode.get().andChildren.firstEntry().getValue().child.get();
+            Assert.assertNotNull(an);
+
+            doc.clearActivations();
+        }
+
+        {
+            Document doc = m.createDocument("ab", 0);
+
+            Activation actA = inA.addInput(doc, 0, 1);
+            Activation actB = inB.addInput(doc, 1, 2);
+
+            AndNode.AndActivation andAct = actA.outputToInputNode.output.outputsToAndNode.firstEntry().getValue().output;
+            Assert.assertNotNull(andAct);
+        }
+    }
 
 
-//        AndNode an = inA.get().outputNode.get().andChildren.firstEntry().getValue().child.get();
-//        Assert.assertNotNull(an);
+    @Test
+    public void testLevel3Linear() {
+        Model m = new Model();
+        m.setNodeStatisticFactory(() -> new NodeStatistic());
+
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
+        Neuron inC = m.createNeuron("C");
+
+        {
+            Document doc = m.createDocument("abc", 0);
+
+            inA.addInput(doc, 0, 1);
+            inB.addInput(doc, 1, 2);
+            inC.addInput(doc, 2, 3);
+
+            Config config = new Config()
+                    .setCounter(act -> count(act))
+                    .setCandidateCheck((act, secondAct) -> true)
+                    .setRefinementCheck(map -> true);
+            PatternDiscovery.discover(doc, config);
+
+            doc.clearActivations();
+        }
+        {
+            Document doc = m.createDocument("abc", 0);
+
+            inA.addInput(doc, 0, 1);
+            inB.addInput(doc, 1, 2);
+            inC.addInput(doc, 2, 3);
+
+            Config config = new Config()
+                    .setCounter(act -> count(act))
+                    .setCandidateCheck((act, secondAct) -> true)
+                    .setRefinementCheck(map -> true);
+            PatternDiscovery.discover(doc, config);
+
+            AndNode an = inA.get().outputNode.get().andChildren.firstEntry().getValue().child.get();
+            Assert.assertNotNull(an);
+
+            doc.clearActivations();
+        }
+
+        {
+            Document doc = m.createDocument("abc", 0);
+
+            Activation actA = inA.addInput(doc, 0, 1);
+            Activation actB = inB.addInput(doc, 1, 2);
+            Activation actC = inC.addInput(doc, 2, 3);
+
+            AndNode.AndActivation and2Act = actA.outputToInputNode.output.outputsToAndNode.firstEntry().getValue().output;
+            AndNode.AndActivation and3Act = and2Act.outputsToAndNode.firstEntry().getValue().output;
+            Assert.assertNotNull(and3Act);
+        }
     }
 
 /*

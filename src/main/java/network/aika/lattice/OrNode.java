@@ -58,7 +58,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref) {
+    public AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref, boolean patterDiscovery) {
         throw new UnsupportedOperationException();
     }
 
@@ -155,7 +155,6 @@ public class OrNode extends Node<OrNode, Activation> {
 
     @Override
     public void discover(Activation act, PatternDiscovery.Config config) {
-        throw new UnsupportedOperationException();
     }
 
 

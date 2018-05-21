@@ -227,18 +227,16 @@
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .addRangeRelation((
+                        .addRangeRelation(
                             Relation.create(
                                 Operator.EQUALS, // A
                                 Operator.NONE,   // B
                                 Operator.EQUALS, // C
                                 Operator.NONE    // D
-                            ),
-							1
-                        )
+                            ), 1)
                         .setRangeOutput(true, true)
                         .setIdentity(true)
-                        .addInstanceRelation(COMMON_ANCESTOR, 2),
+                        .addInstanceRelation(COMMON_ANCESTOR, 2)
                         </code>
 			        </pre>
                 </div>
