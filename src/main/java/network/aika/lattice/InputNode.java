@@ -355,6 +355,11 @@ public class InputNode extends Node<InputNode, InputActivation> {
             assert i == 0;
             return input.input;
         }
+
+
+        public String toString() {
+            return "I-ACT(" + input.input.getLabel() + " " + input.input.range + ")";
+        }
     }
 
 

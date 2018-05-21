@@ -19,6 +19,7 @@ package network.aika.training;
 
 import network.aika.*;
 import network.aika.lattice.AndNode;
+import network.aika.lattice.InputNode;
 import network.aika.neuron.Neuron;
 import network.aika.Document;
 import network.aika.lattice.Node;
@@ -129,7 +130,7 @@ public class PatternDiscoveryTest {
             inC.addInput(doc, 2, 3);
 
             Config config = new Config()
-                    .setCounter(act -> count(act))
+                    .setCounter(act -> {})
                     .setCandidateCheck((act, secondAct) -> true)
                     .setRefinementCheck(map -> true);
             PatternDiscovery.discover(doc, config);
@@ -144,7 +145,7 @@ public class PatternDiscoveryTest {
             inC.addInput(doc, 2, 3);
 
             Config config = new Config()
-                    .setCounter(act -> count(act))
+                    .setCounter(act -> {})
                     .setCandidateCheck((act, secondAct) -> true)
                     .setRefinementCheck(map -> true);
             PatternDiscovery.discover(doc, config);
@@ -165,6 +166,56 @@ public class PatternDiscoveryTest {
             AndNode.AndActivation and2Act = actA.outputToInputNode.output.outputsToAndNode.firstEntry().getValue().output;
             AndNode.AndActivation and3Act = and2Act.outputsToAndNode.firstEntry().getValue().output;
             Assert.assertNotNull(and3Act);
+        }
+    }
+
+    @Test
+    public void testLevelNLinear() {
+
+        for(int n = 3; n < 6; n++) {
+            Model m = new Model();
+            m.setNodeStatisticFactory(() -> new NodeStatistic());
+
+            Neuron[] in = new Neuron[n];
+            for (int i = 0; i < n; i++) {
+                in[i] = m.createNeuron((char)('A' + i) + "");
+            }
+
+            for (int i = 0; i < n; i++) {
+                Document doc = m.createDocument("abcdefgh", 0);
+
+                for (int j = 0; j < n; j++) {
+                    in[j].addInput(doc, 0 + j, 1 + j);
+                }
+
+                Config config = new Config()
+                        .setCounter(act -> {})
+                        .setCandidateCheck((act, secondAct) -> true)
+                        .setRefinementCheck(map -> true);
+                PatternDiscovery.discover(doc, config);
+
+                Node<?, ?> node = in[0].get().outputNode.get();
+                for (int j = 0; j < i; j++) {
+                    node = node.andChildren.firstEntry().getValue().child.get();
+                }
+                Assert.assertNotNull(node);
+                doc.clearActivations();
+            }
+
+            {
+                Document doc = m.createDocument("abcdefgh", 0);
+
+                for (int j = 0; j < n; j++) {
+                    in[j].addInput(doc, 0 + j, 1 + j);
+                }
+
+                Activation act = in[0].getActivation(doc, new Range(0, 1), false);
+                NodeActivation<?> nodeAct = act.outputToInputNode.output;
+                for(int j = 0; j < n - 1; j++) {
+                    nodeAct = nodeAct.outputsToAndNode.firstEntry().getValue().output;
+                }
+                Assert.assertNotNull(nodeAct);
+            }
         }
     }
 

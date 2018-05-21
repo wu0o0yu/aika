@@ -646,6 +646,25 @@ public class AndNode extends Node<AndNode, AndActivation> {
                 return null;
             }
         }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("A-ACT(");
+            boolean first = true;
+            for(int i = 0; i < inputs.length; i++) {
+                Activation iAct = getInputActivation(i);
+                if(iAct != null) {
+                    if(!first) {
+                        sb.append(",");
+                    }
+                    sb.append(i + ":" + iAct.getLabel() + " " + iAct.range);
+
+                    first = false;
+                }
+            }
+            sb.append(")");
+            return sb.toString();
+        }
     }
 
 
