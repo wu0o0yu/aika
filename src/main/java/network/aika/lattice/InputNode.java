@@ -267,9 +267,10 @@ public class InputNode extends Node<InputNode, InputActivation> {
                         RelationsMap rm = new RelationsMap(new Relation[] {r});
                         Refinement ref = new Refinement(rm, in.provider);
 
-                        AndNode nln = extend(doc.threadId, doc, ref, config).child.get();
+                        AndNode.RefValue rv = extend(doc.threadId, doc, ref, config);
 
-                        if (nln != null) {
+                        if (rv != null) {
+                            AndNode nln = rv.child.get();
                             nln.isDiscovered = true;
                         }
                     }

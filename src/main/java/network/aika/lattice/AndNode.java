@@ -174,8 +174,9 @@ public class AndNode extends Node<AndNode, AndActivation> {
                         for(Relation rel: rels) {
                             Refinement nRef = createRefinement(fl.rv, sl.ref, rel);
 
-                            AndNode nln = extend(doc.threadId, doc, nRef, config).child.get();
-                            if (nln != null) {
+                            AndNode.RefValue rv = extend(doc.threadId, doc, nRef, config);
+                            if (rv != null) {
+                                AndNode nln = rv.child.get();
                                 nln.isDiscovered = true;
                             }
                         }
