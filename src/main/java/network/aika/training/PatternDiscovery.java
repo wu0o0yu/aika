@@ -22,7 +22,6 @@ import network.aika.lattice.AndNode;
 import network.aika.lattice.NodeActivation;
 
 import java.util.ArrayList;
-import java.util.SortedMap;
 
 
 /**
@@ -47,9 +46,9 @@ public class PatternDiscovery {
     }
 
 
-    public interface RefinementCheck {
+    public interface PatternCheck {
 
-        boolean check(SortedMap<AndNode.Refinement, AndNode.RefValue> nextLevelParents);
+        boolean check(AndNode andNode);
     }
 
 
@@ -67,7 +66,7 @@ public class PatternDiscovery {
 
     public static class Config {
         public CandidateCheck candidateCheck;
-        public RefinementCheck refinementCheck;
+        public PatternCheck patternCheck;
         public Counter counter;
 
 
@@ -76,8 +75,8 @@ public class PatternDiscovery {
             return this;
         }
 
-        public Config setRefinementCheck(RefinementCheck refinementCheck) {
-            this.refinementCheck = refinementCheck;
+        public Config setPatternCheck(PatternCheck patternCheck) {
+            this.patternCheck = patternCheck;
             return this;
         }
 

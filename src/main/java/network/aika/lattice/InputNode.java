@@ -149,7 +149,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
 
-    public RefValue extend(int threadId, Document doc, Refinement ref, boolean patterDiscovery) {
+    public RefValue extend(int threadId, Document doc, Refinement ref, PatternDiscovery.Config patterDiscoveryConfig) {
         if(ref.relations.size() == 0) return null;
 
         Relation rel = ref.relations.get(0);
@@ -170,7 +170,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         rv = new RefValue(new Integer[] {0}, 1, provider);
         nlParents.put(ref, rv);
 
-        return AndNode.createAndNode(provider.model, doc, nlParents, level + 1) ? rv : null;
+        return AndNode.createAndNode(provider.model, doc, nlParents, level + 1, patterDiscoveryConfig) ? rv : null;
     }
 
 
@@ -267,7 +267,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
                         RelationsMap rm = new RelationsMap(new Relation[] {r});
                         Refinement ref = new Refinement(rm, in.provider);
 
-                        AndNode nln = extend(doc.threadId, doc, ref, true).child.get();
+                        AndNode nln = extend(doc.threadId, doc, ref, config).child.get();
 
                         if (nln != null) {
                             nln.isDiscovered = true;

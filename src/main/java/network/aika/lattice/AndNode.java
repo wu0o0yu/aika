@@ -32,8 +32,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
-import static network.aika.lattice.InputNode.getRelations;
-
 /**
  * The {@code InputNode} and the {@code AndNode} classes together form a pattern lattice, containing all
  * possible substructures of any given conjunction. For example if we have the conjunction ABCD where A, B, C, D are
@@ -176,7 +174,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                         for(Relation rel: rels) {
                             Refinement nRef = createRefinement(fl.rv, sl.ref, rel);
 
-                            AndNode nln = extend(doc.threadId, doc, nRef, true).child.get();
+                            AndNode nln = extend(doc.threadId, doc, nRef, config).child.get();
                             if (nln != null) {
                                 nln.isDiscovered = true;
                             }
@@ -200,7 +198,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
     }
 
 
-    public RefValue extend(int threadId, Document doc, Refinement firstRef, boolean patterDiscovery) {
+    public RefValue extend(int threadId, Document doc, Refinement firstRef, PatternDiscovery.Config patterDiscoverConfig) {
         if(firstRef.relations.size() == 0) return null;
 
         RefValue firstRV = getAndChild(firstRef);
@@ -231,9 +229,9 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
             Refinement secondParentRef = new Refinement(new RelationsMap(secondParentRelations), firstRef.input);
 
-            RefValue secondParentRV = patterDiscovery ?
+            RefValue secondParentRV = patterDiscoverConfig != null ?
                     parentNode.getAndChild(secondParentRef) :
-                    parentNode.extend(threadId, doc, secondParentRef, patterDiscovery);
+                    parentNode.extend(threadId, doc, secondParentRef, null);
 
             if(secondParentRV == null) {
                 continue;
@@ -267,12 +265,12 @@ public class AndNode extends Node<AndNode, AndActivation> {
         firstRV = new RefValue(firstOffsets, firstRefOffset, provider);
         nextLevelParents.put(firstRef, firstRV);
 
-        return createAndNode(provider.model, doc, nextLevelParents, level + 1) ? firstRV : null;
+        return createAndNode(provider.model, doc, nextLevelParents, level + 1, patterDiscoverConfig) ? firstRV : null;
     }
 
 
 
-    static boolean createAndNode(Model m, Document doc, SortedMap<Refinement, RefValue> parents, int level) {
+    static boolean createAndNode(Model m, Document doc, SortedMap<Refinement, RefValue> parents, int level, PatternDiscovery.Config patterDiscoverConfig) {
         if (parents != null) {
             // Locking needs to take place in a predefined order.
             TreeSet<Provider<? extends Node>> parentsForLocking = new TreeSet();
@@ -285,6 +283,10 @@ public class AndNode extends Node<AndNode, AndActivation> {
             }
             try {
                 AndNode nln = new AndNode(m, level, parents);
+
+                if(patterDiscoverConfig != null && !patterDiscoverConfig.patternCheck.check(nln)) {
+                    return false;
+                }
 
                 nln.init();
                 nln.postCreate(doc);

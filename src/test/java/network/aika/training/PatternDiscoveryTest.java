@@ -25,7 +25,6 @@ import network.aika.Document;
 import network.aika.lattice.Node;
 import network.aika.lattice.NodeActivation;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.relation.RangeRelation;
 import network.aika.training.PatternDiscovery.Config;
 import network.aika.neuron.activation.Range;
 import org.junit.Assert;
@@ -35,7 +34,6 @@ import org.junit.Test;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Collections;
 
 /**
  *
@@ -93,7 +91,7 @@ public class PatternDiscoveryTest {
             Config config = new Config()
                     .setCounter(act -> count(act))
                     .setCandidateCheck((act, secondAct) -> true)
-                    .setRefinementCheck(map -> true);
+                    .setPatternCheck(map -> true);
             PatternDiscovery.discover(doc, config);
 
             AndNode an = inA.get().outputNode.get().andChildren.firstEntry().getValue().child.get();
@@ -133,7 +131,7 @@ public class PatternDiscoveryTest {
             Config config = new Config()
                     .setCounter(act -> {})
                     .setCandidateCheck((act, secondAct) -> true)
-                    .setRefinementCheck(map -> true);
+                    .setPatternCheck(map -> true);
             PatternDiscovery.discover(doc, config);
 
             doc.clearActivations();
@@ -148,7 +146,7 @@ public class PatternDiscoveryTest {
             Config config = new Config()
                     .setCounter(act -> {})
                     .setCandidateCheck((act, secondAct) -> true)
-                    .setRefinementCheck(map -> true);
+                    .setPatternCheck(map -> true);
             PatternDiscovery.discover(doc, config);
 
             AndNode an = inA.get().outputNode.get().andChildren.firstEntry().getValue().child.get();
@@ -192,7 +190,7 @@ public class PatternDiscoveryTest {
                 Config config = new Config()
                         .setCounter(act -> {})
                         .setCandidateCheck((act, secondAct) -> true)
-                        .setRefinementCheck(map -> true);
+                        .setPatternCheck(map -> true);
                 PatternDiscovery.discover(doc, config);
 
                 Node<?, ?> node = in[0].get().outputNode.get();
@@ -243,7 +241,7 @@ public class PatternDiscoveryTest {
         Config config = new Config()
                 .setCounter(act -> count(act))
                 .setCandidateCheck((act, secondAct) -> isFrequent(act.node) && isFrequent(secondAct.node))
-                .setRefinementCheck(map -> true);
+                .setPatternCheck(map -> true);
 
         PatternDiscovery.discover(doc, config);
 
