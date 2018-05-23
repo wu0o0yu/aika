@@ -37,6 +37,7 @@ import static network.aika.neuron.INeuron.ALLOW_WEAK_NEGATIVE_WEIGHTS;
 public final class Activation extends OrActivation {
     public static final Comparator<Activation> ACTIVATION_ID_COMP = Comparator.comparingInt(act -> act.id);
     public static int MAX_SELF_REFERENCING_DEPTH = 5;
+    public static int MAX_PREDECESSOR_DEPTH = 100;
 
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
@@ -187,7 +188,7 @@ public final class Activation extends OrActivation {
         int fired = -1;
 
         long v = doc.visitedCounter++;
-        markPredecessor(v);
+        markPredecessor(v, 0);
 
         for (InputState is: getInputStates(round, v)) {
             Synapse s = is.l.synapse;
@@ -256,7 +257,7 @@ public final class Activation extends OrActivation {
         double lb = n.biasSum + n.posRecSum;
 
         long v = doc.visitedCounter++;
-        markPredecessor(v);
+        markPredecessor(v, 0);
 
         for (Link l : neuronInputs.values()) {
             Synapse s = l.synapse;
@@ -380,7 +381,7 @@ public final class Activation extends OrActivation {
         }
 
         long v = doc.visitedCounter++;
-        markPredecessor(v);
+        markPredecessor(v, 0);
         conflicts = new ArrayList<>();
         for(Link l: neuronInputs.values()) {
             if (l.synapse.isNegative() && l.synapse.key.isRecurrent) {
@@ -492,12 +493,16 @@ public final class Activation extends OrActivation {
     }
 
 
-    public void markPredecessor(long v) {
+    public void markPredecessor(long v, int depth) {
+        if(depth > MAX_PREDECESSOR_DEPTH) {
+            throw new RuntimeException("MAX_PREDECESSOR_DEPTH limit exceeded. Probable cause is a non recurrent loop.");
+        }
+
         markedPredecessor = v;
 
         for(Link l: neuronInputs.values()) {
             if(!l.synapse.isNegative() && !l.synapse.key.isRecurrent) {
-                l.input.markPredecessor(v);
+                l.input.markPredecessor(v, depth + 1);
             }
         }
     }
@@ -641,7 +646,7 @@ public final class Activation extends OrActivation {
         }
 
         public String toString() {
-            return "V:" + Utils.round(value) + " " + weight;
+            return "V:" + Utils.round(value) + " W:" + Utils.round(weight);
         }
     }
 
