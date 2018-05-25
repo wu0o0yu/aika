@@ -35,7 +35,7 @@ public class GrammarInductionTest {
         model = new Model();
 
         wordInhib = model.createNeuron("S-WORD");
-        bigramInhib = model.createNeuron("S-PHRASE");
+        bigramInhib = model.createNeuron("S-BI-GRAM");
 
 
         Neuron.init(wordInhib, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
@@ -43,10 +43,10 @@ public class GrammarInductionTest {
         Neuron.init(bigramInhib, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
 
 
-        bigramMetaN = model.createNeuron("M-PHRASE");
+        bigramMetaN = model.createNeuron("M-BI-GRAM");
 
 
-        MetaNetwork.initMetaNeuron(bigramMetaN, 4.0, 6.0,
+        MetaNetwork.initMetaNeuron(bigramMetaN, 1.0, 1.5,
                 new MetaSynapse.Builder() // First word of the phrase
                         .setMetaWeight(2.0)
                         .setMetaBias(-2.0)
@@ -98,7 +98,11 @@ public class GrammarInductionTest {
         for(int i = 0; i < txt.length(); i++) {
             char c = txt.charAt(i);
 
-            if(isSeparator(lc) && !isSeparator(c)) {
+            if(i + 1 == txt.length()) {
+                end = i;
+            }
+
+            if((isSeparator(lc) && !isSeparator(c)) || i + 1 == txt.length()) {
                 if(begin != end) {
                     String word = txt.substring(begin, end);
                     Neuron wn = dictionary.get(word);
@@ -136,17 +140,33 @@ public class GrammarInductionTest {
     }
 
 
+    @Test
+    public void testSimplePhrase() {
+        Document doc = parse("The dog chased the cat");
+
+        System.out.println(doc.activationsToString(true, true, true));
+
+        doc.clearActivations();
+    }
+
+
+
     @Ignore
     @Test
     public void testGrammarInduction() throws IOException {
-        File f = new File("./src/test/resources/text/ADogsLife.txt");
-        InputStream is = new FileInputStream(f);
-        StringWriter writer = new StringWriter();
-        IOUtils.copy(is, writer, "UTF-8");
-        String txt = writer.toString();
+        File dir = new File("/Users/lukas.molzberger/aika-ws/aika-syllables/src/main/resources/text/maerchen");
 
-        Document doc = parse(txt);
+        for(File f: dir.listFiles()) {
+            InputStream is = new FileInputStream(f);
+            StringWriter writer = new StringWriter();
+            IOUtils.copy(is, writer, "UTF-8");
+            String txt = writer.toString();
 
-        System.out.println(doc.activationsToString(true, true, true));
+            Document doc = parse(txt);
+
+            System.out.println(doc.activationsToString(true, true, true));
+
+            doc.clearActivations();
+        }
     }
 }

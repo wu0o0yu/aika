@@ -434,12 +434,6 @@ public class Document implements Comparable<Document> {
 
                 th.isQueued = false;
                 n.processChanges(Document.this);
-
-                if(log.isDebugEnabled()) {
-                    log.debug("QueueId:" + th.queueId);
-                    log.debug(n.toString() + "\n");
-                    log.debug("\n" + activationsToString( false, true, true));
-                }
             }
         }
     }
