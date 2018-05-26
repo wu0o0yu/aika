@@ -44,23 +44,10 @@ public class LongTermLearning {
 
 
     public static class Config {
-        public SynapseEvaluation synapseEvaluation;
         public double ltpLearnRate;
         public double ltdLearnRate;
         public double beta;
-        public boolean createNewSynapses;
 
-
-        /**
-         * Determines whether a synapse should be created between two neurons during training.
-         *
-         * @param synapseEvaluation
-         * @return
-         */
-        public Config setSynapseEvaluation(SynapseEvaluation synapseEvaluation) {
-            this.synapseEvaluation = synapseEvaluation;
-            return this;
-        }
 
 
         public Config setLTPLearnRate(double learnRate) {
@@ -79,12 +66,6 @@ public class LongTermLearning {
             this.beta = beta;
             return this;
         }
-
-
-        public Config setCreateNewSynapses(boolean createNewSynapses) {
-            this.createNewSynapses = createNewSynapses;
-            return this;
-        }
     }
 
 
@@ -97,7 +78,7 @@ public class LongTermLearning {
             longTermDepression(doc, config, act, false);
             longTermDepression(doc, config, act, true);
         });
-//        doc.commit();
+        doc.commit();
     }
 
 
@@ -114,43 +95,24 @@ public class LongTermLearning {
      * @param act
      */
     public static void longTermPotentiation(Document doc, Config config, Activation act) {
-        INeuron n = act.getINeuron();
-
         double iv = Utils.nullSafeMax(act.getFinalState().value, act.targetValue);
 
-        double x = config.ltpLearnRate * (1.0 - act.getFinalState().value) * iv;
+        double x = config.ltpLearnRate * (1.0 - act.getFinalState().value) * iv * act.getSelectionProbability();
 
-        if(config.createNewSynapses) {
-            doc.getActivations()
-                    .filter(iAct -> iAct.targetValue == null ? iAct.isFinalActivation() : iAct.targetValue > 0.0)
-                    .filter(iAct -> iAct.node != act.node)
-                    .forEach(iAct -> {
-                synapseLTP(config, null, iAct, act, x);
-            });
-        } else {
-            act.neuronInputs.values()
-                    .stream()
-                    .filter(sa -> sa.input.targetValue == null ? sa.input.isFinalActivation() : sa.input.targetValue > 0.0)
-                    .forEach(sa -> {
-                synapseLTP(config, sa.synapse, sa.input, act, x);
-            });
-        }
+        act.neuronInputs.values()
+                .stream()
+                .filter(sa -> sa.input.targetValue == null ? sa.input.isFinalActivation() : sa.input.targetValue > 0.0)
+                .forEach(sa -> synapseLTP(config, sa.synapse, sa.input, act, x));
     }
 
 
     private static void synapseLTP(Config config, Synapse s, Activation iAct, Activation act, double x) {
-        Result r = config.synapseEvaluation.evaluate(s, iAct, act);
-
-        if(r == null) return;
-
         double h = s.isConjunction(false, false) ? hConj(act) : 1.0;
 
-        double sDelta = iAct.getFinalState().value * x * r.significance * h;
+        double sDelta = iAct.getFinalState().value * x * h * iAct.getSelectionProbability();
 
         if(sDelta > 0.0) {
-            Synapse synapse = Synapse.createOrLookup(act.doc, null, r.synapseKey, r.relations, r.distanceFunction, iAct.getNeuron(), act.getNeuron());
-
-            synapse.updateDelta(act.doc, sDelta, -config.beta * sDelta);
+            s.updateDelta(act.doc, sDelta, -config.beta * sDelta);
         }
     }
 
@@ -185,12 +147,7 @@ public class LongTermLearning {
                 .filter(s -> !s.isNegative() && !actSyns.contains(s))
                 .forEach(s -> {
                     if(s.isConjunction(false, false) != dir) {
-                        Result r = config.synapseEvaluation.evaluate(s, dir ? act : null, dir ? null : act);
-                        if (r != null) {
-                            s.updateDelta(doc,-config.ltdLearnRate * act.getFinalState().value * r.significance, 0.0);
-
-                            r.deleteMode.checkIfDelete(s, false);
-                        }
+                        s.updateDelta(doc,-config.ltdLearnRate * act.getFinalState().value, 0.0);
                     }
                 });
     }

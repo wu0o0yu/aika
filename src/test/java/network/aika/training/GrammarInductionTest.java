@@ -3,9 +3,11 @@ package network.aika.training;
 import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Model;
+import network.aika.lattice.AndNode;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Range;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -142,13 +144,42 @@ public class GrammarInductionTest {
 
     @Test
     public void testSimplePhrase() {
-        Document doc = parse("The dog chased the cat");
+        {
+            Document doc = parse("The dog chased the cat");
 
-        System.out.println(doc.activationsToString(true, true, true));
+            System.out.println(doc.activationsToString(true, true, true));
 
-        doc.clearActivations();
+            MetaNetwork.train(doc);
+
+            doc.clearActivations();
+
+            dumpResults();
+        }
+
+        {
+            Document doc = parse("The dog chased the cat");
+            LongTermLearning.train(doc,
+                    new LongTermLearning.Config()
+                            .setLTPLearnRate(0.5)
+                            .setLTDLearnRate(0.5)
+            );
+
+            doc.clearActivations();
+
+            dumpResults();
+        }
     }
 
+
+    private void dumpResults() {
+        for(Synapse inhibSyn : bigramInhib.inMemoryInputSynapses.values()) {
+            System.out.println("    " + inhibSyn.input.getLabel() + " Bias:" + inhibSyn.input.get().biasSum);
+
+            for (Synapse s : inhibSyn.input.inMemoryInputSynapses.values()) {
+                System.out.println("        " + s.input.getLabel() + " " + s.weight);
+            }
+        }
+    }
 
 
     @Ignore

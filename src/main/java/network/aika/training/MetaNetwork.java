@@ -120,7 +120,7 @@ public class MetaNetwork {
 
 
     private static void transferMetaSynapses(Document doc, Map<Activation, List<Target>> metaActivations, Activation metaAct, Target t) {
-        TreeSet<Synapse> inputSynapses = new TreeSet<>((s1, s2) -> Integer.compare(s1.id, s2.id));
+        TreeSet<Synapse> inputSynapses = new TreeSet<>(Comparator.comparingInt(s -> s.id));
 
         for (Activation.Link l : metaAct.getFinalInputActivationLinks()) {
             MetaSynapse inputMetaSynapse = l.synapse.meta;
