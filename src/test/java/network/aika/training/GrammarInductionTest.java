@@ -149,7 +149,7 @@ public class GrammarInductionTest {
 
             System.out.println(doc.activationsToString(true, true, true));
 
-            MetaNetwork.train(doc);
+            MetaNetwork.train(doc, 0.1);
 
             doc.clearActivations();
 

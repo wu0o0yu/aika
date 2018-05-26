@@ -166,7 +166,7 @@ public class ExtractSyllables {
 
             doc.process();
 
-            MetaNetwork.train(doc);
+            MetaNetwork.train(doc, 0.1);
 
             doc.clearActivations();
         }

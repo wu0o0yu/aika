@@ -47,7 +47,7 @@ public class MetaNetworkTest {
         keyPhraseHint.addInput(doc, 0, 12);
 
         doc.process();
-        MetaNetwork.train(doc);
+        MetaNetwork.train(doc, 0.1);
 
         System.out.println(doc.activationsToString(true, true, true));
 

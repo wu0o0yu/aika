@@ -47,18 +47,23 @@ public class MetaNetwork {
 
     private static final Logger log = LoggerFactory.getLogger(MetaNetwork.class);
 
-    public static void train(Document doc) {
+    public static void train(Document doc, double threshold) {
         Map<Activation, List<Target>> metaActivations = new TreeMap<>();
 
-        List<INeuron> inhibitoryNeurons = doc.finallyActivatedNeurons
+        List<INeuron> inhibitoryNeurons = doc.activatedNeurons
                 .stream()
                 .filter(n -> n.type == INeuron.Type.INHIBITORY)
                 .collect(Collectors.toList());
 
         for (INeuron n : inhibitoryNeurons) {
-            for (Activation inhibAct : n.getActivations(doc, true)) {
-                for (Activation.Link l : inhibAct.getFinalInputActivationLinks()) {
+            for (Activation inhibAct : n.getActivations(doc, false)) {
+                for (Activation.Link l : inhibAct.neuronInputs.values()) {
                     Activation act = l.input;
+
+                    if(act.getSelectionProbability() < threshold) {
+                        continue;
+                    }
+
                     Neuron targetNeuron = act.getNeuron();
 
                     doc.createV = doc.visitedCounter++;
@@ -67,7 +72,7 @@ public class MetaNetwork {
                     if (targetNeuron.get().type == INeuron.Type.META) {
                         newNeuron = true;
                         targetNeuron = doc.model.createNeuron(n.label.substring(2) + "-" + doc.getText(act.range));
-                        INeuron.update(doc.threadId, doc, targetNeuron, n.bias, Collections.emptySet());
+                        INeuron.update(doc.threadId, doc, targetNeuron, act.getINeuron().metaBias * act.getSelectionProbability(), Collections.emptySet());
                     }
 
                     Activation metaNeuronAct = getMetaNeuronAct(inhibAct);
@@ -86,7 +91,7 @@ public class MetaNetwork {
 
         for(Map.Entry<Activation, List<Target>> me: metaActivations.entrySet()) {
             for(Target t: me.getValue()) {
-                transferMetaSynapses(doc, metaActivations, me.getKey(), t);
+                transferMetaSynapses(doc, metaActivations, me.getKey(), t, threshold);
             }
         }
     }
@@ -119,21 +124,29 @@ public class MetaNetwork {
     }
 
 
-    private static void transferMetaSynapses(Document doc, Map<Activation, List<Target>> metaActivations, Activation metaAct, Target t) {
+    private static void transferMetaSynapses(Document doc, Map<Activation, List<Target>> metaActivations, Activation metaAct, Target t, double threshold) {
         TreeSet<Synapse> inputSynapses = new TreeSet<>(Comparator.comparingInt(s -> s.id));
 
-        for (Activation.Link l : metaAct.getFinalInputActivationLinks()) {
+        for (Activation.Link l : metaAct.neuronInputs.values()) {
             MetaSynapse inputMetaSynapse = l.synapse.meta;
             Synapse os = l.synapse;
+
+            if(l.input.getSelectionProbability() < threshold) {
+                continue;
+            }
 
             if (inputMetaSynapse != null && (inputMetaSynapse.metaWeight != 0.0 || inputMetaSynapse.metaBias != 0.0)) {
                 Neuron ina = l.input.node.neuron;
 
-                List<Activation.Link> inputs = ina.get().type == INeuron.Type.INHIBITORY && inputMetaSynapse.metaWeight >= 0.0 ?
-                        l.input.getFinalInputActivationLinks() :
+                Collection<Activation.Link> inputs = ina.get().type == INeuron.Type.INHIBITORY && inputMetaSynapse.metaWeight >= 0.0 ?
+                        l.input.neuronInputs.values() :
                         Collections.singletonList(l);
 
                 for(Activation.Link isa: inputs) {
+                    if(isa.input.getSelectionProbability() < threshold) {
+                        continue;
+                    }
+
                     Neuron in = isa.input.getNeuron();
 
                     if(in.get(doc).type == INeuron.Type.META) {
@@ -191,7 +204,9 @@ public class MetaNetwork {
 
         Synapse ns = new Synapse(in, t.targetNeuron, os.id, os.key, nRels, os.distanceFunction);
         if (!ns.exists()) {
-            ns.updateDelta(doc, inputMetaSynapse.metaWeight, inputMetaSynapse.metaBias);
+            double sp = metaAct.getSelectionProbability();
+
+            ns.updateDelta(doc, inputMetaSynapse.metaWeight * sp, inputMetaSynapse.metaBias * sp);
 
             inputSynapses.add(ns);
         }
