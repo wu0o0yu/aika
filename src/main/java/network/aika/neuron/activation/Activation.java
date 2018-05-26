@@ -375,6 +375,18 @@ public final class Activation extends OrActivation {
     }
 
 
+    public double getSelectionProbability() {
+        double x = Math.exp(maxWeight);
+
+        double norm = x;
+        for(Activation cAct: getConflicts()) {
+            norm += Math.exp(cAct.maxWeight);
+        }
+
+        return x / norm;
+    }
+
+
     public Collection<Activation> getConflicts() {
         if(conflicts != null) {
             return conflicts;
@@ -701,6 +713,8 @@ public final class Activation extends OrActivation {
         sb.append(Utils.round(upperBound));
         sb.append(" MW:");
         sb.append(Utils.round(maxWeight));
+        sb.append(" SP:");
+        sb.append(Utils.round(getSelectionProbability()));
 
         sb.append(" - ");
         if(finalOnly) {
