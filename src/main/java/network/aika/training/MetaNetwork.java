@@ -55,40 +55,32 @@ public class MetaNetwork {
                 .filter(n -> n.type == INeuron.Type.INHIBITORY)
                 .collect(Collectors.toList());
 
-        for (INeuron n : inhibitoryNeurons) {
-            for (Activation inhibAct : n.getActivations(doc, false)) {
+        for (INeuron inhibN : inhibitoryNeurons) {
+            for (Activation inhibAct : inhibN.getActivations(doc, false)) {
+                Activation targetAct = null;
+                Activation metaAct = null;
+
                 for (Activation.Link l : inhibAct.neuronInputs.values()) {
                     Activation act = l.input;
-
-                    if(act.getSelectionProbability() < threshold) {
-                        continue;
-                    }
-
-                    Neuron targetNeuron;
-                    Activation metaNeuronAct;
-
-                    doc.createV = doc.visitedCounter++;
-
-                    boolean newNeuron = false;
                     if (act.getINeuron().type == INeuron.Type.META) {
-                        metaNeuronAct = act;
-                        newNeuron = true;
-                        targetNeuron = doc.model.createNeuron(n.label.substring(2) + "-" + doc.getText(act.range));
-                        INeuron.update(doc.threadId, doc, targetNeuron, act.getINeuron().metaBias * act.getSelectionProbability(), Collections.emptySet());
-                    } else {
-                        targetNeuron = act.getNeuron();
-                        metaNeuronAct = getMetaNeuronAct(inhibAct, threshold);
+                        metaAct = act;
+                    } else if (act.getINeuron().type == INeuron.Type.EXCITATORY) {
+                        targetAct = act;
                     }
+                }
 
-                    if (metaNeuronAct != null) {
-                        List<Target> targets = metaActivations.get(metaNeuronAct);
-                        if(targets == null) {
-                            targets = new ArrayList<>();
-                            metaActivations.put(metaNeuronAct, targets);
-                        }
 
-                        targets.add(new Target(targetNeuron, newNeuron, n.provider));
-                    }
+                doc.createV = doc.visitedCounter++;
+                Neuron targetNeuron;
+                if (targetAct != null && metaAct != null && targetAct.getSelectionProbability() > threshold) {
+                    targetNeuron = targetAct.getNeuron();
+
+                    collectTarget(metaActivations, metaAct, inhibN, targetNeuron, false);
+                } else if(metaAct != null && metaAct.getSelectionProbability() > threshold) {
+                    targetNeuron = doc.model.createNeuron(inhibN.label.substring(2) + "-" + doc.getText(metaAct.range));
+                    INeuron.update(doc.threadId, doc, targetNeuron, metaAct.getINeuron().metaBias * metaAct.getSelectionProbability(), Collections.emptySet());
+                    targetNeuron.get(doc).type = INeuron.Type.EXCITATORY;
+                    collectTarget(metaActivations, metaAct, inhibN, targetNeuron, true);
                 }
             }
         }
@@ -97,6 +89,19 @@ public class MetaNetwork {
             for(Target t: me.getValue()) {
                 transferMetaSynapses(doc, metaActivations, me.getKey(), t, threshold);
             }
+        }
+    }
+
+
+    private static void collectTarget(Map<Activation, List<Target>> metaActivations, Activation metaAct, INeuron inhibN, Neuron targetNeuron, boolean newNeuron) {
+        if (metaAct != null) {
+            List<Target> targets = metaActivations.get(metaAct);
+            if (targets == null) {
+                targets = new ArrayList<>();
+                metaActivations.put(metaAct, targets);
+            }
+
+            targets.add(new Target(targetNeuron, newNeuron, inhibN.provider));
         }
     }
 
@@ -111,20 +116,6 @@ public class MetaNetwork {
             this.isNewNeuron = isNewNeuron;
             this.inhibNeuron = inhibNeuron;
         }
-    }
-
-
-    private static Activation getMetaNeuronAct(Activation inhibAct, double threshold) {
-        Activation maxMeta = null;
-
-        for(Activation.Link l: inhibAct.neuronInputs.values()) {
-            if(l.input.getINeuron().type == INeuron.Type.META && l.input.getSelectionProbability() >= threshold) {
-                if(maxMeta == null || maxMeta.getFinalState().value < l.input.getFinalState().value) {
-                    maxMeta = l.input;
-                }
-            }
-        }
-        return maxMeta;
     }
 
 

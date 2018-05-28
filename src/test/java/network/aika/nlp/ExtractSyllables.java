@@ -48,35 +48,35 @@ public class ExtractSyllables {
             ArrayList<Synapse.Builder> inputs = new ArrayList<>();
             inputs.add(
                     new MetaSynapse.Builder() // First letter of the pattern
-                            .setMetaWeight(2.0)
-                            .setMetaBias(-2.0)
+                            .setMetaWeight(4.0)
+                            .setMetaBias(-4.0)
                             .setSynapseId(0)
                             .setNeuron(letterInhib)
-                            .setWeight(2.0)
-                            .setBias(-2.0)
+                            .setWeight(0.4)
+                            .setBias(-0.4)
                             .setRangeOutput(true, false)
             );
             for (int j = 0; j < i - 2; j++) {
                 inputs.add(
                         new MetaSynapse.Builder() // Middle letter of the pattern
-                                .setMetaWeight(1.0)
-                                .setMetaBias(-1.0)
+                                .setMetaWeight(2.0)
+                                .setMetaBias(-2.0)
                                 .setSynapseId(j + 1)
                                 .setNeuron(letterInhib)
-                                .setWeight(1.0)
-                                .setBias(-1.0)
+                                .setWeight(0.2)
+                                .setBias(-0.2)
                                 .addRangeRelation(BEGIN_TO_END_EQUALS, j)
                                 .setRangeOutput(false)
                 );
             }
             inputs.add(
                     new MetaSynapse.Builder() // Last letter of the pattern
-                            .setMetaWeight(2.0)
-                            .setMetaBias(-2.0)
+                            .setMetaWeight(4.0)
+                            .setMetaBias(-4.0)
                             .setSynapseId(i - 1)
                             .setNeuron(letterInhib)
-                            .setWeight(2.0)
-                            .setBias(-2.0)
+                            .setWeight(0.4)
+                            .setBias(-0.4)
                             .addRangeRelation(BEGIN_TO_END_EQUALS, i - 2)
                             .setRangeOutput(false, true)
             );
@@ -92,7 +92,7 @@ public class ExtractSyllables {
                             .addRangeRelation(OVERLAPS, Synapse.Builder.OUTPUT)
             );
 
-            MetaNetwork.initMetaNeuron(syllableMetaN, 1.0, 1.5, inputs.toArray(new Synapse.Builder[inputs.size()]));
+            MetaNetwork.initMetaNeuron(syllableMetaN, 0.3, 3.0, inputs.toArray(new Synapse.Builder[inputs.size()]));
 
             Neuron.init(syllableInhib, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY,
                     new MetaSynapse.Builder()
@@ -181,8 +181,8 @@ public class ExtractSyllables {
 
                 LongTermLearning.train(doc,
                         new LongTermLearning.Config()
-                                .setLTPLearnRate(0.5)
-                                .setLTDLearnRate(0.5)
+                                .setLTPLearnRate(0.1)
+                                .setLTDLearnRate(0.1)
                 );
 
                 doc.clearActivations();
