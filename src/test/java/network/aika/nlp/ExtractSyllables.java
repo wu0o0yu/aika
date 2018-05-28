@@ -6,6 +6,7 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.training.LongTermLearning;
 import network.aika.training.MetaNetwork;
 import network.aika.training.MetaSynapse;
 import org.junit.Before;
@@ -40,7 +41,7 @@ public class ExtractSyllables {
         syllableInhibAll = model.createNeuron("S-SYLLABLE-ALL");
         Neuron.init(syllableInhibAll, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
 
-        for(int i = 2; i < 6; i++) {
+        for(int i = 2; i < 3; i++) {
             Neuron syllableInhib = model.createNeuron("S-SYLLABLE-" + i);
             Neuron syllableMetaN = model.createNeuron("M-SYLLABLE-" + i);
 
@@ -160,15 +161,46 @@ public class ExtractSyllables {
 
         for (String txt : inputs) {
             System.out.println(txt);
-            Document doc = model.createDocument(txt);
+            {
+                Document doc = model.createDocument(txt);
 
-            processCharacters(doc);
+                processCharacters(doc);
 
-            doc.process();
+                doc.process();
 
-            MetaNetwork.train(doc, 0.1);
+                MetaNetwork.train(doc, 0.1);
 
-            doc.clearActivations();
+                doc.clearActivations();
+            }
+            {
+                Document doc = model.createDocument(txt);
+
+                processCharacters(doc);
+
+                doc.process();
+
+                LongTermLearning.train(doc,
+                        new LongTermLearning.Config()
+                                .setLTPLearnRate(0.5)
+                                .setLTDLearnRate(0.5)
+                );
+
+                doc.clearActivations();
+            }
+        }
+
+        dumpResults();
+    }
+
+
+    private void dumpResults() {
+        System.out.println("Results: ");
+        for(Synapse inhibSyn : syllableInhibAll.inMemoryInputSynapses.values()) {
+            System.out.println("    " + inhibSyn.input.getLabel() + " Bias:" + inhibSyn.input.get().biasSum);
+
+            for (Synapse s : inhibSyn.input.inMemoryInputSynapses.values()) {
+                System.out.println("        " + s.input.getLabel() + " " + s.weight);
+            }
         }
     }
 }

@@ -237,8 +237,6 @@ public class Converter {
         neuron.biasSum += neuron.biasSumDelta;
         neuron.biasSumDelta = 0.0;
 
-        neuron.biasSum = Math.min(neuron.biasSum, 0.0);
-
         assert Double.isFinite(neuron.biasSum);
 
         neuron.posDirSum += sumDelta[DIRECT][POSITIVE];

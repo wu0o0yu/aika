@@ -391,8 +391,9 @@ public class Synapse implements Writable {
 
 
     public static Synapse createOrLookup(Document doc, Integer synapseId, Key k, Map<Integer, Relation> relations, DistanceFunction distFunc, Neuron inputNeuron, Neuron outputNeuron) {
-        outputNeuron.lock.acquireWriteLock();
+        outputNeuron.get(doc);
         inputNeuron.get(doc);
+        outputNeuron.lock.acquireWriteLock();
         Synapse synapse = null;
         if(synapseId != null) {
             synapse = outputNeuron.inputSynapsesById.get(synapseId);
