@@ -73,10 +73,11 @@ public class LongTermLearning {
     public static void train(Document doc, Config config) {
         doc.getActivations()
                 .filter(act -> act.targetValue == null ? act.isFinalActivation() : act.targetValue > 0.0)
+                .filter(act -> act.getINeuron().type != INeuron.Type.META)
                 .forEach(act -> {
-            longTermPotentiation(doc, config, act);
-            longTermDepression(doc, config, act, false);
-            longTermDepression(doc, config, act, true);
+            longTermPotentiation(config, act);
+            longTermDepression(config, act, false);
+            longTermDepression(config, act, true);
         });
         doc.commit();
     }
@@ -90,11 +91,10 @@ public class LongTermLearning {
     /**
      * The long-term potentiation algorithm is a variant of the Hebb learning rule.
      *
-     * @param doc
      * @param config
      * @param act
      */
-    public static void longTermPotentiation(Document doc, Config config, Activation act) {
+    public static void longTermPotentiation(Config config, Activation act) {
         double iv = Utils.nullSafeMax(act.getFinalState().value, act.targetValue);
 
         double x = config.ltpLearnRate * (1.0 - act.getFinalState().value) * iv * act.getSelectionProbability();
@@ -124,12 +124,11 @@ public class LongTermLearning {
      * the synapse weight. On the other hand, if the synapse has an and-characteristic, then a firing input neuron
      * and a non firing output neuron will not change the synapse weight, too.
      *
-     * @param doc
      * @param config
      * @param act
      * @param dir
      */
-    public static void longTermDepression(Document doc, Config config, Activation act, boolean dir) {
+    public static void longTermDepression(Config config, Activation act, boolean dir) {
         if(act.getFinalState().value <= 0.0) return;
 
         INeuron n = act.getINeuron();
@@ -147,7 +146,7 @@ public class LongTermLearning {
                 .filter(s -> !s.isNegative() && !actSyns.contains(s))
                 .forEach(s -> {
                     if(s.isConjunction(false, false) != dir) {
-                        s.updateDelta(doc,-config.ltdLearnRate * act.getFinalState().value, 0.0);
+                        s.updateDelta(act.doc,-config.ltdLearnRate * act.getFinalState().value, 0.0);
                     }
                 });
     }
