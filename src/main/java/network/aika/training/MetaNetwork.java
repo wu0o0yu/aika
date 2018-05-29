@@ -162,7 +162,7 @@ public class MetaNetwork {
             log.debug(showDelta(t.targetNeuron.get(), inputSynapses));
         }
 
-        INeuron.update(doc.threadId, doc, t.targetNeuron, t.isNewNeuron ? metaAct.getINeuron().metaBias * metaAct.getSelectionProbability() : 0.0, inputSynapses);
+        INeuron.update(doc.threadId, doc, t.targetNeuron, t.isNewNeuron ? metaAct.getINeuron().metaBias * metaAct.getSelectionProbability() : null, inputSynapses);
 
         if (t.isNewNeuron) {
             Activation.Link inhibMetaLink = metaAct.neuronOutputs.first();

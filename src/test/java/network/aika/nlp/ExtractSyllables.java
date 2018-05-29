@@ -181,8 +181,8 @@ public class ExtractSyllables {
 
                 LongTermLearning.train(doc,
                         new LongTermLearning.Config()
-                                .setLTPLearnRate(0.1)
-                                .setLTDLearnRate(0.1)
+                                .setLTPLearnRate(0.5)
+                                .setLTDLearnRate(0.5)
                 );
 
                 doc.clearActivations();
@@ -199,7 +199,12 @@ public class ExtractSyllables {
             System.out.println("    " + inhibSyn.input.getLabel() + " Bias:" + inhibSyn.input.get().biasSum);
 
             for (Synapse s : inhibSyn.input.inMemoryInputSynapses.values()) {
-                System.out.println("        " + s.input.getLabel() + " " + s.weight);
+                Neuron pattern = s.input;
+                System.out.println("        " + pattern.getLabel() + " os.weight:" + s.weight + " bias:" + pattern.get().bias);
+
+                for (Synapse ps : pattern.inMemoryInputSynapses.values()) {
+                    System.out.println("            " + ps.input.getLabel() + " ps.weight:" + ps.weight);
+                }
             }
         }
     }
