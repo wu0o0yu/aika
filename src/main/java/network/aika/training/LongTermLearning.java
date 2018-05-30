@@ -27,6 +27,8 @@ import network.aika.training.SynapseEvaluation.Result;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static network.aika.neuron.activation.Activation.*;
+
 
 /**
  *
@@ -133,21 +135,18 @@ public class LongTermLearning {
 
         INeuron n = act.getINeuron();
 
-        Set<Synapse> actSyns = new TreeSet<>(dir ? Synapse.OUTPUT_SYNAPSE_COMP : Synapse.INPUT_SYNAPSE_COMP);
-        (dir ? act.neuronOutputs : act.neuronInputs.values())
-                .forEach(sa -> {
-                    Activation rAct = dir ? sa.output : sa.input;
-                    if(rAct.targetValue == null ? rAct.isFinalActivation() : rAct.targetValue > 0.0) {
-                        actSyns.add(sa.synapse);
-                    }
-                });
+        for(Synapse s: (dir ? n.outputSynapses : n.inputSynapses).values()) {
+            if(!s.isNegative() && s.isConjunction(false, false) != dir) {
+                double maxSP = 0.0;
+                for(Link l: (dir ? act.neuronOutputs : act.neuronInputs).subMap(
+                        new Link(s, MIN_ACTIVATION, MIN_ACTIVATION),
+                        new Link(s, MAX_ACTIVATION, MAX_ACTIVATION)).values()) {
+                    Activation rAct = dir ? l.output : l.input;
+                    maxSP = Math.max(maxSP, rAct.getSelectionProbability());
+                }
 
-        (dir ? n.outputSynapses : n.inputSynapses).values().stream()
-                .filter(s -> !s.isNegative() && !actSyns.contains(s))
-                .forEach(s -> {
-                    if(s.isConjunction(false, false) != dir) {
-                        s.updateDelta(act.doc,-config.ltdLearnRate * act.getFinalState().value, 0.0);
-                    }
-                });
+                s.updateDelta(act.doc, -config.ltdLearnRate * act.getFinalState().value, 0.0);
+            }
+        }
     }
 }

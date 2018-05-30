@@ -64,7 +64,7 @@ public class InstanceRelation extends Relation {
             results.add(linkedAct);
         }
 
-        for(Activation.Link l: linkedAct.neuronOutputs) {
+        for(Activation.Link l: linkedAct.neuronOutputs.values()) {
             if(l.synapse.key.identity) {
                 collectContains(results, n, l.output, v);
             }

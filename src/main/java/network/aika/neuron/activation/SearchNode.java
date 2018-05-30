@@ -133,7 +133,7 @@ public class SearchNode implements Comparable<SearchNode> {
             if (csn == null || csn.getDecision() != getDecision()) {
                 Activation act = c.activation;
                 act.markDirty(visited);
-                for (Activation.Link l : act.neuronOutputs) {
+                for (Activation.Link l : act.neuronOutputs.values()) {
                     l.output.markDirty(visited);
                 }
             } else {
@@ -190,7 +190,7 @@ public class SearchNode implements Comparable<SearchNode> {
                 return true;
             }
             if(sc.newRounds.isActive()) {
-                for (Activation.Link l : sc.getActivation().neuronOutputs) {
+                for (Activation.Link l : sc.getActivation().neuronOutputs.values()) {
                     if (l.output.decision != UNKNOWN &&
                             l.output.markedDirty > visited) {
                         return true;
@@ -218,7 +218,7 @@ public class SearchNode implements Comparable<SearchNode> {
             Activation.StateChange scb = csn != null ? csn.modifiedActs.get(act) : null;
 
             if (sca == null || scb == null || !sca.newRounds.compare(scb.newRounds)) {
-                for (Activation.Link l : act.neuronOutputs) {
+                for (Activation.Link l : act.neuronOutputs.values()) {
                     l.output.markDirty(visited);
                 }
             }
@@ -444,7 +444,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private void invalidateCachedDecisions() {
-        for (Activation.Link l : candidate.activation.neuronOutputs) {
+        for (Activation.Link l : candidate.activation.neuronOutputs.values()) {
             if (!l.synapse.isNegative()) {
                 invalidateCachedDecision(l.output);
             }

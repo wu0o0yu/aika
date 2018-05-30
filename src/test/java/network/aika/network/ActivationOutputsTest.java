@@ -78,8 +78,8 @@ public class ActivationOutputsTest {
         Activation inA1 = inA.getActivation(doc, new Range(0, 1), false);
         Activation inB1 = inB.getActivation(doc, new Range(0, 1), false);
 
-        Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, pAB.getActivation(doc, new Range(0, 1), false)));
-        Assert.assertTrue(containsOutputActivation(inB1.neuronOutputs, pAB.getActivation(doc, new Range(0, 1), false)));
+        Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs.values(), pAB.getActivation(doc, new Range(0, 1), false)));
+        Assert.assertTrue(containsOutputActivation(inB1.neuronOutputs.values(), pAB.getActivation(doc, new Range(0, 1), false)));
 
         Activation actAB = pAB.getActivation(doc, new Range(0, 1), false);
         Assert.assertEquals(
@@ -94,8 +94,8 @@ public class ActivationOutputsTest {
         );
 
 
-        Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs, pAB.getActivation(doc, new Range(0, 1), false)));
-        Assert.assertTrue(containsOutputActivation(inB1.neuronOutputs, pAB.getActivation(doc, new Range(0, 1), false)));
+        Assert.assertTrue(containsOutputActivation(inA1.neuronOutputs.values(), pAB.getActivation(doc, new Range(0, 1), false)));
+        Assert.assertTrue(containsOutputActivation(inB1.neuronOutputs.values(), pAB.getActivation(doc, new Range(0, 1), false)));
 
         actAB = pAB.getActivation(doc, new Range(0, 1), false);
         Assert.assertEquals(
@@ -121,7 +121,7 @@ public class ActivationOutputsTest {
     }
 
 
-    public boolean containsOutputActivation(Set<Activation.Link> outputActivations, Activation oAct) {
+    public boolean containsOutputActivation(Collection<Activation.Link> outputActivations, Activation oAct) {
         for(Activation.Link l: outputActivations) {
             if(l.output == oAct) return true;
         }
@@ -152,7 +152,7 @@ public class ActivationOutputsTest {
         );
 
         Activation outB1 = outB.getActivation(doc, new Range(0, 1), false);
-        Assert.assertTrue(containsOutputActivation(inA.getActivation(doc, new Range(0, 1), false).neuronOutputs, outB1));
+        Assert.assertTrue(containsOutputActivation(inA.getActivation(doc, new Range(0, 1), false).neuronOutputs.values(), outB1));
     }
 
 
@@ -182,7 +182,7 @@ public class ActivationOutputsTest {
 
         Activation outB1 = outB.getActivation(doc, new Range(0, 1), false);
 
-        Assert.assertTrue(containsOutputActivation(inA.get().getActivation(doc, new Range(0, 1), false).neuronOutputs, outB1));
+        Assert.assertTrue(containsOutputActivation(inA.get().getActivation(doc, new Range(0, 1), false).neuronOutputs.values(), outB1));
     }
 
 }

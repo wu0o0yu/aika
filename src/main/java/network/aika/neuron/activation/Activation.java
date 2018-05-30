@@ -39,6 +39,9 @@ public final class Activation extends OrActivation {
     public static int MAX_SELF_REFERENCING_DEPTH = 5;
     public static int MAX_PREDECESSOR_DEPTH = 100;
 
+    public static Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE, null, null);
+    public static Activation MAX_ACTIVATION = new Activation(Integer.MAX_VALUE, null, null);
+
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
     public Range range;
@@ -46,7 +49,7 @@ public final class Activation extends OrActivation {
 
     public TreeSet<Link> selectedNeuronInputs = new TreeSet<>(INPUT_COMP);
     public TreeMap<Link, Link> neuronInputs = new TreeMap<>(INPUT_COMP);
-    public TreeSet<Link> neuronOutputs = new TreeSet<>(OUTPUT_COMP);
+    public TreeMap<Link, Link> neuronOutputs = new TreeMap<>(OUTPUT_COMP);
 
     public Integer sequence;
 
@@ -126,7 +129,7 @@ public final class Activation extends OrActivation {
     public void addSynapseActivation(Linker.Direction dir, Link sa) {
         switch(dir) {
             case INPUT:
-                neuronOutputs.add(sa);
+                neuronOutputs.put(sa, sa);
                 break;
             case OUTPUT:
                 if(sa.input.decision == SELECTED) {
@@ -240,7 +243,7 @@ public final class Activation extends OrActivation {
         computeBounds();
 
         if(Math.abs(upperBound - oldUpperBound) > 0.01) {
-            for(Link l: neuronOutputs) {
+            for(Link l: neuronOutputs.values()) {
                 doc.ubQueue.add(l.output);
             }
         }
@@ -366,7 +369,7 @@ public final class Activation extends OrActivation {
 
     public List<Link> getFinalOutputActivationLinks() {
         ArrayList<Link> results = new ArrayList<>();
-        for (Link l : neuronOutputs) {
+        for (Link l : neuronOutputs.values()) {
             if (l.output.isFinalActivation()) {
                 results.add(l);
             }
@@ -423,7 +426,7 @@ public final class Activation extends OrActivation {
     private void collectOutgoingConflicts(List<Activation> conflicts, long v) {
         if(markedPredecessor == v) return;
 
-        for(Link l: neuronOutputs) {
+        for(Link l: neuronOutputs.values()) {
             if (l.output.getINeuron().type != INeuron.Type.INHIBITORY) {
                 if (l.synapse.isNegative() && l.synapse.key.isRecurrent) {
                     conflicts.add(l.output);
@@ -436,7 +439,7 @@ public final class Activation extends OrActivation {
 
 
     public void adjustSelectedNeuronInputs(Decision d) {
-        for(Link l: neuronOutputs) {
+        for(Link l: neuronOutputs.values()) {
             if(d == SELECTED) {
                 l.output.selectedNeuronInputs.add(l);
             } else {
@@ -629,9 +632,6 @@ public final class Activation extends OrActivation {
      * interpretation.
      */
     public static class State {
-        public static final int DIR = 0;
-        public static final int REC = 1;
-
         public final double value;
         public final double net;
 
@@ -804,16 +804,16 @@ public final class Activation extends OrActivation {
         public final Activation input;
         public final Activation output;
 
-        public static Comparator<Link> INPUT_COMP = (sa1, sa2) -> {
-            int r = Synapse.INPUT_SYNAPSE_COMP.compare(sa1.synapse, sa2.synapse);
+        public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
+            int r = Synapse.INPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
             if (r != 0) return r;
-            return Integer.compare(sa1.input.id, sa2.input.id);
+            return Integer.compare(l1.input.id, l2.input.id);
         };
 
-        public static Comparator<Link> OUTPUT_COMP = (sa1, sa2) -> {
-            int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(sa1.synapse, sa2.synapse);
+        public static Comparator<Link> OUTPUT_COMP = (l1, l2) -> {
+            int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
             if (r != 0) return r;
-            return Integer.compare(sa1.output.id, sa2.output.id);
+            return Integer.compare(l1.output.id, l2.output.id);
         };
 
 

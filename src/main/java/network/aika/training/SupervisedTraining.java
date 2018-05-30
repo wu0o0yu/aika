@@ -122,7 +122,7 @@ public class SupervisedTraining {
 
 
     public void computeBackpropagationErrorSignal(Activation act) {
-        for (Activation.Link l : act.neuronOutputs) {
+        for (Activation.Link l : act.neuronOutputs.values()) {
             Synapse s = l.synapse;
             Activation oAct = l.output;
 

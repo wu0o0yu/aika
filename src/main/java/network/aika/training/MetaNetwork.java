@@ -165,7 +165,7 @@ public class MetaNetwork {
         INeuron.update(doc.threadId, doc, t.targetNeuron, t.isNewNeuron ? metaAct.getINeuron().metaBias * metaAct.getSelectionProbability() : null, inputSynapses);
 
         if (t.isNewNeuron) {
-            Activation.Link inhibMetaLink = metaAct.neuronOutputs.first();
+            Activation.Link inhibMetaLink = metaAct.neuronOutputs.firstEntry().getValue();
             Synapse.Key inhibSynKey = inhibMetaLink.synapse.key;
             MetaSynapse inhibSS = inhibMetaLink.synapse.meta;
             t.inhibNeuron.addSynapse(
