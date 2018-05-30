@@ -145,7 +145,7 @@ public class LongTermLearning {
                     maxSP = Math.max(maxSP, rAct.getSelectionProbability());
                 }
 
-                s.updateDelta(act.doc, -config.ltdLearnRate * act.getFinalState().value, 0.0);
+                s.updateDelta(act.doc, -config.ltdLearnRate * act.getFinalState().value * (1.0 - maxSP) * act.getSelectionProbability(), 0.0);
             }
         }
     }

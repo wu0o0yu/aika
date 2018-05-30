@@ -233,17 +233,19 @@ public class InputNode extends Node<InputNode, InputActivation> {
         if(act.repropagateV != null && act.repropagateV != nln.markedCreated) return;
 
         ref.relations.get(0).getActivations(secondNode.inputNeuron.get(doc), iAct).forEach(secondIAct -> {
-                    InputActivation secondAct = secondIAct.outputToInputNode.output;
-                    if(secondAct != null) {
-                    //    if (!Conflicts.isConflicting(iAct, secondIAct)) {
+                    if (secondIAct.outputToInputNode != null) {
+                        InputActivation secondAct = secondIAct.outputToInputNode.output;
+                        if (secondAct != null) {
+                            //    if (!Conflicts.isConflicting(iAct, secondIAct)) {
                             AndActivation oAct = new AndActivation(doc.activationIdCounter++, doc, nln);
-                            for(Map.Entry<Refinement, RefValue> me: nln.parents.entrySet()) {
+                            for (Map.Entry<Refinement, RefValue> me : nln.parents.entrySet()) {
                                 boolean match = me.getKey().compareTo(ref) == 0;
                                 oAct.link(me.getKey(), me.getValue(), match ? secondAct : act, match ? act : secondAct);
                             }
                             nln.addActivation(oAct);
+                            // }
                         }
-                   // }
+                    }
                 }
         );
     }
