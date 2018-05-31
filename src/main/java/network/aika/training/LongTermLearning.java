@@ -109,7 +109,7 @@ public class LongTermLearning {
 
 
     private static void synapseLTP(Config config, Synapse s, Activation iAct, Activation act, double x) {
-        double h = s.isConjunction(false, false) ? hConj(act) : 1.0;
+        double h = s.isConjunction(false, true) ? hConj(act) : 1.0;
 
         double sDelta = iAct.getFinalState().value * x * h * iAct.getSelectionProbability();
 
@@ -136,7 +136,7 @@ public class LongTermLearning {
         INeuron n = act.getINeuron();
 
         for(Synapse s: (dir ? n.outputSynapses : n.inputSynapses).values()) {
-            if(!s.isNegative() && s.isConjunction(false, false) != dir) {
+            if(!s.isNegative() && s.isConjunction(false, true) != dir) {
                 double maxSP = 0.0;
                 for(Link l: (dir ? act.neuronOutputs : act.neuronInputs).subMap(
                         new Link(s, MIN_ACTIVATION, MIN_ACTIVATION),
