@@ -111,10 +111,10 @@ public class LongTermLearning {
     private static void synapseLTP(Config config, Synapse s, Activation iAct, Activation act, double x) {
         double h = s.isConjunction(false, true) ? hConj(act) : 1.0;
 
-        double sDelta = iAct.getFinalState().value * x * h * iAct.getSelectionProbability();
+        double delta = iAct.getFinalState().value * x * h * iAct.getSelectionProbability();
 
-        if(sDelta > 0.0) {
-            s.updateDelta(act.doc, sDelta, -config.beta * sDelta);
+        if(delta > 0.0) {
+            s.updateDelta(act.doc, delta, -config.beta * delta);
         }
     }
 
@@ -145,7 +145,10 @@ public class LongTermLearning {
                     maxSP = Math.max(maxSP, rAct.getSelectionProbability());
                 }
 
-                s.updateDelta(act.doc, -config.ltdLearnRate * act.getFinalState().value * (1.0 - maxSP) * act.getSelectionProbability(), 0.0);
+                double delta = -config.ltdLearnRate * act.getFinalState().value * (1.0 - maxSP) * act.getSelectionProbability();
+                if(delta < 0.0) {
+                    s.updateDelta(act.doc, delta, 0.0);
+                }
             }
         }
     }
