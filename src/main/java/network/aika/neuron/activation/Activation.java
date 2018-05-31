@@ -383,7 +383,9 @@ public final class Activation extends OrActivation {
 
         double norm = x;
         for(Activation cAct: getConflicts()) {
-            norm += Math.exp(cAct.maxWeight);
+            if(cAct.getINeuron().type != INeuron.Type.META || cAct.getTarget() == null) {
+                norm += Math.exp(cAct.maxWeight);
+            }
         }
 
         return x / norm;
@@ -446,6 +448,22 @@ public final class Activation extends OrActivation {
                 l.output.selectedNeuronInputs.remove(l);
             }
         }
+    }
+
+
+    public Activation getTarget() {
+        assert getINeuron().type == INeuron.Type.META;
+
+        for(Link li: neuronOutputs.values()) {
+            if(li.output.getINeuron().type == INeuron.Type.INHIBITORY) {
+                for(Link le: li.output.neuronInputs.values()) {
+                    if (le.input.getINeuron().type == INeuron.Type.EXCITATORY) {
+                        return le.input;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 

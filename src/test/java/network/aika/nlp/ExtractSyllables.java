@@ -181,8 +181,8 @@ public class ExtractSyllables {
 
                 LongTermLearning.train(doc,
                         new LongTermLearning.Config()
-                                .setLTPLearnRate(0.5)
-                                .setLTDLearnRate(0.5)
+                                .setLTPLearnRate(1.0)
+                                .setLTDLearnRate(1.0)
                 );
 
                 doc.clearActivations();
