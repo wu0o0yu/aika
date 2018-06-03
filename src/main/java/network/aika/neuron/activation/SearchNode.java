@@ -19,7 +19,6 @@ package network.aika.neuron.activation;
 
 import network.aika.Document;
 import network.aika.Utils;
-import network.aika.neuron.INeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +49,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public static int MAX_SEARCH_STEPS = Integer.MAX_VALUE;
     public static boolean ENABLE_CACHING = true;
+    public static boolean OPTIMIZE_SEARCH = true;
+    public static boolean COMPUTE_SOFT_MAX = false;
 
     public int id;
 
@@ -369,7 +370,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean prepareSelectStep(Document doc) {
-        if(alreadyExcluded || skip == SELECTED || getCachedDecision() == Decision.EXCLUDED) return false;
+        if(alreadyExcluded || skip == SELECTED || (OPTIMIZE_SEARCH && getCachedDecision() == Decision.EXCLUDED)) return false;
 
         candidate.activation.setDecision(SELECTED, visited);
 
@@ -386,7 +387,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean prepareExcludeStep(Document doc) {
-        if(alreadySelected || skip == EXCLUDED || getCachedDecision() == Decision.SELECTED) return false;
+        if(alreadySelected || skip == EXCLUDED || (OPTIMIZE_SEARCH && getCachedDecision() == Decision.SELECTED)) return false;
 
         candidate.activation.setDecision(EXCLUDED, visited);
 
@@ -482,7 +483,29 @@ public class SearchNode implements Comparable<SearchNode> {
             bestPath = false;
         }
 
+        if(COMPUTE_SOFT_MAX) {
+            storeSearchState(doc);
+        }
+
         return accumulatedWeight;
+    }
+
+
+    private void storeSearchState(Document doc) {
+        doc.searchNodeWeights.put(id, accumulatedWeight);
+
+        SearchNode sn = this;
+        while(sn != null) {
+            if(sn.candidate != null) {
+                Activation act = sn.candidate.activation;
+
+                if(act.searchStates == null) {
+                    act.searchStates = new TreeMap<>();
+                }
+                act.searchStates.put(id, act.rounds.getLast());
+            }
+            sn = sn.getParent();
+        }
     }
 
 

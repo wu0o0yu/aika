@@ -74,27 +74,25 @@ public class LongTermLearning {
     private static void trainExcitatory(Config config, Activation act) {
         INeuron n = act.getINeuron();
 
-        double x = (1.0 - act.maxValue) *
-                Utils.nullSafeMax(act.maxValue, act.targetValue) *
-                act.getSelectionProbability();
+        double x = (1.0 - act.avgState.value) * Utils.nullSafeMax(act.avgState.value, act.targetValue);
 
         for(Synapse s: n.inputSynapses.values()) {
             if (!s.isNegative()) {
-                double maxSP = 0.0;
                 double maxValue = 0.0;
+                double maxP = 0.0;
                 for (Link l : act.neuronInputs.subMap(
                         new Link(s, MIN_ACTIVATION, MIN_ACTIVATION),
                         new Link(s, MAX_ACTIVATION, MAX_ACTIVATION)).values()) {
-                    maxSP = Math.max(maxSP, l.input.getSelectionProbability());
-                    maxValue = Math.max(maxValue, l.input.maxValue);
+                    maxValue = Math.max(maxValue, l.input.avgState.value);
+                    maxP = Math.max(maxP, l.input.avgState.p);
                 }
 
-                double h = act.maxNet / (n.biasSum + n.posDirSum + n.posRecSum);
+                double h = act.avgState.net / (n.biasSum + n.posDirSum + n.posRecSum);
 
-                double delta = config.learnRate * x * h * maxValue * maxSP;
-                delta -= config.learnRate * x * h * (1.0 - maxSP);
+                double delta = config.learnRate * x * h * maxValue;
+                delta -= config.learnRate * x * h * (1.0 - maxP);
 
-                double biasDelta = -config.learnRate * (1.0 - act.getSelectionProbability()) * (act.maxPosValue - act.maxValue);
+                double biasDelta = -config.learnRate * (act.avgState.posValue - act.avgState.value);
 
                 if(delta != 0.0 || biasDelta != 0.0) {
                     s.updateDelta(act.doc, delta, biasDelta);
@@ -105,14 +103,12 @@ public class LongTermLearning {
 
 
     private static void trainInhibitoryPot(Config config, Activation act) {
-        double x = (1.0 - act.maxValue) *
-                Utils.nullSafeMax(act.maxValue, act.targetValue) *
-                act.getSelectionProbability();
+        double x = (1.0 - act.avgState.value) * Utils.nullSafeMax(act.avgState.value, act.targetValue);
 
         for (Link l : act.neuronInputs.values()) {
             Activation iAct = l.input;
 
-            double delta = config.learnRate * x * iAct.maxValue * iAct.getSelectionProbability();
+            double delta = config.learnRate * x * iAct.avgState.value;
 
             if(delta != 0.0) {
                 l.synapse.updateDelta(act.doc, delta, 0.0);
@@ -124,23 +120,20 @@ public class LongTermLearning {
     private static void trainInhibitoryDepr(Config config, Activation act) {
         INeuron n = act.getINeuron();
 
-        double x = -config.learnRate *
-                (1.0 - act.maxValue) *
-                Utils.nullSafeMax(act.maxValue, act.targetValue) *
-                act.getSelectionProbability();
+        double x = -config.learnRate * (1.0 - act.avgState.value) * Utils.nullSafeMax(act.avgState.value, act.targetValue);
 
         for(Synapse s: n.outputSynapses.values()) {
             INeuron on = s.output.get(act.doc);
             if(!s.isNegative() && on.type == INeuron.Type.INHIBITORY) {
-                double maxSP = 0.0;
+                double maxP = 0.0;
                 for(Link l: act.neuronOutputs.subMap(
                         new Link(s, MIN_ACTIVATION, MIN_ACTIVATION),
                         new Link(s, MAX_ACTIVATION, MAX_ACTIVATION)).values()) {
                     Activation rAct = l.output;
-                    maxSP = Math.max(maxSP, rAct.getSelectionProbability());
+                    maxP = Math.max(maxP, rAct.avgState.p);
                 }
 
-                double delta = x * (1.0 - maxSP);
+                double delta = x * (1.0 - maxP);
                 if(delta < 0.0) {
                     s.updateDelta(act.doc, delta, 0.0);
                 }

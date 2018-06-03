@@ -72,13 +72,13 @@ public class MetaNetwork {
 
                 doc.createV = doc.visitedCounter++;
                 Neuron targetNeuron;
-                if (targetAct != null && metaAct != null && targetAct.getSelectionProbability() > threshold) {
+                if (targetAct != null && metaAct != null && targetAct.avgState.p > threshold) {
                     targetNeuron = targetAct.getNeuron();
 
                     collectTarget(metaActivations, metaAct, inhibN, targetNeuron, false);
-                } else if(metaAct != null && metaAct.getSelectionProbability() > threshold) {
+                } else if(metaAct != null && metaAct.avgState.p > threshold) {
                     targetNeuron = doc.model.createNeuron(inhibN.label.substring(2) + "-" + doc.getText(metaAct.range));
-                    INeuron.update(doc.threadId, doc, targetNeuron, metaAct.getINeuron().metaBias * metaAct.getSelectionProbability(), Collections.emptySet());
+                    INeuron.update(doc.threadId, doc, targetNeuron, metaAct.getINeuron().metaBias * metaAct.avgState.p, Collections.emptySet());
                     targetNeuron.get(doc).type = INeuron.Type.EXCITATORY;
                     collectTarget(metaActivations, metaAct, inhibN, targetNeuron, true);
                 }
@@ -126,7 +126,7 @@ public class MetaNetwork {
             MetaSynapse inputMetaSynapse = l.synapse.meta;
             Synapse os = l.synapse;
 
-            if(l.input.getSelectionProbability() < threshold) {
+            if(l.input.avgState.p < threshold) {
                 continue;
             }
 
@@ -138,7 +138,7 @@ public class MetaNetwork {
                         Collections.singletonList(l);
 
                 for(Activation.Link isa: inputs) {
-                    if(isa.input.getSelectionProbability() < threshold) {
+                    if(isa.input.avgState.p < threshold) {
                         continue;
                     }
 
@@ -162,7 +162,7 @@ public class MetaNetwork {
             log.debug(showDelta(t.targetNeuron.get(), inputSynapses));
         }
 */
-        INeuron.update(doc.threadId, doc, t.targetNeuron, t.isNewNeuron ? metaAct.getINeuron().metaBias * metaAct.getSelectionProbability() : null, inputSynapses);
+        INeuron.update(doc.threadId, doc, t.targetNeuron, t.isNewNeuron ? metaAct.getINeuron().metaBias * metaAct.avgState.p : null, inputSynapses);
 
         if (t.isNewNeuron) {
             Activation.Link inhibMetaLink = metaAct.neuronOutputs.firstEntry().getValue();
@@ -199,7 +199,7 @@ public class MetaNetwork {
 
         Synapse ns = new Synapse(in, t.targetNeuron, os.id, os.key, nRels, os.distanceFunction);
         if (!ns.exists()) {
-            double sp = metaAct.getSelectionProbability();
+            double sp = metaAct.avgState.p;
 
             ns.updateDelta(doc, inputMetaSynapse.metaWeight * sp, inputMetaSynapse.metaBias * sp);
 

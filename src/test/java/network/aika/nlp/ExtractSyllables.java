@@ -6,6 +6,7 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.SearchNode;
 import network.aika.training.LongTermLearning;
 import network.aika.training.MetaNetwork;
 import network.aika.training.MetaSynapse;
@@ -147,6 +148,9 @@ public class ExtractSyllables {
 
     @Test
     public void extractSyllables() {
+        SearchNode.OPTIMIZE_SEARCH = false;
+        SearchNode.COMPUTE_SOFT_MAX = true;
+
         ArrayList<String> inputs = new ArrayList<>();
         inputs.add("kuchen ");
         inputs.add("küche ");
@@ -167,6 +171,8 @@ public class ExtractSyllables {
                 processCharacters(doc);
 
                 doc.process();
+
+                System.out.println(doc.activationsToString(true, true, true));
 
                 MetaNetwork.train(doc, 0.1);
 

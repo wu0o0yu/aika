@@ -55,10 +55,9 @@ public final class Activation extends OrActivation {
 
     public double upperBound;
     public double lowerBound;
-    public double maxWeight;
-    public double maxValue;
-    public double maxNet;
-    public double maxPosValue;
+
+    public State avgState;
+    public Map<Integer, State> searchStates;
 
     public Rounds rounds = new Rounds();
     public Rounds finalRounds = rounds;
@@ -148,7 +147,7 @@ public final class Activation extends OrActivation {
         double delta = 0.0;
         State s;
         if(inputValue != null) {
-            s = new State(inputValue, 0.0, 0, 0.0);
+            s = new State(inputValue, inputValue, 1.0, 0.0, 0, 0.0);
         } else {
             s = computeValueAndWeight(round);
         }
@@ -217,27 +216,27 @@ public final class Activation extends OrActivation {
             }
         }
 
-        double currentActValue = n.activationFunction.f(net);
+        double actValue = n.activationFunction.f(net);
+        double posActValue = n.activationFunction.f(posNet);
 
         double w = Math.min(-n.negRecSum, net);
 
         // Compute only the recurrent part is above the threshold.
         double newWeight = decision == SELECTED ? Math.max(0.0, w) : 0.0;
 
-        maxWeight = Math.max(maxWeight, newWeight);
-        maxValue = Math.max(maxValue, currentActValue);
-        maxNet = Math.max(maxNet, net);
-        maxPosValue = Math.max(maxPosValue, n.activationFunction.f(posNet));
-
         if(decision == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS) {
             return new State(
-                    currentActValue,
+                    actValue,
+                    posActValue,
+                    1.0,
                     net,
                     -1,
                     newWeight
             );
         } else {
             return new State(
+                    0.0,
+                    posActValue,
                     0.0,
                     0.0,
                     -1,
@@ -307,6 +306,8 @@ public final class Activation extends OrActivation {
     private static State getInitialState(Decision c) {
         return new State(
                 c == SELECTED ? 1.0 : 0.0,
+                0.0,
+                1.0,
                 0.0,
                 0,
                 0.0
@@ -385,20 +386,6 @@ public final class Activation extends OrActivation {
             }
         }
         return results;
-    }
-
-
-    public double getSelectionProbability() {
-        double x = Math.exp(maxWeight);
-
-        double norm = x;
-        for(Activation cAct: getConflicts()) {
-            if(cAct.getINeuron().type != INeuron.Type.META || cAct.getTarget() == null) {
-                norm += Math.exp(cAct.maxWeight);
-            }
-        }
-
-        return x / norm;
     }
 
 
@@ -661,16 +648,20 @@ public final class Activation extends OrActivation {
      */
     public static class State {
         public final double value;
+        public final double posValue;
+        public final double p;
         public final double net;
 
         public final int fired;
         public final double weight;
 
-        public static final State ZERO = new State(0.0, 0.0, -1, 0.0);
+        public static final State ZERO = new State(0.0, 0.0, 0.0, 0.0, -1, 0.0);
 
-        public State(double value, double net, int fired, double weight) {
+        public State(double value, double posValue, double p, double net, int fired, double weight) {
             assert !Double.isNaN(value);
             this.value = value;
+            this.posValue = posValue;
+            this.p = p;
             this.net = net;
             this.fired = fired;
             this.weight = weight;
@@ -686,7 +677,7 @@ public final class Activation extends OrActivation {
         }
 
         public String toString() {
-            return "V:" + Utils.round(value) + " W:" + Utils.round(weight);
+            return "V:" + Utils.round(value) + " pV:" + Utils.round(posValue) + " P:" + Utils.round(p) + " W:" + Utils.round(weight);
         }
     }
 
@@ -739,10 +730,11 @@ public final class Activation extends OrActivation {
 
         sb.append(" - UB:");
         sb.append(Utils.round(upperBound));
-        sb.append(" MW:");
-        sb.append(Utils.round(maxWeight));
-        sb.append(" SP:");
-        sb.append(Utils.round(getSelectionProbability()));
+
+        if(avgState != null) {
+            sb.append(" AVG:");
+            sb.append(avgState);
+        }
 
         sb.append(" - ");
         if(finalOnly) {

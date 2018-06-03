@@ -80,6 +80,7 @@ public class Document implements Comparable<Document> {
     public TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
     public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
     public TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
+    public TreeMap<Integer, Double> searchNodeWeights = new TreeMap<>();
 
     public SupervisedTraining supervisedTraining = new SupervisedTraining(this);
 
@@ -265,6 +266,40 @@ public class Document implements Comparable<Document> {
         for(Activation act: activationsByRangeBegin.values()) {
             if(act.isFinalActivation()) {
                 finallyActivatedNeurons.add(act.getINeuron());
+            }
+        }
+
+        if(SearchNode.COMPUTE_SOFT_MAX) {
+            computeSoftMax();
+        }
+    }
+
+
+    private void computeSoftMax() {
+        double norm = 0.0;
+        for(Double w: searchNodeWeights.values()) {
+            norm += Math.exp(w);
+        }
+
+        for(Activation act: activationsByRangeBegin.values()) {
+            if(act.searchStates != null) {
+                double avgValue = 0.0;
+                double avgPosValue = 0.0;
+                double avgP = 0.0;
+                double avgNet = 0.0;
+
+                for (Map.Entry<Integer, Double> me : searchNodeWeights.entrySet()) {
+                    double p = Math.exp(me.getValue()) / norm;
+
+                    Activation.State s = act.searchStates.get(me.getKey());
+
+                    avgValue += p * s.value;
+                    avgPosValue += p * s.posValue;
+                    avgP += p * s.p;
+                    avgNet += p * s.net;
+                }
+
+                act.avgState = new Activation.State(avgValue, avgPosValue, avgP, avgNet, 0, 0.0);
             }
         }
     }
