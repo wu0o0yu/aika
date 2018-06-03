@@ -147,7 +147,7 @@ public final class Activation extends OrActivation {
         double delta = 0.0;
         State s;
         if(inputValue != null) {
-            s = new State(inputValue, inputValue, 1.0, 0.0, 0, 0.0);
+            s = new State(inputValue, inputValue, 1.0, 0.0, 0.0, 0, 0.0);
         } else {
             s = computeValueAndWeight(round);
         }
@@ -230,6 +230,7 @@ public final class Activation extends OrActivation {
                     posActValue,
                     1.0,
                     net,
+                    posNet,
                     -1,
                     newWeight
             );
@@ -239,6 +240,7 @@ public final class Activation extends OrActivation {
                     posActValue,
                     0.0,
                     0.0,
+                    posNet,
                     -1,
                     newWeight
             );
@@ -308,6 +310,7 @@ public final class Activation extends OrActivation {
                 c == SELECTED ? 1.0 : 0.0,
                 0.0,
                 1.0,
+                0.0,
                 0.0,
                 0,
                 0.0
@@ -651,18 +654,20 @@ public final class Activation extends OrActivation {
         public final double posValue;
         public final double p;
         public final double net;
+        public final double posNet;
 
         public final int fired;
         public final double weight;
 
-        public static final State ZERO = new State(0.0, 0.0, 0.0, 0.0, -1, 0.0);
+        public static final State ZERO = new State(0.0, 0.0, 0.0, 0.0, 0.0, -1, 0.0);
 
-        public State(double value, double posValue, double p, double net, int fired, double weight) {
+        public State(double value, double posValue, double p, double net, double posNet, int fired, double weight) {
             assert !Double.isNaN(value);
             this.value = value;
             this.posValue = posValue;
             this.p = p;
             this.net = net;
+            this.posNet = posNet;
             this.fired = fired;
             this.weight = weight;
         }

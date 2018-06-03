@@ -87,7 +87,7 @@ public class LongTermLearning {
                     maxP = Math.max(maxP, l.input.avgState.p);
                 }
 
-                double h = act.avgState.net / (n.biasSum + n.posDirSum + n.posRecSum);
+                double h = act.avgState.posNet / (n.biasSum + n.posDirSum + n.posRecSum);
 
                 double delta = config.learnRate * x * h * maxValue;
                 delta -= config.learnRate * x * h * (1.0 - maxP);

@@ -287,6 +287,7 @@ public class Document implements Comparable<Document> {
                 double avgPosValue = 0.0;
                 double avgP = 0.0;
                 double avgNet = 0.0;
+                double avgPosNet = 0.0;
 
                 for (Map.Entry<Integer, Double> me : searchNodeWeights.entrySet()) {
                     double p = Math.exp(me.getValue()) / norm;
@@ -297,9 +298,10 @@ public class Document implements Comparable<Document> {
                     avgPosValue += p * s.posValue;
                     avgP += p * s.p;
                     avgNet += p * s.net;
+                    avgPosNet += p * s.posNet;
                 }
 
-                act.avgState = new Activation.State(avgValue, avgPosValue, avgP, avgNet, 0, 0.0);
+                act.avgState = new Activation.State(avgValue, avgPosValue, avgP, avgNet, avgPosNet, 0, 0.0);
             }
         }
     }
