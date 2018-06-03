@@ -160,8 +160,7 @@ public class GrammarInductionTest {
             Document doc = parse("The dog chased the cat");
             LongTermLearning.train(doc,
                     new LongTermLearning.Config()
-                            .setLTPLearnRate(0.5)
-                            .setLTDLearnRate(0.5)
+                            .setLearnRate(0.5)
             );
 
             doc.clearActivations();

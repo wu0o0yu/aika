@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
@@ -162,13 +163,16 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public Stream<Activation> getFinalActivations() {
-        return getActivations().filter(act -> act.isFinalActivation());
-    }
-
-
-    public Stream<Activation> getActivations() {
-        return activationsByRangeBegin.values().stream();
+    public Collection<Activation> getActivations(boolean onlyFinal) {
+        if(!onlyFinal) {
+            return activationsByRangeBegin.values();
+        } else {
+            return activationsByRangeBegin
+                    .values()
+                    .stream()
+                    .filter(act -> act.isFinalActivation())
+                    .collect(Collectors.toList());
+        }
     }
 
 

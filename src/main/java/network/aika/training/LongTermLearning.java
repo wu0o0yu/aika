@@ -22,10 +22,6 @@ import network.aika.Utils;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.INeuron;
-import network.aika.training.SynapseEvaluation.Result;
-
-import java.util.Set;
-import java.util.TreeSet;
 
 import static network.aika.neuron.activation.Activation.*;
 
@@ -46,26 +42,10 @@ public class LongTermLearning {
 
 
     public static class Config {
-        public double ltpLearnRate;
-        public double ltdLearnRate;
-        public double beta;
+        public double learnRate;
 
-
-
-        public Config setLTPLearnRate(double learnRate) {
-            this.ltpLearnRate = learnRate;
-            return this;
-        }
-
-
-        public Config setLTDLearnRate(double learnRate) {
-            this.ltdLearnRate = learnRate;
-            return this;
-        }
-
-
-        public Config setBeta(double beta) {
-            this.beta = beta;
+        public Config setLearnRate(double learnRate) {
+            this.learnRate = learnRate;
             return this;
         }
     }
@@ -73,79 +53,94 @@ public class LongTermLearning {
 
 
     public static void train(Document doc, Config config) {
-        doc.getActivations()
-                .filter(act -> act.targetValue == null ? act.isFinalActivation() : act.targetValue > 0.0)
-                .filter(act -> act.getINeuron().type != INeuron.Type.META)
-                .forEach(act -> {
-            longTermPotentiation(config, act);
-            longTermDepression(config, act, false);
-            longTermDepression(config, act, true);
-        });
+        for(Activation act: doc.getActivations(false)) {
+            INeuron.Type t = act.getINeuron().type;
+            if(t != null) {
+                switch (t) {
+                    case EXCITATORY:
+                        trainExcitatory(config, act);
+                        break;
+                    case INHIBITORY:
+//                    trainInhibitoryPot(config, act);
+                        break;
+                }
+            }
+//            trainInhibitoryDepr(config, act);
+        }
         doc.commit();
     }
 
 
-    private static double hConj(Activation act) {
+    private static void trainExcitatory(Config config, Activation act) {
         INeuron n = act.getINeuron();
-        return act.getFinalState().net / (n.biasSum + n.posDirSum + n.posRecSum);
-    }
 
-    /**
-     * The long-term potentiation algorithm is a variant of the Hebb learning rule.
-     *
-     * @param config
-     * @param act
-     */
-    public static void longTermPotentiation(Config config, Activation act) {
-        double iv = Utils.nullSafeMax(act.getFinalState().value, act.targetValue);
+        double x = (1.0 - act.maxValue) *
+                Utils.nullSafeMax(act.maxValue, act.targetValue) *
+                act.getSelectionProbability();
 
-        double x = config.ltpLearnRate * (1.0 - act.getFinalState().value) * iv * act.getSelectionProbability();
+        for(Synapse s: n.inputSynapses.values()) {
+            if (!s.isNegative()) {
+                double maxSP = 0.0;
+                double maxValue = 0.0;
+                for (Link l : act.neuronInputs.subMap(
+                        new Link(s, MIN_ACTIVATION, MIN_ACTIVATION),
+                        new Link(s, MAX_ACTIVATION, MAX_ACTIVATION)).values()) {
+                    maxSP = Math.max(maxSP, l.input.getSelectionProbability());
+                    maxValue = Math.max(maxValue, l.input.maxValue);
+                }
 
-        act.neuronInputs.values()
-                .stream()
-                .filter(sa -> sa.input.targetValue == null ? sa.input.isFinalActivation() : sa.input.targetValue > 0.0)
-                .forEach(sa -> synapseLTP(config, sa.synapse, sa.input, act, x));
-    }
+                double h = act.maxNet / (n.biasSum + n.posDirSum + n.posRecSum);
 
+                double delta = config.learnRate * x * h * maxValue * maxSP;
+                delta -= config.learnRate * x * h * (1.0 - maxSP);
 
-    private static void synapseLTP(Config config, Synapse s, Activation iAct, Activation act, double x) {
-        double h = s.isConjunction(false, true) ? hConj(act) : 1.0;
+                double biasDelta = -config.learnRate * (1.0 - act.getSelectionProbability()) * (act.maxPosValue - act.maxValue);
 
-        double delta = iAct.getFinalState().value * x * h * iAct.getSelectionProbability();
-
-        if(delta > 0.0) {
-            s.updateDelta(act.doc, delta, -config.beta * delta);
+                if(delta != 0.0 || biasDelta != 0.0) {
+                    s.updateDelta(act.doc, delta, biasDelta);
+                }
+            }
         }
     }
 
 
-    /**
-     * The long-term depression algorithm decreases the strength of a synapse if only one side of the synapse is
-     * firing. The algorithm tries however to preserve the logical characteristic of the synapse. If for example the
-     * synapse has an or-characteristic, then a non firing input neuron and a firing output neuron will not change
-     * the synapse weight. On the other hand, if the synapse has an and-characteristic, then a firing input neuron
-     * and a non firing output neuron will not change the synapse weight, too.
-     *
-     * @param config
-     * @param act
-     * @param dir
-     */
-    public static void longTermDepression(Config config, Activation act, boolean dir) {
-        if(act.getFinalState().value <= 0.0) return;
+    private static void trainInhibitoryPot(Config config, Activation act) {
+        double x = (1.0 - act.maxValue) *
+                Utils.nullSafeMax(act.maxValue, act.targetValue) *
+                act.getSelectionProbability();
 
+        for (Link l : act.neuronInputs.values()) {
+            Activation iAct = l.input;
+
+            double delta = config.learnRate * x * iAct.maxValue * iAct.getSelectionProbability();
+
+            if(delta != 0.0) {
+                l.synapse.updateDelta(act.doc, delta, 0.0);
+            }
+        }
+    }
+
+
+    private static void trainInhibitoryDepr(Config config, Activation act) {
         INeuron n = act.getINeuron();
 
-        for(Synapse s: (dir ? n.outputSynapses : n.inputSynapses).values()) {
-            if(!s.isNegative() && s.isConjunction(false, true) != dir) {
+        double x = -config.learnRate *
+                (1.0 - act.maxValue) *
+                Utils.nullSafeMax(act.maxValue, act.targetValue) *
+                act.getSelectionProbability();
+
+        for(Synapse s: n.outputSynapses.values()) {
+            INeuron on = s.output.get(act.doc);
+            if(!s.isNegative() && on.type == INeuron.Type.INHIBITORY) {
                 double maxSP = 0.0;
-                for(Link l: (dir ? act.neuronOutputs : act.neuronInputs).subMap(
+                for(Link l: act.neuronOutputs.subMap(
                         new Link(s, MIN_ACTIVATION, MIN_ACTIVATION),
                         new Link(s, MAX_ACTIVATION, MAX_ACTIVATION)).values()) {
-                    Activation rAct = dir ? l.output : l.input;
+                    Activation rAct = l.output;
                     maxSP = Math.max(maxSP, rAct.getSelectionProbability());
                 }
 
-                double delta = -config.ltdLearnRate * act.getFinalState().value * (1.0 - maxSP) * act.getSelectionProbability();
+                double delta = x * (1.0 - maxSP);
                 if(delta < 0.0) {
                     s.updateDelta(act.doc, delta, 0.0);
                 }

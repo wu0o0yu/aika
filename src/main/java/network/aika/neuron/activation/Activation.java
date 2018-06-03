@@ -56,6 +56,9 @@ public final class Activation extends OrActivation {
     public double upperBound;
     public double lowerBound;
     public double maxWeight;
+    public double maxValue;
+    public double maxNet;
+    public double maxPosValue;
 
     public Rounds rounds = new Rounds();
     public Rounds finalRounds = rounds;
@@ -187,6 +190,7 @@ public final class Activation extends OrActivation {
     public State computeValueAndWeight(int round) {
         INeuron n = getINeuron();
         double net = n.biasSum;
+        double posNet = n.biasSum;
 
         int fired = -1;
 
@@ -204,6 +208,9 @@ public final class Activation extends OrActivation {
                 x *= s.distanceFunction.f(iAct, this);
             }
             net += x;
+            if(!s.isNegative()) {
+                posNet += x;
+            }
 
             if (!s.key.isRecurrent && !s.isNegative() && net >= 0.0 && fired < 0) {
                 fired = iAct.rounds.get(round).fired + 1;
@@ -218,6 +225,9 @@ public final class Activation extends OrActivation {
         double newWeight = decision == SELECTED ? Math.max(0.0, w) : 0.0;
 
         maxWeight = Math.max(maxWeight, newWeight);
+        maxValue = Math.max(maxValue, currentActValue);
+        maxNet = Math.max(maxNet, net);
+        maxPosValue = Math.max(maxPosValue, n.activationFunction.f(posNet));
 
         if(decision == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS) {
             return new State(

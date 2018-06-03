@@ -99,7 +99,7 @@ public class SupervisedTraining {
 
         n.changeBias(x);
 
-        doc.getFinalActivations().forEach(iAct -> {
+        doc.getActivations(true).forEach(iAct -> {
             Result r = se.evaluate(null, iAct, targetAct);
             if (r != null) {
                 trainSynapse(n, iAct, r, x, v);

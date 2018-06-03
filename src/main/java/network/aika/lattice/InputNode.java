@@ -258,7 +258,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         }
 
         Document doc = act.doc;
-        doc.getFinalActivations().forEach(secondNAct -> {
+        doc.getActivations(true).forEach(secondNAct -> {
             InputActivation secondAct = secondNAct.outputToInputNode.output;
             if (act != secondAct && config.candidateCheck.check(act, secondAct)) {
                 List<Relation> relations = getRelations(act.input.input, secondNAct);

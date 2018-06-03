@@ -223,6 +223,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         act.inputValue = input.value;
         act.upperBound = input.value;
         act.lowerBound = input.value;
+        act.maxValue = input.value;
 
         act.inputDecision = SearchNode.Decision.SELECTED;
         act.finalDecision = act.inputDecision;
