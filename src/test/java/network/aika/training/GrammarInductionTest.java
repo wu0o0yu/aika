@@ -3,12 +3,9 @@ package network.aika.training;
 import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.lattice.AndNode;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Range;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -160,7 +157,7 @@ public class GrammarInductionTest {
             Document doc = parse("The dog chased the cat");
             LongTermLearning.train(doc,
                     new LongTermLearning.Config()
-                            .setLearnRate(0.5)
+                            .setPatternLearnRate(0.5)
             );
 
             doc.clearActivations();

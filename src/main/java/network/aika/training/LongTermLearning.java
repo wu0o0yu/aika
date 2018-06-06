@@ -42,10 +42,22 @@ public class LongTermLearning {
 
 
     public static class Config {
-        public double learnRate;
+        public double patternLearnRate;
+        public double strengthLearnRate;
+        public double strengthOffset;
 
-        public Config setLearnRate(double learnRate) {
-            this.learnRate = learnRate;
+        public Config setPatternLearnRate(double patternLearnRate) {
+            this.patternLearnRate = patternLearnRate;
+            return this;
+        }
+
+        public Config setStrengthLearnRate(double strengthLearnRate) {
+            this.strengthLearnRate = strengthLearnRate;
+            return this;
+        }
+
+        public Config setStrengthOffset(double strengthOffset) {
+            this.strengthOffset = strengthOffset;
             return this;
         }
     }
@@ -54,18 +66,20 @@ public class LongTermLearning {
 
     public static void train(Document doc, Config config) {
         for(Activation act: doc.getActivations(false)) {
-            INeuron.Type t = act.getINeuron().type;
-            if(t != null) {
-                switch (t) {
-                    case EXCITATORY:
-                        trainExcitatory(config, act);
-                        break;
-                    case INHIBITORY:
+            if(act.upperBound > 0.0) {
+                INeuron.Type t = act.getINeuron().type;
+                if (t != null) {
+                    switch (t) {
+                        case EXCITATORY:
+                            trainExcitatory(config, act);
+                            break;
+                        case INHIBITORY:
 //                    trainInhibitoryPot(config, act);
-                        break;
+                            break;
+                    }
                 }
-            }
 //            trainInhibitoryDepr(config, act);
+            }
         }
         doc.commit();
     }
@@ -89,13 +103,16 @@ public class LongTermLearning {
 
                 double h = act.avgState.posNet / (n.biasSum + n.posDirSum + n.posRecSum);
 
-                double delta = config.learnRate * x * h * maxValue;
-                delta -= config.learnRate * x * h * (1.0 - maxP);
+                double patternDelta = config.patternLearnRate * x * h * maxValue;
+                patternDelta -= config.patternLearnRate * x * h * (1.0 - maxP);
 
-                double biasDelta = -config.learnRate * (act.avgState.posValue - act.avgState.value);
+                double weightDelta = patternDelta;
+                double biasDelta = -patternDelta;
 
-                if(delta != 0.0 || biasDelta != 0.0) {
-                    s.updateDelta(act.doc, delta, biasDelta);
+                biasDelta += config.strengthLearnRate * (config.strengthOffset + act.avgState.value - act.avgState.posValue);
+
+                if(weightDelta != 0.0 || biasDelta != 0.0) {
+                    s.updateDelta(act.doc, weightDelta, biasDelta);
                 }
             }
         }
@@ -108,7 +125,7 @@ public class LongTermLearning {
         for (Link l : act.neuronInputs.values()) {
             Activation iAct = l.input;
 
-            double delta = config.learnRate * x * iAct.avgState.value;
+            double delta = config.patternLearnRate * x * iAct.avgState.value;
 
             if(delta != 0.0) {
                 l.synapse.updateDelta(act.doc, delta, 0.0);
@@ -120,7 +137,7 @@ public class LongTermLearning {
     private static void trainInhibitoryDepr(Config config, Activation act) {
         INeuron n = act.getINeuron();
 
-        double x = -config.learnRate * (1.0 - act.avgState.value) * Utils.nullSafeMax(act.avgState.value, act.targetValue);
+        double x = -config.patternLearnRate * (1.0 - act.avgState.value) * Utils.nullSafeMax(act.avgState.value, act.targetValue);
 
         for(Synapse s: n.outputSynapses.values()) {
             INeuron on = s.output.get(act.doc);

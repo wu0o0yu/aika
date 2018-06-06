@@ -163,7 +163,10 @@ public class Converter {
             alreadyCollected.add(syn.id);
             for(Integer synId: syn.relations.keySet()) {
                 if(!alreadyCollected.contains(synId)) {
-                    relatedSyns.put(synId, syn.output.getSynapseById(synId));
+                    Synapse rs = syn.output.getSynapseById(synId);
+                    if(rs != null) {
+                        relatedSyns.put(synId, rs);
+                    }
                 }
             }
 
