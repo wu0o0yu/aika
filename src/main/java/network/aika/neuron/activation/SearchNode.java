@@ -387,13 +387,22 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean prepareExcludeStep(Document doc) {
-        if(alreadySelected || skip == EXCLUDED || (OPTIMIZE_SEARCH && getCachedDecision() == Decision.SELECTED)) return false;
+        if(alreadySelected || skip == EXCLUDED || (OPTIMIZE_SEARCH && getCachedDecision() == Decision.SELECTED) || allOthersExcluded()) return false;
 
         candidate.activation.setDecision(EXCLUDED, visited);
 
         excludedChild = new SearchNode(doc, selectedParent, this, level + 1);
 
         candidate.debugDecisionCounts[1]++;
+
+        return true;
+    }
+
+
+    private boolean allOthersExcluded() {
+        for(Activation cAct: candidate.activation.getConflicts()) {
+            if(cAct.decision != EXCLUDED) return false;
+        }
 
         return true;
     }
