@@ -60,6 +60,7 @@ public class SearchNode implements Comparable<SearchNode> {
     long visited;
     public Candidate candidate;
     int level;
+    int cacheFactor = 1;
 
     DebugState debugState;
 
@@ -180,7 +181,11 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         if (getParent() != null) {
-            accumulatedWeight = weightDelta + getParent().accumulatedWeight;
+            SearchNode pn = getParent();
+
+            accumulatedWeight = weightDelta + pn.accumulatedWeight;
+
+            cacheFactor = pn.cacheFactor * (!OPTIMIZE_SEARCH || pn.alreadySelected || pn.alreadyExcluded || pn.getCachedDecision() == UNKNOWN || pn.allOthersExcluded() ? 1 : 2);
         }
     }
 
@@ -493,6 +498,11 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         if(COMPUTE_SOFT_MAX) {
+            dumpDebugState();
+            System.out.println(accumulatedWeight);
+            System.out.println(cacheFactor);
+            System.out.println();
+
             storeSearchState(doc);
         }
 
