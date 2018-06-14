@@ -16,6 +16,7 @@
  */
 package network.aika.network;
 
+import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
@@ -23,6 +24,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Range;
 import network.aika.neuron.activation.Range.Relation;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.activation.SearchNode;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -466,6 +468,67 @@ public class InterpretationSearchTest {
         System.out.println(doc.activationsToString(true, true, true));
 
         Assert.assertFalse(nD.getActivations(doc, true).isEmpty());
+    }
 
+
+    @Test
+    public void testAvoidUnnecessaryExcludeSteps() {
+        Model m = new Model();
+
+        Neuron in = m.createNeuron("IN");
+
+        Neuron inhib = m.createNeuron("INHIB");
+        Neuron out = m.createNeuron("OUT");
+
+
+        Neuron.init(inhib, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(out)
+                        .setWeight(1.0)
+                        .setBias(0.0)
+                        .setRangeOutput(true)
+        );
+
+        Neuron.init(out, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(in)
+                        .setWeight(20.0)
+                        .setBias(-20.0)
+                        .setRangeOutput(true, false),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(in)
+                        .setWeight(20.0)
+                        .setBias(-20.0)
+                        .setRangeOutput(false, true)
+                        .addRangeRelation(Relation.BEGIN_TO_END_EQUALS, 0),
+                new Synapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(out)
+                        .setWeight(-100.0)
+                        .setBias(0.0)
+                        .setRecurrent(true)
+                        .addRangeRelation(Relation.OVERLAPS, Synapse.Builder.OUTPUT)
+                        .setRangeOutput(false)
+        );
+
+
+        Document doc = m.createDocument("aaaa");
+        in.addInput(doc, 0, 1);
+        in.addInput(doc, 1, 2);
+        in.addInput(doc, 2, 3);
+        in.addInput(doc, 3, 4);
+
+
+        SearchNode.COMPUTE_SOFT_MAX = true;
+        SearchNode.OPTIMIZE_SEARCH = false;
+
+        doc.process();
+
+        System.out.println(doc.activationsToString(true, true, true));
+
+        Assert.assertEquals(13, doc.searchNodeIdCounter);
     }
 }

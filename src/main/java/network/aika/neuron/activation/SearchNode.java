@@ -185,7 +185,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
             accumulatedWeight = weightDelta + pn.accumulatedWeight;
 
-            cacheFactor = pn.cacheFactor * (!OPTIMIZE_SEARCH || pn.alreadySelected || pn.alreadyExcluded || pn.getCachedDecision() == UNKNOWN || pn.allOthersExcluded() ? 1 : 2);
+            cacheFactor = pn.cacheFactor * (!OPTIMIZE_SEARCH || pn.alreadySelected || pn.alreadyExcluded || pn.getCachedDecision() == UNKNOWN || pn.generatesUnsuppressedExcluded() ? 1 : 2);
         }
     }
 
@@ -392,7 +392,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean prepareExcludeStep(Document doc) {
-        if(alreadySelected || skip == EXCLUDED || (OPTIMIZE_SEARCH && getCachedDecision() == Decision.SELECTED) || (!alreadyExcluded && allOthersExcluded())) return false;
+        if(alreadySelected || skip == EXCLUDED || (OPTIMIZE_SEARCH && getCachedDecision() == Decision.SELECTED) || (!alreadyExcluded && generatesUnsuppressedExcluded())) return false;
 
         candidate.activation.setDecision(EXCLUDED, visited);
 
@@ -404,9 +404,20 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean allOthersExcluded() {
-        for(Activation cAct: candidate.activation.getConflicts()) {
-            if(cAct.decision != EXCLUDED) return false;
+    private boolean generatesUnsuppressedExcluded() {
+        x: for (Activation cAct : candidate.activation.getConflicts()) {
+            if(cAct.decision == EXCLUDED) {
+                for (Activation icAct : cAct.getConflicts()) {
+                    if (candidate.activation != icAct && icAct.decision != EXCLUDED) {
+                        continue x;
+                    }
+                }
+                return true;
+            }
+        }
+
+        for (Activation cAct : candidate.activation.getConflicts()) {
+            if (cAct.decision != EXCLUDED) return false;
         }
 
         return true;
