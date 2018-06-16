@@ -88,7 +88,7 @@ public class OrNode extends Node<OrNode, Activation> {
         Range r = new Range(begin, end);
 
         if(neuron.get(doc).outputText != null) {
-            begin = r.begin != Integer.MIN_VALUE ? r.begin : 0;
+            begin = r.begin != Integer.MIN_VALUE ? r.begin : doc.length();
             end = r.end != Integer.MAX_VALUE ? r.end : begin + neuron.get(doc).outputText.length();
             r = new Range(begin, end);
         }

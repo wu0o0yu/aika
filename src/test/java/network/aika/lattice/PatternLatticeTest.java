@@ -68,7 +68,7 @@ public class PatternLatticeTest {
                         .setRangeOutput(true)
         );
 
-        Document doc = m.createDocument(null, 0);
+        Document doc = m.createDocument("", 0);
 
 
         InputNode pA = inA.get().outputNode.get();

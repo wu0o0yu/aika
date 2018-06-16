@@ -173,9 +173,13 @@ public class GenerateTextTest {
 
         System.out.println();
 
+        String outputText = doc.generateOutputText();
         // Generate the output text.
-        System.out.println(doc.generateOutputText());
+        System.out.println(outputText);
 
-        Assert.assertEquals("bbb ddddd ", doc.generateOutputText());
+        Assert.assertEquals("bbb ddddd ", outputText);
+
+
+        System.out.println(doc.activationsToString(true, true, true));
     }
 }

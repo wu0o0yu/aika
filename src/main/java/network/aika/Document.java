@@ -60,7 +60,7 @@ public class Document implements Comparable<Document> {
     public static boolean INCREMENTAL_MODE = false;
 
     public final int id;
-    private final String content;
+    private final StringBuilder content;
 
     public long visitedCounter = 1;
     public int activationIdCounter = 0;
@@ -134,15 +134,20 @@ public class Document implements Comparable<Document> {
 
     public Document(int id, String content, Model model, int threadId) {
         this.id = id;
-        this.content = content;
+        this.content = new StringBuilder(content);
 
         this.model = model;
         this.threadId = threadId;
     }
 
 
+    public void append(String txt) {
+        content.append(txt);
+    }
+
+
     public String getContent() {
-        return content;
+        return content.toString();
     }
 
 
@@ -152,7 +157,7 @@ public class Document implements Comparable<Document> {
 
 
     public String toString() {
-		return content;
+		return content.toString();
 	}
 
 
@@ -372,16 +377,16 @@ public class Document implements Comparable<Document> {
 
 
     public String generateOutputText() {
-        StringBuilder sb = new StringBuilder();
+        int oldLength = length();
         finallyActivatedNeurons.stream()
                 .filter(n -> n.outputText != null)
                 .forEach(n -> {
             for (Activation act : n.getActivations(this, true)) {
-                sb.replace(act.range.begin, act.range.end, n.outputText);
+                content.replace(act.range.begin, act.range.end, n.outputText);
             }
         });
 
-        return sb.toString();
+        return content.substring(oldLength, length());
     }
 
 
