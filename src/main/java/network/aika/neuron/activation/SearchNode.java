@@ -19,6 +19,7 @@ package network.aika.neuron.activation;
 
 import network.aika.Document;
 import network.aika.Utils;
+import network.aika.neuron.INeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -375,7 +376,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean prepareSelectStep(Document doc) {
-        if(alreadyExcluded || skip == SELECTED || (OPTIMIZE_SEARCH && getCachedDecision() == Decision.EXCLUDED)) return false;
+        if(alreadyExcluded || skip == SELECTED || (OPTIMIZE_SEARCH && getCachedDecision() == Decision.EXCLUDED) || isMetaActWithTarget()) return false;
 
         candidate.activation.setDecision(SELECTED, visited);
 
@@ -402,6 +403,17 @@ public class SearchNode implements Comparable<SearchNode> {
 
         return true;
     }
+
+
+
+    private boolean isMetaActWithTarget() {
+        if(candidate.activation.getINeuron().type != INeuron.Type.META) {
+            return false;
+        }
+
+        return candidate.activation.getTarget() != null;
+    }
+
 
 
     private boolean generatesUnsuppressedExcluded() {
@@ -446,7 +458,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         SearchNode cn = d == SELECTED ? selectedChild : excludedChild;
-        if(cn.bestPath) {
+        if(cn != null && cn.bestPath) {
             candidate.bestChildNode = cn;
             bestPath = true;
         }
