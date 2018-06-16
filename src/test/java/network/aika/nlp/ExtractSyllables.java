@@ -183,19 +183,23 @@ public class ExtractSyllables {
 
         ArrayList<String> inputs = new ArrayList<>();
         inputs.add("kuchen ");
+        inputs.add("kirsche ");
         inputs.add("küche ");
         inputs.add("hoch ");
+        inputs.add("schon ");
         inputs.add("ich ");
+        inputs.add("muschel ");
         inputs.add("chinesisch ");
         inputs.add("mich ");
+        inputs.add("schule ");
         inputs.add("kochen ");
         inputs.add("fluch ");
         inputs.add("chef ");
 
 
-/*
+
         String[] files = new String[]{
-                "Aschenputtel",
+                "Aschenputtel"/*,
                 "BruederchenUndSchwesterchen",
                 "DasTapfereSchneiderlein",
                 "DerFroschkoenig",
@@ -223,10 +227,10 @@ public class ExtractSyllables {
                 "SchneeweisschenUndRosenrot",
                 "Schneewitchen",
                 "TischleinDeckDich",
-                "VonDemFischerUndSeinerFrau"
+                "VonDemFischerUndSeinerFrau"*/
         };
 
-
+/*
         ArrayList<String> inputs = new ArrayList<>();
         for (String fn : files) {
             File f = new File("/Users/lukas.molzberger/aika-ws/aika-syllables/src/main/resources/text/maerchen/" + fn + ".txt");
