@@ -146,6 +146,11 @@ public class Document implements Comparable<Document> {
     }
 
 
+    public char charAt(int i) {
+        return content.charAt(i);
+    }
+
+
     public String getContent() {
         return content.toString();
     }
@@ -378,13 +383,11 @@ public class Document implements Comparable<Document> {
 
     public String generateOutputText() {
         int oldLength = length();
-        finallyActivatedNeurons.stream()
-                .filter(n -> n.outputText != null)
-                .forEach(n -> {
-            for (Activation act : n.getActivations(this, true)) {
-                content.replace(act.range.begin, act.range.end, n.outputText);
+        for(Activation act: activationsByRangeBegin.values()) {
+            if(act.getINeuron().outputText != null && act.isFinalActivation()) {
+                content.replace(act.range.begin, act.range.end, act.getINeuron().outputText);
             }
-        });
+        }
 
         return content.substring(oldLength, length());
     }
