@@ -121,6 +121,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
+                        .setRangeOutput(true)
         );
 
         Neuron.init(abcN,
@@ -131,7 +132,10 @@ public class NegationTest {
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setBias(-1.0)
+                        .addRangeRelation(NONE, 1)
+                        .addRangeRelation(NONE, 2)
+                        .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)

@@ -82,8 +82,8 @@ public class NamedEntityRecognitionTest {
                 new Synapse.Builder() // The previous word needs to be a forename
                         .setSynapseId(1)
                         .setNeuron(forenameCategory)
-                        .setWeight(5.0)
-                        .setBias(0.0)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
                         .addRangeRelation(END_TO_BEGIN_EQUALS, 0) // references the previous word
                         .setRecurrent(true) // this input is a positive feedback loop
                         .setRangeOutput(false),
@@ -134,8 +134,8 @@ public class NamedEntityRecognitionTest {
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(surnameCategory)
-                        .setWeight(5.0)
-                        .setBias(0.0)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
                         .addRangeRelation(BEGIN_TO_END_EQUALS, 0)
                         .setRecurrent(true),
                 new Synapse.Builder()

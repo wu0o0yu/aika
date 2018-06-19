@@ -49,16 +49,14 @@ public class Range {
         return Integer.compare(r1.begin, r2.begin);
     };
 
-    public static final Range MIN = new Range(Integer.MIN_VALUE, Integer.MIN_VALUE);
-    public static final Range MAX = new Range(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
-    public final int begin;
-    public final int end;
+    public final Integer begin;
+    public final Integer end;
 
 
     public Range(Integer begin, Integer end) {
-        this.begin = begin != null ? begin : Integer.MIN_VALUE;
-        this.end = end != null ? end : Integer.MAX_VALUE;
+        this.begin = begin;
+        this.end = end;
     }
 
 
@@ -89,7 +87,7 @@ public class Range {
 
 
     public int length() {
-        if(begin == Integer.MIN_VALUE || end == Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        if(begin == null || end == null) return Integer.MAX_VALUE;
 
         return end - begin;
     }
@@ -109,9 +107,9 @@ public class Range {
         StringBuilder sb = new StringBuilder();
 
         sb.append("(");
-        sb.append(begin != Integer.MIN_VALUE ? begin : "MIN");
+        sb.append(begin);
         sb.append(",");
-        sb.append(end != Integer.MAX_VALUE ? end : "MAX");
+        sb.append(end);
         sb.append(")");
 
         return sb.toString();

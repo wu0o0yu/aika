@@ -22,6 +22,7 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.activation.Range;
 import org.junit.Test;
 
 /**
@@ -49,13 +50,15 @@ public class OptionalAndTest {
                         .setNeuron(wordEssen)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(0.0)
+                        .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(wordHamburg)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
+                        .setRangeOutput(true)
         );
         Neuron hintVerb = Neuron.init(m.createNeuron("HINT-VERB"),
                 0.0,
@@ -65,13 +68,15 @@ public class OptionalAndTest {
                         .setNeuron(wordEssen)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(0.0)
+                        .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(wordGehen)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
+                        .setRangeOutput(true)
         );
 
 
@@ -83,19 +88,22 @@ public class OptionalAndTest {
                         .setNeuron(hintNoun)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setBias(-1.0)
+                        .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(upperCase)
-                        .setWeight(1.0)
+                        .setWeight(0.5)
                         .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(0.0)
+                        .addRangeRelation(Range.Relation.EQUALS, 0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setBias(0.0)
+                        .addRangeRelation(Range.Relation.OVERLAPS, 0)
         );
 
         Neuron verb = Neuron.init(m.createNeuron("VERB"),
@@ -106,13 +114,15 @@ public class OptionalAndTest {
                         .setNeuron(hintVerb)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setBias(-1.0)
+                        .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(suppr)
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setBias(0.0)
+                        .addRangeRelation(Range.Relation.OVERLAPS, 0)
         );
 
         Neuron.init(suppr,
@@ -123,13 +133,15 @@ public class OptionalAndTest {
                         .setNeuron(noun)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRecurrent(false),
+                        .setRecurrent(false)
+                        .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(verb)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
+                        .setRangeOutput(true)
         );
 
 

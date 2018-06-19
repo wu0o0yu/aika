@@ -182,4 +182,58 @@ public class GenerateTextTest {
 
         System.out.println(doc.activationsToString(true, true, true));
     }
+
+
+    @Test
+    public void intermediateOutputNeuron() {
+
+        Model m = new Model();
+
+        Neuron in = m.createNeuron("IN");
+
+        Neuron intermediate = m.createNeuron("INTERMEDIATE");
+
+        Neuron outA = m.createNeuron("OUT A", "aaaaaaa ");
+        Neuron outB = m.createNeuron("OUT B", "bbb ");
+
+
+        Neuron.init(intermediate, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(in)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setIdentity(true)
+                        .setRangeOutput(Output.NONE)
+        );
+
+        Neuron.init(outA, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(intermediate)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeOutput(Output.NONE)
+        );
+
+
+        Neuron.init(outB, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(intermediate)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeOutput(Range.Mapping.END, NONE)
+        );
+
+        Document doc = m.createDocument("in ");
+
+        in.addInput(doc, 0, 1);
+
+        doc.process();
+
+        System.out.println(doc.activationsToString(true, true, true));
+
+        Assert.assertEquals("aaaaaaa bbb ", doc.generateOutputText());
+    }
 }

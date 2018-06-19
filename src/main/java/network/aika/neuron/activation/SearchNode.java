@@ -521,11 +521,11 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         if(COMPUTE_SOFT_MAX) {
-            dumpDebugState();
+/*            dumpDebugState();
             System.out.println(accumulatedWeight);
             System.out.println(cacheFactor);
             System.out.println();
-
+*/
             storeSearchState(doc);
         }
 

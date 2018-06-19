@@ -12,6 +12,7 @@ import network.aika.training.MetaNetwork;
 import network.aika.training.MetaSynapse;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.*;
@@ -175,6 +176,7 @@ public class ExtractSyllables {
     }
 
 
+    @Ignore
     @Test
     public void extractSyllables() throws IOException {
         SearchNode.OPTIMIZE_SEARCH = false;
@@ -257,36 +259,38 @@ public class ExtractSyllables {
         }
 */
 
-        for (String txt : inputs) {
-            System.out.println(txt);
-            {
-                Document doc = model.createDocument(txt);
+        for(int round = 0; round < 10; round++) {
+            for (String txt : inputs) {
+                System.out.println(txt);
+                {
+                    Document doc = model.createDocument(txt);
 
-                processCharacters(doc);
+                    processCharacters(doc);
 
-                doc.process();
+                    doc.process();
 
-                System.out.println(doc.activationsToString(true, true, true));
+                    System.out.println(doc.activationsToString(true, true, true));
 
-                MetaNetwork.train(doc, 0.1);
+                    MetaNetwork.train(doc, 0.1);
 
-                doc.clearActivations();
-            }
-            {
-                Document doc = model.createDocument(txt);
+                    doc.clearActivations();
+                }
+                {
+                    Document doc = model.createDocument(txt);
 
-                processCharacters(doc);
+                    processCharacters(doc);
 
-                doc.process();
+                    doc.process();
 
-                LongTermLearning.train(doc,
-                        new LongTermLearning.Config()
-                                .setPatternLearnRate(0.5)
-                                .setStrengthLearnRate(0.2)
-                                .setStrengthOffset(0.4)
-                );
+                    LongTermLearning.train(doc,
+                            new LongTermLearning.Config()
+                                    .setPatternLearnRate(0.5)
+                                    .setStrengthLearnRate(0.2)
+                                    .setStrengthOffset(0.4)
+                    );
 
-                doc.clearActivations();
+                    doc.clearActivations();
+                }
             }
         }
 

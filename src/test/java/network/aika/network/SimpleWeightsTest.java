@@ -49,13 +49,15 @@ public class SimpleWeightsTest {
                         .setNeuron(inA)
                         .setWeight(0.3f)
                         .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(0.0)
+                        .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(0.4f)
                         .setRecurrent(false)
                         .setBias(0.0)
+                        .setRangeOutput(true)
         );
 
         {
