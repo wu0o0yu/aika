@@ -93,10 +93,10 @@ public class OrNode extends Node<OrNode, Activation> {
             r = new Range(begin, end);
         }
 
-/*        if(r.begin == Integer.MIN_VALUE || r.end == Integer.MAX_VALUE) {
+        if(r.begin == null || r.end == null) {
             return;
         }
-*/
+
         Activation act = lookupActivation(doc, r, oe, inputAct);
 
         if(act == null) {

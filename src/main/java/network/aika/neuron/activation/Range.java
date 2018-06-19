@@ -99,7 +99,7 @@ public class Range {
 
 
     public boolean equals(Range r) {
-        return begin == r.begin && end == r.end;
+        return begin.intValue() == r.begin.intValue() && end.intValue() == r.end.intValue();
     }
 
 

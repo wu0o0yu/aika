@@ -544,10 +544,10 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         if (actEnd != null) actEnd.put(ak, act);
 
         Document.ActKey dak = new Document.ActKey(act.range, act.node, act.id);
-        if (act.range.begin != Integer.MIN_VALUE) {
+        if (act.range.begin != null) {
             doc.activationsByRangeBegin.put(dak, act);
         }
-        if (act.range.end != Integer.MAX_VALUE) {
+        if (act.range.end != null) {
             doc.activationsByRangeEnd.put(dak, act);
         }
 

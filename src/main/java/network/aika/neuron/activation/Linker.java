@@ -130,7 +130,7 @@ public class Linker {
         Integer outputBegin = s.key.rangeOutput.begin.map(iAct.range);
         Integer outputEnd = s.key.rangeOutput.end.map(iAct.range);
 
-        if(outputBegin != null && outputBegin != oAct.range.begin || outputEnd != null && outputEnd != oAct.range.end) {
+        if(outputBegin != null && outputBegin.intValue() != oAct.range.begin.intValue() || outputEnd != null && outputEnd.intValue() != oAct.range.end.intValue()) {
             return;
         }
 
