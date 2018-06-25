@@ -82,7 +82,6 @@ public class Linker {
 
 
     public void lateLinking() {
-        // TODO: check if several rounds are required
         for(Activation act: doc.activationsByRangeBegin.values()) {
             linkOutputRelations(act);
 
@@ -91,7 +90,6 @@ public class Linker {
             }
         }
         doc.linker.process();
-        doc.propagate();
     }
 
 
@@ -108,6 +106,7 @@ public class Linker {
                     }
                 }
             }
+            doc.propagate();
         }
     }
 
