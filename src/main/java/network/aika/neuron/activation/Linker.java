@@ -82,6 +82,7 @@ public class Linker {
 
 
     public void lateLinking() {
+        // TODO: check if several rounds are required
         for(Activation act: doc.activationsByRangeBegin.values()) {
             linkOutputRelations(act);
 
@@ -90,6 +91,7 @@ public class Linker {
             }
         }
         doc.linker.process();
+        doc.propagate();
     }
 
 
@@ -144,6 +146,7 @@ public class Linker {
         oAct.addSynapseActivation(OUTPUT, l);
 
         queue.add(l);
+        doc.ubQueue.add(l.output);
 
         return;
     }
