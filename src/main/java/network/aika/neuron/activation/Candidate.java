@@ -9,6 +9,7 @@ public class Candidate  implements Comparable<Candidate> {
      * influences this candidate has changed.
      */
     public SearchNode.Decision cachedDecision = SearchNode.Decision.UNKNOWN;
+    public boolean repeat = false;
 
     /**
      * The cached search node is used to avoid having to recompute the activation values and weights that are associated
@@ -49,6 +50,8 @@ public class Candidate  implements Comparable<Candidate> {
 
     public String toString() {
         return " CID:" + id +
+                " CD:" + cachedDecision +
+                " REPEAT:" + repeat +
                 " CONFLICT:" + isConflicting() +
                 " LIMITED:" + debugCounts[SearchNode.DebugState.LIMITED.ordinal()] +
                 " CACHED:" + debugCounts[SearchNode.DebugState.CACHED.ordinal()] +

@@ -335,7 +335,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.excludedWeight = returnWeight;
 
                     sn.postReturn(sn.excludedChild);
-                    sn.step = Step.FINAL;
+                    sn.step = sn.candidate.repeat ? Step.PREPARE_SELECT : Step.FINAL;
                     break;
                 case FINAL:
                     returnWeight = sn.finalStep();
@@ -376,6 +376,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean prepareSelectStep(Document doc) {
+        candidate.repeat = false;
+
         if(alreadyExcluded || skip == SELECTED || (OPTIMIZE_SEARCH && getCachedDecision() == Decision.EXCLUDED) || isMetaActWithTarget()) return false;
 
         candidate.activation.setDecision(SELECTED, visited);
@@ -495,6 +497,7 @@ public class SearchNode implements Comparable<SearchNode> {
         if (pos != null) {
             if (pos.cachedDecision == Decision.EXCLUDED) {
                 pos.cachedDecision = UNKNOWN;
+                pos.repeat = true;
             }
         }
 

@@ -82,14 +82,18 @@ public class Linker {
 
 
     public void lateLinking() {
-        for(Activation act: doc.activationsByRangeBegin.values()) {
-            linkOutputRelations(act);
+        int oldSize;
+        do {
+            oldSize = doc.activationsByRangeBegin.size();
+            for (Activation act : doc.activationsByRangeBegin.values()) {
+                linkOutputRelations(act);
 
-            for(Link l: act.neuronInputs.values()) {
-                queue.add(l);
+                for (Link l : act.neuronInputs.values()) {
+                    queue.add(l);
+                }
             }
-        }
-        doc.linker.process();
+            doc.linker.process();
+        } while(oldSize != doc.activationsByRangeBegin.size());
     }
 
 
