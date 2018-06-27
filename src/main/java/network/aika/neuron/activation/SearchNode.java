@@ -335,7 +335,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.excludedWeight = returnWeight;
 
                     sn.postReturn(sn.excludedChild);
-                    sn.step = sn.candidate.repeat ? Step.PREPARE_SELECT : Step.FINAL;
+                    sn.step = sn.candidate.repeat && OPTIMIZE_SEARCH ? Step.PREPARE_SELECT : Step.FINAL;
                     break;
                 case FINAL:
                     returnWeight = sn.finalStep();
