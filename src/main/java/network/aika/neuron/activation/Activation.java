@@ -216,6 +216,17 @@ public final class Activation extends OrActivation {
             }
         }
 
+        if(n.passiveInputSynapses != null) {
+            for(Synapse s: n.passiveInputSynapses.values()) {
+                double x = s.weight * s.input.get(doc).passiveInputFunction.getActivationValue(s, this);
+
+                net += x;
+                if(!s.isNegative()) {
+                    posNet += x;
+                }
+            }
+        }
+
         double actValue = n.activationFunction.f(net);
         double posActValue = n.activationFunction.f(posNet);
 
@@ -297,6 +308,15 @@ public final class Activation extends OrActivation {
             } else {
                 ub += iAct.upperBound * x;
                 lb += iAct.lowerBound * x;
+            }
+        }
+
+        if(n.passiveInputSynapses != null) {
+            for(Synapse s: n.passiveInputSynapses.values()) {
+                double x = s.weight * s.input.get(doc).passiveInputFunction.getActivationValue(s, this);
+
+                ub += x;
+                lb += x;
             }
         }
 

@@ -76,6 +76,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public volatile double negDirSum;
     public volatile double negRecSum;
     public volatile double posRecSum;
+    public volatile double posPassiveSum;
 
     public volatile double requiredSum;
     public volatile int numDisjunctiveSynapses = 0;
@@ -95,6 +96,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     // A synapse is stored only in one direction, depending on the synapse weight.
     public TreeMap<Synapse, Synapse> inputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
     public TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
+    public TreeMap<Synapse, Synapse> passiveInputSynapses = null;
 
     public Provider<InputNode> outputNode;
 
@@ -102,6 +104,9 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
 
     public ReadWriteLock lock = new ReadWriteLock();
+
+
+    public PassiveInputFunction passiveInputFunction = null;
 
 
     public ThreadState[] threads;
@@ -355,6 +360,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         out.writeDouble(negDirSum);
         out.writeDouble(negRecSum);
         out.writeDouble(posRecSum);
+        out.writeDouble(posPassiveSum);
+
         out.writeDouble(requiredSum);
         out.writeInt(numDisjunctiveSynapses);
 
@@ -420,6 +427,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         negDirSum = in.readDouble();
         negRecSum = in.readDouble();
         posRecSum = in.readDouble();
+        posPassiveSum = in.readDouble();
+
         requiredSum = in.readDouble();
         numDisjunctiveSynapses = in.readInt();
 
@@ -452,6 +461,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
                 outputRelations.put(synId, r);
             }
         }
+
+        passiveInputFunction = m.passiveActivationFunctions.get(provider.id);
     }
 
 
@@ -575,6 +586,19 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         n.threads = new ThreadState[p.model.numberOfThreads];
         n.readFields(in, p.model);
         return n;
+    }
+
+
+    public boolean isPassiveInputNeuron() {
+        return passiveInputFunction != null;
+    }
+
+
+    public void registerPassiveInputSynapse(Synapse s) {
+        if(passiveInputSynapses == null) {
+            passiveInputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
+        }
+        passiveInputSynapses.put(s, s);
     }
 
 

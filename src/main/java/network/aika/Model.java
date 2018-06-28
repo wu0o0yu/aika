@@ -59,6 +59,7 @@ public class Model {
     public WeakHashMap<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
     public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
 
+    public Map<Integer, PassiveInputFunction> passiveActivationFunctions = new TreeMap<>();
 
     public int defaultThreadId = 0;
 

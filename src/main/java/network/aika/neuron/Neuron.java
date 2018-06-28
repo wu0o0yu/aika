@@ -17,12 +17,8 @@
 package network.aika.neuron;
 
 
+import network.aika.*;
 import network.aika.neuron.activation.Activation;
-import network.aika.ActivationFunction;
-import network.aika.Model;
-import network.aika.Provider;
-import network.aika.ReadWriteLock;
-import network.aika.Document;
 import network.aika.neuron.activation.Range;
 import network.aika.neuron.relation.Relation;
 
@@ -269,6 +265,17 @@ public class Neuron extends Provider<INeuron> {
 
         INeuron.update(doc != null ? doc.threadId : model.defaultThreadId, doc, this, 0.0, Collections.singletonList(s));
     }
+
+
+    public static void registerPassiveInputNeuron(Neuron n, PassiveInputFunction f) {
+        n.get().passiveInputFunction = f;
+        n.model.passiveActivationFunctions.put(n.id, f);
+
+        for(Synapse s: n.get().outputSynapses.values()) {
+            s.output.get().registerPassiveInputSynapse(s);
+        }
+    }
+
 
 
     public Synapse getSynapseById(int synapseId) {

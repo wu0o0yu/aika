@@ -91,7 +91,7 @@ public class Converter {
             double remainingSum = neuron.posDirSum;
             int i = 0;
             for (Synapse s : candidates) {
-                final boolean isOptionalInput = sum + remainingSum - s.weight + neuron.posRecSum + neuron.biasSum > 0.0;
+                final boolean isOptionalInput = sum + remainingSum - s.weight + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum > 0.0;
                 final boolean maxAndNodesReached = i >= MAX_AND_NODE_SIZE;
                 if (isOptionalInput || maxAndNodesReached) {
                     break;
@@ -111,7 +111,7 @@ public class Converter {
 
                 sum += s.weight;
 
-                final boolean sumOfSynapseWeightsAboveThreshold = sum + neuron.posRecSum + neuron.biasSum > 0.0;
+                final boolean sumOfSynapseWeightsAboveThreshold = sum + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum > 0.0;
                 if (sumOfSynapseWeightsAboveThreshold) {
                     noFurtherRefinement = true;
                     break;
@@ -125,7 +125,7 @@ public class Converter {
                 outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node, true);
             } else {
                 for (Synapse s : candidates) {
-                    boolean belowThreshold = sum + s.weight + remainingSum + neuron.posRecSum + neuron.biasSum <= 0.0;
+                    boolean belowThreshold = sum + s.weight + remainingSum + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum <= 0.0;
                     if (belowThreshold) {
                         break;
                     }
@@ -141,7 +141,7 @@ public class Converter {
             }
         } else {
             for (Synapse s : modifiedSynapses) {
-                if (s.weight + neuron.posRecSum + neuron.biasSum > 0.0) {
+                if (s.weight + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum > 0.0) {
                     NodeContext nlNodeContext = expandNode(nodeContext, s);
                     outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
                 }
@@ -180,7 +180,7 @@ public class Converter {
     private Synapse getBestSynapse(Collection<Synapse> synapses) {
         Synapse maxSyn = null;
         for(Synapse s: synapses) {
-            if(!s.isNegative() && !s.key.isRecurrent && !s.inactive) {
+            if(!s.isNegative() && !s.key.isRecurrent && !s.inactive && !s.input.get().isPassiveInputNeuron()) {
                 if(maxSyn == null || SYNAPSE_COMP.compare(maxSyn, s) > 0) {
                     maxSyn = s;
                 }
@@ -195,10 +195,11 @@ public class Converter {
     public static final int POSITIVE = 0;
     public static final int NEGATIVE = 1;
 
+
     private void initInputNodesAndComputeWeightSums() {
         double[][] sumDelta = new double[2][2];
 
-//        neuron.biasSum = 0.0;
+        double posPassiveSumDelta = 0.0;
         for (Synapse s : modifiedSynapses) {
             if(s.toBeDeleted) {
                 s.update(doc, -s.weight, 0.0);
@@ -210,6 +211,10 @@ public class Converter {
                 if (!s.inactive) {
                     sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
                     sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.getNewWeight();
+
+                    if(in.isPassiveInputNeuron() && !s.isNegative()) {
+                        posPassiveSumDelta += s.getNewWeight() - s.weight;
+                    }
 
                     if (s.isConjunction(false, true) && !s.isConjunction(true, true)) {
                         neuron.numDisjunctiveSynapses++;
@@ -246,6 +251,7 @@ public class Converter {
         neuron.negDirSum += sumDelta[DIRECT][NEGATIVE];
         neuron.negRecSum += sumDelta[RECURRENT][NEGATIVE];
         neuron.posRecSum += sumDelta[RECURRENT][POSITIVE];
+        neuron.posPassiveSum += posPassiveSumDelta;
 
         neuron.setModified();
     }

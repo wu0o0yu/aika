@@ -174,6 +174,10 @@ public class Synapse implements Writable {
 
         out.numberOfInputSynapses++;
 
+        if(in.isPassiveInputNeuron()) {
+            out.registerPassiveInputSynapse(this);
+        }
+
         (dir ? in : out).lock.releaseWriteLock();
         (dir ? out : in).lock.releaseWriteLock();
     }
