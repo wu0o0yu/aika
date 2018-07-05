@@ -19,7 +19,6 @@ package network.aika.lattice;
 
 import network.aika.*;
 import network.aika.training.PatternDiscovery;
-import network.aika.*;
 import network.aika.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,7 +129,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         setModified();
 
         if(m.nodeStatisticFactory != null) {
-            statistic = m.nodeStatisticFactory.createStatisticObject();
+            statistic = m.nodeStatisticFactory.createObject();
         }
     }
 
@@ -371,7 +370,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         level = in.readInt();
 
         if(in.readBoolean()) {
-            statistic = m.nodeStatisticFactory.createStatisticObject();
+            statistic = m.nodeStatisticFactory.createObject();
             statistic.readFields(in, m);
         }
 

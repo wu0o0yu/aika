@@ -25,7 +25,7 @@ import network.aika.neuron.activation.Range.Mapping;
 import network.aika.neuron.relation.InstanceRelation;
 import network.aika.neuron.relation.RangeRelation;
 import network.aika.neuron.relation.Relation;
-import network.aika.training.MetaSynapse;
+import network.aika.Writable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -120,7 +120,7 @@ public class Synapse implements Writable {
      */
     public boolean isConjunction;
 
-    public MetaSynapse meta;
+    public Writable meta;
 
     public int createdInDoc;
     public int committedInDoc;
@@ -380,7 +380,7 @@ public class Synapse implements Writable {
         isConjunction = in.readBoolean();
 
         if(in.readBoolean()) {
-            meta = new MetaSynapse();
+            meta = m.getMetaFactory().createObject();
             meta.readFields(in, m);
         }
     }

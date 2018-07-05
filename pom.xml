@@ -5,10 +5,10 @@
     <groupId>org.aika-software</groupId>
     <artifactId>aika</artifactId>
     <packaging>jar</packaging>
-    <version>0.18</version>
+    <version>0.19-SNAPSHOT</version>
     <name>aika</name>
-    <url>http://www.aika-software.org</url>
-    <description>The Aika Text Mining Algorithm</description>
+    <url>http://aika.network</url>
+    <description>An artificial intelligence for knowledge acquisition</description>
 
     <developers>
         <developer>

@@ -188,7 +188,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         this.outputText = outputText;
 
         if(m.neuronStatisticFactory != null) {
-            statistic = m.neuronStatisticFactory.createStatisticObject();
+            statistic = m.neuronStatisticFactory.createObject();
         }
 
         threads = new ThreadState[m.numberOfThreads];
@@ -417,7 +417,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         }
 
         if(in.readBoolean()) {
-            statistic = m.neuronStatisticFactory.createStatisticObject();
+            statistic = m.neuronStatisticFactory.createObject();
             statistic.readFields(in, m);
         }
 

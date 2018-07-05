@@ -18,9 +18,9 @@ package network.aika.training;
 
 
 import network.aika.Document;
+import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.INeuron;
 import network.aika.training.SynapseEvaluation.Result;
 
 import java.util.TreeSet;

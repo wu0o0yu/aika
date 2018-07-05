@@ -49,8 +49,9 @@ public class Model {
 
     public SuspensionHook suspensionHook;
 
-    public StatisticFactory nodeStatisticFactory;
-    public StatisticFactory neuronStatisticFactory;
+    public WritableFactory nodeStatisticFactory;
+    public WritableFactory neuronStatisticFactory;
+    public WritableFactory metaFactory;
 
     public AtomicInteger docIdCounter = new AtomicInteger(0);
     public AtomicInteger currentId = new AtomicInteger(0);
@@ -95,23 +96,33 @@ public class Model {
     }
 
 
-    public StatisticFactory getNodeStatisticFactory() {
+    public WritableFactory getNodeStatisticFactory() {
         return nodeStatisticFactory;
     }
 
 
-    public void setNodeStatisticFactory(StatisticFactory nodeStatisticFactory) {
+    public void setNodeStatisticFactory(WritableFactory nodeStatisticFactory) {
         this.nodeStatisticFactory = nodeStatisticFactory;
     }
 
-    public StatisticFactory getNeuronStatisticFactory() {
+    public WritableFactory getNeuronStatisticFactory() {
         return neuronStatisticFactory;
     }
 
 
-    public void setNeuronStatisticFactory(StatisticFactory neuronStatisticFactory) {
+    public void setNeuronStatisticFactory(WritableFactory neuronStatisticFactory) {
         this.neuronStatisticFactory = neuronStatisticFactory;
     }
+
+    public WritableFactory getMetaFactory() {
+        return metaFactory;
+    }
+
+
+    public void setMetaFactory(WritableFactory metaFactory) {
+        this.metaFactory = metaFactory;
+    }
+
 
 
     public Neuron createNeuron() {
@@ -253,8 +264,8 @@ public class Model {
     }
 
 
-    public interface StatisticFactory {
+    public interface WritableFactory {
 
-        Writable createStatisticObject();
+        Writable createObject();
     }
 }
