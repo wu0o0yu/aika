@@ -472,7 +472,7 @@ public final class Activation extends OrActivation {
 
 
     public Activation getTarget() {
-        assert getINeuron().type == INeuron.Type.META;
+        assert getINeuron().isMeta;
 
         for(Link li: neuronOutputs.values()) {
             if(li.output.getINeuron().type == INeuron.Type.INHIBITORY) {

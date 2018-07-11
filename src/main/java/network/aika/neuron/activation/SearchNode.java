@@ -409,7 +409,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean isMetaActWithTarget() {
-        if(candidate.activation.getINeuron().type != INeuron.Type.META) {
+        if(!candidate.activation.getINeuron().isMeta) {
             return false;
         }
 

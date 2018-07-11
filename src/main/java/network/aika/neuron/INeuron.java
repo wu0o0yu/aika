@@ -58,8 +58,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     public enum Type {
         EXCITATORY,
-        INHIBITORY,
-        META
+        INHIBITORY
     }
 
     public String outputText;
@@ -69,7 +68,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public volatile double biasSum;
     public volatile double biasSumDelta;
 
-    public volatile double metaBias = 0.0;
 
 
     public volatile double posDirSum;
@@ -79,6 +77,10 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public volatile double posPassiveSum;
 
     public volatile double requiredSum;
+
+    public volatile double metaBias = 0.0;
+    public volatile boolean isMeta = false;
+
     public volatile int numDisjunctiveSynapses = 0;
 
     public Writable statistic;
@@ -363,6 +365,10 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         out.writeDouble(posPassiveSum);
 
         out.writeDouble(requiredSum);
+
+        out.writeDouble(metaBias);
+        out.writeBoolean(isMeta);
+
         out.writeInt(numDisjunctiveSynapses);
 
         out.writeUTF(activationFunction.name());
@@ -430,6 +436,10 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         posPassiveSum = in.readDouble();
 
         requiredSum = in.readDouble();
+
+        metaBias = in.readDouble();
+        isMeta = in.readBoolean();
+
         numDisjunctiveSynapses = in.readInt();
 
         activationFunction = ActivationFunction.valueOf(in.readUTF());
