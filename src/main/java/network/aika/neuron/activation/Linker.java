@@ -132,8 +132,20 @@ public class Linker {
 
 
     private void link(Synapse s, Activation iAct, Activation oAct) {
-        Integer outputBegin = s.key.rangeOutput.begin.map(iAct.range);
-        Integer outputEnd = s.key.rangeOutput.end.map(iAct.range);
+        Integer outputBegin = null;
+        Integer outputEnd = null;
+
+        if(s.key.rangeInput == Synapse.Builder.OUTPUT) {
+            outputBegin = s.key.rangeOutput.begin.map(iAct.range);
+            outputEnd = s.key.rangeOutput.end.map(iAct.range);
+        } else {
+            for(Link l: iAct.neuronInputs.values()) {
+                if(l.synapse.id == s.key.rangeInput) {
+                    outputBegin = l.input.range.begin;
+                    outputEnd = l.input.range.end;
+                }
+            }
+        }
 
         if(outputBegin != null && outputBegin.intValue() != oAct.range.begin.intValue() || outputEnd != null && outputEnd.intValue() != oAct.range.end.intValue()) {
             return;

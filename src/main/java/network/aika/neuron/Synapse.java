@@ -455,6 +455,7 @@ public class Synapse implements Writable {
 
         public DistanceFunction distanceFunction;
 
+        public int rangeInput = OUTPUT;
         public Output rangeOutput = Output.NONE;
         public boolean identity;
 
@@ -519,6 +520,18 @@ public class Synapse implements Writable {
             return this;
         }
 
+
+        /**
+         * By default the output range of th synapses input neuron is used. Using this setter a specific input synapse of
+         * the input neuron might be chosen as a source for the range.
+         *
+         * @param synapseId
+         * @return
+         */
+        public Builder setRangeInput(int synapseId) {
+            this.rangeInput = synapseId;
+            return this;
+        }
 
         /**
          * <code>setRangeOutput</code> is just a convenience function to call <code>setBeginRangeOutput</code> and
@@ -605,7 +618,7 @@ public class Synapse implements Writable {
 
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            return createOrLookup(null, synapseId, new Key(recurrent, rangeOutput, identity), relations, distanceFunction, neuron, outputNeuron);
+            return createOrLookup(null, synapseId, new Key(recurrent, rangeInput, rangeOutput, identity), relations, distanceFunction, neuron, outputNeuron);
         }
 
 
@@ -630,13 +643,15 @@ public class Synapse implements Writable {
 
     public static class Key implements Comparable<Key>, Writable {
         public boolean isRecurrent;
+        public int rangeInput;
         public Output rangeOutput;
         public boolean identity;
 
         private Key() {}
 
-        public Key(boolean isRecurrent, Output rangeOutput, boolean identity) {
+        public Key(boolean isRecurrent, int rangeInput, Output rangeOutput, boolean identity) {
             this.isRecurrent = isRecurrent;
+            this.rangeInput = rangeInput;
             this.rangeOutput = rangeOutput;
             this.identity = identity;
         }
@@ -645,6 +660,8 @@ public class Synapse implements Writable {
         @Override
         public int compareTo(Key k) {
             int r = Boolean.compare(isRecurrent, k.isRecurrent);
+            if(r != 0) return r;
+            r = Integer.compare(rangeInput, k.rangeInput);
             if(r != 0) return r;
             r = rangeOutput.compareTo(k.rangeOutput);
             if(r != 0) return r;
@@ -663,6 +680,7 @@ public class Synapse implements Writable {
         @Override
         public void write(DataOutput out) throws IOException {
             out.writeBoolean(isRecurrent);
+            out.writeInt(rangeInput);
             rangeOutput.write(out);
             out.writeBoolean(identity);
         }
@@ -670,6 +688,7 @@ public class Synapse implements Writable {
         @Override
         public void readFields(DataInput in, Model m) throws IOException {
             isRecurrent = in.readBoolean();
+            rangeInput = in.readInt();
             rangeOutput = Range.Output.read(in, m);
             identity = in.readBoolean();
         }
