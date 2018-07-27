@@ -61,7 +61,7 @@ public class CountingTest {
         m.setNodeStatisticFactory(() -> new NodeStatistic());
 
         Neuron inA = m.createNeuron("inA");
-        Neuron outA = Neuron.init(m.createNeuron("nA"), 50.0, INeuron.Type.EXCITATORY,
+        Neuron outA = Neuron.init(m.createNeuron("nA"), 50.0, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)

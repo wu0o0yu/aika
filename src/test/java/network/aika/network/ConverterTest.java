@@ -45,6 +45,7 @@ public class ConverterTest {
         Neuron out = Neuron.init(m.createNeuron("ABCD"),
                 -9.5,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -102,6 +103,7 @@ public class ConverterTest {
         Neuron out = Neuron.init(m.createNeuron("ABCD"),
                 -5.0,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -153,6 +155,7 @@ public class ConverterTest {
         Neuron out = Neuron.init(m.createNeuron("ABCD"),
                 -11.0,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -220,6 +223,7 @@ public class ConverterTest {
         Neuron out = Neuron.init(m.createNeuron("ABCD"),
                 -50.5,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)

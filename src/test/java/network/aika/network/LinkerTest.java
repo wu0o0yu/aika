@@ -43,7 +43,7 @@ public class LinkerTest {
 
             Neuron nc = m.createNeuron("C");
 
-            Neuron.init(nc, 5.0, INeuron.Type.EXCITATORY,
+            Neuron.init(nc, 5.0, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
                     new Synapse.Builder()
                             .setSynapseId(0)
                             .setNeuron(na)

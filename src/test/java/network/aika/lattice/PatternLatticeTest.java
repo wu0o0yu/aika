@@ -43,6 +43,7 @@ public class PatternLatticeTest {
         Neuron.init(m.createNeuron("ABC"),
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -102,6 +103,7 @@ public class PatternLatticeTest {
         Neuron nABC = Neuron.init(m.createNeuron("ABC"),
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)

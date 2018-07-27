@@ -51,6 +51,7 @@ public class WeakInputProcessingTest {
                 m.createNeuron("Pattern A"),
                 0.4,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(strongInput)
@@ -78,6 +79,7 @@ public class WeakInputProcessingTest {
                 m.createNeuron("Pattern B"),
                 0.4,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(strongInput)
@@ -107,6 +109,7 @@ public class WeakInputProcessingTest {
                 m.createNeuron("Pattern C"),
                 0.4,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(strongInput)
@@ -136,6 +139,7 @@ public class WeakInputProcessingTest {
         Neuron.init(suppr,
                 0.0,
                 INeuron.Type.INHIBITORY,
+                INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(patternA)

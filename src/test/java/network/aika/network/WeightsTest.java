@@ -61,6 +61,7 @@ public class WeightsTest {
         Neuron.init(pOrA,
                 0.0,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inAA)
@@ -82,6 +83,7 @@ public class WeightsTest {
         Neuron.init(pDA,
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pOrA)
@@ -115,19 +117,20 @@ public class WeightsTest {
         Neuron.init(pOrB,
                 0.0,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inAB)
                         .setWeight(2.0)
-                        .setRecurrent(false)
                         .setBias(0.0)
+                        .setRecurrent(false)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inBB)
                         .setWeight(5.0)
-                        .setRecurrent(false)
                         .setBias(0.0)
+                        .setRecurrent(false)
                         .addRangeRelation(EQUALS, 0)
                         .setRangeOutput(true)
         );
@@ -136,27 +139,28 @@ public class WeightsTest {
         Neuron.init(pDB,
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pOrB)
                         .setWeight(1.0)
-                        .setRecurrent(false)
                         .setBias(-0.6)
+                        .setRecurrent(false)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inCB)
                         .setWeight(1.0)
-                        .setRecurrent(false)
                         .setBias(-1.0)
+                        .setRecurrent(false)
                         .addRangeRelation(EQUALS, 0)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(pSuppr)
                         .setWeight(-2.0)
-                        .setRecurrent(true)
                         .setBias(0.0)
+                        .setRecurrent(true)
                         .addRangeRelation(CONTAINED_IN, 0)
         );
 
@@ -164,19 +168,20 @@ public class WeightsTest {
         Neuron.init(pSuppr,
                 0.0,
                 INeuron.Type.INHIBITORY,
+                INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pDA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
                         .setBias(0.0)
+                        .setRecurrent(false)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pDB)
                         .setWeight(1.0)
-                        .setRecurrent(false)
                         .setBias(0.0)
+                        .setRecurrent(false)
                         .setRangeOutput(true)
         );
 

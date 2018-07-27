@@ -77,11 +77,11 @@ public class ContextFreeGrammarTest {
 
 
         for(Neuron n: new Neuron[] {I, NP, VP}) {
-            Neuron.init(n, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
+            Neuron.init(n, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY, INeuron.LogicType.DISJUNCTIVE);
         }
 
         for(Neuron n: new Neuron[] {ART, N, ADJ, V, AUX}) {
-            Neuron.init(n, 0.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+            Neuron.init(n, 0.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, INeuron.LogicType.DISJUNCTIVE,
                     new Synapse.Builder()
                             .setNeuron(I)
                             .setWeight(-50.0)
@@ -175,7 +175,7 @@ public class ContextFreeGrammarTest {
                     .addRangeRelation(OVERLAPS, OUTPUT)
         );
 
-        Neuron.init(andN, weight, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, synapses);
+        Neuron.init(andN, weight, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE, synapses);
     }
 
 

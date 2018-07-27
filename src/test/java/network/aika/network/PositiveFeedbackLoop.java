@@ -22,7 +22,7 @@ public class PositiveFeedbackLoop {
         Neuron nC = m.createNeuron("N C");
         Neuron nD = m.createNeuron("N D");
 
-        Neuron.init(nC, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(nC, 5.0, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -38,7 +38,7 @@ public class PositiveFeedbackLoop {
                         .addRangeRelation(Range.Relation.EQUALS, 0)
         );
 
-        Neuron.init(nD, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(nD, 5.0, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)

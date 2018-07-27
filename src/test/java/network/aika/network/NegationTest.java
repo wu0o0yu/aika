@@ -56,6 +56,7 @@ public class NegationTest {
         Neuron.init(abcN,
                 5.0,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -115,6 +116,7 @@ public class NegationTest {
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
                 0.0,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(abcN)
@@ -127,6 +129,7 @@ public class NegationTest {
         Neuron.init(abcN,
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -181,6 +184,7 @@ public class NegationTest {
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
                 0.0,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
@@ -193,6 +197,7 @@ public class NegationTest {
         Neuron.init(asN,
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -238,6 +243,7 @@ public class NegationTest {
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
                 0.0,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
@@ -250,6 +256,7 @@ public class NegationTest {
         Neuron.init(asN,
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -295,6 +302,7 @@ public class NegationTest {
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
                 0.0,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
@@ -307,6 +315,7 @@ public class NegationTest {
         Neuron.init(asN,
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -352,6 +361,7 @@ public class NegationTest {
         Neuron inS = Neuron.init(m.createNeuron("S"),
                 0.0,
                 INeuron.Type.INHIBITORY,
+                INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
@@ -371,6 +381,7 @@ public class NegationTest {
         Neuron.init(asN,
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -389,6 +400,7 @@ public class NegationTest {
         Neuron.init(absN,
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -466,6 +478,7 @@ public class NegationTest {
         Neuron inS = Neuron.init(m.createNeuron("S"),
                 0.0,
                 INeuron.Type.INHIBITORY,
+                INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
@@ -492,6 +505,7 @@ public class NegationTest {
         Neuron.init(asN,
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -511,6 +525,7 @@ public class NegationTest {
         Neuron.init(ascN,
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -539,6 +554,7 @@ public class NegationTest {
         Neuron.init(bsN,
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
@@ -559,6 +575,7 @@ public class NegationTest {
         Neuron outA = Neuron.init(m.createNeuron("OUT A"),
                 0.0,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
@@ -570,6 +587,7 @@ public class NegationTest {
         Neuron outAC = Neuron.init(m.createNeuron("OUT AC"),
                 0.0,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(ascN)
@@ -581,6 +599,7 @@ public class NegationTest {
         Neuron outB = Neuron.init(m.createNeuron("OUT B"),
                 0.0,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(bsN)
@@ -643,6 +662,7 @@ public class NegationTest {
         Neuron.init(pC,
                 0.5,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -661,6 +681,7 @@ public class NegationTest {
         Neuron.init(pD,
                 0.5,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
@@ -683,6 +704,7 @@ public class NegationTest {
         Neuron pH = Neuron.init(m.createNeuron("H"),
                 0.001,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pC)

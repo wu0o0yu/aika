@@ -74,6 +74,7 @@ public class MutualExclusionTest {
                 3.0,
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -95,6 +96,7 @@ public class MutualExclusionTest {
                 5.0,
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
@@ -116,6 +118,7 @@ public class MutualExclusionTest {
                 2.0,
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inC)
@@ -138,6 +141,7 @@ public class MutualExclusionTest {
                 0.0,
                 ActivationFunction.RECTIFIED_LINEAR_UNIT,
                 INeuron.Type.INHIBITORY,
+                INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pA)
@@ -165,6 +169,7 @@ public class MutualExclusionTest {
                 0.0,
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pB)

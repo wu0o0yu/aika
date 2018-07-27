@@ -477,7 +477,8 @@ public final class Activation extends OrActivation {
         for(Link li: neuronOutputs.values()) {
             if(li.output.getINeuron().type == INeuron.Type.INHIBITORY) {
                 for(Link le: li.output.neuronInputs.values()) {
-                    if (le.input.getINeuron().type == INeuron.Type.EXCITATORY) {
+                    INeuron n = le.input.getINeuron();
+                    if (!n.isMeta && n.type == INeuron.Type.EXCITATORY) {
                         return le.input;
                     }
                 }

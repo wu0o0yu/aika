@@ -60,6 +60,7 @@ public class OverlappingOrTest {
                 m.createNeuron("BCD"),
                 2.0,
                 INeuron.Type.EXCITATORY,
+                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))
