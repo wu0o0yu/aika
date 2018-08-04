@@ -51,7 +51,7 @@ public class Model {
 
     public WritableFactory nodeStatisticFactory;
     public WritableFactory neuronStatisticFactory;
-    public WritableFactory metaFactory;
+    public WritableFactory synapseStatisticFactory;
 
     public AtomicInteger docIdCounter = new AtomicInteger(0);
     public AtomicInteger currentId = new AtomicInteger(0);
@@ -114,15 +114,14 @@ public class Model {
         this.neuronStatisticFactory = neuronStatisticFactory;
     }
 
-    public WritableFactory getMetaFactory() {
-        return metaFactory;
+    public WritableFactory getSynapseStatisticFactory() {
+        return synapseStatisticFactory;
     }
 
 
-    public void setMetaFactory(WritableFactory metaFactory) {
-        this.metaFactory = metaFactory;
+    public void setSynapseStatisticFactory(WritableFactory synapseStatisticFactory) {
+        this.synapseStatisticFactory = synapseStatisticFactory;
     }
-
 
 
     public Neuron createNeuron() {

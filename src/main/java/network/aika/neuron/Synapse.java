@@ -93,6 +93,8 @@ public class Synapse implements Writable {
 
     public DistanceFunction distanceFunction = null;
 
+    public Writable statistic;
+
 
     public boolean inactive;
 
@@ -120,8 +122,6 @@ public class Synapse implements Writable {
      */
     public boolean isConjunction;
 
-    public Writable meta;
-
     public int createdInDoc;
     public int committedInDoc;
 
@@ -137,6 +137,10 @@ public class Synapse implements Writable {
         this.input = input;
         this.output = output;
         this.distanceFunction = distanceFunction;
+
+        if(output.model.synapseStatisticFactory != null) {
+            statistic = output.model.synapseStatisticFactory.createObject();
+        }
     }
 
 
@@ -348,9 +352,9 @@ public class Synapse implements Writable {
 
         out.writeBoolean(isConjunction);
 
-        out.writeBoolean(meta != null);
-        if(meta != null) {
-            meta.write(out);
+        out.writeBoolean(statistic != null);
+        if(statistic != null) {
+            statistic.write(out);
         }
     }
 
@@ -380,8 +384,8 @@ public class Synapse implements Writable {
         isConjunction = in.readBoolean();
 
         if(in.readBoolean()) {
-            meta = m.getMetaFactory().createObject();
-            meta.readFields(in, m);
+            statistic = m.synapseStatisticFactory.createObject();
+            statistic.readFields(in, m);
         }
     }
 
