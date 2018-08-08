@@ -22,6 +22,7 @@ import network.aika.lattice.NodeActivation;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.Candidate;
 import network.aika.neuron.activation.Range;
 import network.aika.neuron.activation.SearchNode;
@@ -487,8 +488,15 @@ public class Document implements Comparable<Document> {
         public final ArrayDeque<Activation> queue = new ArrayDeque<>();
 
 
+        public void add(Link l) {
+            if(!l.synapse.key.isRecurrent) {
+                add(l.output);
+            }
+        }
+
+
         public void add(Activation act) {
-            if(!act.ubQueued) {
+            if(!act.ubQueued && act.inputValue == null) {
                 act.ubQueued = true;
                 queue.addLast(act);
             }

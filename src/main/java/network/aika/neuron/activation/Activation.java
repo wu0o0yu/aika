@@ -266,9 +266,7 @@ public final class Activation extends OrActivation {
 
         if(Math.abs(upperBound - oldUpperBound) > 0.01) {
             for(Link l: neuronOutputs.values()) {
-                if(!l.synapse.key.isRecurrent) {
-                    doc.ubQueue.add(l.output);
-                }
+                doc.ubQueue.add(l);
             }
         }
 
@@ -322,8 +320,8 @@ public final class Activation extends OrActivation {
             }
         }
 
-        upperBound = Math.min(inputValue, n.activationFunction.f(ub));
-        lowerBound = Math.min(inputValue, n.activationFunction.f(lb));
+        upperBound = n.activationFunction.f(ub);
+        lowerBound = n.activationFunction.f(lb);
     }
 
 

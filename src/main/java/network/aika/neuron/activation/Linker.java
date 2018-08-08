@@ -161,7 +161,7 @@ public class Linker {
         oAct.addSynapseActivation(OUTPUT, l);
 
         queue.add(l);
-        doc.ubQueue.add(l.output);
+        doc.ubQueue.add(l);
 
         return;
     }
