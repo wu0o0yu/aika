@@ -25,6 +25,7 @@ import network.aika.neuron.activation.Activation.Link;
 
 import java.util.*;
 
+import static network.aika.neuron.Synapse.Builder.VARIABLE;
 import static network.aika.neuron.activation.Linker.Direction.INPUT;
 import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
 
@@ -132,23 +133,26 @@ public class Linker {
 
 
     private void link(Synapse s, Activation iAct, Activation oAct) {
-        Integer outputBegin = null;
-        Integer outputEnd = null;
-
         if(s.key.rangeInput == Synapse.Builder.OUTPUT) {
-            outputBegin = s.key.rangeOutput.begin.map(iAct.range);
-            outputEnd = s.key.rangeOutput.end.map(iAct.range);
+            Integer outputBegin = s.key.rangeOutput.begin.map(iAct.range);
+            Integer outputEnd = s.key.rangeOutput.end.map(iAct.range);
+
+            if(outputBegin != null && outputBegin.intValue() != oAct.range.begin.intValue() || outputEnd != null && outputEnd.intValue() != oAct.range.end.intValue()) {
+                return;
+            }
         } else {
+            boolean match = false;
             for(Link l: iAct.neuronInputs.values()) {
-                if(l.synapse.id == s.key.rangeInput) {
-                    outputBegin = l.input.range.begin;
-                    outputEnd = l.input.range.end;
+                if(l.synapse.id == s.key.rangeInput || s.key.rangeInput == VARIABLE) {
+                    if(l.input.range.begin == oAct.range.begin.intValue() && l.input.range.end == oAct.range.end.intValue()) {
+                        match = true;
+                        break;
+                    }
                 }
             }
-        }
-
-        if(outputBegin != null && outputBegin.intValue() != oAct.range.begin.intValue() || outputEnd != null && outputEnd.intValue() != oAct.range.end.intValue()) {
-            return;
+            if(!match) {
+                return;
+            }
         }
 
         Link l = new Link(s, iAct, oAct);

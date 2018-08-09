@@ -32,6 +32,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
+import static network.aika.neuron.Synapse.Builder.OUTPUT;
+
 /**
  * The {@code Synapse} class connects two neurons with each other. When propagating an activation signal, the
  * weight of the synapse is multiplied with the activation value of the input neurons activation. The result is then added
@@ -191,16 +193,16 @@ public class Synapse implements Writable {
         for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
             int rId = me.getKey();
             Map<Integer, Relation> rel = null;
-            if(rId >= 0) {
-                Synapse rs = out.provider.getSynapseById(rId);
-                if(rs != null) {
-                    rel = rs.relations;
-                }
-            } else {
+            if(rId == OUTPUT) {
                 if(out.outputRelations == null) {
                     out.outputRelations = new TreeMap<>();
                 }
                 rel = out.outputRelations;
+            } else {
+                Synapse rs = out.provider.getSynapseById(rId);
+                if(rs != null) {
+                    rel = rs.relations;
+                }
             }
             if(rel != null) {
                 rel.put(id, me.getValue().invert());
@@ -451,6 +453,7 @@ public class Synapse implements Writable {
      */
     public static class Builder implements Comparable<Builder> {
         public static final int OUTPUT = -1;
+        public static final int VARIABLE = -2;
 
         public boolean recurrent;
         public Neuron neuron;
