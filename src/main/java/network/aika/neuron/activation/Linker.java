@@ -132,7 +132,7 @@ public class Linker {
     }
 
 
-    private void link(Synapse s, Activation iAct, Activation oAct) {
+    protected void link(Synapse s, Activation iAct, Activation oAct) {
         if(s.key.rangeInput == Synapse.Builder.OUTPUT) {
             Integer outputBegin = s.key.rangeOutput.begin.map(iAct.range);
             Integer outputEnd = s.key.rangeOutput.end.map(iAct.range);
