@@ -22,6 +22,8 @@ import network.aika.lattice.Node;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.Provider.SuspensionMode;
+import network.aika.neuron.activation.Linker;
+import network.aika.neuron.activation.SearchNode;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -52,6 +54,8 @@ public class Model {
     public WritableFactory nodeStatisticFactory;
     public WritableFactory neuronStatisticFactory;
     public WritableFactory synapseStatisticFactory;
+    public LinkerFactory linkerFactory = (doc) -> new Linker(doc);
+    public SearchNode.SkipSelectStep skipSelectStep = (act) -> false;
 
     public AtomicInteger docIdCounter = new AtomicInteger(0);
     public AtomicInteger currentId = new AtomicInteger(0);
@@ -121,6 +125,23 @@ public class Model {
 
     public void setSynapseStatisticFactory(WritableFactory synapseStatisticFactory) {
         this.synapseStatisticFactory = synapseStatisticFactory;
+    }
+
+    public LinkerFactory getLinkerFactory() {
+        return linkerFactory;
+    }
+
+    public void setLinkerFactory(LinkerFactory linkerFactory) {
+        this.linkerFactory = linkerFactory;
+    }
+
+
+    public SearchNode.SkipSelectStep getSkipSelectStep() {
+        return skipSelectStep;
+    }
+
+    public void setSkipSelectStep(SearchNode.SkipSelectStep skipSelectStep) {
+        this.skipSelectStep = skipSelectStep;
     }
 
 
@@ -266,5 +287,10 @@ public class Model {
     public interface WritableFactory {
 
         Writable createObject();
+    }
+
+    public interface LinkerFactory {
+
+        Linker createLinker(Document doc);
     }
 }

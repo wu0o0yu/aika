@@ -85,9 +85,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     public volatile double requiredSum;
 
-    public volatile double metaBias = 0.0;
-    public volatile boolean isMeta = false;
-
     public volatile int numDisjunctiveSynapses = 0;
 
     public Writable statistic;
@@ -378,9 +375,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         out.writeDouble(requiredSum);
 
-        out.writeDouble(metaBias);
-        out.writeBoolean(isMeta);
-
         out.writeInt(numDisjunctiveSynapses);
 
         out.writeUTF(activationFunction.name());
@@ -452,9 +446,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         posPassiveSum = in.readDouble();
 
         requiredSum = in.readDouble();
-
-        metaBias = in.readDouble();
-        isMeta = in.readBoolean();
 
         numDisjunctiveSynapses = in.readInt();
 

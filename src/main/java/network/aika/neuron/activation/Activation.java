@@ -471,23 +471,6 @@ public final class Activation extends OrActivation {
     }
 
 
-    public Activation getTarget() {
-        assert getINeuron().isMeta;
-
-        for(Link li: neuronOutputs.values()) {
-            if(li.output.getINeuron().type == INeuron.Type.INHIBITORY) {
-                for(Link le: li.output.neuronInputs.values()) {
-                    INeuron n = le.input.getINeuron();
-                    if (!n.isMeta && n.type == INeuron.Type.EXCITATORY) {
-                        return le.input;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-
     public boolean checkSelfReferencing(boolean onlySelected, int depth, long v) {
         if (markedPredecessor == v) {
             return true;

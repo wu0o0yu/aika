@@ -74,7 +74,7 @@ public class Document implements Comparable<Document> {
     public Queue queue = new Queue();
     public ValueQueue vQueue = new ValueQueue();
     public UpperBoundQueue ubQueue = new UpperBoundQueue();
-    public Linker linker = new Linker(this);
+    public Linker linker;
 
     public TreeSet<Node> activatedNodes = new TreeSet<>();
     public TreeSet<INeuron> activatedNeurons = new TreeSet<>();
@@ -139,6 +139,7 @@ public class Document implements Comparable<Document> {
 
         this.model = model;
         this.threadId = threadId;
+        this.linker = model.getLinkerFactory().createLinker(this);
     }
 
 

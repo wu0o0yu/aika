@@ -378,7 +378,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private boolean prepareSelectStep(Document doc) {
         candidate.repeat = false;
 
-        if(alreadyExcluded || skip == SELECTED || (OPTIMIZE_SEARCH && getCachedDecision() == Decision.EXCLUDED) || isMetaActWithTarget()) return false;
+        if(alreadyExcluded || skip == SELECTED || (OPTIMIZE_SEARCH && getCachedDecision() == Decision.EXCLUDED) || doc.model.getSkipSelectStep().evaluate(candidate.activation)) return false;
 
         candidate.activation.setDecision(SELECTED, visited);
 
@@ -405,17 +405,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
         return true;
     }
-
-
-
-    private boolean isMetaActWithTarget() {
-        if(!candidate.activation.getINeuron().isMeta) {
-            return false;
-        }
-
-        return candidate.activation.getTarget() != null;
-    }
-
 
 
     private boolean generatesUnsuppressedExcluded() {
@@ -633,4 +622,8 @@ public class SearchNode implements Comparable<SearchNode> {
         }
     }
 
+
+    public interface SkipSelectStep {
+        boolean evaluate(Activation act);
+    }
 }
