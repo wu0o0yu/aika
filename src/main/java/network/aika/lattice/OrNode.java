@@ -122,6 +122,8 @@ public class OrNode extends Node<OrNode, Activation> {
                         if (iActA != iActB) {
                             continue x;
                         }
+                    } else {
+                        continue x;
                     }
                 }
             }
