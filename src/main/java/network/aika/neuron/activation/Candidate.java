@@ -49,7 +49,10 @@ public class Candidate  implements Comparable<Candidate> {
 
 
     public String toString() {
-        return " CID:" + id +
+        return " ACT-ID:" + activation.id +
+                " " + activation.range +
+                " " + activation.getLabel() +
+                " CID:" + id +
                 " CD:" + cachedDecision +
                 " REPEAT:" + repeat +
                 " CONFLICT:" + isConflicting() +
@@ -60,10 +63,7 @@ public class Candidate  implements Comparable<Candidate> {
                 " EXCLUDED:" + debugDecisionCounts[1] +
                 " SIM-CACHED:" + debugComputed[0] +
                 " SIM-COMPUTED:" + debugComputed[1] +
-                " MODIFIED:" + debugComputed[2] +
-                " ACT-ID:" + activation.id +
-                " " + activation.range +
-                " " + activation.getLabel();
+                " MODIFIED:" + debugComputed[2];
     }
 
 

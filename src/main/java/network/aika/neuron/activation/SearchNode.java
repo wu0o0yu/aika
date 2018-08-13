@@ -262,9 +262,9 @@ public class SearchNode implements Comparable<SearchNode> {
                     n.level + " " +
                             n.debugState +
                             " DECISION:" + decision +
+                            weights +
                             " " + (n.candidate != null ? n.candidate.toString() : "") +
-                            " MOD-ACTS:" + n.modifiedActs.size() +
-                            weights
+                            " MOD-ACTS:" + n.modifiedActs.size()
             );
 
             decision = n.getDecision();
