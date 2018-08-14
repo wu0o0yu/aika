@@ -692,7 +692,7 @@ public final class Activation extends OrActivation {
 
 
     public String toString() {
-        return range + " - " + node + " -" +
+        return range + " " + identityToString() + " - " + node + " -" +
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
                 (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +
@@ -720,20 +720,8 @@ public final class Activation extends OrActivation {
             sb.append("\"");
         }
 
-        sb.append(" (");
-        boolean first = true;
-        for(Link l: neuronInputs.values()) {
-            if(l.synapse.key.identity) {
-                if(!first) {
-                    sb.append(", ");
-                }
-
-                sb.append(l.input.id);
-
-                first = false;
-            }
-        }
-        sb.append(") - ");
+        sb.append(identityToString());
+        sb.append(" - ");
 
         sb.append(withLogic ? node.toString() : node.getNeuronLabel());
 
@@ -766,6 +754,26 @@ public final class Activation extends OrActivation {
             sb.append(" - TV:" + Utils.round(targetValue));
         }
 
+        return sb.toString();
+    }
+
+
+    private String identityToString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" (");
+        boolean first = true;
+        for(Link l: neuronInputs.values()) {
+            if(l.synapse.key.identity) {
+                if(!first) {
+                    sb.append(", ");
+                }
+
+                sb.append(l.input.id);
+
+                first = false;
+            }
+        }
+        sb.append(")");
         return sb.toString();
     }
 
