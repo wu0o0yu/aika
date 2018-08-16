@@ -694,7 +694,7 @@ public final class Activation extends OrActivation {
         }
 
         public String toString() {
-            return "V:" + Utils.round(value) + " pV:" + Utils.round(posValue) + " Net:" + net + " P:" + Utils.round(p) + " W:" + Utils.round(weight);
+            return "V:" + Utils.round(value) + " pV:" + Utils.round(posValue) + " Net:" + Utils.round(net) + " P:" + Utils.round(p) + " W:" + Utils.round(weight);
         }
     }
 
