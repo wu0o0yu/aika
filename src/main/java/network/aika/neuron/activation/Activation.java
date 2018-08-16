@@ -41,8 +41,6 @@ public final class Activation extends OrActivation {
     public static int MAX_SELF_REFERENCING_DEPTH = 5;
     public static int MAX_PREDECESSOR_DEPTH = 100;
 
-    public static Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE, null, null);
-    public static Activation MAX_ACTIVATION = new Activation(Integer.MAX_VALUE, null, null);
 
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
@@ -696,7 +694,7 @@ public final class Activation extends OrActivation {
         }
 
         public String toString() {
-            return "V:" + Utils.round(value) + " pV:" + Utils.round(posValue) + " P:" + Utils.round(p) + " W:" + Utils.round(weight);
+            return "V:" + Utils.round(value) + " pV:" + Utils.round(posValue) + " Net:" + net + " P:" + Utils.round(p) + " W:" + Utils.round(weight);
         }
     }
 
