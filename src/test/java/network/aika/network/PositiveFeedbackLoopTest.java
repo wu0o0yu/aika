@@ -9,7 +9,7 @@ import network.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class PositiveFeedbackLoop {
+public class PositiveFeedbackLoopTest {
 
 
     @Test

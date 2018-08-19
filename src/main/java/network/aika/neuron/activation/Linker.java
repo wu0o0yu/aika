@@ -90,7 +90,9 @@ public class Linker {
                 linkOutputRelations(act);
 
                 for (Link l : act.neuronInputs.values()) {
-                    queue.add(l);
+                    if(!l.synapse.isNegative()) {
+                        queue.add(l);
+                    }
                 }
             }
             doc.linker.process();
@@ -164,7 +166,9 @@ public class Linker {
         iAct.addSynapseActivation(INPUT, l);
         oAct.addSynapseActivation(OUTPUT, l);
 
-        queue.add(l);
+        if(!l.synapse.isNegative()) {
+            queue.add(l);
+        }
         doc.ubQueue.add(l);
 
         return;
