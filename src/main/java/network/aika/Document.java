@@ -530,8 +530,10 @@ public class Document implements Comparable<Document> {
 
         public void propagateActivationValue(int round, Activation act)  {
             for(Activation.Link l: act.neuronOutputs.values()) {
-                int r = l.synapse.key.isRecurrent ? round + 1 : round;
-                add(r, l.output);
+                if(!l.passive) {
+                    int r = l.synapse.key.isRecurrent ? round + 1 : round;
+                    add(r, l.output);
+                }
             }
         }
 
@@ -539,7 +541,7 @@ public class Document implements Comparable<Document> {
         private void add(Activation act) {
             add(0, act);
             for (Activation.Link l : act.neuronOutputs.values()) {
-                if (l.synapse.key.isRecurrent) {
+                if (!l.passive && l.synapse.key.isRecurrent) {
                     add(0, l.output);
                 }
             }

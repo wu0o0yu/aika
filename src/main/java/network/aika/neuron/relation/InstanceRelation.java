@@ -49,7 +49,7 @@ public class InstanceRelation extends Relation {
         collectContains(results, n, linkedAct, v);
 
         for(Activation.Link l: linkedAct.neuronInputs.values()) {
-            if(l.synapse.key.identity) {
+            if(!l.passive && l.synapse.key.identity) {
                 collectCommonAncestor(results, n, l.input, v);
             }
         }
@@ -65,7 +65,7 @@ public class InstanceRelation extends Relation {
         }
 
         for(Activation.Link l: linkedAct.neuronOutputs.values()) {
-            if(l.synapse.key.identity) {
+            if(!l.passive && l.synapse.key.identity) {
                 collectContains(results, n, l.output, v);
             }
         }
@@ -81,7 +81,7 @@ public class InstanceRelation extends Relation {
         }
 
         for(Activation.Link l: linkedAct.neuronInputs.values()) {
-            if(l.synapse.key.identity) {
+            if(!l.passive && l.synapse.key.identity) {
                 collectContainedIn(results, n, l.input, v);
             }
         }
@@ -124,7 +124,7 @@ public class InstanceRelation extends Relation {
         if(actA == actB) return true;
 
         for(Activation.Link l: actA.neuronInputs.values()) {
-            if(l.synapse.key.identity) {
+            if(!l.passive && l.synapse.key.identity) {
                 if(contains(l.input, actB, v)) return true;
             }
         }
@@ -146,7 +146,7 @@ public class InstanceRelation extends Relation {
         act.markedAncestor = v;
 
         for(Activation.Link l: act.neuronInputs.values()) {
-            if(l.synapse.key.identity) {
+            if(!l.passive && l.synapse.key.identity) {
                 markAncestors(l.input, v);
             }
         }
@@ -160,7 +160,7 @@ public class InstanceRelation extends Relation {
         if(act.markedAncestor == v1) return true;
 
         for(Activation.Link l: act.neuronInputs.values()) {
-            if(l.synapse.key.identity) {
+            if(!l.passive && l.synapse.key.identity) {
                 if(hasCommonAncestor(l.input, v1, v2)) return true;
             }
         }

@@ -21,6 +21,7 @@ import network.aika.Document;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Activation.Link;
 import network.aika.training.SynapseEvaluation.Result;
 
 import java.util.TreeSet;
@@ -122,11 +123,13 @@ public class SupervisedTraining {
 
 
     public void computeBackpropagationErrorSignal(Activation act) {
-        for (Activation.Link l : act.neuronOutputs.values()) {
-            Synapse s = l.synapse;
-            Activation oAct = l.output;
+        for (Link l : act.neuronOutputs.values()) {
+            if(!l.passive) {
+                Synapse s = l.synapse;
+                Activation oAct = l.output;
 
-            act.errorSignal += s.weight * oAct.errorSignal * (1.0 - act.getFinalState().value);
+                act.errorSignal += s.weight * oAct.errorSignal * (1.0 - act.getFinalState().value);
+            }
         }
 
         updateErrorSignal(act);
@@ -136,8 +139,10 @@ public class SupervisedTraining {
     public void updateErrorSignal(Activation act) {
         if(act.errorSignal != 0.0) {
             errorSignalActivations.add(act);
-            for (Activation.Link l : act.neuronInputs.values()) {
-                queue.add(l.input);
+            for (Link l : act.neuronInputs.values()) {
+                if(!l.passive) {
+                    queue.add(l.input);
+                }
             }
         }
     }
