@@ -36,6 +36,7 @@ public class RecurrentSynapseWithIdentityTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
+                        .setIdentity(true)
                         .setRangeOutput(true, true),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -43,6 +44,7 @@ public class RecurrentSynapseWithIdentityTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(true)
+                        .setIdentity(true)
                         .addRangeRelation(EQUALS, 0),
                 new Synapse.Builder()
                         .setSynapseId(2)
@@ -61,6 +63,7 @@ public class RecurrentSynapseWithIdentityTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
+                        .setIdentity(true)
                         .setRangeOutput(true, true),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -68,6 +71,7 @@ public class RecurrentSynapseWithIdentityTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
+                        .setIdentity(true)
                         .addRangeRelation(EQUALS, 0),
                 new Synapse.Builder()
                         .setSynapseId(2)
@@ -86,6 +90,7 @@ public class RecurrentSynapseWithIdentityTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
+                        .setIdentity(true)
                         .setRangeOutput(true, true),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -93,6 +98,7 @@ public class RecurrentSynapseWithIdentityTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
+                        .setIdentity(true)
                         .addRangeRelation(EQUALS, 0),
                 new Synapse.Builder()
                         .setSynapseId(2)
@@ -111,6 +117,7 @@ public class RecurrentSynapseWithIdentityTest {
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
+                        .setIdentity(true)
                         .setRangeOutput(true, true),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -118,6 +125,7 @@ public class RecurrentSynapseWithIdentityTest {
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
+                        .setIdentity(true)
                         .setRangeOutput(true, true)
         );
 

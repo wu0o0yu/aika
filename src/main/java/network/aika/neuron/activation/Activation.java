@@ -153,6 +153,16 @@ public final class Activation extends OrActivation {
     }
 
 
+    public Link getLinkBySynapseId(int synapseId) {
+        for(Link l: neuronInputs.values()) {
+            if(l.synapse.id == synapseId) {
+                return l;
+            }
+        }
+        return null;
+    }
+
+
     public double process(SearchNode sn, int round, long v) {
         double delta = 0.0;
         State s;

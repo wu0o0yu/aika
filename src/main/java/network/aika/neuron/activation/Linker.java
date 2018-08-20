@@ -90,9 +90,7 @@ public class Linker {
                 linkOutputRelations(act);
 
                 for (Link l : act.neuronInputs.values()) {
-                    if(!l.synapse.isNegative()) {
-                        queue.add(l);
-                    }
+                    addToQueue(l);
                 }
             }
             doc.linker.process();
@@ -107,7 +105,7 @@ public class Linker {
                 int relId = me.getKey();
                 if(relId >= 0) {
                     Synapse s = l.output.getNeuron().getSynapseById(relId);
-                    if(s != null && !s.key.identity) {
+                    if(s != null) {
                         Relation r = me.getValue();
                         link(l.input, l.output, s, r);
                     }
@@ -157,20 +155,77 @@ public class Linker {
             }
         }
 
+
+        if(s.key.identity && s.key.isRecurrent) {
+            Link el = oAct.getLinkBySynapseId(s.id);
+            if(el != null && el.input != iAct) {
+                splitActivation(el, s, iAct, oAct);
+                return;
+            }
+        }
+
+        Link l = linkIntern(s, iAct, oAct);
+        addToQueue(l);
+    }
+
+
+    private void splitActivation(Link el, Synapse s, Activation iAct, Activation oAct) {
+        Activation splitAct = new Activation(doc.activationIdCounter++, doc, oAct.range, oAct.node);
+        oAct.node.processActivation(splitAct);
+        doc.ubQueue.add(splitAct);
+
+        System.out.println("iAct:" + iAct.id + " oAct:" + oAct.id + " splitAct:" + splitAct.id);
+
+        for(Link il: oAct.neuronInputs.values()) {
+            if(il.synapse.id != s.id) {
+                linkIntern(il.synapse, il.input, splitAct);
+            }
+        }
+        linkIntern(s, iAct, splitAct);
+
+        for(Iterator<Map.Entry<Link, Link>> it = oAct.neuronOutputs.entrySet().iterator(); it.hasNext();) {
+            Link ol = it.next().getValue();
+            if(!ol.synapse.isNegative() && checkLoop(iAct, ol.output)) {
+                linkIntern(ol.synapse, splitAct, ol.output);
+                it.remove();
+            } else if(!ol.synapse.isNegative() && checkLoop(el.input, ol.output)) {
+
+            } else {
+                linkIntern(ol.synapse, oAct, ol.output);
+                linkIntern(ol.synapse, splitAct, ol.output);
+            }
+        }
+    }
+
+
+    private boolean checkLoop(Activation iAct, Activation oAct) {
+        long v = doc.visitedCounter++;
+
+        oAct.markedPredecessor = v;
+        return iAct.checkSelfReferencing(false, 0, v);
+    }
+
+
+    private Link linkIntern(Synapse s, Activation iAct, Activation oAct) {
         Link l = new Link(s, iAct, oAct);
         Link el = oAct.neuronInputs.get(l);
         if(el != null) {
-            return;
+            return null;
         }
 
         iAct.addSynapseActivation(INPUT, l);
         oAct.addSynapseActivation(OUTPUT, l);
+        return l;
+    }
 
+
+    private void addToQueue(Link l) {
+        if(l == null) {
+            return;
+        }
         if(!l.synapse.isNegative()) {
             queue.add(l);
         }
         doc.ubQueue.add(l);
-
-        return;
     }
 }
