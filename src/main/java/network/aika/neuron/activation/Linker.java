@@ -167,12 +167,14 @@ public class Linker {
             el = oAct.getLinkBySynapseId(s.id);
             if(el != null && el.input != iAct) {
                 splitActivation(el, nl);
-                return;
+                nl.passive = true;
             }
         }
 
         nl.link();
-        addToQueue(nl);
+        if(!nl.passive) {
+            addToQueue(nl);
+        }
     }
 
 
@@ -184,22 +186,19 @@ public class Linker {
         System.out.println("iAct:" + nl.input.id + " oAct:" + nl.output.id + " splitAct:" + splitAct.id);
 
         for(Link il: nl.output.neuronInputs.values()) {
-            if(il.synapse.id != nl.synapse.id) {
-                new Link(il.synapse, il.input, splitAct, il.passive).link();
-            }
+            new Link(il.synapse, il.input, splitAct, il.synapse.id == nl.synapse.id || il.passive).link();
         }
         new Link(nl.synapse, nl.input, splitAct, false).link();
 
-        for(Iterator<Map.Entry<Link, Link>> it = nl.output.neuronOutputs.entrySet().iterator(); it.hasNext();) {
-            Link ol = it.next().getValue();
-            if(!ol.synapse.isNegative() && checkLoop(nl.input, ol.output)) {
-                new Link(ol.synapse, splitAct, ol.output, ol.passive).link();
-                it.remove();
-            } else if(!ol.synapse.isNegative() && checkLoop(el.input, ol.output)) {
+        for(Link ol: nl.output.neuronOutputs.values()) {
+            Link nol = new Link(ol.synapse, splitAct, ol.output, ol.passive);
+            nol.link();
 
-            } else {
-                new Link(ol.synapse, nl.output, ol.output, ol.passive).link();
-                new Link(ol.synapse, splitAct, ol.output, ol.passive).link();
+            if(!ol.synapse.isNegative() && checkLoop(nl.input, ol.output)) {
+                ol.passive = true;
+            }
+            if(!ol.synapse.isNegative() && checkLoop(el.input, ol.output)) {
+                nol.passive = true;
             }
         }
     }

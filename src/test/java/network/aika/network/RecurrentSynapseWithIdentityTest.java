@@ -14,7 +14,6 @@ import static network.aika.neuron.activation.Range.Relation.EQUALS;
 
 public class RecurrentSynapseWithIdentityTest {
 
- //   @Ignore
     @Test
     public void testRecurrentSynapseWithIdentity() {
         Model m = new Model();
