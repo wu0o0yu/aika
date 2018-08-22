@@ -112,22 +112,36 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     private Activation lookupActivation(Document doc, Range r, OrEntry oe, NodeActivation inputAct) {
-        x: for(Activation act: neuron.get(doc).getThreadState(doc.threadId, true).activations.subMap(new INeuron.ActKey(r, Integer.MIN_VALUE), new INeuron.ActKey(r, Integer.MAX_VALUE)).values()) {
+        Synapse ls = null;
+        boolean matched = false;
+        x: for(Activation act: neuron.get(doc)
+                .getThreadState(doc.threadId, true)
+                .activations
+                .subMap(new INeuron.ActKey(r, Integer.MIN_VALUE), new INeuron.ActKey(r, Integer.MAX_VALUE))
+                .values()
+                ) {
             for(Activation.Link l: act.neuronInputs.values()) {
-                if (l.synapse.key.identity) {
-                    Activation iActA = l.input;
-                    Integer i = oe.revSynapseIds.get(l.synapse.id);
-                    if(i != null) {
-                        Activation iActB = inputAct.getInputActivation(i);
-                        if (iActA != iActB) {
-                            continue x;
-                        }
-                    } else {
+                if(ls != null && ls != l.synapse) {
+                    if(!matched) {
                         continue x;
                     }
+                    matched = false;
                 }
+
+                if (l.synapse.key.identity) {
+                    Integer i = oe.revSynapseIds.get(l.synapse.id);
+                    if(i != null && l.input == inputAct.getInputActivation(i)) {
+                        matched = true;
+                    }
+                } else {
+                    matched = true;
+                }
+                ls = l.synapse;
             }
-            return act;
+
+            if(matched) {
+                return act;
+            }
         }
         return null;
     }
