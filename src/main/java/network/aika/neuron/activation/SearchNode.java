@@ -19,7 +19,6 @@ package network.aika.neuron.activation;
 
 import network.aika.Document;
 import network.aika.Utils;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.Activation.StateChange;
 import org.slf4j.Logger;
@@ -138,7 +137,7 @@ public class SearchNode implements Comparable<SearchNode> {
             if (csn == null || csn.getDecision() != getDecision()) {
                 Activation act = c.activation;
                 act.markDirty(visited);
-                for (Link l : act.neuronOutputs.values()) {
+                for (Link l : act.outputLinks.values()) {
                     if(!l.passive) {
                         l.output.markDirty(visited);
                     }
@@ -201,7 +200,7 @@ public class SearchNode implements Comparable<SearchNode> {
                 return true;
             }
             if(sc.newRounds.isActive()) {
-                for (Link l : sc.getActivation().neuronOutputs.values()) {
+                for (Link l : sc.getActivation().outputLinks.values()) {
                     if (!l.passive && l.output.decision != UNKNOWN &&
                             l.output.markedDirty > visited) {
                         return true;
@@ -229,7 +228,7 @@ public class SearchNode implements Comparable<SearchNode> {
             StateChange scb = csn != null ? csn.modifiedActs.get(act) : null;
 
             if (sca == null || scb == null || !sca.newRounds.compare(scb.newRounds)) {
-                for (Activation.Link l : act.neuronOutputs.values()) {
+                for (Activation.Link l : act.outputLinks.values()) {
                     if(!l.passive) {
                         l.output.markDirty(visited);
                     }
@@ -473,13 +472,13 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean checkPrecondition() {
-        Set soin = candidate.activation.selectedNeuronInputs;
+        Set soin = candidate.activation.selectedInputLinks;
         return soin != null && !soin.isEmpty();
     }
 
 
     private void invalidateCachedDecisions() {
-        for (Link l : candidate.activation.neuronOutputs.values()) {
+        for (Link l : candidate.activation.outputLinks.values()) {
             if (!l.passive && !l.synapse.isNegative()) {
                 invalidateCachedDecision(l.output);
             }

@@ -26,8 +26,6 @@ import network.aika.neuron.activation.Activation.Link;
 import java.util.*;
 
 import static network.aika.neuron.Synapse.Builder.VARIABLE;
-import static network.aika.neuron.activation.Linker.Direction.INPUT;
-import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
 
 /**
  * The {@code Linker} class is responsible for for the linkage of neuron activations. These links mirror the synapses between
@@ -89,7 +87,7 @@ public class Linker {
             for (Activation act : doc.getActivations(false)) {
                 linkOutputRelations(act);
 
-                for (Link l : act.neuronInputs.values()) {
+                for (Link l : act.inputLinks.values()) {
                     if(!l.passive) {
                         addToQueue(l);
                     }
@@ -144,7 +142,7 @@ public class Linker {
             }
         } else {
             boolean match = false;
-            for(Link l: iAct.neuronInputs.values()) {
+            for(Link l: iAct.inputLinks.values()) {
                 if(!l.passive && l.synapse.id == s.key.rangeInput || s.key.rangeInput == VARIABLE) {
                     if(l.input.range.begin == oAct.range.begin.intValue() && l.input.range.end == oAct.range.end.intValue()) {
                         match = true;
@@ -158,7 +156,7 @@ public class Linker {
         }
 
         Link nl = new Link(s, iAct, oAct, false);
-        Link el = oAct.neuronInputs.get(nl);
+        Link el = oAct.inputLinks.get(nl);
         if(el != null) {
             return;
         }
@@ -185,12 +183,12 @@ public class Linker {
 
         System.out.println("iAct:" + nl.input.id + " oAct:" + nl.output.id + " splitAct:" + splitAct.id);
 
-        for(Link il: nl.output.neuronInputs.values()) {
+        for(Link il: nl.output.inputLinks.values()) {
             new Link(il.synapse, il.input, splitAct, il.synapse.id == nl.synapse.id || il.passive).link();
         }
         new Link(nl.synapse, nl.input, splitAct, false).link();
 
-        for(Link ol: nl.output.neuronOutputs.values()) {
+        for(Link ol: nl.output.outputLinks.values()) {
             Link nol = new Link(ol.synapse, splitAct, ol.output, ol.passive);
             nol.link();
 

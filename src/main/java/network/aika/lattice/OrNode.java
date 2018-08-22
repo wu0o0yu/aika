@@ -18,7 +18,6 @@ package network.aika.lattice;
 
 
 import network.aika.*;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -118,7 +117,7 @@ public class OrNode extends Node<OrNode, Activation> {
                 .getThreadState(doc.threadId, true)
                 .getActivationsByRangeBegin(r, true, r, false)
                 ) {
-            for(Activation.Link l: act.neuronInputs.values()) {
+            for(Activation.Link l: act.inputLinks.values()) {
                 if(ls != null && ls != l.synapse) {
                     if(!matched) {
                         continue x;
@@ -379,7 +378,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     public static class OrActivation extends NodeActivation<OrNode> {
-        public Map<Integer, Link> inputs = new TreeMap<>();
+        public Map<Integer, Link> orInputs = new TreeMap<>();
 
         public OrActivation(int id, Document doc, OrNode node) {
             super(id, doc, node);
@@ -392,7 +391,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
         public Link link(OrEntry oe, NodeActivation<?> input) {
             Link l = new Link(oe, input, this);
-            inputs.put(input.id, l);
+            orInputs.put(input.id, l);
             input.outputsToOrNode.put(id, l);
             return l;
         }

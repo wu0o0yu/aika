@@ -33,8 +33,8 @@ import static network.aika.neuron.INeuron.ALLOW_WEAK_NEGATIVE_WEIGHTS;
  * contain the interpretation node of this activation, specifying to which interpretation this activation belongs.
  *
  * <p>The activations are linked to each other on two levels. The fields {@code inputs} and {@code outputs}
- * contain the activation links within the logic layer. The fields {@code neuronInputs} and
- * {@code neuronOutputs} contain the links on the neural layer.
+ * contain the activation links within the logic layer. The fields {@code inputLinks} and
+ * {@code outputLinks} contain the links on the neural layer.
  *
  * @author Lukas Molzberger
  */
@@ -51,9 +51,9 @@ public final class Activation extends OrActivation {
     public Range range;
 
 
-    public TreeSet<Link> selectedNeuronInputs = new TreeSet<>(INPUT_COMP);
-    public TreeMap<Link, Link> neuronInputs = new TreeMap<>(INPUT_COMP);
-    public TreeMap<Link, Link> neuronOutputs = new TreeMap<>(OUTPUT_COMP);
+    public TreeSet<Link> selectedInputLinks = new TreeSet<>(INPUT_COMP);
+    public TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
+    public TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
 
     public Integer sequence;
 
@@ -143,20 +143,20 @@ public final class Activation extends OrActivation {
     public void addLink(Linker.Direction dir, Link l) {
         switch(dir) {
             case INPUT:
-                neuronOutputs.put(l, l);
+                outputLinks.put(l, l);
                 break;
             case OUTPUT:
                 if(l.input.decision == SELECTED) {
-                    selectedNeuronInputs.add(l);
+                    selectedInputLinks.add(l);
                 }
-                neuronInputs.put(l, l);
+                inputLinks.put(l, l);
                 break;
         }
     }
 
 
     public Link getLinkBySynapseId(int synapseId) {
-        for(Link l: neuronInputs.values()) {
+        for(Link l: inputLinks.values()) {
             if(!l.passive && l.synapse.id == synapseId) {
                 return l;
             }
@@ -287,7 +287,7 @@ public final class Activation extends OrActivation {
         computeBounds();
 
         if(Math.abs(upperBound - oldUpperBound) > 0.01) {
-            for(Link l: neuronOutputs.values()) {
+            for(Link l: outputLinks.values()) {
                 if(!l.passive) {
                     doc.ubQueue.add(l);
                 }
@@ -308,7 +308,7 @@ public final class Activation extends OrActivation {
         long v = doc.visitedCounter++;
         markPredecessor(v, 0);
 
-        for (Link l : neuronInputs.values()) {
+        for (Link l : inputLinks.values()) {
             Synapse s = l.synapse;
             if(s.inactive || l.passive) {
                 continue;
@@ -367,7 +367,7 @@ public final class Activation extends OrActivation {
         ArrayList<InputState> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
         InputState maxInputState = null;
-        for (Link l : neuronInputs.values()) {
+        for (Link l : inputLinks.values()) {
             if(l.synapse.inactive || l.passive) {
                 continue;
             }
@@ -416,7 +416,7 @@ public final class Activation extends OrActivation {
 
     public List<Link> getFinalInputActivationLinks() {
         ArrayList<Link> results = new ArrayList<>();
-        for (Link l : neuronInputs.values()) {
+        for (Link l : inputLinks.values()) {
             if (!l.passive && l.input.isFinalActivation()) {
                 results.add(l);
             }
@@ -427,7 +427,7 @@ public final class Activation extends OrActivation {
 
     public List<Link> getFinalOutputActivationLinks() {
         ArrayList<Link> results = new ArrayList<>();
-        for (Link l : neuronOutputs.values()) {
+        for (Link l : outputLinks.values()) {
             if (!l.passive && l.output.isFinalActivation()) {
                 results.add(l);
             }
@@ -444,7 +444,7 @@ public final class Activation extends OrActivation {
         long v = doc.visitedCounter++;
         markPredecessor(v, 0);
         conflicts = new ArrayList<>();
-        for(Link l: neuronInputs.values()) {
+        for(Link l: inputLinks.values()) {
             if (!l.passive && l.synapse.isNegative() && l.synapse.key.isRecurrent) {
                 l.input.collectIncomingConflicts(conflicts, v);
             }
@@ -460,7 +460,7 @@ public final class Activation extends OrActivation {
         if (getINeuron().type != INeuron.Type.INHIBITORY) {
             conflicts.add(this);
         } else {
-            for (Link l : neuronInputs.values()) {
+            for (Link l : inputLinks.values()) {
                 if (!l.passive && !l.synapse.isNegative() && !l.synapse.key.isRecurrent) {
                     l.input.collectIncomingConflicts(conflicts, v);
                 }
@@ -472,7 +472,7 @@ public final class Activation extends OrActivation {
     private void collectOutgoingConflicts(List<Activation> conflicts, long v) {
         if(markedPredecessor == v) return;
 
-        for(Link l: neuronOutputs.values()) {
+        for(Link l: outputLinks.values()) {
             if(l.passive) {
                 continue;
             }
@@ -488,14 +488,14 @@ public final class Activation extends OrActivation {
 
 
     public void adjustSelectedNeuronInputs(Decision d) {
-        for(Link l: neuronOutputs.values()) {
+        for(Link l: outputLinks.values()) {
             if(l.passive) {
                 continue;
             }
             if(d == SELECTED) {
-                l.output.selectedNeuronInputs.add(l);
+                l.output.selectedInputLinks.add(l);
             } else {
-                l.output.selectedNeuronInputs.remove(l);
+                l.output.selectedInputLinks.remove(l);
             }
         }
     }
@@ -510,7 +510,7 @@ public final class Activation extends OrActivation {
             return false;
         }
 
-        for (Link l: onlySelected ? selectedNeuronInputs : neuronInputs.values()) {
+        for (Link l: onlySelected ? selectedInputLinks : inputLinks.values()) {
             if(!l.passive && !l.synapse.key.isRecurrent) {
                 if (l.input.checkSelfReferencing(onlySelected, depth + 1, v)) {
                     return true;
@@ -550,7 +550,7 @@ public final class Activation extends OrActivation {
         if (sequence != null) return sequence;
 
         sequence = 0;
-        neuronInputs
+        inputLinks
                 .values()
                 .stream()
                 .filter(l -> !l.synapse.key.isRecurrent && !l.passive)
@@ -571,7 +571,7 @@ public final class Activation extends OrActivation {
 
         markedPredecessor = v;
 
-        for(Link l: neuronInputs.values()) {
+        for(Link l: inputLinks.values()) {
             if(!l.passive && !l.synapse.isNegative() && !l.synapse.key.isRecurrent) {
                 l.input.markPredecessor(v, depth + 1);
             }
@@ -796,7 +796,7 @@ public final class Activation extends OrActivation {
         StringBuilder sb = new StringBuilder();
         sb.append(" (");
         boolean first = true;
-        for(Link l: neuronInputs.values()) {
+        for(Link l: inputLinks.values()) {
             if(!l.passive && l.synapse.key.identity) {
                 if(!first) {
                     sb.append(", ");
@@ -814,7 +814,7 @@ public final class Activation extends OrActivation {
 
     public String linksToString() {
         StringBuilder sb = new StringBuilder();
-        for(Link l: neuronInputs.values()) {
+        for(Link l: inputLinks.values()) {
             if(!l.passive) {
                 sb.append("  " + l.input.getLabel() + "  W:" + l.synapse.weight + "\n");
             }

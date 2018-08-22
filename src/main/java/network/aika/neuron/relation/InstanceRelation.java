@@ -3,6 +3,7 @@ package network.aika.neuron.relation;
 import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Activation.Link;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -48,7 +49,7 @@ public class InstanceRelation extends Relation {
 
         collectContains(results, n, linkedAct, v);
 
-        for(Activation.Link l: linkedAct.neuronInputs.values()) {
+        for(Link l: linkedAct.inputLinks.values()) {
             if(!l.passive && l.synapse.key.identity) {
                 collectCommonAncestor(results, n, l.input, v);
             }
@@ -64,7 +65,7 @@ public class InstanceRelation extends Relation {
             results.add(linkedAct);
         }
 
-        for(Activation.Link l: linkedAct.neuronOutputs.values()) {
+        for(Link l: linkedAct.outputLinks.values()) {
             if(!l.passive && l.synapse.key.identity) {
                 collectContains(results, n, l.output, v);
             }
@@ -80,7 +81,7 @@ public class InstanceRelation extends Relation {
             results.add(linkedAct);
         }
 
-        for(Activation.Link l: linkedAct.neuronInputs.values()) {
+        for(Link l: linkedAct.inputLinks.values()) {
             if(!l.passive && l.synapse.key.identity) {
                 collectContainedIn(results, n, l.input, v);
             }
@@ -123,7 +124,7 @@ public class InstanceRelation extends Relation {
 
         if(actA == actB) return true;
 
-        for(Activation.Link l: actA.neuronInputs.values()) {
+        for(Link l: actA.inputLinks.values()) {
             if(!l.passive && l.synapse.key.identity) {
                 if(contains(l.input, actB, v)) return true;
             }
@@ -145,7 +146,7 @@ public class InstanceRelation extends Relation {
 
         act.markedAncestor = v;
 
-        for(Activation.Link l: act.neuronInputs.values()) {
+        for(Link l: act.inputLinks.values()) {
             if(!l.passive && l.synapse.key.identity) {
                 markAncestors(l.input, v);
             }
@@ -159,7 +160,7 @@ public class InstanceRelation extends Relation {
 
         if(act.markedAncestor == v1) return true;
 
-        for(Activation.Link l: act.neuronInputs.values()) {
+        for(Link l: act.inputLinks.values()) {
             if(!l.passive && l.synapse.key.identity) {
                 if(hasCommonAncestor(l.input, v1, v2)) return true;
             }

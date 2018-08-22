@@ -123,7 +123,7 @@ public class SupervisedTraining {
 
 
     public void computeBackpropagationErrorSignal(Activation act) {
-        for (Link l : act.neuronOutputs.values()) {
+        for (Link l : act.outputLinks.values()) {
             if(!l.passive) {
                 Synapse s = l.synapse;
                 Activation oAct = l.output;
@@ -139,7 +139,7 @@ public class SupervisedTraining {
     public void updateErrorSignal(Activation act) {
         if(act.errorSignal != 0.0) {
             errorSignalActivations.add(act);
-            for (Link l : act.neuronInputs.values()) {
+            for (Link l : act.inputLinks.values()) {
                 if(!l.passive) {
                     queue.add(l.input);
                 }

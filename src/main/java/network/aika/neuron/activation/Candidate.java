@@ -1,5 +1,6 @@
 package network.aika.neuron.activation;
 
+import network.aika.neuron.activation.Activation.Link;
 
 public class Candidate  implements Comparable<Candidate> {
     public SearchNode currentSearchNode;
@@ -41,7 +42,7 @@ public class Candidate  implements Comparable<Candidate> {
 
 
     public boolean checkDependenciesSatisfied(long v) {
-        for (Activation.Link l : activation.neuronInputs.values()) {
+        for (Link l : activation.inputLinks.values()) {
             if (!l.passive && l.input.markedHasCandidate != v && !l.synapse.key.isRecurrent && l.input.upperBound > 0.0) {
                 return false;
             }

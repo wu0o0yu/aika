@@ -22,20 +22,15 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.*;
 import network.aika.neuron.activation.Range.Relation;
 import network.aika.neuron.activation.Range;
 import network.aika.lattice.OrNode;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static network.aika.neuron.activation.Range.Mapping.BEGIN;
-import static network.aika.neuron.activation.Range.Mapping.END;
 import static network.aika.neuron.activation.Range.Operator.GREATER_THAN;
-import static network.aika.neuron.activation.Range.Operator.LESS_THAN;
 import static network.aika.neuron.activation.Range.Relation.CONTAINS;
 import static network.aika.neuron.activation.Range.Relation.NONE;
-import static network.aika.neuron.activation.Range.Operator.EQUALS;
 
 /**
  *
@@ -437,7 +432,7 @@ public class NegationTest {
             System.out.println(doc.activationsToString(false, false, true));
 
             Assert.assertNotNull(inS.getActivation(doc, new Range(0, 6), false));
-            Assert.assertEquals(2, inS.getActivation(doc, new Range(0, 6), false).neuronInputs.size());
+            Assert.assertEquals(2, inS.getActivation(doc, new Range(0, 6), false).inputLinks.size());
 
             doc.clearActivations();
         }
@@ -455,8 +450,8 @@ public class NegationTest {
 //            Assert.assertNotNull(Selector.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
             Assert.assertNotNull(inS.getActivation(doc, new Range(0, 9), false));
 //            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.interpretation.orInterprNodes.size());
-            Assert.assertEquals(1, inS.getActivation(doc, new Range(0, 6), false).neuronInputs.size());
-            Assert.assertEquals(1, inS.getActivation(doc, new Range(0, 9), false).neuronInputs.size());
+            Assert.assertEquals(1, inS.getActivation(doc, new Range(0, 6), false).inputLinks.size());
+            Assert.assertEquals(1, inS.getActivation(doc, new Range(0, 9), false).inputLinks.size());
 
             doc.clearActivations();
         }

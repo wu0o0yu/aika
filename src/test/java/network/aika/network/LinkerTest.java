@@ -69,7 +69,7 @@ public class LinkerTest {
 
             doc.process();
 
-            Assert.assertEquals(targetValue, !na.get().getActivations(doc, false).iterator().next().neuronOutputs.isEmpty());
+            Assert.assertEquals(targetValue, !na.get().getActivations(doc, false).iterator().next().outputLinks.isEmpty());
         }
     }
 }
