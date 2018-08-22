@@ -116,9 +116,7 @@ public class OrNode extends Node<OrNode, Activation> {
         boolean matched = false;
         x: for(Activation act: neuron.get(doc)
                 .getThreadState(doc.threadId, true)
-                .activations
-                .subMap(new INeuron.ActKey(r, Integer.MIN_VALUE), new INeuron.ActKey(r, Integer.MAX_VALUE))
-                .values()
+                .getActivationsByRangeBegin(r, true, r, false)
                 ) {
             for(Activation.Link l: act.neuronInputs.values()) {
                 if(ls != null && ls != l.synapse) {

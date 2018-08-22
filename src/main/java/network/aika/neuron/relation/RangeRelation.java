@@ -80,7 +80,7 @@ public class RangeRelation extends Relation {
     public Collection<Activation> getActivations(INeuron n, Activation linkedAct) {
         INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
 
-        if(th == null || th.activations.isEmpty()) {
+        if(th == null || th.isEmpty()) {
             return Collections.EMPTY_LIST;
         }
 
@@ -98,7 +98,7 @@ public class RangeRelation extends Relation {
         } else if ((relation.endToEnd.isLessThanOrLessThanEqual() || relation.endToBegin.isLessThanOrLessThanEqual()) && r.begin >= r.end) {
             results = getActivationsByRangeEndLessThanEqual(th, r, relation);
         } else {
-            results = th.activations.values();
+            results = th.getActivations();
         }
 
         return results.stream().filter(act -> test(act, linkedAct)).collect(Collectors.toList());
@@ -130,12 +130,10 @@ public class RangeRelation extends Relation {
             toInclusive = true;
         }
 
-        return th.activations.subMap(
-                new INeuron.ActKey(new Range(fromKey, Integer.MIN_VALUE), Integer.MIN_VALUE),
-                fromInclusive,
-                new INeuron.ActKey(new Range(toKey, Integer.MAX_VALUE), Integer.MAX_VALUE),
-                toInclusive
-        ).values();
+        return th.getActivationsByRangeBegin(
+                new Range(fromKey, Integer.MIN_VALUE), fromInclusive,
+                new Range(toKey, Integer.MAX_VALUE), toInclusive
+        );
     }
 
 
@@ -164,12 +162,10 @@ public class RangeRelation extends Relation {
             toInclusive = true;
         }
 
-        return th.activationsEnd.subMap(
-                new INeuron.ActKey(new Range(Integer.MIN_VALUE, fromKey), Integer.MIN_VALUE),
-                fromInclusive,
-                new INeuron.ActKey(new Range(Integer.MAX_VALUE, toKey), Integer.MAX_VALUE),
-                toInclusive
-        ).values();
+        return th.getActivationsByRangeEnd(
+                new Range(Integer.MIN_VALUE, fromKey), fromInclusive,
+                new Range(Integer.MAX_VALUE, toKey), toInclusive
+        );
     }
 
 
@@ -200,12 +196,10 @@ public class RangeRelation extends Relation {
 
         if(fromKey > toKey) return Collections.EMPTY_LIST;
 
-        return th.activations.subMap(
-                new INeuron.ActKey(new Range(fromKey, Integer.MIN_VALUE), Integer.MIN_VALUE),
-                fromInclusive,
-                new INeuron.ActKey(new Range(toKey, Integer.MAX_VALUE), Integer.MAX_VALUE),
-                toInclusive
-        ).values();
+        return th.getActivationsByRangeBegin(
+                new Range(fromKey, Integer.MIN_VALUE), fromInclusive,
+                new Range(toKey, Integer.MAX_VALUE), toInclusive
+        );
     }
 
 
@@ -236,12 +230,10 @@ public class RangeRelation extends Relation {
 
         if(fromKey > toKey) return Collections.EMPTY_LIST;
 
-        return th.activationsEnd.subMap(
-                new INeuron.ActKey(new Range(Integer.MIN_VALUE, fromKey), Integer.MIN_VALUE),
-                fromInclusive,
-                new INeuron.ActKey(new Range(Integer.MAX_VALUE, toKey), Integer.MAX_VALUE),
-                toInclusive
-        ).values();
+        return th.getActivationsByRangeEnd(
+                new Range(Integer.MIN_VALUE, fromKey), fromInclusive,
+                new Range(Integer.MAX_VALUE, toKey), toInclusive
+        );
     }
 
 
@@ -249,20 +241,17 @@ public class RangeRelation extends Relation {
     public static Collection<Activation> getActivationsByRangeEquals(INeuron.ThreadState th, Range r, Range.Relation rr) {
         if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS) {
             int key = rr.beginToBegin == EQUALS ? r.begin : r.end;
-            return th.activations.subMap(
-                    new INeuron.ActKey(new Range(key, Integer.MIN_VALUE), Integer.MIN_VALUE),
-                    true,
-                    new INeuron.ActKey(new Range(key, Integer.MAX_VALUE), Integer.MAX_VALUE),
-                    true
-            ).values();
+            return th.getActivationsByRangeBegin(
+                    new Range(key, Integer.MIN_VALUE), true,
+                    new Range(key, Integer.MAX_VALUE), true
+            );
         } else if(rr.endToEnd == EQUALS || rr.endToBegin == EQUALS) {
             int key = rr.endToEnd == EQUALS ? r.end : r.begin;
-            return th.activationsEnd.subMap(
-                    new INeuron.ActKey(new Range(Integer.MIN_VALUE, key), Integer.MIN_VALUE),
-                    true,
-                    new INeuron.ActKey(new Range(Integer.MAX_VALUE, key), Integer.MAX_VALUE),
-                    true
-            ).values();
+
+            return th.getActivationsByRangeEnd(
+                    new Range(Integer.MIN_VALUE, key), true,
+                    new Range(Integer.MAX_VALUE, key), true
+            );
         }
         throw new RuntimeException("Invalid Range Relation");
     }

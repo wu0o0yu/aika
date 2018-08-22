@@ -103,7 +103,7 @@ public class SimplePatternMatchingTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).activations.size());
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
 
 
         System.out.println("Output activation:");

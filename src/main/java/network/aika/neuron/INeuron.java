@@ -124,14 +124,87 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public static class ThreadState {
         public long lastUsed;
 
-        public TreeMap<ActKey, Activation> activations;
-        public TreeMap<ActKey, Activation> activationsEnd;
+        private TreeMap<ActKey, Activation> activations;
+        private TreeMap<ActKey, Activation> activationsEnd;
         public int minLength = Integer.MAX_VALUE;
         public int maxLength = 0;
+
 
         public ThreadState() {
             activations = new TreeMap<>(BEGIN_COMP);
             activationsEnd = new TreeMap<>(END_COMP);
+        }
+
+
+        public void addActivation(Activation act) {
+            ActKey ak = new ActKey(act.range, act.id);
+            activations.put(ak, act);
+
+            TreeMap<ActKey, Activation> actEnd = activationsEnd;
+            if (actEnd != null) actEnd.put(ak, act);
+        }
+
+
+        public Collection<Activation> getActivations() {
+            return activations.values();
+        }
+
+
+        public boolean isEmpty() {
+            return activations.isEmpty();
+        }
+
+
+        public int size() {
+            return activations.size();
+        }
+
+
+        public void clearActivations() {
+            activations.clear();
+
+            if (activationsEnd != null) activationsEnd.clear();
+        }
+
+
+        public Collection<Activation> getActivationsByRangeBegin(Range fromKey, boolean fromInclusive, Range toKey, boolean toInclusive) {
+            return activations.subMap(
+                    new INeuron.ActKey(fromKey, Integer.MIN_VALUE),
+                    fromInclusive,
+                    new INeuron.ActKey(toKey, Integer.MAX_VALUE),
+                    toInclusive
+            ).values();
+        }
+
+
+        public Collection<Activation> getActivationsByRangeEnd(Range fromKey, boolean fromInclusive, Range toKey, boolean toInclusive) {
+            return activationsEnd.subMap(
+                    new INeuron.ActKey(fromKey, Integer.MIN_VALUE),
+                    fromInclusive,
+                    new INeuron.ActKey(toKey, Integer.MAX_VALUE),
+                    toInclusive
+            ).values();
+        }
+
+
+        public Activation getActivationByRange(Range r) {
+            Map.Entry<ActKey, Activation> me = activations.higherEntry(new ActKey(r, Integer.MIN_VALUE));
+
+            if(me != null && me.getValue().range.equals(r)) {
+                return me.getValue();
+            }
+            return null;
+        }
+
+
+        public Collection<Activation> getActivations(boolean onlyFinal) {
+            return onlyFinal ?
+                    activations
+                            .values()
+                            .stream()
+                            .filter(act -> act.isFinalActivation())
+                            .collect(Collectors.toList()) :
+                    getActivations();
         }
     }
 
@@ -218,11 +291,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public Activation addInput(Document doc, Activation.Builder input) {
         assert input.range.begin <= input.range.end;
 
-        Map.Entry<ActKey, Activation> me = getThreadState(doc.threadId, true).activations.higherEntry(new ActKey(input.range, Integer.MIN_VALUE));
-        Activation act;
-        if(me != null && me.getValue().range.equals(input.range)) {
-            act = me.getValue();
-        } else {
+        Activation act = getThreadState(doc.threadId, true).getActivationByRange(input.range);
+        if(act == null) {
             act = new Activation(doc.activationIdCounter++, doc, node.get(doc));
             act.range = input.range;
         }
@@ -286,22 +356,16 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public Collection<Activation> getActivations(Document doc, boolean onlyFinal) {
         ThreadState th = getThreadState(doc.threadId, false);
         if (th == null) return Collections.EMPTY_LIST;
-        return onlyFinal ?
-                th.activations
-                        .values()
-                        .stream()
-                        .filter(act -> act.isFinalActivation())
-                        .collect(Collectors.toList()) :
-                th.activations.values();
+        return th.getActivations(onlyFinal);
     }
 
 
     public Activation getActivation(Document doc, Range r, boolean onlyFinal) {
         ThreadState th = getThreadState(doc.threadId, false);
         if (th == null) return null;
-        for(Map.Entry<ActKey, Activation> me : th.activations.subMap(new ActKey(r, Integer.MIN_VALUE), new ActKey(r, Integer.MAX_VALUE)).entrySet()) {
-            if (!onlyFinal || me.getValue().isFinalActivation()) {
-                return me.getValue();
+        for(Activation act : th.getActivationsByRangeBegin(r, true, r, false)) {
+            if (!onlyFinal || act.isFinalActivation()) {
+                return act;
             }
         }
         return null;
@@ -323,9 +387,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public void clearActivations(int threadId) {
         ThreadState th = getThreadState(threadId, false);
         if (th == null) return;
-        th.activations.clear();
-
-        if (th.activationsEnd != null) th.activationsEnd.clear();
+        th.clearActivations();
     }
 
 
@@ -558,18 +620,14 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         Document doc = act.doc;
         INeuron.ThreadState th = act.node.neuron.get().getThreadState(doc.threadId, true);
 
-        if (th.activations.isEmpty()) {
+        if (th.isEmpty()) {
             doc.activatedNeurons.add(act.node.neuron.get());
         }
 
         th.minLength = Math.min(th.minLength, act.range.length());
         th.maxLength = Math.max(th.maxLength, act.range.length());
 
-        ActKey ak = new ActKey(act.range, act.id);
-        th.activations.put(ak, act);
-
-        TreeMap<ActKey, Activation> actEnd = th.activationsEnd;
-        if (actEnd != null) actEnd.put(ak, act);
+        th.addActivation(act);
 
         Document.ActKey dak = new Document.ActKey(act.range, act.node, act.id);
         if (act.range.begin != null) {
