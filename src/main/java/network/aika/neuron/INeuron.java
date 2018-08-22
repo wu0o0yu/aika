@@ -629,15 +629,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         th.addActivation(act);
 
-        Document.ActKey dak = new Document.ActKey(act.range, act.node, act.id);
-        if (act.range.begin != null) {
-            doc.activationsByRangeBegin.put(dak, act);
-        }
-        if (act.range.end != null) {
-            doc.activationsByRangeEnd.put(dak, act);
-        }
-
-        doc.addedActivations.add(act);
+        doc.addActivation(act);
     }
 
 

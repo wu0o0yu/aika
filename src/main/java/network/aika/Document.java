@@ -85,7 +85,7 @@ public class Document implements Comparable<Document> {
 
     public SupervisedTraining supervisedTraining = new SupervisedTraining(this);
 
-    public TreeMap<ActKey, Activation> activationsByRangeBegin = new TreeMap<>((ak1, ak2) -> {
+    private TreeMap<ActKey, Activation> activationsByRangeBegin = new TreeMap<>((ak1, ak2) -> {
         int r = Integer.compare(ak1.range.begin, ak2.range.begin);
         if (r != 0) return r;
         r = ak1.node.compareTo(ak2.node);
@@ -93,13 +93,14 @@ public class Document implements Comparable<Document> {
         return Integer.compare(ak1.actId, ak2.actId);
     });
 
-    public TreeMap<ActKey, Activation> activationsByRangeEnd = new TreeMap<>((ak1, ak2) -> {
+    private TreeMap<ActKey, Activation> activationsByRangeEnd = new TreeMap<>((ak1, ak2) -> {
         int r = Integer.compare(ak1.range.end, ak2.range.end);
         if (r != 0) return r;
         r = ak1.node.compareTo(ak2.node);
         if (r != 0) return r;
         return Integer.compare(ak1.actId, ak2.actId);
     });
+
 
     public static class ActKey {
         Range range;
@@ -176,6 +177,18 @@ public class Document implements Comparable<Document> {
     }
 
 
+    public void addActivation(Activation act) {
+        ActKey dak = new ActKey(act.range, act.node, act.id);
+        if (act.range.begin != null) {
+            activationsByRangeBegin.put(dak, act);
+        }
+        if (act.range.end != null) {
+            activationsByRangeEnd.put(dak, act);
+        }
+        addedActivations.add(act);
+    }
+
+
     public Collection<Activation> getActivations(boolean onlyFinal) {
         if(!onlyFinal) {
             return activationsByRangeBegin.values();
@@ -186,6 +199,31 @@ public class Document implements Comparable<Document> {
                     .filter(act -> act.isFinalActivation())
                     .collect(Collectors.toList());
         }
+    }
+
+
+    public Collection<Activation> getActivationsByRangeBegin(Range fromKey, boolean fromInclusive, Range toKey, boolean toInclusive) {
+        return activationsByRangeBegin.subMap(
+                new Document.ActKey(fromKey, Node.MIN_NODE, Integer.MIN_VALUE),
+                fromInclusive,
+                new Document.ActKey(toKey, Node.MAX_NODE, Integer.MAX_VALUE),
+                toInclusive
+        ).values();
+    }
+
+
+    public Collection<Activation> getActivationByRangeEnd(Range fromKey, boolean fromInclusive, Range toKey, boolean toInclusive) {
+        return activationsByRangeEnd.subMap(
+                new Document.ActKey(fromKey, Node.MIN_NODE, Integer.MIN_VALUE),
+                fromInclusive,
+                new Document.ActKey(toKey, Node.MAX_NODE, Integer.MAX_VALUE),
+                toInclusive
+        ).values();
+    }
+
+
+    public int getNumberOfActivations() {
+        return activationsByRangeBegin.size();
     }
 
 

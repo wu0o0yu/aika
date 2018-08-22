@@ -260,20 +260,16 @@ public class RangeRelation extends Relation {
     public static Collection<Activation> getActivationsByRangeEquals(Document doc, Range r, Range.Relation rr) {
         if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS) {
             int key = rr.beginToBegin == EQUALS ? r.begin : r.end;
-            return doc.activationsByRangeBegin.subMap(
-                    new Document.ActKey(new Range(key, Integer.MIN_VALUE), Node.MIN_NODE, Integer.MIN_VALUE),
-                    true,
-                    new Document.ActKey(new Range(key, Integer.MAX_VALUE), Node.MAX_NODE, Integer.MAX_VALUE),
-                    true
-            ).values();
+            return doc.getActivationsByRangeBegin(
+                    new Range(key, Integer.MIN_VALUE), true,
+                    new Range(key, Integer.MAX_VALUE), true
+            );
         } else if(rr.endToEnd == EQUALS || rr.endToBegin == EQUALS) {
             int key = rr.endToEnd == EQUALS ? r.end : r.begin;
-            return doc.activationsByRangeEnd.subMap(
-                    new Document.ActKey(new Range(Integer.MIN_VALUE, key), Node.MIN_NODE, Integer.MIN_VALUE),
-                    true,
-                    new Document.ActKey(new Range(Integer.MAX_VALUE, key), Node.MAX_NODE, Integer.MAX_VALUE),
-                    true
-            ).values();
+            return doc.getActivationByRangeEnd(
+                    new Range(Integer.MIN_VALUE, key), true,
+                    new Range(Integer.MAX_VALUE, key), true
+            );
         }
         throw new RuntimeException("Invalid Range Relation");
     }
