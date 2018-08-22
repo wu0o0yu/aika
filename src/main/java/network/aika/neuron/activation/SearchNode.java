@@ -137,11 +137,9 @@ public class SearchNode implements Comparable<SearchNode> {
             if (csn == null || csn.getDecision() != getDecision()) {
                 Activation act = c.activation;
                 act.markDirty(visited);
-                for (Link l : act.outputLinks.values()) {
-                    if(!l.passive) {
-                        l.output.markDirty(visited);
-                    }
-                }
+                act.getOutputLinks(false).forEach(
+                        l -> l.output.markDirty(visited)
+                );
             } else {
                 modified = csn.isModified();
 
@@ -200,11 +198,11 @@ public class SearchNode implements Comparable<SearchNode> {
                 return true;
             }
             if(sc.newRounds.isActive()) {
-                for (Link l : sc.getActivation().outputLinks.values()) {
-                    if (!l.passive && l.output.decision != UNKNOWN &&
-                            l.output.markedDirty > visited) {
-                        return true;
-                    }
+                if(sc.getActivation()
+                        .getOutputLinks(false)
+                        .anyMatch(l -> l.output.decision != UNKNOWN && l.output.markedDirty > visited)
+                        ) {
+                    return true;
                 }
             }
         }
@@ -228,11 +226,8 @@ public class SearchNode implements Comparable<SearchNode> {
             StateChange scb = csn != null ? csn.modifiedActs.get(act) : null;
 
             if (sca == null || scb == null || !sca.newRounds.compare(scb.newRounds)) {
-                for (Activation.Link l : act.outputLinks.values()) {
-                    if(!l.passive) {
-                        l.output.markDirty(visited);
-                    }
-                }
+                act.getOutputLinks(false)
+                        .forEach(l -> l.output.markDirty(visited));
             }
         });
     }
@@ -359,7 +354,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private void initStep(Document doc) {
         candidate = doc.candidates.get(level);
 
-        boolean precondition = checkPrecondition();
+        boolean precondition = candidate.activation.hasSelectedInputLinks();
 
         alreadySelected = precondition && !candidate.isConflicting() || candidate.activation.inputDecision == SELECTED;
         alreadyExcluded = !precondition || checkExcluded(candidate.activation) || candidate.activation.inputDecision == EXCLUDED;
@@ -471,18 +466,11 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean checkPrecondition() {
-        Set soin = candidate.activation.selectedInputLinks;
-        return soin != null && !soin.isEmpty();
-    }
-
-
     private void invalidateCachedDecisions() {
-        for (Link l : candidate.activation.outputLinks.values()) {
-            if (!l.passive && !l.synapse.isNegative()) {
-                invalidateCachedDecision(l.output);
-            }
-        }
+        candidate.activation
+                .getOutputLinks(false)
+                .filter(l -> !l.synapse.isNegative())
+                .forEach(l -> invalidateCachedDecision(l.output));
     }
 
 

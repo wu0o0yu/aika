@@ -117,7 +117,7 @@ public class OrNode extends Node<OrNode, Activation> {
                 .getThreadState(doc.threadId, true)
                 .getActivationsByRangeBegin(r, true, r, false)
                 ) {
-            for(Activation.Link l: act.inputLinks.values()) {
+            for(Activation.Link l: act.getInputLinksOrderedBySynapse()) {
                 if(ls != null && ls != l.synapse) {
                     if(!matched) {
                         continue x;

@@ -432,7 +432,7 @@ public class NegationTest {
             System.out.println(doc.activationsToString(false, false, true));
 
             Assert.assertNotNull(inS.getActivation(doc, new Range(0, 6), false));
-            Assert.assertEquals(2, inS.getActivation(doc, new Range(0, 6), false).inputLinks.size());
+            Assert.assertEquals(2, inS.getActivation(doc, new Range(0, 6), false).getInputLinks(false, false).count());
 
             doc.clearActivations();
         }
@@ -450,8 +450,8 @@ public class NegationTest {
 //            Assert.assertNotNull(Selector.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
             Assert.assertNotNull(inS.getActivation(doc, new Range(0, 9), false));
 //            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.interpretation.orInterprNodes.size());
-            Assert.assertEquals(1, inS.getActivation(doc, new Range(0, 6), false).inputLinks.size());
-            Assert.assertEquals(1, inS.getActivation(doc, new Range(0, 9), false).inputLinks.size());
+            Assert.assertEquals(1, inS.getActivation(doc, new Range(0, 6), false).getInputLinks(false, false).count());
+            Assert.assertEquals(1, inS.getActivation(doc, new Range(0, 9), false).getInputLinks(false, false).count());
 
             doc.clearActivations();
         }

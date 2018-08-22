@@ -23,12 +23,14 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.Range;
 import network.aika.lattice.Node;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Range.Relation.EQUALS;
 
@@ -77,54 +79,48 @@ public class ActivationOutputsTest {
         Activation inA1 = inA.getActivation(doc, new Range(0, 1), false);
         Activation inB1 = inB.getActivation(doc, new Range(0, 1), false);
 
-        Assert.assertTrue(containsOutputActivation(inA1.outputLinks.values(), pAB.getActivation(doc, new Range(0, 1), false)));
-        Assert.assertTrue(containsOutputActivation(inB1.outputLinks.values(), pAB.getActivation(doc, new Range(0, 1), false)));
+        Assert.assertTrue(containsOutputActivation(inA1.getOutputLinks(false), pAB.getActivation(doc, new Range(0, 1), false)));
+        Assert.assertTrue(containsOutputActivation(inB1.getOutputLinks(false), pAB.getActivation(doc, new Range(0, 1), false)));
 
         Activation actAB = pAB.getActivation(doc, new Range(0, 1), false);
         Assert.assertEquals(
                 inA.getActivation(doc, new Range(0, 1), false),
-                selectInputActivation(actAB.inputLinks.values(), inA.get().node.get())
+                selectInputActivation(actAB.getInputLinks(false, false), inA.get().node.get())
         );
 
         actAB = pAB.getActivation(doc, new Range(0, 1), false);
         Assert.assertEquals(
                 inB.getActivation(doc, new Range(0, 1), false),
-                selectInputActivation(actAB.inputLinks.values(), inB.get().node.get())
+                selectInputActivation(actAB.getInputLinks(false, false), inB.get().node.get())
         );
 
 
-        Assert.assertTrue(containsOutputActivation(inA1.outputLinks.values(), pAB.getActivation(doc, new Range(0, 1), false)));
-        Assert.assertTrue(containsOutputActivation(inB1.outputLinks.values(), pAB.getActivation(doc, new Range(0, 1), false)));
+        Assert.assertTrue(containsOutputActivation(inA1.getOutputLinks(false), pAB.getActivation(doc, new Range(0, 1), false)));
+        Assert.assertTrue(containsOutputActivation(inB1.getOutputLinks(false), pAB.getActivation(doc, new Range(0, 1), false)));
 
         actAB = pAB.getActivation(doc, new Range(0, 1), false);
         Assert.assertEquals(
                 inA.getActivation(doc, new Range(0, 1), false),
-                selectInputActivation(actAB.inputLinks.values(), inA.get().node.get())
+                selectInputActivation(actAB.getInputLinks(false, false), inA.get().node.get())
         );
 
         actAB = pAB.getActivation(doc, new Range(0, 1), false);
         Assert.assertEquals(
                 inB.getActivation(doc, new Range(0, 1), false),
-                selectInputActivation(actAB.inputLinks.values(), inB.get().node.get())
+                selectInputActivation(actAB.getInputLinks(false, false), inB.get().node.get())
         );
     }
 
 
-    private Activation selectInputActivation(Collection<Activation.Link> acts, Node n) {
-        for(Activation.Link l: acts) {
-            if(l.input.node.compareTo(n) == 0) {
-                return l.input;
-            }
-        }
-        return null;
+    private Activation selectInputActivation(Stream<Link> acts, Node n) {
+        return acts.filter(l -> l.input.node.compareTo(n) == 0).map(l -> l.input)
+                .findAny()
+                .orElse(null);
     }
 
 
-    public boolean containsOutputActivation(Collection<Activation.Link> outputActivations, Activation oAct) {
-        for(Activation.Link l: outputActivations) {
-            if(l.output == oAct) return true;
-        }
-        return false;
+    public boolean containsOutputActivation(Stream<Link> outputActivations, Activation oAct) {
+        return outputActivations.anyMatch(l -> l.output == oAct);
     }
 
 
@@ -151,7 +147,7 @@ public class ActivationOutputsTest {
         );
 
         Activation outB1 = outB.getActivation(doc, new Range(0, 1), false);
-        Assert.assertTrue(containsOutputActivation(inA.getActivation(doc, new Range(0, 1), false).outputLinks.values(), outB1));
+        Assert.assertTrue(containsOutputActivation(inA.getActivation(doc, new Range(0, 1), false).getOutputLinks(false), outB1));
     }
 
 
@@ -181,7 +177,7 @@ public class ActivationOutputsTest {
 
         Activation outB1 = outB.getActivation(doc, new Range(0, 1), false);
 
-        Assert.assertTrue(containsOutputActivation(inA.get().getActivation(doc, new Range(0, 1), false).outputLinks.values(), outB1));
+        Assert.assertTrue(containsOutputActivation(inA.get().getActivation(doc, new Range(0, 1), false).getOutputLinks(false), outB1));
     }
 
 }

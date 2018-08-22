@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Linker.Direction.INPUT;
 import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
@@ -51,9 +52,9 @@ public final class Activation extends OrActivation {
     public Range range;
 
 
-    public TreeSet<Link> selectedInputLinks = new TreeSet<>(INPUT_COMP);
-    public TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
-    public TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
+    private TreeSet<Link> selectedInputLinks = new TreeSet<>(INPUT_COMP);
+    private TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
+    private TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
 
     public Integer sequence;
 
@@ -162,6 +163,28 @@ public final class Activation extends OrActivation {
             }
         }
         return null;
+    }
+
+
+    public SortedSet<Link> getInputLinksOrderedBySynapse() {
+        return inputLinks.navigableKeySet();
+    }
+
+
+    public Stream<Link> getInputLinks(boolean includePassive, boolean onlySelected) {
+        Stream<Link> s = (onlySelected ? selectedInputLinks : inputLinks.values()).stream();
+        return includePassive ? s : s.filter(l -> !l.passive);
+    }
+
+
+    public Stream<Link> getOutputLinks(boolean includePassive) {
+        Stream<Link> s = outputLinks.values().stream();
+        return includePassive ? s : s.filter(l -> !l.passive);
+    }
+
+
+    public Link getInputLink(Link l) {
+        return inputLinks.get(l);
     }
 
 
@@ -387,6 +410,10 @@ public final class Activation extends OrActivation {
         }
 
         return tmp;
+    }
+
+    public boolean hasSelectedInputLinks() {
+        return selectedInputLinks != null && !selectedInputLinks.isEmpty();
     }
 
 

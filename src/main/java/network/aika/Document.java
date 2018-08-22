@@ -567,22 +567,16 @@ public class Document implements Comparable<Document> {
         public final ArrayList<TreeSet<Activation>> queue = new ArrayList<>();
 
         public void propagateActivationValue(int round, Activation act)  {
-            for(Activation.Link l: act.outputLinks.values()) {
-                if(!l.passive) {
-                    int r = l.synapse.key.isRecurrent ? round + 1 : round;
-                    add(r, l.output);
-                }
-            }
+            act.getOutputLinks(false)
+                    .forEach(l -> add(l.synapse.key.isRecurrent ? round + 1 : round, l.output));
         }
 
 
         private void add(Activation act) {
             add(0, act);
-            for (Activation.Link l : act.outputLinks.values()) {
-                if (!l.passive && l.synapse.key.isRecurrent) {
-                    add(0, l.output);
-                }
-            }
+            act.getOutputLinks(false)
+                    .filter(l -> l.synapse.key.isRecurrent)
+                    .forEach(l -> add(0, l.output));
         }
 
 

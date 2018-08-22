@@ -123,14 +123,12 @@ public class SupervisedTraining {
 
 
     public void computeBackpropagationErrorSignal(Activation act) {
-        for (Link l : act.outputLinks.values()) {
-            if(!l.passive) {
-                Synapse s = l.synapse;
-                Activation oAct = l.output;
+        act.getOutputLinks(false).forEach(l -> {
+            Synapse s = l.synapse;
+            Activation oAct = l.output;
 
-                act.errorSignal += s.weight * oAct.errorSignal * (1.0 - act.getFinalState().value);
-            }
-        }
+            act.errorSignal += s.weight * oAct.errorSignal * (1.0 - act.getFinalState().value);
+        });
 
         updateErrorSignal(act);
     }
@@ -139,11 +137,8 @@ public class SupervisedTraining {
     public void updateErrorSignal(Activation act) {
         if(act.errorSignal != 0.0) {
             errorSignalActivations.add(act);
-            for (Link l : act.inputLinks.values()) {
-                if(!l.passive) {
-                    queue.add(l.input);
-                }
-            }
+            act.getInputLinks(false, false)
+                    .forEach(l -> queue.add(l.input));
         }
     }
 

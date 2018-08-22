@@ -87,11 +87,8 @@ public class Linker {
             for (Activation act : doc.getActivations(false)) {
                 linkOutputRelations(act);
 
-                for (Link l : act.inputLinks.values()) {
-                    if(!l.passive) {
-                        addToQueue(l);
-                    }
-                }
+                act.getInputLinks(false, false)
+                        .forEach(l -> addToQueue(l));
             }
             doc.linker.process();
         } while(oldSize != doc.getNumberOfActivations());
@@ -137,32 +134,23 @@ public class Linker {
             Integer outputBegin = s.key.rangeOutput.begin.map(iAct.range);
             Integer outputEnd = s.key.rangeOutput.end.map(iAct.range);
 
-            if(outputBegin != null && outputBegin.intValue() != oAct.range.begin.intValue() || outputEnd != null && outputEnd.intValue() != oAct.range.end.intValue()) {
+            if((outputBegin != null && outputBegin.intValue() != oAct.range.begin.intValue()) || (outputEnd != null && outputEnd.intValue() != oAct.range.end.intValue())) {
                 return;
             }
         } else {
-            boolean match = false;
-            for(Link l: iAct.inputLinks.values()) {
-                if(!l.passive && l.synapse.id == s.key.rangeInput || s.key.rangeInput == VARIABLE) {
-                    if(l.input.range.begin == oAct.range.begin.intValue() && l.input.range.end == oAct.range.end.intValue()) {
-                        match = true;
-                        break;
-                    }
-                }
-            }
-            if(!match) {
+            if(iAct.getInputLinks(false, false)
+                    .noneMatch(l -> (l.synapse.id == s.key.rangeInput || s.key.rangeInput == VARIABLE) && l.input.range.equals(oAct.range))) {
                 return;
             }
         }
 
         Link nl = new Link(s, iAct, oAct, false);
-        Link el = oAct.inputLinks.get(nl);
-        if(el != null) {
+        if(oAct.getInputLink(nl) != null) {
             return;
         }
 
         if(s.key.identity && s.key.isRecurrent) {
-            el = oAct.getLinkBySynapseId(s.id);
+            Link el = oAct.getLinkBySynapseId(s.id);
             if(el != null && el.input != iAct) {
                 splitActivation(el, nl);
                 nl.passive = true;
@@ -183,22 +171,28 @@ public class Linker {
 
         System.out.println("iAct:" + nl.input.id + " oAct:" + nl.output.id + " splitAct:" + splitAct.id);
 
-        for(Link il: nl.output.inputLinks.values()) {
-            new Link(il.synapse, il.input, splitAct, il.synapse.id == nl.synapse.id || il.passive).link();
-        }
+        nl.output
+                .getInputLinks(true, false)
+                .forEach(
+                        il -> new Link(il.synapse, il.input, splitAct, il.synapse.id == nl.synapse.id || il.passive).link()
+                );
+
         new Link(nl.synapse, nl.input, splitAct, false).link();
 
-        for(Link ol: nl.output.outputLinks.values()) {
-            Link nol = new Link(ol.synapse, splitAct, ol.output, ol.passive);
-            nol.link();
+        nl.output
+                .getOutputLinks(true)
+                .forEach(ol -> {
+                            Link nol = new Link(ol.synapse, splitAct, ol.output, ol.passive);
+                            nol.link();
 
-            if(!ol.synapse.isNegative() && checkLoop(nl.input, ol.output)) {
-                ol.passive = true;
-            }
-            if(!ol.synapse.isNegative() && checkLoop(el.input, ol.output)) {
-                nol.passive = true;
-            }
-        }
+                            if(!ol.synapse.isNegative() && checkLoop(nl.input, ol.output)) {
+                                ol.passive = true;
+                            }
+                            if(!ol.synapse.isNegative() && checkLoop(el.input, ol.output)) {
+                                nol.passive = true;
+                            }
+                        }
+                );
     }
 
 

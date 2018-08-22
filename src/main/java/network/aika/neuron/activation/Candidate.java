@@ -42,12 +42,8 @@ public class Candidate  implements Comparable<Candidate> {
 
 
     public boolean checkDependenciesSatisfied(long v) {
-        for (Link l : activation.inputLinks.values()) {
-            if (!l.passive && l.input.markedHasCandidate != v && !l.synapse.key.isRecurrent && l.input.upperBound > 0.0) {
-                return false;
-            }
-        }
-        return true;
+        return !activation.getInputLinks(false, false)
+                .anyMatch(l -> l.input.markedHasCandidate != v && !l.synapse.key.isRecurrent && l.input.upperBound > 0.0);
     }
 
 

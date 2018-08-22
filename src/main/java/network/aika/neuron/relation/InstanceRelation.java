@@ -3,7 +3,6 @@ package network.aika.neuron.relation;
 import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Activation.Link;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -49,11 +48,9 @@ public class InstanceRelation extends Relation {
 
         collectContains(results, n, linkedAct, v);
 
-        for(Link l: linkedAct.inputLinks.values()) {
-            if(!l.passive && l.synapse.key.identity) {
-                collectCommonAncestor(results, n, l.input, v);
-            }
-        }
+        linkedAct.getInputLinks(false, false)
+                .filter(l -> l.synapse.key.identity)
+                .forEach(l -> collectCommonAncestor(results, n, l.input, v));
     }
 
 
@@ -65,11 +62,9 @@ public class InstanceRelation extends Relation {
             results.add(linkedAct);
         }
 
-        for(Link l: linkedAct.outputLinks.values()) {
-            if(!l.passive && l.synapse.key.identity) {
-                collectContains(results, n, l.output, v);
-            }
-        }
+        linkedAct.getOutputLinks(false)
+                .filter(l ->l.synapse.key.identity)
+                .forEach(l -> collectContains(results, n, l.output, v));
     }
 
 
@@ -81,11 +76,9 @@ public class InstanceRelation extends Relation {
             results.add(linkedAct);
         }
 
-        for(Link l: linkedAct.inputLinks.values()) {
-            if(!l.passive && l.synapse.key.identity) {
-                collectContainedIn(results, n, l.input, v);
-            }
-        }
+        linkedAct.getInputLinks(false, false)
+                .filter(l -> l.synapse.key.identity)
+                .forEach(l -> collectContainedIn(results, n, l.input, v));
     }
 
 
@@ -124,12 +117,9 @@ public class InstanceRelation extends Relation {
 
         if(actA == actB) return true;
 
-        for(Link l: actA.inputLinks.values()) {
-            if(!l.passive && l.synapse.key.identity) {
-                if(contains(l.input, actB, v)) return true;
-            }
-        }
-        return false;
+        return actA.getInputLinks(false, false)
+                .filter(l -> l.synapse.key.identity)
+                .anyMatch(l -> contains(l.input, actB, v));
     }
 
 
@@ -146,11 +136,9 @@ public class InstanceRelation extends Relation {
 
         act.markedAncestor = v;
 
-        for(Link l: act.inputLinks.values()) {
-            if(!l.passive && l.synapse.key.identity) {
-                markAncestors(l.input, v);
-            }
-        }
+        act.getInputLinks(false, false)
+                .filter(l -> l.synapse.key.identity)
+                .forEach(l -> markAncestors(l.input, v));
     }
 
 
@@ -160,12 +148,9 @@ public class InstanceRelation extends Relation {
 
         if(act.markedAncestor == v1) return true;
 
-        for(Link l: act.inputLinks.values()) {
-            if(!l.passive && l.synapse.key.identity) {
-                if(hasCommonAncestor(l.input, v1, v2)) return true;
-            }
-        }
-        return false;
+        return act.getInputLinks(false, false)
+                .filter(l -> l.synapse.key.identity)
+                .anyMatch(l -> hasCommonAncestor(l.input, v1, v2));
     }
 
 
