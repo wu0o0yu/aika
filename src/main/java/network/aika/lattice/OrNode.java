@@ -111,12 +111,12 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     private Activation lookupActivation(Document doc, Range r, OrEntry oe, NodeActivation inputAct) {
-        Synapse ls = null;
-        boolean matched = false;
         x: for(Activation act: neuron.get(doc)
                 .getThreadState(doc.threadId, true)
                 .getActivationsByRangeBegin(r, true, r, false)
                 ) {
+            Synapse ls = null;
+            boolean matched = false;
             for(Activation.Link l: act.getInputLinksOrderedBySynapse()) {
                 if(ls != null && ls != l.synapse) {
                     if(!matched) {
