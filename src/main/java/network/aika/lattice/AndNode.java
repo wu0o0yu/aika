@@ -117,7 +117,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                             Refinement nRef = me.getKey();
                             RefValue nRv = me.getValue();
                             if(nRef.contains(secondRef, rv)) {
-                                AndActivation nlAct = new AndActivation(act.doc.activationIdCounter++, act.doc, nRv.child.get(act.doc));
+                                AndActivation nlAct = new AndActivation(act.doc.logicNodeActivationIdCounter++, act.doc, nRv.child.get(act.doc));
                                 nlAct.link(nRef, nRv, secondRefAct, act);
                                 nlAct.node.addActivation(nlAct);
 

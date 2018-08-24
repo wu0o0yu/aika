@@ -188,6 +188,26 @@ public final class Activation extends OrActivation {
     }
 
 
+    public Stream<Link> getInputLinksBySynapse(boolean includePassive, Synapse syn) {
+        Stream<Link> s = inputLinks.subMap(
+                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION, false),
+                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION, false))
+                .values()
+                .stream();
+        return includePassive ? s : s.filter(l -> !l.passive);
+    }
+
+
+    public Stream<Link> getOutputLinksBySynapse(boolean includePassive, Synapse syn) {
+        Stream<Link> s = outputLinks.subMap(
+                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION, false),
+                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION, false))
+                .values()
+                .stream();
+        return includePassive ? s : s.filter(l -> !l.passive);
+    }
+
+
     public double process(SearchNode sn, int round, long v) {
         double delta = 0.0;
         State s;

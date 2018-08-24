@@ -98,7 +98,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
     public void addActivation(Activation inputAct) {
         if(inputAct.repropagateV != null && inputAct.repropagateV != markedCreated) return;
 
-        InputActivation act = new InputActivation(inputAct.doc.activationIdCounter++, inputAct, this);
+        InputActivation act = new InputActivation(inputAct.doc.logicNodeActivationIdCounter++, inputAct, this);
 
         addActivation(act);
     }
@@ -237,7 +237,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
                         InputActivation secondAct = secondIAct.outputToInputNode.output;
                         if (secondAct != null) {
                             //    if (!Conflicts.isConflicting(iAct, secondIAct)) {
-                            AndActivation oAct = new AndActivation(doc.activationIdCounter++, doc, nln);
+                            AndActivation oAct = new AndActivation(doc.logicNodeActivationIdCounter++, doc, nln);
                             for (Map.Entry<Refinement, RefValue> me : nln.parents.entrySet()) {
                                 boolean match = me.getKey().compareTo(ref) == 0;
                                 oAct.link(me.getKey(), me.getValue(), match ? secondAct : act, match ? act : secondAct);

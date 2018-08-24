@@ -65,6 +65,7 @@ public class Document implements Comparable<Document> {
 
     public long visitedCounter = 1;
     public int activationIdCounter = 0;
+    public int logicNodeActivationIdCounter = 0;
     public int searchNodeIdCounter = 0;
     public int searchStepCounter = 0;
 
@@ -101,6 +102,12 @@ public class Document implements Comparable<Document> {
         return Integer.compare(ak1.actId, ak2.actId);
     });
 
+    public TreeMap<Integer, Activation> activationsById = new TreeMap<>();
+
+
+    private int lastProcessedActivationId = -1;
+    private int lastLinkedActivationId = -1;
+
 
     public static class ActKey {
         Range range;
@@ -116,7 +123,6 @@ public class Document implements Comparable<Document> {
 
     public TreeSet<Node> addedNodes = new TreeSet<>();
     public ArrayList<NodeActivation> addedNodeActivations = new ArrayList<>();
-    public ArrayList<Activation> addedActivations = new ArrayList<>();
 
 
     public SearchNode selectedSearchNode;
@@ -185,7 +191,7 @@ public class Document implements Comparable<Document> {
         if (act.range.end != null) {
             activationsByRangeEnd.put(dak, act);
         }
-        addedActivations.add(act);
+        activationsById.put(act.id, act);
     }
 
 
@@ -250,10 +256,12 @@ public class Document implements Comparable<Document> {
             candidates.clear();
         }
 
-        for(Activation act: INCREMENTAL_MODE ? addedActivations: activationsByRangeBegin.values()) {
+        for(Activation act: activationsById.subMap(INCREMENTAL_MODE ? lastProcessedActivationId : -1, false, Integer.MAX_VALUE, true).values()) {
             if (act.decision == UNKNOWN && act.upperBound > 0.0) {
                 SearchNode.invalidateCachedDecision(act);
                 tmp.add(new Candidate(act, i++));
+
+                lastProcessedActivationId = Math.max(lastProcessedActivationId, act.id);
             }
         }
 
@@ -299,8 +307,6 @@ public class Document implements Comparable<Document> {
         inputNeuronActivations.forEach(act -> vQueue.propagateActivationValue(0, act));
 
         generateCandidates();
-
-        addedActivations.clear();
 
         if(selectedSearchNode == null || !INCREMENTAL_MODE) {
             selectedSearchNode = new SearchNode(this, null, null, 0);
@@ -386,7 +392,7 @@ public class Document implements Comparable<Document> {
         activatedNeurons.forEach(n -> n.clearActivations(this));
         activatedNodes.forEach(n -> n.clearActivations(this));
 
-        addedActivations.clear();
+        activationsById.clear();
         addedNodeActivations.clear();
         activatedNeurons.clear();
         activatedNodes.clear();
