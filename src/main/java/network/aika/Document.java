@@ -228,6 +228,14 @@ public class Document implements Comparable<Document> {
     }
 
 
+    public Activation getNextActivation(Activation currentAct) {
+        Map.Entry<Integer, Activation> me = currentAct == null ?
+                activationsById.firstEntry() :
+                activationsById.higherEntry(currentAct.id);
+        return me != null ? me.getValue() : null;
+    }
+
+
     public int getNumberOfActivations() {
         return activationsByRangeBegin.size();
     }

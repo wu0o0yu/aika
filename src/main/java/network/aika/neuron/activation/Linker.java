@@ -74,7 +74,7 @@ public class Linker {
         if(n.outputRelations != null) {
             for (Map.Entry<Integer, Relation> me : n.outputRelations.entrySet()) {
                 Synapse s = act.node.neuron.getSynapseById(me.getKey());
-                link(act, act, s, me.getValue());
+                linkRelated(act, act, s, me.getValue());
             }
         }
     }
@@ -84,7 +84,8 @@ public class Linker {
         int oldSize;
         do {
             oldSize = doc.getNumberOfActivations();
-            for (Activation act : doc.getActivations(false)) {
+            Activation act = null;
+            while((act = doc.getNextActivation(act)) != null) {
                 linkOutputRelations(act);
 
                 act.getInputLinks(false, false)
@@ -104,7 +105,7 @@ public class Linker {
                     Synapse s = l.output.getNeuron().getSynapseById(relId);
                     if(s != null) {
                         Relation r = me.getValue();
-                        link(l.input, l.output, s, r);
+                        linkRelated(l.input, l.output, s, r);
                     }
                 }
             }
@@ -113,7 +114,7 @@ public class Linker {
     }
 
 
-    private void link(Activation rAct, Activation oAct, Synapse s, Relation r) {
+    private void linkRelated(Activation rAct, Activation oAct, Synapse s, Relation r) {
         if(!r.isExact()) {
             INeuron.ThreadState ts = s.input.get().getThreadState(doc.threadId, true);
             for(Activation iAct: ts.getActivations()) {
