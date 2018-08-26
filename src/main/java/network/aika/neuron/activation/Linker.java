@@ -150,10 +150,12 @@ public class Linker {
             return;
         }
 
-        if(s.key.identity && s.key.isRecurrent) {
+        if(s.key.identity) {
             Link el = oAct.getLinkBySynapseId(s.id);
             if(el != null && el.input != iAct) {
-                splitActivation(el, nl);
+                if(s.key.isRecurrent) {
+                    splitActivation(el, nl);
+                }
                 nl.passive = true;
             }
         }
