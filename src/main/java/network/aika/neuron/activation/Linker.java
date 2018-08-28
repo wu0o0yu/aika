@@ -26,6 +26,7 @@ import network.aika.neuron.activation.Activation.Link;
 import java.util.*;
 
 import static network.aika.neuron.Synapse.Builder.VARIABLE;
+import static network.aika.neuron.activation.Activation.MAX_SELF_REFERENCING_DEPTH;
 
 /**
  * The {@code Linker} class is responsible for for the linkage of neuron activations. These links mirror the synapses between
@@ -144,8 +145,12 @@ public class Linker {
                 return;
             }
         }
-
-        Link nl = new Link(s, iAct, oAct, false);
+/*
+        if(s.key.isRecurrent && !s.isNegative() && !checkLoop(iAct, oAct)) {
+            return;
+        }
+*/
+        Link nl = new Link(s, iAct, oAct, false, false);
         if(oAct.getInputLink(nl) != null) {
             return;
         }
@@ -153,21 +158,78 @@ public class Linker {
         if(s.key.identity) {
             Link el = oAct.getLinkBySynapseId(s.id);
             if(el != null && el.input != iAct) {
-                if(s.key.isRecurrent) {
-                    splitActivation(el, nl);
+/*                if(s.key.isRecurrent) {
+                    splitActivation(nl);
                 }
+*/
                 nl.passive = true;
             }
         }
 
         nl.link();
+
+        if(nl.synapse.key.isRecurrent) {
+            processLoops(nl);
+        }
+
         if(!nl.passive) {
             addToQueue(nl);
         }
     }
 
 
-    private void splitActivation(Link el, Link nl) {
+    private void processLoops(Link l) {
+        if(processLoopsRecursiveStep(l, l.output, 0, 0)) {
+            processClosedLoop(l, 0);
+        }
+    }
+
+
+    private boolean processLoopsRecursiveStep(Link nl, Activation oAct, int numPassive, int depth) {
+        if(nl.synapse.isNegative()) {
+            return false;
+        }
+
+        numPassive += (nl.passive ? 1 : 0);
+
+        if(oAct == nl.input) {
+            return !nl.passive;
+        }
+
+        if (depth > MAX_SELF_REFERENCING_DEPTH) {
+            return false;
+        }
+
+        for(Link l: nl.input.getInputLinksOrderedBySynapse()) {
+            if (processLoopsRecursiveStep(l, oAct, numPassive, depth + 1)) {
+                processClosedLoop(l, numPassive);
+                return !l.passive;
+            }
+        }
+
+        return false;
+    }
+
+
+    private void processClosedLoop(Link l, int numPassive) {
+        if(numPassive > 1) {
+            return;
+        }
+        l.closedLoop = true;
+
+        if(l.passive && !l.hasBeenSplit && l.synapse.key.isRecurrent) {
+            splitActivation(l);
+        }
+    }
+
+
+    private void splitActivation(Link nl) {
+        if(nl.hasBeenSplit) {
+            return;
+        }
+
+        Link el = nl.output.getLinkBySynapseId(nl.synapse.id);
+
         Activation splitAct = new Activation(doc.activationIdCounter++, doc, nl.output.range, nl.output.node);
         nl.output.node.processActivation(splitAct);
         doc.ubQueue.add(splitAct);
@@ -177,15 +239,15 @@ public class Linker {
         nl.output
                 .getInputLinks(true, false)
                 .forEach(
-                        il -> new Link(il.synapse, il.input, splitAct, il.synapse.id == nl.synapse.id || il.passive).link()
+                        il -> new Link(il.synapse, il.input, splitAct, il.synapse.id == nl.synapse.id || il.passive, il.synapse.id == nl.synapse.id || il.hasBeenSplit).link()
                 );
 
-        new Link(nl.synapse, nl.input, splitAct, false).link();
+        new Link(nl.synapse, nl.input, splitAct, false, true).link();
 
         nl.output
                 .getOutputLinks(true)
                 .forEach(ol -> {
-                            Link nol = new Link(ol.synapse, splitAct, ol.output, ol.passive);
+                            Link nol = new Link(ol.synapse, splitAct, ol.output, ol.passive, ol.hasBeenSplit);
                             nol.link();
 
                             if(!ol.synapse.isNegative() && checkLoop(nl.input, ol.output)) {
@@ -205,6 +267,7 @@ public class Linker {
         oAct.markedPredecessor = v;
         return iAct.checkSelfReferencing(false, 0, v);
     }
+
 
     private void addToQueue(Link l) {
         if(l == null) {
