@@ -149,7 +149,7 @@ public class Linker {
             }
         }
 
-        Link nl = new Link(s, iAct, oAct, false, false);
+        Link nl = new Link(s, iAct, oAct, false);
         if(oAct.getInputLink(nl) != null) {
             return;
         }
@@ -169,11 +169,7 @@ public class Linker {
     }
 
 
-    protected void splitActivation(Link nl) {
-        if(nl.hasBeenSplit) {
-            return;
-        }
-
+    protected Activation splitActivation(Link nl) {
         Link el = nl.output.getLinkBySynapseId(nl.synapse.id);
 
         Activation splitAct = new Activation(doc.activationIdCounter++, doc, nl.output.range, nl.output.node);
@@ -185,15 +181,15 @@ public class Linker {
         nl.output
                 .getInputLinks(true, false)
                 .forEach(
-                        il -> new Link(il.synapse, il.input, splitAct, il.synapse.id == nl.synapse.id || il.passive, il.synapse.id == nl.synapse.id || il.hasBeenSplit).link()
+                        il -> new Link(il.synapse, il.input, splitAct, il.synapse.id == nl.synapse.id || il.passive).link()
                 );
 
-        new Link(nl.synapse, nl.input, splitAct, false, true).link();
+        new Link(nl.synapse, nl.input, splitAct, false).link();
 
         nl.output
                 .getOutputLinks(true)
                 .forEach(ol -> {
-                            Link nol = new Link(ol.synapse, splitAct, ol.output, ol.passive, ol.hasBeenSplit);
+                            Link nol = new Link(ol.synapse, splitAct, ol.output, ol.passive);
                             nol.link();
 
                             if(!ol.synapse.isNegative() && checkLoop(nl.input, ol.output)) {
@@ -204,6 +200,8 @@ public class Linker {
                             }
                         }
                 );
+
+        return splitAct;
     }
 
 

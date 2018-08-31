@@ -197,8 +197,8 @@ public final class Activation extends OrActivation {
 
     public Stream<Link> getInputLinksBySynapse(boolean includePassive, Synapse syn) {
         Stream<Link> s = inputLinks.subMap(
-                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION, false, false),
-                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION, false, false))
+                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION, false),
+                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION, false))
                 .values()
                 .stream();
         return includePassive ? s : s.filter(l -> !l.passive);
@@ -207,8 +207,8 @@ public final class Activation extends OrActivation {
 
     public Stream<Link> getOutputLinksBySynapse(boolean includePassive, Synapse syn) {
         Stream<Link> s = outputLinks.subMap(
-                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION, false, false),
-                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION, false, false))
+                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION, false),
+                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION, false))
                 .values()
                 .stream();
         return includePassive ? s : s.filter(l -> !l.passive);
@@ -931,7 +931,6 @@ public final class Activation extends OrActivation {
         public final Activation input;
         public final Activation output;
         public boolean passive;
-        public boolean hasBeenSplit;
 
         public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
             int r = Synapse.INPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
@@ -946,12 +945,11 @@ public final class Activation extends OrActivation {
         };
 
 
-        public Link(Synapse s, Activation input, Activation output, boolean passive, boolean hasBeenSplit) {
+        public Link(Synapse s, Activation input, Activation output, boolean passive) {
             this.synapse = s;
             this.input = input;
             this.output = output;
             this.passive = passive;
-            this.hasBeenSplit = hasBeenSplit;
         }
 
 
