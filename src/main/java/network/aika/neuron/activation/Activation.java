@@ -99,7 +99,7 @@ public final class Activation extends OrActivation {
     public Activation(int id, Document doc, OrNode n) {
         super(id, doc, n);
 
-        if(doc.model.getActivationStatisticFactory() != null) {
+        if(doc != null && doc.model.getActivationStatisticFactory() != null) {
             statistic = doc.model.getActivationStatisticFactory().createObject();
         }
     }
