@@ -176,8 +176,6 @@ public class Linker {
         nl.output.node.processActivation(splitAct);
         doc.ubQueue.add(splitAct);
 
-        System.out.println("iAct:" + nl.input.id + " oAct:" + nl.output.id + " splitAct:" + splitAct.id);
-
         nl.output
                 .getInputLinks(true, false)
                 .forEach(
@@ -200,6 +198,8 @@ public class Linker {
                             }
                         }
                 );
+
+        splitAct.upperBound = nl.output.upperBound;
 
         return splitAct;
     }
