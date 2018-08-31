@@ -2,6 +2,7 @@ package network.aika.neuron.activation;
 
 import network.aika.Document;
 import network.aika.Utils;
+import network.aika.Writable;
 import network.aika.lattice.OrNode;
 import network.aika.lattice.OrNode.OrActivation;
 import network.aika.neuron.INeuron;
@@ -81,6 +82,8 @@ public final class Activation extends OrActivation {
     public Double targetValue;
     public Double inputValue;
 
+    public Writable statistic;
+
 
     public Decision inputDecision = Decision.UNKNOWN;
     public Decision decision = Decision.UNKNOWN;
@@ -95,10 +98,14 @@ public final class Activation extends OrActivation {
 
     public Activation(int id, Document doc, OrNode n) {
         super(id, doc, n);
+
+        if(doc.model.getActivationStatisticFactory() != null) {
+            statistic = doc.model.getActivationStatisticFactory().createObject();
+        }
     }
 
     public Activation(int id, Document doc, Range r, OrNode n) {
-        super(id, doc, n);
+        this(id, doc, n);
         this.range = r;
     }
 

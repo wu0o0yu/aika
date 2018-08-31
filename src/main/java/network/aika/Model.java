@@ -51,9 +51,10 @@ public class Model {
 
     public SuspensionHook suspensionHook;
 
-    public WritableFactory nodeStatisticFactory;
-    public WritableFactory neuronStatisticFactory;
-    public WritableFactory synapseStatisticFactory;
+    private WritableFactory nodeStatisticFactory;
+    private WritableFactory neuronStatisticFactory;
+    private WritableFactory synapseStatisticFactory;
+    private WritableFactory activationStatisticFactory;
     public LinkerFactory linkerFactory = (doc) -> new Linker(doc);
     public SearchNode.SkipSelectStep skipSelectStep = (act) -> false;
 
@@ -126,6 +127,17 @@ public class Model {
     public void setSynapseStatisticFactory(WritableFactory synapseStatisticFactory) {
         this.synapseStatisticFactory = synapseStatisticFactory;
     }
+
+
+    public WritableFactory getActivationStatisticFactory() {
+        return activationStatisticFactory;
+    }
+
+
+    public void setActivationStatisticFactory(WritableFactory activationStatisticFactory) {
+        this.activationStatisticFactory = activationStatisticFactory;
+    }
+
 
     public LinkerFactory getLinkerFactory() {
         return linkerFactory;

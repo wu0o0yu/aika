@@ -140,8 +140,8 @@ public class Synapse implements Writable {
         this.output = output;
         this.distanceFunction = distanceFunction;
 
-        if(output.model.synapseStatisticFactory != null) {
-            statistic = output.model.synapseStatisticFactory.createObject();
+        if(output.model.getSynapseStatisticFactory() != null) {
+            statistic = output.model.getSynapseStatisticFactory().createObject();
         }
     }
 
@@ -386,7 +386,7 @@ public class Synapse implements Writable {
         isConjunction = in.readBoolean();
 
         if(in.readBoolean()) {
-            statistic = m.synapseStatisticFactory.createObject();
+            statistic = m.getSynapseStatisticFactory().createObject();
             statistic.readFields(in, m);
         }
     }
