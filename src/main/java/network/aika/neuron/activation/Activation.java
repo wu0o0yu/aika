@@ -924,7 +924,6 @@ public final class Activation extends OrActivation {
         public final Activation input;
         public final Activation output;
         public boolean passive;
-        public boolean closedLoop;
         public boolean hasBeenSplit;
 
         public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
@@ -955,7 +954,7 @@ public final class Activation extends OrActivation {
         }
 
         public String toString() {
-            return synapse + ": " + input + " --> " + output;
+            return (passive ? "p" : "") + synapse + ": " + input + " --> " + output;
         }
     }
 

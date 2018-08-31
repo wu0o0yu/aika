@@ -36,7 +36,7 @@ import static network.aika.neuron.activation.Activation.MAX_SELF_REFERENCING_DEP
  */
 public class Linker {
 
-    Document doc;
+    protected Document doc;
     ArrayDeque<Link> queue = new ArrayDeque<>();
 
     public enum Direction {
@@ -94,6 +94,9 @@ public class Linker {
             }
             doc.linker.process();
         } while(oldSize != doc.getNumberOfActivations());
+
+
+        checkPositiveFeedbackLoops();
     }
 
 
@@ -145,11 +148,7 @@ public class Linker {
                 return;
             }
         }
-/*
-        if(s.key.isRecurrent && !s.isNegative() && !checkLoop(iAct, oAct)) {
-            return;
-        }
-*/
+
         Link nl = new Link(s, iAct, oAct, false, false);
         if(oAct.getInputLink(nl) != null) {
             return;
@@ -158,19 +157,11 @@ public class Linker {
         if(s.key.identity) {
             Link el = oAct.getLinkBySynapseId(s.id);
             if(el != null && el.input != iAct) {
-/*                if(s.key.isRecurrent) {
-                    splitActivation(nl);
-                }
-*/
                 nl.passive = true;
             }
         }
 
         nl.link();
-
-        if(nl.synapse.key.isRecurrent) {
-            processLoops(nl);
-        }
 
         if(!nl.passive) {
             addToQueue(nl);
@@ -178,52 +169,7 @@ public class Linker {
     }
 
 
-    private void processLoops(Link l) {
-        if(processLoopsRecursiveStep(l, l.output, 0, 0)) {
-            processClosedLoop(l, 0);
-        }
-    }
-
-
-    private boolean processLoopsRecursiveStep(Link nl, Activation oAct, int numPassive, int depth) {
-        if(nl.synapse.isNegative()) {
-            return false;
-        }
-
-        numPassive += (nl.passive ? 1 : 0);
-
-        if(oAct == nl.input) {
-            return !nl.passive;
-        }
-
-        if (depth > MAX_SELF_REFERENCING_DEPTH) {
-            return false;
-        }
-
-        for(Link l: nl.input.getInputLinksOrderedBySynapse()) {
-            if (processLoopsRecursiveStep(l, oAct, numPassive, depth + 1)) {
-                processClosedLoop(l, numPassive);
-                return !l.passive;
-            }
-        }
-
-        return false;
-    }
-
-
-    private void processClosedLoop(Link l, int numPassive) {
-        if(numPassive > 1) {
-            return;
-        }
-        l.closedLoop = true;
-
-        if(l.passive && !l.hasBeenSplit && l.synapse.key.isRecurrent) {
-            splitActivation(l);
-        }
-    }
-
-
-    private void splitActivation(Link nl) {
+    protected void splitActivation(Link nl) {
         if(nl.hasBeenSplit) {
             return;
         }
@@ -261,7 +207,22 @@ public class Linker {
     }
 
 
-    private boolean checkLoop(Activation iAct, Activation oAct) {
+
+    protected void checkPositiveFeedbackLoops() {
+        doc.getActivations(false)
+                .stream()
+                .flatMap(act -> act.getInputLinks(false, false))
+                .filter(l -> l.synapse.key.isRecurrent && !l.synapse.isNegative())
+                .forEach(l -> {
+                    if(!l.passive && !checkLoop(l.input, l.output)) {
+                        l.passive = true;
+                    }
+                });
+    }
+
+
+
+    protected boolean checkLoop(Activation iAct, Activation oAct) {
         long v = doc.visitedCounter++;
 
         oAct.markedPredecessor = v;
