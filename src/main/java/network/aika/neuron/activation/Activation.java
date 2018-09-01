@@ -565,7 +565,7 @@ public final class Activation extends OrActivation {
         }
 
         for (Link l: onlySelected ? selectedInputLinks : inputLinks.values()) {
-            if(!l.passive) {
+            if(!l.passive && !l.synapse.isNegative()) {
                 if (l.input.checkSelfReferencing(onlySelected, depth + 1, v)) {
                     return true;
                 }
