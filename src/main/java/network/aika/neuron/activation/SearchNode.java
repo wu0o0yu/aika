@@ -258,7 +258,7 @@ public class SearchNode implements Comparable<SearchNode> {
         String weights = "";
         Decision decision = UNKNOWN;
         while (n != null && n.level >= 0) {
-            log.info(
+            System.out.println(
                     n.level + " " +
                             n.debugState +
                             " DECISION:" + decision +

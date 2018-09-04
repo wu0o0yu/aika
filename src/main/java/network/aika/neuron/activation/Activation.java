@@ -846,7 +846,7 @@ public final class Activation extends OrActivation {
     }
 
 
-    private String identityToString() {
+    public String identityToString() {
         StringBuilder sb = new StringBuilder();
         sb.append(" (");
         boolean first = true;

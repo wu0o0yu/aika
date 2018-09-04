@@ -51,6 +51,7 @@ public class Candidate  implements Comparable<Candidate> {
         return " ACT-ID:" + activation.id +
                 " " + activation.range +
                 " " + activation.getLabel() +
+                " " + activation.identityToString() +
                 " CID:" + id +
                 " CD:" + cachedDecision +
                 " REPEAT:" + repeat +
