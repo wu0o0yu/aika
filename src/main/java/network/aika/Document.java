@@ -54,6 +54,7 @@ public class Document implements Comparable<Document> {
 
     public static int CLEANUP_INTERVAL = 500;
     public static int MAX_ROUND = 20;
+    public static int ROUND_LIMIT = -1;
 
     /**
      * Experimental code: not working yet!

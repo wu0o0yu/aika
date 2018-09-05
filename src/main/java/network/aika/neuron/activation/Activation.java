@@ -241,7 +241,9 @@ public final class Activation extends OrActivation {
                     doc.dumpOscillatingActivations();
                     throw new RuntimeException("Maximum number of rounds reached. The network might be oscillating.");
                 } else {
-                    doc.vQueue.propagateActivationValue(round, this);
+                    if(Document.ROUND_LIMIT < 0 || round < Document.ROUND_LIMIT) {
+                        doc.vQueue.propagateActivationValue(round, this);
+                    }
                 }
             }
 
