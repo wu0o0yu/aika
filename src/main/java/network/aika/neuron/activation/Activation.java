@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Linker.Direction.INPUT;
 import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
+import static network.aika.neuron.activation.SearchNode.Decision.EXCLUDED;
 import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
@@ -348,7 +349,7 @@ public final class Activation extends OrActivation {
             if (iAct == this) continue;
 
             double iv = 0.0;
-            if(!l.synapse.isNegative()) {
+            if(!l.synapse.isNegative() && l.input.decision != EXCLUDED) {
                 iv = l.input.upperBound;
             }
 
