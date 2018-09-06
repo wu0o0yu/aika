@@ -19,7 +19,6 @@ package network.aika.neuron.activation;
 
 import network.aika.Document;
 import network.aika.Utils;
-import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.Activation.StateChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -354,7 +353,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private void initStep(Document doc) {
         candidate = doc.candidates.get(level);
 
-        boolean precondition = candidate.activation.hasSelectedInputLinks();
+        boolean precondition = candidate.activation.isActiveable();
 
         alreadySelected = precondition && !candidate.isConflicting() || candidate.activation.inputDecision == SELECTED;
         alreadyExcluded = !precondition || checkExcluded(candidate.activation) || candidate.activation.inputDecision == EXCLUDED;

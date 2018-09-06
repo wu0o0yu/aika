@@ -333,6 +333,44 @@ public final class Activation extends OrActivation {
     }
 
 
+    public boolean isActiveable() {
+        INeuron n = getINeuron();
+        double net = n.biasSum;
+
+        for (Link l: inputLinks.values()) {
+            if(l.passive) {
+                continue;
+            }
+
+            Synapse s = l.synapse;
+            Activation iAct = l.input;
+
+            if (iAct == this) continue;
+
+            double iv = 0.0;
+            if(!l.synapse.isNegative()) {
+                iv = l.input.upperBound;
+            }
+
+            double x = iv * s.weight;
+            if(s.distanceFunction != null) {
+                x *= s.distanceFunction.f(iAct, this);
+            }
+            net += x;
+        }
+
+        if(n.passiveInputSynapses != null) {
+            for(Synapse s: n.passiveInputSynapses.values()) {
+                double x = s.weight * s.input.get(doc).passiveInputFunction.getActivationValue(s, this);
+
+                net += x;
+            }
+        }
+
+        return net > 0.0;
+    }
+
+
     public void processBounds() {
         double oldUpperBound = upperBound;
 
@@ -439,10 +477,6 @@ public final class Activation extends OrActivation {
         }
 
         return tmp;
-    }
-
-    public boolean hasSelectedInputLinks() {
-        return selectedInputLinks != null && !selectedInputLinks.isEmpty();
     }
 
 
