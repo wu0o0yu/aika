@@ -91,14 +91,15 @@ public class Converter {
             double remainingSum = neuron.posDirSum;
             int i = 0;
             for (Synapse s : candidates) {
-                final boolean isOptionalInput = sum + remainingSum - s.weight + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum > 0.0;
+                double v = s.getMaxInputValue();
+                final boolean isOptionalInput = sum + remainingSum - v + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum > 0.0;
                 final boolean maxAndNodesReached = i >= MAX_AND_NODE_SIZE;
                 if (isOptionalInput || maxAndNodesReached) {
                     break;
                 }
 
-                remainingSum -= s.weight;
-                neuron.requiredSum += s.weight;
+                remainingSum -= v;
+                neuron.requiredSum += v;
                 reqSyns.add(s);
 
                 NodeContext nlNodeContext = expandNode(nodeContext, s);
@@ -109,7 +110,7 @@ public class Converter {
 
                 i++;
 
-                sum += s.weight;
+                sum += v;
 
                 final boolean sumOfSynapseWeightsAboveThreshold = sum + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum > 0.0;
                 if (sumOfSynapseWeightsAboveThreshold) {
@@ -125,7 +126,8 @@ public class Converter {
                 outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node, true);
             } else {
                 for (Synapse s : candidates) {
-                    boolean belowThreshold = sum + s.weight + remainingSum + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum <= 0.0;
+                    double v = s.getMaxInputValue();
+                    boolean belowThreshold = sum + v + remainingSum + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum <= 0.0;
                     if (belowThreshold) {
                         break;
                     }
@@ -134,14 +136,14 @@ public class Converter {
                         NodeContext nlNodeContext = expandNode(nodeContext, s);
                         if(nlNodeContext != null) {
                             outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, true);
-                            remainingSum -= s.weight;
+                            remainingSum -= v;
                         }
                     }
                 }
             }
         } else {
             for (Synapse s : modifiedSynapses) {
-                if (s.weight + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum > 0.0) {
+                if (s.getMaxInputValue() + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum > 0.0) {
                     NodeContext nlNodeContext = expandNode(nodeContext, s);
                     outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
                 }
@@ -202,18 +204,18 @@ public class Converter {
         double posPassiveSumDelta = 0.0;
         for (Synapse s : modifiedSynapses) {
             if(s.toBeDeleted) {
-                s.update(doc, -s.weight, 0.0);
+                s.update(doc, -s.weight, 0.0, s.limit);
             }
 
             INeuron in = s.input.get();
             in.lock.acquireWriteLock();
             try {
                 if (!s.inactive) {
-                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.weight;
-                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.getNewWeight();
+                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.limit * s.weight;
+                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.limit * s.getNewWeight();
 
                     if(in.isPassiveInputNeuron() && !s.isNegative()) {
-                        posPassiveSumDelta += s.getNewWeight() - s.weight;
+                        posPassiveSumDelta += (s.limit * s.getNewWeight()) - (s.limit * s.weight);
                     }
 
                     if (s.isConjunction(false, true) && !s.isConjunction(true, true)) {

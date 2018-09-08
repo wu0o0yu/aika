@@ -277,7 +277,7 @@ public final class Activation extends OrActivation {
 
             if (iAct == this) continue;
 
-            double x = is.s.value * s.weight;
+            double x = Math.min(s.limit, is.s.value) * s.weight;
             if(s.distanceFunction != null) {
                 x *= s.distanceFunction.f(iAct, this);
             }
@@ -350,7 +350,7 @@ public final class Activation extends OrActivation {
 
             double iv = 0.0;
             if(!l.synapse.isNegative() && l.input.decision != EXCLUDED) {
-                iv = l.input.upperBound;
+                iv = Math.min(l.synapse.limit, l.input.upperBound);
             }
 
             double x = iv * s.weight;
@@ -416,13 +416,13 @@ public final class Activation extends OrActivation {
 
             if (s.isNegative()) {
                 if (!s.key.isRecurrent && !iAct.checkSelfReferencing(false, 0, v)) {
-                    ub += iAct.lowerBound * x;
+                    ub += Math.min(s.limit, iAct.lowerBound) * x;
                 }
 
-                lb += x;
+                lb += s.limit * x;
             } else {
-                ub += iAct.upperBound * x;
-                lb += iAct.lowerBound * x;
+                ub += Math.min(s.limit, iAct.upperBound) * x;
+                lb += Math.min(s.limit, iAct.lowerBound) * x;
             }
         }
 

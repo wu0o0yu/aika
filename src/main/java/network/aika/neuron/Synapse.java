@@ -116,6 +116,8 @@ public class Synapse implements Writable {
 
     public double biasDelta;
 
+    public double limit;
+
     public boolean toBeDeleted;
 
     /**
@@ -277,6 +279,11 @@ public class Synapse implements Writable {
     }
 
 
+    public double getMaxInputValue() {
+        return limit * weight;
+    }
+
+
     public boolean exists() {
         if(input.get().outputSynapses.containsKey(this)) return true;
         if(output.get().inputSynapses.containsKey(this)) return true;
@@ -307,11 +314,12 @@ public class Synapse implements Writable {
     }
 
 
-    public void update(Document doc, double weight, double bias) {
+    public void update(Document doc, double weight, double bias, double limit) {
         this.weightDelta = weight - this.weight;
         double newBiasDelta = bias - this.bias;
         output.get().biasSumDelta += newBiasDelta - biasDelta;
         biasDelta = newBiasDelta;
+        this.limit = limit;
 
         relink();
         if(doc != null) {
@@ -351,6 +359,7 @@ public class Synapse implements Writable {
 
         out.writeDouble(weight);
         out.writeDouble(bias);
+        out.writeDouble(limit);
 
         out.writeBoolean(isConjunction);
 
@@ -382,6 +391,7 @@ public class Synapse implements Writable {
 
         weight = in.readDouble();
         bias = in.readDouble();
+        limit = in.readDouble();
 
         isConjunction = in.readBoolean();
 
@@ -459,6 +469,7 @@ public class Synapse implements Writable {
         public Neuron neuron;
         public double weight;
         public double bias;
+        public double limit = 1.0;
 
         public DistanceFunction distanceFunction;
 
@@ -518,6 +529,12 @@ public class Synapse implements Writable {
          */
         public Builder setBias(double bias) {
             this.bias = bias;
+            return this;
+        }
+
+
+        public Builder setLimit(double limit) {
+            this.limit = limit;
             return this;
         }
 
