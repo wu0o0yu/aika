@@ -175,7 +175,7 @@ public class NamedEntityRecognitionTest {
         Neuron.init(
                 forenameCategory,
                 0.0,
-                ActivationFunction.RECTIFIED_LINEAR_UNIT,
+                ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
                 INeuron.Type.EXCITATORY,
                 INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder() // In this example there is only one forename considered.
@@ -188,7 +188,7 @@ public class NamedEntityRecognitionTest {
         Neuron.init(
                 surnameCategory,
                 0.0,
-                ActivationFunction.RECTIFIED_LINEAR_UNIT,
+                ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
                 INeuron.Type.EXCITATORY,
                 INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
@@ -202,7 +202,7 @@ public class NamedEntityRecognitionTest {
         Neuron.init(
                 inhibitingN,
                 0.0,
-                ActivationFunction.RECTIFIED_LINEAR_UNIT,
+                ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
                 INeuron.Type.INHIBITORY,
                 INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder().setNeuron(cookProfessionEntity)

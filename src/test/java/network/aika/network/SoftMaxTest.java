@@ -38,7 +38,7 @@ public class SoftMaxTest {
         Model m = new Model();
 
         Neuron inhib = m.createNeuron("INHIBITORY");
-        Neuron.init(inhib, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY, INeuron.LogicType.DISJUNCTIVE);
+        Neuron.init(inhib, 0.0, ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY, INeuron.LogicType.DISJUNCTIVE);
 
         Neuron[] inputs = new Neuron[]{
                 m.createNeuron("INPUT A"),

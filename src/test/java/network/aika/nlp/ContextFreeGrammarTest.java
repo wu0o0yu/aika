@@ -77,7 +77,7 @@ public class ContextFreeGrammarTest {
 
 
         for(Neuron n: new Neuron[] {I, NP, VP}) {
-            Neuron.init(n, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY, INeuron.LogicType.DISJUNCTIVE);
+            Neuron.init(n, 0.0, ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY, INeuron.LogicType.DISJUNCTIVE);
         }
 
         for(Neuron n: new Neuron[] {ART, N, ADJ, V, AUX}) {

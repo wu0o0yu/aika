@@ -139,7 +139,7 @@ public class MutualExclusionTest {
         Neuron.init(
                 inhibN,
                 0.0,
-                ActivationFunction.RECTIFIED_LINEAR_UNIT,
+                ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
                 INeuron.Type.INHIBITORY,
                 INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder()
