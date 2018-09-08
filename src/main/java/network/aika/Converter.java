@@ -216,7 +216,7 @@ public class Converter {
                         posPassiveSumDelta += s.getNewWeight() - s.weight;
                     }
 
-                    if (s.isConjunction(false, true) && !s.isConjunction(true, true)) {
+                    if (s.isConjunction(false, true) && !s.isConjunction(true, true) && s.key.rangeOutput.begin != NONE && s.key.rangeOutput.end != NONE) {
                         neuron.numDisjunctiveSynapses++;
                     }
                 }

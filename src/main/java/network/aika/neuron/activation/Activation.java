@@ -339,7 +339,7 @@ public final class Activation extends OrActivation {
         double net = n.biasSum;
 
         for (Link l: inputLinks.values()) {
-            if(l.passive) {
+            if(l.synapse.inactive || l.passive) {
                 continue;
             }
 
