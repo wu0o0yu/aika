@@ -67,7 +67,7 @@ public class NamedEntityRecognitionTest {
         // conjunction of the inputs.
         Neuron cookSurnameEntity = Neuron.init(
                 m.createNeuron("E-cook (surname)"),
-                3.0, // adjusts the bias
+                6.0, // adjusts the bias
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 INeuron.LogicType.CONJUNCTIVE,
@@ -124,7 +124,7 @@ public class NamedEntityRecognitionTest {
 
         Neuron jacksonForenameEntity = Neuron.init(
                 m.createNeuron("E-jackson (forename)"),
-                3.0,
+                6.0,
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
                 INeuron.LogicType.CONJUNCTIVE,
