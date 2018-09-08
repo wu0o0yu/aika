@@ -155,7 +155,7 @@ public class SupervisedTraining {
 
         Synapse synapse = Synapse.createOrLookup(doc, null, r.synapseKey, r.relations, r.distanceFunction, inputNeuron.provider, n.provider);
 
-        synapse.updateDelta(doc, deltaW, 0.0);
+        synapse.updateDelta(doc, deltaW, 0.0, 0.0);
 
         r.deleteMode.checkIfDelete(synapse, true);
     }

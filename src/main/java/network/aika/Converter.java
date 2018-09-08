@@ -212,10 +212,10 @@ public class Converter {
             try {
                 if (!s.inactive) {
                     sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.limit * s.weight;
-                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += s.limit * s.getNewWeight();
+                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += (s.limit + s.limitDelta) * s.getNewWeight();
 
                     if(in.isPassiveInputNeuron() && !s.isNegative()) {
-                        posPassiveSumDelta += (s.limit * s.getNewWeight()) - (s.limit * s.weight);
+                        posPassiveSumDelta += ((s.limit + s.limitDelta) * s.getNewWeight()) - (s.limit * s.weight);
                     }
 
                     if (s.isConjunction(false, true) && !s.isConjunction(true, true)) {
@@ -228,6 +228,9 @@ public class Converter {
 
                 s.bias += s.biasDelta;
                 s.biasDelta = 0.0;
+
+                s.limit += s.limitDelta;
+                s.limitDelta = 0.0;
 
                 if (doc != null) {
                     s.committedInDoc = doc.id;

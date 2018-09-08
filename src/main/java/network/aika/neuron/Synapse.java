@@ -118,6 +118,8 @@ public class Synapse implements Writable {
 
     public double limit;
 
+    public double limitDelta;
+
     public boolean toBeDeleted;
 
     /**
@@ -303,9 +305,10 @@ public class Synapse implements Writable {
     }
 
 
-    public void updateDelta(Document doc, double weightDelta, double biasDelta) {
+    public void updateDelta(Document doc, double weightDelta, double biasDelta, double limitDelta) {
         this.weightDelta += weightDelta;
         this.biasDelta += biasDelta;
+        this.limitDelta += limitDelta;
         output.get().biasSumDelta += biasDelta;
         relink();
         if(doc != null) {
@@ -317,9 +320,9 @@ public class Synapse implements Writable {
     public void update(Document doc, double weight, double bias, double limit) {
         this.weightDelta = weight - this.weight;
         double newBiasDelta = bias - this.bias;
+        this.limitDelta = limit - this.limit;
         output.get().biasSumDelta += newBiasDelta - biasDelta;
         biasDelta = newBiasDelta;
-        this.limit = limit;
 
         relink();
         if(doc != null) {
