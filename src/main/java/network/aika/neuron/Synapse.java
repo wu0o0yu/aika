@@ -301,7 +301,7 @@ public class Synapse implements Writable {
      */
     public boolean isConjunction(boolean v, boolean absolute) {
         INeuron out = output.get();
-        return (v ? getNewWeight() : weight) + (absolute ? 0.0 : out.requiredSum) + (v ? out.getNewBiasSum() : out.biasSum) <= 0.0;
+        return (v ? (limit + limitDelta) * getNewWeight() : limit * weight) + (absolute ? 0.0 : out.requiredSum) + (v ? out.getNewBiasSum() : out.biasSum) <= 0.0;
     }
 
 
