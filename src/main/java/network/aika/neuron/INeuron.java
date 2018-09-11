@@ -524,11 +524,19 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         while (in.readBoolean()) {
             Synapse syn = Synapse.read(in, m);
             inputSynapses.put(syn, syn);
+
+            if(syn.input.get().isPassiveInputNeuron()) {
+                registerPassiveInputSynapse(syn);
+            }
         }
 
         while (in.readBoolean()) {
             Synapse syn = Synapse.read(in, m);
             outputSynapses.put(syn, syn);
+
+            if(isPassiveInputNeuron()) {
+                syn.output.get().registerPassiveInputSynapse(syn);
+            }
         }
 
         int l = in.readInt();
