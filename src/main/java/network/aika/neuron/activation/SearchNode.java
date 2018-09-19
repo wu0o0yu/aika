@@ -355,8 +355,10 @@ public class SearchNode implements Comparable<SearchNode> {
 
         boolean precondition = candidate.activation.isActiveable();
 
-        alreadySelected = precondition && !candidate.isConflicting() || candidate.activation.inputDecision == SELECTED;
-        alreadyExcluded = !precondition || checkExcluded(candidate.activation) || candidate.activation.inputDecision == EXCLUDED;
+        Decision bd = doc.linker.getLinkedDecision(candidate.activation);
+
+        alreadySelected = (precondition && !candidate.isConflicting()) || bd == SELECTED || candidate.activation.inputDecision == SELECTED;
+        alreadyExcluded = !precondition || checkExcluded(candidate.activation) || bd == EXCLUDED || candidate.activation.inputDecision == EXCLUDED;
 
         if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
             dumpDebugState();

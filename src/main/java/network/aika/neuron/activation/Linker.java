@@ -39,6 +39,7 @@ public class Linker {
     protected Document doc;
     ArrayDeque<Link> queue = new ArrayDeque<>();
 
+
     public enum Direction {
         INPUT,
         OUTPUT
@@ -47,6 +48,16 @@ public class Linker {
 
     public Linker(Document doc) {
         this.doc = doc;
+    }
+
+
+    /**
+     *
+     * @param act
+     * @return
+     */
+    public SearchNode.Decision getLinkedDecision(Activation act) {
+        return null;
     }
 
 
