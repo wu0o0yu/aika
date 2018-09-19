@@ -850,6 +850,10 @@ public final class Activation extends OrActivation {
 
         sb.append(withLogic ? node.toString() : node.getNeuronLabel());
 
+        if(statistic != null) {
+            sb.append(" - " + statistic);
+        }
+
         sb.append(" - UB:");
         sb.append(Utils.round(upperBound));
 
