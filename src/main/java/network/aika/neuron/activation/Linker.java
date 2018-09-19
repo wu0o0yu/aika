@@ -27,6 +27,7 @@ import java.util.*;
 
 import static network.aika.neuron.Synapse.Builder.VARIABLE;
 import static network.aika.neuron.activation.Activation.MAX_SELF_REFERENCING_DEPTH;
+import static network.aika.neuron.activation.SearchNode.Decision;
 
 /**
  * The {@code Linker} class is responsible for for the linkage of neuron activations. These links mirror the synapses between
@@ -56,8 +57,8 @@ public class Linker {
      * @param act
      * @return
      */
-    public SearchNode.Decision getLinkedDecision(Activation act) {
-        return null;
+    public Decision getLinkedDecision(Activation act) {
+        return Decision.UNKNOWN;
     }
 
 

@@ -61,7 +61,6 @@ public class SearchNode implements Comparable<SearchNode> {
     long visited;
     public Candidate candidate;
     int level;
-    int cacheFactor = 1;
 
     DebugState debugState;
 
@@ -93,8 +92,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private Step step = Step.INIT;
-    private boolean alreadySelected;
-    private boolean alreadyExcluded;
+    private Decision preDecision;
     private SearchNode selectedChild = null;
     private SearchNode excludedChild = null;
     private double selectedWeight = 0.0;
@@ -185,8 +183,6 @@ public class SearchNode implements Comparable<SearchNode> {
             SearchNode pn = getParent();
 
             accumulatedWeight = weightDelta + pn.accumulatedWeight;
-
-            cacheFactor = pn.cacheFactor * (!OPTIMIZE_SEARCH || pn.alreadySelected || pn.alreadyExcluded || pn.getCachedDecision() == UNKNOWN || pn.generatesUnsuppressedExcluded() ? 1 : 2);
         }
     }
 
@@ -355,10 +351,19 @@ public class SearchNode implements Comparable<SearchNode> {
 
         boolean precondition = candidate.activation.isActiveable();
 
-        Decision bd = doc.linker.getLinkedDecision(candidate.activation);
-
-        alreadySelected = (precondition && !candidate.isConflicting()) || bd == SELECTED || candidate.activation.inputDecision == SELECTED;
-        alreadyExcluded = !alreadySelected && (!precondition || checkExcluded(candidate.activation) || bd == EXCLUDED || candidate.activation.inputDecision == EXCLUDED);
+        preDecision = candidate.activation.inputDecision;
+        if(preDecision == UNKNOWN) {
+            preDecision = doc.linker.getLinkedDecision(candidate.activation);
+        }
+        if(preDecision == UNKNOWN && (!precondition || checkExcluded(candidate.activation))) {
+            preDecision = EXCLUDED;
+        }
+        if(preDecision == UNKNOWN && !candidate.isConflicting()) {
+            preDecision = SELECTED;
+        }
+        if(preDecision == UNKNOWN && OPTIMIZE_SEARCH) {
+            preDecision = getCachedDecision();
+        }
 
         if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
             dumpDebugState();
@@ -372,14 +377,14 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private Decision getCachedDecision() {
-        return !alreadyExcluded ? candidate.cachedDecision : Decision.UNKNOWN;
+        return preDecision != EXCLUDED ? candidate.cachedDecision : Decision.UNKNOWN;
     }
 
 
     private boolean prepareSelectStep(Document doc) {
         candidate.repeat = false;
 
-        if(alreadyExcluded || skip == SELECTED || (OPTIMIZE_SEARCH && getCachedDecision() == Decision.EXCLUDED) || doc.model.getSkipSelectStep().evaluate(candidate.activation)) return false;
+        if(preDecision == EXCLUDED || skip == SELECTED || doc.model.getSkipSelectStep().evaluate(candidate.activation)) return false;
 
         candidate.activation.setDecision(SELECTED, visited);
 
@@ -396,7 +401,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean prepareExcludeStep(Document doc) {
-        if(alreadySelected || skip == EXCLUDED || (OPTIMIZE_SEARCH && getCachedDecision() == Decision.SELECTED) || (!alreadyExcluded && generatesUnsuppressedExcluded())) return false;
+        if(preDecision == SELECTED || skip == EXCLUDED || (preDecision != EXCLUDED && generatesUnsuppressedExcluded())) return false;
 
         candidate.activation.setDecision(EXCLUDED, visited);
 
@@ -440,9 +445,9 @@ public class SearchNode implements Comparable<SearchNode> {
         Decision d;
         Decision cd = getCachedDecision();
         if(cd == UNKNOWN) {
-            d = alreadySelected || (!alreadyExcluded && selectedWeight >= excludedWeight) ? SELECTED : EXCLUDED;
+            d = preDecision != UNKNOWN ? preDecision : (selectedWeight >= excludedWeight ? SELECTED : EXCLUDED);
 
-            if (!alreadyExcluded) {
+            if (preDecision != EXCLUDED) {
                 candidate.cachedDecision = d;
             }
         } else {
@@ -597,7 +602,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private void storeDebugInfos() {
-        if (alreadyExcluded || alreadySelected) {
+        if (preDecision != UNKNOWN) {
             debugState = DebugState.LIMITED;
         } else if (getCachedDecision() != UNKNOWN) {
             debugState = DebugState.CACHED;
