@@ -180,43 +180,6 @@ public class Linker {
     }
 
 
-    protected Activation splitActivation(Link nl) {
-        Link el = nl.output.getLinkBySynapseId(nl.synapse.id);
-
-        Activation splitAct = new Activation(doc.activationIdCounter++, doc, nl.output.range, nl.output.node);
-        nl.output.node.processActivation(splitAct);
-        doc.ubQueue.add(splitAct);
-
-        nl.output
-                .getInputLinks(true, false)
-                .forEach(
-                        il -> new Link(il.synapse, il.input, splitAct, il.synapse.id == nl.synapse.id || il.passive).link()
-                );
-
-        new Link(nl.synapse, nl.input, splitAct, false).link();
-
-        nl.output
-                .getOutputLinks(true)
-                .forEach(ol -> {
-                            Link nol = new Link(ol.synapse, splitAct, ol.output, ol.passive);
-                            nol.link();
-
-                            if(!ol.synapse.isNegative() && checkLoop(nl.input, ol.output)) {
-                                ol.passive = true;
-                            }
-                            if(!ol.synapse.isNegative() && checkLoop(el.input, ol.output)) {
-                                nol.passive = true;
-                            }
-                        }
-                );
-
-        splitAct.upperBound = nl.output.upperBound;
-
-        return splitAct;
-    }
-
-
-
     protected void checkPositiveFeedbackLoops() {
         doc.getActivations(false)
                 .stream()
