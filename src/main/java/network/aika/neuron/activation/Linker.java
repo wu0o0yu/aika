@@ -26,7 +26,6 @@ import network.aika.neuron.activation.Activation.Link;
 import java.util.*;
 
 import static network.aika.neuron.Synapse.Builder.VARIABLE;
-import static network.aika.neuron.activation.Activation.MAX_SELF_REFERENCING_DEPTH;
 import static network.aika.neuron.activation.SearchNode.Decision;
 
 /**
@@ -108,7 +107,7 @@ public class Linker {
         } while(oldSize != doc.getNumberOfActivations());
 
 
-        checkPositiveFeedbackLoops();
+        postLateLinking();
     }
 
 
@@ -147,6 +146,10 @@ public class Linker {
 
 
     protected void link(Synapse s, Activation iAct, Activation oAct) {
+        if(iAct.blocked) {
+            return;
+        }
+
         if(s.key.rangeInput == Synapse.Builder.OUTPUT) {
             Integer outputBegin = s.key.rangeOutput.begin.map(iAct.range);
             Integer outputEnd = s.key.rangeOutput.end.map(iAct.range);
@@ -181,7 +184,7 @@ public class Linker {
     }
 
 
-    protected void checkPositiveFeedbackLoops() {
+    protected void postLateLinking() {
         doc.getActivations(false)
                 .stream()
                 .flatMap(act -> act.getInputLinks(false, false))

@@ -93,6 +93,8 @@ public final class Activation extends OrActivation {
     private long visitedState;
     public long markedAncestor;
 
+    public boolean blocked;
+
 
     private List<Activation> conflicts;
 
@@ -385,7 +387,7 @@ public final class Activation extends OrActivation {
             }
         }
 
-        if (oldUpperBound <= 0.0 && upperBound > 0.0) {
+        if (oldUpperBound <= 0.0 && upperBound > 0.0 && !blocked) {
             getINeuron().propagate(this);
         }
     }
