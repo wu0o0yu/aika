@@ -56,7 +56,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public int level;
 
-    public Writable statistic;
+    public Writable extension;
 
     // Prevents this node from being removed during cleanup.
     public boolean isDiscovered;
@@ -128,8 +128,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         this.level = level;
         setModified();
 
-        if(m.getNodeStatisticFactory() != null) {
-            statistic = m.getNodeStatisticFactory().createObject();
+        if(m.getNodeExtensionFactory() != null) {
+            extension = m.getNodeExtensionFactory().createObject();
         }
     }
 
@@ -335,9 +335,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void write(DataOutput out) throws IOException {
         out.writeInt(level);
 
-        out.writeBoolean(statistic != null);
-        if(statistic != null) {
-            statistic.write(out);
+        out.writeBoolean(extension != null);
+        if(extension != null) {
+            extension.write(out);
         }
 
         out.writeBoolean(isDiscovered);
@@ -370,8 +370,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         level = in.readInt();
 
         if(in.readBoolean()) {
-            statistic = m.getNodeStatisticFactory().createObject();
-            statistic.readFields(in, m);
+            extension = m.getNodeExtensionFactory().createObject();
+            extension.readFields(in, m);
         }
 
         isDiscovered = in.readBoolean();

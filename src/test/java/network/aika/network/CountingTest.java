@@ -58,7 +58,7 @@ public class CountingTest {
     @Test
     public void testActivationCounting() {
         Model m = new Model();
-        m.setNodeStatisticFactory(() -> new NodeStatistic());
+        m.setNodeExtensionFactory(() -> new NodeStatistic());
 
         Neuron inA = m.createNeuron("inA");
         Neuron outA = Neuron.init(m.createNeuron("nA"), 50.0, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
@@ -89,12 +89,12 @@ public class CountingTest {
                         .setPatternCheck(map -> true)
                         .setCounter(act -> count(act))
         );
-        Assert.assertEquals(6.0, ((NodeStatistic) inA.get().outputNode.get().statistic).frequency, 0.001);
+        Assert.assertEquals(6.0, ((NodeStatistic) inA.get().outputNode.get().extension).frequency, 0.001);
     }
 
 
     public void count(NodeActivation act) {
-        NodeStatistic stat = ((NodeStatistic) act.node.statistic);
+        NodeStatistic stat = ((NodeStatistic) act.node.extension);
 
         stat.frequency++;
     }

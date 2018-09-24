@@ -87,7 +87,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     public volatile int numDisjunctiveSynapses = 0;
 
-    public Writable statistic;
+    public Writable extension;
 
     public ActivationFunction activationFunction = ActivationFunction.RECTIFIED_SCALED_LOGISTIC_SIGMOID;
 
@@ -266,8 +266,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         this.label = label;
         this.outputText = outputText;
 
-        if(m.getNeuronStatisticFactory() != null) {
-            statistic = m.getNeuronStatisticFactory().createObject();
+        if(m.getNeuronExtensionFactory() != null) {
+            extension = m.getNeuronExtensionFactory().createObject();
         }
 
         threads = new ThreadState[m.numberOfThreads];
@@ -422,9 +422,9 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             out.writeUTF(outputText);
         }
 
-        out.writeBoolean(statistic != null);
-        if(statistic != null) {
-            statistic.write(out);
+        out.writeBoolean(extension != null);
+        if(extension != null) {
+            extension.write(out);
         }
 
         out.writeDouble(bias);
@@ -497,8 +497,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         }
 
         if(in.readBoolean()) {
-            statistic = m.getNeuronStatisticFactory().createObject();
-            statistic.readFields(in, m);
+            extension = m.getNeuronExtensionFactory().createObject();
+            extension.readFields(in, m);
         }
 
         bias = in.readDouble();

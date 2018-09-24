@@ -51,10 +51,11 @@ public class Model {
 
     public SuspensionHook suspensionHook;
 
-    private WritableFactory nodeStatisticFactory;
-    private WritableFactory neuronStatisticFactory;
-    private WritableFactory synapseStatisticFactory;
-    private WritableFactory activationStatisticFactory;
+    private WritableFactory nodeExtensionFactory;
+    private WritableFactory neuronExtensionFactory;
+    private WritableFactory synapseExtensionFactory;
+    private WritableFactory activationExtensionFactory;
+
     public LinkerFactory linkerFactory = (doc) -> new Linker(doc);
     public SearchNode.SkipSelectStep skipSelectStep = (act) -> false;
 
@@ -101,41 +102,41 @@ public class Model {
     }
 
 
-    public WritableFactory getNodeStatisticFactory() {
-        return nodeStatisticFactory;
+    public WritableFactory getNodeExtensionFactory() {
+        return nodeExtensionFactory;
     }
 
 
-    public void setNodeStatisticFactory(WritableFactory nodeStatisticFactory) {
-        this.nodeStatisticFactory = nodeStatisticFactory;
+    public void setNodeExtensionFactory(WritableFactory nodeExtensionFactory) {
+        this.nodeExtensionFactory = nodeExtensionFactory;
     }
 
-    public WritableFactory getNeuronStatisticFactory() {
-        return neuronStatisticFactory;
-    }
-
-
-    public void setNeuronStatisticFactory(WritableFactory neuronStatisticFactory) {
-        this.neuronStatisticFactory = neuronStatisticFactory;
-    }
-
-    public WritableFactory getSynapseStatisticFactory() {
-        return synapseStatisticFactory;
+    public WritableFactory getNeuronExtensionFactory() {
+        return neuronExtensionFactory;
     }
 
 
-    public void setSynapseStatisticFactory(WritableFactory synapseStatisticFactory) {
-        this.synapseStatisticFactory = synapseStatisticFactory;
+    public void setNeuronExtensionFactory(WritableFactory neuronExtensionFactory) {
+        this.neuronExtensionFactory = neuronExtensionFactory;
+    }
+
+    public WritableFactory getSynapseExtensionFactory() {
+        return synapseExtensionFactory;
     }
 
 
-    public WritableFactory getActivationStatisticFactory() {
-        return activationStatisticFactory;
+    public void setSynapseExtensionFactory(WritableFactory synapseExtensionFactory) {
+        this.synapseExtensionFactory = synapseExtensionFactory;
     }
 
 
-    public void setActivationStatisticFactory(WritableFactory activationStatisticFactory) {
-        this.activationStatisticFactory = activationStatisticFactory;
+    public WritableFactory getActivationExtensionFactory() {
+        return activationExtensionFactory;
+    }
+
+
+    public void setActivationExtensionFactory(WritableFactory activationExtensionFactory) {
+        this.activationExtensionFactory = activationExtensionFactory;
     }
 
 

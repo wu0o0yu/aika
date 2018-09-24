@@ -83,7 +83,7 @@ public final class Activation extends OrActivation {
     public Double targetValue;
     public Double inputValue;
 
-    public Writable statistic;
+    public Writable extension;
 
 
     public Decision inputDecision = Decision.UNKNOWN;
@@ -102,8 +102,8 @@ public final class Activation extends OrActivation {
     public Activation(int id, Document doc, OrNode n) {
         super(id, doc, n);
 
-        if(doc != null && doc.model.getActivationStatisticFactory() != null) {
-            statistic = doc.model.getActivationStatisticFactory().createObject();
+        if(doc != null && doc.model.getActivationExtensionFactory() != null) {
+            extension = doc.model.getActivationExtensionFactory().createObject();
         }
     }
 
@@ -820,6 +820,7 @@ public final class Activation extends OrActivation {
 
     public String toString() {
         return id + " " + range + " " + identityToString() + " - " + node + " -" +
+                (extension != null ? extension.toString() + " -" : "") +
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
                 (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +
@@ -852,8 +853,8 @@ public final class Activation extends OrActivation {
 
         sb.append(withLogic ? node.toString() : node.getNeuronLabel());
 
-        if(statistic != null) {
-            sb.append(" - " + statistic);
+        if(extension != null) {
+            sb.append(" - " + extension);
         }
 
         sb.append(" - UB:");
