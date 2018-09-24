@@ -347,6 +347,11 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
+    public int getNewSynapseId() {
+        return numberOfInputSynapses++;
+    }
+
+
     public void propagate(Activation act) {
         Document doc = act.doc;
         outputNode.get(doc).addActivation(act);

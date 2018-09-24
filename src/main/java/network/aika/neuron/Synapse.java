@@ -182,7 +182,9 @@ public class Synapse implements Writable {
             in.setModified();
         }
 
-        out.numberOfInputSynapses++;
+        if(id >= out.numberOfInputSynapses) {
+            out.numberOfInputSynapses = id + 1;
+        }
 
         if(in.isPassiveInputNeuron()) {
             out.registerPassiveInputSynapse(this);
@@ -435,7 +437,7 @@ public class Synapse implements Writable {
             synapse = new Synapse(inputNeuron, outputNeuron, synapseId, k, relations, distFunc);
 
             if(synapseId == null) {
-                synapse.id = outputNeuron.get(doc).numberOfInputSynapses;
+                synapse.id = outputNeuron.get(doc).getNewSynapseId();
             }
 
             synapse.link();
