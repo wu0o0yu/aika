@@ -543,7 +543,7 @@ public class Document implements Comparable<Document> {
 
 
         public void add(Link l) {
-            if(!l.synapse.key.isRecurrent) {
+            if(!l.synapse.isRecurrent) {
                 add(l.output);
             }
         }
@@ -583,14 +583,14 @@ public class Document implements Comparable<Document> {
 
         public void propagateActivationValue(int round, Activation act)  {
             act.getOutputLinks(false)
-                    .forEach(l -> add(l.synapse.key.isRecurrent ? round + 1 : round, l.output));
+                    .forEach(l -> add(l.synapse.isRecurrent ? round + 1 : round, l.output));
         }
 
 
         private void add(Activation act) {
             add(0, act);
             act.getOutputLinks(false)
-                    .filter(l -> l.synapse.key.isRecurrent)
+                    .filter(l -> l.synapse.isRecurrent)
                     .forEach(l -> add(0, l.output));
         }
 

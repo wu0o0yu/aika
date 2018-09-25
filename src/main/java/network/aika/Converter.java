@@ -39,8 +39,8 @@ public class Converter {
 
     public static Comparator<Synapse> SYNAPSE_COMP = (s1, s2) -> {
         int r = Boolean.compare(
-                s2.key.rangeOutput.begin != NONE || s2.key.rangeOutput.end != NONE || s2.key.identity,
-                s1.key.rangeOutput.begin != NONE || s1.key.rangeOutput.end != NONE || s1.key.identity
+                s2.rangeOutput.begin != NONE || s2.rangeOutput.end != NONE || s2.identity,
+                s1.rangeOutput.begin != NONE || s1.rangeOutput.end != NONE || s1.identity
         );
         if (r != 0) return r;
         r = Double.compare(s2.weight, s1.weight);
@@ -182,7 +182,7 @@ public class Converter {
     private Synapse getBestSynapse(Collection<Synapse> synapses) {
         Synapse maxSyn = null;
         for(Synapse s: synapses) {
-            if(!s.isNegative() && !s.key.isRecurrent && !s.inactive && !s.input.get().isPassiveInputNeuron()) {
+            if(!s.isNegative() && !s.isRecurrent && !s.inactive && !s.input.get().isPassiveInputNeuron()) {
                 if(maxSyn == null || SYNAPSE_COMP.compare(maxSyn, s) > 0) {
                     maxSyn = s;
                 }
@@ -211,8 +211,8 @@ public class Converter {
             in.lock.acquireWriteLock();
             try {
                 if (!s.inactive) {
-                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.limit * s.weight;
-                    sumDelta[s.key.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += (s.limit + s.limitDelta) * s.getNewWeight();
+                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.limit * s.weight;
+                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += (s.limit + s.limitDelta) * s.getNewWeight();
 
                     if(in.isPassiveInputNeuron() && !s.isNegative()) {
                         posPassiveSumDelta += ((s.limit + s.limitDelta) * s.getNewWeight()) - (s.limit * s.weight);

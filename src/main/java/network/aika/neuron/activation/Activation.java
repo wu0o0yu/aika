@@ -288,7 +288,7 @@ public final class Activation extends OrActivation {
                 posNet += x;
             }
 
-            if (!s.key.isRecurrent && !s.isNegative() && net >= 0.0 && fired < 0) {
+            if (!s.isRecurrent && !s.isNegative() && net >= 0.0 && fired < 0) {
                 fired = iAct.rounds.get(round).fired + 1;
             }
         }
@@ -417,7 +417,7 @@ public final class Activation extends OrActivation {
             }
 
             if (s.isNegative()) {
-                if (!s.key.isRecurrent && !iAct.checkSelfReferencing(false, 0, v)) {
+                if (!s.isRecurrent && !iAct.checkSelfReferencing(false, 0, v)) {
                     ub += Math.min(s.limit, iAct.lowerBound) * x;
                 }
 
@@ -496,7 +496,7 @@ public final class Activation extends OrActivation {
 
     private State getInputState(int round, Synapse s, long v) {
         State is = State.ZERO;
-        if (s.key.isRecurrent) {
+        if (s.isRecurrent) {
             if (!s.isNegative() || !checkSelfReferencing(true, 0, v)) {
                 is = round == 0 ? getInitialState(decision) : rounds.get(round - 1);
             }
@@ -538,7 +538,7 @@ public final class Activation extends OrActivation {
         markPredecessor(v, 0);
         conflicts = new ArrayList<>();
         for(Link l: inputLinks.values()) {
-            if (!l.passive && l.synapse.isNegative() && l.synapse.key.isRecurrent) {
+            if (!l.passive && l.synapse.isNegative() && l.synapse.isRecurrent) {
                 l.input.collectIncomingConflicts(conflicts, v);
             }
         }
@@ -554,7 +554,7 @@ public final class Activation extends OrActivation {
             conflicts.add(this);
         } else {
             for (Link l : inputLinks.values()) {
-                if (!l.passive && !l.synapse.isNegative() && !l.synapse.key.isRecurrent) {
+                if (!l.passive && !l.synapse.isNegative() && !l.synapse.isRecurrent) {
                     l.input.collectIncomingConflicts(conflicts, v);
                 }
             }
@@ -570,10 +570,10 @@ public final class Activation extends OrActivation {
                 continue;
             }
             if (l.output.getINeuron().type != INeuron.Type.INHIBITORY) {
-                if (l.synapse.isNegative() && l.synapse.key.isRecurrent) {
+                if (l.synapse.isNegative() && l.synapse.isRecurrent) {
                     conflicts.add(l.output);
                 }
-            } else if (!l.synapse.isNegative() && !l.synapse.key.isRecurrent) {
+            } else if (!l.synapse.isNegative() && !l.synapse.isRecurrent) {
                 l.output.collectOutgoingConflicts(conflicts, v);
             }
         }
@@ -646,7 +646,7 @@ public final class Activation extends OrActivation {
         inputLinks
                 .values()
                 .stream()
-                .filter(l -> !l.synapse.key.isRecurrent && !l.passive)
+                .filter(l -> !l.synapse.isRecurrent && !l.passive)
                 .forEach(l -> sequence = Math.max(sequence, l.input.getSequence() + 1));
         return sequence;
     }
@@ -665,7 +665,7 @@ public final class Activation extends OrActivation {
         markedPredecessor = v;
 
         for(Link l: inputLinks.values()) {
-            if(!l.passive && !l.synapse.isNegative() && !l.synapse.key.isRecurrent) {
+            if(!l.passive && !l.synapse.isNegative() && !l.synapse.isRecurrent) {
                 l.input.markPredecessor(v, depth + 1);
             }
         }
@@ -895,7 +895,7 @@ public final class Activation extends OrActivation {
         sb.append(" (");
         boolean first = true;
         for(Link l: inputLinks.values()) {
-            if(!l.passive && l.synapse.key.identity) {
+            if(!l.passive && l.synapse.identity) {
                 if(!first) {
                     sb.append(", ");
                 }

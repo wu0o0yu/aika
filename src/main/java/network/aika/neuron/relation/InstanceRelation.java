@@ -49,7 +49,7 @@ public class InstanceRelation extends Relation {
         collectContains(results, n, linkedAct, v);
 
         linkedAct.getInputLinks(false, false)
-                .filter(l -> l.synapse.key.identity)
+                .filter(l -> l.synapse.identity)
                 .forEach(l -> collectCommonAncestor(results, n, l.input, v));
     }
 
@@ -63,7 +63,7 @@ public class InstanceRelation extends Relation {
         }
 
         linkedAct.getOutputLinks(false)
-                .filter(l ->l.synapse.key.identity)
+                .filter(l ->l.synapse.identity)
                 .forEach(l -> collectContains(results, n, l.output, v));
     }
 
@@ -77,7 +77,7 @@ public class InstanceRelation extends Relation {
         }
 
         linkedAct.getInputLinks(false, false)
-                .filter(l -> l.synapse.key.identity)
+                .filter(l -> l.synapse.identity)
                 .forEach(l -> collectContainedIn(results, n, l.input, v));
     }
 
@@ -118,7 +118,7 @@ public class InstanceRelation extends Relation {
         if(actA == actB) return true;
 
         return actA.getInputLinks(false, false)
-                .filter(l -> l.synapse.key.identity)
+                .filter(l -> l.synapse.identity)
                 .anyMatch(l -> contains(l.input, actB, v));
     }
 
@@ -137,7 +137,7 @@ public class InstanceRelation extends Relation {
         act.markedAncestor = v;
 
         act.getInputLinks(false, false)
-                .filter(l -> l.synapse.key.identity)
+                .filter(l -> l.synapse.identity)
                 .forEach(l -> markAncestors(l.input, v));
     }
 
@@ -149,7 +149,7 @@ public class InstanceRelation extends Relation {
         if(act.markedAncestor == v1) return true;
 
         return act.getInputLinks(false, false)
-                .filter(l -> l.synapse.key.identity)
+                .filter(l -> l.synapse.identity)
                 .anyMatch(l -> hasCommonAncestor(l.input, v1, v2));
     }
 

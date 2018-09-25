@@ -150,16 +150,16 @@ public class Linker {
             return;
         }
 
-        if(s.key.rangeInput == Synapse.Builder.OUTPUT) {
-            Integer outputBegin = s.key.rangeOutput.begin.map(iAct.range);
-            Integer outputEnd = s.key.rangeOutput.end.map(iAct.range);
+        if(s.rangeInput == Synapse.Builder.OUTPUT) {
+            Integer outputBegin = s.rangeOutput.begin.map(iAct.range);
+            Integer outputEnd = s.rangeOutput.end.map(iAct.range);
 
             if((outputBegin != null && outputBegin.intValue() != oAct.range.begin.intValue()) || (outputEnd != null && outputEnd.intValue() != oAct.range.end.intValue())) {
                 return;
             }
         } else {
             if(iAct.getInputLinks(false, false)
-                    .noneMatch(l -> (l.synapse.id == s.key.rangeInput || s.key.rangeInput == VARIABLE) && l.input.range.equals(oAct.range))) {
+                    .noneMatch(l -> (l.synapse.id == s.rangeInput || s.rangeInput == VARIABLE) && l.input.range.equals(oAct.range))) {
                 return;
             }
         }
@@ -169,7 +169,7 @@ public class Linker {
             return;
         }
 
-        if(s.key.identity) {
+        if(s.identity) {
             Link el = oAct.getLinkBySynapseId(s.id);
             if(el != null && el.input != iAct) {
                 nl.passive = true;
@@ -188,7 +188,7 @@ public class Linker {
         doc.getActivations(false)
                 .stream()
                 .flatMap(act -> act.getInputLinks(false, false))
-                .filter(l -> l.synapse.key.isRecurrent && !l.synapse.isNegative())
+                .filter(l -> l.synapse.isRecurrent && !l.synapse.isNegative())
                 .forEach(l -> {
                     if(!l.passive && !checkLoop(l.input, l.output)) {
                         l.passive = true;

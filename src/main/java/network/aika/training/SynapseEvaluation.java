@@ -3,6 +3,7 @@ package network.aika.training;
 import network.aika.DistanceFunction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Range;
 import network.aika.neuron.relation.Relation;
 
 import java.util.Map;
@@ -57,15 +58,21 @@ public interface SynapseEvaluation {
     }
 
     class Result {
-        public Result(Synapse.Key synapseKey, Map<Integer, Relation> relations, DistanceFunction distanceFunction, double significance, DeleteMode deleteMode) {
-            this.synapseKey = synapseKey;
+        public Result(boolean isRecurrent, int rangeInput, Range.Output rangeOutput, boolean identity, Map<Integer, Relation> relations, DistanceFunction distanceFunction, double significance, DeleteMode deleteMode) {
+            this.isRecurrent = isRecurrent;
+            this.rangeInput = rangeInput;
+            this.rangeOutput = rangeOutput;
+            this.identity = identity;
             this.relations = relations;
             this.distanceFunction = distanceFunction;
             this.significance = significance;
             this.deleteMode = deleteMode;
         }
 
-        public Synapse.Key synapseKey;
+        public boolean isRecurrent;
+        public int rangeInput;
+        public Range.Output rangeOutput;
+        public boolean identity;
         public Map<Integer, Relation> relations;
         public DistanceFunction distanceFunction;
         public double significance;

@@ -67,16 +67,12 @@ public class Synapse implements Writable {
     public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = (s1, s2) -> {
         int r = s1.input.compareTo(s2.input);
         if (r != 0) return r;
-        r = s1.key.compareTo(s2.key);
-        if (r != 0) return r;
         return Integer.compare(s1.id, s2.id);
     };
 
 
     public static final Comparator<Synapse> OUTPUT_SYNAPSE_COMP = (s1, s2) -> {
         int r = s1.output.compareTo(s2.output);
-        if (r != 0) return r;
-        r = s1.key.compareTo(s2.key);
         if (r != 0) return r;
         return Integer.compare(s1.id, s2.id);
     };
@@ -88,7 +84,10 @@ public class Synapse implements Writable {
 
     public Integer id;
 
-    public Key key;
+    public boolean isRecurrent;
+    public int rangeInput;
+    public Output rangeOutput;
+    public boolean identity;
 
     // synapseId -> relation
     public Map<Integer, Relation> relations;
@@ -136,13 +135,10 @@ public class Synapse implements Writable {
     }
 
 
-    public Synapse(Neuron input, Neuron output, Integer id, Key key, Map<Integer, Relation> relations, DistanceFunction distanceFunction) {
-        this.key = lookupKey(key);
-        this.relations = relations;
+    public Synapse(Neuron input, Neuron output, Integer id) {
         this.id = id;
         this.input = input;
         this.output = output;
-        this.distanceFunction = distanceFunction;
 
         if(output.model.getSynapseExtensionFactory() != null) {
             extension = output.model.getSynapseExtensionFactory().createObject();
@@ -338,14 +334,18 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S OW:" + weight + " NW:" + (weight + weightDelta) + " rec:" + key.isRecurrent + " o:" + key.rangeOutput + " " +  input + "->" + output;
+        return "S OW:" + weight + " NW:" + (weight + weightDelta) + " rec:" + isRecurrent + " o:" + rangeOutput + " " +  input + "->" + output;
     }
 
 
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeInt(id);
-        key.write(out);
+
+        out.writeBoolean(isRecurrent);
+        out.writeInt(rangeInput);
+        rangeOutput.write(out);
+        out.writeBoolean(identity);
 
         out.writeInt(input.id);
         out.writeInt(output.id);
@@ -377,7 +377,11 @@ public class Synapse implements Writable {
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         id = in.readInt();
-        key = Key.read(in, m);
+
+        isRecurrent = in.readBoolean();
+        rangeInput = in.readInt();
+        rangeOutput = Range.Output.read(in, m);
+        identity = in.readBoolean();
 
         input = m.lookupNeuron(in.readInt());
         output = m.lookupNeuron(in.readInt());
@@ -414,7 +418,7 @@ public class Synapse implements Writable {
 
 
 
-    public static Synapse createOrLookup(Document doc, Integer synapseId, Key k, Map<Integer, Relation> relations, DistanceFunction distFunc, Neuron inputNeuron, Neuron outputNeuron) {
+    public static Synapse createOrLookup(Document doc, Integer synapseId, Neuron inputNeuron, Neuron outputNeuron) {
         outputNeuron.get(doc);
         inputNeuron.get(doc);
         outputNeuron.lock.acquireWriteLock();
@@ -423,8 +427,8 @@ public class Synapse implements Writable {
             synapse = outputNeuron.inputSynapsesById.get(synapseId);
         } else {
             Map.Entry<Synapse, Synapse> me = outputNeuron.inMemoryInputSynapses.subMap(
-                    new Synapse(inputNeuron, outputNeuron, Integer.MIN_VALUE, k, null, null), true,
-                    new Synapse(inputNeuron, outputNeuron, Integer.MAX_VALUE, k, null, null), true
+                    new Synapse(inputNeuron, outputNeuron, Integer.MIN_VALUE), true,
+                    new Synapse(inputNeuron, outputNeuron, Integer.MAX_VALUE), true
             ).firstEntry();
             if(me != null) {
                 synapse = me.getKey();
@@ -433,7 +437,7 @@ public class Synapse implements Writable {
         outputNeuron.lock.releaseWriteLock();
 
         if(synapse == null) {
-            synapse = new Synapse(inputNeuron, outputNeuron, synapseId, k, relations, distFunc);
+            synapse = new Synapse(inputNeuron, outputNeuron, synapseId);
 
             if(synapseId == null) {
                 synapse.id = outputNeuron.get(doc).getNewSynapseId();
@@ -646,7 +650,16 @@ public class Synapse implements Writable {
 
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            return createOrLookup(null, synapseId, new Key(recurrent, rangeInput, rangeOutput, identity), relations, distanceFunction, neuron, outputNeuron);
+            Synapse s = createOrLookup(null, synapseId, neuron, outputNeuron);
+
+            s.isRecurrent = recurrent;
+            s.rangeInput = rangeInput;
+            s.rangeOutput = rangeOutput;
+            s.identity = identity;
+            s.relations = relations;
+            s.distanceFunction = distanceFunction;
+
+            return s;
         }
 
 
@@ -655,71 +668,4 @@ public class Synapse implements Writable {
             return Integer.compare(synapseId, in.synapseId);
         }
     }
-
-
-    static Map<Key, Key> keyMap = new TreeMap<>();
-
-    public static Key lookupKey(Key k) {
-        Key rk = keyMap.get(k);
-        if(rk == null) {
-            keyMap.put(k, k);
-            rk = k;
-        }
-        return rk;
-    }
-
-
-    public static class Key implements Comparable<Key>, Writable {
-        public boolean isRecurrent;
-        public int rangeInput;
-        public Output rangeOutput;
-        public boolean identity;
-
-        private Key() {}
-
-        public Key(boolean isRecurrent, int rangeInput, Output rangeOutput, boolean identity) {
-            this.isRecurrent = isRecurrent;
-            this.rangeInput = rangeInput;
-            this.rangeOutput = rangeOutput;
-            this.identity = identity;
-        }
-
-
-        @Override
-        public int compareTo(Key k) {
-            int r = Boolean.compare(isRecurrent, k.isRecurrent);
-            if(r != 0) return r;
-            r = Integer.compare(rangeInput, k.rangeInput);
-            if(r != 0) return r;
-            r = rangeOutput.compareTo(k.rangeOutput);
-            if(r != 0) return r;
-            r = Boolean.compare(identity, k.identity);
-            return r;
-        }
-
-
-        public static Key read(DataInput in, Model m) throws IOException {
-            Key k = new Key();
-            k.readFields(in, m);
-            return k;
-        }
-
-
-        @Override
-        public void write(DataOutput out) throws IOException {
-            out.writeBoolean(isRecurrent);
-            out.writeInt(rangeInput);
-            rangeOutput.write(out);
-            out.writeBoolean(identity);
-        }
-
-        @Override
-        public void readFields(DataInput in, Model m) throws IOException {
-            isRecurrent = in.readBoolean();
-            rangeInput = in.readInt();
-            rangeOutput = Range.Output.read(in, m);
-            identity = in.readBoolean();
-        }
-    }
-
 }

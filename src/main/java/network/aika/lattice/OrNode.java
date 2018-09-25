@@ -73,13 +73,13 @@ public class OrNode extends Node<OrNode, Activation> {
 
             neuron.get(inputAct.doc);
             Synapse s = neuron.getSynapseById(synapseId);
-            if(s.key.rangeOutput.begin != Range.Mapping.NONE || s.key.rangeOutput.end != Range.Mapping.NONE) {
+            if(s.rangeOutput.begin != Range.Mapping.NONE || s.rangeOutput.end != Range.Mapping.NONE) {
                 Activation iAct = inputAct.getInputActivation(i);
 
-                Integer b = s.key.rangeOutput.begin.map(iAct.range);
+                Integer b = s.rangeOutput.begin.map(iAct.range);
                 if(b != null) begin = b;
 
-                Integer e = s.key.rangeOutput.end.map(iAct.range);
+                Integer e = s.rangeOutput.end.map(iAct.range);
                 if(e != null) end = e;
             }
         }
@@ -125,7 +125,7 @@ public class OrNode extends Node<OrNode, Activation> {
                     matched = false;
                 }
 
-                if (l.synapse.key.identity) {
+                if (l.synapse.identity) {
                     Integer i = oe.revSynapseIds.get(l.synapse.id);
                     if(i != null && l.input == inputAct.getInputActivation(i)) {
                         matched = true;
