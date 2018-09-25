@@ -652,7 +652,10 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         }
 
         // s.link requires an updated n.biasSumDelta value.
-        modifiedSynapses.forEach(s -> s.link());
+        modifiedSynapses.forEach(s -> {
+            s.link();
+            s.reverseLinkRelations();
+        });
 
         return Converter.convert(threadId, doc, n, modifiedSynapses);
     }

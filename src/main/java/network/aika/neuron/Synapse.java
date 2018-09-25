@@ -164,8 +164,6 @@ public class Synapse implements Writable {
         in.provider.lock.releaseWriteLock();
 
         out.provider.lock.acquireWriteLock();
-        reverseLinkRelations(out);
-
         out.provider.inMemoryInputSynapses.put(this, this);
         out.provider.inputSynapsesById.put(id, this);
         out.provider.lock.releaseWriteLock();
@@ -195,7 +193,8 @@ public class Synapse implements Writable {
     }
 
 
-    private void reverseLinkRelations(INeuron out) {
+    public void reverseLinkRelations() {
+        INeuron out = output.get();
         for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
             int rId = me.getKey();
             Map<Integer, Relation> rel = null;
