@@ -59,7 +59,7 @@ public class GenerateTextTest {
 
         // Word aaaaaaa is only added to the resulting text if input a is active and this neuron
         // is not suppressed by another neuron. Output aaaaaaa may start a text.
-        Neuron.init(outA, 4.0, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+        Neuron.init(outA, 4.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -78,7 +78,7 @@ public class GenerateTextTest {
         // Word bbb is only added to the resulting text if input b is active and this neuron
         // is not suppressed by another neuron. Output bbb may start a text.
         // Neuron outB has a slightly higher weight than outA.
-        Neuron.init(outB, 5.0, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+        Neuron.init(outB, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
@@ -96,7 +96,7 @@ public class GenerateTextTest {
 
 
         // OutC is only activated if the previous word was outA.
-        Neuron.init(outC, 5.0, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+        Neuron.init(outC, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(outA)
@@ -113,7 +113,7 @@ public class GenerateTextTest {
         );
 
         // OutD is only activated if the previous word was outB.
-        Neuron.init(outD, 5.0, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+        Neuron.init(outD, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(outB)
@@ -131,7 +131,7 @@ public class GenerateTextTest {
 
 
         // All outputs suppress each other.
-        Neuron.init(suppr, 0.0, ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY, INeuron.LogicType.DISJUNCTIVE,
+        Neuron.init(suppr, 0.0, ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(outA)
@@ -199,7 +199,7 @@ public class GenerateTextTest {
         Neuron outB = m.createNeuron("OUT B", "bbb ");
 
 
-        Neuron.init(intermediate, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+        Neuron.init(intermediate, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(in)
@@ -209,7 +209,7 @@ public class GenerateTextTest {
                         .setRangeOutput(Output.NONE)
         );
 
-        Neuron.init(outA, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+        Neuron.init(outA, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(intermediate)
@@ -219,7 +219,7 @@ public class GenerateTextTest {
         );
 
 
-        Neuron.init(outB, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+        Neuron.init(outB, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(intermediate)

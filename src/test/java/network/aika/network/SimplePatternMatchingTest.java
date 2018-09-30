@@ -60,7 +60,6 @@ public class SimplePatternMatchingTest {
                 m.createNeuron("BCD"),
                 0.4,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))
@@ -144,7 +143,6 @@ public class SimplePatternMatchingTest {
                 5.0,
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))

@@ -34,7 +34,6 @@ public class RelationsTest {
         INeuron outC = Neuron.init(m.createNeuron("C"),
                 5.0,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -75,7 +74,6 @@ public class RelationsTest {
         INeuron inB = Neuron.init(m.createNeuron("B"),
                 5.0,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -89,7 +87,6 @@ public class RelationsTest {
         INeuron outC = Neuron.init(m.createNeuron("C"),
                 5.0,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -131,7 +128,6 @@ public class RelationsTest {
         INeuron outD = Neuron.init(m.createNeuron("D"),
                 0.001,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -209,7 +205,7 @@ public class RelationsTest {
             }
         }
 
-        Neuron n = Neuron.init(m.createNeuron("PATTERN"), 0.5, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE, inputs);
+        Neuron n = Neuron.init(m.createNeuron("PATTERN"), 0.5, INeuron.Type.EXCITATORY, inputs);
 
         System.out.println(n.get().node.get().logicToString());
 
@@ -238,7 +234,7 @@ public class RelationsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        Neuron nB = Neuron.init(m.createNeuron("B"), 5.0, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+        Neuron nB = Neuron.init(m.createNeuron("B"), 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -249,7 +245,7 @@ public class RelationsTest {
                         .setRangeOutput(true)
         );
 
-        Neuron nC = Neuron.init(m.createNeuron("C"), 5.0, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+        Neuron nC = Neuron.init(m.createNeuron("C"), 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -260,7 +256,7 @@ public class RelationsTest {
                         .setRangeOutput(true)
         );
 
-        Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+        Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(nB)
@@ -300,7 +296,7 @@ public class RelationsTest {
         Neuron inB = m.createNeuron("B");
 
 
-        Neuron nC = Neuron.init(m.createNeuron("C"), 5.0, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+        Neuron nC = Neuron.init(m.createNeuron("C"), 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)

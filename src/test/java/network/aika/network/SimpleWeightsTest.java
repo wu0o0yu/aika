@@ -44,7 +44,6 @@ public class SimpleWeightsTest {
         Neuron.init(pC,
                 0.0,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -98,7 +97,6 @@ public class SimpleWeightsTest {
         Neuron.init(pC,
                 0.01,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)

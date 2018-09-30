@@ -7,7 +7,6 @@ import network.aika.lattice.OrNode;
 import network.aika.lattice.OrNode.OrActivation;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.INeuron.Type;
-import network.aika.neuron.INeuron.LogicType;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.SearchNode.Decision;
@@ -130,11 +129,6 @@ public final class Activation extends OrActivation {
     public Type getType() {
         return getINeuron().type;
     }
-
-    public LogicType getLogicType() {
-        return getINeuron().logicType;
-    }
-
 
     public String getText() {
         return doc.getText(range);

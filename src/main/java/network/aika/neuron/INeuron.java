@@ -61,12 +61,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         INHIBITORY
     }
 
-    public LogicType logicType;
-
-    public enum LogicType {
-        CONJUNCTIVE,
-        DISJUNCTIVE
-    }
 
     public String outputText;
 
@@ -417,11 +411,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             out.writeUTF(type.name());
         }
 
-        out.writeBoolean(logicType != null);
-        if(logicType != null) {
-            out.writeUTF(logicType.name());
-        }
-
         out.writeBoolean(outputText != null);
         if(outputText != null) {
             out.writeUTF(outputText);
@@ -491,10 +480,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         if(in.readBoolean()) {
             type = Type.valueOf(in.readUTF());
-        }
-
-        if(in.readBoolean()) {
-            logicType = LogicType.valueOf(in.readUTF());
         }
 
         if(in.readBoolean()) {

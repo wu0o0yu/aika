@@ -38,7 +38,7 @@ public class SoftMaxTest {
         Model m = new Model();
 
         Neuron inhib = m.createNeuron("INHIBITORY");
-        Neuron.init(inhib, 0.0, ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY, INeuron.LogicType.DISJUNCTIVE);
+        Neuron.init(inhib, 0.0, ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
 
         Neuron[] inputs = new Neuron[]{
                 m.createNeuron("INPUT A"),
@@ -52,7 +52,7 @@ public class SoftMaxTest {
             int i = 0;
 
             for (double a : y) {
-                Neuron n = Neuron.init(m.createNeuron(j + "-" + i), a, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+                Neuron n = Neuron.init(m.createNeuron(j + "-" + i), a, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
                         new Synapse.Builder()
                                 .setSynapseId(0)
                                 .setNeuron(inputs[j])

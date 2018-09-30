@@ -70,7 +70,6 @@ public class NamedEntityRecognitionTest {
                 6.0, // adjusts the bias
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder() // Requires the word to be recognized
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get("cook"))
@@ -106,7 +105,6 @@ public class NamedEntityRecognitionTest {
                 5.0,
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get("cook"))
@@ -127,7 +125,6 @@ public class NamedEntityRecognitionTest {
                 6.0,
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get("jackson"))
@@ -155,7 +152,6 @@ public class NamedEntityRecognitionTest {
                 5.0,
                 ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get("jackson"))
@@ -177,7 +173,6 @@ public class NamedEntityRecognitionTest {
                 0.0,
                 ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder() // In this example there is only one forename considered.
                         .setSynapseId(0)
                         .setNeuron(jacksonForenameEntity)
@@ -190,7 +185,6 @@ public class NamedEntityRecognitionTest {
                 0.0,
                 ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(cookSurnameEntity)
@@ -204,7 +198,6 @@ public class NamedEntityRecognitionTest {
                 0.0,
                 ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
                 INeuron.Type.INHIBITORY,
-                INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder().setNeuron(cookProfessionEntity)
                         .setSynapseId(0)
                         .setWeight(1.0)

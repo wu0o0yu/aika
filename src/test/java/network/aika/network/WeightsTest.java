@@ -61,7 +61,6 @@ public class WeightsTest {
         Neuron.init(pOrA,
                 0.0,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inAA)
@@ -83,7 +82,6 @@ public class WeightsTest {
         Neuron.init(pDA,
                 0.001,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pOrA)
@@ -117,7 +115,6 @@ public class WeightsTest {
         Neuron.init(pOrB,
                 0.0,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inAB)
@@ -139,7 +136,6 @@ public class WeightsTest {
         Neuron.init(pDB,
                 0.001,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pOrB)
@@ -168,7 +164,6 @@ public class WeightsTest {
         Neuron.init(pSuppr,
                 0.0,
                 INeuron.Type.INHIBITORY,
-                INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pDA)

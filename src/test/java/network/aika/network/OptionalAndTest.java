@@ -45,7 +45,6 @@ public class OptionalAndTest {
         Neuron hintNoun = Neuron.init(m.createNeuron("HINT-NOUN"),
                 0.0,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wordEssen)
@@ -64,7 +63,6 @@ public class OptionalAndTest {
         Neuron hintVerb = Neuron.init(m.createNeuron("HINT-VERB"),
                 0.0,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wordEssen)
@@ -85,7 +83,6 @@ public class OptionalAndTest {
         Neuron noun = Neuron.init(m.createNeuron("NOUN"),
                 0.001,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(hintNoun)
@@ -112,7 +109,6 @@ public class OptionalAndTest {
         Neuron verb = Neuron.init(m.createNeuron("VERB"),
                 0.001,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(hintVerb)
@@ -132,7 +128,6 @@ public class OptionalAndTest {
         Neuron.init(suppr,
                 0.0,
                 INeuron.Type.INHIBITORY,
-                INeuron.LogicType.DISJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(noun)

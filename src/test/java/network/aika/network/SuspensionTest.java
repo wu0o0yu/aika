@@ -71,7 +71,6 @@ public class SuspensionTest {
         Neuron nC = Neuron.init(m.createNeuron("C"),
                 5.0,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -93,7 +92,6 @@ public class SuspensionTest {
         Neuron outD = Neuron.init(m.createNeuron("D"),
                 5.0,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(nC)

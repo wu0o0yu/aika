@@ -29,7 +29,6 @@ import network.aika.lattice.Node;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Collection;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Range.Relation.EQUALS;
@@ -52,7 +51,6 @@ public class ActivationOutputsTest {
         Neuron pAB = Neuron.init(m.createNeuron("pAB"),
                 0.001,
                 INeuron.Type.EXCITATORY,
-                INeuron.LogicType.CONJUNCTIVE,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -131,7 +129,7 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        INeuron outB = Neuron.init(m.createNeuron("B"), 0.5, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+        INeuron outB = Neuron.init(m.createNeuron("B"), 0.5, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -159,7 +157,7 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        INeuron outB = Neuron.init(m.createNeuron("B"), 0.001, INeuron.Type.EXCITATORY, INeuron.LogicType.CONJUNCTIVE,
+        INeuron outB = Neuron.init(m.createNeuron("B"), 0.001, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
