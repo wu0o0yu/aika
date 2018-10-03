@@ -334,7 +334,7 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S OW:" + weight + " NW:" + (weight + weightDelta) + " rec:" + isRecurrent + " o:" + rangeOutput + " " +  input + "->" + output;
+        return "S NW:" + getNewWeight() + " NB:" + getNewBias() + " rec:" + isRecurrent + " o:" + rangeOutput + " " +  input + "->" + output;
     }
 
 
