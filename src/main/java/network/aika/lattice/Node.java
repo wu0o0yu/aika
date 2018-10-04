@@ -185,10 +185,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    A processActivation(A act) {
+    void processActivation(A act) {
         register(act);
         propagate(act);
-        return act;
     }
 
 

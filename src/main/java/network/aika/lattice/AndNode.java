@@ -89,6 +89,14 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
 
     @Override
+    void processActivation(AndActivation act) {
+        if(act.isComplete()) {
+            super.processActivation(act);
+        }
+    }
+
+
+    @Override
     void apply(AndActivation act) {
         if (andChildren != null) {
             for (Link fl : act.inputs) {
@@ -117,11 +125,18 @@ public class AndNode extends Node<AndNode, AndActivation> {
                             Refinement nRef = me.getKey();
                             RefValue nRv = me.getValue();
                             if(nRef.contains(secondRef, rv)) {
-                                AndActivation nlAct = new AndActivation(act.doc.logicNodeActivationIdCounter++, act.doc, nRv.child.get(act.doc));
-                                nlAct.link(nRef, nRv, secondRefAct, act);
+                                AndNode nlNode = nRv.child.get(act.doc);
+
+                                AndActivation nlAct = lookupAndActivation(act, nRef);
+
+                                if(nlAct == null) {
+                                    nlAct = new AndActivation(act.doc.logicNodeActivationIdCounter++, act.doc, nlNode);
+                                    nlAct.link(nRef, nRv, secondRefAct, act);
+                                }
+
                                 nlAct.node.addActivation(nlAct);
 
-                                for(Map.Entry<Refinement, RefValue> mea: nlAct.node.parents.entrySet()) {
+                                for(Map.Entry<Refinement, RefValue> mea: nlNode.parents.entrySet()) {
                                     Refinement secondNRef = mea.getKey();
                                     RefValue secondNRv = mea.getValue();
                                     if(secondNRv.parent.get(act.doc) == secondAct.node && secondNRef.contains(ref, secondRv)) {
@@ -138,6 +153,16 @@ public class AndNode extends Node<AndNode, AndActivation> {
         }
 
         OrNode.processCandidate(this, act, false);
+    }
+
+
+    private AndActivation lookupAndActivation(NodeActivation<?> input, Refinement ref) {
+        for (Link l : input.outputsToAndNode.values()) {
+            if(l.ref.compareTo(ref) == 0) {
+                return l.output;
+            }
+        }
+        return null;
     }
 
 
@@ -635,6 +660,14 @@ public class AndNode extends Node<AndNode, AndActivation> {
                 }
                 return null;
             }
+        }
+
+        public boolean isComplete() {
+            int numberOfLinks = 0;
+            for (Link l : inputs) {
+                if (l != null) numberOfLinks++;
+            }
+            return node.parents.size() == numberOfLinks;
         }
 
         public String toString() {

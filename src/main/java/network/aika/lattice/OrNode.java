@@ -149,10 +149,9 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    public Activation processActivation(Activation act) {
+    public void processActivation(Activation act) {
         super.processActivation(act);
         neuron.get(act.doc).register(act);
-        return act;
     }
 
 

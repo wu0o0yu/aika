@@ -58,28 +58,28 @@ public class SimplePatternMatchingTest {
         // is relative or absolute.
         Neuron pattern = Neuron.init(
                 m.createNeuron("BCD"),
-                0.4,
+                1.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))
-                        .setWeight(1.0)
-                        .setBias(-0.9)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
                         .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 1)
                         .setRangeOutput(true, false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))
-                        .setWeight(1.0)
-                        .setBias(-0.9)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
                         .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 2),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inputNeurons.get('d'))
-                        .setWeight(1.0)
-                        .setBias(-0.9)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeOutput(false, true)
         );
@@ -209,5 +209,153 @@ public class SimplePatternMatchingTest {
 
         doc.clearActivations();
     }
-    
+
+
+
+    @Test
+    public void testPatternMatching3() {
+        Model m = new Model();
+
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
+        Neuron inC = m.createNeuron("C");
+
+
+        Neuron pattern = Neuron.init(
+                m.createNeuron("ABC"),
+                1.0,
+                INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(inA)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false)
+                        .addRangeRelation(Range.Relation.EQUALS, 1)
+                        .setRangeOutput(true, false),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(inB)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false)
+                        .addRangeRelation(Range.Relation.EQUALS, 2),
+                new Synapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(inC)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false)
+                        .addRangeRelation(Range.Relation.EQUALS, 0)
+                        .setRangeOutput(false, true)
+        );
+
+
+        Document doc = m.createDocument("X", 0);
+
+        inA.addInput(doc, 0, 1);
+        inB.addInput(doc, 0, 1);
+        inC.addInput(doc, 0, 1);
+
+        // Computes the selected option
+        doc.process();
+
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
+
+
+        System.out.println("Output activation:");
+        INeuron n = pattern.get();
+        for(Activation act: n.getActivations(doc, false)) {
+            System.out.println("Text Range: " + act.range);
+            System.out.println("Node: " + act.node);
+            System.out.println();
+        }
+
+        System.out.println("All activations:");
+        System.out.println(doc.activationsToString(true, false, true));
+        System.out.println();
+
+        doc.clearActivations();
+    }
+
+    @Test
+    public void testPatternMatching4() {
+        Model m = new Model();
+
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
+        Neuron inC = m.createNeuron("C");
+        Neuron inD = m.createNeuron("D");
+
+
+        Neuron pattern = Neuron.init(
+                m.createNeuron("ABCD"),
+                1.0,
+                INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(inA)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false)
+                        .addRangeRelation(Range.Relation.EQUALS, 1)
+                        .addRangeRelation(Range.Relation.EQUALS, 2)
+                        .addRangeRelation(Range.Relation.EQUALS, 3)
+                        .setRangeOutput(true, false),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(inB)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false)
+                        .addRangeRelation(Range.Relation.EQUALS, 2)
+                        .addRangeRelation(Range.Relation.EQUALS, 3),
+                new Synapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(inC)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false)
+                        .addRangeRelation(Range.Relation.EQUALS, 3)
+                        .setRangeOutput(false, false),
+                new Synapse.Builder()
+                        .setSynapseId(3)
+                        .setNeuron(inD)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false)
+                        .setRangeOutput(false, true)
+        );
+
+
+        Document doc = m.createDocument("X", 0);
+
+        inA.addInput(doc, 0, 1);
+        inB.addInput(doc, 0, 1);
+        inC.addInput(doc, 0, 1);
+        inD.addInput(doc, 0, 1);
+
+        // Computes the selected option
+        doc.process();
+
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
+
+
+        System.out.println("Output activation:");
+        INeuron n = pattern.get();
+        for(Activation act: n.getActivations(doc, false)) {
+            System.out.println("Text Range: " + act.range);
+            System.out.println("Node: " + act.node);
+            System.out.println();
+        }
+
+        System.out.println("All activations:");
+        System.out.println(doc.activationsToString(true, false, true));
+        System.out.println();
+
+        doc.clearActivations();
+    }
+
+
+
 }
