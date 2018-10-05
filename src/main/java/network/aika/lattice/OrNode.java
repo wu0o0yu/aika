@@ -127,7 +127,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
                 if (l.synapse.identity) {
                     Integer i = oe.revSynapseIds.get(l.synapse.id);
-                    if(i != null && l.input == inputAct.getInputActivation(i)) {
+                    if(i != null && l.input == doc.linker.computeInputActivation(l.synapse, inputAct.getInputActivation(i))) {
                         matched = true;
                     }
                 } else {

@@ -61,6 +61,11 @@ public class Linker {
     }
 
 
+    public Activation computeInputActivation(Synapse s, Activation iAct) {
+        return iAct;
+    }
+
+
     /**
      * Adds the incoming links between neuron activations.
      *
@@ -146,7 +151,9 @@ public class Linker {
 
 
     protected void link(Synapse s, Activation iAct, Activation oAct) {
-        if(iAct.blocked) {
+        iAct = computeInputActivation(s, iAct);
+
+        if(iAct == null || iAct.blocked) {
             return;
         }
 
