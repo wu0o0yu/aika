@@ -162,13 +162,13 @@ public class InputNode extends Node<InputNode, InputActivation> {
             return rv;
         }
 
-        SortedMap<Refinement, RefValue> nlParents = new TreeMap<>();
+        List<AndNode.Entry> nlParents = new ArrayList<>();
 
         Refinement mirrorRef = new Refinement(new AndNode.RelationsMap(new Relation[]{rel.invert()}), provider);
-        nlParents.put(mirrorRef, new RefValue(new Integer[] {1}, 0, ref.input));
+        nlParents.add(new AndNode.Entry(mirrorRef, new RefValue(new Integer[] {1}, 0, ref.input)));
 
         rv = new RefValue(new Integer[] {0}, 1, provider);
-        nlParents.put(ref, rv);
+        nlParents.add(new AndNode.Entry(ref, rv));
 
         return AndNode.createAndNode(provider.model, doc, nlParents, level + 1, patterDiscoveryConfig) ? rv : null;
     }
@@ -238,9 +238,9 @@ public class InputNode extends Node<InputNode, InputActivation> {
                         if (secondAct != null) {
                             //    if (!Conflicts.isConflicting(iAct, secondIAct)) {
                             AndActivation oAct = new AndActivation(doc.logicNodeActivationIdCounter++, doc, nln);
-                            for (Map.Entry<Refinement, RefValue> me : nln.parents.entrySet()) {
-                                boolean match = me.getKey().compareTo(ref) == 0;
-                                oAct.link(me.getKey(), me.getValue(), match ? secondAct : act, match ? act : secondAct);
+                            for (AndNode.Entry e : nln.parents) {
+                                boolean match = e.ref.compareTo(ref) == 0;
+                                oAct.link(e.ref, e.rv, match ? secondAct : act, match ? act : secondAct);
                             }
                             nln.addActivation(oAct);
                             // }

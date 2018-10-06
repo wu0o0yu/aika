@@ -45,27 +45,25 @@ import java.util.*;
 public class AndNode extends Node<AndNode, AndActivation> {
 
 
-    public SortedMap<Refinement, RefValue> parents;
+    public List<Entry> parents;
 
     public AndNode() {
-        parents = new TreeMap<>();
+        parents = new ArrayList<>();
     }
 
 
-    public AndNode(Model m, int level, SortedMap<Refinement, RefValue> parents) {
+    public AndNode(Model m, int level, List<Entry> parents) {
         super(m, level);
         this.parents = parents;
     }
 
 
     private void init() {
-        for(Map.Entry<Refinement, RefValue> me: parents.entrySet()) {
-            Refinement ref = me.getKey();
-            RefValue rv = me.getValue();
-            rv.child = provider;
-            Node pn = rv.parent.get();
+        for(Entry e: parents) {
+            e.rv.child = provider;
+            Node pn = e.rv.parent.get();
 
-            pn.addAndChild(ref, rv);
+            pn.addAndChild(e.ref, e.rv);
             pn.setModified();
         }
     }
@@ -81,8 +79,8 @@ public class AndNode extends Node<AndNode, AndActivation> {
         if(!isRemoved && !isRequired()) {
             remove();
 
-            for(RefValue p: parents.values()) {
-                p.parent.get().cleanup();
+            for(Entry e: parents) {
+                e.rv.parent.get().cleanup();
             }
         }
     }
@@ -136,11 +134,9 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
                                 nlAct.node.addActivation(nlAct);
 
-                                for(Map.Entry<Refinement, RefValue> mea: nlNode.parents.entrySet()) {
-                                    Refinement secondNRef = mea.getKey();
-                                    RefValue secondNRv = mea.getValue();
-                                    if(secondNRv.parent.get(act.doc) == secondAct.node && secondNRef.contains(ref, secondRv)) {
-                                        nlAct.link(secondNRef, secondNRv, refAct, secondAct);
+                                for(Entry secondNE: nlNode.parents) {
+                                    if(secondNE.rv.parent.get(act.doc) == secondAct.node && secondNE.ref.contains(ref, secondRv)) {
+                                        nlAct.link(secondNE.ref, secondNE.rv, refAct, secondAct);
                                         break;
                                     }
                                 }
@@ -225,16 +221,14 @@ public class AndNode extends Node<AndNode, AndActivation> {
             firstOffsets[i] = i;
         }
 
-        SortedMap<Refinement, RefValue> nextLevelParents = new TreeMap<>();
+        List<Entry> nextLevelParents = new ArrayList<>();
 
-        for(Map.Entry<Refinement, RefValue> me: parents.entrySet()) {
-            Refinement firstParentRef = me.getKey();
-            RefValue firstParentRV = me.getValue();
-            Node parentNode = firstParentRV.parent.get(doc);
+        for(Entry firstParent: parents) {
+            Node parentNode = firstParent.rv.parent.get(doc);
 
             Relation[] secondParentRelations = new Relation[firstRef.relations.length() - 1];
             for(int i = 0; i < firstRef.relations.length(); i++) {
-                Integer j = firstParentRV.reverseOffsets[i];
+                Integer j = firstParent.rv.reverseOffsets[i];
                 if(j != null) {
                     secondParentRelations[j] = firstRef.relations.get(i);
                 }
@@ -250,45 +244,45 @@ public class AndNode extends Node<AndNode, AndActivation> {
                 continue;
             }
 
-            Relation[] secondRelations = new Relation[firstParentRef.relations.length() + 1];
-            for(int i = 0; i < firstParentRef.relations.length(); i++) {
+            Relation[] secondRelations = new Relation[firstParent.ref.relations.length() + 1];
+            for(int i = 0; i < firstParent.ref.relations.length(); i++) {
                 int j = secondParentRV.offsets[i];
-                secondRelations[j] = firstParentRef.relations.get(i);
+                secondRelations[j] = firstParent.ref.relations.get(i);
             }
 
-            Relation rel = firstRef.relations.get(firstParentRV.refOffset);
+            Relation rel = firstRef.relations.get(firstParent.rv.refOffset);
             if(rel != null) {
                 secondRelations[secondParentRV.refOffset] = rel.invert();
             }
 
-            Refinement secondRef = new Refinement(new RelationsMap(secondRelations), firstParentRef.input);
+            Refinement secondRef = new Refinement(new RelationsMap(secondRelations), firstParent.ref.input);
 
             Integer[] secondOffsets = new Integer[secondParentRV.offsets.length + 1];
-            for(int i = 0; i < firstParentRV.reverseOffsets.length; i++) {
-                Integer j = firstParentRV.reverseOffsets[i];
+            for(int i = 0; i < firstParent.rv.reverseOffsets.length; i++) {
+                Integer j = firstParent.rv.reverseOffsets[i];
                 if(j != null) {
                     secondOffsets[secondParentRV.offsets[j]] = i;
                 }
             }
             secondOffsets[secondParentRV.refOffset] = firstRefOffset;
 
-            nextLevelParents.put(secondRef, new RefValue(secondOffsets, firstOffsets[firstParentRV.refOffset], secondParentRV.child));
+            nextLevelParents.add(new Entry(secondRef, new RefValue(secondOffsets, firstOffsets[firstParent.rv.refOffset], secondParentRV.child)));
         }
 
         firstRV = new RefValue(firstOffsets, firstRefOffset, provider);
-        nextLevelParents.put(firstRef, firstRV);
+        nextLevelParents.add(new Entry(firstRef, firstRV));
 
         return createAndNode(provider.model, doc, nextLevelParents, level + 1, patterDiscoverConfig) ? firstRV : null;
     }
 
 
 
-    static boolean createAndNode(Model m, Document doc, SortedMap<Refinement, RefValue> parents, int level, PatternDiscovery.Config patterDiscoverConfig) {
+    static boolean createAndNode(Model m, Document doc, List<Entry> parents, int level, PatternDiscovery.Config patterDiscoverConfig) {
         if (parents != null) {
             // Locking needs to take place in a predefined order.
             TreeSet<Provider<? extends Node>> parentsForLocking = new TreeSet();
-            for(RefValue rv: parents.values()) {
-                parentsForLocking.add(rv.parent);
+            for(Entry e: parents) {
+                parentsForLocking.add(e.rv.parent);
             }
 
             for (Provider<? extends Node> pn : parentsForLocking) {
@@ -318,14 +312,14 @@ public class AndNode extends Node<AndNode, AndActivation> {
     public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
         super.changeNumberOfNeuronRefs(threadId, v, d);
 
-        parents.values().forEach(rv -> rv.parent.get().changeNumberOfNeuronRefs(threadId, v, d));
+        parents.forEach(e -> e.rv.parent.get().changeNumberOfNeuronRefs(threadId, v, d));
     }
 
 
     @Override
     public void reprocessInputs(Document doc) {
-        for(RefValue pp: parents.values()) {
-            Node<?, NodeActivation<?>> pn = pp.parent.get();
+        for(Entry e: parents) {
+            Node<?, NodeActivation<?>> pn = e.rv.parent.get();
             for(NodeActivation act : pn.getActivations(doc)) {
                 act.repropagateV = markedCreated;
                 act.node.propagate(act);
@@ -338,10 +332,10 @@ public class AndNode extends Node<AndNode, AndActivation> {
     public void remove() {
         super.remove();
 
-        for(Map.Entry<Refinement, RefValue> me: parents.entrySet()) {
-            Node pn = me.getValue().parent.get();
+        for(Entry e: parents) {
+            Node pn = e.rv.parent.get();
             pn.lock.acquireWriteLock();
-            pn.removeAndChild(me.getKey());
+            pn.removeAndChild(e.ref);
             pn.setModified();
             pn.lock.releaseWriteLock();
         }
@@ -352,12 +346,12 @@ public class AndNode extends Node<AndNode, AndActivation> {
         StringBuilder sb = new StringBuilder();
         sb.append("AND[");
         boolean first = true;
-        for(Refinement ref: parents.keySet()) {
+        for(Entry e: parents) {
             if(!first) {
                 sb.append(",");
             }
             first = false;
-            sb.append(ref);
+            sb.append(e.ref);
         }
         sb.append("]");
         return sb.toString();
@@ -371,9 +365,9 @@ public class AndNode extends Node<AndNode, AndActivation> {
         super.write(out);
 
         out.writeInt(parents.size());
-        for(Map.Entry<Refinement, RefValue> me: parents.entrySet()) {
-            me.getKey().write(out);
-            me.getValue().write(out);
+        for(Entry e: parents) {
+            e.ref.write(out);
+            e.rv.write(out);
         }
     }
 
@@ -386,7 +380,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
         for(int i = 0; i < s; i++) {
             Refinement ref = Refinement.read(in, m);
             RefValue rv = RefValue.read(in, m);
-            parents.put(ref, rv);
+            parents.add(new Entry(ref, rv));
         }
     }
 
@@ -626,6 +620,17 @@ public class AndNode extends Node<AndNode, AndActivation> {
             refOffset = in.readInt();
             parent = m.lookupNodeProvider(in.readInt());
             child = m.lookupNodeProvider(in.readInt());
+        }
+    }
+
+
+    public static class Entry {
+        public Refinement ref;
+        public RefValue rv;
+
+        public Entry(Refinement ref, RefValue rv) {
+            this.ref = ref;
+            this.rv = rv;
         }
     }
 
