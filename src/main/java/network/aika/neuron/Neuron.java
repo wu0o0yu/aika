@@ -277,6 +277,11 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
+    public void setOutputText(String outputText) {
+        get().outputText = outputText;
+    }
+
+
 
     public Synapse getSynapseById(int synapseId) {
         return inputSynapsesById.get(synapseId);
