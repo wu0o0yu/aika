@@ -56,8 +56,8 @@ public class Range {
 
     public Range(Integer begin, Integer end) {
         this(
-                new FixedPosition(begin),
-                new FixedPosition(end)
+                new Position(begin),
+                new Position(end)
         );
     }
 

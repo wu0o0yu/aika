@@ -7,13 +7,23 @@ import java.util.Collection;
 
 public class Position {
 
-    Position MIN = new FixedPosition(Integer.MIN_VALUE);
-    Position MAX = new FixedPosition(Integer.MAX_VALUE);
+    public static final Position MIN = new Position(Integer.MIN_VALUE);
+    public static final Position MAX = new Position(Integer.MAX_VALUE);
+
 
     private Integer finalPosition;
 
 
-    static int compare(Position a, Position b) {
+    public Position() {
+    }
+
+
+    public Position(int pos) {
+        finalPosition = pos;
+    }
+
+
+    public static int compare(Position a, Position b) {
         return a.compare(b);
     }
 
@@ -61,7 +71,7 @@ public class Position {
 
 
 
-    enum Operator {
+    public enum Operator {
         EQUALS(0),
         LESS_THAN_EQUAL(1),
         GREATER_THAN_EQUAL(2),
