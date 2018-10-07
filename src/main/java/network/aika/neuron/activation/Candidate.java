@@ -1,6 +1,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.activation.Activation.Link;
+import network.aika.neuron.range.Position;
 
 public class Candidate  implements Comparable<Candidate> {
     public SearchNode currentSearchNode;
@@ -72,9 +73,9 @@ public class Candidate  implements Comparable<Candidate> {
         if(!isConflicting() && c.isConflicting()) return -1;
         if(isConflicting() && !c.isConflicting()) return 1;
 
-        int r = Integer.compare(activation.range.begin, c.activation.range.begin);
+        int r = Position.compare(activation.range.begin, c.activation.range.begin);
         if (r != 0) return r;
-        r = Integer.compare(activation.range.end, c.activation.range.end);
+        r = Position.compare(activation.range.end, c.activation.range.end);
         if (r != 0) return r;
 
         r = Integer.compare(sequence, c.sequence);

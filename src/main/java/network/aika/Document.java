@@ -24,7 +24,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.Candidate;
-import network.aika.neuron.activation.Range;
+import network.aika.neuron.range.Position;
+import network.aika.neuron.range.Range;
 import network.aika.neuron.activation.SearchNode;
 import network.aika.lattice.Node.ThreadState;
 import network.aika.neuron.activation.*;
@@ -88,7 +89,7 @@ public class Document implements Comparable<Document> {
     public SupervisedTraining supervisedTraining = new SupervisedTraining(this);
 
     private TreeMap<ActKey, Activation> activationsByRangeBegin = new TreeMap<>((ak1, ak2) -> {
-        int r = Integer.compare(ak1.range.begin, ak2.range.begin);
+        int r = Position.compare(ak1.range.begin, ak2.range.begin);
         if (r != 0) return r;
         r = ak1.node.compareTo(ak2.node);
         if (r != 0) return r;
@@ -96,7 +97,7 @@ public class Document implements Comparable<Document> {
     });
 
     private TreeMap<ActKey, Activation> activationsByRangeEnd = new TreeMap<>((ak1, ak2) -> {
-        int r = Integer.compare(ak1.range.end, ak2.range.end);
+        int r = Position.compare(ak1.range.end, ak2.range.end);
         if (r != 0) return r;
         r = ak1.node.compareTo(ak2.node);
         if (r != 0) return r;
@@ -178,8 +179,8 @@ public class Document implements Comparable<Document> {
 
     public String getText(Range r) {
         return content.substring(
-                Math.max(0, Math.min(r.begin, length())),
-                Math.max(0, Math.min(r.end, length()))
+                Math.max(0, Math.min(r.begin.getFinalPosition(), length())),
+                Math.max(0, Math.min(r.end.getFinalPosition(), length()))
         );
     }
 
@@ -433,12 +434,14 @@ public class Document implements Comparable<Document> {
 
     public String generateOutputText() {
         int oldLength = length();
+/*
+        TODO:
         for(Activation act: activationsByRangeBegin.values()) {
             if(act.getINeuron().outputText != null && act.isFinalActivation()) {
                 content.replace(act.range.begin, act.range.end, act.getINeuron().outputText);
             }
         }
-
+*/
         return content.substring(oldLength, length());
     }
 

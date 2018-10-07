@@ -24,7 +24,7 @@ import network.aika.SuspensionHook;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.activation.Range.Relation;
+import network.aika.neuron.range.Range.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -20,7 +20,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Range;
+import network.aika.neuron.range.Range;
 import network.aika.neuron.activation.SearchNode;
 import network.aika.lattice.InputNode;
 import network.aika.neuron.relation.Relation;
@@ -283,8 +283,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
      * @param input
      */
     public Activation addInput(Document doc, Activation.Builder input) {
-        assert input.range.begin <= input.range.end;
-
         Activation act = getThreadState(doc.threadId, true).getActivationByRange(input.range);
         if(act == null) {
             act = new Activation(doc.activationIdCounter++, doc, node.get(doc));

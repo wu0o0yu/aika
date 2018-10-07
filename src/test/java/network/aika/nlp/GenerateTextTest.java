@@ -21,16 +21,15 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Range;
+import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.activation.Range.Relation;
-import network.aika.neuron.activation.Range.Output;
+import network.aika.neuron.range.Range.Relation;
+import network.aika.neuron.range.Range.Output;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.Builder.OUTPUT;
-import static network.aika.neuron.activation.Range.Mapping.NONE;
+import static network.aika.neuron.range.Range.Mapping.NONE;
 
 
 
@@ -185,7 +184,6 @@ public class GenerateTextTest {
     }
 
 
-    @Ignore
     @Test
     public void intermediateOutputNeuron() {
 

@@ -25,7 +25,7 @@ import network.aika.neuron.Synapse;
 
 import java.util.*;
 
-import static network.aika.neuron.activation.Range.Mapping.NONE;
+import static network.aika.neuron.range.Range.Mapping.NONE;
 
 /**
  * Converts the synapse weights of a neuron into a boolean logic representation of this neuron.

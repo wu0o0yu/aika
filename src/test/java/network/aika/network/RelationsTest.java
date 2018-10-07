@@ -7,7 +7,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Range;
+import network.aika.neuron.range.Range;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ import java.util.List;
 
 import static network.aika.neuron.relation.InstanceRelation.Type.COMMON_ANCESTOR;
 import static network.aika.neuron.relation.InstanceRelation.Type.CONTAINED_IN;
-import static network.aika.neuron.activation.Range.Operator.*;
+import static network.aika.neuron.range.Range.Operator.*;
 
 
 public class RelationsTest {

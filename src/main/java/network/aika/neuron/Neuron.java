@@ -19,7 +19,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Range;
+import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 
 import java.util.*;

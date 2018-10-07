@@ -3,7 +3,7 @@ package network.aika.training;
 import network.aika.DistanceFunction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Range;
+import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 
 import java.util.Map;

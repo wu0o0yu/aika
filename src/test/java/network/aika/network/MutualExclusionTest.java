@@ -22,7 +22,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Range;
+import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;

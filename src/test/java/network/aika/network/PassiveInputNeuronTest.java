@@ -6,7 +6,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Range;
+import network.aika.neuron.range.Range;
 import org.junit.Assert;
 import org.junit.Test;
 

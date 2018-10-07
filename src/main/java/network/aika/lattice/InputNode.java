@@ -22,7 +22,7 @@ import network.aika.Model;
 import network.aika.Provider;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Range;
+import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.InstanceRelation;
 import network.aika.neuron.relation.RangeRelation;
 import network.aika.neuron.relation.Relation;
@@ -39,7 +39,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
-import static network.aika.neuron.activation.Range.Relation.*;
+import static network.aika.neuron.range.Range.Relation.*;
 
 
 /**

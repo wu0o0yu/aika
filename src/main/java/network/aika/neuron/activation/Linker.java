@@ -19,6 +19,7 @@ package network.aika.neuron.activation;
 import network.aika.Document;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.range.Position;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation.Link;
@@ -158,10 +159,10 @@ public class Linker {
         }
 
         if(s.rangeInput == Synapse.Builder.OUTPUT) {
-            Integer outputBegin = s.rangeOutput.begin.map(iAct.range);
-            Integer outputEnd = s.rangeOutput.end.map(iAct.range);
+            Position outputBegin = s.rangeOutput.begin.map(iAct.range);
+            Position outputEnd = s.rangeOutput.end.map(iAct.range);
 
-            if((outputBegin != null && outputBegin.intValue() != oAct.range.begin.intValue()) || (outputEnd != null && outputEnd.intValue() != oAct.range.end.intValue())) {
+            if((outputBegin != null && !outputBegin.compare(Position.Operator.EQUALS, oAct.range.begin)) || (outputEnd != null && !outputEnd.compare(Position.Operator.EQUALS, oAct.range.end))) {
                 return;
             }
         } else {

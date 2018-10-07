@@ -11,8 +11,7 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Range;
-import network.aika.neuron.activation.SearchNode;
+import network.aika.neuron.range.Range;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,8 +21,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static network.aika.neuron.Synapse.Builder.OUTPUT;
-import static network.aika.neuron.activation.Range.Relation.BEGIN_TO_END_EQUALS;
-import static network.aika.neuron.activation.Range.Relation.OVERLAPS;
+import static network.aika.neuron.range.Range.Relation.BEGIN_TO_END_EQUALS;
+import static network.aika.neuron.range.Range.Relation.OVERLAPS;
 
 public class ContextFreeGrammarTest {
 

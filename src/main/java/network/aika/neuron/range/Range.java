@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.range;
 
 import network.aika.Model;
 import network.aika.Utils;
@@ -27,7 +27,7 @@ import java.util.Comparator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import static network.aika.neuron.activation.Range.Mapping.BEGIN;
+import static network.aika.neuron.range.Position.Operator;
 
 
 /**
@@ -38,40 +38,43 @@ import static network.aika.neuron.activation.Range.Mapping.BEGIN;
 public class Range {
 
     public static Comparator<Range> BEGIN_COMP = (r1, r2) -> {
-        int r = Integer.compare(r1.begin, r2.begin);
+        int r = Position.compare(r1.begin, r2.begin);
         if(r != 0) return r;
-        return Integer.compare(r1.end, r2.end);
+        return Position.compare(r1.end, r2.end);
     };
 
     public static Comparator<Range> END_COMP = (r1, r2) -> {
-        int r = Integer.compare(r1.end, r2.end);
+        int r = Position.compare(r1.end, r2.end);
         if(r != 0) return r;
-        return Integer.compare(r1.begin, r2.begin);
+        return Position.compare(r1.begin, r2.begin);
     };
 
 
-    public final Integer begin;
-    public final Integer end;
+    public final Position begin;
+    public final Position end;
 
 
     public Range(Integer begin, Integer end) {
+        this(
+                new FixedPosition(begin),
+                new FixedPosition(end)
+        );
+    }
+
+    public Range(Position begin, Position end) {
+        assert begin != null && end != null;
+
         this.begin = begin;
         this.end = end;
     }
 
 
-    @Deprecated
-    public static boolean overlaps(Range ra, Range rb) {
-        return !(Utils.compareInteger(ra.end, rb.begin) <= 0 || Utils.compareInteger(rb.end, ra.begin) <= 0);
-    }
-
-
-    public int getBegin(boolean invert) {
+    public Position getBegin(boolean invert) {
         return invert ? end : begin;
     }
 
 
-    public int getEnd(boolean invert) {
+    public Position getEnd(boolean invert) {
         return invert ? begin : end;
     }
 
@@ -86,20 +89,15 @@ public class Range {
     }
 
 
-    public int length() {
+    public Integer length() {
         if(begin == null || end == null) return Integer.MAX_VALUE;
 
-        return end - begin;
-    }
-
-
-    public boolean contains(Range r) {
-        return begin <= r.begin && r.end <= end ;
+        return begin.getDistance(end);
     }
 
 
     public boolean equals(Range r) {
-        return begin.intValue() == r.begin.intValue() && end.intValue() == r.end.intValue();
+        return begin.compare(Operator.EQUALS, r.begin) && end.compare(Operator.EQUALS, r.end);
     }
 
 
@@ -117,17 +115,17 @@ public class Range {
 
 
     public static int compare(Range ra, Range rb, boolean inv) {
-        int a = Integer.compare(ra.getBegin(inv), rb.getBegin(inv));
+        int a = Position.compare(ra.getBegin(inv), rb.getBegin(inv));
         if(a != 0) return a;
-        int b = Integer.compare(ra.getEnd(inv), rb.getEnd(inv));
+        int b = Position.compare(ra.getEnd(inv), rb.getEnd(inv));
         return b;
     }
 
 
     public static int compare(Range ra, Range rb) {
-        int a = Integer.compare(ra.begin, rb.begin);
+        int a = Position.compare(ra.begin, rb.begin);
         if(a != 0) return a;
-        int b = Integer.compare(ra.end, rb.end);
+        int b = Position.compare(ra.end, rb.end);
         return b;
     }
 
@@ -182,10 +180,10 @@ public class Range {
 
 
         public boolean compare(Range ra, Range rb) {
-            return beginToBegin.compare(ra.begin, rb.begin) &&
-                    beginToEnd.compare(ra.begin, rb.end) &&
-                    endToEnd.compare(ra.end, rb.end) &&
-                    endToBegin.compare(ra.end, rb.begin);
+            return ra.begin.compare(beginToBegin, rb.begin) &&
+                    ra.begin.compare(beginToEnd, rb.end) &&
+                    ra.end.compare(endToEnd, rb.end) &&
+                    ra.end.compare(endToBegin, rb.begin);
         }
 
 
@@ -236,85 +234,6 @@ public class Range {
             beginToEnd = Operator.getById(in.readByte());
             endToEnd = Operator.getById(in.readByte());
             endToBegin = Operator.getById(in.readByte());
-        }
-    }
-
-
-    public enum Operator {
-        EQUALS(0),
-        LESS_THAN_EQUAL(1),
-        GREATER_THAN_EQUAL(2),
-        LESS_THAN(3),
-        GREATER_THAN(4),
-        NONE(5);
-
-        Operator(int id) {
-            this.id = (short) id;
-        }
-
-        int id;
-
-        public static Operator getById(int id) {
-            for(Operator o: Operator.values()) {
-                if(o.id == id) return o;
-            }
-            return null;
-        }
-
-
-        public boolean isGreaterThanOrGreaterThanEqual() {
-            return this == GREATER_THAN || this == GREATER_THAN_EQUAL;
-        }
-
-
-        public boolean isLessThanOrLessThanEqual() {
-            return this == LESS_THAN || this == LESS_THAN_EQUAL;
-        }
-
-
-        public boolean includesEqual() {
-            return this == EQUALS || this == GREATER_THAN_EQUAL || this == LESS_THAN_EQUAL;
-        }
-
-
-        public int getId() {
-            return id;
-        }
-
-
-        public boolean compare(int a, int b) {
-            switch(this) {
-                case EQUALS:
-                    return a == b;
-                case LESS_THAN_EQUAL:
-                    return a <= b;
-                case GREATER_THAN_EQUAL:
-                    return a >= b;
-                case LESS_THAN:
-                    return a < b;
-                case GREATER_THAN:
-                    return a > b;
-                default:
-                    return true;
-            }
-        }
-
-
-        public Operator invert() {
-            switch(this) {
-                case EQUALS:
-                    return EQUALS;
-                case LESS_THAN_EQUAL:
-                    return GREATER_THAN_EQUAL;
-                case GREATER_THAN_EQUAL:
-                    return LESS_THAN_EQUAL;
-                case LESS_THAN:
-                    return GREATER_THAN;
-                case GREATER_THAN:
-                    return LESS_THAN;
-                default:
-                    return NONE;
-            }
         }
     }
 
@@ -435,7 +354,7 @@ public class Range {
         }
 
 
-        public Integer map(Range r) {
+        public Position map(Range r) {
             switch(this) {
                 case BEGIN:
                     return r.begin;

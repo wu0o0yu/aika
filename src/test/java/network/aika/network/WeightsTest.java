@@ -22,12 +22,10 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.activation.Range;
 import org.junit.Test;
 
-import static network.aika.neuron.activation.Range.Relation.CONTAINED_IN;
-import static network.aika.neuron.activation.Range.Relation.END_EQUALS;
-import static network.aika.neuron.activation.Range.Relation.EQUALS;
+import static network.aika.neuron.range.Range.Relation.CONTAINED_IN;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
 
 /**
  *

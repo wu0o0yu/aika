@@ -24,13 +24,12 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.activation.Range;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
 
-import static network.aika.neuron.activation.Range.Relation.*;
+import static network.aika.neuron.range.Range.Relation.*;
 
 /**
  *

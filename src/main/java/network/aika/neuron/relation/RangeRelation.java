@@ -2,10 +2,10 @@ package network.aika.neuron.relation;
 
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.lattice.Node;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Range;
+import network.aika.neuron.range.Position;
+import network.aika.neuron.range.Range;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -14,7 +14,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.Range.Operator.EQUALS;
+import static network.aika.neuron.range.Position.Operator.EQUALS;
+import static network.aika.neuron.range.Position.Operator.GREATER_THAN_EQUAL;
+import static network.aika.neuron.range.Position.Operator.LESS_THAN_EQUAL;
 
 
 public class RangeRelation extends Relation {
@@ -69,10 +71,10 @@ public class RangeRelation extends Relation {
 
     @Override
     public boolean isExact() {
-        return relation.beginToBegin == Range.Operator.EQUALS ||
-                relation.beginToEnd == Range.Operator.EQUALS ||
-                relation.endToBegin == Range.Operator.EQUALS ||
-                relation.endToEnd == Range.Operator.EQUALS;
+        return relation.beginToBegin == EQUALS ||
+                relation.beginToEnd == EQUALS ||
+                relation.endToBegin == EQUALS ||
+                relation.endToEnd == EQUALS;
     }
 
 
@@ -89,13 +91,13 @@ public class RangeRelation extends Relation {
         Collection<Activation> results;
         if(isExact()) {
             results = getActivationsByRangeEquals(th, r, relation);
-        } else if (((relation.beginToBegin.isGreaterThanOrGreaterThanEqual() || relation.beginToEnd.isGreaterThanOrGreaterThanEqual())) && r.begin <= r.end) {
+        } else if (((relation.beginToBegin.isGreaterThanOrGreaterThanEqual() || relation.beginToEnd.isGreaterThanOrGreaterThanEqual())) && r.begin.compare(LESS_THAN_EQUAL, r.end)) {
             results = getActivationsByRangeBeginGreaterThan(th, r, relation);
-        } else if (((relation.endToEnd.isGreaterThanOrGreaterThanEqual() || relation.endToBegin.isGreaterThanOrGreaterThanEqual())) && r.begin >= r.end) {
+        } else if (((relation.endToEnd.isGreaterThanOrGreaterThanEqual() || relation.endToBegin.isGreaterThanOrGreaterThanEqual())) && r.begin.compare(GREATER_THAN_EQUAL, r.end)) {
             results = getActivationsByRangeEndGreaterThan(th, r, relation);
-        } else if ((relation.beginToBegin.isLessThanOrLessThanEqual() || relation.beginToEnd.isLessThanOrLessThanEqual()) && r.begin <= r.end) {
+        } else if ((relation.beginToBegin.isLessThanOrLessThanEqual() || relation.beginToEnd.isLessThanOrLessThanEqual()) && r.begin.compare(LESS_THAN_EQUAL, r.end)) {
             results = getActivationsByRangeBeginLessThanEqual(th, r, relation);
-        } else if ((relation.endToEnd.isLessThanOrLessThanEqual() || relation.endToBegin.isLessThanOrLessThanEqual()) && r.begin >= r.end) {
+        } else if ((relation.endToEnd.isLessThanOrLessThanEqual() || relation.endToBegin.isLessThanOrLessThanEqual()) && r.begin.compare(GREATER_THAN_EQUAL, r.end)) {
             results = getActivationsByRangeEndLessThanEqual(th, r, relation);
         } else {
             results = th.getActivations();
@@ -106,7 +108,7 @@ public class RangeRelation extends Relation {
 
 
     private static Collection<Activation> getActivationsByRangeBeginGreaterThan(INeuron.ThreadState th, Range r, Range.Relation rr) {
-        int fromKey;
+        Position fromKey;
         boolean fromInclusive;
 
         if(rr.beginToBegin.isGreaterThanOrGreaterThanEqual()) {
@@ -117,7 +119,7 @@ public class RangeRelation extends Relation {
             fromInclusive = rr.beginToEnd.includesEqual();
         }
 
-        int toKey;
+        Position toKey;
         boolean toInclusive;
         if(rr.endToEnd.isLessThanOrLessThanEqual()) {
             toKey = r.end;
@@ -126,19 +128,19 @@ public class RangeRelation extends Relation {
             toKey = r.begin;
             toInclusive = rr.endToBegin.includesEqual();
         } else {
-            toKey = Integer.MAX_VALUE;
+            toKey = Position.MAX;
             toInclusive = true;
         }
 
         return th.getActivationsByRangeBegin(
-                new Range(fromKey, Integer.MIN_VALUE), fromInclusive,
-                new Range(toKey, Integer.MAX_VALUE), toInclusive
+                new Range(fromKey, Position.MIN), fromInclusive,
+                new Range(toKey, Position.MAX), toInclusive
         );
     }
 
 
     private static Collection<Activation> getActivationsByRangeEndGreaterThan(INeuron.ThreadState th, Range r, Range.Relation rr) {
-        int fromKey;
+        Position fromKey;
         boolean fromInclusive;
 
         if(rr.endToEnd.isGreaterThanOrGreaterThanEqual()) {
@@ -149,7 +151,7 @@ public class RangeRelation extends Relation {
             fromInclusive = rr.endToBegin.includesEqual();
         }
 
-        int toKey;
+        Position toKey;
         boolean toInclusive;
         if(rr.beginToBegin.isLessThanOrLessThanEqual()) {
             toKey = r.begin;
@@ -158,19 +160,19 @@ public class RangeRelation extends Relation {
             toKey = r.end;
             toInclusive = rr.beginToEnd.includesEqual();
         } else {
-            toKey = Integer.MAX_VALUE;
+            toKey = Position.MAX;
             toInclusive = true;
         }
 
         return th.getActivationsByRangeEnd(
-                new Range(Integer.MIN_VALUE, fromKey), fromInclusive,
-                new Range(Integer.MAX_VALUE, toKey), toInclusive
+                new Range(Position.MIN, fromKey), fromInclusive,
+                new Range(Position.MAX, toKey), toInclusive
         );
     }
 
 
     private static Collection<Activation> getActivationsByRangeBeginLessThanEqual(INeuron.ThreadState th, Range r, Range.Relation rr) {
-        int fromKey;
+        Position fromKey;
         boolean fromInclusive;
         if(rr.endToEnd.isGreaterThanOrGreaterThanEqual()) {
             fromKey = r.end - th.maxLength;
@@ -179,11 +181,11 @@ public class RangeRelation extends Relation {
             fromKey = r.begin - th.maxLength;
             fromInclusive = rr.endToBegin.includesEqual();
         } else {
-            fromKey = Integer.MIN_VALUE;
+            fromKey = Position.MIN;
             fromInclusive = true;
         }
 
-        int toKey;
+        Position toKey;
         boolean toInclusive;
 
         if(rr.beginToBegin.isLessThanOrLessThanEqual()) {
@@ -197,14 +199,14 @@ public class RangeRelation extends Relation {
         if(fromKey > toKey) return Collections.EMPTY_LIST;
 
         return th.getActivationsByRangeBegin(
-                new Range(fromKey, Integer.MIN_VALUE), fromInclusive,
-                new Range(toKey, Integer.MAX_VALUE), toInclusive
+                new Range(fromKey, Position.MIN), fromInclusive,
+                new Range(toKey, Position.MAX), toInclusive
         );
     }
 
 
     private static Collection<Activation> getActivationsByRangeEndLessThanEqual(INeuron.ThreadState th, Range r, Range.Relation rr) {
-        int fromKey;
+        Position fromKey;
         boolean fromInclusive;
         if(rr.beginToEnd.isGreaterThanOrGreaterThanEqual()) {
             fromKey = r.end - th.maxLength;
@@ -213,11 +215,11 @@ public class RangeRelation extends Relation {
             fromKey = r.begin - th.maxLength;
             fromInclusive = rr.beginToBegin.includesEqual();
         } else {
-            fromKey = Integer.MIN_VALUE;
+            fromKey = Position.MIN;
             fromInclusive = true;
         }
 
-        int toKey;
+        Position toKey;
         boolean toInclusive;
 
         if(rr.endToBegin.isLessThanOrLessThanEqual()) {
@@ -231,8 +233,8 @@ public class RangeRelation extends Relation {
         if(fromKey > toKey) return Collections.EMPTY_LIST;
 
         return th.getActivationsByRangeEnd(
-                new Range(Integer.MIN_VALUE, fromKey), fromInclusive,
-                new Range(Integer.MAX_VALUE, toKey), toInclusive
+                new Range(Position.MIN, fromKey), fromInclusive,
+                new Range(Position.MAX, toKey), toInclusive
         );
     }
 
@@ -240,17 +242,17 @@ public class RangeRelation extends Relation {
 
     public static Collection<Activation> getActivationsByRangeEquals(INeuron.ThreadState th, Range r, Range.Relation rr) {
         if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS) {
-            int key = rr.beginToBegin == EQUALS ? r.begin : r.end;
+            Position key = rr.beginToBegin == EQUALS ? r.begin : r.end;
             return th.getActivationsByRangeBegin(
-                    new Range(key, Integer.MIN_VALUE), true,
-                    new Range(key, Integer.MAX_VALUE), true
+                    new Range(key, Position.MIN), true,
+                    new Range(key, Position.MAX), true
             );
         } else if(rr.endToEnd == EQUALS || rr.endToBegin == EQUALS) {
-            int key = rr.endToEnd == EQUALS ? r.end : r.begin;
+            Position key = rr.endToEnd == EQUALS ? r.end : r.begin;
 
             return th.getActivationsByRangeEnd(
-                    new Range(Integer.MIN_VALUE, key), true,
-                    new Range(Integer.MAX_VALUE, key), true
+                    new Range(Position.MIN, key), true,
+                    new Range(Position.MAX, key), true
             );
         }
         throw new RuntimeException("Invalid Range Relation");
@@ -259,16 +261,16 @@ public class RangeRelation extends Relation {
 
     public static Collection<Activation> getActivationsByRangeEquals(Document doc, Range r, Range.Relation rr) {
         if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS) {
-            int key = rr.beginToBegin == EQUALS ? r.begin : r.end;
+            Position key = rr.beginToBegin == EQUALS ? r.begin : r.end;
             return doc.getActivationsByRangeBegin(
-                    new Range(key, Integer.MIN_VALUE), true,
-                    new Range(key, Integer.MAX_VALUE), true
+                    new Range(key, Position.MIN), true,
+                    new Range(key, Position.MAX), true
             );
         } else if(rr.endToEnd == EQUALS || rr.endToBegin == EQUALS) {
-            int key = rr.endToEnd == EQUALS ? r.end : r.begin;
+            Position key = rr.endToEnd == EQUALS ? r.end : r.begin;
             return doc.getActivationByRangeEnd(
-                    new Range(Integer.MIN_VALUE, key), true,
-                    new Range(Integer.MAX_VALUE, key), true
+                    new Range(Position.MIN, key), true,
+                    new Range(Position.MAX, key), true
             );
         }
         throw new RuntimeException("Invalid Range Relation");

@@ -19,9 +19,9 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Document;
-import network.aika.neuron.activation.Range;
-import network.aika.neuron.activation.Range.Output;
-import network.aika.neuron.activation.Range.Mapping;
+import network.aika.neuron.range.Range;
+import network.aika.neuron.range.Range.Output;
+import network.aika.neuron.range.Range.Mapping;
 import network.aika.neuron.relation.InstanceRelation;
 import network.aika.neuron.relation.RangeRelation;
 import network.aika.neuron.relation.Relation;

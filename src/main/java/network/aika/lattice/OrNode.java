@@ -21,9 +21,10 @@ import network.aika.*;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.range.Position;
 import network.aika.training.PatternDiscovery;
 import network.aika.Document;
-import network.aika.neuron.activation.Range;
+import network.aika.neuron.range.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,8 +66,8 @@ public class OrNode extends Node<OrNode, Activation> {
     public void addInputActivation(OrEntry oe, NodeActivation inputAct) {
         Document doc = inputAct.doc;
 
-        Integer begin = null;
-        Integer end = null;
+        Position begin = null;
+        Position end = null;
 
         for(int i = 0; i < oe.synapseIds.length; i++) {
             int synapseId = oe.synapseIds[i];
@@ -76,25 +77,15 @@ public class OrNode extends Node<OrNode, Activation> {
             if(s.rangeOutput.begin != Range.Mapping.NONE || s.rangeOutput.end != Range.Mapping.NONE) {
                 Activation iAct = inputAct.getInputActivation(i);
 
-                Integer b = s.rangeOutput.begin.map(iAct.range);
+                Position b = s.rangeOutput.begin.map(iAct.range);
                 if(b != null) begin = b;
 
-                Integer e = s.rangeOutput.end.map(iAct.range);
+                Position e = s.rangeOutput.end.map(iAct.range);
                 if(e != null) end = e;
             }
         }
 
         Range r = new Range(begin, end);
-
-        if(neuron.get(doc).outputText != null) {
-            begin = r.begin != null ? r.begin : doc.length();
-            end = r.end != null ? r.end : begin + neuron.get(doc).outputText.length();
-            r = new Range(begin, end);
-        }
-
-        if(r.begin == null || r.end == null) {
-            return;
-        }
 
         Activation act = lookupActivation(doc, r, oe, inputAct);
 

@@ -22,15 +22,15 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Range.Relation;
-import network.aika.neuron.activation.Range;
+import network.aika.neuron.range.Range.Relation;
+import network.aika.neuron.range.Range;
 import network.aika.lattice.OrNode;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static network.aika.neuron.activation.Range.Operator.GREATER_THAN;
-import static network.aika.neuron.activation.Range.Relation.CONTAINS;
-import static network.aika.neuron.activation.Range.Relation.NONE;
+import static network.aika.neuron.range.Range.Operator.GREATER_THAN;
+import static network.aika.neuron.range.Range.Relation.CONTAINS;
+import static network.aika.neuron.range.Range.Relation.NONE;
 
 /**
  *

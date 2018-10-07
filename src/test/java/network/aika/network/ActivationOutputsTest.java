@@ -24,14 +24,14 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.Link;
-import network.aika.neuron.activation.Range;
+import network.aika.neuron.range.Range;
 import network.aika.lattice.Node;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.Range.Relation.EQUALS;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
 
 
 /**
