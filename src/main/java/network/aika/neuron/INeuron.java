@@ -164,7 +164,9 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         public Collection<Activation> getActivationsByRangeBeginLimited(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
             if(fromKey.getFinalPosition() != null && toKey.getFinalPosition() != null) {
-                fromKey = new Position(fromKey.getFinalPosition() - maxLength);
+                if(fromKey != Position.MIN) {
+                    fromKey = new Position(fromKey.getFinalPosition() - maxLength);
+                }
 
                 if (fromKey.compare(Position.Operator.GREATER_THAN, toKey)) return Collections.EMPTY_LIST;
 
@@ -176,11 +178,12 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         public Collection<Activation> getActivationsByRangeEndLimited(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
             if(fromKey.getFinalPosition() != null && toKey.getFinalPosition() != null) {
-            fromKey = new Position(fromKey.getFinalPosition() - maxLength);
+                if(fromKey != Position.MIN) {
+                    fromKey = new Position(fromKey.getFinalPosition() - maxLength);
+                }
+                if (fromKey.compare(Position.Operator.GREATER_THAN, toKey)) return Collections.EMPTY_LIST;
 
-            if (fromKey.compare(Position.Operator.GREATER_THAN, toKey)) return Collections.EMPTY_LIST;
-
-            return getActivationsByRangeEnd(fromKey, fromInclusive, toKey, toInclusive);
+                return getActivationsByRangeEnd(fromKey, fromInclusive, toKey, toInclusive);
             } else {
                 return Collections.EMPTY_LIST; // TODO:
             }
