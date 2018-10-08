@@ -17,7 +17,7 @@ import java.util.List;
 
 import static network.aika.neuron.relation.InstanceRelation.Type.COMMON_ANCESTOR;
 import static network.aika.neuron.relation.InstanceRelation.Type.CONTAINED_IN;
-import static network.aika.neuron.range.Range.Operator.*;
+import static network.aika.neuron.range.Position.Operator.*;
 
 
 public class RelationsTest {
@@ -57,7 +57,7 @@ public class RelationsTest {
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);
 
-        Activation outC1 = outC.getActivation(doc, new Range(0, 1), false);
+        Activation outC1 = outC.getActivation(doc, new Range(doc, 0, 1), false);
 
         System.out.println(doc.activationsToString(false, false, true));
 
@@ -109,7 +109,7 @@ public class RelationsTest {
 
         inA.addInput(doc, 0, 1);
 
-        Activation outC1 = outC.getActivation(doc, new Range(0, 1), false);
+        Activation outC1 = outC.getActivation(doc, new Range(doc, 0, 1), false);
 
         System.out.println(doc.activationsToString(false, false, true));
 
@@ -159,7 +159,7 @@ public class RelationsTest {
         inB.addInput(doc, 1, 2);
         inC.addInput(doc, 2, 3);
 
-        Activation outD1 = outD.getActivation(doc, new Range(0, 3), false);
+        Activation outD1 = outD.getActivation(doc, new Range(doc, 0, 3), false);
 
         Assert.assertNotNull(outD1);
     }
@@ -216,7 +216,7 @@ public class RelationsTest {
 
             Neuron inputNeuron = chars.get(c);
             if (inputNeuron != null) {
-                inputNeuron.addInput(doc, new Range(i, i + 1));
+                inputNeuron.addInput(doc, i, i + 1);
             }
         }
 

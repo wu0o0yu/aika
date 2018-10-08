@@ -133,8 +133,8 @@ public class RangeRelation extends Relation {
         }
 
         return th.getActivationsByRangeBegin(
-                new Range(fromKey, Position.MIN), fromInclusive,
-                new Range(toKey, Position.MAX), toInclusive
+                fromKey, fromInclusive,
+                toKey, toInclusive
         );
     }
 
@@ -165,8 +165,8 @@ public class RangeRelation extends Relation {
         }
 
         return th.getActivationsByRangeEnd(
-                new Range(Position.MIN, fromKey), fromInclusive,
-                new Range(Position.MAX, toKey), toInclusive
+                fromKey, fromInclusive,
+                toKey, toInclusive
         );
     }
 
@@ -175,10 +175,10 @@ public class RangeRelation extends Relation {
         Position fromKey;
         boolean fromInclusive;
         if(rr.endToEnd.isGreaterThanOrGreaterThanEqual()) {
-            fromKey = r.end - th.maxLength;
+            fromKey = r.end;
             fromInclusive = rr.endToEnd.includesEqual();
         } else if(rr.endToBegin.isGreaterThanOrGreaterThanEqual()) {
-            fromKey = r.begin - th.maxLength;
+            fromKey = r.begin;
             fromInclusive = rr.endToBegin.includesEqual();
         } else {
             fromKey = Position.MIN;
@@ -196,11 +196,9 @@ public class RangeRelation extends Relation {
             toInclusive = rr.beginToEnd.includesEqual();
         }
 
-        if(fromKey > toKey) return Collections.EMPTY_LIST;
-
-        return th.getActivationsByRangeBegin(
-                new Range(fromKey, Position.MIN), fromInclusive,
-                new Range(toKey, Position.MAX), toInclusive
+        return th.getActivationsByRangeBeginLimited(
+                fromKey, fromInclusive,
+                toKey, toInclusive
         );
     }
 
@@ -209,10 +207,10 @@ public class RangeRelation extends Relation {
         Position fromKey;
         boolean fromInclusive;
         if(rr.beginToEnd.isGreaterThanOrGreaterThanEqual()) {
-            fromKey = r.end - th.maxLength;
+            fromKey = r.end;
             fromInclusive = rr.beginToEnd.includesEqual();
         } else if(rr.beginToBegin.isGreaterThanOrGreaterThanEqual()) {
-            fromKey = r.begin - th.maxLength;
+            fromKey = r.begin;
             fromInclusive = rr.beginToBegin.includesEqual();
         } else {
             fromKey = Position.MIN;
@@ -230,11 +228,9 @@ public class RangeRelation extends Relation {
             toInclusive = rr.endToEnd.includesEqual();
         }
 
-        if(fromKey > toKey) return Collections.EMPTY_LIST;
-
-        return th.getActivationsByRangeEnd(
-                new Range(Position.MIN, fromKey), fromInclusive,
-                new Range(Position.MAX, toKey), toInclusive
+        return th.getActivationsByRangeEndLimited(
+                fromKey, fromInclusive,
+                toKey, toInclusive
         );
     }
 
@@ -244,15 +240,15 @@ public class RangeRelation extends Relation {
         if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS) {
             Position key = rr.beginToBegin == EQUALS ? r.begin : r.end;
             return th.getActivationsByRangeBegin(
-                    new Range(key, Position.MIN), true,
-                    new Range(key, Position.MAX), true
+                    key, true,
+                    key, true
             );
         } else if(rr.endToEnd == EQUALS || rr.endToBegin == EQUALS) {
             Position key = rr.endToEnd == EQUALS ? r.end : r.begin;
 
             return th.getActivationsByRangeEnd(
-                    new Range(Position.MIN, key), true,
-                    new Range(Position.MAX, key), true
+                    key, true,
+                    key, true
             );
         }
         throw new RuntimeException("Invalid Range Relation");

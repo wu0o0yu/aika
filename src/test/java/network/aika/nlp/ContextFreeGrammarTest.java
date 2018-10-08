@@ -204,6 +204,6 @@ public class ContextFreeGrammarTest {
 
         System.out.println(doc.activationsToString(true, true, true));
 
-        Assert.assertNotNull(S.getActivation(doc, new Range(0, 33), true));
+        Assert.assertNotNull(S.getActivation(doc, new Range(doc, 0, 33), true));
     }
 }

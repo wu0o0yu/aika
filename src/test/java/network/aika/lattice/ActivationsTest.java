@@ -55,15 +55,15 @@ public class ActivationsTest {
         inA.addInput(doc, 0, 1);
         inA.addInput(doc, 2, 3);
 
-        Assert.assertNotNull(pA.getActivation(doc, new Range(0, 1), false));
-        Assert.assertNull(pA.getActivation(doc, new Range(1, 2), false));
-        Assert.assertNotNull(pA.getActivation(doc, new Range(2, 3), false));
+        Assert.assertNotNull(pA.getActivation(doc, new Range(doc, 0, 1), false));
+        Assert.assertNull(pA.getActivation(doc, new Range(doc, 1, 2), false));
+        Assert.assertNotNull(pA.getActivation(doc, new Range(doc, 2, 3), false));
 
         inA.addInput(doc, 1, 2);
 
-        Assert.assertNotNull(pA.getActivation(doc, new Range(0, 1), false));
-        Assert.assertNotNull(pA.getActivation(doc, new Range(1, 2), false));
-        Assert.assertNotNull(pA.getActivation(doc, new Range(2, 3), false));
+        Assert.assertNotNull(pA.getActivation(doc, new Range(doc, 0, 1), false));
+        Assert.assertNotNull(pA.getActivation(doc, new Range(doc, 1, 2), false));
+        Assert.assertNotNull(pA.getActivation(doc, new Range(doc, 2, 3), false));
     }
 
 
@@ -76,15 +76,15 @@ public class ActivationsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inNode.processActivation(new Activation(0, doc, new Range(0, 1), inNode));
+        inNode.processActivation(new Activation(0, doc, new Range(doc, 0, 1), inNode));
 
-        inNode.processActivation(new Activation(0, doc, new Range(0, 1), inNode));
+        inNode.processActivation(new Activation(0, doc, new Range(doc, 0, 1), inNode));
 
-        inNode.processActivation(new Activation(0, doc, new Range(0, 1), inNode));
+        inNode.processActivation(new Activation(0, doc, new Range(doc, 0, 1), inNode));
 
-        inNode.processActivation(new Activation(0, doc, new Range(0, 1), inNode));
+        inNode.processActivation(new Activation(0, doc, new Range(doc,0, 1), inNode));
 
-        inNode.processActivation(new Activation(0, doc, new Range(0, 1), inNode));
+        inNode.processActivation(new Activation(0, doc, new Range(doc, 0, 1), inNode));
     }
 
 }

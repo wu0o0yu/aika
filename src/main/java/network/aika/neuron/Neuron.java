@@ -67,7 +67,7 @@ public class Neuron extends Provider<INeuron> {
     public Activation addInput(Document doc, int begin, int end) {
         return addInput(doc,
                 new Activation.Builder()
-                        .setRange(begin, end)
+                        .setRange(doc, begin, end)
         );
     }
 

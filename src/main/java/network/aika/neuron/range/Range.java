@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.range;
 
+import network.aika.Document;
 import network.aika.Model;
 import network.aika.Utils;
 import network.aika.Writable;
@@ -54,10 +55,10 @@ public class Range {
     public final Position end;
 
 
-    public Range(Integer begin, Integer end) {
+    public Range(Document doc, Integer begin, Integer end) {
         this(
-                new Position(begin),
-                new Position(end)
+                doc.lookupFinalPosition(begin),
+                doc.lookupFinalPosition(end)
         );
     }
 

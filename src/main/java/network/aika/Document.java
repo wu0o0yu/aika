@@ -79,6 +79,7 @@ public class Document implements Comparable<Document> {
     public UpperBoundQueue ubQueue = new UpperBoundQueue();
     public Linker linker;
 
+    public TreeMap<Integer, Position> positions = new TreeMap<>();
     public TreeSet<Node> activatedNodes = new TreeSet<>();
     public TreeSet<INeuron> activatedNeurons = new TreeSet<>();
     public TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
@@ -175,6 +176,17 @@ public class Document implements Comparable<Document> {
     public String toString() {
 		return content.toString();
 	}
+
+
+	public Position lookupFinalPosition(int pos) {
+        Position p = positions.get(pos);
+
+        if(p == null) {
+            p = new Position(pos);
+            positions.put(pos, p);
+        }
+        return p;
+    }
 
 
     public String getText(Range r) {

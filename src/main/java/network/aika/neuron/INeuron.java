@@ -20,6 +20,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.range.Position;
 import network.aika.neuron.range.Range;
 import network.aika.neuron.activation.SearchNode;
 import network.aika.lattice.InputNode;
@@ -161,21 +162,46 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         }
 
 
-        public Collection<Activation> getActivationsByRangeBegin(Range fromKey, boolean fromInclusive, Range toKey, boolean toInclusive) {
+        public Collection<Activation> getActivationsByRangeBeginLimited(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
+            if(fromKey.getFinalPosition() != null && toKey.getFinalPosition() != null) {
+                fromKey = new Position(fromKey.getFinalPosition() - maxLength);
+
+                if (fromKey.compare(Position.Operator.GREATER_THAN, toKey)) return Collections.EMPTY_LIST;
+
+                return getActivationsByRangeBegin(fromKey, fromInclusive, toKey, toInclusive);
+            } else {
+                return Collections.EMPTY_LIST; // TODO:
+            }
+        }
+
+        public Collection<Activation> getActivationsByRangeEndLimited(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
+            if(fromKey.getFinalPosition() != null && toKey.getFinalPosition() != null) {
+            fromKey = new Position(fromKey.getFinalPosition() - maxLength);
+
+            if (fromKey.compare(Position.Operator.GREATER_THAN, toKey)) return Collections.EMPTY_LIST;
+
+            return getActivationsByRangeEnd(fromKey, fromInclusive, toKey, toInclusive);
+            } else {
+                return Collections.EMPTY_LIST; // TODO:
+            }
+        }
+
+
+        public Collection<Activation> getActivationsByRangeBegin(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
             return activations.subMap(
-                    new INeuron.ActKey(fromKey, Integer.MIN_VALUE),
+                    new INeuron.ActKey(new Range(fromKey, Position.MIN), Integer.MIN_VALUE),
                     fromInclusive,
-                    new INeuron.ActKey(toKey, Integer.MAX_VALUE),
+                    new INeuron.ActKey(new Range(toKey, Position.MAX), Integer.MAX_VALUE),
                     toInclusive
             ).values();
         }
 
 
-        public Collection<Activation> getActivationsByRangeEnd(Range fromKey, boolean fromInclusive, Range toKey, boolean toInclusive) {
+        public Collection<Activation> getActivationsByRangeEnd(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
             return activationsEnd.subMap(
-                    new INeuron.ActKey(fromKey, Integer.MIN_VALUE),
+                    new INeuron.ActKey(new Range(Position.MIN, fromKey), Integer.MIN_VALUE),
                     fromInclusive,
-                    new INeuron.ActKey(toKey, Integer.MAX_VALUE),
+                    new INeuron.ActKey(new Range(Position.MAX, toKey), Integer.MAX_VALUE),
                     toInclusive
             ).values();
         }
@@ -360,7 +386,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public Activation getActivation(Document doc, Range r, boolean onlyFinal) {
         ThreadState th = getThreadState(doc.threadId, false);
         if (th == null) return null;
-        for(Activation act : th.getActivationsByRangeBegin(r, true, r, false)) {
+        for(Activation act : th.getActivationsByRangeBegin(r.begin, true, r.begin, false)) {
             if (!onlyFinal || act.isFinalActivation()) {
                 return act;
             }
@@ -622,6 +648,10 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         th.maxLength = Math.max(th.maxLength, act.range.length());
 
         th.addActivation(act);
+
+
+        act.range.begin.addBeginActivation(act);
+        act.range.end.addEndActivations(act);
 
         doc.addActivation(act);
     }

@@ -93,7 +93,7 @@ public class SoftMaxTest {
             for(int i = 0; i < 2; i++) {
                 Neuron n = output[j][i];
 
-                Activation act = n.getActivation(doc, j == 0 ? new Range(0, 1) : new Range(2, 3), false);
+                Activation act = n.getActivation(doc, j == 0 ? new Range(doc, 0, 1) : new Range(doc, 2, 3), false);
                 results[j][i] = act.avgState.p;
             }
         }

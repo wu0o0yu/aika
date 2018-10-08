@@ -22,13 +22,14 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.range.Position;
 import network.aika.neuron.range.Range.Relation;
 import network.aika.neuron.range.Range;
 import network.aika.lattice.OrNode;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static network.aika.neuron.range.Range.Operator.GREATER_THAN;
+import static network.aika.neuron.range.Position.Operator.GREATER_THAN;
 import static network.aika.neuron.range.Range.Relation.CONTAINS;
 import static network.aika.neuron.range.Range.Relation.NONE;
 
@@ -79,7 +80,7 @@ public class NegationTest {
         inA.addInput(doc, 0, 11);
 
         System.out.println(doc.activationsToString(false, false, true));
-        Assert.assertNotNull(abcN.getActivation(doc, new Range(0, 11), false));
+        Assert.assertNotNull(abcN.getActivation(doc, new Range(doc, 0, 11), false));
 
         inB.addInput(doc, 2, 7);
 
@@ -91,7 +92,7 @@ public class NegationTest {
 
         doc.process();
 
-        Assert.assertNotNull(abcN.getActivation(doc, new Range(0, 11), false));
+        Assert.assertNotNull(abcN.getActivation(doc, new Range(doc, 0, 11), false));
     }
 
 
@@ -214,7 +215,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, false, true));
 
-        Assert.assertNotNull(outN.getActivation(doc, new Range(0, 11), false));
+        Assert.assertNotNull(outN.getActivation(doc, new Range(doc, 0, 11), false));
 
         doc.clearActivations();
     }
@@ -271,7 +272,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, false, true));
 
-        Assert.assertNotNull(outN.getActivation(doc, new Range(0, 11), false));
+        Assert.assertNotNull(outN.getActivation(doc, new Range(doc, 0, 11), false));
 
         doc.clearActivations();
     }
@@ -328,7 +329,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, false, true));
 
-        Assert.assertNotNull(outN.getActivation(doc, new Range(0, 11), false));
+        Assert.assertNotNull(outN.getActivation(doc, new Range(doc, 0, 11), false));
 
         doc.clearActivations();
     }
@@ -390,7 +391,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .addRangeRelation(Relation.create(Range.Operator.NONE, Range.Operator.NONE, Range.Operator.NONE, GREATER_THAN), 1)
+                        .addRangeRelation(Relation.create(Position.Operator.NONE, Position.Operator.NONE, Position.Operator.NONE, GREATER_THAN), 1)
                         .setRangeOutput(true, false),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -419,8 +420,8 @@ public class NegationTest {
 
             System.out.println(doc.activationsToString(false, false, true));
 
-            Assert.assertNotNull(inS.getActivation(doc, new Range(0, 6), false));
-            Assert.assertEquals(2, inS.getActivation(doc, new Range(0, 6), false).getInputLinks(false, false).count());
+            Assert.assertNotNull(inS.getActivation(doc, new Range(doc, 0, 6), false));
+            Assert.assertEquals(2, inS.getActivation(doc, new Range(doc, 0, 6), false).getInputLinks(false, false).count());
 
             doc.clearActivations();
         }
@@ -436,10 +437,10 @@ public class NegationTest {
             System.out.println(doc.activationsToString(false, false, true));
 
 //            Assert.assertNotNull(Selector.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
-            Assert.assertNotNull(inS.getActivation(doc, new Range(0, 9), false));
+            Assert.assertNotNull(inS.getActivation(doc, new Range(doc, 0, 9), false));
 //            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.interpretation.orInterprNodes.size());
-            Assert.assertEquals(1, inS.getActivation(doc, new Range(0, 6), false).getInputLinks(false, false).count());
-            Assert.assertEquals(1, inS.getActivation(doc, new Range(0, 9), false).getInputLinks(false, false).count());
+            Assert.assertEquals(1, inS.getActivation(doc, new Range(doc, 0, 6), false).getInputLinks(false, false).count());
+            Assert.assertEquals(1, inS.getActivation(doc, new Range(doc, 0, 9), false).getInputLinks(false, false).count());
 
             doc.clearActivations();
         }
@@ -709,8 +710,8 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, false, true));
 
-        Assert.assertNotNull(pC.get().getActivation(doc, new Range(0, 1), false));
-        Assert.assertNotNull(pD.get().getActivation(doc, new Range(0, 1), false));
+        Assert.assertNotNull(pC.get().getActivation(doc, new Range(doc, 0, 1), false));
+        Assert.assertNotNull(pD.get().getActivation(doc, new Range(doc, 0, 1), false));
 
         // Die Optionen 0 und 2 stehen in Konflikt. Da sie aber jetzt in Oder Optionen eingebettet sind, werden sie nicht mehr ausgefiltert.
 //        Assert.assertNull(pH.node.getFirstActivation(t));

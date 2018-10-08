@@ -23,7 +23,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.range.Range;
 import network.aika.neuron.range.Range.Relation;
-import network.aika.neuron.range.Range.Operator;
+import network.aika.neuron.range.Position.Operator;
 import network.aika.neuron.INeuron;
 import org.junit.Assert;
 import org.junit.Test;

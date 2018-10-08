@@ -1,14 +1,19 @@
 package network.aika.neuron.range;
 
-import network.aika.neuron.INeuron;
+
 import network.aika.neuron.activation.Activation;
 
-import java.util.Collection;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class Position {
 
     public static final Position MIN = new Position(Integer.MIN_VALUE);
     public static final Position MAX = new Position(Integer.MAX_VALUE);
+
+
+    public SortedSet<Activation> beginActivations = new TreeSet<>();
+    public SortedSet<Activation> endActivations = new TreeSet<>();
 
 
     private Integer finalPosition;
@@ -34,6 +39,12 @@ public class Position {
 
         return 0; // TODO:
     }
+
+
+    public String toString() {
+        return finalPosition != null ? "" + finalPosition : "X";
+    }
+
 
     public boolean compare(Operator o, Position pos) {
 
@@ -69,6 +80,17 @@ public class Position {
         return finalPosition;
     }
 
+    public void addBeginActivation(Activation act) {
+        if(finalPosition == 0) {
+            beginActivations.add(act);
+        }
+    }
+
+    public void addEndActivations(Activation act) {
+        if(finalPosition == 0) {
+            endActivations.add(act);
+        }
+    }
 
 
     public enum Operator {
