@@ -1,6 +1,7 @@
 package network.aika.neuron.range;
 
 
+import network.aika.Document;
 import network.aika.neuron.activation.Activation;
 
 import java.util.SortedSet;
@@ -8,22 +9,27 @@ import java.util.TreeSet;
 
 public class Position {
 
-    public static final Position MIN = new Position(Integer.MIN_VALUE);
-    public static final Position MAX = new Position(Integer.MAX_VALUE);
+    public static final Position MIN = new Position(null, Integer.MIN_VALUE);
+    public static final Position MAX = new Position(null, Integer.MAX_VALUE);
 
 
     public SortedSet<Activation> beginActivations = new TreeSet<>();
     public SortedSet<Activation> endActivations = new TreeSet<>();
 
 
+    public Document doc;
+    public final int id;
     private Integer finalPosition;
 
 
-    public Position() {
+    public Position(Document doc) {
+        this(doc, null);
     }
 
 
-    public Position(int pos) {
+    public Position(Document doc, Integer pos) {
+        this.doc = doc;
+        this.id = doc != null ? doc.positionIdCounter++ : -1;
         finalPosition = pos;
     }
 
@@ -42,7 +48,7 @@ public class Position {
 
 
     public String toString() {
-        return finalPosition != null ? "" + finalPosition : "X";
+        return finalPosition != null ? "" + finalPosition : "<" + id + ">";
     }
 
 
@@ -80,16 +86,18 @@ public class Position {
         return finalPosition;
     }
 
+
+    public void setFinalPosition(int finalPos) {
+        finalPosition = finalPos;
+    }
+
+
     public void addBeginActivation(Activation act) {
-        if(finalPosition == 0) {
-            beginActivations.add(act);
-        }
+        beginActivations.add(act);
     }
 
     public void addEndActivations(Activation act) {
-        if(finalPosition == 0) {
-            endActivations.add(act);
-        }
+        endActivations.add(act);
     }
 
 

@@ -165,7 +165,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         public Collection<Activation> getActivationsByRangeBeginLimited(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
             if(fromKey.getFinalPosition() != null && toKey.getFinalPosition() != null) {
                 if(fromKey != Position.MIN) {
-                    fromKey = new Position(fromKey.getFinalPosition() - maxLength);
+                    fromKey = new Position(fromKey.doc, fromKey.getFinalPosition() - maxLength);
                 }
 
                 if (fromKey.compare(Position.Operator.GREATER_THAN, toKey)) return Collections.EMPTY_LIST;
@@ -179,7 +179,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         public Collection<Activation> getActivationsByRangeEndLimited(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
             if(fromKey.getFinalPosition() != null && toKey.getFinalPosition() != null) {
                 if(fromKey != Position.MIN) {
-                    fromKey = new Position(fromKey.getFinalPosition() - maxLength);
+                    fromKey = new Position(fromKey.doc, fromKey.getFinalPosition() - maxLength);
                 }
                 if (fromKey.compare(Position.Operator.GREATER_THAN, toKey)) return Collections.EMPTY_LIST;
 
@@ -647,8 +647,11 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             doc.activatedNeurons.add(act.node.neuron.get());
         }
 
-        th.minLength = Math.min(th.minLength, act.range.length());
-        th.maxLength = Math.max(th.maxLength, act.range.length());
+        Integer l = act.range.length();
+        if(l != null) {
+            th.minLength = Math.min(th.minLength, act.range.length());
+            th.maxLength = Math.max(th.maxLength, act.range.length());
+        }
 
         th.addActivation(act);
 

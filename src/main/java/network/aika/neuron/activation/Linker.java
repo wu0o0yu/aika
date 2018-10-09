@@ -159,8 +159,8 @@ public class Linker {
         }
 
         if(s.rangeInput == Synapse.Builder.OUTPUT) {
-            Position outputBegin = s.rangeOutput.begin.map(iAct.range);
-            Position outputEnd = s.rangeOutput.end.map(iAct.range);
+            Position outputBegin = s.rangeOutput.begin.map(iAct.doc, iAct.range, false);
+            Position outputEnd = s.rangeOutput.end.map(iAct.doc, iAct.range, false);
 
             if((outputBegin != null && !outputBegin.compare(Position.Operator.EQUALS, oAct.range.begin)) || (outputEnd != null && !outputEnd.compare(Position.Operator.EQUALS, oAct.range.end))) {
                 return;

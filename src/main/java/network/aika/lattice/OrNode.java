@@ -77,10 +77,10 @@ public class OrNode extends Node<OrNode, Activation> {
             if(s.rangeOutput.begin != Range.Mapping.NONE || s.rangeOutput.end != Range.Mapping.NONE) {
                 Activation iAct = inputAct.getInputActivation(i);
 
-                Position b = s.rangeOutput.begin.map(iAct.range);
+                Position b = s.rangeOutput.begin.map(doc, iAct.range, true);
                 if(b != null) begin = b;
 
-                Position e = s.rangeOutput.end.map(iAct.range);
+                Position e = s.rangeOutput.end.map(doc, iAct.range, true);
                 if(e != null) end = e;
             }
         }

@@ -70,6 +70,7 @@ public class Document implements Comparable<Document> {
     public int logicNodeActivationIdCounter = 0;
     public int searchNodeIdCounter = 0;
     public int searchStepCounter = 0;
+    public int positionIdCounter = 0;
 
     public Model model;
     public int threadId;
@@ -182,7 +183,7 @@ public class Document implements Comparable<Document> {
         Position p = positions.get(pos);
 
         if(p == null) {
-            p = new Position(pos);
+            p = new Position(this, pos);
             positions.put(pos, p);
         }
         return p;
@@ -199,10 +200,10 @@ public class Document implements Comparable<Document> {
 
     public void addActivation(Activation act) {
         ActKey dak = new ActKey(act.range, act.node, act.id);
-        if (act.range.begin != null) {
+        if (act.range.begin != null && act.range.begin.getFinalPosition() != null) {
             activationsByRangeBegin.put(dak, act);
         }
-        if (act.range.end != null) {
+        if (act.range.end != null && act.range.end.getFinalPosition() != null) {
             activationsByRangeEnd.put(dak, act);
         }
         activationsById.put(act.id, act);
@@ -446,14 +447,28 @@ public class Document implements Comparable<Document> {
 
     public String generateOutputText() {
         int oldLength = length();
-/*
-        TODO:
+
+        TreeSet<Position> queue = new TreeSet<>(Comparator.comparingInt(p -> p.id));
+
         for(Activation act: activationsByRangeBegin.values()) {
-            if(act.getINeuron().outputText != null && act.isFinalActivation()) {
-                content.replace(act.range.begin, act.range.end, act.getINeuron().outputText);
+            if(act.range.begin.getFinalPosition() != null && act.range.end.getFinalPosition() == null) {
+                queue.add(act.range.begin);
             }
         }
-*/
+
+        while(!queue.isEmpty()) {
+            Position pos = queue.pollFirst();
+
+            for(Activation act: pos.beginActivations) {
+                if (act.getINeuron().outputText != null && act.isFinalActivation()) {
+                    String outText = act.getINeuron().outputText;
+                    Position nextPos = act.range.end;
+                    nextPos.setFinalPosition(pos.getFinalPosition() + outText.length());
+
+                    content.replace(act.range.begin.getFinalPosition(), act.range.end.getFinalPosition(), outText);
+                }
+            }
+        }
         return content.substring(oldLength, length());
     }
 

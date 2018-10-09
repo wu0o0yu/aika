@@ -204,7 +204,7 @@ public class GenerateTextTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setIdentity(true)
-                        .setRangeOutput(Output.NONE)
+                        .setRangeOutput(Range.Mapping.END, Range.Mapping.CREATE)
         );
 
         Neuron.init(outA, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
@@ -213,7 +213,7 @@ public class GenerateTextTest {
                         .setNeuron(intermediate)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeOutput(Output.NONE)
+                        .setRangeOutput(Output.DIRECT)
         );
 
 
@@ -223,7 +223,7 @@ public class GenerateTextTest {
                         .setNeuron(intermediate)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeOutput(Range.Mapping.END, NONE)
+                        .setRangeOutput(Range.Mapping.END, Range.Mapping.CREATE)
         );
 
         Document doc = m.createDocument("in ");
@@ -232,8 +232,10 @@ public class GenerateTextTest {
 
         doc.process();
 
+        String outputText = doc.generateOutputText();
+
         System.out.println(doc.activationsToString(true, true, true));
 
-        Assert.assertEquals("aaaaaaa bbb ", doc.generateOutputText());
+        Assert.assertEquals("aaaaaaa bbb ", outputText);
     }
 }
