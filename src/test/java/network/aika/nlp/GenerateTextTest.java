@@ -25,12 +25,14 @@ import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.range.Range.Relation;
 import network.aika.neuron.range.Range.Output;
+import network.aika.neuron.relation.InstanceRelation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.Builder.OUTPUT;
 import static network.aika.neuron.range.Range.Mapping.NONE;
-
+import static network.aika.neuron.relation.InstanceRelation.Type.CONTAINED_IN;
+import static network.aika.neuron.relation.InstanceRelation.Type.CONTAINS;
 
 
 /**
@@ -44,11 +46,17 @@ public class GenerateTextTest {
         Model m = new Model();
 
         // The suppressing neuron should prevent that two neurons output overlapping text.
-        Neuron suppr = m.createNeuron("SUPPR");
+        Neuron inhib = m.createNeuron("INHIB");
 
         // Some input neurons
         Neuron inA = m.createNeuron("IN-A");
         Neuron inB = m.createNeuron("IN-B");
+        Neuron inOut = m.createNeuron("IN-OUT");
+
+        Neuron phraseA = m.createNeuron("PHRASE-A");
+        Neuron phraseB = m.createNeuron("PHRASE-B");
+
+        Neuron outputFrame = m.createNeuron("OUTPUT-FRAME");
 
         // Four test words that should be used to generate a text.
         Neuron outA = m.createNeuron("OUT-A", "aaaaaaa ");
@@ -56,23 +64,96 @@ public class GenerateTextTest {
         Neuron outC = m.createNeuron("OUT-C", "ccccccccc ");
         Neuron outD = m.createNeuron("OUT-D", "ddddd ");
 
+
+
         // Word aaaaaaa is only added to the resulting text if input a is active and this neuron
         // is not suppressed by another neuron. Output aaaaaaa may start a text.
-        Neuron.init(outA, 4.0, INeuron.Type.EXCITATORY,
+        Neuron.init(phraseA, 4.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
+                        .setNeuron(outputFrame)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeOutput(Output.DIRECT),
+                new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
+                        .addRangeRelation(Relation.NONE, 0)
                         .setRangeOutput(Output.NONE),
                 new Synapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(suppr)
-                        .setWeight(-20.0)
+                        .setSynapseId(2)
+                        .setNeuron(inhib)
+                        .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Relation.OVERLAPS, OUTPUT)
+                        .addRangeRelation(Relation.EQUALS, OUTPUT)
         );
+
+        Neuron.init(phraseB, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(outputFrame)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeOutput(Output.DIRECT),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(inB)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .addRangeRelation(Relation.NONE, 0)
+                        .setRangeOutput(Output.NONE),
+                new Synapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(inhib)
+                        .setWeight(-100.0)
+                        .setBias(0.0)
+                        .setRecurrent(true)
+                        .addRangeRelation(Relation.EQUALS, OUTPUT)
+        );
+
+
+        Neuron.init(outputFrame, 4.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(inOut)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeOutput(Range.Mapping.END, Range.Mapping.CREATE)
+        );
+
+
+        Neuron.init(outA, 4.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(phraseA)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setIdentity(true)
+                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.CREATE)
+        );
+
+
+
+        // OutC is only activated if the previous word was outA.
+        Neuron.init(outC, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(phraseA)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(outA)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .addInstanceRelation(CONTAINS, 0)
+                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE)
+        );
+
 
         // Word bbb is only added to the resulting text if input b is active and this neuron
         // is not suppressed by another neuron. Output bbb may start a text.
@@ -80,78 +161,43 @@ public class GenerateTextTest {
         Neuron.init(outB, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
-                        .setNeuron(inB)
+                        .setNeuron(phraseB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeOutput(Output.NONE),
-                new Synapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(suppr)
-                        .setWeight(-20.0)
-                        .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(Relation.OVERLAPS, OUTPUT)
+                        .setIdentity(true)
+                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.CREATE)
         );
 
-
-        // OutC is only activated if the previous word was outA.
-        Neuron.init(outC, 5.0, INeuron.Type.EXCITATORY,
-                new Synapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(outA)
-                        .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Mapping.END, NONE),
-                new Synapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(suppr)
-                        .setWeight(-20.0)
-                        .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(Relation.OVERLAPS, OUTPUT)
-        );
 
         // OutD is only activated if the previous word was outB.
         Neuron.init(outD, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
+                        .setNeuron(phraseB)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                new Synapse.Builder()
+                        .setSynapseId(1)
                         .setNeuron(outB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeOutput(Range.Mapping.END, NONE),
-                new Synapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(suppr)
-                        .setWeight(-20.0)
-                        .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(Relation.OVERLAPS, OUTPUT)
+                        .addInstanceRelation(CONTAINS, 0)
+                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE)
         );
 
 
         // All outputs suppress each other.
-        Neuron.init(suppr, 0.0, ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY,
+        Neuron.init(inhib, 0.0, ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
-                        .setNeuron(outA)
+                        .setNeuron(phraseA)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRangeOutput(true),
                 new Synapse.Builder()
                         .setSynapseId(1)
-                        .setNeuron(outB)
-                        .setWeight(1.0)
-                        .setBias(0.0)
-                        .setRangeOutput(true),
-                new Synapse.Builder()
-                        .setSynapseId(2)
-                        .setNeuron(outC)
-                        .setWeight(1.0)
-                        .setBias(0.0)
-                        .setRangeOutput(true),
-                new Synapse.Builder()
-                        .setSynapseId(3)
-                        .setNeuron(outD)
+                        .setNeuron(phraseB)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRangeOutput(true)
@@ -163,6 +209,8 @@ public class GenerateTextTest {
         // Add both input a and input b.
         inA.addInput(doc, 0, 3);
         inB.addInput(doc, 0, 3);
+
+        inOut.addInput(doc, 0, 3);
 
         System.out.println(doc.activationsToString(false, true, true));
 
@@ -228,7 +276,7 @@ public class GenerateTextTest {
 
         Document doc = m.createDocument("in ");
 
-        in.addInput(doc, 0, 1);
+        in.addInput(doc, 0, 3);
 
         doc.process();
 

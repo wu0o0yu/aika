@@ -7,6 +7,8 @@ import network.aika.neuron.activation.Activation;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import static network.aika.neuron.range.Position.Operator.*;
+
 public class Position {
 
     public static final Position MIN = new Position(null, Integer.MIN_VALUE);
@@ -20,6 +22,8 @@ public class Position {
     public Document doc;
     public final int id;
     private Integer finalPosition;
+
+    private long visited;
 
 
     public Position(Document doc) {
@@ -53,11 +57,12 @@ public class Position {
 
 
     public boolean compare(Operator o, Position pos) {
-
-        if(finalPosition != null && pos.finalPosition != null) {
+        if(o == NONE) {
+            return true;
+        } else if(o == EQUALS) {
+            return this == pos;
+        } else if(finalPosition != null && pos.finalPosition != null) {
             switch(o) {
-                case EQUALS:
-                    return finalPosition == pos.finalPosition;
                 case LESS_THAN_EQUAL:
                     return finalPosition <= pos.finalPosition;
                 case GREATER_THAN_EQUAL:
@@ -69,10 +74,29 @@ public class Position {
                 default:
                     return true;
             }
+        } else if(this == pos) {
+            return o == EQUALS || o == LESS_THAN_EQUAL || o == GREATER_THAN_EQUAL;
         }
 
-        return false; // TODO:
+        return lessThan(pos, doc.visitedCounter++) && o == LESS_THAN;
     }
+
+
+    private boolean lessThan(Position pos, long v) {
+        if(visited == v) return false;
+        visited = v;
+
+        if(this == pos) return true;
+
+        for(Activation act: beginActivations) {
+            Position nextPos = act.range.end;
+
+            if(lessThan(nextPos, v)) return true;
+        }
+
+        return false;
+    }
+
 
     public Integer getDistance(Position pos) {
         if(finalPosition != null && pos.finalPosition != null) {

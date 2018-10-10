@@ -191,10 +191,14 @@ public class Document implements Comparable<Document> {
 
 
     public String getText(Range r) {
-        return content.substring(
-                Math.max(0, Math.min(r.begin.getFinalPosition(), length())),
-                Math.max(0, Math.min(r.end.getFinalPosition(), length()))
-        );
+        if(r.begin.getFinalPosition() != null && r.end.getFinalPosition() != null) {
+            return content.substring(
+                    Math.max(0, Math.min(r.begin.getFinalPosition(), length())),
+                    Math.max(0, Math.min(r.end.getFinalPosition(), length()))
+            );
+        } else {
+            return "";
+        }
     }
 
 
@@ -466,6 +470,8 @@ public class Document implements Comparable<Document> {
                     nextPos.setFinalPosition(pos.getFinalPosition() + outText.length());
 
                     content.replace(act.range.begin.getFinalPosition(), act.range.end.getFinalPosition(), outText);
+
+                    queue.add(nextPos);
                 }
             }
         }
