@@ -60,7 +60,7 @@ public class AddSynapseTest {
         for(Neuron in: inputNeurons.values()) {
             in.addInput(doc,
                     new Activation.Builder()
-                            .setRange(doc, i * 2, (i * 2) + 1)
+                            .setRange(i * 2, (i * 2) + 1)
             );
 
             i++;

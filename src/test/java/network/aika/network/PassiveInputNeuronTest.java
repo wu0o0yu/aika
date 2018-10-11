@@ -42,7 +42,7 @@ public class PassiveInputNeuronTest {
 
         inA.addInput(doc,
                 new Activation.Builder()
-                        .setRange(doc, 0, 1)
+                        .setRange(0, 1)
         );
 
         Activation outAct = out.getActivation(doc, new Range(doc, 0, 1), false);

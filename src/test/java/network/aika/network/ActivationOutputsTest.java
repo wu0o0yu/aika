@@ -141,7 +141,7 @@ public class ActivationOutputsTest {
 
 
         inA.addInput(doc, new Activation.Builder()
-                .setRange(doc, 0, 1)
+                .setRange(0, 1)
         );
 
         Activation outB1 = outB.getActivation(doc, new Range(doc, 0, 1), false);
@@ -170,7 +170,7 @@ public class ActivationOutputsTest {
 
         inA.addInput(doc,
                 new Activation.Builder()
-                        .setRange(doc, 0, 1)
+                        .setRange(0, 1)
         );
 
         Activation outB1 = outB.getActivation(doc, new Range(doc, 0, 1), false);

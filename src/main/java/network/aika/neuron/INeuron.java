@@ -312,10 +312,11 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
      * @param input
      */
     public Activation addInput(Document doc, Activation.Builder input) {
-        Activation act = getThreadState(doc.threadId, true).getActivationByRange(input.range);
+        Range r = new Range(doc, input.begin, input.end);
+        Activation act = getThreadState(doc.threadId, true).getActivationByRange(r);
         if(act == null) {
             act = new Activation(doc.activationIdCounter++, doc, node.get(doc));
-            act.range = input.range;
+            act.range = r;
         }
 
         register(act);

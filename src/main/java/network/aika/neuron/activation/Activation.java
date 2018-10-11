@@ -1003,19 +1003,16 @@ public final class Activation extends OrActivation {
     }
 
     public static class Builder {
-        public Range range;
+        public int begin;
+        public int end;
         public double value = 1.0;
         public Double targetValue;
         public int fired;
 
 
-        public Builder setRange(Document doc, int begin, int end) {
-            this.range = new Range(doc, begin, end);
-            return this;
-        }
-
-        public Builder setRange(Range range) {
-            this.range = range;
+        public Builder setRange(int begin, int end) {
+            this.begin = begin;
+            this.end = end;
             return this;
         }
 
