@@ -216,9 +216,9 @@ public class Document implements Comparable<Document> {
 
     public Collection<Activation> getActivations(boolean onlyFinal) {
         if(!onlyFinal) {
-            return activationsByRangeBegin.values();
+            return activationsById.values();
         } else {
-            return activationsByRangeBegin
+            return activationsById
                     .values()
                     .stream()
                     .filter(act -> act.isFinalActivation())
@@ -256,7 +256,7 @@ public class Document implements Comparable<Document> {
 
 
     public int getNumberOfActivations() {
-        return activationsByRangeBegin.size();
+        return activationsById.size();
     }
 
 
@@ -341,7 +341,7 @@ public class Document implements Comparable<Document> {
 
         SearchNode.search(this, selectedSearchNode, visitedCounter++, timeoutInMilliSeconds);
 
-        for(Activation act: activationsByRangeBegin.values()) {
+        for(Activation act: activationsById.values()) {
             if(act.isFinalActivation()) {
                 finallyActivatedNeurons.add(act.getINeuron());
             }
@@ -359,7 +359,7 @@ public class Document implements Comparable<Document> {
             norm += Math.exp(w);
         }
 
-        for(Activation act: activationsByRangeBegin.values()) {
+        for(Activation act: activationsById.values()) {
             if(act.searchStates != null) {
                 double avgValue = 0.0;
                 double avgPosValue = 0.0;
@@ -487,7 +487,7 @@ public class Document implements Comparable<Document> {
     public String activationsToString(boolean finalOnly, boolean withTextSnippet, boolean withLogic) {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
-        acts.addAll(activationsByRangeBegin.values());
+        acts.addAll(activationsById.values());
 
         StringBuilder sb = new StringBuilder();
 
