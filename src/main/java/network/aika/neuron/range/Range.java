@@ -260,8 +260,8 @@ public class Range {
         }
 
 
-        public Range map(Document doc, Range r, boolean createPos) {
-            return new Range(begin.map(doc, r, createPos), end.map(doc, r, createPos));
+        public Range map(Range r) {
+            return new Range(begin.map(r), end.map(r));
         }
 
 
@@ -334,8 +334,7 @@ public class Range {
     public enum Mapping {
         BEGIN(0),
         END(1),
-        NONE(2),
-        CREATE(3);
+        NONE(2);
 
         Mapping(int id) {
             this.id =  id;
@@ -356,14 +355,12 @@ public class Range {
         }
 
 
-        public Position map(Document doc, Range r, boolean createPos) {
+        public Position map(Range r) {
             switch(this) {
                 case BEGIN:
                     return r.begin;
                 case END:
                     return r.end;
-                case CREATE:
-                    return createPos ? new Position(doc) : null;
                 case NONE:
                 default:
                     return null;
@@ -378,8 +375,6 @@ public class Range {
                     return "E";
                 case NONE:
                     return "N";
-                case CREATE:
-                    return "C";
             }
             return "";
         }

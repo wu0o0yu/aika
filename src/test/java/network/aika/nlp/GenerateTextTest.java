@@ -121,7 +121,7 @@ public class GenerateTextTest {
                         .setNeuron(inOut)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeOutput(Range.Mapping.END, Range.Mapping.CREATE)
+                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE)
         );
 
 
@@ -132,7 +132,7 @@ public class GenerateTextTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setIdentity(true)
-                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.CREATE)
+                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE)
         );
 
 
@@ -165,7 +165,7 @@ public class GenerateTextTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setIdentity(true)
-                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.CREATE)
+                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE)
         );
 
 
@@ -252,7 +252,7 @@ public class GenerateTextTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setIdentity(true)
-                        .setRangeOutput(Range.Mapping.END, Range.Mapping.CREATE)
+                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE)
         );
 
         Neuron.init(outA, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
@@ -271,7 +271,7 @@ public class GenerateTextTest {
                         .setNeuron(intermediate)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeOutput(Range.Mapping.END, Range.Mapping.CREATE)
+                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE)
         );
 
         Document doc = m.createDocument("in ");
