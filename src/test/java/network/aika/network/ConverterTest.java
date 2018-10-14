@@ -16,6 +16,7 @@
  */
 package network.aika.network;
 
+import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
@@ -256,6 +257,40 @@ public class ConverterTest {
         System.out.println(out.get().node.get().logicToString());
         Assert.assertEquals(3, out.get().node.get().andParents.size());
 
+    }
+
+
+    @Test
+    public void testDuplicates() {
+        Model m = new Model();
+
+        Neuron in = m.createNeuron("IN");
+
+        Neuron out = Neuron.init(m.createNeuron("OUT"),
+                5.0,
+                INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(in)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false)
+                        .addRangeRelation(Relation.EQUALS, 1)
+                        .setRangeOutput(true),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(in)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false)
+                        .setRangeOutput(false)
+        );
+
+        Document doc = m.createDocument("IN");
+
+        in.addInput(doc, 0, 2);
+
+        Assert.assertFalse(out.getActivations(doc, false).isEmpty());
     }
 
 }

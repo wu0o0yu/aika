@@ -169,8 +169,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             andChildren = new TreeMap<>();
         }
 
-        AndNode.RefValue n = andChildren.put(ref, child);
-        assert n == null;
+        if(!andChildren.containsKey(ref)) {
+            andChildren.put(ref, child);
+        }
     }
 
 
