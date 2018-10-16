@@ -25,13 +25,13 @@ public class TestNextWord {
                         .setWeight(10.0)
                         .setBias(-9.5)
                         .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 1)
-                        .setRangeOutput(true, false),
+                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-9.5)
-                        .setRangeOutput(false, true)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END)
         );
 
         Document doc = m.createDocument("aaaa bbbb  ", 0);

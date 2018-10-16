@@ -53,7 +53,7 @@ public class ConverterTest {
                         .setRecurrent(false)
                         .setBias(0.0)
                         .addRangeRelation(Relation.EQUALS, 1)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
@@ -61,7 +61,7 @@ public class ConverterTest {
                         .setRecurrent(false)
                         .setBias(0.0)
                         .addRangeRelation(Relation.EQUALS, 2)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
@@ -69,14 +69,14 @@ public class ConverterTest {
                         .setRecurrent(false)
                         .setBias(0.0)
                         .addRangeRelation(Relation.EQUALS, 3)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inD)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         System.out.println(out.get().node.get().logicToString());
@@ -230,28 +230,28 @@ public class ConverterTest {
                         .addRangeRelation(Relation.EQUALS, 1)
                         .addRangeRelation(Relation.EQUALS, 2)
                         .addRangeRelation(Relation.EQUALS, 3)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(3.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(2.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inD)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         System.out.println(out.get().node.get().logicToString());
@@ -276,14 +276,14 @@ public class ConverterTest {
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .addRangeRelation(Relation.EQUALS, 1)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(in)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(false)
+                        .setRangeOutput(Range.Output.NONE)
         );
 
         Document doc = m.createDocument("IN");

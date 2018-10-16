@@ -51,14 +51,14 @@ public class OptionalAndTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(wordHamburg)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
         Neuron hintVerb = Neuron.init(m.createNeuron("HINT-VERB"),
                 0.0,
@@ -69,14 +69,14 @@ public class OptionalAndTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(wordGehen)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
 
@@ -89,7 +89,7 @@ public class OptionalAndTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(upperCase)
@@ -115,7 +115,7 @@ public class OptionalAndTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(suppr)
@@ -134,14 +134,14 @@ public class OptionalAndTest {
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(verb)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
 

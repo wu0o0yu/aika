@@ -24,6 +24,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.range.Range;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -77,7 +78,7 @@ public class NamedEntityRecognitionTest {
                         // activation value of at least 0.9
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder() // The previous word needs to be a forename
                         .setSynapseId(1)
                         .setNeuron(forenameCategory)
@@ -85,7 +86,7 @@ public class NamedEntityRecognitionTest {
                         .setBias(-10.0)
                         .addRangeRelation(END_TO_BEGIN_EQUALS, 0) // references the previous word
                         .setRecurrent(true) // this input is a positive feedback loop
-                        .setRangeOutput(false),
+                        .setRangeOutput(Range.Output.NONE),
 
                 // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
                 // self suppression taking place even though 'E-cook (surname)' is also contained
@@ -109,7 +110,7 @@ public class NamedEntityRecognitionTest {
                         .setNeuron(inputNeurons.get("cook"))
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibitingN)
@@ -129,7 +130,7 @@ public class NamedEntityRecognitionTest {
                         .setNeuron(inputNeurons.get("jackson"))
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(surnameCategory)
@@ -157,7 +158,7 @@ public class NamedEntityRecognitionTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibitingN)
@@ -177,7 +178,7 @@ public class NamedEntityRecognitionTest {
                         .setNeuron(jacksonForenameEntity)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
         Neuron.init(
                 surnameCategory,
@@ -189,7 +190,7 @@ public class NamedEntityRecognitionTest {
                         .setNeuron(cookSurnameEntity)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Neuron.init(
@@ -201,25 +202,25 @@ public class NamedEntityRecognitionTest {
                         .setSynapseId(0)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(cookSurnameEntity)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(jacksonCityEntity)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(jacksonForenameEntity)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
 

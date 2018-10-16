@@ -28,7 +28,7 @@ public class PositiveFeedbackLoopTest {
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(nD)
@@ -44,7 +44,7 @@ public class PositiveFeedbackLoopTest {
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(nC)

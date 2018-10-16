@@ -24,6 +24,7 @@ import network.aika.SuspensionHook;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.range.Range;
 import network.aika.neuron.range.Range.Relation;
 import org.junit.Assert;
 import org.junit.Test;
@@ -78,14 +79,14 @@ public class SuspensionTest {
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .addRangeRelation(Relation.END_TO_BEGIN_EQUALS, 1)
-                        .setRangeOutput(true, false),
+                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(false, true)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END)
         );
 
 
@@ -98,7 +99,7 @@ public class SuspensionTest {
                         .setWeight(10.0)
                         .setBias(-9.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         m.suspendAll(Provider.SuspensionMode.SAVE);

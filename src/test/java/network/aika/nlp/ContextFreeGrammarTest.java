@@ -126,7 +126,7 @@ public class ContextFreeGrammarTest {
                             .setNeuron(wordN)
                             .setWeight(3.0)
                             .setBias(0.0)
-                            .setRangeOutput(true)
+                            .setRangeOutput(Range.Output.DIRECT)
             );
         }
     }
@@ -138,7 +138,7 @@ public class ContextFreeGrammarTest {
                     new Synapse.Builder()
                             .setNeuron(n)
                             .setWeight(1.0)
-                            .setRangeOutput(true)
+                            .setRangeOutput(Range.Output.DIRECT)
             );
         }
     }
@@ -157,7 +157,7 @@ public class ContextFreeGrammarTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setIdentity(true)
-                        .setRangeOutput(begin, end);
+                        .setRangeOutput(begin ? Range.Mapping.BEGIN :Range.Mapping.NONE, end ? Range.Mapping.END : Range.Mapping.NONE);
 
             if(!begin) {
                 s = s.addRangeRelation(BEGIN_TO_END_EQUALS, i - 1);

@@ -22,6 +22,7 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.range.Range;
 import org.junit.Test;
 
 import static network.aika.neuron.range.Range.Relation.CONTAINED_IN;
@@ -65,14 +66,14 @@ public class WeightsTest {
                         .setWeight(3.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inBA)
                         .setWeight(4.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         pDA = m.createNeuron("DA");
@@ -86,7 +87,7 @@ public class WeightsTest {
                         .setWeight(1.0)
                         .setBias(-0.6)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inCA)
@@ -94,7 +95,7 @@ public class WeightsTest {
                         .setBias(0.0)
                         .setRecurrent(false)
                         .addRangeRelation(EQUALS, 0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(pSuppr)
@@ -119,7 +120,7 @@ public class WeightsTest {
                         .setWeight(2.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inBB)
@@ -127,7 +128,7 @@ public class WeightsTest {
                         .setBias(0.0)
                         .setRecurrent(false)
                         .addRangeRelation(EQUALS, 0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         pDB = m.createNeuron("DB");
@@ -140,7 +141,7 @@ public class WeightsTest {
                         .setWeight(1.0)
                         .setBias(-0.6)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inCB)
@@ -148,7 +149,7 @@ public class WeightsTest {
                         .setBias(-1.0)
                         .setRecurrent(false)
                         .addRangeRelation(EQUALS, 0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(pSuppr)
@@ -168,14 +169,14 @@ public class WeightsTest {
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pDB)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         testVariant(m, 9); // 17

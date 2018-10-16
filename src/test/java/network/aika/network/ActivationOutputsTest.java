@@ -136,7 +136,7 @@ public class ActivationOutputsTest {
                         .setWeight(1.0)
                         .setBias(-1.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         ).get();
 
 
@@ -164,7 +164,7 @@ public class ActivationOutputsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         ).get();
 
 

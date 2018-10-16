@@ -126,7 +126,7 @@
                     // activation value of at least 0.9
                     .setBias(-10.0)
                     .setRecurrent(false)
-                    .setRangeOutput(true),
+                    .setRangeOutput(Range.Output.DIRECT),
             new Synapse.Builder() // The previous word needs to be a forename
                     .setSynapseId(1)
                     .setNeuron(forenameCategory)
@@ -166,7 +166,7 @@
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(1.0)
                     .setBias(0.0)
-                    .setRangeOutput(true)
+                    .setRangeOutput(Range.Output.DIRECT)
     );
     Neuron.init(
             surnameCategory,
@@ -178,7 +178,7 @@
                     .setNeuron(cookSurnameEntity)
                     .setWeight(1.0)
                     .setBias(0.0)
-                    .setRangeOutput(true)
+                    .setRangeOutput(Range.Output.DIRECT)
     );
                 </code>
 			</pre>
@@ -309,7 +309,7 @@ The output of this example looks as following. Each line in the table represents
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
@@ -330,7 +330,7 @@ The output of this example looks as following. Each line in the table represents
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
@@ -351,7 +351,7 @@ The output of this example looks as following. Each line in the table represents
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
@@ -373,21 +373,21 @@ The output of this example looks as following. Each line in the table represents
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pB)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(pC)
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
@@ -400,7 +400,7 @@ The output of this example looks as following. Each line in the table represents
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         // Now that the model is complete, apply it to a document.
@@ -479,7 +479,7 @@ The output of this example looks as following. Each line in the table represents
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 1)
-                        .setRangeOutput(true, false),
+                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))

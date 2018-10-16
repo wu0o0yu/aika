@@ -565,30 +565,6 @@ public class Synapse implements Writable {
             return this;
         }
 
-        /**
-         * <code>setRangeOutput</code> is just a convenience function to call <code>setBeginRangeOutput</code> and
-         * <code>setEndRangeOutput</code> at the same time.
-         *
-         * @param ro
-         * @return
-         */
-        public Builder setRangeOutput(boolean ro) {
-            this.rangeOutput = ro ? Output.DIRECT : Output.NONE;
-            return this;
-        }
-
-        /**
-         * <code>setRangeOutput</code> is just a convenience function to call <code>setBeginRangeOutput</code> and
-         * <code>setEndRangeOutput</code> at the same time.
-         *
-         * @param begin
-         * @param end
-         * @return
-         */
-        public Builder setRangeOutput(boolean begin, boolean end) {
-            return setRangeOutput(begin ? Mapping.BEGIN : Mapping.NONE, end ? Mapping.END : Mapping.NONE);
-        }
-
 
         public Builder setIdentity(boolean identity) {
             this.identity = identity;

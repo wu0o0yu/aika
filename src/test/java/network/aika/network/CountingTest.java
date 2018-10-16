@@ -22,6 +22,7 @@ import network.aika.Model;
 import network.aika.Writable;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.range.Range;
 import network.aika.training.PatternDiscovery;
 import network.aika.training.PatternDiscovery.Config;
 import network.aika.lattice.NodeActivation;
@@ -67,7 +68,7 @@ public class CountingTest {
                         .setNeuron(inA)
                         .setWeight(100.0)
                         .setBias(-47.5)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
 

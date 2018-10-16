@@ -60,7 +60,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .addRangeRelation(CONTAINS, 1)
                         .addRangeRelation(CONTAINS, 2)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
@@ -117,7 +117,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Neuron.init(abcN,
@@ -131,7 +131,7 @@ public class NegationTest {
                         .setBias(-1.0)
                         .addRangeRelation(NONE, 1)
                         .addRangeRelation(NONE, 2)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
@@ -183,7 +183,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Neuron.init(asN,
@@ -195,7 +195,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setBias(-1.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inS)
@@ -240,7 +240,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Neuron.init(asN,
@@ -252,7 +252,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setBias(-1.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inS)
@@ -297,7 +297,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Neuron.init(asN,
@@ -309,7 +309,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setBias(-1.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inS)
@@ -354,14 +354,14 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(absN)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Neuron.init(asN,
@@ -373,7 +373,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inS)
@@ -392,14 +392,14 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setBias(-1.0)
                         .addRangeRelation(Relation.create(Position.Operator.NONE, Position.Operator.NONE, Position.Operator.NONE, GREATER_THAN), 1)
-                        .setRangeOutput(true, false),
+                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeOutput(false, true),
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inS)
@@ -468,21 +468,21 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(ascN)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(bsN)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Neuron.init(asN,
@@ -494,7 +494,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inS)
@@ -502,7 +502,7 @@ public class NegationTest {
                         .setRecurrent(true)
                         .setBias(0.0)
                         .addRangeRelation(Relation.EQUALS, 0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
         Neuron.init(ascN,
                 0.001,
@@ -513,7 +513,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inC)
@@ -521,7 +521,7 @@ public class NegationTest {
                         .setRecurrent(false)
                         .setBias(-1.0)
                         .addRangeRelation(Relation.EQUALS, 0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inS)
@@ -529,7 +529,7 @@ public class NegationTest {
                         .setRecurrent(true)
                         .setBias(0.0)
                         .addRangeRelation(Relation.EQUALS, 0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Neuron.init(bsN,
@@ -541,7 +541,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inS)
@@ -549,7 +549,7 @@ public class NegationTest {
                         .setRecurrent(true)
                         .setBias(0.0)
                         .addRangeRelation(Relation.EQUALS, 0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Neuron outA = Neuron.init(m.createNeuron("OUT A"),
@@ -561,7 +561,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
         Neuron outAC = Neuron.init(m.createNeuron("OUT AC"),
                 0.0,
@@ -572,7 +572,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
         Neuron outB = Neuron.init(m.createNeuron("OUT B"),
                 0.0,
@@ -583,7 +583,7 @@ public class NegationTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -645,7 +645,7 @@ public class NegationTest {
                         .setWeight(2.0)
                         .setBias(-2.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pD)
@@ -663,7 +663,7 @@ public class NegationTest {
                         .setWeight(2.0)
                         .setBias(-2.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pC)
@@ -685,21 +685,21 @@ public class NegationTest {
                         .setBias(-2.0)
                         .setWeight(2.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pD)
                         .setWeight(2.0)
                         .setBias(-2.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inG)
                         .setWeight(2.0)
                         .setBias(-2.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

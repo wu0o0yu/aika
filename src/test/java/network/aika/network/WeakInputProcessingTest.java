@@ -57,7 +57,7 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setBias(-45.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(weakInputA)
@@ -84,7 +84,7 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setBias(-45.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(weakInputB)
@@ -92,7 +92,7 @@ public class WeakInputProcessingTest {
                         .setRecurrent(false)
                         .setBias(-1.5)
                         .addRangeRelation(Relation.EQUALS, 0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
@@ -100,7 +100,7 @@ public class WeakInputProcessingTest {
                         .setRecurrent(true)
                         .setBias(0.0)
                         .addRangeRelation(Relation.EQUALS, 0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Neuron patternC = Neuron.init(
@@ -113,7 +113,7 @@ public class WeakInputProcessingTest {
                         .setWeight(50.0)
                         .setRecurrent(false)
                         .setBias(-45.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(weakInputC)
@@ -121,7 +121,7 @@ public class WeakInputProcessingTest {
                         .setRecurrent(false)
                         .setBias(-0.5)
                         .addRangeRelation(Relation.EQUALS, 0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
@@ -129,7 +129,7 @@ public class WeakInputProcessingTest {
                         .setRecurrent(true)
                         .setBias(0.0)
                         .addRangeRelation(Relation.EQUALS, 0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
 
@@ -142,21 +142,21 @@ public class WeakInputProcessingTest {
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(patternB)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(patternC)
                         .setWeight(10.0)
                         .setBias(0.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Document doc = m.createDocument("a ");

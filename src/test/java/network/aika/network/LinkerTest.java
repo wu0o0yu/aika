@@ -55,7 +55,7 @@ public class LinkerTest {
                             .setWeight(10.0)
                             .setBias(-10.0)
                             .addRangeRelation(rr, 0)
-                            .setRangeOutput(true)
+                            .setRangeOutput(Range.Output.DIRECT)
             );
 
             Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");

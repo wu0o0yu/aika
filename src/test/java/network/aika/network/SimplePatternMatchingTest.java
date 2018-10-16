@@ -65,7 +65,7 @@ public class SimplePatternMatchingTest {
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 1)
-                        .setRangeOutput(true, false),
+                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))
@@ -79,7 +79,7 @@ public class SimplePatternMatchingTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(false, true)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END)
         );
 
 
@@ -148,7 +148,7 @@ public class SimplePatternMatchingTest {
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 1)
-                        .setRangeOutput(true, false),
+                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))
@@ -169,7 +169,7 @@ public class SimplePatternMatchingTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(false, true)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END)
         );
 
 
@@ -230,7 +230,7 @@ public class SimplePatternMatchingTest {
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .addRangeRelation(Range.Relation.EQUALS, 1)
-                        .setRangeOutput(true, false),
+                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
@@ -245,7 +245,7 @@ public class SimplePatternMatchingTest {
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .addRangeRelation(Range.Relation.EQUALS, 0)
-                        .setRangeOutput(false, true)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END)
         );
 
 
@@ -299,7 +299,7 @@ public class SimplePatternMatchingTest {
                         .addRangeRelation(Range.Relation.EQUALS, 1)
                         .addRangeRelation(Range.Relation.EQUALS, 2)
                         .addRangeRelation(Range.Relation.EQUALS, 3)
-                        .setRangeOutput(true, false),
+                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
@@ -315,14 +315,14 @@ public class SimplePatternMatchingTest {
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .addRangeRelation(Range.Relation.EQUALS, 3)
-                        .setRangeOutput(false, false),
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.NONE),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inD)
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(false, true)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END)
         );
 
 

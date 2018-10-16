@@ -21,6 +21,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.range.Range;
 import network.aika.neuron.range.Range.Relation;
 import network.aika.neuron.INeuron;
 import org.junit.Assert;
@@ -49,7 +50,7 @@ public class PatternLatticeTest {
                         .setRecurrent(false)
                         .setBias(-1.0)
                         .addRangeRelation(Relation.EQUALS, 1)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
@@ -57,14 +58,14 @@ public class PatternLatticeTest {
                         .setRecurrent(false)
                         .setBias(-1.0)
                         .addRangeRelation(Relation.EQUALS, 2)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Document doc = m.createDocument("", 0);
@@ -108,7 +109,7 @@ public class PatternLatticeTest {
                         .setBias(-1.0)
                         .setRecurrent(false)
                         .addRangeRelation(Relation.EQUALS, 1)
-                        .setRangeOutput(true, false),
+                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
@@ -122,7 +123,7 @@ public class PatternLatticeTest {
                         .setWeight(1.0)
                         .setBias(-1.0)
                         .setRecurrent(false)
-                        .setRangeOutput(false, true)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

@@ -194,13 +194,13 @@ public class GenerateTextTest {
                         .setNeuron(phraseA)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeOutput(true),
+                        .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(phraseB)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
 

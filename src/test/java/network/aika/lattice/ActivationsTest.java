@@ -47,7 +47,7 @@ public class ActivationsTest {
                         .setWeight(1.0)
                         .setBias(-1.0)
                         .setRecurrent(false)
-                        .setRangeOutput(true)
+                        .setRangeOutput(Range.Output.DIRECT)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
