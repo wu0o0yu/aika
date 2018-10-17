@@ -215,8 +215,8 @@ public class Converter {
                     sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += (s.limit + s.limitDelta) * s.getNewWeight();
 
                     if(in.isPassiveInputNeuron() && !s.isNegative()) {
-                        posPassiveSumDelta += !s.isNegative() ? ((s.limit + s.limitDelta) * s.getNewWeight()) : 0.0;
-                        posPassiveSumDelta -= s.getNewWeight() > 0.0 ? (s.limit * s.weight) : 0.0;
+                        posPassiveSumDelta -= !s.isNegative() ? (s.limit * s.weight) : 0.0;
+                        posPassiveSumDelta += s.getNewWeight() > 0.0 ? ((s.limit + s.limitDelta) * s.getNewWeight()) : 0.0;
                     }
 
                     if (s.isConjunction(false, true) && !s.isConjunction(true, true)) {
