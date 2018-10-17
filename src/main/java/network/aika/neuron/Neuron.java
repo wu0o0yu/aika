@@ -209,8 +209,6 @@ public class Neuron extends Provider<INeuron> {
             for (Iterator<Map.Entry<Integer, Relation>> it = input.relations.entrySet().iterator(); it.hasNext(); ) {
                 Map.Entry<Integer, Relation> me = it.next();
 
-                assert me.getKey() != input.synapseId;
-
                 if(me.getKey() > input.synapseId) {
                     synapseInputs.get(me.getKey()).relations.put(input.synapseId, me.getValue().invert());
                     it.remove();

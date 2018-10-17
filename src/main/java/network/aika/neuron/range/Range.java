@@ -143,6 +143,7 @@ public class Range {
         public static Relation CONTAINED_IN = create(Operator.GREATER_THAN_EQUAL, Operator.LESS_THAN_EQUAL);
         public static Relation OVERLAPS = create(Operator.NONE, Operator.LESS_THAN, Operator.NONE, Operator.GREATER_THAN);
         public static Relation NONE = create(Operator.NONE, Operator.NONE);
+        public static Relation BETWEEN = create(Operator.GREATER_THAN, Operator.LESS_THAN);
 
 
         public Operator beginToBegin = Operator.NONE;
