@@ -20,6 +20,7 @@ import network.aika.Document;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.range.Position;
+import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation.Link;
@@ -95,6 +96,20 @@ public class Linker {
                 linkRelated(act, act, s, me.getValue());
             }
         }
+    }
+
+
+    public void linkInput(Activation act) {
+        for(Synapse s: act.getNeuron().inMemoryInputSynapses.values()) {
+            if(s.rangeOutput.compareTo(Range.Output.NONE) != 0) {
+                Range r = s.rangeOutput.invert().map(act.range);
+
+                Activation iAct = s.input.get(act.doc).getActivation(act.doc, r, false);
+
+                link(s, iAct, act);
+            }
+        }
+        doc.linker.process();
     }
 
 

@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static network.aika.neuron.range.Position.Operator.*;
+import static network.aika.neuron.range.Range.Output.DIRECT;
 
 public class LinkerTest {
 
@@ -55,7 +56,7 @@ public class LinkerTest {
                             .setWeight(10.0)
                             .setBias(-10.0)
                             .addRangeRelation(rr, 0)
-                            .setRangeOutput(Range.Output.DIRECT)
+                            .setRangeOutput(DIRECT)
             );
 
             Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
@@ -71,5 +72,33 @@ public class LinkerTest {
 
             Assert.assertEquals(targetValue, na.get().getActivations(doc, false).iterator().next().getOutputLinks(false).count() != 0);
         }
+    }
+
+
+    @Test
+    public void testLinkInputActivation() {
+
+        Model m = new Model();
+
+        Neuron na = m.createNeuron("A");
+
+        Neuron nb = m.createNeuron("B");
+
+        Neuron.init(nb, -0.5, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(na)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRangeOutput(DIRECT)
+        );
+
+        Document doc = m.createDocument("X");
+
+        na.addInput(doc, 0, 1);
+        nb.addInput(doc, 0, 1);
+
+        Assert.assertTrue(nb.getActivations(doc, false).iterator().next().getInputLinks(false, false).findAny().isPresent());
+
     }
 }

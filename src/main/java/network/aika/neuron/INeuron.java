@@ -338,6 +338,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         doc.inputNeuronActivations.add(act);
         doc.finallyActivatedNeurons.add(act.getINeuron());
 
+        doc.linker.linkInput(act);
+
         propagate(act);
 
         doc.propagate();
@@ -390,9 +392,18 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public Activation getActivation(Document doc, Range r, boolean onlyFinal) {
         ThreadState th = getThreadState(doc.threadId, false);
         if (th == null) return null;
-        for(Activation act : th.getActivationsByRangeBegin(r.begin, true, r.begin, false)) {
-            if (!onlyFinal || act.isFinalActivation()) {
-                return act;
+
+        if (r.begin != null) {
+            for (Activation act : th.getActivationsByRangeBegin(r.begin, true, r.begin, false)) {
+                if (!onlyFinal || act.isFinalActivation()) {
+                    return act;
+                }
+            }
+        } else if(r.end != null) {
+            for (Activation act : th.getActivationsByRangeEnd(r.end, true, r.end, false)) {
+                if (!onlyFinal || act.isFinalActivation()) {
+                    return act;
+                }
             }
         }
         return null;
