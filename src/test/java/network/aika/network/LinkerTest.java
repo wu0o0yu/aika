@@ -81,7 +81,6 @@ public class LinkerTest {
         Model m = new Model();
 
         Neuron na = m.createNeuron("A");
-
         Neuron nb = m.createNeuron("B");
 
         Neuron.init(nb, -0.5, INeuron.Type.EXCITATORY,

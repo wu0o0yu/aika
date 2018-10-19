@@ -63,8 +63,6 @@ public class Range {
     }
 
     public Range(Position begin, Position end) {
-        assert begin != null && end != null;
-
         this.begin = begin;
         this.end = end;
     }
