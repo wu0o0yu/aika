@@ -6,6 +6,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,7 +36,11 @@ public class PositiveFeedbackLoopTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Range.Relation.EQUALS, 0)
+                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         Neuron.init(nD, 5.0, INeuron.Type.EXCITATORY,
@@ -51,7 +56,11 @@ public class PositiveFeedbackLoopTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Range.Relation.EQUALS, 0)
+                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
 

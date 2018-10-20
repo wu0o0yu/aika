@@ -22,8 +22,8 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.Converter;
 import network.aika.neuron.range.Range;
-import network.aika.neuron.range.Range.Relation;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -76,7 +76,19 @@ public class ConverterTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRangeOutput(Range.Output.DIRECT),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(3)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         System.out.println(out.get().node.get().logicToString());
@@ -133,7 +145,19 @@ public class ConverterTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRangeOutput(Range.Output.DIRECT),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(3)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         System.out.println(out.get().node.get().logicToString());
@@ -192,7 +216,23 @@ public class ConverterTest {
                         .setWeight(0.5f)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRangeOutput(Range.Output.DIRECT),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(3)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(4)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         System.out.println(out.get().node.get().logicToString());
@@ -251,7 +291,19 @@ public class ConverterTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRangeOutput(Range.Output.DIRECT),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(3)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         System.out.println(out.get().node.get().logicToString());
@@ -283,7 +335,11 @@ public class ConverterTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(Range.Output.NONE)
+                        .setRangeOutput(Range.Output.NONE),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         Document doc = m.createDocument("IN");

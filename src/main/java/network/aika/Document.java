@@ -30,7 +30,6 @@ import network.aika.neuron.activation.SearchNode;
 import network.aika.lattice.Node.ThreadState;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.SearchNode.Decision;
-import network.aika.training.SupervisedTraining;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +87,6 @@ public class Document implements Comparable<Document> {
     public TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
     public TreeMap<Integer, Double> searchNodeWeights = new TreeMap<>();
 
-    public SupervisedTraining supervisedTraining = new SupervisedTraining(this);
 
     private TreeMap<ActKey, Activation> activationsByRangeBegin = new TreeMap<>((ak1, ak2) -> {
         int r = Position.compare(ak1.range.begin, ak2.range.begin);

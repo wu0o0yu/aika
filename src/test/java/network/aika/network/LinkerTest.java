@@ -5,8 +5,8 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.range.Range;
-import network.aika.neuron.range.Range.Relation;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,7 +35,7 @@ public class LinkerTest {
     }
 */
 
-    public void testSynapse(Range ra, Range rb, Relation rr, boolean targetValue) {
+    public void testSynapse(Range ra, Range rb, Range.Relation rr, boolean targetValue) {
         for (int dir = 0; dir < 2; dir++) {
             Model m = new Model();
 
@@ -56,7 +56,11 @@ public class LinkerTest {
                             .setWeight(10.0)
                             .setBias(-10.0)
                             .addRangeRelation(rr, 0)
-                            .setRangeOutput(DIRECT)
+                            .setRangeOutput(DIRECT),
+                    new Relation.Builder()
+                            .setFrom(1)
+                            .setTo(0)
+                            .setRangeRelation(rr)
             );
 
             Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");

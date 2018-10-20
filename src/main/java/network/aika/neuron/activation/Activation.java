@@ -115,11 +115,6 @@ public final class Activation extends OrActivation {
 
     public void setTargetValue(Double targetValue) {
         this.targetValue = targetValue;
-        if (targetValue != null) {
-            doc.supervisedTraining.targetActivations.add(this);
-        } else {
-            doc.supervisedTraining.targetActivations.remove(this);
-        }
     }
 
 

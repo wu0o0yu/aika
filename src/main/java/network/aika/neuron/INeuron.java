@@ -91,7 +91,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
 
     // synapseId -> relation
-    public Map<Integer, Relation> outputRelations;
+    public Map<Relation.Key, Relation> outputRelations;
 
 
     // A synapse is stored only in one direction, depending on the synapse weight.
@@ -501,8 +501,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         if(outputRelations != null) {
             out.writeInt(outputRelations.size());
-            for (Map.Entry<Integer, Relation> me : outputRelations.entrySet()) {
-                out.writeInt(me.getKey());
+            for (Map.Entry<Relation.Key, Relation> me : outputRelations.entrySet()) {
+                me.getKey().write(out);
                 me.getValue().write(out);
             }
         } else  {
@@ -570,9 +570,9 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         if(l > 0) {
             outputRelations = new TreeMap<>();
             for(int i = 0; i < l; i++) {
-                int synId = in.readInt();
+                Relation.Key rk = Relation.Key.read(in, m);
                 Relation r = Relation.read(in, m);
-                outputRelations.put(synId, r);
+                outputRelations.put(rk, r);
             }
         }
 
@@ -672,23 +672,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         act.range.end.addEndActivations(act);
 
         doc.addActivation(act);
-    }
-
-
-    public static boolean update(int threadId, Document doc, Neuron pn, Double bias, Collection<Synapse> modifiedSynapses) {
-        INeuron n = pn.get();
-
-        if(bias != null) {
-            n.setBias(bias);
-        }
-
-        // s.link requires an updated n.biasSumDelta value.
-        modifiedSynapses.forEach(s -> {
-            s.link();
-            s.reverseLinkRelations();
-        });
-
-        return Converter.convert(threadId, doc, n, modifiedSynapses);
     }
 
 

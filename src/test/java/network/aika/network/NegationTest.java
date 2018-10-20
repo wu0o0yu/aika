@@ -23,9 +23,9 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.range.Position;
-import network.aika.neuron.range.Range.Relation;
 import network.aika.neuron.range.Range;
 import network.aika.lattice.OrNode;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -72,7 +72,15 @@ public class NegationTest {
                         .setNeuron(inC)
                         .setWeight(-10.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
+                        .setRecurrent(true),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.CONTAINS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.CONTAINS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -143,7 +151,15 @@ public class NegationTest {
                         .setNeuron(inC)
                         .setWeight(-1.0)
                         .setRecurrent(true)
-                        .setBias(0.0)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.NONE),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.NONE)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -202,7 +218,11 @@ public class NegationTest {
                         .setWeight(-1.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Relation.EQUALS, 0)
+                        .addRangeRelation(Relation.EQUALS, 0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -259,7 +279,11 @@ public class NegationTest {
                         .setWeight(-1.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Relation.CONTAINS, 0)
+                        .addRangeRelation(Relation.CONTAINS, 0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.CONTAINS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -316,7 +340,11 @@ public class NegationTest {
                         .setWeight(-1.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Relation.CONTAINS, 0)
+                        .addRangeRelation(Relation.CONTAINS, 0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.CONTAINS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -380,7 +408,11 @@ public class NegationTest {
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setBias(0.0)
-                        .addRangeRelation(Relation.CONTAINS, 0)
+                        .addRangeRelation(Relation.CONTAINS, 0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.CONTAINS)
         );
         Neuron.init(absN,
                 0.001,
@@ -407,7 +439,19 @@ public class NegationTest {
                         .setRecurrent(true)
                         .setBias(0.0)
                         .addRangeRelation(Relation.OVERLAPS, 0)
-                        .addRangeRelation(Relation.OVERLAPS, 1)
+                        .addRangeRelation(Relation.OVERLAPS, 1),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.create(Position.Operator.NONE, Position.Operator.NONE, Position.Operator.NONE, GREATER_THAN)),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.OVERLAPS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.OVERLAPS)
         );
 
         {
@@ -502,7 +546,11 @@ public class NegationTest {
                         .setRecurrent(true)
                         .setBias(0.0)
                         .addRangeRelation(Relation.EQUALS, 0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRangeOutput(Range.Output.DIRECT),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
         Neuron.init(ascN,
                 0.001,
@@ -529,7 +577,15 @@ public class NegationTest {
                         .setRecurrent(true)
                         .setBias(0.0)
                         .addRangeRelation(Relation.EQUALS, 0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRangeOutput(Range.Output.DIRECT),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         Neuron.init(bsN,
@@ -549,7 +605,11 @@ public class NegationTest {
                         .setRecurrent(true)
                         .setBias(0.0)
                         .addRangeRelation(Relation.EQUALS, 0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRangeOutput(Range.Output.DIRECT),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         Neuron outA = Neuron.init(m.createNeuron("OUT A"),

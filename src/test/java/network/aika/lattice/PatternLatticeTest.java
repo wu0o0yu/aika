@@ -22,8 +22,8 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.range.Range;
-import network.aika.neuron.range.Range.Relation;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,7 +49,7 @@ public class PatternLatticeTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .addRangeRelation(Relation.EQUALS, 1)
+                        .addRangeRelation(Range.Relation.EQUALS, 1)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -57,7 +57,7 @@ public class PatternLatticeTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .addRangeRelation(Relation.EQUALS, 2)
+                        .addRangeRelation(Range.Relation.EQUALS, 2)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(2)
@@ -65,7 +65,15 @@ public class PatternLatticeTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRangeOutput(Range.Output.DIRECT),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         Document doc = m.createDocument("", 0);
@@ -123,7 +131,15 @@ public class PatternLatticeTest {
                         .setWeight(1.0)
                         .setBias(-1.0)
                         .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

@@ -7,6 +7,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.range.Range;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,7 +37,11 @@ public class PassiveInputNeuronTest {
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .addRangeRelation(Range.Relation.EQUALS, 0)
+                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
 

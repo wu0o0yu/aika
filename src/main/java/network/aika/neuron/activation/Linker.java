@@ -27,7 +27,7 @@ import network.aika.neuron.activation.Activation.Link;
 
 import java.util.*;
 
-import static network.aika.neuron.Synapse.Builder.VARIABLE;
+import static network.aika.neuron.Synapse.VARIABLE;
 import static network.aika.neuron.activation.SearchNode.Decision;
 
 /**
@@ -91,10 +91,12 @@ public class Linker {
     private void linkOutputRelations(Activation act) {
         INeuron n = act.getINeuron();
         if(n.outputRelations != null) {
-            for (Map.Entry<Integer, Relation> me : n.outputRelations.entrySet()) {
+            linkRelated(act, act, n.outputRelations);
+/*            for (Map.Entry<Relation.Key, Relation> me : n.outputRelations.entrySet()) {
                 Synapse s = act.node.neuron.getSynapseById(me.getKey());
                 linkRelated(act, act, s, me.getValue());
             }
+*/
         }
     }
 
@@ -135,7 +137,9 @@ public class Linker {
     public void process() {
         while(!queue.isEmpty()) {
             Link l = queue.pollFirst();
-            for(Map.Entry<Integer, Relation> me: l.synapse.relations.entrySet()) {
+            linkRelated(l.input, l.output, l.synapse.relations);
+/*
+            for(Map.Entry<Relation.Key, Relation> me: l.synapse.relations.entrySet()) {
                 int relId = me.getKey();
                 if(relId >= 0) {
                     Synapse s = l.output.getNeuron().getSynapseById(relId);
@@ -145,7 +149,22 @@ public class Linker {
                     }
                 }
             }
+*/
             doc.propagate();
+        }
+    }
+
+
+    private void linkRelated(Activation rAct, Activation oAct, Map<Relation.Key, Relation> relations) {
+        for(Map.Entry<Relation.Key, Relation> me: relations.entrySet()) {
+            Relation.Key rk = me.getKey();
+            if(rk.synapseId >= 0) {
+                Synapse s = oAct.getNeuron().getSynapseById(rk.synapseId);
+                if(s != null) {
+                    Relation r = me.getValue();
+                    linkRelated(rAct, oAct, s, r);
+                }
+            }
         }
     }
 
@@ -169,11 +188,11 @@ public class Linker {
     protected void link(Synapse s, Activation iAct, Activation oAct) {
         iAct = computeInputActivation(s, iAct);
 
-        if(iAct == null || iAct.blocked) {
+        if(iAct == null || iAct.blocked || !checkRelations(s, iAct, oAct)) {
             return;
         }
 
-        if(s.rangeInput == Synapse.Builder.OUTPUT) {
+        if(s.rangeInput == Synapse.OUTPUT) {
             Position outputBegin = s.rangeOutput.begin.map(iAct.range);
             Position outputEnd = s.rangeOutput.end.map(iAct.range);
 
@@ -204,6 +223,21 @@ public class Linker {
         if(!nl.passive) {
             addToQueue(nl);
         }
+    }
+
+
+    private boolean checkRelations(Synapse s, Activation iAct, Activation oAct) {
+        for(Map.Entry<Relation.Key, Relation> me: s.relations.entrySet()) {
+            if(me.getKey().synapseId == Synapse.OUTPUT) {
+                Relation r = me.getValue();
+                if(!r.test(iAct, oAct)) {
+                    return false;
+                }
+            }
+            // TODO: other relations
+        }
+
+        return true;
     }
 
 

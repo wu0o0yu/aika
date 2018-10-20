@@ -24,6 +24,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -87,7 +88,11 @@ public class MutualExclusionTest {
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Range.Relation.EQUALS, 0)
+                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         Neuron pB = Neuron.init(
@@ -108,7 +113,11 @@ public class MutualExclusionTest {
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Range.Relation.EQUALS, 0)
+                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         Neuron pC = Neuron.init(
@@ -129,7 +138,11 @@ public class MutualExclusionTest {
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Range.Relation.EQUALS, 0)
+                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         // Finally addInput all the inputs to the suppressing neuron.

@@ -91,8 +91,8 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Neuron n, double bias, INeuron.Type type, Synapse.Builder... inputs) {
-        return init(n, bias, type, new ArrayList<>(Arrays.asList(inputs)));
+    public static Neuron init(Neuron n, double bias, INeuron.Type type, Builder... inputs) {
+        return init(n, bias, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
     }
 
 
@@ -105,7 +105,7 @@ public class Neuron extends Provider<INeuron> {
      * @return
      */
     public static Neuron init(Document doc, Neuron n, double bias, INeuron.Type type, Synapse.Builder... inputs) {
-        return init(doc, n, bias, null, type, new ArrayList<>(Arrays.asList(inputs)));
+        return init(doc, n, bias, null, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
     }
 
 
@@ -118,7 +118,7 @@ public class Neuron extends Provider<INeuron> {
      * @return
      */
     public static Neuron init(Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Synapse.Builder... inputs) {
-        return init(n, bias, activationFunction, type, new ArrayList<>(Arrays.asList(inputs)));
+        return init(n, bias, activationFunction, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
     }
 
 
@@ -131,7 +131,7 @@ public class Neuron extends Provider<INeuron> {
      * @return
      */
     public static Neuron init(Document doc, Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Synapse.Builder... inputs) {
-        return init(doc, n, bias, activationFunction, type, new ArrayList<>(Arrays.asList(inputs)));
+        return init(doc, n, bias, activationFunction, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
     }
 
 
@@ -141,11 +141,12 @@ public class Neuron extends Provider<INeuron> {
      *
      * @param n
      * @param bias
-     * @param inputs
+     * @param synapseBuilders
+     * @param relationBuilders
      * @return
      */
-    public static Neuron init(Neuron n, double bias, INeuron.Type type, List<Synapse.Builder> inputs) {
-        return init(n, bias, null, type, inputs);
+    public static Neuron init(Neuron n, double bias, INeuron.Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
+        return init(n, bias, null, type, synapseBuilders, relationBuilders);
     }
 
 
@@ -154,11 +155,12 @@ public class Neuron extends Provider<INeuron> {
      *
      * @param n
      * @param bias
-     * @param inputs
+     * @param synapseBuilders
+     * @param relationBuilders
      * @return
      */
-    public static Neuron init(Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, List<Synapse.Builder> inputs) {
-        if(n.init(bias, activationFunction, type, inputs)) return n;
+    public static Neuron init(Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
+        if(n.init(bias, activationFunction, type, synapseBuilders, relationBuilders)) return n;
         return null;
     }
 
@@ -167,11 +169,12 @@ public class Neuron extends Provider<INeuron> {
      *
      * @param n
      * @param bias
-     * @param inputs
+     * @param synapseBuilders
+     * @param relationBuilders
      * @return
      */
-    public static Neuron init(Document doc, Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, List<Synapse.Builder> inputs) {
-        if(n.init(doc, bias, activationFunction, type, inputs)) return n;
+    public static Neuron init(Document doc, Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
+        if(n.init(doc, bias, activationFunction, type, synapseBuilders, relationBuilders)) return n;
         return null;
     }
 
@@ -180,75 +183,43 @@ public class Neuron extends Provider<INeuron> {
      * Initializes a neuron with the given bias.
      *
      * @param bias
-     * @param inputs
+     * @param synapseBuilders
+     * @param relationBuilders
      * @return
      */
-    public boolean init(double bias, ActivationFunction activationFunction, INeuron.Type type, List<Synapse.Builder> inputs) {
-        return init((Document) null, bias, activationFunction, type, inputs);
+    public boolean init(double bias, ActivationFunction activationFunction, INeuron.Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
+        return init((Document) null, bias, activationFunction, type, synapseBuilders, relationBuilders);
     }
 
 
-    public boolean init(Document doc, double bias, ActivationFunction activationFunction, INeuron.Type type, List<Synapse.Builder> inputs) {
+    public boolean init(Document doc, Double bias, ActivationFunction activationFunction, INeuron.Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
 
-        int maxSynapseId = -1;
-        for (Synapse.Builder input : inputs) {
-            if(input.synapseId != null) {
-                maxSynapseId = Math.max(input.synapseId, maxSynapseId);
-            }
-        }
-
-        Map<Integer, Synapse.Builder> synapseInputs = new TreeMap<>();
-        for (Synapse.Builder input : inputs) {
-            if(input.synapseId == null) {
-                input.synapseId = ++maxSynapseId;
-            }
-            synapseInputs.put(input.synapseId, input);
-        }
-
-        for (Synapse.Builder input : inputs) {
-            for (Iterator<Map.Entry<Integer, Relation>> it = input.relations.entrySet().iterator(); it.hasNext(); ) {
-                Map.Entry<Integer, Relation> me = it.next();
-
-                if(me.getKey() > input.synapseId) {
-                    synapseInputs.get(me.getKey()).relations.put(input.synapseId, me.getValue().invert());
-                    it.remove();
-                }
-            }
-        }
-
-        List<Synapse> inputSynapses = new ArrayList<>();
-        for (Synapse.Builder input : synapseInputs.values()) {
-            Synapse s = input.getSynapse(this);
-            s.update(doc, input.weight, input.bias, input.limit);
-            inputSynapses.add(s);
-        }
-
+        INeuron n = get();
 
         if(activationFunction != null) {
-            INeuron in = get();
-            in.activationFunction = activationFunction;
+            n.activationFunction = activationFunction;
         }
 
         if(type != null) {
-            INeuron in = get();
-            in.type = type;
+            n.type = type;
         }
 
-        return INeuron.update(model.defaultThreadId, doc, this, bias, inputSynapses);
-    }
+        if(bias != null) {
+            n.setBias(bias);
+        }
 
+        ArrayList<Synapse> modifiedSynapses = new ArrayList<>();
+        // s.link requires an updated n.biasSumDelta value.
+        synapseBuilders.forEach(input -> {
+            Synapse s = input.getSynapse(this);
+            s.update(doc, input.weight, input.bias, input.limit);
+            s.link();
+            modifiedSynapses.add(s);
+        });
 
-    public void addSynapse(Synapse.Builder input) {
-        addSynapse(null, input);
-    }
+        relationBuilders.forEach(input -> input.connect(this));
 
-
-    public void addSynapse(Document doc, Synapse.Builder input) {
-        Synapse s = input.getSynapse(this);
-
-        s.update(doc, input.weight, input.bias, input.limit);
-
-        INeuron.update(doc != null ? doc.threadId : model.defaultThreadId, doc, this, 0.0, Collections.singletonList(s));
+        return Converter.convert(model.defaultThreadId, doc, n, modifiedSynapses);
     }
 
 
@@ -328,6 +299,33 @@ public class Neuron extends Provider<INeuron> {
         if(this == MAX_NEURON) return "MAX_NEURON";
 
         return super.toString();
+    }
+
+
+    public interface Builder {
+
+    }
+
+
+    private static Collection<Synapse.Builder> getSynapseBuilders(Builder... builders) {
+        ArrayList<Synapse.Builder> result = new ArrayList<>();
+        for(Builder b: builders) {
+            if(b instanceof Synapse.Builder) {
+                result.add((Synapse.Builder) b);
+            }
+        }
+        return result;
+    }
+
+
+    private static Collection<Relation.Builder> getRelationBuilders(Builder... builders) {
+        ArrayList<Relation.Builder> result = new ArrayList<>();
+        for(Builder b: builders) {
+            if(b instanceof Relation.Builder) {
+                result.add((Relation.Builder) b);
+            }
+        }
+        return result;
     }
 
 }

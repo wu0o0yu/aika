@@ -25,6 +25,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -79,7 +80,15 @@ public class SimplePatternMatchingTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS)
         );
 
 
@@ -169,7 +178,19 @@ public class SimplePatternMatchingTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(3)
+                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS)
         );
 
 
@@ -245,7 +266,19 @@ public class SimplePatternMatchingTest {
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .addRangeRelation(Range.Relation.EQUALS, 0)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
 
@@ -322,7 +355,31 @@ public class SimplePatternMatchingTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(3)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(3)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(3)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
 

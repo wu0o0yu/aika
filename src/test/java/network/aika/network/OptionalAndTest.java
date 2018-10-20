@@ -23,6 +23,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.range.Range;
+import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
 /**
@@ -103,7 +104,15 @@ public class OptionalAndTest {
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setBias(0.0)
-                        .addRangeRelation(Range.Relation.OVERLAPS, 0)
+                        .addRangeRelation(Range.Relation.OVERLAPS, 0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.OVERLAPS)
         );
 
         Neuron verb = Neuron.init(m.createNeuron("VERB"),
@@ -122,7 +131,11 @@ public class OptionalAndTest {
                         .setWeight(-1.0)
                         .setRecurrent(true)
                         .setBias(0.0)
-                        .addRangeRelation(Range.Relation.OVERLAPS, 0)
+                        .addRangeRelation(Range.Relation.OVERLAPS, 0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.OVERLAPS)
         );
 
         Neuron.init(suppr,

@@ -9,6 +9,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.range.Range;
 import network.aika.neuron.activation.SearchNode;
+import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
 import static network.aika.neuron.range.Range.Relation.EQUALS;
@@ -64,7 +65,11 @@ public class SoftMaxTest {
                                 .setBias(0.0)
                                 .setRecurrent(true)
                                 .addRangeRelation(EQUALS, 0)
-                                .setRangeOutput(Range.Output.NONE)
+                                .setRangeOutput(Range.Output.NONE),
+                        new Relation.Builder()
+                                .setFrom(1)
+                                .setTo(0)
+                                .setRangeRelation(Range.Relation.EQUALS)
                 );
                 output[j][i] = n;
 

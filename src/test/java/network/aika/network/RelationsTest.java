@@ -8,6 +8,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.range.Range;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -101,7 +102,11 @@ public class RelationsTest {
                         .setWeight(10.0)
                         .setRecurrent(false)
                         .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRangeOutput(Range.Output.DIRECT),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setInstanceRelation(CONTAINED_IN)
         ).get();
 
 
@@ -150,7 +155,15 @@ public class RelationsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END)
+                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS)
         ).get();
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -178,7 +191,7 @@ public class RelationsTest {
         String word = "Huettenheim";
 
 
-        List<Synapse.Builder> inputs = new ArrayList<>();
+        List<Neuron.Builder> inputs = new ArrayList<>();
         for (int i = 0; i < word.length(); i++) {
             char c = word.toLowerCase().charAt(i);
 
@@ -187,25 +200,32 @@ public class RelationsTest {
                 boolean begin = i == 0;
                 boolean end = i + 1 == word.length();
 
-                Synapse.Builder s = new Synapse.Builder()
+                inputs.add(new Synapse.Builder()
                         .setSynapseId(i)
                         .setNeuron(rec)
                         .setWeight(begin || end ? 2.0 : 1.0)
                         .setRecurrent(false)
                         .setBias(begin || end ? -2.0 : -1.0)
-                        .setRangeOutput(begin ? Range.Mapping.BEGIN : Range.Mapping.NONE, end ? Range.Mapping.END : Range.Mapping.NONE);
+                        .setRangeOutput(begin ? Range.Mapping.BEGIN : Range.Mapping.NONE, end ? Range.Mapping.END : Range.Mapping.NONE)
+                );
 
                 if(!end) {
-                    s = s.addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, i + 1);
+                    inputs.add(new Relation.Builder()
+                                    .setFrom(i)
+                                    .setTo(i + 1)
+                                    .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS)
+                    );
                 } else {
-                    s = s.addRangeRelation(Range.Relation.create(NONE, NONE, NONE, GREATER_THAN), 0);
+                    inputs.add(new Relation.Builder()
+                                    .setFrom(i)
+                                    .setTo(0)
+                                    .setRangeRelation(Range.Relation.create(NONE, NONE, NONE, GREATER_THAN))
+                    );
                 }
-
-                inputs.add(s);
             }
         }
 
-        Neuron n = Neuron.init(m.createNeuron("PATTERN"), 0.5, INeuron.Type.EXCITATORY, inputs);
+        Neuron n = Neuron.init(m.createNeuron("PATTERN"), 0.5, INeuron.Type.EXCITATORY, inputs.toArray(new Neuron.Builder[inputs.size()]));
 
         System.out.println(n.get().node.get().logicToString());
 
@@ -274,7 +294,11 @@ public class RelationsTest {
                         .setRecurrent(false)
                         .setRangeOutput(Range.Output.NONE)
                         .setSynapseId(1)
-                        .addInstanceRelation(COMMON_ANCESTOR, 0)
+                        .addInstanceRelation(COMMON_ANCESTOR, 0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setInstanceRelation(COMMON_ANCESTOR)
         );
 
 
@@ -314,7 +338,11 @@ public class RelationsTest {
                         .setRecurrent(false)
                         .setRangeOutput(Range.Output.NONE)
                         .setSynapseId(1)
-                        .addInstanceRelation(COMMON_ANCESTOR, 0)
+                        .addInstanceRelation(COMMON_ANCESTOR, 0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setInstanceRelation(COMMON_ANCESTOR)
         );
 
 

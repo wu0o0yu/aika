@@ -23,15 +23,12 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.range.Range.Relation;
 import network.aika.neuron.range.Range.Output;
-import network.aika.neuron.relation.InstanceRelation;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static network.aika.neuron.Synapse.Builder.OUTPUT;
-import static network.aika.neuron.range.Range.Mapping.NONE;
-import static network.aika.neuron.relation.InstanceRelation.Type.CONTAINED_IN;
+import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.InstanceRelation.Type.CONTAINS;
 
 
@@ -80,7 +77,7 @@ public class GenerateTextTest {
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .addRangeRelation(Relation.NONE, 0)
+                        .addRangeRelation(Range.Relation.NONE, 0)
                         .setRangeOutput(Output.NONE),
                 new Synapse.Builder()
                         .setSynapseId(2)
@@ -88,7 +85,15 @@ public class GenerateTextTest {
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Relation.EQUALS, OUTPUT)
+                        .addRangeRelation(Range.Relation.EQUALS, OUTPUT),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.NONE),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         Neuron.init(phraseB, 5.0, INeuron.Type.EXCITATORY,
@@ -111,7 +116,15 @@ public class GenerateTextTest {
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true)
-                        .addRangeRelation(Relation.EQUALS, OUTPUT)
+                        .addRangeRelation(Relation.EQUALS, OUTPUT),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.NONE),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
 
@@ -151,7 +164,11 @@ public class GenerateTextTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .addInstanceRelation(CONTAINS, 0)
-                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE)
+                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setInstanceRelation(CONTAINS)
         );
 
 
@@ -183,7 +200,11 @@ public class GenerateTextTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .addInstanceRelation(CONTAINS, 0)
-                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE)
+                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setInstanceRelation(CONTAINS)
         );
 
 

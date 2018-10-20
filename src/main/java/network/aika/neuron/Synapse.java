@@ -22,8 +22,6 @@ import network.aika.Document;
 import network.aika.neuron.range.Range;
 import network.aika.neuron.range.Range.Output;
 import network.aika.neuron.range.Range.Mapping;
-import network.aika.neuron.relation.InstanceRelation;
-import network.aika.neuron.relation.RangeRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.Writable;
 
@@ -31,8 +29,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
-
-import static network.aika.neuron.Synapse.Builder.OUTPUT;
 
 /**
  * The {@code Synapse} class connects two neurons with each other. When propagating an activation signal, the
@@ -63,6 +59,8 @@ import static network.aika.neuron.Synapse.Builder.OUTPUT;
  */
 public class Synapse implements Writable {
 
+    public static final int OUTPUT = -1;
+    public static final int VARIABLE = -2;
 
     public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = (s1, s2) -> {
         int r = s1.input.compareTo(s2.input);
@@ -89,8 +87,7 @@ public class Synapse implements Writable {
     public Output rangeOutput;
     public boolean identity;
 
-    // synapseId -> relation
-    public Map<Integer, Relation> relations;
+    public Map<Relation.Key, Relation> relations;
 
     public DistanceFunction distanceFunction = null;
 
@@ -186,29 +183,6 @@ public class Synapse implements Writable {
 
         (dir ? in : out).lock.releaseWriteLock();
         (dir ? out : in).lock.releaseWriteLock();
-    }
-
-
-    public void reverseLinkRelations() {
-        INeuron out = output.get();
-        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
-            int rId = me.getKey();
-            Map<Integer, Relation> rel = null;
-            if(rId == OUTPUT) {
-                if(out.outputRelations == null) {
-                    out.outputRelations = new TreeMap<>();
-                }
-                rel = out.outputRelations;
-            } else {
-                Synapse rs = out.provider.getSynapseById(rId);
-                if(rs != null) {
-                    rel = rs.relations;
-                }
-            }
-            if(rel != null) {
-                rel.put(id, me.getValue().invert());
-            }
-        }
     }
 
 
@@ -351,8 +325,8 @@ public class Synapse implements Writable {
         out.writeInt(output.id);
 
         out.writeInt(relations.size());
-        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
-            out.writeInt(me.getKey());
+        for(Map.Entry<Relation.Key, Relation> me: relations.entrySet()) {
+            me.getKey().write(out);
             me.getValue().write(out);
         }
 
@@ -388,9 +362,9 @@ public class Synapse implements Writable {
 
         int l = in.readInt();
         for(int i = 0; i < l; i++) {
-            int synId = in.readInt();
+            Relation.Key relKey = Relation.Key.read(in, m);
             Relation r = Relation.read(in, m);
-            relations.put(synId, r);
+            relations.put(relKey, r);
         }
 
         if(in.readBoolean()) {
@@ -469,9 +443,7 @@ public class Synapse implements Writable {
      *
      * @author Lukas Molzberger
      */
-    public static class Builder implements Comparable<Builder> {
-        public static final int OUTPUT = -1;
-        public static final int VARIABLE = -2;
+    public static class Builder implements Neuron.Builder {
 
         public boolean recurrent;
         public Neuron neuron;
@@ -486,7 +458,6 @@ public class Synapse implements Writable {
         public boolean identity;
 
         public Integer synapseId;
-        public Map<Integer, Relation> relations = new TreeMap<>();
 
 
         /**
@@ -604,27 +575,6 @@ public class Synapse implements Writable {
             return this;
         }
 
-
-        public Builder addRelations(Map<Integer, Relation> relations) {
-            this.relations.putAll(relations);
-            return this;
-        }
-
-
-        public Builder addInstanceRelation(InstanceRelation.Type type, int synapseId) {
-            assert synapseId >= -1;
-            relations.put(synapseId, new InstanceRelation(type));
-            return this;
-        }
-
-
-        public Builder addRangeRelation(Range.Relation relation, int synapseId) {
-            assert synapseId >= -1;
-            relations.put(synapseId, new RangeRelation(relation));
-            return this;
-        }
-
-
         public Synapse getSynapse(Neuron outputNeuron) {
             Synapse s = createOrLookup(null, synapseId, neuron, outputNeuron);
 
@@ -632,16 +582,9 @@ public class Synapse implements Writable {
             s.rangeInput = rangeInput;
             s.rangeOutput = rangeOutput;
             s.identity = identity;
-            s.relations = relations;
             s.distanceFunction = distanceFunction;
 
             return s;
-        }
-
-
-        @Override
-        public int compareTo(Builder in) {
-            return Integer.compare(synapseId, in.synapseId);
         }
     }
 }

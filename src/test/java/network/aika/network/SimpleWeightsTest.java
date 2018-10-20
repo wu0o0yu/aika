@@ -23,6 +23,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.range.Range;
+import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
 /**
@@ -108,7 +109,11 @@ public class SimpleWeightsTest {
                         .setWeight(3.0)
                         .setBias(-3.0)
                         .setRecurrent(false)
-                        .addRangeRelation(Range.Relation.EQUALS, 0)
+                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
         {

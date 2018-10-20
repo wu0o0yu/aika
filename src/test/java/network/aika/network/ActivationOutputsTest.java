@@ -26,6 +26,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.range.Range;
 import network.aika.lattice.Node;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -65,7 +66,11 @@ public class ActivationOutputsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .setRangeOutput(Range.Output.END)
+                        .setRangeOutput(Range.Output.END),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.EQUALS)
         );
 
 
