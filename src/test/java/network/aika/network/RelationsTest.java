@@ -41,7 +41,6 @@ public class RelationsTest {
                         .setWeight(10.0)
                         .setRecurrent(false)
                         .setBias(-10.0)
-                        .addRangeRelation(Range.Relation.EQUALS, 1)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -94,7 +93,6 @@ public class RelationsTest {
                         .setWeight(10.0)
                         .setRecurrent(false)
                         .setBias(-10.0)
-                        .addInstanceRelation(CONTAINED_IN, 1)
                         .setRangeOutput(Range.Output.DIRECT),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -139,7 +137,6 @@ public class RelationsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 1)
                         .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -147,7 +144,6 @@ public class RelationsTest {
                         .setWeight(1.0)
                         .setRecurrent(false)
                         .setBias(-1.0)
-                        .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 2)
                         .setRangeOutput(Range.Output.NONE),
                 new Synapse.Builder()
                         .setSynapseId(2)
@@ -284,8 +280,7 @@ public class RelationsTest {
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeOutput(Range.Output.DIRECT)
-                        .setSynapseId(0)
-                        .addInstanceRelation(COMMON_ANCESTOR, 1),
+                        .setSynapseId(0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(nC)
@@ -293,8 +288,7 @@ public class RelationsTest {
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeOutput(Range.Output.NONE)
-                        .setSynapseId(1)
-                        .addInstanceRelation(COMMON_ANCESTOR, 0),
+                        .setSynapseId(1),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -328,8 +322,7 @@ public class RelationsTest {
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeOutput(Range.Output.DIRECT)
-                        .setSynapseId(0)
-                        .addInstanceRelation(COMMON_ANCESTOR, 1),
+                        .setSynapseId(0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
@@ -337,8 +330,7 @@ public class RelationsTest {
                         .setBias(-10.0)
                         .setRecurrent(false)
                         .setRangeOutput(Range.Output.NONE)
-                        .setSynapseId(1)
-                        .addInstanceRelation(COMMON_ANCESTOR, 0),
+                        .setSynapseId(1),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)

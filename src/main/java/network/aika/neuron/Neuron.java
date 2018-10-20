@@ -83,6 +83,17 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
+    public static Neuron init(Neuron n, Builder... inputs) {
+        return init(null, n, inputs);
+    }
+
+
+    public static Neuron init(Document doc, Neuron n, Builder... inputs) {
+        if(n.init(null, null, null, null, getSynapseBuilders(inputs), getRelationBuilders(inputs))) {
+            return n;
+        } else return null;
+    }
+
     /**
      * Creates a neuron with the given bias.
      *
@@ -104,7 +115,7 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Document doc, Neuron n, double bias, INeuron.Type type, Synapse.Builder... inputs) {
+    public static Neuron init(Document doc, Neuron n, double bias, INeuron.Type type, Builder... inputs) {
         return init(doc, n, bias, null, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
     }
 
@@ -117,7 +128,7 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Synapse.Builder... inputs) {
+    public static Neuron init(Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Builder... inputs) {
         return init(n, bias, activationFunction, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
     }
 
@@ -130,7 +141,7 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Document doc, Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Synapse.Builder... inputs) {
+    public static Neuron init(Document doc, Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Builder... inputs) {
         return init(doc, n, bias, activationFunction, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
     }
 
@@ -190,7 +201,6 @@ public class Neuron extends Provider<INeuron> {
     public boolean init(double bias, ActivationFunction activationFunction, INeuron.Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
         return init((Document) null, bias, activationFunction, type, synapseBuilders, relationBuilders);
     }
-
 
     public boolean init(Document doc, Double bias, ActivationFunction activationFunction, INeuron.Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
 
@@ -299,6 +309,11 @@ public class Neuron extends Provider<INeuron> {
         if(this == MAX_NEURON) return "MAX_NEURON";
 
         return super.toString();
+    }
+
+
+    public int getNewSynapseId() {
+        return get().getNewSynapseId();
     }
 
 

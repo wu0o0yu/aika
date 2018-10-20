@@ -12,15 +12,17 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.range.Range;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static network.aika.neuron.Synapse.Builder.OUTPUT;
+import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.range.Range.Relation.BEGIN_TO_END_EQUALS;
 import static network.aika.neuron.range.Range.Relation.OVERLAPS;
 
@@ -82,11 +84,15 @@ public class ContextFreeGrammarTest {
         for(Neuron n: new Neuron[] {ART, N, ADJ, V, AUX}) {
             Neuron.init(n, 0.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
                     new Synapse.Builder()
+                            .setSynapseId(0)
                             .setNeuron(I)
                             .setWeight(-50.0)
                             .setBias(0.0)
-                            .setRecurrent(true)
-                            .addRangeRelation(OVERLAPS, OUTPUT)
+                            .setRecurrent(true),
+                    new Relation.Builder()
+                            .setFrom(0)
+                            .setTo(Synapse.OUTPUT)
+                            .setRangeRelation(Range.Relation.OVERLAPS)
             );
         }
 
@@ -121,8 +127,9 @@ public class ContextFreeGrammarTest {
         dictionary.put(word, wordN);
 
         for (Neuron wordType : wordTypes) {
-            wordType.addSynapse(
+            Neuron.init(wordType,
                     new Synapse.Builder()
+                            .setSynapseId(wordType.getNewSynapseId())
                             .setNeuron(wordN)
                             .setWeight(3.0)
                             .setBias(0.0)
@@ -134,8 +141,9 @@ public class ContextFreeGrammarTest {
 
     private void initOrNeuron(Neuron orN, Neuron... inputs) {
         for (Neuron n : inputs) {
-            orN.addSynapse(
+            Neuron.init(orN,
                     new Synapse.Builder()
+                            .setSynapseId(orN.getNewSynapseId())
                             .setNeuron(n)
                             .setWeight(1.0)
                             .setRangeOutput(Range.Output.DIRECT)
@@ -145,36 +153,44 @@ public class ContextFreeGrammarTest {
 
 
     private void initAndNeuron(Neuron andN, double weight, Neuron... inputs) {
-        ArrayList<Synapse.Builder> synapses = new ArrayList<>();
+        List<Neuron.Builder> in = new ArrayList<>();
 
         for(int i = 0; i < inputs.length; i++) {
             boolean begin = i == 0;
             boolean end = i + 1 == inputs.length;
 
-            Synapse.Builder s = new Synapse.Builder()
+            in.add(new Synapse.Builder()
                         .setSynapseId(i)
                         .setNeuron(inputs[i])
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setIdentity(true)
-                        .setRangeOutput(begin ? Range.Mapping.BEGIN :Range.Mapping.NONE, end ? Range.Mapping.END : Range.Mapping.NONE);
+                        .setRangeOutput(begin ? Range.Mapping.BEGIN :Range.Mapping.NONE, end ? Range.Mapping.END : Range.Mapping.NONE)
+            );
 
             if(!begin) {
-                s = s.addRangeRelation(BEGIN_TO_END_EQUALS, i - 1);
+                in.add(new Relation.Builder()
+                        .setFrom(i)
+                        .setTo(i - 1)
+                        .setRangeRelation(Range.Relation.BEGIN_TO_END_EQUALS)
+                );
             }
-            synapses.add(s);
         }
 
-        synapses.add(
-                new Synapse.Builder()
-                    .setNeuron(I)
-                    .setWeight(-100.0)
-                    .setBias(0.0)
-                    .setRecurrent(true)
-                    .addRangeRelation(OVERLAPS, OUTPUT)
+        in.add(new Synapse.Builder()
+                .setSynapseId(inputs.length)
+                .setNeuron(I)
+                .setWeight(-100.0)
+                .setBias(0.0)
+                .setRecurrent(true)
+        );
+        in.add(new Relation.Builder()
+                .setFrom(inputs.length)
+                .setTo(Synapse.OUTPUT)
+                .setRangeRelation(Range.Relation.OVERLAPS)
         );
 
-        Neuron.init(andN, weight, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, synapses);
+        Neuron.init(andN, weight, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, in.toArray(new Neuron.Builder[in.size()]));
     }
 
 

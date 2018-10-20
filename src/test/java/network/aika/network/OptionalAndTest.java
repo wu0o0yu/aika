@@ -96,15 +96,13 @@ public class OptionalAndTest {
                         .setNeuron(upperCase)
                         .setWeight(0.5)
                         .setRecurrent(false)
-                        .setBias(0.0)
-                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                        .setBias(0.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-1.0)
                         .setRecurrent(true)
-                        .setBias(0.0)
-                        .addRangeRelation(Range.Relation.OVERLAPS, 0),
+                        .setBias(0.0),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -130,8 +128,7 @@ public class OptionalAndTest {
                         .setNeuron(suppr)
                         .setWeight(-1.0)
                         .setRecurrent(true)
-                        .setBias(0.0)
-                        .addRangeRelation(Range.Relation.OVERLAPS, 0),
+                        .setBias(0.0),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)

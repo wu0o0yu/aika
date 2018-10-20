@@ -55,7 +55,6 @@ public class LinkerTest {
                             .setNeuron(nb)
                             .setWeight(10.0)
                             .setBias(-10.0)
-                            .addRangeRelation(rr, 0)
                             .setRangeOutput(DIRECT),
                     new Relation.Builder()
                             .setFrom(1)

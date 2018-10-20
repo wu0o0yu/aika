@@ -64,7 +64,6 @@ public class SoftMaxTest {
                                 .setWeight(-100.0)
                                 .setBias(0.0)
                                 .setRecurrent(true)
-                                .addRangeRelation(EQUALS, 0)
                                 .setRangeOutput(Range.Output.NONE),
                         new Relation.Builder()
                                 .setFrom(1)
@@ -73,8 +72,9 @@ public class SoftMaxTest {
                 );
                 output[j][i] = n;
 
-                inhib.addSynapse(
+                Neuron.init(inhib,
                         new Synapse.Builder()
+                                .setSynapseId(inhib.getNewSynapseId())
                                 .setNeuron(n)
                                 .setWeight(1.0)
                                 .setBias(0.0)

@@ -87,7 +87,7 @@ public class Synapse implements Writable {
     public Output rangeOutput;
     public boolean identity;
 
-    public Map<Relation.Key, Relation> relations;
+    public Map<Relation.Key, Relation> relations = new TreeMap<>();
 
     public DistanceFunction distanceFunction = null;
 

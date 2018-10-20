@@ -77,15 +77,13 @@ public class GenerateTextTest {
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .addRangeRelation(Range.Relation.NONE, 0)
                         .setRangeOutput(Output.NONE),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(Range.Relation.EQUALS, OUTPUT),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -108,15 +106,13 @@ public class GenerateTextTest {
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .addRangeRelation(Relation.NONE, 0)
                         .setRangeOutput(Output.NONE),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(Relation.EQUALS, OUTPUT),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -163,7 +159,6 @@ public class GenerateTextTest {
                         .setNeuron(outA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .addInstanceRelation(CONTAINS, 0)
                         .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE),
                 new Relation.Builder()
                         .setFrom(1)
@@ -199,7 +194,6 @@ public class GenerateTextTest {
                         .setNeuron(outB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .addInstanceRelation(CONTAINS, 0)
                         .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE),
                 new Relation.Builder()
                         .setFrom(1)

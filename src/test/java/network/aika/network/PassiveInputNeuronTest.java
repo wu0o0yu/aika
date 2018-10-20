@@ -36,8 +36,7 @@ public class PassiveInputNeuronTest {
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                        .setBias(-10.0),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)

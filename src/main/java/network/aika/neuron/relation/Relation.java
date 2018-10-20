@@ -145,9 +145,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
                 return in.outputRelations;
             } else {
                 Synapse s = n.getSynapseById(synapseId);
-                if (s.relations == null) {
-                    s.relations = new TreeMap<>();
-                }
                return s.relations;
             }
         }

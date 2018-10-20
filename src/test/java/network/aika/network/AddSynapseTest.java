@@ -46,7 +46,7 @@ public class AddSynapseTest {
         for(String l: new String[] {"A", "B", "C", "D"}) {
             Neuron in = m.createNeuron(l);
             inputNeurons.put(l, in);
-            n.addSynapse(
+            Neuron.init(n,
                     new Synapse.Builder()
                             .setSynapseId(i++)
                             .setNeuron(in)

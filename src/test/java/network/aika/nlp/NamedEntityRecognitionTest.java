@@ -25,6 +25,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.range.Range;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -84,7 +85,6 @@ public class NamedEntityRecognitionTest {
                         .setNeuron(forenameCategory)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .addRangeRelation(END_TO_BEGIN_EQUALS, 0) // references the previous word
                         .setRecurrent(true) // this input is a positive feedback loop
                         .setRangeOutput(Range.Output.NONE),
 
@@ -96,8 +96,15 @@ public class NamedEntityRecognitionTest {
                         .setNeuron(inhibitingN)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true) // this input is a negative feedback loop
-                        .addRangeRelation(OVERLAPS, 0)
+                        .setRecurrent(true), // this input is a negative feedback loop
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.OVERLAPS)
         );
 
         Neuron cookProfessionEntity = Neuron.init(
@@ -116,8 +123,11 @@ public class NamedEntityRecognitionTest {
                         .setNeuron(inhibitingN)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(OVERLAPS, 0)
+                        .setRecurrent(true),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.OVERLAPS)
         );
 
         Neuron jacksonForenameEntity = Neuron.init(
@@ -136,15 +146,21 @@ public class NamedEntityRecognitionTest {
                         .setNeuron(surnameCategory)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .addRangeRelation(BEGIN_TO_END_EQUALS, 0)
                         .setRecurrent(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inhibitingN)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(OVERLAPS, 0)
+                        .setRecurrent(true),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.BEGIN_TO_END_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.OVERLAPS)
         );
 
         Neuron jacksonCityEntity = Neuron.init(
@@ -164,8 +180,11 @@ public class NamedEntityRecognitionTest {
                         .setNeuron(inhibitingN)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(OVERLAPS, 0)
+                        .setRecurrent(true),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRangeRelation(Range.Relation.OVERLAPS)
         );
 
         Neuron.init(

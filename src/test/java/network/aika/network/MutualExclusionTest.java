@@ -87,8 +87,7 @@ public class MutualExclusionTest {
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -112,8 +111,7 @@ public class MutualExclusionTest {
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -137,8 +135,7 @@ public class MutualExclusionTest {
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)

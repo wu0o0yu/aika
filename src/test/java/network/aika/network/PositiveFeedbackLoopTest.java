@@ -35,8 +35,7 @@ public class PositiveFeedbackLoopTest {
                         .setNeuron(nD)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -55,8 +54,7 @@ public class PositiveFeedbackLoopTest {
                         .setNeuron(nC)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)

@@ -108,8 +108,7 @@ public class SimpleWeightsTest {
                         .setNeuron(inB)
                         .setWeight(3.0)
                         .setBias(-3.0)
-                        .setRecurrent(false)
-                        .addRangeRelation(Range.Relation.EQUALS, 0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
