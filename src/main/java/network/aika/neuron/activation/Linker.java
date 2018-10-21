@@ -155,11 +155,11 @@ public class Linker {
     }
 
 
-    private void linkRelated(Activation rAct, Activation oAct, Map<Relation.Key, Relation> relations) {
-        for(Map.Entry<Relation.Key, Relation> me: relations.entrySet()) {
-            Relation.Key rk = me.getKey();
-            if(rk.synapseId >= 0) {
-                Synapse s = oAct.getNeuron().getSynapseById(rk.synapseId);
+    private void linkRelated(Activation rAct, Activation oAct, Map<Integer, Relation> relations) {
+        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
+            Integer relId = me.getKey();
+            if(relId >= 0) {
+                Synapse s = oAct.getNeuron().getSynapseById(relId);
                 if(s != null) {
                     Relation r = me.getValue();
                     linkRelated(rAct, oAct, s, r);
@@ -227,8 +227,8 @@ public class Linker {
 
 
     private boolean checkRelations(Synapse s, Activation iAct, Activation oAct) {
-        for(Map.Entry<Relation.Key, Relation> me: s.relations.entrySet()) {
-            if(me.getKey().synapseId == Synapse.OUTPUT) {
+        for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+            if(me.getKey() == Synapse.OUTPUT) {
                 Relation r = me.getValue();
                 if(!r.test(iAct, oAct)) {
                     return false;

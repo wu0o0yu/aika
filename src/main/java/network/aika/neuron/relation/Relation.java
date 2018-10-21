@@ -39,44 +39,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public abstract Collection<Activation> getActivations(INeuron n, Activation linkedAct);
 
 
-    public static class Key implements Comparable<Key>, Writable {
-        public int group;
-        public int synapseId;
-
-        private Key() {
-        }
-
-        public Key(int group, int synapseId) {
-            this.group = group;
-            this.synapseId = synapseId;
-        }
-
-        @Override
-        public void write(DataOutput out) throws IOException {
-            out.writeInt(group);
-            out.writeInt(synapseId);
-        }
-
-        public static Key read(DataInput in, Model m) throws IOException {
-            Key rk = new Key();
-            rk.readFields(in, m);
-            return rk;
-        }
-
-        @Override
-        public void readFields(DataInput in, Model m) throws IOException {
-            group = in.readInt();
-            synapseId = in.readInt();
-        }
-
-        @Override
-        public int compareTo(Key rk) {
-            int r = Integer.compare(group, rk.group);
-            if(r != 0) return r;
-            return Integer.compare(synapseId, rk.synapseId);
-        }
-    }
-
 
     public static class Builder implements Neuron.Builder {
         public static final int DEFAULT_GROUP = -1;
@@ -102,16 +64,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             return this;
         }
 
-        public Builder setFromGroup(int group) {
-            fromGroup = group;
-            return this;
-        }
-
-        public Builder setToGroup(int group) {
-            toGroup = group;
-            return this;
-        }
-
         public Builder setAncestorRelation(AncestorRelation.Type type) {
             relation = new AncestorRelation(type);
             return this;
@@ -128,14 +80,14 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         public void connect(Neuron n) {
-            Map<Key, Relation> fromRel = getRelationsMap(from, n);
-            Map<Key, Relation> toRel = getRelationsMap(to, n);
+            Map<Integer, Relation> fromRel = getRelationsMap(from, n);
+            Map<Integer, Relation> toRel = getRelationsMap(to, n);
 
-            fromRel.put(new Key(toGroup, to), relation);
-            toRel.put(new Key(fromGroup, from), relation.invert());
+            fromRel.put(to, relation);
+            toRel.put(from, relation.invert());
         }
 
-        private static Map<Key, Relation> getRelationsMap(int synapseId, Neuron n) {
+        private static Map<Integer, Relation> getRelationsMap(int synapseId, Neuron n) {
             if(synapseId == Synapse.OUTPUT) {
                 INeuron in = n.get();
                 if (in.outputRelations == null) {

@@ -87,7 +87,7 @@ public class Synapse implements Writable {
     public Output rangeOutput;
     public boolean identity;
 
-    public Map<Relation.Key, Relation> relations = new TreeMap<>();
+    public Map<Integer, Relation> relations = new TreeMap<>();
 
     public DistanceFunction distanceFunction = null;
 
@@ -306,8 +306,8 @@ public class Synapse implements Writable {
 
 
     public Relation getRelationById(Integer id) {
-        for(Map.Entry<Relation.Key, Relation> me: relations.entrySet()) {
-            if(me.getKey().synapseId == id) {
+        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
+            if(me.getKey() == id) {
                 return me.getValue();
             }
         }
@@ -333,8 +333,8 @@ public class Synapse implements Writable {
         out.writeInt(output.id);
 
         out.writeInt(relations.size());
-        for(Map.Entry<Relation.Key, Relation> me: relations.entrySet()) {
-            me.getKey().write(out);
+        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
+            out.writeInt(me.getKey());
             me.getValue().write(out);
         }
 
@@ -370,9 +370,9 @@ public class Synapse implements Writable {
 
         int l = in.readInt();
         for(int i = 0; i < l; i++) {
-            Relation.Key relKey = Relation.Key.read(in, m);
+            Integer relId = in.readInt();
             Relation r = Relation.read(in, m);
-            relations.put(relKey, r);
+            relations.put(relId, r);
         }
 
         if(in.readBoolean()) {
