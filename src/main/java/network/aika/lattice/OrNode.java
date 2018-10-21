@@ -22,7 +22,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.range.Position;
-import network.aika.training.PatternDiscovery;
+import network.aika.PatternDiscovery;
 import network.aika.Document;
 import network.aika.neuron.range.Range;
 import org.slf4j.Logger;

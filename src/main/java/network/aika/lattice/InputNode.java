@@ -27,7 +27,7 @@ import network.aika.neuron.relation.AncestorRelation;
 import network.aika.neuron.relation.RangeRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
-import network.aika.training.PatternDiscovery;
+import network.aika.PatternDiscovery;
 import network.aika.lattice.AndNode.AndActivation;
 import network.aika.lattice.InputNode.InputActivation;
 import network.aika.lattice.AndNode.Refinement;

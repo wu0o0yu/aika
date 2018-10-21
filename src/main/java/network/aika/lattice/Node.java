@@ -18,7 +18,7 @@ package network.aika.lattice;
 
 
 import network.aika.*;
-import network.aika.training.PatternDiscovery;
+import network.aika.PatternDiscovery;
 import network.aika.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
