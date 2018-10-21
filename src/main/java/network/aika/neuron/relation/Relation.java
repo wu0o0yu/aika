@@ -147,5 +147,11 @@ public abstract class Relation implements Comparable<Relation>, Writable {
                return s.relations;
             }
         }
+
+        @Override
+        public void registerSynapseIds(Neuron n) {
+            n.registerSynapseId(from);
+            n.registerSynapseId(to);
+        }
     }
 }

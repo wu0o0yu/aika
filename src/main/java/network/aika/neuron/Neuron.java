@@ -318,8 +318,13 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
-    public interface Builder {
+    public void registerSynapseId(int synId) {
+        get().registerSynapseId(synId);
+    }
 
+
+    public interface Builder {
+        void registerSynapseIds(Neuron n);
     }
 
 

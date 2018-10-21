@@ -57,6 +57,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public String label;
     public Type type;
 
+
     public enum Type {
         EXCITATORY,
         INHIBITORY
@@ -87,7 +88,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public ActivationFunction activationFunction = ActivationFunction.RECTIFIED_SCALED_LOGISTIC_SIGMOID;
 
 
-    public int numberOfInputSynapses = 0;
+    public int synapseIdCounter = 0;
 
 
     // synapseId -> relation
@@ -372,7 +373,14 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
 
     public int getNewSynapseId() {
-        return numberOfInputSynapses++;
+        return synapseIdCounter++;
+    }
+
+
+    public void registerSynapseId(Integer synId) {
+        if(synId >= synapseIdCounter) {
+            synapseIdCounter = synId + 1;
+        }
     }
 
 
@@ -481,7 +489,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             out.writeInt(node.id);
         }
 
-        out.writeInt(numberOfInputSynapses);
+        out.writeInt(synapseIdCounter);
         for (Synapse s : inputSynapses.values()) {
             if (s.input != null) {
                 out.writeBoolean(true);
@@ -551,7 +559,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             node = m.lookupNodeProvider(nId);
         }
 
-        numberOfInputSynapses = in.readInt();
+        synapseIdCounter = in.readInt();
         while (in.readBoolean()) {
             Synapse syn = Synapse.read(in, m);
             inputSynapses.put(syn, syn);

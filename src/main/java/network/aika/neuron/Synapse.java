@@ -173,9 +173,7 @@ public class Synapse implements Writable {
             in.setModified();
         }
 
-        if(id >= out.numberOfInputSynapses) {
-            out.numberOfInputSynapses = id + 1;
-        }
+        out.registerSynapseId(id);
 
         if(in.isPassiveInputNeuron()) {
             out.registerPassiveInputSynapse(this);
@@ -241,12 +239,12 @@ public class Synapse implements Writable {
         if(isConjunction(false, false)) {
             if(out.inputSynapses.remove(this) != null) {
                 out.setModified();
-                out.numberOfInputSynapses--;
+                out.synapseIdCounter--;
             }
         } else {
             if(in.outputSynapses.remove(this) != null) {
                 in.setModified();
-                out.numberOfInputSynapses--;
+                out.synapseIdCounter--;
             }
         }
     }
@@ -583,6 +581,13 @@ public class Synapse implements Writable {
             this.synapseId = synapseId;
             return this;
         }
+
+
+        @Override
+        public void registerSynapseIds(Neuron n) {
+            n.registerSynapseId(synapseId);
+        }
+
 
         public Synapse getSynapse(Neuron outputNeuron) {
             Synapse s = createOrLookup(null, synapseId, neuron, outputNeuron);
