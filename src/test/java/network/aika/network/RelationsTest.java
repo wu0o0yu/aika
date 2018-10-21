@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static network.aika.neuron.relation.AncestorRelation.Type.COMMON_ANCESTOR;
-import static network.aika.neuron.relation.AncestorRelation.Type.CONTAINED_IN;
+import static network.aika.neuron.relation.AncestorRelation.Type.IS_ANCESTOR_OF;
 import static network.aika.neuron.range.Position.Operator.*;
 
 
@@ -108,7 +108,7 @@ public class RelationsTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setAncestorRelation(CONTAINED_IN)
+                        .setAncestorRelation(IS_ANCESTOR_OF)
         ).get();
 
 

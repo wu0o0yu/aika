@@ -19,7 +19,7 @@ public class LinkerTest {
     @Test
     public void testLinker() {
 
-        testSynapse(new Range(doc, 0, 20), new Range(5, 15), Relation.CONTAINED_IN, true);
+        testSynapse(new Range(doc, 0, 20), new Range(5, 15), Relation.IS_ANCESTOR_OF, true);
         testSynapse(new Range(0, 10), new Range(0, 10), Relation.EQUALS, true);
 
         // Overlaps

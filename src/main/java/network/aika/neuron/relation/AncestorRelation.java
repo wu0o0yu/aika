@@ -17,8 +17,8 @@ public class AncestorRelation extends Relation {
 
     public enum Type  {
         COMMON_ANCESTOR,
-        CONTAINS,
-        CONTAINED_IN
+        IS_DESCENDANT_OF,
+        IS_ANCESTOR_OF
     }
 
     AncestorRelation() {}
@@ -34,9 +34,9 @@ public class AncestorRelation extends Relation {
         switch(type) {
             case COMMON_ANCESTOR:
                 collectCommonAncestor(results, n, linkedAct, linkedAct.doc.visitedCounter++);
-            case CONTAINS:
+            case IS_DESCENDANT_OF:
                 collectContains(results, n, linkedAct, linkedAct.doc.visitedCounter++);
-            case CONTAINED_IN:
+            case IS_ANCESTOR_OF:
                 collectContainedIn(results, n, linkedAct, linkedAct.doc.visitedCounter++);
         }
         return results;
@@ -88,9 +88,9 @@ public class AncestorRelation extends Relation {
         switch(type) {
             case COMMON_ANCESTOR:
                 return hasCommonAncestor(act, linkedAct);
-            case CONTAINS:
+            case IS_DESCENDANT_OF:
                 return contains(act, linkedAct, act.doc.visitedCounter++);
-            case CONTAINED_IN:
+            case IS_ANCESTOR_OF:
                 return contains(linkedAct, act, act.doc.visitedCounter++);
         }
         return true;
@@ -102,10 +102,10 @@ public class AncestorRelation extends Relation {
         switch(type) {
             case COMMON_ANCESTOR:
                 return this;
-            case CONTAINS:
-                return new AncestorRelation(Type.CONTAINED_IN);
-            case CONTAINED_IN:
-                return new AncestorRelation(Type.CONTAINS);
+            case IS_DESCENDANT_OF:
+                return new AncestorRelation(Type.IS_ANCESTOR_OF);
+            case IS_ANCESTOR_OF:
+                return new AncestorRelation(Type.IS_DESCENDANT_OF);
         }
         return null;
     }

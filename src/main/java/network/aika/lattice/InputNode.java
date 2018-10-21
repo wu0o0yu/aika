@@ -66,8 +66,8 @@ public class InputNode extends Node<InputNode, InputActivation> {
         new RangeRelation(END_EQUALS),
         new RangeRelation(CONTAINS),
         new RangeRelation(CONTAINED_IN),
-        new AncestorRelation(AncestorRelation.Type.CONTAINS),
-        new AncestorRelation(AncestorRelation.Type.CONTAINED_IN),
+        new AncestorRelation(AncestorRelation.Type.IS_DESCENDANT_OF),
+        new AncestorRelation(AncestorRelation.Type.IS_ANCESTOR_OF),
         new AncestorRelation(AncestorRelation.Type.COMMON_ANCESTOR)
     };
 

@@ -29,7 +29,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.relation.AncestorRelation.Type.CONTAINS;
+import static network.aika.neuron.relation.AncestorRelation.Type.IS_DESCENDANT_OF;
 
 
 /**
@@ -163,7 +163,7 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setAncestorRelation(CONTAINS)
+                        .setAncestorRelation(IS_DESCENDANT_OF)
         );
 
 
@@ -198,7 +198,7 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setAncestorRelation(CONTAINS)
+                        .setAncestorRelation(IS_DESCENDANT_OF)
         );
 
 
