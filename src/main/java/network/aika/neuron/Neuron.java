@@ -89,7 +89,7 @@ public class Neuron extends Provider<INeuron> {
 
 
     public static Neuron init(Document doc, Neuron n, Builder... inputs) {
-        if(n.init(null, null, null, null, getSynapseBuilders(inputs), getRelationBuilders(inputs))) {
+        if(n.init(doc, null, null, null, getSynapseBuilders(inputs), getRelationBuilders(inputs))) {
             return n;
         } else return null;
     }
@@ -145,8 +145,7 @@ public class Neuron extends Provider<INeuron> {
         return init(doc, n, bias, activationFunction, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
     }
 
-
-
+    
     /**
      * Creates a neuron with the given bias.
      *
@@ -171,7 +170,7 @@ public class Neuron extends Provider<INeuron> {
      * @return
      */
     public static Neuron init(Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
-        if(n.init(bias, activationFunction, type, synapseBuilders, relationBuilders)) return n;
+        if(n.init((Document) null, bias, activationFunction, type, synapseBuilders, relationBuilders)) return n;
         return null;
     }
 
@@ -190,20 +189,7 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
-    /**
-     * Initializes a neuron with the given bias.
-     *
-     * @param bias
-     * @param synapseBuilders
-     * @param relationBuilders
-     * @return
-     */
-    public boolean init(double bias, ActivationFunction activationFunction, INeuron.Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
-        return init((Document) null, bias, activationFunction, type, synapseBuilders, relationBuilders);
-    }
-
-    public boolean init(Document doc, Double bias, ActivationFunction activationFunction, INeuron.Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
-
+    private boolean init(Document doc, Double bias, ActivationFunction activationFunction, INeuron.Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
         INeuron n = get();
 
         if(activationFunction != null) {
@@ -323,11 +309,6 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
-    public interface Builder {
-        void registerSynapseIds(Neuron n);
-    }
-
-
     private static Collection<Synapse.Builder> getSynapseBuilders(Builder... builders) {
         ArrayList<Synapse.Builder> result = new ArrayList<>();
         for(Builder b: builders) {
@@ -347,6 +328,11 @@ public class Neuron extends Provider<INeuron> {
             }
         }
         return result;
+    }
+
+
+    public interface Builder {
+        void registerSynapseIds(Neuron n);
     }
 
 }
