@@ -41,15 +41,10 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
 
     public static class Builder implements Neuron.Builder {
-        public static final int DEFAULT_GROUP = -1;
+        private int from;
+        private int to;
 
-        public int from;
-        public int to;
-
-        public int fromGroup = DEFAULT_GROUP;
-        public int toGroup = DEFAULT_GROUP;
-
-        public Relation relation;
+        private Relation relation;
 
 
         public Builder setFrom(int synapseId) {
@@ -79,12 +74,17 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             return this;
         }
 
+        public Relation getRelation() {
+            return relation;
+        }
+
         public void connect(Neuron n) {
             Map<Integer, Relation> fromRel = getRelationsMap(from, n);
             Map<Integer, Relation> toRel = getRelationsMap(to, n);
 
-            fromRel.put(to, relation);
-            toRel.put(from, relation.invert());
+            Relation r = getRelation();
+            fromRel.put(to, r);
+            toRel.put(from, r.invert());
         }
 
         private static Map<Integer, Relation> getRelationsMap(int synapseId, Neuron n) {
