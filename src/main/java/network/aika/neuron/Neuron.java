@@ -223,9 +223,10 @@ public class Neuron extends Provider<INeuron> {
         synapseBuilders.forEach(input -> {
             Synapse s = input.getSynapse(this);
             s.update(doc, input.weight, input.bias, input.limit);
-            s.link();
             modifiedSynapses.add(s);
         });
+
+        modifiedSynapses.forEach(s -> s.link());
 
         relationBuilders.forEach(input -> input.connect(this));
 

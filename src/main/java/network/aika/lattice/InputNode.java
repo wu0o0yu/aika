@@ -23,7 +23,7 @@ import network.aika.Provider;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.range.Range;
-import network.aika.neuron.relation.InstanceRelation;
+import network.aika.neuron.relation.AncestorRelation;
 import network.aika.neuron.relation.RangeRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
@@ -66,9 +66,9 @@ public class InputNode extends Node<InputNode, InputActivation> {
         new RangeRelation(END_EQUALS),
         new RangeRelation(CONTAINS),
         new RangeRelation(CONTAINED_IN),
-        new InstanceRelation(InstanceRelation.Type.CONTAINS),
-        new InstanceRelation(InstanceRelation.Type.CONTAINED_IN),
-        new InstanceRelation(InstanceRelation.Type.COMMON_ANCESTOR)
+        new AncestorRelation(AncestorRelation.Type.CONTAINS),
+        new AncestorRelation(AncestorRelation.Type.CONTAINED_IN),
+        new AncestorRelation(AncestorRelation.Type.COMMON_ANCESTOR)
     };
 
 

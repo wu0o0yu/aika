@@ -307,6 +307,16 @@ public class Synapse implements Writable {
     }
 
 
+    public Relation getRelationById(Integer id) {
+        for(Map.Entry<Relation.Key, Relation> me: relations.entrySet()) {
+            if(me.getKey().synapseId == id) {
+                return me.getValue();
+            }
+        }
+        return null;
+    }
+
+
     public String toString() {
         return "S NW:" + getNewWeight() + " NB:" + getNewBias() + " rec:" + isRecurrent + " o:" + rangeOutput + " " +  input + "->" + output;
     }
@@ -434,7 +444,6 @@ public class Synapse implements Writable {
     public double getNewBias() {
         return bias + biasDelta;
     }
-
 
 
     /**

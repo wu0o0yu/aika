@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static network.aika.neuron.relation.InstanceRelation.Type.COMMON_ANCESTOR;
-import static network.aika.neuron.relation.InstanceRelation.Type.CONTAINED_IN;
+import static network.aika.neuron.relation.AncestorRelation.Type.COMMON_ANCESTOR;
+import static network.aika.neuron.relation.AncestorRelation.Type.CONTAINED_IN;
 import static network.aika.neuron.range.Position.Operator.*;
 
 
@@ -48,7 +48,11 @@ public class RelationsTest {
                         .setWeight(10.0)
                         .setRecurrent(false)
                         .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRangeOutput(Range.Output.DIRECT),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRangeRelation(Range.Relation.EQUALS)
         ).get();
 
 
@@ -104,7 +108,7 @@ public class RelationsTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setInstanceRelation(CONTAINED_IN)
+                        .setAncestorRelation(CONTAINED_IN)
         ).get();
 
 
@@ -292,7 +296,7 @@ public class RelationsTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setInstanceRelation(COMMON_ANCESTOR)
+                        .setAncestorRelation(COMMON_ANCESTOR)
         );
 
 
@@ -334,7 +338,7 @@ public class RelationsTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setInstanceRelation(COMMON_ANCESTOR)
+                        .setAncestorRelation(COMMON_ANCESTOR)
         );
 
 

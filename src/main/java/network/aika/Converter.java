@@ -272,7 +272,7 @@ public class Converter {
             Relation[] relations = new Relation[nc.offsets.length];
             for(int i = 0; i < nc.offsets.length; i++) {
                 Synapse linkedSynapse = nc.offsets[i];
-                relations[i] = s.relations.get(linkedSynapse.id);
+                relations[i] = s.getRelationById(linkedSynapse.id);
             }
 
             NodeContext nln = new NodeContext();

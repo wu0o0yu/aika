@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 
-public class InstanceRelation extends Relation {
+public class AncestorRelation extends Relation {
     public Type type;
 
     public enum Type  {
@@ -21,9 +21,9 @@ public class InstanceRelation extends Relation {
         CONTAINED_IN
     }
 
-    InstanceRelation() {}
+    AncestorRelation() {}
 
-    public InstanceRelation(Type type) {
+    public AncestorRelation(Type type) {
         this.type = type;
     }
 
@@ -103,9 +103,9 @@ public class InstanceRelation extends Relation {
             case COMMON_ANCESTOR:
                 return this;
             case CONTAINS:
-                return new InstanceRelation(Type.CONTAINED_IN);
+                return new AncestorRelation(Type.CONTAINED_IN);
             case CONTAINED_IN:
-                return new InstanceRelation(Type.CONTAINS);
+                return new AncestorRelation(Type.CONTAINS);
         }
         return null;
     }
@@ -169,8 +169,8 @@ public class InstanceRelation extends Relation {
     }
 
 
-    public static InstanceRelation read(DataInput in, Model m) throws IOException {
-        InstanceRelation ir = new InstanceRelation();
+    public static AncestorRelation read(DataInput in, Model m) throws IOException {
+        AncestorRelation ir = new AncestorRelation();
         ir.readFields(in, m);
         return ir;
     }
@@ -184,7 +184,7 @@ public class InstanceRelation extends Relation {
     @Override
     public int compareTo(Relation rel) {
         if(rel instanceof RangeRelation) return 1;
-        InstanceRelation ir = (InstanceRelation) rel;
+        AncestorRelation ir = (AncestorRelation) rel;
 
         return type.compareTo(ir.type);
     }

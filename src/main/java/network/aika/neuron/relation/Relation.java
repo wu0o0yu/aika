@@ -13,7 +13,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -28,7 +27,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public static Relation read(DataInput in, Model m) throws IOException {
         if(in.readBoolean()) {
-            return InstanceRelation.read(in, m);
+            return AncestorRelation.read(in, m);
         } else {
             return RangeRelation.read(in, m);
         }
@@ -113,8 +112,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             return this;
         }
 
-        public Builder setInstanceRelation(InstanceRelation.Type type) {
-            relation = new InstanceRelation(type);
+        public Builder setAncestorRelation(AncestorRelation.Type type) {
+            relation = new AncestorRelation(type);
             return this;
         }
 
