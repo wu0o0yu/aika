@@ -159,6 +159,10 @@ public class Neuron extends Provider<INeuron> {
         return init(n, bias, null, type, synapseBuilders, relationBuilders);
     }
 
+    public static Neuron init(Neuron n, double bias, INeuron.Type type, Collection<Neuron.Builder> inputs) {
+        return init(n, bias, null, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
+    }
+
 
     /**
      * Initializes a neuron with the given bias.
@@ -185,6 +189,12 @@ public class Neuron extends Provider<INeuron> {
      */
     public static Neuron init(Document doc, Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
         if(n.init(doc, bias, activationFunction, type, synapseBuilders, relationBuilders)) return n;
+        return null;
+    }
+
+
+    public static Neuron init(Document doc, Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Collection<Neuron.Builder> inputs) {
+        if(n.init(doc, bias, activationFunction, type, getSynapseBuilders(inputs), getRelationBuilders(inputs))) return n;
         return null;
     }
 
@@ -308,6 +318,27 @@ public class Neuron extends Provider<INeuron> {
         get().registerSynapseId(synId);
     }
 
+
+    private static Collection<Synapse.Builder> getSynapseBuilders(Collection<Builder> builders) {
+        ArrayList<Synapse.Builder> result = new ArrayList<>();
+        for(Builder b: builders) {
+            if(b instanceof Synapse.Builder) {
+                result.add((Synapse.Builder) b);
+            }
+        }
+        return result;
+    }
+
+
+    private static Collection<Relation.Builder> getRelationBuilders(Collection<Builder> builders) {
+        ArrayList<Relation.Builder> result = new ArrayList<>();
+        for(Builder b: builders) {
+            if(b instanceof Relation.Builder) {
+                result.add((Relation.Builder) b);
+            }
+        }
+        return result;
+    }
 
     private static Collection<Synapse.Builder> getSynapseBuilders(Builder... builders) {
         ArrayList<Synapse.Builder> result = new ArrayList<>();
