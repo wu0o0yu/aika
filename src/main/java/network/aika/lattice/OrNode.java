@@ -119,6 +119,10 @@ public class OrNode extends Node<OrNode, Activation> {
                 .getThreadState(doc.threadId, true)
                 .getActivationsByRangeBegin(r.begin, true, r.begin, false)
                 ) {
+            if(!act.range.equals(r)) {
+                continue;
+            }
+
             Synapse ls = null;
             boolean matched = false;
             for(Activation.Link l: act.getInputLinksOrderedBySynapse()) {
