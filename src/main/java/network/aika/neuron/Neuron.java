@@ -178,6 +178,12 @@ public class Neuron extends Provider<INeuron> {
         return null;
     }
 
+
+    public static Neuron init(Neuron n, double bias, ActivationFunction activationFunction, INeuron.Type type, Collection<Neuron.Builder> inputs) {
+        if(n.init((Document) null, bias, activationFunction, type, getSynapseBuilders(inputs), getRelationBuilders(inputs))) return n;
+        return null;
+    }
+
     /**
      * Initializes a neuron with the given bias.
      *

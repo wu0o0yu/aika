@@ -83,6 +83,9 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     public volatile int numDisjunctiveSynapses = 0;
 
+    public boolean createBeginPosition = true;
+    public boolean createEndPosition = true;
+
     public Writable extension;
 
     public ActivationFunction activationFunction = ActivationFunction.RECTIFIED_SCALED_LOGISTIC_SIGMOID;
@@ -482,6 +485,9 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         out.writeUTF(activationFunction.name());
 
+        out.writeBoolean(createBeginPosition);
+        out.writeBoolean(createEndPosition);
+
         out.writeInt(outputNode.id);
 
         out.writeBoolean(node != null);
@@ -551,6 +557,9 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         numDisjunctiveSynapses = in.readInt();
 
         activationFunction = ActivationFunction.valueOf(in.readUTF());
+
+        createBeginPosition = in.readBoolean();
+        createEndPosition = in.readBoolean();
 
         outputNode = m.lookupNodeProvider(in.readInt());
 

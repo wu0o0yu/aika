@@ -18,6 +18,7 @@ package network.aika.lattice;
 
 
 import network.aika.*;
+import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -69,10 +70,10 @@ public class OrNode extends Node<OrNode, Activation> {
         Position begin = null;
         Position end = null;
 
+        INeuron n = neuron.get(inputAct.doc);
         for(int i = 0; i < oe.synapseIds.length; i++) {
             int synapseId = oe.synapseIds[i];
 
-            neuron.get(inputAct.doc);
             Synapse s = neuron.getSynapseById(synapseId);
             if(s.rangeOutput.begin != Range.Mapping.NONE || s.rangeOutput.end != Range.Mapping.NONE) {
                 Activation iAct = inputAct.getInputActivation(i);
@@ -85,12 +86,16 @@ public class OrNode extends Node<OrNode, Activation> {
             }
         }
 
-        if(begin == null) {
+        if(begin == null && n.createBeginPosition) {
             begin = new Position(doc);
         }
 
-        if(end == null) {
+        if(end == null && n.createEndPosition) {
             end = new Position(doc);
+        }
+
+        if(begin == null || end == null) {
+            return;
         }
 
         Range r = new Range(begin, end);

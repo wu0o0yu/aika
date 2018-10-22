@@ -72,6 +72,7 @@ public class Converter {
         outputNode = neuron.node.get();
 
         initInputNodesAndComputeWeightSums();
+        initCreateBeginEndPositionFlags();
 
         if(neuron.biasSum + neuron.posDirSum + neuron.posRecSum <= 0.0) {
             neuron.requiredSum = neuron.posDirSum + neuron.posRecSum;
@@ -152,6 +153,19 @@ public class Converter {
 
         return true;
     }
+
+
+    private void initCreateBeginEndPositionFlags() {
+        modifiedSynapses.forEach(s -> {
+            if (s.rangeOutput.begin != NONE) {
+                neuron.createBeginPosition = false;
+            }
+            if (s.rangeOutput.end != NONE) {
+                neuron.createEndPosition = false;
+            }
+        });
+    }
+
 
     private List<Synapse> prepareCandidates() {
         Synapse syn = getBestSynapse(neuron.inputSynapses.values());
