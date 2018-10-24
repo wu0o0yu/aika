@@ -32,6 +32,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
+
 /**
  * The {@code InputNode} and the {@code AndNode} classes together form a pattern lattice, containing all
  * possible substructures of any given conjunction. For example if we have the conjunction ABCD where A, B, C, D are
@@ -532,7 +533,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                 if(ra == null && rb != null) return -1;
                 if(ra != null && rb == null) return 1;
 
-                r = ra.compareTo(rb);
+                r = Relation.COMPARATOR.compare(ra, rb);
                 if(r != 0) return r;
             }
             return 0;

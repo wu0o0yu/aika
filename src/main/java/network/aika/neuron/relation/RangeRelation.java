@@ -45,8 +45,12 @@ public class RangeRelation extends Relation {
 
 
     @Override
+    public int getRelationType() {
+        return 0;
+    }
+
+    @Override
     public int compareTo(Relation rel) {
-        if(rel instanceof AncestorRelation) return -1;
         RangeRelation rr = (RangeRelation) rel;
 
         return relation.compareTo(rr.relation);

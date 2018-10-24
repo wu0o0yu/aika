@@ -27,7 +27,6 @@ public class AncestorRelation extends Relation {
         this.type = type;
     }
 
-
     @Override
     public Collection<Activation> getActivations(INeuron n, Activation linkedAct) {
         List<Activation> results = new ArrayList<>();
@@ -182,8 +181,12 @@ public class AncestorRelation extends Relation {
 
 
     @Override
+    public int getRelationType() {
+        return 1;
+    }
+
+    @Override
     public int compareTo(Relation rel) {
-        if(rel instanceof RangeRelation) return 1;
         AncestorRelation ir = (AncestorRelation) rel;
 
         return type.compareTo(ir.type);

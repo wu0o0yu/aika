@@ -13,12 +13,22 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
 
 public abstract class Relation implements Comparable<Relation>, Writable {
 
+
+    public static Comparator<Relation> COMPARATOR = (r1, r2) -> {
+        int r = Integer.compare(r1.getRelationType(), r2.getRelationType());
+        if(r != 0) return r;
+        return r1.compareTo(r2);
+    };
+
+
+    public abstract int getRelationType();
 
     public abstract boolean test(Activation act, Activation linkedAct);
 
@@ -38,6 +48,10 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public abstract Collection<Activation> getActivations(INeuron n, Activation linkedAct);
 
+
+    public boolean follow(Activation rAct, Activation oAct, Map<Integer, Relation> relations) {
+        return true;
+    }
 
 
     public static class Builder implements Neuron.Builder {

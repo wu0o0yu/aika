@@ -162,7 +162,9 @@ public class Linker {
                 Synapse s = oAct.getNeuron().getSynapseById(relId);
                 if(s != null) {
                     Relation r = me.getValue();
-                    linkRelated(rAct, oAct, s, r);
+                    if(r.follow(rAct, oAct, relations)) {
+                        linkRelated(rAct, oAct, s, r);
+                    }
                 }
             }
         }
