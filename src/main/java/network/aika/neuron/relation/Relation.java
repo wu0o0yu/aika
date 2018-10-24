@@ -12,10 +12,7 @@ import network.aika.neuron.range.Range;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 
 public abstract class Relation implements Comparable<Relation>, Writable {
@@ -49,8 +46,18 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public abstract Collection<Activation> getActivations(INeuron n, Activation linkedAct);
 
 
-    public boolean follow(Activation rAct, Activation oAct, Map<Integer, Relation> relations) {
+    public boolean follow(Activation rAct, Activation oAct, Map<Integer, Set<Relation>> relations) {
         return true;
+    }
+
+
+    public static void addRelation(Map<Integer, Set<Relation>> relMap, Integer synId, Relation r) {
+        Set<Relation> relSet = relMap.get(synId);
+        if(relSet == null) {
+            relSet = new TreeSet<>(COMPARATOR);
+            relMap.put(synId, relSet);
+        }
+        relSet.add(r);
     }
 
 
@@ -93,15 +100,15 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         public void connect(Neuron n) {
-            Map<Integer, Relation> fromRel = getRelationsMap(from, n);
-            Map<Integer, Relation> toRel = getRelationsMap(to, n);
+            Map<Integer, Set<Relation>> fromRel = getRelationsMap(from, n);
+            Map<Integer, Set<Relation>> toRel = getRelationsMap(to, n);
 
             Relation r = getRelation();
-            fromRel.put(to, r);
-            toRel.put(from, r.invert());
+            addRelation(fromRel, to, r);
+            addRelation(toRel, from, r.invert());
         }
 
-        private static Map<Integer, Relation> getRelationsMap(int synapseId, Neuron n) {
+        private static Map<Integer, Set<Relation>> getRelationsMap(int synapseId, Neuron n) {
             if(synapseId == Synapse.OUTPUT) {
                 INeuron in = n.get();
                 if (in.outputRelations == null) {

@@ -57,6 +57,11 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
+    public void setLabel(String label) {
+        get().label = label;
+    }
+
+
     /**
      * Propagate an input activation into the network.
      *

@@ -87,7 +87,7 @@ public class Synapse implements Writable {
     public Output rangeOutput;
     public boolean identity;
 
-    public Map<Integer, Relation> relations = new TreeMap<>();
+    public Map<Integer, Set<Relation>> relations = new TreeMap<>();
 
     public DistanceFunction distanceFunction = null;
 
@@ -305,13 +305,8 @@ public class Synapse implements Writable {
     }
 
 
-    public Relation getRelationById(Integer id) {
-        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
-            if(me.getKey() == id) {
-                return me.getValue();
-            }
-        }
-        return null;
+    public Set<Relation> getRelationById(Integer id) {
+        return relations.get(id);
     }
 
 
@@ -333,9 +328,13 @@ public class Synapse implements Writable {
         out.writeInt(output.id);
 
         out.writeInt(relations.size());
-        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
+        for(Map.Entry<Integer, Set<Relation>> me: relations.entrySet()) {
             out.writeInt(me.getKey());
-            me.getValue().write(out);
+
+            out.writeInt(me.getValue().size());
+            for(Relation rel: me.getValue()) {
+                rel.write(out);
+            }
         }
 
         out.writeBoolean(distanceFunction != null);
@@ -371,8 +370,13 @@ public class Synapse implements Writable {
         int l = in.readInt();
         for(int i = 0; i < l; i++) {
             Integer relId = in.readInt();
-            Relation r = Relation.read(in, m);
-            relations.put(relId, r);
+            Set<Relation> relSet = new TreeSet(Relation.COMPARATOR);
+            int s = in.readInt();
+            for(int j = 0; j < s; j++) {
+                Relation r = Relation.read(in, m);
+                relSet.add(r);
+            }
+            relations.put(relId, relSet);
         }
 
         if(in.readBoolean()) {

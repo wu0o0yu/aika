@@ -345,7 +345,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
     public String logicToString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("AND[");
+        sb.append("AND(" + level + ")[");
         boolean first = true;
         for(Entry e: parents) {
             if(!first) {

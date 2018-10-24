@@ -108,7 +108,9 @@ public class Linker {
 
                 Activation iAct = s.input.get(act.doc).getActivation(act.doc, r, false);
 
-                link(s, iAct, act);
+                if(iAct != null) {
+                    link(s, iAct, act);
+                }
             }
         }
         doc.linker.process();
@@ -138,32 +140,21 @@ public class Linker {
         while(!queue.isEmpty()) {
             Link l = queue.pollFirst();
             linkRelated(l.input, l.output, l.synapse.relations);
-/*
-            for(Map.Entry<Relation.Key, Relation> me: l.synapse.relations.entrySet()) {
-                int relId = me.getKey();
-                if(relId >= 0) {
-                    Synapse s = l.output.getNeuron().getSynapseById(relId);
-                    if(s != null) {
-                        Relation r = me.getValue();
-                        linkRelated(l.input, l.output, s, r);
-                    }
-                }
-            }
-*/
             doc.propagate();
         }
     }
 
 
-    private void linkRelated(Activation rAct, Activation oAct, Map<Integer, Relation> relations) {
-        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
+    private void linkRelated(Activation rAct, Activation oAct, Map<Integer, Set<Relation>> relations) {
+        for(Map.Entry<Integer, Set<Relation>> me: relations.entrySet()) {
             Integer relId = me.getKey();
             if(relId >= 0) {
                 Synapse s = oAct.getNeuron().getSynapseById(relId);
                 if(s != null) {
-                    Relation r = me.getValue();
-                    if(r.follow(rAct, oAct, relations)) {
-                        linkRelated(rAct, oAct, s, r);
+                    for(Relation r: me.getValue()) {
+                        if (r.follow(rAct, oAct, relations)) {
+                            linkRelated(rAct, oAct, s, r);
+                        }
                     }
                 }
             }
@@ -229,11 +220,12 @@ public class Linker {
 
 
     private boolean checkRelations(Synapse s, Activation iAct, Activation oAct) {
-        for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+        for(Map.Entry<Integer, Set<Relation>> me: s.relations.entrySet()) {
             if(me.getKey() == Synapse.OUTPUT) {
-                Relation r = me.getValue();
-                if(!r.test(iAct, oAct)) {
-                    return false;
+                for (Relation r : me.getValue()) {
+                    if (!r.test(iAct, oAct)) {
+                        return false;
+                    }
                 }
             }
             // TODO: other relations
