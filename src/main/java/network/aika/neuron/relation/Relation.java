@@ -61,6 +61,20 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     }
 
 
+    public static Map<Integer, Set<Relation>> getRelationsMap(int synapseId, Neuron n) {
+        if(synapseId == Synapse.OUTPUT) {
+            INeuron in = n.get();
+            if (in.outputRelations == null) {
+                in.outputRelations = new TreeMap<>();
+            }
+            return in.outputRelations;
+        } else {
+            Synapse s = n.getSynapseById(synapseId);
+            return s.relations;
+        }
+    }
+
+
     public static class Builder implements Neuron.Builder {
         private int from;
         private int to;
@@ -106,19 +120,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             Relation r = getRelation();
             addRelation(fromRel, to, r);
             addRelation(toRel, from, r.invert());
-        }
-
-        private static Map<Integer, Set<Relation>> getRelationsMap(int synapseId, Neuron n) {
-            if(synapseId == Synapse.OUTPUT) {
-                INeuron in = n.get();
-                if (in.outputRelations == null) {
-                    in.outputRelations = new TreeMap<>();
-                }
-                return in.outputRelations;
-            } else {
-                Synapse s = n.getSynapseById(synapseId);
-               return s.relations;
-            }
         }
 
         @Override

@@ -406,13 +406,13 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         if (r.begin != null) {
             for (Activation act : th.getActivationsByRangeBegin(r.begin, true, r.begin, false)) {
-                if (!onlyFinal || act.isFinalActivation()) {
+                if ((!onlyFinal || act.isFinalActivation()) && r.equalsIgnoreNull(act.range)) {
                     return act;
                 }
             }
         } else if(r.end != null) {
             for (Activation act : th.getActivationsByRangeEnd(r.end, true, r.end, false)) {
-                if (!onlyFinal || act.isFinalActivation()) {
+                if (!onlyFinal || act.isFinalActivation() && r.equalsIgnoreNull(act.range)) {
                     return act;
                 }
             }

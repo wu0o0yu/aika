@@ -100,6 +100,18 @@ public class Range {
     }
 
 
+    public boolean equalsIgnoreNull(Range r) {
+        if(begin != null && r.begin != null && !begin.compare(Operator.EQUALS, r.begin)) {
+            return false;
+        }
+        if(end != null && r.end != null && !end.compare(Operator.EQUALS, r.end)) {
+            return false;
+        }
+
+        return true;
+    }
+
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
@@ -142,7 +154,8 @@ public class Range {
         public static Relation OVERLAPS = create(Operator.NONE, Operator.LESS_THAN, Operator.NONE, Operator.GREATER_THAN);
         public static Relation NONE = create(Operator.NONE, Operator.NONE);
         public static Relation BETWEEN = create(Operator.GREATER_THAN, Operator.LESS_THAN);
-
+        public static Relation BEFORE = create(Operator.NONE, Operator.NONE, Operator.NONE , Operator.LESS_THAN_EQUAL);
+        public static Relation AFTER = create(Operator.NONE, Operator.NONE, Operator.NONE , Operator.GREATER_THAN_EQUAL);
 
         public Operator beginToBegin = Operator.NONE;
         public Operator beginToEnd = Operator.NONE;
