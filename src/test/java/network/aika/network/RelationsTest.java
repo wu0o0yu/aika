@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Position.Operator.NONE;
+import static network.aika.neuron.range.Range.Relation.*;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
 import static network.aika.neuron.relation.AncestorRelation.Type.COMMON_ANCESTOR;
 import static network.aika.neuron.relation.AncestorRelation.Type.IS_ANCESTOR_OF;
 import static network.aika.neuron.range.Position.Operator.*;
@@ -40,19 +44,25 @@ public class RelationsTest {
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setRecurrent(false)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setRecurrent(false)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         ).get();
 
 
@@ -84,8 +94,11 @@ public class RelationsTest {
                         .setWeight(10.0)
                         .setRecurrent(false)
                         .setIdentity(true)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(-10.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         ).get();
 
         INeuron outC = Neuron.init(m.createNeuron("C"),
@@ -96,19 +109,25 @@ public class RelationsTest {
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setRecurrent(false)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB.provider)
                         .setWeight(10.0)
                         .setRecurrent(false)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setAncestorRelation(IS_ANCESTOR_OF)
+                        .setAncestorRelation(IS_ANCESTOR_OF),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         ).get();
 
 
@@ -140,30 +159,35 @@ public class RelationsTest {
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0)
-                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
+                        .setBias(-1.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0)
-                        .setRangeOutput(Range.Output.NONE),
+                        .setBias(-1.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                        .setBias(-1.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                        .setRangeRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS)
+                        .setRangeRelation(END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_EQUALS)
         ).get();
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -206,14 +230,30 @@ public class RelationsTest {
                         .setWeight(begin || end ? 2.0 : 1.0)
                         .setRecurrent(false)
                         .setBias(begin || end ? -2.0 : -1.0)
-                        .setRangeOutput(begin ? Range.Mapping.BEGIN : Range.Mapping.NONE, end ? Range.Mapping.END : Range.Mapping.NONE)
                 );
+                if(begin) {
+                    inputs.add(
+                            new Relation.Builder()
+                                    .setFrom(0)
+                                    .setTo(OUTPUT)
+                                    .setRangeRelation(BEGIN_EQUALS)
+                    );
+                }
+
+                if(end) {
+                    inputs.add(
+                            new Relation.Builder()
+                                    .setFrom(i)
+                                    .setTo(OUTPUT)
+                                    .setRangeRelation(END_EQUALS)
+                    );
+                }
 
                 if(!end) {
                     inputs.add(new Relation.Builder()
                                     .setFrom(i)
                                     .setTo(i + 1)
-                                    .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS)
+                                    .setRangeRelation(END_TO_BEGIN_EQUALS)
                     );
                 } else {
                     inputs.add(new Relation.Builder()
@@ -261,8 +301,11 @@ public class RelationsTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setIdentity(true)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setIdentity(true),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron nC = Neuron.init(m.createNeuron("C"), 5.0, INeuron.Type.EXCITATORY,
@@ -272,8 +315,11 @@ public class RelationsTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setIdentity(true)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setIdentity(true),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
@@ -283,7 +329,6 @@ public class RelationsTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT)
                         .setSynapseId(0),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -291,12 +336,15 @@ public class RelationsTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(Range.Output.NONE)
                         .setSynapseId(1),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setAncestorRelation(COMMON_ANCESTOR)
+                        .setAncestorRelation(COMMON_ANCESTOR),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
 
@@ -325,7 +373,6 @@ public class RelationsTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT)
                         .setSynapseId(0),
                 new Synapse.Builder()
                         .setSynapseId(1)
@@ -333,12 +380,15 @@ public class RelationsTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(false)
-                        .setRangeOutput(Range.Output.NONE)
                         .setSynapseId(1),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setAncestorRelation(COMMON_ANCESTOR)
+                        .setAncestorRelation(COMMON_ANCESTOR),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
 

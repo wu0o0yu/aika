@@ -31,6 +31,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
+import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.range.Range.Relation.*;
 
 /**
@@ -78,15 +79,17 @@ public class NamedEntityRecognitionTest {
                         // This input requires the input activation to have an
                         // activation value of at least 0.9
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder() // The previous word needs to be a forename
                         .setSynapseId(1)
                         .setNeuron(forenameCategory)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(true) // this input is a positive feedback loop
-                        .setRangeOutput(Range.Output.NONE),
+                        .setRecurrent(true), // this input is a positive feedback loop
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
 
                 // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
                 // self suppression taking place even though 'E-cook (surname)' is also contained
@@ -116,8 +119,7 @@ public class NamedEntityRecognitionTest {
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get("cook"))
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibitingN)
@@ -127,7 +129,11 @@ public class NamedEntityRecognitionTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.OVERLAPS)
+                        .setRangeRelation(Range.Relation.OVERLAPS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron jacksonForenameEntity = Neuron.init(
@@ -139,8 +145,7 @@ public class NamedEntityRecognitionTest {
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get("jackson"))
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(surnameCategory)
@@ -160,7 +165,11 @@ public class NamedEntityRecognitionTest {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.OVERLAPS)
+                        .setRangeRelation(Range.Relation.OVERLAPS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron jacksonCityEntity = Neuron.init(
@@ -173,8 +182,7 @@ public class NamedEntityRecognitionTest {
                         .setNeuron(inputNeurons.get("jackson"))
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibitingN)
@@ -184,7 +192,11 @@ public class NamedEntityRecognitionTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.OVERLAPS)
+                        .setRangeRelation(Range.Relation.OVERLAPS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron.init(
@@ -196,8 +208,11 @@ public class NamedEntityRecognitionTest {
                         .setSynapseId(0)
                         .setNeuron(jacksonForenameEntity)
                         .setWeight(1.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
         Neuron.init(
                 surnameCategory,
@@ -208,8 +223,11 @@ public class NamedEntityRecognitionTest {
                         .setSynapseId(0)
                         .setNeuron(cookSurnameEntity)
                         .setWeight(1.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron.init(
@@ -220,26 +238,38 @@ public class NamedEntityRecognitionTest {
                 new Synapse.Builder().setNeuron(cookProfessionEntity)
                         .setSynapseId(0)
                         .setWeight(1.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(0.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(cookSurnameEntity)
                         .setWeight(1.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(0.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(jacksonCityEntity)
                         .setWeight(1.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(0.0),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(jacksonForenameEntity)
                         .setWeight(1.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(3)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
 

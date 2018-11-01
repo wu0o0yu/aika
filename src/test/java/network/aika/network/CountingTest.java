@@ -27,12 +27,16 @@ import network.aika.PatternDiscovery;
 import network.aika.PatternDiscovery.Config;
 import network.aika.lattice.NodeActivation;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
 
 /**
  *
@@ -67,8 +71,11 @@ public class CountingTest {
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(100.0)
-                        .setBias(-47.5)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(-47.5),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
 

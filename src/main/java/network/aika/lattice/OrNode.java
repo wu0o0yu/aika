@@ -22,10 +22,12 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Linker;
 import network.aika.neuron.range.Position;
 import network.aika.PatternDiscovery;
 import network.aika.Document;
 import network.aika.neuron.range.Range;
+import network.aika.neuron.relation.Relation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,18 +73,21 @@ public class OrNode extends Node<OrNode, Activation> {
         Position end = null;
 
         INeuron n = neuron.get(inputAct.doc);
-        for(int i = 0; i < oe.synapseIds.length; i++) {
-            int synapseId = oe.synapseIds[i];
+        for(Map.Entry<Integer, Set<Relation>> me: n.outputRelations.entrySet()) {
+            Integer synId = me.getKey();
+            Set<Relation> relSet = me.getValue();
 
-            Synapse s = neuron.getSynapseById(synapseId);
-            if(s.rangeOutput.begin != Range.Mapping.NONE || s.rangeOutput.end != Range.Mapping.NONE) {
+            Integer i = oe.revSynapseIds.get(synId);
+            if(i != null) {
                 Activation iAct = inputAct.getInputActivation(i);
+                for(Relation rel: relSet) {
+                    Range r = rel.mapRange(iAct, Linker.Direction.OUTPUT);
 
-                Position b = s.rangeOutput.begin.map(iAct.range);
-                if(b != null) begin = b;
-
-                Position e = s.rangeOutput.end.map(iAct.range);
-                if(e != null) end = e;
+                    if(r != null) {
+                        if (r.begin != null) begin = r.begin;
+                        if (r.end != null) end = r.end;
+                    }
+                }
             }
         }
 

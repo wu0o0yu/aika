@@ -24,8 +24,12 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.range.Range;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
 
 /**
  *
@@ -46,8 +50,11 @@ public class ActivationsTest {
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setBias(-1.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

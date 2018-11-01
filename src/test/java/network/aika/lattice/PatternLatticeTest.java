@@ -27,6 +27,11 @@ import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.BEGIN_EQUALS;
+import static network.aika.neuron.range.Range.Relation.END_EQUALS;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
+
 /**
  *
  * @author Lukas Molzberger
@@ -48,30 +53,39 @@ public class PatternLatticeTest {
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-1.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-1.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-1.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRangeRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Document doc = m.createDocument("", 0);
@@ -113,8 +127,7 @@ public class PatternLatticeTest {
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setBias(-1.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
@@ -126,8 +139,7 @@ public class PatternLatticeTest {
                         .setNeuron(inC)
                         .setWeight(1.0)
                         .setBias(-1.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -135,7 +147,15 @@ public class PatternLatticeTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_EQUALS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);

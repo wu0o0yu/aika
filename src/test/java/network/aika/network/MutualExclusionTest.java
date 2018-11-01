@@ -28,6 +28,9 @@ import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
+
 
 /**
  *
@@ -80,8 +83,7 @@ public class MutualExclusionTest {
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
@@ -91,7 +93,11 @@ public class MutualExclusionTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron pB = Neuron.init(
@@ -104,8 +110,7 @@ public class MutualExclusionTest {
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
@@ -115,7 +120,11 @@ public class MutualExclusionTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron pC = Neuron.init(
@@ -128,8 +137,7 @@ public class MutualExclusionTest {
                         .setNeuron(inC)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
@@ -139,7 +147,11 @@ public class MutualExclusionTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         // Finally addInput all the inputs to the suppressing neuron.
@@ -153,22 +165,31 @@ public class MutualExclusionTest {
                         .setNeuron(pA)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pB)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(pC)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
@@ -180,8 +201,11 @@ public class MutualExclusionTest {
                         .setNeuron(pB)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         // Now that the model is complete, apply it to a document.

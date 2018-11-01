@@ -32,6 +32,9 @@ import org.junit.Test;
 
 import java.util.stream.Stream;
 
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.BEGIN_EQUALS;
+import static network.aika.neuron.range.Range.Relation.END_EQUALS;
 import static network.aika.neuron.range.Range.Relation.EQUALS;
 
 
@@ -57,19 +60,25 @@ public class ActivationOutputsTest {
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0)
-                        .setRangeOutput(Range.Output.BEGIN),
+                        .setBias(-1.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0)
-                        .setRangeOutput(Range.Output.END),
+                        .setBias(-1.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_EQUALS)
         );
 
 
@@ -139,8 +148,11 @@ public class ActivationOutputsTest {
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setBias(-1.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         ).get();
 
 
@@ -167,8 +179,11 @@ public class ActivationOutputsTest {
                         .setNeuron(inA)
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(-1.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(-1.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         ).get();
 
 

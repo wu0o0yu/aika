@@ -12,6 +12,7 @@ import network.aika.neuron.activation.SearchNode;
 import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
+import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.range.Range.Relation.EQUALS;
 
 public class SoftMaxTest {
@@ -56,29 +57,35 @@ public class SoftMaxTest {
                                 .setSynapseId(0)
                                 .setNeuron(inputs[j])
                                 .setWeight(10.0)
-                                .setBias(-10.0)
-                                .setRangeOutput(Range.Output.DIRECT),
+                                .setBias(-10.0),
                         new Synapse.Builder()
                                 .setSynapseId(1)
                                 .setNeuron(inhib)
                                 .setWeight(-100.0)
                                 .setBias(0.0)
-                                .setRecurrent(true)
-                                .setRangeOutput(Range.Output.NONE),
+                                .setRecurrent(true),
                         new Relation.Builder()
                                 .setFrom(1)
                                 .setTo(0)
-                                .setRangeRelation(Range.Relation.EQUALS)
+                                .setRangeRelation(Range.Relation.EQUALS),
+                        new Relation.Builder()
+                                .setFrom(0)
+                                .setTo(OUTPUT)
+                                .setRangeRelation(EQUALS)
                 );
                 output[j][i] = n;
 
+                int inhibSynId = inhib.getNewSynapseId();
                 Neuron.init(inhib,
                         new Synapse.Builder()
-                                .setSynapseId(inhib.getNewSynapseId())
+                                .setSynapseId(inhibSynId)
                                 .setNeuron(n)
                                 .setWeight(1.0)
-                                .setBias(0.0)
-                                .setRangeOutput(Range.Output.DIRECT)
+                                .setBias(0.0),
+                        new Relation.Builder()
+                                .setFrom(inhibSynId)
+                                .setTo(OUTPUT)
+                                .setRangeRelation(EQUALS)
                 );
                 i++;
             }

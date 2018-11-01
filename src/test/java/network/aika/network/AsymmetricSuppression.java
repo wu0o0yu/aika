@@ -6,9 +6,13 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.range.Range;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
 
 public class AsymmetricSuppression {
 
@@ -30,15 +34,21 @@ public class AsymmetricSuppression {
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRecurrent(true),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Document doc = m.createDocument("a");

@@ -23,10 +23,14 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.range.Range;
+import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.TreeMap;
+
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
 
 /**
  *
@@ -46,12 +50,16 @@ public class AddSynapseTest {
         for(String l: new String[] {"A", "B", "C", "D"}) {
             Neuron in = m.createNeuron(l);
             inputNeurons.put(l, in);
+            int synId = i++;
             Neuron.init(n,
                     new Synapse.Builder()
-                            .setSynapseId(i++)
+                            .setSynapseId(synId)
                             .setNeuron(in)
-                            .setWeight(10.0)
-                            .setRangeOutput(Range.Output.DIRECT)
+                            .setWeight(10.0),
+                    new Relation.Builder()
+                            .setFrom(synId)
+                            .setTo(OUTPUT)
+                            .setRangeRelation(EQUALS)
             );
         }
 

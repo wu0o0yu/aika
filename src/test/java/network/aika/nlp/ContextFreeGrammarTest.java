@@ -23,8 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.BEGIN_TO_END_EQUALS;
-import static network.aika.neuron.range.Range.Relation.OVERLAPS;
+import static network.aika.neuron.range.Range.Relation.*;
 
 public class ContextFreeGrammarTest {
 
@@ -127,13 +126,17 @@ public class ContextFreeGrammarTest {
         dictionary.put(word, wordN);
 
         for (Neuron wordType : wordTypes) {
+            int wtSynId = wordType.getNewSynapseId();
             Neuron.init(wordType,
                     new Synapse.Builder()
-                            .setSynapseId(wordType.getNewSynapseId())
+                            .setSynapseId(wtSynId)
                             .setNeuron(wordN)
                             .setWeight(3.0)
-                            .setBias(0.0)
-                            .setRangeOutput(Range.Output.DIRECT)
+                            .setBias(0.0),
+                    new Relation.Builder()
+                            .setFrom(wtSynId)
+                            .setTo(OUTPUT)
+                            .setRangeRelation(EQUALS)
             );
         }
     }
@@ -141,12 +144,16 @@ public class ContextFreeGrammarTest {
 
     private void initOrNeuron(Neuron orN, Neuron... inputs) {
         for (Neuron n : inputs) {
+            int synId = orN.getNewSynapseId();
             Neuron.init(orN,
                     new Synapse.Builder()
-                            .setSynapseId(orN.getNewSynapseId())
+                            .setSynapseId(synId)
                             .setNeuron(n)
-                            .setWeight(1.0)
-                            .setRangeOutput(Range.Output.DIRECT)
+                            .setWeight(1.0),
+                    new Relation.Builder()
+                            .setFrom(synId)
+                            .setTo(OUTPUT)
+                            .setRangeRelation(EQUALS)
             );
         }
     }
@@ -165,8 +172,24 @@ public class ContextFreeGrammarTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setIdentity(true)
-                        .setRangeOutput(begin ? Range.Mapping.BEGIN :Range.Mapping.NONE, end ? Range.Mapping.END : Range.Mapping.NONE)
             );
+
+            if(begin) {
+                in.add(
+                        new Relation.Builder()
+                                .setFrom(i)
+                                .setTo(OUTPUT)
+                                .setRangeRelation(BEGIN_EQUALS)
+                );
+            }
+            if(end) {
+                in.add(
+                        new Relation.Builder()
+                                .setFrom(i)
+                                .setTo(OUTPUT)
+                                .setRangeRelation(END_EQUALS)
+                );
+            }
 
             if(!begin) {
                 in.add(new Relation.Builder()

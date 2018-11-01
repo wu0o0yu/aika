@@ -10,6 +10,11 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.BEGIN_EQUALS;
+import static network.aika.neuron.range.Range.Relation.END_EQUALS;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
+
 public class TestNextWord {
 
     @Test
@@ -24,18 +29,24 @@ public class TestNextWord {
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-9.5)
-                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
+                        .setBias(-9.5),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-9.5)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                        .setBias(-9.5),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS)
+                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_EQUALS)
         );
 
         Document doc = m.createDocument("aaaa bbbb  ", 0);

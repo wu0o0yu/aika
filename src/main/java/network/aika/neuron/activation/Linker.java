@@ -27,6 +27,7 @@ import network.aika.neuron.activation.Activation.Link;
 
 import java.util.*;
 
+import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.Synapse.VARIABLE;
 import static network.aika.neuron.activation.SearchNode.Decision;
 
@@ -103,13 +104,19 @@ public class Linker {
 
     public void linkInput(Activation act) {
         for(Synapse s: act.getNeuron().inMemoryInputSynapses.values()) {
-            if(s.rangeOutput.compareTo(Range.Output.NONE) != 0) {
-                Range r = s.rangeOutput.invert().map(act.range);
+            for(Map.Entry<Integer, Set<Relation>> me: s.relations.entrySet()) {
+                if(me.getKey() == OUTPUT) {
+                    for(Relation rel: me.getValue()) {
+                        Range r = rel.mapRange(act, Direction.INPUT);
 
-                Activation iAct = s.input.get(act.doc).getActivation(act.doc, r, false);
+                        if(r != null) {
+                            Activation iAct = s.input.get(act.doc).getActivation(act.doc, r, false);
 
-                if(iAct != null) {
-                    link(s, iAct, act);
+                            if (iAct != null) {
+                                link(s, iAct, act);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -183,20 +190,6 @@ public class Linker {
 
         if(iAct == null || iAct.blocked || !checkRelations(s, iAct, oAct)) {
             return;
-        }
-
-        if(s.rangeInput == Synapse.OUTPUT) {
-            Position outputBegin = s.rangeOutput.begin.map(iAct.range);
-            Position outputEnd = s.rangeOutput.end.map(iAct.range);
-
-            if((outputBegin != null && !outputBegin.compare(Position.Operator.EQUALS, oAct.range.begin)) || (outputEnd != null && !outputEnd.compare(Position.Operator.EQUALS, oAct.range.end))) {
-                return;
-            }
-        } else {
-            if(iAct.getInputLinks(false, false)
-                    .noneMatch(l -> (l.synapse.id == s.rangeInput || s.rangeInput == VARIABLE) && l.input.range.equals(oAct.range))) {
-                return;
-            }
         }
 
         Link nl = new Link(s, iAct, oAct, false);

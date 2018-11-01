@@ -31,6 +31,11 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.BEGIN_EQUALS;
+import static network.aika.neuron.range.Range.Relation.END_EQUALS;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
+
 /**
  *
  * @author Lukas Molzberger
@@ -65,8 +70,7 @@ public class OverlappingOrTest {
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(4.0)
                         .setRecurrent(false)
-                        .setBias(-4.0)
-                        .setRangeOutput(Range.Output.BEGIN),
+                        .setBias(-4.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))
@@ -78,8 +82,7 @@ public class OverlappingOrTest {
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(4.0)
                         .setRecurrent(false)
-                        .setBias(-4.0)
-                        .setRangeOutput(Range.Output.END),
+                        .setBias(-4.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -91,7 +94,15 @@ public class OverlappingOrTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS)
+                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_EQUALS)
         );
 
         Document doc = m.createDocument("a b c d e ", 0);

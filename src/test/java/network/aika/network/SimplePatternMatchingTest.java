@@ -32,6 +32,11 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.BEGIN_EQUALS;
+import static network.aika.neuron.range.Range.Relation.END_EQUALS;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
+
 /**
  *
  * @author Lukas Molzberger
@@ -64,8 +69,7 @@ public class SimplePatternMatchingTest {
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))
@@ -77,8 +81,7 @@ public class SimplePatternMatchingTest {
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -86,7 +89,15 @@ public class SimplePatternMatchingTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS)
+                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_EQUALS)
         );
 
 
@@ -153,8 +164,7 @@ public class SimplePatternMatchingTest {
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))
@@ -172,8 +182,7 @@ public class SimplePatternMatchingTest {
                         .setNeuron(inputNeurons.get('e'))
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -185,7 +194,15 @@ public class SimplePatternMatchingTest {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(3)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS)
+                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(3)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_EQUALS)
         );
 
 
@@ -244,8 +261,7 @@ public class SimplePatternMatchingTest {
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
@@ -257,8 +273,7 @@ public class SimplePatternMatchingTest {
                         .setNeuron(inC)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -270,7 +285,15 @@ public class SimplePatternMatchingTest {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_EQUALS)
         );
 
 
@@ -320,8 +343,7 @@ public class SimplePatternMatchingTest {
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
@@ -333,15 +355,13 @@ public class SimplePatternMatchingTest {
                         .setNeuron(inC)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.NONE),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inD)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -365,7 +385,15 @@ public class SimplePatternMatchingTest {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(3)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(3)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_EQUALS)
         );
 
 

@@ -26,6 +26,9 @@ import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
+
 /**
  *
  * @author Lukas Molzberger
@@ -48,15 +51,21 @@ public class SimpleWeightsTest {
                         .setNeuron(inA)
                         .setWeight(0.3f)
                         .setRecurrent(false)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(0.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(0.4f)
                         .setRecurrent(false)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         {
@@ -101,8 +110,7 @@ public class SimpleWeightsTest {
                         .setNeuron(inA)
                         .setWeight(3.0)
                         .setBias(-3.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
@@ -112,7 +120,11 @@ public class SimpleWeightsTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         {

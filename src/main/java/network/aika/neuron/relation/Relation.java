@@ -7,10 +7,11 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.Writable;
+import network.aika.neuron.activation.Linker;
+import network.aika.neuron.range.Position;
 import network.aika.neuron.range.Range;
 
 import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
@@ -30,6 +31,12 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public abstract boolean test(Activation act, Activation linkedAct);
 
     public abstract Relation invert();
+
+    public abstract Range mapRange(Activation act, Linker.Direction input);
+
+    public abstract boolean linksOutputBegin();
+
+    public abstract boolean linksOutputEnd();
 
 
     public static Relation read(DataInput in, Model m) throws IOException {
@@ -80,6 +87,17 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         private int to;
 
         private Relation relation;
+
+
+        /**
+         * This parameter allows to specify whether the relations connected to thy synapse refer to the activation of the
+         * input neuron (that's the default) or if the should refer to one of the input activations of the input neuron.
+         * In this case the synapseId of the input neuron needs to be specified which leads to the desired input activation.
+         *
+         * @param synapseId
+         * @return
+         */
+
 
 
         public Builder setFrom(int synapseId) {

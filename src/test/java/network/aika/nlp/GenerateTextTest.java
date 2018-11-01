@@ -23,12 +23,12 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.range.Range.Output;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.*;
 import static network.aika.neuron.relation.AncestorRelation.Type.IS_DESCENDANT_OF;
 
 
@@ -70,14 +70,12 @@ public class GenerateTextTest {
                         .setSynapseId(0)
                         .setNeuron(outputFrame)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Output.NONE),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inhib)
@@ -87,11 +85,15 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.NONE),
+                        .setRangeRelation(NONE),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron.init(phraseB, 5.0, INeuron.Type.EXCITATORY,
@@ -99,14 +101,12 @@ public class GenerateTextTest {
                         .setSynapseId(0)
                         .setNeuron(outputFrame)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Output.NONE),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inhib)
@@ -116,11 +116,15 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.NONE),
+                        .setRangeRelation(NONE),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
 
@@ -129,8 +133,11 @@ public class GenerateTextTest {
                         .setSynapseId(0)
                         .setNeuron(inOut)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE)
+                        .setBias(-10.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_TO_BEGIN_EQUALS)
         );
 
 
@@ -140,8 +147,11 @@ public class GenerateTextTest {
                         .setNeuron(phraseA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setIdentity(true)
-                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE)
+                        .setIdentity(true),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(BEGIN_EQUALS)
         );
 
 
@@ -152,18 +162,24 @@ public class GenerateTextTest {
                         .setSynapseId(0)
                         .setNeuron(phraseA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(outA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE),
+                        .setBias(-10.0),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setAncestorRelation(IS_DESCENDANT_OF)
+                        .setAncestorRelation(IS_DESCENDANT_OF),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_TO_BEGIN_EQUALS)
         );
 
 
@@ -176,8 +192,11 @@ public class GenerateTextTest {
                         .setNeuron(phraseB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setIdentity(true)
-                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE)
+                        .setIdentity(true),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(BEGIN_EQUALS)
         );
 
 
@@ -187,18 +206,24 @@ public class GenerateTextTest {
                         .setSynapseId(0)
                         .setNeuron(phraseB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(outB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE),
+                        .setBias(-10.0),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setAncestorRelation(IS_DESCENDANT_OF)
+                        .setAncestorRelation(IS_DESCENDANT_OF),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_TO_BEGIN_EQUALS)
         );
 
 
@@ -208,14 +233,20 @@ public class GenerateTextTest {
                         .setSynapseId(0)
                         .setNeuron(phraseA)
                         .setWeight(1.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(0.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(phraseB)
                         .setWeight(1.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
 
@@ -266,8 +297,11 @@ public class GenerateTextTest {
                         .setNeuron(in)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setIdentity(true)
-                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE)
+                        .setIdentity(true),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_TO_BEGIN_EQUALS)
         );
 
         Neuron.init(outA, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
@@ -275,8 +309,11 @@ public class GenerateTextTest {
                         .setSynapseId(0)
                         .setNeuron(intermediate)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Output.DIRECT)
+                        .setBias(-10.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
 
@@ -285,8 +322,11 @@ public class GenerateTextTest {
                         .setSynapseId(0)
                         .setNeuron(intermediate)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Mapping.END, Range.Mapping.NONE)
+                        .setBias(-10.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_TO_BEGIN_EQUALS)
         );
 
         Document doc = m.createDocument("in ");

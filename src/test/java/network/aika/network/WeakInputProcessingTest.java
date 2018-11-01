@@ -28,6 +28,9 @@ import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
+
 /**
  *
  * @author Lukas Molzberger
@@ -56,8 +59,7 @@ public class WeakInputProcessingTest {
                         .setNeuron(strongInput)
                         .setWeight(50.0)
                         .setRecurrent(false)
-                        .setBias(-45.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-45.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(weakInputA)
@@ -77,7 +79,11 @@ public class WeakInputProcessingTest {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.OVERLAPS)
+                        .setRangeRelation(Range.Relation.OVERLAPS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron patternB = Neuron.init(
@@ -89,22 +95,19 @@ public class WeakInputProcessingTest {
                         .setNeuron(strongInput)
                         .setWeight(50.0)
                         .setRecurrent(false)
-                        .setBias(-45.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-45.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(weakInputB)
                         .setWeight(1.5f)
                         .setRecurrent(false)
-                        .setBias(-1.5)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-1.5),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setRecurrent(true)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(0.0),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -112,7 +115,19 @@ public class WeakInputProcessingTest {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron patternC = Neuron.init(
@@ -124,22 +139,19 @@ public class WeakInputProcessingTest {
                         .setNeuron(strongInput)
                         .setWeight(50.0)
                         .setRecurrent(false)
-                        .setBias(-45.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-45.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(weakInputC)
                         .setWeight(0.5f)
                         .setRecurrent(false)
-                        .setBias(-0.5)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-0.5),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setRecurrent(true)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(0.0),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -147,7 +159,19 @@ public class WeakInputProcessingTest {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
 
@@ -159,22 +183,31 @@ public class WeakInputProcessingTest {
                         .setNeuron(patternA)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(patternB)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(patternC)
                         .setWeight(10.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Document doc = m.createDocument("a ");

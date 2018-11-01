@@ -25,8 +25,6 @@ import network.aika.neuron.Synapse;
 
 import java.util.*;
 
-import static network.aika.neuron.range.Range.Mapping.NONE;
-
 /**
  * Converts the synapse weights of a neuron into a boolean logic representation of this neuron.
  *
@@ -39,8 +37,8 @@ public class Converter {
 
     public static Comparator<Synapse> SYNAPSE_COMP = (s1, s2) -> {
         int r = Boolean.compare(
-                s2.rangeOutput.begin != NONE || s2.rangeOutput.end != NONE || s2.identity,
-                s1.rangeOutput.begin != NONE || s1.rangeOutput.end != NONE || s1.identity
+                s2.linksAnyOutput() || s2.identity,
+                s1.linksAnyOutput() || s1.identity
         );
         if (r != 0) return r;
         r = Double.compare(s2.weight, s1.weight);
@@ -157,10 +155,11 @@ public class Converter {
 
     private void initCreateBeginEndPositionFlags() {
         modifiedSynapses.forEach(s -> {
-            if (s.rangeOutput.begin != NONE) {
+            boolean[] linksOutput = s.linksOutput();
+            if(linksOutput[0]) {
                 neuron.createBeginPosition = false;
             }
-            if (s.rangeOutput.end != NONE) {
+            if(linksOutput[1]) {
                 neuron.createEndPosition = false;
             }
         });

@@ -3,6 +3,9 @@ package network.aika.neuron.relation;
 import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Linker;
+import network.aika.neuron.range.Position;
+import network.aika.neuron.range.Range;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -107,6 +110,23 @@ public class AncestorRelation extends Relation {
                 return new AncestorRelation(Type.IS_DESCENDANT_OF);
         }
         return null;
+    }
+
+
+    @Override
+    public Range mapRange(Activation act, Linker.Direction input) {
+        return null;
+    }
+
+
+    @Override
+    public boolean linksOutputBegin() {
+        return false;
+    }
+
+    @Override
+    public boolean linksOutputEnd() {
+        return false;
     }
 
 

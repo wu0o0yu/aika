@@ -19,9 +19,6 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Document;
-import network.aika.neuron.range.Range;
-import network.aika.neuron.range.Range.Output;
-import network.aika.neuron.range.Range.Mapping;
 import network.aika.neuron.relation.Relation;
 import network.aika.Writable;
 
@@ -83,8 +80,6 @@ public class Synapse implements Writable {
     public Integer id;
 
     public boolean isRecurrent;
-    public int rangeInput;
-    public Output rangeOutput;
     public boolean identity;
 
     public Map<Integer, Set<Relation>> relations = new TreeMap<>();
@@ -311,7 +306,7 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S NW:" + getNewWeight() + " NB:" + getNewBias() + " rec:" + isRecurrent + " o:" + rangeOutput + " " +  input + "->" + output;
+        return "S NW:" + getNewWeight() + " NB:" + getNewBias() + " rec:" + isRecurrent + " " +  input + "->" + output;
     }
 
 
@@ -320,8 +315,6 @@ public class Synapse implements Writable {
         out.writeInt(id);
 
         out.writeBoolean(isRecurrent);
-        out.writeInt(rangeInput);
-        rangeOutput.write(out);
         out.writeBoolean(identity);
 
         out.writeInt(input.id);
@@ -360,8 +353,6 @@ public class Synapse implements Writable {
         id = in.readInt();
 
         isRecurrent = in.readBoolean();
-        rangeInput = in.readInt();
-        rangeOutput = Range.Output.read(in, m);
         identity = in.readBoolean();
 
         input = m.lookupNeuron(in.readInt());
@@ -448,6 +439,30 @@ public class Synapse implements Writable {
     }
 
 
+    public boolean[] linksOutput() {
+        boolean[] result = new boolean[] {false, false};
+        for(Map.Entry<Integer, Set<Relation>> me: relations.entrySet()) {
+            if(me.getKey() == OUTPUT) {
+                for(Relation r: me.getValue()) {
+                    if (r.linksOutputBegin()) {
+                        result[0] = true;
+                    }
+                    if (r.linksOutputEnd()) {
+                        result[1] = true;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+
+    public boolean linksAnyOutput() {
+        boolean[] lo = linksOutput();
+        return lo[0] || lo[1];
+    }
+
+
     /**
      * The {@code Builder} class is just a helper class which is used to initialize a neuron. Most of the parameters of this class
      * will be mapped to a input synapse for this neuron.
@@ -464,8 +479,6 @@ public class Synapse implements Writable {
 
         public DistanceFunction distanceFunction;
 
-        public int rangeInput = OUTPUT;
-        public Output rangeOutput = Output.NONE;
         public boolean identity;
 
         public Integer synapseId;
@@ -535,47 +548,10 @@ public class Synapse implements Writable {
         }
 
 
-        /**
-         * By default the output range of th synapses input neuron is used. Using this setter a specific input synapse of
-         * the input neuron might be chosen as a source for the range.
-         *
-         * @param synapseId
-         * @return
-         */
-        public Builder setRangeInput(int synapseId) {
-            this.rangeInput = synapseId;
-            return this;
-        }
 
 
         public Builder setIdentity(boolean identity) {
             this.identity = identity;
-            return this;
-        }
-
-
-        /**
-         * <code>setRangeOutput</code> is just a convenience function to call <code>setBeginRangeOutput</code> and
-         * <code>setEndRangeOutput</code> at the same time.
-         *
-         * @param rangeOutput
-         * @return
-         */
-        public Builder setRangeOutput(Output rangeOutput) {
-            this.rangeOutput = rangeOutput;
-            return this;
-        }
-
-
-        /**
-         * Determines if this input is used to compute the range start of the output activation.
-         *
-         * @param begin
-         * @param end
-         * @return
-         */
-        public Builder setRangeOutput(Mapping begin, Mapping end) {
-            this.rangeOutput = Output.create(begin, end);
             return this;
         }
 
@@ -597,8 +573,6 @@ public class Synapse implements Writable {
             Synapse s = createOrLookup(null, synapseId, neuron, outputNeuron);
 
             s.isRecurrent = recurrent;
-            s.rangeInput = rangeInput;
-            s.rangeOutput = rangeOutput;
             s.identity = identity;
             s.distanceFunction = distanceFunction;
 

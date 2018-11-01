@@ -10,8 +10,9 @@ import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static network.aika.neuron.range.Position.Operator.*;
-import static network.aika.neuron.range.Range.Output.DIRECT;
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.EQUALS;
+
 
 public class LinkerTest {
 
@@ -54,12 +55,15 @@ public class LinkerTest {
                             .setSynapseId(1)
                             .setNeuron(nb)
                             .setWeight(10.0)
-                            .setBias(-10.0)
-                            .setRangeOutput(DIRECT),
+                            .setBias(-10.0),
                     new Relation.Builder()
                             .setFrom(1)
                             .setTo(0)
-                            .setRangeRelation(rr)
+                            .setRangeRelation(rr),
+                    new Relation.Builder()
+                            .setFrom(1)
+                            .setTo(OUTPUT)
+                            .setRangeRelation(EQUALS)
             );
 
             Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
@@ -91,8 +95,11 @@ public class LinkerTest {
                         .setSynapseId(1)
                         .setNeuron(na)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(DIRECT)
+                        .setBias(-10.0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Document doc = m.createDocument("X");

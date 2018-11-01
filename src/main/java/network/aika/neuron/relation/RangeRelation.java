@@ -4,6 +4,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Linker;
 import network.aika.neuron.range.Position;
 import network.aika.neuron.range.Range;
 
@@ -41,6 +42,43 @@ public class RangeRelation extends Relation {
     @Override
     public Relation invert() {
         return new RangeRelation(relation.invert());
+    }
+
+
+    @Override
+    public Range mapRange(Activation act, Linker.Direction direction) {
+        Range.Relation rel = relation;
+        if(direction == Linker.Direction.INPUT) {
+            rel = rel.invert();
+        }
+
+        Range r = act.range;
+        Position begin = null;
+        Position end = null;
+        if(rel.beginToBegin == EQUALS) {
+            begin = r.begin;
+        } else if(rel.endToBegin == EQUALS) {
+            begin = r.end;
+        }
+        if(rel.endToEnd == EQUALS) {
+            end = r.end;
+        } else if(rel.beginToEnd == EQUALS) {
+            end = r.begin;
+        }
+
+        return new Range(begin, end);
+    }
+
+
+    @Override
+    public boolean linksOutputBegin() {
+        return relation.beginToBegin == EQUALS || relation.endToBegin == EQUALS;
+    }
+
+
+    @Override
+    public boolean linksOutputEnd() {
+        return relation.endToEnd == EQUALS || relation.beginToEnd == EQUALS;
     }
 
 

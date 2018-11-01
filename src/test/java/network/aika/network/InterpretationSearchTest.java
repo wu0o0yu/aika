@@ -29,6 +29,9 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.range.Range.Relation.*;
+
 /**
  *
  * @author Lukas Molzberger
@@ -55,38 +58,42 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(wJoerg)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .setRangeOutput(Range.Output.NONE),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
         Neuron.init(eZimmermannCompany, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wZimmermann)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .setRangeOutput(Range.Output.NONE),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron.init(eJoergForename, 6.0, INeuron.Type.EXCITATORY,
@@ -94,22 +101,19 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(wJoerg)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(eZimmermannSurname)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(true)
-                        .setRangeOutput(Range.Output.NONE),
+                        .setRecurrent(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .setRangeOutput(Range.Output.NONE),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -117,7 +121,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron.init(eZimmermannSurname, 6.0, INeuron.Type.EXCITATORY,
@@ -125,22 +133,19 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(wZimmermann)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(eJoergForename)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(true)
-                        .setRangeOutput(Range.Output.NONE),
+                        .setRecurrent(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .setRangeOutput(Range.Output.NONE),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -148,7 +153,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(Range.Relation.EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
 
@@ -157,26 +166,38 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(eJoergForename)
                         .setWeight(10.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(0.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(eJoergSurname)
                         .setWeight(10.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(0.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(eZimmermannCompany)
                         .setWeight(10.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(0.0),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(eZimmermannSurname)
                         .setWeight(10.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(3)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Document doc = m.createDocument("Joerg Zimmermann");
@@ -227,8 +248,7 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
@@ -238,7 +258,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
@@ -246,8 +270,7 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(nF)
@@ -262,11 +285,15 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.NONE),
+                        .setRangeRelation(NONE),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron nE = Neuron.init(m.createNeuron("E"), 5.0, INeuron.Type.EXCITATORY,
@@ -274,8 +301,7 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
@@ -285,7 +311,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron.init(nF, 6.0, INeuron.Type.EXCITATORY,
@@ -293,8 +323,7 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
@@ -304,7 +333,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
 
@@ -313,26 +346,38 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(nC)
                         .setWeight(10.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(0.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(nD)
                         .setWeight(10.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(0.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(nE)
                         .setWeight(10.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(0.0),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(nF)
                         .setWeight(10.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(3)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
 
@@ -370,8 +415,7 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
@@ -381,7 +425,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
@@ -389,8 +437,7 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
@@ -400,7 +447,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron.init(inhib,
@@ -408,8 +459,11 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(nC)
                         .setWeight(10.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron.init(inhib,
@@ -417,8 +471,11 @@ public class InterpretationSearchTest {
                         .setSynapseId(1)
                         .setNeuron(nD)
                         .setWeight(10.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
 
@@ -447,7 +504,7 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.NONE)
+                        .setRangeRelation(NONE)
         );
 
         Neuron.init(doc, nE, 5.0, INeuron.Type.EXCITATORY,
@@ -455,8 +512,7 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
@@ -466,7 +522,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron.init(doc, nF, 6.0, INeuron.Type.EXCITATORY,
@@ -474,8 +534,7 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setBias(-10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
@@ -485,7 +544,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS)
+                        .setRangeRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron.init(
@@ -495,8 +558,11 @@ public class InterpretationSearchTest {
                         .setSynapseId(2)
                         .setNeuron(nE)
                         .setWeight(10.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron.init(
@@ -506,8 +572,11 @@ public class InterpretationSearchTest {
                         .setSynapseId(3)
                         .setNeuron(nF)
                         .setWeight(10.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(3)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         inA.addInput(doc, 0, 5);
@@ -537,8 +606,11 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(out)
                         .setWeight(1.0)
-                        .setBias(0.0)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
         );
 
         Neuron.init(out, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
@@ -546,29 +618,34 @@ public class InterpretationSearchTest {
                         .setSynapseId(0)
                         .setNeuron(in)
                         .setWeight(20.0)
-                        .setBias(-20.0)
-                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
+                        .setBias(-20.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(in)
                         .setWeight(20.0)
-                        .setBias(-20.0)
-                        .setRangeOutput(Range.Mapping.NONE, Range.Mapping.END),
+                        .setBias(-20.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(out)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .setRangeOutput(Range.Output.NONE),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.BEGIN_TO_END_EQUALS),
+                        .setRangeRelation(BEGIN_TO_END_EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(Synapse.OUTPUT)
-                        .setRangeRelation(Range.Relation.OVERLAPS)
+                        .setRangeRelation(OVERLAPS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(END_EQUALS)
         );
 
 
