@@ -5,6 +5,7 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
@@ -92,6 +93,7 @@ public class InputRelationTest {
         doc.process();
 
         Assert.assertFalse(nD.getActivations(doc,  true).isEmpty());
+        Assert.assertNotNull(nE.getActivation(doc, new Range(doc, 2, 6),  true));
 
         System.out.println(doc.activationsToString(true, false, false));
 

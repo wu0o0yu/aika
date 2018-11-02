@@ -82,8 +82,14 @@ public class InputRelation extends Relation {
 
 
     @Override
-    public Range mapRange(Activation act, Linker.Direction direction) {
-        return null; //relation.mapRange(act, direction);
+    public Range mapRange(Activation act, Linker.Direction dir) {
+        if(dir == Linker.Direction.OUTPUT) {
+            for(Activation iAct: followLinks(toInput, act, INPUT)) {
+                return relation.mapRange(iAct, dir);
+            }
+        }
+
+        return null;
     }
 
 
