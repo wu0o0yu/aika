@@ -23,7 +23,8 @@ public class AncestorRelation extends Relation {
     public enum Type  {
         COMMON_ANCESTOR,
         IS_DESCENDANT_OF,
-        IS_ANCESTOR_OF
+        IS_ANCESTOR_OF,
+        EQUALS
     }
 
     AncestorRelation() {}
@@ -38,10 +39,16 @@ public class AncestorRelation extends Relation {
         switch(type) {
             case COMMON_ANCESTOR:
                 collectCommonAncestor(results, n, linkedAct, linkedAct.doc.visitedCounter++);
+                break;
             case IS_DESCENDANT_OF:
                 collectContains(results, n, linkedAct, linkedAct.doc.visitedCounter++);
+                break;
             case IS_ANCESTOR_OF:
                 collectContainedIn(results, n, linkedAct, linkedAct.doc.visitedCounter++);
+                break;
+            case EQUALS:
+                collectEquals(results, n, linkedAct);
+                break;
         }
         return results;
     }
@@ -85,6 +92,10 @@ public class AncestorRelation extends Relation {
                 .forEach(l -> collectContainedIn(results, n, l.input, v));
     }
 
+
+    private void collectEquals(List<Activation> results, INeuron n, Activation linkedAct) {
+        results.add(linkedAct);
+    }
 
 
     @Override

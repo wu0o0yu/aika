@@ -9,12 +9,15 @@ import network.aika.neuron.range.Range;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.Synapse.VARIABLE;
+import static network.aika.neuron.activation.Linker.Direction.INPUT;
 
 
 public class InputRelation extends Relation {
@@ -40,8 +43,8 @@ public class InputRelation extends Relation {
 
     @Override
     public boolean test(Activation act, Activation linkedAct) {
-        for(Activation iAct: getInputActivations(fromInput, act)) {
-            for(Activation linkedIAct: getInputActivations(toInput, linkedAct)) {
+        for(Activation iAct: followLinks(fromInput, act, INPUT)) {
+            for(Activation linkedIAct: followLinks(toInput, linkedAct, INPUT)) {
                 return relation.test(iAct, linkedIAct);
             }
         }
@@ -49,17 +52,18 @@ public class InputRelation extends Relation {
     }
 
 
-    private Collection<Activation> getInputActivations(int inputSynId, Activation act) {
+    private Collection<Activation> followLinks(int inputSynId, Activation act, Linker.Direction dir) {
         if(inputSynId == OUTPUT) {
             return Collections.singleton(act);
-        } else if(inputSynId == VARIABLE) {
-            return act.getInputLinks(false, false)
-                    .map(l -> l.input)
-                    .collect(Collectors.toList());
         } else {
-            return act.getInputLinks(false, false)
-                    .filter(l -> l.synapse.id == inputSynId)
-                    .map(l -> l.input)
+            Stream<Activation.Link> s = dir == INPUT ?
+                    act.getInputLinks(false, false) :
+                    act.getOutputLinks(false);
+            if(inputSynId != VARIABLE) {
+                s = s.filter(l -> l.synapse.id == inputSynId);
+            }
+
+            return s.map(l -> l.input)
                     .collect(Collectors.toList());
         }
     }
@@ -79,7 +83,7 @@ public class InputRelation extends Relation {
 
     @Override
     public Range mapRange(Activation act, Linker.Direction direction) {
-        return relation.mapRange(act, direction);
+        return null; //relation.mapRange(act, direction);
     }
 
 
@@ -100,9 +104,20 @@ public class InputRelation extends Relation {
         return relation.isExact();
     }
 
+
     @Override
     public Collection<Activation> getActivations(INeuron n, Activation linkedAct) {
-        return relation.getActivations(n, linkedAct);
+        Collection<Activation> results = new ArrayList<>();
+        for(Activation linkedIAct: followLinks(toInput, linkedAct, INPUT)) {
+            for(Activation iAct: relation.getActivations(n, linkedIAct)) {
+                for(Activation act: followLinks(fromInput, iAct, Linker.Direction.OUTPUT)) {
+                    if(act.getINeuron() == n) {
+                        results.add(act);
+                    }
+                }
+            }
+        }
+        return results;
     }
 
 
