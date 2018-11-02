@@ -21,6 +21,10 @@ import static network.aika.neuron.range.Position.Operator.LESS_THAN_EQUAL;
 
 
 public class RangeRelation extends Relation {
+    public static final int RELATION_TYPE = 0;
+
+
+
     public Range.Relation relation;
 
     RangeRelation() {}
@@ -84,7 +88,7 @@ public class RangeRelation extends Relation {
 
     @Override
     public int getRelationType() {
-        return 0;
+        return RELATION_TYPE;
     }
 
     @Override
@@ -96,7 +100,8 @@ public class RangeRelation extends Relation {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeBoolean(false);
+        out.writeInt(getRelationType());
+
         relation.write(out);
     }
 

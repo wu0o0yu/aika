@@ -8,12 +8,13 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.Writable;
 import network.aika.neuron.activation.Linker;
-import network.aika.neuron.range.Position;
 import network.aika.neuron.range.Range;
 
 import java.io.DataInput;
 import java.io.IOException;
 import java.util.*;
+
+import static network.aika.neuron.Synapse.OUTPUT;
 
 
 public abstract class Relation implements Comparable<Relation>, Writable {
@@ -32,7 +33,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public abstract Relation invert();
 
-    public abstract Range mapRange(Activation act, Linker.Direction input);
+    public abstract Range mapRange(Activation act, Linker.Direction direction);
 
     public abstract boolean linksOutputBegin();
 
@@ -40,10 +41,13 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
 
     public static Relation read(DataInput in, Model m) throws IOException {
-        if(in.readBoolean()) {
-            return AncestorRelation.read(in, m);
-        } else {
-            return RangeRelation.read(in, m);
+        switch(in.readInt()) {
+            case AncestorRelation.RELATION_TYPE:
+                return AncestorRelation.read(in, m);
+            case RangeRelation.RELATION_TYPE:
+                return RangeRelation.read(in, m);
+            case InputRelation.RELATION_TYPE:
+                return InputRelation.read(in, m);
         }
     }
 
@@ -69,7 +73,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
 
     public static Map<Integer, Set<Relation>> getRelationsMap(int synapseId, Neuron n) {
-        if(synapseId == Synapse.OUTPUT) {
+        if(synapseId == OUTPUT) {
             INeuron in = n.get();
             if (in.outputRelations == null) {
                 in.outputRelations = new TreeMap<>();
@@ -85,6 +89,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public static class Builder implements Neuron.Builder {
         private int from;
         private int to;
+        private int fromInput = OUTPUT;
+        private int toInput = OUTPUT;
 
         private Relation relation;
 
@@ -112,6 +118,18 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             return this;
         }
 
+        public Builder setFromInput(int synapseId) {
+            assert synapseId >= -2;
+            fromInput = synapseId;
+            return this;
+        }
+
+        public Builder setToInput(int synapseId) {
+            assert synapseId >= -2;
+            toInput = synapseId;
+            return this;
+        }
+
         public Builder setAncestorRelation(AncestorRelation.Type type) {
             relation = new AncestorRelation(type);
             return this;
@@ -128,6 +146,9 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         public Relation getRelation() {
+            if(fromInput != OUTPUT || toInput != OUTPUT) {
+                return new InputRelation(relation, fromInput, toInput);
+            }
             return relation;
         }
 

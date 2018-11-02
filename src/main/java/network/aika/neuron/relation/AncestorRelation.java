@@ -4,7 +4,6 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Linker;
-import network.aika.neuron.range.Position;
 import network.aika.neuron.range.Range;
 
 import java.io.DataInput;
@@ -16,6 +15,9 @@ import java.util.List;
 
 
 public class AncestorRelation extends Relation {
+    public static final int RELATION_TYPE = 1;
+
+
     public Type type;
 
     public enum Type  {
@@ -114,7 +116,7 @@ public class AncestorRelation extends Relation {
 
 
     @Override
-    public Range mapRange(Activation act, Linker.Direction input) {
+    public Range mapRange(Activation act, Linker.Direction direction) {
         return null;
     }
 
@@ -176,7 +178,7 @@ public class AncestorRelation extends Relation {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeBoolean(true);
+        out.writeInt(getRelationType());
 
         out.writeUTF(type.name());
     }
@@ -202,7 +204,7 @@ public class AncestorRelation extends Relation {
 
     @Override
     public int getRelationType() {
-        return 1;
+        return RELATION_TYPE;
     }
 
     @Override
