@@ -25,6 +25,7 @@ public class InputRelationTest {
 
         Neuron nC = m.createNeuron("C");
         Neuron nD = m.createNeuron("D");
+        Neuron nE = m.createNeuron("E");
 
         Neuron.init(nC, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
@@ -65,6 +66,19 @@ public class InputRelationTest {
                         .setRangeRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRangeRelation(EQUALS)
+        );
+
+        Neuron.init(nE, 5.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(nC)
+                        .setWeight(10.0)
+                        .setBias(-10.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setFromInput(11)
                         .setTo(OUTPUT)
                         .setRangeRelation(EQUALS)
         );
