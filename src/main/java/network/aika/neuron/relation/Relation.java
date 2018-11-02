@@ -48,6 +48,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
                 return RangeRelation.read(in, m);
             case InputRelation.RELATION_TYPE:
                 return InputRelation.read(in, m);
+            default:
+                return null;
         }
     }
 

@@ -10,6 +10,11 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
+
+import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.Synapse.VARIABLE;
 
 
 public class InputRelation extends Relation {
@@ -35,7 +40,28 @@ public class InputRelation extends Relation {
 
     @Override
     public boolean test(Activation act, Activation linkedAct) {
-        return relation.test(act, linkedAct);
+        for(Activation iAct: getInputActivations(fromInput, act)) {
+            for(Activation linkedIAct: getInputActivations(toInput, linkedAct)) {
+                return relation.test(iAct, linkedIAct);
+            }
+        }
+        return false;
+    }
+
+
+    private Collection<Activation> getInputActivations(int inputSynId, Activation act) {
+        if(inputSynId == OUTPUT) {
+            return Collections.singleton(act);
+        } else if(inputSynId == VARIABLE) {
+            return act.getInputLinks(false, false)
+                    .map(l -> l.input)
+                    .collect(Collectors.toList());
+        } else {
+            return act.getInputLinks(false, false)
+                    .filter(l -> l.synapse.id == inputSynId)
+                    .map(l -> l.input)
+                    .collect(Collectors.toList());
+        }
     }
 
 

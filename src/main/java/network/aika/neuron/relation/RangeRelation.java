@@ -39,9 +39,11 @@ public class RangeRelation extends Relation {
         return relation.compare(act.range, linkedAct.range);
     }
 
+
     public String toString() {
         return "RR(" + relation + ")";
     }
+
 
     @Override
     public Relation invert() {
@@ -52,21 +54,18 @@ public class RangeRelation extends Relation {
     @Override
     public Range mapRange(Activation act, Linker.Direction direction) {
         Range.Relation rel = relation;
-        if(direction == Linker.Direction.INPUT) {
-            rel = rel.invert();
-        }
 
         Range r = act.range;
         Position begin = null;
         Position end = null;
         if(rel.beginToBegin == EQUALS) {
             begin = r.begin;
-        } else if(rel.endToBegin == EQUALS) {
+        } else if(rel.beginToEnd == EQUALS) {
             begin = r.end;
         }
         if(rel.endToEnd == EQUALS) {
             end = r.end;
-        } else if(rel.beginToEnd == EQUALS) {
+        } else if(rel.endToBegin == EQUALS) {
             end = r.begin;
         }
 
