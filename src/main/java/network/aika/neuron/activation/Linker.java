@@ -241,7 +241,6 @@ public class Linker {
     }
 
 
-
     protected boolean checkLoop(Activation iAct, Activation oAct) {
         long v = doc.visitedCounter++;
 

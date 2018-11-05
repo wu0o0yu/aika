@@ -64,7 +64,14 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     }
 
 
-    public static void addRelation(Map<Integer, Set<Relation>> relMap, Integer synId, Relation r) {
+    public static void addRelation(Map<Integer, Set<Relation>> relMap, Integer synId, Integer targetSynId, Neuron n, Relation r) {
+        if(targetSynId == OUTPUT) {
+            Synapse s = n.getSynapseById(synId);
+            if(s == null || !s.isConjunction) {
+                return;
+            }
+        }
+
         Set<Relation> relSet = relMap.get(synId);
         if(relSet == null) {
             relSet = new TreeSet<>(COMPARATOR);
@@ -159,8 +166,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             Map<Integer, Set<Relation>> toRel = getRelationsMap(to, n);
 
             Relation r = getRelation();
-            addRelation(fromRel, to, r);
-            addRelation(toRel, from, r.invert());
+            addRelation(fromRel, to, from, n, r);
+            addRelation(toRel, from, to, n, r.invert());
         }
 
         @Override
