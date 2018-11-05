@@ -73,19 +73,20 @@ public class OrNode extends Node<OrNode, Activation> {
         Position end = null;
 
         INeuron n = neuron.get(inputAct.doc);
-        for(Map.Entry<Integer, Set<Relation>> me: n.outputRelations.entrySet()) {
-            Integer synId = me.getKey();
-            Set<Relation> relSet = me.getValue();
+        for(int i = 0; i < oe.synapseIds.length; i++) {
+            int synapseId = oe.synapseIds[i];
 
-            Integer i = oe.revSynapseIds.get(synId);
-            if(i != null) {
-                Activation iAct = inputAct.getInputActivation(i);
-                for(Relation rel: relSet) {
-                    Range r = rel.mapRange(iAct, Linker.Direction.OUTPUT);
+            Synapse s = neuron.getSynapseById(synapseId);
+            for(Map.Entry<Integer, Set<Relation>> me: s.relations.entrySet()) {
+                if(me.getKey() == Synapse.OUTPUT) {
+                    Activation iAct = inputAct.getInputActivation(i);
+                    for(Relation rel: me.getValue()) {
+                        Range r = rel.invert().mapRange(iAct, Linker.Direction.OUTPUT);
 
-                    if(r != null) {
-                        if (r.begin != null) begin = r.begin;
-                        if (r.end != null) end = r.end;
+                        if(r != null) {
+                            if (r.begin != null) begin = r.begin;
+                            if (r.end != null) end = r.end;
+                        }
                     }
                 }
             }
