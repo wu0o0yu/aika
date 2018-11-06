@@ -24,6 +24,8 @@ public class AncestorRelation extends Relation {
         COMMON_ANCESTOR,
         IS_DESCENDANT_OF,
         IS_ANCESTOR_OF,
+        NOT_DESCENDANT_OF,
+        NOT_ANCESTOR_OF,
         EQUALS
     }
 
