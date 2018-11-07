@@ -29,11 +29,14 @@ public class AncestorRelation extends Relation {
         EQUALS
     }
 
+
     AncestorRelation() {}
+
 
     public AncestorRelation(Type type) {
         this.type = type;
     }
+
 
     @Override
     public Collection<Activation> getActivations(INeuron n, Activation linkedAct) {
@@ -109,6 +112,10 @@ public class AncestorRelation extends Relation {
                 return contains(act, linkedAct, act.doc.visitedCounter++);
             case IS_ANCESTOR_OF:
                 return contains(linkedAct, act, act.doc.visitedCounter++);
+            case NOT_DESCENDANT_OF:
+                return !contains(act, linkedAct, act.doc.visitedCounter++);
+            case NOT_ANCESTOR_OF:
+                return !contains(linkedAct, act, act.doc.visitedCounter++);
         }
         return true;
     }
@@ -123,6 +130,10 @@ public class AncestorRelation extends Relation {
                 return new AncestorRelation(Type.IS_ANCESTOR_OF);
             case IS_ANCESTOR_OF:
                 return new AncestorRelation(Type.IS_DESCENDANT_OF);
+            case NOT_DESCENDANT_OF:
+                return new AncestorRelation(Type.NOT_ANCESTOR_OF);
+            case NOT_ANCESTOR_OF:
+                return new AncestorRelation(Type.NOT_DESCENDANT_OF);
         }
         return null;
     }
