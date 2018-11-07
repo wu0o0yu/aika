@@ -26,7 +26,6 @@ import network.aika.neuron.activation.Linker;
 import network.aika.neuron.range.Position;
 import network.aika.PatternDiscovery;
 import network.aika.Document;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

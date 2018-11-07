@@ -2,8 +2,13 @@ package network.aika.neuron.range;
 
 
 import network.aika.Document;
+import network.aika.Model;
+import network.aika.Writable;
 import network.aika.neuron.activation.Activation;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -55,31 +60,6 @@ public class Position {
         return finalPosition != null ? "" + finalPosition : "<" + id + ">";
     }
 
-
-    public boolean compare(Operator o, Position pos) {
-        if(o == NONE) {
-            return true;
-        } else if(o == EQUALS) {
-            return this == pos;
-        } else if(finalPosition != null && pos.finalPosition != null) {
-            switch(o) {
-                case LESS_THAN_EQUAL:
-                    return finalPosition <= pos.finalPosition;
-                case GREATER_THAN_EQUAL:
-                    return finalPosition >= pos.finalPosition;
-                case LESS_THAN:
-                    return finalPosition < pos.finalPosition;
-                case GREATER_THAN:
-                    return finalPosition > pos.finalPosition;
-                default:
-                    return true;
-            }
-        } else if(this == pos) {
-            return o == EQUALS || o == LESS_THAN_EQUAL || o == GREATER_THAN_EQUAL;
-        }
-
-        return lessThan(pos, doc.visitedCounter++) && o == LESS_THAN;
-    }
 
 
     private boolean lessThan(Position pos, long v) {
@@ -182,6 +162,32 @@ public class Position {
                 default:
                     return NONE;
             }
+        }
+
+
+        public boolean compare(Position a, Position b) {
+            if(this == NONE) {
+                return true;
+            } else if(this == EQUALS) {
+                return a == b;
+            } else if(a.finalPosition != null && b.finalPosition != null) {
+                switch(this) {
+                    case LESS_THAN_EQUAL:
+                        return a.finalPosition <= b.finalPosition;
+                    case GREATER_THAN_EQUAL:
+                        return a.finalPosition >= b.finalPosition;
+                    case LESS_THAN:
+                        return a.finalPosition < b.finalPosition;
+                    case GREATER_THAN:
+                        return a.finalPosition > b.finalPosition;
+                    default:
+                        return true;
+                }
+            } else if(a == b) {
+                return this == EQUALS || this == LESS_THAN_EQUAL || this == GREATER_THAN_EQUAL;
+            }
+
+            return lessThan(b, a.doc.visitedCounter++) && this == LESS_THAN;
         }
     }
 

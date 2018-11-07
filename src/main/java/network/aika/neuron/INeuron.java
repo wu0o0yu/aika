@@ -21,7 +21,6 @@ import network.aika.*;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.range.Position;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.activation.SearchNode;
 import network.aika.lattice.InputNode;
 import network.aika.neuron.relation.Relation;
@@ -124,23 +123,20 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         public long lastUsed;
 
         private TreeMap<ActKey, Activation> activations;
-        private TreeMap<ActKey, Activation> activationsEnd;
         public int minLength = Integer.MAX_VALUE;
         public int maxLength = 0;
 
 
         public ThreadState() {
-            activations = new TreeMap<>(BEGIN_COMP);
-            activationsEnd = new TreeMap<>(END_COMP);
+            activations = new TreeMap<>();
         }
 
 
         public void addActivation(Activation act) {
-            ActKey ak = new ActKey(act.range, act.id);
-            activations.put(ak, act);
-
-            TreeMap<ActKey, Activation> actEnd = activationsEnd;
-            if (actEnd != null) actEnd.put(ak, act);
+            for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
+                ActKey ak = new ActKey(me.getKey(), me.getValue(), act.id);
+                activations.put(ak, act);
+            }
         }
 
 
@@ -161,8 +157,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         public void clearActivations() {
             activations.clear();
-
-            if (activationsEnd != null) activationsEnd.clear();
         }
 
 
@@ -180,47 +174,14 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             }
         }
 
-        public Collection<Activation> getActivationsByRangeEndLimited(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
-            if(fromKey.getFinalPosition() != null && toKey.getFinalPosition() != null) {
-                if(fromKey != Position.MIN) {
-                    fromKey = new Position(fromKey.doc, fromKey.getFinalPosition() - maxLength);
-                }
-                if (fromKey.compare(Position.Operator.GREATER_THAN, toKey)) return Collections.EMPTY_LIST;
 
-                return getActivationsByRangeEnd(fromKey, fromInclusive, toKey, toInclusive);
-            } else {
-                return Collections.EMPTY_LIST; // TODO:
-            }
-        }
-
-
-        public Collection<Activation> getActivationsByRangeBegin(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
+        public Collection<Activation> getActivations(int fromSlot, Position fromPos, boolean fromInclusive, int toSlot, Position toPos, boolean toInclusive) {
             return activations.subMap(
-                    new INeuron.ActKey(new Range(fromKey, Position.MIN), Integer.MIN_VALUE),
+                    new INeuron.ActKey(fromSlot, fromPos, Integer.MIN_VALUE),
                     fromInclusive,
-                    new INeuron.ActKey(new Range(toKey, Position.MAX), Integer.MAX_VALUE),
+                    new INeuron.ActKey(toSlot, toPos, Integer.MAX_VALUE),
                     toInclusive
             ).values();
-        }
-
-
-        public Collection<Activation> getActivationsByRangeEnd(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
-            return activationsEnd.subMap(
-                    new INeuron.ActKey(new Range(Position.MIN, fromKey), Integer.MIN_VALUE),
-                    fromInclusive,
-                    new INeuron.ActKey(new Range(Position.MAX, toKey), Integer.MAX_VALUE),
-                    toInclusive
-            ).values();
-        }
-
-
-        public Activation getActivationByRange(Range r) {
-            Map.Entry<ActKey, Activation> me = activations.higherEntry(new ActKey(r, Integer.MIN_VALUE));
-
-            if(me != null && me.getValue().range.equals(r)) {
-                return me.getValue();
-            }
-            return null;
         }
 
 
@@ -236,27 +197,24 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-    public static final Comparator<ActKey> BEGIN_COMP = (ak1, ak2) -> {
-        int r = Range.BEGIN_COMP.compare(ak1.r, ak2.r);
-        if(r != 0) return r;
-        return Integer.compare(ak1.actId, ak2.actId);
-    };
-
-
-    public static final Comparator<ActKey> END_COMP = (ak1, ak2) -> {
-        int r = Range.END_COMP.compare(ak1.r, ak2.r);
-        if(r != 0) return r;
-        return Integer.compare(ak1.actId, ak2.actId);
-    };
-
-
-    public static class ActKey {
-        Range r;
+    public static class ActKey implements Comparable<ActKey> {
+        int slot;
+        Position pos;
         int actId;
 
-        public ActKey(Range r, int actId) {
-            this.r = r;
+        public ActKey(int slot, Position pos, int actId) {
+            this.slot = slot;
+            this.pos = pos;
             this.actId = actId;
+        }
+
+        @Override
+        public int compareTo(ActKey ak) {
+            int r = Integer.compare(slot, ak.slot);
+            if(r != 0) return r;
+            r = pos.compare(ak.pos);
+            if(r != 0) return r;
+            return Integer.compare(actId, ak.actId);
         }
     }
 

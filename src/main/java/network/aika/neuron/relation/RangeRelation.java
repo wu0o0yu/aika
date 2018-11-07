@@ -6,7 +6,6 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Linker;
 import network.aika.neuron.range.Position;
-import network.aika.neuron.range.Range;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -23,31 +22,34 @@ import static network.aika.neuron.range.Position.Operator.LESS_THAN_EQUAL;
 public class RangeRelation extends Relation {
     public static final int RELATION_TYPE = 0;
 
+    public int fromSlot;
+    public int toSlot;
 
-
-    public Range.Relation relation;
+    public Position.Operator relation;
 
     RangeRelation() {}
 
-    public RangeRelation(Range.Relation relation) {
+    public RangeRelation(int fromSlot, int toSlot, Position.Operator relation) {
+        this.fromSlot = fromSlot;
+        this.toSlot = toSlot;
         this.relation = relation;
     }
 
 
     @Override
     public boolean test(Activation act, Activation linkedAct) {
-        return relation.compare(act.range, linkedAct.range);
+        return relation.compare(act.getSlot(fromSlot), linkedAct.getSlot(toSlot));
     }
 
 
     public String toString() {
-        return "RR(" + relation + ")";
+        return "RR(" + fromSlot + "," + toSlot + "," + relation + ")";
     }
 
 
     @Override
     public Relation invert() {
-        return new RangeRelation(relation.invert());
+        return new RangeRelation(toSlot, fromSlot, relation.invert());
     }
 
 
@@ -101,12 +103,19 @@ public class RangeRelation extends Relation {
     public void write(DataOutput out) throws IOException {
         out.writeInt(getRelationType());
 
-        relation.write(out);
+        out.writeInt(fromSlot);
+        out.writeInt(toSlot);
+
+        out.writeByte(relation.getId());
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        relation = Range.Relation.read(in, m);
+
+        fromSlot = in.readInt();
+        toSlot = in.readInt();
+
+        relation = Position.Operator.getById(in.readByte());
     }
 
     public static RangeRelation read(DataInput in, Model m) throws IOException {
