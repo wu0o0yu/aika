@@ -19,50 +19,49 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 
 import java.util.*;
 
-/**
- * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
- * Aika uses the provider pattern to store and reload rarely used neurons or logic nodes.
- *
- * @author Lukas Molzberger
- */
-public class Neuron extends Provider<INeuron> {
-
-    public static final Neuron MIN_NEURON = new Neuron(null, Integer.MIN_VALUE);
-    public static final Neuron MAX_NEURON = new Neuron(null, Integer.MAX_VALUE);
-
-
-    public ReadWriteLock lock = new ReadWriteLock();
-
-    public NavigableMap<Integer, Synapse> inputSynapsesById = new TreeMap<>();
-    public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
-    public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
-
-
-    public Neuron(Model m, int id) {
-        super(m, id);
-    }
-
-    public Neuron(Model m, INeuron n) {
-        super(m, n);
-    }
-
-
-    public String getLabel() {
-        return get().label;
-    }
-
-
-    public void setLabel(String label) {
-        get().label = label;
-    }
-
-
     /**
+     * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
+     * Aika uses the provider pattern to store and reload rarely used neurons or logic nodes.
+     *
+     * @author Lukas Molzberger
+     */
+    public class Neuron extends Provider<INeuron> {
+
+        public static final Neuron MIN_NEURON = new Neuron(null, Integer.MIN_VALUE);
+        public static final Neuron MAX_NEURON = new Neuron(null, Integer.MAX_VALUE);
+
+
+        public ReadWriteLock lock = new ReadWriteLock();
+
+        public NavigableMap<Integer, Synapse> inputSynapsesById = new TreeMap<>();
+        public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
+        public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
+
+
+        public Neuron(Model m, int id) {
+            super(m, id);
+        }
+
+        public Neuron(Model m, INeuron n) {
+            super(m, n);
+        }
+
+
+        public String getLabel() {
+            return get().label;
+        }
+
+
+        public void setLabel(String label) {
+            get().label = label;
+        }
+
+
+        /**
      * Propagate an input activation into the network.
      *
      * @param doc   The current document

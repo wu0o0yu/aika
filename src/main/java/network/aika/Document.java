@@ -130,7 +130,7 @@ public class Document implements Comparable<Document> {
 
 
     public static Comparator<Activation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
-        int r = Range.compare(act1.range, act2.range, false);
+        int r = Position.compare(act1.getSlot(Activation.BEGIN), act2.getSlot(Activation.BEGIN));
         if (r != 0) return r;
         r = act1.node.compareTo(act2.node);
         if (r != 0) return r;
@@ -443,9 +443,9 @@ public class Document implements Comparable<Document> {
 
         TreeSet<Position> queue = new TreeSet<>(Comparator.comparingInt(p -> p.id));
 
-        for(Activation act: activationsByRangeBegin.values()) {
-            if(act.range.begin.getFinalPosition() != null && act.range.end.getFinalPosition() == null) {
-                queue.add(act.range.begin);
+        for(Activation act: activationsById.values()) {
+            if(act.getINeuron().outputText != null && act.getSlot(Activation.BEGIN).getFinalPosition() != null && act.getSlot(Activation.END).getFinalPosition() == null) {
+                queue.add(act.getSlot(Activation.BEGIN));
             }
         }
 
@@ -455,10 +455,10 @@ public class Document implements Comparable<Document> {
             for(Activation act: pos.beginActivations) {
                 if (act.getINeuron().outputText != null && act.isFinalActivation()) {
                     String outText = act.getINeuron().outputText;
-                    Position nextPos = act.range.end;
+                    Position nextPos = act.getSlot(Activation.END);
                     nextPos.setFinalPosition(pos.getFinalPosition() + outText.length());
 
-                    content.replace(act.range.begin.getFinalPosition(), act.range.end.getFinalPosition(), outText);
+                    content.replace(act.getSlot(Activation.BEGIN).getFinalPosition(), act.getSlot(Activation.END).getFinalPosition(), outText);
 
                     queue.add(nextPos);
                 }

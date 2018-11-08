@@ -232,7 +232,8 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         if(act.repropagateV != null && act.repropagateV != nln.markedCreated) return;
 
-        ref.relations.get(0).getActivations(secondNode.inputNeuron.get(doc), iAct).forEach(secondIAct -> {
+        ref.relations.get(0).getActivations(secondNode.inputNeuron.get(doc), iAct)
+                .forEach(secondIAct -> {
                     if (secondIAct.outputToInputNode != null) {
                         InputActivation secondAct = secondIAct.outputToInputNode.output;
                         if (secondAct != null) {

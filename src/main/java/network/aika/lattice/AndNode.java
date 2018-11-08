@@ -462,13 +462,13 @@ public class AndNode extends Node<AndNode, AndActivation> {
         public static final RelationsMap MIN = new RelationsMap();
         public static final RelationsMap MAX = new RelationsMap();
 
-        public Relation[] relations;
+        public Set<Relation>[] relations;
 
 
         public RelationsMap() {}
 
 
-        public RelationsMap(Relation[] relations) {
+        public RelationsMap(Set<Relation>[] relations) {
             this.relations = relations;
         }
 
@@ -476,7 +476,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
         public void write(DataOutput out) throws IOException {
             out.writeInt(relations.length);
             for(int i = 0; i < relations.length; i++) {
-                Relation rel = relations[i];
+                Set<Relation> rel = relations[i];
                 out.writeBoolean(rel != null);
                 if(rel != null) {
                     rel.write(out);
@@ -487,7 +487,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
         public void readFields(DataInput in, Model m) throws IOException {
             int l = in.readInt();
-            relations = new Relation[l];
+            relations = new Set[l];
             for(int i = 0; i < l; i++) {
                 if(in.readBoolean()) {
                     relations[i] = Relation.read(in, m);
@@ -543,7 +543,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
             return relations.length;
         }
 
-        public Relation get(int i) {
+        public Set<Relation> get(int i) {
             return relations[i];
         }
 

@@ -160,26 +160,12 @@ public class Linker {
                 if(s != null) {
                     for(Relation r: me.getValue()) {
                         if (r.follow(rAct, oAct, relations)) {
-                            linkRelated(rAct, oAct, s, r);
+                            for(Activation iAct: r.invert().getActivations(s.input.get(rAct.doc), rAct)) {
+                                link(s, iAct, oAct);
+                            }
                         }
                     }
                 }
-            }
-        }
-    }
-
-
-    private void linkRelated(Activation rAct, Activation oAct, Synapse s, Relation r) {
-        if(!r.isExact()) {
-            INeuron.ThreadState ts = s.input.get().getThreadState(doc.threadId, true);
-            for(Activation iAct: ts.getActivations()) {
-                if(r.test(rAct, iAct)) {
-                    link(s, iAct, oAct);
-                }
-            }
-        } else {
-            for(Activation iAct: r.invert().getActivations(s.input.get(rAct.doc), rAct)) {
-                link(s, iAct, oAct);
             }
         }
     }

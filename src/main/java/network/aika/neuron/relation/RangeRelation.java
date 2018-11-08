@@ -126,10 +126,7 @@ public class RangeRelation extends Relation {
 
     @Override
     public boolean isExact() {
-        return relation.beginToBegin == EQUALS ||
-                relation.beginToEnd == EQUALS ||
-                relation.endToBegin == EQUALS ||
-                relation.endToEnd == EQUALS;
+        return relation == EQUALS;
     }
 
 
@@ -141,11 +138,14 @@ public class RangeRelation extends Relation {
             return Collections.EMPTY_LIST;
         }
 
-        Range r = linkedAct.range;
+        Position pos = linkedAct.getSlot(toSlot);
 
         Collection<Activation> results;
-        if(isExact()) {
-            results = getActivationsByRangeEquals(th, r, relation);
+        if(relation == EQUALS) {
+            results = th.getActivations(
+                    fromSlot, pos, true,
+                    fromSlot, pos, true
+            );
         } else if (((relation.beginToBegin.isGreaterThanOrGreaterThanEqual() || relation.beginToEnd.isGreaterThanOrGreaterThanEqual())) && r.begin.compare(LESS_THAN_EQUAL, r.end)) {
             results = getActivationsByRangeBeginGreaterThan(th, r, relation);
         } else if (((relation.endToEnd.isGreaterThanOrGreaterThanEqual() || relation.endToBegin.isGreaterThanOrGreaterThanEqual())) && r.begin.compare(GREATER_THAN_EQUAL, r.end)) {
@@ -289,25 +289,6 @@ public class RangeRelation extends Relation {
         );
     }
 
-
-
-    public static Collection<Activation> getActivationsByRangeEquals(INeuron.ThreadState th, Range r, Range.Relation rr) {
-        if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS) {
-            Position key = rr.beginToBegin == EQUALS ? r.begin : r.end;
-            return th.getActivationsByRangeBegin(
-                    key, true,
-                    key, true
-            );
-        } else if(rr.endToEnd == EQUALS || rr.endToBegin == EQUALS) {
-            Position key = rr.endToEnd == EQUALS ? r.end : r.begin;
-
-            return th.getActivationsByRangeEnd(
-                    key, true,
-                    key, true
-            );
-        }
-        throw new RuntimeException("Invalid Range Relation");
-    }
 
 
     public static Collection<Activation> getActivationsByRangeEquals(Document doc, Range r, Range.Relation rr) {

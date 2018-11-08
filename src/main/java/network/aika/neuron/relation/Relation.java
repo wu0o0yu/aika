@@ -8,7 +8,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.Writable;
 import network.aika.neuron.activation.Linker;
-import network.aika.neuron.range.Range;
 
 import java.io.DataInput;
 import java.io.IOException;
