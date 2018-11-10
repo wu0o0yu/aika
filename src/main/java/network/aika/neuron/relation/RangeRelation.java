@@ -57,7 +57,7 @@ public class RangeRelation extends Relation {
     @Override
     public void mapRange(Map<Integer, Position> slots, Activation act) {
         if(relation == Position.Operator.EQUALS) {
-            slots.put(fromSlot, act.getSlot(toSlot));
+            slots.put(toSlot, act.getSlot(fromSlot));
         }
     }
 

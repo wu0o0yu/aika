@@ -9,7 +9,9 @@ import network.aika.neuron.activation.Activation;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import static network.aika.neuron.range.Position.Operator.*;
@@ -20,8 +22,7 @@ public class Position {
     public static final Position MAX = new Position(null, Integer.MAX_VALUE);
 
 
-    public SortedSet<Activation> beginActivations = new TreeSet<>();
-    public SortedSet<Activation> endActivations = new TreeSet<>();
+    public SortedMap<Integer, Activation> activations = new TreeMap<>();
 
 
     public Document doc;

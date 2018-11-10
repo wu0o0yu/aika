@@ -190,12 +190,11 @@ public class Linker {
 
 
     private boolean checkRelations(Synapse s, Activation iAct, Activation oAct) {
-        for(Map.Entry<Integer, Set<Relation>> me: s.relations.entrySet()) {
+        for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+            Relation rel = me.getValue();
             if(me.getKey() == Synapse.OUTPUT) {
-                for (Relation r : me.getValue()) {
-                    if (!r.test(iAct, oAct)) {
-                        return false;
-                    }
+                if (!rel.test(iAct, oAct)) {
+                    return false;
                 }
             }
             // TODO: other relations

@@ -79,7 +79,7 @@ public class OrNode extends Node<OrNode, Activation> {
                 Relation rel = me.getValue();
                 if(me.getKey() == Synapse.OUTPUT) {
                     Activation iAct = inputAct.getInputActivation(i);
-                    rel.invert().mapRange(slots, iAct, Linker.Direction.OUTPUT);
+                    rel.mapRange(slots, iAct);
                 }
             }
         }
