@@ -24,12 +24,14 @@ import network.aika.neuron.range.Position;
 import network.aika.neuron.activation.SearchNode;
 import network.aika.lattice.InputNode;
 import network.aika.neuron.relation.Relation;
+import network.aika.neuron.relation.RelationsSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -94,7 +96,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
 
     // synapseId -> relation
-    public Map<Integer, Set<Relation>> outputRelations;
+    public Map<Integer, RelationsSet> outputRelations;
 
 
     // A synapse is stored only in one direction, depending on the synapse weight.
@@ -274,8 +276,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
      * @param input
      */
     public Activation addInput(Document doc, Activation.Builder input) {
-        Range r = new Range(doc, input.begin, input.end);
-        Activation act = getThreadState(doc.threadId, true).getActivationByRange(r);
+        Integer firstSlot = input.positions.firstKey();
+        Activation act = getThreadState(doc.threadId, true).getActivations();
         if(act == null) {
             act = new Activation(doc.activationIdCounter++, doc, node.get(doc));
             act.range = r;
@@ -358,24 +360,13 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-    public Activation getActivation(Document doc, Range r, boolean onlyFinal) {
+    public Stream<Activation> getActivations(Document doc, int slot, Position pos, boolean onlyFinal) {
         ThreadState th = getThreadState(doc.threadId, false);
-        if (th == null) return null;
+        if (th == null) return Stream.empty();
 
-        if (r.begin != null) {
-            for (Activation act : th.getActivationsByRangeBegin(r.begin, true, r.begin, false)) {
-                if ((!onlyFinal || act.isFinalActivation()) && r.equalsIgnoreNull(act.range)) {
-                    return act;
-                }
-            }
-        } else if(r.end != null) {
-            for (Activation act : th.getActivationsByRangeEnd(r.end, true, r.end, false)) {
-                if (!onlyFinal || act.isFinalActivation() && r.equalsIgnoreNull(act.range)) {
-                    return act;
-                }
-            }
-        }
-        return null;
+        return th.getActivations(slot, pos, true, slot, pos, false)
+                .stream()
+                .filter(act -> !onlyFinal || act.isFinalActivation());
     }
 
 

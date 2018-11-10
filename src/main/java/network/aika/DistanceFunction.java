@@ -6,7 +6,7 @@ import network.aika.neuron.activation.Activation;
 public enum DistanceFunction {
 
     NONE((iAct, oAct) -> 1.0),
-    DEGRADING((iAct, oAct) -> 1.0 / ((double) (1 + Math.abs(iAct.range.begin.getDistance(oAct.range.begin)))));
+    DEGRADING((iAct, oAct) -> 1.0 / ((double) (1 + Math.abs(iAct.getSlot(Activation.BEGIN).getDistance(oAct.getSlot(Activation.BEGIN))))));
 
     Function f;
 

@@ -19,11 +19,13 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.range.Position;
 import network.aika.neuron.relation.Relation;
 
 import java.util.*;
+import java.util.stream.Stream;
 
-    /**
+/**
      * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
      * Aika uses the provider pattern to store and reload rarely used neurons or logic nodes.
      *
@@ -275,10 +277,10 @@ import java.util.*;
     }
 
 
-    public Activation getActivation(Document doc, Range r, boolean onlyFinal) {
+    public Stream<Activation> getActivations(Document doc, int slot, Position pos, boolean onlyFinal) {
         INeuron n = getIfNotSuspended();
         if(n == null) return null;
-        return n.getActivation(doc, r, onlyFinal);
+        return n.getActivations(doc, slot, pos, onlyFinal);
     }
 
 

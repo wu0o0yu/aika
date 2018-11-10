@@ -58,7 +58,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public abstract Collection<Activation> getActivations(INeuron n, Activation linkedAct);
 
 
-    public boolean follow(Activation rAct, Activation oAct, Map<Integer, Set<Relation>> relations) {
+    public boolean follow(Activation rAct, Activation oAct, Map<Integer, RelationsSet> relations) {
         return true;
     }
 
@@ -80,7 +80,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     }
 
 
-    public static Map<Integer, Set<Relation>> getRelationsMap(int synapseId, Neuron n) {
+    public static Map<Integer, RelationsSet> getRelationsMap(int synapseId, Neuron n) {
         if(synapseId == OUTPUT) {
             INeuron in = n.get();
             if (in.outputRelations == null) {

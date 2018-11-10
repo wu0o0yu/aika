@@ -4,7 +4,6 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Linker;
-import network.aika.neuron.range.Range;
 
 import java.io.DataInput;
 import java.io.DataOutput;

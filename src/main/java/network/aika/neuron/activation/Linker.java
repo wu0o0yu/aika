@@ -20,10 +20,10 @@ import network.aika.Document;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.range.Position;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation.Link;
+import network.aika.neuron.relation.RelationsSet;
 
 import java.util.*;
 
@@ -104,9 +104,9 @@ public class Linker {
 
     public void linkInput(Activation act) {
         for(Synapse s: act.getNeuron().inMemoryInputSynapses.values()) {
-            for(Map.Entry<Integer, Set<Relation>> me: s.relations.entrySet()) {
+            for(Map.Entry<Integer, RelationsSet> me: s.relations.entrySet()) {
                 if(me.getKey() == OUTPUT) {
-                    for(Relation rel: me.getValue()) {
+                    for(Relation rel: me.getValue().relations) {
                         Range r = rel.mapRange(act, Direction.INPUT);
 
                         if(r != null) {
@@ -152,13 +152,13 @@ public class Linker {
     }
 
 
-    private void linkRelated(Activation rAct, Activation oAct, Map<Integer, Set<Relation>> relations) {
-        for(Map.Entry<Integer, Set<Relation>> me: relations.entrySet()) {
+    private void linkRelated(Activation rAct, Activation oAct, Map<Integer, RelationsSet> relations) {
+        for(Map.Entry<Integer, RelationsSet> me: relations.entrySet()) {
             Integer relId = me.getKey();
             if(relId >= 0) {
                 Synapse s = oAct.getNeuron().getSynapseById(relId);
                 if(s != null) {
-                    for(Relation r: me.getValue()) {
+                    for(Relation r: me.getValue().relations) {
                         if (r.follow(rAct, oAct, relations)) {
                             for(Activation iAct: r.invert().getActivations(s.input.get(rAct.doc), rAct)) {
                                 link(s, iAct, oAct);

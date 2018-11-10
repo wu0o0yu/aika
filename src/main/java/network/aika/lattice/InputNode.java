@@ -33,6 +33,7 @@ import network.aika.lattice.InputNode.InputActivation;
 import network.aika.lattice.AndNode.Refinement;
 import network.aika.lattice.AndNode.RefValue;
 import network.aika.lattice.AndNode.RelationsMap;
+import network.aika.neuron.relation.RelationsSet;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -152,7 +153,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
     public RefValue extend(int threadId, Document doc, Refinement ref, PatternDiscovery.Config patterDiscoveryConfig) {
         if(ref.relations.size() == 0) return null;
 
-        Relation rel = ref.relations.get(0);
+        RelationsSet rel = ref.relations.get(0);
         if(rel == null) {
             return null;
         }
@@ -164,7 +165,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         List<AndNode.Entry> nlParents = new ArrayList<>();
 
-        Refinement mirrorRef = new Refinement(new AndNode.RelationsMap(new Relation[]{rel.invert()}), provider);
+        Refinement mirrorRef = new Refinement(new AndNode.RelationsMap(new RelationsSet[]{rel.invert()}), provider);
         nlParents.add(new AndNode.Entry(mirrorRef, new RefValue(new Integer[] {1}, 0, ref.input)));
 
         rv = new RefValue(new Integer[] {0}, 1, provider);
@@ -362,7 +363,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
         public String toString() {
-            return "I-ACT(" + input.input.getLabel() + " " + input.input.range + ")";
+            return "I-ACT(" + input.input.getLabel() + " " + input.input.slotsToString() + ")";
         }
     }
 

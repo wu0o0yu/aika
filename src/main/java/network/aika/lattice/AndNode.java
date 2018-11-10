@@ -26,6 +26,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.PatternDiscovery;
 import network.aika.lattice.InputNode.InputActivation;
 import network.aika.lattice.AndNode.AndActivation;
+import network.aika.neuron.relation.RelationsSet;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -112,7 +113,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                     RefValue secondRv = sl.rv;
                     NodeActivation secondAct = sl.output;
                     if (act != secondAct) {
-                        Relation[] relations = new Relation[secondRef.relations.length() + 1];
+                        RelationsSet[] relations = new RelationsSet[secondRef.relations.length() + 1];
                         for(int i = 0; i < secondRef.relations.length(); i++) {
                             relations[rv.offsets[i]] = secondRef.relations.get(i);
                         }
@@ -196,10 +197,10 @@ public class AndNode extends Node<AndNode, AndActivation> {
     }
 
 
-    private Refinement createRefinement(RefValue firstRV, Refinement secondRef, Relation rel) {
-        Relation[] srm = secondRef.relations.relations;
+    private Refinement createRefinement(RefValue firstRV, Refinement secondRef, RelationsSet rel) {
+        RelationsSet[] srm = secondRef.relations.relations;
         RelationsMap rm = new RelationsMap();
-        rm.relations = new Relation[srm.length + 1];
+        rm.relations = new RelationsSet[srm.length + 1];
         for (int i = 0; i < srm.length; i++) {
             rm.relations[firstRV.offsets[i]] = srm[i];
         }
@@ -227,7 +228,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
         for(Entry firstParent: parents) {
             Node parentNode = firstParent.rv.parent.get(doc);
 
-            Relation[] secondParentRelations = new Relation[firstRef.relations.length() - 1];
+            RelationsSet[] secondParentRelations = new RelationsSet[firstRef.relations.length() - 1];
             for(int i = 0; i < firstRef.relations.length(); i++) {
                 Integer j = firstParent.rv.reverseOffsets[i];
                 if(j != null) {
@@ -245,13 +246,13 @@ public class AndNode extends Node<AndNode, AndActivation> {
                 continue;
             }
 
-            Relation[] secondRelations = new Relation[firstParent.ref.relations.length() + 1];
+            RelationsSet[] secondRelations = new RelationsSet[firstParent.ref.relations.length() + 1];
             for(int i = 0; i < firstParent.ref.relations.length(); i++) {
                 int j = secondParentRV.offsets[i];
                 secondRelations[j] = firstParent.ref.relations.get(i);
             }
 
-            Relation rel = firstRef.relations.get(firstParent.rv.refOffset);
+            RelationsSet rel = firstRef.relations.get(firstParent.rv.refOffset);
             if(rel != null) {
                 secondRelations[secondParentRV.refOffset] = rel.invert();
             }
@@ -462,13 +463,13 @@ public class AndNode extends Node<AndNode, AndActivation> {
         public static final RelationsMap MIN = new RelationsMap();
         public static final RelationsMap MAX = new RelationsMap();
 
-        public Set<Relation>[] relations;
+        public RelationsSet[] relations;
 
 
         public RelationsMap() {}
 
 
-        public RelationsMap(Set<Relation>[] relations) {
+        public RelationsMap(RelationsSet[] relations) {
             this.relations = relations;
         }
 
@@ -476,7 +477,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
         public void write(DataOutput out) throws IOException {
             out.writeInt(relations.length);
             for(int i = 0; i < relations.length; i++) {
-                Set<Relation> rel = relations[i];
+                RelationsSet rel = relations[i];
                 out.writeBoolean(rel != null);
                 if(rel != null) {
                     rel.write(out);
@@ -487,10 +488,10 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
         public void readFields(DataInput in, Model m) throws IOException {
             int l = in.readInt();
-            relations = new Set[l];
+            relations = new RelationsSet[l];
             for(int i = 0; i < l; i++) {
                 if(in.readBoolean()) {
-                    relations[i] = Relation.read(in, m);
+                    relations[i] = RelationsSet.read(in, m);
                 }
             }
         }
@@ -506,7 +507,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             for(int i = 0; i < relations.length; i++) {
-                Relation rel = relations[i];
+                RelationsSet rel = relations[i];
                 if(rel != null) {
                     sb.append(i + ":" + rel + ", ");
                 }
@@ -526,14 +527,14 @@ public class AndNode extends Node<AndNode, AndActivation> {
             if(r != 0) return r;
 
             for(int i = 0; i < relations.length; i++) {
-                Relation ra = relations[i];
-                Relation rb = rm.relations[i];
+                RelationsSet ra = relations[i];
+                RelationsSet rb = rm.relations[i];
 
                 if(ra == null && rb == null) continue;
                 if(ra == null && rb != null) return -1;
                 if(ra != null && rb == null) return 1;
 
-                r = Relation.COMPARATOR.compare(ra, rb);
+                r = RelationsSet.COMPARATOR.compare(ra, rb);
                 if(r != 0) return r;
             }
             return 0;
@@ -543,7 +544,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
             return relations.length;
         }
 
-        public Set<Relation> get(int i) {
+        public RelationsSet get(int i) {
             return relations[i];
         }
 
@@ -557,7 +558,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
         }
 
         public boolean isExact() {
-            for(Relation rel: relations) {
+            for(RelationsSet rel: relations) {
                 if(!rel.isExact()) {
                     return false;
                 }
@@ -686,7 +687,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                     if(!first) {
                         sb.append(",");
                     }
-                    sb.append(i + ":" + iAct.getLabel() + " " + iAct.range + " (" + iAct.id + ")");
+                    sb.append(i + ":" + iAct.getLabel() + " " + iAct.slotsToString() + " (" + iAct.id + ")");
 
                     first = false;
                 }

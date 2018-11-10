@@ -21,6 +21,7 @@ import network.aika.*;
 import network.aika.Document;
 import network.aika.neuron.relation.Relation;
 import network.aika.Writable;
+import network.aika.neuron.relation.RelationsSet;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -82,7 +83,7 @@ public class Synapse implements Writable {
     public boolean isRecurrent;
     public boolean identity;
 
-    public Map<Integer, Set<Relation>> relations = new TreeMap<>();
+    public Map<Integer, RelationsSet> relations = new TreeMap<>();
 
     public DistanceFunction distanceFunction = null;
 
@@ -300,7 +301,7 @@ public class Synapse implements Writable {
     }
 
 
-    public Set<Relation> getRelationById(Integer id) {
+    public RelationsSet getRelationById(Integer id) {
         return relations.get(id);
     }
 
@@ -321,13 +322,10 @@ public class Synapse implements Writable {
         out.writeInt(output.id);
 
         out.writeInt(relations.size());
-        for(Map.Entry<Integer, Set<Relation>> me: relations.entrySet()) {
+        for(Map.Entry<Integer, RelationsSet> me: relations.entrySet()) {
             out.writeInt(me.getKey());
 
-            out.writeInt(me.getValue().size());
-            for(Relation rel: me.getValue()) {
-                rel.write(out);
-            }
+            me.getValue().write(out);
         }
 
         out.writeBoolean(distanceFunction != null);
@@ -361,13 +359,7 @@ public class Synapse implements Writable {
         int l = in.readInt();
         for(int i = 0; i < l; i++) {
             Integer relId = in.readInt();
-            Set<Relation> relSet = new TreeSet(Relation.COMPARATOR);
-            int s = in.readInt();
-            for(int j = 0; j < s; j++) {
-                Relation r = Relation.read(in, m);
-                relSet.add(r);
-            }
-            relations.put(relId, relSet);
+            relations.put(relId, RelationsSet.read(in, m));
         }
 
         if(in.readBoolean()) {
@@ -441,9 +433,9 @@ public class Synapse implements Writable {
 
     public boolean[] linksOutput() {
         boolean[] result = new boolean[] {false, false};
-        for(Map.Entry<Integer, Set<Relation>> me: relations.entrySet()) {
+        for(Map.Entry<Integer, RelationsSet> me: relations.entrySet()) {
             if(me.getKey() == OUTPUT) {
-                for(Relation r: me.getValue()) {
+                for(Relation r: me.getValue().relations) {
                     if (r.linksOutputBegin()) {
                         result[0] = true;
                     }

@@ -22,6 +22,7 @@ import network.aika.lattice.OrNode;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.relation.RelationsSet;
 
 import java.util.*;
 
@@ -283,14 +284,10 @@ public class Converter {
             nln.offsets = new Synapse[] {s};
             return nln;
         } else {
-            Relation[] relations = new Relation[nc.offsets.length];
+            RelationsSet[] relations = new RelationsSet[nc.offsets.length];
             for(int i = 0; i < nc.offsets.length; i++) {
                 Synapse linkedSynapse = nc.offsets[i];
-                Set<Relation> relSet = s.getRelationById(linkedSynapse.id);
-                if (relSet != null) {
-                    assert relSet.size() == 1;
-                    relations[i] = relSet.iterator().next();
-                }
+                relations[i] = s.getRelationById(linkedSynapse.id);
             }
 
             NodeContext nln = new NodeContext();
