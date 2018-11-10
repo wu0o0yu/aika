@@ -277,10 +277,23 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
      */
     public Activation addInput(Document doc, Activation.Builder input) {
         Integer firstSlot = input.positions.firstKey();
-        Activation act = getThreadState(doc.threadId, true).getActivations();
-        if(act == null) {
+        Position firstPos = doc.lookupFinalPosition(input.positions.get(firstSlot));
+        Activation act = null;
+        x: for(Activation a: getThreadState(doc.threadId, true).getActivations(firstSlot, firstPos, true, firstSlot, firstPos, true)) {
+            for(Map.Entry<Integer, Integer> me: input.positions.entrySet()) {
+                Position pos = a.getSlot(me.getKey());
+                if(pos == null || me.getValue().compareTo(pos.getFinalPosition()) != 0) {
+                    continue x;
+                }
+            }
+            act = a;
+        }
+
+        if (act == null) {
             act = new Activation(doc.activationIdCounter++, doc, node.get(doc));
-            act.range = r;
+            for(Map.Entry<Integer, Integer> me: input.positions.entrySet()) {
+                act.setSlot(me.getKey(), doc.lookupFinalPosition(me.getValue()));
+            }
         }
 
         register(act);

@@ -8,6 +8,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.Writable;
 import network.aika.neuron.activation.Linker;
+import network.aika.neuron.range.Position;
 
 import java.io.DataInput;
 import java.io.IOException;
@@ -45,8 +46,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
                 return AncestorRelation.read(in, m);
             case RangeRelation.RELATION_TYPE:
                 return RangeRelation.read(in, m);
-            case InputRelation.RELATION_TYPE:
-                return InputRelation.read(in, m);
             default:
                 return null;
         }
@@ -97,10 +96,11 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public static class Builder implements Neuron.Builder {
         private int from;
         private int to;
-        private int fromInput = OUTPUT;
-        private int toInput = OUTPUT;
+        private int fromSlot;
+        private int toSlot;
 
-        private Relation relation;
+        private Position.Operator operator;
+        private AncestorRelation ancestorRelation;
 
 
         /**
@@ -126,38 +126,34 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             return this;
         }
 
-        public Builder setFromInput(int synapseId) {
-            assert synapseId >= -2;
-            fromInput = synapseId;
+        public Builder setFromSlot(int slot) {
+            fromSlot = slot;
             return this;
         }
 
-        public Builder setToInput(int synapseId) {
-            assert synapseId >= -2;
-            toInput = synapseId;
+        public Builder setToSlot(int slot) {
+            toSlot = slot;
             return this;
         }
 
         public Builder setAncestorRelation(AncestorRelation.Type type) {
-            relation = new AncestorRelation(type);
+            this.ancestorRelation = new AncestorRelation(type);
             return this;
         }
 
-        public Builder setRangeRelation(Range.Relation rr) {
-            relation = new RangeRelation(rr);
+        public Builder setPositionOperator(Position.Operator operator) {
+            this.operator = operator;
             return this;
         }
 
-        public Builder setRelation(Relation rel) {
-            relation = rel;
-            return this;
-        }
 
         public Relation getRelation() {
-            if(fromInput != OUTPUT || toInput != OUTPUT) {
-                return new InputRelation(relation, fromInput, toInput);
+            if(operator != null) {
+                return new RangeRelation(fromSlot, toSlot, operator);
+            } else if(ancestorRelation != null) {
+                return ancestorRelation;
             }
-            return relation;
+            return null;
         }
 
         public void connect(Neuron n) {
