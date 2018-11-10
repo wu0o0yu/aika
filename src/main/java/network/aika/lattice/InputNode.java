@@ -22,8 +22,6 @@ import network.aika.Model;
 import network.aika.Provider;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.range.Range;
-import network.aika.neuron.relation.AncestorRelation;
 import network.aika.neuron.relation.RangeRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
@@ -39,8 +37,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
-
-import static network.aika.neuron.range.Range.Relation.*;
 
 
 /**
@@ -59,8 +55,8 @@ public class InputNode extends Node<InputNode, InputActivation> {
     private long visitedDiscover;
 
 
-    public static final Relation[] CANDIDATE_RELATIONS = new Relation[] {
-        new RangeRelation(EQUALS),
+    public static final RelationsSet[] CANDIDATE_RELATIONS = new RelationsSet[] {
+/*        new RangeRelation(EQUALS),
         new RangeRelation(BEGIN_TO_END_EQUALS),
         new RangeRelation(END_TO_BEGIN_EQUALS),
         new RangeRelation(BEGIN_EQUALS),
@@ -69,7 +65,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         new RangeRelation(CONTAINED_IN),
         new AncestorRelation(AncestorRelation.Type.IS_DESCENDANT_OF),
         new AncestorRelation(AncestorRelation.Type.IS_ANCESTOR_OF),
-        new AncestorRelation(AncestorRelation.Type.COMMON_ANCESTOR)
+        new AncestorRelation(AncestorRelation.Type.COMMON_ANCESTOR)*/
     };
 
 
@@ -263,12 +259,12 @@ public class InputNode extends Node<InputNode, InputActivation> {
         doc.getActivations(true).forEach(secondNAct -> {
             InputActivation secondAct = secondNAct.outputToInputNode.output;
             if (act != secondAct && config.candidateCheck.check(act, secondAct)) {
-                List<Relation> relations = getRelations(act.input.input, secondNAct);
-                for(Relation r: relations) {
+                List<RelationsSet> relations = getRelations(act.input.input, secondNAct);
+                for(RelationsSet r: relations) {
                     InputNode in = secondAct.node;
 
                     if (r != null) {
-                        RelationsMap rm = new RelationsMap(new Relation[] {r});
+                        RelationsMap rm = new RelationsMap(new RelationsSet[] {r});
                         Refinement ref = new Refinement(rm, in.provider);
 
                         AndNode.RefValue rv = extend(doc.threadId, doc, ref, config);
@@ -284,9 +280,9 @@ public class InputNode extends Node<InputNode, InputActivation> {
     }
 
 
-    public static List<Relation> getRelations(Activation act1, Activation act2) {
-        ArrayList<Relation> rels = new ArrayList<>();
-        for(Relation rel: CANDIDATE_RELATIONS) {
+    public static List<RelationsSet> getRelations(Activation act1, Activation act2) {
+        ArrayList<RelationsSet> rels = new ArrayList<>();
+        for(RelationsSet rel: CANDIDATE_RELATIONS) {
             if(rel.test(act2, act1)) {
                 rels.add(rel);
                 break;

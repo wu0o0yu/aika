@@ -443,8 +443,8 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
         public boolean contains(Refinement ref, RefValue rv) {
             for(int i = 0; i < ref.relations.length(); i++) {
-                Relation ra = ref.relations.get(i);
-                Relation rb = relations.get(rv.offsets[i]);
+                RelationsSet ra = ref.relations.get(i);
+                RelationsSet rb = relations.get(rv.offsets[i]);
 
                 if((ra == null && rb != null) || (ra != null && rb == null)) return false;
 
