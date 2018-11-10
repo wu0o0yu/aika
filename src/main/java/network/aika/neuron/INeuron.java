@@ -24,7 +24,6 @@ import network.aika.neuron.range.Position;
 import network.aika.neuron.activation.SearchNode;
 import network.aika.lattice.InputNode;
 import network.aika.neuron.relation.Relation;
-import network.aika.neuron.relation.RelationsSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +95,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
 
     // synapseId -> relation
-    public Map<Integer, RelationsSet> outputRelations;
+    public Map<Integer, Relation> outputRelations;
 
 
     // A synapse is stored only in one direction, depending on the synapse weight.
@@ -477,13 +476,10 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         if(outputRelations != null) {
             out.writeInt(outputRelations.size());
-            for (Map.Entry<Integer, Set<Relation>> me : outputRelations.entrySet()) {
+            for (Map.Entry<Integer, Relation> me : outputRelations.entrySet()) {
                 out.writeInt(me.getKey());
 
-                out.writeInt(me.getValue().size());
-                for(Relation rel: me.getValue()) {
-                    rel.write(out);
-                }
+                me.getValue().write(out);
             }
         } else  {
             out.writeInt(0);
@@ -555,13 +551,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             for(int i = 0; i < l; i++) {
                 Integer relId = in.readInt();
 
-                Set<Relation> relSet = new TreeSet(Relation.COMPARATOR);
-                int s = in.readInt();
-                for(int j = 0; j < s; j++) {
-                    Relation r = Relation.read(in, m);
-                    relSet.add(r);
-                }
-                outputRelations.put(relId, relSet);
+                Relation r = Relation.read(in, m);
+                outputRelations.put(relId, r);
             }
         }
 

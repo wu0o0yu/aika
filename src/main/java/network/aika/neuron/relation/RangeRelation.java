@@ -12,6 +12,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.range.Position.Operator.EQUALS;
@@ -54,24 +55,10 @@ public class RangeRelation extends Relation {
 
 
     @Override
-    public Range mapRange(Activation act, Linker.Direction direction) {
-        Range.Relation rel = relation;
-
-        Range r = act.range;
-        Position begin = null;
-        Position end = null;
-        if(rel.beginToBegin == EQUALS) {
-            begin = r.begin;
-        } else if(rel.beginToEnd == EQUALS) {
-            begin = r.end;
+    public void mapRange(Map<Integer, Position> slots, Activation act) {
+        if(relation == Position.Operator.EQUALS) {
+            slots.put(fromSlot, act.getSlot(toSlot));
         }
-        if(rel.endToEnd == EQUALS) {
-            end = r.end;
-        } else if(rel.endToBegin == EQUALS) {
-            end = r.begin;
-        }
-
-        return new Range(begin, end);
     }
 
 

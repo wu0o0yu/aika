@@ -23,7 +23,6 @@ import network.aika.neuron.range.Position;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation.Link;
-import network.aika.neuron.relation.RelationsSet;
 
 import java.util.*;
 
@@ -104,18 +103,11 @@ public class Linker {
 
     public void linkInput(Activation act) {
         for(Synapse s: act.getNeuron().inMemoryInputSynapses.values()) {
-            for(Map.Entry<Integer, RelationsSet> me: s.relations.entrySet()) {
+            for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+                Relation rel = me.getValue();
                 if(me.getKey() == OUTPUT) {
-                    for(Relation rel: me.getValue().relations) {
-                        Range r = rel.mapRange(act, Direction.INPUT);
-
-                        if(r != null) {
-                            Activation iAct = s.input.get(act.doc).getActivation(act.doc, r, false);
-
-                            if (iAct != null) {
-                                link(s, iAct, act);
-                            }
-                        }
+                    for (Activation iAct : rel.invert().getActivations(s.input.get(act.doc), act)) {
+                        link(s, iAct, act);
                     }
                 }
             }
@@ -152,17 +144,16 @@ public class Linker {
     }
 
 
-    private void linkRelated(Activation rAct, Activation oAct, Map<Integer, RelationsSet> relations) {
-        for(Map.Entry<Integer, RelationsSet> me: relations.entrySet()) {
+    private void linkRelated(Activation rAct, Activation oAct, Map<Integer, Relation> relations) {
+        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
+            Relation rel = me.getValue();
             Integer relId = me.getKey();
             if(relId >= 0) {
                 Synapse s = oAct.getNeuron().getSynapseById(relId);
-                if(s != null) {
-                    for(Relation r: me.getValue().relations) {
-                        if (r.follow(rAct, oAct, relations)) {
-                            for(Activation iAct: r.invert().getActivations(s.input.get(rAct.doc), rAct)) {
-                                link(s, iAct, oAct);
-                            }
+                if (s != null) {
+                    if (rel.follow(rAct, oAct, relations)) {
+                        for (Activation iAct : rel.invert().getActivations(s.input.get(rAct.doc), rAct)) {
+                            link(s, iAct, oAct);
                         }
                     }
                 }

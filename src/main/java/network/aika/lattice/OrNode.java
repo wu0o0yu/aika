@@ -68,25 +68,18 @@ public class OrNode extends Node<OrNode, Activation> {
     public void addInputActivation(OrEntry oe, NodeActivation inputAct) {
         Document doc = inputAct.doc;
 
-        Position begin = null;
-        Position end = null;
+        Map<Integer, Position> slots = new TreeMap<>();
 
         INeuron n = neuron.get(inputAct.doc);
         for(int i = 0; i < oe.synapseIds.length; i++) {
             int synapseId = oe.synapseIds[i];
 
             Synapse s = neuron.getSynapseById(synapseId);
-            for(Map.Entry<Integer, Set<Relation>> me: s.relations.entrySet()) {
+            for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+                Relation rel = me.getValue();
                 if(me.getKey() == Synapse.OUTPUT) {
                     Activation iAct = inputAct.getInputActivation(i);
-                    for(Relation rel: me.getValue()) {
-                        Range r = rel.invert().mapRange(iAct, Linker.Direction.OUTPUT);
-
-                        if(r != null) {
-                            if (r.begin != null) begin = r.begin;
-                            if (r.end != null) end = r.end;
-                        }
-                    }
+                    rel.invert().mapRange(slots, iAct, Linker.Direction.OUTPUT);
                 }
             }
         }

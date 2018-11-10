@@ -21,7 +21,6 @@ import network.aika.*;
 import network.aika.Document;
 import network.aika.neuron.relation.Relation;
 import network.aika.Writable;
-import network.aika.neuron.relation.RelationsSet;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -83,7 +82,7 @@ public class Synapse implements Writable {
     public boolean isRecurrent;
     public boolean identity;
 
-    public Map<Integer, RelationsSet> relations = new TreeMap<>();
+    public Map<Integer, Relation> relations = new TreeMap<>();
 
     public DistanceFunction distanceFunction = null;
 
@@ -301,7 +300,7 @@ public class Synapse implements Writable {
     }
 
 
-    public RelationsSet getRelationById(Integer id) {
+    public Relation getRelationById(Integer id) {
         return relations.get(id);
     }
 
@@ -322,7 +321,7 @@ public class Synapse implements Writable {
         out.writeInt(output.id);
 
         out.writeInt(relations.size());
-        for(Map.Entry<Integer, RelationsSet> me: relations.entrySet()) {
+        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
             out.writeInt(me.getKey());
 
             me.getValue().write(out);
@@ -359,7 +358,7 @@ public class Synapse implements Writable {
         int l = in.readInt();
         for(int i = 0; i < l; i++) {
             Integer relId = in.readInt();
-            relations.put(relId, RelationsSet.read(in, m));
+            relations.put(relId, Relation.read(in, m));
         }
 
         if(in.readBoolean()) {
@@ -433,15 +432,14 @@ public class Synapse implements Writable {
 
     public boolean[] linksOutput() {
         boolean[] result = new boolean[] {false, false};
-        for(Map.Entry<Integer, RelationsSet> me: relations.entrySet()) {
+        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
+            Relation rel = me.getValue();
             if(me.getKey() == OUTPUT) {
-                for(Relation r: me.getValue().relations) {
-                    if (r.linksOutputBegin()) {
-                        result[0] = true;
-                    }
-                    if (r.linksOutputEnd()) {
-                        result[1] = true;
-                    }
+                if (rel.linksOutputBegin()) {
+                    result[0] = true;
+                }
+                if (rel.linksOutputEnd()) {
+                    result[1] = true;
                 }
             }
         }

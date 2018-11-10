@@ -31,7 +31,6 @@ import network.aika.lattice.InputNode.InputActivation;
 import network.aika.lattice.AndNode.Refinement;
 import network.aika.lattice.AndNode.RefValue;
 import network.aika.lattice.AndNode.RelationsMap;
-import network.aika.neuron.relation.RelationsSet;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -55,7 +54,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
     private long visitedDiscover;
 
 
-    public static final RelationsSet[] CANDIDATE_RELATIONS = new RelationsSet[] {
+    public static final Relation[] CANDIDATE_RELATIONS = new Relation[] {
 /*        new RangeRelation(EQUALS),
         new RangeRelation(BEGIN_TO_END_EQUALS),
         new RangeRelation(END_TO_BEGIN_EQUALS),
@@ -149,7 +148,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
     public RefValue extend(int threadId, Document doc, Refinement ref, PatternDiscovery.Config patterDiscoveryConfig) {
         if(ref.relations.size() == 0) return null;
 
-        RelationsSet rel = ref.relations.get(0);
+        Relation rel = ref.relations.get(0);
         if(rel == null) {
             return null;
         }
@@ -161,7 +160,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         List<AndNode.Entry> nlParents = new ArrayList<>();
 
-        Refinement mirrorRef = new Refinement(new AndNode.RelationsMap(new RelationsSet[]{rel.invert()}), provider);
+        Refinement mirrorRef = new Refinement(new AndNode.RelationsMap(new Relation[]{rel.invert()}), provider);
         nlParents.add(new AndNode.Entry(mirrorRef, new RefValue(new Integer[] {1}, 0, ref.input)));
 
         rv = new RefValue(new Integer[] {0}, 1, provider);
@@ -259,12 +258,12 @@ public class InputNode extends Node<InputNode, InputActivation> {
         doc.getActivations(true).forEach(secondNAct -> {
             InputActivation secondAct = secondNAct.outputToInputNode.output;
             if (act != secondAct && config.candidateCheck.check(act, secondAct)) {
-                List<RelationsSet> relations = getRelations(act.input.input, secondNAct);
-                for(RelationsSet r: relations) {
+                List<Relation> relations = getRelations(act.input.input, secondNAct);
+                for(Relation r: relations) {
                     InputNode in = secondAct.node;
 
                     if (r != null) {
-                        RelationsMap rm = new RelationsMap(new RelationsSet[] {r});
+                        RelationsMap rm = new RelationsMap(new Relation[] {r});
                         Refinement ref = new Refinement(rm, in.provider);
 
                         AndNode.RefValue rv = extend(doc.threadId, doc, ref, config);
@@ -280,9 +279,9 @@ public class InputNode extends Node<InputNode, InputActivation> {
     }
 
 
-    public static List<RelationsSet> getRelations(Activation act1, Activation act2) {
-        ArrayList<RelationsSet> rels = new ArrayList<>();
-        for(RelationsSet rel: CANDIDATE_RELATIONS) {
+    public static List<Relation> getRelations(Activation act1, Activation act2) {
+        ArrayList<Relation> rels = new ArrayList<>();
+        for(Relation rel: CANDIDATE_RELATIONS) {
             if(rel.test(act2, act1)) {
                 rels.add(rel);
                 break;

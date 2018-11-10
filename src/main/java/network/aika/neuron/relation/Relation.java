@@ -33,7 +33,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public abstract Relation invert();
 
-    public abstract Range mapRange(Activation act, Linker.Direction direction);
+    public abstract void mapRange(Map<Integer, Position> slots, Activation act);
 
     public abstract boolean linksOutputBegin();
 
@@ -57,7 +57,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public abstract Collection<Activation> getActivations(INeuron n, Activation linkedAct);
 
 
-    public boolean follow(Activation rAct, Activation oAct, Map<Integer, RelationsSet> relations) {
+    public boolean follow(Activation rAct, Activation oAct, Map<Integer, Relation> relations) {
         return true;
     }
 
@@ -79,7 +79,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     }
 
 
-    public static Map<Integer, RelationsSet> getRelationsMap(int synapseId, Neuron n) {
+    public static Map<Integer, Relation> getRelationsMap(int synapseId, Neuron n) {
         if(synapseId == OUTPUT) {
             INeuron in = n.get();
             if (in.outputRelations == null) {
@@ -157,8 +157,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         public void connect(Neuron n) {
-            Map<Integer, Set<Relation>> fromRel = getRelationsMap(from, n);
-            Map<Integer, Set<Relation>> toRel = getRelationsMap(to, n);
+            Map<Integer, Relation> fromRel = getRelationsMap(from, n);
+            Map<Integer, Relation> toRel = getRelationsMap(to, n);
 
             Relation r = getRelation();
             addRelation(fromRel, to, from, n, r);
