@@ -431,25 +431,20 @@ public class Synapse implements Writable {
 
 
     public Set<Integer> linksOutput() {
-        boolean[] result = new boolean[] {false, false};
+        Set<Integer> results = new TreeSet<>();
         for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
             Relation rel = me.getValue();
             if(me.getKey() == OUTPUT) {
-                if (rel.linksOutputBegin()) {
-                    result[0] = true;
-                }
-                if (rel.linksOutputEnd()) {
-                    result[1] = true;
-                }
+                rel.linksOutputs(results);
             }
         }
-        return result;
+        return results;
     }
 
 
     public boolean linksAnyOutput() {
-        boolean[] lo = linksOutput();
-        return lo[0] || lo[1];
+        Set<Integer> tmp = linksOutput();
+        return !tmp.isEmpty();
     }
 
 

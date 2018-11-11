@@ -180,6 +180,24 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
                             .collect(Collectors.toList()) :
                     getActivations();
         }
+
+        public Collection<Activation> getActivations(SortedMap<Integer, Position> slots) {
+            Integer firstSlot = slots.firstKey();
+            Position firstPos = slots.get(firstSlot);
+
+            return getActivations(firstSlot, firstPos, true, firstSlot, firstPos, true)
+                    .stream()
+                    .filter( act -> {
+                        for(Map.Entry<Integer, Position> me: slots.entrySet()) {
+                            Position pos = me.getValue();
+                            if(pos.getFinalPosition() != null && pos.compare(act.getSlot(me.getKey())) != 0) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
 

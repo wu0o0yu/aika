@@ -34,10 +34,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public abstract void mapRange(Map<Integer, Position> slots, Activation act);
 
-    public abstract boolean linksOutputBegin();
-
-    public abstract boolean linksOutputEnd();
-
+    public abstract void linksOutputs(Set<Integer> outputs);
 
     public static Relation read(DataInput in, Model m) throws IOException {
         switch(in.readInt()) {

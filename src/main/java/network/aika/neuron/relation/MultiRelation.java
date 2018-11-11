@@ -11,6 +11,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
+
 
 public class MultiRelation extends Relation {
 
@@ -35,14 +37,9 @@ public class MultiRelation extends Relation {
     }
 
     @Override
-    public boolean linksOutputBegin() {
-        return false;
+    public void linksOutputs(Set<Integer> results) {
     }
 
-    @Override
-    public boolean linksOutputEnd() {
-        return false;
-    }
 
     @Override
     public boolean isExact() {

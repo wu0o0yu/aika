@@ -2,6 +2,7 @@ package network.aika.neuron.relation;
 
 import network.aika.Model;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Linker;
 import network.aika.neuron.range.Position;
@@ -9,10 +10,7 @@ import network.aika.neuron.range.Position;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class AncestorRelation extends Relation {
@@ -54,6 +52,11 @@ public class AncestorRelation extends Relation {
                 break;
         }
         return results;
+    }
+
+    @Override
+    public void registerRequiredSlots(Neuron input) {
+
     }
 
 
@@ -135,13 +138,7 @@ public class AncestorRelation extends Relation {
 
 
     @Override
-    public boolean linksOutputBegin() {
-        return false;
-    }
-
-    @Override
-    public boolean linksOutputEnd() {
-        return false;
+    public void linksOutputs(Set<Integer> results) {
     }
 
 

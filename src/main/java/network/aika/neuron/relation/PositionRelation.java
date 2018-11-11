@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.range.Position.Operator.*;
@@ -60,14 +61,8 @@ public class PositionRelation extends Relation {
 
 
     @Override
-    public boolean linksOutputBegin() {
-        return relation.beginToBegin == EQUALS || relation.endToBegin == EQUALS;
-    }
-
-
-    @Override
-    public boolean linksOutputEnd() {
-        return relation.endToEnd == EQUALS || relation.beginToEnd == EQUALS;
+    public void linksOutputs(Set<Integer> results) {
+        results.add(toSlot);
     }
 
 
