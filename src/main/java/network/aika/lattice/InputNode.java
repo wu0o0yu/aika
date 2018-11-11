@@ -22,6 +22,7 @@ import network.aika.Model;
 import network.aika.Provider;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.range.Position;
 import network.aika.neuron.relation.RangeRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
@@ -206,13 +207,13 @@ public class InputNode extends Node<InputNode, InputActivation> {
     private void applyExactRelations(InputActivation act) {
         Activation iAct = act.input.input;
 
-        for(Range.Relation rel: new Range.Relation[] {BEGIN_EQUALS, END_EQUALS, BEGIN_TO_END_EQUALS, END_TO_BEGIN_EQUALS}) {
-            for(Activation linkedAct: RangeRelation.getActivationsByRangeEquals(act.doc, iAct.range, rel)) {
+        for (Map.Entry<Integer, Position> me : iAct.slots.entrySet()) {
+            for (Activation linkedAct : act.doc.getActivationsByPosition(me.getValue(), true, me.getValue(), true)) {
                 Provider<InputNode> in = linkedAct.getINeuron().outputNode;
-                for (Map.Entry<AndNode.Refinement, AndNode.RefValue> me : andChildren.subMap(
+                for (Map.Entry<AndNode.Refinement, AndNode.RefValue> mea : andChildren.subMap(
                         new Refinement(RelationsMap.MIN, in),
                         new Refinement(RelationsMap.MAX, in)).entrySet()) {
-                    addNextLevelActivations(in.get(act.doc), me.getKey(), me.getValue().child.get(act.doc), act);
+                    addNextLevelActivations(in.get(act.doc), mea.getKey(), mea.getValue().child.get(act.doc), act);
                 }
             }
         }

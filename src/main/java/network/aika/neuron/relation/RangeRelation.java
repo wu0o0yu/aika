@@ -282,23 +282,4 @@ public class RangeRelation extends Relation {
                 toKey, toInclusive
         );
     }
-
-
-
-    public static Collection<Activation> getActivationsByRangeEquals(Document doc, Range r, Range.Relation rr) {
-        if(rr.beginToBegin == EQUALS || rr.beginToEnd == EQUALS) {
-            Position key = rr.beginToBegin == EQUALS ? r.begin : r.end;
-            return doc.getActivationsByRangeBegin(
-                    new Range(key, Position.MIN), true,
-                    new Range(key, Position.MAX), true
-            );
-        } else if(rr.endToEnd == EQUALS || rr.endToBegin == EQUALS) {
-            Position key = rr.endToEnd == EQUALS ? r.end : r.begin;
-            return doc.getActivationByRangeEnd(
-                    new Range(Position.MIN, key), true,
-                    new Range(Position.MAX, key), true
-            );
-        }
-        throw new RuntimeException("Invalid Range Relation");
-    }
 }

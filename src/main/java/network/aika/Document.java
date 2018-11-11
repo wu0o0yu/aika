@@ -87,10 +87,18 @@ public class Document implements Comparable<Document> {
     public TreeMap<Integer, Double> searchNodeWeights = new TreeMap<>();
 
 
-    private TreeMap<ActKey, Activation> activationsByPosition = new TreeMap<>((ak1, ak2) -> {
+    private TreeMap<ActKey, Activation> activationsBySlotAndPosition = new TreeMap<>((ak1, ak2) -> {
         int r = Integer.compare(ak1.slot, ak2.slot);
         if (r != 0) return r;
         r = Position.compare(ak1.pos, ak2.pos);
+        if (r != 0) return r;
+        r = ak1.node.compareTo(ak2.node);
+        if (r != 0) return r;
+        return Integer.compare(ak1.actId, ak2.actId);
+    });
+
+    private TreeMap<ActKey, Activation> activationsByPosition = new TreeMap<>((ak1, ak2) -> {
+        int r = Position.compare(ak1.pos, ak2.pos);
         if (r != 0) return r;
         r = ak1.node.compareTo(ak2.node);
         if (r != 0) return r;
@@ -206,6 +214,7 @@ public class Document implements Comparable<Document> {
             Position pos = me.getValue();
             if (pos != null && pos.getFinalPosition() != null) {
                 ActKey dak = new ActKey(me.getKey(), pos, act.node, act.id);
+                activationsBySlotAndPosition.put(dak, act);
                 activationsByPosition.put(dak, act);
             }
         }
@@ -227,10 +236,20 @@ public class Document implements Comparable<Document> {
 
 
     public Collection<Activation> getActivationsByPosition(int fromSlot, Position fromPos, boolean fromInclusive, int toSlot, Position toPos, boolean toInclusive) {
-        return activationsByPosition.subMap(
+        return activationsBySlotAndPosition.subMap(
                 new Document.ActKey(fromSlot, fromPos, Node.MIN_NODE, Integer.MIN_VALUE),
                 fromInclusive,
                 new Document.ActKey(toSlot, toPos, Node.MAX_NODE, Integer.MAX_VALUE),
+                toInclusive
+        ).values();
+    }
+
+
+    public Collection<Activation> getActivationsByPosition(Position fromPos, boolean fromInclusive, Position toPos, boolean toInclusive) {
+        return activationsByPosition.subMap(
+                new Document.ActKey(-1, fromPos, Node.MIN_NODE, Integer.MIN_VALUE),
+                fromInclusive,
+                new Document.ActKey(-1, toPos, Node.MAX_NODE, Integer.MAX_VALUE),
                 toInclusive
         ).values();
     }
