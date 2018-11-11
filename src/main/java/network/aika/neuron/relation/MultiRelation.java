@@ -10,11 +10,16 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 
 public class MultiRelation extends Relation {
+
+    public MultiRelation(List<Relation> rels) {
+
+    }
 
     @Override
     public int getRelationType() {

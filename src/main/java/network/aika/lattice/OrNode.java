@@ -68,7 +68,7 @@ public class OrNode extends Node<OrNode, Activation> {
     public void addInputActivation(OrEntry oe, NodeActivation inputAct) {
         Document doc = inputAct.doc;
 
-        Map<Integer, Position> slots = new TreeMap<>();
+        SortedMap<Integer, Position> slots = new TreeMap<>();
 
         INeuron n = neuron.get(inputAct.doc);
         for(int i = 0; i < oe.synapseIds.length; i++) {
@@ -109,7 +109,7 @@ public class OrNode extends Node<OrNode, Activation> {
         act.doc.linker.link(act, ol);
     }
 
-    private Activation lookupActivation(Document doc, Map<Integer, Position> slots, OrEntry oe, NodeActivation inputAct) {
+    private Activation lookupActivation(Document doc, SortedMap<Integer, Position> slots, OrEntry oe, NodeActivation inputAct) {
         x: for(Activation act: neuron.get(doc)
                 .getThreadState(doc.threadId, true)
                 .getActivations(slots)

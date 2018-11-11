@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.range.Position.Operator.*;
+import static network.aika.neuron.range.Position.Operator;
 
 
 public class PositionRelation extends Relation {
@@ -105,7 +106,7 @@ public class PositionRelation extends Relation {
 
     @Override
     public boolean isExact() {
-        return relation == EQUALS;
+        return relation == Operator.EQUALS;
     }
 
 
@@ -120,7 +121,7 @@ public class PositionRelation extends Relation {
         Position pos = linkedAct.getSlot(toSlot);
 
         Collection<Activation> results;
-        if(relation == EQUALS) {
+        if(relation == Operator.EQUALS) {
             results = th.getActivations(
                     fromSlot, pos, true,
                     fromSlot, pos, true
