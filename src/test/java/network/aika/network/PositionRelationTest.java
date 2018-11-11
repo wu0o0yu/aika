@@ -25,7 +25,7 @@ import static network.aika.neuron.relation.AncestorRelation.Type.IS_ANCESTOR_OF;
 import static network.aika.neuron.range.Position.Operator.*;
 
 
-public class RangeRelationTest {
+public class PositionRelationTest {
 
 
     @Test

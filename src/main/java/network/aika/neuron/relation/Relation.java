@@ -7,7 +7,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.Writable;
-import network.aika.neuron.activation.Linker;
 import network.aika.neuron.range.Position;
 
 import java.io.DataInput;
@@ -44,8 +43,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         switch(in.readInt()) {
             case AncestorRelation.RELATION_TYPE:
                 return AncestorRelation.read(in, m);
-            case RangeRelation.RELATION_TYPE:
-                return RangeRelation.read(in, m);
+            case PositionRelation.RELATION_TYPE:
+                return PositionRelation.read(in, m);
             default:
                 return null;
         }
@@ -151,7 +150,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
         public Relation getRelation() {
             if(operator != null) {
-                return new RangeRelation(fromSlot, toSlot, operator);
+                return new PositionRelation(fromSlot, toSlot, operator);
             } else if(ancestorRelation != null) {
                 return ancestorRelation;
             }

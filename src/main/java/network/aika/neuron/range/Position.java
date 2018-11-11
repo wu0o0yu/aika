@@ -97,12 +97,8 @@ public class Position {
     }
 
 
-    public void addBeginActivation(Activation act) {
-        beginActivations.add(act);
-    }
-
-    public void addEndActivations(Activation act) {
-        endActivations.add(act);
+    public void addActivation(Integer slot, Activation act) {
+        activations.put(slot, act);
     }
 
 

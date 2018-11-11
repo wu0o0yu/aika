@@ -161,21 +161,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         }
 
 
-        public Collection<Activation> getActivationsByRangeBeginLimited(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
-            if(fromKey.getFinalPosition() != null && toKey.getFinalPosition() != null) {
-                if(fromKey != Position.MIN) {
-                    fromKey = new Position(fromKey.doc, fromKey.getFinalPosition() - maxLength);
-                }
-
-                if (fromKey.compare(Position.Operator.GREATER_THAN, toKey)) return Collections.EMPTY_LIST;
-
-                return getActivationsByRangeBegin(fromKey, fromInclusive, toKey, toInclusive);
-            } else {
-                return Collections.EMPTY_LIST; // TODO:
-            }
-        }
-
-
         public Collection<Activation> getActivations(int fromSlot, Position fromPos, boolean fromInclusive, int toSlot, Position toPos, boolean toInclusive) {
             return activations.subMap(
                     new INeuron.ActKey(fromSlot, fromPos, Integer.MIN_VALUE),
@@ -446,8 +431,15 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         out.writeUTF(activationFunction.name());
 
-        out.writeBoolean(createBeginPosition);
-        out.writeBoolean(createEndPosition);
+        out.writeInt(slotHasInputs.size());
+        for(Integer slot: slotHasInputs) {
+            out.writeInt(slot);
+        }
+
+        out.writeInt(slotRequired.size());
+        for(Integer slot: slotRequired) {
+            out.writeInt(slot);
+        }
 
         out.writeInt(outputNode.id);
 
@@ -520,8 +512,15 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         activationFunction = ActivationFunction.valueOf(in.readUTF());
 
-        createBeginPosition = in.readBoolean();
-        createEndPosition = in.readBoolean();
+        int l = in.readInt();
+        for(int i = 0; i < l; i++) {
+            slotHasInputs.add(in.readInt());
+        }
+
+        l = in.readInt();
+        for(int i = 0; i < l; i++) {
+            slotRequired.add(in.readInt());
+        }
 
         outputNode = m.lookupNodeProvider(in.readInt());
 
@@ -545,7 +544,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             outputSynapses.put(syn, syn);
         }
 
-        int l = in.readInt();
+        l = in.readInt();
         if(l > 0) {
             outputRelations = new TreeMap<>();
             for(int i = 0; i < l; i++) {
@@ -639,17 +638,18 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             doc.activatedNeurons.add(act.node.neuron.get());
         }
 
-        Integer l = act.range.length();
+        Integer l = act.length();
         if(l != null) {
-            th.minLength = Math.min(th.minLength, act.range.length());
-            th.maxLength = Math.max(th.maxLength, act.range.length());
+            th.minLength = Math.min(th.minLength, l);
+            th.maxLength = Math.max(th.maxLength, l);
         }
 
         th.addActivation(act);
 
 
-        act.range.begin.addBeginActivation(act);
-        act.range.end.addEndActivations(act);
+        for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
+            me.getValue().addActivation(me.getKey(), act);
+        }
 
         doc.addActivation(act);
     }

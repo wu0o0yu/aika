@@ -23,7 +23,6 @@ import network.aika.Provider;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.range.Position;
-import network.aika.neuron.relation.RangeRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
 import network.aika.PatternDiscovery;

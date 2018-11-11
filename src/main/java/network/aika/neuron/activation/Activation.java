@@ -125,6 +125,22 @@ public final class Activation extends OrActivation {
     }
 
 
+    public Integer length() {
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        for(Position pos: slots.values()) {
+            if(pos.getFinalPosition() == null) {
+                return null;
+            }
+            min = Math.min(min, pos.getFinalPosition());
+            max = Math.max(max, pos.getFinalPosition());
+        }
+
+        if(min > max) return 0;
+        return min - max;
+    }
+
+
     public void setTargetValue(Double targetValue) {
         this.targetValue = targetValue;
     }
