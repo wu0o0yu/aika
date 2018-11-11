@@ -83,8 +83,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     public volatile int numDisjunctiveSynapses = 0;
 
-    public boolean createBeginPosition = true;
-    public boolean createEndPosition = true;
+    public Set<Integer> slotHasInputs = new TreeSet<>();
+    public Set<Integer> slotRequired = new TreeSet<>();
 
     public Writable extension;
 

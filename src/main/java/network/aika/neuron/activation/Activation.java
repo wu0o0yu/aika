@@ -118,6 +118,13 @@ public final class Activation extends OrActivation {
     }
 
 
+    public void setSlots(Map<Integer, Position> slots) {
+        for(Map.Entry<Integer, Position> me: slots.entrySet()) {
+            setSlot(me.getKey(), me.getValue());
+        }
+    }
+
+
     public void setTargetValue(Double targetValue) {
         this.targetValue = targetValue;
     }

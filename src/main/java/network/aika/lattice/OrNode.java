@@ -84,24 +84,22 @@ public class OrNode extends Node<OrNode, Activation> {
             }
         }
 
-        if(begin == null && n.createBeginPosition) {
-            begin = new Position(doc);
+        for(Integer slot : n.slotRequired) {
+            if (!slots.containsKey(slot)) {
+                if (!n.slotHasInputs.contains(slot)) {
+                    slots.put(slot, new Position(doc));
+                } else {
+                    return;
+                }
+            }
         }
 
-        if(end == null && n.createEndPosition) {
-            end = new Position(doc);
-        }
-
-        if(begin == null || end == null) {
-            return;
-        }
-
-        Range r = new Range(begin, end);
-
-        Activation act = lookupActivation(doc, r, oe, inputAct);
+        Activation act = lookupActivation(doc, slots, oe, inputAct);
 
         if(act == null) {
-            act = new Activation(doc.activationIdCounter++, doc, r, this);
+            act = new Activation(doc.activationIdCounter++, doc, this);
+            act.setSlots(slots);
+
             processActivation(act);
         } else {
             propagate(act);
@@ -111,8 +109,7 @@ public class OrNode extends Node<OrNode, Activation> {
         act.doc.linker.link(act, ol);
     }
 
-
-    private Activation lookupActivation(Document doc, Range r, OrEntry oe, NodeActivation inputAct) {
+    private Activation lookupActivation(Document doc, Map<Integer, Position> slots, OrEntry oe, NodeActivation inputAct) {
         x: for(Activation act: neuron.get(doc)
                 .getThreadState(doc.threadId, true)
                 .getActivationsByRangeBegin(r.begin, true, r.begin, false)

@@ -70,7 +70,7 @@ public class Converter {
         outputNode = neuron.node.get();
 
         initInputNodesAndComputeWeightSums();
-        initCreateBeginEndPositionFlags();
+        initSlotFlags();
 
         if(neuron.biasSum + neuron.posDirSum + neuron.posRecSum <= 0.0) {
             neuron.requiredSum = neuron.posDirSum + neuron.posRecSum;
@@ -153,14 +153,13 @@ public class Converter {
     }
 
 
-    private void initCreateBeginEndPositionFlags() {
+    private void initSlotFlags() {
         modifiedSynapses.forEach(s -> {
-            boolean[] linksOutput = s.linksOutput();
-            if(linksOutput[0]) {
-                neuron.createBeginPosition = false;
+            for(Integer slot: s.linksOutput()) {
+                neuron.slotHasInputs.add(slot);
             }
-            if(linksOutput[1]) {
-                neuron.createEndPosition = false;
+            for(Relation rel: s.relations.values()) {
+                rel.registerRequiredSlots(s.input);
             }
         });
     }

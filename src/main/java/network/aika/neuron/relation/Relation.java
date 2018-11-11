@@ -92,6 +92,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
     }
 
+    public abstract void registerRequiredSlots(Neuron input);
+
 
     public static class Builder implements Neuron.Builder {
         private int from;

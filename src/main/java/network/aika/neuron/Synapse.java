@@ -430,7 +430,7 @@ public class Synapse implements Writable {
     }
 
 
-    public boolean[] linksOutput() {
+    public Set<Integer> linksOutput() {
         boolean[] result = new boolean[] {false, false};
         for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
             Relation rel = me.getValue();
