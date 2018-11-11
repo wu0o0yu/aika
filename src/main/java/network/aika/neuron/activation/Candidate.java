@@ -3,6 +3,9 @@ package network.aika.neuron.activation;
 import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.range.Position;
 
+import java.util.Iterator;
+import java.util.Map;
+
 public class Candidate  implements Comparable<Candidate> {
     public SearchNode currentSearchNode;
 
@@ -73,12 +76,30 @@ public class Candidate  implements Comparable<Candidate> {
         if(!isConflicting() && c.isConflicting()) return -1;
         if(isConflicting() && !c.isConflicting()) return 1;
 
-        int r = Position.compare(activation.range.begin, c.activation.range.begin);
-        if (r != 0) return r;
-        r = Position.compare(activation.range.end, c.activation.range.end);
-        if (r != 0) return r;
+        Iterator<Map.Entry<Integer, Position>> ita = activation.slots.entrySet().iterator();
+        Iterator<Map.Entry<Integer, Position>> itb = c.activation.slots.entrySet().iterator();
 
-        r = Integer.compare(sequence, c.sequence);
+        Map.Entry<Integer, Position> mea = null;
+        Map.Entry<Integer, Position> meb = null;
+        while(ita.hasNext() || itb.hasNext()) {
+            mea = ita.hasNext() ? ita.next() : null;
+            meb = itb.hasNext() ? itb.next() : null;
+
+            if(mea == null && meb == null) {
+                break;
+            } else if(mea == null && meb != null) {
+                return -1;
+            } else if(mea != null && meb == null) {
+                return -1;
+            }
+
+            int r = Integer.compare(mea.getKey(), meb.getKey());
+            if (r != 0) return r;
+            r = Position.compare(activation.getSlot(mea.getKey()), c.activation.getSlot(meb.getKey()));
+            if (r != 0) return r;
+        }
+
+        int r = Integer.compare(sequence, c.sequence);
         if (r != 0) return r;
 
         return Integer.compare(id, c.id);
