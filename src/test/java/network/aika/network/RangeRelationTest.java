@@ -25,7 +25,7 @@ import static network.aika.neuron.relation.AncestorRelation.Type.IS_ANCESTOR_OF;
 import static network.aika.neuron.range.Position.Operator.*;
 
 
-public class RelationsTest {
+public class RangeRelationTest {
 
 
     @Test
@@ -77,71 +77,6 @@ public class RelationsTest {
 
         Assert.assertNotNull(outC1);
     }
-
-
-    @Test
-    public void testInstanceRelation() {
-        Model m = new Model();
-
-        Neuron inA = m.createNeuron("A");
-
-        INeuron inB = Neuron.init(m.createNeuron("B"),
-                5.0,
-                INeuron.Type.EXCITATORY,
-                new Synapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setRecurrent(false)
-                        .setIdentity(true)
-                        .setBias(-10.0),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
-        ).get();
-
-        INeuron outC = Neuron.init(m.createNeuron("C"),
-                5.0,
-                INeuron.Type.EXCITATORY,
-                new Synapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setRecurrent(false)
-                        .setBias(-10.0),
-                new Synapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(inB.provider)
-                        .setWeight(10.0)
-                        .setRecurrent(false)
-                        .setBias(-10.0),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(1)
-                        .setAncestorRelation(IS_ANCESTOR_OF),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
-                new Relation.Builder()
-                        .setFrom(1)
-                        .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
-        ).get();
-
-
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
-
-        inA.addInput(doc, 0, 1);
-
-        Activation outC1 = outC.getActivation(doc, new Range(doc, 0, 1), false);
-
-        System.out.println(doc.activationsToString(false, false, true));
-
-        Assert.assertNotNull(outC1);
-    }
-
 
     @Test
     public void testABCPattern() {
@@ -283,121 +218,5 @@ public class RelationsTest {
         System.out.println(doc.activationsToString(false, true, true));
 
         assert n.get().getActivations(doc, false).size() >= 1;
-    }
-
-
-
-    @Test
-    public void testInstanceRelation1() {
-        Model m = new Model();
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
-
-        Neuron inA = m.createNeuron("A");
-
-        Neuron nB = Neuron.init(m.createNeuron("B"), 5.0, INeuron.Type.EXCITATORY,
-                new Synapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setIdentity(true),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
-        );
-
-        Neuron nC = Neuron.init(m.createNeuron("C"), 5.0, INeuron.Type.EXCITATORY,
-                new Synapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setIdentity(true),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
-        );
-
-        Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
-                new Synapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(nB)
-                        .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setSynapseId(0),
-                new Synapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(nC)
-                        .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setSynapseId(1),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(1)
-                        .setAncestorRelation(COMMON_ANCESTOR),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
-        );
-
-
-        inA.addInput(doc, 0, 1);
-
-        doc.process();
-
-        Assert.assertFalse(nD.getActivations(doc, true).isEmpty());
-    }
-
-
-    @Test
-    public void testInstanceRelation2() {
-        Model m = new Model();
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
-
-        Neuron inA = m.createNeuron("A");
-
-        Neuron inB = m.createNeuron("B");
-
-
-        Neuron nC = Neuron.init(m.createNeuron("C"), 5.0, INeuron.Type.EXCITATORY,
-                new Synapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setSynapseId(0),
-                new Synapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(inB)
-                        .setWeight(10.0)
-                        .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setSynapseId(1),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(1)
-                        .setAncestorRelation(COMMON_ANCESTOR),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
-        );
-
-
-        inA.addInput(doc, 0, 1);
-        inB.addInput(doc, 1, 2);
-
-        doc.process();
-
-        Assert.assertTrue(nC.getActivations(doc, true).isEmpty());
-
     }
 }
