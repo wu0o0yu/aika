@@ -31,36 +31,37 @@ import java.util.stream.Stream;
      *
      * @author Lukas Molzberger
      */
-    public class Neuron extends Provider<INeuron> {
+public class Neuron extends Provider<INeuron> {
 
-        public static final Neuron MIN_NEURON = new Neuron(null, Integer.MIN_VALUE);
-        public static final Neuron MAX_NEURON = new Neuron(null, Integer.MAX_VALUE);
-
-
-        public ReadWriteLock lock = new ReadWriteLock();
-
-        public NavigableMap<Integer, Synapse> inputSynapsesById = new TreeMap<>();
-        public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
-        public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
+    public static final Neuron MIN_NEURON = new Neuron(null, Integer.MIN_VALUE);
+    public static final Neuron MAX_NEURON = new Neuron(null, Integer.MAX_VALUE);
 
 
-        public Neuron(Model m, int id) {
-            super(m, id);
-        }
+    public ReadWriteLock lock = new ReadWriteLock();
 
-        public Neuron(Model m, INeuron n) {
-            super(m, n);
-        }
+    public NavigableMap<Integer, Synapse> inputSynapsesById = new TreeMap<>();
+    public NavigableMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
+    public NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
 
 
-        public String getLabel() {
-            return get().label;
-        }
+    public Neuron(Model m, int id) {
+        super(m, id);
+    }
 
 
-        public void setLabel(String label) {
-            get().label = label;
-        }
+    public Neuron(Model m, INeuron n) {
+        super(m, n);
+    }
+
+
+    public String getLabel() {
+        return get().label;
+    }
+
+
+    public void setLabel(String label) {
+        get().label = label;
+    }
 
 
         /**
@@ -165,6 +166,7 @@ import java.util.stream.Stream;
         return init(n, bias, null, type, synapseBuilders, relationBuilders);
     }
 
+
     public static Neuron init(Neuron n, double bias, INeuron.Type type, Collection<Neuron.Builder> inputs) {
         return init(n, bias, null, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
     }
@@ -257,7 +259,6 @@ import java.util.stream.Stream;
     }
 
 
-
     public Synapse getSynapseById(int synapseId) {
         return inputSynapsesById.get(synapseId);
     }
@@ -270,9 +271,9 @@ import java.util.stream.Stream;
      * @param doc The current document
      * @return A collection with all final activations of this neuron.
      */
-    public Collection<Activation> getActivations(Document doc, boolean onlyFinal) {
+    public Stream<Activation> getActivations(Document doc, boolean onlyFinal) {
         INeuron n = getIfNotSuspended();
-        if(n == null) return Collections.emptyList();
+        if(n == null) return Stream.empty();
         return n.getActivations(doc, onlyFinal);
     }
 
@@ -281,6 +282,14 @@ import java.util.stream.Stream;
         INeuron n = getIfNotSuspended();
         if(n == null) return null;
         return n.getActivations(doc, slot, pos, onlyFinal);
+    }
+
+
+    public Activation getActivation(Document doc, int begin, int end, boolean onlyFinal) {
+        return getActivations(doc, Activation.BEGIN, doc.lookupFinalPosition(begin), onlyFinal)
+                .filter(act -> act.getSlot(Activation.END).getFinalPosition() == end)
+                .findFirst()
+                .orElse(null);
     }
 
 
@@ -312,6 +321,7 @@ import java.util.stream.Stream;
         inMemoryOutputSynapses.remove(s);
         lock.releaseWriteLock();
     }
+
 
     public String toString() {
         if(this == MIN_NEURON) return "MIN_NEURON";
@@ -351,6 +361,7 @@ import java.util.stream.Stream;
         }
         return result;
     }
+
 
     private static Collection<Synapse.Builder> getSynapseBuilders(Builder... builders) {
         ArrayList<Synapse.Builder> result = new ArrayList<>();

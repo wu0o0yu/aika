@@ -471,17 +471,17 @@ public class Document implements Comparable<Document> {
         while(!queue.isEmpty()) {
             Position pos = queue.pollFirst();
 
-            for(Activation act: pos.beginActivations) {
-                if (act.getINeuron().outputText != null && act.isFinalActivation()) {
-                    String outText = act.getINeuron().outputText;
-                    Position nextPos = act.getSlot(Activation.END);
-                    nextPos.setFinalPosition(pos.getFinalPosition() + outText.length());
+            pos.getActivations(Activation.BEGIN)
+                    .filter(act -> act.getINeuron().outputText != null && act.isFinalActivation())
+                    .forEach(act -> {
+                        String outText = act.getINeuron().outputText;
+                        Position nextPos = act.getSlot(Activation.END);
+                        nextPos.setFinalPosition(pos.getFinalPosition() + outText.length());
 
-                    content.replace(act.getSlot(Activation.BEGIN).getFinalPosition(), act.getSlot(Activation.END).getFinalPosition(), outText);
+                        content.replace(act.getSlot(Activation.BEGIN).getFinalPosition(), act.getSlot(Activation.END).getFinalPosition(), outText);
 
-                    queue.add(nextPos);
-                }
-            }
+                        queue.add(nextPos);
+                    });
         }
         return content.substring(oldLength, length());
     }
@@ -680,7 +680,7 @@ public class Document implements Comparable<Document> {
 
     public void dumpOscillatingActivations() {
         activatedNeurons.stream()
-                .flatMap(n -> n.getActivations(this, false).stream())
+                .flatMap(n -> n.getActivations(this, false))
                 .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)
                 .forEach(act -> {
                     log.error(act.id + " " + act.slotsToString() + " " + act.decision + " " + act.rounds);

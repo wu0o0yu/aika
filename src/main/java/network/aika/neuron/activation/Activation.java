@@ -911,7 +911,13 @@ public final class Activation extends OrActivation {
     public String slotsToString() {
         StringBuilder sb = new StringBuilder();
         sb.append("(");
+        boolean first = true;
         for(Map.Entry<Integer, Position> me: slots.entrySet()) {
+            if(!first) {
+                sb.append(", ");
+            }
+            first = false;
+
             sb.append(me.getKey());
             sb.append(":");
             sb.append(me.getValue());

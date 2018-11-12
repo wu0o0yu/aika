@@ -4,14 +4,15 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.stream.Collectors;
+
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.EQUALS;
 
 public class PositiveFeedbackLoopTest {
 
@@ -41,11 +42,11 @@ public class PositiveFeedbackLoopTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(nD, 5.0, INeuron.Type.EXCITATORY,
@@ -63,11 +64,11 @@ public class PositiveFeedbackLoopTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -77,7 +78,7 @@ public class PositiveFeedbackLoopTest {
 
         doc.process();
 
-        Assert.assertFalse(nC.getActivations(doc, true).isEmpty());
-        Assert.assertFalse(nD.getActivations(doc, true).isEmpty());
+        Assert.assertFalse(nC.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
+        Assert.assertFalse(nD.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
     }
 }

@@ -106,9 +106,8 @@ public class Linker {
             for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
                 Relation rel = me.getValue();
                 if(me.getKey() == OUTPUT) {
-                    for (Activation iAct : rel.invert().getActivations(s.input.get(act.doc), act)) {
-                        link(s, iAct, act);
-                    }
+                    rel.invert().getActivations(s.input.get(act.doc), act)
+                            .forEach(iAct -> link(s, iAct, act));
                 }
             }
         }
@@ -152,9 +151,8 @@ public class Linker {
                 Synapse s = oAct.getNeuron().getSynapseById(relId);
                 if (s != null) {
                     if (rel.follow(rAct, oAct, relations)) {
-                        for (Activation iAct : rel.invert().getActivations(s.input.get(rAct.doc), rAct)) {
-                            link(s, iAct, oAct);
-                        }
+                        rel.invert().getActivations(s.input.get(rAct.doc), rAct)
+                                .forEach(iAct -> link(s, iAct, oAct));
                     }
                 }
             }

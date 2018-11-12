@@ -11,6 +11,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Stream;
 
 
 public class AncestorRelation extends Relation {
@@ -28,14 +29,17 @@ public class AncestorRelation extends Relation {
         EQUALS
     }
 
+
     AncestorRelation() {}
+
 
     public AncestorRelation(Type type) {
         this.type = type;
     }
 
+
     @Override
-    public Collection<Activation> getActivations(INeuron n, Activation linkedAct) {
+    public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
         List<Activation> results = new ArrayList<>();
         switch(type) {
             case COMMON_ANCESTOR:
@@ -51,7 +55,7 @@ public class AncestorRelation extends Relation {
                 collectEquals(results, n, linkedAct);
                 break;
         }
-        return results;
+        return results.stream();
     }
 
     @Override
@@ -188,7 +192,7 @@ public class AncestorRelation extends Relation {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeInt(getRelationType());
+        super.write(out);
 
         out.writeUTF(type.name());
     }

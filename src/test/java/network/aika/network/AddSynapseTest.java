@@ -22,15 +22,15 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.EQUALS;
 
 /**
  *
@@ -59,7 +59,7 @@ public class AddSynapseTest {
                     new Relation.Builder()
                             .setFrom(synId)
                             .setTo(OUTPUT)
-                            .setRangeRelation(EQUALS)
+                            .setRelation(EQUALS)
             );
         }
 
@@ -77,6 +77,6 @@ public class AddSynapseTest {
 
         doc.process();
 
-        Assert.assertEquals(4, n.getActivations(doc, true).size());
+        Assert.assertEquals(4, n.getActivations(doc, true).collect(Collectors.toList()).size());
     }
 }

@@ -13,6 +13,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.range.Position.Operator.*;
 
@@ -22,7 +23,7 @@ public class Position {
     public static final Position MAX = new Position(null, Integer.MAX_VALUE);
 
 
-    public SortedMap<Integer, Activation> activations = new TreeMap<>();
+    public SortedMap<ActKey, Activation> activations = new TreeMap<>();
 
 
     public Document doc;
@@ -62,23 +63,6 @@ public class Position {
     }
 
 
-
-    private boolean lessThan(Position pos, long v) {
-        if(visited == v) return false;
-        visited = v;
-
-        if(this == pos) return true;
-
-        for(Activation act: beginActivations) {
-            Position nextPos = act.range.end;
-
-            if(lessThan(nextPos, v)) return true;
-        }
-
-        return false;
-    }
-
-
     public Integer getDistance(Position pos) {
         if(finalPosition != null && pos.finalPosition != null) {
             return pos.finalPosition - finalPosition;
@@ -98,7 +82,14 @@ public class Position {
 
 
     public void addActivation(Integer slot, Activation act) {
-        activations.put(slot, act);
+        activations.put(new ActKey(slot, act.id), act);
+    }
+
+
+    public Stream<Activation> getActivations(int slot) {
+        return activations.subMap(new ActKey(slot, Integer.MIN_VALUE), new ActKey(slot, Integer.MAX_VALUE))
+                .values()
+                .stream();
     }
 
 
@@ -184,7 +175,25 @@ public class Position {
                 return this == EQUALS || this == LESS_THAN_EQUAL || this == GREATER_THAN_EQUAL;
             }
 
-            return lessThan(b, a.doc.visitedCounter++) && this == LESS_THAN;
+            return false;
+        }
+    }
+
+
+    public static class ActKey implements Comparable<ActKey> {
+        int slot;
+        int actId;
+
+        public ActKey(int slot, int actId) {
+            this.slot = slot;
+            this.actId = actId;
+        }
+
+        @Override
+        public int compareTo(ActKey ak) {
+            int r = Integer.compare(slot, ak.slot);
+            if(r != 0) return r;
+            return Integer.compare(actId, ak.actId);
         }
     }
 

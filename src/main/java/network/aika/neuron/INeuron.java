@@ -39,9 +39,9 @@ import java.util.stream.Stream;
  * (input act. value * synapse weight) of the input synapses, adding the bias to it and sending the resulting value
  * through a transfer function (the upper part of tanh).
  * <p>
- * <p>The neuron does not store its activations by itself. The activation objects are stored within the
- * logic nodes. To access the activations of this neuron simply use the member variable {@code node} or use
- * the method {@code getFinalActivations(Document doc)} to ge the final activations of this neuron.
+ * <p>The neuron does not store its activationsBySlotAndPosition by itself. The activation objects are stored within the
+ * logic nodes. To access the activationsBySlotAndPosition of this neuron simply use the member variable {@code node} or use
+ * the method {@code getFinalActivations(Document doc)} to ge the final activationsBySlotAndPosition of this neuron.
  *
  * @author Lukas Molzberger
  */
@@ -117,18 +117,20 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public ThreadState[] threads;
 
     /**
-     * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
+     * The {@code ThreadState} is a thread local data structure containing the activationsBySlotAndPosition of a single document for
      * a specific logic node.
      */
     public static class ThreadState {
         public long lastUsed;
 
-        private TreeMap<ActKey, Activation> activations;
+        private TreeMap<ActKey, Activation> activationsBySlotAndPosition;
+        private TreeMap<Integer, Activation> activations;
         public int minLength = Integer.MAX_VALUE;
         public int maxLength = 0;
 
 
         public ThreadState() {
+            activationsBySlotAndPosition = new TreeMap<>();
             activations = new TreeMap<>();
         }
 
@@ -136,18 +138,19 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         public void addActivation(Activation act) {
             for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
                 ActKey ak = new ActKey(me.getKey(), me.getValue(), act.id);
-                activations.put(ak, act);
+                activationsBySlotAndPosition.put(ak, act);
+                activations.put(act.id, act);
             }
         }
 
 
-        public Collection<Activation> getActivations() {
-            return activations.values();
+        public Stream<Activation> getActivations() {
+            return activations.values().stream();
         }
 
 
         public boolean isEmpty() {
-            return activations.isEmpty();
+            return activationsBySlotAndPosition.isEmpty();
         }
 
 
@@ -157,27 +160,26 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
 
         public void clearActivations() {
+            activationsBySlotAndPosition.clear();
             activations.clear();
         }
 
 
-        public Collection<Activation> getActivations(int fromSlot, Position fromPos, boolean fromInclusive, int toSlot, Position toPos, boolean toInclusive) {
-            return activations.subMap(
+        public Stream<Activation> getActivations(int fromSlot, Position fromPos, boolean fromInclusive, int toSlot, Position toPos, boolean toInclusive) {
+            return activationsBySlotAndPosition.subMap(
                     new INeuron.ActKey(fromSlot, fromPos, Integer.MIN_VALUE),
                     fromInclusive,
                     new INeuron.ActKey(toSlot, toPos, Integer.MAX_VALUE),
                     toInclusive
-            ).values();
+            ).values()
+                    .stream();
         }
 
 
-        public Collection<Activation> getActivations(boolean onlyFinal) {
+        public Stream<Activation> getActivations(boolean onlyFinal) {
             return onlyFinal ?
-                    activations
-                            .values()
-                            .stream()
-                            .filter(act -> act.isFinalActivation())
-                            .collect(Collectors.toList()) :
+                    getActivations()
+                            .filter(act -> act.isFinalActivation()) :
                     getActivations();
         }
 
@@ -186,7 +188,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             Position firstPos = slots.get(firstSlot);
 
             return getActivations(firstSlot, firstPos, true, firstSlot, firstPos, true)
-                    .stream()
                     .filter( act -> {
                         for(Map.Entry<Integer, Position> me: slots.entrySet()) {
                             Position pos = me.getValue();
@@ -281,7 +282,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         Integer firstSlot = input.positions.firstKey();
         Position firstPos = doc.lookupFinalPosition(input.positions.get(firstSlot));
         Activation act = null;
-        x: for(Activation a: getThreadState(doc.threadId, true).getActivations(firstSlot, firstPos, true, firstSlot, firstPos, true)) {
+        x: for(Activation a: getThreadState(doc.threadId, true).getActivations(firstSlot, firstPos, true, firstSlot, firstPos, true).collect(Collectors.toList())) {
             for(Map.Entry<Integer, Integer> me: input.positions.entrySet()) {
                 Position pos = a.getSlot(me.getKey());
                 if(pos == null || me.getValue().compareTo(pos.getFinalPosition()) != 0) {
@@ -368,9 +369,9 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-    public Collection<Activation> getActivations(Document doc, boolean onlyFinal) {
+    public Stream<Activation> getActivations(Document doc, boolean onlyFinal) {
         ThreadState th = getThreadState(doc.threadId, false);
-        if (th == null) return Collections.EMPTY_LIST;
+        if (th == null) return Stream.empty();
         return th.getActivations(onlyFinal);
     }
 
@@ -380,7 +381,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         if (th == null) return Stream.empty();
 
         return th.getActivations(slot, pos, true, slot, pos, false)
-                .stream()
                 .filter(act -> !onlyFinal || act.isFinalActivation());
     }
 

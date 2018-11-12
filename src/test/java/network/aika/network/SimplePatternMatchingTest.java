@@ -23,7 +23,6 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
@@ -31,11 +30,10 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.BEGIN_EQUALS;
-import static network.aika.neuron.range.Range.Relation.END_EQUALS;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.*;
 
 /**
  *
@@ -85,19 +83,19 @@ public class SimplePatternMatchingTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                        .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                        .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(BEGIN_EQUALS),
+                        .setRelation(BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_EQUALS)
+                        .setRelation(END_EQUALS)
         );
 
 
@@ -123,8 +121,8 @@ public class SimplePatternMatchingTest {
 
         System.out.println("Output activation:");
         INeuron n = pattern.get();
-        for(Activation act: n.getActivations(doc, false)) {
-            System.out.println("Text Range: " + act.range);
+        for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
+            System.out.println("Text Range: " + act.slotsToString());
             System.out.println("Node: " + act.node);
             System.out.println();
         }
@@ -186,23 +184,23 @@ public class SimplePatternMatchingTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                        .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                        .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(3)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                        .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(BEGIN_EQUALS),
+                        .setRelation(BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_EQUALS)
+                        .setRelation(END_EQUALS)
         );
 
 
@@ -223,13 +221,13 @@ public class SimplePatternMatchingTest {
         // Computes the best interpretation
         doc.process();
 
-        Assert.assertEquals(1, pattern.getActivations(doc, false).size());
+        Assert.assertEquals(1, pattern.getActivations(doc, false).collect(Collectors.toList()).size());
 
 
         System.out.println("Output activation:");
         INeuron n = pattern.get();
-        for(Activation act: n.getActivations(doc, false)) {
-            System.out.println("Text Range: " + act.range);
+        for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
+            System.out.println("Text Range: " + act.slotsToString());
             System.out.println("Node: " + act.node);
             System.out.println();
         }
@@ -277,23 +275,23 @@ public class SimplePatternMatchingTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(BEGIN_EQUALS),
+                        .setRelation(BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_EQUALS)
+                        .setRelation(END_EQUALS)
         );
 
 
@@ -311,8 +309,8 @@ public class SimplePatternMatchingTest {
 
         System.out.println("Output activation:");
         INeuron n = pattern.get();
-        for(Activation act: n.getActivations(doc, false)) {
-            System.out.println("Text Range: " + act.range);
+        for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
+            System.out.println("Text Range: " + act.slotsToString());
             System.out.println("Node: " + act.node);
             System.out.println();
         }
@@ -365,35 +363,35 @@ public class SimplePatternMatchingTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(3)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(3)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(3)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(BEGIN_EQUALS),
+                        .setRelation(BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_EQUALS)
+                        .setRelation(END_EQUALS)
         );
 
 
@@ -412,8 +410,8 @@ public class SimplePatternMatchingTest {
 
         System.out.println("Output activation:");
         INeuron n = pattern.get();
-        for(Activation act: n.getActivations(doc, false)) {
-            System.out.println("Text Range: " + act.range);
+        for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
+            System.out.println("Text Range: " + act.slotsToString());
             System.out.println("Node: " + act.node);
             System.out.println();
         }

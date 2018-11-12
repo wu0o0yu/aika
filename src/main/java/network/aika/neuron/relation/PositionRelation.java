@@ -9,11 +9,9 @@ import network.aika.neuron.range.Position;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.range.Position.Operator.*;
 import static network.aika.neuron.range.Position.Operator;
@@ -72,16 +70,23 @@ public class PositionRelation extends Relation {
         return RELATION_TYPE;
     }
 
+
     @Override
     public int compareTo(Relation rel) {
-        PositionRelation rr = (PositionRelation) rel;
+        PositionRelation pr = (PositionRelation) rel;
 
-        return relation.compareTo(rr.relation);
+        int r = Integer.compare(fromSlot, pr.fromSlot);
+        if(r != 0) return r;
+        r = Integer.compare(toSlot, pr.toSlot);
+        if(r != 0) return r;
+
+        return relation.compareTo(pr.relation);
     }
+
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeInt(getRelationType());
+        super.write(out);
 
         out.writeInt(fromSlot);
         out.writeInt(toSlot);
@@ -89,20 +94,22 @@ public class PositionRelation extends Relation {
         out.writeByte(relation.getId());
     }
 
+
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-
         fromSlot = in.readInt();
         toSlot = in.readInt();
 
         relation = Position.Operator.getById(in.readByte());
     }
 
+
     public static PositionRelation read(DataInput in, Model m) throws IOException {
         PositionRelation rr = new PositionRelation();
         rr.readFields(in, m);
         return rr;
     }
+
 
     @Override
     public boolean isExact() {
@@ -111,16 +118,16 @@ public class PositionRelation extends Relation {
 
 
     @Override
-    public Collection<Activation> getActivations(INeuron n, Activation linkedAct) {
+    public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
         INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
 
         if(th == null || th.isEmpty()) {
-            return Collections.EMPTY_LIST;
+            return Stream.empty();
         }
 
         Position pos = linkedAct.getSlot(toSlot);
 
-        Collection<Activation> results;
+        Stream<Activation> results;
         if(relation == Operator.EQUALS) {
             results = th.getActivations(
                     fromSlot, pos, true,
@@ -140,7 +147,8 @@ public class PositionRelation extends Relation {
             results = th.getActivations();
         }
 
-        return results.stream().filter(act -> test(act, linkedAct)).collect(Collectors.toList());
+        return results
+                .filter(act -> test(act, linkedAct));
     }
 
 

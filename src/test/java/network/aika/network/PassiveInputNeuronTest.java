@@ -6,13 +6,12 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.EQUALS;
 
 public class PassiveInputNeuronTest {
 
@@ -42,11 +41,11 @@ public class PassiveInputNeuronTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -55,7 +54,7 @@ public class PassiveInputNeuronTest {
                         .setRange(0, 1)
         );
 
-        Activation outAct = out.getActivation(doc, new Range(doc, 0, 1), false);
+        Activation outAct = out.getActivation(doc, 0, 1, false);
 
         System.out.println(doc.activationsToString(false, true, true));
 

@@ -4,14 +4,13 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.EQUALS;
 
 
 public class LinkerTest {
@@ -36,7 +35,7 @@ public class LinkerTest {
     }
 */
 
-    public void testSynapse(Range ra, Range rb, Range.Relation rr, boolean targetValue) {
+    public void testSynapse(int beginA, int endA, int beginB, int endB, Relation rr, boolean targetValue) {
         for (int dir = 0; dir < 2; dir++) {
             Model m = new Model();
 
@@ -59,20 +58,20 @@ public class LinkerTest {
                     new Relation.Builder()
                             .setFrom(1)
                             .setTo(0)
-                            .setRangeRelation(rr),
+                            .setRelation(rr),
                     new Relation.Builder()
                             .setFrom(1)
                             .setTo(OUTPUT)
-                            .setRangeRelation(EQUALS)
+                            .setRelation(EQUALS)
             );
 
             Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
             if (dir == 0) {
-                na.addInput(doc, ra.begin.getFinalPosition(), ra.end.getFinalPosition());
-                nb.addInput(doc, rb.begin.getFinalPosition(), rb.end.getFinalPosition());
+                na.addInput(doc, beginA, endA);
+                nb.addInput(doc, beginB, endB);
             } else {
-                nb.addInput(doc, rb.begin.getFinalPosition(), rb.end.getFinalPosition());
-                na.addInput(doc, ra.begin.getFinalPosition(), ra.end.getFinalPosition());
+                nb.addInput(doc, beginB, endB);
+                na.addInput(doc, beginA, endA);
             }
 
             doc.process();
@@ -99,7 +98,7 @@ public class LinkerTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Document doc = m.createDocument("X");

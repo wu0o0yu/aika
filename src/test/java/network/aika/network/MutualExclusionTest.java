@@ -22,14 +22,15 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.stream.Collectors;
+
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.EQUALS;
 
 
 /**
@@ -93,11 +94,11 @@ public class MutualExclusionTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron pB = Neuron.init(
@@ -120,11 +121,11 @@ public class MutualExclusionTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron pC = Neuron.init(
@@ -147,11 +148,11 @@ public class MutualExclusionTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         // Finally addInput all the inputs to the suppressing neuron.
@@ -181,15 +182,15 @@ public class MutualExclusionTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
@@ -205,7 +206,7 @@ public class MutualExclusionTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         // Now that the model is complete, apply it to a document.
@@ -223,11 +224,11 @@ public class MutualExclusionTest {
 
         System.out.println(doc.activationsToString(true, false, true));
 
-        Assert.assertTrue(pA.getActivations(doc, true).isEmpty());
-        Assert.assertFalse(pB.getActivations(doc, true).isEmpty());
-        Assert.assertTrue(pC.getActivations(doc, true).isEmpty());
+        Assert.assertTrue(pA.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
+        Assert.assertFalse(pB.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
+        Assert.assertTrue(pC.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
 
-        Assert.assertFalse(outN.getActivations(doc, true).isEmpty());
+        Assert.assertFalse(outN.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
         doc.clearActivations();
     }
 }

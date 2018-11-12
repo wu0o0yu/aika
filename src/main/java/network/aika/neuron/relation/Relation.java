@@ -10,8 +10,10 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.range.Position;
 
 import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.range.Position.Operator;
 import static network.aika.neuron.Synapse.OUTPUT;
@@ -80,12 +82,20 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public abstract void linksOutputs(Set<Integer> outputs);
 
+
+    public void write(DataOutput out) throws IOException {
+        out.writeInt(getRelationType());
+    }
+
+
     public static Relation read(DataInput in, Model m) throws IOException {
-        switch(in.readInt()) {
+        switch (in.readInt()) {
             case AncestorRelation.RELATION_TYPE:
                 return AncestorRelation.read(in, m);
             case PositionRelation.RELATION_TYPE:
                 return PositionRelation.read(in, m);
+            case MultiRelation.RELATION_TYPE:
+                return MultiRelation.read(in, m);
             default:
                 return null;
         }
@@ -94,7 +104,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public abstract boolean isExact();
 
 
-    public abstract Collection<Activation> getActivations(INeuron n, Activation linkedAct);
+    public abstract Stream<Activation> getActivations(INeuron n, Activation linkedAct);
 
 
     public boolean follow(Activation rAct, Activation oAct, Map<Integer, Relation> relations) {

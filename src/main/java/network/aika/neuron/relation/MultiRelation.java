@@ -10,12 +10,18 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Stream;
 
 
 public class MultiRelation extends Relation {
     public static final int RELATION_TYPE = 2;
 
     private List<Relation> relations;
+
+
+    public MultiRelation() {
+        relations = new ArrayList<>();
+    }
 
 
     public MultiRelation(List<Relation> rels) {
@@ -79,28 +85,70 @@ public class MultiRelation extends Relation {
 
 
     @Override
-    public Collection<Activation> getActivations(INeuron n, Activation linkedAct) {
-        return null;
+    public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+        if(relations.isEmpty()) {
+            INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
+            return th != null ? th.getActivations() : Stream.empty();
+        } else {
+            Relation firstRelation = relations.get(0);
+            return firstRelation
+                    .getActivations(n, linkedAct)
+                    .filter(act -> {
+                        for(Relation rel: relations) {
+                            if(!rel.test(act, linkedAct)) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    });
+        }
     }
 
 
     @Override
     public void registerRequiredSlots(Neuron input) {
-
+        for(Relation rel: relations) {
+            rel.registerRequiredSlots(input);
+        }
     }
+
 
     @Override
     public int compareTo(Relation rel) {
+        MultiRelation mr = (MultiRelation) rel;
+        int r = Integer.compare(relations.size(), mr.relations.size());
+        if(r != 0) return r;
+        for(int i = 0; i < relations.size(); i++) {
+            Relation a = relations.get(i);
+            Relation b = mr.relations.get(i);
+            r = Relation.COMPARATOR.compare(a, b);
+            if(r != 0) return r;
+        }
         return 0;
     }
 
     @Override
     public void write(DataOutput out) throws IOException {
+        super.write(out);
 
+        out.writeInt(relations.size());
+        for(Relation rel: relations) {
+            rel.write(out);
+        }
     }
+
+    public static MultiRelation read(DataInput in, Model m) throws IOException {
+        MultiRelation mr = new MultiRelation();
+        mr.readFields(in, m);
+        return mr;
+    }
+
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-
+        int l = in.readInt();
+        for(int i = 0; i < l; i++) {
+            relations.add(Relation.read(in, m));
+        }
     }
 }

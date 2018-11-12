@@ -6,13 +6,14 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.stream.Collectors;
+
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.EQUALS;
 import static network.aika.neuron.relation.AncestorRelation.Type.COMMON_ANCESTOR;
 import static network.aika.neuron.relation.AncestorRelation.Type.IS_ANCESTOR_OF;
 import static network.aika.neuron.relation.AncestorRelation.Type.NOT_ANCESTOR_OF;
@@ -39,7 +40,7 @@ public class AncestorRelationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron outC = Neuron.init(m.createNeuron("C"),
@@ -64,11 +65,11 @@ public class AncestorRelationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -76,7 +77,7 @@ public class AncestorRelationTest {
 
         inA.addInput(doc, 0, 1);
 
-        Activation outC1 = outC.getActivation(doc, new Range(doc, 0, 1), false);
+        Activation outC1 = outC.getActivation(doc, 0, 1, false);
 
         System.out.println(doc.activationsToString(false, false, true));
 
@@ -101,7 +102,7 @@ public class AncestorRelationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron nC = Neuron.init(m.createNeuron("C"), 5.0, INeuron.Type.EXCITATORY,
@@ -115,7 +116,7 @@ public class AncestorRelationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
@@ -140,7 +141,7 @@ public class AncestorRelationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -148,7 +149,7 @@ public class AncestorRelationTest {
 
         doc.process();
 
-        Assert.assertFalse(nD.getActivations(doc, true).isEmpty());
+        Assert.assertFalse(nD.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
     }
 
 
@@ -183,7 +184,7 @@ public class AncestorRelationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -192,7 +193,7 @@ public class AncestorRelationTest {
 
         doc.process();
 
-        Assert.assertTrue(nC.getActivations(doc, true).isEmpty());
+        Assert.assertTrue(nC.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
     }
 
 
@@ -216,7 +217,7 @@ public class AncestorRelationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron outC = Neuron.init(m.createNeuron("C"),
@@ -241,11 +242,11 @@ public class AncestorRelationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -253,7 +254,7 @@ public class AncestorRelationTest {
 
         inA.addInput(doc, 0, 1);
 
-        Activation outC1 = outC.getActivation(doc, new Range(doc, 0, 1), false);
+        Activation outC1 = outC.getActivation(doc, 0, 1, false);
 
         System.out.println(doc.activationsToString(false, false, true));
 

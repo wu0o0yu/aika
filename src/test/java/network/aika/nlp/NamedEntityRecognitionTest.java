@@ -24,15 +24,15 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.*;
+import static network.aika.neuron.relation.Relation.*;
 
 /**
  *
@@ -89,7 +89,7 @@ public class NamedEntityRecognitionTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
 
                 // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
                 // self suppression taking place even though 'E-cook (surname)' is also contained
@@ -103,11 +103,11 @@ public class NamedEntityRecognitionTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                        .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.OVERLAPS)
+                        .setRelation(OVERLAPS)
         );
 
         Neuron cookProfessionEntity = Neuron.init(
@@ -129,11 +129,11 @@ public class NamedEntityRecognitionTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.OVERLAPS),
+                        .setRelation(OVERLAPS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron jacksonForenameEntity = Neuron.init(
@@ -161,15 +161,15 @@ public class NamedEntityRecognitionTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.BEGIN_TO_END_EQUALS),
+                        .setRelation(BEGIN_TO_END_EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.OVERLAPS),
+                        .setRelation(OVERLAPS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron jacksonCityEntity = Neuron.init(
@@ -192,11 +192,11 @@ public class NamedEntityRecognitionTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.OVERLAPS),
+                        .setRelation(OVERLAPS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(
@@ -212,7 +212,7 @@ public class NamedEntityRecognitionTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
         Neuron.init(
                 surnameCategory,
@@ -227,7 +227,7 @@ public class NamedEntityRecognitionTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(
@@ -257,19 +257,19 @@ public class NamedEntityRecognitionTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -292,14 +292,14 @@ public class NamedEntityRecognitionTest {
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");
-        for(Activation act: surnameCategory.getActivations(doc, true)) {
-            System.out.print(act.range + " ");
+        for(Activation act: surnameCategory.getActivations(doc, true).collect(Collectors.toList())) {
+            System.out.print(act.slotsToString() + " ");
             System.out.print(act.getLabel() + " ");
             System.out.print(act.getFinalState().value);
         }
 
-        Assert.assertFalse(jacksonForenameEntity.getActivations(doc, true).isEmpty());
-        Assert.assertFalse(cookSurnameEntity.getActivations(doc, true).isEmpty());
+        Assert.assertFalse(jacksonForenameEntity.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
+        Assert.assertFalse(cookSurnameEntity.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
 
         doc.clearActivations();
     }

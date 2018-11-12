@@ -21,7 +21,6 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.SearchNode;
 import network.aika.neuron.relation.Relation;
@@ -29,8 +28,10 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.stream.Collectors;
+
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.*;
+import static network.aika.neuron.relation.Relation.*;
 
 /**
  *
@@ -68,11 +69,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
         Neuron.init(eZimmermannCompany, 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
@@ -89,11 +90,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(eJoergForename, 6.0, INeuron.Type.EXCITATORY,
@@ -117,15 +118,15 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                        .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(eZimmermannSurname, 6.0, INeuron.Type.EXCITATORY,
@@ -149,15 +150,15 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.BEGIN_TO_END_EQUALS),
+                        .setRelation(BEGIN_TO_END_EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -185,19 +186,19 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Document doc = m.createDocument("Joerg Zimmermann");
@@ -209,8 +210,8 @@ public class InterpretationSearchTest {
 
         System.out.println(doc.activationsToString());
 
-        Assert.assertTrue(eZimmermannCompany.getActivations(doc, true).isEmpty());
-        Assert.assertFalse(eZimmermannSurname.getActivations(doc, true).isEmpty());
+        Assert.assertTrue(eZimmermannCompany.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
+        Assert.assertFalse(eZimmermannSurname.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
 
         doc.clearActivations();
 
@@ -225,8 +226,8 @@ public class InterpretationSearchTest {
 
         System.out.println(doc.activationsToString());
 
-        Assert.assertEquals(0, eZimmermannCompany.getActivations(doc, true).size());
-        Assert.assertEquals(2, eZimmermannSurname.getActivations(doc, true).size());
+        Assert.assertEquals(0, eZimmermannCompany.getActivations(doc, true).collect(Collectors.toList()).size());
+        Assert.assertEquals(2, eZimmermannSurname.getActivations(doc, true).collect(Collectors.toList()).size());
 
         doc.clearActivations();
     }
@@ -258,11 +259,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
@@ -285,15 +286,15 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(NONE),
+                        .setRelation(NONE),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron nE = Neuron.init(m.createNeuron("E"), 5.0, INeuron.Type.EXCITATORY,
@@ -311,11 +312,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(nF, 6.0, INeuron.Type.EXCITATORY,
@@ -333,11 +334,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -365,19 +366,19 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -390,7 +391,7 @@ public class InterpretationSearchTest {
 
         System.out.println(doc.activationsToString(true, true, true));
 
-        Assert.assertFalse(nD.getActivations(doc, true).isEmpty());
+        Assert.assertFalse(nD.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
     }
 
 
@@ -425,11 +426,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
@@ -447,11 +448,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(inhib,
@@ -463,7 +464,7 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(inhib,
@@ -475,7 +476,7 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -504,7 +505,7 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(NONE)
+                        .setRelation(NONE)
         );
 
         Neuron.init(doc, nE, 5.0, INeuron.Type.EXCITATORY,
@@ -522,11 +523,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(doc, nF, 6.0, INeuron.Type.EXCITATORY,
@@ -544,11 +545,11 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(
@@ -562,7 +563,7 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(
@@ -576,7 +577,7 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         inA.addInput(doc, 0, 5);
@@ -587,7 +588,7 @@ public class InterpretationSearchTest {
 
         System.out.println(doc.activationsToString(true, true, true));
 
-        Assert.assertFalse(nD.getActivations(doc, true).isEmpty());
+        Assert.assertFalse(nD.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
     }
 
 
@@ -610,7 +611,7 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(out, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
@@ -633,19 +634,19 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(BEGIN_TO_END_EQUALS),
+                        .setRelation(BEGIN_TO_END_EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(Synapse.OUTPUT)
-                        .setRangeRelation(OVERLAPS),
+                        .setRelation(OVERLAPS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(BEGIN_EQUALS),
+                        .setRelation(BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_EQUALS)
+                        .setRelation(END_EQUALS)
         );
 
 
