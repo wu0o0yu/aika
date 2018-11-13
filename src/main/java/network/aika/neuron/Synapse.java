@@ -59,6 +59,10 @@ public class Synapse implements Writable {
     public static final int OUTPUT = -1;
     public static final int VARIABLE = -2;
 
+    public static double DISJUNCTION_THRESHOLD = 0.6;
+    public static double CONJUNCTION_THRESHOLD = 0.4;
+
+
     public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = (s1, s2) -> {
         int r = s1.input.compareTo(s2.input);
         if (r != 0) return r;
@@ -113,11 +117,9 @@ public class Synapse implements Writable {
 
     public boolean toBeDeleted;
 
-    /**
-     * The synapse is stored either in the input neuron or the output neuron
-     * depending on whether it is a conjunctive or disjunctive synapse.
-     */
+
     public boolean isConjunction;
+    public boolean isDisjunction;
 
     public int createdInDoc;
     public int committedInDoc;
@@ -158,13 +160,15 @@ public class Synapse implements Writable {
 
         removeLinkInternal(in, out);
 
-        if(isConjunction(true, false)) {
+        isConjunction = isConjunction(State.NEW);
+        if(isConjunction) {
             out.inputSynapses.put(this, this);
-            isConjunction = true;
             out.setModified();
-        } else {
+        }
+
+        isDisjunction = isDisjunction(State.NEW);
+        if(isDisjunction){
             in.outputSynapses.put(this, this);
-            isConjunction = false;
             in.setModified();
         }
 
@@ -180,7 +184,7 @@ public class Synapse implements Writable {
 
 
     public void relink() {
-        boolean newIsConjunction = isConjunction(true, false);
+        boolean newIsConjunction = isConjunction(State.NEW);
         if(newIsConjunction != isConjunction) {
             INeuron in = input.get();
             INeuron out = output.get();
@@ -189,13 +193,34 @@ public class Synapse implements Writable {
             (dir ? in : out).lock.acquireWriteLock();
             (dir ? out : in).lock.acquireWriteLock();
 
-            if (newIsConjunction) {
+            isConjunction = newIsConjunction;
+            if (isConjunction) {
                 out.inputSynapses.put(this, this);
-                isConjunction = true;
                 out.setModified();
             } else {
+                out.inputSynapses.remove(this);
+                out.setModified();
+            }
+
+            (dir ? in : out).lock.releaseWriteLock();
+            (dir ? out : in).lock.releaseWriteLock();
+        }
+
+        boolean newIsDisjunction = isConjunction(State.NEW);
+        if(newIsDisjunction != isDisjunction) {
+            INeuron in = input.get();
+            INeuron out = output.get();
+
+            boolean dir = in.provider.id < out.provider.id;
+            (dir ? in : out).lock.acquireWriteLock();
+            (dir ? out : in).lock.acquireWriteLock();
+
+            isDisjunction = newIsDisjunction;
+            if (isDisjunction) {
                 in.outputSynapses.put(this, this);
-                isConjunction = false;
+                in.setModified();
+            } else {
+                in.outputSynapses.remove(this);
                 in.setModified();
             }
 
@@ -231,15 +256,14 @@ public class Synapse implements Writable {
 
 
     private void removeLinkInternal(INeuron in, INeuron out) {
-        if(isConjunction(false, false)) {
+        if(isConjunction(State.OLD)) {
             if(out.inputSynapses.remove(this) != null) {
                 out.setModified();
-                out.synapseIdCounter--;
             }
-        } else {
+        }
+        if(isDisjunction(State.OLD)) {
             if(in.outputSynapses.remove(this) != null) {
                 in.setModified();
-                out.synapseIdCounter--;
             }
         }
     }
@@ -257,15 +281,23 @@ public class Synapse implements Writable {
     }
 
 
-    /**
-     *
-     * @param v
-     * @param absolute if true, a disjunctive synapse needs to be able to activate the neuron by itself.
-     * @return
-     */
-    public boolean isConjunction(boolean v, boolean absolute) {
-        INeuron out = output.get();
-        return (v ? (limit + limitDelta) * getNewWeight() : limit * weight) + (absolute ? 0.0 : out.requiredSum) + (v ? out.getNewBiasSum() : out.biasSum) <= 0.0;
+    public enum State {
+        NEW,
+        OLD
+    }
+
+
+    public boolean isConjunction(State state) {
+        double w = state == State.NEW ? (limit + limitDelta) * getNewWeight() : limit * weight;
+        double b = state == State.NEW ? bias + biasDelta : bias;
+        return w > 0.0 && (-b / w) >= CONJUNCTION_THRESHOLD;
+    }
+
+
+    public boolean isDisjunction(State state) {
+        double w = state == State.NEW ? (limit + limitDelta) * getNewWeight() : limit * weight;
+        double b = state == State.NEW ? bias + biasDelta : bias;
+        return w > 0.0 && (-b / w) <= DISJUNCTION_THRESHOLD;
     }
 
 
@@ -340,6 +372,7 @@ public class Synapse implements Writable {
         out.writeDouble(limit);
 
         out.writeBoolean(isConjunction);
+        out.writeBoolean(isDisjunction);
 
         out.writeBoolean(extension != null);
         if(extension != null) {
@@ -379,6 +412,7 @@ public class Synapse implements Writable {
         limit = in.readDouble();
 
         isConjunction = in.readBoolean();
+        isDisjunction = in.readBoolean();
 
         if(in.readBoolean()) {
             extension = m.getSynapseExtensionFactory().createObject();

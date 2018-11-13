@@ -232,9 +232,9 @@ public class Converter {
                         posPassiveSumDelta += s.getNewWeight() > 0.0 ? ((s.limit + s.limitDelta) * s.getNewWeight()) : 0.0;
                     }
 
-                    if (s.isConjunction(true, true) && !s.isConjunction(false, true)) {
+                    if (s.isDisjunction(Synapse.State.OLD) && !s.isDisjunction(Synapse.State.NEW)) {
                         neuron.numDisjunctiveSynapses++;
-                    } else if (s.isConjunction(false, true) && !s.isConjunction(true, true)) {
+                    } else if (s.isDisjunction(Synapse.State.NEW) && !s.isConjunction(Synapse.State.OLD)) {
                         neuron.numDisjunctiveSynapses--;
                     }
                 }
