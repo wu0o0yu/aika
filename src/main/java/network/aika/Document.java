@@ -463,7 +463,7 @@ public class Document implements Comparable<Document> {
         TreeSet<Position> queue = new TreeSet<>(Comparator.comparingInt(p -> p.id));
 
         for(Activation act: activationsById.values()) {
-            if(act.getINeuron().outputText != null && act.getSlot(Activation.BEGIN).getFinalPosition() != null && act.getSlot(Activation.END).getFinalPosition() == null) {
+            if(act.getINeuron().getOutputText() != null && act.getSlot(Activation.BEGIN).getFinalPosition() != null && act.getSlot(Activation.END).getFinalPosition() == null) {
                 queue.add(act.getSlot(Activation.BEGIN));
             }
         }
@@ -472,9 +472,9 @@ public class Document implements Comparable<Document> {
             Position pos = queue.pollFirst();
 
             pos.getActivations(Activation.BEGIN)
-                    .filter(act -> act.getINeuron().outputText != null && act.isFinalActivation())
+                    .filter(act -> act.getINeuron().getOutputText() != null && act.isFinalActivation())
                     .forEach(act -> {
-                        String outText = act.getINeuron().outputText;
+                        String outText = act.getINeuron().getOutputText();
                         Position nextPos = act.getSlot(Activation.END);
                         nextPos.setFinalPosition(pos.getFinalPosition() + outText.length());
 

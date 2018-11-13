@@ -858,8 +858,8 @@ public final class Activation extends OrActivation {
 
         if(withTextSnippet) {
             sb.append(" \"");
-            if(node.neuron.get().outputText != null) {
-                sb.append(Utils.collapseText(node.neuron.get().outputText, 7));
+            if(node.neuron.get().getOutputText() != null) {
+                sb.append(Utils.collapseText(node.neuron.get().getOutputText(), 7));
             } else {
                 sb.append(Utils.collapseText(doc.getText(getSlot(BEGIN), getSlot(END)), 7));
             }

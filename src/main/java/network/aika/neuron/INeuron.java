@@ -64,7 +64,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-    public String outputText;
+    private String outputText;
 
     public volatile double bias;
     public volatile double biasDelta;
@@ -254,7 +254,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     public INeuron(Model m, String label, String outputText) {
         this.label = label;
-        this.outputText = outputText;
+        setOutputText(outputText);
 
         if(m.getNeuronExtensionFactory() != null) {
             extension = m.getNeuronExtensionFactory().createObject();
@@ -270,6 +270,18 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         this.node = node.provider;
 
         setModified();
+    }
+
+
+    public void setOutputText(String outputText) {
+        this.outputText = outputText;
+        slotRequired.add(Activation.BEGIN);
+        slotRequired.add(Activation.END);
+    }
+
+
+    public String getOutputText() {
+        return outputText;
     }
 
     /**
