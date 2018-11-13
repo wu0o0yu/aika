@@ -280,7 +280,7 @@ public class Neuron extends Provider<INeuron> {
 
     public Stream<Activation> getActivations(Document doc, int slot, Position pos, boolean onlyFinal) {
         INeuron n = getIfNotSuspended();
-        if(n == null) return null;
+        if(n == null) return Stream.empty();
         return n.getActivations(doc, slot, pos, onlyFinal);
     }
 
