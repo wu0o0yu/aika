@@ -234,7 +234,7 @@ public class Converter {
 
                     if (!s.isDisjunction(Synapse.State.OLD) && s.isDisjunction(Synapse.State.NEW)) {
                         neuron.numDisjunctiveSynapses++;
-                    } else if (s.isDisjunction(Synapse.State.OLD) && !s.isConjunction(Synapse.State.NEW)) {
+                    } else if (s.isDisjunction(Synapse.State.OLD) && !s.isDisjunction(Synapse.State.NEW)) {
                         neuron.numDisjunctiveSynapses--;
                     }
                 }
