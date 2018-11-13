@@ -265,7 +265,7 @@ public class InterpretationSearchTest {
                         .setRangeRelation(EQUALS)
         );
 
-        Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
+        Neuron nD = Neuron.init(m.createNeuron("D"), 7.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -275,7 +275,7 @@ public class InterpretationSearchTest {
                         .setSynapseId(1)
                         .setNeuron(nF)
                         .setWeight(2.0)
-                        .setBias(0.0),
+                        .setBias(-2.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inhib)
