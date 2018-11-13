@@ -63,7 +63,7 @@ public class OverlappingOrTest {
         // relative or absolute.
         Neuron pattern = Neuron.init(
                 m.createNeuron("BCD"),
-                2.0,
+                3.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
@@ -76,7 +76,7 @@ public class OverlappingOrTest {
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0)
                         .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(-1.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inputNeurons.get('d'))

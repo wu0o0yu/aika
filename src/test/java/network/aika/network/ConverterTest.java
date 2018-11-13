@@ -47,32 +47,32 @@ public class ConverterTest {
         Neuron inD = m.createNeuron("D");
 
         Neuron out = Neuron.init(m.createNeuron("ABCD"),
-                -9.5,
+                0.5,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(4.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(-4.0)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(3.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(-3.0)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(2.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(-2.0)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inD)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(-1.0)
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -106,7 +106,7 @@ public class ConverterTest {
         System.out.println(out.get().node.get().logicToString());
         Assert.assertEquals(1, out.get().node.get().andParents.size());
 
-        out.get().setBias(-8.5);
+        out.get().setBias(1.5);
         Converter.convert(0, null, out.get(), out.get().inputSynapses.values());
 
         System.out.println(out.get().node.get().logicToString());
@@ -131,26 +131,26 @@ public class ConverterTest {
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(0.0)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(0.0)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(0.0)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inD)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(0.0)
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -197,38 +197,38 @@ public class ConverterTest {
         Neuron inE = m.createNeuron("E");
 
         Neuron out = Neuron.init(m.createNeuron("ABCD"),
-                -11.0,
+                3.5,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(5.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(-5.0)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(5.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(-5.0)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(2.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(-2.0)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inD)
                         .setWeight(2.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(-2.0)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(4)
                         .setNeuron(inE)
-                        .setWeight(0.5f)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setWeight(0.5)
+                        .setBias(-0.5)
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -291,32 +291,32 @@ public class ConverterTest {
         Neuron inD = m.createNeuron("D");
 
         Neuron out = Neuron.init(m.createNeuron("ABCD"),
-                -50.5,
+                5.5,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(50.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(-50.0)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(3.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(-3.0)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(2.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(-2.0)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inD)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setBias(-1.0)
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
