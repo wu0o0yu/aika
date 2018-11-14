@@ -4,7 +4,7 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.range.Position;
+import network.aika.neuron.activation.Position;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.range.Position.Operator.*;
-import static network.aika.neuron.range.Position.Operator;
+import static network.aika.neuron.activation.Position.Operator.*;
+import static network.aika.neuron.activation.Position.Operator;
 
 
 public class PositionRelation extends Relation {

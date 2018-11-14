@@ -17,12 +17,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Position.Operator.NONE;
+import static network.aika.neuron.activation.Position.Operator.NONE;
 import static network.aika.neuron.relation.Relation.*;
 import static network.aika.neuron.relation.Relation.EQUALS;
-import static network.aika.neuron.relation.AncestorRelation.Type.COMMON_ANCESTOR;
-import static network.aika.neuron.relation.AncestorRelation.Type.IS_ANCESTOR_OF;
-import static network.aika.neuron.range.Position.Operator.*;
+import static network.aika.neuron.activation.Position.Operator.*;
 
 
 public class PositionRelationTest {

@@ -1,21 +1,11 @@
-package network.aika.neuron.range;
+package network.aika.neuron.activation;
 
 
 import network.aika.Document;
-import network.aika.Model;
-import network.aika.Writable;
-import network.aika.neuron.activation.Activation;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.stream.Stream;
-
-import static network.aika.neuron.range.Position.Operator.*;
 
 public class Position {
 

@@ -7,7 +7,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.range.Position;
+import network.aika.neuron.activation.Position;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.range.Position.Operator;
+import static network.aika.neuron.activation.Position.Operator;
 import static network.aika.neuron.Synapse.OUTPUT;
 
 
