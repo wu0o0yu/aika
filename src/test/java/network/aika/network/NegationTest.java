@@ -22,14 +22,14 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.range.Position;
+import network.aika.neuron.activation.Position;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Position.Operator.GREATER_THAN;
+import static network.aika.neuron.activation.Position.Operator.GREATER_THAN;
 import static network.aika.neuron.relation.Relation.*;
 
 /**

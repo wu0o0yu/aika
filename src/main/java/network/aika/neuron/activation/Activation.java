@@ -10,7 +10,6 @@ import network.aika.neuron.INeuron.Type;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.SearchNode.Decision;
-import network.aika.neuron.range.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

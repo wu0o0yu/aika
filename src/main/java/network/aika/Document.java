@@ -24,7 +24,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.Candidate;
-import network.aika.neuron.range.Position;
+import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.SearchNode;
 import network.aika.lattice.Node.ThreadState;
 import network.aika.neuron.activation.*;

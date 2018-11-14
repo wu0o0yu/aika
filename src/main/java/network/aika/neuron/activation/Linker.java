@@ -19,7 +19,6 @@ package network.aika.neuron.activation;
 import network.aika.Document;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.range.Position;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation.Link;
@@ -27,7 +26,6 @@ import network.aika.neuron.activation.Activation.Link;
 import java.util.*;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.Synapse.VARIABLE;
 import static network.aika.neuron.activation.SearchNode.Decision;
 
 /**

@@ -1,8 +1,5 @@
 package network.aika.neuron.activation;
 
-import network.aika.neuron.activation.Activation.Link;
-import network.aika.neuron.range.Position;
-
 import java.util.Iterator;
 import java.util.Map;
 
