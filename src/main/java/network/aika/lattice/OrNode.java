@@ -26,7 +26,6 @@ import network.aika.neuron.activation.Linker;
 import network.aika.neuron.range.Position;
 import network.aika.PatternDiscovery;
 import network.aika.Document;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,47 +68,38 @@ public class OrNode extends Node<OrNode, Activation> {
     public void addInputActivation(OrEntry oe, NodeActivation inputAct) {
         Document doc = inputAct.doc;
 
-        Position begin = null;
-        Position end = null;
+        SortedMap<Integer, Position> slots = new TreeMap<>();
 
         INeuron n = neuron.get(inputAct.doc);
         for(int i = 0; i < oe.synapseIds.length; i++) {
             int synapseId = oe.synapseIds[i];
 
             Synapse s = neuron.getSynapseById(synapseId);
-            for(Map.Entry<Integer, Set<Relation>> me: s.relations.entrySet()) {
+            for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+                Relation rel = me.getValue();
                 if(me.getKey() == Synapse.OUTPUT) {
                     Activation iAct = inputAct.getInputActivation(i);
-                    for(Relation rel: me.getValue()) {
-                        Range r = rel.invert().mapRange(iAct, Linker.Direction.OUTPUT);
-
-                        if(r != null) {
-                            if (r.begin != null) begin = r.begin;
-                            if (r.end != null) end = r.end;
-                        }
-                    }
+                    rel.mapRange(slots, iAct);
                 }
             }
         }
 
-        if(begin == null && n.createBeginPosition) {
-            begin = new Position(doc);
+        for(Integer slot : n.slotRequired) {
+            if (!slots.containsKey(slot)) {
+                if (!n.slotHasInputs.contains(slot)) {
+                    slots.put(slot, new Position(doc));
+                } else {
+                    return;
+                }
+            }
         }
 
-        if(end == null && n.createEndPosition) {
-            end = new Position(doc);
-        }
-
-        if(begin == null || end == null) {
-            return;
-        }
-
-        Range r = new Range(begin, end);
-
-        Activation act = lookupActivation(doc, r, oe, inputAct);
+        Activation act = lookupActivation(doc, slots, oe, inputAct);
 
         if(act == null) {
-            act = new Activation(doc.activationIdCounter++, doc, r, this);
+            act = new Activation(doc.activationIdCounter++, doc, this);
+            act.setSlots(slots);
+
             processActivation(act);
         } else {
             propagate(act);
@@ -119,15 +109,11 @@ public class OrNode extends Node<OrNode, Activation> {
         act.doc.linker.link(act, ol);
     }
 
-
-    private Activation lookupActivation(Document doc, Range r, OrEntry oe, NodeActivation inputAct) {
+    private Activation lookupActivation(Document doc, SortedMap<Integer, Position> slots, OrEntry oe, NodeActivation inputAct) {
         x: for(Activation act: neuron.get(doc)
                 .getThreadState(doc.threadId, true)
-                .getActivationsByRangeBegin(r.begin, true, r.begin, false)
+                .getActivations(slots)
                 ) {
-            if(!act.range.equals(r)) {
-                continue;
-            }
 
             Synapse ls = null;
             boolean matched = false;

@@ -21,7 +21,6 @@ import network.aika.*;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.range.Position;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.activation.SearchNode;
 import network.aika.lattice.InputNode;
 import network.aika.neuron.relation.Relation;
@@ -31,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -39,9 +39,9 @@ import java.util.stream.Collectors;
  * (input act. value * synapse weight) of the input synapses, adding the bias to it and sending the resulting value
  * through a transfer function (the upper part of tanh).
  * <p>
- * <p>The neuron does not store its activations by itself. The activation objects are stored within the
- * logic nodes. To access the activations of this neuron simply use the member variable {@code node} or use
- * the method {@code getFinalActivations(Document doc)} to ge the final activations of this neuron.
+ * <p>The neuron does not store its activationsBySlotAndPosition by itself. The activation objects are stored within the
+ * logic nodes. To access the activationsBySlotAndPosition of this neuron simply use the member variable {@code node} or use
+ * the method {@code getFinalActivations(Document doc)} to ge the final activationsBySlotAndPosition of this neuron.
  *
  * @author Lukas Molzberger
  */
@@ -64,7 +64,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-    public String outputText;
+    private String outputText;
 
     public volatile double bias;
     public volatile double biasDelta;
@@ -83,8 +83,8 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     public volatile int numDisjunctiveSynapses = 0;
 
-    public boolean createBeginPosition = true;
-    public boolean createEndPosition = true;
+    public Set<Integer> slotHasInputs = new TreeSet<>();
+    public Set<Integer> slotRequired = new TreeSet<>();
 
     public Writable extension;
 
@@ -95,7 +95,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
 
     // synapseId -> relation
-    public Map<Integer, Set<Relation>> outputRelations;
+    public Map<Integer, Relation> outputRelations;
 
 
     // A synapse is stored only in one direction, depending on the synapse weight.
@@ -117,40 +117,40 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public ThreadState[] threads;
 
     /**
-     * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
+     * The {@code ThreadState} is a thread local data structure containing the activationsBySlotAndPosition of a single document for
      * a specific logic node.
      */
     public static class ThreadState {
         public long lastUsed;
 
-        private TreeMap<ActKey, Activation> activations;
-        private TreeMap<ActKey, Activation> activationsEnd;
+        private TreeMap<ActKey, Activation> activationsBySlotAndPosition;
+        private TreeMap<Integer, Activation> activations;
         public int minLength = Integer.MAX_VALUE;
         public int maxLength = 0;
 
 
         public ThreadState() {
-            activations = new TreeMap<>(BEGIN_COMP);
-            activationsEnd = new TreeMap<>(END_COMP);
+            activationsBySlotAndPosition = new TreeMap<>();
+            activations = new TreeMap<>();
         }
 
 
         public void addActivation(Activation act) {
-            ActKey ak = new ActKey(act.range, act.id);
-            activations.put(ak, act);
-
-            TreeMap<ActKey, Activation> actEnd = activationsEnd;
-            if (actEnd != null) actEnd.put(ak, act);
+            for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
+                ActKey ak = new ActKey(me.getKey(), me.getValue(), act.id);
+                activationsBySlotAndPosition.put(ak, act);
+                activations.put(act.id, act);
+            }
         }
 
 
-        public Collection<Activation> getActivations() {
-            return activations.values();
+        public Stream<Activation> getActivations() {
+            return activations.values().stream();
         }
 
 
         public boolean isEmpty() {
-            return activations.isEmpty();
+            return activationsBySlotAndPosition.isEmpty();
         }
 
 
@@ -160,103 +160,66 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
 
         public void clearActivations() {
+            activationsBySlotAndPosition.clear();
             activations.clear();
-
-            if (activationsEnd != null) activationsEnd.clear();
         }
 
 
-        public Collection<Activation> getActivationsByRangeBeginLimited(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
-            if(fromKey.getFinalPosition() != null && toKey.getFinalPosition() != null) {
-                if(fromKey != Position.MIN) {
-                    fromKey = new Position(fromKey.doc, fromKey.getFinalPosition() - maxLength);
-                }
-
-                if (fromKey.compare(Position.Operator.GREATER_THAN, toKey)) return Collections.EMPTY_LIST;
-
-                return getActivationsByRangeBegin(fromKey, fromInclusive, toKey, toInclusive);
-            } else {
-                return Collections.EMPTY_LIST; // TODO:
-            }
-        }
-
-        public Collection<Activation> getActivationsByRangeEndLimited(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
-            if(fromKey.getFinalPosition() != null && toKey.getFinalPosition() != null) {
-                if(fromKey != Position.MIN) {
-                    fromKey = new Position(fromKey.doc, fromKey.getFinalPosition() - maxLength);
-                }
-                if (fromKey.compare(Position.Operator.GREATER_THAN, toKey)) return Collections.EMPTY_LIST;
-
-                return getActivationsByRangeEnd(fromKey, fromInclusive, toKey, toInclusive);
-            } else {
-                return Collections.EMPTY_LIST; // TODO:
-            }
-        }
-
-
-        public Collection<Activation> getActivationsByRangeBegin(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
-            return activations.subMap(
-                    new INeuron.ActKey(new Range(fromKey, Position.MIN), Integer.MIN_VALUE),
+        public Stream<Activation> getActivations(int fromSlot, Position fromPos, boolean fromInclusive, int toSlot, Position toPos, boolean toInclusive) {
+            return activationsBySlotAndPosition.subMap(
+                    new INeuron.ActKey(fromSlot, fromPos, Integer.MIN_VALUE),
                     fromInclusive,
-                    new INeuron.ActKey(new Range(toKey, Position.MAX), Integer.MAX_VALUE),
+                    new INeuron.ActKey(toSlot, toPos, Integer.MAX_VALUE),
                     toInclusive
-            ).values();
+            ).values()
+                    .stream();
         }
 
 
-        public Collection<Activation> getActivationsByRangeEnd(Position fromKey, boolean fromInclusive, Position toKey, boolean toInclusive) {
-            return activationsEnd.subMap(
-                    new INeuron.ActKey(new Range(Position.MIN, fromKey), Integer.MIN_VALUE),
-                    fromInclusive,
-                    new INeuron.ActKey(new Range(Position.MAX, toKey), Integer.MAX_VALUE),
-                    toInclusive
-            ).values();
-        }
-
-
-        public Activation getActivationByRange(Range r) {
-            Map.Entry<ActKey, Activation> me = activations.higherEntry(new ActKey(r, Integer.MIN_VALUE));
-
-            if(me != null && me.getValue().range.equals(r)) {
-                return me.getValue();
-            }
-            return null;
-        }
-
-
-        public Collection<Activation> getActivations(boolean onlyFinal) {
+        public Stream<Activation> getActivations(boolean onlyFinal) {
             return onlyFinal ?
-                    activations
-                            .values()
-                            .stream()
-                            .filter(act -> act.isFinalActivation())
-                            .collect(Collectors.toList()) :
+                    getActivations()
+                            .filter(act -> act.isFinalActivation()) :
                     getActivations();
+        }
+
+        public Collection<Activation> getActivations(SortedMap<Integer, Position> slots) {
+            Integer firstSlot = slots.firstKey();
+            Position firstPos = slots.get(firstSlot);
+
+            return getActivations(firstSlot, firstPos, true, firstSlot, firstPos, true)
+                    .filter( act -> {
+                        for(Map.Entry<Integer, Position> me: slots.entrySet()) {
+                            Position pos = me.getValue();
+                            if(pos.getFinalPosition() != null && pos.compare(act.getSlot(me.getKey())) != 0) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
         }
     }
 
 
-    public static final Comparator<ActKey> BEGIN_COMP = (ak1, ak2) -> {
-        int r = Range.BEGIN_COMP.compare(ak1.r, ak2.r);
-        if(r != 0) return r;
-        return Integer.compare(ak1.actId, ak2.actId);
-    };
-
-
-    public static final Comparator<ActKey> END_COMP = (ak1, ak2) -> {
-        int r = Range.END_COMP.compare(ak1.r, ak2.r);
-        if(r != 0) return r;
-        return Integer.compare(ak1.actId, ak2.actId);
-    };
-
-
-    public static class ActKey {
-        Range r;
+    public static class ActKey implements Comparable<ActKey> {
+        int slot;
+        Position pos;
         int actId;
 
-        public ActKey(Range r, int actId) {
-            this.r = r;
+        public ActKey(int slot, Position pos, int actId) {
+            this.slot = slot;
+            this.pos = pos;
             this.actId = actId;
+        }
+
+        @Override
+        public int compareTo(ActKey ak) {
+            int r = Integer.compare(slot, ak.slot);
+            if(r != 0) return r;
+            r = pos.compare(ak.pos);
+            if(r != 0) return r;
+            return Integer.compare(actId, ak.actId);
         }
     }
 
@@ -291,7 +254,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     public INeuron(Model m, String label, String outputText) {
         this.label = label;
-        this.outputText = outputText;
+        setOutputText(outputText);
 
         if(m.getNeuronExtensionFactory() != null) {
             extension = m.getNeuronExtensionFactory().createObject();
@@ -309,6 +272,18 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         setModified();
     }
 
+
+    public void setOutputText(String outputText) {
+        this.outputText = outputText;
+        slotRequired.add(Activation.BEGIN);
+        slotRequired.add(Activation.END);
+    }
+
+
+    public String getOutputText() {
+        return outputText;
+    }
+
     /**
      * Propagate an input activation into the network.
      *
@@ -316,11 +291,24 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
      * @param input
      */
     public Activation addInput(Document doc, Activation.Builder input) {
-        Range r = new Range(doc, input.begin, input.end);
-        Activation act = getThreadState(doc.threadId, true).getActivationByRange(r);
-        if(act == null) {
+        Integer firstSlot = input.positions.firstKey();
+        Position firstPos = doc.lookupFinalPosition(input.positions.get(firstSlot));
+        Activation act = null;
+        x: for(Activation a: getThreadState(doc.threadId, true).getActivations(firstSlot, firstPos, true, firstSlot, firstPos, true).collect(Collectors.toList())) {
+            for(Map.Entry<Integer, Integer> me: input.positions.entrySet()) {
+                Position pos = a.getSlot(me.getKey());
+                if(pos == null || me.getValue().compareTo(pos.getFinalPosition()) != 0) {
+                    continue x;
+                }
+            }
+            act = a;
+        }
+
+        if (act == null) {
             act = new Activation(doc.activationIdCounter++, doc, node.get(doc));
-            act.range = r;
+            for(Map.Entry<Integer, Integer> me: input.positions.entrySet()) {
+                act.setSlot(me.getKey(), doc.lookupFinalPosition(me.getValue()));
+            }
         }
 
         register(act);
@@ -393,31 +381,19 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-    public Collection<Activation> getActivations(Document doc, boolean onlyFinal) {
+    public Stream<Activation> getActivations(Document doc, boolean onlyFinal) {
         ThreadState th = getThreadState(doc.threadId, false);
-        if (th == null) return Collections.EMPTY_LIST;
+        if (th == null) return Stream.empty();
         return th.getActivations(onlyFinal);
     }
 
 
-    public Activation getActivation(Document doc, Range r, boolean onlyFinal) {
+    public Stream<Activation> getActivations(Document doc, int slot, Position pos, boolean onlyFinal) {
         ThreadState th = getThreadState(doc.threadId, false);
-        if (th == null) return null;
+        if (th == null) return Stream.empty();
 
-        if (r.begin != null) {
-            for (Activation act : th.getActivationsByRangeBegin(r.begin, true, r.begin, false)) {
-                if ((!onlyFinal || act.isFinalActivation()) && r.equalsIgnoreNull(act.range)) {
-                    return act;
-                }
-            }
-        } else if(r.end != null) {
-            for (Activation act : th.getActivationsByRangeEnd(r.end, true, r.end, false)) {
-                if (!onlyFinal || act.isFinalActivation() && r.equalsIgnoreNull(act.range)) {
-                    return act;
-                }
-            }
-        }
-        return null;
+        return th.getActivations(slot, pos, true, slot, pos, false)
+                .filter(act -> !onlyFinal || act.isFinalActivation());
     }
 
 
@@ -485,8 +461,15 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         out.writeUTF(activationFunction.name());
 
-        out.writeBoolean(createBeginPosition);
-        out.writeBoolean(createEndPosition);
+        out.writeInt(slotHasInputs.size());
+        for(Integer slot: slotHasInputs) {
+            out.writeInt(slot);
+        }
+
+        out.writeInt(slotRequired.size());
+        for(Integer slot: slotRequired) {
+            out.writeInt(slot);
+        }
 
         out.writeInt(outputNode.id);
 
@@ -515,13 +498,10 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         if(outputRelations != null) {
             out.writeInt(outputRelations.size());
-            for (Map.Entry<Integer, Set<Relation>> me : outputRelations.entrySet()) {
+            for (Map.Entry<Integer, Relation> me : outputRelations.entrySet()) {
                 out.writeInt(me.getKey());
 
-                out.writeInt(me.getValue().size());
-                for(Relation rel: me.getValue()) {
-                    rel.write(out);
-                }
+                me.getValue().write(out);
             }
         } else  {
             out.writeInt(0);
@@ -562,8 +542,15 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         activationFunction = ActivationFunction.valueOf(in.readUTF());
 
-        createBeginPosition = in.readBoolean();
-        createEndPosition = in.readBoolean();
+        int l = in.readInt();
+        for(int i = 0; i < l; i++) {
+            slotHasInputs.add(in.readInt());
+        }
+
+        l = in.readInt();
+        for(int i = 0; i < l; i++) {
+            slotRequired.add(in.readInt());
+        }
 
         outputNode = m.lookupNodeProvider(in.readInt());
 
@@ -587,19 +574,14 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             outputSynapses.put(syn, syn);
         }
 
-        int l = in.readInt();
+        l = in.readInt();
         if(l > 0) {
             outputRelations = new TreeMap<>();
             for(int i = 0; i < l; i++) {
                 Integer relId = in.readInt();
 
-                Set<Relation> relSet = new TreeSet(Relation.COMPARATOR);
-                int s = in.readInt();
-                for(int j = 0; j < s; j++) {
-                    Relation r = Relation.read(in, m);
-                    relSet.add(r);
-                }
-                outputRelations.put(relId, relSet);
+                Relation r = Relation.read(in, m);
+                outputRelations.put(relId, r);
             }
         }
 
@@ -686,17 +668,18 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             doc.activatedNeurons.add(act.node.neuron.get());
         }
 
-        Integer l = act.range.length();
+        Integer l = act.length();
         if(l != null) {
-            th.minLength = Math.min(th.minLength, act.range.length());
-            th.maxLength = Math.max(th.maxLength, act.range.length());
+            th.minLength = Math.min(th.minLength, l);
+            th.maxLength = Math.max(th.maxLength, l);
         }
 
         th.addActivation(act);
 
 
-        act.range.begin.addBeginActivation(act);
-        act.range.end.addEndActivations(act);
+        for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
+            me.getValue().addActivation(me.getKey(), act);
+        }
 
         doc.addActivation(act);
     }

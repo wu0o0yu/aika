@@ -10,7 +10,7 @@ import network.aika.neuron.INeuron.Type;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.SearchNode.Decision;
-import network.aika.neuron.range.Range;
+import network.aika.neuron.range.Position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +42,10 @@ import static network.aika.neuron.INeuron.ALLOW_WEAK_NEGATIVE_WEIGHTS;
  * @author Lukas Molzberger
  */
 public final class Activation extends OrActivation {
+
+    public static int BEGIN = 0;
+    public static int END = 1;
+
     public static final Comparator<Activation> ACTIVATION_ID_COMP = Comparator.comparingInt(act -> act.id);
     public static int MAX_SELF_REFERENCING_DEPTH = 5;
     public static int MAX_PREDECESSOR_DEPTH = 100;
@@ -51,8 +55,7 @@ public final class Activation extends OrActivation {
 
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
-    public Range range;
-
+    public Map<Integer, Position> slots = new TreeMap<>();
 
     private TreeSet<Link> selectedInputLinks = new TreeSet<>(INPUT_COMP);
     private TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
@@ -70,8 +73,6 @@ public final class Activation extends OrActivation {
     public Rounds finalRounds = rounds;
 
     public boolean ubQueued = false;
-    public boolean isQueued = false;
-    public long queueId;
     public long markedHasCandidate;
 
     public long currentStateV;
@@ -79,7 +80,6 @@ public final class Activation extends OrActivation {
     public long markedDirty;
     public long markedPredecessor;
 
-    public double errorSignal;
     public Double targetValue;
     public Double inputValue;
 
@@ -107,9 +107,37 @@ public final class Activation extends OrActivation {
         }
     }
 
-    public Activation(int id, Document doc, Range r, OrNode n) {
-        this(id, doc, n);
-        this.range = r;
+
+    public Position getSlot(int slot) {
+        return slots.get(slot);
+    }
+
+
+    public void setSlot(int slot, Position pos) {
+        slots.put(slot, pos);
+    }
+
+
+    public void setSlots(Map<Integer, Position> slots) {
+        for(Map.Entry<Integer, Position> me: slots.entrySet()) {
+            setSlot(me.getKey(), me.getValue());
+        }
+    }
+
+
+    public Integer length() {
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        for(Position pos: slots.values()) {
+            if(pos.getFinalPosition() == null) {
+                return null;
+            }
+            min = Math.min(min, pos.getFinalPosition());
+            max = Math.max(max, pos.getFinalPosition());
+        }
+
+        if(min > max) return 0;
+        return min - max;
     }
 
 
@@ -127,7 +155,7 @@ public final class Activation extends OrActivation {
     }
 
     public String getText() {
-        return doc.getText(range);
+        return doc.getText(getSlot(BEGIN), getSlot(END));
     }
 
 
@@ -809,7 +837,7 @@ public final class Activation extends OrActivation {
 
 
     public String toString() {
-        return id + " " + range + " " + identityToString() + " - " + node + " -" +
+        return id + " " + slotsToString() + " " + identityToString() + " - " + node + " -" +
                 (extension != null ? extension.toString() + " -" : "") +
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
@@ -826,14 +854,14 @@ public final class Activation extends OrActivation {
 
         sb.append((finalOnly ? finalDecision : decision) + " - ");
 
-        sb.append(range);
+        sb.append(slotsToString());
 
         if(withTextSnippet) {
             sb.append(" \"");
-            if(node.neuron.get().outputText != null) {
-                sb.append(Utils.collapseText(node.neuron.get().outputText, 7));
+            if(node.neuron.get().getOutputText() != null) {
+                sb.append(Utils.collapseText(node.neuron.get().getOutputText(), 7));
             } else {
-                sb.append(Utils.collapseText(doc.getText(range), 7));
+                sb.append(Utils.collapseText(doc.getText(getSlot(BEGIN), getSlot(END)), 7));
             }
             sb.append("\"");
         }
@@ -876,6 +904,25 @@ public final class Activation extends OrActivation {
             sb.append(" - TV:" + Utils.round(targetValue));
         }
 
+        return sb.toString();
+    }
+
+
+    public String slotsToString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(");
+        boolean first = true;
+        for(Map.Entry<Integer, Position> me: slots.entrySet()) {
+            if(!first) {
+                sb.append(", ");
+            }
+            first = false;
+
+            sb.append(me.getKey());
+            sb.append(":");
+            sb.append(me.getValue());
+        }
+        sb.append(")");
         return sb.toString();
     }
 
@@ -998,16 +1045,20 @@ public final class Activation extends OrActivation {
     }
 
     public static class Builder {
-        public int begin;
-        public int end;
+        public SortedMap<Integer, Integer> positions = new TreeMap<>();
         public double value = 1.0;
         public Double targetValue;
         public int fired;
 
 
         public Builder setRange(int begin, int end) {
-            this.begin = begin;
-            this.end = end;
+            setPosition(Activation.BEGIN, begin);
+            setPosition(Activation.END, end);
+            return this;
+        }
+
+        public Builder setPosition(int slot, int pos) {
+            positions.put(slot, pos);
             return this;
         }
 

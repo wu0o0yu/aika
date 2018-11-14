@@ -7,7 +7,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
@@ -15,17 +14,18 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.range.Position.Operator.NONE;
-import static network.aika.neuron.range.Range.Relation.*;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.*;
+import static network.aika.neuron.relation.Relation.EQUALS;
 import static network.aika.neuron.relation.AncestorRelation.Type.COMMON_ANCESTOR;
 import static network.aika.neuron.relation.AncestorRelation.Type.IS_ANCESTOR_OF;
 import static network.aika.neuron.range.Position.Operator.*;
 
 
-public class RangeRelationTest {
+public class PositionRelationTest {
 
 
     @Test
@@ -36,7 +36,7 @@ public class RangeRelationTest {
         Neuron inB = m.createNeuron("B");
 
 
-        INeuron outC = Neuron.init(m.createNeuron("C"),
+        Neuron outC = Neuron.init(m.createNeuron("C"),
                 5.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
@@ -54,16 +54,16 @@ public class RangeRelationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
-        ).get();
+                        .setRelation(EQUALS)
+        );
 
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -71,7 +71,7 @@ public class RangeRelationTest {
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);
 
-        Activation outC1 = outC.getActivation(doc, new Range(doc, 0, 1), false);
+        Activation outC1 = outC.getActivation(doc, 0, 1, false);
 
         System.out.println(doc.activationsToString(false, false, true));
 
@@ -86,7 +86,7 @@ public class RangeRelationTest {
         Neuron inB = m.createNeuron("B");
         Neuron inC = m.createNeuron("C");
 
-        INeuron outD = Neuron.init(m.createNeuron("D"),
+        Neuron outD = Neuron.init(m.createNeuron("D"),
                 0.001,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
@@ -110,20 +110,20 @@ public class RangeRelationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(END_TO_BEGIN_EQUALS),
+                        .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(END_TO_BEGIN_EQUALS),
+                        .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(BEGIN_EQUALS),
+                        .setRelation(BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_EQUALS)
-        ).get();
+                        .setRelation(END_EQUALS)
+        );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
@@ -131,7 +131,7 @@ public class RangeRelationTest {
         inB.addInput(doc, 1, 2);
         inC.addInput(doc, 2, 3);
 
-        Activation outD1 = outD.getActivation(doc, new Range(doc, 0, 3), false);
+        Activation outD1 = outD.getActivation(doc, 0, 3, false);
 
         Assert.assertNotNull(outD1);
     }
@@ -171,7 +171,7 @@ public class RangeRelationTest {
                             new Relation.Builder()
                                     .setFrom(0)
                                     .setTo(OUTPUT)
-                                    .setRangeRelation(BEGIN_EQUALS)
+                                    .setRelation(BEGIN_EQUALS)
                     );
                 }
 
@@ -180,7 +180,7 @@ public class RangeRelationTest {
                             new Relation.Builder()
                                     .setFrom(i)
                                     .setTo(OUTPUT)
-                                    .setRangeRelation(END_EQUALS)
+                                    .setRelation(END_EQUALS)
                     );
                 }
 
@@ -188,13 +188,13 @@ public class RangeRelationTest {
                     inputs.add(new Relation.Builder()
                                     .setFrom(i)
                                     .setTo(i + 1)
-                                    .setRangeRelation(END_TO_BEGIN_EQUALS)
+                                    .setRelation(END_TO_BEGIN_EQUALS)
                     );
                 } else {
                     inputs.add(new Relation.Builder()
                                     .setFrom(i)
                                     .setTo(0)
-                                    .setRangeRelation(Range.Relation.create(NONE, NONE, NONE, GREATER_THAN))
+                                    .setRelation(Relation.createRangeRelation(NONE, NONE, NONE, GREATER_THAN))
                     );
                 }
             }
@@ -217,6 +217,6 @@ public class RangeRelationTest {
 
         System.out.println(doc.activationsToString(false, true, true));
 
-        assert n.get().getActivations(doc, false).size() >= 1;
+        assert n.get().getActivations(doc, false).collect(Collectors.toList()).size() >= 1;
     }
 }

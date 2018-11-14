@@ -686,7 +686,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                     if(!first) {
                         sb.append(",");
                     }
-                    sb.append(i + ":" + iAct.getLabel() + " " + iAct.range + " (" + iAct.id + ")");
+                    sb.append(i + ":" + iAct.getLabel() + " " + iAct.slotsToString() + " (" + iAct.id + ")");
 
                     first = false;
                 }

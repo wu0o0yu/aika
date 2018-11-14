@@ -23,13 +23,14 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.activation.Activation.BEGIN;
+import static network.aika.neuron.activation.Activation.END;
+import static network.aika.neuron.relation.Relation.EQUALS;
 
 /**
  *
@@ -54,7 +55,7 @@ public class ActivationsTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -62,15 +63,15 @@ public class ActivationsTest {
         inA.addInput(doc, 0, 1);
         inA.addInput(doc, 2, 3);
 
-        Assert.assertNotNull(pA.getActivation(doc, new Range(doc, 0, 1), false));
-        Assert.assertNull(pA.getActivation(doc, new Range(doc, 1, 2), false));
-        Assert.assertNotNull(pA.getActivation(doc, new Range(doc, 2, 3), false));
+        Assert.assertNotNull(pA.getActivation(doc, 0, 1, false));
+        Assert.assertNull(pA.getActivation(doc, 1, 2, false));
+        Assert.assertNotNull(pA.getActivation(doc, 2, 3, false));
 
         inA.addInput(doc, 1, 2);
 
-        Assert.assertNotNull(pA.getActivation(doc, new Range(doc, 0, 1), false));
-        Assert.assertNotNull(pA.getActivation(doc, new Range(doc, 1, 2), false));
-        Assert.assertNotNull(pA.getActivation(doc, new Range(doc, 2, 3), false));
+        Assert.assertNotNull(pA.getActivation(doc, 0, 1, false));
+        Assert.assertNotNull(pA.getActivation(doc, 1, 2, false));
+        Assert.assertNotNull(pA.getActivation(doc, 2, 3, false));
     }
 
 
@@ -83,15 +84,23 @@ public class ActivationsTest {
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
-        inNode.processActivation(new Activation(0, doc, new Range(doc, 0, 1), inNode));
+        inNode.processActivation(createActivation(doc, inNode));
 
-        inNode.processActivation(new Activation(0, doc, new Range(doc, 0, 1), inNode));
+        inNode.processActivation(createActivation(doc, inNode));
 
-        inNode.processActivation(new Activation(0, doc, new Range(doc, 0, 1), inNode));
+        inNode.processActivation(createActivation(doc, inNode));
 
-        inNode.processActivation(new Activation(0, doc, new Range(doc,0, 1), inNode));
+        inNode.processActivation(createActivation(doc, inNode));
 
-        inNode.processActivation(new Activation(0, doc, new Range(doc, 0, 1), inNode));
+        inNode.processActivation(createActivation(doc, inNode));
+    }
+
+
+    private Activation createActivation(Document doc, OrNode inNode) {
+        Activation act = new Activation(0, doc, inNode);
+        act.setSlot(BEGIN, doc.lookupFinalPosition(0));
+        act.setSlot(END, doc.lookupFinalPosition(1));
+        return act;
     }
 
 }

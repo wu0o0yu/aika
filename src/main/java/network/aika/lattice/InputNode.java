@@ -22,9 +22,7 @@ import network.aika.Model;
 import network.aika.Provider;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.range.Range;
-import network.aika.neuron.relation.AncestorRelation;
-import network.aika.neuron.relation.RangeRelation;
+import network.aika.neuron.range.Position;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
 import network.aika.PatternDiscovery;
@@ -38,8 +36,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
-
-import static network.aika.neuron.range.Range.Relation.*;
 
 
 /**
@@ -59,7 +55,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
     public static final Relation[] CANDIDATE_RELATIONS = new Relation[] {
-        new RangeRelation(EQUALS),
+/*        new RangeRelation(EQUALS),
         new RangeRelation(BEGIN_TO_END_EQUALS),
         new RangeRelation(END_TO_BEGIN_EQUALS),
         new RangeRelation(BEGIN_EQUALS),
@@ -68,7 +64,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         new RangeRelation(CONTAINED_IN),
         new AncestorRelation(AncestorRelation.Type.IS_DESCENDANT_OF),
         new AncestorRelation(AncestorRelation.Type.IS_ANCESTOR_OF),
-        new AncestorRelation(AncestorRelation.Type.COMMON_ANCESTOR)
+        new AncestorRelation(AncestorRelation.Type.COMMON_ANCESTOR)*/
     };
 
 
@@ -210,13 +206,13 @@ public class InputNode extends Node<InputNode, InputActivation> {
     private void applyExactRelations(InputActivation act) {
         Activation iAct = act.input.input;
 
-        for(Range.Relation rel: new Range.Relation[] {BEGIN_EQUALS, END_EQUALS, BEGIN_TO_END_EQUALS, END_TO_BEGIN_EQUALS}) {
-            for(Activation linkedAct: RangeRelation.getActivationsByRangeEquals(act.doc, iAct.range, rel)) {
+        for (Map.Entry<Integer, Position> me : iAct.slots.entrySet()) {
+            for (Activation linkedAct : act.doc.getActivationsByPosition(me.getValue(), true, me.getValue(), true)) {
                 Provider<InputNode> in = linkedAct.getINeuron().outputNode;
-                for (Map.Entry<AndNode.Refinement, AndNode.RefValue> me : andChildren.subMap(
+                for (Map.Entry<AndNode.Refinement, AndNode.RefValue> mea : andChildren.subMap(
                         new Refinement(RelationsMap.MIN, in),
                         new Refinement(RelationsMap.MAX, in)).entrySet()) {
-                    addNextLevelActivations(in.get(act.doc), me.getKey(), me.getValue().child.get(act.doc), act);
+                    addNextLevelActivations(in.get(act.doc), mea.getKey(), mea.getValue().child.get(act.doc), act);
                 }
             }
         }
@@ -232,7 +228,8 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         if(act.repropagateV != null && act.repropagateV != nln.markedCreated) return;
 
-        ref.relations.get(0).getActivations(secondNode.inputNeuron.get(doc), iAct).forEach(secondIAct -> {
+        ref.relations.get(0).getActivations(secondNode.inputNeuron.get(doc), iAct)
+                .forEach(secondIAct -> {
                     if (secondIAct.outputToInputNode != null) {
                         InputActivation secondAct = secondIAct.outputToInputNode.output;
                         if (secondAct != null) {
@@ -361,7 +358,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
         public String toString() {
-            return "I-ACT(" + input.input.getLabel() + " " + input.input.range + ")";
+            return "I-ACT(" + input.input.getLabel() + " " + input.input.slotsToString() + ")";
         }
     }
 

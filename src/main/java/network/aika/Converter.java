@@ -20,8 +20,8 @@ import network.aika.lattice.AndNode;
 import network.aika.lattice.Node;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.relation.Relation;
 
 import java.util.*;
 
@@ -70,7 +70,7 @@ public class Converter {
         outputNode = neuron.node.get();
 
         initInputNodesAndComputeWeightSums();
-        initCreateBeginEndPositionFlags();
+        initSlotFlags();
 
         if(neuron.biasSum + neuron.posDirSum + neuron.posRecSum <= 0.0) {
             neuron.requiredSum = neuron.posDirSum + neuron.posRecSum;
@@ -153,14 +153,13 @@ public class Converter {
     }
 
 
-    private void initCreateBeginEndPositionFlags() {
+    private void initSlotFlags() {
         modifiedSynapses.forEach(s -> {
-            boolean[] linksOutput = s.linksOutput();
-            if(linksOutput[0]) {
-                neuron.createBeginPosition = false;
+            for(Integer slot: s.linksOutput()) {
+                neuron.slotHasInputs.add(slot);
             }
-            if(linksOutput[1]) {
-                neuron.createEndPosition = false;
+            for(Relation rel: s.relations.values()) {
+                rel.registerRequiredSlots(s.input);
             }
         });
     }
@@ -290,11 +289,7 @@ public class Converter {
             Relation[] relations = new Relation[nc.offsets.length];
             for(int i = 0; i < nc.offsets.length; i++) {
                 Synapse linkedSynapse = nc.offsets[i];
-                Set<Relation> relSet = s.getRelationById(linkedSynapse.id);
-                if (relSet != null) {
-                    assert relSet.size() == 1;
-                    relations[i] = relSet.iterator().next();
-                }
+                relations[i] = s.getRelationById(linkedSynapse.id);
             }
 
             NodeContext nln = new NodeContext();

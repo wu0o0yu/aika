@@ -23,7 +23,6 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.range.Position;
-import network.aika.neuron.range.Range;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
@@ -31,7 +30,7 @@ import org.junit.Test;
 
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.range.Position.Operator.GREATER_THAN;
-import static network.aika.neuron.range.Range.Relation.*;
+import static network.aika.neuron.relation.Relation.*;
 
 /**
  *
@@ -73,15 +72,15 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(CONTAINS),
+                        .setRelation(CONTAINS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(2)
-                        .setRangeRelation(CONTAINS),
+                        .setRelation(CONTAINS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -89,7 +88,7 @@ public class NegationTest {
         inA.addInput(doc, 0, 11);
 
         System.out.println(doc.activationsToString(false, false, true));
-        Assert.assertNotNull(abcN.getActivation(doc, new Range(doc, 0, 11), false));
+        Assert.assertNotNull(abcN.getActivation(doc, 0, 11, false));
 
         inB.addInput(doc, 2, 7);
 
@@ -101,7 +100,7 @@ public class NegationTest {
 
         doc.process();
 
-        Assert.assertNotNull(abcN.getActivation(doc, new Range(doc, 0, 11), false));
+        Assert.assertNotNull(abcN.getActivation(doc, 0, 11, false));
     }
 
 
@@ -129,7 +128,7 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(abcN,
@@ -156,15 +155,15 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.NONE),
+                        .setRelation(NONE),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.NONE),
+                        .setRelation(NONE),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -207,7 +206,7 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(asN,
@@ -228,11 +227,11 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -245,7 +244,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, false, true));
 
-        Assert.assertNotNull(outN.getActivation(doc, new Range(doc, 0, 11), false));
+        Assert.assertNotNull(outN.getActivation(doc, 0, 11, false));
 
         doc.clearActivations();
     }
@@ -273,7 +272,7 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(asN,
@@ -294,11 +293,11 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.CONTAINS),
+                        .setRelation(CONTAINS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -311,7 +310,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, false, true));
 
-        Assert.assertNotNull(outN.getActivation(doc, new Range(doc, 0, 11), false));
+        Assert.assertNotNull(outN.getActivation(doc, 0, 11, false));
 
         doc.clearActivations();
     }
@@ -339,7 +338,7 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(asN,
@@ -360,11 +359,11 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(CONTAINS),
+                        .setRelation(CONTAINS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
@@ -377,7 +376,7 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, false, true));
 
-        Assert.assertNotNull(outN.getActivation(doc, new Range(doc, 0, 11), false));
+        Assert.assertNotNull(outN.getActivation(doc, 0, 11, false));
 
         doc.clearActivations();
     }
@@ -411,11 +410,11 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(asN,
@@ -436,11 +435,11 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(CONTAINS),
+                        .setRelation(CONTAINS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
         Neuron.init(absN,
                 0.001,
@@ -466,23 +465,23 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.create(Position.Operator.NONE, Position.Operator.NONE, Position.Operator.NONE, GREATER_THAN)),
+                        .setRelation(Relation.createRangeRelation(Position.Operator.NONE, Position.Operator.NONE, Position.Operator.NONE, GREATER_THAN)),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(OVERLAPS),
+                        .setRelation(OVERLAPS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(1)
-                        .setRangeRelation(OVERLAPS),
+                        .setRelation(OVERLAPS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(BEGIN_EQUALS),
+                        .setRelation(BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_EQUALS)
+                        .setRelation(END_EQUALS)
         );
 
         {
@@ -495,8 +494,8 @@ public class NegationTest {
 
             System.out.println(doc.activationsToString(false, false, true));
 
-            Assert.assertNotNull(inS.getActivation(doc, new Range(doc, 0, 6), false));
-            Assert.assertEquals(2, inS.getActivation(doc, new Range(doc, 0, 6), false).getInputLinks(false, false).count());
+            Assert.assertNotNull(inS.getActivation(doc, 0, 6, false));
+            Assert.assertEquals(2, inS.getActivation(doc, 0, 6, false).getInputLinks(false, false).count());
 
             doc.clearActivations();
         }
@@ -511,11 +510,9 @@ public class NegationTest {
 
             System.out.println(doc.activationsToString(false, false, true));
 
-//            Assert.assertNotNull(Selector.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null));
-            Assert.assertNotNull(inS.getActivation(doc, new Range(doc, 0, 9), false));
-//            Assert.assertEquals(1, Activation.get(t, inS.node, 0, new Range(0, 6), EQUALS, EQUALS, null, null, null).key.interpretation.orInterprNodes.size());
-            Assert.assertEquals(1, inS.getActivation(doc, new Range(doc, 0, 6), false).getInputLinks(false, false).count());
-            Assert.assertEquals(1, inS.getActivation(doc, new Range(doc, 0, 9), false).getInputLinks(false, false).count());
+            Assert.assertNotNull(inS.getActivation(doc, 0, 9, false));
+            Assert.assertEquals(1, inS.getActivation(doc, 0, 6, false).getInputLinks(false, false).count());
+            Assert.assertEquals(1, inS.getActivation(doc, 0, 9, false).getInputLinks(false, false).count());
 
             doc.clearActivations();
         }
@@ -558,15 +555,15 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(asN,
@@ -587,15 +584,15 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
         Neuron.init(ascN,
                 0.001,
@@ -621,23 +618,23 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(bsN,
@@ -658,15 +655,15 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron outA = Neuron.init(m.createNeuron("OUT A"),
@@ -681,7 +678,7 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
         Neuron outAC = Neuron.init(m.createNeuron("OUT AC"),
                 0.0,
@@ -695,7 +692,7 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
         Neuron outB = Neuron.init(m.createNeuron("OUT B"),
                 0.0,
@@ -709,7 +706,7 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -780,7 +777,7 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(pD,
@@ -801,7 +798,7 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -832,15 +829,15 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
@@ -851,8 +848,8 @@ public class NegationTest {
 
         System.out.println(doc.activationsToString(false, false, true));
 
-        Assert.assertNotNull(pC.get().getActivation(doc, new Range(doc, 0, 1), false));
-        Assert.assertNotNull(pD.get().getActivation(doc, new Range(doc, 0, 1), false));
+        Assert.assertNotNull(pC.getActivation(doc, 0, 1, false));
+        Assert.assertNotNull(pD.getActivation(doc, 0, 1, false));
 
         // Die Optionen 0 und 2 stehen in Konflikt. Da sie aber jetzt in Oder Optionen eingebettet sind, werden sie nicht mehr ausgefiltert.
 //        Assert.assertNull(pH.node.getFirstActivation(t));

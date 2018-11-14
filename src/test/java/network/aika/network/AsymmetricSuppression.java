@@ -5,14 +5,15 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.stream.Collectors;
+
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.EQUALS;
 
 public class AsymmetricSuppression {
 
@@ -44,11 +45,11 @@ public class AsymmetricSuppression {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Document doc = m.createDocument("a");
@@ -60,7 +61,7 @@ public class AsymmetricSuppression {
 
         System.out.println(doc.activationsToString(true, false, true));
 
-        Assert.assertTrue(outN.getActivations(doc, true).isEmpty());
+        Assert.assertTrue(outN.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
 
         doc.clearActivations();
     }

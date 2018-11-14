@@ -19,17 +19,18 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.range.Range;
+import network.aika.neuron.range.Position;
 import network.aika.neuron.relation.Relation;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
- * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
- * Aika uses the provider pattern to store and reload rarely used neurons or logic nodes.
- *
- * @author Lukas Molzberger
- */
+     * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
+     * Aika uses the provider pattern to store and reload rarely used neurons or logic nodes.
+     *
+     * @author Lukas Molzberger
+     */
 public class Neuron extends Provider<INeuron> {
 
     public static final Neuron MIN_NEURON = new Neuron(null, Integer.MIN_VALUE);
@@ -47,6 +48,7 @@ public class Neuron extends Provider<INeuron> {
         super(m, id);
     }
 
+
     public Neuron(Model m, INeuron n) {
         super(m, n);
     }
@@ -62,7 +64,7 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
-    /**
+        /**
      * Propagate an input activation into the network.
      *
      * @param doc   The current document
@@ -164,6 +166,7 @@ public class Neuron extends Provider<INeuron> {
         return init(n, bias, null, type, synapseBuilders, relationBuilders);
     }
 
+
     public static Neuron init(Neuron n, double bias, INeuron.Type type, Collection<Neuron.Builder> inputs) {
         return init(n, bias, null, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
     }
@@ -252,9 +255,8 @@ public class Neuron extends Provider<INeuron> {
 
 
     public void setOutputText(String outputText) {
-        get().outputText = outputText;
+        get().setOutputText(outputText);
     }
-
 
 
     public Synapse getSynapseById(int synapseId) {
@@ -269,17 +271,25 @@ public class Neuron extends Provider<INeuron> {
      * @param doc The current document
      * @return A collection with all final activations of this neuron.
      */
-    public Collection<Activation> getActivations(Document doc, boolean onlyFinal) {
+    public Stream<Activation> getActivations(Document doc, boolean onlyFinal) {
         INeuron n = getIfNotSuspended();
-        if(n == null) return Collections.emptyList();
+        if(n == null) return Stream.empty();
         return n.getActivations(doc, onlyFinal);
     }
 
 
-    public Activation getActivation(Document doc, Range r, boolean onlyFinal) {
+    public Stream<Activation> getActivations(Document doc, int slot, Position pos, boolean onlyFinal) {
         INeuron n = getIfNotSuspended();
-        if(n == null) return null;
-        return n.getActivation(doc, r, onlyFinal);
+        if(n == null) return Stream.empty();
+        return n.getActivations(doc, slot, pos, onlyFinal);
+    }
+
+
+    public Activation getActivation(Document doc, int begin, int end, boolean onlyFinal) {
+        return getActivations(doc, Activation.BEGIN, doc.lookupFinalPosition(begin), onlyFinal)
+                .filter(act -> act.getSlot(Activation.END).getFinalPosition() == end)
+                .findFirst()
+                .orElse(null);
     }
 
 
@@ -311,6 +321,7 @@ public class Neuron extends Provider<INeuron> {
         inMemoryOutputSynapses.remove(s);
         lock.releaseWriteLock();
     }
+
 
     public String toString() {
         if(this == MIN_NEURON) return "MIN_NEURON";
@@ -350,6 +361,7 @@ public class Neuron extends Provider<INeuron> {
         }
         return result;
     }
+
 
     private static Collection<Synapse.Builder> getSynapseBuilders(Builder... builders) {
         ArrayList<Synapse.Builder> result = new ArrayList<>();

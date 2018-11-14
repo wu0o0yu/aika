@@ -25,7 +25,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.Candidate;
 import network.aika.neuron.range.Position;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.activation.SearchNode;
 import network.aika.lattice.Node.ThreadState;
 import network.aika.neuron.activation.*;
@@ -88,21 +87,24 @@ public class Document implements Comparable<Document> {
     public TreeMap<Integer, Double> searchNodeWeights = new TreeMap<>();
 
 
-    private TreeMap<ActKey, Activation> activationsByRangeBegin = new TreeMap<>((ak1, ak2) -> {
-        int r = Position.compare(ak1.range.begin, ak2.range.begin);
+    private TreeMap<ActKey, Activation> activationsBySlotAndPosition = new TreeMap<>((ak1, ak2) -> {
+        int r = Integer.compare(ak1.slot, ak2.slot);
+        if (r != 0) return r;
+        r = Position.compare(ak1.pos, ak2.pos);
         if (r != 0) return r;
         r = ak1.node.compareTo(ak2.node);
         if (r != 0) return r;
         return Integer.compare(ak1.actId, ak2.actId);
     });
 
-    private TreeMap<ActKey, Activation> activationsByRangeEnd = new TreeMap<>((ak1, ak2) -> {
-        int r = Position.compare(ak1.range.end, ak2.range.end);
+    private TreeMap<ActKey, Activation> activationsByPosition = new TreeMap<>((ak1, ak2) -> {
+        int r = Position.compare(ak1.pos, ak2.pos);
         if (r != 0) return r;
         r = ak1.node.compareTo(ak2.node);
         if (r != 0) return r;
         return Integer.compare(ak1.actId, ak2.actId);
     });
+
 
     public TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
@@ -112,12 +114,14 @@ public class Document implements Comparable<Document> {
 
 
     public static class ActKey {
-        Range range;
+        int slot;
+        Position pos;
         Node node;
         int actId;
 
-        public ActKey(Range range, Node node, int actId) {
-            this.range = range;
+        public ActKey(int slot, Position pos, Node node, int actId) {
+            this.slot = slot;
+            this.pos = pos;
             this.node = node;
             this.actId = actId;
         }
@@ -134,7 +138,7 @@ public class Document implements Comparable<Document> {
 
 
     public static Comparator<Activation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
-        int r = Range.compare(act1.range, act2.range, false);
+        int r = Position.compare(act1.getSlot(Activation.BEGIN), act2.getSlot(Activation.BEGIN));
         if (r != 0) return r;
         r = act1.node.compareTo(act2.node);
         if (r != 0) return r;
@@ -188,11 +192,16 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public String getText(Range r) {
-        if(r.begin.getFinalPosition() != null && r.end.getFinalPosition() != null) {
+    public String getText(Position begin, Position end) {
+        return getText(begin.getFinalPosition(), end.getFinalPosition());
+    }
+
+
+    public String getText(Integer begin, Integer end) {
+        if(begin != null && end != null) {
             return content.substring(
-                    Math.max(0, Math.min(r.begin.getFinalPosition(), length())),
-                    Math.max(0, Math.min(r.end.getFinalPosition(), length()))
+                    Math.max(0, Math.min(begin, length())),
+                    Math.max(0, Math.min(end, length()))
             );
         } else {
             return "";
@@ -201,12 +210,13 @@ public class Document implements Comparable<Document> {
 
 
     public void addActivation(Activation act) {
-        ActKey dak = new ActKey(act.range, act.node, act.id);
-        if (act.range.begin != null && act.range.begin.getFinalPosition() != null) {
-            activationsByRangeBegin.put(dak, act);
-        }
-        if (act.range.end != null && act.range.end.getFinalPosition() != null) {
-            activationsByRangeEnd.put(dak, act);
+        for(Map.Entry<Integer, Position> me : act.slots.entrySet()) {
+            Position pos = me.getValue();
+            if (pos != null && pos.getFinalPosition() != null) {
+                ActKey dak = new ActKey(me.getKey(), pos, act.node, act.id);
+                activationsBySlotAndPosition.put(dak, act);
+                activationsByPosition.put(dak, act);
+            }
         }
         activationsById.put(act.id, act);
     }
@@ -225,21 +235,21 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public Collection<Activation> getActivationsByRangeBegin(Range fromKey, boolean fromInclusive, Range toKey, boolean toInclusive) {
-        return activationsByRangeBegin.subMap(
-                new Document.ActKey(fromKey, Node.MIN_NODE, Integer.MIN_VALUE),
+    public Collection<Activation> getActivationsByPosition(int fromSlot, Position fromPos, boolean fromInclusive, int toSlot, Position toPos, boolean toInclusive) {
+        return activationsBySlotAndPosition.subMap(
+                new Document.ActKey(fromSlot, fromPos, Node.MIN_NODE, Integer.MIN_VALUE),
                 fromInclusive,
-                new Document.ActKey(toKey, Node.MAX_NODE, Integer.MAX_VALUE),
+                new Document.ActKey(toSlot, toPos, Node.MAX_NODE, Integer.MAX_VALUE),
                 toInclusive
         ).values();
     }
 
 
-    public Collection<Activation> getActivationByRangeEnd(Range fromKey, boolean fromInclusive, Range toKey, boolean toInclusive) {
-        return activationsByRangeEnd.subMap(
-                new Document.ActKey(fromKey, Node.MIN_NODE, Integer.MIN_VALUE),
+    public Collection<Activation> getActivationsByPosition(Position fromPos, boolean fromInclusive, Position toPos, boolean toInclusive) {
+        return activationsByPosition.subMap(
+                new Document.ActKey(-1, fromPos, Node.MIN_NODE, Integer.MIN_VALUE),
                 fromInclusive,
-                new Document.ActKey(toKey, Node.MAX_NODE, Integer.MAX_VALUE),
+                new Document.ActKey(-1, toPos, Node.MAX_NODE, Integer.MAX_VALUE),
                 toInclusive
         ).values();
     }
@@ -452,26 +462,26 @@ public class Document implements Comparable<Document> {
 
         TreeSet<Position> queue = new TreeSet<>(Comparator.comparingInt(p -> p.id));
 
-        for(Activation act: activationsByRangeBegin.values()) {
-            if(act.range.begin.getFinalPosition() != null && act.range.end.getFinalPosition() == null) {
-                queue.add(act.range.begin);
+        for(Activation act: activationsById.values()) {
+            if(act.getINeuron().getOutputText() != null && act.getSlot(Activation.BEGIN).getFinalPosition() != null && act.getSlot(Activation.END).getFinalPosition() == null) {
+                queue.add(act.getSlot(Activation.BEGIN));
             }
         }
 
         while(!queue.isEmpty()) {
             Position pos = queue.pollFirst();
 
-            for(Activation act: pos.beginActivations) {
-                if (act.getINeuron().outputText != null && act.isFinalActivation()) {
-                    String outText = act.getINeuron().outputText;
-                    Position nextPos = act.range.end;
-                    nextPos.setFinalPosition(pos.getFinalPosition() + outText.length());
+            pos.getActivations(Activation.BEGIN)
+                    .filter(act -> act.getINeuron().getOutputText() != null && act.isFinalActivation())
+                    .forEach(act -> {
+                        String outText = act.getINeuron().getOutputText();
+                        Position nextPos = act.getSlot(Activation.END);
+                        nextPos.setFinalPosition(pos.getFinalPosition() + outText.length());
 
-                    content.replace(act.range.begin.getFinalPosition(), act.range.end.getFinalPosition(), outText);
+                        content.replace(act.getSlot(Activation.BEGIN).getFinalPosition(), act.getSlot(Activation.END).getFinalPosition(), outText);
 
-                    queue.add(nextPos);
-                }
-            }
+                        queue.add(nextPos);
+                    });
         }
         return content.substring(oldLength, length());
     }
@@ -670,10 +680,10 @@ public class Document implements Comparable<Document> {
 
     public void dumpOscillatingActivations() {
         activatedNeurons.stream()
-                .flatMap(n -> n.getActivations(this, false).stream())
+                .flatMap(n -> n.getActivations(this, false))
                 .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)
                 .forEach(act -> {
-                    log.error(act.id + " " + act.range + " " + act.decision + " " + act.rounds);
+                    log.error(act.id + " " + act.slotsToString() + " " + act.decision + " " + act.rounds);
                     log.error(act.linksToString());
                     log.error("");
                 });

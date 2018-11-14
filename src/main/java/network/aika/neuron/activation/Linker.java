@@ -20,7 +20,6 @@ import network.aika.Document;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.range.Position;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation.Link;
@@ -104,19 +103,11 @@ public class Linker {
 
     public void linkInput(Activation act) {
         for(Synapse s: act.getNeuron().inMemoryInputSynapses.values()) {
-            for(Map.Entry<Integer, Set<Relation>> me: s.relations.entrySet()) {
+            for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+                Relation rel = me.getValue();
                 if(me.getKey() == OUTPUT) {
-                    for(Relation rel: me.getValue()) {
-                        Range r = rel.mapRange(act, Direction.INPUT);
-
-                        if(r != null) {
-                            Activation iAct = s.input.get(act.doc).getActivation(act.doc, r, false);
-
-                            if (iAct != null) {
-                                link(s, iAct, act);
-                            }
-                        }
-                    }
+                    rel.invert().getActivations(s.input.get(act.doc), act)
+                            .forEach(iAct -> link(s, iAct, act));
                 }
             }
         }
@@ -152,34 +143,18 @@ public class Linker {
     }
 
 
-    private void linkRelated(Activation rAct, Activation oAct, Map<Integer, Set<Relation>> relations) {
-        for(Map.Entry<Integer, Set<Relation>> me: relations.entrySet()) {
+    private void linkRelated(Activation rAct, Activation oAct, Map<Integer, Relation> relations) {
+        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
+            Relation rel = me.getValue();
             Integer relId = me.getKey();
             if(relId >= 0) {
                 Synapse s = oAct.getNeuron().getSynapseById(relId);
-                if(s != null) {
-                    for(Relation r: me.getValue()) {
-                        if (r.follow(rAct, oAct, relations)) {
-                            linkRelated(rAct, oAct, s, r);
-                        }
+                if (s != null) {
+                    if (rel.follow(rAct, oAct, relations)) {
+                        rel.invert().getActivations(s.input.get(rAct.doc), rAct)
+                                .forEach(iAct -> link(s, iAct, oAct));
                     }
                 }
-            }
-        }
-    }
-
-
-    private void linkRelated(Activation rAct, Activation oAct, Synapse s, Relation r) {
-        if(!r.isExact()) {
-            INeuron.ThreadState ts = s.input.get().getThreadState(doc.threadId, true);
-            for(Activation iAct: ts.getActivations()) {
-                if(r.test(rAct, iAct)) {
-                    link(s, iAct, oAct);
-                }
-            }
-        } else {
-            for(Activation iAct: r.invert().getActivations(s.input.get(rAct.doc), rAct)) {
-                link(s, iAct, oAct);
             }
         }
     }
@@ -213,12 +188,11 @@ public class Linker {
 
 
     private boolean checkRelations(Synapse s, Activation iAct, Activation oAct) {
-        for(Map.Entry<Integer, Set<Relation>> me: s.relations.entrySet()) {
+        for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+            Relation rel = me.getValue();
             if(me.getKey() == Synapse.OUTPUT) {
-                for (Relation r : me.getValue()) {
-                    if (!r.test(iAct, oAct)) {
-                        return false;
-                    }
+                if (!rel.test(iAct, oAct)) {
+                    return false;
                 }
             }
             // TODO: other relations

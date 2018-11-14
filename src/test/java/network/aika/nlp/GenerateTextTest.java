@@ -21,14 +21,13 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.*;
+import static network.aika.neuron.relation.Relation.*;
 import static network.aika.neuron.relation.AncestorRelation.Type.IS_DESCENDANT_OF;
 
 
@@ -85,15 +84,15 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(NONE),
+                        .setRelation(NONE),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(phraseB, 5.0, INeuron.Type.EXCITATORY,
@@ -116,15 +115,15 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(NONE),
+                        .setRelation(NONE),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -137,7 +136,7 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_TO_BEGIN_EQUALS)
+                        .setRelation(END_TO_BEGIN_EQUALS)
         );
 
 
@@ -151,7 +150,7 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(BEGIN_EQUALS)
+                        .setRelation(BEGIN_EQUALS)
         );
 
 
@@ -175,11 +174,11 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_EQUALS),
+                        .setRelation(END_EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_TO_BEGIN_EQUALS)
+                        .setRelation(END_TO_BEGIN_EQUALS)
         );
 
 
@@ -196,7 +195,7 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(BEGIN_EQUALS)
+                        .setRelation(BEGIN_EQUALS)
         );
 
 
@@ -219,11 +218,11 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_EQUALS),
+                        .setRelation(END_EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_TO_BEGIN_EQUALS)
+                        .setRelation(END_TO_BEGIN_EQUALS)
         );
 
 
@@ -242,11 +241,11 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -301,7 +300,7 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_TO_BEGIN_EQUALS)
+                        .setRelation(END_TO_BEGIN_EQUALS)
         );
 
         Neuron.init(outA, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
@@ -313,7 +312,7 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -326,7 +325,7 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_TO_BEGIN_EQUALS)
+                        .setRelation(END_TO_BEGIN_EQUALS)
         );
 
         Document doc = m.createDocument("in ");

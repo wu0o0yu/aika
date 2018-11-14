@@ -21,14 +21,15 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.Converter;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.stream.Collectors;
+
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.EQUALS;
 
 /**
  *
@@ -76,31 +77,31 @@ public class ConverterTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(3)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         System.out.println(out.get().node.get().logicToString());
@@ -154,31 +155,31 @@ public class ConverterTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(3)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         System.out.println(out.get().node.get().logicToString());
@@ -232,39 +233,39 @@ public class ConverterTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(3)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(4)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(4)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         System.out.println(out.get().node.get().logicToString());
@@ -320,31 +321,31 @@ public class ConverterTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(3)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         System.out.println(out.get().node.get().logicToString());
@@ -377,18 +378,18 @@ public class ConverterTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Document doc = m.createDocument("IN");
 
         in.addInput(doc, 0, 2);
 
-        Assert.assertFalse(out.getActivations(doc, false).isEmpty());
+        Assert.assertFalse(out.getActivations(doc, false).collect(Collectors.toList()).isEmpty());
     }
 
 }

@@ -22,12 +22,12 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.OVERLAPS;
 
 /**
  *
@@ -64,11 +64,11 @@ public class OptionalAndTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
         Neuron hintVerb = Neuron.init(m.createNeuron("HINT-VERB"),
                 0.0,
@@ -88,11 +88,11 @@ public class OptionalAndTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -120,15 +120,15 @@ public class OptionalAndTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.OVERLAPS),
+                        .setRelation(OVERLAPS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron verb = Neuron.init(m.createNeuron("VERB"),
@@ -149,11 +149,11 @@ public class OptionalAndTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.OVERLAPS),
+                        .setRelation(OVERLAPS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron.init(suppr,
@@ -174,11 +174,11 @@ public class OptionalAndTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 

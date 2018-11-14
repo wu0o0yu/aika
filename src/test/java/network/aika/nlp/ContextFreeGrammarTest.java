@@ -11,7 +11,6 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,7 +22,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.*;
+import static network.aika.neuron.relation.Relation.*;
 
 public class ContextFreeGrammarTest {
 
@@ -91,7 +90,7 @@ public class ContextFreeGrammarTest {
                     new Relation.Builder()
                             .setFrom(0)
                             .setTo(Synapse.OUTPUT)
-                            .setRangeRelation(Range.Relation.OVERLAPS)
+                            .setRelation(OVERLAPS)
             );
         }
 
@@ -136,7 +135,7 @@ public class ContextFreeGrammarTest {
                     new Relation.Builder()
                             .setFrom(wtSynId)
                             .setTo(OUTPUT)
-                            .setRangeRelation(EQUALS)
+                            .setRelation(EQUALS)
             );
         }
     }
@@ -153,7 +152,7 @@ public class ContextFreeGrammarTest {
                     new Relation.Builder()
                             .setFrom(synId)
                             .setTo(OUTPUT)
-                            .setRangeRelation(EQUALS)
+                            .setRelation(EQUALS)
             );
         }
     }
@@ -179,7 +178,7 @@ public class ContextFreeGrammarTest {
                         new Relation.Builder()
                                 .setFrom(i)
                                 .setTo(OUTPUT)
-                                .setRangeRelation(BEGIN_EQUALS)
+                                .setRelation(BEGIN_EQUALS)
                 );
             }
             if(end) {
@@ -187,7 +186,7 @@ public class ContextFreeGrammarTest {
                         new Relation.Builder()
                                 .setFrom(i)
                                 .setTo(OUTPUT)
-                                .setRangeRelation(END_EQUALS)
+                                .setRelation(END_EQUALS)
                 );
             }
 
@@ -195,7 +194,7 @@ public class ContextFreeGrammarTest {
                 in.add(new Relation.Builder()
                         .setFrom(i)
                         .setTo(i - 1)
-                        .setRangeRelation(Range.Relation.BEGIN_TO_END_EQUALS)
+                        .setRelation(BEGIN_TO_END_EQUALS)
                 );
             }
         }
@@ -210,7 +209,7 @@ public class ContextFreeGrammarTest {
         in.add(new Relation.Builder()
                 .setFrom(inputs.length)
                 .setTo(Synapse.OUTPUT)
-                .setRangeRelation(Range.Relation.OVERLAPS)
+                .setRelation(OVERLAPS)
         );
 
         Neuron.init(andN, weight, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, in.toArray(new Neuron.Builder[in.size()]));
@@ -243,6 +242,6 @@ public class ContextFreeGrammarTest {
 
         System.out.println(doc.activationsToString(true, true, true));
 
-        Assert.assertNotNull(S.getActivation(doc, new Range(doc, 0, 33), true));
+        Assert.assertNotNull(S.getActivation(doc, 0, 33, true));
     }
 }

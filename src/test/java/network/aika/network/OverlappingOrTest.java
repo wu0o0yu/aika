@@ -21,7 +21,6 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.range.Position.Operator;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
@@ -32,9 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.BEGIN_EQUALS;
-import static network.aika.neuron.range.Range.Relation.END_EQUALS;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.*;
 
 /**
  *
@@ -86,23 +83,23 @@ public class OverlappingOrTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                        .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.create(Operator.NONE, Operator.NONE, Operator.NONE, Operator.LESS_THAN)),
+                        .setRelation(Relation.createRangeRelation(Operator.NONE, Operator.NONE, Operator.NONE, Operator.LESS_THAN)),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                        .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(BEGIN_EQUALS),
+                        .setRelation(BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_EQUALS)
+                        .setRelation(END_EQUALS)
         );
 
         Document doc = m.createDocument("a b c d e ", 0);

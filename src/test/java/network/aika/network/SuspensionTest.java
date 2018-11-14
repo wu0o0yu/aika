@@ -24,7 +24,6 @@ import network.aika.SuspensionHook;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,11 +31,10 @@ import org.junit.Test;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.BEGIN_EQUALS;
-import static network.aika.neuron.range.Range.Relation.END_EQUALS;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.*;
 
 /**
  *
@@ -92,15 +90,15 @@ public class SuspensionTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS),
+                        .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(BEGIN_EQUALS),
+                        .setRelation(BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(END_EQUALS)
+                        .setRelation(END_EQUALS)
         );
 
 
@@ -116,7 +114,7 @@ public class SuspensionTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         m.suspendAll(Provider.SuspensionMode.SAVE);
@@ -137,7 +135,7 @@ public class SuspensionTest {
 
         System.out.println(doc.activationsToString());
 
-        Assert.assertFalse(outD.getActivations(doc, true).isEmpty());
+        Assert.assertFalse(outD.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
     }
 
 

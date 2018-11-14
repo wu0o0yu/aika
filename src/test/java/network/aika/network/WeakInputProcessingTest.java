@@ -22,14 +22,14 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.range.Range;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.OVERLAPS;
 
 /**
  *
@@ -75,15 +75,15 @@ public class WeakInputProcessingTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.OVERLAPS),
+                        .setRelation(OVERLAPS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron patternB = Neuron.init(
@@ -111,23 +111,23 @@ public class WeakInputProcessingTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Neuron patternC = Neuron.init(
@@ -155,23 +155,23 @@ public class WeakInputProcessingTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRangeRelation(Range.Relation.EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
@@ -199,15 +199,15 @@ public class WeakInputProcessingTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS),
+                        .setRelation(EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
         Document doc = m.createDocument("a ");
@@ -220,13 +220,13 @@ public class WeakInputProcessingTest {
 
         System.out.println(doc.activationsToString(true, false, true));
 
-        Activation act = patternA.getActivation(doc, new Range(doc, 0, 1), false);
+        Activation act = patternA.getActivation(doc, 0, 1, false);
         Assert.assertTrue(act.getFinalState().value < 0.5);
 
-        act = patternB.getActivation(doc, new Range(doc, 0, 1), false);
+        act = patternB.getActivation(doc, 0, 1, false);
         Assert.assertTrue(act.getFinalState().value > 0.5);
 
-        act = patternC.getActivation(doc, new Range(doc, 0, 1), false);
+        act = patternC.getActivation(doc, 0, 1, false);
         Assert.assertTrue(act.getFinalState().value < 0.5);
     }
 

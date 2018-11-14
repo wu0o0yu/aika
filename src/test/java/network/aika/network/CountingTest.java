@@ -22,7 +22,6 @@ import network.aika.Model;
 import network.aika.Writable;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.range.Range;
 import network.aika.PatternDiscovery;
 import network.aika.PatternDiscovery.Config;
 import network.aika.lattice.NodeActivation;
@@ -36,7 +35,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.range.Range.Relation.EQUALS;
+import static network.aika.neuron.relation.Relation.EQUALS;
 
 /**
  *
@@ -75,7 +74,7 @@ public class CountingTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
-                        .setRangeRelation(EQUALS)
+                        .setRelation(EQUALS)
         );
 
 
