@@ -142,7 +142,7 @@ public class Converter {
             }
         } else {
             for (Synapse s : modifiedSynapses) {
-                if (s.isDisjunction) {
+                if (s.isDisjunction && !s.isRecurrent) {
                     NodeContext nlNodeContext = expandNode(nodeContext, s);
                     outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
                 }
@@ -232,10 +232,12 @@ public class Converter {
                         posPassiveSumDelta += s.getNewWeight() > 0.0 ? ((s.limit + s.limitDelta) * s.getNewWeight()) : 0.0;
                     }
 
-                    if (!s.isDisjunction(Synapse.State.OLD) && s.isDisjunction(Synapse.State.NEW)) {
-                        neuron.numDisjunctiveSynapses++;
-                    } else if (s.isDisjunction(Synapse.State.OLD) && !s.isDisjunction(Synapse.State.NEW)) {
-                        neuron.numDisjunctiveSynapses--;
+                    if(!s.isRecurrent) {
+                        if (!s.isDisjunction(Synapse.State.OLD) && s.isDisjunction(Synapse.State.NEW)) {
+                            neuron.numDisjunctiveSynapses++;
+                        } else if (s.isDisjunction(Synapse.State.OLD) && !s.isDisjunction(Synapse.State.NEW)) {
+                            neuron.numDisjunctiveSynapses--;
+                        }
                     }
                 }
 
