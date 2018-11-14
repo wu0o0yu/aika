@@ -20,8 +20,6 @@ public class Position {
     public final int id;
     private Integer finalPosition;
 
-    private long visited;
-
 
     public Position(Document doc) {
         this(doc, null);
