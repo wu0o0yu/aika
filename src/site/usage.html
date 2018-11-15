@@ -122,8 +122,6 @@
                     .setSynapseId(0)
                     .setNeuron(inputNeurons.get("cook"))
                     .setWeight(10.0)
-                    // This input requires the input activation to have an
-                    // activation value of at least 0.9
                     .setBias(-10.0)
                     .setRecurrent(false),
             new Synapse.Builder() // The previous word needs to be a forename
@@ -518,7 +516,7 @@ Final SearchNode:10  WeightSum:5.0
 
         Map&lt;Character, Neuron&gt; inputNeurons = new HashMap&lt;&gt;();
 
-        // Create an input neuron and a recurrent neuron for every letter in this example.
+        // Create an input neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e', 'f'}) {
             Neuron in = m.createNeuron(c + "");
 
