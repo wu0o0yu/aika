@@ -58,7 +58,7 @@
                 &lt;dependency&gt;<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;org.aika-software&lt;&#47;groupId&gt;<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;aika&lt;&#47;artifactId&gt;<br/>
-                &nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;0.17&lt;&#47;version&gt;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;0.23&lt;&#47;version&gt;<br/>
                 &lt;&#47;dependency&gt;<br/>
                 </b>
             </p>
@@ -115,7 +115,7 @@
 				<code class="language-java">
     Neuron cookSurnameEntity = Neuron.init(
             m.createNeuron("E-cook (surname)"),
-            3.0, // adjusts the bias
+            6.0, // adjusts the bias
             RECTIFIED_HYPERBOLIC_TANGENT,
             EXCITATORY,
             new Synapse.Builder() // Requires the word to be recognized
@@ -125,16 +125,13 @@
                     // This input requires the input activation to have an
                     // activation value of at least 0.9
                     .setBias(-10.0)
-                    .setRecurrent(false)
-                    .setRangeOutput(Range.Output.DIRECT),
+                    .setRecurrent(false),
             new Synapse.Builder() // The previous word needs to be a forename
                     .setSynapseId(1)
                     .setNeuron(forenameCategory)
-                    .setWeight(5.0)
-                    .setBias(0.0)
-                    .addRangeRelation(END_TO_BEGIN_EQUALS, 0) // references the previous word
-                    .setRecurrent(true) // this input is a positive feedback loop
-                    .setRangeOutput(false),
+                    .setWeight(10.0)
+                    .setBias(-10.0)
+                    .setRecurrent(true), // this input is a positive feedback loop
 
                     // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
                     // self suppression taking place even though 'E-cook (surname)' is also contained
@@ -144,8 +141,19 @@
                     .setNeuron(inhibitingN)
                     .setWeight(-100.0)
                     .setBias(0.0)
-                    .setRecurrent(true) // this input is a negative feedback loop
-                    .addRangeRelation(OVERLAPS, 0)
+                    .setRecurrent(true), // this input is a negative feedback loop
+            new Relation.Builder()  // references the previous word
+                    .setFrom(1)
+                    .setTo(0)
+                    .setRelation(END_TO_BEGIN_EQUALS),
+            new Relation.Builder()
+                    .setFrom(2)
+                    .setTo(0)
+                    .setRelation(OVERLAPS),
+            new Relation.Builder()
+                    .setFrom(0)
+                    .setTo(OUTPUT)
+                    .setRelation(EQUALS)
     );
                 </code>
 			</pre>
@@ -165,8 +173,11 @@
                     .setSynapseId(0)
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(1.0)
-                    .setBias(0.0)
-                    .setRangeOutput(Range.Output.DIRECT)
+                    .setBias(0.0),
+            new Relation.Builder()
+                    .setFrom(0)
+                    .setTo(OUTPUT)
+                    .setRelation(EQUALS)
     );
     Neuron.init(
             surnameCategory,
@@ -177,8 +188,11 @@
                     .setSynapseId(0)
                     .setNeuron(cookSurnameEntity)
                     .setWeight(1.0)
-                    .setBias(0.0)
-                    .setRangeOutput(Range.Output.DIRECT)
+                    .setBias(0.0),
+            new Relation.Builder()
+                    .setFrom(0)
+                    .setTo(OUTPUT)
+                    .setRelation(EQUALS)
     );
                 </code>
 			</pre>
@@ -197,26 +211,38 @@
             new Synapse.Builder().setNeuron(cookProfessionEntity)
                     .setSynapseId(0)
                     .setWeight(1.0)
-                    .setBias(0.0)
-                    .setRangeOutput(true, true),
+                    .setBias(0.0),
             new Synapse.Builder()
                     .setSynapseId(1)
                     .setNeuron(cookSurnameEntity)
                     .setWeight(1.0)
-                    .setBias(0.0)
-                    .setRangeOutput(true, true),
+                    .setBias(0.0),
             new Synapse.Builder()
                     .setSynapseId(2)
                     .setNeuron(jacksonCityEntity)
                     .setWeight(1.0)
-                    .setBias(0.0)
-                    .setRangeOutput(true, true),
+                    .setBias(0.0),
             new Synapse.Builder()
                     .setSynapseId(3)
                     .setNeuron(jacksonForenameEntity)
                     .setWeight(1.0)
-                    .setBias(0.0)
-                    .setRangeOutput(true, true)
+                    .setBias(0.0),
+            new Relation.Builder()
+                    .setFrom(0)
+                    .setTo(OUTPUT)
+                    .setRelation(EQUALS),
+            new Relation.Builder()
+                    .setFrom(1)
+                    .setTo(OUTPUT)
+                    .setRelation(EQUALS),
+            new Relation.Builder()
+                    .setFrom(2)
+                    .setTo(OUTPUT)
+                    .setRelation(EQUALS),
+            new Relation.Builder()
+                    .setFrom(3)
+                    .setTo(OUTPUT)
+                    .setRelation(EQUALS)
         );
                 </code>
 			</pre>
@@ -248,28 +274,30 @@
 			</pre>
             </div>
             <p>
-The output of this example looks as following. Each line in the table represents a neuron activation.
+The output of this example looks as following. Each line in the table represents a neuron activation. In this example,
+slots simply specify the range begin (slot 0) and the range end (slot 1).
             </p>
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-// Activation ID - Final Decision - Range - Neuron Label - Upper Bound
-// - Final Value | Final Weight | Final Norm - Input Value | Target Value
+
+Activation ID - Final Decision - Slots | Identity - Neuron Label - Logic Layer - Upper Bound -
+Final Value | Final Weight | Final Norm - Input Value | Target Value
 
     ...
-7  - SELECTED - (4,11)  - INHIB                - UB:2.0 - V:1.0 W:0.0 N:0.0
-3  - EXCLUDED - (4,11)  - E-jackson (city)     - UB:1.0 -
-10 - SELECTED - (4,11)  - C-forename           - UB:1.0 - V:1.0 W:0.0 N:0.0
-1  - SELECTED - (4,11)  - W-jackson            - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
-5  - SELECTED - (4,11)  - E-jackson (forename) - UB:1.0 - V:1.0 W:8.0 N:8.0
-20 - SELECTED - (12,16) - INHIB                - UB:2.0 - V:1.0 W:0.0 N:0.0
-16 - EXCLUDED - (12,16) - E-cook (profession)  - UB:1.0 -
-23 - SELECTED - (12,16) - C-surname            - UB:1.0 - V:1.0 W:0.0 N:0.0
-14 - SELECTED - (12,16) - W-cook               - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
-18 - SELECTED - (12,16) - E-cook (surname)     - UB:1.0 - V:1.0 W:8.0 N:8.0
+3 - SELECTED - (0:4, 1:12) () - C-forename - OR[] - UB:1.0 - V:1.0 pV:1.0 Net:1.0 P:1.0 W:0.0
+4 - SELECTED - (0:4, 1:12) () - INHIB - OR[] - UB:1.0 - V:1.0 pV:1.0 Net:1.0 P:1.0 W:0.0
+1 - SELECTED - (0:4, 1:12) () - W-jackson - OR[] - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
+2 - SELECTED - (0:4, 1:12) () - E-jackson (forename) - UB:1.0 - V:1.0 pV:1.0 Net:6.0 P:1.0 W:6.0
+5 - EXCLUDED - (0:4, 1:12) () - E-jackson (city) - UB:1.0 -
+8 - SELECTED - (0:12, 1:17) () - C-surname - OR[] - UB:1.0 - V:1.0 pV:1.0 Net:1.0 P:1.0 W:0.0
+9 - SELECTED - (0:12, 1:17) () - INHIB - OR[] - UB:1.0 - V:1.0 pV:1.0 Net:1.0 P:1.0 W:0.0
+6 - SELECTED - (0:12, 1:17) () - W-cook - OR[] - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
+7 - SELECTED - (0:12, 1:17) () - E-cook (surname) - UB:1.0 - V:1.0 pV:1.0 Net:8.0 P:1.0 W:8.0
+10 - EXCLUDED - (0:12, 1:17) () - E-cook (profession) - UB:1.0 -
     ...
 
- Final SearchNode:27  WeightSum:W:16.0 N:26.0
+ Final SearchNode:8  WeightSum:13.999
                 </code>
 			</pre>
             </div>
@@ -308,15 +336,21 @@ The output of this example looks as following. Each line in the table represents
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(EQUALS, 0)
+                        .setRecurrent(true),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS)
         );
 
         Neuron pB = Neuron.init(
@@ -329,15 +363,21 @@ The output of this example looks as following. Each line in the table represents
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(EQUALS, 0)
+                        .setRecurrent(true),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS)
         );
 
         Neuron pC = Neuron.init(
@@ -350,15 +390,21 @@ The output of this example looks as following. Each line in the table represents
                         .setNeuron(inC)
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
                         .setBias(0.0)
-                        .setRecurrent(true)
-                        .addRangeRelation(EQUALS, 0)
+                        .setRecurrent(true),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(0)
+                        .setRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS)
         );
 
         // Finally addInput all the inputs to the suppressing neuron.
@@ -372,22 +418,31 @@ The output of this example looks as following. Each line in the table represents
                         .setNeuron(pA)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pB)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(pC)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS)
         );
 
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
@@ -399,8 +454,11 @@ The output of this example looks as following. Each line in the table represents
                         .setNeuron(pB)
                         .setWeight(1.0)
                         .setBias(0.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(Range.Output.DIRECT)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS)
         );
 
         // Now that the model is complete, apply it to a document.
@@ -416,13 +474,13 @@ The output of this example looks as following. Each line in the table represents
         // Computes the best interpretation
         doc.process();
 
-        System.out.println(doc.activationsToString(true, false, true));
+        System.out.println(doc.activationsToString());
 
-        Assert.assertTrue(pA.getFinalActivations(doc).isEmpty());
-        Assert.assertFalse(pB.getFinalActivations(doc).isEmpty());
-        Assert.assertTrue(pC.getFinalActivations(doc).isEmpty());
+        Assert.assertEquals(0, pA.getActivations(doc, true).count());
+        Assert.assertEquals(1, pB.getActivations(doc, true).count());
+        Assert.assertEquals(0, pC.getActivations(doc, true).count());
 
-        Assert.assertFalse(outN.getFinalActivations(doc).isEmpty());
+        Assert.assertEquals(1, outN.getActivations(doc, true).count());
         doc.clearActivations();
     }
                 </code>
@@ -430,19 +488,19 @@ The output of this example looks as following. Each line in the table represents
 
 			<pre class="prettyprint">
 				<code class="language-java">
-// Activation ID - Final Decision - Range - Neuron Label - Upper Bound
-// - Final Value | Final Weight | Final Norm - Input Value | Target Value
+ Activation ID - Final Decision - Slots | Identity - Neuron Label - Upper Bound -
+ Final Value | Final Weight | Final Norm - Input Value | Target Value
 
-0  - SELECTED - (0,1) - IN-A  - UB:1.0   - V:1.0 W:0.0 N:0.0 - IV:1.0
-6  - SELECTED - (0,1) - IN-B  - UB:1.0   - V:1.0 W:0.0 N:0.0 - IV:1.0
-11 - SELECTED - (0,1) - IN-C  - UB:1.0   - V:1.0 W:0.0 N:0.0 - IV:1.0
-4  - SELECTED - (0,1) - INHIB - UB:2.959 - V:1.0 W:0.0 N:0.0
-2  - EXCLUDED - (0,1) - A     - UB:0.995 -
-8  - SELECTED - (0,1) - B     - UB:1.0   - V:1.0 W:5.0 N:5.0
-13 - EXCLUDED - (0,1) - C     - UB:0.964 -
-10 - SELECTED - (0,1) - OUT   - UB:0.762 - V:0.762 W:0.0 N:0.0
+0 - SELECTED - (0:0, 1:1) () - IN-A - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
+3 - SELECTED - (0:0, 1:1) () - IN-B - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
+6 - SELECTED - (0:0, 1:1) () - IN-C - UB:1.0  - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
+2 - SELECTED - (0:0, 1:1) () - INHIB - UB:2.959 - V:1.0 pV:1.0 Net:1.0 P:1.0 W:0.0
+1 - EXCLUDED - (0:0, 1:1) () - A - UB:0.995 -
+4 - SELECTED - (0:0, 1:1) () - B - UB:1.0 - V:1.0 pV:1.0 Net:5.0 P:1.0 W:5.0
+7 - EXCLUDED - (0:0, 1:1) () - C - UB:0.964 -
+5 - SELECTED - (0:0, 1:1) () - OUT - UB:0.762 - V:0.762 pV:0.762 Net:1.0 P:1.0 W:0.0
 
- Final SearchNode:10  WeightSum:W:5.0 N:10.0
+Final SearchNode:10  WeightSum:5.0
 				</code>
 			</pre>
             </div>
@@ -477,60 +535,67 @@ The output of this example looks as following. Each line in the table represents
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 1)
-                        .setRangeOutput(Range.Mapping.BEGIN, Range.Mapping.NONE),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 2),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .addRangeRelation(Range.Relation.END_TO_BEGIN_EQUALS, 3),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inputNeurons.get('e'))
                         .setWeight(10.0)
                         .setBias(-10.0)
-                        .setRecurrent(false)
-                        .setRangeOutput(false, true)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRelation(END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRelation(END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(3)
+                        .setRelation(END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(3)
+                        .setTo(OUTPUT)
+                        .setRelation(END_EQUALS)
         );
 
 
         // Create a simple text document.
-        Document doc = m.createDocument("a b c d e ", 0);
+        Document doc = m.createDocument("a b c d e ");
 
         // Then add the characters
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
-                inputNeurons.get(c).addInput(doc, i, i + 1);
+                inputNeurons.get(c).addInput(doc, i, i + 2);
             }
         }
 
         // Computes the best interpretation
         doc.process();
 
-        Assert.assertEquals(1, pattern.getActivations(doc, false).size());
+        Assert.assertEquals(1, pattern.getActivations(doc, false).count());
 
-
-        System.out.println("Output activation:");
-        INeuron n = pattern.get();
-        for(NodeActivation act: n.getActivations(doc, true)) {
-            System.out.println("Text Range: " + act.key.range);
-            System.out.println("Node: " + act.key.node);
-            System.out.println();
-        }
 
         System.out.println("All activations:");
-        System.out.println(doc.activationsToString(true, false, true));
+        System.out.println(doc.activationsToString());
         System.out.println();
 
         doc.clearActivations();
@@ -542,22 +607,17 @@ The output of this example looks as following. Each line in the table represents
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-Output activation:
-Text Range: (2,9)
-Node: BCDE - OR[0:AND[(-1:I[3,b|),(1:I|5,c|),(2:I|7,d|),(3:I|9,e])]]
+Activation ID - Final Decision - Slots | Identity - Neuron Label - Upper Bound -
+Final Value | Final Weight | Final Norm - Input Value | Target Value
 
-All activations:
-//Activation ID - Final Decision - Range - Neuron Label
-//- Upper Bound - Final Value | Final Weight | Final Norm - Input Value | Target Value
+0 - SELECTED - (0:0, 1:2) () - a - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
+1 - SELECTED - (0:2, 1:4) () - b - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
+5 - SELECTED - (0:2, 1:10) () - BCDE - UB:1.0 - V:1.0 pV:1.0 Net:5.0 P:1.0 W:0.0
+2 - SELECTED - (0:4, 1:6) () - c - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
+3 - SELECTED - (0:6, 1:8) () - d - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
+4 - SELECTED - (0:8, 1:10) () - e - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
 
-0  - SELECTED - (0,1) - a    - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
-1  - SELECTED - (2,3) - b    - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
-20 - SELECTED - (2,9) - BCDE - UB:1.0 - V:1.0 W:0.0 N:0.0
-3  - SELECTED - (4,5) - c    - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
-6  - SELECTED - (6,7) - d    - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
-11 - SELECTED - (8,9) - e    - UB:1.0 - V:1.0 W:0.0 N:0.0 - IV:1.0
-
- Final SearchNode:1  WeightSum:W:0.0 N:0.0
+ Final SearchNode:1  WeightSum:0.0
 				</code>
 			</pre>
             </div>

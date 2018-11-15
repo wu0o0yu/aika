@@ -31,6 +31,8 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 
@@ -70,8 +72,8 @@ public class NamedEntityRecognitionTest {
         Neuron cookSurnameEntity = Neuron.init(
                 m.createNeuron("E-cook (surname)"),
                 6.0, // adjusts the bias
-                ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
-                INeuron.Type.EXCITATORY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
+                EXCITATORY,
                 new Synapse.Builder() // Requires the word to be recognized
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get("cook"))
@@ -86,35 +88,35 @@ public class NamedEntityRecognitionTest {
                         .setWeight(10.0)
                         .setBias(-10.0)
                         .setRecurrent(true), // this input is a positive feedback loop
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRelation(EQUALS),
 
                 // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
                 // self suppression taking place even though 'E-cook (surname)' is also contained
-                // in the suppressingN.
+                // in the inhibitingN.
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inhibitingN)
                         .setWeight(-100.0)
                         .setBias(0.0)
                         .setRecurrent(true), // this input is a negative feedback loop
-                new Relation.Builder()
+                new Relation.Builder()  // references the previous word
                         .setFrom(1)
                         .setTo(0)
                         .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRelation(OVERLAPS)
+                        .setRelation(OVERLAPS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS)
         );
 
         Neuron cookProfessionEntity = Neuron.init(
                 m.createNeuron("E-cook (profession)"),
                 5.0,
-                ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
-                INeuron.Type.EXCITATORY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get("cook"))
@@ -139,8 +141,8 @@ public class NamedEntityRecognitionTest {
         Neuron jacksonForenameEntity = Neuron.init(
                 m.createNeuron("E-jackson (forename)"),
                 6.0,
-                ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
-                INeuron.Type.EXCITATORY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get("jackson"))
@@ -175,8 +177,8 @@ public class NamedEntityRecognitionTest {
         Neuron jacksonCityEntity = Neuron.init(
                 m.createNeuron("E-jackson (city)"),
                 5.0,
-                ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
-                INeuron.Type.EXCITATORY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get("jackson"))
@@ -203,7 +205,7 @@ public class NamedEntityRecognitionTest {
                 forenameCategory,
                 0.0,
                 ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder() // In this example there is only one forename considered.
                         .setSynapseId(0)
                         .setNeuron(jacksonForenameEntity)
@@ -218,7 +220,7 @@ public class NamedEntityRecognitionTest {
                 surnameCategory,
                 0.0,
                 ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(cookSurnameEntity)
@@ -288,7 +290,7 @@ public class NamedEntityRecognitionTest {
         // Search for the best interpretation of this text.
         doc.process();
 
-        System.out.println(doc.activationsToString(true, false, true));
+        System.out.println(doc.activationsToString());
         System.out.println();
 
         System.out.println("Activations of the Surname Category:");

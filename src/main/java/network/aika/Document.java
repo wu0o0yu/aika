@@ -488,7 +488,12 @@ public class Document implements Comparable<Document> {
 
 
     public String activationsToString() {
-        return activationsToString(true, false, false);
+        return activationsToString(true, true, false);
+    }
+
+
+    public String activationsToString(boolean finalOnly, boolean withTextSnippet) {
+        return activationsToString(finalOnly, withTextSnippet, false);
     }
 
 
@@ -509,7 +514,6 @@ public class Document implements Comparable<Document> {
         sb.append(" | Identity -");
         sb.append(" Neuron Label -");
         sb.append((withLogic ? " Logic Layer -" : ""));
-        sb.append(" Relational ID (Word Pos.) -");
         sb.append(" Upper Bound -");
         if(finalOnly) {
             sb.append(" Final Value | Final Weight | Final Norm -");
