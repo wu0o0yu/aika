@@ -194,9 +194,14 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             Map<Integer, Relation> fromRel = getRelationsMap(from, n);
             Map<Integer, Relation> toRel = getRelationsMap(to, n);
 
-            Relation r = getRelation();
-            addRelation(fromRel, to, from, n, r);
-            addRelation(toRel, from, to, n, r.invert());
+            Relation rel = getRelation();
+            if(from != to) {
+                addRelation(fromRel, to, from, n, rel);
+                addRelation(toRel, from, to, n, rel.invert());
+            } else {
+                MultiRelation mr = new MultiRelation(Arrays.asList(rel, rel.invert()));
+                addRelation(fromRel, to, from, n, mr);
+            }
         }
 
         @Override

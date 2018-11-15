@@ -29,6 +29,10 @@ public class MultiRelation extends Relation {
     }
 
 
+    public List<Relation> getRelations() {
+        return relations;
+    }
+
     @Override
     public int getRelationType() {
         return RELATION_TYPE;
