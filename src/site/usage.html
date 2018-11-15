@@ -555,8 +555,8 @@ Final SearchNode:10  WeightSum:5.0
                         .setBias(-10.0)
                         .setRecurrent(false),
                 new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(1)
+                        .setFrom(0)  // From Synapse Id
+                        .setTo(1)    // To Synapse Id
                         .setRelation(END_TO_BEGIN_EQUALS),
                 new Relation.Builder()
                         .setFrom(1)
