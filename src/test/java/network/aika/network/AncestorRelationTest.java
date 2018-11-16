@@ -198,7 +198,7 @@ public class AncestorRelationTest {
         Assert.assertTrue(nC.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
     }
 
-    @Ignore
+
     @Test
     public void testNotAncestorOfRelation() {
         Model m = new Model();
@@ -239,8 +239,8 @@ public class AncestorRelationTest {
                         .setBias(-10.0)
                         .setRecurrent(false),
                 new Relation.Builder()
-                        .setFrom(1)
-                        .setTo(OUTPUT)
+                        .setFrom(0)
+                        .setTo(1)
                         .setRelation(NOT_ANCESTOR_OF),
                 new Relation.Builder()
                         .setFrom(0)
@@ -256,6 +256,7 @@ public class AncestorRelationTest {
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 1);
+        inB.addInput(doc, 0, 1);
 
         Activation outC1 = outC.getActivation(doc, 0, 1, false);
 

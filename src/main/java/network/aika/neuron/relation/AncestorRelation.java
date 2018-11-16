@@ -26,11 +26,6 @@ public abstract class AncestorRelation extends Relation {
     }
 
 
-    private static void collectNotAncestorOf(List<Activation> results, INeuron n, Activation linkedAct) {
-
-    }
-
-
     private static void collectCommonAncestor(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
         if(linkedAct.visited == v) return;
 
@@ -111,15 +106,15 @@ public abstract class AncestorRelation extends Relation {
     }
 
 
-    private static void markDescendant(Activation act, long v) {
+    private static void markDescendants(Activation act, long v) {
         if(act.visited == v) return;
         act.visited = v;
 
         act.markedAncDesc = v;
 
-        act.getInputLinks(false, false)
+        act.getOutputLinks(false)
                 .filter(l -> l.synapse.identity)
-                .forEach(l -> markDescendant(l.input, v));
+                .forEach(l -> markDescendants(l.input, v));
     }
 
 
@@ -258,8 +253,12 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-            List<Activation> results = new ArrayList<>();
-            return results.stream();
+            long v = linkedAct.doc.visitedCounter++;
+            markDescendants(linkedAct, v);
+
+            INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
+            return th.getActivations()
+                    .filter(act -> act.markedAncDesc != v);
         }
     }
 
@@ -288,9 +287,12 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-            List<Activation> results = new ArrayList<>();
-            collectNotAncestorOf(results, n, linkedAct);
-            return results.stream();
+            long v = linkedAct.doc.visitedCounter++;
+            markAncestors(linkedAct, v);
+
+            INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
+            return th.getActivations()
+                    .filter(act -> act.markedAncDesc != v);
         }
     }
 }
