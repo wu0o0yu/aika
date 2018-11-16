@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 
 public abstract class AncestorRelation extends Relation {
 
-
     public static AncestorRelation COMMON_ANCESTOR = new CommonAncestor();
     public static AncestorRelation IS_DESCENDANT_OF = new IsDescendantOf();
     public static AncestorRelation IS_ANCESTOR_OF = new IsAncestorOf();

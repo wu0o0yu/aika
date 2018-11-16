@@ -533,7 +533,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                 if(ra == null && rb != null) return -1;
                 if(ra != null && rb == null) return 1;
 
-                r = Relation.COMPARATOR.compare(ra, rb);
+                r = ra.compareTo(rb);
                 if(r != 0) return r;
             }
             return 0;

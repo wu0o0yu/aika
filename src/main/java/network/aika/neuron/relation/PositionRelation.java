@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 
 
 public abstract class PositionRelation extends Relation {
-    public static final int RELATION_TYPE = 0;
 
     public int fromSlot;
     public int toSlot;
@@ -49,12 +48,6 @@ public abstract class PositionRelation extends Relation {
     @Override
     public void linksOutputs(Set<Integer> results) {
         results.add(toSlot);
-    }
-
-
-    @Override
-    public int getId() {
-        return RELATION_TYPE;
     }
 
 

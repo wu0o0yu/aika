@@ -25,7 +25,6 @@ import static network.aika.neuron.relation.PositionRelation.GreaterThan;
 
 public abstract class Relation implements Comparable<Relation>, Writable {
 
-
     public static Map<Integer, RelationFactory> relationRegistry = new TreeMap<>();
 
     public static Relation EQUALS = new MultiRelation(new Equals(BEGIN, BEGIN), new Equals(END, END));
@@ -42,18 +41,10 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public static Relation NONE = new None();
 
 
-    public static Comparator<Relation> COMPARATOR = (r1, r2) -> {
-        int r = Integer.compare(r1.getId(), r2.getId());
-        if(r != 0) return r;
-        return r1.compareTo(r2);
-    };
-
-
     @Override
     public int compareTo(Relation rel) {
         return Integer.compare(getId(), rel.getId());
     }
-
 
 
     public static void registerRelation(int relationId, RelationFactory rf) {

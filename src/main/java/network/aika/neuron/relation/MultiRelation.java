@@ -136,7 +136,7 @@ public class MultiRelation extends Relation {
         for(int i = 0; i < relations.size(); i++) {
             Relation a = relations.get(i);
             Relation b = mr.relations.get(i);
-            r = Relation.COMPARATOR.compare(a, b);
+            r = a.compareTo(b);
             if(r != 0) return r;
         }
         return 0;
