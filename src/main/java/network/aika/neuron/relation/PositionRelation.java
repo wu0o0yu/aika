@@ -290,6 +290,22 @@ public abstract class PositionRelation extends Relation {
             );
         }
 
+
+        @Override
+        public void write(DataOutput out) throws IOException {
+            super.write(out);
+
+            out.writeBoolean(orEquals);
+        }
+
+
+        @Override
+        public void readFields(DataInput in, Model m) throws IOException {
+            super.readFields(in, m);
+
+            orEquals = in.readBoolean();
+        }
+
         public String toString() {
             return "GT" + (orEquals ? "E" : "") + "(" + fromSlot + "," + toSlot + ")";
         }
