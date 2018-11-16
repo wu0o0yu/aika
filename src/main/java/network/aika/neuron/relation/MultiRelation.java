@@ -45,7 +45,7 @@ public class MultiRelation extends Relation {
 
 
     @Override
-    public int getId() {
+    public int getType() {
         return ID;
     }
 

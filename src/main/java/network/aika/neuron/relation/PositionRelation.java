@@ -107,10 +107,10 @@ public abstract class PositionRelation extends Relation {
 
 
     public static class Equals extends PositionRelation {
-        public static int ID = 0;
+        public static int TYPE = 0;
 
         static {
-            registerRelation(ID, () -> new Equals());
+            registerRelation(TYPE, () -> new Equals());
         }
 
 
@@ -122,8 +122,8 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public int getId() {
-            return ID;
+        public int getType() {
+            return TYPE;
         }
 
         @Override
@@ -161,12 +161,12 @@ public abstract class PositionRelation extends Relation {
 
 
     public static class LessThan extends PositionRelation {
-        public static int ID = 10;
+        public static int TYPE = 10;
 
         private boolean orEquals;
 
         static {
-            registerRelation(ID, () -> new LessThan());
+            registerRelation(TYPE, () -> new LessThan());
         }
 
 
@@ -180,8 +180,8 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public int getId() {
-            return ID;
+        public int getType() {
+            return TYPE;
         }
 
         @Override
@@ -233,12 +233,12 @@ public abstract class PositionRelation extends Relation {
 
 
     public static class GreaterThan extends PositionRelation {
-        public static int ID = 11;
+        public static int TYPE = 11;
 
         private boolean orEquals;
 
         static {
-            registerRelation(ID, () -> new GreaterThan());
+            registerRelation(TYPE, () -> new GreaterThan());
         }
 
 
@@ -252,8 +252,8 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public int getId() {
-            return ID;
+        public int getType() {
+            return TYPE;
         }
 
         @Override

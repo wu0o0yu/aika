@@ -1,14 +1,10 @@
 package network.aika.neuron.relation;
 
-import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -146,15 +142,15 @@ public abstract class AncestorRelation extends Relation {
 
 
     public static class CommonAncestor extends AncestorRelation {
-        public static int ID = 50;
+        public static int TYPE = 50;
 
         static {
-            registerRelation(ID, () -> COMMON_ANCESTOR);
+            registerRelation(TYPE, () -> COMMON_ANCESTOR);
         }
 
         @Override
-        public int getId() {
-            return ID;
+        public int getType() {
+            return TYPE;
         }
 
         @Override
@@ -177,15 +173,15 @@ public abstract class AncestorRelation extends Relation {
 
 
     public static class IsDescendantOf extends AncestorRelation {
-        public static int ID = 51;
+        public static int TYPE = 51;
 
         static {
-            registerRelation(ID, () -> IS_DESCENDANT_OF);
+            registerRelation(TYPE, () -> IS_DESCENDANT_OF);
         }
 
         @Override
-        public int getId() {
-            return ID;
+        public int getType() {
+            return TYPE;
         }
 
         @Override
@@ -208,15 +204,15 @@ public abstract class AncestorRelation extends Relation {
 
 
     public static class IsAncestorOf extends AncestorRelation {
-        public static int ID = 52;
+        public static int TYPE = 52;
 
         static {
-            registerRelation(ID, () -> IS_ANCESTOR_OF);
+            registerRelation(TYPE, () -> IS_ANCESTOR_OF);
         }
 
         @Override
-        public int getId() {
-            return ID;
+        public int getType() {
+            return TYPE;
         }
 
         @Override
@@ -239,15 +235,15 @@ public abstract class AncestorRelation extends Relation {
 
 
     public static class NotDescendantOf extends AncestorRelation {
-        public static int ID = 53;
+        public static int TYPE = 53;
 
         static {
-            registerRelation(ID, () -> NOT_DESCENDANT_OF);
+            registerRelation(TYPE, () -> NOT_DESCENDANT_OF);
         }
 
         @Override
-        public int getId() {
-            return ID;
+        public int getType() {
+            return TYPE;
         }
 
         @Override
@@ -269,15 +265,15 @@ public abstract class AncestorRelation extends Relation {
 
 
     public static class NotAncestorOf extends AncestorRelation {
-        public static int ID = 54;
+        public static int TYPE = 54;
 
         static {
-            registerRelation(ID, () -> NOT_ANCESTOR_OF);
+            registerRelation(TYPE, () -> NOT_ANCESTOR_OF);
         }
 
         @Override
-        public int getId() {
-            return ID;
+        public int getType() {
+            return TYPE;
         }
 
         @Override

@@ -504,7 +504,7 @@ public class Document implements Comparable<Document> {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Activation ID -");
+        sb.append("Activation TYPE -");
         if(finalOnly) {
             sb.append(" Final Decision -");
         } else {
