@@ -154,13 +154,6 @@ public class MultiRelation extends Relation {
     }
 
 
-    public static MultiRelation read(DataInput in, Model m) throws IOException {
-        MultiRelation mr = new MultiRelation();
-        mr.readFields(in, m);
-        return mr;
-    }
-
-
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         int l = in.readInt();
