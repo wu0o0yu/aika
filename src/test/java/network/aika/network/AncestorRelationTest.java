@@ -198,7 +198,7 @@ public class AncestorRelationTest {
         Assert.assertTrue(nC.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
     }
 
-
+    @Ignore
     @Test
     public void testNotAncestorOfRelation() {
         Model m = new Model();
