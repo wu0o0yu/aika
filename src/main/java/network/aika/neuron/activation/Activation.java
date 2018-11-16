@@ -90,7 +90,7 @@ public final class Activation extends OrActivation {
     public Decision finalDecision = Decision.UNKNOWN;
     public Candidate candidate;
     private long visitedState;
-    public long markedAncestor;
+    public long markedAncDesc;
 
     public boolean blocked;
 

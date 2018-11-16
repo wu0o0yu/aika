@@ -21,8 +21,8 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Position.Operator;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,6 +32,8 @@ import java.util.Map;
 
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
+import static network.aika.neuron.activation.Activation.BEGIN;
+import static network.aika.neuron.activation.Activation.END;
 
 /**
  *
@@ -87,7 +89,7 @@ public class OverlappingOrTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(2)
-                        .setRelation(Relation.createRangeRelation(Operator.NONE, Operator.NONE, Operator.NONE, Operator.LESS_THAN)),
+                        .setRelation(new PositionRelation.LessThan(END, BEGIN, false)),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)

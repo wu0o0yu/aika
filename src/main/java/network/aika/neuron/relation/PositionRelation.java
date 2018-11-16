@@ -13,49 +13,36 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.Position.Operator.*;
-import static network.aika.neuron.activation.Position.Operator;
 
 
-public class PositionRelation extends Relation {
+public abstract class PositionRelation extends Relation {
     public static final int RELATION_TYPE = 0;
 
     public int fromSlot;
     public int toSlot;
 
-    public Position.Operator relation;
 
-    PositionRelation() {}
+    public PositionRelation() {
 
-    public PositionRelation(int fromSlot, int toSlot, Position.Operator relation) {
+    }
+
+    public PositionRelation(int fromSlot, int toSlot) {
         this.fromSlot = fromSlot;
         this.toSlot = toSlot;
-        this.relation = relation;
     }
 
 
     @Override
     public boolean test(Activation act, Activation linkedAct) {
-        return relation.compare(act.getSlot(fromSlot), linkedAct.getSlot(toSlot));
+        return test(act.getSlot(fromSlot), linkedAct.getSlot(toSlot));
     }
 
 
-    public String toString() {
-        return "RR(" + fromSlot + "," + toSlot + "," + relation + ")";
-    }
-
-
-    @Override
-    public Relation invert() {
-        return new PositionRelation(toSlot, fromSlot, relation.invert());
-    }
+    public abstract boolean test(Position a, Position b);
 
 
     @Override
     public void mapRange(Map<Integer, Position> slots, Activation act) {
-        if(relation == Position.Operator.EQUALS) {
-            slots.put(toSlot, act.getSlot(fromSlot));
-        }
     }
 
 
@@ -66,21 +53,22 @@ public class PositionRelation extends Relation {
 
 
     @Override
-    public int getRelationType() {
+    public int getId() {
         return RELATION_TYPE;
     }
 
 
     @Override
     public int compareTo(Relation rel) {
+        int r = super.compareTo(rel);
+        if(r != 0) return r;
+
         PositionRelation pr = (PositionRelation) rel;
 
-        int r = Integer.compare(fromSlot, pr.fromSlot);
+        r = Integer.compare(fromSlot, pr.fromSlot);
         if(r != 0) return r;
         r = Integer.compare(toSlot, pr.toSlot);
-        if(r != 0) return r;
-
-        return relation.compareTo(pr.relation);
+        return r;
     }
 
 
@@ -90,30 +78,15 @@ public class PositionRelation extends Relation {
 
         out.writeInt(fromSlot);
         out.writeInt(toSlot);
-
-        out.writeByte(relation.getId());
     }
 
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
+        super.readFields(in, m);
+
         fromSlot = in.readInt();
         toSlot = in.readInt();
-
-        relation = Position.Operator.getById(in.readByte());
-    }
-
-
-    public static PositionRelation read(DataInput in, Model m) throws IOException {
-        PositionRelation rr = new PositionRelation();
-        rr.readFields(in, m);
-        return rr;
-    }
-
-
-    @Override
-    public boolean isExact() {
-        return relation == Operator.EQUALS;
     }
 
 
@@ -127,33 +100,198 @@ public class PositionRelation extends Relation {
 
         Position pos = linkedAct.getSlot(toSlot);
 
-        Stream<Activation> results;
-        if(relation == Operator.EQUALS) {
-            results = th.getActivations(
-                    fromSlot, pos, true,
-                    fromSlot, pos, true
-            );
-        } else if(relation == LESS_THAN || relation == LESS_THAN_EQUAL) {
-            results = th.getActivations(
-                    fromSlot, Position.MIN, true,
-                    fromSlot, pos, relation == LESS_THAN_EQUAL
-            );
-        } else if(relation == GREATER_THAN || relation == GREATER_THAN_EQUAL) {
-            results = th.getActivations(
-                    fromSlot, pos, relation == GREATER_THAN_EQUAL,
-                    fromSlot, Position.MAX, true
-            );
-        } else {
-            results = th.getActivations();
-        }
-
-        return results
+        return getActivations(th, pos)
                 .filter(act -> test(act, linkedAct));
     }
+
+    public abstract Stream<Activation> getActivations(INeuron.ThreadState th, Position pos);
 
 
     @Override
     public void registerRequiredSlots(Neuron input) {
         input.get().slotRequired.add(fromSlot);
+    }
+
+
+    public static class Equals extends PositionRelation {
+        public static int ID = 0;
+
+        static {
+            registerRelation(ID, () -> new Equals());
+        }
+
+
+        public Equals() {}
+
+
+        public Equals(int fromSlot, int toSlot) {
+            super(fromSlot, toSlot);
+        }
+
+        @Override
+        public int getId() {
+            return ID;
+        }
+
+        @Override
+        public Relation invert() {
+            return new Equals(toSlot, fromSlot);
+        }
+
+        @Override
+        public boolean test(Position a, Position b) {
+            return a == b;
+        }
+
+        @Override
+        public void mapRange(Map<Integer, Position> slots, Activation act) {
+            slots.put(toSlot, act.getSlot(fromSlot));
+        }
+
+        @Override
+        public boolean isExact() {
+            return true;
+        }
+
+        @Override
+        public Stream<Activation> getActivations(INeuron.ThreadState th, Position pos) {
+            return th.getActivations(
+                    fromSlot, pos, true,
+                    fromSlot, pos, true
+            );
+        }
+
+        public String toString() {
+            return "EQUALS(" + fromSlot + "," + toSlot + ")";
+        }
+    }
+
+
+    public static class LessThan extends PositionRelation {
+        public static int ID = 10;
+
+        private boolean orEquals;
+
+        static {
+            registerRelation(ID, () -> new LessThan());
+        }
+
+
+        public LessThan() {
+
+        }
+
+        public LessThan(int fromSlot, int toSlot, boolean orEquals) {
+            super(fromSlot, toSlot);
+            this.orEquals = orEquals;
+        }
+
+        @Override
+        public int getId() {
+            return ID;
+        }
+
+        @Override
+        public Relation invert() {
+            return new GreaterThan(toSlot, fromSlot, orEquals);
+        }
+
+        @Override
+        public boolean isExact() {
+            return false;
+        }
+
+        @Override
+        public boolean test(Position a, Position b) {
+            if(a == b) {
+                return orEquals;
+            }
+
+            return a.getFinalPosition() != null && b.getFinalPosition() != null && a.getFinalPosition() < b.getFinalPosition();
+        }
+
+        @Override
+        public Stream<Activation> getActivations(INeuron.ThreadState th, Position pos) {
+            return th.getActivations(
+                    fromSlot, Position.MIN, true,
+                    fromSlot, pos, orEquals
+            );
+        }
+
+        @Override
+        public void write(DataOutput out) throws IOException {
+            super.write(out);
+
+            out.writeBoolean(orEquals);
+        }
+
+
+        @Override
+        public void readFields(DataInput in, Model m) throws IOException {
+            super.readFields(in, m);
+
+            orEquals = in.readBoolean();
+        }
+
+        public String toString() {
+            return "LT" + (orEquals ? "E" : "") + "(" + fromSlot + "," + toSlot + ")";
+        }
+    }
+
+
+    public static class GreaterThan extends PositionRelation {
+        public static int ID = 11;
+
+        private boolean orEquals;
+
+        static {
+            registerRelation(ID, () -> new GreaterThan());
+        }
+
+
+        public GreaterThan() {
+
+        }
+
+        public GreaterThan(int fromSlot, int toSlot, boolean orEquals) {
+            super(fromSlot, toSlot);
+            this.orEquals = orEquals;
+        }
+
+        @Override
+        public int getId() {
+            return ID;
+        }
+
+        @Override
+        public Relation invert() {
+            return new LessThan(toSlot, fromSlot, orEquals);
+        }
+
+        @Override
+        public boolean isExact() {
+            return false;
+        }
+
+        @Override
+        public boolean test(Position a, Position b) {
+            if(a == b) {
+                return orEquals;
+            }
+
+            return a.getFinalPosition() != null && b.getFinalPosition() != null && a.getFinalPosition() > b.getFinalPosition();
+        }
+
+        @Override
+        public Stream<Activation> getActivations(INeuron.ThreadState th, Position pos) {
+            return th.getActivations(
+                    fromSlot, pos, orEquals,
+                    fromSlot, Position.MAX, true
+            );
+        }
+
+        public String toString() {
+            return "GT" + (orEquals ? "E" : "") + "(" + fromSlot + "," + toSlot + ")";
+        }
     }
 }

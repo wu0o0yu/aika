@@ -14,13 +14,23 @@ import java.util.stream.Stream;
 
 
 public class MultiRelation extends Relation {
-    public static final int RELATION_TYPE = 2;
+    public static final int ID = 1;
 
     private List<Relation> relations;
 
 
+    static {
+        registerRelation(ID, () -> new MultiRelation());
+    }
+
+
     public MultiRelation() {
         relations = new ArrayList<>();
+    }
+
+
+    public MultiRelation(Relation... rels) {
+        relations = Arrays.asList(rels);
     }
 
 
@@ -33,9 +43,10 @@ public class MultiRelation extends Relation {
         return relations;
     }
 
+
     @Override
-    public int getRelationType() {
-        return RELATION_TYPE;
+    public int getId() {
+        return ID;
     }
 
 
@@ -131,6 +142,7 @@ public class MultiRelation extends Relation {
         return 0;
     }
 
+
     @Override
     public void write(DataOutput out) throws IOException {
         super.write(out);
@@ -140,6 +152,7 @@ public class MultiRelation extends Relation {
             rel.write(out);
         }
     }
+
 
     public static MultiRelation read(DataInput in, Model m) throws IOException {
         MultiRelation mr = new MultiRelation();
@@ -154,5 +167,20 @@ public class MultiRelation extends Relation {
         for(int i = 0; i < l; i++) {
             relations.add(Relation.read(in, m));
         }
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("MR(");
+        boolean first = true;
+        for(Relation rel: relations) {
+            if(!first) {
+                sb.append(", ");
+            }
+            first = false;
+            sb.append(rel.toString());
+        }
+        sb.append(")");
+        return sb.toString();
     }
 }

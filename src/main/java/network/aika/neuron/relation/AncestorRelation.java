@@ -13,57 +13,30 @@ import java.util.*;
 import java.util.stream.Stream;
 
 
-public class AncestorRelation extends Relation {
-    public static final int RELATION_TYPE = 1;
+public abstract class AncestorRelation extends Relation {
 
 
-    public Type type;
-
-    public enum Type  {
-        COMMON_ANCESTOR,
-        IS_DESCENDANT_OF,
-        IS_ANCESTOR_OF,
-        NOT_DESCENDANT_OF,
-        NOT_ANCESTOR_OF,
-        EQUALS
-    }
+    public static AncestorRelation COMMON_ANCESTOR = new CommonAncestor();
+    public static AncestorRelation IS_DESCENDANT_OF = new IsDescendantOf();
+    public static AncestorRelation IS_ANCESTOR_OF = new IsAncestorOf();
+    public static AncestorRelation NOT_DESCENDANT_OF = new NotDescendantOf();
+    public static AncestorRelation NOT_ANCESTOR_OF = new NotAncestorOf();
 
 
     AncestorRelation() {}
 
 
-    public AncestorRelation(Type type) {
-        this.type = type;
-    }
-
-
-    @Override
-    public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-        List<Activation> results = new ArrayList<>();
-        switch(type) {
-            case COMMON_ANCESTOR:
-                collectCommonAncestor(results, n, linkedAct, linkedAct.doc.visitedCounter++);
-                break;
-            case IS_DESCENDANT_OF:
-                collectContains(results, n, linkedAct, linkedAct.doc.visitedCounter++);
-                break;
-            case IS_ANCESTOR_OF:
-                collectContainedIn(results, n, linkedAct, linkedAct.doc.visitedCounter++);
-                break;
-            case EQUALS:
-                collectEquals(results, n, linkedAct);
-                break;
-        }
-        return results.stream();
-    }
-
     @Override
     public void registerRequiredSlots(Neuron input) {
+    }
+
+
+    private static void collectNotAncestorOf(List<Activation> results, INeuron n, Activation linkedAct) {
 
     }
 
 
-    private void collectCommonAncestor(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
+    private static void collectCommonAncestor(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
         if(linkedAct.visited == v) return;
 
         collectContains(results, n, linkedAct, v);
@@ -74,7 +47,7 @@ public class AncestorRelation extends Relation {
     }
 
 
-    private void collectContains(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
+    private static void collectContains(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
         if(linkedAct.visited == v) return;
         linkedAct.visited = v;
 
@@ -88,7 +61,7 @@ public class AncestorRelation extends Relation {
     }
 
 
-    private void collectContainedIn(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
+    private static void collectContainedIn(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
         if(linkedAct.visited == v) return;
         linkedAct.visited = v;
 
@@ -99,47 +72,6 @@ public class AncestorRelation extends Relation {
         linkedAct.getInputLinks(false, false)
                 .filter(l -> l.synapse.identity)
                 .forEach(l -> collectContainedIn(results, n, l.input, v));
-    }
-
-
-    private void collectEquals(List<Activation> results, INeuron n, Activation linkedAct) {
-        results.add(linkedAct);
-    }
-
-
-    @Override
-    public boolean test(Activation act, Activation linkedAct) {
-        switch(type) {
-            case COMMON_ANCESTOR:
-                return hasCommonAncestor(act, linkedAct);
-            case IS_DESCENDANT_OF:
-                return contains(act, linkedAct, act.doc.visitedCounter++);
-            case IS_ANCESTOR_OF:
-                return contains(linkedAct, act, act.doc.visitedCounter++);
-            case NOT_DESCENDANT_OF:
-                return !contains(act, linkedAct, act.doc.visitedCounter++);
-            case NOT_ANCESTOR_OF:
-                return !contains(linkedAct, act, act.doc.visitedCounter++);
-        }
-        return true;
-    }
-
-
-    @Override
-    public Relation invert() {
-        switch(type) {
-            case COMMON_ANCESTOR:
-                return this;
-            case IS_DESCENDANT_OF:
-                return new AncestorRelation(Type.IS_ANCESTOR_OF);
-            case IS_ANCESTOR_OF:
-                return new AncestorRelation(Type.IS_DESCENDANT_OF);
-            case NOT_DESCENDANT_OF:
-                return new AncestorRelation(Type.NOT_ANCESTOR_OF);
-            case NOT_ANCESTOR_OF:
-                return new AncestorRelation(Type.NOT_DESCENDANT_OF);
-        }
-        return null;
     }
 
 
@@ -176,7 +108,7 @@ public class AncestorRelation extends Relation {
         if(act.visited == v) return;
         act.visited = v;
 
-        act.markedAncestor = v;
+        act.markedAncDesc = v;
 
         act.getInputLinks(false, false)
                 .filter(l -> l.synapse.identity)
@@ -184,11 +116,23 @@ public class AncestorRelation extends Relation {
     }
 
 
+    private static void markDescendant(Activation act, long v) {
+        if(act.visited == v) return;
+        act.visited = v;
+
+        act.markedAncDesc = v;
+
+        act.getInputLinks(false, false)
+                .filter(l -> l.synapse.identity)
+                .forEach(l -> markDescendant(l.input, v));
+    }
+
+
     private static boolean hasCommonAncestor(Activation act, long v1, long v2) {
         if(act.visited == v2) return false;
         act.visited = v2;
 
-        if(act.markedAncestor == v1) return true;
+        if(act.markedAncDesc == v1) return true;
 
         return act.getInputLinks(false, false)
                 .filter(l -> l.synapse.identity)
@@ -196,42 +140,162 @@ public class AncestorRelation extends Relation {
     }
 
 
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-
-        out.writeUTF(type.name());
-    }
-
-
-    @Override
-    public void readFields(DataInput in, Model m) throws IOException {
-        type = Type.valueOf(in.readUTF());
-    }
-
-
-    public static AncestorRelation read(DataInput in, Model m) throws IOException {
-        AncestorRelation ir = new AncestorRelation();
-        ir.readFields(in, m);
-        return ir;
-    }
-
     @Override
     public boolean isExact() {
         return false;
     }
 
 
-    @Override
-    public int getRelationType() {
-        return RELATION_TYPE;
+    public static class CommonAncestor extends AncestorRelation {
+        public static int ID = 50;
+
+        static {
+            registerRelation(ID, () -> COMMON_ANCESTOR);
+        }
+
+        @Override
+        public int getId() {
+            return ID;
+        }
+
+        @Override
+        public Relation invert() {
+            return COMMON_ANCESTOR;
+        }
+
+        @Override
+        public boolean test(Activation act, Activation linkedAct) {
+            return hasCommonAncestor(act, linkedAct);
+        }
+
+        @Override
+        public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+            List<Activation> results = new ArrayList<>();
+            collectCommonAncestor(results, n, linkedAct, linkedAct.doc.visitedCounter++);
+            return results.stream();
+        }
     }
 
-    @Override
-    public int compareTo(Relation rel) {
-        AncestorRelation ir = (AncestorRelation) rel;
 
-        return type.compareTo(ir.type);
+    public static class IsDescendantOf extends AncestorRelation {
+        public static int ID = 51;
+
+        static {
+            registerRelation(ID, () -> IS_DESCENDANT_OF);
+        }
+
+        @Override
+        public int getId() {
+            return ID;
+        }
+
+        @Override
+        public Relation invert() {
+            return IS_ANCESTOR_OF;
+        }
+
+        @Override
+        public boolean test(Activation act, Activation linkedAct) {
+            return contains(act, linkedAct, act.doc.visitedCounter++);
+        }
+
+        @Override
+        public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+            List<Activation> results = new ArrayList<>();
+            collectContains(results, n, linkedAct, linkedAct.doc.visitedCounter++);
+            return results.stream();
+        }
+    }
+
+
+    public static class IsAncestorOf extends AncestorRelation {
+        public static int ID = 52;
+
+        static {
+            registerRelation(ID, () -> IS_ANCESTOR_OF);
+        }
+
+        @Override
+        public int getId() {
+            return ID;
+        }
+
+        @Override
+        public Relation invert() {
+            return IS_DESCENDANT_OF;
+        }
+
+        @Override
+        public boolean test(Activation act, Activation linkedAct) {
+            return contains(linkedAct, act, act.doc.visitedCounter++);
+        }
+
+        @Override
+        public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+            List<Activation> results = new ArrayList<>();
+            collectContainedIn(results, n, linkedAct, linkedAct.doc.visitedCounter++);
+            return results.stream();
+        }
+    }
+
+
+    public static class NotDescendantOf extends AncestorRelation {
+        public static int ID = 53;
+
+        static {
+            registerRelation(ID, () -> NOT_DESCENDANT_OF);
+        }
+
+        @Override
+        public int getId() {
+            return ID;
+        }
+
+        @Override
+        public Relation invert() {
+            return NOT_ANCESTOR_OF;
+        }
+
+        @Override
+        public boolean test(Activation act, Activation linkedAct) {
+            return !contains(act, linkedAct, act.doc.visitedCounter++);
+        }
+
+        @Override
+        public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+            List<Activation> results = new ArrayList<>();
+            return results.stream();
+        }
+    }
+
+
+    public static class NotAncestorOf extends AncestorRelation {
+        public static int ID = 54;
+
+        static {
+            registerRelation(ID, () -> NOT_ANCESTOR_OF);
+        }
+
+        @Override
+        public int getId() {
+            return ID;
+        }
+
+        @Override
+        public Relation invert() {
+            return NOT_DESCENDANT_OF;
+        }
+
+        @Override
+        public boolean test(Activation act, Activation linkedAct) {
+            return !contains(linkedAct, act, act.doc.visitedCounter++);
+        }
+
+        @Override
+        public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+            List<Activation> results = new ArrayList<>();
+            collectNotAncestorOf(results, n, linkedAct);
+            return results.stream();
+        }
     }
 }

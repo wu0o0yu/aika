@@ -7,6 +7,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,10 +18,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.activation.Position.Operator.NONE;
+import static network.aika.neuron.activation.Activation.BEGIN;
+import static network.aika.neuron.activation.Activation.END;
 import static network.aika.neuron.relation.Relation.*;
 import static network.aika.neuron.relation.Relation.EQUALS;
-import static network.aika.neuron.activation.Position.Operator.*;
 
 
 public class PositionRelationTest {
@@ -192,7 +193,7 @@ public class PositionRelationTest {
                     inputs.add(new Relation.Builder()
                                     .setFrom(i)
                                     .setTo(0)
-                                    .setRelation(Relation.createRangeRelation(NONE, NONE, NONE, GREATER_THAN))
+                                    .setRelation(new PositionRelation.GreaterThan(END, BEGIN, false))
                     );
                 }
             }

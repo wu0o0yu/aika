@@ -24,12 +24,14 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Position;
 import network.aika.lattice.OrNode;
+import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.activation.Position.Operator.GREATER_THAN;
+import static network.aika.neuron.activation.Activation.BEGIN;
+import static network.aika.neuron.activation.Activation.END;
 import static network.aika.neuron.relation.Relation.*;
 
 /**
@@ -465,7 +467,7 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRelation(Relation.createRangeRelation(Position.Operator.NONE, Position.Operator.NONE, Position.Operator.NONE, GREATER_THAN)),
+                        .setRelation(new PositionRelation.GreaterThan(END, BEGIN, false)),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)

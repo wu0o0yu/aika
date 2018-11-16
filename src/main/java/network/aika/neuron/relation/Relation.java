@@ -15,64 +15,56 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.Position.Operator;
 import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.activation.Activation.BEGIN;
+import static network.aika.neuron.activation.Activation.END;
+import static network.aika.neuron.relation.PositionRelation.Equals;
+import static network.aika.neuron.relation.PositionRelation.LessThan;
+import static network.aika.neuron.relation.PositionRelation.GreaterThan;
 
 
 public abstract class Relation implements Comparable<Relation>, Writable {
 
-    public static Relation EQUALS = createRangeRelation(Operator.EQUALS, Operator.EQUALS);
-    public static Relation BEGIN_EQUALS = createRangeRelation(Operator.EQUALS, Operator.NONE);
-    public static Relation END_EQUALS = createRangeRelation(Operator.NONE, Position.Operator.EQUALS);
-    public static Relation BEGIN_TO_END_EQUALS = createRangeRelation(Position.Operator.NONE, Operator.EQUALS, Operator.NONE , Operator.NONE);
-    public static Relation END_TO_BEGIN_EQUALS = createRangeRelation(Operator.NONE, Operator.NONE, Operator.NONE , Operator.EQUALS);
-    public static Relation CONTAINS = createRangeRelation(Operator.LESS_THAN_EQUAL, Operator.GREATER_THAN_EQUAL);
-    public static Relation CONTAINED_IN = createRangeRelation(Operator.GREATER_THAN_EQUAL, Operator.LESS_THAN_EQUAL);
-    public static Relation OVERLAPS = createRangeRelation(Operator.NONE, Operator.LESS_THAN, Operator.NONE, Operator.GREATER_THAN);
-    public static Relation NONE = createRangeRelation(Operator.NONE, Operator.NONE);
-    public static Relation BETWEEN = createRangeRelation(Operator.GREATER_THAN, Operator.LESS_THAN);
-    public static Relation BEFORE = createRangeRelation(Operator.NONE, Operator.NONE, Operator.NONE , Operator.LESS_THAN_EQUAL);
-    public static Relation AFTER = createRangeRelation(Operator.NONE, Operator.NONE, Operator.NONE , Operator.GREATER_THAN_EQUAL);
 
+    public static Map<Integer, RelationFactory> relationRegistry = new TreeMap<>();
+
+    public static Relation EQUALS = new MultiRelation(new Equals(BEGIN, BEGIN), new Equals(END, END));
+    public static Relation BEGIN_EQUALS = new Equals(BEGIN, BEGIN);
+    public static Relation END_EQUALS = new Equals(END, END);
+    public static Relation BEGIN_TO_END_EQUALS = new Equals(BEGIN, END);
+    public static Relation END_TO_BEGIN_EQUALS = new Equals(END, BEGIN);
+    public static Relation CONTAINS = new MultiRelation(new LessThan(BEGIN, BEGIN, true), new GreaterThan(END, END, true));
+    public static Relation CONTAINED_IN = new MultiRelation(new GreaterThan(BEGIN, BEGIN, true), new LessThan(END, END, true));
+    public static Relation OVERLAPS = new MultiRelation(new LessThan(BEGIN, END, false), new GreaterThan(END, BEGIN, false));
+    public static Relation BEFORE = new LessThan(END, BEGIN, true);
+    public static Relation AFTER = new GreaterThan(BEGIN, END, true);
+
+    public static Relation NONE = new None();
 
 
     public static Comparator<Relation> COMPARATOR = (r1, r2) -> {
-        int r = Integer.compare(r1.getRelationType(), r2.getRelationType());
+        int r = Integer.compare(r1.getId(), r2.getId());
         if(r != 0) return r;
         return r1.compareTo(r2);
     };
 
 
-    public static Relation createRangeRelation(Operator beginToBegin, Operator beginToEnd, Operator endToEnd, Operator endToBegin) {
-        List<Relation> rels = new ArrayList<>();
-
-        if(beginToBegin != Operator.NONE) {
-            rels.add(new PositionRelation(Activation.BEGIN, Activation.BEGIN, beginToBegin));
-        }
-        if(beginToEnd != Operator.NONE) {
-            rels.add(new PositionRelation(Activation.BEGIN, Activation.END, beginToEnd));
-        }
-        if(endToEnd != Operator.NONE) {
-            rels.add(new PositionRelation(Activation.END, Activation.END, endToEnd));
-        }
-        if(endToBegin != Operator.NONE) {
-            rels.add(new PositionRelation(Activation.END, Activation.BEGIN, endToBegin));
-        }
-
-        if(rels.size() == 1) {
-            return rels.get(0);
-        } else {
-            return new MultiRelation(rels);
-        }
+    @Override
+    public int compareTo(Relation rel) {
+        return Integer.compare(getId(), rel.getId());
     }
 
 
-    public static Relation createRangeRelation(Operator beginToBegin, Operator endToEnd) {
-        return createRangeRelation(beginToBegin, Operator.NONE, endToEnd, Operator.NONE);
+
+    public static void registerRelation(int relationId, RelationFactory rf) {
+        relationRegistry.put(relationId, rf);
     }
 
+    public interface RelationFactory {
+        Relation create();
+    }
 
-    public abstract int getRelationType();
+    public abstract int getId();
 
     public abstract boolean test(Activation act, Activation linkedAct);
 
@@ -84,22 +76,22 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
 
     public void write(DataOutput out) throws IOException {
-        out.writeInt(getRelationType());
+        out.writeInt(getId());
     }
 
 
     public static Relation read(DataInput in, Model m) throws IOException {
-        switch (in.readInt()) {
-            case AncestorRelation.RELATION_TYPE:
-                return AncestorRelation.read(in, m);
-            case PositionRelation.RELATION_TYPE:
-                return PositionRelation.read(in, m);
-            case MultiRelation.RELATION_TYPE:
-                return MultiRelation.read(in, m);
-            default:
-                return null;
-        }
+        RelationFactory rf = relationRegistry.get(in.readInt());
+        Relation rel = rf.create();
+        rel.readFields(in, m);
+        return rel;
     }
+
+
+    @Override
+    public void readFields(DataInput in, Model m) throws IOException {
+    }
+
 
     public abstract boolean isExact();
 
@@ -170,15 +162,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             return this;
         }
 
-        public Builder setAncestorRelation(AncestorRelation.Type type) {
-            this.relation = new AncestorRelation(type);
-            return this;
-        }
-
-        public Builder setPositionRelation(int fromSlot, int toSlot, Operator operator) {
-            this.relation = new PositionRelation(fromSlot, toSlot, operator);
-            return this;
-        }
 
         public Builder setRelation(Relation rel) {
             this.relation = rel;
@@ -208,6 +191,57 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         public void registerSynapseIds(Neuron n) {
             n.registerSynapseId(from);
             n.registerSynapseId(to);
+        }
+    }
+
+
+    public static class None extends Relation {
+        public static int ID = 100;
+
+        static {
+            registerRelation(ID, () -> Relation.NONE);
+        }
+
+        @Override
+        public int getId() {
+            return ID;
+        }
+
+        @Override
+        public boolean test(Activation act, Activation linkedAct) {
+            return true;
+        }
+
+        @Override
+        public Relation invert() {
+            return this;
+        }
+
+        @Override
+        public void mapRange(Map<Integer, Position> slots, Activation act) {
+        }
+
+        @Override
+        public void linksOutputs(Set<Integer> outputs) {
+        }
+
+        @Override
+        public boolean isExact() {
+            return false;
+        }
+
+        @Override
+        public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+            INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
+
+            if(th == null || th.isEmpty()) {
+                return Stream.empty();
+            }
+            return th.getActivations();
+        }
+
+        @Override
+        public void registerRequiredSlots(Neuron input) {
         }
     }
 }
