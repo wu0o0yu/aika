@@ -206,7 +206,7 @@ public class Synapse implements Writable {
             (dir ? out : in).lock.releaseWriteLock();
         }
 
-        boolean newIsDisjunction = isConjunction(State.NEW);
+        boolean newIsDisjunction = isDisjunction(State.NEW);
         if(newIsDisjunction != isDisjunction) {
             INeuron in = input.get();
             INeuron out = output.get();
