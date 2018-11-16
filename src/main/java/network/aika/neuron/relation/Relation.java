@@ -43,19 +43,19 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     @Override
     public int compareTo(Relation rel) {
-        return Integer.compare(getId(), rel.getId());
+        return Integer.compare(getType(), rel.getType());
     }
 
 
-    public static void registerRelation(int relationId, RelationFactory rf) {
-        relationRegistry.put(relationId, rf);
+    public static void registerRelation(int relationType, RelationFactory rf) {
+        relationRegistry.put(relationType, rf);
     }
 
     public interface RelationFactory {
         Relation create();
     }
 
-    public abstract int getId();
+    public abstract int getType();
 
     public abstract boolean test(Activation act, Activation linkedAct);
 
@@ -67,7 +67,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
 
     public void write(DataOutput out) throws IOException {
-        out.writeInt(getId());
+        out.writeInt(getType());
     }
 
 
@@ -194,7 +194,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         @Override
-        public int getId() {
+        public int getType() {
             return ID;
         }
 
