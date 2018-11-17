@@ -38,7 +38,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public static Relation BEFORE = new LessThan(END, BEGIN, true);
     public static Relation AFTER = new GreaterThan(BEGIN, END, true);
 
-    public static Relation NONE = new None();
+    public static Relation ANY = new Any();
 
 
     @Override
@@ -61,7 +61,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public abstract Relation invert();
 
-    public abstract void mapRange(Map<Integer, Position> slots, Activation act);
+    public abstract void mapSlots(Map<Integer, Position> slots, Activation act);
 
     public abstract void linksOutputs(Set<Integer> outputs);
 
@@ -186,11 +186,11 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     }
 
 
-    public static class None extends Relation {
+    public static class Any extends Relation {
         public static int ID = 100;
 
         static {
-            registerRelation(ID, () -> Relation.NONE);
+            registerRelation(ID, () -> Relation.ANY);
         }
 
         @Override
@@ -209,7 +209,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         @Override
-        public void mapRange(Map<Integer, Position> slots, Activation act) {
+        public void mapSlots(Map<Integer, Position> slots, Activation act) {
         }
 
         @Override

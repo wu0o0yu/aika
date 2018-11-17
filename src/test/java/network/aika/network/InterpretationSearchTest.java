@@ -286,7 +286,7 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRelation(NONE),
+                        .setRelation(ANY),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
@@ -505,7 +505,7 @@ public class InterpretationSearchTest {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRelation(NONE)
+                        .setRelation(ANY)
         );
 
         Neuron.init(doc, nE, 5.0, INeuron.Type.EXCITATORY,

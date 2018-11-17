@@ -66,7 +66,7 @@ public abstract class AncestorRelation extends Relation {
 
 
     @Override
-    public void mapRange(Map<Integer, Position> slots, Activation act) {
+    public void mapSlots(Map<Integer, Position> slots, Activation act) {
     }
 
 

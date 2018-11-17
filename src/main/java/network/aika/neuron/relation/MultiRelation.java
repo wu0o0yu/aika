@@ -73,9 +73,9 @@ public class MultiRelation extends Relation {
 
 
     @Override
-    public void mapRange(Map<Integer, Position> slots, Activation act) {
+    public void mapSlots(Map<Integer, Position> slots, Activation act) {
         for(Relation rel: relations) {
-            rel.mapRange(slots, act);
+            rel.mapSlots(slots, act);
         }
     }
 

@@ -22,7 +22,6 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Position;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
@@ -157,11 +156,11 @@ public class NegationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRelation(NONE),
+                        .setRelation(ANY),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(2)
-                        .setRelation(NONE),
+                        .setRelation(ANY),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)

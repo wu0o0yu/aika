@@ -84,7 +84,7 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRelation(NONE),
+                        .setRelation(ANY),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
@@ -115,7 +115,7 @@ public class GenerateTextTest {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRelation(NONE),
+                        .setRelation(ANY),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)

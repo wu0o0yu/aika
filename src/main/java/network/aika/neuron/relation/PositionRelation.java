@@ -41,7 +41,7 @@ public abstract class PositionRelation extends Relation {
 
 
     @Override
-    public void mapRange(Map<Integer, Position> slots, Activation act) {
+    public void mapSlots(Map<Integer, Position> slots, Activation act) {
     }
 
 
@@ -137,7 +137,7 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public void mapRange(Map<Integer, Position> slots, Activation act) {
+        public void mapSlots(Map<Integer, Position> slots, Activation act) {
             slots.put(toSlot, act.getSlot(fromSlot));
         }
 
