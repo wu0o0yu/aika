@@ -57,7 +57,6 @@ import java.util.*;
 public class Synapse implements Writable {
 
     public static final int OUTPUT = -1;
-    public static final int VARIABLE = -2;
 
     public static double DISJUNCTION_THRESHOLD = 0.6;
     public static double CONJUNCTION_THRESHOLD = 0.4;
