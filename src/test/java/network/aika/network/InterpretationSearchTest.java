@@ -389,7 +389,7 @@ public class InterpretationSearchTest {
 
         doc.process();
 
-        System.out.println(doc.activationsToString(true, true, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertFalse(nD.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
     }
@@ -490,7 +490,7 @@ public class InterpretationSearchTest {
 
 //        doc.process();
 
-        System.out.println(doc.activationsToString(true, true, true));
+        System.out.println(doc.activationsToString());
 
 
         // Complete the model
@@ -586,7 +586,7 @@ public class InterpretationSearchTest {
         doc.propagate();
         doc.process();
 
-        System.out.println(doc.activationsToString(true, true, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertFalse(nD.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
     }
@@ -662,7 +662,7 @@ public class InterpretationSearchTest {
 
         doc.process();
 
-        System.out.println(doc.activationsToString(true, true, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertEquals(13, doc.searchNodeIdCounter);
     }

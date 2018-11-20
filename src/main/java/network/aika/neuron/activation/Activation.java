@@ -48,6 +48,7 @@ public final class Activation extends OrActivation {
     public static final Comparator<Activation> ACTIVATION_ID_COMP = Comparator.comparingInt(act -> act.id);
     public static int MAX_SELF_REFERENCING_DEPTH = 5;
     public static int MAX_PREDECESSOR_DEPTH = 100;
+    public static boolean DEBUG_OUTPUT = false;
 
     public static Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE, null, null);
     public static Activation MAX_ACTIVATION = new Activation(Integer.MAX_VALUE, null, null);
@@ -256,7 +257,6 @@ public final class Activation extends OrActivation {
             if (propagate) {
                 if(round > Document.MAX_ROUND) {
                     log.error("Error: Maximum number of rounds reached. The network might be oscillating.");
-                    log.info(doc.activationsToString(false, true, true));
 
                     doc.dumpOscillatingActivations();
                     throw new RuntimeException("Maximum number of rounds reached. The network might be oscillating.");
@@ -830,7 +830,7 @@ public final class Activation extends OrActivation {
         }
 
         public String toString() {
-            return "V:" + Utils.round(value) + " pV:" + Utils.round(posValue) + " Net:" + Utils.round(net) + " P:" + Utils.round(p) + " W:" + Utils.round(weight);
+            return "V:" + Utils.round(value) + (DEBUG_OUTPUT ? " pV:" + Utils.round(posValue) : "") + " Net:" + Utils.round(net) + (DEBUG_OUTPUT ? " P:" + Utils.round(p) : "") + " W:" + Utils.round(weight);
         }
     }
 
@@ -847,23 +847,21 @@ public final class Activation extends OrActivation {
 
 
 
-    public String toString(boolean finalOnly, boolean withTextSnippet, boolean withLogic) {
+    public String toString(boolean withLogic) {
         StringBuilder sb = new StringBuilder();
         sb.append(id + " - ");
 
-        sb.append((finalOnly ? finalDecision : decision) + " - ");
+        sb.append(finalDecision + " - ");
 
         sb.append(slotsToString());
 
-        if(withTextSnippet) {
-            sb.append(" \"");
-            if(node.neuron.get().getOutputText() != null) {
-                sb.append(Utils.collapseText(node.neuron.get().getOutputText(), 7));
-            } else {
-                sb.append(Utils.collapseText(doc.getText(getSlot(BEGIN), getSlot(END)), 7));
-            }
-            sb.append("\"");
+        sb.append(" \"");
+        if (node.neuron.get().getOutputText() != null) {
+            sb.append(Utils.collapseText(node.neuron.get().getOutputText(), 7));
+        } else {
+            sb.append(Utils.collapseText(doc.getText(getSlot(BEGIN), getSlot(END)), 7));
         }
+        sb.append("\"");
 
         sb.append(identityToString());
         sb.append(" - ");
@@ -874,26 +872,22 @@ public final class Activation extends OrActivation {
             sb.append(" - " + extension);
         }
 
-        sb.append(" - UB:");
-        sb.append(Utils.round(upperBound));
+        if(DEBUG_OUTPUT) {
+            sb.append(" - UB:");
+            sb.append(Utils.round(upperBound));
+        }
 
-        if(avgState != null) {
+        if(SearchNode.COMPUTE_SOFT_MAX && avgState != null) {
             sb.append(" AVG:");
             sb.append(avgState);
         }
 
         sb.append(" - ");
-        if(finalOnly) {
-            if (isFinalActivation()) {
-                State fs = getFinalState();
-                sb.append(fs);
-            }
-        } else {
-            for (Map.Entry<Integer, State> me : rounds.rounds.entrySet()) {
-                State s = me.getValue();
-                sb.append("[R: " + me.getKey() + " " + s + "]");
-            }
+        if (isFinalActivation()) {
+            State fs = getFinalState();
+            sb.append(fs);
         }
+
 
         if (inputValue != null) {
             sb.append(" - IV:" + Utils.round(inputValue));

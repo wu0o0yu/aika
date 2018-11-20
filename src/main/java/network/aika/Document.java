@@ -488,38 +488,27 @@ public class Document implements Comparable<Document> {
 
 
     public String activationsToString() {
-        return activationsToString(true, true, false);
+        return activationsToString(false);
     }
 
 
-    public String activationsToString(boolean finalOnly, boolean withTextSnippet) {
-        return activationsToString(finalOnly, withTextSnippet, false);
-    }
-
-
-    public String activationsToString(boolean finalOnly, boolean withTextSnippet, boolean withLogic) {
+    public String activationsToString(boolean withLogic) {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         acts.addAll(activationsById.values());
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Activation TYPE -");
-        if(finalOnly) {
-            sb.append(" Final Decision -");
-        } else {
-            sb.append(" Decision -");
-        }
-        sb.append(" Range" + (withTextSnippet ? " | Text Snippet" : ""));
+        sb.append("Id -");
+
+        sb.append(" Decision -");
+
+        sb.append(" Range | Text Snippet");
         sb.append(" | Identity -");
         sb.append(" Neuron Label -");
         sb.append((withLogic ? " Logic Layer -" : ""));
         sb.append(" Upper Bound -");
-        if(finalOnly) {
-            sb.append(" Final Value | Final Weight | Final Norm -");
-        } else {
-            sb.append(" Simulation Rounds [Round | Value | Weight | Norm] -");
-        }
+        sb.append(" Value | Net | Weight -");
         sb.append(" Input Value |");
         sb.append(" Target Value");
         sb.append("\n");
@@ -530,7 +519,7 @@ public class Document implements Comparable<Document> {
                 continue;
             }
 
-            sb.append(act.toString(finalOnly, withTextSnippet, withLogic));
+            sb.append(act.toString(withLogic));
             sb.append("\n");
         }
 

@@ -106,14 +106,12 @@ public class OverlappingOrTest {
 
         Document doc = m.createDocument("a b c d e ", 0);
 
-        System.out.println(doc.activationsToString(false, false, true));
 
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
             if(c != ' ') {
                 inputNeurons.get(c).addInput(doc, i, i + 2);
             }
-            System.out.println(doc.activationsToString(false, false, true));
         }
 
         // Computes the selected option
@@ -122,7 +120,7 @@ public class OverlappingOrTest {
         Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
 
         System.out.println("All activations:");
-        System.out.println(doc.activationsToString(true, true, true));
+        System.out.println(doc.activationsToString());
         System.out.println();
 
         doc.clearActivations();

@@ -72,7 +72,7 @@ public class PositionRelationTest {
 
         Activation outC1 = outC.getActivation(doc, 0, 1, false);
 
-        System.out.println(doc.activationsToString(false, false, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertNotNull(outC1);
     }
@@ -214,7 +214,7 @@ public class PositionRelationTest {
             }
         }
 
-        System.out.println(doc.activationsToString(false, true, true));
+        System.out.println(doc.activationsToString());
 
         assert n.get().getActivations(doc, false).collect(Collectors.toList()).size() >= 1;
     }

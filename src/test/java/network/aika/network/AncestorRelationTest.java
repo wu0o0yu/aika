@@ -81,7 +81,7 @@ public class AncestorRelationTest {
 
         Activation outC1 = outC.getActivation(doc, 0, 1, false);
 
-        System.out.println(doc.activationsToString(false, false, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertNotNull(outC1);
     }
@@ -260,7 +260,7 @@ public class AncestorRelationTest {
 
         Activation outC1 = outC.getActivation(doc, 0, 1, false);
 
-        System.out.println(doc.activationsToString(false, false, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertNotNull(outC1);
     }

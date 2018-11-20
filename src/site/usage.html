@@ -280,19 +280,19 @@ slots simply specify the range begin (slot 0) and the range end (slot 1).
 				<code class="language-java">
 
 Activation ID - Final Decision - Slots | Identity - Neuron Label - Logic Layer - Upper Bound -
-Final Value | Final Weight | Final Norm - Input Value | Target Value
+Value | Sum | Weight - Input Value | Target Value
 
     ...
-3 - SELECTED - (0:4, 1:12) () - C-forename - OR[] - UB:1.0 - V:1.0 pV:1.0 Net:1.0 P:1.0 W:0.0
-4 - SELECTED - (0:4, 1:12) () - INHIB - OR[] - UB:1.0 - V:1.0 pV:1.0 Net:1.0 P:1.0 W:0.0
-1 - SELECTED - (0:4, 1:12) () - W-jackson - OR[] - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
-2 - SELECTED - (0:4, 1:12) () - E-jackson (forename) - UB:1.0 - V:1.0 pV:1.0 Net:6.0 P:1.0 W:6.0
-5 - EXCLUDED - (0:4, 1:12) () - E-jackson (city) - UB:1.0 -
-8 - SELECTED - (0:12, 1:17) () - C-surname - OR[] - UB:1.0 - V:1.0 pV:1.0 Net:1.0 P:1.0 W:0.0
-9 - SELECTED - (0:12, 1:17) () - INHIB - OR[] - UB:1.0 - V:1.0 pV:1.0 Net:1.0 P:1.0 W:0.0
-6 - SELECTED - (0:12, 1:17) () - W-cook - OR[] - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
-7 - SELECTED - (0:12, 1:17) () - E-cook (surname) - UB:1.0 - V:1.0 pV:1.0 Net:8.0 P:1.0 W:8.0
-10 - EXCLUDED - (0:12, 1:17) () - E-cook (profession) - UB:1.0 -
+3 - SELECTED - (0:4, 1:12) () - C-forename - OR[] - V:1.0 Net:1.0 W:0.0
+4 - SELECTED - (0:4, 1:12) () - INHIB - OR[] - V:1.0 Net:1.0 W:0.0
+1 - SELECTED - (0:4, 1:12) () - W-jackson - OR[] - V:1.0 Net:0.0 W:0.0 - IV:1.0
+2 - SELECTED - (0:4, 1:12) () - E-jackson (forename) - V:1.0 Net:6.0 W:6.0
+5 - EXCLUDED - (0:4, 1:12) () - E-jackson (city) -
+8 - SELECTED - (0:12, 1:17) () - C-surname - OR[] - V:1.0 Net:1.0 W:0.0
+9 - SELECTED - (0:12, 1:17) () - INHIB - OR[] - V:1.0 Net:1.0 W:0.0
+6 - SELECTED - (0:12, 1:17) () - W-cook - OR[] - V:1.0 Net:0.0 W:0.0 - IV:1.0
+7 - SELECTED - (0:12, 1:17) () - E-cook (surname) - V:1.0 Net:8.0 W:8.0
+10 - EXCLUDED - (0:12, 1:17) () - E-cook (profession) -
     ...
 
  Final SearchNode:8  WeightSum:13.999
@@ -487,16 +487,16 @@ Final Value | Final Weight | Final Norm - Input Value | Target Value
 			<pre class="prettyprint">
 				<code class="language-java">
  Activation ID - Final Decision - Slots | Identity - Neuron Label - Upper Bound -
- Final Value | Final Weight | Final Norm - Input Value | Target Value
+ Value | Net | Weight - Input Value | Target Value
 
-0 - SELECTED - (0:0, 1:1) () - IN-A - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
-3 - SELECTED - (0:0, 1:1) () - IN-B - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
-6 - SELECTED - (0:0, 1:1) () - IN-C - UB:1.0  - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
-2 - SELECTED - (0:0, 1:1) () - INHIB - UB:2.959 - V:1.0 pV:1.0 Net:1.0 P:1.0 W:0.0
-1 - EXCLUDED - (0:0, 1:1) () - A - UB:0.995 -
-4 - SELECTED - (0:0, 1:1) () - B - UB:1.0 - V:1.0 pV:1.0 Net:5.0 P:1.0 W:5.0
-7 - EXCLUDED - (0:0, 1:1) () - C - UB:0.964 -
-5 - SELECTED - (0:0, 1:1) () - OUT - UB:0.762 - V:0.762 pV:0.762 Net:1.0 P:1.0 W:0.0
+0 - SELECTED - (0:0, 1:1) () - IN-A - V:1.0 Net:0.0 W:0.0 - IV:1.0
+3 - SELECTED - (0:0, 1:1) () - IN-B - V:1.0 Net:0.0 W:0.0 - IV:1.0
+6 - SELECTED - (0:0, 1:1) () - IN-C - V:1.0 Net:0.0 W:0.0 - IV:1.0
+2 - SELECTED - (0:0, 1:1) () - INHIB - V:1.0 Net:1.0 W:0.0
+1 - EXCLUDED - (0:0, 1:1) () - A -
+4 - SELECTED - (0:0, 1:1) () - B - V:1.0 Net:5.0 W:5.0
+7 - EXCLUDED - (0:0, 1:1) () - C -
+5 - SELECTED - (0:0, 1:1) () - OUT - V:0.762 Net:1.0 W:0.0
 
 Final SearchNode:10  WeightSum:5.0
 				</code>
@@ -606,14 +606,14 @@ Final SearchNode:10  WeightSum:5.0
             <pre class="prettyprint">
 				<code class="language-java">
 Activation ID - Final Decision - Slots | Identity - Neuron Label - Upper Bound -
-Final Value | Final Weight | Final Norm - Input Value | Target Value
+Value | Net | Weight - Input Value | Target Value
 
-0 - SELECTED - (0:0, 1:2) () - a - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
-1 - SELECTED - (0:2, 1:4) () - b - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
-5 - SELECTED - (0:2, 1:10) () - BCDE - UB:1.0 - V:1.0 pV:1.0 Net:5.0 P:1.0 W:0.0
-2 - SELECTED - (0:4, 1:6) () - c - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
-3 - SELECTED - (0:6, 1:8) () - d - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
-4 - SELECTED - (0:8, 1:10) () - e - UB:1.0 - V:1.0 pV:1.0 Net:0.0 P:1.0 W:0.0 - IV:1.0
+0 - SELECTED - (0:0, 1:2) () - a - V:1.0 Net:0.0 W:0.0 - IV:1.0
+1 - SELECTED - (0:2, 1:4) () - b - V:1.0 Net:0.0 W:0.0 - IV:1.0
+5 - SELECTED - (0:2, 1:10) () - BCDE - V:1.0 Net:5.0 W:0.0
+2 - SELECTED - (0:4, 1:6) () - c - V:1.0 Net:0.0 W:0.0 - IV:1.0
+3 - SELECTED - (0:6, 1:8) () - d - V:1.0 Net:0.0 W:0.0 - IV:1.0
+4 - SELECTED - (0:8, 1:10) () - e - V:1.0 Net:0.0 W:0.0 - IV:1.0
 
  Final SearchNode:1  WeightSum:0.0
 				</code>

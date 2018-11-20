@@ -74,7 +74,7 @@ public class SimpleWeightsTest {
 
             doc.process();
 
-            System.out.println(doc.activationsToString(true, false, true));
+            System.out.println(doc.activationsToString());
 
             doc.clearActivations();
         }
@@ -86,7 +86,7 @@ public class SimpleWeightsTest {
 
             doc.process();
 
-            System.out.println(doc.activationsToString(true, false, true));
+            System.out.println(doc.activationsToString());
 
             doc.clearActivations();
         }
@@ -134,7 +134,7 @@ public class SimpleWeightsTest {
 
             doc.process();
 
-            System.out.println(doc.activationsToString(true, false, true));
+            System.out.println(doc.activationsToString());
 
             doc.clearActivations();
         }

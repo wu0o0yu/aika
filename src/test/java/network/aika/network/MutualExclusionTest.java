@@ -222,7 +222,7 @@ public class MutualExclusionTest {
         // Computes the best interpretation
         doc.process();
 
-        System.out.println(doc.activationsToString(true, false, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertTrue(pA.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
         Assert.assertFalse(pB.getActivations(doc, true).collect(Collectors.toList()).isEmpty());

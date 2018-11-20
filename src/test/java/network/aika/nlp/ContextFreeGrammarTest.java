@@ -240,7 +240,7 @@ public class ContextFreeGrammarTest {
     public void parseSentence() {
         Document doc = parse("the large can can hold the water ");
 
-        System.out.println(doc.activationsToString(true, true, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertNotNull(S.getActivation(doc, 0, 33, true));
     }

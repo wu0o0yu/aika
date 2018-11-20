@@ -56,9 +56,9 @@ public class PassiveInputNeuronTest {
 
         Activation outAct = out.getActivation(doc, 0, 1, false);
 
-        System.out.println(doc.activationsToString(false, true, true));
-
         doc.process();
+
+        System.out.println(doc.activationsToString());
 
         Assert.assertTrue(outAct.isFinalActivation());
     }

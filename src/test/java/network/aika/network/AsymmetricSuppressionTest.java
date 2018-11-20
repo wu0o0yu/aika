@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
-public class AsymmetricSuppression {
+public class AsymmetricSuppressionTest {
 
 
     @Ignore
@@ -59,7 +59,7 @@ public class AsymmetricSuppression {
 
         doc.process();
 
-        System.out.println(doc.activationsToString(true, false, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertTrue(outN.getActivations(doc, true).collect(Collectors.toList()).isEmpty());
 

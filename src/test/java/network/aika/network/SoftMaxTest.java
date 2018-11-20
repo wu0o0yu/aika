@@ -29,7 +29,7 @@ public class SoftMaxTest {
         r = initModel(new double[][] {{1.0, 1.0}, {0.5, 5.0}});
 
         System.out.println(r);
-
+        SearchNode.COMPUTE_SOFT_MAX = false;
     }
 
 
@@ -97,7 +97,7 @@ public class SoftMaxTest {
 
         doc.process();
 
-        System.out.println(doc.activationsToString(true, true, true));
+        System.out.println(doc.activationsToString());
 
         double[][] results = new double[2][2];
         for(j = 0; j < 2; j++) {

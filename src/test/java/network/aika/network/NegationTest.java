@@ -88,18 +88,14 @@ public class NegationTest {
 
         inA.addInput(doc, 0, 11);
 
-        System.out.println(doc.activationsToString(false, false, true));
         Assert.assertNotNull(abcN.getActivation(doc, 0, 11, false));
 
         inB.addInput(doc, 2, 7);
-
-        System.out.println(doc.activationsToString(false, false, true));
-
         inC.addInput(doc, 4, 9);
 
-        System.out.println(doc.activationsToString(false, false, true));
-
         doc.process();
+
+        System.out.println(doc.activationsToString());
 
         Assert.assertNotNull(abcN.getActivation(doc, 0, 11, false));
     }
@@ -170,16 +166,10 @@ public class NegationTest {
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 11);
-
-        System.out.println(doc.activationsToString(false, false, true));
-
         inB.addInput(doc, 2, 7);
-
-        System.out.println(doc.activationsToString(false, false, true));
-
         inC.addInput(doc, 4, 9);
 
-        System.out.println(doc.activationsToString(false, false, true));
+        System.out.println(doc.activationsToString());
 
 //        Assert.assertNull(Activation.get(t, outN.node, 0, new Range(0, 11), Range.Relation.EQUALS, null, null, null));
     }
@@ -239,11 +229,11 @@ public class NegationTest {
 
         inS.addInput(doc, 3, 8);
 
-        System.out.println(doc.activationsToString(false, false, true));
+        System.out.println(doc.activationsToString());
 
         inA.addInput(doc, 0, 11);
 
-        System.out.println(doc.activationsToString(false, false, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertNotNull(outN.getActivation(doc, 0, 11, false));
 
@@ -305,11 +295,10 @@ public class NegationTest {
 
         inS.addInput(doc, 3, 8);
 
-        System.out.println(doc.activationsToString(false, false, true));
 
         inA.addInput(doc, 0, 11);
 
-        System.out.println(doc.activationsToString(false, false, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertNotNull(outN.getActivation(doc, 0, 11, false));
 
@@ -370,12 +359,9 @@ public class NegationTest {
         Document doc = m.createDocument("aaaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 11);
-
-        System.out.println(doc.activationsToString(false, false, true));
-
         inS.addInput(doc, 3, 8);
 
-        System.out.println(doc.activationsToString(false, false, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertNotNull(outN.getActivation(doc, 0, 11, false));
 
@@ -489,11 +475,9 @@ public class NegationTest {
             Document doc = m.createDocument("aaaaaaaaaa", 0);
 
             inA.addInput(doc, 0, 6);
-            System.out.println(doc.activationsToString(false, false, true));
-
             inB.addInput(doc, 0, 6);
 
-            System.out.println(doc.activationsToString(false, false, true));
+            System.out.println(doc.activationsToString());
 
             Assert.assertNotNull(inS.getActivation(doc, 0, 6, false));
             Assert.assertEquals(2, inS.getActivation(doc, 0, 6, false).getInputLinks(false, false).count());
@@ -505,11 +489,9 @@ public class NegationTest {
             Document doc = m.createDocument("aaaaaaaaaa", 0);
 
             inA.addInput(doc, 0, 6);
-            System.out.println(doc.activationsToString(false, false, true));
-
             inB.addInput(doc, 3, 9);
 
-            System.out.println(doc.activationsToString(false, false, true));
+            System.out.println(doc.activationsToString());
 
             Assert.assertNotNull(inS.getActivation(doc, 0, 9, false));
             Assert.assertEquals(1, inS.getActivation(doc, 0, 6, false).getInputLinks(false, false).count());
@@ -714,20 +696,12 @@ public class NegationTest {
 
 
         inA.addInput(doc, 0, 6);
-
-        System.out.println(doc.activationsToString(false, false, true));
-
         inB.addInput(doc, 0, 6);
-
-        System.out.println(doc.activationsToString(false, false, true));
-
         inC.addInput(doc, 0, 6);
-
-        System.out.println(doc.activationsToString(false, false, true));
 
         doc.process();
 
-        System.out.println(doc.activationsToString( true, false, true));
+        System.out.println(doc.activationsToString());
     }
 
 
@@ -847,7 +821,7 @@ public class NegationTest {
         inB.addInput(doc, 0, 1);
         inG.addInput(doc, 0, 1);
 
-        System.out.println(doc.activationsToString(false, false, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertNotNull(pC.getActivation(doc, 0, 1, false));
         Assert.assertNotNull(pD.getActivation(doc, 0, 1, false));

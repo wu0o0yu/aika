@@ -257,12 +257,10 @@ public class GenerateTextTest {
 
         inOut.addInput(doc, 0, 3);
 
-        System.out.println(doc.activationsToString(false, true, true));
-
         // Search for the best interpretation.
         doc.process();
 
-        System.out.println(doc.activationsToString(true, true, true));
+        System.out.println(doc.activationsToString());
 
         System.out.println();
 
@@ -273,7 +271,7 @@ public class GenerateTextTest {
         Assert.assertEquals("bbb ddddd ", outputText);
 
 
-        System.out.println(doc.activationsToString(true, true, true));
+        System.out.println(doc.activationsToString());
     }
 
 
@@ -336,7 +334,7 @@ public class GenerateTextTest {
 
         String outputText = doc.generateOutputText();
 
-        System.out.println(doc.activationsToString(true, true, true));
+        System.out.println(doc.activationsToString());
 
         Assert.assertEquals("aaaaaaa bbb ", outputText);
     }
