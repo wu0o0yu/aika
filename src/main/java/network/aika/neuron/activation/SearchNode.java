@@ -352,9 +352,6 @@ public class SearchNode implements Comparable<SearchNode> {
         boolean precondition = candidate.activation.isActiveable();
 
         preDecision = candidate.activation.inputDecision;
-        if(preDecision == UNKNOWN) {
-            preDecision = doc.linker.getLinkedDecision(candidate.activation);
-        }
         if(preDecision == UNKNOWN && (!precondition || checkExcluded(candidate.activation))) {
             preDecision = EXCLUDED;
         }

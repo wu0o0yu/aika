@@ -51,16 +51,6 @@ public class Linker {
     }
 
 
-    /**
-     *
-     * @param act
-     * @return
-     */
-    public Decision getLinkedDecision(Activation act) {
-        return Decision.UNKNOWN;
-    }
-
-
     public Activation computeInputActivation(Synapse s, Activation iAct) {
         return iAct;
     }
@@ -145,7 +135,7 @@ public class Linker {
         for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
             Relation rel = me.getValue();
             Integer relId = me.getKey();
-            if(relId >= 0) {
+            if(relId != OUTPUT) {
                 Synapse s = oAct.getNeuron().getSynapseById(relId);
                 if (s != null) {
                     if (rel.follow(rAct, oAct, relations)) {
