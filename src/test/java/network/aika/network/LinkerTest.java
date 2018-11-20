@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.relation.Relation.ANY;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
 
@@ -83,7 +84,6 @@ public class LinkerTest {
 
     @Test
     public void testLinkInputActivation() {
-
         Model m = new Model();
 
         Neuron na = m.createNeuron("A");
@@ -107,6 +107,49 @@ public class LinkerTest {
         nb.addInput(doc, 0, 1);
 
         Assert.assertTrue(nb.getActivations(doc, false).iterator().next().getInputLinks(false, false).findAny().isPresent());
+    }
+
+
+    @Test
+    public void testLinkReverseFromOutputActivation() {
+        Model m = new Model();
+
+        Neuron ina = m.createNeuron("A");
+        Neuron inb = m.createNeuron("B");
+
+        Neuron out = m.createNeuron("Out");
+
+        Neuron.init(out, 0.0, INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(ina)
+                        .setWeight(10.0)
+                        .setBias(0.0),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(inb)
+                        .setWeight(10.0)
+                        .setBias(0.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(ANY),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS)
+        );
+
+        Document doc = m.createDocument("X");
+
+        ina.addInput(doc, 0, 1);
+        inb.addInput(doc, 0, 1);
+
+        doc.process();
+
+        System.out.println(doc.activationsToString());
+
+        Assert.assertEquals(2, out.getActivations(doc, false).findFirst().get().getInputLinks(false, false).count());
 
     }
 }

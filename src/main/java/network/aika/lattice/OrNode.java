@@ -108,6 +108,7 @@ public class OrNode extends Node<OrNode, Activation> {
         act.doc.linker.link(act, ol);
     }
 
+
     private Activation lookupActivation(Document doc, SortedMap<Integer, Position> slots, OrEntry oe, NodeActivation inputAct) {
         x: for(Activation act: neuron.get(doc)
                 .getThreadState(doc.threadId, true)

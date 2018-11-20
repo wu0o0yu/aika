@@ -26,7 +26,6 @@ import network.aika.neuron.activation.Activation.Link;
 import java.util.*;
 
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.activation.SearchNode.Decision;
 
 /**
  * The {@code Linker} class is responsible for for the linkage of neuron activations. These links mirror the synapses between
@@ -63,6 +62,7 @@ public class Linker {
      */
     public void link(Activation act, OrNode.Link ol) {
         linkOrNodeRelations(act, ol);
+        linkInput(act);
         process();
     }
 
@@ -80,11 +80,6 @@ public class Linker {
         INeuron n = act.getINeuron();
         if(n.outputRelations != null) {
             linkRelated(act, act, n.outputRelations);
-/*            for (Map.Entry<Relation.Key, Relation> me : n.outputRelations.entrySet()) {
-                Synapse s = act.node.neuron.getSynapseById(me.getKey());
-                linkRelated(act, act, s, me.getValue());
-            }
-*/
         }
     }
 
