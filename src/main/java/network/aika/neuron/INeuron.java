@@ -331,6 +331,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         doc.finallyActivatedNeurons.add(act.getINeuron());
 
         doc.linker.linkInput(act);
+        doc.linker.process();
 
         propagate(act);
 

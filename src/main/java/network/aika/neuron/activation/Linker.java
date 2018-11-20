@@ -94,7 +94,6 @@ public class Linker {
                 }
             }
         }
-        doc.linker.process();
     }
 
 
