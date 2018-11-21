@@ -62,7 +62,6 @@ public class Linker {
      */
     public void link(Activation act, OrNode.Link ol) {
         linkOrNodeRelations(act, ol);
-        linkInput(act);
         process();
     }
 
