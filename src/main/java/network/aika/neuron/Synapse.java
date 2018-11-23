@@ -370,6 +370,8 @@ public class Synapse implements Writable {
         out.writeBoolean(isConjunction);
         out.writeBoolean(isDisjunction);
 
+        out.writeBoolean(inactive);
+
         out.writeBoolean(extension != null);
         if(extension != null) {
             extension.write(out);
@@ -403,6 +405,8 @@ public class Synapse implements Writable {
 
         isConjunction = in.readBoolean();
         isDisjunction = in.readBoolean();
+
+        inactive = in.readBoolean();
 
         if(in.readBoolean()) {
             extension = m.getSynapseExtensionFactory().createObject();
