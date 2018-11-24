@@ -98,7 +98,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public static void addRelation(Map<Integer, Relation> relMap, Integer synId, Integer targetSynId, Neuron n, Relation r) {
         if(targetSynId == OUTPUT) {
             Synapse s = n.getSynapseById(synId);
-            if(s == null || (r.isExact() && s.isDisjunction)) {
+            if(s == null || (r.isExact() && s.isDisjunction && !s.inactive)) {
                 return;
             }
         }
