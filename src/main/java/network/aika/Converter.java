@@ -121,7 +121,7 @@ public class Converter {
 
             outputNode.removeParents(threadId);
 
-            if (noFurtherRefinement || i == MAX_AND_NODE_SIZE || i == candidates.size()) {
+            if (noFurtherRefinement || (i > 0 && (i == MAX_AND_NODE_SIZE || i == candidates.size()))) {
                 outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node, true);
             } else {
                 for (Synapse s : candidates) {

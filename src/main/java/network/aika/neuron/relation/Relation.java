@@ -175,7 +175,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
                 addRelation(fromRel, to, from, n, rel);
                 addRelation(toRel, from, to, n, rel.invert());
             } else {
-                MultiRelation mr = new MultiRelation(Arrays.asList(rel, rel.invert()));
+                MultiRelation mr = new MultiRelation(MultiRelation.Type.OR, Arrays.asList(rel, rel.invert()));
                 addRelation(fromRel, to, from, n, mr);
             }
         }

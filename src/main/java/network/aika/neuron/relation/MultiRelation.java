@@ -18,6 +18,12 @@ public class MultiRelation extends Relation {
 
     private List<Relation> relations;
 
+    private Type type = Type.AND;
+
+    public enum Type {
+        AND,
+        OR
+    }
 
     static {
         registerRelation(ID, () -> new MultiRelation());
@@ -33,8 +39,19 @@ public class MultiRelation extends Relation {
         relations = Arrays.asList(rels);
     }
 
+    public MultiRelation(Type type, Relation... rels) {
+        this.type = type;
+        relations = Arrays.asList(rels);
+    }
+
 
     public MultiRelation(List<Relation> rels) {
+        relations = rels;
+    }
+
+
+    public MultiRelation(Type type, List<Relation> rels) {
+        this.type = type;
         relations = rels;
     }
 
@@ -52,13 +69,22 @@ public class MultiRelation extends Relation {
 
     @Override
     public boolean test(Activation act, Activation linkedAct) {
-        for(Relation rel: relations) {
-            if(!rel.test(act, linkedAct)) {
-                return false;
+        if(type == Type.AND) {
+            for (Relation rel : relations) {
+                if (!rel.test(act, linkedAct)) {
+                    return false;
+                }
             }
+            return true;
+        } else if(type == Type.OR) {
+            for (Relation rel : relations) {
+                if (rel.test(act, linkedAct)) {
+                    return true;
+                }
+            }
+            return false;
         }
-
-        return true;
+        return false;
     }
 
 
@@ -155,6 +181,7 @@ public class MultiRelation extends Relation {
     @Override
     public void write(DataOutput out) throws IOException {
         super.write(out);
+        out.writeUTF(type.name());
 
         out.writeInt(relations.size());
         for(Relation rel: relations) {
@@ -165,6 +192,9 @@ public class MultiRelation extends Relation {
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
+
+        type = Type.valueOf(in.readUTF());
+
         int l = in.readInt();
         for(int i = 0; i < l; i++) {
             relations.add(Relation.read(in, m));
