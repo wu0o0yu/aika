@@ -1040,6 +1040,7 @@ public final class Activation extends OrActivation {
     public static class Builder {
         public SortedMap<Integer, Integer> positions = new TreeMap<>();
         public double value = 1.0;
+        public double net = 0.0;
         public Double targetValue;
         public int fired;
 
@@ -1057,6 +1058,11 @@ public final class Activation extends OrActivation {
 
         public Builder setValue(double value) {
             this.value = value;
+            return this;
+        }
+
+        public Builder setNet(double net) {
+            this.net = net;
             return this;
         }
 
