@@ -147,6 +147,11 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
+        public boolean convertible() {
+            return true;
+        }
+
+        @Override
         public Stream<Activation> getActivations(INeuron.ThreadState th, Position pos) {
             return th.getActivations(
                     fromSlot, pos, true,
@@ -192,6 +197,11 @@ public abstract class PositionRelation extends Relation {
         @Override
         public boolean isExact() {
             return false;
+        }
+
+        @Override
+        public boolean convertible() {
+            return true;
         }
 
         @Override
@@ -264,6 +274,11 @@ public abstract class PositionRelation extends Relation {
         @Override
         public boolean isExact() {
             return false;
+        }
+
+        @Override
+        public boolean convertible() {
+            return true;
         }
 
         @Override

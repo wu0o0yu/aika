@@ -119,6 +119,15 @@ public class MultiRelation extends Relation {
         }
     }
 
+    @Override
+    public boolean convertible() {
+        for(Relation rel: relations) {
+            if(rel.convertible()) return true;
+        }
+
+        return false;
+    }
+
 
     @Override
     public void registerRequiredSlots(Neuron input) {

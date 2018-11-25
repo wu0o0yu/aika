@@ -39,7 +39,7 @@ import static network.aika.neuron.relation.Relation.*;
  *
  * @author Lukas Molzberger
  */
-public class SimplePatternMatchingTest {
+public class PatternMatchingTest {
 
     @Test
     public void testPatternMatching1() {
@@ -423,6 +423,220 @@ public class SimplePatternMatchingTest {
         doc.clearActivations();
     }
 
+    @Test
+    public void testPatternMatching5() {
+        Model m = new Model();
 
+        Neuron word = m.createNeuron("Word");
+        Map<Character, Neuron> inputNeurons = new HashMap<>();
+
+        // Create an input neuron and a recurrent neuron for every letter in this example.
+        for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
+            Neuron in = m.createNeuron(c + "");
+
+            inputNeurons.put(c, in);
+        }
+
+        // Create a pattern neuron with the relational neurons as input. The numbers that are
+        // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
+        // of the inputs relative to each other. The following flag specifies whether this relativeRid
+        // is relative or absolute.
+        Neuron pattern = Neuron.init(
+                m.createNeuron("BCD"),
+                1.0,
+                INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(inputNeurons.get('b'))
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(inputNeurons.get('c'))
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false),
+                new Synapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(inputNeurons.get('d'))
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false),
+                new Synapse.Builder()
+                        .setSynapseId(3)
+                        .setNeuron(word)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRelation(END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRelation(END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRelation(END_EQUALS),
+                new Relation.Builder()
+                        .setFrom(3)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS)
+        );
+
+
+        // Create a simple text document.
+        Document doc = m.createDocument("a b c d e ", 0);
+
+        word.addInput(doc, 2, 8);
+
+        // Then add the characters
+        int wordPos = 0;
+        for(int i = 0; i < doc.length(); i++) {
+            char c = doc.getContent().charAt(i);
+            if(c != ' ') {
+                inputNeurons.get(c).addInput(doc, i, i + 2);
+            } else {
+                wordPos++;
+            }
+        }
+
+        // Computes the selected option
+        doc.process();
+
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
+
+
+        System.out.println("Output activation:");
+        INeuron n = pattern.get();
+        for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
+            System.out.println("Text Range: " + act.slotsToString());
+            System.out.println("Node: " + act.node);
+            System.out.println();
+        }
+
+        System.out.println("All activations:");
+        System.out.println(doc.activationsToString());
+        System.out.println();
+
+        doc.clearActivations();
+    }
+
+    @Test
+    public void testPatternMatching6() {
+        Model m = new Model();
+
+        Neuron word = m.createNeuron("Word");
+        Map<Character, Neuron> inputNeurons = new HashMap<>();
+
+        // Create an input neuron and a recurrent neuron for every letter in this example.
+        for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
+            Neuron in = m.createNeuron(c + "");
+
+            inputNeurons.put(c, in);
+        }
+
+        // Create a pattern neuron with the relational neurons as input. The numbers that are
+        // given in the inputs are the recurrent ids (relativeRid) which specify the relative position
+        // of the inputs relative to each other. The following flag specifies whether this relativeRid
+        // is relative or absolute.
+        Neuron pattern = Neuron.init(
+                m.createNeuron("BCD"),
+                5.0,
+                INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(inputNeurons.get('b'))
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(inputNeurons.get('c'))
+                        .setWeight(2.0)
+                        .setBias(-2.0)
+                        .setRecurrent(false),
+                new Synapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(inputNeurons.get('d'))
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false),
+                new Synapse.Builder()
+                        .setSynapseId(3)
+                        .setNeuron(word)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRelation(END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRelation(END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRelation(END_EQUALS),
+                new Relation.Builder()
+                        .setFrom(3)
+                        .setTo(0)
+                        .setRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(3)
+                        .setTo(2)
+                        .setRelation(END_EQUALS)
+        );
+
+
+        // Create a simple text document.
+        Document doc = m.createDocument("a b c d e ", 0);
+
+        word.addInput(doc, 2, 8);
+
+        // Then add the characters
+        int wordPos = 0;
+        for(int i = 0; i < doc.length(); i++) {
+            char c = doc.getContent().charAt(i);
+            if(c != ' ') {
+                inputNeurons.get(c).addInput(doc, i, i + 2);
+            } else {
+                wordPos++;
+            }
+        }
+
+        // Computes the selected option
+        doc.process();
+
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
+
+
+        System.out.println("Output activation:");
+        INeuron n = pattern.get();
+        for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
+            System.out.println("Text Range: " + act.slotsToString());
+            System.out.println("Node: " + act.node);
+            System.out.println();
+        }
+
+        System.out.println("All activations:");
+        System.out.println(doc.activationsToString());
+        System.out.println();
+
+        doc.clearActivations();
+    }
 
 }

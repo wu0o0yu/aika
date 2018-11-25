@@ -121,7 +121,7 @@ public class Converter {
 
             outputNode.removeParents(threadId);
 
-            if (noFurtherRefinement || i == MAX_AND_NODE_SIZE) {
+            if (noFurtherRefinement || i == MAX_AND_NODE_SIZE || i == candidates.size()) {
                 outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node, true);
             } else {
                 for (Synapse s : candidates) {
@@ -175,8 +175,10 @@ public class Converter {
             relatedSyns.remove(syn.id);
             selectedCandidates.add(syn);
             alreadyCollected.add(syn.id);
-            for(Integer relId: syn.relations.keySet()) {
-                if(!alreadyCollected.contains(relId)) {
+            for(Map.Entry<Integer, Relation> me: syn.relations.entrySet()) {
+                Integer relId = me.getKey();
+                Relation rel = me.getValue();
+                if(rel.convertible() && !alreadyCollected.contains(relId)) {
                     Synapse rs = syn.output.getSynapseById(relId);
                     if(rs != null) {
                         relatedSyns.put(relId, rs);

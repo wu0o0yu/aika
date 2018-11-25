@@ -94,6 +94,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         return true;
     }
 
+    public abstract boolean convertible();
+
 
     public static void addRelation(Map<Integer, Relation> relMap, Integer synId, Integer targetSynId, Neuron n, Relation r) {
         if(targetSynId == OUTPUT) {
@@ -229,6 +231,11 @@ public abstract class Relation implements Comparable<Relation>, Writable {
                 return Stream.empty();
             }
             return th.getActivations();
+        }
+
+        @Override
+        public boolean convertible() {
+            return true;
         }
 
         @Override
