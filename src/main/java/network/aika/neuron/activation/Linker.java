@@ -75,6 +75,7 @@ public class Linker {
         }
     }
 
+
     private void linkOutputRelations(Activation act) {
         INeuron n = act.getINeuron();
         if(n.outputRelations != null) {

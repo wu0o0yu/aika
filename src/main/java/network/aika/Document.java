@@ -84,7 +84,6 @@ public class Document implements Comparable<Document> {
     public TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
     public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
     public TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
-    public TreeMap<Integer, Double> searchNodeWeights = new TreeMap<>();
 
 
     private TreeMap<ActKey, Activation> activationsBySlotAndPosition = new TreeMap<>((ak1, ak2) -> {
@@ -110,7 +109,6 @@ public class Document implements Comparable<Document> {
 
 
     private int lastProcessedActivationId = -1;
-    private int lastLinkedActivationId = -1;
 
 
     public static class ActKey {
@@ -343,8 +341,10 @@ public class Document implements Comparable<Document> {
 
         generateCandidates();
 
+        SearchNode rootNode = null;
         if(selectedSearchNode == null || !INCREMENTAL_MODE) {
             selectedSearchNode = new SearchNode(this, null, null, 0);
+            rootNode = selectedSearchNode;
         }
 
         SearchNode.search(this, selectedSearchNode, visitedCounter++, timeoutInMilliSeconds);
@@ -356,16 +356,13 @@ public class Document implements Comparable<Document> {
         }
 
         if(SearchNode.COMPUTE_SOFT_MAX) {
-            computeSoftMax();
+            computeSoftMax(rootNode);
         }
     }
 
 
-    private void computeSoftMax() {
-        double norm = 0.0;
-        for(Double w: searchNodeWeights.values()) {
-            norm += Math.exp(w);
-        }
+    private void computeSoftMax(SearchNode rootNode) {
+        double norm = rootNode.getWeightExpSum();
 
         for(Activation act: activationsById.values()) {
             if(act.searchStates != null) {
@@ -375,10 +372,10 @@ public class Document implements Comparable<Document> {
                 double avgNet = 0.0;
                 double avgPosNet = 0.0;
 
-                for (Map.Entry<Integer, Double> me : searchNodeWeights.entrySet()) {
-                    double p = Math.exp(me.getValue()) / norm;
+                for (Activation.AvgState avgState : act.searchStates) {
+                    double p = avgState.weight / norm;
 
-                    Activation.State s = act.searchStates.get(me.getKey());
+                    Activation.State s = avgState.state;
 
                     avgValue += p * s.value;
                     avgPosValue += p * s.posValue;

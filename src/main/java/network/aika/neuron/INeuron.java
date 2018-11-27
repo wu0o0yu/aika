@@ -343,7 +343,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     // TODO
     public void remove() {
-
         clearActivations();
 
         for (Synapse s : inputSynapses.values()) {

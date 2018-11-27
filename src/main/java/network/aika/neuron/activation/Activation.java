@@ -67,7 +67,7 @@ public final class Activation extends OrActivation {
     public double lowerBound;
 
     public State avgState;
-    public Map<Integer, State> searchStates;
+    public List<AvgState> searchStates;
 
     public Rounds rounds = new Rounds();
     public Rounds finalRounds = rounds;
@@ -993,6 +993,17 @@ public final class Activation extends OrActivation {
 
         public Activation getActivation() {
             return Activation.this;
+        }
+    }
+
+
+    public static class AvgState {
+        public State state;
+        public double weight;
+
+        public AvgState(State state, double weight) {
+            this.state = state;
+            this.weight = weight;
         }
     }
 
