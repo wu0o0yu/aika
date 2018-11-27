@@ -67,6 +67,26 @@ public class MultiRelation extends Relation {
     }
 
 
+    public boolean follow(Activation rAct, Activation oAct, Map<Integer, Relation> rels) {
+        if(type == Type.AND) {
+            for (Relation rel : relations) {
+                if (!rel.follow(rAct, oAct, rels)) {
+                    return false;
+                }
+            }
+            return true;
+        } else if(type == Type.OR) {
+            for (Relation rel : relations) {
+                if (rel.follow(rAct, oAct, rels)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+
+
     @Override
     public boolean test(Activation act, Activation linkedAct) {
         if(type == Type.AND) {
@@ -130,7 +150,7 @@ public class MultiRelation extends Relation {
         if(relations.isEmpty()) {
             INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
             return th != null ? th.getActivations() : Stream.empty();
-        } else {
+        } else if(type == Type.AND) {
             Relation firstRelation = relations.get(0);
             return firstRelation
                     .getActivations(n, linkedAct)
@@ -142,7 +162,12 @@ public class MultiRelation extends Relation {
                         }
                         return true;
                     });
+        } else if(type == Type.OR) {
+            return relations
+                    .stream()
+                    .flatMap(rel -> rel.getActivations(n, linkedAct));
         }
+        return null;
     }
 
     @Override
