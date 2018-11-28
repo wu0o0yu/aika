@@ -21,14 +21,14 @@ public class SoftMaxTest {
         SearchNode.COMPUTE_SOFT_MAX = true;
 
         SearchNode.OPTIMIZE_SEARCH = false;
-        double[][] r = initModel(new double[][] {{1.0, 1.0}, {0.5, 5.0}});
+        double[][] ra = initModel(new double[][] {{1.0, 1.0}, {0.5, 5.0}});
 
-        System.out.println(r);
+        System.out.println(ra);
 
         SearchNode.OPTIMIZE_SEARCH = true;
-        r = initModel(new double[][] {{1.0, 1.0}, {0.5, 5.0}});
+        double[][] rb = initModel(new double[][] {{1.0, 1.0}, {0.5, 5.0}});
 
-        System.out.println(r);
+        System.out.println(rb);
         SearchNode.COMPUTE_SOFT_MAX = false;
     }
 

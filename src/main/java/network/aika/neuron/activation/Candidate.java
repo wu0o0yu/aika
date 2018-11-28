@@ -12,6 +12,7 @@ public class Candidate  implements Comparable<Candidate> {
      */
     public SearchNode.Decision cachedDecision = SearchNode.Decision.UNKNOWN;
     public boolean repeat = false;
+    public double alternativeCachedWeightExpSum;
 
     /**
      * The cached search node is used to avoid having to recompute the activation values and weights that are associated

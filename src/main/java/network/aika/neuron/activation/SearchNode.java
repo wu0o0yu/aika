@@ -375,11 +375,17 @@ public class SearchNode implements Comparable<SearchNode> {
             preDecision = SELECTED;
         }
         if(preDecision == UNKNOWN && OPTIMIZE_SEARCH) {
-            preDecision = getCachedDecision();
+            Decision cd = getCachedDecision();
 
-            if(preDecision != UNKNOWN) {
-                System.out.println(preDecision);
+            switch (cd) {
+                case SELECTED:
+                    excludedWeightExpSum = candidate.alternativeCachedWeightExpSum;
+                    break;
+                case EXCLUDED:
+                    selectedWeightExpSum = candidate.alternativeCachedWeightExpSum;
+                    break;
             }
+            preDecision = cd;
         }
 
         if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
@@ -482,6 +488,14 @@ public class SearchNode implements Comparable<SearchNode> {
 
             if (preDecision != EXCLUDED) {
                 candidate.cachedDecision = d;
+                switch(candidate.cachedDecision) {
+                    case SELECTED:
+                        candidate.alternativeCachedWeightExpSum = excludedWeightExpSum;
+                        break;
+                    case EXCLUDED:
+                        candidate.alternativeCachedWeightExpSum = selectedWeightExpSum;
+                        break;
+                }
             }
         } else {
             d = cd;
