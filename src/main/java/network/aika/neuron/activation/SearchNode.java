@@ -97,6 +97,8 @@ public class SearchNode implements Comparable<SearchNode> {
     private SearchNode excludedChild = null;
     private double selectedWeight = 0.0;
     private double excludedWeight = 0.0;
+    private double selectedWeightExpSum = 0.0;
+    private double excludedWeightExpSum = 0.0;
     private long processVisited;
     private boolean bestPath;
 
@@ -283,6 +285,7 @@ public class SearchNode implements Comparable<SearchNode> {
     public static void search(Document doc, SearchNode root, long v, Long timeoutInMilliSeconds) throws TimeoutException {
         SearchNode sn = root;
         double returnWeight = 0.0;
+        double returnWeightExpSum = 0.0;
         long startTime = System.currentTimeMillis();
 
         do {
@@ -299,6 +302,8 @@ public class SearchNode implements Comparable<SearchNode> {
                         }
 
                         returnWeight = sn.processResult(doc);
+                        returnWeightExpSum = Math.exp(returnWeight);
+
                         sn.step = Step.FINAL;
                         sn = sn.getParent();
                     } else {
@@ -315,6 +320,9 @@ public class SearchNode implements Comparable<SearchNode> {
                     break;
                 case POST_SELECT:
                     sn.selectedWeight = returnWeight;
+                    sn.selectedWeightExpSum = returnWeightExpSum;
+
+                    sn.storeSearchState(returnWeightExpSum);
 
                     sn.postReturn(sn.selectedChild);
                     sn.step = Step.PREPARE_EXCLUDE;
@@ -328,12 +336,15 @@ public class SearchNode implements Comparable<SearchNode> {
                     break;
                 case POST_EXCLUDE:
                     sn.excludedWeight = returnWeight;
+                    sn.excludedWeightExpSum = returnWeightExpSum;
 
                     sn.postReturn(sn.excludedChild);
                     sn.step = sn.candidate.repeat && OPTIMIZE_SEARCH ? Step.PREPARE_SELECT : Step.FINAL;
                     break;
                 case FINAL:
                     returnWeight = sn.finalStep();
+                    returnWeightExpSum = sn.getWeightExpSum();
+
                     SearchNode pn = sn.getParent();
                     if(pn != null) {
                         pn.skip = sn.getDecision();
@@ -343,6 +354,11 @@ public class SearchNode implements Comparable<SearchNode> {
                 default:
             }
         } while(sn != null);
+    }
+
+
+    public double getWeightExpSum() {
+        return selectedWeightExpSum + excludedWeightExpSum;
     }
 
 
@@ -360,6 +376,10 @@ public class SearchNode implements Comparable<SearchNode> {
         }
         if(preDecision == UNKNOWN && OPTIMIZE_SEARCH) {
             preDecision = getCachedDecision();
+
+            if(preDecision != UNKNOWN) {
+                System.out.println(preDecision);
+            }
         }
 
         if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
@@ -381,7 +401,15 @@ public class SearchNode implements Comparable<SearchNode> {
     private boolean prepareSelectStep(Document doc) {
         candidate.repeat = false;
 
-        if(preDecision == EXCLUDED || skip == SELECTED || doc.model.getSkipSelectStep().evaluate(candidate.activation)) return false;
+        if(preDecision == EXCLUDED) {
+            return false;
+        }
+        if(skip == SELECTED) {
+            return false;
+        }
+        if(doc.model.getSkipSelectStep().evaluate(candidate.activation)) {
+            return false;
+        }
 
         candidate.activation.setDecision(SELECTED, visited);
 
@@ -398,7 +426,15 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean prepareExcludeStep(Document doc) {
-        if(preDecision == SELECTED || skip == EXCLUDED || (preDecision != EXCLUDED && generatesUnsuppressedExcluded())) return false;
+        if(preDecision == SELECTED) {
+            return false;
+        }
+        if(skip == EXCLUDED) {
+            return false;
+        }
+        if(preDecision != EXCLUDED && generatesUnsuppressedExcluded()) {
+            return false;
+        }
 
         candidate.activation.setDecision(EXCLUDED, visited);
 
@@ -509,32 +545,24 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         if(COMPUTE_SOFT_MAX) {
-/*            dumpDebugState();
+            dumpDebugState();
             System.out.println(accumulatedWeight);
-            System.out.println(cacheFactor);
             System.out.println();
-*/
-            storeSearchState(doc);
+
         }
 
         return accumulatedWeight;
     }
 
 
-    private void storeSearchState(Document doc) {
-        doc.searchNodeWeights.put(id, accumulatedWeight);
+    private void storeSearchState(double interpretationWeight) {
+        if(COMPUTE_SOFT_MAX) {
+            Activation act = candidate.activation;
 
-        SearchNode sn = this;
-        while(sn != null) {
-            if(sn.candidate != null) {
-                Activation act = sn.candidate.activation;
-
-                if(act.searchStates == null) {
-                    act.searchStates = new TreeMap<>();
-                }
-                act.searchStates.put(id, act.rounds.getLast());
+            if (act.searchStates == null) {
+                act.searchStates = new ArrayList<>();
             }
-            sn = sn.getParent();
+            act.searchStates.add(new Activation.AvgState(act.rounds.getLast(), interpretationWeight));
         }
     }
 
