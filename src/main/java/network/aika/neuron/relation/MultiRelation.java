@@ -114,7 +114,7 @@ public class MultiRelation extends Relation {
         for(Relation rel: relations) {
             invRels.add(rel.invert());
         }
-        return new MultiRelation(invRels);
+        return new MultiRelation(type, invRels);
     }
 
 
@@ -228,7 +228,7 @@ public class MultiRelation extends Relation {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("MR(");
+        sb.append("MULTI(");
         boolean first = true;
         for(Relation rel: relations) {
             if(!first) {
