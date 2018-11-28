@@ -67,26 +67,6 @@ public class MultiRelation extends Relation {
     }
 
 
-    public boolean follow(Activation rAct, Activation oAct, Map<Integer, Relation> rels) {
-        if(type == Type.AND) {
-            for (Relation rel : relations) {
-                if (!rel.follow(rAct, oAct, rels)) {
-                    return false;
-                }
-            }
-            return true;
-        } else if(type == Type.OR) {
-            for (Relation rel : relations) {
-                if (rel.follow(rAct, oAct, rels)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        return false;
-    }
-
-
     @Override
     public boolean test(Activation act, Activation linkedAct) {
         if(type == Type.AND) {

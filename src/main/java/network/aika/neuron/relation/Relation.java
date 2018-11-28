@@ -90,10 +90,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public abstract Stream<Activation> getActivations(INeuron n, Activation linkedAct);
 
 
-    public boolean follow(Activation rAct, Activation oAct, Map<Integer, Relation> relations) {
-        return true;
-    }
-
     public abstract boolean convertible();
 
 

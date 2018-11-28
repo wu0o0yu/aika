@@ -132,10 +132,8 @@ public class Linker {
             if(relId != OUTPUT) {
                 Synapse s = oAct.getNeuron().getSynapseById(relId);
                 if (s != null) {
-                    if (rel.follow(rAct, oAct, relations)) {
-                        rel.invert().getActivations(s.input.get(rAct.doc), rAct)
-                                .forEach(iAct -> link(s, iAct, oAct));
-                    }
+                    rel.invert().getActivations(s.input.get(rAct.doc), rAct)
+                            .forEach(iAct -> link(s, iAct, oAct));
                 }
             }
         }
