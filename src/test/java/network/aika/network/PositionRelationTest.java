@@ -231,6 +231,7 @@ public class PositionRelationTest {
 
         Neuron inputChar = m.createNeuron("CHAR");
 
+        Neuron wordPlaceholder = m.createNeuron("Placeholder");
 
 
         Neuron pattern = Neuron.init(
@@ -255,6 +256,20 @@ public class PositionRelationTest {
                         .setWeight(15.0)
                         .setBias(-15.0)
                         .setRecurrent(false),
+                new Synapse.Builder()
+                        .setSynapseId(3)
+                        .setNeuron(wordPlaceholder)
+                        .setWeight(30.0)
+                        .setBias(-30.0)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(3)
+                        .setRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(3)
+                        .setRelation(END_EQUALS),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -291,6 +306,8 @@ public class PositionRelationTest {
 
 
         Document doc = m.createDocument("a b c d e f g h ", 0);
+
+        wordPlaceholder.addInput(doc, 2, 14);
 
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().charAt(i);
