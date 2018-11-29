@@ -7,6 +7,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
@@ -15,12 +16,16 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.Activation.END;
 import static network.aika.neuron.relation.Relation.*;
+import static network.aika.neuron.relation.PositionRelation.Equals;
+import static network.aika.neuron.relation.PositionRelation.LessThan;
+import static network.aika.neuron.relation.PositionRelation.GreaterThan;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
 
@@ -218,4 +223,100 @@ public class PositionRelationTest {
 
         assert n.get().getActivations(doc, false).collect(Collectors.toList()).size() >= 1;
     }
+
+
+    @Test
+    public void testOptionalRelation() {
+        Model m = new Model();
+
+        Neuron inputChar = m.createNeuron("CHAR");
+
+
+
+        Neuron pattern = Neuron.init(
+                m.createNeuron("BCDEFG"),
+                1.0,
+                INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(inputChar)
+                        .setWeight(15.0)
+                        .setBias(-15.0)
+                        .setRecurrent(false),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(inputChar)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false),
+                new Synapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(inputChar)
+                        .setWeight(15.0)
+                        .setBias(-15.0)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRelation(new Equals(END, BEGIN, true, true)),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRelation(new LessThan(END, BEGIN, false, false, true)),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(1)
+                        .setRelation(new Equals(END, BEGIN, true, true)),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(1)
+                        .setRelation(new LessThan(END, BEGIN, false, false, true)),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRelation(new Equals(END, BEGIN, true, true)),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRelation(new LessThan(END, BEGIN, false, false, true)),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRelation(END_EQUALS)
+        );
+
+
+        Document doc = m.createDocument("a b c d e f g h ", 0);
+
+        for(int i = 0; i < doc.length(); i++) {
+            char c = doc.getContent().charAt(i);
+            if(c != ' ') {
+                inputChar.addInput(doc, i, i + 2);
+            }
+        }
+
+        doc.process();
+
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
+
+
+        System.out.println("Output activation:");
+        INeuron n = pattern.get();
+        for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
+            System.out.println("Text Range: " + act.slotsToString());
+            System.out.println("Node: " + act.node);
+            System.out.println();
+        }
+
+        System.out.println("All activations:");
+        System.out.println(doc.activationsToString());
+        System.out.println();
+
+        doc.clearActivations();
+    }
+
 }

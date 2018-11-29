@@ -30,10 +30,17 @@ public abstract class PositionRelation extends Relation {
         this.toSlot = toSlot;
     }
 
+    public PositionRelation(int fromSlot, int toSlot, boolean optional, boolean follow) {
+        this.fromSlot = fromSlot;
+        this.toSlot = toSlot;
+        this.optional = optional;
+        this.follow = follow;
+    }
+
 
     @Override
     public boolean test(Activation act, Activation linkedAct) {
-        return test(act.getSlot(fromSlot), linkedAct.getSlot(toSlot));
+        return optional || test(act.getSlot(fromSlot), linkedAct.getSlot(toSlot));
     }
 
 
@@ -121,6 +128,10 @@ public abstract class PositionRelation extends Relation {
             super(fromSlot, toSlot);
         }
 
+        public Equals(int fromSlot, int toSlot, boolean optional, boolean follow) {
+            super(fromSlot, toSlot, optional, follow);
+        }
+
         @Override
         public int getType() {
             return TYPE;
@@ -153,6 +164,7 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron.ThreadState th, Position pos) {
+            if(!follow) return Stream.empty();
             return th.getActivations(
                     fromSlot, pos, true,
                     fromSlot, pos, true
@@ -169,6 +181,7 @@ public abstract class PositionRelation extends Relation {
         public static int TYPE = 10;
 
         private boolean orEquals;
+        private int maxLength = Integer.MAX_VALUE;
 
         static {
             registerRelation(TYPE, () -> new LessThan());
@@ -184,6 +197,11 @@ public abstract class PositionRelation extends Relation {
             this.orEquals = orEquals;
         }
 
+        public LessThan(int fromSlot, int toSlot, boolean orEquals, boolean optional, boolean follow) {
+            super(fromSlot, toSlot, optional, follow);
+            this.orEquals = orEquals;
+        }
+
         @Override
         public int getType() {
             return TYPE;
@@ -191,7 +209,7 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new GreaterThan(toSlot, fromSlot, orEquals);
+            return new GreaterThan(toSlot, fromSlot, orEquals, optional, follow);
         }
 
         @Override
@@ -210,13 +228,14 @@ public abstract class PositionRelation extends Relation {
                 return orEquals;
             }
 
-            return a.getFinalPosition() != null && b.getFinalPosition() != null && a.getFinalPosition() < b.getFinalPosition();
+            return a.getFinalPosition() != null && b.getFinalPosition() != null && a.getFinalPosition() < b.getFinalPosition() && (b.getFinalPosition() - a.getFinalPosition() < maxLength);
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron.ThreadState th, Position pos) {
+            if(!follow) return Stream.empty();
             return th.getActivations(
-                    fromSlot, Position.MIN, true,
+                    fromSlot, new Position(pos.doc, maxLength != Integer.MAX_VALUE ? pos.getFinalPosition() - maxLength : Integer.MIN_VALUE), true,
                     fromSlot, pos, orEquals
             );
         }
@@ -226,6 +245,7 @@ public abstract class PositionRelation extends Relation {
             super.write(out);
 
             out.writeBoolean(orEquals);
+            out.writeInt(maxLength);
         }
 
 
@@ -234,6 +254,7 @@ public abstract class PositionRelation extends Relation {
             super.readFields(in, m);
 
             orEquals = in.readBoolean();
+            maxLength = in.readInt();
         }
 
         public String toString() {
@@ -246,6 +267,7 @@ public abstract class PositionRelation extends Relation {
         public static int TYPE = 11;
 
         private boolean orEquals;
+        private int maxLength = Integer.MAX_VALUE;
 
         static {
             registerRelation(TYPE, () -> new GreaterThan());
@@ -261,6 +283,11 @@ public abstract class PositionRelation extends Relation {
             this.orEquals = orEquals;
         }
 
+        public GreaterThan(int fromSlot, int toSlot, boolean orEquals, boolean optional, boolean follow) {
+            super(fromSlot, toSlot, optional, follow);
+            this.orEquals = orEquals;
+        }
+
         @Override
         public int getType() {
             return TYPE;
@@ -268,7 +295,7 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new LessThan(toSlot, fromSlot, orEquals);
+            return new LessThan(toSlot, fromSlot, orEquals, optional, follow);
         }
 
         @Override
@@ -287,14 +314,15 @@ public abstract class PositionRelation extends Relation {
                 return orEquals;
             }
 
-            return a.getFinalPosition() != null && b.getFinalPosition() != null && a.getFinalPosition() > b.getFinalPosition();
+            return a.getFinalPosition() != null && b.getFinalPosition() != null && a.getFinalPosition() > b.getFinalPosition() && (a.getFinalPosition() - b.getFinalPosition() < maxLength);
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron.ThreadState th, Position pos) {
+            if(!follow) return Stream.empty();
             return th.getActivations(
                     fromSlot, pos, orEquals,
-                    fromSlot, Position.MAX, true
+                    fromSlot, new Position(pos.doc, maxLength != Integer.MAX_VALUE ? pos.getFinalPosition() + maxLength : Integer.MAX_VALUE), true
             );
         }
 
@@ -304,6 +332,7 @@ public abstract class PositionRelation extends Relation {
             super.write(out);
 
             out.writeBoolean(orEquals);
+            out.writeInt(maxLength);
         }
 
 
@@ -312,6 +341,7 @@ public abstract class PositionRelation extends Relation {
             super.readFields(in, m);
 
             orEquals = in.readBoolean();
+            maxLength = in.readInt();
         }
 
         public String toString() {

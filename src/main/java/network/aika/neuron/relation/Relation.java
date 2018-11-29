@@ -27,19 +27,22 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public static Map<Integer, RelationFactory> relationRegistry = new TreeMap<>();
 
-    public static Relation EQUALS = new MultiRelation(new Equals(BEGIN, BEGIN), new Equals(END, END));
+    public static Relation EQUALS = new MultiRelation(new Equals(BEGIN, BEGIN), new Equals(END, END, false, false));
     public static Relation BEGIN_EQUALS = new Equals(BEGIN, BEGIN);
     public static Relation END_EQUALS = new Equals(END, END);
     public static Relation BEGIN_TO_END_EQUALS = new Equals(BEGIN, END);
     public static Relation END_TO_BEGIN_EQUALS = new Equals(END, BEGIN);
-    public static Relation CONTAINS = new MultiRelation(new LessThan(BEGIN, BEGIN, true), new GreaterThan(END, END, true));
-    public static Relation CONTAINED_IN = new MultiRelation(new GreaterThan(BEGIN, BEGIN, true), new LessThan(END, END, true));
-    public static Relation OVERLAPS = new MultiRelation(new LessThan(BEGIN, END, false), new GreaterThan(END, BEGIN, false));
+    public static Relation CONTAINS = new MultiRelation(new LessThan(BEGIN, BEGIN, true), new GreaterThan(END, END, true, false, false));
+    public static Relation CONTAINED_IN = new MultiRelation(new GreaterThan(BEGIN, BEGIN, true), new LessThan(END, END, true, false, false));
+    public static Relation OVERLAPS = new MultiRelation(new LessThan(BEGIN, END, false), new GreaterThan(END, BEGIN, false, false, false));
     public static Relation BEFORE = new LessThan(END, BEGIN, true);
     public static Relation AFTER = new GreaterThan(BEGIN, END, true);
 
     public static Relation ANY = new Any();
 
+
+    protected boolean optional;
+    protected boolean follow = true;
 
     @Override
     public int compareTo(Relation rel) {
@@ -66,8 +69,20 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public abstract void linksOutputs(Set<Integer> outputs);
 
 
+    public Relation() {
+    }
+
+
+    public Relation(boolean optional, boolean follow) {
+        this.optional = optional;
+        this.follow = follow;
+    }
+
+
     public void write(DataOutput out) throws IOException {
         out.writeInt(getType());
+        out.writeBoolean(optional);
+        out.writeBoolean(follow);
     }
 
 
@@ -81,6 +96,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
+        optional = in.readBoolean();
+        follow = in.readBoolean();
     }
 
 
@@ -171,7 +188,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
                 addRelation(fromRel, to, from, n, rel);
                 addRelation(toRel, from, to, n, rel.invert());
             } else {
-                MultiRelation mr = new MultiRelation(MultiRelation.Type.OR, Arrays.asList(rel, rel.invert()));
+                MultiRelation mr = new MultiRelation(Arrays.asList(rel, rel.invert()));
                 addRelation(fromRel, to, from, n, mr);
             }
         }

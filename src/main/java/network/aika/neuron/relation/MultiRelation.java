@@ -18,13 +18,6 @@ public class MultiRelation extends Relation {
 
     private List<Relation> relations;
 
-    private Type type = Type.AND;
-
-    public enum Type {
-        AND,
-        OR
-    }
-
     static {
         registerRelation(ID, () -> new MultiRelation());
     }
@@ -39,19 +32,9 @@ public class MultiRelation extends Relation {
         relations = Arrays.asList(rels);
     }
 
-    public MultiRelation(Type type, Relation... rels) {
-        this.type = type;
-        relations = Arrays.asList(rels);
-    }
 
 
     public MultiRelation(List<Relation> rels) {
-        relations = rels;
-    }
-
-
-    public MultiRelation(Type type, List<Relation> rels) {
-        this.type = type;
         relations = rels;
     }
 
@@ -69,22 +52,12 @@ public class MultiRelation extends Relation {
 
     @Override
     public boolean test(Activation act, Activation linkedAct) {
-        if(type == Type.AND) {
-            for (Relation rel : relations) {
-                if (!rel.test(act, linkedAct)) {
-                    return false;
-                }
+        for (Relation rel : relations) {
+            if (!rel.test(act, linkedAct)) {
+                return false;
             }
-            return true;
-        } else if(type == Type.OR) {
-            for (Relation rel : relations) {
-                if (rel.test(act, linkedAct)) {
-                    return true;
-                }
-            }
-            return false;
         }
-        return false;
+        return true;
     }
 
 
@@ -94,7 +67,7 @@ public class MultiRelation extends Relation {
         for(Relation rel: relations) {
             invRels.add(rel.invert());
         }
-        return new MultiRelation(type, invRels);
+        return new MultiRelation(invRels);
     }
 
 
@@ -127,27 +100,24 @@ public class MultiRelation extends Relation {
 
     @Override
     public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+        if(!follow) return Stream.empty();
+
         if(relations.isEmpty()) {
             INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
             return th != null ? th.getActivations() : Stream.empty();
-        } else if(type == Type.AND) {
-            Relation firstRelation = relations.get(0);
-            return firstRelation
-                    .getActivations(n, linkedAct)
+        } else {
+            return relations
+                    .stream()
+                    .flatMap(r -> r.getActivations(n, linkedAct))
                     .filter(act -> {
-                        for(Relation rel: relations) {
-                            if(!rel.test(act, linkedAct)) {
+                        for (Relation rel : relations) {
+                            if (!rel.test(act, linkedAct)) {
                                 return false;
                             }
                         }
                         return true;
                     });
-        } else if(type == Type.OR) {
-            return relations
-                    .stream()
-                    .flatMap(rel -> rel.getActivations(n, linkedAct));
         }
-        return null;
     }
 
     @Override
@@ -186,8 +156,6 @@ public class MultiRelation extends Relation {
     @Override
     public void write(DataOutput out) throws IOException {
         super.write(out);
-        out.writeUTF(type.name());
-
         out.writeInt(relations.size());
         for(Relation rel: relations) {
             rel.write(out);
@@ -197,9 +165,7 @@ public class MultiRelation extends Relation {
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-
-        type = Type.valueOf(in.readUTF());
-
+        super.readFields(in, m);
         int l = in.readInt();
         for(int i = 0; i < l; i++) {
             relations.add(Relation.read(in, m));

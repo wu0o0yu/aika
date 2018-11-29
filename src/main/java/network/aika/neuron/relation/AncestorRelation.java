@@ -165,6 +165,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+            if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
             collectCommonAncestor(results, n, linkedAct, linkedAct.doc.visitedCounter++);
             return results.stream();
@@ -201,6 +202,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+            if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
             collectContains(results, n, linkedAct, linkedAct.doc.visitedCounter++);
             return results.stream();
@@ -237,6 +239,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+            if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
             collectContainedIn(results, n, linkedAct, linkedAct.doc.visitedCounter++);
             return results.stream();
@@ -273,6 +276,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+            if(!follow) return Stream.empty();
             long v = linkedAct.doc.visitedCounter++;
             markDescendants(linkedAct, v);
 
@@ -312,6 +316,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+            if(!follow) return Stream.empty();
             long v = linkedAct.doc.visitedCounter++;
             markAncestors(linkedAct, v);
 

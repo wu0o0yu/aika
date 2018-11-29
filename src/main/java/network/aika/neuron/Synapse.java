@@ -289,14 +289,14 @@ public class Synapse implements Writable {
     public boolean isConjunction(State state) {
         double w = state == State.NEW ? (limit + limitDelta) * getNewWeight() : limit * weight;
         double b = state == State.NEW ? bias + biasDelta : bias;
-        return w > 0.0 && (-b / w) >= CONJUNCTION_THRESHOLD;
+        return isNegative() || (w > 0.0 && (-b / w) >= CONJUNCTION_THRESHOLD);
     }
 
 
     public boolean isDisjunction(State state) {
         double w = state == State.NEW ? (limit + limitDelta) * getNewWeight() : limit * weight;
         double b = state == State.NEW ? bias + biasDelta : bias;
-        return w > 0.0 && (-b / w) <= DISJUNCTION_THRESHOLD;
+        return !isNegative()&& (w > 0.0 && (-b / w) <= DISJUNCTION_THRESHOLD);
     }
 
 
