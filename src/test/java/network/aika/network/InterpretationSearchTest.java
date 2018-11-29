@@ -395,7 +395,6 @@ public class InterpretationSearchTest {
     }
 
 
-    @Ignore
     @Test
     public void testReversePositiveFeedbackSynapse() {
         Model m = new Model();
