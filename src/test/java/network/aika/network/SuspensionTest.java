@@ -166,4 +166,74 @@ public class SuspensionTest {
             return storage.keySet();
         }
     }
+
+
+
+
+    @Test
+    public void testSuspendNegativeNeuron() {
+        Model m = new Model(new DummySuspensionHook(), 1);
+
+        Neuron inA = m.createNeuron("A");
+        Neuron inB = m.createNeuron("B");
+
+        int idA = inA.id;
+        int idB = inB.id;
+
+        Neuron nC = Neuron.init(m.createNeuron("C"),
+                5.0,
+                INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(inA)
+                        .setWeight(10.0)
+                        .setBias(-10.0)
+                        .setRecurrent(false),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(inB)
+                        .setWeight(-100.0)
+                        .setBias(0.0)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRelation(EQUALS)
+        );
+
+
+        Neuron outD = Neuron.init(m.createNeuron("D"),
+                5.0,
+                INeuron.Type.EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(nC)
+                        .setWeight(10.0)
+                        .setBias(-9.0)
+                        .setRecurrent(false),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS)
+        );
+
+        m.suspendAll(Provider.SuspensionMode.SAVE);
+
+        Assert.assertTrue(outD.isSuspended());
+
+        // Reactivate
+
+        Document doc = m.createDocument("Bla");
+
+        inA = m.lookupNeuron(idA);
+        inA.addInput(doc, 0, 1);
+
+        inB = m.lookupNeuron(idB);
+        Assert.assertEquals(2, nC.get().inputSynapses.size());
+    }
+
 }
