@@ -139,7 +139,7 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new Equals(toSlot, fromSlot);
+            return new Equals(toSlot, fromSlot, optional, follow);
         }
 
         @Override
@@ -154,11 +154,6 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public boolean isExact() {
-            return true;
-        }
-
-        @Override
-        public boolean convertible() {
             return true;
         }
 
@@ -197,9 +192,10 @@ public abstract class PositionRelation extends Relation {
             this.orEquals = orEquals;
         }
 
-        public LessThan(int fromSlot, int toSlot, boolean orEquals, boolean optional, boolean follow) {
+        public LessThan(int fromSlot, int toSlot, boolean orEquals, boolean optional, boolean follow, int maxLength) {
             super(fromSlot, toSlot, optional, follow);
             this.orEquals = orEquals;
+            this.maxLength = maxLength;
         }
 
         @Override
@@ -209,17 +205,12 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new GreaterThan(toSlot, fromSlot, orEquals, optional, follow);
+            return new GreaterThan(toSlot, fromSlot, orEquals, optional, follow, maxLength);
         }
 
         @Override
         public boolean isExact() {
             return false;
-        }
-
-        @Override
-        public boolean convertible() {
-            return true;
         }
 
         @Override
@@ -283,9 +274,10 @@ public abstract class PositionRelation extends Relation {
             this.orEquals = orEquals;
         }
 
-        public GreaterThan(int fromSlot, int toSlot, boolean orEquals, boolean optional, boolean follow) {
+        public GreaterThan(int fromSlot, int toSlot, boolean orEquals, boolean optional, boolean follow, int maxLength) {
             super(fromSlot, toSlot, optional, follow);
             this.orEquals = orEquals;
+            this.maxLength = maxLength;
         }
 
         @Override
@@ -295,17 +287,12 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new LessThan(toSlot, fromSlot, orEquals, optional, follow);
+            return new LessThan(toSlot, fromSlot, orEquals, optional, follow, maxLength);
         }
 
         @Override
         public boolean isExact() {
             return false;
-        }
-
-        @Override
-        public boolean convertible() {
-            return true;
         }
 
         @Override

@@ -27,14 +27,26 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public static Map<Integer, RelationFactory> relationRegistry = new TreeMap<>();
 
-    public static Relation EQUALS = new MultiRelation(new Equals(BEGIN, BEGIN), new Equals(END, END, false, false));
+    public static Relation EQUALS = new MultiRelation(
+            new Equals(BEGIN, BEGIN),
+            new Equals(END, END, false, false)
+    );
     public static Relation BEGIN_EQUALS = new Equals(BEGIN, BEGIN);
     public static Relation END_EQUALS = new Equals(END, END);
     public static Relation BEGIN_TO_END_EQUALS = new Equals(BEGIN, END);
     public static Relation END_TO_BEGIN_EQUALS = new Equals(END, BEGIN);
-    public static Relation CONTAINS = new MultiRelation(new LessThan(BEGIN, BEGIN, true), new GreaterThan(END, END, true, false, false));
-    public static Relation CONTAINED_IN = new MultiRelation(new GreaterThan(BEGIN, BEGIN, true), new LessThan(END, END, true, false, false));
-    public static Relation OVERLAPS = new MultiRelation(new LessThan(BEGIN, END, false), new GreaterThan(END, BEGIN, false, false, false));
+    public static Relation CONTAINS = new MultiRelation(
+            new LessThan(BEGIN, BEGIN, true),
+            new GreaterThan(END, END, true, false, false, Integer.MAX_VALUE)
+    );
+    public static Relation CONTAINED_IN = new MultiRelation(
+            new GreaterThan(BEGIN, BEGIN, true),
+            new LessThan(END, END, true, false, false, Integer.MAX_VALUE)
+    );
+    public static Relation OVERLAPS = new MultiRelation(
+            new LessThan(BEGIN, END, false),
+            new GreaterThan(END, BEGIN, false, false, false, Integer.MAX_VALUE)
+    );
     public static Relation BEFORE = new LessThan(END, BEGIN, true);
     public static Relation AFTER = new GreaterThan(BEGIN, END, true);
 
@@ -107,7 +119,9 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public abstract Stream<Activation> getActivations(INeuron n, Activation linkedAct);
 
 
-    public abstract boolean convertible();
+    public boolean convertible() {
+        return !optional && follow;
+    }
 
 
     public static void addRelation(Map<Integer, Relation> relMap, Integer synId, Integer targetSynId, Neuron n, Relation r) {

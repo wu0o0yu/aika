@@ -154,11 +154,6 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public boolean convertible() {
-            return true;
-        }
-
-        @Override
         public boolean test(Activation act, Activation linkedAct) {
             return hasCommonAncestor(act, linkedAct);
         }
@@ -188,11 +183,6 @@ public abstract class AncestorRelation extends Relation {
         @Override
         public Relation invert() {
             return IS_ANCESTOR_OF;
-        }
-
-        @Override
-        public boolean convertible() {
-            return true;
         }
 
         @Override
@@ -228,11 +218,6 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public boolean convertible() {
-            return true;
-        }
-
-        @Override
         public boolean test(Activation act, Activation linkedAct) {
             return contains(linkedAct, act, act.doc.visitedCounter++);
         }
@@ -262,11 +247,6 @@ public abstract class AncestorRelation extends Relation {
         @Override
         public Relation invert() {
             return NOT_ANCESTOR_OF;
-        }
-
-        @Override
-        public boolean convertible() {
-            return true;
         }
 
         @Override
@@ -302,11 +282,6 @@ public abstract class AncestorRelation extends Relation {
         @Override
         public Relation invert() {
             return NOT_DESCENDANT_OF;
-        }
-
-        @Override
-        public boolean convertible() {
-            return true;
         }
 
         @Override
