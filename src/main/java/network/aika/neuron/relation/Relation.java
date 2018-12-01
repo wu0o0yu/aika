@@ -52,9 +52,17 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public static Relation ANY = new Any();
 
-
     protected boolean optional;
     protected boolean follow = true;
+
+
+    public boolean isOptional() {
+        return optional;
+    }
+
+    public boolean isFollow() {
+        return follow;
+    }
 
     @Override
     public int compareTo(Relation rel) {
