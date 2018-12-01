@@ -80,6 +80,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public abstract void linksOutputs(Set<Integer> outputs);
 
+    public abstract Relation setOptionalAndFollow(boolean optional, boolean follow);
+
 
     public Relation() {
     }
@@ -222,6 +224,13 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             registerRelation(ID, () -> Relation.ANY);
         }
 
+        public Any() {
+        }
+
+        public Any(boolean optional, boolean follow) {
+            super(optional, follow);
+        }
+
         @Override
         public int getType() {
             return ID;
@@ -263,6 +272,11 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         @Override
         public boolean convertible() {
             return true;
+        }
+
+        @Override
+        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
+            return new Any(optional, follow);
         }
 
         @Override

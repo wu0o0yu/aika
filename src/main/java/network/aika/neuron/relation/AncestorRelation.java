@@ -143,6 +143,14 @@ public abstract class AncestorRelation extends Relation {
             registerRelation(TYPE, () -> COMMON_ANCESTOR);
         }
 
+        public CommonAncestor() {
+        }
+
+        public CommonAncestor(boolean optional, boolean follow) {
+            this.optional = optional;
+            this.follow = follow;
+        }
+
         @Override
         public int getType() {
             return TYPE;
@@ -150,7 +158,12 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return COMMON_ANCESTOR;
+            return new CommonAncestor(optional, follow);
+        }
+
+        @Override
+        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
+            return new CommonAncestor(optional, follow);
         }
 
         @Override
@@ -175,6 +188,14 @@ public abstract class AncestorRelation extends Relation {
             registerRelation(TYPE, () -> IS_DESCENDANT_OF);
         }
 
+        public IsDescendantOf() {
+        }
+
+        public IsDescendantOf(boolean optional, boolean follow) {
+            this.optional = optional;
+            this.follow = follow;
+        }
+
         @Override
         public int getType() {
             return TYPE;
@@ -182,7 +203,12 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return IS_ANCESTOR_OF;
+            return new IsAncestorOf(optional, follow);
+        }
+
+        @Override
+        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
+            return new IsDescendantOf(optional, follow);
         }
 
         @Override
@@ -207,6 +233,14 @@ public abstract class AncestorRelation extends Relation {
             registerRelation(TYPE, () -> IS_ANCESTOR_OF);
         }
 
+        public IsAncestorOf() {
+        }
+
+        public IsAncestorOf(boolean optional, boolean follow) {
+            this.optional = optional;
+            this.follow = follow;
+        }
+
         @Override
         public int getType() {
             return TYPE;
@@ -214,7 +248,12 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return IS_DESCENDANT_OF;
+            return new IsDescendantOf(optional, follow);
+        }
+
+        @Override
+        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
+            return new IsAncestorOf(optional, follow);
         }
 
         @Override
@@ -239,6 +278,14 @@ public abstract class AncestorRelation extends Relation {
             registerRelation(TYPE, () -> NOT_DESCENDANT_OF);
         }
 
+        public NotDescendantOf() {
+        }
+
+        public NotDescendantOf(boolean optional, boolean follow) {
+            this.optional = optional;
+            this.follow = follow;
+        }
+
         @Override
         public int getType() {
             return TYPE;
@@ -246,7 +293,12 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return NOT_ANCESTOR_OF;
+            return new NotAncestorOf(optional, follow);
+        }
+
+        @Override
+        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
+            return new NotDescendantOf(optional, follow);
         }
 
         @Override
@@ -274,6 +326,14 @@ public abstract class AncestorRelation extends Relation {
             registerRelation(TYPE, () -> NOT_ANCESTOR_OF);
         }
 
+        public NotAncestorOf() {
+        }
+
+        public NotAncestorOf(boolean optional, boolean follow) {
+            this.optional = optional;
+            this.follow = follow;
+        }
+
         @Override
         public int getType() {
             return TYPE;
@@ -281,7 +341,12 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return NOT_DESCENDANT_OF;
+            return new NotDescendantOf(optional, follow);
+        }
+
+        @Override
+        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
+            return new NotAncestorOf(optional, follow);
         }
 
         @Override

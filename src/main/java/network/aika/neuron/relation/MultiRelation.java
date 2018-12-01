@@ -28,6 +28,11 @@ public class MultiRelation extends Relation {
     }
 
 
+    public MultiRelation(boolean optional, boolean follow, List<Relation> relations) {
+        super(optional, follow);
+        this.relations = relations;
+    }
+
     public MultiRelation(Relation... rels) {
         relations = Arrays.asList(rels);
     }
@@ -67,7 +72,13 @@ public class MultiRelation extends Relation {
         for(Relation rel: relations) {
             invRels.add(rel.invert());
         }
-        return new MultiRelation(invRels);
+        return new MultiRelation(optional, follow, invRels);
+    }
+
+
+    @Override
+    public Relation setOptionalAndFollow(boolean optional, boolean follow) {
+        return new MultiRelation(optional, follow, relations);
     }
 
 

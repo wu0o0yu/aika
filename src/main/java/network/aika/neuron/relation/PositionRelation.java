@@ -143,6 +143,11 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
+        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
+            return new Equals(fromSlot, toSlot, optional, follow);
+        }
+
+        @Override
         public boolean test(Position a, Position b) {
             return a == b;
         }
@@ -206,6 +211,11 @@ public abstract class PositionRelation extends Relation {
         @Override
         public Relation invert() {
             return new GreaterThan(toSlot, fromSlot, orEquals, optional, follow, maxLength);
+        }
+
+        @Override
+        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
+            return new LessThan(fromSlot, toSlot, orEquals, optional, follow, maxLength);
         }
 
         @Override
@@ -288,6 +298,11 @@ public abstract class PositionRelation extends Relation {
         @Override
         public Relation invert() {
             return new LessThan(toSlot, fromSlot, orEquals, optional, follow, maxLength);
+        }
+
+        @Override
+        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
+            return new GreaterThan(fromSlot, toSlot, orEquals, optional, follow, maxLength);
         }
 
         @Override
