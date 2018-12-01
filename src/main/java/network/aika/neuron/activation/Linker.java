@@ -169,13 +169,19 @@ public class Linker {
 
     private boolean checkRelations(Synapse s, Activation iAct, Activation oAct) {
         for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+            Integer relSynId = me.getKey();
             Relation rel = me.getValue();
-            if(me.getKey() == Synapse.OUTPUT) {
+            if(relSynId == Synapse.OUTPUT) {
                 if (!rel.test(iAct, oAct)) {
                     return false;
                 }
+            } else {
+                Synapse relSyn = oAct.getNeuron().getSynapseById(relSynId);
+                if(relSyn!= null && oAct.getInputLinksBySynapse(false, relSyn)
+                        .anyMatch(l -> !rel.test(iAct, l.input))) {
+                    return false;
+                }
             }
-            // TODO: other relations
         }
 
         return true;

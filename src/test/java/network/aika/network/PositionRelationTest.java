@@ -273,15 +273,24 @@ public class PositionRelationTest {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRelation(new MultiRelation(new Equals(END, BEGIN, true, true), new LessThan(BEGIN, BEGIN, false, false, false, Integer.MAX_VALUE))),
+                        .setRelation(new MultiRelation(
+                                new Equals(END, BEGIN, true, true),
+                                new LessThan(BEGIN, BEGIN, false, false, false, Integer.MAX_VALUE)
+                        )),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(1)
-                        .setRelation(new MultiRelation(new Equals(END, BEGIN, true, true), new LessThan(BEGIN, BEGIN, false, false, false, Integer.MAX_VALUE))),
+                        .setRelation(new MultiRelation(
+                                new Equals(END, BEGIN, true, true),
+                                new LessThan(BEGIN, BEGIN, false, false, false, Integer.MAX_VALUE)
+                        )),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(2)
-                        .setRelation(new MultiRelation(new Equals(END, BEGIN, true, true), new LessThan(BEGIN, BEGIN, false, false, false, Integer.MAX_VALUE))),
+                        .setRelation(new MultiRelation(
+                                new Equals(END, BEGIN, true, true),
+                                new LessThan(BEGIN, BEGIN, false, false, false, Integer.MAX_VALUE)
+                        )),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
