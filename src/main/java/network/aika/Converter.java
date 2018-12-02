@@ -32,7 +32,7 @@ import java.util.*;
  */
 public class Converter {
 
-    public static int MAX_AND_NODE_SIZE = 6;
+    public static int MAX_AND_NODE_SIZE = 10;
 
 
     public static Comparator<Synapse> SYNAPSE_COMP = (s1, s2) -> {
