@@ -120,7 +120,6 @@ public class Linker {
         while(!queue.isEmpty()) {
             Link l = queue.pollFirst();
             linkRelated(l.input, l.output, l.synapse.relations);
-            doc.propagate();
         }
     }
 
