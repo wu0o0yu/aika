@@ -209,7 +209,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
 
     public RefValue extend(int threadId, Document doc, Refinement firstRef, PatternDiscovery.Config patterDiscoverConfig) {
-        if(firstRef.relations.size() == 0) return null;
+        if(!firstRef.isConvertible()) return null;
 
         RefValue firstRV = getAndChild(firstRef);
         if(firstRV != null) {
@@ -402,6 +402,12 @@ public class AndNode extends Node<AndNode, AndActivation> {
             this.input = input;
         }
 
+        public boolean isConvertible() {
+            for(Relation rel: relations.relations) {
+                if(rel != null && rel.isConvertible()) return true;
+            }
+            return false;
+        }
 
         public String toString() {
             StringBuilder sb = new StringBuilder();

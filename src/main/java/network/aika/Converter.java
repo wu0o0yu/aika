@@ -116,7 +116,6 @@ public class Converter {
                     noFurtherRefinement = true;
                     break;
                 }
-
             }
 
             outputNode.removeParents(threadId);
@@ -178,7 +177,7 @@ public class Converter {
             for(Map.Entry<Integer, Relation> me: syn.relations.entrySet()) {
                 Integer relId = me.getKey();
                 Relation rel = me.getValue();
-                if(rel.convertible() && !alreadyCollected.contains(relId)) {
+                if(rel.isConvertible() && !alreadyCollected.contains(relId)) {
                     Synapse rs = syn.output.getSynapseById(relId);
                     if(rs != null) {
                         relatedSyns.put(relId, rs);

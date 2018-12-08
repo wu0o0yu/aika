@@ -129,7 +129,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public abstract Stream<Activation> getActivations(INeuron n, Activation linkedAct);
 
 
-    public boolean convertible() {
+    public boolean isConvertible() {
         return !optional && follow;
     }
 
@@ -278,7 +278,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         @Override
-        public boolean convertible() {
+        public boolean isConvertible() {
             return true;
         }
 

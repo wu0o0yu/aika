@@ -132,9 +132,9 @@ public class MultiRelation extends Relation {
     }
 
     @Override
-    public boolean convertible() {
+    public boolean isConvertible() {
         for(Relation rel: relations) {
-            if(rel.convertible()) return true;
+            if(rel.isConvertible()) return true;
         }
 
         return false;

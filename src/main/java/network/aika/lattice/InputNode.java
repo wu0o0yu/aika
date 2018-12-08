@@ -146,7 +146,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
     public RefValue extend(int threadId, Document doc, Refinement ref, PatternDiscovery.Config patterDiscoveryConfig) {
-        if(ref.relations.size() == 0) return null;
+        if(!ref.isConvertible()) return null;
 
         Relation rel = ref.relations.get(0);
         if(rel == null) {
