@@ -151,8 +151,11 @@ public class MultiRelation extends Relation {
 
     @Override
     public int compareTo(Relation rel) {
+        int r = super.compareTo(rel);
+        if(r != 0) return r;
+
         MultiRelation mr = (MultiRelation) rel;
-        int r = Integer.compare(relations.size(), mr.relations.size());
+        r = Integer.compare(relations.size(), mr.relations.size());
         if(r != 0) return r;
         for(int i = 0; i < relations.size(); i++) {
             Relation a = relations.get(i);
