@@ -89,7 +89,7 @@ public class Linker {
             for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
                 Relation rel = me.getValue();
                 if(me.getKey() == OUTPUT) {
-                    rel.invert().getActivations(s.input.get(act.doc), act)
+                    rel.getActivations(s.input.get(act.doc), act)
                             .forEach(iAct -> link(s, iAct, act));
                 }
             }

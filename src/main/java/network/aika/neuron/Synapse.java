@@ -337,7 +337,7 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S NW:" + getNewWeight() + " NB:" + getNewBias() + " rec:" + isRecurrent + " " +  input + "->" + output;
+        return "S ID:" + id + " NW:" + getNewWeight() + " NB:" + getNewBias() + " rec:" + isRecurrent + " " +  input + "->" + output;
     }
 
 

@@ -99,6 +99,9 @@ public abstract class PositionRelation extends Relation {
         }
 
         Position pos = linkedAct.getSlot(toSlot);
+        if(pos == null) {
+            return Stream.empty();
+        }
 
         return getActivations(th, pos)
                 .filter(act -> test(act, linkedAct));
