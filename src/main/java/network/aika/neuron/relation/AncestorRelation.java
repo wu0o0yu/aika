@@ -178,6 +178,10 @@ public abstract class AncestorRelation extends Relation {
             collectCommonAncestor(results, n, linkedAct, linkedAct.doc.visitedCounter++);
             return results.stream();
         }
+
+        public String toString() {
+            return "COMMON-ANCESTOR";
+        }
     }
 
 
@@ -223,6 +227,11 @@ public abstract class AncestorRelation extends Relation {
             collectContains(results, n, linkedAct, linkedAct.doc.visitedCounter++);
             return results.stream();
         }
+
+
+        public String toString() {
+            return "DESCENDANT-OF";
+        }
     }
 
 
@@ -267,6 +276,10 @@ public abstract class AncestorRelation extends Relation {
             List<Activation> results = new ArrayList<>();
             collectContainedIn(results, n, linkedAct, linkedAct.doc.visitedCounter++);
             return results.stream();
+        }
+
+        public String toString() {
+            return "ANCESTOR-OF";
         }
     }
 
@@ -316,6 +329,10 @@ public abstract class AncestorRelation extends Relation {
             return th.getActivations()
                     .filter(act -> act.markedAncDesc != v);
         }
+
+        public String toString() {
+            return "NOT-DESCENDANT-OF";
+        }
     }
 
 
@@ -363,6 +380,10 @@ public abstract class AncestorRelation extends Relation {
             INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
             return th.getActivations()
                     .filter(act -> act.markedAncDesc != v);
+        }
+
+        public String toString() {
+            return "NOT-ANCESTOR-OF";
         }
     }
 }

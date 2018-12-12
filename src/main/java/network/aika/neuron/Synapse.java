@@ -101,7 +101,7 @@ public class Synapse implements Writable {
 
     /**
      * The weight delta of this synapse. The converter will use it to compute few internal
-     * parameters and then createOrLookup the weight variable.
+     * parameters and then createOrReplace the weight variable.
      */
     public double weightDelta;
 
@@ -423,35 +423,30 @@ public class Synapse implements Writable {
 
 
 
-    public static Synapse createOrLookup(Document doc, Integer synapseId, Neuron inputNeuron, Neuron outputNeuron) {
+    public static Synapse createOrReplace(Document doc, Integer synapseId, Neuron inputNeuron, Neuron outputNeuron) {
         outputNeuron.get(doc);
         inputNeuron.get(doc);
         outputNeuron.lock.acquireWriteLock();
-        Synapse synapse = null;
-        if(synapseId != null) {
-            synapse = outputNeuron.inputSynapsesById.get(synapseId);
-        } else {
-            Map.Entry<Synapse, Synapse> me = outputNeuron.inMemoryInputSynapses.subMap(
-                    new Synapse(inputNeuron, outputNeuron, Integer.MIN_VALUE), true,
-                    new Synapse(inputNeuron, outputNeuron, Integer.MAX_VALUE), true
-            ).firstEntry();
-            if(me != null) {
-                synapse = me.getKey();
-            }
+        Synapse synapse = outputNeuron.inputSynapsesById.get(synapseId);
+        if(synapse != null) {
+            synapse.unlink();
         }
         outputNeuron.lock.releaseWriteLock();
 
         if(synapse == null) {
             synapse = new Synapse(inputNeuron, outputNeuron, synapseId);
+        } else {
+            synapse.input = inputNeuron;
+            synapse.output = outputNeuron;
+        }
 
-            if(synapseId == null) {
-                synapse.id = outputNeuron.get(doc).getNewSynapseId();
-            }
+        if (synapseId == null) {
+            synapse.id = outputNeuron.get(doc).getNewSynapseId();
+        }
 
-            synapse.link();
-            if(doc != null) {
-                synapse.createdInDoc = doc.id;
-            }
+        synapse.link();
+        if (doc != null) {
+            synapse.createdInDoc = doc.id;
         }
         return synapse;
     }
@@ -592,7 +587,7 @@ public class Synapse implements Writable {
 
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            Synapse s = createOrLookup(null, synapseId, neuron, outputNeuron);
+            Synapse s = createOrReplace(null, synapseId, neuron, outputNeuron);
 
             s.isRecurrent = recurrent;
             s.identity = identity;
