@@ -229,20 +229,18 @@ public class InputNode extends Node<InputNode, InputActivation> {
         if(act.repropagateV != null && act.repropagateV != nln.markedCreated) return;
 
         ref.relations.get(0).getActivations(secondNode.inputNeuron.get(doc), iAct)
-                .forEach(secondIAct -> {
-                    if (secondIAct.outputToInputNode != null) {
-                        InputActivation secondAct = secondIAct.outputToInputNode.output;
-                        if (secondAct != null) {
-                            //    if (!Conflicts.isConflicting(iAct, secondIAct)) {
-                            AndActivation oAct = new AndActivation(doc.logicNodeActivationIdCounter++, doc, nln);
-                            for (AndNode.Entry e : nln.parents) {
-                                boolean match = e.ref.compareTo(ref) == 0;
-                                oAct.link(e.ref, e.rv, match ? secondAct : act, match ? act : secondAct);
-                            }
-                            nln.addActivation(oAct);
-                            // }
-                        }
+                .filter(secondIAct -> secondIAct.outputToInputNode != null)
+                .map(secondIAct -> secondIAct.outputToInputNode.output)
+                .filter(secondAct -> secondAct != null && secondAct.registered)
+                .forEach(secondAct -> {
+                    //    if (!Conflicts.isConflicting(iAct, secondIAct)) {
+                    AndActivation oAct = new AndActivation(doc.logicNodeActivationIdCounter++, doc, nln);
+                    for (AndNode.Entry e : nln.parents) {
+                        boolean match = e.ref.compareTo(ref) == 0;
+                        oAct.link(e.ref, e.rv, match ? secondAct : act, match ? act : secondAct);
                     }
+                    nln.addActivation(oAct);
+                    // }
                 }
         );
     }

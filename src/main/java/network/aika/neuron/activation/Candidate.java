@@ -88,7 +88,7 @@ public class Candidate  implements Comparable<Candidate> {
             } else if(mea == null && meb != null) {
                 return -1;
             } else if(mea != null && meb == null) {
-                return -1;
+                return 1;
             }
 
             int r = Integer.compare(mea.getKey(), meb.getKey());

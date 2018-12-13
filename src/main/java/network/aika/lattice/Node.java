@@ -202,6 +202,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         th.activations.add(act);
 
         doc.addedNodeActivations.add(act);
+        act.registered = true;
     }
 
 

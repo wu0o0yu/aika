@@ -33,6 +33,7 @@ public abstract class NodeActivation<T extends Node> implements Comparable<NodeA
 
     public long visited = -1;
     public Long repropagateV;
+    public boolean registered;
 
     public TreeMap<Integer, AndNode.Link> outputsToAndNode = new TreeMap<>();
     public TreeMap<Integer, OrNode.Link> outputsToOrNode = new TreeMap<>();
