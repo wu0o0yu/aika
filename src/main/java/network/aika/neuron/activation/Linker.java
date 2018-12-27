@@ -109,6 +109,7 @@ public class Linker {
                         .forEach(l -> addToQueue(l));
             }
             doc.linker.process();
+            doc.propagate();
         } while(oldSize != doc.getNumberOfActivations());
 
 
