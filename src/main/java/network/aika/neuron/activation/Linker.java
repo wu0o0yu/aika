@@ -111,9 +111,6 @@ public class Linker {
             doc.linker.process();
             doc.propagate();
         } while(oldSize != doc.getNumberOfActivations());
-
-
-        postLateLinking();
     }
 
 
@@ -185,19 +182,6 @@ public class Linker {
         }
 
         return true;
-    }
-
-
-    protected void postLateLinking() {
-        doc.getActivations(false)
-                .stream()
-                .flatMap(act -> act.getInputLinks(false, false))
-                .filter(l -> l.synapse.isRecurrent && !l.synapse.isNegative())
-                .forEach(l -> {
-                    if(!l.passive && !checkLoop(l.input, l.output)) {
-                        l.passive = true;
-                    }
-                });
     }
 
 
