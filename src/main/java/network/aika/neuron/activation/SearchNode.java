@@ -454,7 +454,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private boolean generatesUnsuppressedExcluded() {
         x: for (Activation cAct : candidate.activation.getConflicts()) {
-            if(cAct.decision == EXCLUDED) {
+            if(cAct.decision == EXCLUDED && cAct.isActiveable()) {
                 for (Activation icAct : cAct.getConflicts()) {
                     if (candidate.activation != icAct && icAct.decision != EXCLUDED) {
                         continue x;
