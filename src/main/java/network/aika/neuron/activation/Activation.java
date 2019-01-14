@@ -137,7 +137,7 @@ public final class Activation extends OrActivation {
         }
 
         if(min > max) return 0;
-        return min - max;
+        return max - min;
     }
 
 
