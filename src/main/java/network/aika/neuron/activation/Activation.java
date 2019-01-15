@@ -23,6 +23,7 @@ import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
 import static network.aika.neuron.INeuron.ALLOW_WEAK_NEGATIVE_WEIGHTS;
+import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
 
 
 /**
@@ -497,6 +498,15 @@ public final class Activation extends OrActivation {
         }
 
         return tmp;
+    }
+
+
+    /*
+    An activable activation object might still be suppressed by an undecided positive feedback link.
+     */
+    public boolean hasUndecidedPositiveFeedbackLinks() {
+        return getInputLinks(false, false)
+                .anyMatch(l -> l.synapse.isRecurrent && !l.synapse.isNegative() && l.input.decision == UNKNOWN);
     }
 
 

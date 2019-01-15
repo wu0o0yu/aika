@@ -371,7 +371,8 @@ public class SearchNode implements Comparable<SearchNode> {
         if(preDecision == UNKNOWN && (!precondition || checkExcluded(candidate.activation))) {
             preDecision = EXCLUDED;
         }
-        if(preDecision == UNKNOWN && !candidate.isConflicting()) {
+
+        if(preDecision == UNKNOWN && !candidate.isConflicting() && !candidate.activation.hasUndecidedPositiveFeedbackLinks()) {
             preDecision = SELECTED;
         }
         if(preDecision == UNKNOWN && OPTIMIZE_SEARCH) {
@@ -438,7 +439,7 @@ public class SearchNode implements Comparable<SearchNode> {
         if(skip == EXCLUDED) {
             return false;
         }
-        if(preDecision != EXCLUDED && generatesUnsuppressedExcluded()) {
+        if(preDecision != EXCLUDED && generatesUnsuppressedExcluded() && !candidate.activation.hasUndecidedPositiveFeedbackLinks()) {
             return false;
         }
 
