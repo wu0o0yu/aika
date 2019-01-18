@@ -124,7 +124,6 @@ public class Synapse implements Writable {
     public int committedInDoc;
 
     public Synapse() {
-        relations = new TreeMap<>();
     }
 
 

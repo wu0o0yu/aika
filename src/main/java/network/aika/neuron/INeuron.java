@@ -617,14 +617,10 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public void reactivate() {
         provider.lock.acquireReadLock();
         for (Synapse s : provider.inMemoryInputSynapses.values()) {
-            if(s.isDisjunction) {
-                s.input.addInMemoryOutputSynapse(s);
-            }
+            s.input.addInMemoryOutputSynapse(s);
         }
         for (Synapse s : provider.inMemoryOutputSynapses.values()) {
-            if(s.isConjunction) {
-                s.output.addInMemoryInputSynapse(s);
-            }
+            s.output.addInMemoryInputSynapse(s);
         }
         provider.lock.releaseReadLock();
 
