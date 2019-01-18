@@ -615,10 +615,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     @Override
     public void reactivate() {
-        if(provider.id == 8455596) {
-            System.out.println();
-        }
-
         provider.lock.acquireReadLock();
         for (Synapse s : provider.inMemoryInputSynapses.values()) {
             s.input.addInMemoryOutputSynapse(s);
