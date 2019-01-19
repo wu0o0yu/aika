@@ -91,7 +91,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public ActivationFunction activationFunction = ActivationFunction.RECTIFIED_SCALED_LOGISTIC_SIGMOID;
 
 
-    public int synapseIdCounter = 0;
+    public volatile int synapseIdCounter = 0;
 
 
     // synapseId -> relation
@@ -363,13 +363,15 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-    public int getNewSynapseId() {
+    public synchronized int getNewSynapseId() {
+        setModified();
         return synapseIdCounter++;
     }
 
 
-    public void registerSynapseId(Integer synId) {
+    public synchronized void registerSynapseId(Integer synId) {
         if(synId >= synapseIdCounter) {
+            setModified();
             synapseIdCounter = synId + 1;
         }
     }
@@ -600,14 +602,10 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         provider.lock.acquireReadLock();
         for (Synapse s : provider.inMemoryInputSynapses.values()) {
-            if(s.isDisjunction) {
-                s.input.removeInMemoryOutputSynapse(s);
-            }
+            s.input.removeInMemoryOutputSynapse(s);
         }
         for (Synapse s : provider.inMemoryOutputSynapses.values()) {
-            if(s.isConjunction) {
-                s.output.removeInMemoryInputSynapse(s);
-            }
+            s.output.removeInMemoryInputSynapse(s);
         }
         provider.lock.releaseReadLock();
     }
