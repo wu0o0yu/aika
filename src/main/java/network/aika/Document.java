@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
 import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
 
 
@@ -362,8 +363,6 @@ public class Document implements Comparable<Document> {
 
 
     private void computeSoftMax(SearchNode rootNode) {
-        double norm = rootNode.getWeightExpSum();
-
         for(Activation act: activationsById.values()) {
             if(act.searchStates != null) {
                 double avgValue = 0.0;
@@ -372,17 +371,40 @@ public class Document implements Comparable<Document> {
                 double avgNet = 0.0;
                 double avgPosNet = 0.0;
 
+                System.out.println(act.toString(false));
+                System.out.println();
+
+                System.out.println("Compute Norm:");
+                double norm = 0.0;
                 for (Activation.AvgState avgState : act.searchStates) {
-                    double p = avgState.weight / norm;
-
-                    Activation.State s = avgState.state;
-
-                    avgValue += p * s.value;
-                    avgPosValue += p * s.posValue;
-                    avgP += p * s.p;
-                    avgNet += p * s.net;
-                    avgPosNet += p * s.posNet;
+                    norm += Math.exp(avgState.weight);
+                    System.out.println(avgState);
                 }
+
+                System.out.println();
+                System.out.println("Compute P:");
+
+                for (Activation.AvgState avgState : act.searchStates) {
+                    if(avgState.decision == SELECTED) {
+                        double p = Math.exp(avgState.weight) / norm;
+                        System.out.println(avgState);
+                        System.out.println("P:" + p);
+
+                        Activation.State s = avgState.state;
+
+                        avgValue += p * s.value;
+                        avgPosValue += p * s.posValue;
+                        avgP += p * s.p;
+                        avgNet += p * s.net;
+                        avgPosNet += p * s.posNet;
+
+                        for(Map.Entry<Link, Activation.AvgState> me: avgState.inputLinks.entrySet()) {
+                            System.out.println("l:" + me.getKey() + "     avgState:" + me.getValue());
+                        }
+                    }
+                }
+
+                System.out.println();
 
                 act.avgState = new Activation.State(avgValue, avgPosValue, avgP, avgNet, avgPosNet, 0, 0.0);
             }

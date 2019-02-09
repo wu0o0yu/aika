@@ -3,6 +3,7 @@ package network.aika.network;
 import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Model;
+import network.aika.Utils;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
@@ -20,15 +21,12 @@ public class SoftMaxTest {
     public void testSoftMax() {
         SearchNode.COMPUTE_SOFT_MAX = true;
 
-        SearchNode.OPTIMIZE_SEARCH = false;
-        double[][] ra = initModel(new double[][] {{1.0, 1.0}, {0.5, 5.0}});
-
-        System.out.println(ra);
+//        SearchNode.OPTIMIZE_SEARCH = false;
+//        double[][] ra = initModel(new double[][]{{1.0, 1.0}, {0.5, 5.0}});
 
         SearchNode.OPTIMIZE_SEARCH = true;
-        double[][] rb = initModel(new double[][] {{1.0, 1.0}, {0.5, 5.0}});
+        double[][] rb = initModel(new double[][]{{1.0, 1.0}, {0.5, 5.0}});
 
-        System.out.println(rb);
         SearchNode.COMPUTE_SOFT_MAX = false;
     }
 
@@ -99,6 +97,8 @@ public class SoftMaxTest {
 
         System.out.println(doc.activationsToString());
 
+        System.out.println();
+
         double[][] results = new double[2][2];
         for(j = 0; j < 2; j++) {
             for(int i = 0; i < 2; i++) {
@@ -108,8 +108,13 @@ public class SoftMaxTest {
                         n.getActivation(doc, 0, 1, false) :
                         n.getActivation(doc, 2, 3, false);
                 results[j][i] = act.avgState.p;
+
+                System.out.print("j:" + j + " i:" + i + " p:" + act.avgState.p + "  ");
             }
         }
+
+        System.out.println();
+        System.out.println();
 
         return results;
     }
