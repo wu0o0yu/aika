@@ -561,8 +561,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if(COMPUTE_SOFT_MAX) {
             dumpDebugState();
-            System.out.println(accumulatedWeight);
-            System.out.println();
+//            System.out.println(accumulatedWeight);
+//            System.out.println();
 
         }
 
