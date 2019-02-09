@@ -357,6 +357,7 @@ public class Document implements Comparable<Document> {
         }
 
         if(SearchNode.COMPUTE_SOFT_MAX) {
+            SearchNode.computeCachedFactor(rootNode);
             computeSoftMax(rootNode);
         }
     }

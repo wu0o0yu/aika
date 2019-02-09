@@ -624,7 +624,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private static void computeCachedFactor(SearchNode sn) {
+    public static void computeCachedFactor(SearchNode sn) {
         while(sn != null) {
             switch(sn.cacheFactorComputeDecision) {
                 case UNKNOWN:
@@ -648,6 +648,8 @@ public class SearchNode implements Comparable<SearchNode> {
     private void computeCacheFactor() {
         SearchNode pn = getParent();
         cachedFactor = (pn != null ? pn.cachedFactor : 1) * cachedCount;
+
+        avgState.cacheFactor = cachedFactor;
     }
 
 
