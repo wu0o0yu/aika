@@ -366,12 +366,6 @@ public class Document implements Comparable<Document> {
     private void computeSoftMax(SearchNode rootNode) {
         for(Activation act: activationsById.values()) {
             if(act.searchStates != null) {
-                double avgValue = 0.0;
-                double avgPosValue = 0.0;
-                double avgP = 0.0;
-                double avgNet = 0.0;
-                double avgPosNet = 0.0;
-
                 double offset = Double.MAX_VALUE;
                 for (Activation.AvgState avgState : act.searchStates) {
                     offset = Math.min(offset, Math.log(avgState.cacheFactor) + avgState.weight);
@@ -384,18 +378,9 @@ public class Document implements Comparable<Document> {
 
                 for (Activation.AvgState avgState : act.searchStates) {
                     if(avgState.decision == SELECTED) {
-                        double p = Math.exp(Math.log(avgState.cacheFactor) + avgState.weight - offset) / norm;
-                        Activation.State s = avgState.state;
-
-                        avgValue += p * s.value;
-                        avgPosValue += p * s.posValue;
-                        avgP += p * s.p;
-                        avgNet += p * s.net;
-                        avgPosNet += p * s.posNet;
+                        avgState.p = Math.exp(Math.log(avgState.cacheFactor) + avgState.weight - offset) / norm;
                     }
                 }
-
-                act.avgState = new Activation.State(avgValue, avgPosValue, avgP, avgNet, avgPosNet, 0, 0.0);
             }
         }
     }
