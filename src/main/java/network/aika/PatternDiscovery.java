@@ -67,7 +67,6 @@ public class PatternDiscovery {
          * Updates the statistics of this node
          *
          * @param act
-         * @return
          */
         void count(NodeActivation act);
     }

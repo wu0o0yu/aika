@@ -1008,12 +1008,65 @@ public final class Activation extends OrActivation {
 
 
     public static class AvgState {
+        public int snId;
         public State state;
-        public double weight;
+        public Decision decision;
 
-        public AvgState(State state, double weight) {
-            this.state = state;
+        public double weight;
+        public int cacheFactor = 1;
+
+
+        public Map<Link, AvgState> inputLinks = new TreeMap<>(INPUT_COMP);
+
+        public AvgState(int snId, Activation act, Decision d) {
+            this.snId = snId;
+            this.state = act.rounds.getLast();
+            this.decision = d;
+
+            if (act.searchStates == null) {
+                act.searchStates = new ArrayList<>();
+            }
+            act.searchStates.add(this);
+        }
+
+
+        public void setWeight(Activation act, double weight) {
             this.weight = weight;
+
+            for(Link l: act.inputLinks.values()) {
+                if(l.input.decision == SELECTED) {
+                    if(l.input.candidate != null) {
+                        if (l.input.candidate.id < act.candidate.id) {
+                            SearchNode inputSN = l.input.candidate.currentSearchNode.getParent();
+
+                            inputLinks.put(l, inputSN.getCurrentAvgState());
+                        }
+                    } else {
+                        inputLinks.put(l, null);
+                    }
+                }
+            }
+
+            for(Link l: act.outputLinks.values()) {
+                if(l.input.decision == SELECTED) {
+                    if(l.output.candidate != null) {
+                        if(l.output.candidate.id < act.candidate.id) {
+                            SearchNode outputSN = l.output.candidate.currentSearchNode.getParent();
+
+                            outputSN.getCurrentAvgState().inputLinks.put(l, this);
+                        }
+                    }
+                }
+            }
+        }
+
+        public void setCacheFactor(int cf) {
+            cacheFactor = cf;
+        }
+
+
+        public String toString() {
+            return " snId:" + snId + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " " + state;
         }
     }
 

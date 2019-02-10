@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
 import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
 
 
@@ -356,14 +357,13 @@ public class Document implements Comparable<Document> {
         }
 
         if(SearchNode.COMPUTE_SOFT_MAX) {
+            SearchNode.computeCachedFactor(rootNode);
             computeSoftMax(rootNode);
         }
     }
 
 
     private void computeSoftMax(SearchNode rootNode) {
-        double norm = rootNode.getWeightExpSum();
-
         for(Activation act: activationsById.values()) {
             if(act.searchStates != null) {
                 double avgValue = 0.0;
@@ -372,16 +372,27 @@ public class Document implements Comparable<Document> {
                 double avgNet = 0.0;
                 double avgPosNet = 0.0;
 
+                double offset = Double.MAX_VALUE;
                 for (Activation.AvgState avgState : act.searchStates) {
-                    double p = avgState.weight / norm;
+                    offset = Math.min(offset, Math.log(avgState.cacheFactor) + avgState.weight);
+                }
 
-                    Activation.State s = avgState.state;
+                double norm = 0.0;
+                for (Activation.AvgState avgState : act.searchStates) {
+                    norm += Math.exp(Math.log(avgState.cacheFactor) + avgState.weight - offset);
+                }
 
-                    avgValue += p * s.value;
-                    avgPosValue += p * s.posValue;
-                    avgP += p * s.p;
-                    avgNet += p * s.net;
-                    avgPosNet += p * s.posNet;
+                for (Activation.AvgState avgState : act.searchStates) {
+                    if(avgState.decision == SELECTED) {
+                        double p = Math.exp(Math.log(avgState.cacheFactor) + avgState.weight - offset) / norm;
+                        Activation.State s = avgState.state;
+
+                        avgValue += p * s.value;
+                        avgPosValue += p * s.posValue;
+                        avgP += p * s.p;
+                        avgNet += p * s.net;
+                        avgPosNet += p * s.posNet;
+                    }
                 }
 
                 act.avgState = new Activation.State(avgValue, avgPosValue, avgP, avgNet, avgPosNet, 0, 0.0);

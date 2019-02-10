@@ -244,7 +244,7 @@ public class Model {
 
 
     /**
-     * Suspend all neurons and logic nodes whose last used document id is lower/older than {@param docId}.
+     * Suspend all neurons and logic nodes whose last used document id is lower/older than docId.
      *
      * @param docId
      */

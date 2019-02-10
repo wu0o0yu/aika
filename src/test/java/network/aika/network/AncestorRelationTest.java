@@ -207,7 +207,7 @@ public class AncestorRelationTest {
 
         Neuron inB = m.createNeuron("B");
 /*
-        Neuron.init(inB,
+        Neuron.setWeight(inB,
                 5.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
