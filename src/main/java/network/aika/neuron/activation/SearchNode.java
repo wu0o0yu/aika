@@ -106,7 +106,6 @@ public class SearchNode implements Comparable<SearchNode> {
     private boolean bestPath;
     private int cachedCount = 1;
     private int cachedFactor = 1;
-    private Decision cacheFactorComputeDecision = UNKNOWN;
 
     public AvgState avgState;
 
@@ -373,12 +372,12 @@ public class SearchNode implements Comparable<SearchNode> {
                     returnWeight = sn.finalStep();
                     returnWeightSum = sn.getWeightSum();
 
+                    sn.currentDecision = UNKNOWN;
                     SearchNode pn = sn.getParent();
                     if(pn != null) {
                         pn.skip = sn.getDecision();
                     }
                     sn = pn;
-                    sn.currentDecision = UNKNOWN;
                     break;
                 default:
             }
@@ -416,8 +415,11 @@ public class SearchNode implements Comparable<SearchNode> {
                     break;
             }
 
-            if(cd != null && cd != UNKNOWN) {
-                cachedCount++;
+            if(COMPUTE_SOFT_MAX && cd != null && cd != UNKNOWN) {
+                SearchNode asn = candidate.cachedSearchNode.getAlternative();
+                if(asn != null) {
+                    asn.cachedCount++;
+                }
             }
 
             preDecision = cd;
@@ -431,6 +433,18 @@ public class SearchNode implements Comparable<SearchNode> {
         doc.searchStepCounter++;
 
         storeDebugInfos();
+    }
+
+
+    public SearchNode getAlternative() {
+        SearchNode pn = getParent();
+        switch(getDecision()) {
+            case SELECTED:
+                return pn.excludedChild;
+            case EXCLUDED:
+                return pn.selectedChild;
+        }
+        return null;
     }
 
 
@@ -626,16 +640,20 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public static void computeCachedFactor(SearchNode sn) {
         while(sn != null) {
-            switch(sn.cacheFactorComputeDecision) {
+            switch(sn.currentDecision) {
                 case UNKNOWN:
-                    sn.cacheFactorComputeDecision = SELECTED;
-                    sn = sn.selectedChild != null ? sn.selectedChild : sn;
-                    sn.computeCacheFactor();
+                    sn.currentDecision = SELECTED;
+                    if(sn.selectedChild != null) {
+                        sn = sn.selectedChild;
+                        sn.computeCacheFactor();
+                    }
                     break;
                 case SELECTED:
-                    sn.cacheFactorComputeDecision = EXCLUDED;
-                    sn = sn.selectedChild != null ? sn.excludedChild : sn;
-                    sn.computeCacheFactor();
+                    sn.currentDecision = EXCLUDED;
+                    if(sn.excludedChild != null) {
+                        sn = sn.excludedChild;
+                        sn.computeCacheFactor();
+                    }
                     break;
                 case EXCLUDED:
                     sn = sn.getParent();
@@ -649,7 +667,7 @@ public class SearchNode implements Comparable<SearchNode> {
         SearchNode pn = getParent();
         cachedFactor = (pn != null ? pn.cachedFactor : 1) * cachedCount;
 
-        avgState.cacheFactor = cachedFactor;
+        avgState.setCacheFactor(cachedFactor);
     }
 
 
@@ -673,7 +691,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public String toString() {
-        return candidate.activation.id + " Decision:" + getDecision();
+        return "id:" + id + " actId:" + candidate.activation.id + " Decision:" + getDecision() + " curDec:" + currentDecision;
     }
 
 

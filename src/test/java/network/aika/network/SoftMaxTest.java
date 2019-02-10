@@ -21,8 +21,8 @@ public class SoftMaxTest {
     public void testSoftMax() {
         SearchNode.COMPUTE_SOFT_MAX = true;
 
-//        SearchNode.OPTIMIZE_SEARCH = false;
-//        double[][] ra = initModel(new double[][]{{1.0, 1.0}, {0.5, 5.0}});
+        SearchNode.OPTIMIZE_SEARCH = false;
+        double[][] ra = initModel(new double[][]{{1.0, 1.0}, {0.5, 5.0}});
 
         SearchNode.OPTIMIZE_SEARCH = true;
         double[][] rb = initModel(new double[][]{{1.0, 1.0}, {0.5, 5.0}});

@@ -1037,7 +1037,7 @@ public final class Activation extends OrActivation {
                 if(l.input.decision == SELECTED) {
                     if(l.input.candidate != null) {
                         if (l.input.candidate.id < act.candidate.id) {
-                            SearchNode inputSN = l.input.candidate.currentSearchNode;
+                            SearchNode inputSN = l.input.candidate.currentSearchNode.getParent();
 
                             inputLinks.put(l, inputSN.getCurrentAvgState());
                         }
@@ -1048,10 +1048,14 @@ public final class Activation extends OrActivation {
             }
 
             for(Link l: act.outputLinks.values()) {
-                if(l.input.decision == SELECTED && l.output.candidate.id < act.candidate.id) {
-                    SearchNode outputSN = l.output.candidate.currentSearchNode;
+                if(l.input.decision == SELECTED) {
+                    if(l.output.candidate != null) {
+                        if(l.output.candidate.id < act.candidate.id) {
+                            SearchNode outputSN = l.output.candidate.currentSearchNode.getParent();
 
-                    outputSN.getCurrentAvgState().inputLinks.put(l, this);
+                            outputSN.getCurrentAvgState().inputLinks.put(l, this);
+                        }
+                    }
                 }
             }
         }

@@ -372,25 +372,19 @@ public class Document implements Comparable<Document> {
                 double avgNet = 0.0;
                 double avgPosNet = 0.0;
 
-                System.out.println(act.toString(false));
-                System.out.println();
-
-                System.out.println("Compute Norm:");
-                double norm = 0.0;
+                double offset = Double.MAX_VALUE;
                 for (Activation.AvgState avgState : act.searchStates) {
-                    norm += Math.exp(avgState.weight);
-                    System.out.println(avgState);
+                    offset = Math.min(offset, Math.log(avgState.cacheFactor) + avgState.weight);
                 }
 
-                System.out.println();
-                System.out.println("Compute P:");
+                double norm = 0.0;
+                for (Activation.AvgState avgState : act.searchStates) {
+                    norm += Math.exp(Math.log(avgState.cacheFactor) + avgState.weight - offset);
+                }
 
                 for (Activation.AvgState avgState : act.searchStates) {
                     if(avgState.decision == SELECTED) {
-                        double p = Math.exp(avgState.weight) / norm;
-                        System.out.println(avgState);
-                        System.out.println("P:" + p);
-
+                        double p = Math.exp(Math.log(avgState.cacheFactor) + avgState.weight - offset) / norm;
                         Activation.State s = avgState.state;
 
                         avgValue += p * s.value;
@@ -398,14 +392,8 @@ public class Document implements Comparable<Document> {
                         avgP += p * s.p;
                         avgNet += p * s.net;
                         avgPosNet += p * s.posNet;
-
-                        for(Map.Entry<Link, Activation.AvgState> me: avgState.inputLinks.entrySet()) {
-                            System.out.println("l:" + me.getKey() + "     avgState:" + me.getValue());
-                        }
                     }
                 }
-
-                System.out.println();
 
                 act.avgState = new Activation.State(avgValue, avgPosValue, avgP, avgNet, avgPosNet, 0, 0.0);
             }
