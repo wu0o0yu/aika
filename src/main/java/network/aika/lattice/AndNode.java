@@ -177,7 +177,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                         Activation iAct = act.getInputActivation(fl.rv.refOffset);
                         Activation secondIAct = secondAct.getInputActivation(sl.rv.refOffset);
 
-                        List<Relation> rels = InputNode.getRelations(iAct, secondIAct);
+                        List<Relation> rels = config.candidateRelations.getRelations(iAct, secondIAct);
                         rels.add(null);
 
                         for(Relation rel: rels) {

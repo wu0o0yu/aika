@@ -54,20 +54,6 @@ public class InputNode extends Node<InputNode, InputActivation> {
     private long visitedDiscover;
 
 
-    public static final Relation[] CANDIDATE_RELATIONS = new Relation[] {
-/*        new RangeRelation(EQUALS),
-        new RangeRelation(BEGIN_TO_END_EQUALS),
-        new RangeRelation(END_TO_BEGIN_EQUALS),
-        new RangeRelation(BEGIN_EQUALS),
-        new RangeRelation(END_EQUALS),
-        new RangeRelation(CONTAINS),
-        new RangeRelation(CONTAINED_IN),
-        new AncestorRelation(AncestorRelation.Type.IS_DESCENDANT_OF),
-        new AncestorRelation(AncestorRelation.Type.IS_ANCESTOR_OF),
-        new AncestorRelation(AncestorRelation.Type.COMMON_ANCESTOR)*/
-    };
-
-
     public InputNode() {
     }
 
@@ -256,37 +242,22 @@ public class InputNode extends Node<InputNode, InputActivation> {
         doc.getActivations(true).forEach(secondNAct -> {
             InputActivation secondAct = secondNAct.outputToInputNode.output;
             if (act != secondAct && config.candidateCheck.check(act, secondAct)) {
-                List<Relation> relations = getRelations(act.input.input, secondNAct);
-                for(Relation r: relations) {
-                    InputNode in = secondAct.node;
+                List<Relation> relations = config.candidateRelations.getRelations(act.input.input, secondNAct);
+                InputNode in = secondAct.node;
 
-                    if (r != null) {
-                        RelationsMap rm = new RelationsMap(new Relation[] {r});
-                        Refinement ref = new Refinement(rm, in.provider);
+                for (Relation r : relations) {
+                    RelationsMap rm = new RelationsMap(new Relation[]{r});
+                    Refinement ref = new Refinement(rm, in.provider);
 
-                        AndNode.RefValue rv = extend(doc.threadId, doc, ref, config);
+                    AndNode.RefValue rv = extend(doc.threadId, doc, ref, config);
 
-                        if (rv != null) {
-                            AndNode nln = rv.child.get();
-                            nln.isDiscovered = true;
-                        }
+                    if (rv != null) {
+                        AndNode nln = rv.child.get();
+                        nln.isDiscovered = true;
                     }
                 }
             }
         });
-    }
-
-
-    public static List<Relation> getRelations(Activation act1, Activation act2) {
-        ArrayList<Relation> rels = new ArrayList<>();
-        for(Relation rel: CANDIDATE_RELATIONS) {
-            if(rel.test(act2, act1)) {
-                rels.add(rel);
-                break;
-            }
-        }
-
-        return rels;
     }
 
 

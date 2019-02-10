@@ -20,8 +20,11 @@ package network.aika;
 import network.aika.Document;
 import network.aika.lattice.AndNode;
 import network.aika.lattice.NodeActivation;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.relation.Relation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -52,6 +55,12 @@ public class PatternDiscovery {
     }
 
 
+    public interface CandidateRelations {
+
+        List<Relation> getRelations(Activation act1, Activation act2);
+    }
+
+
     public interface Counter {
 
         /**
@@ -67,6 +76,7 @@ public class PatternDiscovery {
         public CandidateCheck candidateCheck;
         public PatternCheck patternCheck;
         public Counter counter;
+        public CandidateRelations candidateRelations;
 
 
         public Config setCandidateCheck(CandidateCheck candidateCheck) {
@@ -79,7 +89,6 @@ public class PatternDiscovery {
             return this;
         }
 
-
         /**
          * The counter callback function should implement a customized counting function.
          * The counting function should modify the custom meta object stored in the node.
@@ -90,6 +99,11 @@ public class PatternDiscovery {
          */
         public Config setCounter(Counter counter) {
             this.counter = counter;
+            return this;
+        }
+
+        public Config setCandidateRelations(CandidateRelations candidateRelations) {
+            this.candidateRelations = candidateRelations;
             return this;
         }
     }
@@ -107,7 +121,7 @@ public class PatternDiscovery {
 
 //        doc.propagate();
 
-        doc.addedNodeActivations.forEach(act -> config.counter.count(act));
+//        doc.addedNodeActivations.forEach(act -> config.counter.count(act));
     }
 
 }
