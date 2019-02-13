@@ -67,7 +67,6 @@ public final class Activation extends OrActivation {
     public double upperBound;
     public double lowerBound;
 
-    public State avgState;
     public List<AvgState> searchStates;
 
     public Rounds rounds = new Rounds();
@@ -887,9 +886,9 @@ public final class Activation extends OrActivation {
             sb.append(Utils.round(upperBound));
         }
 
-        if(SearchNode.COMPUTE_SOFT_MAX && avgState != null) {
+        if(SearchNode.COMPUTE_SOFT_MAX) {
             sb.append(" AVG:");
-            sb.append(avgState);
+            sb.append(getAvgState());
         }
 
         sb.append(" - ");
@@ -908,6 +907,29 @@ public final class Activation extends OrActivation {
         }
 
         return sb.toString();
+    }
+
+    public State getAvgState() {
+        double avgValue = 0.0;
+        double avgPosValue = 0.0;
+        double avgP = 0.0;
+        double avgNet = 0.0;
+        double avgPosNet = 0.0;
+
+        for (Activation.AvgState avgState : searchStates) {
+            if(avgState.decision == SELECTED) {
+                double p = avgState.p;
+                Activation.State s = avgState.state;
+
+                avgValue += p * s.value;
+                avgPosValue += p * s.posValue;
+                avgP += p * s.p;
+                avgNet += p * s.net;
+                avgPosNet += p * s.posNet;
+            }
+        }
+
+        return new Activation.State(avgValue, avgPosValue, avgP, avgNet, avgPosNet, 0, 0.0);
     }
 
 
@@ -1014,6 +1036,7 @@ public final class Activation extends OrActivation {
 
         public double weight;
         public int cacheFactor = 1;
+        public double p;
 
 
         public Map<Link, AvgState> inputLinks = new TreeMap<>(INPUT_COMP);
@@ -1066,7 +1089,7 @@ public final class Activation extends OrActivation {
 
 
         public String toString() {
-            return " snId:" + snId + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " " + state;
+            return " snId:" + snId + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " " + state;
         }
     }
 

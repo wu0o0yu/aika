@@ -107,9 +107,9 @@ public class SoftMaxTest {
                 Activation act = j == 0 ?
                         n.getActivation(doc, 0, 1, false) :
                         n.getActivation(doc, 2, 3, false);
-                results[j][i] = act.avgState.p;
+                results[j][i] = act.getAvgState().p;
 
-                System.out.print("j:" + j + " i:" + i + " p:" + act.avgState.p + "  ");
+                System.out.print("j:" + j + " i:" + i + " p:" + act.getAvgState().p + "  ");
             }
         }
 
