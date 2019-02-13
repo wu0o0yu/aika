@@ -33,6 +33,7 @@ import org.junit.Test;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
@@ -92,6 +93,7 @@ public class CountingTest {
         doc.process();
         PatternDiscovery.discover(doc,
                 new Config()
+                        .setCandidateRelations((act1, act2) -> Arrays.asList(EQUALS))
                         .setCandidateCheck((act, secondAct) -> true)
                         .setPatternCheck(map -> true)
                         .setCounter(act -> count(act))
