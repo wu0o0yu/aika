@@ -67,7 +67,6 @@ public final class Activation extends OrActivation {
     public double upperBound;
     public double lowerBound;
 
-    public State avgState;
     public List<AvgState> searchStates;
 
     public Rounds rounds = new Rounds();
@@ -887,9 +886,9 @@ public final class Activation extends OrActivation {
             sb.append(Utils.round(upperBound));
         }
 
-        if(SearchNode.COMPUTE_SOFT_MAX && avgState != null) {
+        if(SearchNode.COMPUTE_SOFT_MAX) {
             sb.append(" AVG:");
-            sb.append(avgState);
+            sb.append(getAvgState());
         }
 
         sb.append(" - ");
@@ -908,6 +907,29 @@ public final class Activation extends OrActivation {
         }
 
         return sb.toString();
+    }
+
+    public State getAvgState() {
+        double avgValue = 0.0;
+        double avgPosValue = 0.0;
+        double avgP = 0.0;
+        double avgNet = 0.0;
+        double avgPosNet = 0.0;
+
+        for (Activation.AvgState avgState : searchStates) {
+            if(avgState.decision == SELECTED) {
+                double p = avgState.p;
+                Activation.State s = avgState.state;
+
+                avgValue += p * s.value;
+                avgPosValue += p * s.posValue;
+                avgP += p * s.p;
+                avgNet += p * s.net;
+                avgPosNet += p * s.posNet;
+            }
+        }
+
+        return new Activation.State(avgValue, avgPosValue, avgP, avgNet, avgPosNet, 0, 0.0);
     }
 
 
@@ -1008,12 +1030,66 @@ public final class Activation extends OrActivation {
 
 
     public static class AvgState {
+        public int snId;
         public State state;
-        public double weight;
+        public Decision decision;
 
-        public AvgState(State state, double weight) {
-            this.state = state;
+        public double weight;
+        public int cacheFactor = 1;
+        public double p;
+
+
+        public Map<Link, AvgState> inputLinks = new TreeMap<>(INPUT_COMP);
+
+        public AvgState(int snId, Activation act, Decision d) {
+            this.snId = snId;
+            this.state = act.rounds.getLast();
+            this.decision = d;
+
+            if (act.searchStates == null) {
+                act.searchStates = new ArrayList<>();
+            }
+            act.searchStates.add(this);
+        }
+
+
+        public void setWeight(Activation act, double weight) {
             this.weight = weight;
+
+            for(Link l: act.inputLinks.values()) {
+                if(l.input.decision == SELECTED) {
+                    if(l.input.candidate != null) {
+                        if (l.input.candidate.id < act.candidate.id) {
+                            SearchNode inputSN = l.input.candidate.currentSearchNode.getParent();
+
+                            inputLinks.put(l, inputSN.getCurrentAvgState());
+                        }
+                    } else {
+                        inputLinks.put(l, null);
+                    }
+                }
+            }
+
+            for(Link l: act.outputLinks.values()) {
+                if(l.input.decision == SELECTED) {
+                    if(l.output.candidate != null) {
+                        if(l.output.candidate.id < act.candidate.id) {
+                            SearchNode outputSN = l.output.candidate.currentSearchNode.getParent();
+
+                            outputSN.getCurrentAvgState().inputLinks.put(l, this);
+                        }
+                    }
+                }
+            }
+        }
+
+        public void setCacheFactor(int cf) {
+            cacheFactor = cf;
+        }
+
+
+        public String toString() {
+            return " snId:" + snId + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " " + state;
         }
     }
 
