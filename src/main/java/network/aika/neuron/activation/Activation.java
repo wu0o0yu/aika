@@ -186,7 +186,7 @@ public final class Activation extends OrActivation {
 
     public Link getLinkBySynapseId(int synapseId) {
         for(Link l: inputLinks.values()) {
-            if(!l.passive && l.synapse.id == synapseId) {
+            if(l.synapse.id == synapseId) {
                 return l;
             }
         }
@@ -199,15 +199,13 @@ public final class Activation extends OrActivation {
     }
 
 
-    public Stream<Link> getInputLinks(boolean includePassive, boolean onlySelected) {
-        Stream<Link> s = (onlySelected ? selectedInputLinks : inputLinks.values()).stream();
-        return includePassive ? s : s.filter(l -> !l.passive);
+    public Stream<Link> getInputLinks(boolean onlySelected) {
+        return (onlySelected ? selectedInputLinks : inputLinks.values()).stream();
     }
 
 
-    public Stream<Link> getOutputLinks(boolean includePassive) {
-        Stream<Link> s = outputLinks.values().stream();
-        return includePassive ? s : s.filter(l -> !l.passive);
+    public Stream<Link> getOutputLinks() {
+        return outputLinks.values().stream();
     }
 
 
@@ -216,23 +214,21 @@ public final class Activation extends OrActivation {
     }
 
 
-    public Stream<Link> getInputLinksBySynapse(boolean includePassive, Synapse syn) {
-        Stream<Link> s = inputLinks.subMap(
-                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION, false),
-                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION, false))
+    public Stream<Link> getInputLinksBySynapse(Synapse syn) {
+        return inputLinks.subMap(
+                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION),
+                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION))
                 .values()
                 .stream();
-        return includePassive ? s : s.filter(l -> !l.passive);
     }
 
 
-    public Stream<Link> getOutputLinksBySynapse(boolean includePassive, Synapse syn) {
-        Stream<Link> s = outputLinks.subMap(
-                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION, false),
-                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION, false))
+    public Stream<Link> getOutputLinksBySynapse(Synapse syn) {
+        return outputLinks.subMap(
+                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION),
+                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION))
                 .values()
                 .stream();
-        return includePassive ? s : s.filter(l -> !l.passive);
     }
 
 
@@ -358,7 +354,7 @@ public final class Activation extends OrActivation {
         double net = n.biasSum;
 
         for (Link l: inputLinks.values()) {
-            if(l.synapse.inactive || l.passive) {
+            if(l.synapse.inactive) {
                 continue;
             }
 
@@ -398,9 +394,7 @@ public final class Activation extends OrActivation {
 
         if(Math.abs(upperBound - oldUpperBound) > 0.01) {
             for(Link l: outputLinks.values()) {
-                if(!l.passive) {
-                    doc.ubQueue.add(l);
-                }
+                doc.ubQueue.add(l);
             }
         }
 
@@ -420,7 +414,7 @@ public final class Activation extends OrActivation {
 
         for (Link l : inputLinks.values()) {
             Synapse s = l.synapse;
-            if(s.inactive || l.passive) {
+            if(s.inactive) {
                 continue;
             }
 
@@ -478,7 +472,7 @@ public final class Activation extends OrActivation {
         Synapse lastSynapse = null;
         InputState maxInputState = null;
         for (Link l : inputLinks.values()) {
-            if(l.synapse.inactive || l.passive) {
+            if(l.synapse.inactive) {
                 continue;
             }
             if (lastSynapse != null && lastSynapse != l.synapse) {
@@ -504,7 +498,7 @@ public final class Activation extends OrActivation {
     An activable activation object might still be suppressed by an undecided positive feedback link.
      */
     public boolean hasUndecidedPositiveFeedbackLinks() {
-        return getInputLinks(false, false)
+        return getInputLinks(false)
                 .anyMatch(l -> l.synapse.isRecurrent && !l.synapse.isNegative() && l.input.decision == UNKNOWN);
     }
 
@@ -536,7 +530,7 @@ public final class Activation extends OrActivation {
     public List<Link> getFinalInputActivationLinks() {
         ArrayList<Link> results = new ArrayList<>();
         for (Link l : inputLinks.values()) {
-            if (!l.passive && l.input.isFinalActivation()) {
+            if (l.input.isFinalActivation()) {
                 results.add(l);
             }
         }
@@ -547,7 +541,7 @@ public final class Activation extends OrActivation {
     public List<Link> getFinalOutputActivationLinks() {
         ArrayList<Link> results = new ArrayList<>();
         for (Link l : outputLinks.values()) {
-            if (!l.passive && l.output.isFinalActivation()) {
+            if (l.output.isFinalActivation()) {
                 results.add(l);
             }
         }
@@ -564,7 +558,7 @@ public final class Activation extends OrActivation {
         markPredecessor(v, 0);
         conflicts = new ArrayList<>();
         for(Link l: inputLinks.values()) {
-            if (!l.passive && l.synapse.isNegative() && l.synapse.isRecurrent) {
+            if (l.synapse.isNegative() && l.synapse.isRecurrent) {
                 l.input.collectIncomingConflicts(conflicts, v);
             }
         }
@@ -580,7 +574,7 @@ public final class Activation extends OrActivation {
             conflicts.add(this);
         } else {
             for (Link l : inputLinks.values()) {
-                if (!l.passive && !l.synapse.isNegative() && !l.synapse.isRecurrent) {
+                if (!l.synapse.isNegative() && !l.synapse.isRecurrent) {
                     l.input.collectIncomingConflicts(conflicts, v);
                 }
             }
@@ -592,9 +586,6 @@ public final class Activation extends OrActivation {
         if(markedPredecessor == v) return;
 
         for(Link l: outputLinks.values()) {
-            if(l.passive) {
-                continue;
-            }
             if (l.output.getINeuron().type != INeuron.Type.INHIBITORY) {
                 if (l.synapse.isNegative() && l.synapse.isRecurrent) {
                     conflicts.add(l.output);
@@ -608,9 +599,6 @@ public final class Activation extends OrActivation {
 
     public void adjustSelectedNeuronInputs(Decision d) {
         for(Link l: outputLinks.values()) {
-            if(l.passive) {
-                continue;
-            }
             if(d == SELECTED) {
                 l.output.selectedInputLinks.add(l);
             } else {
@@ -630,7 +618,7 @@ public final class Activation extends OrActivation {
         }
 
         for (Link l: onlySelected ? selectedInputLinks : inputLinks.values()) {
-            if(!l.passive && !l.synapse.isNegative()) {
+            if(!l.synapse.isNegative()) {
                 if (l.input.checkSelfReferencing(onlySelected, depth + 1, v)) {
                     return true;
                 }
@@ -672,7 +660,7 @@ public final class Activation extends OrActivation {
         inputLinks
                 .values()
                 .stream()
-                .filter(l -> !l.synapse.isRecurrent && !l.passive)
+                .filter(l -> !l.synapse.isRecurrent)
                 .forEach(l -> sequence = Math.max(sequence, l.input.getSequence() + 1));
         return sequence;
     }
@@ -691,7 +679,7 @@ public final class Activation extends OrActivation {
         markedPredecessor = v;
 
         for(Link l: inputLinks.values()) {
-            if(!l.passive && !l.synapse.isNegative() && !l.synapse.isRecurrent) {
+            if(!l.synapse.isNegative() && !l.synapse.isRecurrent) {
                 l.input.markPredecessor(v, depth + 1);
             }
         }
@@ -959,7 +947,7 @@ public final class Activation extends OrActivation {
         sb.append(" (");
         boolean first = true;
         for(Link l: inputLinks.values()) {
-            if(!l.passive && l.synapse.identity) {
+            if(l.synapse.identity) {
                 if(!first) {
                     sb.append(", ");
                 }
@@ -977,9 +965,7 @@ public final class Activation extends OrActivation {
     public String linksToString() {
         StringBuilder sb = new StringBuilder();
         for(Link l: inputLinks.values()) {
-            if(!l.passive) {
-                sb.append("  " + l.input.getLabel() + "  W:" + l.synapse.weight + "\n");
-            }
+            sb.append("  " + l.input.getLabel() + "  W:" + l.synapse.weight + "\n");
         }
 
         return sb.toString();
@@ -1106,7 +1092,6 @@ public final class Activation extends OrActivation {
         public final Synapse synapse;
         public final Activation input;
         public final Activation output;
-        public boolean passive;
 
         public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
             int r = Synapse.INPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
@@ -1121,11 +1106,10 @@ public final class Activation extends OrActivation {
         };
 
 
-        public Link(Synapse s, Activation input, Activation output, boolean passive) {
+        public Link(Synapse s, Activation input, Activation output) {
             this.synapse = s;
             this.input = input;
             this.output = output;
-            this.passive = passive;
         }
 
 
@@ -1135,7 +1119,7 @@ public final class Activation extends OrActivation {
         }
 
         public String toString() {
-            return (passive ? "p" : "") + synapse + ": " + input + " --> " + output;
+            return synapse + ": " + input + " --> " + output;
         }
     }
 

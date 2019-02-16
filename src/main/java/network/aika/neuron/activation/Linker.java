@@ -105,7 +105,7 @@ public class Linker {
             while((act = doc.getNextActivation(act)) != null) {
                 linkOutputRelations(act);
 
-                act.getInputLinks(false, false)
+                act.getInputLinks(false)
                         .forEach(l -> addToQueue(l));
             }
             doc.linker.process();
@@ -144,7 +144,7 @@ public class Linker {
             return;
         }
 
-        Link nl = new Link(s, iAct, oAct, false);
+        Link nl = new Link(s, iAct, oAct);
         if(oAct.getInputLink(nl) != null) {
             return;
         }
@@ -152,15 +152,13 @@ public class Linker {
         if(s.identity) {
             Link el = oAct.getLinkBySynapseId(s.id);
             if(el != null && el.input != iAct) {
-                nl.passive = true;
+                return;
             }
         }
 
         nl.link();
 
-        if(!nl.passive) {
-            addToQueue(nl);
-        }
+        addToQueue(nl);
     }
 
 
@@ -174,7 +172,7 @@ public class Linker {
                 }
             } else {
                 Synapse relSyn = oAct.getNeuron().getSynapseById(relSynId);
-                if(relSyn!= null && oAct.getInputLinksBySynapse(false, relSyn)
+                if(relSyn!= null && oAct.getInputLinksBySynapse(relSyn)
                         .anyMatch(l -> !rel.test(iAct, l.input))) {
                     return false;
                 }

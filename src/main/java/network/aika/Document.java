@@ -612,14 +612,14 @@ public class Document implements Comparable<Document> {
         public final ArrayList<TreeSet<Activation>> queue = new ArrayList<>();
 
         public void propagateActivationValue(int round, Activation act)  {
-            act.getOutputLinks(false)
+            act.getOutputLinks()
                     .forEach(l -> add(l.synapse.isRecurrent ? round + 1 : round, l.output));
         }
 
 
         private void add(Activation act) {
             add(0, act);
-            act.getOutputLinks(false)
+            act.getOutputLinks()
                     .filter(l -> l.synapse.isRecurrent)
                     .forEach(l -> add(0, l.output));
         }

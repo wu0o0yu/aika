@@ -89,35 +89,35 @@ public class ActivationOutputsTest {
         Activation inA1 = inA.getActivation(doc, 0, 1, false);
         Activation inB1 = inB.getActivation(doc, 0, 1, false);
 
-        Assert.assertTrue(containsOutputActivation(inA1.getOutputLinks(false), pAB.getActivation(doc, 0, 1, false)));
-        Assert.assertTrue(containsOutputActivation(inB1.getOutputLinks(false), pAB.getActivation(doc, 0, 1, false)));
+        Assert.assertTrue(containsOutputActivation(inA1.getOutputLinks(), pAB.getActivation(doc, 0, 1, false)));
+        Assert.assertTrue(containsOutputActivation(inB1.getOutputLinks(), pAB.getActivation(doc, 0, 1, false)));
 
         Activation actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inA.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false, false), inA.get().node.get())
+                selectInputActivation(actAB.getInputLinks(false), inA.get().node.get())
         );
 
         actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inB.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false, false), inB.get().node.get())
+                selectInputActivation(actAB.getInputLinks(false), inB.get().node.get())
         );
 
 
-        Assert.assertTrue(containsOutputActivation(inA1.getOutputLinks(false), pAB.getActivation(doc, 0, 1, false)));
-        Assert.assertTrue(containsOutputActivation(inB1.getOutputLinks(false), pAB.getActivation(doc, 0, 1, false)));
+        Assert.assertTrue(containsOutputActivation(inA1.getOutputLinks(), pAB.getActivation(doc, 0, 1, false)));
+        Assert.assertTrue(containsOutputActivation(inB1.getOutputLinks(), pAB.getActivation(doc, 0, 1, false)));
 
         actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inA.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false, false), inA.get().node.get())
+                selectInputActivation(actAB.getInputLinks(false), inA.get().node.get())
         );
 
         actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inB.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false, false), inB.get().node.get())
+                selectInputActivation(actAB.getInputLinks(false), inB.get().node.get())
         );
     }
 
@@ -160,7 +160,7 @@ public class ActivationOutputsTest {
         );
 
         Activation outB1 = outB.getActivation(doc, 0, 1, false);
-        Assert.assertTrue(containsOutputActivation(inA.getActivation(doc, 0, 1, false).getOutputLinks(false), outB1));
+        Assert.assertTrue(containsOutputActivation(inA.getActivation(doc, 0, 1, false).getOutputLinks(), outB1));
     }
 
 
@@ -193,7 +193,7 @@ public class ActivationOutputsTest {
 
         Activation outB1 = outB.getActivation(doc, 0, 1, false);
 
-        Assert.assertTrue(containsOutputActivation(inA.getActivation(doc, 0, 1, false).getOutputLinks(false), outB1));
+        Assert.assertTrue(containsOutputActivation(inA.getActivation(doc, 0, 1, false).getOutputLinks(), outB1));
     }
 
 }

@@ -31,7 +31,7 @@ public abstract class AncestorRelation extends Relation {
 
         collectContains(results, n, linkedAct, v);
 
-        linkedAct.getInputLinks(false, false)
+        linkedAct.getInputLinks(false)
                 .filter(l -> l.synapse.identity)
                 .forEach(l -> collectCommonAncestor(results, n, l.input, v));
     }
@@ -45,7 +45,7 @@ public abstract class AncestorRelation extends Relation {
             results.add(linkedAct);
         }
 
-        linkedAct.getOutputLinks(false)
+        linkedAct.getOutputLinks()
                 .filter(l ->l.synapse.identity)
                 .forEach(l -> collectContains(results, n, l.output, v));
     }
@@ -59,7 +59,7 @@ public abstract class AncestorRelation extends Relation {
             results.add(linkedAct);
         }
 
-        linkedAct.getInputLinks(false, false)
+        linkedAct.getInputLinks(false)
                 .filter(l -> l.synapse.identity)
                 .forEach(l -> collectContainedIn(results, n, l.input, v));
     }
@@ -81,7 +81,7 @@ public abstract class AncestorRelation extends Relation {
 
         if(actA == actB) return true;
 
-        return actA.getInputLinks(false, false)
+        return actA.getInputLinks(false)
                 .filter(l -> l.synapse.identity)
                 .anyMatch(l -> contains(l.input, actB, v));
     }
@@ -100,7 +100,7 @@ public abstract class AncestorRelation extends Relation {
 
         act.markedAncDesc = v;
 
-        act.getInputLinks(false, false)
+        act.getInputLinks(false)
                 .filter(l -> l.synapse.identity)
                 .forEach(l -> markAncestors(l.input, v));
     }
@@ -112,7 +112,7 @@ public abstract class AncestorRelation extends Relation {
 
         act.markedAncDesc = v;
 
-        act.getOutputLinks(false)
+        act.getOutputLinks()
                 .filter(l -> l.synapse.identity)
                 .forEach(l -> markDescendants(l.input, v));
     }
@@ -124,7 +124,7 @@ public abstract class AncestorRelation extends Relation {
 
         if(act.markedAncDesc == v1) return true;
 
-        return act.getInputLinks(false, false)
+        return act.getInputLinks(false)
                 .filter(l -> l.synapse.identity)
                 .anyMatch(l -> hasCommonAncestor(l.input, v1, v2));
     }

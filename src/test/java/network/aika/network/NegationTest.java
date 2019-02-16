@@ -480,7 +480,7 @@ public class NegationTest {
             System.out.println(doc.activationsToString());
 
             Assert.assertNotNull(inS.getActivation(doc, 0, 6, false));
-            Assert.assertEquals(2, inS.getActivation(doc, 0, 6, false).getInputLinks(false, false).count());
+            Assert.assertEquals(2, inS.getActivation(doc, 0, 6, false).getInputLinks(false).count());
 
             doc.clearActivations();
         }
@@ -494,8 +494,8 @@ public class NegationTest {
             System.out.println(doc.activationsToString());
 
             Assert.assertNotNull(inS.getActivation(doc, 0, 9, false));
-            Assert.assertEquals(1, inS.getActivation(doc, 0, 6, false).getInputLinks(false, false).count());
-            Assert.assertEquals(1, inS.getActivation(doc, 0, 9, false).getInputLinks(false, false).count());
+            Assert.assertEquals(1, inS.getActivation(doc, 0, 6, false).getInputLinks(false).count());
+            Assert.assertEquals(1, inS.getActivation(doc, 0, 9, false).getInputLinks(false).count());
 
             doc.clearActivations();
         }
