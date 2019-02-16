@@ -1029,7 +1029,7 @@ public final class Activation extends OrActivation {
     }
 
 
-    public static class AvgState {
+    public class AvgState {
         public int snId;
         public State state;
         public Decision decision;
@@ -1039,30 +1039,30 @@ public final class Activation extends OrActivation {
         public double p;
 
 
-        public Map<Link, AvgState> inputLinks = new TreeMap<>(INPUT_COMP);
+        public Map<Link, AvgState> avgInputLinks = new TreeMap<>(INPUT_COMP);
 
-        public AvgState(int snId, Activation act, Decision d) {
+        public AvgState(int snId, Decision d) {
             this.snId = snId;
-            this.state = act.rounds.getLast();
+            this.state = rounds.getLast();
             this.decision = d;
 
-            if (act.searchStates == null) {
-                act.searchStates = new ArrayList<>();
+            if (searchStates == null) {
+                searchStates = new ArrayList<>();
             }
-            act.searchStates.add(this);
+            searchStates.add(this);
         }
 
 
-        public void setWeight(Activation act, double weight) {
+        public void setWeight(double weight) {
             this.weight = weight;
 
-            for(Link l: act.inputLinks.values()) {
+            for(Link l: inputLinks.values()) {
                 if(l.input.decision == SELECTED) {
                     if(l.input.candidate != null) {
-                        if (l.input.candidate.id < act.candidate.id) {
+                        if (l.input.candidate.id < candidate.id) {
                             SearchNode inputSN = l.input.candidate.currentSearchNode.getParent();
 
-                            inputLinks.put(l, inputSN.getCurrentAvgState());
+                            avgInputLinks.put(l, inputSN.getCurrentAvgState());
                         }
                     } else {
                         inputLinks.put(l, null);
@@ -1070,13 +1070,13 @@ public final class Activation extends OrActivation {
                 }
             }
 
-            for(Link l: act.outputLinks.values()) {
+            for(Link l: outputLinks.values()) {
                 if(l.input.decision == SELECTED) {
                     if(l.output.candidate != null) {
-                        if(l.output.candidate.id < act.candidate.id) {
+                        if(l.output.candidate.id < candidate.id) {
                             SearchNode outputSN = l.output.candidate.currentSearchNode.getParent();
 
-                            outputSN.getCurrentAvgState().inputLinks.put(l, this);
+                            outputSN.getCurrentAvgState().avgInputLinks.put(l, this);
                         }
                     }
                 }
@@ -1087,6 +1087,9 @@ public final class Activation extends OrActivation {
             cacheFactor = cf;
         }
 
+        public Activation getAct() {
+            return Activation.this;
+        }
 
         public String toString() {
             return " snId:" + snId + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " " + state;

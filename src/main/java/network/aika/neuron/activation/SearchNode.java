@@ -343,7 +343,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.selectedWeightSum = returnWeightSum;
 
                     if(COMPUTE_SOFT_MAX) {
-                        sn.selectedChild.avgState.setWeight(sn.candidate.activation, returnWeightSum);
+                        sn.selectedChild.avgState.setWeight(returnWeightSum);
                     }
 
                     sn.postReturn(sn.selectedChild);
@@ -362,7 +362,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.excludedWeightSum = returnWeightSum;
 
                     if(COMPUTE_SOFT_MAX) {
-                        sn.excludedChild.avgState.setWeight(sn.candidate.activation, returnWeightSum);
+                        sn.excludedChild.avgState.setWeight(returnWeightSum);
                     }
 
                     sn.postReturn(sn.excludedChild);
@@ -477,7 +477,7 @@ public class SearchNode implements Comparable<SearchNode> {
         candidate.debugDecisionCounts[0]++;
 
         if(COMPUTE_SOFT_MAX) {
-            selectedChild.avgState = new Activation.AvgState(id, candidate.activation, SELECTED);
+            selectedChild.avgState = candidate.activation.new AvgState(id, SELECTED);
         }
 
         return true;
@@ -502,7 +502,7 @@ public class SearchNode implements Comparable<SearchNode> {
         candidate.debugDecisionCounts[1]++;
 
         if(COMPUTE_SOFT_MAX) {
-            excludedChild.avgState = new Activation.AvgState(id, candidate.activation, EXCLUDED);
+            excludedChild.avgState = candidate.activation.new AvgState(id, EXCLUDED);
         }
 
         return true;
