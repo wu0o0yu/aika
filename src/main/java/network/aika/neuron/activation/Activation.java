@@ -916,16 +916,18 @@ public final class Activation extends OrActivation {
         double avgNet = 0.0;
         double avgPosNet = 0.0;
 
-        for (Activation.AvgState avgState : searchStates) {
-            if(avgState.decision == SELECTED) {
-                double p = avgState.p;
-                Activation.State s = avgState.state;
+        if(searchStates != null) {
+            for (Activation.AvgState avgState : searchStates) {
+                if (avgState.decision == SELECTED) {
+                    double p = avgState.p;
+                    Activation.State s = avgState.state;
 
-                avgValue += p * s.value;
-                avgPosValue += p * s.posValue;
-                avgP += p * s.p;
-                avgNet += p * s.net;
-                avgPosNet += p * s.posNet;
+                    avgValue += p * s.value;
+                    avgPosValue += p * s.posValue;
+                    avgP += p * s.p;
+                    avgNet += p * s.net;
+                    avgPosNet += p * s.posNet;
+                }
             }
         }
 
@@ -1065,7 +1067,7 @@ public final class Activation extends OrActivation {
                             avgInputLinks.put(l, inputSN.getCurrentAvgState());
                         }
                     } else {
-                        inputLinks.put(l, null);
+                        avgInputLinks.put(l, null);
                     }
                 }
             }
