@@ -88,7 +88,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     public Writable extension;
 
-    public ActivationFunction activationFunction = ActivationFunction.RECTIFIED_SCALED_LOGISTIC_SIGMOID;
+    public ActivationFunction activationFunction = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 
 
     public volatile int synapseIdCounter = 0;
