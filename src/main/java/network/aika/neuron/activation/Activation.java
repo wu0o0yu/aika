@@ -1,5 +1,6 @@
 package network.aika.neuron.activation;
 
+import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Utils;
 import network.aika.Writable;
@@ -493,6 +494,10 @@ public final class Activation extends OrActivation {
         return tmp;
     }
 
+
+    public ActivationFunction getActivationFunction() {
+        return getINeuron().activationFunction;
+    }
 
     /*
     An activable activation object might still be suppressed by an undecided positive feedback link.
