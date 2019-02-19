@@ -20,7 +20,7 @@ package network.aika.neuron.activation;
 import network.aika.Document;
 import network.aika.Utils;
 import network.aika.neuron.activation.Activation.StateChange;
-import network.aika.neuron.activation.Activation.AvgState;
+import network.aika.neuron.activation.Activation.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,7 +107,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private int cachedCount = 1;
     private int cachedFactor = 1;
 
-    public AvgState avgState;
+    public Option option;
 
     // Avoids having to search the same path twice.
     private Decision skip = UNKNOWN;
@@ -196,12 +196,12 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public AvgState getCurrentAvgState()  {
+    public Option getCurrentAvgState()  {
         switch(currentDecision) {
             case SELECTED:
-                return selectedChild.avgState;
+                return selectedChild.option;
             case EXCLUDED:
-                return excludedChild.avgState;
+                return excludedChild.option;
             default:
                 return null;
         }
@@ -343,7 +343,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.selectedWeightSum = returnWeightSum;
 
                     if(COMPUTE_SOFT_MAX) {
-                        sn.selectedChild.avgState.setWeight(returnWeightSum);
+                        sn.selectedChild.option.setWeight(returnWeightSum);
                     }
 
                     sn.postReturn(sn.selectedChild);
@@ -362,7 +362,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.excludedWeightSum = returnWeightSum;
 
                     if(COMPUTE_SOFT_MAX) {
-                        sn.excludedChild.avgState.setWeight(returnWeightSum);
+                        sn.excludedChild.option.setWeight(returnWeightSum);
                     }
 
                     sn.postReturn(sn.excludedChild);
@@ -477,7 +477,7 @@ public class SearchNode implements Comparable<SearchNode> {
         candidate.debugDecisionCounts[0]++;
 
         if(COMPUTE_SOFT_MAX) {
-            selectedChild.avgState = candidate.activation.new AvgState(id, SELECTED);
+            selectedChild.option = candidate.activation.new Option(id, SELECTED);
         }
 
         return true;
@@ -502,7 +502,7 @@ public class SearchNode implements Comparable<SearchNode> {
         candidate.debugDecisionCounts[1]++;
 
         if(COMPUTE_SOFT_MAX) {
-            excludedChild.avgState = candidate.activation.new AvgState(id, EXCLUDED);
+            excludedChild.option = candidate.activation.new Option(id, EXCLUDED);
         }
 
         return true;
@@ -667,7 +667,7 @@ public class SearchNode implements Comparable<SearchNode> {
         SearchNode pn = getParent();
         cachedFactor = (pn != null ? pn.cachedFactor : 1) * cachedCount;
 
-        avgState.setCacheFactor(cachedFactor);
+        option.setCacheFactor(cachedFactor);
     }
 
 
