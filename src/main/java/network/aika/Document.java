@@ -364,22 +364,20 @@ public class Document implements Comparable<Document> {
 
 
     private void computeSoftMax(SearchNode rootNode) {
-        for(Activation act: activationsById.values()) {
-            if(act.options != null) {
-                double offset = Double.MAX_VALUE;
-                for (Activation.Option option : act.options) {
-                    offset = Math.min(offset, Math.log(option.cacheFactor) + option.weight);
-                }
+        for (Activation act : activationsById.values()) {
+            double offset = Double.MAX_VALUE;
+            for (Activation.Option option : act.options) {
+                offset = Math.min(offset, Math.log(option.cacheFactor) + option.weight);
+            }
 
-                double norm = 0.0;
-                for (Activation.Option option : act.options) {
-                    norm += Math.exp(Math.log(option.cacheFactor) + option.weight - offset);
-                }
+            double norm = 0.0;
+            for (Activation.Option option : act.options) {
+                norm += Math.exp(Math.log(option.cacheFactor) + option.weight - offset);
+            }
 
-                for (Activation.Option option : act.options) {
-                    if(option.decision == SELECTED) {
-                        option.p = Math.exp(Math.log(option.cacheFactor) + option.weight - offset) / norm;
-                    }
+            for (Activation.Option option : act.options) {
+                if (option.decision == SELECTED) {
+                    option.p = Math.exp(Math.log(option.cacheFactor) + option.weight - offset) / norm;
                 }
             }
         }

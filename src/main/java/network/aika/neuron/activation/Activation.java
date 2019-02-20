@@ -898,25 +898,26 @@ public final class Activation extends OrActivation {
     }
 
     public State getAvgState() {
+        if (options == null) {
+            return null;
+        }
+
         double avgValue = 0.0;
         double avgPosValue = 0.0;
         double avgNet = 0.0;
         double avgPosNet = 0.0;
 
-        if(options != null) {
-            for (Option option : options) {
-                if (option.decision == SELECTED) {
-                    double p = option.p;
-                    Activation.State s = option.state;
+        for (Option option : options) {
+            if (option.decision == SELECTED) {
+                double p = option.p;
+                Activation.State s = option.state;
 
-                    avgValue += p * s.value;
-                    avgPosValue += p * s.posValue;
-                    avgNet += p * s.net;
-                    avgPosNet += p * s.posNet;
-                }
+                avgValue += p * s.value;
+                avgPosValue += p * s.posValue;
+                avgNet += p * s.net;
+                avgPosNet += p * s.posNet;
             }
         }
-
         return new Activation.State(avgValue, avgPosValue, avgNet, avgPosNet, 0, 0.0);
     }
 

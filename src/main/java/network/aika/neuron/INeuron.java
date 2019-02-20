@@ -20,6 +20,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Activation.Option;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.SearchNode;
 import network.aika.lattice.InputNode;
@@ -32,6 +33,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
 
 /**
  * The {@code INeuron} class represents a internal neuron implementation in Aikas neural network and is connected to other neurons through
@@ -315,11 +317,21 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         Activation.State s = new Activation.State(input.value, input.value, input.net, 0.0, input.fired, 0.0);
         act.rounds.set(0, s);
+
+        if(SearchNode.COMPUTE_SOFT_MAX) {
+            Option o = act.new Option(-1, SELECTED);
+            o.p = 1.0;
+            o.state = s;
+
+            act.options = new ArrayList<>();
+            act.options.add(o);
+        }
+
         act.inputValue = input.value;
         act.upperBound = input.value;
         act.lowerBound = input.value;
 
-        act.inputDecision = SearchNode.Decision.SELECTED;
+        act.inputDecision = SELECTED;
         act.finalDecision = act.inputDecision;
         act.setDecision(act.inputDecision, doc.visitedCounter++);
 
