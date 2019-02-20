@@ -237,7 +237,7 @@ public final class Activation extends OrActivation {
         double delta = 0.0;
         State s;
         if(inputValue != null) {
-            s = new State(inputValue, inputValue, 1.0, 0.0, 0.0, 0, 0.0);
+            s = new State(inputValue, inputValue, 0.0, 0.0, 0, 0.0);
         } else {
             s = computeValueAndWeight(round);
         }
@@ -330,7 +330,6 @@ public final class Activation extends OrActivation {
             return new State(
                     actValue,
                     posActValue,
-                    1.0,
                     net,
                     posNet,
                     -1,
@@ -340,7 +339,6 @@ public final class Activation extends OrActivation {
             return new State(
                     0.0,
                     posActValue,
-                    0.0,
                     0.0,
                     posNet,
                     -1,
@@ -458,7 +456,6 @@ public final class Activation extends OrActivation {
         return new State(
                 c == SELECTED ? 1.0 : 0.0,
                 0.0,
-                1.0,
                 0.0,
                 0.0,
                 0,
@@ -802,20 +799,18 @@ public final class Activation extends OrActivation {
     public static class State {
         public final double value;
         public final double posValue;
-        public final double p;
         public final double net;
         public final double posNet;
 
         public final int fired;
         public final double weight;
 
-        public static final State ZERO = new State(0.0, 0.0, 0.0, 0.0, 0.0, -1, 0.0);
+        public static final State ZERO = new State(0.0, 0.0, 0.0, 0.0, -1, 0.0);
 
-        public State(double value, double posValue, double p, double net, double posNet, int fired, double weight) {
+        public State(double value, double posValue, double net, double posNet, int fired, double weight) {
             assert !Double.isNaN(value);
             this.value = value;
             this.posValue = posValue;
-            this.p = p;
             this.net = net;
             this.posNet = posNet;
             this.fired = fired;
@@ -832,7 +827,7 @@ public final class Activation extends OrActivation {
         }
 
         public String toString() {
-            return "V:" + Utils.round(value) + (DEBUG_OUTPUT ? " pV:" + Utils.round(posValue) : "") + " Net:" + Utils.round(net) + (DEBUG_OUTPUT ? " P:" + Utils.round(p) : "") + " W:" + Utils.round(weight);
+            return "V:" + Utils.round(value) + (DEBUG_OUTPUT ? " pV:" + Utils.round(posValue) : "") + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
         }
     }
 
@@ -905,7 +900,6 @@ public final class Activation extends OrActivation {
     public State getAvgState() {
         double avgValue = 0.0;
         double avgPosValue = 0.0;
-        double avgP = 0.0;
         double avgNet = 0.0;
         double avgPosNet = 0.0;
 
@@ -917,14 +911,13 @@ public final class Activation extends OrActivation {
 
                     avgValue += p * s.value;
                     avgPosValue += p * s.posValue;
-                    avgP += p * s.p;
                     avgNet += p * s.net;
                     avgPosNet += p * s.posNet;
                 }
             }
         }
 
-        return new Activation.State(avgValue, avgPosValue, avgP, avgNet, avgPosNet, 0, 0.0);
+        return new Activation.State(avgValue, avgPosValue, avgNet, avgPosNet, 0, 0.0);
     }
 
 
