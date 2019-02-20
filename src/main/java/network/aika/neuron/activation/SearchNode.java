@@ -196,7 +196,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public Option getCurrentAvgState()  {
+    public Option getCurrentOption()  {
         switch(currentDecision) {
             case SELECTED:
                 return selectedChild.option;

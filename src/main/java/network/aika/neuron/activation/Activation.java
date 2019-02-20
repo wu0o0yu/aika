@@ -1049,10 +1049,10 @@ public final class Activation extends OrActivation {
                         if (l.input.candidate.id < candidate.id) {
                             SearchNode inputSN = l.input.candidate.currentSearchNode.getParent();
 
-                            inputOptions.put(l, inputSN.getCurrentAvgState());
+                            link(l, inputSN.getCurrentOption());
                         }
                     } else {
-                        inputOptions.put(l, null);
+                        link(l, l.input.options.get(0));
                     }
                 }
             }
@@ -1063,11 +1063,16 @@ public final class Activation extends OrActivation {
                         if(l.output.candidate.id < candidate.id) {
                             SearchNode outputSN = l.output.candidate.currentSearchNode.getParent();
 
-                            outputSN.getCurrentAvgState().inputOptions.put(l, this);
+                            outputSN.getCurrentOption().link(l, this);
                         }
                     }
                 }
             }
+        }
+
+        public void link(Link l, Option in) {
+            inputOptions.put(l, in);
+            in.outputOptions.put(l, this);
         }
 
         public void setCacheFactor(int cf) {
