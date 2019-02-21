@@ -96,7 +96,7 @@ public class OrNode extends Node<OrNode, Activation> {
         Activation act = lookupActivation(doc, slots, oe, inputAct);
 
         if(act == null) {
-            act = new Activation(doc.activationIdCounter++, doc, this);
+            act = new Activation(doc.activationIdCounter++, doc, this, neuron.get(doc));
             act.setSlots(slots);
 
             processActivation(act);

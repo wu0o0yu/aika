@@ -52,10 +52,12 @@ public final class Activation extends OrActivation {
     public static int MAX_PREDECESSOR_DEPTH = 100;
     public static boolean DEBUG_OUTPUT = false;
 
-    public static Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE, null, null);
-    public static Activation MAX_ACTIVATION = new Activation(Integer.MAX_VALUE, null, null);
+    public static Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE, null, null, null);
+    public static Activation MAX_ACTIVATION = new Activation(Integer.MAX_VALUE, null, null, null);
 
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
+
+    public INeuron neuron;
 
     public Map<Integer, Position> slots = new TreeMap<>();
 
@@ -100,8 +102,9 @@ public final class Activation extends OrActivation {
     private List<Activation> conflicts;
 
 
-    public Activation(int id, Document doc, OrNode n) {
+    public Activation(int id, Document doc, OrNode n, INeuron neuron) {
         super(id, doc, n);
+        this.neuron = neuron;
 
         if(doc != null && doc.model.getActivationExtensionFactory() != null) {
             extension = doc.model.getActivationExtensionFactory().createObject();
@@ -161,12 +164,12 @@ public final class Activation extends OrActivation {
 
 
     public INeuron getINeuron() {
-        return getNeuron().get(doc);
+        return neuron;
     }
 
 
     public Neuron getNeuron() {
-        return node.neuron;
+        return neuron.provider;
     }
 
 

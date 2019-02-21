@@ -97,7 +97,7 @@ public class ActivationsTest {
 
 
     private Activation createActivation(Document doc, OrNode inNode) {
-        Activation act = new Activation(0, doc, inNode);
+        Activation act = new Activation(0, doc, inNode, inNode.neuron.get());
         act.setSlot(BEGIN, doc.lookupFinalPosition(0));
         act.setSlot(END, doc.lookupFinalPosition(1));
         return act;
