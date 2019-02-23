@@ -113,11 +113,6 @@ public class AndNode extends Node<AndNode, AndActivation> {
                     RefValue secondRv = sl.rv;
                     NodeActivation secondAct = sl.output;
                     if (act != secondAct) {
-                        Relation[] relations = new Relation[secondRef.relations.length() + 1];
-                        for(int i = 0; i < secondRef.relations.length(); i++) {
-                            relations[rv.offsets[i]] = secondRef.relations.get(i);
-                        }
-
                         lock.acquireReadLock();
                         for(Map.Entry<Refinement, RefValue> me: andChildren.subMap(
                                 new Refinement(RelationsMap.MIN, secondRef.input),
