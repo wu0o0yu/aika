@@ -23,7 +23,6 @@ import network.aika.Provider;
 import network.aika.Writable;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
-import network.aika.PatternDiscovery;
 import network.aika.lattice.InputNode.InputActivation;
 import network.aika.lattice.AndNode.AndActivation;
 
@@ -165,39 +164,6 @@ public class AndNode extends Node<AndNode, AndActivation> {
     }
 
 
-
-    @Override
-    public void discover(AndActivation act, PatternDiscovery.Config config) {
-        Document doc = act.getDocument();
-        for(Link fl : act.inputs) {
-            if(fl == null) continue;
-
-            for (Link sl : fl.input.outputsToAndNode.values()) {
-                AndActivation secondAct = sl.output;
-                if (secondAct.getNode() instanceof AndNode) {
-                    if (act != secondAct && config.candidateCheck.check(act, secondAct)) {
-                        Activation iAct = act.getInputActivation(fl.rv.refOffset);
-                        Activation secondIAct = secondAct.getInputActivation(sl.rv.refOffset);
-
-                        List<Relation> rels = config.candidateRelations.getRelations(iAct, secondIAct);
-                        rels.add(null);
-
-                        for(Relation rel: rels) {
-                            Refinement nRef = createRefinement(fl.rv, sl.ref, rel);
-
-                            AndNode.RefValue rv = extend(doc.getThreadId(), doc, nRef, config);
-                            if (rv != null) {
-                                AndNode nln = rv.child.get();
-                                nln.isDiscovered = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
     private Refinement createRefinement(RefValue firstRV, Refinement secondRef, Relation rel) {
         Relation[] srm = secondRef.relations.relations;
         RelationsMap rm = new RelationsMap();
@@ -210,7 +176,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
     }
 
 
-    public RefValue extend(int threadId, Document doc, Refinement firstRef, PatternDiscovery.Config patterDiscoverConfig) {
+    public RefValue extend(int threadId, Document doc, Refinement firstRef) {
         if(!firstRef.isConvertible()) return null;
 
         RefValue firstRV = getAndChild(firstRef);
@@ -239,9 +205,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
             Refinement secondParentRef = new Refinement(new RelationsMap(secondParentRelations), firstRef.input);
 
-            RefValue secondParentRV = patterDiscoverConfig != null ?
-                    parentNode.getAndChild(secondParentRef) :
-                    parentNode.extend(threadId, doc, secondParentRef, null);
+            RefValue secondParentRV = parentNode.extend(threadId, doc, secondParentRef);
 
             if(secondParentRV == null) {
                 continue;
@@ -275,12 +239,12 @@ public class AndNode extends Node<AndNode, AndActivation> {
         firstRV = new RefValue(firstOffsets, firstRefOffset, provider);
         nextLevelParents.add(new Entry(firstRef, firstRV));
 
-        return createAndNode(provider.model, doc, nextLevelParents, level + 1, patterDiscoverConfig) ? firstRV : null;
+        return createAndNode(provider.model, doc, nextLevelParents, level + 1) ? firstRV : null;
     }
 
 
 
-    static boolean createAndNode(Model m, Document doc, List<Entry> parents, int level, PatternDiscovery.Config patterDiscoverConfig) {
+    static boolean createAndNode(Model m, Document doc, List<Entry> parents, int level) {
         if (parents != null) {
             // Locking needs to take place in a predefined order.
             TreeSet<Provider<? extends Node>> parentsForLocking = new TreeSet();
@@ -293,10 +257,6 @@ public class AndNode extends Node<AndNode, AndActivation> {
             }
             try {
                 AndNode nln = new AndNode(m, level, parents);
-
-                if(patterDiscoverConfig != null && !patterDiscoverConfig.patternCheck.check(nln)) {
-                    return false;
-                }
 
                 nln.init();
                 nln.postCreate(doc);

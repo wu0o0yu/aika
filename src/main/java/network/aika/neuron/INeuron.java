@@ -239,7 +239,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-
     private INeuron() {
     }
 

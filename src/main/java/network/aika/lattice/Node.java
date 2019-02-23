@@ -18,7 +18,6 @@ package network.aika.lattice;
 
 
 import network.aika.*;
-import network.aika.PatternDiscovery;
 import network.aika.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,9 +56,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public int level;
 
     public Writable extension;
-
-    // Prevents this node from being removed during cleanup.
-    public boolean isDiscovered;
 
     public AtomicInteger numberOfNeuronRefs = new AtomicInteger(0);
     volatile boolean isRemoved;
@@ -114,11 +110,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public abstract AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref, PatternDiscovery.Config patterDiscoveryConfig);
+    public abstract AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref);
 
     abstract void apply(A act);
-
-    public abstract void discover(A act, PatternDiscovery.Config config);
 
     public abstract void reprocessInputs(Document doc);
 
@@ -293,7 +287,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public boolean isRequired() {
-        return numberOfNeuronRefs.get() > 0 || isDiscovered;
+        return numberOfNeuronRefs.get() > 0;
     }
 
 
@@ -350,8 +344,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             extension.write(out);
         }
 
-        out.writeBoolean(isDiscovered);
-
         out.writeInt(numberOfNeuronRefs.get());
 
         if (andChildren != null) {
@@ -383,8 +375,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             extension = m.getNodeExtensionFactory().createObject();
             extension.readFields(in, m);
         }
-
-        isDiscovered = in.readBoolean();
 
         numberOfNeuronRefs.set(in.readInt());
 

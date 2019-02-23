@@ -23,7 +23,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
-import network.aika.PatternDiscovery;
 import network.aika.Document;
 import network.aika.neuron.relation.Relation;
 import org.slf4j.Logger;
@@ -59,7 +58,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref, PatternDiscovery.Config patterDiscovery) {
+    public AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref) {
         throw new UnsupportedOperationException();
     }
 
@@ -164,11 +163,6 @@ public class OrNode extends Node<OrNode, Activation> {
     @Override
     public void apply(Activation act) {
         throw new UnsupportedOperationException();
-    }
-
-
-    @Override
-    public void discover(Activation act, PatternDiscovery.Config config) {
     }
 
 

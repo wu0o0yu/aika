@@ -25,7 +25,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
-import network.aika.PatternDiscovery;
 import network.aika.lattice.AndNode.AndActivation;
 import network.aika.lattice.InputNode.InputActivation;
 import network.aika.lattice.AndNode.Refinement;
@@ -50,8 +49,6 @@ public class InputNode extends Node<InputNode, InputActivation> {
     public Neuron inputNeuron;
 
     public TreeMap<AndNode.Refinement, AndNode.RefValue> nonExactAndChildren;
-
-    private long visitedDiscover;
 
 
     public InputNode() {
@@ -131,7 +128,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
 
-    public RefValue extend(int threadId, Document doc, Refinement ref, PatternDiscovery.Config patterDiscoveryConfig) {
+    public RefValue extend(int threadId, Document doc, Refinement ref) {
         if(!ref.isConvertible()) return null;
 
         Relation rel = ref.relations.get(0);
@@ -152,7 +149,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         rv = new RefValue(new Integer[] {0}, 1, provider);
         nlParents.add(new AndNode.Entry(ref, rv));
 
-        return AndNode.createAndNode(provider.model, doc, nlParents, level + 1, patterDiscoveryConfig) ? rv : null;
+        return AndNode.createAndNode(provider.model, doc, nlParents, level + 1) ? rv : null;
     }
 
 
@@ -230,35 +227,6 @@ public class InputNode extends Node<InputNode, InputActivation> {
                     // }
                 }
         );
-    }
-
-
-    @Override
-    public void discover(InputActivation act, PatternDiscovery.Config config) {
-        if(!act.input.input.isFinalActivation()) {
-            return;
-        }
-
-        Document doc = act.getDocument();
-        doc.getActivations(true).forEach(secondNAct -> {
-            InputActivation secondAct = secondNAct.outputToInputNode.output;
-            if (act != secondAct && config.candidateCheck.check(act, secondAct)) {
-                List<Relation> relations = config.candidateRelations.getRelations(act.input.input, secondNAct);
-                InputNode in = secondAct.getNode();
-
-                for (Relation r : relations) {
-                    RelationsMap rm = new RelationsMap(new Relation[]{r});
-                    Refinement ref = new Refinement(rm, in.provider);
-
-                    AndNode.RefValue rv = extend(doc.getThreadId(), doc, ref, config);
-
-                    if (rv != null) {
-                        AndNode nln = rv.child.get();
-                        nln.isDiscovered = true;
-                    }
-                }
-            }
-        });
     }
 
 

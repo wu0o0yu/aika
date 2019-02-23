@@ -296,7 +296,7 @@ public class Converter {
             NodeContext nln = new NodeContext();
             nln.offsets = new Synapse[nc.offsets.length + 1];
             AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.input.get().outputNode);
-            AndNode.RefValue rv = nc.node.extend(threadId, doc, ref, null);
+            AndNode.RefValue rv = nc.node.extend(threadId, doc, ref);
             if(rv == null) {
                 return null;
             }
