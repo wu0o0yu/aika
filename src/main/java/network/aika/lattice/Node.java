@@ -71,7 +71,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
      * a specific logic node.
      */
-    public static class ThreadState<A extends NodeActivation> {
+    private static class ThreadState<A extends NodeActivation> {
         public long lastUsed;
 
         public List<A> added;
@@ -89,7 +89,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public ThreadState<A> getThreadState(int threadId, boolean create) {
+    private ThreadState<A> getThreadState(int threadId, boolean create) {
         ThreadState<A> th = threads[threadId];
         if (th == null) {
             if (!create) return null;
@@ -198,7 +198,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void register(A act) {
         Document doc = act.getDocument();
 
-        ThreadState th = act.getNode().getThreadState(doc.getThreadId(), true);
+        assert act.getNode() == this;
+
+        ThreadState th = getThreadState(doc.getThreadId(), true);
         if (th.activations.isEmpty()) {
             doc.activatedNodes.add(act.getNode());
         }
@@ -309,6 +311,30 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public String getNeuronLabel() {
         return "";
+    }
+
+
+    public boolean isQueued(int threadId, long queueId) {
+        ThreadState th = getThreadState(threadId, true);
+        if (!th.isQueued) {
+            th.isQueued = true;
+            th.queueId = queueId;
+        }
+        return false;
+    }
+
+
+    public void setNotQueued(int threadId) {
+        ThreadState th = getThreadState(threadId, false);
+        if(th == null) return;
+        th.isQueued = false;
+    }
+
+
+    public static int compareQueueId(int threadId, Node n1, Node n2) {
+        ThreadState th1 = n1.getThreadState(threadId, true);
+        ThreadState th2 = n2.getThreadState(threadId, true);
+        return Long.compare(th1.queueId, th2.queueId);
     }
 
 

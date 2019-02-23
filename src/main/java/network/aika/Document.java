@@ -26,7 +26,6 @@ import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.Candidate;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.SearchNode;
-import network.aika.lattice.Node.ThreadState;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.SearchNode.Decision;
 import org.slf4j.Logger;
@@ -544,9 +543,7 @@ public class Document implements Comparable<Document> {
                 int r = Integer.compare(n1.level, n2.level);
                 if(r != 0) return r;
 
-                ThreadState th1 = n1.getThreadState(threadId, true);
-                ThreadState th2 = n2.getThreadState(threadId, true);
-                return Long.compare(th1.queueId, th2.queueId);
+                return Node.compareQueueId(threadId, n1, n2);
             }
         });
 
@@ -554,11 +551,7 @@ public class Document implements Comparable<Document> {
 
 
         public void add(Node n) {
-            ThreadState th = n.getThreadState(threadId, true);
-
-            if(!th.isQueued) {
-                th.isQueued = true;
-                th.queueId = queueIdCounter++;
+            if(!n.isQueued(threadId, queueIdCounter++)) {
                 queue.add(n);
             }
         }
@@ -567,9 +560,8 @@ public class Document implements Comparable<Document> {
         public void processChanges() {
             while(!queue.isEmpty()) {
                 Node n = queue.pollFirst();
-                ThreadState th = n.getThreadState(threadId, true);
 
-                th.isQueued = false;
+                n.setNotQueued(threadId);
                 n.processChanges(Document.this);
             }
         }
