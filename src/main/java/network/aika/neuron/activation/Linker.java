@@ -186,14 +186,6 @@ public class Linker {
     }
 
 
-    protected boolean checkLoop(Activation iAct, Activation oAct) {
-        long v = doc.getNewVisitedId();
-
-        oAct.markedPredecessor = v;
-        return iAct.checkSelfReferencing(false, 0, v);
-    }
-
-
     private void addToQueue(Link l) {
         if(l == null) {
             return;
