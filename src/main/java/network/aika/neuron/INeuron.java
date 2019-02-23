@@ -59,6 +59,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public static final INeuron MIN_NEURON = new INeuron();
     public static final INeuron MAX_NEURON = new INeuron();
 
+    private static final int DIRECT = 0;
+    private static final int RECURRENT = 1;
+    private static final int POSITIVE = 0;
+    private static final int NEGATIVE = 1;
+
 
     public String label;
     public Type type;
@@ -411,6 +416,76 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         return act;
     }
+
+
+    public void commit(Document doc, Collection<Synapse> modifiedSynapses) {
+        double[][] sumDelta = new double[2][2];
+
+        double posPassiveSumDelta = 0.0;
+        for (Synapse s : modifiedSynapses) {
+            if(s.toBeDeleted) {
+                s.update(doc, -s.weight, 0.0, s.limit);
+            }
+
+            INeuron in = s.input.get();
+            in.lock.acquireWriteLock();
+            try {
+                if (!s.inactive) {
+                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.limit * s.weight;
+                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += (s.limit + s.limitDelta) * s.getNewWeight();
+
+                    if(in.isPassiveInputNeuron() && !s.isNegative()) {
+                        posPassiveSumDelta -= !s.isNegative() ? (s.limit * s.weight) : 0.0;
+                        posPassiveSumDelta += s.getNewWeight() > 0.0 ? ((s.limit + s.limitDelta) * s.getNewWeight()) : 0.0;
+                    }
+
+                    if(!s.isRecurrent) {
+                        if (!s.isDisjunction(Synapse.State.OLD) && s.isDisjunction(Synapse.State.NEW)) {
+                            numDisjunctiveSynapses++;
+                        } else if (s.isDisjunction(Synapse.State.OLD) && !s.isDisjunction(Synapse.State.NEW)) {
+                            numDisjunctiveSynapses--;
+                        }
+                    }
+                }
+
+                s.weight += s.weightDelta;
+                s.weightDelta = 0.0;
+
+                s.bias += s.biasDelta;
+                s.biasDelta = 0.0;
+
+                s.limit += s.limitDelta;
+                s.limitDelta = 0.0;
+
+                if (doc != null) {
+                    s.committedInDoc = doc.id;
+                }
+            } finally {
+                in.lock.releaseWriteLock();
+            }
+
+            if(s.toBeDeleted) {
+                s.unlink();
+            }
+        }
+
+        bias += biasDelta;
+        biasDelta = 0.0;
+
+        biasSum += biasSumDelta;
+        biasSumDelta = 0.0;
+
+        assert Double.isFinite(biasSum);
+
+        posDirSum += sumDelta[DIRECT][POSITIVE];
+        negDirSum += sumDelta[DIRECT][NEGATIVE];
+        negRecSum += sumDelta[RECURRENT][NEGATIVE];
+        posRecSum += sumDelta[RECURRENT][POSITIVE];
+        posPassiveSum += posPassiveSumDelta;
+
+        setModified();
+    }
+
 
 
     // TODO

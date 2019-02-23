@@ -17,6 +17,7 @@
 package network.aika;
 
 
+import network.aika.lattice.Converter;
 import network.aika.lattice.Node;
 import network.aika.lattice.NodeActivation;
 import network.aika.neuron.INeuron;
@@ -421,7 +422,10 @@ public class Document implements Comparable<Document> {
      * It applies the weight and bias delta values and reflects the changes in the logic node structure.
      */
     public void commit() {
-        modifiedWeights.forEach((n, inputSyns) -> Converter.convert(threadId, this, n, inputSyns));
+        modifiedWeights.forEach((n, inputSyns) -> {
+            n.commit(this, inputSyns);
+            Converter.convert(threadId, this, n, inputSyns);
+        });
         modifiedWeights.clear();
     }
 

@@ -18,6 +18,7 @@ package network.aika.neuron;
 
 
 import network.aika.*;
+import network.aika.lattice.Converter;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.relation.Relation;
@@ -239,6 +240,8 @@ public class Neuron extends Provider<INeuron> {
         modifiedSynapses.forEach(s -> s.link());
 
         relationBuilders.forEach(input -> input.connect(this));
+
+        n.commit(doc, modifiedSynapses);
 
         return Converter.convert(model.defaultThreadId, doc, n, modifiedSynapses);
     }

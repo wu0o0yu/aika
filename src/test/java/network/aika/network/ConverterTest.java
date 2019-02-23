@@ -20,7 +20,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.Converter;
+import network.aika.lattice.Converter;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
@@ -108,6 +108,8 @@ public class ConverterTest {
         Assert.assertEquals(1, out.get().node.get().andParents.size());
 
         out.get().setBias(1.5);
+
+        out.get().commit(null, out.get().inputSynapses.values());
         Converter.convert(0, null, out.get(), out.get().inputSynapses.values());
 
         System.out.println(out.get().node.get().logicToString());
@@ -275,6 +277,7 @@ public class ConverterTest {
 
         inD.inMemoryOutputSynapses.firstEntry().getValue().weightDelta = -1.5f;
 
+        out.get().commit(null, out.get().inputSynapses.values());
         Converter.convert( 0, null, out.get(), out.get().inputSynapses.values());
         System.out.println(out.get().node.get().logicToString());
         Assert.assertEquals(1, out.get().node.get().andParents.size());

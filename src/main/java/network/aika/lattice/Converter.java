@@ -14,11 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.lattice;
 
-import network.aika.lattice.AndNode;
-import network.aika.lattice.Node;
-import network.aika.lattice.OrNode;
+import network.aika.Document;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.relation.Relation;
@@ -69,7 +67,6 @@ public class Converter {
     private boolean convert() {
         outputNode = neuron.node.get();
 
-        initInputNodesAndComputeWeightSums();
         initSlotFlags();
 
         if(neuron.biasSum + neuron.posDirSum + neuron.posRecSum <= 0.0) {
@@ -202,81 +199,6 @@ public class Converter {
             }
         }
         return maxSyn;
-    }
-
-
-    public static final int DIRECT = 0;
-    public static final int RECURRENT = 1;
-    public static final int POSITIVE = 0;
-    public static final int NEGATIVE = 1;
-
-
-    private void initInputNodesAndComputeWeightSums() {
-        double[][] sumDelta = new double[2][2];
-
-        double posPassiveSumDelta = 0.0;
-        for (Synapse s : modifiedSynapses) {
-            if(s.toBeDeleted) {
-                s.update(doc, -s.weight, 0.0, s.limit);
-            }
-
-            INeuron in = s.input.get();
-            in.lock.acquireWriteLock();
-            try {
-                if (!s.inactive) {
-                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.limit * s.weight;
-                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += (s.limit + s.limitDelta) * s.getNewWeight();
-
-                    if(in.isPassiveInputNeuron() && !s.isNegative()) {
-                        posPassiveSumDelta -= !s.isNegative() ? (s.limit * s.weight) : 0.0;
-                        posPassiveSumDelta += s.getNewWeight() > 0.0 ? ((s.limit + s.limitDelta) * s.getNewWeight()) : 0.0;
-                    }
-
-                    if(!s.isRecurrent) {
-                        if (!s.isDisjunction(Synapse.State.OLD) && s.isDisjunction(Synapse.State.NEW)) {
-                            neuron.numDisjunctiveSynapses++;
-                        } else if (s.isDisjunction(Synapse.State.OLD) && !s.isDisjunction(Synapse.State.NEW)) {
-                            neuron.numDisjunctiveSynapses--;
-                        }
-                    }
-                }
-
-                s.weight += s.weightDelta;
-                s.weightDelta = 0.0;
-
-                s.bias += s.biasDelta;
-                s.biasDelta = 0.0;
-
-                s.limit += s.limitDelta;
-                s.limitDelta = 0.0;
-
-                if (doc != null) {
-                    s.committedInDoc = doc.id;
-                }
-            } finally {
-                in.lock.releaseWriteLock();
-            }
-
-            if(s.toBeDeleted) {
-                s.unlink();
-            }
-        }
-
-        neuron.bias += neuron.biasDelta;
-        neuron.biasDelta = 0.0;
-
-        neuron.biasSum += neuron.biasSumDelta;
-        neuron.biasSumDelta = 0.0;
-
-        assert Double.isFinite(neuron.biasSum);
-
-        neuron.posDirSum += sumDelta[DIRECT][POSITIVE];
-        neuron.negDirSum += sumDelta[DIRECT][NEGATIVE];
-        neuron.negRecSum += sumDelta[RECURRENT][NEGATIVE];
-        neuron.posRecSum += sumDelta[RECURRENT][POSITIVE];
-        neuron.posPassiveSum += posPassiveSumDelta;
-
-        neuron.setModified();
     }
 
 
