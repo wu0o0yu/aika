@@ -325,8 +325,7 @@ public abstract class AncestorRelation extends Relation {
             long v = linkedAct.getVisitedId();
             markDescendants(linkedAct, v);
 
-            INeuron.ThreadState th = n.getThreadState(linkedAct.getThreadId(), false);
-            return th.getActivations()
+            return n.getActivations(linkedAct.getDocument())
                     .filter(act -> act.markedAncDesc != v);
         }
 
@@ -377,8 +376,7 @@ public abstract class AncestorRelation extends Relation {
             long v = linkedAct.getVisitedId();
             markAncestors(linkedAct, v);
 
-            INeuron.ThreadState th = n.getThreadState(linkedAct.getThreadId(), false);
-            return th.getActivations()
+            return n.getActivations(linkedAct.getDocument())
                     .filter(act -> act.markedAncDesc != v);
         }
 

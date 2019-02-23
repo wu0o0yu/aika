@@ -205,8 +205,8 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
     private static void addNextLevelActivations(InputNode secondNode, Refinement ref, AndNode nln, InputActivation act) {
         Document doc = act.getDocument();
-        INeuron.ThreadState th = secondNode.inputNeuron.get().getThreadState(doc.getThreadId(), false);
-        if (th == null || th.isEmpty()) return;
+
+        if(secondNode.inputNeuron.get().isEmpty(doc)) return;
 
         Activation iAct = act.input.input;
 

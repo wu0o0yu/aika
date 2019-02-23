@@ -16,7 +16,7 @@ public class Position {
     public SortedMap<ActKey, Activation> activations = new TreeMap<>();
 
 
-    public Document doc;
+    private Document doc;
     public final int id;
     private Integer finalPosition;
 
@@ -30,6 +30,11 @@ public class Position {
         this.doc = doc;
         this.id = doc != null ? doc.positionIdCounter++ : -1;
         finalPosition = pos;
+    }
+
+
+    public Document getDocument() {
+        return doc;
     }
 
 

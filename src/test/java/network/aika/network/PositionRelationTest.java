@@ -312,7 +312,7 @@ public class PositionRelationTest {
 
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().getThreadState(doc.getThreadId(), true).size());
+        Assert.assertEquals(1, pattern.get().size(doc));
 
 
         System.out.println("Output activation:");

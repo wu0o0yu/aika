@@ -110,8 +110,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
     private Activation lookupActivation(Document doc, SortedMap<Integer, Position> slots, OrEntry oe, NodeActivation inputAct) {
         x: for(Activation act: neuron.get(doc)
-                .getThreadState(doc.getThreadId(), true)
-                .getActivations(slots)
+                .getActivations(doc, slots)
                 ) {
 
             Synapse ls = null;

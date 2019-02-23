@@ -54,7 +54,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     private static final Logger log = LoggerFactory.getLogger(INeuron.class);
 
     public static double WEIGHT_TOLERANCE = 0.001;
-    public static double TOLERANCE = 0.000001;
 
     public String label;
     public Type type;
@@ -116,13 +115,13 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public PassiveInputFunction passiveInputFunction = null;
 
 
-    public ThreadState[] threads;
+    private ThreadState[] threads;
 
     /**
      * The {@code ThreadState} is a thread local data structure containing the activationsBySlotAndPosition of a single document for
      * a specific logic node.
      */
-    public static class ThreadState {
+    private static class ThreadState {
         public long lastUsed;
 
         private TreeMap<ActKey, Activation> activationsBySlotAndPosition;
@@ -135,73 +134,130 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
             activationsBySlotAndPosition = new TreeMap<>();
             activations = new TreeMap<>();
         }
+    }
 
 
-        public void addActivation(Activation act) {
-            for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
-                ActKey ak = new ActKey(me.getKey(), me.getValue(), act.id);
-                activationsBySlotAndPosition.put(ak, act);
-                activations.put(act.id, act);
-            }
+    public boolean addActivation(Activation act) {
+        ThreadState th = getThreadState(act.getThreadId(), true);
+
+        boolean first = th.activationsBySlotAndPosition.isEmpty();
+
+        Integer l = act.length();
+        if(l != null) {
+            th.minLength = Math.min(th.minLength, l);
+            th.maxLength = Math.max(th.maxLength, l);
         }
 
-
-        public Stream<Activation> getActivations() {
-            return activations.values().stream();
+        for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
+            ActKey ak = new ActKey(me.getKey(), me.getValue(), act.id);
+            th.activationsBySlotAndPosition.put(ak, act);
+            th.activations.put(act.id, act);
         }
 
+        return first;
+    }
 
-        public boolean isEmpty() {
-            return activationsBySlotAndPosition.isEmpty();
+
+    public Stream<Activation> getActivations(Document doc) {
+        ThreadState th = getThreadState(doc.getThreadId(), false);
+        if(th == null) {
+            return Stream.empty();
         }
 
+        return th.activations.values().stream();
+    }
 
-        public int size() {
-            return activations.size();
+
+    public boolean isEmpty(Document doc) {
+        ThreadState th = getThreadState(doc.getThreadId(), false);
+        if(th == null) {
+            return true;
+        }
+        return th.activationsBySlotAndPosition.isEmpty();
+    }
+
+
+    public int size(Document doc) {
+        ThreadState th = getThreadState(doc.getThreadId(), false);
+        if(th == null) {
+            return 0;
         }
 
+        return th.activations.size();
+    }
 
-        public void clearActivations() {
-            activationsBySlotAndPosition.clear();
-            activations.clear();
+
+    public void clearActivations(Document doc) {
+        ThreadState th = getThreadState(doc.getThreadId(), false);
+        if(th == null) {
+            return;
         }
+        th.activationsBySlotAndPosition.clear();
+        th.activations.clear();
+    }
 
 
-        public Stream<Activation> getActivations(int fromSlot, Position fromPos, boolean fromInclusive, int toSlot, Position toPos, boolean toInclusive) {
-            return activationsBySlotAndPosition.subMap(
-                    new INeuron.ActKey(fromSlot, fromPos, Integer.MIN_VALUE),
-                    fromInclusive,
-                    new INeuron.ActKey(toSlot, toPos, Integer.MAX_VALUE),
-                    toInclusive
-            ).values()
-                    .stream();
-        }
+    public Stream<Activation> getActivations(Document doc, int slot, Position pos, boolean onlyFinal) {
+        return getActivations(doc, slot, pos, true, slot, pos, false)
+                .filter(act -> !onlyFinal || act.isFinalActivation());
+    }
 
 
-        public Stream<Activation> getActivations(boolean onlyFinal) {
-            return onlyFinal ?
-                    getActivations()
-                            .filter(act -> act.isFinalActivation()) :
-                    getActivations();
-        }
-
-        public Collection<Activation> getActivations(SortedMap<Integer, Position> slots) {
-            Integer firstSlot = slots.firstKey();
-            Position firstPos = slots.get(firstSlot);
-
-            return getActivations(firstSlot, firstPos, true, firstSlot, firstPos, true)
-                    .filter( act -> {
-                        for(Map.Entry<Integer, Position> me: slots.entrySet()) {
-                            Position pos = me.getValue();
-                            if(pos.getFinalPosition() != null && pos.compare(act.getSlot(me.getKey())) != 0) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    })
-                    .collect(Collectors.toList());
+    public void clearActivations() {
+        for (int i = 0; i < provider.model.numberOfThreads; i++) {
+            clearActivations(i);
         }
     }
+
+
+    public void clearActivations(int threadId) {
+        ThreadState th = getThreadState(threadId, false);
+        if (th == null) return;
+        th.activationsBySlotAndPosition.clear();
+        th.activations.clear();
+    }
+
+
+    public Stream<Activation> getActivations(Document doc, int fromSlot, Position fromPos, boolean fromInclusive, int toSlot, Position toPos, boolean toInclusive) {
+        ThreadState th = getThreadState(doc.getThreadId(), false);
+        if(th == null) {
+            return Stream.empty();
+        }
+        return th.activationsBySlotAndPosition.subMap(
+                new INeuron.ActKey(fromSlot, fromPos, Integer.MIN_VALUE),
+                fromInclusive,
+                new INeuron.ActKey(toSlot, toPos, Integer.MAX_VALUE),
+                toInclusive
+        ).values()
+                .stream();
+    }
+
+
+    public Stream<Activation> getActivations(Document doc, boolean onlyFinal) {
+        return onlyFinal ?
+                getActivations(doc)
+                        .filter(act -> act.isFinalActivation()) :
+                getActivations(doc);
+    }
+
+
+    public Collection<Activation> getActivations(Document doc, SortedMap<Integer, Position> slots) {
+        Integer firstSlot = slots.firstKey();
+        Position firstPos = slots.get(firstSlot);
+
+        return getActivations(doc, firstSlot, firstPos, true, firstSlot, firstPos, true)
+                .filter( act -> {
+                    for(Map.Entry<Integer, Position> me: slots.entrySet()) {
+                        Position pos = me.getValue();
+                        if(pos.getFinalPosition() != null && pos.compare(act.getSlot(me.getKey())) != 0) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
+    }
+
 
 
     public static class ActKey implements Comparable<ActKey> {
@@ -226,7 +282,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     }
 
 
-    public ThreadState getThreadState(int threadId, boolean create) {
+    private ThreadState getThreadState(int threadId, boolean create) {
         ThreadState th = threads[threadId];
         if (th == null) {
             if (!create) return null;
@@ -295,7 +351,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         Integer firstSlot = input.positions.firstKey();
         Position firstPos = doc.lookupFinalPosition(input.positions.get(firstSlot));
         Activation act = null;
-        x: for(Activation a: getThreadState(doc.getThreadId(), true).getActivations(firstSlot, firstPos, true, firstSlot, firstPos, true).collect(Collectors.toList())) {
+        x: for(Activation a: getActivations(doc, firstSlot, firstPos, true, firstSlot, firstPos, true).collect(Collectors.toList())) {
             for(Map.Entry<Integer, Integer> me: input.positions.entrySet()) {
                 Position pos = a.getSlot(me.getKey());
                 if(pos == null || me.getValue().compareTo(pos.getFinalPosition()) != 0) {
@@ -390,41 +446,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
     public void propagate(Activation act) {
         Document doc = act.getDocument();
         outputNode.get(doc).addActivation(act);
-    }
-
-
-    public Stream<Activation> getActivations(Document doc, boolean onlyFinal) {
-        ThreadState th = getThreadState(doc.getThreadId(), false);
-        if (th == null) return Stream.empty();
-        return th.getActivations(onlyFinal);
-    }
-
-
-    public Stream<Activation> getActivations(Document doc, int slot, Position pos, boolean onlyFinal) {
-        ThreadState th = getThreadState(doc.getThreadId(), false);
-        if (th == null) return Stream.empty();
-
-        return th.getActivations(slot, pos, true, slot, pos, false)
-                .filter(act -> !onlyFinal || act.isFinalActivation());
-    }
-
-
-    public void clearActivations() {
-        for (int i = 0; i < provider.model.numberOfThreads; i++) {
-            clearActivations(i);
-        }
-    }
-
-
-    public void clearActivations(Document doc) {
-        clearActivations(doc.getThreadId());
-    }
-
-
-    public void clearActivations(int threadId) {
-        ThreadState th = getThreadState(threadId, false);
-        if (th == null) return;
-        th.clearActivations();
     }
 
 
@@ -666,19 +687,10 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     public void register(Activation act) {
         Document doc = act.getDocument();
-        INeuron.ThreadState th = act.getINeuron().getThreadState(doc.getThreadId(), true);
 
-        if (th.isEmpty()) {
+        if (addActivation(act)) {
             doc.activatedNeurons.add(act.getINeuron());
         }
-
-        Integer l = act.length();
-        if(l != null) {
-            th.minLength = Math.min(th.minLength, l);
-            th.maxLength = Math.max(th.maxLength, l);
-        }
-
-        th.addActivation(act);
 
         for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
             me.getValue().addActivation(me.getKey(), act);
