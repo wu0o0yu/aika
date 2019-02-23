@@ -18,6 +18,7 @@ package network.aika.neuron;
 
 
 import network.aika.*;
+import network.aika.lattice.Node;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.Option;
@@ -47,13 +48,17 @@ import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
  *
  * @author Lukas Molzberger
  */
-public class INeuron extends AbstractNode<Neuron, Activation> implements Comparable<INeuron> {
-
-    public static boolean ALLOW_WEAK_NEGATIVE_WEIGHTS = false;
+public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron> {
 
     private static final Logger log = LoggerFactory.getLogger(INeuron.class);
 
+    public static boolean ALLOW_WEAK_NEGATIVE_WEIGHTS = false;
     public static double WEIGHT_TOLERANCE = 0.001;
+
+
+    public static final INeuron MIN_NEURON = new INeuron();
+    public static final INeuron MAX_NEURON = new INeuron();
+
 
     public String label;
     public Type type;
@@ -117,6 +122,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
     private ThreadState[] threads;
 
+
     /**
      * The {@code ThreadState} is a thread local data structure containing the activationsBySlotAndPosition of a single document for
      * a specific logic node.
@@ -149,9 +155,9 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         }
 
         for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
-            ActKey ak = new ActKey(me.getKey(), me.getValue(), act.id);
+            ActKey ak = new ActKey(me.getKey(), me.getValue(), act.getId());
             th.activationsBySlotAndPosition.put(ak, act);
-            th.activations.put(act.id, act);
+            th.activations.put(act.getId(), act);
         }
 
         return first;
@@ -362,7 +368,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         }
 
         if (act == null) {
-            act = new Activation(doc.getNewActivationId(), doc, node.get(doc), this);
+            act = new Activation(doc, this);
             for(Map.Entry<Integer, Integer> me: input.positions.entrySet()) {
                 act.setSlot(me.getKey(), doc.lookupFinalPosition(me.getValue()));
             }

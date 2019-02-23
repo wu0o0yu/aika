@@ -4,7 +4,8 @@ import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Utils;
 import network.aika.Writable;
-import network.aika.lattice.OrNode;
+import network.aika.lattice.InputNode.InputActivation;
+import network.aika.lattice.NodeActivation;
 import network.aika.lattice.OrNode.OrActivation;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.INeuron.Type;
@@ -42,7 +43,7 @@ import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
  *
  * @author Lukas Molzberger
  */
-public final class Activation extends OrActivation {
+public final class Activation implements Comparable<Activation> {
 
     public static int BEGIN = 0;
     public static int END = 1;
@@ -52,15 +53,19 @@ public final class Activation extends OrActivation {
     public static int MAX_PREDECESSOR_DEPTH = 100;
     public static boolean DEBUG_OUTPUT = false;
 
-    public static Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE, null, null, null);
-    public static Activation MAX_ACTIVATION = new Activation(Integer.MAX_VALUE, null, null, null);
+    public static Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE);
+    public static Activation MAX_ACTIVATION = new Activation(Integer.MAX_VALUE);
 
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
+    private int id;
     private INeuron neuron;
+    private Document doc;
+    private long visited = 0;
 
     public Map<Integer, Position> slots = new TreeMap<>();
-
+    private OrActivation inputNodeActivation;
+    private InputActivation outputNodeActivation;
     private TreeSet<Link> selectedInputLinks = new TreeSet<>(INPUT_COMP);
     private TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
     private TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
@@ -101,9 +106,13 @@ public final class Activation extends OrActivation {
 
     private List<Activation> conflicts;
 
+    private Activation(int id) {
+        this.id = id;
+    }
 
-    public Activation(int id, Document doc, OrNode n, INeuron neuron) {
-        super(id, doc, n);
+    public Activation(Document doc, INeuron neuron) {
+        this.id = doc.getNewActivationId();
+        this.doc = doc;
         this.neuron = neuron;
 
         if(doc != null && doc.model.getActivationExtensionFactory() != null) {
@@ -111,6 +120,23 @@ public final class Activation extends OrActivation {
         }
     }
 
+
+    public void setInputNodeActivation(OrActivation inputNodeActivation) {
+        this.inputNodeActivation = inputNodeActivation;
+    }
+
+
+    public OrActivation getInputNodeActivation() {
+        return inputNodeActivation;
+    }
+
+    public InputActivation getOutputNodeActivation() {
+        return outputNodeActivation;
+    }
+
+    public void setOutputNodeActivation(InputActivation outputNodeActivation) {
+        this.outputNodeActivation = outputNodeActivation;
+    }
 
     public Position getSlot(int slot) {
         return slots.get(slot);
@@ -149,6 +175,31 @@ public final class Activation extends OrActivation {
         this.targetValue = targetValue;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public Document getDocument() {
+        return doc;
+    }
+
+    public int getThreadId() {
+        return doc.getThreadId();
+    }
+
+    public long getNewVisitedId() {
+        return doc.getNewVisitedId();
+    }
+
+    public long getVisitedId() {
+        return visited;
+    }
+
+    public boolean checkVisited(long v) {
+        if(visited == v) return false;
+        visited = v;
+        return true;
+    }
 
     public String getLabel() {
         return getINeuron().label;
@@ -836,7 +887,7 @@ public final class Activation extends OrActivation {
 
 
     public String toString() {
-        return id + " " + slotsToString() + " " + identityToString() + " - " + getNode() + " -" +
+        return id + " " + slotsToString() + " " + identityToString() + " - " +
                 (extension != null ? extension.toString() + " -" : "") +
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
@@ -847,7 +898,7 @@ public final class Activation extends OrActivation {
 
 
 
-    public String toString(boolean withLogic) {
+    public String toStringDetailed() {
         StringBuilder sb = new StringBuilder();
         sb.append(id + " - ");
 
@@ -866,7 +917,7 @@ public final class Activation extends OrActivation {
         sb.append(identityToString());
         sb.append(" - ");
 
-        sb.append(withLogic ? getNode().toString() : getLabel());
+        sb.append(getLabel());
 
         if(extension != null) {
             sb.append(" - " + extension);
@@ -922,6 +973,13 @@ public final class Activation extends OrActivation {
             }
         }
         return new Activation.State(avgValue, avgPosValue, avgNet, avgPosNet, 0, 0.0);
+    }
+
+
+
+    @Override
+    public int compareTo(Activation act) {
+        return Integer.compare(id, act.id);
     }
 
 

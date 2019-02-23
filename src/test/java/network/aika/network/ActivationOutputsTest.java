@@ -95,13 +95,13 @@ public class ActivationOutputsTest {
         Activation actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inA.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false), inA.get().node.get())
+                selectInputActivation(actAB.getInputLinks(false), inA)
         );
 
         actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inB.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false), inB.get().node.get())
+                selectInputActivation(actAB.getInputLinks(false), inB)
         );
 
 
@@ -111,19 +111,19 @@ public class ActivationOutputsTest {
         actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inA.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false), inA.get().node.get())
+                selectInputActivation(actAB.getInputLinks(false), inA)
         );
 
         actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inB.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false), inB.get().node.get())
+                selectInputActivation(actAB.getInputLinks(false), inB)
         );
     }
 
 
-    private Activation selectInputActivation(Stream<Link> acts, Node n) {
-        return acts.filter(l -> l.input.getNode().compareTo(n) == 0).map(l -> l.input)
+    private Activation selectInputActivation(Stream<Link> acts, Neuron n) {
+        return acts.filter(l -> l.input.getNeuron().compareTo(n) == 0).map(l -> l.input)
                 .findAny()
                 .orElse(null);
     }

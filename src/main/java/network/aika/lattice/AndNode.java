@@ -130,7 +130,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                                 AndActivation nlAct = lookupAndActivation(act, nRef);
 
                                 if(nlAct == null) {
-                                    nlAct = new AndActivation(doc.logicNodeActivationIdCounter++, doc, nlNode);
+                                    nlAct = new AndActivation(doc, nlNode);
                                     nlAct.link(nRef, nRv, secondRefAct, act);
                                 }
 
@@ -161,18 +161,6 @@ public class AndNode extends Node<AndNode, AndActivation> {
             }
         }
         return null;
-    }
-
-
-    private Refinement createRefinement(RefValue firstRV, Refinement secondRef, Relation rel) {
-        Relation[] srm = secondRef.relations.relations;
-        RelationsMap rm = new RelationsMap();
-        rm.relations = new Relation[srm.length + 1];
-        for (int i = 0; i < srm.length; i++) {
-            rm.relations[firstRV.offsets[i]] = srm[i];
-        }
-        rm.relations[firstRV.refOffset] = rel;
-        return new Refinement(rm, secondRef.input);
     }
 
 
@@ -608,8 +596,8 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
         public Link[] inputs;
 
-        public AndActivation(int id, Document doc, AndNode node) {
-            super(id, doc, node);
+        public AndActivation(Document doc, AndNode node) {
+            super(doc, node);
             inputs = new Link[node.level];
         }
 
@@ -622,7 +610,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
         public Activation getInputActivation(int i) {
             Link l = inputs[i];
             if(l != null) {
-                return l.refAct.input.input;
+                return l.refAct.input;
             } else {
                 for(int j = 0; j < inputs.length; j++) {
                     if (j != i) {
@@ -654,7 +642,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                     if(!first) {
                         sb.append(",");
                     }
-                    sb.append(i + ":" + iAct.getLabel() + " " + iAct.slotsToString() + " (" + iAct.id + ")");
+                    sb.append(i + ":" + iAct.getLabel() + " " + iAct.slotsToString() + " (" + iAct.getId() + ")");
 
                     first = false;
                 }

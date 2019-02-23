@@ -27,7 +27,7 @@ public abstract class AncestorRelation extends Relation {
 
 
     private static void collectCommonAncestor(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
-        if(linkedAct.visited == v) return;
+        if(linkedAct.getVisitedId() == v) return;
 
         collectContains(results, n, linkedAct, v);
 
@@ -38,8 +38,7 @@ public abstract class AncestorRelation extends Relation {
 
 
     private static void collectContains(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
-        if(linkedAct.visited == v) return;
-        linkedAct.visited = v;
+        if(!linkedAct.checkVisited(v)) return;
 
         if(linkedAct.getINeuron() == n) {
             results.add(linkedAct);
@@ -52,8 +51,7 @@ public abstract class AncestorRelation extends Relation {
 
 
     private static void collectContainedIn(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
-        if(linkedAct.visited == v) return;
-        linkedAct.visited = v;
+        if(!linkedAct.checkVisited(v)) return;
 
         if(linkedAct.getINeuron() == n) {
             results.add(linkedAct);
@@ -76,8 +74,7 @@ public abstract class AncestorRelation extends Relation {
 
 
     private static boolean contains(Activation actA, Activation actB, long v) {
-        if(actA.visited == v) return false;
-        actA.visited = v;
+        if(!actA.checkVisited(v)) return false;
 
         if(actA == actB) return true;
 
@@ -88,15 +85,14 @@ public abstract class AncestorRelation extends Relation {
 
 
     private static boolean hasCommonAncestor(Activation act, Activation linkedAct) {
-        long v = act.getVisitedId();
+        long v = act.getNewVisitedId();
         markAncestors(linkedAct, v);
-        return hasCommonAncestor(act, v, act.getVisitedId());
+        return hasCommonAncestor(act, v, act.getNewVisitedId());
     }
 
 
     private static void markAncestors(Activation act, long v) {
-        if(act.visited == v) return;
-        act.visited = v;
+        if(!act.checkVisited(v)) return;
 
         act.markedAncDesc = v;
 
@@ -107,8 +103,7 @@ public abstract class AncestorRelation extends Relation {
 
 
     private static void markDescendants(Activation act, long v) {
-        if(act.visited == v) return;
-        act.visited = v;
+        if(!act.checkVisited(v)) return;
 
         act.markedAncDesc = v;
 
@@ -119,8 +114,7 @@ public abstract class AncestorRelation extends Relation {
 
 
     private static boolean hasCommonAncestor(Activation act, long v1, long v2) {
-        if(act.visited == v2) return false;
-        act.visited = v2;
+        if(!act.checkVisited(v2)) return false;
 
         if(act.markedAncDesc == v1) return true;
 
@@ -175,7 +169,7 @@ public abstract class AncestorRelation extends Relation {
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
-            collectCommonAncestor(results, n, linkedAct, linkedAct.getVisitedId());
+            collectCommonAncestor(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
         }
 
@@ -217,14 +211,14 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public boolean test(Activation act, Activation linkedAct) {
-            return contains(act, linkedAct, act.getVisitedId());
+            return contains(act, linkedAct, act.getNewVisitedId());
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
-            collectContains(results, n, linkedAct, linkedAct.getVisitedId());
+            collectContains(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
         }
 
@@ -267,14 +261,14 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public boolean test(Activation act, Activation linkedAct) {
-            return contains(linkedAct, act, act.getVisitedId());
+            return contains(linkedAct, act, act.getNewVisitedId());
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
-            collectContainedIn(results, n, linkedAct, linkedAct.getVisitedId());
+            collectContainedIn(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
         }
 
@@ -316,13 +310,13 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public boolean test(Activation act, Activation linkedAct) {
-            return !contains(act, linkedAct, act.getVisitedId());
+            return !contains(act, linkedAct, act.getNewVisitedId());
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
-            long v = linkedAct.getVisitedId();
+            long v = linkedAct.getNewVisitedId();
             markDescendants(linkedAct, v);
 
             return n.getActivations(linkedAct.getDocument())
@@ -367,13 +361,13 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public boolean test(Activation act, Activation linkedAct) {
-            return !contains(linkedAct, act, act.getVisitedId());
+            return !contains(linkedAct, act, act.getNewVisitedId());
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
-            long v = linkedAct.getVisitedId();
+            long v = linkedAct.getNewVisitedId();
             markAncestors(linkedAct, v);
 
             return n.getActivations(linkedAct.getDocument())

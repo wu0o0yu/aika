@@ -31,32 +31,29 @@ public abstract class NodeActivation<T extends Node> implements Comparable<NodeA
 
     protected final Document doc;
 
-    public long visited = -1;
     public Long repropagateV;
     public boolean registered;
 
     public TreeMap<Integer, AndNode.Link> outputsToAndNode = new TreeMap<>();
     public TreeMap<Integer, OrNode.Link> outputsToOrNode = new TreeMap<>();
-    public InputNode.Link outputToInputNode;
 
 
-    public NodeActivation(int id, Document doc, T node) {
-        this.id = id;
+    public NodeActivation(Document doc, T node) {
+        this.id = doc.getNewNodeActivationId();
         this.doc = doc;
         this.node = node;
     }
+
 
     public T getNode() {
         return node;
     }
 
+
     public Document getDocument() {
         return doc;
     }
 
-    public long getVisitedId() {
-        return doc.getNewVisitedId();
-    }
 
     public int getThreadId() {
         return doc.getThreadId();

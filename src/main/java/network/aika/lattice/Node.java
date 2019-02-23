@@ -43,7 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Lukas Molzberger
  */
-public abstract class Node<T extends Node, A extends NodeActivation<T>> extends AbstractNode<Provider<T>, A> implements Comparable<Node> {
+public abstract class Node<T extends Node, A extends NodeActivation<T>> extends AbstractNode<Provider<T>> implements Comparable<Node> {
 
     public static final Node MIN_NODE = new InputNode();
     public static final Node MAX_NODE = new InputNode();
@@ -66,6 +66,14 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     private ThreadState<A>[] threads;
 
     public long markedCreated;
+
+    /**
+     * Propagate an activation to the next node or the next neuron that is depending on the current node.
+     *
+     * @param act
+     */
+    public abstract void propagate(A act);
+
 
     /**
      * The {@code ThreadState} is a thread local data structure containing the activations of a single document for

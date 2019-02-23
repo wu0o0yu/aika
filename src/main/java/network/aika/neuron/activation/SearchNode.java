@@ -691,7 +691,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public String toString() {
-        return "id:" + id + " actId:" + candidate.activation.id + " Decision:" + getDecision() + " curDec:" + currentDecision;
+        return "id:" + id + " actId:" + candidate.activation.getId() + " Decision:" + getDecision() + " curDec:" + currentDecision;
     }
 
 

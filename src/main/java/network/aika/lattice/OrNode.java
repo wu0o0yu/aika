@@ -25,6 +25,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
 import network.aika.Document;
 import network.aika.neuron.relation.Relation;
+import network.aika.lattice.OrNode.OrActivation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-public class OrNode extends Node<OrNode, Activation> {
+public class OrNode extends Node<OrNode, OrActivation> {
 
     private static final Logger log = LoggerFactory.getLogger(OrNode.class);
 
@@ -95,15 +96,20 @@ public class OrNode extends Node<OrNode, Activation> {
         Activation act = lookupActivation(doc, slots, oe, inputAct);
 
         if(act == null) {
-            act = new Activation(doc.getNewActivationId(), doc, this, neuron.get(doc));
+            OrActivation orAct = new OrActivation(doc, this);
+            act = new Activation(doc, neuron.get(doc));
+            act.setInputNodeActivation(orAct);
+            orAct.setOutputAct(act);
+
             act.setSlots(slots);
 
-            processActivation(act);
+            processActivation(orAct);
+            neuron.get(act.getDocument()).register(act);
         } else {
-            propagate(act);
+            propagate(act.getInputNodeActivation());
         }
 
-        Link ol = act.link(oe, inputAct);
+        Link ol = act.getInputNodeActivation().link(oe, inputAct);
         doc.linker.link(act, ol);
     }
 
@@ -142,14 +148,8 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    public void propagate(Activation act) {
-        act.getDocument().ubQueue.add(act);
-    }
-
-
-    public void processActivation(Activation act) {
-        super.processActivation(act);
-        neuron.get(act.getDocument()).register(act);
+    public void propagate(OrActivation act) {
+        act.getDocument().ubQueue.add(act.getOutputAct());
     }
 
 
@@ -160,7 +160,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public void apply(Activation act) {
+    public void apply(OrActivation act) {
         throw new UnsupportedOperationException();
     }
 
@@ -371,9 +371,18 @@ public class OrNode extends Node<OrNode, Activation> {
 
     public static class OrActivation extends NodeActivation<OrNode> {
         public Map<Integer, Link> orInputs = new TreeMap<>();
+        private Activation outputAct;
 
-        public OrActivation(int id, Document doc, OrNode node) {
-            super(id, doc, node);
+        public OrActivation(Document doc, OrNode node) {
+            super(doc, node);
+        }
+
+        public Activation getOutputAct() {
+            return outputAct;
+        }
+
+        public void setOutputAct(Activation outputAct) {
+            this.outputAct = outputAct;
         }
 
         @Override

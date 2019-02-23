@@ -28,20 +28,13 @@ import java.io.IOException;
  *
  * @author Lukas Molzberger
  */
-public abstract class AbstractNode<P extends Provider<? extends AbstractNode>, A extends NodeActivation> implements Writable {
+public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> implements Writable {
 
     public volatile int lastUsedDocumentId = 0;
 
     public volatile boolean modified;
 
     public P provider;
-
-    /**
-     * Propagate an activation to the next node or the next neuron that is depending on the current node.
-     *
-     * @param act
-     */
-    public abstract void propagate(A act);
 
     public void setModified() {
         modified = true;

@@ -319,7 +319,7 @@ public class PositionRelationTest {
         INeuron n = pattern.get();
         for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
             System.out.println("Text Range: " + act.slotsToString());
-            System.out.println("Node: " + act.getNode());
+            System.out.println("Neuron: " + act.getLabel());
             System.out.println();
         }
 

@@ -96,11 +96,15 @@ public class ActivationsTest {
     }
 
 
-    private Activation createActivation(Document doc, OrNode inNode) {
-        Activation act = new Activation(0, doc, inNode, inNode.neuron.get());
+    private OrNode.OrActivation createActivation(Document doc, OrNode inNode) {
+        Activation act = new Activation(doc, inNode.neuron.get());
+        OrNode.OrActivation orAct = new OrNode.OrActivation(doc, inNode);
+        act.setInputNodeActivation(orAct);
+        orAct.setOutputAct(act);
+
         act.setSlot(BEGIN, doc.lookupFinalPosition(0));
         act.setSlot(END, doc.lookupFinalPosition(1));
-        return act;
+        return orAct;
     }
 
 }

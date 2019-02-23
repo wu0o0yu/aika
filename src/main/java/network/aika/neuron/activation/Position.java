@@ -17,7 +17,7 @@ public class Position {
 
 
     private Document doc;
-    public final int id;
+    private int id;
     private Integer finalPosition;
 
 
@@ -32,6 +32,9 @@ public class Position {
         finalPosition = pos;
     }
 
+    public int getId() {
+        return id;
+    }
 
     public Document getDocument() {
         return doc;
@@ -75,7 +78,7 @@ public class Position {
 
 
     public void addActivation(Integer slot, Activation act) {
-        activations.put(new ActKey(slot, act.id), act);
+        activations.put(new ActKey(slot, act.getId()), act);
     }
 
 

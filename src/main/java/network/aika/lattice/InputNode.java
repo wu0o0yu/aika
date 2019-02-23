@@ -75,9 +75,9 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
     public void addActivation(Activation inputAct) {
-        if(inputAct.repropagateV != null && inputAct.repropagateV != markedCreated) return;
+//        if(inputAct.repropagateV != null && inputAct.repropagateV != markedCreated) return;
 
-        InputActivation act = new InputActivation(inputAct.getDocument().logicNodeActivationIdCounter++, inputAct, this);
+        InputActivation act = new InputActivation(inputAct, this);
 
         addActivation(act);
     }
@@ -90,7 +90,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
     public void reprocessInputs(Document doc) {
         inputNeuron.get(doc).getActivations(doc, false).forEach(act -> {
-            act.repropagateV = markedCreated;
+//            act.repropagateV = markedCreated;
             if(act.upperBound > 0.0) {
                 act.getINeuron().propagate(act);
             }
@@ -187,7 +187,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
     private void applyExactRelations(InputActivation act) {
-        Activation iAct = act.input.input;
+        Activation iAct = act.input;
         Document doc = act.getDocument();
 
         for (Map.Entry<Integer, Position> me : iAct.slots.entrySet()) {
@@ -208,17 +208,17 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         if(secondNode.inputNeuron.get().isEmpty(doc)) return;
 
-        Activation iAct = act.input.input;
+        Activation iAct = act.input;
 
         if(act.repropagateV != null && act.repropagateV != nln.markedCreated) return;
 
         ref.relations.get(0).getActivations(secondNode.inputNeuron.get(doc), iAct)
-                .filter(secondIAct -> secondIAct.outputToInputNode != null)
-                .map(secondIAct -> secondIAct.outputToInputNode.output)
+                .filter(secondIAct -> secondIAct.getOutputNodeActivation() != null)
+                .map(secondIAct -> secondIAct.getOutputNodeActivation())
                 .filter(secondAct -> secondAct != null && secondAct.registered)
                 .forEach(secondAct -> {
                     //    if (!Conflicts.isConflicting(iAct, secondIAct)) {
-                    AndActivation oAct = new AndActivation(doc.logicNodeActivationIdCounter++, doc, nln);
+                    AndActivation oAct = new AndActivation(doc, nln);
                     for (AndNode.Entry e : nln.parents) {
                         boolean match = e.ref.compareTo(ref) == 0;
                         oAct.link(e.ref, e.rv, match ? secondAct : act, match ? act : secondAct);
@@ -281,33 +281,22 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
     public static class InputActivation extends NodeActivation<InputNode> {
 
-        public Link input;
+        public Activation input;
 
-        public InputActivation(int id, Activation iAct, InputNode node) {
-            super(id, iAct.getDocument(), node);
-            input = new Link(iAct, this);
-            iAct.outputToInputNode = input;
+        public InputActivation(Activation iAct, InputNode node) {
+            super(iAct.getDocument(), node);
+            input = iAct;
+            iAct.setOutputNodeActivation(this);
         }
 
         public Activation getInputActivation(int i) {
             assert i == 0;
-            return input.input;
+            return input;
         }
 
 
         public String toString() {
-            return "I-ACT(" + input.input.getLabel() + " " + input.input.slotsToString() + ")";
-        }
-    }
-
-
-    public static class Link {
-        public Activation input;
-        public InputActivation output;
-
-        public Link(Activation iAct, InputActivation oAct) {
-            input = iAct;
-            output = oAct;
+            return "I-ACT(" + input.getLabel() + " " + input.slotsToString() + ")";
         }
     }
 }

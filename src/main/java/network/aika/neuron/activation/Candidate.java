@@ -50,7 +50,7 @@ public class Candidate  implements Comparable<Candidate> {
 
 
     public String toString() {
-        return " ACT:" + activation.id +
+        return " ACT:" + activation.getId() +
                 " " + activation.slotsToString() +
                 " " + activation.identityToString() +
                 " " + activation.getLabel() +

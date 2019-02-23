@@ -65,7 +65,7 @@ public class Document implements Comparable<Document> {
 
     private long visitedCounter = 1;
     private int activationIdCounter = 0;
-    public int logicNodeActivationIdCounter = 0;
+    private int nodeActivationIdCounter = 0;
     public int searchNodeIdCounter = 0;
     public int searchStepCounter = 0;
     public int positionIdCounter = 0;
@@ -91,7 +91,7 @@ public class Document implements Comparable<Document> {
         if (r != 0) return r;
         r = Position.compare(ak1.pos, ak2.pos);
         if (r != 0) return r;
-        r = ak1.node.compareTo(ak2.node);
+        r = ak1.neuron.compareTo(ak2.neuron);
         if (r != 0) return r;
         return Integer.compare(ak1.actId, ak2.actId);
     });
@@ -99,7 +99,7 @@ public class Document implements Comparable<Document> {
     private TreeMap<ActKey, Activation> activationsByPosition = new TreeMap<>((ak1, ak2) -> {
         int r = Position.compare(ak1.pos, ak2.pos);
         if (r != 0) return r;
-        r = ak1.node.compareTo(ak2.node);
+        r = ak1.neuron.compareTo(ak2.neuron);
         if (r != 0) return r;
         return Integer.compare(ak1.actId, ak2.actId);
     });
@@ -114,13 +114,13 @@ public class Document implements Comparable<Document> {
     public static class ActKey {
         int slot;
         Position pos;
-        Node node;
+        INeuron neuron;
         int actId;
 
-        public ActKey(int slot, Position pos, Node node, int actId) {
+        public ActKey(int slot, Position pos, INeuron neuron, int actId) {
             this.slot = slot;
             this.pos = pos;
-            this.node = node;
+            this.neuron = neuron;
             this.actId = actId;
         }
     }
@@ -138,9 +138,9 @@ public class Document implements Comparable<Document> {
     public static Comparator<Activation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
         int r = Position.compare(act1.getSlot(Activation.BEGIN), act2.getSlot(Activation.BEGIN));
         if (r != 0) return r;
-        r = act1.getNode().compareTo(act2.getNode());
+        r = act1.getINeuron().compareTo(act2.getINeuron());
         if (r != 0) return r;
-        return Integer.compare(act1.id, act2.id);
+        return Integer.compare(act1.getId(), act2.getId());
     };
 
 
@@ -160,6 +160,10 @@ public class Document implements Comparable<Document> {
 
     public int getNewActivationId() {
         return activationIdCounter++;
+    }
+
+    public int getNewNodeActivationId() {
+        return nodeActivationIdCounter++;
     }
 
     public int getThreadId() {
@@ -223,12 +227,12 @@ public class Document implements Comparable<Document> {
         for(Map.Entry<Integer, Position> me : act.slots.entrySet()) {
             Position pos = me.getValue();
             if (pos != null && pos.getFinalPosition() != null) {
-                ActKey dak = new ActKey(me.getKey(), pos, act.getNode(), act.id);
+                ActKey dak = new ActKey(me.getKey(), pos, act.getINeuron(), act.getId());
                 activationsBySlotAndPosition.put(dak, act);
                 activationsByPosition.put(dak, act);
             }
         }
-        activationsById.put(act.id, act);
+        activationsById.put(act.getId(), act);
     }
 
 
@@ -247,9 +251,9 @@ public class Document implements Comparable<Document> {
 
     public Collection<Activation> getActivationsByPosition(int fromSlot, Position fromPos, boolean fromInclusive, int toSlot, Position toPos, boolean toInclusive) {
         return activationsBySlotAndPosition.subMap(
-                new Document.ActKey(fromSlot, fromPos, Node.MIN_NODE, Integer.MIN_VALUE),
+                new Document.ActKey(fromSlot, fromPos, INeuron.MIN_NEURON, Integer.MIN_VALUE),
                 fromInclusive,
-                new Document.ActKey(toSlot, toPos, Node.MAX_NODE, Integer.MAX_VALUE),
+                new Document.ActKey(toSlot, toPos, INeuron.MAX_NEURON, Integer.MAX_VALUE),
                 toInclusive
         ).values();
     }
@@ -257,9 +261,9 @@ public class Document implements Comparable<Document> {
 
     public Collection<Activation> getActivationsByPosition(Position fromPos, boolean fromInclusive, Position toPos, boolean toInclusive) {
         return activationsByPosition.subMap(
-                new Document.ActKey(-1, fromPos, Node.MIN_NODE, Integer.MIN_VALUE),
+                new Document.ActKey(-1, fromPos, INeuron.MIN_NEURON, Integer.MIN_VALUE),
                 fromInclusive,
-                new Document.ActKey(-1, toPos, Node.MAX_NODE, Integer.MAX_VALUE),
+                new Document.ActKey(-1, toPos, INeuron.MAX_NEURON, Integer.MAX_VALUE),
                 toInclusive
         ).values();
     }
@@ -268,7 +272,7 @@ public class Document implements Comparable<Document> {
     public Activation getNextActivation(Activation currentAct) {
         Map.Entry<Integer, Activation> me = currentAct == null ?
                 activationsById.firstEntry() :
-                activationsById.higherEntry(currentAct.id);
+                activationsById.higherEntry(currentAct.getId());
         return me != null ? me.getValue() : null;
     }
 
@@ -306,7 +310,7 @@ public class Document implements Comparable<Document> {
                 SearchNode.invalidateCachedDecision(act);
                 tmp.add(new Candidate(act, i++));
 
-                lastProcessedActivationId = Math.max(lastProcessedActivationId, act.id);
+                lastProcessedActivationId = Math.max(lastProcessedActivationId, act.getId());
             }
         }
 
@@ -460,7 +464,7 @@ public class Document implements Comparable<Document> {
     public String generateOutputText() {
         int oldLength = length();
 
-        TreeSet<Position> queue = new TreeSet<>(Comparator.comparingInt(p -> p.id));
+        TreeSet<Position> queue = new TreeSet<>(Comparator.comparingInt(p -> p.getId()));
 
         for(Activation act: activationsById.values()) {
             if(act.getINeuron().getOutputText() != null && act.getSlot(Activation.BEGIN).getFinalPosition() != null && act.getSlot(Activation.END).getFinalPosition() == null) {
@@ -488,11 +492,6 @@ public class Document implements Comparable<Document> {
 
 
     public String activationsToString() {
-        return activationsToString(false);
-    }
-
-
-    public String activationsToString(boolean withLogic) {
         Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
 
         acts.addAll(activationsById.values());
@@ -506,7 +505,6 @@ public class Document implements Comparable<Document> {
         sb.append(" Range | Text Snippet");
         sb.append(" | Identity -");
         sb.append(" Neuron Label -");
-        sb.append((withLogic ? " Logic Layer -" : ""));
         sb.append(" Upper Bound -");
         sb.append(" Value | Net | Weight -");
         sb.append(" Input Value |");
@@ -519,7 +517,7 @@ public class Document implements Comparable<Document> {
                 continue;
             }
 
-            sb.append(act.toString(withLogic));
+            sb.append(act.toStringDetailed());
             sb.append("\n");
         }
 
@@ -604,7 +602,7 @@ public class Document implements Comparable<Document> {
     private static Comparator<Activation> VALUE_QUEUE_COMP = (a, b) -> {
         int r = Integer.compare(a.getSequence(), b.getSequence());
         if(r != 0) return r;
-        return Integer.compare(a.id, b.id);
+        return Integer.compare(a.getId(), b.getId());
     };
 
 
@@ -669,7 +667,7 @@ public class Document implements Comparable<Document> {
                 .flatMap(n -> n.getActivations(this, false))
                 .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)
                 .forEach(act -> {
-                    log.error(act.id + " " + act.slotsToString() + " " + act.decision + " " + act.rounds);
+                    log.error(act.getId() + " " + act.slotsToString() + " " + act.decision + " " + act.rounds);
                     log.error(act.linksToString());
                     log.error("");
                 });
