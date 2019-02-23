@@ -115,8 +115,8 @@ public final class Activation implements Comparable<Activation> {
         this.doc = doc;
         this.neuron = neuron;
 
-        if(doc != null && doc.model.getActivationExtensionFactory() != null) {
-            extension = doc.model.getActivationExtensionFactory().createObject();
+        if(doc != null && doc.getModel().getActivationExtensionFactory() != null) {
+            extension = doc.getModel().getActivationExtensionFactory().createObject();
         }
     }
 
@@ -313,14 +313,14 @@ public final class Activation implements Comparable<Activation> {
                     throw new RuntimeException("Maximum number of rounds reached. The network might be oscillating.");
                 } else {
                     if(Document.ROUND_LIMIT < 0 || round < Document.ROUND_LIMIT) {
-                        doc.vQueue.propagateActivationValue(round, this);
+                        doc.getValueQueue().propagateActivationValue(round, this);
                     }
                 }
             }
 
             if (round == 0) {
                 // In case that there is a positive feedback loop.
-                doc.vQueue.add(1, this);
+                doc.getValueQueue().add(1, this);
             }
 
             if (rounds.getLastRound() != null && round >= rounds.getLastRound()) { // Consider only the final round.
@@ -447,7 +447,7 @@ public final class Activation implements Comparable<Activation> {
 
         if(Math.abs(upperBound - oldUpperBound) > 0.01) {
             for(Link l: outputLinks.values()) {
-                doc.ubQueue.add(l);
+                doc.addToUpperBoundQueue(l);
             }
         }
 

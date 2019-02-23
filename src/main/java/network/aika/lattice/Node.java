@@ -19,8 +19,6 @@ package network.aika.lattice;
 
 import network.aika.*;
 import network.aika.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -48,14 +46,11 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public static final Node MIN_NODE = new InputNode();
     public static final Node MAX_NODE = new InputNode();
 
-    private static final Logger log = LoggerFactory.getLogger(Node.class);
 
-    public TreeMap<AndNode.Refinement, AndNode.RefValue> andChildren;
-    public TreeSet<OrNode.OrEntry> orChildren;
+    TreeMap<AndNode.Refinement, AndNode.RefValue> andChildren;
+    TreeSet<OrNode.OrEntry> orChildren;
 
-    public int level;
-
-    public Writable extension;
+    int level;
 
     public AtomicInteger numberOfNeuronRefs = new AtomicInteger(0);
     volatile boolean isRemoved;
@@ -138,10 +133,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         provider = new Provider(m, this);
         this.level = level;
         setModified();
-
-        if(m.getNodeExtensionFactory() != null) {
-            extension = m.getNodeExtensionFactory().createObject();
-        }
     }
 
 
@@ -210,7 +201,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         ThreadState th = getThreadState(doc.getThreadId(), true);
         if (th.activations.isEmpty()) {
-            doc.activatedNodes.add(act.getNode());
+            doc.addActivatedNode(act.getNode());
         }
         th.activations.add(act);
 
@@ -266,7 +257,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void addActivation(A act) {
         ThreadState<A> th = getThreadState(act.getThreadId(), true);
         th.added.add(act);
-        act.getDocument().queue.add(this);
+        act.getDocument().addToNodeQueue(this);
     }
 
 
@@ -339,7 +330,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public static int compareQueueId(int threadId, Node n1, Node n2) {
+    public static int compareRank(int threadId, Node n1, Node n2) {
+        int r = Integer.compare(n1.level, n2.level);
+        if(r != 0) return r;
+
         ThreadState th1 = n1.getThreadState(threadId, true);
         ThreadState th2 = n2.getThreadState(threadId, true);
         return Long.compare(th1.queueId, th2.queueId);
@@ -373,11 +367,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void write(DataOutput out) throws IOException {
         out.writeInt(level);
 
-        out.writeBoolean(extension != null);
-        if(extension != null) {
-            extension.write(out);
-        }
-
         out.writeInt(numberOfNeuronRefs.get());
 
         if (andChildren != null) {
@@ -404,11 +393,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         level = in.readInt();
-
-        if(in.readBoolean()) {
-            extension = m.getNodeExtensionFactory().createObject();
-            extension.readFields(in, m);
-        }
 
         numberOfNeuronRefs.set(in.readInt());
 

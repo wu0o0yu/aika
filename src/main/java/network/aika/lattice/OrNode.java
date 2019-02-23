@@ -110,7 +110,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
         }
 
         Link ol = act.getInputNodeActivation().link(oe, inputAct);
-        doc.linker.link(act, ol);
+        doc.getLinker().link(act, ol);
     }
 
 
@@ -131,7 +131,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
                 if (l.synapse.identity) {
                     Integer i = oe.revSynapseIds.get(l.synapse.id);
-                    if(i != null && l.input == doc.linker.computeInputActivation(l.synapse, inputAct.getInputActivation(i))) {
+                    if(i != null && l.input == doc.getLinker().computeInputActivation(l.synapse, inputAct.getInputActivation(i))) {
                         matched = true;
                     }
                 } else {
@@ -149,7 +149,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
 
     public void propagate(OrActivation act) {
-        act.getDocument().ubQueue.add(act.getOutputAct());
+        act.getDocument().addToUpperBoundQueue(act.getOutputAct());
     }
 
 

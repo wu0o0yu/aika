@@ -45,7 +45,8 @@ import java.util.*;
 public class AndNode extends Node<AndNode, AndActivation> {
 
 
-    public List<Entry> parents;
+    List<Entry> parents;
+
 
     public AndNode() {
         parents = new ArrayList<>();
@@ -96,56 +97,55 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
     @Override
     void apply(AndActivation act) {
-        Document doc = act.getDocument();
-
         if (andChildren != null) {
             for (Link fl : act.inputs) {
                 if(fl == null) continue;
 
-                InputActivation refAct = fl.refAct;
-                Refinement ref = fl.ref;
-                RefValue rv = fl.rv;
                 NodeActivation<?> pAct = fl.input;
 
                 for (Link sl : pAct.outputsToAndNode.values()) {
-                    InputActivation secondRefAct = sl.refAct;
-                    Refinement secondRef = sl.ref;
-                    RefValue secondRv = sl.rv;
                     NodeActivation secondAct = sl.output;
                     if (act != secondAct) {
-                        lock.acquireReadLock();
-                        for(Map.Entry<Refinement, RefValue> me: andChildren.subMap(
-                                new Refinement(RelationsMap.MIN, secondRef.input),
-                                new Refinement(RelationsMap.MAX, secondRef.input)).entrySet()) {
-                            Refinement nRef = me.getKey();
-                            RefValue nRv = me.getValue();
-                            if(nRef.contains(secondRef, rv)) {
-                                AndNode nlNode = nRv.child.get(doc);
-
-                                AndActivation nlAct = lookupAndActivation(act, nRef);
-
-                                if(nlAct == null) {
-                                    nlAct = new AndActivation(doc, nlNode);
-                                    nlAct.link(nRef, nRv, secondRefAct, act);
-                                }
-
-                                nlAct.getNode().addActivation(nlAct);
-
-                                for(Entry secondNE: nlNode.parents) {
-                                    if(secondNE.rv.parent.get(doc) == secondAct.getNode() && secondNE.ref.contains(ref, secondRv)) {
-                                        nlAct.link(secondNE.ref, secondNE.rv, refAct, secondAct);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        lock.releaseReadLock();
+                        applyIntern(act, fl.refAct, fl.ref, fl.rv, secondAct, sl.refAct, sl.ref, sl.rv);
                     }
                 }
             }
         }
 
         OrNode.processCandidate(this, act, false);
+    }
+
+
+    private void applyIntern(AndActivation act, InputActivation refAct, Refinement ref, RefValue rv, NodeActivation secondAct, InputActivation secondRefAct, Refinement secondRef, RefValue secondRv) {
+        Document doc = act.getDocument();
+
+        lock.acquireReadLock();
+        for(Map.Entry<Refinement, RefValue> me: andChildren.subMap(
+                new Refinement(RelationsMap.MIN, secondRef.input),
+                new Refinement(RelationsMap.MAX, secondRef.input)).entrySet()) {
+            Refinement nRef = me.getKey();
+            RefValue nRv = me.getValue();
+            if(nRef.contains(secondRef, rv)) {
+                AndNode nlNode = nRv.child.get(doc);
+
+                AndActivation nlAct = lookupAndActivation(act, nRef);
+
+                if(nlAct == null) {
+                    nlAct = new AndActivation(doc, nlNode);
+                    nlAct.link(nRef, nRv, secondRefAct, act);
+                }
+
+                nlAct.getNode().addActivation(nlAct);
+
+                for(Entry secondNE: nlNode.parents) {
+                    if(secondNE.rv.parent.get(doc) == secondAct.getNode() && secondNE.ref.contains(ref, secondRv)) {
+                        nlAct.link(secondNE.ref, secondNE.rv, refAct, secondAct);
+                        break;
+                    }
+                }
+            }
+        }
+        lock.releaseReadLock();
     }
 
 

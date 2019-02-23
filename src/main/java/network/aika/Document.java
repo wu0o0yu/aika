@@ -28,13 +28,11 @@ import network.aika.neuron.activation.Candidate;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.SearchNode;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.SearchNode.Decision;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
 import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
@@ -61,7 +59,7 @@ public class Document implements Comparable<Document> {
      */
     public static boolean INCREMENTAL_MODE = false;
 
-    public final int id;
+    private final int id;
     private final StringBuilder content;
 
     private long visitedCounter = 1;
@@ -71,20 +69,20 @@ public class Document implements Comparable<Document> {
     public int searchStepCounter = 0;
     public int positionIdCounter = 0;
 
-    public Model model;
+    private Model model;
     private int threadId;
 
-    public Queue queue = new Queue();
-    public ValueQueue vQueue = new ValueQueue();
-    public UpperBoundQueue ubQueue = new UpperBoundQueue();
-    public Linker linker;
+    private NodeQueue nodeQueue = new NodeQueue();
+    private ValueQueue valueQueue = new ValueQueue();
+    private UpperBoundQueue ubQueue = new UpperBoundQueue();
+    private Linker linker;
 
-    public TreeMap<Integer, Position> positions = new TreeMap<>();
-    public TreeSet<Node> activatedNodes = new TreeSet<>();
-    public TreeSet<INeuron> activatedNeurons = new TreeSet<>();
-    public TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
-    public TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
-    public TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
+    private TreeMap<Integer, Position> positions = new TreeMap<>();
+    private TreeSet<Node> activatedNodes = new TreeSet<>();
+    private TreeSet<INeuron> activatedNeurons = new TreeSet<>();
+    private TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
+    private TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
+    private TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
 
 
     private TreeMap<ActKey, Activation> activationsBySlotAndPosition = new TreeMap<>((ak1, ak2) -> {
@@ -106,13 +104,11 @@ public class Document implements Comparable<Document> {
     });
 
 
-    public TreeMap<Integer, Activation> activationsById = new TreeMap<>();
-
+    private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
     private int lastProcessedActivationId = -1;
 
-
-    public static class ActKey {
+    private static class ActKey {
         int slot;
         Position pos;
         INeuron neuron;
@@ -155,9 +151,29 @@ public class Document implements Comparable<Document> {
     }
 
 
+    public int getId() {
+        return id;
+    }
+
+
+    public Model getModel() {
+        return model;
+    }
+
+
+    public Linker getLinker() {
+        return linker;
+    }
+
+
+    public ValueQueue getValueQueue() {
+        return valueQueue;
+    }
+
     public long getNewVisitedId() {
         return visitedCounter++;
     }
+
 
     public int getNewActivationId() {
         return activationIdCounter++;
@@ -166,6 +182,27 @@ public class Document implements Comparable<Document> {
     public int getNewNodeActivationId() {
         return nodeActivationIdCounter++;
     }
+
+
+    public void addActivatedNode(Node n) {
+        activatedNodes.add(n);
+    }
+
+
+    public void addInputNeuronActivation(Activation act) {
+        inputNeuronActivations.add(act);
+    }
+
+
+    public void addFinallyActivatedNeuron(INeuron n) {
+        finallyActivatedNeurons.add(n);
+    }
+
+
+    public void addActivatedNeuron(INeuron n) {
+        activatedNeurons.add(n);
+    }
+
 
     public int getThreadId() {
         return threadId;
@@ -292,7 +329,7 @@ public class Document implements Comparable<Document> {
     public void propagate() {
         boolean flag = true;
         while(flag) {
-            queue.processChanges();
+            nodeQueue.processChanges();
             flag = ubQueue.process();
         }
     }
@@ -354,7 +391,7 @@ public class Document implements Comparable<Document> {
     public void process(Long timeoutInMilliSeconds) throws SearchNode.TimeoutException {
         linker.lateLinking();
 
-        inputNeuronActivations.forEach(act -> vQueue.propagateActivationValue(0, act));
+        inputNeuronActivations.forEach(act -> valueQueue.propagateActivationValue(0, act));
 
         generateCandidates();
 
@@ -427,6 +464,22 @@ public class Document implements Comparable<Document> {
             Converter.convert(threadId, this, n, inputSyns);
         });
         modifiedWeights.clear();
+    }
+
+
+
+
+    public void addToUpperBoundQueue(Link l) {
+        ubQueue.add(l);
+    }
+
+    public void addToUpperBoundQueue(Activation act) {
+        ubQueue.add(act);
+    }
+
+
+    public void addToNodeQueue(Node n) {
+        nodeQueue.add(n);
     }
 
 
@@ -532,29 +585,21 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public class Queue {
+    private class NodeQueue {
 
-        public final TreeSet<Node> queue = new TreeSet<>(new Comparator<Node>() {
-            @Override
-            public int compare(Node n1, Node n2) {
-                int r = Integer.compare(n1.level, n2.level);
-                if(r != 0) return r;
-
-                return Node.compareQueueId(threadId, n1, n2);
-            }
-        });
+        private final TreeSet<Node> queue = new TreeSet<>(
+                (n1, n2) -> Node.compareRank(threadId, n1, n2)
+        );
 
         private long queueIdCounter = 0;
 
-
-        public void add(Node n) {
+        private void add(Node n) {
             if(!n.isQueued(threadId, queueIdCounter++)) {
                 queue.add(n);
             }
         }
 
-
-        public void processChanges() {
+        private void processChanges() {
             while(!queue.isEmpty()) {
                 Node n = queue.pollFirst();
 
@@ -565,26 +610,23 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public class UpperBoundQueue {
-        public final ArrayDeque<Activation> queue = new ArrayDeque<>();
+    private class UpperBoundQueue {
+        private final ArrayDeque<Activation> queue = new ArrayDeque<>();
 
-
-        public void add(Link l) {
+        private void add(Link l) {
             if(!l.synapse.isRecurrent) {
                 add(l.output);
             }
         }
 
-
-        public void add(Activation act) {
+        private void add(Activation act) {
             if(!act.ubQueued && act.inputValue == null) {
                 act.ubQueued = true;
                 queue.addLast(act);
             }
         }
 
-
-        public boolean process() {
+        private boolean process() {
             boolean flag = false;
             while(!queue.isEmpty()) {
                 flag = true;
@@ -596,70 +638,6 @@ public class Document implements Comparable<Document> {
             return flag;
         }
     }
-
-
-    private static Comparator<Activation> VALUE_QUEUE_COMP = (a, b) -> {
-        int r = Integer.compare(a.getSequence(), b.getSequence());
-        if(r != 0) return r;
-        return Integer.compare(a.getId(), b.getId());
-    };
-
-
-    public class ValueQueue {
-        public final ArrayList<TreeSet<Activation>> queue = new ArrayList<>();
-
-        public void propagateActivationValue(int round, Activation act)  {
-            act.getOutputLinks()
-                    .forEach(l -> add(l.synapse.isRecurrent ? round + 1 : round, l.output));
-        }
-
-
-        private void add(Activation act) {
-            if(act == null) return;
-
-            add(0, act);
-            act.getOutputLinks()
-                    .filter(l -> l.synapse.isRecurrent)
-                    .forEach(l -> add(0, l.output));
-        }
-
-
-        public void add(int round, Activation act) {
-            if(act.rounds.isQueued(round) || act.decision == Decision.UNKNOWN) return;
-
-            TreeSet<Activation> q;
-            if(round < queue.size()) {
-                q = queue.get(round);
-            } else {
-                assert round == queue.size();
-                q = new TreeSet<>(VALUE_QUEUE_COMP);
-                queue.add(q);
-            }
-
-            act.rounds.setQueued(round, true);
-            q.add(act);
-        }
-
-
-        public double process(SearchNode sn) {
-            long v = visitedCounter++;
-
-            add(sn.getActivation());
-
-            double delta = 0.0;
-            for(int round = 0; round < queue.size(); round++) {
-                TreeSet<Activation> q = queue.get(round);
-                while (!q.isEmpty()) {
-                    Activation act = q.pollFirst();
-                    act.rounds.setQueued(round, false);
-
-                    delta += act.process(sn, round, v);
-                }
-            }
-            return delta;
-        }
-    }
-
 
     public void dumpOscillatingActivations() {
         activatedNeurons.stream()

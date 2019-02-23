@@ -110,7 +110,7 @@ public class Linker {
                 act.getInputLinks(false)
                         .forEach(l -> addToQueue(l));
             }
-            doc.linker.process();
+            doc.getLinker().process();
             doc.propagate();
         } while(oldSize != doc.getNumberOfActivations());
     }
@@ -201,6 +201,6 @@ public class Linker {
         if(!l.synapse.isNegative()) {
             queue.add(l);
         }
-        doc.ubQueue.add(l);
+        doc.addToUpperBoundQueue(l);
     }
 }

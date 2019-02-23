@@ -445,7 +445,7 @@ public class Synapse implements Writable {
 
         synapse.link();
         if (doc != null) {
-            synapse.createdInDoc = doc.id;
+            synapse.createdInDoc = doc.getId();
         }
         return synapse;
     }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.network;
+package network.aika.lattice;
 
 import network.aika.Document;
 import network.aika.Model;

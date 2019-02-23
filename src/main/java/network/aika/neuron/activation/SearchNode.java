@@ -154,7 +154,7 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         if(modified) {
-            weightDelta = doc.vQueue.process(this);
+            weightDelta = doc.getValueQueue().process(doc, this);
             markDirty();
 
             if(c != null) {
@@ -171,7 +171,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     act.saveNewState();
                 }
             } else {
-                weightDelta = doc.vQueue.process(this);
+                weightDelta = doc.getValueQueue().process(doc, this);
                 if (Math.abs(weightDelta - csn.weightDelta) > 0.00001 || !compareNewState(csn)) {
                     log.error("Cached search node activation do not match the newly computed results.");
                     log.info("Computed results:");
@@ -488,7 +488,7 @@ public class SearchNode implements Comparable<SearchNode> {
         if(skip == SELECTED) {
             return false;
         }
-        if(doc.model.getSkipSelectStep().evaluate(candidate.activation)) {
+        if(doc.getModel().getSkipSelectStep().evaluate(candidate.activation)) {
             return false;
         }
 

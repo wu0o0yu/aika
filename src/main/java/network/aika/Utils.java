@@ -17,8 +17,6 @@
 package network.aika;
 
 
-import java.util.Comparator;
-
 /**
  *
  * @author Lukas Molzberger

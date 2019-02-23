@@ -404,11 +404,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         act.setTargetValue(input.targetValue);
 
-        doc.inputNeuronActivations.add(act);
-        doc.finallyActivatedNeurons.add(act.getINeuron());
+        doc.addInputNeuronActivation(act);
+        doc.addFinallyActivatedNeuron(act.getINeuron());
 
-        doc.linker.linkInput(act);
-        doc.linker.process();
+        doc.getLinker().linkInput(act);
+        doc.getLinker().process();
 
         propagate(act);
 
@@ -458,7 +458,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 s.limitDelta = 0.0;
 
                 if (doc != null) {
-                    s.committedInDoc = doc.id;
+                    s.committedInDoc = doc.getId();
                 }
             } finally {
                 in.lock.releaseWriteLock();
@@ -770,7 +770,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         Document doc = act.getDocument();
 
         if (addActivation(act)) {
-            doc.activatedNeurons.add(act.getINeuron());
+            doc.addActivatedNeuron(act.getINeuron());
         }
 
         for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {

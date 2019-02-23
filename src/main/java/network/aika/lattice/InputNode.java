@@ -46,9 +46,12 @@ import java.util.*;
  */
 public class InputNode extends Node<InputNode, InputActivation> {
 
-    public Neuron inputNeuron;
+    public static int CHILD_NODE_THRESHOLD = 10;
 
-    public TreeMap<AndNode.Refinement, AndNode.RefValue> nonExactAndChildren;
+
+    private Neuron inputNeuron;
+
+    private TreeMap<AndNode.Refinement, AndNode.RefValue> nonExactAndChildren;
 
 
     public InputNode() {
@@ -162,7 +165,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
             lock.acquireReadLock();
             if (andChildren != null) {
                 TreeMap<AndNode.Refinement, AndNode.RefValue> children;
-                if(andChildren.size() > 10) {
+                if(andChildren.size() > CHILD_NODE_THRESHOLD) {
                     children = nonExactAndChildren;
                     applyExactRelations(act);
                 } else {
