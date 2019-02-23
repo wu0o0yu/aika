@@ -297,7 +297,7 @@ public final class Activation implements Comparable<Activation> {
         }
 
         if (round == 0 || !rounds.get(round).equalsWithWeights(s)) {
-            saveOldState(sn.modifiedActs, v);
+            saveOldState(sn.getModifiedActivations(), v);
 
             State oldState = rounds.get(round);
 

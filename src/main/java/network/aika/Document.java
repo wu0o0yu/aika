@@ -526,14 +526,9 @@ public class Document implements Comparable<Document> {
         }
 
         if(selectedSearchNode != null) {
-            sb.append("\n Final SearchNode:" + selectedSearchNode.id + "  WeightSum:" + selectedSearchNode.accumulatedWeight + "\n");
+            sb.append("\n Final SearchNode:" + selectedSearchNode.getId() + "  WeightSum:" + selectedSearchNode.getAccumulatedWeight() + "\n");
         }
         return sb.toString();
-    }
-
-
-    public Stream<NodeActivation> getAllActivationsStream() {
-        return addedNodeActivations.stream();
     }
 
 
@@ -620,6 +615,8 @@ public class Document implements Comparable<Document> {
 
 
         private void add(Activation act) {
+            if(act == null) return;
+
             add(0, act);
             act.getOutputLinks()
                     .filter(l -> l.synapse.isRecurrent)
@@ -647,9 +644,7 @@ public class Document implements Comparable<Document> {
         public double process(SearchNode sn) {
             long v = visitedCounter++;
 
-            if(sn.getParent() != null && sn.getParent().candidate != null) {
-                add(sn.getParent().candidate.activation);
-            }
+            add(sn.getActivation());
 
             double delta = 0.0;
             for(int round = 0; round < queue.size(); round++) {

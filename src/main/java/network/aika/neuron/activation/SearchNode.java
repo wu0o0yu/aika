@@ -55,16 +55,16 @@ public class SearchNode implements Comparable<SearchNode> {
     public static boolean OPTIMIZE_SEARCH = true;
     public static boolean COMPUTE_SOFT_MAX = false;
 
-    public int id;
+    private int id;
 
-    SearchNode excludedParent;
-    SearchNode selectedParent;
+    private SearchNode excludedParent;
+    private SearchNode selectedParent;
 
-    long visited;
-    public Candidate candidate;
-    int level;
+    private long visited;
+    private Candidate candidate;
+    private int level;
 
-    DebugState debugState;
+    private DebugState debugState;
 
 
     public enum Decision {
@@ -86,12 +86,10 @@ public class SearchNode implements Comparable<SearchNode> {
         EXPLORE
     }
 
-    double weightDelta;
-    public double accumulatedWeight = 0.0;
+    private double weightDelta;
+    private double accumulatedWeight = 0.0;
 
-    public Map<Activation, Activation.StateChange> modifiedActs = new TreeMap<>(Activation.ACTIVATION_ID_COMP);
-
-
+    private Map<Activation, Activation.StateChange> modifiedActs = new TreeMap<>(Activation.ACTIVATION_ID_COMP);
 
     private Step step = Step.INIT;
     private Decision currentDecision = UNKNOWN;
@@ -107,7 +105,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private int cachedCount = 1;
     private int cachedFactor = 1;
 
-    public Option option;
+    private Option option;
 
     // Avoids having to search the same path twice.
     private Decision skip = UNKNOWN;
@@ -193,6 +191,34 @@ public class SearchNode implements Comparable<SearchNode> {
 
             accumulatedWeight = weightDelta + pn.accumulatedWeight;
         }
+    }
+
+
+    public int getId() {
+        return id;
+    }
+
+
+    public Option getOption() {
+        return option;
+    }
+
+
+    public Map<Activation, StateChange> getModifiedActivations() {
+        return modifiedActs;
+    }
+
+
+    public double getAccumulatedWeight() {
+        return accumulatedWeight;
+    }
+
+
+    public Activation getActivation() {
+        if(getParent() != null && getParent().candidate != null) {
+            return getParent().candidate.activation;
+        }
+        return null;
     }
 
 
