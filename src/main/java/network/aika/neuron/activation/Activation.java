@@ -57,7 +57,7 @@ public final class Activation extends OrActivation {
 
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
-    public INeuron neuron;
+    private INeuron neuron;
 
     public Map<Integer, Position> slots = new TreeMap<>();
 
@@ -287,7 +287,7 @@ public final class Activation extends OrActivation {
 
         int fired = -1;
 
-        long v = doc.visitedCounter++;
+        long v = doc.getVisitedId();
         markPredecessor(v, 0);
 
         for (InputState is: getInputStates(round, v)) {
@@ -411,7 +411,7 @@ public final class Activation extends OrActivation {
         double ub = n.biasSum + n.posRecSum;
         double lb = n.biasSum + n.posRecSum;
 
-        long v = doc.visitedCounter++;
+        long v = doc.getVisitedId();
         markPredecessor(v, 0);
 
         for (Link l : inputLinks.values()) {
@@ -559,7 +559,7 @@ public final class Activation extends OrActivation {
             return conflicts;
         }
 
-        long v = doc.visitedCounter++;
+        long v = doc.getVisitedId();
         markPredecessor(v, 0);
         conflicts = new ArrayList<>();
         for(Link l: inputLinks.values()) {
@@ -836,7 +836,7 @@ public final class Activation extends OrActivation {
 
 
     public String toString() {
-        return id + " " + slotsToString() + " " + identityToString() + " - " + node + " -" +
+        return id + " " + slotsToString() + " " + identityToString() + " - " + getNode() + " -" +
                 (extension != null ? extension.toString() + " -" : "") +
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
@@ -856,8 +856,8 @@ public final class Activation extends OrActivation {
         sb.append(slotsToString());
 
         sb.append(" \"");
-        if (node.neuron.get().getOutputText() != null) {
-            sb.append(Utils.collapseText(node.neuron.get().getOutputText(), 7));
+        if (getINeuron().getOutputText() != null) {
+            sb.append(Utils.collapseText(getINeuron().getOutputText(), 7));
         } else {
             sb.append(Utils.collapseText(doc.getText(getSlot(BEGIN), getSlot(END)), 7));
         }
@@ -866,7 +866,7 @@ public final class Activation extends OrActivation {
         sb.append(identityToString());
         sb.append(" - ");
 
-        sb.append(withLogic ? node.toString() : node.getNeuronLabel());
+        sb.append(withLogic ? getNode().toString() : getLabel());
 
         if(extension != null) {
             sb.append(" - " + extension);

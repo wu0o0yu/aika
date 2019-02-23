@@ -123,7 +123,7 @@ public class ActivationOutputsTest {
 
 
     private Activation selectInputActivation(Stream<Link> acts, Node n) {
-        return acts.filter(l -> l.input.node.compareTo(n) == 0).map(l -> l.input)
+        return acts.filter(l -> l.input.getNode().compareTo(n) == 0).map(l -> l.input)
                 .findAny()
                 .orElse(null);
     }

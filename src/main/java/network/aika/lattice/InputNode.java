@@ -80,7 +80,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
     public void addActivation(Activation inputAct) {
         if(inputAct.repropagateV != null && inputAct.repropagateV != markedCreated) return;
 
-        InputActivation act = new InputActivation(inputAct.doc.logicNodeActivationIdCounter++, inputAct, this);
+        InputActivation act = new InputActivation(inputAct.getDocument().logicNodeActivationIdCounter++, inputAct, this);
 
         addActivation(act);
     }
@@ -176,7 +176,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
                     children.forEach((ref, rv) -> {
                         InputNode in = ref.input.getIfNotSuspended();
                         if (in != null) {
-                            addNextLevelActivations(in, ref, rv.child.get(act.doc), act);
+                            addNextLevelActivations(in, ref, rv.child.get(act.getDocument()), act);
                         }
                     });
                 }
@@ -191,14 +191,15 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
     private void applyExactRelations(InputActivation act) {
         Activation iAct = act.input.input;
+        Document doc = act.getDocument();
 
         for (Map.Entry<Integer, Position> me : iAct.slots.entrySet()) {
-            for (Activation linkedAct : act.doc.getActivationsByPosition(me.getValue(), true, me.getValue(), true)) {
+            for (Activation linkedAct : act.getDocument().getActivationsByPosition(me.getValue(), true, me.getValue(), true)) {
                 Provider<InputNode> in = linkedAct.getINeuron().outputNode;
                 for (Map.Entry<AndNode.Refinement, AndNode.RefValue> mea : andChildren.subMap(
                         new Refinement(RelationsMap.MIN, in),
                         new Refinement(RelationsMap.MAX, in)).entrySet()) {
-                    addNextLevelActivations(in.get(act.doc), mea.getKey(), mea.getValue().child.get(act.doc), act);
+                    addNextLevelActivations(in.get(doc), mea.getKey(), mea.getValue().child.get(doc), act);
                 }
             }
         }
@@ -206,8 +207,8 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
     private static void addNextLevelActivations(InputNode secondNode, Refinement ref, AndNode nln, InputActivation act) {
-        Document doc = act.doc;
-        INeuron.ThreadState th = secondNode.inputNeuron.get().getThreadState(doc.threadId, false);
+        Document doc = act.getDocument();
+        INeuron.ThreadState th = secondNode.inputNeuron.get().getThreadState(doc.getThreadId(), false);
         if (th == null || th.isEmpty()) return;
 
         Activation iAct = act.input.input;
@@ -238,18 +239,18 @@ public class InputNode extends Node<InputNode, InputActivation> {
             return;
         }
 
-        Document doc = act.doc;
+        Document doc = act.getDocument();
         doc.getActivations(true).forEach(secondNAct -> {
             InputActivation secondAct = secondNAct.outputToInputNode.output;
             if (act != secondAct && config.candidateCheck.check(act, secondAct)) {
                 List<Relation> relations = config.candidateRelations.getRelations(act.input.input, secondNAct);
-                InputNode in = secondAct.node;
+                InputNode in = secondAct.getNode();
 
                 for (Relation r : relations) {
                     RelationsMap rm = new RelationsMap(new Relation[]{r});
                     Refinement ref = new Refinement(rm, in.provider);
 
-                    AndNode.RefValue rv = extend(doc.threadId, doc, ref, config);
+                    AndNode.RefValue rv = extend(doc.getThreadId(), doc, ref, config);
 
                     if (rv != null) {
                         AndNode nln = rv.child.get();
@@ -315,7 +316,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         public Link input;
 
         public InputActivation(int id, Activation iAct, InputNode node) {
-            super(id, iAct.doc, node);
+            super(id, iAct.getDocument(), node);
             input = new Link(iAct, this);
             iAct.outputToInputNode = input;
         }

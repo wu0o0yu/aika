@@ -117,7 +117,7 @@ public class OverlappingOrTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.getThreadId(), true).size());
 
         System.out.println("All activations:");
         System.out.println(doc.activationsToString());

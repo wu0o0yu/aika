@@ -103,7 +103,7 @@ public class CountingTest {
 
 
     public void count(NodeActivation act) {
-        NodeStatistic stat = ((NodeStatistic) act.node.extension);
+        NodeStatistic stat = ((NodeStatistic) act.getNode().extension);
 
         stat.frequency++;
     }

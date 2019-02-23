@@ -193,11 +193,11 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public void register(A act) {
-        Document doc = act.doc;
+        Document doc = act.getDocument();
 
-        ThreadState th = act.node.getThreadState(doc.threadId, true);
+        ThreadState th = act.getNode().getThreadState(doc.getThreadId(), true);
         if (th.activations.isEmpty()) {
-            doc.activatedNodes.add(act.node);
+            doc.activatedNodes.add(act.getNode());
         }
         th.activations.add(act);
 
@@ -207,7 +207,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public void clearActivations(Document doc) {
-        clearActivations(doc.threadId);
+        clearActivations(doc.getThreadId());
     }
 
 
@@ -233,7 +233,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * @param doc
      */
     public void processChanges(Document doc) {
-        ThreadState th = getThreadState(doc.threadId, true);
+        ThreadState th = getThreadState(doc.getThreadId(), true);
         List<A> tmpAdded = th.added;
 
         th.added = new ArrayList<>();
@@ -251,9 +251,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * @param act
      */
     public void addActivation(A act) {
-        ThreadState<T, A> th = getThreadState(act.doc.threadId, true);
+        ThreadState<T, A> th = getThreadState(act.getThreadId(), true);
         th.added.add(act);
-        act.doc.queue.add(this);
+        act.getDocument().queue.add(this);
     }
 
 
@@ -297,7 +297,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public Collection<A> getActivations(Document doc) {
-        ThreadState<T, A> th = getThreadState(doc.threadId, false);
+        ThreadState<T, A> th = getThreadState(doc.getThreadId(), false);
         if (th == null) return Collections.EMPTY_LIST;
         return th.activations;
     }

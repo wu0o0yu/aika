@@ -69,7 +69,7 @@ public class Linker {
     private void linkOrNodeRelations(Activation act, OrNode.Link ol) {
         for (int i = 0; i < ol.oe.synapseIds.length; i++) {
             int synId = ol.oe.synapseIds[i];
-            Synapse s = act.node.neuron.getSynapseById(synId);
+            Synapse s = act.getNeuron().getSynapseById(synId);
             Activation iAct = ol.input.getInputActivation(i);
             link(s, iAct, act);
         }
@@ -85,11 +85,13 @@ public class Linker {
 
 
     public void linkInput(Activation act) {
+        Document doc = act.getDocument();
+
         for(Synapse s: act.getNeuron().inMemoryInputSynapses.values()) {
             for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
                 Relation rel = me.getValue();
                 if(me.getKey() == OUTPUT) {
-                    rel.getActivations(s.input.get(act.doc), act)
+                    rel.getActivations(s.input.get(doc), act)
                             .forEach(iAct -> link(s, iAct, act));
                 }
             }
@@ -123,13 +125,14 @@ public class Linker {
 
 
     private void linkRelated(Activation rAct, Activation oAct, Map<Integer, Relation> relations) {
+        Document doc = rAct.getDocument();
         for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
             Relation rel = me.getValue();
             Integer relId = me.getKey();
             if(relId != OUTPUT) {
                 Synapse s = oAct.getNeuron().getSynapseById(relId);
                 if (s != null) {
-                    rel.invert().getActivations(s.input.get(rAct.doc), rAct)
+                    rel.invert().getActivations(s.input.get(doc), rAct)
                             .forEach(iAct -> link(s, iAct, oAct));
                 }
             }
@@ -184,7 +187,7 @@ public class Linker {
 
 
     protected boolean checkLoop(Activation iAct, Activation oAct) {
-        long v = doc.visitedCounter++;
+        long v = doc.getVisitedId();
 
         oAct.markedPredecessor = v;
         return iAct.checkSelfReferencing(false, 0, v);

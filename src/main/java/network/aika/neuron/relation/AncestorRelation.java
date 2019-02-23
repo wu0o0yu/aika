@@ -88,9 +88,9 @@ public abstract class AncestorRelation extends Relation {
 
 
     private static boolean hasCommonAncestor(Activation act, Activation linkedAct) {
-        long v = act.doc.visitedCounter++;
+        long v = act.getVisitedId();
         markAncestors(linkedAct, v);
-        return hasCommonAncestor(act, v, act.doc.visitedCounter++);
+        return hasCommonAncestor(act, v, act.getVisitedId());
     }
 
 
@@ -175,7 +175,7 @@ public abstract class AncestorRelation extends Relation {
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
-            collectCommonAncestor(results, n, linkedAct, linkedAct.doc.visitedCounter++);
+            collectCommonAncestor(results, n, linkedAct, linkedAct.getVisitedId());
             return results.stream();
         }
 
@@ -217,14 +217,14 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public boolean test(Activation act, Activation linkedAct) {
-            return contains(act, linkedAct, act.doc.visitedCounter++);
+            return contains(act, linkedAct, act.getVisitedId());
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
-            collectContains(results, n, linkedAct, linkedAct.doc.visitedCounter++);
+            collectContains(results, n, linkedAct, linkedAct.getVisitedId());
             return results.stream();
         }
 
@@ -267,14 +267,14 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public boolean test(Activation act, Activation linkedAct) {
-            return contains(linkedAct, act, act.doc.visitedCounter++);
+            return contains(linkedAct, act, act.getVisitedId());
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
-            collectContainedIn(results, n, linkedAct, linkedAct.doc.visitedCounter++);
+            collectContainedIn(results, n, linkedAct, linkedAct.getVisitedId());
             return results.stream();
         }
 
@@ -316,16 +316,16 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public boolean test(Activation act, Activation linkedAct) {
-            return !contains(act, linkedAct, act.doc.visitedCounter++);
+            return !contains(act, linkedAct, act.getVisitedId());
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
-            long v = linkedAct.doc.visitedCounter++;
+            long v = linkedAct.getVisitedId();
             markDescendants(linkedAct, v);
 
-            INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
+            INeuron.ThreadState th = n.getThreadState(linkedAct.getThreadId(), false);
             return th.getActivations()
                     .filter(act -> act.markedAncDesc != v);
         }
@@ -368,16 +368,16 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public boolean test(Activation act, Activation linkedAct) {
-            return !contains(linkedAct, act, act.doc.visitedCounter++);
+            return !contains(linkedAct, act, act.getVisitedId());
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
-            long v = linkedAct.doc.visitedCounter++;
+            long v = linkedAct.getVisitedId();
             markAncestors(linkedAct, v);
 
-            INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
+            INeuron.ThreadState th = n.getThreadState(linkedAct.getThreadId(), false);
             return th.getActivations()
                     .filter(act -> act.markedAncDesc != v);
         }

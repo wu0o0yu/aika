@@ -27,9 +27,9 @@ public abstract class NodeActivation<T extends Node> implements Comparable<NodeA
 
     public final int id;
 
-    public final T node;
+    private final T node;
 
-    public final Document doc;
+    protected final Document doc;
 
     public long visited = -1;
     public Long repropagateV;
@@ -44,6 +44,22 @@ public abstract class NodeActivation<T extends Node> implements Comparable<NodeA
         this.id = id;
         this.doc = doc;
         this.node = node;
+    }
+
+    public T getNode() {
+        return node;
+    }
+
+    public Document getDocument() {
+        return doc;
+    }
+
+    public long getVisitedId() {
+        return doc.getVisitedId();
+    }
+
+    public int getThreadId() {
+        return doc.getThreadId();
     }
 
     public abstract Activation getInputActivation(int i);

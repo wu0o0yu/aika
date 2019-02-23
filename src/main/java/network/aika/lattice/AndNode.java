@@ -97,6 +97,8 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
     @Override
     void apply(AndActivation act) {
+        Document doc = act.getDocument();
+
         if (andChildren != null) {
             for (Link fl : act.inputs) {
                 if(fl == null) continue;
@@ -124,19 +126,19 @@ public class AndNode extends Node<AndNode, AndActivation> {
                             Refinement nRef = me.getKey();
                             RefValue nRv = me.getValue();
                             if(nRef.contains(secondRef, rv)) {
-                                AndNode nlNode = nRv.child.get(act.doc);
+                                AndNode nlNode = nRv.child.get(doc);
 
                                 AndActivation nlAct = lookupAndActivation(act, nRef);
 
                                 if(nlAct == null) {
-                                    nlAct = new AndActivation(act.doc.logicNodeActivationIdCounter++, act.doc, nlNode);
+                                    nlAct = new AndActivation(doc.logicNodeActivationIdCounter++, doc, nlNode);
                                     nlAct.link(nRef, nRv, secondRefAct, act);
                                 }
 
-                                nlAct.node.addActivation(nlAct);
+                                nlAct.getNode().addActivation(nlAct);
 
                                 for(Entry secondNE: nlNode.parents) {
-                                    if(secondNE.rv.parent.get(act.doc) == secondAct.node && secondNE.ref.contains(ref, secondRv)) {
+                                    if(secondNE.rv.parent.get(doc) == secondAct.getNode() && secondNE.ref.contains(ref, secondRv)) {
                                         nlAct.link(secondNE.ref, secondNE.rv, refAct, secondAct);
                                         break;
                                     }
@@ -166,13 +168,13 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
     @Override
     public void discover(AndActivation act, PatternDiscovery.Config config) {
-        Document doc = act.doc;
+        Document doc = act.getDocument();
         for(Link fl : act.inputs) {
             if(fl == null) continue;
 
             for (Link sl : fl.input.outputsToAndNode.values()) {
                 AndActivation secondAct = sl.output;
-                if (secondAct.node instanceof AndNode) {
+                if (secondAct.getNode() instanceof AndNode) {
                     if (act != secondAct && config.candidateCheck.check(act, secondAct)) {
                         Activation iAct = act.getInputActivation(fl.rv.refOffset);
                         Activation secondIAct = secondAct.getInputActivation(sl.rv.refOffset);
@@ -183,7 +185,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                         for(Relation rel: rels) {
                             Refinement nRef = createRefinement(fl.rv, sl.ref, rel);
 
-                            AndNode.RefValue rv = extend(doc.threadId, doc, nRef, config);
+                            AndNode.RefValue rv = extend(doc.getThreadId(), doc, nRef, config);
                             if (rv != null) {
                                 AndNode nln = rv.child.get();
                                 nln.isDiscovered = true;
@@ -323,7 +325,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
             Node<?, NodeActivation<?>> pn = e.rv.parent.get();
             for(NodeActivation act : pn.getActivations(doc)) {
                 act.repropagateV = markedCreated;
-                act.node.propagate(act);
+                act.getNode().propagate(act);
             }
         }
     }
@@ -679,7 +681,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
             for (Link l : inputs) {
                 if (l != null) numberOfLinks++;
             }
-            return node.parents.size() == numberOfLinks;
+            return getNode().parents.size() == numberOfLinks;
         }
 
         public String toString() {

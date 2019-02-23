@@ -296,7 +296,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         Integer firstSlot = input.positions.firstKey();
         Position firstPos = doc.lookupFinalPosition(input.positions.get(firstSlot));
         Activation act = null;
-        x: for(Activation a: getThreadState(doc.threadId, true).getActivations(firstSlot, firstPos, true, firstSlot, firstPos, true).collect(Collectors.toList())) {
+        x: for(Activation a: getThreadState(doc.getThreadId(), true).getActivations(firstSlot, firstPos, true, firstSlot, firstPos, true).collect(Collectors.toList())) {
             for(Map.Entry<Integer, Integer> me: input.positions.entrySet()) {
                 Position pos = a.getSlot(me.getKey());
                 if(pos == null || me.getValue().compareTo(pos.getFinalPosition()) != 0) {
@@ -333,7 +333,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         act.inputDecision = SELECTED;
         act.finalDecision = act.inputDecision;
-        act.setDecision(act.inputDecision, doc.visitedCounter++);
+        act.setDecision(act.inputDecision, doc.getVisitedId());
 
 
         act.setTargetValue(input.targetValue);
@@ -389,20 +389,20 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
 
     public void propagate(Activation act) {
-        Document doc = act.doc;
+        Document doc = act.getDocument();
         outputNode.get(doc).addActivation(act);
     }
 
 
     public Stream<Activation> getActivations(Document doc, boolean onlyFinal) {
-        ThreadState th = getThreadState(doc.threadId, false);
+        ThreadState th = getThreadState(doc.getThreadId(), false);
         if (th == null) return Stream.empty();
         return th.getActivations(onlyFinal);
     }
 
 
     public Stream<Activation> getActivations(Document doc, int slot, Position pos, boolean onlyFinal) {
-        ThreadState th = getThreadState(doc.threadId, false);
+        ThreadState th = getThreadState(doc.getThreadId(), false);
         if (th == null) return Stream.empty();
 
         return th.getActivations(slot, pos, true, slot, pos, false)
@@ -418,7 +418,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
 
     public void clearActivations(Document doc) {
-        clearActivations(doc.threadId);
+        clearActivations(doc.getThreadId());
     }
 
 
@@ -666,11 +666,11 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
 
     public void register(Activation act) {
-        Document doc = act.doc;
-        INeuron.ThreadState th = act.node.neuron.get().getThreadState(doc.threadId, true);
+        Document doc = act.getDocument();
+        INeuron.ThreadState th = act.getINeuron().getThreadState(doc.getThreadId(), true);
 
         if (th.isEmpty()) {
-            doc.activatedNeurons.add(act.node.neuron.get());
+            doc.activatedNeurons.add(act.getINeuron());
         }
 
         Integer l = act.length();
@@ -680,7 +680,6 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         }
 
         th.addActivation(act);
-
 
         for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
             me.getValue().addActivation(me.getKey(), act);

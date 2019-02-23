@@ -64,7 +64,7 @@ public class Document implements Comparable<Document> {
     public final int id;
     private final StringBuilder content;
 
-    public long visitedCounter = 1;
+    private long visitedCounter = 1;
     public int activationIdCounter = 0;
     public int logicNodeActivationIdCounter = 0;
     public int searchNodeIdCounter = 0;
@@ -72,7 +72,7 @@ public class Document implements Comparable<Document> {
     public int positionIdCounter = 0;
 
     public Model model;
-    public int threadId;
+    private int threadId;
 
     public Queue queue = new Queue();
     public ValueQueue vQueue = new ValueQueue();
@@ -139,7 +139,7 @@ public class Document implements Comparable<Document> {
     public static Comparator<Activation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
         int r = Position.compare(act1.getSlot(Activation.BEGIN), act2.getSlot(Activation.BEGIN));
         if (r != 0) return r;
-        r = act1.node.compareTo(act2.node);
+        r = act1.getNode().compareTo(act2.getNode());
         if (r != 0) return r;
         return Integer.compare(act1.id, act2.id);
     };
@@ -154,6 +154,14 @@ public class Document implements Comparable<Document> {
         this.linker = model.getLinkerFactory().createLinker(this);
     }
 
+
+    public long getVisitedId() {
+        return visitedCounter++;
+    }
+
+    public int getThreadId() {
+        return threadId;
+    }
 
     public void append(String txt) {
         content.append(txt);
@@ -212,7 +220,7 @@ public class Document implements Comparable<Document> {
         for(Map.Entry<Integer, Position> me : act.slots.entrySet()) {
             Position pos = me.getValue();
             if (pos != null && pos.getFinalPosition() != null) {
-                ActKey dak = new ActKey(me.getKey(), pos, act.node, act.id);
+                ActKey dak = new ActKey(me.getKey(), pos, act.getNode(), act.id);
                 activationsBySlotAndPosition.put(dak, act);
                 activationsByPosition.put(dak, act);
             }

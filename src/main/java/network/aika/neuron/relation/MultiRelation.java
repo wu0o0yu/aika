@@ -114,7 +114,7 @@ public class MultiRelation extends Relation {
         if(!follow) return Stream.empty();
 
         if(relations.isEmpty()) {
-            INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
+            INeuron.ThreadState th = n.getThreadState(linkedAct.getThreadId(), false);
             return th != null ? th.getActivations() : Stream.empty();
         } else {
             return relations

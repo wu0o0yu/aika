@@ -65,11 +65,11 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     public void addInputActivation(OrEntry oe, NodeActivation inputAct) {
-        Document doc = inputAct.doc;
+        Document doc = inputAct.getDocument();
 
         SortedMap<Integer, Position> slots = new TreeMap<>();
 
-        INeuron n = neuron.get(inputAct.doc);
+        INeuron n = neuron.get(doc);
         for(int i = 0; i < oe.synapseIds.length; i++) {
             int synapseId = oe.synapseIds[i];
 
@@ -105,13 +105,13 @@ public class OrNode extends Node<OrNode, Activation> {
         }
 
         Link ol = act.link(oe, inputAct);
-        act.doc.linker.link(act, ol);
+        doc.linker.link(act, ol);
     }
 
 
     private Activation lookupActivation(Document doc, SortedMap<Integer, Position> slots, OrEntry oe, NodeActivation inputAct) {
         x: for(Activation act: neuron.get(doc)
-                .getThreadState(doc.threadId, true)
+                .getThreadState(doc.getThreadId(), true)
                 .getActivations(slots)
                 ) {
 
@@ -145,13 +145,13 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     public void propagate(Activation act) {
-        act.doc.ubQueue.add(act);
+        act.getDocument().ubQueue.add(act);
     }
 
 
     public void processActivation(Activation act) {
         super.processActivation(act);
-        neuron.get(act.doc).register(act);
+        neuron.get(act.getDocument()).register(act);
     }
 
 
@@ -173,7 +173,7 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     public static void processCandidate(Node<?, ? extends NodeActivation<?>> parentNode, NodeActivation inputAct, boolean train) {
-        Document doc = inputAct.doc;
+        Document doc = inputAct.getDocument();
         try {
             parentNode.lock.acquireReadLock();
             if (parentNode.orChildren != null) {
@@ -193,7 +193,7 @@ public class OrNode extends Node<OrNode, Activation> {
             Node<?, NodeActivation<?>> pn = oe.parent.get();
             for (NodeActivation act : pn.getActivations(doc)) {
                 act.repropagateV = markedCreated;
-                act.node.propagate(act);
+                act.getNode().propagate(act);
             }
         }
     }

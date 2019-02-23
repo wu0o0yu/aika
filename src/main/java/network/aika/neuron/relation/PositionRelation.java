@@ -92,7 +92,7 @@ public abstract class PositionRelation extends Relation {
 
     @Override
     public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-        INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
+        INeuron.ThreadState th = n.getThreadState(linkedAct.getThreadId(), false);
 
         if(th == null || th.isEmpty()) {
             return Stream.empty();

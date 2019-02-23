@@ -116,14 +116,14 @@ public class PatternMatchingTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.getThreadId(), true).size());
 
 
         System.out.println("Output activation:");
         INeuron n = pattern.get();
         for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
             System.out.println("Text Range: " + act.slotsToString());
-            System.out.println("Node: " + act.node);
+            System.out.println("Node: " + act.getNode());
             System.out.println();
         }
 
@@ -228,7 +228,7 @@ public class PatternMatchingTest {
         INeuron n = pattern.get();
         for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
             System.out.println("Text Range: " + act.slotsToString());
-            System.out.println("Node: " + act.node);
+            System.out.println("Node: " + act.getNode());
             System.out.println();
         }
 
@@ -304,14 +304,14 @@ public class PatternMatchingTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.getThreadId(), true).size());
 
 
         System.out.println("Output activation:");
         INeuron n = pattern.get();
         for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
             System.out.println("Text Range: " + act.slotsToString());
-            System.out.println("Node: " + act.node);
+            System.out.println("Node: " + act.getNode());
             System.out.println();
         }
 
@@ -405,14 +405,14 @@ public class PatternMatchingTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.getThreadId(), true).size());
 
 
         System.out.println("Output activation:");
         INeuron n = pattern.get();
         for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
             System.out.println("Text Range: " + act.slotsToString());
-            System.out.println("Node: " + act.node);
+            System.out.println("Node: " + act.getNode());
             System.out.println();
         }
 
@@ -511,14 +511,14 @@ public class PatternMatchingTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.getThreadId(), true).size());
 
 
         System.out.println("Output activation:");
         INeuron n = pattern.get();
         for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
             System.out.println("Text Range: " + act.slotsToString());
-            System.out.println("Node: " + act.node);
+            System.out.println("Node: " + act.getNode());
             System.out.println();
         }
 
@@ -621,14 +621,14 @@ public class PatternMatchingTest {
         // Computes the selected option
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
+        Assert.assertEquals(1, pattern.get().getThreadState(doc.getThreadId(), true).size());
 
 
         System.out.println("Output activation:");
         INeuron n = pattern.get();
         for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
             System.out.println("Text Range: " + act.slotsToString());
-            System.out.println("Node: " + act.node);
+            System.out.println("Node: " + act.getNode());
             System.out.println();
         }
 
