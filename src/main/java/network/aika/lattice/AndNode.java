@@ -42,7 +42,7 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-public class AndNode extends Node<AndNode, AndActivation> {
+class AndNode extends Node<AndNode, AndActivation> {
 
 
     List<Entry> parents;
