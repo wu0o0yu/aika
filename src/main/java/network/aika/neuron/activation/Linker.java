@@ -187,7 +187,7 @@ public class Linker {
 
 
     protected boolean checkLoop(Activation iAct, Activation oAct) {
-        long v = doc.getVisitedId();
+        long v = doc.getNewVisitedId();
 
         oAct.markedPredecessor = v;
         return iAct.checkSelfReferencing(false, 0, v);

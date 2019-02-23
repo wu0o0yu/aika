@@ -307,7 +307,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
         }
 
         if (act == null) {
-            act = new Activation(doc.activationIdCounter++, doc, node.get(doc), this);
+            act = new Activation(doc.getNewActivationId(), doc, node.get(doc), this);
             for(Map.Entry<Integer, Integer> me: input.positions.entrySet()) {
                 act.setSlot(me.getKey(), doc.lookupFinalPosition(me.getValue()));
             }
@@ -333,7 +333,7 @@ public class INeuron extends AbstractNode<Neuron, Activation> implements Compara
 
         act.inputDecision = SELECTED;
         act.finalDecision = act.inputDecision;
-        act.setDecision(act.inputDecision, doc.getVisitedId());
+        act.setDecision(act.inputDecision, doc.getNewVisitedId());
 
 
         act.setTargetValue(input.targetValue);

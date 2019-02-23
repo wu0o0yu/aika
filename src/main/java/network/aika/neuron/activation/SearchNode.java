@@ -127,7 +127,7 @@ public class SearchNode implements Comparable<SearchNode> {
     public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, int level) {
         id = doc.searchNodeIdCounter++;
         this.level = level;
-        visited = doc.getVisitedId();
+        visited = doc.getNewVisitedId();
         selectedParent = selParent;
         excludedParent = exclParent;
 
@@ -169,7 +169,7 @@ public class SearchNode implements Comparable<SearchNode> {
                 weightDelta = c.cachedSearchNode.weightDelta;
 
                 for(Activation act: c.cachedSearchNode.modifiedActs.keySet()) {
-                    act.saveOldState(modifiedActs, doc.getVisitedId());
+                    act.saveOldState(modifiedActs, doc.getNewVisitedId());
                     act.saveNewState();
                 }
             } else {

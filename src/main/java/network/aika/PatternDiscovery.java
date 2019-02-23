@@ -17,7 +17,6 @@
 package network.aika;
 
 
-import network.aika.Document;
 import network.aika.lattice.AndNode;
 import network.aika.lattice.NodeActivation;
 import network.aika.neuron.activation.Activation;
@@ -110,7 +109,7 @@ public class PatternDiscovery {
 
 
     public static void discover(Document doc, Config config) {
-        doc.createV = doc.getVisitedId();
+        doc.createV = doc.getNewVisitedId();
 
         doc.getAllActivationsStream().forEach(act -> config.counter.count(act));
 

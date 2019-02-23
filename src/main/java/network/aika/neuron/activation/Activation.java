@@ -287,7 +287,7 @@ public final class Activation extends OrActivation {
 
         int fired = -1;
 
-        long v = doc.getVisitedId();
+        long v = doc.getNewVisitedId();
         markPredecessor(v, 0);
 
         for (InputState is: getInputStates(round, v)) {
@@ -411,7 +411,7 @@ public final class Activation extends OrActivation {
         double ub = n.biasSum + n.posRecSum;
         double lb = n.biasSum + n.posRecSum;
 
-        long v = doc.getVisitedId();
+        long v = doc.getNewVisitedId();
         markPredecessor(v, 0);
 
         for (Link l : inputLinks.values()) {
@@ -559,7 +559,7 @@ public final class Activation extends OrActivation {
             return conflicts;
         }
 
-        long v = doc.getVisitedId();
+        long v = doc.getNewVisitedId();
         markPredecessor(v, 0);
         conflicts = new ArrayList<>();
         for(Link l: inputLinks.values()) {

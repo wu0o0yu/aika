@@ -67,7 +67,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     // Only the children maps are locked.
     public ReadWriteLock lock = new ReadWriteLock();
 
-    public ThreadState<T, A>[] threads;
+    private ThreadState<A>[] threads;
 
     public long markedCreated;
 
@@ -75,7 +75,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
      * a specific logic node.
      */
-    public static class ThreadState<T extends Node, A extends NodeActivation> {
+    public static class ThreadState<A extends NodeActivation> {
         public long lastUsed;
 
         public List<A> added;
@@ -93,8 +93,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public ThreadState<T, A> getThreadState(int threadId, boolean create) {
-        ThreadState<T, A> th = threads[threadId];
+    public ThreadState<A> getThreadState(int threadId, boolean create) {
+        ThreadState<A> th = threads[threadId];
         if (th == null) {
             if (!create) return null;
 
@@ -104,6 +104,15 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         th.lastUsed = provider.model.docIdCounter.get();
         return th;
     }
+
+
+    public void clearThreadState(int threadId, int deleteDocId) {
+        Node.ThreadState th = threads[threadId];
+        if (th != null && th.lastUsed < deleteDocId) {
+            threads[threadId] = null;
+        }
+    }
+
 
     public abstract AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref, PatternDiscovery.Config patterDiscoveryConfig);
 
@@ -251,7 +260,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * @param act
      */
     public void addActivation(A act) {
-        ThreadState<T, A> th = getThreadState(act.getThreadId(), true);
+        ThreadState<A> th = getThreadState(act.getThreadId(), true);
         th.added.add(act);
         act.getDocument().queue.add(this);
     }
@@ -297,7 +306,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public Collection<A> getActivations(Document doc) {
-        ThreadState<T, A> th = getThreadState(doc.getThreadId(), false);
+        ThreadState<A> th = getThreadState(doc.getThreadId(), false);
         if (th == null) return Collections.EMPTY_LIST;
         return th.activations;
     }

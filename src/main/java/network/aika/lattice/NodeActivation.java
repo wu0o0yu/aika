@@ -55,7 +55,7 @@ public abstract class NodeActivation<T extends Node> implements Comparable<NodeA
     }
 
     public long getVisitedId() {
-        return doc.getVisitedId();
+        return doc.getNewVisitedId();
     }
 
     public int getThreadId() {

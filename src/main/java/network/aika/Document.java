@@ -65,7 +65,7 @@ public class Document implements Comparable<Document> {
     private final StringBuilder content;
 
     private long visitedCounter = 1;
-    public int activationIdCounter = 0;
+    private int activationIdCounter = 0;
     public int logicNodeActivationIdCounter = 0;
     public int searchNodeIdCounter = 0;
     public int searchStepCounter = 0;
@@ -155,8 +155,12 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public long getVisitedId() {
+    public long getNewVisitedId() {
         return visitedCounter++;
+    }
+
+    public int getNewActivationId() {
+        return activationIdCounter++;
     }
 
     public int getThreadId() {
@@ -444,10 +448,8 @@ public class Document implements Comparable<Document> {
                 AbstractNode an = np.getIfNotSuspended();
                 if (an != null && an instanceof Node) {
                     Node n = (Node) an;
-                    Node.ThreadState th = n.threads[threadId];
-                    if (th != null && th.lastUsed + CLEANUP_INTERVAL < id) {
-                        n.threads[threadId] = null;
-                    }
+
+                    n.clearThreadState(threadId,  id - CLEANUP_INTERVAL);
                 }
             });
         }
