@@ -427,19 +427,19 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 s.update(doc, -s.weight, 0.0, s.limit);
             }
 
-            INeuron in = s.input.get();
+            INeuron in = s.getInput().get();
             in.lock.acquireWriteLock();
             try {
-                if (!s.inactive) {
-                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.limit * s.weight;
-                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += (s.limit + s.limitDelta) * s.getNewWeight();
+                if (!s.isInactive()) {
+                    sumDelta[s.isRecurrent() ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.limit * s.weight;
+                    sumDelta[s.isRecurrent() ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += (s.limit + s.limitDelta) * s.getNewWeight();
 
                     if(in.isPassiveInputNeuron() && !s.isNegative()) {
                         posPassiveSumDelta -= !s.isNegative() ? (s.limit * s.weight) : 0.0;
                         posPassiveSumDelta += s.getNewWeight() > 0.0 ? ((s.limit + s.limitDelta) * s.getNewWeight()) : 0.0;
                     }
 
-                    if(!s.isRecurrent) {
+                    if(!s.isRecurrent()) {
                         if (!s.isDisjunction(Synapse.State.OLD) && s.isDisjunction(Synapse.State.NEW)) {
                             numDisjunctiveSynapses++;
                         } else if (s.isDisjunction(Synapse.State.OLD) && !s.isDisjunction(Synapse.State.NEW)) {
@@ -493,7 +493,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         clearActivations();
 
         for (Synapse s : inputSynapses.values()) {
-            INeuron in = s.input.get();
+            INeuron in = s.getInput().get();
             in.provider.lock.acquireWriteLock();
             in.provider.inMemoryOutputSynapses.remove(s);
             in.provider.lock.releaseWriteLock();
@@ -501,7 +501,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         provider.lock.acquireReadLock();
         for (Synapse s : provider.inMemoryOutputSynapses.values()) {
-            INeuron out = s.output.get();
+            INeuron out = s.getOutput().get();
             out.lock.acquireWriteLock();
             out.inputSynapses.remove(s);
             out.lock.releaseWriteLock();
@@ -594,7 +594,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         out.writeInt(synapseIdCounter);
         for (Synapse s : inputSynapses.values()) {
-            if (s.input != null) {
+            if (s.getInput() != null) {
                 out.writeBoolean(true);
                 s.write(out);
 
@@ -603,7 +603,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
         out.writeBoolean(false);
         for (Synapse s : outputSynapses.values()) {
-            if (s.output != null) {
+            if (s.getOutput() != null) {
                 out.writeBoolean(true);
                 s.write(out);
             }
@@ -706,18 +706,18 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     @Override
     public void suspend() {
         for (Synapse s : inputSynapses.values()) {
-            s.input.removeInMemoryOutputSynapse(s);
+            s.getInput().removeInMemoryOutputSynapse(s);
         }
         for (Synapse s : outputSynapses.values()) {
-            s.output.removeInMemoryInputSynapse(s);
+            s.getOutput().removeInMemoryInputSynapse(s);
         }
 
         provider.lock.acquireReadLock();
         for (Synapse s : provider.inMemoryInputSynapses.values()) {
-            s.input.removeInMemoryOutputSynapse(s);
+            s.getInput().removeInMemoryOutputSynapse(s);
         }
         for (Synapse s : provider.inMemoryOutputSynapses.values()) {
-            s.output.removeInMemoryInputSynapse(s);
+            s.getOutput().removeInMemoryInputSynapse(s);
         }
         provider.lock.releaseReadLock();
     }
@@ -727,23 +727,23 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public void reactivate() {
         provider.lock.acquireReadLock();
         for (Synapse s : provider.inMemoryInputSynapses.values()) {
-            s.input.addInMemoryOutputSynapse(s);
+            s.getInput().addInMemoryOutputSynapse(s);
         }
         for (Synapse s : provider.inMemoryOutputSynapses.values()) {
-            s.output.addInMemoryInputSynapse(s);
+            s.getOutput().addInMemoryInputSynapse(s);
         }
         provider.lock.releaseReadLock();
 
         for (Synapse s : inputSynapses.values()) {
-            s.input.addInMemoryOutputSynapse(s);
-            if (!s.input.isSuspended()) {
-                s.output.addInMemoryInputSynapse(s);
+            s.getInput().addInMemoryOutputSynapse(s);
+            if (!s.getInput().isSuspended()) {
+                s.getOutput().addInMemoryInputSynapse(s);
             }
         }
         for (Synapse s : outputSynapses.values()) {
-            s.output.addInMemoryInputSynapse(s);
-            if (!s.output.isSuspended()) {
-                s.input.addInMemoryOutputSynapse(s);
+            s.getOutput().addInMemoryInputSynapse(s);
+            if (!s.getOutput().isSuspended()) {
+                s.getInput().addInMemoryOutputSynapse(s);
             }
         }
     }
@@ -812,7 +812,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         SortedSet<Synapse> is = new TreeSet<>((s1, s2) -> {
             int r = Double.compare(s2.weight, s1.weight);
             if (r != 0) return r;
-            return Integer.compare(s1.input.id, s2.input.id);
+            return Integer.compare(s1.getInput().id, s2.getInput().id);
         });
 
         is.addAll(inputSynapses.values());
@@ -826,7 +826,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             sb.append(", ");
             sb.append(Utils.round(s.weight));
             sb.append(":");
-            sb.append(s.input.toString());
+            sb.append(s.getInput().toString());
         }
         sb.append(">");
         return sb.toString();

@@ -75,24 +75,22 @@ public class Synapse implements Writable {
         return Integer.compare(s1.id, s2.id);
     };
 
+    private Neuron input;
+    private Neuron output;
+
+    private Integer id;
+
+    private boolean isRecurrent;
+    private boolean identity;
+
+    private Map<Integer, Relation> relations = new TreeMap<>();
+
+    private DistanceFunction distanceFunction = null;
+
+    private Writable extension;
 
 
-    public Neuron input;
-    public Neuron output;
-
-    public Integer id;
-
-    public boolean isRecurrent;
-    public boolean identity;
-
-    public Map<Integer, Relation> relations = new TreeMap<>();
-
-    public DistanceFunction distanceFunction = null;
-
-    public Writable extension;
-
-
-    public boolean inactive;
+    private boolean inactive;
 
     /**
      * The weight of this synapse.
@@ -137,6 +135,66 @@ public class Synapse implements Writable {
         }
     }
 
+
+    public Neuron getInput() {
+        return input;
+    }
+
+    public Neuron getOutput() {
+        return output;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public boolean isRecurrent() {
+        return isRecurrent;
+    }
+
+    public void setRecurrent(boolean recurrent) {
+        isRecurrent = recurrent;
+    }
+
+    public boolean isIdentity() {
+        return identity;
+    }
+
+    public void setIdentity(boolean identity) {
+        this.identity = identity;
+    }
+
+    public Map<Integer, Relation> getRelations() {
+        return relations;
+    }
+
+    public void setRelations(Map<Integer, Relation> relations) {
+        this.relations = relations;
+    }
+
+    public DistanceFunction getDistanceFunction() {
+        return distanceFunction;
+    }
+
+    public void setDistanceFunction(DistanceFunction distanceFunction) {
+        this.distanceFunction = distanceFunction;
+    }
+
+    public Writable getExtension() {
+        return extension;
+    }
+
+    public void setExtension(Writable extension) {
+        this.extension = extension;
+    }
+
+    public boolean isInactive() {
+        return inactive;
+    }
+
+    public void setInactive(boolean inactive) {
+        this.inactive = inactive;
+    }
 
     public void link() {
         INeuron in = input.get();

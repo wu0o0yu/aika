@@ -35,13 +35,13 @@ public class Converter {
 
     public static Comparator<Synapse> SYNAPSE_COMP = (s1, s2) -> {
         int r = Boolean.compare(
-                s2.linksAnyOutput() || s2.identity,
-                s1.linksAnyOutput() || s1.identity
+                s2.linksAnyOutput() || s2.isIdentity(),
+                s1.linksAnyOutput() || s1.isIdentity()
         );
         if (r != 0) return r;
         r = Double.compare(s2.weight, s1.weight);
         if (r != 0) return r;
-        return Integer.compare(s1.id, s2.id);
+        return Integer.compare(s1.getId(), s2.getId());
     };
 
     private int threadId;
@@ -138,7 +138,7 @@ public class Converter {
             }
         } else {
             for (Synapse s : modifiedSynapses) {
-                if (s.isDisjunction && !s.isRecurrent) {
+                if (s.isDisjunction && !s.isRecurrent()) {
                     NodeContext nlNodeContext = expandNode(nodeContext, s);
                     outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
                 }
@@ -154,8 +154,8 @@ public class Converter {
             for(Integer slot: s.linksOutput()) {
                 neuron.slotHasInputs.add(slot);
             }
-            for(Relation rel: s.relations.values()) {
-                rel.registerRequiredSlots(s.input);
+            for(Relation rel: s.getRelations().values()) {
+                rel.registerRequiredSlots(s.getInput());
             }
         });
     }
@@ -168,14 +168,14 @@ public class Converter {
         ArrayList<Synapse> selectedCandidates = new ArrayList<>();
         TreeMap<Integer, Synapse> relatedSyns = new TreeMap<>();
         while(syn != null && selectedCandidates.size() < MAX_AND_NODE_SIZE) {
-            relatedSyns.remove(syn.id);
+            relatedSyns.remove(syn.getId());
             selectedCandidates.add(syn);
-            alreadyCollected.add(syn.id);
-            for(Map.Entry<Integer, Relation> me: syn.relations.entrySet()) {
+            alreadyCollected.add(syn.getId());
+            for(Map.Entry<Integer, Relation> me: syn.getRelations().entrySet()) {
                 Integer relId = me.getKey();
                 Relation rel = me.getValue();
                 if(rel.isConvertible() && !alreadyCollected.contains(relId)) {
-                    Synapse rs = syn.output.getSynapseById(relId);
+                    Synapse rs = syn.getOutput().getSynapseById(relId);
                     if(rs != null) {
                         relatedSyns.put(relId, rs);
                     }
@@ -192,7 +192,7 @@ public class Converter {
     private Synapse getBestSynapse(Collection<Synapse> synapses) {
         Synapse maxSyn = null;
         for(Synapse s: synapses) {
-            if(!s.isNegative() && !s.isRecurrent && !s.inactive && !s.input.get().isPassiveInputNeuron()) {
+            if(!s.isNegative() && !s.isRecurrent() && !s.isInactive() && !s.getInput().get().isPassiveInputNeuron()) {
                 if(maxSyn == null || SYNAPSE_COMP.compare(maxSyn, s) > 0) {
                     maxSyn = s;
                 }
@@ -205,19 +205,19 @@ public class Converter {
     private NodeContext expandNode(NodeContext nc, Synapse s) {
         if (nc == null) {
             NodeContext nln = new NodeContext();
-            nln.node = s.input.get().outputNode.get();
+            nln.node = s.getInput().get().outputNode.get();
             nln.offsets = new Synapse[] {s};
             return nln;
         } else {
             Relation[] relations = new Relation[nc.offsets.length];
             for(int i = 0; i < nc.offsets.length; i++) {
                 Synapse linkedSynapse = nc.offsets[i];
-                relations[i] = s.getRelationById(linkedSynapse.id);
+                relations[i] = s.getRelationById(linkedSynapse.getId());
             }
 
             NodeContext nln = new NodeContext();
             nln.offsets = new Synapse[nc.offsets.length + 1];
-            AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.input.get().outputNode);
+            AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.getInput().get().outputNode);
             AndNode.RefValue rv = nc.node.extend(threadId, doc, ref);
             if(rv == null) {
                 return null;
@@ -246,7 +246,7 @@ public class Converter {
         int[] getSynapseIds() {
             int[] result = new int[offsets.length];
             for(int i = 0; i < result.length; i++) {
-                result[i] = offsets[i].id;
+                result[i] = offsets[i].getId();
             }
             return result;
         }

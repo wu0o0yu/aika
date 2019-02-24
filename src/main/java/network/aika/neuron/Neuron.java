@@ -252,7 +252,7 @@ public class Neuron extends Provider<INeuron> {
         n.model.passiveActivationFunctions.put(n.id, f);
 
         for(Synapse s: n.get().outputSynapses.values()) {
-            s.output.get().registerPassiveInputSynapse(s);
+            s.getOutput().get().registerPassiveInputSynapse(s);
         }
     }
 
@@ -299,7 +299,7 @@ public class Neuron extends Provider<INeuron> {
     public void addInMemoryInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryInputSynapses.put(s, s);
-        inputSynapsesById.put(s.id, s);
+        inputSynapsesById.put(s.getId(), s);
         lock.releaseWriteLock();
     }
 
@@ -307,7 +307,7 @@ public class Neuron extends Provider<INeuron> {
     public void removeInMemoryInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryInputSynapses.remove(s);
-        inputSynapsesById.remove(s.id);
+        inputSynapsesById.remove(s.getId());
         lock.releaseWriteLock();
     }
 

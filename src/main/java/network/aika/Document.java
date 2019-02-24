@@ -445,10 +445,10 @@ public class Document implements Comparable<Document> {
 
 
     public void notifyWeightModified(Synapse synapse) {
-        Set<Synapse> is = modifiedWeights.get(synapse.output.get());
+        Set<Synapse> is = modifiedWeights.get(synapse.getOutput().get());
         if(is == null) {
             is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
-            modifiedWeights.put(synapse.output.get(), is);
+            modifiedWeights.put(synapse.getOutput().get(), is);
         }
         is.add(synapse);
     }
@@ -614,7 +614,7 @@ public class Document implements Comparable<Document> {
         private final ArrayDeque<Activation> queue = new ArrayDeque<>();
 
         private void add(Link l) {
-            if(!l.getSynapse().isRecurrent) {
+            if(!l.isRecurrent()) {
                 add(l.getOutput());
             }
         }

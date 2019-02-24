@@ -88,10 +88,10 @@ public class Linker {
         Document doc = act.getDocument();
 
         for(Synapse s: act.getNeuron().inMemoryInputSynapses.values()) {
-            for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
                 Relation rel = me.getValue();
                 if(me.getKey() == OUTPUT) {
-                    rel.getActivations(s.input.get(doc), act)
+                    rel.getActivations(s.getInput().get(doc), act)
                             .forEach(iAct -> link(s, iAct, act));
                 }
             }
@@ -119,7 +119,7 @@ public class Linker {
     public void process() {
         while(!queue.isEmpty()) {
             Link l = queue.pollFirst();
-            linkRelated(l.getInput(), l.getOutput(), l.getSynapse().relations);
+            linkRelated(l.getInput(), l.getOutput(), l.getSynapse().getRelations());
         }
     }
 
@@ -132,7 +132,7 @@ public class Linker {
             if(relId != OUTPUT) {
                 Synapse s = oAct.getNeuron().getSynapseById(relId);
                 if (s != null) {
-                    rel.invert().getActivations(s.input.get(doc), rAct)
+                    rel.invert().getActivations(s.getInput().get(doc), rAct)
                             .forEach(iAct -> link(s, iAct, oAct));
                 }
             }
@@ -152,8 +152,8 @@ public class Linker {
             return;
         }
 
-        if(s.identity) {
-            Link el = oAct.getLinkBySynapseId(s.id);
+        if(s.isIdentity()) {
+            Link el = oAct.getLinkBySynapseId(s.getId());
             if(el != null && el.getInput() != iAct) {
                 return;
             }
@@ -166,7 +166,7 @@ public class Linker {
 
 
     private boolean checkRelations(Synapse s, Activation iAct, Activation oAct) {
-        for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+        for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
             Integer relSynId = me.getKey();
             Relation rel = me.getValue();
             if(relSynId == Synapse.OUTPUT) {

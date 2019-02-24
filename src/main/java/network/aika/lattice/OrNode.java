@@ -74,7 +74,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
             int synapseId = oe.synapseIds[i];
 
             Synapse s = neuron.getSynapseById(synapseId);
-            for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
                 Relation rel = me.getValue();
                 if(me.getKey() == Synapse.OUTPUT) {
                     Activation iAct = inputAct.getInputActivation(i);
@@ -131,8 +131,8 @@ public class OrNode extends Node<OrNode, OrActivation> {
                     matched = false;
                 }
 
-                if (s.identity) {
-                    Integer i = oe.revSynapseIds.get(s.id);
+                if (s.isIdentity()) {
+                    Integer i = oe.revSynapseIds.get(s.getId());
                     Activation iAct = doc.getLinker().computeInputActivation(s, inputAct.getInputActivation(i));
                     if(i != null && l.getInput() == iAct) {
                         matched = true;
