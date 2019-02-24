@@ -79,8 +79,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public volatile double bias;
     public volatile double biasDelta;
+
+
     public volatile double biasSum;
-    public volatile double biasSumDelta;
 
 
 
@@ -420,6 +421,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         double[][] sumDelta = new double[2][2];
 
         double posPassiveSumDelta = 0.0;
+        double biasSumDelta = biasDelta;
+
         for (Synapse s : modifiedSynapses) {
             if(s.toBeDeleted) {
                 s.update(doc, -s.weight, 0.0, s.limit);
@@ -429,6 +432,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             in.lock.acquireWriteLock();
             try {
                 if (!s.isInactive()) {
+                    biasSumDelta -= s.bias;
+                    biasSumDelta += s.getNewBias();
+
                     sumDelta[s.isRecurrent() ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.limit * s.weight;
                     sumDelta[s.isRecurrent() ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += (s.limit + s.limitDelta) * s.getNewWeight();
 
@@ -471,7 +477,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         biasDelta = 0.0;
 
         biasSum += biasSumDelta;
-        biasSumDelta = 0.0;
 
         assert Double.isFinite(biasSum);
 
@@ -743,20 +748,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
     public void setBias(double b) {
-        double newBiasDelta = b - bias;
-        biasSumDelta += newBiasDelta - biasDelta;
-        biasDelta = newBiasDelta;
-    }
-
-
-    public void changeBias(double bd) {
-        biasDelta += bd;
-        biasSumDelta += bd;
-    }
-
-
-    public double getNewBiasSum() {
-        return biasSum + biasSumDelta;
+        biasDelta = b - bias;
     }
 
 
