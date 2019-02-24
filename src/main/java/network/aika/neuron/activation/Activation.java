@@ -5,9 +5,9 @@ import network.aika.Document;
 import network.aika.Utils;
 import network.aika.Writable;
 import network.aika.lattice.InputNode.InputActivation;
-import network.aika.lattice.NodeActivation;
 import network.aika.lattice.OrNode.OrActivation;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.neuron.INeuron.Type;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
@@ -338,7 +338,7 @@ public final class Activation implements Comparable<Activation> {
 
     public State computeValueAndWeight(int round) {
         INeuron n = getINeuron();
-        INeuron.SynapseSummary ss = n.getSynapseSummary();
+        SynapseSummary ss = n.getSynapseSummary();
 
         double net = ss.getBiasSum();
         double posNet = ss.getBiasSum();
@@ -411,7 +411,7 @@ public final class Activation implements Comparable<Activation> {
 
     public boolean isActiveable() {
         INeuron n = getINeuron();
-        INeuron.SynapseSummary ss = n.getSynapseSummary();
+        SynapseSummary ss = n.getSynapseSummary();
 
         double net = ss.getBiasSum();
 
@@ -468,7 +468,7 @@ public final class Activation implements Comparable<Activation> {
 
     public void computeBounds() {
         INeuron n = getINeuron();
-        INeuron.SynapseSummary ss = n.getSynapseSummary();
+        SynapseSummary ss = n.getSynapseSummary();
 
         double ub = ss.getBiasSum() + ss.getPosRecSum();
         double lb = ss.getBiasSum() + ss.getPosRecSum();
