@@ -90,8 +90,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public volatile double posRecSum;
     public volatile double posPassiveSum;
 
-    public volatile double requiredSum;
-
     public volatile int numDisjunctiveSynapses = 0;
 
     public Set<Integer> slotHasInputs = new TreeSet<>();
@@ -102,7 +100,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public ActivationFunction activationFunction = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 
 
-    public volatile int synapseIdCounter = 0;
+    private volatile int synapseIdCounter = 0;
 
 
     // synapseId -> relation
@@ -569,8 +567,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         out.writeDouble(posRecSum);
         out.writeDouble(posPassiveSum);
 
-        out.writeDouble(requiredSum);
-
         out.writeInt(numDisjunctiveSynapses);
 
         out.writeUTF(activationFunction.name());
@@ -649,8 +645,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         negRecSum = in.readDouble();
         posRecSum = in.readDouble();
         posPassiveSum = in.readDouble();
-
-        requiredSum = in.readDouble();
 
         numDisjunctiveSynapses = in.readInt();
 

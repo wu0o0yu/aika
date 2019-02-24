@@ -70,7 +70,6 @@ public class Converter {
         initSlotFlags();
 
         if(neuron.biasSum + neuron.posDirSum + neuron.posRecSum <= 0.0) {
-            neuron.requiredSum = neuron.posDirSum + neuron.posRecSum;
             outputNode.removeParents(threadId);
             return false;
         }
@@ -81,7 +80,6 @@ public class Converter {
         boolean noFurtherRefinement = false;
         TreeSet<Synapse> reqSyns = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
         double sum = 0.0;
-        neuron.requiredSum = 0.0;
 
         if(neuron.numDisjunctiveSynapses == 0) {
             double remainingSum = neuron.posDirSum;
@@ -95,7 +93,6 @@ public class Converter {
                 }
 
                 remainingSum -= v;
-                neuron.requiredSum += v;
                 reqSyns.add(s);
 
                 NodeContext nlNodeContext = expandNode(nodeContext, s);

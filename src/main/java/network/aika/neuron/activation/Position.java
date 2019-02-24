@@ -3,6 +3,7 @@ package network.aika.neuron.activation;
 
 import network.aika.Document;
 
+import java.util.Collection;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
@@ -86,6 +87,10 @@ public class Position {
         return activations.subMap(new ActKey(slot, Integer.MIN_VALUE), new ActKey(slot, Integer.MAX_VALUE))
                 .values()
                 .stream();
+    }
+
+    public Collection<Activation> getActivations() {
+        return activations.values();
     }
 
 
