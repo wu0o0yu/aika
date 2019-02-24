@@ -137,7 +137,7 @@ public class Converter {
             }
         } else {
             for (Synapse s : modifiedSynapses) {
-                if (s.isDisjunction && !s.isRecurrent()) {
+                if (s.isDisjunction() && !s.isRecurrent()) {
                     NodeContext nlNodeContext = expandNode(nodeContext, s);
                     outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
                 }

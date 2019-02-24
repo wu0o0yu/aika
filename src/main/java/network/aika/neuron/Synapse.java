@@ -114,9 +114,8 @@ public class Synapse implements Writable {
 
     public boolean toBeDeleted;
 
-
-    public boolean isConjunction;
-    public boolean isDisjunction;
+    private boolean isConjunction;
+    private boolean isDisjunction;
 
 
     public Synapse() {
@@ -192,6 +191,14 @@ public class Synapse implements Writable {
 
     public void setInactive(boolean inactive) {
         this.inactive = inactive;
+    }
+
+    public boolean isConjunction() {
+        return isConjunction;
+    }
+
+    public boolean isDisjunction() {
+        return isDisjunction;
     }
 
     public void link() {
