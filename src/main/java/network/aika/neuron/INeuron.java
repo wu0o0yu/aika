@@ -74,7 +74,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public volatile double bias;
     public volatile double biasDelta;
 
-    public SynapseSummary synapseSummary = new SynapseSummary();
+    private SynapseSummary synapseSummary = new SynapseSummary();
 
     public Set<Integer> slotHasInputs = new TreeSet<>();
     public Set<Integer> slotRequired = new TreeSet<>();
