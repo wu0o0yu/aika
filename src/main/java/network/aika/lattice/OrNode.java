@@ -198,7 +198,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
     public void addInput(int[] synapseIds, int threadId, Node in, boolean andMode) {
         in.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), 1);
 
-        OrEntry oe = new OrEntry(synapseIds, in.provider, provider);
+        OrEntry oe = new OrEntry(synapseIds, in.getProvider(), provider);
         in.addOrChild(oe);
         in.setModified();
 

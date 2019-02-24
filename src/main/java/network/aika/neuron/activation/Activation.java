@@ -220,7 +220,12 @@ public final class Activation implements Comparable<Activation> {
 
 
     public Neuron getNeuron() {
-        return neuron.provider;
+        return neuron.getProvider();
+    }
+
+
+    public Synapse getSynapseById(int synapseId) {
+        return getNeuron().getSynapseById(synapseId);
     }
 
 
@@ -407,7 +412,7 @@ public final class Activation implements Comparable<Activation> {
         double net = n.biasSum;
 
         for (Link l: inputLinks.values()) {
-            if(l.synapse.isInactive()) {
+            if(l.isInactive()) {
                 continue;
             }
 
@@ -417,7 +422,7 @@ public final class Activation implements Comparable<Activation> {
             if (iAct == this) continue;
 
             double iv = 0.0;
-            if(!l.synapse.isNegative() && l.input.decision != EXCLUDED) {
+            if(!l.isNegative() && l.input.decision != EXCLUDED) {
                 iv = Math.min(l.synapse.limit, l.input.upperBound);
             }
 
@@ -524,7 +529,7 @@ public final class Activation implements Comparable<Activation> {
         Synapse lastSynapse = null;
         InputState maxInputState = null;
         for (Link l : inputLinks.values()) {
-            if(l.synapse.isInactive()) {
+            if(l.isInactive()) {
                 continue;
             }
             if (lastSynapse != null && lastSynapse != l.synapse) {
@@ -1199,6 +1204,10 @@ public final class Activation implements Comparable<Activation> {
 
         public boolean isNegative() {
             return synapse.isNegative();
+        }
+
+        public boolean isInactive() {
+            return synapse.isInactive();
         }
 
         public void link() {

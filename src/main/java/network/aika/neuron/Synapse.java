@@ -180,8 +180,8 @@ public class Synapse implements Writable {
         this.distanceFunction = distanceFunction;
     }
 
-    public Writable getExtension() {
-        return extension;
+    public <T extends Writable> T getExtension() {
+        return (T) extension;
     }
 
     public void setExtension(Writable extension) {
@@ -200,19 +200,19 @@ public class Synapse implements Writable {
         INeuron in = input.get();
         INeuron out = output.get();
 
-        boolean dir = in.provider.id < out.provider.id;
+        boolean dir = in.getProvider().id < out.getProvider().id;
 
         (dir ? in : out).lock.acquireWriteLock();
         (dir ? out : in).lock.acquireWriteLock();
 
-        in.provider.lock.acquireWriteLock();
-        in.provider.inMemoryOutputSynapses.put(this, this);
-        in.provider.lock.releaseWriteLock();
+        input.lock.acquireWriteLock();
+        input.inMemoryOutputSynapses.put(this, this);
+        input.lock.releaseWriteLock();
 
-        out.provider.lock.acquireWriteLock();
-        out.provider.inMemoryInputSynapses.put(this, this);
-        out.provider.inputSynapsesById.put(id, this);
-        out.provider.lock.releaseWriteLock();
+        output.lock.acquireWriteLock();
+        output.inMemoryInputSynapses.put(this, this);
+        output.inputSynapsesById.put(id, this);
+        output.lock.releaseWriteLock();
 
         removeLinkInternal(in, out);
 
@@ -245,7 +245,7 @@ public class Synapse implements Writable {
             INeuron in = input.get();
             INeuron out = output.get();
 
-            boolean dir = in.provider.id < out.provider.id;
+            boolean dir = in.getProvider().id < out.getProvider().id;
             (dir ? in : out).lock.acquireWriteLock();
             (dir ? out : in).lock.acquireWriteLock();
 
@@ -267,7 +267,7 @@ public class Synapse implements Writable {
             INeuron in = input.get();
             INeuron out = output.get();
 
-            boolean dir = in.provider.id < out.provider.id;
+            boolean dir = in.getProvider().id < out.getProvider().id;
             (dir ? in : out).lock.acquireWriteLock();
             (dir ? out : in).lock.acquireWriteLock();
 
@@ -290,19 +290,19 @@ public class Synapse implements Writable {
         INeuron in = input.get();
         INeuron out = output.get();
 
-        boolean dir = in.provider.id < out.provider.id;
+        boolean dir = input.id < out.getProvider().id;
 
         (dir ? in : out).lock.acquireWriteLock();
         (dir ? out : in).lock.acquireWriteLock();
 
-        in.provider.lock.acquireWriteLock();
-        in.provider.inMemoryOutputSynapses.remove(this);
-        in.provider.lock.releaseWriteLock();
+        input.lock.acquireWriteLock();
+        input.inMemoryOutputSynapses.remove(this);
+        input.lock.releaseWriteLock();
 
-        out.provider.lock.acquireWriteLock();
-        out.provider.inMemoryInputSynapses.remove(this);
-        out.provider.inputSynapsesById.remove(id);
-        out.provider.lock.releaseWriteLock();
+        output.lock.acquireWriteLock();
+        output.inMemoryInputSynapses.remove(this);
+        output.inputSynapsesById.remove(id);
+        output.lock.releaseWriteLock();
 
         removeLinkInternal(in, out);
 

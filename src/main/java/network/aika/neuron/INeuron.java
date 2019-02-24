@@ -335,7 +335,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         OrNode node = new OrNode(m);
 
         node.neuron = provider;
-        this.node = node.provider;
+        this.node = node.getProvider();
 
         setModified();
     }

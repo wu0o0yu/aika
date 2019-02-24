@@ -35,8 +35,8 @@ import static network.aika.neuron.Synapse.OUTPUT;
  */
 public class Linker {
 
-    protected Document doc;
-    ArrayDeque<Link> queue = new ArrayDeque<>();
+    private Document doc;
+    private ArrayDeque<Link> queue = new ArrayDeque<>();
 
 
     public enum Direction {
@@ -69,7 +69,7 @@ public class Linker {
     private void linkOrNodeRelations(Activation act, OrNode.Link ol) {
         for (int i = 0; i < ol.oe.synapseIds.length; i++) {
             int synId = ol.oe.synapseIds[i];
-            Synapse s = act.getNeuron().getSynapseById(synId);
+            Synapse s = act.getSynapseById(synId);
             Activation iAct = ol.input.getInputActivation(i);
             link(s, iAct, act);
         }
@@ -130,7 +130,7 @@ public class Linker {
             Relation rel = me.getValue();
             Integer relId = me.getKey();
             if(relId != OUTPUT) {
-                Synapse s = oAct.getNeuron().getSynapseById(relId);
+                Synapse s = oAct.getSynapseById(relId);
                 if (s != null) {
                     rel.invert().getActivations(s.getInput().get(doc), rAct)
                             .forEach(iAct -> link(s, iAct, oAct));
@@ -174,7 +174,7 @@ public class Linker {
                     return false;
                 }
             } else {
-                Synapse relSyn = oAct.getNeuron().getSynapseById(relSynId);
+                Synapse relSyn = oAct.getSynapseById(relSynId);
                 if(relSyn!= null && oAct.getInputLinksBySynapse(relSyn)
                         .anyMatch(l -> !rel.test(iAct, l.getInput()))) {
                     return false;

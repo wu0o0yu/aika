@@ -97,10 +97,10 @@ public class PatternLatticeTest {
         InputNode pC = inC.get().outputNode.get();
 
         AndNode pAB = pA.andChildren.firstEntry().getValue().child.get();
-        Assert.assertNotNull(pAB.provider);
+        Assert.assertNotNull(pAB.getProvider());
 
         AndNode pBC = pC.andChildren.firstEntry().getValue().child.get();
-        Assert.assertNotNull(pBC.provider);
+        Assert.assertNotNull(pBC.getProvider());
 
         Assert.assertEquals(1, pAB.andChildren.size());
         Assert.assertEquals(1, pBC.andChildren.size());

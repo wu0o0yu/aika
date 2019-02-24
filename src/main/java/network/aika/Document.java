@@ -362,10 +362,10 @@ public class Document implements Comparable<Document> {
             for (Candidate c : tmp) {
                 if (c.checkDependenciesSatisfied(v)) {
                     tmp.remove(c);
-                    c.id = candidates.size();
+                    c.setId(candidates.size());
                     candidates.add(c);
 
-                    c.activation.markedHasCandidate = v;
+                    c.getActivation().markedHasCandidate = v;
                     break;
                 }
             }

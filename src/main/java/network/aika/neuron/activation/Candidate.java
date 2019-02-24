@@ -4,30 +4,30 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class Candidate  implements Comparable<Candidate> {
-    public SearchNode currentSearchNode;
+    SearchNode currentSearchNode;
 
     /**
      * The cached decision is used to avoid having to explore the same candidate twice even though nothing that
      * influences this candidate has changed.
      */
-    public SearchNode.Decision cachedDecision = SearchNode.Decision.UNKNOWN;
-    public boolean repeat = false;
-    public double alternativeCachedWeightExpSum;
+    SearchNode.Decision cachedDecision = SearchNode.Decision.UNKNOWN;
+    boolean repeat = false;
+    double alternativeCachedWeightExpSum;
 
     /**
      * The cached search node is used to avoid having to recompute the activation values and weights that are associated
      * with this search node.
      */
-    public SearchNode cachedSearchNode;
-    public SearchNode bestChildNode;
+    SearchNode cachedSearchNode;
+    SearchNode bestChildNode;
 
-    public Activation activation;
+    Activation activation;
 
-    public int[] debugCounts = new int[3];
-    public int[] debugDecisionCounts = new int[3];
-    public int[] debugComputed = new int[3];
+    int[] debugCounts = new int[3];
+    int[] debugDecisionCounts = new int[3];
+    int[] debugComputed = new int[3];
 
-    public int id;
+    int id;
     int sequence = 0;
 
     public Candidate(Activation act, int id) {
@@ -35,6 +35,16 @@ public class Candidate  implements Comparable<Candidate> {
         this.id = id;
         act.candidate = this;
         sequence = act.getSequence();
+    }
+
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+
+    public Activation getActivation() {
+        return activation;
     }
 
 
@@ -77,8 +87,8 @@ public class Candidate  implements Comparable<Candidate> {
         Iterator<Map.Entry<Integer, Position>> ita = activation.slots.entrySet().iterator();
         Iterator<Map.Entry<Integer, Position>> itb = c.activation.slots.entrySet().iterator();
 
-        Map.Entry<Integer, Position> mea = null;
-        Map.Entry<Integer, Position> meb = null;
+        Map.Entry<Integer, Position> mea;
+        Map.Entry<Integer, Position> meb;
         while(ita.hasNext() || itb.hasNext()) {
             mea = ita.hasNext() ? ita.next() : null;
             meb = itb.hasNext() ? itb.next() : null;

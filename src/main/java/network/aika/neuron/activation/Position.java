@@ -13,7 +13,7 @@ public class Position {
     public static final Position MAX = new Position(null, Integer.MAX_VALUE);
 
 
-    public SortedMap<ActKey, Activation> activations = new TreeMap<>();
+    private SortedMap<ActKey, Activation> activations = new TreeMap<>();
 
 
     private Document doc;
@@ -89,7 +89,7 @@ public class Position {
     }
 
 
-    public static class ActKey implements Comparable<ActKey> {
+    private static class ActKey implements Comparable<ActKey> {
         int slot;
         int actId;
 

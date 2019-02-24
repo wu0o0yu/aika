@@ -34,7 +34,11 @@ public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> i
 
     public volatile boolean modified;
 
-    public P provider;
+    protected P provider;
+
+    public P getProvider() {
+        return provider;
+    }
 
     public void setModified() {
         modified = true;
