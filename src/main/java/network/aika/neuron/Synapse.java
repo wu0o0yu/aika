@@ -118,8 +118,6 @@ public class Synapse implements Writable {
     public boolean isConjunction;
     public boolean isDisjunction;
 
-    public int createdInDoc;
-    public int committedInDoc;
 
     public Synapse() {
     }
@@ -337,6 +335,18 @@ public class Synapse implements Writable {
     }
 
 
+    public void commit() {
+        weight += weightDelta;
+        weightDelta = 0.0;
+
+        bias += biasDelta;
+        biasDelta = 0.0;
+
+        limit += limitDelta;
+        limitDelta = 0.0;
+    }
+
+
     public enum State {
         NEW,
         OLD
@@ -499,9 +509,7 @@ public class Synapse implements Writable {
         }
 
         synapse.link();
-        if (doc != null) {
-            synapse.createdInDoc = doc.getId();
-        }
+
         return synapse;
     }
 

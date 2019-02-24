@@ -418,18 +418,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             try {
                 synapseSummary.updateSynapse(s);
 
-                s.weight += s.weightDelta;
-                s.weightDelta = 0.0;
-
-                s.bias += s.biasDelta;
-                s.biasDelta = 0.0;
-
-                s.limit += s.limitDelta;
-                s.limitDelta = 0.0;
-
-                if (doc != null) {
-                    s.committedInDoc = doc.getId();
-                }
+                s.commit();
             } finally {
                 in.lock.releaseWriteLock();
             }
