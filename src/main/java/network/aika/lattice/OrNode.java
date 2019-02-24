@@ -122,22 +122,25 @@ public class OrNode extends Node<OrNode, OrActivation> {
             Synapse ls = null;
             boolean matched = false;
             for(Activation.Link l: act.getInputLinksOrderedBySynapse()) {
-                if(ls != null && ls != l.synapse) {
+                Synapse s = l.getSynapse();
+
+                if(ls != null && ls != s) {
                     if(!matched) {
                         continue x;
                     }
                     matched = false;
                 }
 
-                if (l.synapse.identity) {
-                    Integer i = oe.revSynapseIds.get(l.synapse.id);
-                    if(i != null && l.input == doc.getLinker().computeInputActivation(l.synapse, inputAct.getInputActivation(i))) {
+                if (s.identity) {
+                    Integer i = oe.revSynapseIds.get(s.id);
+                    Activation iAct = doc.getLinker().computeInputActivation(s, inputAct.getInputActivation(i));
+                    if(i != null && l.getInput() == iAct) {
                         matched = true;
                     }
                 } else {
                     matched = true;
                 }
-                ls = l.synapse;
+                ls = s;
             }
 
             if(matched) {

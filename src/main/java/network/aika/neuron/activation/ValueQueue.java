@@ -18,7 +18,7 @@ public class ValueQueue {
 
     public void propagateActivationValue(int round, Activation act)  {
         act.getOutputLinks()
-                .forEach(l -> add(l.synapse.isRecurrent ? round + 1 : round, l.output));
+                .forEach(l -> add(l.getSynapse().isRecurrent ? round + 1 : round, l.getOutput()));
     }
 
 
@@ -27,8 +27,8 @@ public class ValueQueue {
 
         add(0, act);
         act.getOutputLinks()
-                .filter(l -> l.synapse.isRecurrent)
-                .forEach(l -> add(0, l.output));
+                .filter(l -> l.getSynapse().isRecurrent)
+                .forEach(l -> add(0, l.getOutput()));
     }
 
 

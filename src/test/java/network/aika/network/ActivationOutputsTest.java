@@ -123,14 +123,14 @@ public class ActivationOutputsTest {
 
 
     private Activation selectInputActivation(Stream<Link> acts, Neuron n) {
-        return acts.filter(l -> l.input.getNeuron().compareTo(n) == 0).map(l -> l.input)
+        return acts.filter(l -> l.getInput().getNeuron().compareTo(n) == 0).map(l -> l.getInput())
                 .findAny()
                 .orElse(null);
     }
 
 
     public boolean containsOutputActivation(Stream<Link> outputActivations, Activation oAct) {
-        return outputActivations.anyMatch(l -> l.output == oAct);
+        return outputActivations.anyMatch(l -> l.getOutput() == oAct);
     }
 
 

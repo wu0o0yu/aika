@@ -614,8 +614,8 @@ public class Document implements Comparable<Document> {
         private final ArrayDeque<Activation> queue = new ArrayDeque<>();
 
         private void add(Link l) {
-            if(!l.synapse.isRecurrent) {
-                add(l.output);
+            if(!l.getSynapse().isRecurrent) {
+                add(l.getOutput());
             }
         }
 

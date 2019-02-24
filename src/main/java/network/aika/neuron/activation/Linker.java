@@ -119,7 +119,7 @@ public class Linker {
     public void process() {
         while(!queue.isEmpty()) {
             Link l = queue.pollFirst();
-            linkRelated(l.input, l.output, l.synapse.relations);
+            linkRelated(l.getInput(), l.getOutput(), l.getSynapse().relations);
         }
     }
 
@@ -154,7 +154,7 @@ public class Linker {
 
         if(s.identity) {
             Link el = oAct.getLinkBySynapseId(s.id);
-            if(el != null && el.input != iAct) {
+            if(el != null && el.getInput() != iAct) {
                 return;
             }
         }
@@ -176,7 +176,7 @@ public class Linker {
             } else {
                 Synapse relSyn = oAct.getNeuron().getSynapseById(relSynId);
                 if(relSyn!= null && oAct.getInputLinksBySynapse(relSyn)
-                        .anyMatch(l -> !rel.test(iAct, l.input))) {
+                        .anyMatch(l -> !rel.test(iAct, l.getInput()))) {
                     return false;
                 }
             }
@@ -190,7 +190,7 @@ public class Linker {
         if(l == null) {
             return;
         }
-        if(!l.synapse.isNegative()) {
+        if(!l.getSynapse().isNegative()) {
             queue.add(l);
         }
         doc.addToUpperBoundQueue(l);

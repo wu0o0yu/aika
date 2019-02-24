@@ -1154,9 +1154,9 @@ public final class Activation implements Comparable<Activation> {
      * The {@code SynapseActivation} mirror the synapse link in the network of activations.
      */
     public static class Link {
-        public final Synapse synapse;
-        public final Activation input;
-        public final Activation output;
+        private final Synapse synapse;
+        private final Activation input;
+        private final Activation output;
 
         public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
             int r = Synapse.INPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
@@ -1177,6 +1177,17 @@ public final class Activation implements Comparable<Activation> {
             this.output = output;
         }
 
+        public Synapse getSynapse() {
+            return synapse;
+        }
+
+        public Activation getInput() {
+            return input;
+        }
+
+        public Activation getOutput() {
+            return output;
+        }
 
         public void link() {
             input.addLink(INPUT, this);
