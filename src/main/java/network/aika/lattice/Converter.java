@@ -39,7 +39,7 @@ public class Converter {
                 s1.linksAnyOutput() || s1.isIdentity()
         );
         if (r != 0) return r;
-        r = Double.compare(s2.weight, s1.weight);
+        r = Double.compare(s2.getWeight(), s1.getWeight());
         if (r != 0) return r;
         return Integer.compare(s1.getId(), s2.getId());
     };

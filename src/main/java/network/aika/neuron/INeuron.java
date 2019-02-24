@@ -405,14 +405,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public void commit(Document doc, Collection<Synapse> modifiedSynapses) {
+    public void commit(Collection<Synapse> modifiedSynapses) {
         synapseSummary.updateNeuronBias(biasDelta);
 
         for (Synapse s : modifiedSynapses) {
-            if(s.toBeDeleted) {
-                s.update(doc, -s.weight, 0.0, s.limit);
-            }
-
             INeuron in = s.getInput().get();
             in.lock.acquireWriteLock();
             try {
@@ -423,7 +419,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 in.lock.releaseWriteLock();
             }
 
-            if(s.toBeDeleted) {
+            if(s.isZero()) {
                 s.unlink();
             }
         }
@@ -728,7 +724,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public String toStringWithSynapses() {
         SortedSet<Synapse> is = new TreeSet<>((s1, s2) -> {
-            int r = Double.compare(s2.weight, s1.weight);
+            int r = Double.compare(s2.getWeight(), s1.getWeight());
             if (r != 0) return r;
             return Integer.compare(s1.getInput().id, s2.getInput().id);
         });
@@ -742,7 +738,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         sb.append(Utils.round(bias));
         for (Synapse s : is) {
             sb.append(", ");
-            sb.append(Utils.round(s.weight));
+            sb.append(Utils.round(s.getWeight()));
             sb.append(":");
             sb.append(s.getInput().toString());
         }
@@ -796,15 +792,15 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         public void updateSynapse(Synapse s) {
             if (!s.isInactive()) {
-                biasSum -= s.bias;
+                biasSum -= s.getBias();
                 biasSum += s.getNewBias();
 
-                updateSum(s.isRecurrent(), s.isNegative(), -(s.limit * s.weight));
-                updateSum(s.isRecurrent(), s.getNewWeight() <= 0.0, (s.limit + s.limitDelta) * s.getNewWeight());
+                updateSum(s.isRecurrent(), s.isNegative(), -(s.getLimit() * s.getWeight()));
+                updateSum(s.isRecurrent(), s.getNewWeight() <= 0.0, s.getNewLimit() * s.getNewWeight());
 
                 if(s.getInput().get().isPassiveInputNeuron() && !s.isNegative()) {
-                    posPassiveSum -= !s.isNegative() ? (s.limit * s.weight) : 0.0;
-                    posPassiveSum += s.getNewWeight() > 0.0 ? ((s.limit + s.limitDelta) * s.getNewWeight()) : 0.0;
+                    posPassiveSum -= !s.isNegative() ? (s.getLimit() * s.getWeight()) : 0.0;
+                    posPassiveSum += s.getNewWeight() > 0.0 ? (s.getNewLimit() * s.getNewWeight()) : 0.0;
                 }
 
                 if(!s.isRecurrent()) {

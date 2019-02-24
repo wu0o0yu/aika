@@ -354,7 +354,7 @@ public final class Activation implements Comparable<Activation> {
 
             if (iAct == this) continue;
 
-            double x = Math.min(s.limit, is.s.value) * s.weight;
+            double x = Math.min(s.getLimit(), is.s.value) * s.getWeight();
             if(s.getDistanceFunction() != null) {
                 x *= s.getDistanceFunction().f(iAct, this);
             }
@@ -370,7 +370,7 @@ public final class Activation implements Comparable<Activation> {
 
         if(n.passiveInputSynapses != null) {
             for(Synapse s: n.passiveInputSynapses.values()) {
-                double x = s.weight * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
+                double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
 
                 net += x;
                 if(!s.isNegative()) {
@@ -427,10 +427,10 @@ public final class Activation implements Comparable<Activation> {
 
             double iv = 0.0;
             if(!l.isNegative() && l.input.decision != EXCLUDED) {
-                iv = Math.min(l.synapse.limit, l.input.upperBound);
+                iv = Math.min(l.synapse.getLimit(), l.input.upperBound);
             }
 
-            double x = iv * s.weight;
+            double x = iv * s.getWeight();
             if(s.getDistanceFunction() != null) {
                 x *= s.getDistanceFunction().f(iAct, this);
             }
@@ -439,7 +439,7 @@ public final class Activation implements Comparable<Activation> {
 
         if(n.passiveInputSynapses != null) {
             for(Synapse s: n.passiveInputSynapses.values()) {
-                double x = s.weight * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
+                double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
 
                 net += x;
             }
@@ -486,26 +486,26 @@ public final class Activation implements Comparable<Activation> {
 
             if (iAct == this) continue;
 
-            double x = s.weight;
+            double x = s.getWeight();
             if(s.getDistanceFunction() != null) {
                 x *= s.getDistanceFunction().f(iAct, this);
             }
 
             if (s.isNegative()) {
                 if (!s.isRecurrent() && !iAct.checkSelfReferencing(false, 0, v)) {
-                    ub += Math.min(s.limit, iAct.lowerBound) * x;
+                    ub += Math.min(s.getLimit(), iAct.lowerBound) * x;
                 }
 
-                lb += s.limit * x;
+                lb += s.getLimit() * x;
             } else {
-                ub += Math.min(s.limit, iAct.upperBound) * x;
-                lb += Math.min(s.limit, iAct.lowerBound) * x;
+                ub += Math.min(s.getLimit(), iAct.upperBound) * x;
+                lb += Math.min(s.getLimit(), iAct.lowerBound) * x;
             }
         }
 
         if(n.passiveInputSynapses != null) {
             for(Synapse s: n.passiveInputSynapses.values()) {
-                double x = s.weight * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
+                double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
 
                 ub += x;
                 lb += x;
@@ -1036,7 +1036,7 @@ public final class Activation implements Comparable<Activation> {
     public String linksToString() {
         StringBuilder sb = new StringBuilder();
         for(Link l: inputLinks.values()) {
-            sb.append("  " + l.input.getLabel() + "  W:" + l.synapse.weight + "\n");
+            sb.append("  " + l.input.getLabel() + "  W:" + l.synapse.getWeight() + "\n");
         }
 
         return sb.toString();

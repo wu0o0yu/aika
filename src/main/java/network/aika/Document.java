@@ -460,7 +460,7 @@ public class Document implements Comparable<Document> {
      */
     public void commit() {
         modifiedWeights.forEach((n, inputSyns) -> {
-            n.commit(this, inputSyns);
+            n.commit(inputSyns);
             Converter.convert(threadId, this, n, inputSyns);
         });
         modifiedWeights.clear();

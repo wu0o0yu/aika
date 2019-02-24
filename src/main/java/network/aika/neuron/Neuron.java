@@ -241,7 +241,7 @@ public class Neuron extends Provider<INeuron> {
 
         relationBuilders.forEach(input -> input.connect(this));
 
-        n.commit(doc, modifiedSynapses);
+        n.commit(modifiedSynapses);
 
         return Converter.convert(model.defaultThreadId, doc, n, modifiedSynapses);
     }

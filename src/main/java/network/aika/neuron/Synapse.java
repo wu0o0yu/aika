@@ -61,6 +61,8 @@ public class Synapse implements Writable {
     public static double DISJUNCTION_THRESHOLD = 0.6;
     public static double CONJUNCTION_THRESHOLD = 0.4;
 
+    public static double TOLERANCE = 0.0000001;
+
 
     public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = (s1, s2) -> {
         int r = s1.input.compareTo(s2.input);
@@ -92,27 +94,14 @@ public class Synapse implements Writable {
 
     private boolean inactive;
 
-    /**
-     * The weight of this synapse.
-     */
-    public double weight;
+    private double weight;
+    private double weightDelta;
 
-    /**
-     * The weight delta of this synapse. The converter will use it to compute few internal
-     * parameters and then createOrReplace the weight variable.
-     */
-    public double weightDelta;
+    private double bias;
+    private double biasDelta;
 
-
-    public double bias;
-
-    public double biasDelta;
-
-    public double limit;
-
-    public double limitDelta;
-
-    public boolean toBeDeleted;
+    private double limit;
+    private double limitDelta;
 
     private boolean isConjunction;
     private boolean isDisjunction;
@@ -200,6 +189,32 @@ public class Synapse implements Writable {
     public boolean isDisjunction() {
         return isDisjunction;
     }
+
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public double getBias() {
+        return bias;
+    }
+
+    public double getLimit() {
+        return limit;
+    }
+
+    public double getNewWeight() {
+        return weight + weightDelta;
+    }
+
+    public double getNewBias() {
+        return bias + biasDelta;
+    }
+
+    public double getNewLimit() {
+        return limit + limitDelta;
+    }
+
 
     public void link() {
         INeuron in = input.get();
@@ -351,6 +366,11 @@ public class Synapse implements Writable {
 
         limit += limitDelta;
         limitDelta = 0.0;
+    }
+
+
+    public boolean isZero() {
+        return Math.abs(weight) < TOLERANCE && Math.abs(bias) < TOLERANCE ;
     }
 
 
@@ -519,17 +539,6 @@ public class Synapse implements Writable {
 
         return synapse;
     }
-
-
-    public double getNewWeight() {
-        return weight + weightDelta;
-    }
-
-
-    public double getNewBias() {
-        return bias + biasDelta;
-    }
-
 
     public Set<Integer> linksOutput() {
         Set<Integer> results = new TreeSet<>();
