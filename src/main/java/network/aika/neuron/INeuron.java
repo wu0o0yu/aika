@@ -18,7 +18,6 @@ package network.aika.neuron;
 
 
 import network.aika.*;
-import network.aika.lattice.Node;
 import network.aika.lattice.OrNode;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.Option;
@@ -59,11 +58,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public static final INeuron MIN_NEURON = new INeuron();
     public static final INeuron MAX_NEURON = new INeuron();
 
-    private static final int DIRECT = 0;
-    private static final int RECURRENT = 1;
-    private static final int POSITIVE = 0;
-    private static final int NEGATIVE = 1;
-
 
     public String label;
     public Type type;
@@ -80,18 +74,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public volatile double bias;
     public volatile double biasDelta;
 
-
-    public volatile double biasSum;
-
-
-
-    public volatile double posDirSum;
-    public volatile double negDirSum;
-    public volatile double negRecSum;
-    public volatile double posRecSum;
-    public volatile double posPassiveSum;
-
-    public volatile int numDisjunctiveSynapses = 0;
+    public SynapseSummary synapseSummary = new SynapseSummary();
 
     public Set<Integer> slotHasInputs = new TreeSet<>();
     public Set<Integer> slotRequired = new TreeSet<>();
@@ -144,6 +127,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             activationsBySlotAndPosition = new TreeMap<>();
             activations = new TreeMap<>();
         }
+    }
+
+
+    public SynapseSummary getSynapseSummary() {
+        return synapseSummary;
     }
 
 
@@ -418,10 +406,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public void commit(Document doc, Collection<Synapse> modifiedSynapses) {
-        double[][] sumDelta = new double[2][2];
-
-        double posPassiveSumDelta = 0.0;
-        double biasSumDelta = biasDelta;
+        synapseSummary.updateNeuronBias(biasDelta);
 
         for (Synapse s : modifiedSynapses) {
             if(s.toBeDeleted) {
@@ -431,26 +416,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             INeuron in = s.getInput().get();
             in.lock.acquireWriteLock();
             try {
-                if (!s.isInactive()) {
-                    biasSumDelta -= s.bias;
-                    biasSumDelta += s.getNewBias();
-
-                    sumDelta[s.isRecurrent() ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.limit * s.weight;
-                    sumDelta[s.isRecurrent() ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += (s.limit + s.limitDelta) * s.getNewWeight();
-
-                    if(in.isPassiveInputNeuron() && !s.isNegative()) {
-                        posPassiveSumDelta -= !s.isNegative() ? (s.limit * s.weight) : 0.0;
-                        posPassiveSumDelta += s.getNewWeight() > 0.0 ? ((s.limit + s.limitDelta) * s.getNewWeight()) : 0.0;
-                    }
-
-                    if(!s.isRecurrent()) {
-                        if (!s.isDisjunction(Synapse.State.OLD) && s.isDisjunction(Synapse.State.NEW)) {
-                            numDisjunctiveSynapses++;
-                        } else if (s.isDisjunction(Synapse.State.OLD) && !s.isDisjunction(Synapse.State.NEW)) {
-                            numDisjunctiveSynapses--;
-                        }
-                    }
-                }
+                synapseSummary.updateSynapse(s);
 
                 s.weight += s.weightDelta;
                 s.weightDelta = 0.0;
@@ -475,16 +441,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         bias += biasDelta;
         biasDelta = 0.0;
-
-        biasSum += biasSumDelta;
-
-        assert Double.isFinite(biasSum);
-
-        posDirSum += sumDelta[DIRECT][POSITIVE];
-        negDirSum += sumDelta[DIRECT][NEGATIVE];
-        negRecSum += sumDelta[RECURRENT][NEGATIVE];
-        posRecSum += sumDelta[RECURRENT][POSITIVE];
-        posPassiveSum += posPassiveSumDelta;
 
         setModified();
     }
@@ -565,14 +521,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         out.writeDouble(bias);
-        out.writeDouble(biasSum);
-        out.writeDouble(posDirSum);
-        out.writeDouble(negDirSum);
-        out.writeDouble(negRecSum);
-        out.writeDouble(posRecSum);
-        out.writeDouble(posPassiveSum);
 
-        out.writeInt(numDisjunctiveSynapses);
+        synapseSummary.write(out);
 
         out.writeUTF(activationFunction.name());
 
@@ -644,14 +594,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         bias = in.readDouble();
-        biasSum = in.readDouble();
-        posDirSum = in.readDouble();
-        negDirSum = in.readDouble();
-        negRecSum = in.readDouble();
-        posRecSum = in.readDouble();
-        posPassiveSum = in.readDouble();
-
-        numDisjunctiveSynapses = in.readInt();
+        synapseSummary = SynapseSummary.read(in, m);
 
         activationFunction = ActivationFunction.valueOf(in.readUTF());
 
@@ -807,7 +750,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         sb.append(toString());
         sb.append("<");
         sb.append("B:");
-        sb.append(Utils.round(biasSum));
+        sb.append(Utils.round(bias));
         for (Synapse s : is) {
             sb.append(", ");
             sb.append(Utils.round(s.weight));
@@ -816,5 +759,123 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
         sb.append(">");
         return sb.toString();
+    }
+
+
+    public static class SynapseSummary implements Writable {
+        private volatile double biasSum;
+        private volatile double posDirSum;
+        private volatile double negDirSum;
+        private volatile double negRecSum;
+        private volatile double posRecSum;
+        private volatile double posPassiveSum;
+
+        private volatile int numDisjunctiveSynapses = 0;
+
+
+        public double getBiasSum() {
+            return biasSum;
+        }
+
+        public double getPosDirSum() {
+            return posDirSum;
+        }
+
+        public double getNegDirSum() {
+            return negDirSum;
+        }
+
+        public double getNegRecSum() {
+            return negRecSum;
+        }
+
+        public double getPosRecSum() {
+            return posRecSum;
+        }
+
+        public double getPosPassiveSum() {
+            return posPassiveSum;
+        }
+
+        public int getNumDisjunctiveSynapses() {
+            return numDisjunctiveSynapses;
+        }
+
+        public void updateNeuronBias(double biasDelta) {
+            biasSum += biasDelta;
+        }
+
+        public void updateSynapse(Synapse s) {
+            if (!s.isInactive()) {
+                biasSum -= s.bias;
+                biasSum += s.getNewBias();
+
+                updateSum(s.isRecurrent(), s.isNegative(), -(s.limit * s.weight));
+                updateSum(s.isRecurrent(), s.getNewWeight() <= 0.0, (s.limit + s.limitDelta) * s.getNewWeight());
+
+                if(s.getInput().get().isPassiveInputNeuron() && !s.isNegative()) {
+                    posPassiveSum -= !s.isNegative() ? (s.limit * s.weight) : 0.0;
+                    posPassiveSum += s.getNewWeight() > 0.0 ? ((s.limit + s.limitDelta) * s.getNewWeight()) : 0.0;
+                }
+
+                if(!s.isRecurrent()) {
+                    if (!s.isDisjunction(Synapse.State.OLD) && s.isDisjunction(Synapse.State.NEW)) {
+                        numDisjunctiveSynapses++;
+                    } else if (s.isDisjunction(Synapse.State.OLD) && !s.isDisjunction(Synapse.State.NEW)) {
+                        numDisjunctiveSynapses--;
+                    }
+                }
+            }
+
+            assert Double.isFinite(biasSum);
+        }
+
+
+        private void updateSum(boolean rec, boolean neg, double delta) {
+            if(!rec) {
+                if(!neg) {
+                    posDirSum += delta;
+                } else {
+                    negDirSum += delta;
+                }
+            } else {
+                if(!neg) {
+                    posRecSum += delta;
+                } else {
+                    negRecSum += delta;
+                }
+            }
+        }
+
+
+        public static SynapseSummary read(DataInput in, Model m) throws IOException {
+            SynapseSummary ss = new SynapseSummary();
+            ss.readFields(in, m);
+            return ss;
+        }
+
+        @Override
+        public void write(DataOutput out) throws IOException {
+            out.writeDouble(biasSum);
+            out.writeDouble(posDirSum);
+            out.writeDouble(negDirSum);
+            out.writeDouble(negRecSum);
+            out.writeDouble(posRecSum);
+            out.writeDouble(posPassiveSum);
+
+            out.writeInt(numDisjunctiveSynapses);
+        }
+
+        @Override
+        public void readFields(DataInput in, Model m) throws IOException {
+            biasSum = in.readDouble();
+            posDirSum = in.readDouble();
+            negDirSum = in.readDouble();
+            negRecSum = in.readDouble();
+            posRecSum = in.readDouble();
+            posPassiveSum = in.readDouble();
+
+            numDisjunctiveSynapses = in.readInt();
+        }
     }
 }

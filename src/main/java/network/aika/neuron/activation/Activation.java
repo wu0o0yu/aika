@@ -338,8 +338,10 @@ public final class Activation implements Comparable<Activation> {
 
     public State computeValueAndWeight(int round) {
         INeuron n = getINeuron();
-        double net = n.biasSum;
-        double posNet = n.biasSum;
+        INeuron.SynapseSummary ss = n.getSynapseSummary();
+
+        double net = ss.getBiasSum();
+        double posNet = ss.getBiasSum();
 
         int fired = -1;
 
@@ -380,7 +382,7 @@ public final class Activation implements Comparable<Activation> {
         double actValue = n.activationFunction.f(net);
         double posActValue = n.activationFunction.f(posNet);
 
-        double w = Math.min(-n.negRecSum, net);
+        double w = Math.min(-ss.getNegRecSum(), net);
 
         // Compute only the recurrent part is above the threshold.
         double newWeight = decision == SELECTED ? Math.max(0.0, w) : 0.0;
@@ -409,7 +411,9 @@ public final class Activation implements Comparable<Activation> {
 
     public boolean isActiveable() {
         INeuron n = getINeuron();
-        double net = n.biasSum;
+        INeuron.SynapseSummary ss = n.getSynapseSummary();
+
+        double net = ss.getBiasSum();
 
         for (Link l: inputLinks.values()) {
             if(l.isInactive()) {
@@ -464,8 +468,10 @@ public final class Activation implements Comparable<Activation> {
 
     public void computeBounds() {
         INeuron n = getINeuron();
-        double ub = n.biasSum + n.posRecSum;
-        double lb = n.biasSum + n.posRecSum;
+        INeuron.SynapseSummary ss = n.getSynapseSummary();
+
+        double ub = ss.getBiasSum() + ss.getPosRecSum();
+        double lb = ss.getBiasSum() + ss.getPosRecSum();
 
         long v = doc.getNewVisitedId();
         markPredecessor(v, 0);

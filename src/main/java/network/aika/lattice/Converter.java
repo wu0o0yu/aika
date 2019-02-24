@@ -69,7 +69,9 @@ public class Converter {
 
         initSlotFlags();
 
-        if(neuron.biasSum + neuron.posDirSum + neuron.posRecSum <= 0.0) {
+        INeuron.SynapseSummary ss = neuron.getSynapseSummary();
+
+        if(ss.getBiasSum() + ss.getPosDirSum() + ss.getPosRecSum() <= 0.0) {
             outputNode.removeParents(threadId);
             return false;
         }
@@ -81,12 +83,12 @@ public class Converter {
         TreeSet<Synapse> reqSyns = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
         double sum = 0.0;
 
-        if(neuron.numDisjunctiveSynapses == 0) {
-            double remainingSum = neuron.posDirSum;
+        if(ss.getNumDisjunctiveSynapses() == 0) {
+            double remainingSum = ss.getPosDirSum();
             int i = 0;
             for (Synapse s : candidates) {
                 double v = s.getMaxInputValue();
-                final boolean isOptionalInput = sum + remainingSum - v + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum > 0.0;
+                final boolean isOptionalInput = sum + remainingSum - v + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0;
                 final boolean maxAndNodesReached = i >= MAX_AND_NODE_SIZE;
                 if (isOptionalInput || maxAndNodesReached) {
                     break;
@@ -105,7 +107,7 @@ public class Converter {
 
                 sum += v;
 
-                final boolean sumOfSynapseWeightsAboveThreshold = sum + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum > 0.0;
+                final boolean sumOfSynapseWeightsAboveThreshold = sum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0;
                 if (sumOfSynapseWeightsAboveThreshold) {
                     noFurtherRefinement = true;
                     break;
@@ -119,7 +121,7 @@ public class Converter {
             } else {
                 for (Synapse s : candidates) {
                     double v = s.getMaxInputValue();
-                    boolean belowThreshold = sum + v + remainingSum + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum <= 0.0;
+                    boolean belowThreshold = sum + v + remainingSum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() <= 0.0;
                     if (belowThreshold) {
                         break;
                     }
