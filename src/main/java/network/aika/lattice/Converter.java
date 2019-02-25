@@ -65,7 +65,7 @@ public class Converter {
 
 
     private boolean convert() {
-        outputNode = neuron.node.get();
+        outputNode = neuron.getInputNode().get();
 
         initSlotFlags();
 
@@ -161,7 +161,7 @@ public class Converter {
 
 
     private List<Synapse> prepareCandidates() {
-        Synapse syn = getBestSynapse(neuron.inputSynapses.values());
+        Synapse syn = getStrongestSynapse(neuron.getInputSynapses());
 
         TreeSet<Integer> alreadyCollected = new TreeSet<>();
         ArrayList<Synapse> selectedCandidates = new ArrayList<>();
@@ -181,14 +181,14 @@ public class Converter {
                 }
             }
 
-            syn = getBestSynapse(relatedSyns.values());
+            syn = getStrongestSynapse(relatedSyns.values());
         }
 
         return selectedCandidates;
     }
 
 
-    private Synapse getBestSynapse(Collection<Synapse> synapses) {
+    private Synapse getStrongestSynapse(Collection<Synapse> synapses) {
         Synapse maxSyn = null;
         for(Synapse s: synapses) {
             if(!s.isNegative() && !s.isRecurrent() && !s.isInactive() && !s.getInput().get().isPassiveInputNeuron()) {
@@ -204,7 +204,7 @@ public class Converter {
     private NodeContext expandNode(NodeContext nc, Synapse s) {
         if (nc == null) {
             NodeContext nln = new NodeContext();
-            nln.node = s.getInput().get().outputNode.get();
+            nln.node = s.getInput().get().getOutputNode().get();
             nln.offsets = new Synapse[] {s};
             return nln;
         } else {
@@ -216,7 +216,7 @@ public class Converter {
 
             NodeContext nln = new NodeContext();
             nln.offsets = new Synapse[nc.offsets.length + 1];
-            AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.getInput().get().outputNode);
+            AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.getInput().get().getOutputNode());
             AndNode.RefValue rv = nc.node.extend(threadId, doc, ref);
             if(rv == null) {
                 return null;

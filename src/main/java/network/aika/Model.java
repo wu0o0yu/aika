@@ -160,11 +160,7 @@ public class Model {
 
     public Neuron createNeuron(String label, String outputText) {
         INeuron n = new INeuron(this, label, outputText);
-
-        InputNode iNode = InputNode.add(this, n);
-        iNode.setModified();
-
-        return n.provider;
+        return n.getProvider();
     }
 
 

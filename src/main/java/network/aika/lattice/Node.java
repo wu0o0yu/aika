@@ -292,7 +292,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
+    protected void changeNumberOfNeuronRefs(int threadId, long v, int d) {
         ThreadState th = getThreadState(threadId, true);
         if (th.visited == v) return;
         th.visited = v;

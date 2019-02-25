@@ -110,14 +110,17 @@ public final class Activation implements Comparable<Activation> {
         this.id = id;
     }
 
-    public Activation(Document doc, INeuron neuron) {
+    public Activation(Document doc, INeuron neuron, Map<Integer, Position> slots) {
         this.id = doc.getNewActivationId();
         this.doc = doc;
         this.neuron = neuron;
+        this.slots = slots;
 
         if(doc != null && doc.getModel().getActivationExtensionFactory() != null) {
             extension = doc.getModel().getActivationExtensionFactory().createObject();
         }
+
+        neuron.register(this);
     }
 
 
@@ -140,18 +143,6 @@ public final class Activation implements Comparable<Activation> {
 
     public Position getSlot(int slot) {
         return slots.get(slot);
-    }
-
-
-    public void setSlot(int slot, Position pos) {
-        slots.put(slot, pos);
-    }
-
-
-    public void setSlots(Map<Integer, Position> slots) {
-        for(Map.Entry<Integer, Position> me: slots.entrySet()) {
-            setSlot(me.getKey(), me.getValue());
-        }
     }
 
 
@@ -202,11 +193,11 @@ public final class Activation implements Comparable<Activation> {
     }
 
     public String getLabel() {
-        return getINeuron().label;
+        return getINeuron().getLabel();
     }
 
     public Type getType() {
-        return getINeuron().type;
+        return getINeuron().getType();
     }
 
     public String getText() {
@@ -368,19 +359,17 @@ public final class Activation implements Comparable<Activation> {
             }
         }
 
-        if(n.passiveInputSynapses != null) {
-            for(Synapse s: n.passiveInputSynapses.values()) {
-                double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
+        for(Synapse s : n.getPassiveInputSynapses()) {
+            double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
 
-                net += x;
-                if(!s.isNegative()) {
-                    posNet += x;
-                }
+            net += x;
+            if (!s.isNegative()) {
+                posNet += x;
             }
         }
 
-        double actValue = n.activationFunction.f(net);
-        double posActValue = n.activationFunction.f(posNet);
+        double actValue = n.getActivationFunction().f(net);
+        double posActValue = n.getActivationFunction().f(posNet);
 
         double w = Math.min(-ss.getNegRecSum(), net);
 
@@ -437,12 +426,10 @@ public final class Activation implements Comparable<Activation> {
             net += x;
         }
 
-        if(n.passiveInputSynapses != null) {
-            for(Synapse s: n.passiveInputSynapses.values()) {
+        for(Synapse s: n.getPassiveInputSynapses()) {
                 double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
 
                 net += x;
-            }
         }
 
         return net > 0.0;
@@ -503,17 +490,15 @@ public final class Activation implements Comparable<Activation> {
             }
         }
 
-        if(n.passiveInputSynapses != null) {
-            for(Synapse s: n.passiveInputSynapses.values()) {
-                double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
+        for(Synapse s : n.getPassiveInputSynapses()) {
+            double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
 
-                ub += x;
-                lb += x;
-            }
+            ub += x;
+            lb += x;
         }
 
-        upperBound = n.activationFunction.f(ub);
-        lowerBound = n.activationFunction.f(lb);
+        upperBound = n.getActivationFunction().f(ub);
+        lowerBound = n.getActivationFunction().f(lb);
     }
 
 
@@ -558,7 +543,7 @@ public final class Activation implements Comparable<Activation> {
 
 
     public ActivationFunction getActivationFunction() {
-        return getINeuron().activationFunction;
+        return getINeuron().getActivationFunction();
     }
 
     /*
@@ -637,7 +622,7 @@ public final class Activation implements Comparable<Activation> {
     private void collectIncomingConflicts(List<Activation> conflicts, long v) {
         if(markedPredecessor == v) return;
 
-        if (getINeuron().type != INeuron.Type.INHIBITORY) {
+        if (getType() != INeuron.Type.INHIBITORY) {
             conflicts.add(this);
         } else {
             for (Link l : inputLinks.values()) {
@@ -653,7 +638,7 @@ public final class Activation implements Comparable<Activation> {
         if(markedPredecessor == v) return;
 
         for(Link l: outputLinks.values()) {
-            if (l.output.getINeuron().type != INeuron.Type.INHIBITORY) {
+            if (l.output.getType() != INeuron.Type.INHIBITORY) {
                 if (l.isNegative() && l.isRecurrent()) {
                     conflicts.add(l.output);
                 }
@@ -940,8 +925,8 @@ public final class Activation implements Comparable<Activation> {
         }
 
         if(SearchNode.COMPUTE_SOFT_MAX) {
-            sb.append(" AVG:");
-            sb.append(getAvgState());
+            sb.append(" Exp:");
+            sb.append(getExpectedState());
         }
 
         sb.append(" - ");
@@ -962,28 +947,28 @@ public final class Activation implements Comparable<Activation> {
         return sb.toString();
     }
 
-    public State getAvgState() {
+    public State getExpectedState() {
         if (options == null) {
             return null;
         }
 
-        double avgValue = 0.0;
-        double avgPosValue = 0.0;
-        double avgNet = 0.0;
-        double avgPosNet = 0.0;
+        double value = 0.0;
+        double posValue = 0.0;
+        double net = 0.0;
+        double posNet = 0.0;
 
         for (Option option : options) {
             if (option.decision == SELECTED) {
                 double p = option.p;
                 Activation.State s = option.state;
 
-                avgValue += p * s.value;
-                avgPosValue += p * s.posValue;
-                avgNet += p * s.net;
-                avgPosNet += p * s.posNet;
+                value += p * s.value;
+                posValue += p * s.posValue;
+                net += p * s.net;
+                posNet += p * s.posNet;
             }
         }
-        return new Activation.State(avgValue, avgPosValue, avgNet, avgPosNet, 0, 0.0);
+        return new Activation.State(value, posValue, net, posNet, 0, 0.0);
     }
 
 
@@ -1263,6 +1248,14 @@ public final class Activation implements Comparable<Activation> {
         public Builder setFired(int fired) {
             this.fired = fired;
             return this;
+        }
+
+        public Map<Integer, Position> getSlots(Document doc) {
+            TreeMap<Integer, Position> slots = new TreeMap<>();
+            for(Map.Entry<Integer, Integer> me: positions.entrySet()) {
+                slots.put(me.getKey(), doc.lookupFinalPosition(me.getValue()));
+            }
+            return slots;
         }
     }
 }

@@ -148,11 +148,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public static Map<Integer, Relation> getRelationsMap(int synapseId, Neuron n) {
         if(synapseId == OUTPUT) {
-            INeuron in = n.get();
-            if (in.outputRelations == null) {
-                in.outputRelations = new TreeMap<>();
-            }
-            return in.outputRelations;
+            return n.get().getOutputRelations();
         } else {
             Synapse s = n.getSynapseById(synapseId);
             return s.getRelations();

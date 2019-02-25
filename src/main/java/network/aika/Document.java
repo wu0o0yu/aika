@@ -24,6 +24,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.Link;
+import network.aika.neuron.activation.Activation.Option;
 import network.aika.neuron.activation.Candidate;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.SearchNode;
@@ -245,6 +246,9 @@ public class Document implements Comparable<Document> {
 
 
     public String getText(Position begin, Position end) {
+        if(begin == null || end == null) {
+            return "";
+        }
         return getText(begin.getFinalPosition(), end.getFinalPosition());
     }
 
@@ -419,16 +423,16 @@ public class Document implements Comparable<Document> {
     private void computeSoftMax(SearchNode rootNode) {
         for (Activation act : activationsById.values()) {
             double offset = Double.MAX_VALUE;
-            for (Activation.Option option : act.options) {
+            for (Option option : act.options) {
                 offset = Math.min(offset, Math.log(option.cacheFactor) + option.weight);
             }
 
             double norm = 0.0;
-            for (Activation.Option option : act.options) {
+            for (Option option : act.options) {
                 norm += Math.exp(Math.log(option.cacheFactor) + option.weight - offset);
             }
 
-            for (Activation.Option option : act.options) {
+            for (Option option : act.options) {
                 if (option.decision == SELECTED) {
                     option.p = Math.exp(Math.log(option.cacheFactor) + option.weight - offset) / norm;
                 }

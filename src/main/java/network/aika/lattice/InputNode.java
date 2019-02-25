@@ -57,23 +57,14 @@ public class InputNode extends Node<InputNode, InputActivation> {
     public InputNode() {
     }
 
+
     public InputNode(Model m) {
         super(m, 1);
     }
 
 
-    public static InputNode add(Model m, INeuron input) {
-        if (input.outputNode != null) {
-            return input.outputNode.get();
-        }
-        InputNode in = new InputNode(m);
-
-        if (input != null && in.inputNeuron == null) {
-            in.inputNeuron = input.getProvider();
-            input.outputNode = in.provider;
-            input.setModified();
-        }
-        return in;
+    public void setInputNeuron(Neuron n) {
+        inputNeuron = n;
     }
 
 
@@ -195,7 +186,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         for (Map.Entry<Integer, Position> me : iAct.slots.entrySet()) {
             for (Activation linkedAct : act.getDocument().getActivationsByPosition(me.getValue(), true, me.getValue(), true)) {
-                Provider<InputNode> in = linkedAct.getINeuron().outputNode;
+                Provider<InputNode> in = linkedAct.getINeuron().getOutputNode();
                 for (Map.Entry<AndNode.Refinement, AndNode.RefValue> mea : andChildren.subMap(
                         new Refinement(RelationsMap.MIN, in),
                         new Refinement(RelationsMap.MAX, in)).entrySet()) {

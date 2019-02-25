@@ -46,9 +46,10 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
     private static final Logger log = LoggerFactory.getLogger(OrNode.class);
 
-    public TreeSet<OrEntry> andParents = new TreeSet<>();
+    TreeSet<OrEntry> andParents = new TreeSet<>();
 
-    public Neuron neuron = null;
+    private Neuron outputNeuron = null;
+
 
     public OrNode() {}
 
@@ -66,45 +67,22 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
     public void addInputActivation(OrEntry oe, NodeActivation inputAct) {
         Document doc = inputAct.getDocument();
+        INeuron n = outputNeuron.get(doc);
 
-        SortedMap<Integer, Position> slots = new TreeMap<>();
-
-        INeuron n = neuron.get(doc);
-        for(int i = 0; i < oe.synapseIds.length; i++) {
-            int synapseId = oe.synapseIds[i];
-
-            Synapse s = neuron.getSynapseById(synapseId);
-            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
-                Relation rel = me.getValue();
-                if(me.getKey() == Synapse.OUTPUT) {
-                    Activation iAct = inputAct.getInputActivation(i);
-                    rel.mapSlots(slots, iAct);
-                }
-            }
-        }
-
-        for(Integer slot : n.slotRequired) {
-            if (!slots.containsKey(slot)) {
-                if (!n.slotHasInputs.contains(slot)) {
-                    slots.put(slot, new Position(doc));
-                } else {
-                    return;
-                }
-            }
-        }
+        SortedMap<Integer, Position> slots = getSlots(oe, inputAct);
+        if (n.checkRequiredSlots(doc, slots)) return;
 
         Activation act = lookupActivation(doc, slots, oe, inputAct);
 
         if(act == null) {
             OrActivation orAct = new OrActivation(doc, this);
-            act = new Activation(doc, neuron.get(doc));
+
+            act = new Activation(doc, outputNeuron.get(doc), slots);
+
             act.setInputNodeActivation(orAct);
             orAct.setOutputAct(act);
 
-            act.setSlots(slots);
-
             processActivation(orAct);
-            neuron.get(act.getDocument()).register(act);
         } else {
             propagate(act.getInputNodeActivation());
         }
@@ -114,8 +92,26 @@ public class OrNode extends Node<OrNode, OrActivation> {
     }
 
 
+    public SortedMap<Integer, Position> getSlots(OrEntry oe, NodeActivation inputAct) {
+        SortedMap<Integer, Position> slots = new TreeMap<>();
+        for(int i = 0; i < oe.synapseIds.length; i++) {
+            int synapseId = oe.synapseIds[i];
+
+            Synapse s = outputNeuron.getSynapseById(synapseId);
+            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
+                Relation rel = me.getValue();
+                if(me.getKey() == Synapse.OUTPUT) {
+                    Activation iAct = inputAct.getInputActivation(i);
+                    rel.mapSlots(slots, iAct);
+                }
+            }
+        }
+        return slots;
+    }
+
+
     private Activation lookupActivation(Document doc, SortedMap<Integer, Position> slots, OrEntry oe, NodeActivation inputAct) {
-        x: for(Activation act: neuron.get(doc)
+        x: for(Activation act: outputNeuron.get(doc)
                 .getActivations(doc, slots)
                 ) {
 
@@ -168,7 +164,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
     }
 
 
-    public static void processCandidate(Node<?, ? extends NodeActivation<?>> parentNode, NodeActivation inputAct, boolean train) {
+    static void processCandidate(Node<?, ? extends NodeActivation<?>> parentNode, NodeActivation inputAct, boolean train) {
         Document doc = inputAct.getDocument();
         try {
             parentNode.lock.acquireReadLock();
@@ -195,7 +191,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
     }
 
 
-    public void addInput(int[] synapseIds, int threadId, Node in, boolean andMode) {
+    void addInput(int[] synapseIds, int threadId, Node in, boolean andMode) {
         in.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), 1);
 
         OrEntry oe = new OrEntry(synapseIds, in.getProvider(), provider);
@@ -212,7 +208,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
 
     void remove(int threadId) {
-        neuron.get().remove();
+        outputNeuron.get().remove();
 
         super.remove();
 
@@ -225,7 +221,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
     }
 
 
-    public void removeParents(int threadId) {
+    void removeParents(int threadId) {
         for (OrEntry oe : andParents) {
             Node pn = oe.parent.get();
             pn.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), -1);
@@ -237,7 +233,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
 
     @Override
-    public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
+    protected void changeNumberOfNeuronRefs(int threadId, long v, int d) {
         throw new UnsupportedOperationException();
     }
 
@@ -272,7 +268,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
         out.writeChar('O');
         super.write(out);
 
-        out.writeInt(neuron.id);
+        out.writeInt(outputNeuron.id);
 
         out.writeInt(andParents.size());
         for(OrEntry oe: andParents) {
@@ -285,7 +281,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
-        neuron = m.lookupNeuron(in.readInt());
+        outputNeuron = m.lookupNeuron(in.readInt());
 
         int s = in.readInt();
         for(int i = 0; i < s; i++) {
@@ -295,16 +291,25 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
 
     public String getNeuronLabel() {
-        String l = neuron.getLabel();
+        String l = outputNeuron.getLabel();
         return l != null ? l : "";
     }
 
 
-    public static class OrEntry implements Comparable<OrEntry>, Writable {
-        public int[] synapseIds;
-        public TreeMap<Integer, Integer> revSynapseIds = new TreeMap<>();
-        public Provider<? extends Node> parent;
-        public Provider<OrNode> child;
+    public void setOutputNeuron(Neuron n) {
+        outputNeuron = n;
+    }
+
+    public Neuron getOutputNeuron() {
+        return outputNeuron;
+    }
+
+
+    static class OrEntry implements Comparable<OrEntry>, Writable {
+        int[] synapseIds;
+        TreeMap<Integer, Integer> revSynapseIds = new TreeMap<>();
+        Provider<? extends Node> parent;
+        Provider<OrNode> child;
 
         private OrEntry() {}
 
@@ -317,6 +322,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
             this.parent = parent;
             this.child = child;
         }
+
 
         @Override
         public void write(DataOutput out) throws IOException {
@@ -412,6 +418,15 @@ public class OrNode extends Node<OrNode, OrActivation> {
             this.oe = oe;
             this.input = input;
             this.output = output;
+        }
+
+
+        public int size() {
+            return oe.synapseIds.length;
+        }
+
+        public int get(int i) {
+            return oe.synapseIds[i];
         }
     }
 }

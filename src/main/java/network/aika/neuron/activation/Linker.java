@@ -67,8 +67,8 @@ public class Linker {
 
 
     private void linkOrNodeRelations(Activation act, OrNode.Link ol) {
-        for (int i = 0; i < ol.oe.synapseIds.length; i++) {
-            int synId = ol.oe.synapseIds[i];
+        for (int i = 0; i < ol.size(); i++) {
+            int synId = ol.get(i);
             Synapse s = act.getSynapseById(synId);
             Activation iAct = ol.input.getInputActivation(i);
             link(s, iAct, act);
@@ -77,17 +77,14 @@ public class Linker {
 
 
     private void linkOutputRelations(Activation act) {
-        INeuron n = act.getINeuron();
-        if(n.outputRelations != null) {
-            linkRelated(act, act, n.outputRelations);
-        }
+        linkRelated(act, act, act.getINeuron().getOutputRelations());
     }
 
 
     public void linkInput(Activation act) {
         Document doc = act.getDocument();
 
-        for(Synapse s: act.getNeuron().inMemoryInputSynapses.values()) {
+        for(Synapse s: act.getNeuron().getInMemoryInputSynapses()) {
             for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
                 Relation rel = me.getValue();
                 if(me.getKey() == OUTPUT) {
