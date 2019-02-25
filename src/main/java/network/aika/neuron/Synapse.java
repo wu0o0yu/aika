@@ -61,6 +61,8 @@ public class Synapse implements Writable {
     public static double DISJUNCTION_THRESHOLD = 0.6;
     public static double CONJUNCTION_THRESHOLD = 0.4;
 
+    public static double TOLERANCE = 0.0000001;
+
 
     public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = (s1, s2) -> {
         int r = s1.input.compareTo(s2.input);
@@ -75,53 +77,35 @@ public class Synapse implements Writable {
         return Integer.compare(s1.id, s2.id);
     };
 
+    private Neuron input;
+    private Neuron output;
+
+    private Integer id;
+
+    private boolean isRecurrent;
+    private boolean identity;
+
+    private Map<Integer, Relation> relations = new TreeMap<>();
+
+    private DistanceFunction distanceFunction = null;
+
+    private Writable extension;
 
 
-    public Neuron input;
-    public Neuron output;
+    private boolean inactive;
 
-    public Integer id;
+    private double weight;
+    private double weightDelta;
 
-    public boolean isRecurrent;
-    public boolean identity;
+    private double bias;
+    private double biasDelta;
 
-    public Map<Integer, Relation> relations = new TreeMap<>();
+    private double limit;
+    private double limitDelta;
 
-    public DistanceFunction distanceFunction = null;
+    private boolean isConjunction;
+    private boolean isDisjunction;
 
-    public Writable extension;
-
-
-    public boolean inactive;
-
-    /**
-     * The weight of this synapse.
-     */
-    public double weight;
-
-    /**
-     * The weight delta of this synapse. The converter will use it to compute few internal
-     * parameters and then createOrReplace the weight variable.
-     */
-    public double weightDelta;
-
-
-    public double bias;
-
-    public double biasDelta;
-
-    public double limit;
-
-    public double limitDelta;
-
-    public boolean toBeDeleted;
-
-
-    public boolean isConjunction;
-    public boolean isDisjunction;
-
-    public int createdInDoc;
-    public int committedInDoc;
 
     public Synapse() {
     }
@@ -138,23 +122,117 @@ public class Synapse implements Writable {
     }
 
 
+    public Neuron getInput() {
+        return input;
+    }
+
+    public Neuron getOutput() {
+        return output;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public boolean isRecurrent() {
+        return isRecurrent;
+    }
+
+    public void setRecurrent(boolean recurrent) {
+        isRecurrent = recurrent;
+    }
+
+    public boolean isIdentity() {
+        return identity;
+    }
+
+    public void setIdentity(boolean identity) {
+        this.identity = identity;
+    }
+
+    public Map<Integer, Relation> getRelations() {
+        return relations;
+    }
+
+    public void setRelations(Map<Integer, Relation> relations) {
+        this.relations = relations;
+    }
+
+    public DistanceFunction getDistanceFunction() {
+        return distanceFunction;
+    }
+
+    public void setDistanceFunction(DistanceFunction distanceFunction) {
+        this.distanceFunction = distanceFunction;
+    }
+
+    public <T extends Writable> T getExtension() {
+        return (T) extension;
+    }
+
+    public void setExtension(Writable extension) {
+        this.extension = extension;
+    }
+
+    public boolean isInactive() {
+        return inactive;
+    }
+
+    public void setInactive(boolean inactive) {
+        this.inactive = inactive;
+    }
+
+    public boolean isConjunction() {
+        return isConjunction;
+    }
+
+    public boolean isDisjunction() {
+        return isDisjunction;
+    }
+
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public double getBias() {
+        return bias;
+    }
+
+    public double getLimit() {
+        return limit;
+    }
+
+    public double getNewWeight() {
+        return weight + weightDelta;
+    }
+
+    public double getNewBias() {
+        return bias + biasDelta;
+    }
+
+    public double getNewLimit() {
+        return limit + limitDelta;
+    }
+
+
     public void link() {
         INeuron in = input.get();
         INeuron out = output.get();
 
-        boolean dir = in.provider.id < out.provider.id;
+        boolean dir = in.getProvider().id < out.getProvider().id;
 
         (dir ? in : out).lock.acquireWriteLock();
         (dir ? out : in).lock.acquireWriteLock();
 
-        in.provider.lock.acquireWriteLock();
-        in.provider.inMemoryOutputSynapses.put(this, this);
-        in.provider.lock.releaseWriteLock();
+        input.lock.acquireWriteLock();
+        input.inMemoryOutputSynapses.put(this, this);
+        input.lock.releaseWriteLock();
 
-        out.provider.lock.acquireWriteLock();
-        out.provider.inMemoryInputSynapses.put(this, this);
-        out.provider.inputSynapsesById.put(id, this);
-        out.provider.lock.releaseWriteLock();
+        output.lock.acquireWriteLock();
+        output.inMemoryInputSynapses.put(this, this);
+        output.inputSynapsesById.put(id, this);
+        output.lock.releaseWriteLock();
 
         removeLinkInternal(in, out);
 
@@ -187,7 +265,7 @@ public class Synapse implements Writable {
             INeuron in = input.get();
             INeuron out = output.get();
 
-            boolean dir = in.provider.id < out.provider.id;
+            boolean dir = in.getProvider().id < out.getProvider().id;
             (dir ? in : out).lock.acquireWriteLock();
             (dir ? out : in).lock.acquireWriteLock();
 
@@ -209,7 +287,7 @@ public class Synapse implements Writable {
             INeuron in = input.get();
             INeuron out = output.get();
 
-            boolean dir = in.provider.id < out.provider.id;
+            boolean dir = in.getProvider().id < out.getProvider().id;
             (dir ? in : out).lock.acquireWriteLock();
             (dir ? out : in).lock.acquireWriteLock();
 
@@ -232,19 +310,19 @@ public class Synapse implements Writable {
         INeuron in = input.get();
         INeuron out = output.get();
 
-        boolean dir = in.provider.id < out.provider.id;
+        boolean dir = input.id < out.getProvider().id;
 
         (dir ? in : out).lock.acquireWriteLock();
         (dir ? out : in).lock.acquireWriteLock();
 
-        in.provider.lock.acquireWriteLock();
-        in.provider.inMemoryOutputSynapses.remove(this);
-        in.provider.lock.releaseWriteLock();
+        input.lock.acquireWriteLock();
+        input.inMemoryOutputSynapses.remove(this);
+        input.lock.releaseWriteLock();
 
-        out.provider.lock.acquireWriteLock();
-        out.provider.inMemoryInputSynapses.remove(this);
-        out.provider.inputSynapsesById.remove(id);
-        out.provider.lock.releaseWriteLock();
+        output.lock.acquireWriteLock();
+        output.inMemoryInputSynapses.remove(this);
+        output.inputSynapsesById.remove(id);
+        output.lock.releaseWriteLock();
 
         removeLinkInternal(in, out);
 
@@ -279,6 +357,23 @@ public class Synapse implements Writable {
     }
 
 
+    public void commit() {
+        weight += weightDelta;
+        weightDelta = 0.0;
+
+        bias += biasDelta;
+        biasDelta = 0.0;
+
+        limit += limitDelta;
+        limitDelta = 0.0;
+    }
+
+
+    public boolean isZero() {
+        return Math.abs(weight) < TOLERANCE && Math.abs(bias) < TOLERANCE ;
+    }
+
+
     public enum State {
         NEW,
         OLD
@@ -303,7 +398,6 @@ public class Synapse implements Writable {
         this.weightDelta += weightDelta;
         this.biasDelta += biasDelta;
         this.limitDelta += limitDelta;
-        output.get().biasSumDelta += biasDelta;
         relink();
         if(doc != null) {
             doc.notifyWeightModified(this);
@@ -313,10 +407,8 @@ public class Synapse implements Writable {
 
     public void update(Document doc, double weight, double bias, double limit) {
         this.weightDelta = weight - this.weight;
-        double newBiasDelta = bias - this.bias;
         this.limitDelta = limit - this.limit;
-        output.get().biasSumDelta += newBiasDelta - biasDelta;
-        biasDelta = newBiasDelta;
+        this.biasDelta = bias - this.bias;
 
         relink();
         if(doc != null) {
@@ -444,22 +536,9 @@ public class Synapse implements Writable {
         }
 
         synapse.link();
-        if (doc != null) {
-            synapse.createdInDoc = doc.id;
-        }
+
         return synapse;
     }
-
-
-    public double getNewWeight() {
-        return weight + weightDelta;
-    }
-
-
-    public double getNewBias() {
-        return bias + biasDelta;
-    }
-
 
     public Set<Integer> linksOutput() {
         Set<Integer> results = new TreeSet<>();

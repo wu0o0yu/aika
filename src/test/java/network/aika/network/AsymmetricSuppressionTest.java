@@ -18,7 +18,6 @@ import static network.aika.neuron.relation.Relation.EQUALS;
 public class AsymmetricSuppressionTest {
 
 
-    @Ignore
     @Test
     public void testAsymmetricSuppression() {
         Model m = new Model();

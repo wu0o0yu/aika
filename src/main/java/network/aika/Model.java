@@ -51,7 +51,6 @@ public class Model {
 
     public SuspensionHook suspensionHook;
 
-    private WritableFactory nodeExtensionFactory;
     private WritableFactory neuronExtensionFactory;
     private WritableFactory synapseExtensionFactory;
     private WritableFactory activationExtensionFactory;
@@ -101,15 +100,6 @@ public class Model {
         this.suspensionHook = suspensionHook;
     }
 
-
-    public WritableFactory getNodeExtensionFactory() {
-        return nodeExtensionFactory;
-    }
-
-
-    public void setNodeExtensionFactory(WritableFactory nodeExtensionFactory) {
-        this.nodeExtensionFactory = nodeExtensionFactory;
-    }
 
     public WritableFactory getNeuronExtensionFactory() {
         return neuronExtensionFactory;
@@ -263,7 +253,7 @@ public class Model {
     public int getOldestDocIdInProcessing() {
         int oldestDocId = Integer.MAX_VALUE;
         for(Document doc: docs) {
-            if(doc != null) oldestDocId = Math.min(oldestDocId, doc.id);
+            if(doc != null) oldestDocId = Math.min(oldestDocId, doc.getId());
         }
         return oldestDocId;
     }

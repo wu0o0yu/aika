@@ -1,5 +1,6 @@
 package network.aika.neuron.relation;
 
+import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
@@ -92,22 +93,16 @@ public abstract class PositionRelation extends Relation {
 
     @Override
     public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-        INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
-
-        if(th == null || th.isEmpty()) {
-            return Stream.empty();
-        }
-
         Position pos = linkedAct.getSlot(toSlot);
         if(pos == null) {
             return Stream.empty();
         }
 
-        return getActivations(th, pos)
+        return getActivations(n, pos)
                 .filter(act -> test(act, linkedAct));
     }
 
-    public abstract Stream<Activation> getActivations(INeuron.ThreadState th, Position pos);
+    public abstract Stream<Activation> getActivations(INeuron n, Position pos);
 
 
     @Override
@@ -166,9 +161,9 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public Stream<Activation> getActivations(INeuron.ThreadState th, Position pos) {
+        public Stream<Activation> getActivations(INeuron n, Position pos) {
             if(!follow) return Stream.empty();
-            return th.getActivations(
+            return n.getActivations(pos.getDocument(),
                     fromSlot, pos, true,
                     fromSlot, pos, true
             );
@@ -236,10 +231,11 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public Stream<Activation> getActivations(INeuron.ThreadState th, Position pos) {
+        public Stream<Activation> getActivations(INeuron n, Position pos) {
             if(!follow) return Stream.empty();
-            return th.getActivations(
-                    fromSlot, new Position(pos.doc, maxLength != Integer.MAX_VALUE ? pos.getFinalPosition() - maxLength : Integer.MIN_VALUE), true,
+            return n.getActivations(
+                    pos.getDocument(),
+                    fromSlot, new Position(pos.getDocument(), maxLength != Integer.MAX_VALUE ? pos.getFinalPosition() - maxLength : Integer.MIN_VALUE), true,
                     fromSlot, pos, orEquals
             );
         }
@@ -323,11 +319,12 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public Stream<Activation> getActivations(INeuron.ThreadState th, Position pos) {
+        public Stream<Activation> getActivations(INeuron n, Position pos) {
             if(!follow) return Stream.empty();
-            return th.getActivations(
+            return n.getActivations(
+                    pos.getDocument(),
                     fromSlot, pos, orEquals,
-                    fromSlot, new Position(pos.doc, maxLength != Integer.MAX_VALUE ? pos.getFinalPosition() + maxLength : Integer.MAX_VALUE), true
+                    fromSlot, new Position(pos.getDocument(), maxLength != Integer.MAX_VALUE ? pos.getFinalPosition() + maxLength : Integer.MAX_VALUE), true
             );
         }
 

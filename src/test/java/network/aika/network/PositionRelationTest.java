@@ -312,14 +312,14 @@ public class PositionRelationTest {
 
         doc.process();
 
-        Assert.assertEquals(1, pattern.get().getThreadState(doc.threadId, true).size());
+        Assert.assertEquals(1, pattern.get().size(doc));
 
 
         System.out.println("Output activation:");
         INeuron n = pattern.get();
         for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
             System.out.println("Text Range: " + act.slotsToString());
-            System.out.println("Node: " + act.node);
+            System.out.println("Neuron: " + act.getLabel());
             System.out.println();
         }
 

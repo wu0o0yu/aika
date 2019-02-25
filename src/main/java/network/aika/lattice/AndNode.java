@@ -23,7 +23,6 @@ import network.aika.Provider;
 import network.aika.Writable;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
-import network.aika.PatternDiscovery;
 import network.aika.lattice.InputNode.InputActivation;
 import network.aika.lattice.AndNode.AndActivation;
 
@@ -43,10 +42,11 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-public class AndNode extends Node<AndNode, AndActivation> {
+class AndNode extends Node<AndNode, AndActivation> {
 
 
-    public List<Entry> parents;
+    List<Entry> parents;
+
 
     public AndNode() {
         parents = new ArrayList<>();
@@ -101,55 +101,51 @@ public class AndNode extends Node<AndNode, AndActivation> {
             for (Link fl : act.inputs) {
                 if(fl == null) continue;
 
-                InputActivation refAct = fl.refAct;
-                Refinement ref = fl.ref;
-                RefValue rv = fl.rv;
                 NodeActivation<?> pAct = fl.input;
 
                 for (Link sl : pAct.outputsToAndNode.values()) {
-                    InputActivation secondRefAct = sl.refAct;
-                    Refinement secondRef = sl.ref;
-                    RefValue secondRv = sl.rv;
                     NodeActivation secondAct = sl.output;
                     if (act != secondAct) {
-                        Relation[] relations = new Relation[secondRef.relations.length() + 1];
-                        for(int i = 0; i < secondRef.relations.length(); i++) {
-                            relations[rv.offsets[i]] = secondRef.relations.get(i);
-                        }
-
-                        lock.acquireReadLock();
-                        for(Map.Entry<Refinement, RefValue> me: andChildren.subMap(
-                                new Refinement(RelationsMap.MIN, secondRef.input),
-                                new Refinement(RelationsMap.MAX, secondRef.input)).entrySet()) {
-                            Refinement nRef = me.getKey();
-                            RefValue nRv = me.getValue();
-                            if(nRef.contains(secondRef, rv)) {
-                                AndNode nlNode = nRv.child.get(act.doc);
-
-                                AndActivation nlAct = lookupAndActivation(act, nRef);
-
-                                if(nlAct == null) {
-                                    nlAct = new AndActivation(act.doc.logicNodeActivationIdCounter++, act.doc, nlNode);
-                                    nlAct.link(nRef, nRv, secondRefAct, act);
-                                }
-
-                                nlAct.node.addActivation(nlAct);
-
-                                for(Entry secondNE: nlNode.parents) {
-                                    if(secondNE.rv.parent.get(act.doc) == secondAct.node && secondNE.ref.contains(ref, secondRv)) {
-                                        nlAct.link(secondNE.ref, secondNE.rv, refAct, secondAct);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        lock.releaseReadLock();
+                        applyIntern(act, fl.refAct, fl.ref, fl.rv, secondAct, sl.refAct, sl.ref, sl.rv);
                     }
                 }
             }
         }
 
         OrNode.processCandidate(this, act, false);
+    }
+
+
+    private void applyIntern(AndActivation act, InputActivation refAct, Refinement ref, RefValue rv, NodeActivation secondAct, InputActivation secondRefAct, Refinement secondRef, RefValue secondRv) {
+        Document doc = act.getDocument();
+
+        lock.acquireReadLock();
+        for(Map.Entry<Refinement, RefValue> me: andChildren.subMap(
+                new Refinement(RelationsMap.MIN, secondRef.input),
+                new Refinement(RelationsMap.MAX, secondRef.input)).entrySet()) {
+            Refinement nRef = me.getKey();
+            RefValue nRv = me.getValue();
+            if(nRef.contains(secondRef, rv)) {
+                AndNode nlNode = nRv.child.get(doc);
+
+                AndActivation nlAct = lookupAndActivation(act, nRef);
+
+                if(nlAct == null) {
+                    nlAct = new AndActivation(doc, nlNode);
+                    nlAct.link(nRef, nRv, secondRefAct, act);
+                }
+
+                nlAct.getNode().addActivation(nlAct);
+
+                for(Entry secondNE: nlNode.parents) {
+                    if(secondNE.rv.parent.get(doc) == secondAct.getNode() && secondNE.ref.contains(ref, secondRv)) {
+                        nlAct.link(secondNE.ref, secondNE.rv, refAct, secondAct);
+                        break;
+                    }
+                }
+            }
+        }
+        lock.releaseReadLock();
     }
 
 
@@ -163,52 +159,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
     }
 
 
-
-    @Override
-    public void discover(AndActivation act, PatternDiscovery.Config config) {
-        Document doc = act.doc;
-        for(Link fl : act.inputs) {
-            if(fl == null) continue;
-
-            for (Link sl : fl.input.outputsToAndNode.values()) {
-                AndActivation secondAct = sl.output;
-                if (secondAct.node instanceof AndNode) {
-                    if (act != secondAct && config.candidateCheck.check(act, secondAct)) {
-                        Activation iAct = act.getInputActivation(fl.rv.refOffset);
-                        Activation secondIAct = secondAct.getInputActivation(sl.rv.refOffset);
-
-                        List<Relation> rels = config.candidateRelations.getRelations(iAct, secondIAct);
-                        rels.add(null);
-
-                        for(Relation rel: rels) {
-                            Refinement nRef = createRefinement(fl.rv, sl.ref, rel);
-
-                            AndNode.RefValue rv = extend(doc.threadId, doc, nRef, config);
-                            if (rv != null) {
-                                AndNode nln = rv.child.get();
-                                nln.isDiscovered = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
-    private Refinement createRefinement(RefValue firstRV, Refinement secondRef, Relation rel) {
-        Relation[] srm = secondRef.relations.relations;
-        RelationsMap rm = new RelationsMap();
-        rm.relations = new Relation[srm.length + 1];
-        for (int i = 0; i < srm.length; i++) {
-            rm.relations[firstRV.offsets[i]] = srm[i];
-        }
-        rm.relations[firstRV.refOffset] = rel;
-        return new Refinement(rm, secondRef.input);
-    }
-
-
-    public RefValue extend(int threadId, Document doc, Refinement firstRef, PatternDiscovery.Config patterDiscoverConfig) {
+    public RefValue extend(int threadId, Document doc, Refinement firstRef) {
         if(!firstRef.isConvertible()) return null;
 
         RefValue firstRV = getAndChild(firstRef);
@@ -237,9 +188,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
             Refinement secondParentRef = new Refinement(new RelationsMap(secondParentRelations), firstRef.input);
 
-            RefValue secondParentRV = patterDiscoverConfig != null ?
-                    parentNode.getAndChild(secondParentRef) :
-                    parentNode.extend(threadId, doc, secondParentRef, null);
+            RefValue secondParentRV = parentNode.extend(threadId, doc, secondParentRef);
 
             if(secondParentRV == null) {
                 continue;
@@ -273,12 +222,12 @@ public class AndNode extends Node<AndNode, AndActivation> {
         firstRV = new RefValue(firstOffsets, firstRefOffset, provider);
         nextLevelParents.add(new Entry(firstRef, firstRV));
 
-        return createAndNode(provider.model, doc, nextLevelParents, level + 1, patterDiscoverConfig) ? firstRV : null;
+        return createAndNode(provider.model, doc, nextLevelParents, level + 1) ? firstRV : null;
     }
 
 
 
-    static boolean createAndNode(Model m, Document doc, List<Entry> parents, int level, PatternDiscovery.Config patterDiscoverConfig) {
+    static boolean createAndNode(Model m, Document doc, List<Entry> parents, int level) {
         if (parents != null) {
             // Locking needs to take place in a predefined order.
             TreeSet<Provider<? extends Node>> parentsForLocking = new TreeSet();
@@ -291,10 +240,6 @@ public class AndNode extends Node<AndNode, AndActivation> {
             }
             try {
                 AndNode nln = new AndNode(m, level, parents);
-
-                if(patterDiscoverConfig != null && !patterDiscoverConfig.patternCheck.check(nln)) {
-                    return false;
-                }
 
                 nln.init();
                 nln.postCreate(doc);
@@ -323,7 +268,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
             Node<?, NodeActivation<?>> pn = e.rv.parent.get();
             for(NodeActivation act : pn.getActivations(doc)) {
                 act.repropagateV = markedCreated;
-                act.node.propagate(act);
+                act.getNode().propagate(act);
             }
         }
     }
@@ -646,8 +591,8 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
         public Link[] inputs;
 
-        public AndActivation(int id, Document doc, AndNode node) {
-            super(id, doc, node);
+        public AndActivation(Document doc, AndNode node) {
+            super(doc, node);
             inputs = new Link[node.level];
         }
 
@@ -660,7 +605,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
         public Activation getInputActivation(int i) {
             Link l = inputs[i];
             if(l != null) {
-                return l.refAct.input.input;
+                return l.refAct.input;
             } else {
                 for(int j = 0; j < inputs.length; j++) {
                     if (j != i) {
@@ -679,7 +624,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
             for (Link l : inputs) {
                 if (l != null) numberOfLinks++;
             }
-            return node.parents.size() == numberOfLinks;
+            return getNode().parents.size() == numberOfLinks;
         }
 
         public String toString() {
@@ -692,7 +637,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
                     if(!first) {
                         sb.append(",");
                     }
-                    sb.append(i + ":" + iAct.getLabel() + " " + iAct.slotsToString() + " (" + iAct.id + ")");
+                    sb.append(i + ":" + iAct.getLabel() + " " + iAct.slotsToString() + " (" + iAct.getId() + ")");
 
                     first = false;
                 }

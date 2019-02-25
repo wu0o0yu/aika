@@ -23,9 +23,9 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
-import network.aika.PatternDiscovery;
 import network.aika.Document;
 import network.aika.neuron.relation.Relation;
+import network.aika.lattice.OrNode.OrActivation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +42,7 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-public class OrNode extends Node<OrNode, Activation> {
+public class OrNode extends Node<OrNode, OrActivation> {
 
     private static final Logger log = LoggerFactory.getLogger(OrNode.class);
 
@@ -59,22 +59,22 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref, PatternDiscovery.Config patterDiscovery) {
+    public AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref) {
         throw new UnsupportedOperationException();
     }
 
 
     public void addInputActivation(OrEntry oe, NodeActivation inputAct) {
-        Document doc = inputAct.doc;
+        Document doc = inputAct.getDocument();
 
         SortedMap<Integer, Position> slots = new TreeMap<>();
 
-        INeuron n = neuron.get(inputAct.doc);
+        INeuron n = neuron.get(doc);
         for(int i = 0; i < oe.synapseIds.length; i++) {
             int synapseId = oe.synapseIds[i];
 
             Synapse s = neuron.getSynapseById(synapseId);
-            for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
                 Relation rel = me.getValue();
                 if(me.getKey() == Synapse.OUTPUT) {
                     Activation iAct = inputAct.getInputActivation(i);
@@ -96,44 +96,51 @@ public class OrNode extends Node<OrNode, Activation> {
         Activation act = lookupActivation(doc, slots, oe, inputAct);
 
         if(act == null) {
-            act = new Activation(doc.activationIdCounter++, doc, this);
+            OrActivation orAct = new OrActivation(doc, this);
+            act = new Activation(doc, neuron.get(doc));
+            act.setInputNodeActivation(orAct);
+            orAct.setOutputAct(act);
+
             act.setSlots(slots);
 
-            processActivation(act);
+            processActivation(orAct);
+            neuron.get(act.getDocument()).register(act);
         } else {
-            propagate(act);
+            propagate(act.getInputNodeActivation());
         }
 
-        Link ol = act.link(oe, inputAct);
-        act.doc.linker.link(act, ol);
+        Link ol = act.getInputNodeActivation().link(oe, inputAct);
+        doc.getLinker().link(act, ol);
     }
 
 
     private Activation lookupActivation(Document doc, SortedMap<Integer, Position> slots, OrEntry oe, NodeActivation inputAct) {
         x: for(Activation act: neuron.get(doc)
-                .getThreadState(doc.threadId, true)
-                .getActivations(slots)
+                .getActivations(doc, slots)
                 ) {
 
             Synapse ls = null;
             boolean matched = false;
             for(Activation.Link l: act.getInputLinksOrderedBySynapse()) {
-                if(ls != null && ls != l.synapse) {
+                Synapse s = l.getSynapse();
+
+                if(ls != null && ls != s) {
                     if(!matched) {
                         continue x;
                     }
                     matched = false;
                 }
 
-                if (l.synapse.identity) {
-                    Integer i = oe.revSynapseIds.get(l.synapse.id);
-                    if(i != null && l.input == doc.linker.computeInputActivation(l.synapse, inputAct.getInputActivation(i))) {
+                if (s.isIdentity()) {
+                    Integer i = oe.revSynapseIds.get(s.getId());
+                    Activation iAct = doc.getLinker().computeInputActivation(s, inputAct.getInputActivation(i));
+                    if(i != null && l.getInput() == iAct) {
                         matched = true;
                     }
                 } else {
                     matched = true;
                 }
-                ls = l.synapse;
+                ls = s;
             }
 
             if(matched) {
@@ -144,14 +151,8 @@ public class OrNode extends Node<OrNode, Activation> {
     }
 
 
-    public void propagate(Activation act) {
-        act.doc.ubQueue.add(act);
-    }
-
-
-    public void processActivation(Activation act) {
-        super.processActivation(act);
-        neuron.get(act.doc).register(act);
+    public void propagate(OrActivation act) {
+        act.getDocument().addToUpperBoundQueue(act.getOutputAct());
     }
 
 
@@ -162,18 +163,13 @@ public class OrNode extends Node<OrNode, Activation> {
 
 
     @Override
-    public void apply(Activation act) {
+    public void apply(OrActivation act) {
         throw new UnsupportedOperationException();
     }
 
 
-    @Override
-    public void discover(Activation act, PatternDiscovery.Config config) {
-    }
-
-
     public static void processCandidate(Node<?, ? extends NodeActivation<?>> parentNode, NodeActivation inputAct, boolean train) {
-        Document doc = inputAct.doc;
+        Document doc = inputAct.getDocument();
         try {
             parentNode.lock.acquireReadLock();
             if (parentNode.orChildren != null) {
@@ -193,7 +189,7 @@ public class OrNode extends Node<OrNode, Activation> {
             Node<?, NodeActivation<?>> pn = oe.parent.get();
             for (NodeActivation act : pn.getActivations(doc)) {
                 act.repropagateV = markedCreated;
-                act.node.propagate(act);
+                act.getNode().propagate(act);
             }
         }
     }
@@ -202,7 +198,7 @@ public class OrNode extends Node<OrNode, Activation> {
     public void addInput(int[] synapseIds, int threadId, Node in, boolean andMode) {
         in.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), 1);
 
-        OrEntry oe = new OrEntry(synapseIds, in.provider, provider);
+        OrEntry oe = new OrEntry(synapseIds, in.getProvider(), provider);
         in.addOrChild(oe);
         in.setModified();
 
@@ -378,9 +374,18 @@ public class OrNode extends Node<OrNode, Activation> {
 
     public static class OrActivation extends NodeActivation<OrNode> {
         public Map<Integer, Link> orInputs = new TreeMap<>();
+        private Activation outputAct;
 
-        public OrActivation(int id, Document doc, OrNode node) {
-            super(id, doc, node);
+        public OrActivation(Document doc, OrNode node) {
+            super(doc, node);
+        }
+
+        public Activation getOutputAct() {
+            return outputAct;
+        }
+
+        public void setOutputAct(Activation outputAct) {
+            this.outputAct = outputAct;
         }
 
         @Override

@@ -137,7 +137,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public static void addRelation(Map<Integer, Relation> relMap, Integer synId, Integer targetSynId, Neuron n, Relation r) {
         if(targetSynId == OUTPUT) {
             Synapse s = n.getSynapseById(synId);
-            if(s == null || (r.isExact() && s.isDisjunction && !s.inactive)) {
+            if(s == null || (r.isExact() && s.isDisjunction() && !s.isInactive())) {
                 return;
             }
         }
@@ -155,7 +155,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             return in.outputRelations;
         } else {
             Synapse s = n.getSynapseById(synapseId);
-            return s.relations;
+            return s.getRelations();
         }
     }
 
@@ -269,12 +269,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-            INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
-
-            if(th == null || th.isEmpty()) {
-                return Stream.empty();
-            }
-            return th.getActivations();
+            return n.getActivations(linkedAct.getDocument());
         }
 
         @Override

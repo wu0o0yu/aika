@@ -27,41 +27,39 @@ public abstract class AncestorRelation extends Relation {
 
 
     private static void collectCommonAncestor(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
-        if(linkedAct.visited == v) return;
+        if(linkedAct.getVisitedId() == v) return;
 
         collectContains(results, n, linkedAct, v);
 
-        linkedAct.getInputLinks(false, false)
-                .filter(l -> l.synapse.identity)
-                .forEach(l -> collectCommonAncestor(results, n, l.input, v));
+        linkedAct.getInputLinks(false)
+                .filter(l -> l.isIdentity())
+                .forEach(l -> collectCommonAncestor(results, n, l.getInput(), v));
     }
 
 
     private static void collectContains(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
-        if(linkedAct.visited == v) return;
-        linkedAct.visited = v;
+        if(!linkedAct.checkVisited(v)) return;
 
         if(linkedAct.getINeuron() == n) {
             results.add(linkedAct);
         }
 
-        linkedAct.getOutputLinks(false)
-                .filter(l ->l.synapse.identity)
-                .forEach(l -> collectContains(results, n, l.output, v));
+        linkedAct.getOutputLinks()
+                .filter(l ->l.isIdentity())
+                .forEach(l -> collectContains(results, n, l.getOutput(), v));
     }
 
 
     private static void collectContainedIn(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
-        if(linkedAct.visited == v) return;
-        linkedAct.visited = v;
+        if(!linkedAct.checkVisited(v)) return;
 
         if(linkedAct.getINeuron() == n) {
             results.add(linkedAct);
         }
 
-        linkedAct.getInputLinks(false, false)
-                .filter(l -> l.synapse.identity)
-                .forEach(l -> collectContainedIn(results, n, l.input, v));
+        linkedAct.getInputLinks(false)
+                .filter(l -> l.isIdentity())
+                .forEach(l -> collectContainedIn(results, n, l.getInput(), v));
     }
 
 
@@ -76,57 +74,53 @@ public abstract class AncestorRelation extends Relation {
 
 
     private static boolean contains(Activation actA, Activation actB, long v) {
-        if(actA.visited == v) return false;
-        actA.visited = v;
+        if(!actA.checkVisited(v)) return false;
 
         if(actA == actB) return true;
 
-        return actA.getInputLinks(false, false)
-                .filter(l -> l.synapse.identity)
-                .anyMatch(l -> contains(l.input, actB, v));
+        return actA.getInputLinks(false)
+                .filter(l -> l.isIdentity())
+                .anyMatch(l -> contains(l.getInput(), actB, v));
     }
 
 
     private static boolean hasCommonAncestor(Activation act, Activation linkedAct) {
-        long v = act.doc.visitedCounter++;
+        long v = act.getNewVisitedId();
         markAncestors(linkedAct, v);
-        return hasCommonAncestor(act, v, act.doc.visitedCounter++);
+        return hasCommonAncestor(act, v, act.getNewVisitedId());
     }
 
 
     private static void markAncestors(Activation act, long v) {
-        if(act.visited == v) return;
-        act.visited = v;
+        if(!act.checkVisited(v)) return;
 
         act.markedAncDesc = v;
 
-        act.getInputLinks(false, false)
-                .filter(l -> l.synapse.identity)
-                .forEach(l -> markAncestors(l.input, v));
+        act.getInputLinks(false)
+                .filter(l -> l.isIdentity())
+                .forEach(l -> markAncestors(l.getInput(), v));
     }
 
 
     private static void markDescendants(Activation act, long v) {
-        if(act.visited == v) return;
-        act.visited = v;
+        if(!act.checkVisited(v)) return;
 
         act.markedAncDesc = v;
 
-        act.getOutputLinks(false)
-                .filter(l -> l.synapse.identity)
-                .forEach(l -> markDescendants(l.input, v));
+        act.getOutputLinks()
+                .filter(l -> l.isIdentity())
+                .forEach(l -> markDescendants(l.getInput(), v));
     }
 
 
     private static boolean hasCommonAncestor(Activation act, long v1, long v2) {
-        if(act.visited == v2) return false;
-        act.visited = v2;
+        if(!act.checkVisited(v2)) return false;
 
         if(act.markedAncDesc == v1) return true;
 
-        return act.getInputLinks(false, false)
-                .filter(l -> l.synapse.identity)
-                .anyMatch(l -> hasCommonAncestor(l.input, v1, v2));
+        return act.getInputLinks(false)
+                .filter(l -> l.isIdentity())
+                .anyMatch(l -> hasCommonAncestor(l.getInput(), v1, v2));
     }
 
 
@@ -175,7 +169,7 @@ public abstract class AncestorRelation extends Relation {
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
-            collectCommonAncestor(results, n, linkedAct, linkedAct.doc.visitedCounter++);
+            collectCommonAncestor(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
         }
 
@@ -217,14 +211,14 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public boolean test(Activation act, Activation linkedAct) {
-            return contains(act, linkedAct, act.doc.visitedCounter++);
+            return contains(act, linkedAct, act.getNewVisitedId());
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
-            collectContains(results, n, linkedAct, linkedAct.doc.visitedCounter++);
+            collectContains(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
         }
 
@@ -267,14 +261,14 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public boolean test(Activation act, Activation linkedAct) {
-            return contains(linkedAct, act, act.doc.visitedCounter++);
+            return contains(linkedAct, act, act.getNewVisitedId());
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
-            collectContainedIn(results, n, linkedAct, linkedAct.doc.visitedCounter++);
+            collectContainedIn(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
         }
 
@@ -316,17 +310,16 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public boolean test(Activation act, Activation linkedAct) {
-            return !contains(act, linkedAct, act.doc.visitedCounter++);
+            return !contains(act, linkedAct, act.getNewVisitedId());
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
-            long v = linkedAct.doc.visitedCounter++;
+            long v = linkedAct.getNewVisitedId();
             markDescendants(linkedAct, v);
 
-            INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
-            return th.getActivations()
+            return n.getActivations(linkedAct.getDocument())
                     .filter(act -> act.markedAncDesc != v);
         }
 
@@ -368,17 +361,16 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public boolean test(Activation act, Activation linkedAct) {
-            return !contains(linkedAct, act, act.doc.visitedCounter++);
+            return !contains(linkedAct, act, act.getNewVisitedId());
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             if(!follow) return Stream.empty();
-            long v = linkedAct.doc.visitedCounter++;
+            long v = linkedAct.getNewVisitedId();
             markAncestors(linkedAct, v);
 
-            INeuron.ThreadState th = n.getThreadState(linkedAct.doc.threadId, false);
-            return th.getActivations()
+            return n.getActivations(linkedAct.getDocument())
                     .filter(act -> act.markedAncDesc != v);
         }
 

@@ -77,7 +77,7 @@ public class LinkerTest {
 
             doc.process();
 
-            Assert.assertEquals(targetValue, na.get().getActivations(doc, false).iterator().next().getOutputLinks(false).count() != 0);
+            Assert.assertEquals(targetValue, na.get().getActivations(doc, false).iterator().next().getOutputLinks().count() != 0);
         }
     }
 
@@ -106,7 +106,7 @@ public class LinkerTest {
         na.addInput(doc, 0, 1);
         nb.addInput(doc, 0, 1);
 
-        Assert.assertTrue(nb.getActivations(doc, false).iterator().next().getInputLinks(false, false).findAny().isPresent());
+        Assert.assertTrue(nb.getActivations(doc, false).iterator().next().getInputLinks(false).findAny().isPresent());
     }
 
 
@@ -149,7 +149,7 @@ public class LinkerTest {
 
         System.out.println(doc.activationsToString());
 
-        Assert.assertEquals(2, out.getActivations(doc, false).findFirst().get().getInputLinks(false, false).count());
+        Assert.assertEquals(2, out.getActivations(doc, false).findFirst().get().getInputLinks(false).count());
 
     }
 }

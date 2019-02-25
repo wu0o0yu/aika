@@ -649,20 +649,22 @@ public class InterpretationSearchTest {
         );
 
 
+
+        SearchNode.COMPUTE_SOFT_MAX = true;
+        SearchNode.OPTIMIZE_SEARCH = false;
+
         Document doc = m.createDocument("aaaa");
         in.addInput(doc, 0, 1);
         in.addInput(doc, 1, 2);
         in.addInput(doc, 2, 3);
         in.addInput(doc, 3, 4);
 
-
-        SearchNode.COMPUTE_SOFT_MAX = true;
-        SearchNode.OPTIMIZE_SEARCH = false;
-
         doc.process();
 
         System.out.println(doc.activationsToString());
 
         Assert.assertEquals(13, doc.searchNodeIdCounter);
+
+        SearchNode.COMPUTE_SOFT_MAX = false;
     }
 }

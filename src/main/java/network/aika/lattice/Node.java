@@ -18,10 +18,7 @@ package network.aika.lattice;
 
 
 import network.aika.*;
-import network.aika.PatternDiscovery;
 import network.aika.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -44,22 +41,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Lukas Molzberger
  */
-public abstract class Node<T extends Node, A extends NodeActivation<T>> extends AbstractNode<Provider<T>, A> implements Comparable<Node> {
+public abstract class Node<T extends Node, A extends NodeActivation<T>> extends AbstractNode<Provider<T>> implements Comparable<Node> {
 
     public static final Node MIN_NODE = new InputNode();
     public static final Node MAX_NODE = new InputNode();
 
-    private static final Logger log = LoggerFactory.getLogger(Node.class);
 
-    public TreeMap<AndNode.Refinement, AndNode.RefValue> andChildren;
-    public TreeSet<OrNode.OrEntry> orChildren;
+    TreeMap<AndNode.Refinement, AndNode.RefValue> andChildren;
+    TreeSet<OrNode.OrEntry> orChildren;
 
-    public int level;
-
-    public Writable extension;
-
-    // Prevents this node from being removed during cleanup.
-    public boolean isDiscovered;
+    int level;
 
     public AtomicInteger numberOfNeuronRefs = new AtomicInteger(0);
     volatile boolean isRemoved;
@@ -67,15 +58,23 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     // Only the children maps are locked.
     public ReadWriteLock lock = new ReadWriteLock();
 
-    public ThreadState<T, A>[] threads;
+    private ThreadState<A>[] threads;
 
     public long markedCreated;
+
+    /**
+     * Propagate an activation to the next node or the next neuron that is depending on the current node.
+     *
+     * @param act
+     */
+    public abstract void propagate(A act);
+
 
     /**
      * The {@code ThreadState} is a thread local data structure containing the activations of a single document for
      * a specific logic node.
      */
-    public static class ThreadState<T extends Node, A extends NodeActivation> {
+    private static class ThreadState<A extends NodeActivation> {
         public long lastUsed;
 
         public List<A> added;
@@ -93,8 +92,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public ThreadState<T, A> getThreadState(int threadId, boolean create) {
-        ThreadState<T, A> th = threads[threadId];
+    private ThreadState<A> getThreadState(int threadId, boolean create) {
+        ThreadState<A> th = threads[threadId];
         if (th == null) {
             if (!create) return null;
 
@@ -105,11 +104,18 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         return th;
     }
 
-    public abstract AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref, PatternDiscovery.Config patterDiscoveryConfig);
+
+    public void clearThreadState(int threadId, int deleteDocId) {
+        Node.ThreadState th = threads[threadId];
+        if (th != null && th.lastUsed < deleteDocId) {
+            threads[threadId] = null;
+        }
+    }
+
+
+    public abstract AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref);
 
     abstract void apply(A act);
-
-    public abstract void discover(A act, PatternDiscovery.Config config);
 
     public abstract void reprocessInputs(Document doc);
 
@@ -127,10 +133,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         provider = new Provider(m, this);
         this.level = level;
         setModified();
-
-        if(m.getNodeExtensionFactory() != null) {
-            extension = m.getNodeExtensionFactory().createObject();
-        }
     }
 
 
@@ -193,11 +195,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public void register(A act) {
-        Document doc = act.doc;
+        Document doc = act.getDocument();
 
-        ThreadState th = act.node.getThreadState(doc.threadId, true);
+        assert act.getNode() == this;
+
+        ThreadState th = getThreadState(doc.getThreadId(), true);
         if (th.activations.isEmpty()) {
-            doc.activatedNodes.add(act.node);
+            doc.addActivatedNode(act.getNode());
         }
         th.activations.add(act);
 
@@ -207,7 +211,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public void clearActivations(Document doc) {
-        clearActivations(doc.threadId);
+        clearActivations(doc.getThreadId());
     }
 
 
@@ -233,7 +237,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * @param doc
      */
     public void processChanges(Document doc) {
-        ThreadState th = getThreadState(doc.threadId, true);
+        ThreadState th = getThreadState(doc.getThreadId(), true);
         List<A> tmpAdded = th.added;
 
         th.added = new ArrayList<>();
@@ -251,9 +255,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      * @param act
      */
     public void addActivation(A act) {
-        ThreadState<T, A> th = getThreadState(act.doc.threadId, true);
+        ThreadState<A> th = getThreadState(act.getThreadId(), true);
         th.added.add(act);
-        act.doc.queue.add(this);
+        act.getDocument().addToNodeQueue(this);
     }
 
 
@@ -284,7 +288,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public boolean isRequired() {
-        return numberOfNeuronRefs.get() > 0 || isDiscovered;
+        return numberOfNeuronRefs.get() > 0;
     }
 
 
@@ -297,7 +301,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public Collection<A> getActivations(Document doc) {
-        ThreadState<T, A> th = getThreadState(doc.threadId, false);
+        ThreadState<A> th = getThreadState(doc.getThreadId(), false);
         if (th == null) return Collections.EMPTY_LIST;
         return th.activations;
     }
@@ -306,6 +310,33 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     public String getNeuronLabel() {
         return "";
+    }
+
+
+    public boolean isQueued(int threadId, long queueId) {
+        ThreadState th = getThreadState(threadId, true);
+        if (!th.isQueued) {
+            th.isQueued = true;
+            th.queueId = queueId;
+        }
+        return false;
+    }
+
+
+    public void setNotQueued(int threadId) {
+        ThreadState th = getThreadState(threadId, false);
+        if(th == null) return;
+        th.isQueued = false;
+    }
+
+
+    public static int compareRank(int threadId, Node n1, Node n2) {
+        int r = Integer.compare(n1.level, n2.level);
+        if(r != 0) return r;
+
+        ThreadState th1 = n1.getThreadState(threadId, true);
+        ThreadState th2 = n2.getThreadState(threadId, true);
+        return Long.compare(th1.queueId, th2.queueId);
     }
 
 
@@ -336,13 +367,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void write(DataOutput out) throws IOException {
         out.writeInt(level);
 
-        out.writeBoolean(extension != null);
-        if(extension != null) {
-            extension.write(out);
-        }
-
-        out.writeBoolean(isDiscovered);
-
         out.writeInt(numberOfNeuronRefs.get());
 
         if (andChildren != null) {
@@ -369,13 +393,6 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         level = in.readInt();
-
-        if(in.readBoolean()) {
-            extension = m.getNodeExtensionFactory().createObject();
-            extension.readFields(in, m);
-        }
-
-        isDiscovered = in.readBoolean();
 
         numberOfNeuronRefs.set(in.readInt());
 

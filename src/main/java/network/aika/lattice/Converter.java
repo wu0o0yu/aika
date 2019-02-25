@@ -14,11 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.lattice;
 
-import network.aika.lattice.AndNode;
-import network.aika.lattice.Node;
-import network.aika.lattice.OrNode;
+import network.aika.Document;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.relation.Relation;
@@ -37,13 +35,13 @@ public class Converter {
 
     public static Comparator<Synapse> SYNAPSE_COMP = (s1, s2) -> {
         int r = Boolean.compare(
-                s2.linksAnyOutput() || s2.identity,
-                s1.linksAnyOutput() || s1.identity
+                s2.linksAnyOutput() || s2.isIdentity(),
+                s1.linksAnyOutput() || s1.isIdentity()
         );
         if (r != 0) return r;
-        r = Double.compare(s2.weight, s1.weight);
+        r = Double.compare(s2.getWeight(), s1.getWeight());
         if (r != 0) return r;
-        return Integer.compare(s1.id, s2.id);
+        return Integer.compare(s1.getId(), s2.getId());
     };
 
     private int threadId;
@@ -69,11 +67,11 @@ public class Converter {
     private boolean convert() {
         outputNode = neuron.node.get();
 
-        initInputNodesAndComputeWeightSums();
         initSlotFlags();
 
-        if(neuron.biasSum + neuron.posDirSum + neuron.posRecSum <= 0.0) {
-            neuron.requiredSum = neuron.posDirSum + neuron.posRecSum;
+        INeuron.SynapseSummary ss = neuron.getSynapseSummary();
+
+        if(ss.getBiasSum() + ss.getPosDirSum() + ss.getPosRecSum() <= 0.0) {
             outputNode.removeParents(threadId);
             return false;
         }
@@ -84,21 +82,19 @@ public class Converter {
         boolean noFurtherRefinement = false;
         TreeSet<Synapse> reqSyns = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
         double sum = 0.0;
-        neuron.requiredSum = 0.0;
 
-        if(neuron.numDisjunctiveSynapses == 0) {
-            double remainingSum = neuron.posDirSum;
+        if(ss.getNumDisjunctiveSynapses() == 0) {
+            double remainingSum = ss.getPosDirSum();
             int i = 0;
             for (Synapse s : candidates) {
                 double v = s.getMaxInputValue();
-                final boolean isOptionalInput = sum + remainingSum - v + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum > 0.0;
+                final boolean isOptionalInput = sum + remainingSum - v + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0;
                 final boolean maxAndNodesReached = i >= MAX_AND_NODE_SIZE;
                 if (isOptionalInput || maxAndNodesReached) {
                     break;
                 }
 
                 remainingSum -= v;
-                neuron.requiredSum += v;
                 reqSyns.add(s);
 
                 NodeContext nlNodeContext = expandNode(nodeContext, s);
@@ -111,7 +107,7 @@ public class Converter {
 
                 sum += v;
 
-                final boolean sumOfSynapseWeightsAboveThreshold = sum + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum > 0.0;
+                final boolean sumOfSynapseWeightsAboveThreshold = sum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0;
                 if (sumOfSynapseWeightsAboveThreshold) {
                     noFurtherRefinement = true;
                     break;
@@ -125,7 +121,7 @@ public class Converter {
             } else {
                 for (Synapse s : candidates) {
                     double v = s.getMaxInputValue();
-                    boolean belowThreshold = sum + v + remainingSum + neuron.posRecSum + neuron.posPassiveSum + neuron.biasSum <= 0.0;
+                    boolean belowThreshold = sum + v + remainingSum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() <= 0.0;
                     if (belowThreshold) {
                         break;
                     }
@@ -141,7 +137,7 @@ public class Converter {
             }
         } else {
             for (Synapse s : modifiedSynapses) {
-                if (s.isDisjunction && !s.isRecurrent) {
+                if (s.isDisjunction() && !s.isRecurrent()) {
                     NodeContext nlNodeContext = expandNode(nodeContext, s);
                     outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
                 }
@@ -157,8 +153,8 @@ public class Converter {
             for(Integer slot: s.linksOutput()) {
                 neuron.slotHasInputs.add(slot);
             }
-            for(Relation rel: s.relations.values()) {
-                rel.registerRequiredSlots(s.input);
+            for(Relation rel: s.getRelations().values()) {
+                rel.registerRequiredSlots(s.getInput());
             }
         });
     }
@@ -171,14 +167,14 @@ public class Converter {
         ArrayList<Synapse> selectedCandidates = new ArrayList<>();
         TreeMap<Integer, Synapse> relatedSyns = new TreeMap<>();
         while(syn != null && selectedCandidates.size() < MAX_AND_NODE_SIZE) {
-            relatedSyns.remove(syn.id);
+            relatedSyns.remove(syn.getId());
             selectedCandidates.add(syn);
-            alreadyCollected.add(syn.id);
-            for(Map.Entry<Integer, Relation> me: syn.relations.entrySet()) {
+            alreadyCollected.add(syn.getId());
+            for(Map.Entry<Integer, Relation> me: syn.getRelations().entrySet()) {
                 Integer relId = me.getKey();
                 Relation rel = me.getValue();
                 if(rel.isConvertible() && !alreadyCollected.contains(relId)) {
-                    Synapse rs = syn.output.getSynapseById(relId);
+                    Synapse rs = syn.getOutput().getSynapseById(relId);
                     if(rs != null) {
                         relatedSyns.put(relId, rs);
                     }
@@ -195,7 +191,7 @@ public class Converter {
     private Synapse getBestSynapse(Collection<Synapse> synapses) {
         Synapse maxSyn = null;
         for(Synapse s: synapses) {
-            if(!s.isNegative() && !s.isRecurrent && !s.inactive && !s.input.get().isPassiveInputNeuron()) {
+            if(!s.isNegative() && !s.isRecurrent() && !s.isInactive() && !s.getInput().get().isPassiveInputNeuron()) {
                 if(maxSyn == null || SYNAPSE_COMP.compare(maxSyn, s) > 0) {
                     maxSyn = s;
                 }
@@ -205,98 +201,23 @@ public class Converter {
     }
 
 
-    public static final int DIRECT = 0;
-    public static final int RECURRENT = 1;
-    public static final int POSITIVE = 0;
-    public static final int NEGATIVE = 1;
-
-
-    private void initInputNodesAndComputeWeightSums() {
-        double[][] sumDelta = new double[2][2];
-
-        double posPassiveSumDelta = 0.0;
-        for (Synapse s : modifiedSynapses) {
-            if(s.toBeDeleted) {
-                s.update(doc, -s.weight, 0.0, s.limit);
-            }
-
-            INeuron in = s.input.get();
-            in.lock.acquireWriteLock();
-            try {
-                if (!s.inactive) {
-                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.isNegative() ? NEGATIVE : POSITIVE] -= s.limit * s.weight;
-                    sumDelta[s.isRecurrent ? RECURRENT : DIRECT][s.getNewWeight() <= 0.0 ? NEGATIVE : POSITIVE] += (s.limit + s.limitDelta) * s.getNewWeight();
-
-                    if(in.isPassiveInputNeuron() && !s.isNegative()) {
-                        posPassiveSumDelta -= !s.isNegative() ? (s.limit * s.weight) : 0.0;
-                        posPassiveSumDelta += s.getNewWeight() > 0.0 ? ((s.limit + s.limitDelta) * s.getNewWeight()) : 0.0;
-                    }
-
-                    if(!s.isRecurrent) {
-                        if (!s.isDisjunction(Synapse.State.OLD) && s.isDisjunction(Synapse.State.NEW)) {
-                            neuron.numDisjunctiveSynapses++;
-                        } else if (s.isDisjunction(Synapse.State.OLD) && !s.isDisjunction(Synapse.State.NEW)) {
-                            neuron.numDisjunctiveSynapses--;
-                        }
-                    }
-                }
-
-                s.weight += s.weightDelta;
-                s.weightDelta = 0.0;
-
-                s.bias += s.biasDelta;
-                s.biasDelta = 0.0;
-
-                s.limit += s.limitDelta;
-                s.limitDelta = 0.0;
-
-                if (doc != null) {
-                    s.committedInDoc = doc.id;
-                }
-            } finally {
-                in.lock.releaseWriteLock();
-            }
-
-            if(s.toBeDeleted) {
-                s.unlink();
-            }
-        }
-
-        neuron.bias += neuron.biasDelta;
-        neuron.biasDelta = 0.0;
-
-        neuron.biasSum += neuron.biasSumDelta;
-        neuron.biasSumDelta = 0.0;
-
-        assert Double.isFinite(neuron.biasSum);
-
-        neuron.posDirSum += sumDelta[DIRECT][POSITIVE];
-        neuron.negDirSum += sumDelta[DIRECT][NEGATIVE];
-        neuron.negRecSum += sumDelta[RECURRENT][NEGATIVE];
-        neuron.posRecSum += sumDelta[RECURRENT][POSITIVE];
-        neuron.posPassiveSum += posPassiveSumDelta;
-
-        neuron.setModified();
-    }
-
-
     private NodeContext expandNode(NodeContext nc, Synapse s) {
         if (nc == null) {
             NodeContext nln = new NodeContext();
-            nln.node = s.input.get().outputNode.get();
+            nln.node = s.getInput().get().outputNode.get();
             nln.offsets = new Synapse[] {s};
             return nln;
         } else {
             Relation[] relations = new Relation[nc.offsets.length];
             for(int i = 0; i < nc.offsets.length; i++) {
                 Synapse linkedSynapse = nc.offsets[i];
-                relations[i] = s.getRelationById(linkedSynapse.id);
+                relations[i] = s.getRelationById(linkedSynapse.getId());
             }
 
             NodeContext nln = new NodeContext();
             nln.offsets = new Synapse[nc.offsets.length + 1];
-            AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.input.get().outputNode);
-            AndNode.RefValue rv = nc.node.extend(threadId, doc, ref, null);
+            AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.getInput().get().outputNode);
+            AndNode.RefValue rv = nc.node.extend(threadId, doc, ref);
             if(rv == null) {
                 return null;
             }
@@ -324,7 +245,7 @@ public class Converter {
         int[] getSynapseIds() {
             int[] result = new int[offsets.length];
             for(int i = 0; i < result.length; i++) {
-                result[i] = offsets[i].id;
+                result[i] = offsets[i].getId();
             }
             return result;
         }

@@ -35,8 +35,8 @@ import static network.aika.neuron.Synapse.OUTPUT;
  */
 public class Linker {
 
-    protected Document doc;
-    ArrayDeque<Link> queue = new ArrayDeque<>();
+    private Document doc;
+    private ArrayDeque<Link> queue = new ArrayDeque<>();
 
 
     public enum Direction {
@@ -69,7 +69,7 @@ public class Linker {
     private void linkOrNodeRelations(Activation act, OrNode.Link ol) {
         for (int i = 0; i < ol.oe.synapseIds.length; i++) {
             int synId = ol.oe.synapseIds[i];
-            Synapse s = act.node.neuron.getSynapseById(synId);
+            Synapse s = act.getSynapseById(synId);
             Activation iAct = ol.input.getInputActivation(i);
             link(s, iAct, act);
         }
@@ -85,11 +85,13 @@ public class Linker {
 
 
     public void linkInput(Activation act) {
+        Document doc = act.getDocument();
+
         for(Synapse s: act.getNeuron().inMemoryInputSynapses.values()) {
-            for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
                 Relation rel = me.getValue();
                 if(me.getKey() == OUTPUT) {
-                    rel.getActivations(s.input.get(act.doc), act)
+                    rel.getActivations(s.getInput().get(doc), act)
                             .forEach(iAct -> link(s, iAct, act));
                 }
             }
@@ -105,10 +107,10 @@ public class Linker {
             while((act = doc.getNextActivation(act)) != null) {
                 linkOutputRelations(act);
 
-                act.getInputLinks(false, false)
+                act.getInputLinks(false)
                         .forEach(l -> addToQueue(l));
             }
-            doc.linker.process();
+            doc.getLinker().process();
             doc.propagate();
         } while(oldSize != doc.getNumberOfActivations());
     }
@@ -117,19 +119,20 @@ public class Linker {
     public void process() {
         while(!queue.isEmpty()) {
             Link l = queue.pollFirst();
-            linkRelated(l.input, l.output, l.synapse.relations);
+            linkRelated(l.getInput(), l.getOutput(), l.getSynapse().getRelations());
         }
     }
 
 
     private void linkRelated(Activation rAct, Activation oAct, Map<Integer, Relation> relations) {
+        Document doc = rAct.getDocument();
         for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
             Relation rel = me.getValue();
             Integer relId = me.getKey();
             if(relId != OUTPUT) {
-                Synapse s = oAct.getNeuron().getSynapseById(relId);
+                Synapse s = oAct.getSynapseById(relId);
                 if (s != null) {
-                    rel.invert().getActivations(s.input.get(rAct.doc), rAct)
+                    rel.invert().getActivations(s.getInput().get(doc), rAct)
                             .forEach(iAct -> link(s, iAct, oAct));
                 }
             }
@@ -144,28 +147,26 @@ public class Linker {
             return;
         }
 
-        Link nl = new Link(s, iAct, oAct, false);
+        Link nl = new Link(s, iAct, oAct);
         if(oAct.getInputLink(nl) != null) {
             return;
         }
 
-        if(s.identity) {
-            Link el = oAct.getLinkBySynapseId(s.id);
-            if(el != null && el.input != iAct) {
-                nl.passive = true;
+        if(s.isIdentity()) {
+            Link el = oAct.getLinkBySynapseId(s.getId());
+            if(el != null && el.getInput() != iAct) {
+                return;
             }
         }
 
         nl.link();
 
-        if(!nl.passive) {
-            addToQueue(nl);
-        }
+        addToQueue(nl);
     }
 
 
     private boolean checkRelations(Synapse s, Activation iAct, Activation oAct) {
-        for(Map.Entry<Integer, Relation> me: s.relations.entrySet()) {
+        for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
             Integer relSynId = me.getKey();
             Relation rel = me.getValue();
             if(relSynId == Synapse.OUTPUT) {
@@ -173,9 +174,9 @@ public class Linker {
                     return false;
                 }
             } else {
-                Synapse relSyn = oAct.getNeuron().getSynapseById(relSynId);
-                if(relSyn!= null && oAct.getInputLinksBySynapse(false, relSyn)
-                        .anyMatch(l -> !rel.test(iAct, l.input))) {
+                Synapse relSyn = oAct.getSynapseById(relSynId);
+                if(relSyn!= null && oAct.getInputLinksBySynapse(relSyn)
+                        .anyMatch(l -> !rel.test(iAct, l.getInput()))) {
                     return false;
                 }
             }
@@ -185,21 +186,13 @@ public class Linker {
     }
 
 
-    protected boolean checkLoop(Activation iAct, Activation oAct) {
-        long v = doc.visitedCounter++;
-
-        oAct.markedPredecessor = v;
-        return iAct.checkSelfReferencing(false, 0, v);
-    }
-
-
     private void addToQueue(Link l) {
         if(l == null) {
             return;
         }
-        if(!l.synapse.isNegative()) {
+        if(!l.getSynapse().isNegative()) {
             queue.add(l);
         }
-        doc.ubQueue.add(l);
+        doc.addToUpperBoundQueue(l);
     }
 }

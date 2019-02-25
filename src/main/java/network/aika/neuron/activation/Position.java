@@ -3,6 +3,7 @@ package network.aika.neuron.activation;
 
 import network.aika.Document;
 
+import java.util.Collection;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
@@ -13,11 +14,11 @@ public class Position {
     public static final Position MAX = new Position(null, Integer.MAX_VALUE);
 
 
-    public SortedMap<ActKey, Activation> activations = new TreeMap<>();
+    private SortedMap<ActKey, Activation> activations = new TreeMap<>();
 
 
-    public Document doc;
-    public final int id;
+    private Document doc;
+    private int id;
     private Integer finalPosition;
 
 
@@ -30,6 +31,14 @@ public class Position {
         this.doc = doc;
         this.id = doc != null ? doc.positionIdCounter++ : -1;
         finalPosition = pos;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public Document getDocument() {
+        return doc;
     }
 
 
@@ -70,7 +79,7 @@ public class Position {
 
 
     public void addActivation(Integer slot, Activation act) {
-        activations.put(new ActKey(slot, act.id), act);
+        activations.put(new ActKey(slot, act.getId()), act);
     }
 
 
@@ -80,8 +89,12 @@ public class Position {
                 .stream();
     }
 
+    public Collection<Activation> getActivations() {
+        return activations.values();
+    }
 
-    public static class ActKey implements Comparable<ActKey> {
+
+    private static class ActKey implements Comparable<ActKey> {
         int slot;
         int actId;
 

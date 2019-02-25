@@ -1,11 +1,13 @@
 package network.aika.neuron.activation;
 
+import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Utils;
 import network.aika.Writable;
-import network.aika.lattice.OrNode;
+import network.aika.lattice.InputNode.InputActivation;
 import network.aika.lattice.OrNode.OrActivation;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.neuron.INeuron.Type;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
@@ -41,7 +43,7 @@ import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
  *
  * @author Lukas Molzberger
  */
-public final class Activation extends OrActivation {
+public final class Activation implements Comparable<Activation> {
 
     public static int BEGIN = 0;
     public static int END = 1;
@@ -51,13 +53,19 @@ public final class Activation extends OrActivation {
     public static int MAX_PREDECESSOR_DEPTH = 100;
     public static boolean DEBUG_OUTPUT = false;
 
-    public static Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE, null, null);
-    public static Activation MAX_ACTIVATION = new Activation(Integer.MAX_VALUE, null, null);
+    public static Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE);
+    public static Activation MAX_ACTIVATION = new Activation(Integer.MAX_VALUE);
 
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
-    public Map<Integer, Position> slots = new TreeMap<>();
+    private int id;
+    private INeuron neuron;
+    private Document doc;
+    private long visited = 0;
 
+    public Map<Integer, Position> slots = new TreeMap<>();
+    private OrActivation inputNodeActivation;
+    private InputActivation outputNodeActivation;
     private TreeSet<Link> selectedInputLinks = new TreeSet<>(INPUT_COMP);
     private TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
     private TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
@@ -67,7 +75,7 @@ public final class Activation extends OrActivation {
     public double upperBound;
     public double lowerBound;
 
-    public List<AvgState> searchStates;
+    public List<Option> options;
 
     public Rounds rounds = new Rounds();
     public Rounds finalRounds = rounds;
@@ -98,15 +106,37 @@ public final class Activation extends OrActivation {
 
     private List<Activation> conflicts;
 
+    private Activation(int id) {
+        this.id = id;
+    }
 
-    public Activation(int id, Document doc, OrNode n) {
-        super(id, doc, n);
+    public Activation(Document doc, INeuron neuron) {
+        this.id = doc.getNewActivationId();
+        this.doc = doc;
+        this.neuron = neuron;
 
-        if(doc != null && doc.model.getActivationExtensionFactory() != null) {
-            extension = doc.model.getActivationExtensionFactory().createObject();
+        if(doc != null && doc.getModel().getActivationExtensionFactory() != null) {
+            extension = doc.getModel().getActivationExtensionFactory().createObject();
         }
     }
 
+
+    public void setInputNodeActivation(OrActivation inputNodeActivation) {
+        this.inputNodeActivation = inputNodeActivation;
+    }
+
+
+    public OrActivation getInputNodeActivation() {
+        return inputNodeActivation;
+    }
+
+    public InputActivation getOutputNodeActivation() {
+        return outputNodeActivation;
+    }
+
+    public void setOutputNodeActivation(InputActivation outputNodeActivation) {
+        this.outputNodeActivation = outputNodeActivation;
+    }
 
     public Position getSlot(int slot) {
         return slots.get(slot);
@@ -145,6 +175,31 @@ public final class Activation extends OrActivation {
         this.targetValue = targetValue;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public Document getDocument() {
+        return doc;
+    }
+
+    public int getThreadId() {
+        return doc.getThreadId();
+    }
+
+    public long getNewVisitedId() {
+        return doc.getNewVisitedId();
+    }
+
+    public long getVisitedId() {
+        return visited;
+    }
+
+    public boolean checkVisited(long v) {
+        if(visited == v) return false;
+        visited = v;
+        return true;
+    }
 
     public String getLabel() {
         return getINeuron().label;
@@ -160,12 +215,17 @@ public final class Activation extends OrActivation {
 
 
     public INeuron getINeuron() {
-        return getNeuron().get(doc);
+        return neuron;
     }
 
 
     public Neuron getNeuron() {
-        return node.neuron;
+        return neuron.getProvider();
+    }
+
+
+    public Synapse getSynapseById(int synapseId) {
+        return getNeuron().getSynapseById(synapseId);
     }
 
 
@@ -186,7 +246,7 @@ public final class Activation extends OrActivation {
 
     public Link getLinkBySynapseId(int synapseId) {
         for(Link l: inputLinks.values()) {
-            if(!l.passive && l.synapse.id == synapseId) {
+            if(l.synapse.getId() == synapseId) {
                 return l;
             }
         }
@@ -199,15 +259,13 @@ public final class Activation extends OrActivation {
     }
 
 
-    public Stream<Link> getInputLinks(boolean includePassive, boolean onlySelected) {
-        Stream<Link> s = (onlySelected ? selectedInputLinks : inputLinks.values()).stream();
-        return includePassive ? s : s.filter(l -> !l.passive);
+    public Stream<Link> getInputLinks(boolean onlySelected) {
+        return (onlySelected ? selectedInputLinks : inputLinks.values()).stream();
     }
 
 
-    public Stream<Link> getOutputLinks(boolean includePassive) {
-        Stream<Link> s = outputLinks.values().stream();
-        return includePassive ? s : s.filter(l -> !l.passive);
+    public Stream<Link> getOutputLinks() {
+        return outputLinks.values().stream();
     }
 
 
@@ -216,23 +274,21 @@ public final class Activation extends OrActivation {
     }
 
 
-    public Stream<Link> getInputLinksBySynapse(boolean includePassive, Synapse syn) {
-        Stream<Link> s = inputLinks.subMap(
-                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION, false),
-                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION, false))
+    public Stream<Link> getInputLinksBySynapse(Synapse syn) {
+        return inputLinks.subMap(
+                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION),
+                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION))
                 .values()
                 .stream();
-        return includePassive ? s : s.filter(l -> !l.passive);
     }
 
 
-    public Stream<Link> getOutputLinksBySynapse(boolean includePassive, Synapse syn) {
-        Stream<Link> s = outputLinks.subMap(
-                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION, false),
-                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION, false))
+    public Stream<Link> getOutputLinksBySynapse(Synapse syn) {
+        return outputLinks.subMap(
+                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION),
+                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION))
                 .values()
                 .stream();
-        return includePassive ? s : s.filter(l -> !l.passive);
     }
 
 
@@ -240,13 +296,13 @@ public final class Activation extends OrActivation {
         double delta = 0.0;
         State s;
         if(inputValue != null) {
-            s = new State(inputValue, inputValue, 1.0, 0.0, 0.0, 0, 0.0);
+            s = new State(inputValue, inputValue, 0.0, 0.0, 0, 0.0);
         } else {
             s = computeValueAndWeight(round);
         }
 
         if (round == 0 || !rounds.get(round).equalsWithWeights(s)) {
-            saveOldState(sn.modifiedActs, v);
+            saveOldState(sn.getModifiedActivations(), v);
 
             State oldState = rounds.get(round);
 
@@ -262,14 +318,14 @@ public final class Activation extends OrActivation {
                     throw new RuntimeException("Maximum number of rounds reached. The network might be oscillating.");
                 } else {
                     if(Document.ROUND_LIMIT < 0 || round < Document.ROUND_LIMIT) {
-                        doc.vQueue.propagateActivationValue(round, this);
+                        doc.getValueQueue().propagateActivationValue(round, this);
                     }
                 }
             }
 
             if (round == 0) {
                 // In case that there is a positive feedback loop.
-                doc.vQueue.add(1, this);
+                doc.getValueQueue().add(1, this);
             }
 
             if (rounds.getLastRound() != null && round >= rounds.getLastRound()) { // Consider only the final round.
@@ -282,12 +338,14 @@ public final class Activation extends OrActivation {
 
     public State computeValueAndWeight(int round) {
         INeuron n = getINeuron();
-        double net = n.biasSum;
-        double posNet = n.biasSum;
+        SynapseSummary ss = n.getSynapseSummary();
+
+        double net = ss.getBiasSum();
+        double posNet = ss.getBiasSum();
 
         int fired = -1;
 
-        long v = doc.visitedCounter++;
+        long v = doc.getNewVisitedId();
         markPredecessor(v, 0);
 
         for (InputState is: getInputStates(round, v)) {
@@ -296,23 +354,23 @@ public final class Activation extends OrActivation {
 
             if (iAct == this) continue;
 
-            double x = Math.min(s.limit, is.s.value) * s.weight;
-            if(s.distanceFunction != null) {
-                x *= s.distanceFunction.f(iAct, this);
+            double x = Math.min(s.getLimit(), is.s.value) * s.getWeight();
+            if(s.getDistanceFunction() != null) {
+                x *= s.getDistanceFunction().f(iAct, this);
             }
             net += x;
             if(!s.isNegative()) {
                 posNet += x;
             }
 
-            if (!s.isRecurrent && !s.isNegative() && net >= 0.0 && fired < 0) {
+            if (!s.isRecurrent() && !s.isNegative() && net >= 0.0 && fired < 0) {
                 fired = iAct.rounds.get(round).fired + 1;
             }
         }
 
         if(n.passiveInputSynapses != null) {
             for(Synapse s: n.passiveInputSynapses.values()) {
-                double x = s.weight * s.input.get(doc).passiveInputFunction.getActivationValue(s, this);
+                double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
 
                 net += x;
                 if(!s.isNegative()) {
@@ -324,7 +382,7 @@ public final class Activation extends OrActivation {
         double actValue = n.activationFunction.f(net);
         double posActValue = n.activationFunction.f(posNet);
 
-        double w = Math.min(-n.negRecSum, net);
+        double w = Math.min(-ss.getNegRecSum(), net);
 
         // Compute only the recurrent part is above the threshold.
         double newWeight = decision == SELECTED ? Math.max(0.0, w) : 0.0;
@@ -333,7 +391,6 @@ public final class Activation extends OrActivation {
             return new State(
                     actValue,
                     posActValue,
-                    1.0,
                     net,
                     posNet,
                     -1,
@@ -343,7 +400,6 @@ public final class Activation extends OrActivation {
             return new State(
                     0.0,
                     posActValue,
-                    0.0,
                     0.0,
                     posNet,
                     -1,
@@ -355,10 +411,12 @@ public final class Activation extends OrActivation {
 
     public boolean isActiveable() {
         INeuron n = getINeuron();
-        double net = n.biasSum;
+        SynapseSummary ss = n.getSynapseSummary();
+
+        double net = ss.getBiasSum();
 
         for (Link l: inputLinks.values()) {
-            if(l.synapse.inactive || l.passive) {
+            if(l.isInactive()) {
                 continue;
             }
 
@@ -368,20 +426,20 @@ public final class Activation extends OrActivation {
             if (iAct == this) continue;
 
             double iv = 0.0;
-            if(!l.synapse.isNegative() && l.input.decision != EXCLUDED) {
-                iv = Math.min(l.synapse.limit, l.input.upperBound);
+            if(!l.isNegative() && l.input.decision != EXCLUDED) {
+                iv = Math.min(l.synapse.getLimit(), l.input.upperBound);
             }
 
-            double x = iv * s.weight;
-            if(s.distanceFunction != null) {
-                x *= s.distanceFunction.f(iAct, this);
+            double x = iv * s.getWeight();
+            if(s.getDistanceFunction() != null) {
+                x *= s.getDistanceFunction().f(iAct, this);
             }
             net += x;
         }
 
         if(n.passiveInputSynapses != null) {
             for(Synapse s: n.passiveInputSynapses.values()) {
-                double x = s.weight * s.input.get(doc).passiveInputFunction.getActivationValue(s, this);
+                double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
 
                 net += x;
             }
@@ -398,9 +456,7 @@ public final class Activation extends OrActivation {
 
         if(Math.abs(upperBound - oldUpperBound) > 0.01) {
             for(Link l: outputLinks.values()) {
-                if(!l.passive) {
-                    doc.ubQueue.add(l);
-                }
+                doc.addToUpperBoundQueue(l);
             }
         }
 
@@ -412,15 +468,17 @@ public final class Activation extends OrActivation {
 
     public void computeBounds() {
         INeuron n = getINeuron();
-        double ub = n.biasSum + n.posRecSum;
-        double lb = n.biasSum + n.posRecSum;
+        SynapseSummary ss = n.getSynapseSummary();
 
-        long v = doc.visitedCounter++;
+        double ub = ss.getBiasSum() + ss.getPosRecSum();
+        double lb = ss.getBiasSum() + ss.getPosRecSum();
+
+        long v = doc.getNewVisitedId();
         markPredecessor(v, 0);
 
         for (Link l : inputLinks.values()) {
             Synapse s = l.synapse;
-            if(s.inactive || l.passive) {
+            if(s.isInactive()) {
                 continue;
             }
 
@@ -428,26 +486,26 @@ public final class Activation extends OrActivation {
 
             if (iAct == this) continue;
 
-            double x = s.weight;
-            if(s.distanceFunction != null) {
-                x *= s.distanceFunction.f(iAct, this);
+            double x = s.getWeight();
+            if(s.getDistanceFunction() != null) {
+                x *= s.getDistanceFunction().f(iAct, this);
             }
 
             if (s.isNegative()) {
-                if (!s.isRecurrent && !iAct.checkSelfReferencing(false, 0, v)) {
-                    ub += Math.min(s.limit, iAct.lowerBound) * x;
+                if (!s.isRecurrent() && !iAct.checkSelfReferencing(false, 0, v)) {
+                    ub += Math.min(s.getLimit(), iAct.lowerBound) * x;
                 }
 
-                lb += s.limit * x;
+                lb += s.getLimit() * x;
             } else {
-                ub += Math.min(s.limit, iAct.upperBound) * x;
-                lb += Math.min(s.limit, iAct.lowerBound) * x;
+                ub += Math.min(s.getLimit(), iAct.upperBound) * x;
+                lb += Math.min(s.getLimit(), iAct.lowerBound) * x;
             }
         }
 
         if(n.passiveInputSynapses != null) {
             for(Synapse s: n.passiveInputSynapses.values()) {
-                double x = s.weight * s.input.get(doc).passiveInputFunction.getActivationValue(s, this);
+                double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
 
                 ub += x;
                 lb += x;
@@ -463,7 +521,6 @@ public final class Activation extends OrActivation {
         return new State(
                 c == SELECTED ? 1.0 : 0.0,
                 0.0,
-                1.0,
                 0.0,
                 0.0,
                 0,
@@ -478,7 +535,7 @@ public final class Activation extends OrActivation {
         Synapse lastSynapse = null;
         InputState maxInputState = null;
         for (Link l : inputLinks.values()) {
-            if(l.synapse.inactive || l.passive) {
+            if(l.isInactive()) {
                 continue;
             }
             if (lastSynapse != null && lastSynapse != l.synapse) {
@@ -500,12 +557,16 @@ public final class Activation extends OrActivation {
     }
 
 
+    public ActivationFunction getActivationFunction() {
+        return getINeuron().activationFunction;
+    }
+
     /*
     An activable activation object might still be suppressed by an undecided positive feedback link.
      */
     public boolean hasUndecidedPositiveFeedbackLinks() {
-        return getInputLinks(false, false)
-                .anyMatch(l -> l.synapse.isRecurrent && !l.synapse.isNegative() && l.input.decision == UNKNOWN);
+        return getInputLinks(false)
+                .anyMatch(l -> l.isRecurrent() && !l.isNegative() && l.input.decision == UNKNOWN);
     }
 
 
@@ -522,7 +583,7 @@ public final class Activation extends OrActivation {
 
     private State getInputState(int round, Synapse s, long v) {
         State is = State.ZERO;
-        if (s.isRecurrent) {
+        if (s.isRecurrent()) {
             if (!s.isNegative() || !checkSelfReferencing(true, 0, v)) {
                 is = round == 0 ? getInitialState(decision) : rounds.get(round - 1);
             }
@@ -536,7 +597,7 @@ public final class Activation extends OrActivation {
     public List<Link> getFinalInputActivationLinks() {
         ArrayList<Link> results = new ArrayList<>();
         for (Link l : inputLinks.values()) {
-            if (!l.passive && l.input.isFinalActivation()) {
+            if (l.input.isFinalActivation()) {
                 results.add(l);
             }
         }
@@ -547,7 +608,7 @@ public final class Activation extends OrActivation {
     public List<Link> getFinalOutputActivationLinks() {
         ArrayList<Link> results = new ArrayList<>();
         for (Link l : outputLinks.values()) {
-            if (!l.passive && l.output.isFinalActivation()) {
+            if (l.output.isFinalActivation()) {
                 results.add(l);
             }
         }
@@ -560,11 +621,11 @@ public final class Activation extends OrActivation {
             return conflicts;
         }
 
-        long v = doc.visitedCounter++;
+        long v = doc.getNewVisitedId();
         markPredecessor(v, 0);
         conflicts = new ArrayList<>();
         for(Link l: inputLinks.values()) {
-            if (!l.passive && l.synapse.isNegative() && l.synapse.isRecurrent) {
+            if (l.isNegative() && l.isRecurrent()) {
                 l.input.collectIncomingConflicts(conflicts, v);
             }
         }
@@ -580,7 +641,7 @@ public final class Activation extends OrActivation {
             conflicts.add(this);
         } else {
             for (Link l : inputLinks.values()) {
-                if (!l.passive && !l.synapse.isNegative() && !l.synapse.isRecurrent) {
+                if (!l.isNegative() && !l.isRecurrent()) {
                     l.input.collectIncomingConflicts(conflicts, v);
                 }
             }
@@ -592,14 +653,11 @@ public final class Activation extends OrActivation {
         if(markedPredecessor == v) return;
 
         for(Link l: outputLinks.values()) {
-            if(l.passive) {
-                continue;
-            }
             if (l.output.getINeuron().type != INeuron.Type.INHIBITORY) {
-                if (l.synapse.isNegative() && l.synapse.isRecurrent) {
+                if (l.isNegative() && l.isRecurrent()) {
                     conflicts.add(l.output);
                 }
-            } else if (!l.synapse.isNegative() && !l.synapse.isRecurrent) {
+            } else if (!l.isNegative() && !l.isRecurrent()) {
                 l.output.collectOutgoingConflicts(conflicts, v);
             }
         }
@@ -608,9 +666,6 @@ public final class Activation extends OrActivation {
 
     public void adjustSelectedNeuronInputs(Decision d) {
         for(Link l: outputLinks.values()) {
-            if(l.passive) {
-                continue;
-            }
             if(d == SELECTED) {
                 l.output.selectedInputLinks.add(l);
             } else {
@@ -630,7 +685,7 @@ public final class Activation extends OrActivation {
         }
 
         for (Link l: onlySelected ? selectedInputLinks : inputLinks.values()) {
-            if(!l.passive && !l.synapse.isNegative()) {
+            if(!l.synapse.isNegative()) {
                 if (l.input.checkSelfReferencing(onlySelected, depth + 1, v)) {
                     return true;
                 }
@@ -672,7 +727,7 @@ public final class Activation extends OrActivation {
         inputLinks
                 .values()
                 .stream()
-                .filter(l -> !l.synapse.isRecurrent && !l.passive)
+                .filter(l -> !l.isRecurrent())
                 .forEach(l -> sequence = Math.max(sequence, l.input.getSequence() + 1));
         return sequence;
     }
@@ -691,7 +746,7 @@ public final class Activation extends OrActivation {
         markedPredecessor = v;
 
         for(Link l: inputLinks.values()) {
-            if(!l.passive && !l.synapse.isNegative() && !l.synapse.isRecurrent) {
+            if(!l.isNegative() && !l.isRecurrent()) {
                 l.input.markPredecessor(v, depth + 1);
             }
         }
@@ -809,20 +864,18 @@ public final class Activation extends OrActivation {
     public static class State {
         public final double value;
         public final double posValue;
-        public final double p;
         public final double net;
         public final double posNet;
 
         public final int fired;
         public final double weight;
 
-        public static final State ZERO = new State(0.0, 0.0, 0.0, 0.0, 0.0, -1, 0.0);
+        public static final State ZERO = new State(0.0, 0.0, 0.0, 0.0, -1, 0.0);
 
-        public State(double value, double posValue, double p, double net, double posNet, int fired, double weight) {
+        public State(double value, double posValue, double net, double posNet, int fired, double weight) {
             assert !Double.isNaN(value);
             this.value = value;
             this.posValue = posValue;
-            this.p = p;
             this.net = net;
             this.posNet = posNet;
             this.fired = fired;
@@ -839,13 +892,13 @@ public final class Activation extends OrActivation {
         }
 
         public String toString() {
-            return "V:" + Utils.round(value) + (DEBUG_OUTPUT ? " pV:" + Utils.round(posValue) : "") + " Net:" + Utils.round(net) + (DEBUG_OUTPUT ? " P:" + Utils.round(p) : "") + " W:" + Utils.round(weight);
+            return "V:" + Utils.round(value) + (DEBUG_OUTPUT ? " pV:" + Utils.round(posValue) : "") + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
         }
     }
 
 
     public String toString() {
-        return id + " " + slotsToString() + " " + identityToString() + " - " + node + " -" +
+        return id + " " + slotsToString() + " " + identityToString() + " - " +
                 (extension != null ? extension.toString() + " -" : "") +
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
@@ -856,7 +909,7 @@ public final class Activation extends OrActivation {
 
 
 
-    public String toString(boolean withLogic) {
+    public String toStringDetailed() {
         StringBuilder sb = new StringBuilder();
         sb.append(id + " - ");
 
@@ -865,8 +918,8 @@ public final class Activation extends OrActivation {
         sb.append(slotsToString());
 
         sb.append(" \"");
-        if (node.neuron.get().getOutputText() != null) {
-            sb.append(Utils.collapseText(node.neuron.get().getOutputText(), 7));
+        if (getINeuron().getOutputText() != null) {
+            sb.append(Utils.collapseText(getINeuron().getOutputText(), 7));
         } else {
             sb.append(Utils.collapseText(doc.getText(getSlot(BEGIN), getSlot(END)), 7));
         }
@@ -875,7 +928,7 @@ public final class Activation extends OrActivation {
         sb.append(identityToString());
         sb.append(" - ");
 
-        sb.append(withLogic ? node.toString() : node.getNeuronLabel());
+        sb.append(getLabel());
 
         if(extension != null) {
             sb.append(" - " + extension);
@@ -910,26 +963,34 @@ public final class Activation extends OrActivation {
     }
 
     public State getAvgState() {
+        if (options == null) {
+            return null;
+        }
+
         double avgValue = 0.0;
         double avgPosValue = 0.0;
-        double avgP = 0.0;
         double avgNet = 0.0;
         double avgPosNet = 0.0;
 
-        for (Activation.AvgState avgState : searchStates) {
-            if(avgState.decision == SELECTED) {
-                double p = avgState.p;
-                Activation.State s = avgState.state;
+        for (Option option : options) {
+            if (option.decision == SELECTED) {
+                double p = option.p;
+                Activation.State s = option.state;
 
                 avgValue += p * s.value;
                 avgPosValue += p * s.posValue;
-                avgP += p * s.p;
                 avgNet += p * s.net;
                 avgPosNet += p * s.posNet;
             }
         }
+        return new Activation.State(avgValue, avgPosValue, avgNet, avgPosNet, 0, 0.0);
+    }
 
-        return new Activation.State(avgValue, avgPosValue, avgP, avgNet, avgPosNet, 0, 0.0);
+
+
+    @Override
+    public int compareTo(Activation act) {
+        return Integer.compare(id, act.id);
     }
 
 
@@ -957,7 +1018,7 @@ public final class Activation extends OrActivation {
         sb.append(" (");
         boolean first = true;
         for(Link l: inputLinks.values()) {
-            if(!l.passive && l.synapse.identity) {
+            if(l.isIdentity()) {
                 if(!first) {
                     sb.append(", ");
                 }
@@ -975,9 +1036,7 @@ public final class Activation extends OrActivation {
     public String linksToString() {
         StringBuilder sb = new StringBuilder();
         for(Link l: inputLinks.values()) {
-            if(!l.passive) {
-                sb.append("  " + l.input.getLabel() + "  W:" + l.synapse.weight + "\n");
-            }
+            sb.append("  " + l.input.getLabel() + "  W:" + l.synapse.getWeight() + "\n");
         }
 
         return sb.toString();
@@ -1029,7 +1088,7 @@ public final class Activation extends OrActivation {
     }
 
 
-    public static class AvgState {
+    public class Option {
         public int snId;
         public State state;
         public Decision decision;
@@ -1038,55 +1097,63 @@ public final class Activation extends OrActivation {
         public int cacheFactor = 1;
         public double p;
 
+        public Map<Link, Option> inputOptions = new TreeMap<>(INPUT_COMP);
+        public Map<Link, Option> outputOptions = new TreeMap<>(OUTPUT_COMP); // TODO:
 
-        public Map<Link, AvgState> inputLinks = new TreeMap<>(INPUT_COMP);
 
-        public AvgState(int snId, Activation act, Decision d) {
+        public Option(int snId, Decision d) {
             this.snId = snId;
-            this.state = act.rounds.getLast();
+            this.state = rounds.getLast();
             this.decision = d;
 
-            if (act.searchStates == null) {
-                act.searchStates = new ArrayList<>();
+            if (options == null) {
+                options = new ArrayList<>();
             }
-            act.searchStates.add(this);
+            options.add(this);
         }
 
-
-        public void setWeight(Activation act, double weight) {
+        public void setWeight(double weight) {
             this.weight = weight;
 
-            for(Link l: act.inputLinks.values()) {
+            for(Link l: inputLinks.values()) {
                 if(l.input.decision == SELECTED) {
                     if(l.input.candidate != null) {
-                        if (l.input.candidate.id < act.candidate.id) {
+                        if (l.input.candidate.id < candidate.id) {
                             SearchNode inputSN = l.input.candidate.currentSearchNode.getParent();
 
-                            inputLinks.put(l, inputSN.getCurrentAvgState());
+                            link(l, inputSN.getCurrentOption());
                         }
                     } else {
-                        inputLinks.put(l, null);
+                        link(l, l.input.options.get(0));
                     }
                 }
             }
 
-            for(Link l: act.outputLinks.values()) {
+            for(Link l: outputLinks.values()) {
                 if(l.input.decision == SELECTED) {
                     if(l.output.candidate != null) {
-                        if(l.output.candidate.id < act.candidate.id) {
+                        if(l.output.candidate.id < candidate.id) {
                             SearchNode outputSN = l.output.candidate.currentSearchNode.getParent();
 
-                            outputSN.getCurrentAvgState().inputLinks.put(l, this);
+                            outputSN.getCurrentOption().link(l, this);
                         }
                     }
                 }
             }
+        }
+
+        public void link(Link l, Option in) {
+            inputOptions.put(l, in);
+            in.outputOptions.put(l, this);
         }
 
         public void setCacheFactor(int cf) {
             cacheFactor = cf;
         }
 
+        public Activation getAct() {
+            return Activation.this;
+        }
 
         public String toString() {
             return " snId:" + snId + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " " + state;
@@ -1098,10 +1165,9 @@ public final class Activation extends OrActivation {
      * The {@code SynapseActivation} mirror the synapse link in the network of activations.
      */
     public static class Link {
-        public final Synapse synapse;
-        public final Activation input;
-        public final Activation output;
-        public boolean passive;
+        private final Synapse synapse;
+        private final Activation input;
+        private final Activation output;
 
         public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
             int r = Synapse.INPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
@@ -1116,13 +1182,39 @@ public final class Activation extends OrActivation {
         };
 
 
-        public Link(Synapse s, Activation input, Activation output, boolean passive) {
+        public Link(Synapse s, Activation input, Activation output) {
             this.synapse = s;
             this.input = input;
             this.output = output;
-            this.passive = passive;
         }
 
+        public Synapse getSynapse() {
+            return synapse;
+        }
+
+        public Activation getInput() {
+            return input;
+        }
+
+        public Activation getOutput() {
+            return output;
+        }
+
+        public boolean isRecurrent() {
+            return synapse.isRecurrent();
+        }
+
+        public boolean isIdentity() {
+            return synapse.isIdentity();
+        }
+
+        public boolean isNegative() {
+            return synapse.isNegative();
+        }
+
+        public boolean isInactive() {
+            return synapse.isInactive();
+        }
 
         public void link() {
             input.addLink(INPUT, this);
@@ -1130,7 +1222,7 @@ public final class Activation extends OrActivation {
         }
 
         public String toString() {
-            return (passive ? "p" : "") + synapse + ": " + input + " --> " + output;
+            return synapse + ": " + input + " --> " + output;
         }
     }
 
