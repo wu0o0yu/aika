@@ -52,22 +52,22 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     int level;
 
-    public AtomicInteger numberOfNeuronRefs = new AtomicInteger(0);
+    private AtomicInteger numberOfNeuronRefs = new AtomicInteger(0);
     volatile boolean isRemoved;
 
     // Only the children maps are locked.
-    public ReadWriteLock lock = new ReadWriteLock();
+    protected ReadWriteLock lock = new ReadWriteLock();
 
     private ThreadState<A>[] threads;
 
-    public long markedCreated;
+    long markedCreated;
 
     /**
      * Propagate an activation to the next node or the next neuron that is depending on the current node.
      *
      * @param act
      */
-    public abstract void propagate(A act);
+    protected abstract void propagate(A act);
 
 
     /**
@@ -113,9 +113,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public abstract AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref);
-
-    abstract void apply(A act);
+    abstract AndNode.RefValue expand(int threadId, Document doc, AndNode.Refinement ref);
 
     public abstract void reprocessInputs(Document doc);
 
@@ -195,6 +193,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public void register(A act) {
+        if(act.registered) {
+            return;
+        }
+
         Document doc = act.getDocument();
 
         assert act.getNode() == this;
@@ -246,6 +248,21 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
+    protected void propagateToOrNode(NodeActivation inputAct) {
+        Document doc = inputAct.getDocument();
+        try {
+            lock.acquireReadLock();
+            if (orChildren != null) {
+                for (OrNode.OrEntry oe : orChildren) {
+                    oe.child.get(doc).addActivation(oe, inputAct);
+                }
+            }
+        } finally {
+            lock.releaseReadLock();
+        }
+    }
+
+
     /**
      * Add a new activation to this logic node and further propagate this activation through the network.
      * This activation, however, will not be added immediately. This method only adds a request to the activations
@@ -257,7 +274,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void addActivation(A act) {
         ThreadState<A> th = getThreadState(act.getThreadId(), true);
         th.added.add(act);
-        act.getDocument().addToNodeQueue(this);
+        act.getDocument().getNodeQueue().add(this);
     }
 
 

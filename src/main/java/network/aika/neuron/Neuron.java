@@ -242,12 +242,16 @@ public class Neuron extends Provider<INeuron> {
         return Converter.convert(model.defaultThreadId, doc, n, modifiedSynapses);
     }
 
+    public PassiveInputFunction getPassiveInputFunction() {
+        return get().passiveInputFunction;
+    }
 
-    public static void registerPassiveInputNeuron(Neuron n, PassiveInputFunction f) {
-        n.get().passiveInputFunction = f;
-        n.model.passiveActivationFunctions.put(n.id, f);
 
-        for(Synapse s: n.get().outputSynapses.values()) {
+    public void setPassiveInputFunction(PassiveInputFunction f) {
+        get().passiveInputFunction = f;
+        model.passiveActivationFunctions.put(id, f);
+
+        for(Synapse s: get().outputSynapses.values()) {
             s.getOutput().get().registerPassiveInputSynapse(s);
         }
     }

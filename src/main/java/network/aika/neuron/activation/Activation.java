@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Linker.Direction.INPUT;
@@ -245,10 +246,6 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
-    public SortedSet<Link> getInputLinksOrderedBySynapse() {
-        return inputLinks.navigableKeySet();
-    }
-
 
     public Stream<Link> getInputLinks(boolean onlySelected) {
         return (onlySelected ? selectedInputLinks : inputLinks.values()).stream();
@@ -360,7 +357,7 @@ public final class Activation implements Comparable<Activation> {
         }
 
         for(Synapse s : n.getPassiveInputSynapses()) {
-            double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
+            double x = s.getWeight() * s.getInput().getPassiveInputFunction().getActivationValue(s, this);
 
             net += x;
             if (!s.isNegative()) {
@@ -427,7 +424,7 @@ public final class Activation implements Comparable<Activation> {
         }
 
         for(Synapse s: n.getPassiveInputSynapses()) {
-                double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
+                double x = s.getWeight() * s.getInput().getPassiveInputFunction().getActivationValue(s, this);
 
                 net += x;
         }
@@ -443,7 +440,7 @@ public final class Activation implements Comparable<Activation> {
 
         if(Math.abs(upperBound - oldUpperBound) > 0.01) {
             for(Link l: outputLinks.values()) {
-                doc.addToUpperBoundQueue(l);
+                doc.getUpperBoundQueue().add(l);
             }
         }
 
@@ -491,7 +488,7 @@ public final class Activation implements Comparable<Activation> {
         }
 
         for(Synapse s : n.getPassiveInputSynapses()) {
-            double x = s.getWeight() * s.getInput().get(doc).passiveInputFunction.getActivationValue(s, this);
+            double x = s.getWeight() * s.getInput().getPassiveInputFunction().getActivationValue(s, this);
 
             ub += x;
             lb += x;
@@ -738,6 +735,29 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
+    public boolean match(Predicate<Link> filter) {
+        Synapse ls = null;
+        boolean matched = false;
+        for(Link l: inputLinks.navigableKeySet()) {
+            Synapse s = l.getSynapse();
+
+            if(ls != null && ls != s) {
+                if(!matched) {
+                    return false;
+                }
+                matched = false;
+            }
+
+            if(filter.test(l)) {
+                matched = true;
+            }
+
+            ls = s;
+        }
+
+        return matched;
+    }
+
     /**
      * Since Aika is a recurrent neural network, it is necessary to compute several rounds of activation values. The
      * computation stops if no further changes occur to the state. Only the recurrent synapses depend on the previous
@@ -893,7 +913,6 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
-
     public String toStringDetailed() {
         StringBuilder sb = new StringBuilder();
         sb.append(id + " - ");
@@ -946,6 +965,7 @@ public final class Activation implements Comparable<Activation> {
 
         return sb.toString();
     }
+
 
     public State getExpectedState() {
         if (options == null) {
@@ -1210,6 +1230,7 @@ public final class Activation implements Comparable<Activation> {
             return synapse + ": " + input + " --> " + output;
         }
     }
+
 
     public static class Builder {
         public SortedMap<Integer, Integer> positions = new TreeMap<>();

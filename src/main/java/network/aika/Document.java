@@ -20,6 +20,7 @@ package network.aika;
 import network.aika.lattice.Converter;
 import network.aika.lattice.Node;
 import network.aika.lattice.NodeActivation;
+import network.aika.lattice.NodeQueue;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -73,7 +74,7 @@ public class Document implements Comparable<Document> {
     private Model model;
     private int threadId;
 
-    private NodeQueue nodeQueue = new NodeQueue();
+    private NodeQueue nodeQueue = new NodeQueue(this);
     private ValueQueue valueQueue = new ValueQueue();
     private UpperBoundQueue ubQueue = new UpperBoundQueue();
     private Linker linker;
@@ -234,7 +235,17 @@ public class Document implements Comparable<Document> {
 	}
 
 
-	public Position lookupFinalPosition(int pos) {
+    public UpperBoundQueue getUpperBoundQueue() {
+        return ubQueue;
+    }
+
+
+    public NodeQueue getNodeQueue() {
+        return nodeQueue;
+    }
+
+
+    public Position lookupFinalPosition(int pos) {
         Position p = positions.get(pos);
 
         if(p == null) {
@@ -333,7 +344,7 @@ public class Document implements Comparable<Document> {
     public void propagate() {
         boolean flag = true;
         while(flag) {
-            nodeQueue.processChanges();
+            nodeQueue.process();
             flag = ubQueue.process();
         }
     }
@@ -471,22 +482,6 @@ public class Document implements Comparable<Document> {
     }
 
 
-
-
-    public void addToUpperBoundQueue(Link l) {
-        ubQueue.add(l);
-    }
-
-    public void addToUpperBoundQueue(Activation act) {
-        ubQueue.add(act);
-    }
-
-
-    public void addToNodeQueue(Node n) {
-        nodeQueue.add(n);
-    }
-
-
     /**
      * Removes the activations of this document from the model again.
      */
@@ -588,60 +583,6 @@ public class Document implements Comparable<Document> {
         return sb.toString();
     }
 
-
-    private class NodeQueue {
-
-        private final TreeSet<Node> queue = new TreeSet<>(
-                (n1, n2) -> Node.compareRank(threadId, n1, n2)
-        );
-
-        private long queueIdCounter = 0;
-
-        private void add(Node n) {
-            if(!n.isQueued(threadId, queueIdCounter++)) {
-                queue.add(n);
-            }
-        }
-
-        private void processChanges() {
-            while(!queue.isEmpty()) {
-                Node n = queue.pollFirst();
-
-                n.setNotQueued(threadId);
-                n.processChanges(Document.this);
-            }
-        }
-    }
-
-
-    private class UpperBoundQueue {
-        private final ArrayDeque<Activation> queue = new ArrayDeque<>();
-
-        private void add(Link l) {
-            if(!l.isRecurrent()) {
-                add(l.getOutput());
-            }
-        }
-
-        private void add(Activation act) {
-            if(!act.ubQueued && act.inputValue == null) {
-                act.ubQueued = true;
-                queue.addLast(act);
-            }
-        }
-
-        private boolean process() {
-            boolean flag = false;
-            while(!queue.isEmpty()) {
-                flag = true;
-                Activation act = queue.pollFirst();
-                act.ubQueued = false;
-
-                act.processBounds();
-            }
-            return flag;
-        }
-    }
 
     public void dumpOscillatingActivations() {
         activatedNeurons.stream()

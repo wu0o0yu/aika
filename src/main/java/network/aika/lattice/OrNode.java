@@ -22,6 +22,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Linker;
 import network.aika.neuron.activation.Position;
 import network.aika.Document;
 import network.aika.neuron.relation.Relation;
@@ -60,39 +61,48 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
 
     @Override
-    public AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref) {
+    public AndNode.RefValue expand(int threadId, Document doc, AndNode.Refinement ref) {
         throw new UnsupportedOperationException();
     }
 
 
-    public void addInputActivation(OrEntry oe, NodeActivation inputAct) {
+    protected void addActivation(OrEntry oe, NodeActivation inputAct) {
         Document doc = inputAct.getDocument();
         INeuron n = outputNeuron.get(doc);
 
         SortedMap<Integer, Position> slots = getSlots(oe, inputAct);
         if (n.checkRequiredSlots(doc, slots)) return;
 
-        Activation act = lookupActivation(doc, slots, oe, inputAct);
+        Activation act = n.lookupActivation(doc, slots, l -> {
+            Synapse s = l.getSynapse();
+            if(!s.isIdentity()) return true;
+
+            Integer i = oe.revSynapseIds.get(s.getId());
+            Activation iAct = doc.getLinker().computeInputActivation(s, inputAct.getInputActivation(i));
+            return i != null && l.getInput() == iAct;
+        });
 
         if(act == null) {
             OrActivation orAct = new OrActivation(doc, this);
+            register(orAct);
 
-            act = new Activation(doc, outputNeuron.get(doc), slots);
+            act = new Activation(doc, n, slots);
 
             act.setInputNodeActivation(orAct);
             orAct.setOutputAct(act);
-
-            processActivation(orAct);
-        } else {
-            propagate(act.getInputNodeActivation());
         }
 
-        Link ol = act.getInputNodeActivation().link(oe, inputAct);
-        doc.getLinker().link(act, ol);
+
+        OrActivation orAct = act.getInputNodeActivation();
+        propagate(orAct);
+        Link ol = orAct.link(oe, inputAct);
+
+        ol.linkOutputActivation(act);
     }
 
 
-    public SortedMap<Integer, Position> getSlots(OrEntry oe, NodeActivation inputAct) {
+
+    private SortedMap<Integer, Position> getSlots(OrEntry oe, NodeActivation inputAct) {
         SortedMap<Integer, Position> slots = new TreeMap<>();
         for(int i = 0; i < oe.synapseIds.length; i++) {
             int synapseId = oe.synapseIds[i];
@@ -110,72 +120,15 @@ public class OrNode extends Node<OrNode, OrActivation> {
     }
 
 
-    private Activation lookupActivation(Document doc, SortedMap<Integer, Position> slots, OrEntry oe, NodeActivation inputAct) {
-        x: for(Activation act: outputNeuron.get(doc)
-                .getActivations(doc, slots)
-                ) {
-
-            Synapse ls = null;
-            boolean matched = false;
-            for(Activation.Link l: act.getInputLinksOrderedBySynapse()) {
-                Synapse s = l.getSynapse();
-
-                if(ls != null && ls != s) {
-                    if(!matched) {
-                        continue x;
-                    }
-                    matched = false;
-                }
-
-                if (s.isIdentity()) {
-                    Integer i = oe.revSynapseIds.get(s.getId());
-                    Activation iAct = doc.getLinker().computeInputActivation(s, inputAct.getInputActivation(i));
-                    if(i != null && l.getInput() == iAct) {
-                        matched = true;
-                    }
-                } else {
-                    matched = true;
-                }
-                ls = s;
-            }
-
-            if(matched) {
-                return act;
-            }
-        }
-        return null;
-    }
-
-
-    public void propagate(OrActivation act) {
-        act.getDocument().addToUpperBoundQueue(act.getOutputAct());
+    @Override
+    protected void propagate(OrActivation act) {
+        act.getDocument().getUpperBoundQueue().add(act.getOutputAct());
     }
 
 
     @Override
     public void cleanup() {
 
-    }
-
-
-    @Override
-    public void apply(OrActivation act) {
-        throw new UnsupportedOperationException();
-    }
-
-
-    static void processCandidate(Node<?, ? extends NodeActivation<?>> parentNode, NodeActivation inputAct, boolean train) {
-        Document doc = inputAct.getDocument();
-        try {
-            parentNode.lock.acquireReadLock();
-            if (parentNode.orChildren != null) {
-                for (OrEntry oe : parentNode.orChildren) {
-                    oe.child.get(doc).addInputActivation(oe, inputAct);
-                }
-            }
-        } finally {
-            parentNode.lock.releaseReadLock();
-        }
     }
 
 
@@ -379,7 +332,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
 
     public static class OrActivation extends NodeActivation<OrNode> {
-        public Map<Integer, Link> orInputs = new TreeMap<>();
+        private Map<Integer, Link> orInputs = new TreeMap<>();
         private Activation outputAct;
 
         public OrActivation(Document doc, OrNode node) {
@@ -408,11 +361,11 @@ public class OrNode extends Node<OrNode, OrActivation> {
     }
 
 
-    public static class Link {
+    protected static class Link {
         public OrEntry oe;
 
-        public NodeActivation<?> input;
-        public OrActivation output;
+        private NodeActivation<?> input;
+        private OrActivation output;
 
         public Link(OrEntry oe, NodeActivation<?> input, OrActivation output) {
             this.oe = oe;
@@ -427,6 +380,18 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
         public int get(int i) {
             return oe.synapseIds[i];
+        }
+
+
+        void linkOutputActivation(Activation act) {
+            Linker l = act.getDocument().getLinker();
+            for (int i = 0; i < size(); i++) {
+                int synId = get(i);
+                Synapse s = act.getSynapseById(synId);
+                Activation iAct = input.getInputActivation(i);
+                l.link(s, iAct, act);
+            }
+            l.process();
         }
     }
 }

@@ -55,27 +55,6 @@ public class Linker {
     }
 
 
-    /**
-     * Adds the incoming links between neuron activations.
-     *
-     * @param act
-     */
-    public void link(Activation act, OrNode.Link ol) {
-        linkOrNodeRelations(act, ol);
-        process();
-    }
-
-
-    private void linkOrNodeRelations(Activation act, OrNode.Link ol) {
-        for (int i = 0; i < ol.size(); i++) {
-            int synId = ol.get(i);
-            Synapse s = act.getSynapseById(synId);
-            Activation iAct = ol.input.getInputActivation(i);
-            link(s, iAct, act);
-        }
-    }
-
-
     private void linkOutputRelations(Activation act) {
         linkRelated(act, act, act.getINeuron().getOutputRelations());
     }
@@ -137,7 +116,7 @@ public class Linker {
     }
 
 
-    protected void link(Synapse s, Activation iAct, Activation oAct) {
+    public void link(Synapse s, Activation iAct, Activation oAct) {
         iAct = computeInputActivation(s, iAct);
 
         if(iAct == null || iAct.blocked || !checkRelations(s, iAct, oAct)) {
@@ -190,6 +169,6 @@ public class Linker {
         if(!l.getSynapse().isNegative()) {
             queue.add(l);
         }
-        doc.addToUpperBoundQueue(l);
+        doc.getUpperBoundQueue().add(l);
     }
 }

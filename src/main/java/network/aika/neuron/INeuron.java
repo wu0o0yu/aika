@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -101,7 +102,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     ReadWriteLock lock = new ReadWriteLock();
 
 
-    public PassiveInputFunction passiveInputFunction = null;
+    PassiveInputFunction passiveInputFunction = null;
 
 
     private ThreadState[] threads;
@@ -485,6 +486,16 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             }
         }
         return false;
+    }
+
+
+
+    public Activation lookupActivation(Document doc, SortedMap<Integer, Position> slots, Predicate<Activation.Link> filter) {
+        return getActivations(doc, slots)
+                .stream()
+                .filter(act -> act.match(filter))
+                .findFirst()
+                .orElse(null);
     }
 
 
