@@ -25,6 +25,7 @@ import network.aika.neuron.relation.Relation;
 import network.aika.neuron.INeuron.Type;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -292,7 +293,24 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
-    public void addInMemoryInputSynapse(Synapse s) {
+    public Synapse selectInputSynapse(Neuron inputNeuron, Predicate<Synapse> filter) {
+        lock.acquireWriteLock();
+        Synapse synapse = inMemoryInputSynapses.subMap(
+                new Synapse(inputNeuron, this, Integer.MIN_VALUE), true,
+                new Synapse(inputNeuron, this, Integer.MAX_VALUE), true
+        )
+                .keySet()
+                .stream()
+                .filter(filter)
+                .findAny()
+                .orElse(null);
+
+        lock.releaseWriteLock();
+        return synapse;
+    }
+
+
+    void addInMemoryInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryInputSynapses.put(s, s);
         inputSynapsesById.put(s.getId(), s);
@@ -300,7 +318,7 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
-    public void removeInMemoryInputSynapse(Synapse s) {
+    void removeInMemoryInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryInputSynapses.remove(s);
         inputSynapsesById.remove(s.getId());
@@ -308,14 +326,14 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
-    public void addInMemoryOutputSynapse(Synapse s) {
+    void addInMemoryOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryOutputSynapses.put(s, s);
         lock.releaseWriteLock();
     }
 
 
-    public void removeInMemoryOutputSynapse(Synapse s) {
+    void removeInMemoryOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inMemoryOutputSynapses.remove(s);
         lock.releaseWriteLock();
@@ -342,6 +360,11 @@ public class Neuron extends Provider<INeuron> {
 
     public Collection<Synapse> getInMemoryInputSynapses() {
         return inMemoryInputSynapses.values();
+    }
+
+
+    public Collection<Synapse> getInMemoryOutputSynapses() {
+        return inMemoryOutputSynapses.values();
     }
 
 
