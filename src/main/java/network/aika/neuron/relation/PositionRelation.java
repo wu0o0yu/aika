@@ -107,7 +107,7 @@ public abstract class PositionRelation extends Relation {
 
     @Override
     public void registerRequiredSlots(Neuron input) {
-        input.get().slotRequired.add(fromSlot);
+        input.get().addRequiredSlot(fromSlot);
     }
 
 

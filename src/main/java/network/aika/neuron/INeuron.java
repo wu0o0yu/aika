@@ -64,6 +64,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public enum Type {
+        INPUT,
         EXCITATORY,
         INHIBITORY
     }
@@ -81,7 +82,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private Writable extension;
 
-    ActivationFunction activationFunction = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+    ActivationFunction activationFunction;
 
 
     private volatile int synapseIdCounter = 0;
@@ -173,6 +174,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         return passiveInputSynapses.values();
+    }
+
+
+    public void addRequiredSlot(int slot) {
+        slotRequired.add(slot);
     }
 
 
@@ -348,8 +354,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public INeuron(Model m, String label, String outputText) {
+    public INeuron(Model m, String label, String outputText, Type type, ActivationFunction actF) {
         this.label = label;
+        this.type = type;
+        this.activationFunction = actF;
+
         setOutputText(outputText);
 
         if(m.getNeuronExtensionFactory() != null) {
@@ -744,6 +753,21 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public void setBias(double b) {
         biasDelta = b - bias;
+    }
+
+
+    public void updateBiasDelta(double biasDelta) {
+        this.biasDelta += biasDelta;
+    }
+
+
+    public double getBias() {
+        return bias;
+    }
+
+
+    public double getNewBias() {
+        return bias + biasDelta;
     }
 
 
