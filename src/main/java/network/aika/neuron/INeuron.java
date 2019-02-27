@@ -551,6 +551,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public int compareTo(INeuron n) {
+        if (this == n) return 0;
+        if (this == MIN_NEURON) return -1;
+        if (n == MIN_NEURON) return 1;
+        if (this == MAX_NEURON) return 1;
+        if (n == MAX_NEURON) return -1;
+
         if (provider.id < n.provider.id) return -1;
         else if (provider.id > n.provider.id) return 1;
         else return 0;

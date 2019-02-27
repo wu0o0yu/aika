@@ -24,7 +24,6 @@ import network.aika.lattice.NodeQueue;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.Activation.Option;
 import network.aika.neuron.activation.Candidate;
 import network.aika.neuron.activation.Position;
