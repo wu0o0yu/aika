@@ -100,7 +100,7 @@ public class Synapse implements Writable {
     private double bias;
     private double biasDelta;
 
-    private double limit;
+    private double limit = 1.0;
     private double limitDelta;
 
     private boolean isConjunction;
