@@ -97,24 +97,29 @@ public class Converter {
         NodeContext nodeContext = null;
         double remainingSum = ss.getPosDirSum();
         int i = 0;
+        boolean optionalInputMode = false;
+
         for (Synapse s : candidates) {
             double v = s.getMaxInputValue();
-            final boolean isOptionalInput = sum + remainingSum - v + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0;
+            if(sum + remainingSum - v + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0) {
+                optionalInputMode = true;
+            }
 
-            if (!isOptionalInput) {
-                remainingSum -= v;
+            if (!optionalInputMode) {
 
                 NodeContext nlNodeContext = expandNode(nodeContext, s);
                 if (nlNodeContext == null) {
-                    break;
+                    return;
                 }
                 nodeContext = nlNodeContext;
+
+                remainingSum -= v;
                 sum += v;
                 i++;
             } else {
                 boolean belowThreshold = sum + v + remainingSum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() <= 0.0;
                 if (belowThreshold) {
-                    break;
+                    return;
                 }
 
                 NodeContext nlNodeContext = expandNode(nodeContext, s);
@@ -126,10 +131,13 @@ public class Converter {
 
             final boolean sumOfSynapseWeightsAboveThreshold = sum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0;
             final boolean maxAndNodesReached = i >= MAX_AND_NODE_SIZE;
-            if (sumOfSynapseWeightsAboveThreshold || maxAndNodesReached || i == candidates.size()) {
-                outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node, true);
-                return;
+            if (sumOfSynapseWeightsAboveThreshold || maxAndNodesReached) {
+                break;
             }
+        }
+
+        if(nodeContext != null && !optionalInputMode) {
+            outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node, true);
         }
     }
 
