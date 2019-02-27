@@ -101,12 +101,16 @@ public class Converter {
 
         for (Synapse s : candidates) {
             double v = s.getMaxInputValue();
+            boolean belowThreshold = sum + v + remainingSum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() <= 0.0;
+            if (belowThreshold) {
+                return;
+            }
+
             if(sum + remainingSum - v + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0) {
                 optionalInputMode = true;
             }
 
             if (!optionalInputMode) {
-
                 NodeContext nlNodeContext = expandNode(nodeContext, s);
                 if (nlNodeContext == null) {
                     return;
@@ -117,11 +121,6 @@ public class Converter {
                 sum += v;
                 i++;
             } else {
-                boolean belowThreshold = sum + v + remainingSum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() <= 0.0;
-                if (belowThreshold) {
-                    return;
-                }
-
                 NodeContext nlNodeContext = expandNode(nodeContext, s);
                 if (nlNodeContext != null) {
                     outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, true);
