@@ -315,7 +315,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
 
-    public static class ActKey implements Comparable<ActKey> {
+    private static class ActKey implements Comparable<ActKey> {
         int slot;
         Position pos;
         int actId;
