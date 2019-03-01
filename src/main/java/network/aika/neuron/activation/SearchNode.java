@@ -342,9 +342,7 @@ public class SearchNode implements Comparable<SearchNode> {
             switch(sn.step) {
                 case INIT:
                     if (sn.level >= doc.candidates.size()) {
-                        if(timeoutInMilliSeconds != null && System.currentTimeMillis() > startTime + timeoutInMilliSeconds) {
-                            throw new TimeoutException("Interpretation search took too long: " + (System.currentTimeMillis() - startTime) + "ms");
-                        }
+                        checkTimeoutCondition(timeoutInMilliSeconds, startTime);
 
                         returnWeight = sn.processResult(doc);
                         returnWeightSum = returnWeight;
@@ -411,6 +409,13 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
+    private static void checkTimeoutCondition(Long timeoutInMilliSeconds, long startTime) {
+        if(timeoutInMilliSeconds != null && System.currentTimeMillis() > startTime + timeoutInMilliSeconds) {
+            throw new TimeoutException("Interpretation search took too long: " + (System.currentTimeMillis() - startTime) + "ms");
+        }
+    }
+
+
     public double getWeightSum() {
         return selectedWeightSum + excludedWeightSum;
     }
@@ -432,14 +437,7 @@ public class SearchNode implements Comparable<SearchNode> {
         if(preDecision == UNKNOWN && OPTIMIZE_SEARCH) {
             Decision cd = getCachedDecision();
 
-            switch (cd) {
-                case SELECTED:
-                    excludedWeightSum = candidate.alternativeCachedWeightExpSum;
-                    break;
-                case EXCLUDED:
-                    selectedWeightSum = candidate.alternativeCachedWeightExpSum;
-                    break;
-            }
+            setWeightSum(cd, candidate.alternativeCachedWeightSum);
 
             if(COMPUTE_SOFT_MAX && cd != null && cd != UNKNOWN) {
                 SearchNode asn = candidate.cachedSearchNode.getAlternative();
@@ -571,14 +569,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
             if (preDecision != EXCLUDED) {
                 candidate.cachedDecision = d;
-                switch(candidate.cachedDecision) {
-                    case SELECTED:
-                        candidate.alternativeCachedWeightExpSum = excludedWeightSum;
-                        break;
-                    case EXCLUDED:
-                        candidate.alternativeCachedWeightExpSum = selectedWeightSum;
-                        break;
-                }
+                candidate.alternativeCachedWeightSum = getWeightSum(candidate.cachedDecision);
             }
         } else {
             d = cd;
@@ -687,6 +678,31 @@ public class SearchNode implements Comparable<SearchNode> {
             }
         }
     }
+
+
+    private double getWeightSum(Decision d) {
+        switch(d) {
+            case SELECTED:
+                return excludedWeightSum;
+            case EXCLUDED:
+                return selectedWeightSum;
+            default:
+                return 0.0;
+        }
+    }
+
+
+    private void setWeightSum(Decision d, double weightSum) {
+        switch (d) {
+            case SELECTED:
+                excludedWeightSum = weightSum;
+                break;
+            case EXCLUDED:
+                selectedWeightSum = weightSum;
+                break;
+        }
+    }
+
 
 
     private void computeCacheFactor() {
