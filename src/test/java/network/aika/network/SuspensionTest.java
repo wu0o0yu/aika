@@ -51,7 +51,7 @@ public class SuspensionTest {
         n.get().getInputNode().suspend(Provider.SuspensionMode.SAVE);
         n.suspend(Provider.SuspensionMode.SAVE);
 
-        int id = n.id;
+        int id = n.getId();
 
 
         // Reactivate
@@ -69,8 +69,8 @@ public class SuspensionTest {
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
 
-        int idA = inA.id;
-        int idB = inB.id;
+        int idA = inA.getId();
+        int idB = inB.getId();
 
         Neuron nC = Neuron.init(m.createNeuron("C"),
                 5.0,
@@ -177,8 +177,8 @@ public class SuspensionTest {
         Neuron inA = m.createNeuron("A");
         Neuron inB = m.createNeuron("B");
 
-        int idA = inA.id;
-        int idB = inB.id;
+        int idA = inA.getId();
+        int idB = inB.getId();
 
         Neuron nC = Neuron.init(m.createNeuron("C"),
                 5.0,

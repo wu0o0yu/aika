@@ -400,18 +400,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      * @param input
      */
     public Activation addInput(Document doc, Activation.Builder input) {
-        Integer firstSlot = input.positions.firstKey();
-        Position firstPos = doc.lookupFinalPosition(input.positions.get(firstSlot));
-        Activation act = null;
-        x: for(Activation a: getActivations(doc, firstSlot, firstPos, true, firstSlot, firstPos, true).collect(Collectors.toList())) {
-            for(Map.Entry<Integer, Integer> me: input.positions.entrySet()) {
-                Position pos = a.getSlot(me.getKey());
-                if(pos == null || me.getValue().compareTo(pos.getFinalPosition()) != 0) {
-                    continue x;
-                }
-            }
-            act = a;
-        }
+        Activation act = getActivation(doc, input);
 
         if (act == null) {
             act = new Activation(doc, this, input.getSlots(doc));
@@ -441,6 +430,22 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         doc.propagate();
 
         return act;
+    }
+
+
+    private Activation getActivation(Document doc, Activation.Builder input) {
+        Integer firstSlot = input.positions.firstKey();
+        Position firstPos = doc.lookupFinalPosition(input.positions.get(firstSlot));
+        x: for(Activation a: getActivations(doc, firstSlot, firstPos, true, firstSlot, firstPos, true).collect(Collectors.toList())) {
+            for(Map.Entry<Integer, Integer> me: input.positions.entrySet()) {
+                Position pos = a.getSlot(me.getKey());
+                if(pos == null || me.getValue().compareTo(pos.getFinalPosition()) != 0) {
+                    continue x;
+                }
+            }
+            return a;
+        }
+        return null;
     }
 
 

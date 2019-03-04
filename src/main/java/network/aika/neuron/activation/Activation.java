@@ -565,24 +565,14 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
-    private void addOption(Option o) {
-        if(options == null) {
-            options = new ArrayList<>();
-        }
-        options.add(o);
-    }
-
-
     public void setInputState(Builder input) {
-        Activation.State s = new Activation.State(input.value, input.value, input.net, 0.0, input.fired, 0.0);
+        State s = new State(input.value, input.value, input.net, 0.0, input.fired, 0.0);
         rounds.set(0, s);
 
         if(SearchNode.COMPUTE_SOFT_MAX) {
             Option o = new Option(-1, SELECTED);
             o.p = 1.0;
             o.state = s;
-
-            addOption(o);
         }
     }
 
@@ -943,7 +933,7 @@ public final class Activation implements Comparable<Activation> {
 
 
     public String toString() {
-        return id + " " + slotsToString() + " " + identityToString() + " - " +
+        return id + " " + getLabel() + " " + slotsToString() + " " + identityToString() + " - " +
                 (extension != null ? extension.toString() + " -" : "") +
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
