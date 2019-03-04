@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static network.aika.Document.MAX_ROUND;
 import static network.aika.neuron.activation.Linker.Direction.INPUT;
 import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
 import static network.aika.neuron.activation.SearchNode.Decision.EXCLUDED;
@@ -76,10 +77,10 @@ public final class Activation implements Comparable<Activation> {
     public double upperBound;
     public double lowerBound;
 
-    public List<Option> options;
+    private List<Option> options;
 
-    public Rounds rounds = new Rounds();
-    public Rounds finalRounds = rounds;
+    Rounds rounds = new Rounds();
+    Rounds finalRounds = rounds;
 
     public boolean ubQueued = false;
     public long markedHasCandidate;
@@ -193,6 +194,13 @@ public final class Activation implements Comparable<Activation> {
         return true;
     }
 
+
+    public Collection<Option> getOptions() {
+        if(options == null) return Collections.emptyList();
+        return options;
+    }
+
+
     public String getLabel() {
         return getINeuron().getLabel();
     }
@@ -299,7 +307,7 @@ public final class Activation implements Comparable<Activation> {
             saveNewState();
 
             if (propagate) {
-                if(round > Document.MAX_ROUND) {
+                if(round > MAX_ROUND) {
                     log.error("Error: Maximum number of rounds reached. The network might be oscillating.");
 
                     doc.dumpOscillatingActivations();
@@ -552,6 +560,33 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
+    public boolean isOscillating() {
+         return rounds.getLastRound() != null && rounds.getLastRound() > MAX_ROUND - 5;
+    }
+
+
+    private void addOption(Option o) {
+        if(options == null) {
+            options = new ArrayList<>();
+        }
+        options.add(o);
+    }
+
+
+    public void setInputState(Builder input) {
+        Activation.State s = new Activation.State(input.value, input.value, input.net, 0.0, input.fired, 0.0);
+        rounds.set(0, s);
+
+        if(SearchNode.COMPUTE_SOFT_MAX) {
+            Option o = new Option(-1, SELECTED);
+            o.p = 1.0;
+            o.state = s;
+
+            addOption(o);
+        }
+    }
+
+
     private static class InputState {
         public InputState(Link l, State s) {
             this.l = l;
@@ -697,8 +732,13 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
-    public State getFinalState() {
+    State getFinalState() {
         return finalRounds.getLast();
+    }
+
+
+    public double getValue() {
+        return getFinalState().value;
     }
 
 

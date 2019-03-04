@@ -9,8 +9,8 @@ import java.util.zip.GZIPOutputStream;
 
 public class Provider<T extends AbstractNode> implements Comparable<Provider<?>> {
 
-    public Model model;
-    public Integer id;
+    protected Model model;
+    protected Integer id;
 
     private volatile T n;
 
@@ -45,6 +45,16 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
                 model.register(this);
             }
         }
+    }
+
+
+    public Integer getId() {
+        return id;
+    }
+
+
+    public Model getModel() {
+        return model;
     }
 
 

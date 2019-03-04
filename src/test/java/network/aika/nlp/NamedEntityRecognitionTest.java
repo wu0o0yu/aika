@@ -297,7 +297,7 @@ public class NamedEntityRecognitionTest {
         for(Activation act: surnameCategory.getActivations(doc, true).collect(Collectors.toList())) {
             System.out.print(act.slotsToString() + " ");
             System.out.print(act.getLabel() + " ");
-            System.out.print(act.getFinalState().value);
+            System.out.print(act.getValue());
         }
 
         Assert.assertFalse(jacksonForenameEntity.getActivations(doc, true).collect(Collectors.toList()).isEmpty());

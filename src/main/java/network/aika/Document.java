@@ -433,16 +433,16 @@ public class Document implements Comparable<Document> {
     private void computeSoftMax(SearchNode rootNode) {
         for (Activation act : activationsById.values()) {
             double offset = Double.MAX_VALUE;
-            for (Option option : act.options) {
+            for (Option option : act.getOptions()) {
                 offset = Math.min(offset, Math.log(option.cacheFactor) + option.weight);
             }
 
             double norm = 0.0;
-            for (Option option : act.options) {
+            for (Option option : act.getOptions()) {
                 norm += Math.exp(Math.log(option.cacheFactor) + option.weight - offset);
             }
 
-            for (Option option : act.options) {
+            for (Option option : act.getOptions()) {
                 if (option.decision == SELECTED) {
                     option.p = Math.exp(Math.log(option.cacheFactor) + option.weight - offset) / norm;
                 }
@@ -586,9 +586,9 @@ public class Document implements Comparable<Document> {
     public void dumpOscillatingActivations() {
         activatedNeurons.stream()
                 .flatMap(n -> n.getActivations(this, false))
-                .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)
+                .filter(act -> act.isOscillating())
                 .forEach(act -> {
-                    log.error(act.getId() + " " + act.slotsToString() + " " + act.decision + " " + act.rounds);
+                    log.error(act.getId() + " " + act.slotsToString() + " " + act.decision);
                     log.error(act.linksToString());
                     log.error("");
                 });

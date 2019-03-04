@@ -190,7 +190,7 @@ class AndNode extends Node<AndNode, AndActivation> {
         firstRV = new RefValue(firstOffsets, firstRefOffset, provider);
         nextLevelParents.add(new Entry(firstRef, firstRV));
 
-        return createAndNode(provider.model, doc, nextLevelParents, level + 1) ? firstRV : null;
+        return createAndNode(provider.getModel(), doc, nextLevelParents, level + 1) ? firstRV : null;
     }
 
 
@@ -373,7 +373,7 @@ class AndNode extends Node<AndNode, AndActivation> {
 
         public void write(DataOutput out) throws IOException {
             relations.write(out);
-            out.writeInt(input.id);
+            out.writeInt(input.getId());
         }
 
 
@@ -554,8 +554,8 @@ class AndNode extends Node<AndNode, AndActivation> {
                 out.writeInt(ofs);
             }
             out.writeInt(refOffset);
-            out.writeInt(parent.id);
-            out.writeInt(child.id);
+            out.writeInt(parent.getId());
+            out.writeInt(child.getId());
         }
 
         public static RefValue read(DataInput in, Model m)  throws IOException {

@@ -116,8 +116,8 @@ public class Synapse implements Writable {
         this.input = input;
         this.output = output;
 
-        if(output.model.getSynapseExtensionFactory() != null) {
-            extension = output.model.getSynapseExtensionFactory().createObject();
+        if(output.getModel().getSynapseExtensionFactory() != null) {
+            extension = output.getModel().getSynapseExtensionFactory().createObject();
         }
     }
 
@@ -220,17 +220,17 @@ public class Synapse implements Writable {
         INeuron in = input.get();
         INeuron out = output.get();
 
-        boolean dir = in.getProvider().id < out.getProvider().id;
+        boolean dir = in.getProvider().getId() < out.getProvider().getId();
 
         (dir ? in : out).lock.acquireWriteLock();
         (dir ? out : in).lock.acquireWriteLock();
 
         input.lock.acquireWriteLock();
-        input.inMemoryOutputSynapses.put(this, this);
+        input.activeOutputSynapses.put(this, this);
         input.lock.releaseWriteLock();
 
         output.lock.acquireWriteLock();
-        output.inMemoryInputSynapses.put(this, this);
+        output.activeInputSynapses.put(this, this);
         output.inputSynapsesById.put(id, this);
         output.lock.releaseWriteLock();
 
@@ -265,7 +265,7 @@ public class Synapse implements Writable {
             INeuron in = input.get();
             INeuron out = output.get();
 
-            boolean dir = in.getProvider().id < out.getProvider().id;
+            boolean dir = in.getProvider().getId() < out.getProvider().getId();
             (dir ? in : out).lock.acquireWriteLock();
             (dir ? out : in).lock.acquireWriteLock();
 
@@ -287,7 +287,7 @@ public class Synapse implements Writable {
             INeuron in = input.get();
             INeuron out = output.get();
 
-            boolean dir = in.getProvider().id < out.getProvider().id;
+            boolean dir = in.getProvider().getId() < out.getProvider().getId();
             (dir ? in : out).lock.acquireWriteLock();
             (dir ? out : in).lock.acquireWriteLock();
 
@@ -310,17 +310,17 @@ public class Synapse implements Writable {
         INeuron in = input.get();
         INeuron out = output.get();
 
-        boolean dir = input.id < out.getProvider().id;
+        boolean dir = input.getId() < out.getProvider().getId();
 
         (dir ? in : out).lock.acquireWriteLock();
         (dir ? out : in).lock.acquireWriteLock();
 
         input.lock.acquireWriteLock();
-        input.inMemoryOutputSynapses.remove(this);
+        input.activeOutputSynapses.remove(this);
         input.lock.releaseWriteLock();
 
         output.lock.acquireWriteLock();
-        output.inMemoryInputSynapses.remove(this);
+        output.activeInputSynapses.remove(this);
         output.inputSynapsesById.remove(id);
         output.lock.releaseWriteLock();
 
@@ -439,8 +439,8 @@ public class Synapse implements Writable {
         out.writeBoolean(isRecurrent);
         out.writeBoolean(identity);
 
-        out.writeInt(input.id);
-        out.writeInt(output.id);
+        out.writeInt(input.getId());
+        out.writeInt(output.getId());
 
         out.writeInt(relations.size());
         for(Map.Entry<Integer, Relation> me: relations.entrySet()) {

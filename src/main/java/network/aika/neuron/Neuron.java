@@ -43,8 +43,8 @@ public class Neuron extends Provider<INeuron> {
     ReadWriteLock lock = new ReadWriteLock();
 
     NavigableMap<Integer, Synapse> inputSynapsesById = new TreeMap<>();
-    NavigableMap<Synapse, Synapse> inMemoryInputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
-    NavigableMap<Synapse, Synapse> inMemoryOutputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
+    NavigableMap<Synapse, Synapse> activeInputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
+    NavigableMap<Synapse, Synapse> activeOutputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
 
 
     public Neuron(Model m, int id) {
@@ -299,7 +299,7 @@ public class Neuron extends Provider<INeuron> {
 
     public Synapse selectInputSynapse(Neuron inputNeuron, Predicate<Synapse> filter) {
         lock.acquireWriteLock();
-        Synapse synapse = inMemoryInputSynapses.subMap(
+        Synapse synapse = activeInputSynapses.subMap(
                 new Synapse(inputNeuron, this, Integer.MIN_VALUE), true,
                 new Synapse(inputNeuron, this, Integer.MAX_VALUE), true
         )
@@ -314,32 +314,32 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
-    void addInMemoryInputSynapse(Synapse s) {
+    void addActiveInputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        inMemoryInputSynapses.put(s, s);
+        activeInputSynapses.put(s, s);
         inputSynapsesById.put(s.getId(), s);
         lock.releaseWriteLock();
     }
 
 
-    void removeInMemoryInputSynapse(Synapse s) {
+    void removeActiveInputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        inMemoryInputSynapses.remove(s);
+        activeInputSynapses.remove(s);
         inputSynapsesById.remove(s.getId());
         lock.releaseWriteLock();
     }
 
 
-    void addInMemoryOutputSynapse(Synapse s) {
+    void addActiveOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        inMemoryOutputSynapses.put(s, s);
+        activeOutputSynapses.put(s, s);
         lock.releaseWriteLock();
     }
 
 
-    void removeInMemoryOutputSynapse(Synapse s) {
+    void removeActiveOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        inMemoryOutputSynapses.remove(s);
+        activeOutputSynapses.remove(s);
         lock.releaseWriteLock();
     }
 
@@ -362,13 +362,18 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
-    public Collection<Synapse> getInMemoryInputSynapses() {
-        return inMemoryInputSynapses.values();
+    /**
+     * Active input synapses are those synapses that are currently available in the main memory.
+     *
+     * @return
+     */
+    public Collection<Synapse> getActiveInputSynapses() {
+        return activeInputSynapses.values();
     }
 
 
-    public Collection<Synapse> getInMemoryOutputSynapses() {
-        return inMemoryOutputSynapses.values();
+    public Collection<Synapse> getActiveOutputSynapses() {
+        return activeOutputSynapses.values();
     }
 
 

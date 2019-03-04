@@ -190,6 +190,18 @@ public class Model {
     }
 
 
+    public Collection<Neuron> getActiveNeurons() {
+        List<Neuron> tmp = new ArrayList<>();
+        for(Provider<?> p: activeProviders.values()) {
+            if(p instanceof Neuron) {
+                tmp.add((Neuron) p);
+            }
+        }
+
+        return tmp;
+    }
+
+
     public <P extends Provider<? extends Node>> P lookupNodeProvider(int id) {
         synchronized (providers) {
             WeakReference<Provider<? extends AbstractNode>> wr = providers.get(id);

@@ -145,7 +145,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
 
     void addInput(int[] synapseIds, int threadId, Node in, boolean andMode) {
-        in.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), 1);
+        in.changeNumberOfNeuronRefs(threadId, provider.getModel().visitedCounter.addAndGet(1), 1);
 
         OrEntry oe = new OrEntry(synapseIds, in.getProvider(), provider);
         in.addOrChild(oe);
@@ -177,7 +177,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
     void removeParents(int threadId) {
         for (OrEntry oe : andParents) {
             Node pn = oe.parent.get();
-            pn.changeNumberOfNeuronRefs(threadId, provider.model.visitedCounter.addAndGet(1), -1);
+            pn.changeNumberOfNeuronRefs(threadId, provider.getModel().visitedCounter.addAndGet(1), -1);
             pn.removeOrChild(oe);
             pn.setModified();
         }
@@ -221,7 +221,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
         out.writeChar('O');
         super.write(out);
 
-        out.writeInt(outputNeuron.id);
+        out.writeInt(outputNeuron.getId());
 
         out.writeInt(andParents.size());
         for(OrEntry oe: andParents) {
@@ -285,8 +285,8 @@ public class OrNode extends Node<OrNode, OrActivation> {
                 out.writeBoolean(ofs != null);
                 out.writeInt(ofs);
             }
-            out.writeInt(parent.id);
-            out.writeInt(child.id);
+            out.writeInt(parent.getId());
+            out.writeInt(child.getId());
         }
 
         public static OrEntry read(DataInput in, Model m)  throws IOException {

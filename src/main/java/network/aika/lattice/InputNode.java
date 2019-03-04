@@ -136,7 +136,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         rv = new RefValue(new Integer[] {0}, 1, provider);
         nlParents.add(new AndNode.Entry(ref, rv));
 
-        return AndNode.createAndNode(provider.model, doc, nlParents, level + 1) ? rv : null;
+        return AndNode.createAndNode(provider.getModel(), doc, nlParents, level + 1) ? rv : null;
     }
 
 
@@ -229,7 +229,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         sb.append("[");
 
         if (inputNeuron != null) {
-            sb.append(inputNeuron.id);
+            sb.append(inputNeuron.getId());
             if (inputNeuron.getLabel() != null) {
                 sb.append(",");
                 sb.append(inputNeuron.getLabel());
@@ -251,7 +251,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         out.writeBoolean(inputNeuron != null);
         if (inputNeuron != null) {
-            out.writeInt(inputNeuron.id);
+            out.writeInt(inputNeuron.getId());
         }
     }
 
