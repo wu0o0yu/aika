@@ -231,7 +231,7 @@ public class Synapse implements Writable {
         INeuron in = input.get();
         INeuron out = output.get();
 
-        boolean dir = in.getProvider().getId() < out.getProvider().getId();
+        boolean dir = in.getId() < out.getId();
 
         (dir ? in : out).lock.acquireWriteLock();
         (dir ? out : in).lock.acquireWriteLock();
@@ -276,7 +276,7 @@ public class Synapse implements Writable {
             INeuron in = input.get();
             INeuron out = output.get();
 
-            boolean dir = in.getProvider().getId() < out.getProvider().getId();
+            boolean dir = in.getId() < out.getId();
             (dir ? in : out).lock.acquireWriteLock();
             (dir ? out : in).lock.acquireWriteLock();
 
@@ -298,7 +298,7 @@ public class Synapse implements Writable {
             INeuron in = input.get();
             INeuron out = output.get();
 
-            boolean dir = in.getProvider().getId() < out.getProvider().getId();
+            boolean dir = in.getId() < out.getId();
             (dir ? in : out).lock.acquireWriteLock();
             (dir ? out : in).lock.acquireWriteLock();
 
@@ -321,7 +321,7 @@ public class Synapse implements Writable {
         INeuron in = input.get();
         INeuron out = output.get();
 
-        boolean dir = input.getId() < out.getProvider().getId();
+        boolean dir = input.getId() < out.getId();
 
         (dir ? in : out).lock.acquireWriteLock();
         (dir ? out : in).lock.acquireWriteLock();

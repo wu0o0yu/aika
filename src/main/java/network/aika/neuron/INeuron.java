@@ -131,6 +131,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         outputNode = node;
     }
 
+    public Integer getId() {
+        return provider.getId();
+    }
 
     public String getLabel() {
         return label;
@@ -549,8 +552,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         if (this == MAX_NEURON) return 1;
         if (n == MAX_NEURON) return -1;
 
-        if (provider.getId() < n.provider.getId()) return -1;
-        else if (provider.getId() > n.provider.getId()) return 1;
+        if (getId() < n.getId()) return -1;
+        else if (getId() > n.getId()) return 1;
         else return 0;
     }
 
@@ -700,7 +703,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             }
         }
 
-        passiveInputFunction = m.passiveActivationFunctions.get(provider.getId());
+        passiveInputFunction = m.passiveActivationFunctions.get(getId());
     }
 
 
