@@ -215,6 +215,17 @@ public class Synapse implements Writable {
         return limit + limitDelta;
     }
 
+    public double getWeightDelta() {
+        return weightDelta;
+    }
+
+    public double getBiasDelta() {
+        return biasDelta;
+    }
+
+    public double getLimitDelta() {
+        return limitDelta;
+    }
 
     public void link() {
         INeuron in = input.get();
