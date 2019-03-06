@@ -771,6 +771,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         return bias + biasDelta;
     }
 
+    public double getBiasDelta() {
+        return biasDelta;
+    }
+
 
     public void register(Activation act) {
         Document doc = act.getDocument();
