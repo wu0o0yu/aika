@@ -450,19 +450,25 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             in.lock.acquireWriteLock();
             try {
                 synapseSummary.updateSynapse(s);
-
-                s.commit();
             } finally {
                 in.lock.releaseWriteLock();
             }
+        }
+
+        bias += biasDelta;
+        biasDelta = 0.0;
+
+        for (Synapse s : modifiedSynapses) {
+            synapseSummary.updateDisjunctiveSynapses(s);
+
+            s.commit();
 
             if(s.isZero()) {
                 s.unlink();
             }
         }
 
-        bias += biasDelta;
-        biasDelta = 0.0;
+        synapseSummary.commit();
 
         setModified();
     }
@@ -841,6 +847,13 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         private volatile double posRecSum;
         private volatile double posPassiveSum;
 
+        private volatile double biasSumDelta = 0.0;
+        private volatile double posDirSumDelta = 0.0;
+        private volatile double negDirSumDelta = 0.0;
+        private volatile double negRecSumDelta = 0.0;
+        private volatile double posRecSumDelta = 0.0;
+        private volatile double posPassiveSumDelta = 0.0;
+
         private volatile int numDisjunctiveSynapses = 0;
 
 
@@ -868,6 +881,27 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             return posPassiveSum;
         }
 
+        public double getPosSum(Synapse.State state) {
+            return getPosDirSum(state) + getPosRecSum(state) + getPosPassiveSum(state);
+        }
+
+
+        public double getBiasSum(Synapse.State state) {
+            return state == CURRENT ? biasSum : biasSum + biasSumDelta;
+        }
+
+        private double getPosDirSum(Synapse.State state) {
+            return state == CURRENT ? posDirSum : posDirSum + posDirSumDelta;
+        }
+
+        private double getPosRecSum(Synapse.State state) {
+            return state == CURRENT ? posRecSum : posRecSum + posRecSumDelta;
+        }
+
+        private double getPosPassiveSum(Synapse.State state) {
+            return state == CURRENT ? posPassiveSum : posPassiveSum + posPassiveSumDelta;
+        }
+
         public int getNumDisjunctiveSynapses() {
             return numDisjunctiveSynapses;
         }
@@ -880,42 +914,70 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             if (!s.isInactive()) {
                 updateSynapse(CURRENT, s);
                 updateSynapse(NEXT, s);
+            }
+        }
 
-                if(!s.isRecurrent()) {
-                    if (!s.isDisjunction(CURRENT) && s.isDisjunction(NEXT)) {
-                        numDisjunctiveSynapses++;
-                    } else if (s.isDisjunction(CURRENT) && !s.isDisjunction(NEXT)) {
-                        numDisjunctiveSynapses--;
-                    }
+        public void updateDisjunctiveSynapses(Synapse s) {
+            if (!s.isInactive() && !s.isRecurrent()) {
+                boolean csd = isStrongDisjunction(s, CURRENT);
+                boolean nsd = isStrongDisjunction(s, NEXT);
+                if (!csd && nsd) {
+                    numDisjunctiveSynapses++;
+                } else if (csd && !nsd) {
+                    numDisjunctiveSynapses--;
                 }
             }
+        }
 
-            assert Double.isFinite(biasSum);
+        private boolean isStrongDisjunction(Synapse s, Synapse.State state) {
+            return !s.isWeak(state) && s.isDisjunction(state);
         }
 
         private void updateSynapse(Synapse.State state, Synapse s) {
             double sign = (state == CURRENT ? -1.0 : 1.0);
-            biasSum += sign * s.getBias(state);
+
+            biasSumDelta += sign * s.getBias(state);
+
             updateSum(s.isRecurrent(), s.isNegative(state), sign * (s.getLimit(state) * s.getWeight(state)));
+
             if(s.getInput().get().isPassiveInputNeuron() && !s.isNegative(state)) {
-                posPassiveSum += sign * (!s.isNegative(state) ? (s.getLimit(state) * s.getWeight(state)) : 0.0);
+                posPassiveSumDelta += sign * (!s.isNegative(state) ? (s.getLimit(state) * s.getWeight(state)) : 0.0);
             }
         }
 
         private void updateSum(boolean rec, boolean neg, double delta) {
             if(!rec) {
                 if(!neg) {
-                    posDirSum += delta;
+                    posDirSumDelta += delta;
                 } else {
-                    negDirSum += delta;
+                    negDirSumDelta += delta;
                 }
             } else {
                 if(!neg) {
-                    posRecSum += delta;
+                    posRecSumDelta += delta;
                 } else {
-                    negRecSum += delta;
+                    negRecSumDelta += delta;
                 }
             }
+        }
+
+
+        public void commit() {
+            biasSum += biasSumDelta;
+            posDirSum += posDirSumDelta;
+            negDirSum += negDirSumDelta;
+            posRecSum += posRecSumDelta;
+            negRecSum += negRecSumDelta;
+            posPassiveSum += posPassiveSumDelta;
+
+            biasSumDelta = 0.0;
+            posDirSumDelta = 0.0;
+            negDirSumDelta = 0.0;
+            negRecSumDelta = 0.0;
+            posDirSumDelta = 0.0;
+            posPassiveSumDelta = 0.0;
+
+            assert Double.isFinite(biasSum);
         }
 
 

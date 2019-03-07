@@ -20,6 +20,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Document;
 import network.aika.neuron.relation.Relation;
+import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.Writable;
 
 import java.io.DataInput;
@@ -422,9 +423,15 @@ public class Synapse implements Writable {
 
     public boolean isWeak(State state) {
         double w = getLimit(state) * getWeight(state);
-        double b = getBias(state);
 
+        SynapseSummary ss = output.get().getSynapseSummary();
+        if(w > -ss.getBiasSum(state)) {
+            return false;
+        }
 
+        if(w > ss.getBiasSum(state) + ss.getPosSum(state)) {
+            return false;
+        }
         return true;
     }
 
