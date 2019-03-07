@@ -878,16 +878,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         public void updateSynapse(Synapse s) {
             if (!s.isInactive()) {
-                biasSum -= s.getBias();
-                biasSum += s.getNewBias();
-
-                updateSum(s.isRecurrent(), s.isNegative(CURRENT), -(s.getLimit() * s.getWeight()));
-                updateSum(s.isRecurrent(), s.getNewWeight() <= 0.0, s.getNewLimit() * s.getNewWeight());
-
-                if(s.getInput().get().isPassiveInputNeuron() && !s.isNegative(CURRENT)) {
-                    posPassiveSum -= !s.isNegative(CURRENT) ? (s.getLimit() * s.getWeight()) : 0.0;
-                    posPassiveSum += s.getNewWeight() > 0.0 ? (s.getNewLimit() * s.getNewWeight()) : 0.0;
-                }
+                updateSynapse(CURRENT, s);
+                updateSynapse(NEXT, s);
 
                 if(!s.isRecurrent()) {
                     if (!s.isDisjunction(CURRENT) && s.isDisjunction(NEXT)) {
@@ -903,10 +895,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         private void updateSynapse(Synapse.State state, Synapse s) {
             double sign = (state == CURRENT ? -1.0 : 1.0);
-            biasSum = sign * s.getBias(state);
+            biasSum += sign * s.getBias(state);
             updateSum(s.isRecurrent(), s.isNegative(state), sign * (s.getLimit(state) * s.getWeight(state)));
             if(s.getInput().get().isPassiveInputNeuron() && !s.isNegative(state)) {
-                posPassiveSum = sign * (!s.isNegative(state) ? (s.getLimit(state) * s.getWeight(state)) : 0.0);
+                posPassiveSum += sign * (!s.isNegative(state) ? (s.getLimit(state) * s.getWeight(state)) : 0.0);
             }
         }
 
