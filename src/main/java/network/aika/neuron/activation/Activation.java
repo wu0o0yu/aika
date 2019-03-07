@@ -28,6 +28,8 @@ import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
 import static network.aika.neuron.INeuron.ALLOW_WEAK_NEGATIVE_WEIGHTS;
 import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
+import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.Synapse.State.NEXT;
 
 
 /**
@@ -396,11 +398,11 @@ public final class Activation implements Comparable<Activation> {
                 x *= s.getDistanceFunction().f(iAct, this);
             }
             net += x;
-            if(!s.isNegative()) {
+            if(!s.isNegative(CURRENT)) {
                 posNet += x;
             }
 
-            if (!s.isRecurrent() && !s.isNegative() && net >= 0.0 && fired < 0) {
+            if (!s.isRecurrent() && !s.isNegative(CURRENT) && net >= 0.0 && fired < 0) {
                 fired = iAct.rounds.get(round).fired + 1;
             }
         }
@@ -409,7 +411,7 @@ public final class Activation implements Comparable<Activation> {
             double x = s.getWeight() * s.getInput().getPassiveInputFunction().getActivationValue(s, this);
 
             net += x;
-            if (!s.isNegative()) {
+            if (!s.isNegative(CURRENT)) {
                 posNet += x;
             }
         }
@@ -461,7 +463,7 @@ public final class Activation implements Comparable<Activation> {
             if (iAct == this) continue;
 
             double iv = 0.0;
-            if(!l.isNegative() && l.input.decision != EXCLUDED) {
+            if(!l.isNegative(CURRENT) && l.input.decision != EXCLUDED) {
                 iv = Math.min(l.synapse.getLimit(), l.input.upperBound);
             }
 
@@ -524,7 +526,7 @@ public final class Activation implements Comparable<Activation> {
                 x *= s.getDistanceFunction().f(iAct, this);
             }
 
-            if (s.isNegative()) {
+            if (s.isNegative(CURRENT)) {
                 if (!s.isRecurrent() && !iAct.checkSelfReferencing(false, 0, v)) {
                     ub += Math.min(s.getLimit(), iAct.lowerBound) * x;
                 }
@@ -597,7 +599,7 @@ public final class Activation implements Comparable<Activation> {
      */
     public boolean hasUndecidedPositiveFeedbackLinks() {
         return getInputLinks(false)
-                .anyMatch(l -> l.isRecurrent() && !l.isNegative() && l.input.decision == UNKNOWN);
+                .anyMatch(l -> l.isRecurrent() && !l.isNegative(CURRENT) && l.input.decision == UNKNOWN);
     }
 
 
@@ -641,7 +643,7 @@ public final class Activation implements Comparable<Activation> {
     private State getInputState(int round, Synapse s, long v) {
         State is = State.ZERO;
         if (s.isRecurrent()) {
-            if (!s.isNegative() || !checkSelfReferencing(true, 0, v)) {
+            if (!s.isNegative(CURRENT) || !checkSelfReferencing(true, 0, v)) {
                 is = round == 0 ? getInitialState(decision) : rounds.get(round - 1);
             }
         } else {
@@ -682,7 +684,7 @@ public final class Activation implements Comparable<Activation> {
         markPredecessor(v, 0);
         conflicts = new ArrayList<>();
         for(Link l: inputLinks.values()) {
-            if (l.isNegative() && l.isRecurrent()) {
+            if (l.isNegative(CURRENT) && l.isRecurrent()) {
                 l.input.collectIncomingConflicts(conflicts, v);
             }
         }
@@ -698,7 +700,7 @@ public final class Activation implements Comparable<Activation> {
             conflicts.add(this);
         } else {
             for (Link l : inputLinks.values()) {
-                if (!l.isNegative() && !l.isRecurrent()) {
+                if (!l.isNegative(CURRENT) && !l.isRecurrent()) {
                     l.input.collectIncomingConflicts(conflicts, v);
                 }
             }
@@ -711,10 +713,10 @@ public final class Activation implements Comparable<Activation> {
 
         for(Link l: outputLinks.values()) {
             if (l.output.getType() != INeuron.Type.INHIBITORY) {
-                if (l.isNegative() && l.isRecurrent()) {
+                if (l.isNegative(CURRENT) && l.isRecurrent()) {
                     conflicts.add(l.output);
                 }
-            } else if (!l.isNegative() && !l.isRecurrent()) {
+            } else if (!l.isNegative(CURRENT) && !l.isRecurrent()) {
                 l.output.collectOutgoingConflicts(conflicts, v);
             }
         }
@@ -742,7 +744,7 @@ public final class Activation implements Comparable<Activation> {
         }
 
         for (Link l: onlySelected ? selectedInputLinks : inputLinks.values()) {
-            if(!l.synapse.isNegative()) {
+            if(!l.synapse.isNegative(CURRENT)) {
                 if (l.input.checkSelfReferencing(onlySelected, depth + 1, v)) {
                     return true;
                 }
@@ -808,7 +810,7 @@ public final class Activation implements Comparable<Activation> {
         markedPredecessor = v;
 
         for(Link l: inputLinks.values()) {
-            if(!l.isNegative() && !l.isRecurrent()) {
+            if(!l.isNegative(CURRENT) && !l.isRecurrent()) {
                 l.input.markPredecessor(v, depth + 1);
             }
         }
@@ -1293,8 +1295,8 @@ public final class Activation implements Comparable<Activation> {
             return synapse.isIdentity();
         }
 
-        public boolean isNegative() {
-            return synapse.isNegative();
+        public boolean isNegative(Synapse.State s) {
+            return synapse.isNegative(s);
         }
 
         public boolean isInactive() {

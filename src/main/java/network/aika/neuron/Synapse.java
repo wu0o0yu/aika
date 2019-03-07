@@ -215,6 +215,18 @@ public class Synapse implements Writable {
         return limit + limitDelta;
     }
 
+    public double getWeight(State s) {
+        return s == State.CURRENT ? weight : getNewWeight();
+    }
+
+    public double getBias(State s) {
+        return s == State.CURRENT ? bias : getNewBias();
+    }
+
+    public double getLimit(State s) {
+        return s == State.CURRENT ? limit : getNewLimit();
+    }
+
     public double getWeightDelta() {
         return weightDelta;
     }
@@ -247,13 +259,13 @@ public class Synapse implements Writable {
 
         removeLinkInternal(in, out);
 
-        isConjunction = isConjunction(State.NEW);
+        isConjunction = isConjunction(State.NEXT);
         if(isConjunction) {
             out.inputSynapses.put(this, this);
             out.setModified();
         }
 
-        isDisjunction = isDisjunction(State.NEW);
+        isDisjunction = isDisjunction(State.NEXT);
         if(isDisjunction){
             in.outputSynapses.put(this, this);
             in.setModified();
@@ -271,7 +283,7 @@ public class Synapse implements Writable {
 
 
     public void relink() {
-        boolean newIsConjunction = isConjunction(State.NEW);
+        boolean newIsConjunction = isConjunction(State.NEXT);
         if(newIsConjunction != isConjunction) {
             INeuron in = input.get();
             INeuron out = output.get();
@@ -293,7 +305,7 @@ public class Synapse implements Writable {
             (dir ? out : in).lock.releaseWriteLock();
         }
 
-        boolean newIsDisjunction = isDisjunction(State.NEW);
+        boolean newIsDisjunction = isDisjunction(State.NEXT);
         if(newIsDisjunction != isDisjunction) {
             INeuron in = input.get();
             INeuron out = output.get();
@@ -343,12 +355,12 @@ public class Synapse implements Writable {
 
 
     private void removeLinkInternal(INeuron in, INeuron out) {
-        if(isConjunction(State.OLD)) {
+        if(isConjunction(State.CURRENT)) {
             if(out.inputSynapses.remove(this) != null) {
                 out.setModified();
             }
         }
-        if(isDisjunction(State.OLD)) {
+        if(isDisjunction(State.CURRENT)) {
             if(in.outputSynapses.remove(this) != null) {
                 in.setModified();
             }
@@ -386,22 +398,31 @@ public class Synapse implements Writable {
 
 
     public enum State {
-        NEW,
-        OLD
+        NEXT,
+        CURRENT
     }
 
 
     public boolean isConjunction(State state) {
-        double w = state == State.NEW ? (limit + limitDelta) * getNewWeight() : limit * weight;
-        double b = state == State.NEW ? bias + biasDelta : bias;
+        double w = getLimit(state) * getWeight(state);
+        double b = getBias(state);
         return w < 0.0 || (w > 0.0 && (-b / w) >= CONJUNCTION_THRESHOLD);
     }
 
 
     public boolean isDisjunction(State state) {
-        double w = state == State.NEW ? (limit + limitDelta) * getNewWeight() : limit * weight;
-        double b = state == State.NEW ? bias + biasDelta : bias;
+        double w = getLimit(state) * getWeight(state);
+        double b = getBias(state);
         return w > 0.0 && (-b / w) <= DISJUNCTION_THRESHOLD;
+    }
+
+
+    public boolean isWeak(State state) {
+        double w = getLimit(state) * getWeight(state);
+        double b = getBias(state);
+
+
+        return true;
     }
 
 
@@ -428,8 +449,8 @@ public class Synapse implements Writable {
     }
 
 
-    public boolean isNegative() {
-        return weight < 0.0;
+    public boolean isNegative(State s) {
+        return getWeight(s) < 0.0;
     }
 
 

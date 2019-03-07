@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
 import static network.aika.neuron.activation.SearchNode.Decision.EXCLUDED;
 import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
@@ -596,7 +597,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private void invalidateCachedDecisions() {
         candidate.activation
                 .getOutputLinks()
-                .filter(l -> !l.getSynapse().isNegative())
+                .filter(l -> !l.isNegative(CURRENT))
                 .forEach(l -> invalidateCachedDecision(l.getOutput()));
     }
 

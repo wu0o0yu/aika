@@ -24,6 +24,8 @@ import network.aika.neuron.relation.Relation;
 
 import java.util.*;
 
+import static network.aika.neuron.Synapse.State.CURRENT;
+
 /**
  * Converts the synapse weights of a neuron into a boolean logic representation of this neuron.
  *
@@ -194,7 +196,7 @@ public class Converter {
     private Synapse getStrongestSynapse(Collection<Synapse> synapses) {
         Synapse maxSyn = null;
         for(Synapse s: synapses) {
-            if(!s.isNegative() && !s.isRecurrent() && !s.isInactive() && !s.getInput().get().isPassiveInputNeuron()) {
+            if(!s.isNegative(CURRENT) && !s.isRecurrent() && !s.isInactive() && !s.getInput().get().isPassiveInputNeuron()) {
                 if(maxSyn == null || SYNAPSE_COMP.compare(maxSyn, s) > 0) {
                     maxSyn = s;
                 }

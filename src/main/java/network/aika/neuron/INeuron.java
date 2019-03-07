@@ -32,7 +32,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
+import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.Synapse.State.NEXT;
 
 /**
  * The {@code INeuron} class represents a internal neuron implementation in Aikas neural network and is connected to other neurons through
@@ -880,18 +881,18 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 biasSum -= s.getBias();
                 biasSum += s.getNewBias();
 
-                updateSum(s.isRecurrent(), s.isNegative(), -(s.getLimit() * s.getWeight()));
+                updateSum(s.isRecurrent(), s.isNegative(CURRENT), -(s.getLimit() * s.getWeight()));
                 updateSum(s.isRecurrent(), s.getNewWeight() <= 0.0, s.getNewLimit() * s.getNewWeight());
 
-                if(s.getInput().get().isPassiveInputNeuron() && !s.isNegative()) {
-                    posPassiveSum -= !s.isNegative() ? (s.getLimit() * s.getWeight()) : 0.0;
+                if(s.getInput().get().isPassiveInputNeuron() && !s.isNegative(CURRENT)) {
+                    posPassiveSum -= !s.isNegative(CURRENT) ? (s.getLimit() * s.getWeight()) : 0.0;
                     posPassiveSum += s.getNewWeight() > 0.0 ? (s.getNewLimit() * s.getNewWeight()) : 0.0;
                 }
 
                 if(!s.isRecurrent()) {
-                    if (!s.isDisjunction(Synapse.State.OLD) && s.isDisjunction(Synapse.State.NEW)) {
+                    if (!s.isDisjunction(CURRENT) && s.isDisjunction(NEXT)) {
                         numDisjunctiveSynapses++;
-                    } else if (s.isDisjunction(Synapse.State.OLD) && !s.isDisjunction(Synapse.State.NEW)) {
+                    } else if (s.isDisjunction(CURRENT) && !s.isDisjunction(NEXT)) {
                         numDisjunctiveSynapses--;
                     }
                 }
@@ -900,6 +901,14 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             assert Double.isFinite(biasSum);
         }
 
+        private void updateSynapse(Synapse.State state, Synapse s) {
+            double sign = (state == CURRENT ? -1.0 : 1.0);
+            biasSum = sign * s.getBias(state);
+            updateSum(s.isRecurrent(), s.isNegative(state), sign * (s.getLimit(state) * s.getWeight(state)));
+            if(s.getInput().get().isPassiveInputNeuron() && !s.isNegative(state)) {
+                posPassiveSum = sign * (!s.isNegative(state) ? (s.getLimit(state) * s.getWeight(state)) : 0.0);
+            }
+        }
 
         private void updateSum(boolean rec, boolean neg, double delta) {
             if(!rec) {
