@@ -79,7 +79,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
     public void reprocessInputs(Document doc) {
         inputNeuron.get(doc).getActivations(doc, false).forEach(act -> {
 //            act.repropagateV = markedCreated;
-            if(act.upperBound > 0.0) {
+            if(act.getUpperBound() > 0.0) {
                 act.getINeuron().propagate(act);
             }
         });
@@ -177,7 +177,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         Activation iAct = act.input;
         Document doc = act.getDocument();
 
-        for (Map.Entry<Integer, Position> me : iAct.slots.entrySet()) {
+        for (Map.Entry<Integer, Position> me : iAct.getSlots().entrySet()) {
             for (Activation linkedAct : act.getDocument().getActivationsByPosition(me.getValue(), true, me.getValue(), true)) {
                 Provider<InputNode> in = linkedAct.getINeuron().getOutputNode();
                 for (Map.Entry<AndNode.Refinement, AndNode.RefValue> mea : andChildren.subMap(

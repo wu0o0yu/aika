@@ -55,8 +55,8 @@ public final class Activation implements Comparable<Activation> {
     public static int MAX_PREDECESSOR_DEPTH = 100;
     public static boolean DEBUG_OUTPUT = false;
 
-    public static Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE);
-    public static Activation MAX_ACTIVATION = new Activation(Integer.MAX_VALUE);
+    public static final Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE);
+    public static final Activation MAX_ACTIVATION = new Activation(Integer.MAX_VALUE);
 
     private static final Logger log = LoggerFactory.getLogger(Activation.class);
 
@@ -65,41 +65,39 @@ public final class Activation implements Comparable<Activation> {
     private Document doc;
     private long visited = 0;
 
-    public Map<Integer, Position> slots = new TreeMap<>();
+    private Map<Integer, Position> slots = new TreeMap<>();
     private OrActivation inputNodeActivation;
     private InputActivation outputNodeActivation;
     private TreeSet<Link> selectedInputLinks = new TreeSet<>(INPUT_COMP);
     private TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
     private TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
 
-    public Integer sequence;
-
-    public double upperBound;
-    public double lowerBound;
+    private Integer sequence;
+    private double upperBound;
+    private double lowerBound;
 
     private List<Option> options;
 
     Rounds rounds = new Rounds();
     Rounds finalRounds = rounds;
 
-    public boolean ubQueued = false;
+    boolean ubQueued = false;
     public long markedHasCandidate;
 
-    public long currentStateV;
-    public StateChange currentStateChange;
-    public long markedDirty;
-    public long markedPredecessor;
+    private long currentStateV;
+    private StateChange currentStateChange;
+    long markedDirty;
+    private long markedPredecessor;
 
-    public Double targetValue;
-    public Double inputValue;
+    private Double targetValue;
+    private Double inputValue;
 
-    public Writable extension;
+    private Writable extension;
 
-
-    public Decision inputDecision = Decision.UNKNOWN;
-    public Decision decision = Decision.UNKNOWN;
-    public Decision finalDecision = Decision.UNKNOWN;
-    public Candidate candidate;
+    Decision inputDecision = Decision.UNKNOWN;
+    Decision decision = Decision.UNKNOWN;
+    Decision finalDecision = Decision.UNKNOWN;
+    Candidate candidate;
     private long visitedState;
     public long markedAncDesc;
 
@@ -108,9 +106,11 @@ public final class Activation implements Comparable<Activation> {
 
     private List<Activation> conflicts;
 
+
     private Activation(int id) {
         this.id = id;
     }
+
 
     public Activation(Document doc, INeuron neuron, Map<Integer, Position> slots) {
         this.id = doc.getNewActivationId();
@@ -143,6 +143,11 @@ public final class Activation implements Comparable<Activation> {
         this.outputNodeActivation = outputNodeActivation;
     }
 
+
+    public Map<Integer, Position> getSlots() {
+        return slots;
+    }
+
     public Position getSlot(int slot) {
         return slots.get(slot);
     }
@@ -163,10 +168,6 @@ public final class Activation implements Comparable<Activation> {
         return max - min;
     }
 
-
-    public void setTargetValue(Double targetValue) {
-        this.targetValue = targetValue;
-    }
 
     public int getId() {
         return id;
@@ -228,6 +229,34 @@ public final class Activation implements Comparable<Activation> {
         return getNeuron().getSynapseById(synapseId);
     }
 
+
+    public double getUpperBound() {
+        return upperBound;
+    }
+
+    public double getLowerBound() {
+        return lowerBound;
+    }
+
+    public Double getTargetValue() {
+        return targetValue;
+    }
+
+    public Double getInputValue() {
+        return inputValue;
+    }
+
+    public Decision getInputDecision() {
+        return inputDecision;
+    }
+
+    public Decision getDecision() {
+        return decision;
+    }
+
+    public Decision getFinalDecision() {
+        return finalDecision;
+    }
 
     public void addLink(Linker.Direction dir, Link l) {
         switch(dir) {
@@ -574,6 +603,15 @@ public final class Activation implements Comparable<Activation> {
             o.p = 1.0;
             o.state = s;
         }
+
+        inputValue = input.value;
+        upperBound = input.value;
+        lowerBound = input.value;
+        targetValue = input.targetValue;
+
+        inputDecision = SELECTED;
+        finalDecision = inputDecision;
+        setDecision(inputDecision, doc.getNewVisitedId());
     }
 
 

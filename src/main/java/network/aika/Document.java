@@ -276,7 +276,7 @@ public class Document implements Comparable<Document> {
 
 
     public void addActivation(Activation act) {
-        for(Map.Entry<Integer, Position> me : act.slots.entrySet()) {
+        for(Map.Entry<Integer, Position> me : act.getSlots().entrySet()) {
             Position pos = me.getValue();
             if (pos != null && pos.getFinalPosition() != null) {
                 ActKey dak = new ActKey(me.getKey(), pos, act.getINeuron(), act.getId());
@@ -358,7 +358,7 @@ public class Document implements Comparable<Document> {
         }
 
         for(Activation act: activationsById.subMap(INCREMENTAL_MODE ? lastProcessedActivationId : -1, false, Integer.MAX_VALUE, true).values()) {
-            if (act.decision == UNKNOWN && act.upperBound > 0.0) {
+            if (act.getDecision() == UNKNOWN && act.getUpperBound() > 0.0) {
                 SearchNode.invalidateCachedDecision(act);
                 tmp.add(new Candidate(act, i++));
 
@@ -568,7 +568,7 @@ public class Document implements Comparable<Document> {
         sb.append("\n");
 
         for(Activation act: acts) {
-            if(act.upperBound <= 0.0 && (act.targetValue == null || act.targetValue <= 0.0)) {
+            if(act.getUpperBound() <= 0.0 && (act.getTargetValue() == null || act.getTargetValue() <= 0.0)) {
                 continue;
             }
 
@@ -588,7 +588,7 @@ public class Document implements Comparable<Document> {
                 .flatMap(n -> n.getActivations(this, false))
                 .filter(act -> act.isOscillating())
                 .forEach(act -> {
-                    log.error(act.getId() + " " + act.slotsToString() + " " + act.decision);
+                    log.error(act.getId() + " " + act.slotsToString() + " " + act.getDecision());
                     log.error(act.linksToString());
                     log.error("");
                 });

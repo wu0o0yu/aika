@@ -204,7 +204,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             th.maxLength = Math.max(th.maxLength, l);
         }
 
-        for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
+        for(Map.Entry<Integer, Position> me: act.getSlots().entrySet()) {
             ActKey ak = new ActKey(me.getKey(), me.getValue(), act.getId());
             th.activationsBySlotAndPosition.put(ak, act);
             th.activations.put(act.getId(), act);
@@ -410,17 +410,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         act.setInputState(input);
-
-        act.inputValue = input.value;
-        act.upperBound = input.value;
-        act.lowerBound = input.value;
-
-        act.inputDecision = SELECTED;
-        act.finalDecision = act.inputDecision;
-        act.setDecision(act.inputDecision, doc.getNewVisitedId());
-
-
-        act.setTargetValue(input.targetValue);
 
         doc.addInputNeuronActivation(act);
         doc.addFinallyActivatedNeuron(act.getINeuron());
@@ -783,7 +772,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             doc.addActivatedNeuron(act.getINeuron());
         }
 
-        for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
+        for(Map.Entry<Integer, Position> me: act.getSlots().entrySet()) {
             me.getValue().addActivation(me.getKey(), act);
         }
 
