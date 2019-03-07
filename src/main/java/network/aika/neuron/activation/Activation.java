@@ -73,6 +73,7 @@ public final class Activation implements Comparable<Activation> {
     private TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
 
     private Integer sequence;
+
     private double upperBound;
     private double lowerBound;
 
@@ -234,8 +235,19 @@ public final class Activation implements Comparable<Activation> {
         return upperBound;
     }
 
+
+    public void setUpperBound(double upperBound) {
+        this.upperBound = upperBound;
+    }
+
+
     public double getLowerBound() {
         return lowerBound;
+    }
+
+
+    public void setLowerBound(double lowerBound) {
+        this.lowerBound = lowerBound;
     }
 
     public Double getTargetValue() {
