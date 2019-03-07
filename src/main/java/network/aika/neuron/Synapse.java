@@ -27,6 +27,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
+import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.Synapse.State.NEXT;
+
 /**
  * The {@code Synapse} class connects two neurons with each other. When propagating an activation signal, the
  * weight of the synapse is multiplied with the activation value of the input neurons activation. The result is then added
@@ -259,7 +262,7 @@ public class Synapse implements Writable {
 
         removeLinkInternal(in, out);
 
-        isConjunction = isConjunction(State.NEXT);
+        isConjunction = isConjunction(NEXT);
         if(isConjunction) {
             out.inputSynapses.put(this, this);
             out.setModified();
@@ -283,7 +286,7 @@ public class Synapse implements Writable {
 
 
     public void relink() {
-        boolean newIsConjunction = isConjunction(State.NEXT);
+        boolean newIsConjunction = isConjunction(NEXT);
         if(newIsConjunction != isConjunction) {
             INeuron in = input.get();
             INeuron out = output.get();
@@ -305,7 +308,7 @@ public class Synapse implements Writable {
             (dir ? out : in).lock.releaseWriteLock();
         }
 
-        boolean newIsDisjunction = isDisjunction(State.NEXT);
+        boolean newIsDisjunction = isDisjunction(NEXT);
         if(newIsDisjunction != isDisjunction) {
             INeuron in = input.get();
             INeuron out = output.get();
@@ -355,12 +358,12 @@ public class Synapse implements Writable {
 
 
     private void removeLinkInternal(INeuron in, INeuron out) {
-        if(isConjunction(State.CURRENT)) {
+        if(isConjunction(CURRENT)) {
             if(out.inputSynapses.remove(this) != null) {
                 out.setModified();
             }
         }
-        if(isDisjunction(State.CURRENT)) {
+        if(isDisjunction(CURRENT)) {
             if(in.outputSynapses.remove(this) != null) {
                 in.setModified();
             }
