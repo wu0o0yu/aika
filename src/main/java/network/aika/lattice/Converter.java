@@ -145,7 +145,7 @@ public class Converter {
 
     private void convertDisjunction() {
         for (Synapse s : modifiedSynapses) {
-            if (s.isDisjunction() && !s.isRecurrent()) {
+            if (s.isDisjunction() && !s.isRecurrent() && !s.isWeak(CURRENT)) {
                 NodeContext nlNodeContext = expandNode(null, s);
                 outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
             }

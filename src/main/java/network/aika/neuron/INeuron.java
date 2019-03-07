@@ -930,7 +930,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         private boolean isStrongDisjunction(Synapse s, Synapse.State state) {
-            return !s.isWeak(state) && s.isDisjunction(state);
+            return s.isDisjunction(state) && !s.isWeak(state);
         }
 
         private void updateSynapse(Synapse.State state, Synapse s) {
