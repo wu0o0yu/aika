@@ -468,6 +468,10 @@ public class Document implements Comparable<Document> {
     }
 
 
+    public Map<INeuron, Set<Synapse>> getModifiedWeights() {
+        return modifiedWeights;
+    }
+
     /**
      * Updates the model after the training step.
      * It applies the weight and bias delta values and reflects the changes in the logic node structure.

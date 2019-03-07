@@ -134,6 +134,22 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     }
 
 
+    public static void link(Neuron n, Relation rel, int from, int to) {
+        if(from != to) {
+            addRelation(to, from, n, rel);
+            addRelation(from, to, n, rel.invert());
+        } else {
+            MultiRelation mr = new MultiRelation(Arrays.asList(rel, rel.invert()));
+            addRelation(to, from, n, mr);
+        }
+    }
+
+
+    public static void addRelation(Integer synId, Integer targetSynId, Neuron n, Relation rel) {
+        addRelation(getRelationsMap(targetSynId, n), synId, targetSynId, n, rel);
+    }
+
+
     public static void addRelation(Map<Integer, Relation> relMap, Integer synId, Integer targetSynId, Neuron n, Relation r) {
         if(targetSynId == OUTPUT) {
             Synapse s = n.getSynapseById(synId);
@@ -143,6 +159,16 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         relMap.put(synId, r);
+    }
+
+
+    public static void removeRelation(Integer synId, Integer targetSynId, Neuron n) {
+        removeRelation(getRelationsMap(targetSynId, n), synId);
+    }
+
+
+    public static void removeRelation(Map<Integer, Relation> relMap, Integer synId) {
+        relMap.remove(synId);
     }
 
 
@@ -200,17 +226,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         public void connect(Neuron n) {
-            Map<Integer, Relation> fromRel = getRelationsMap(from, n);
-            Map<Integer, Relation> toRel = getRelationsMap(to, n);
-
-            Relation rel = getRelation();
-            if(from != to) {
-                addRelation(fromRel, to, from, n, rel);
-                addRelation(toRel, from, to, n, rel.invert());
-            } else {
-                MultiRelation mr = new MultiRelation(Arrays.asList(rel, rel.invert()));
-                addRelation(fromRel, to, from, n, mr);
-            }
+            link(n, getRelation(), from, to);
         }
 
         @Override
