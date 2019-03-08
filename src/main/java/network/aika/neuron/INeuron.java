@@ -32,6 +32,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.Synapse.State.NEXT;
 
@@ -167,6 +168,23 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public Collection<Synapse> getInputSynapses() {
         return inputSynapses.values();
+    }
+
+
+    public Synapse getMaxInputSynapse(Synapse.State state) {
+        if(type != EXCITATORY) {
+            return null;
+        }
+
+        Synapse maxSyn = null;
+        for(Synapse s: getInputSynapses()) {
+            if(!s.isInactive() && !s.isWeak(state)) {
+                if(maxSyn == null || maxSyn.getNewWeight() < s.getNewWeight()) {
+                    maxSyn = s;
+                }
+            }
+        }
+        return maxSyn;
     }
 
 
