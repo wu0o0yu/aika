@@ -135,13 +135,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
 
     public static void link(Neuron n, Relation rel, int from, int to) {
-        if(from != to) {
-            addRelation(to, from, n, rel);
-            addRelation(from, to, n, rel.invert());
-        } else {
-            MultiRelation mr = new MultiRelation(Arrays.asList(rel, rel.invert()));
-            addRelation(to, from, n, mr);
-        }
+        addRelation(to, from, n, rel);
+        addRelation(from, to, n, rel.invert());
     }
 
 
@@ -158,17 +153,40 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             }
         }
 
-        relMap.put(synId, r);
+        Relation existingRel = relMap.get(synId);
+        if (existingRel == null) {
+            relMap.put(synId, r);
+        } else if(existingRel instanceof MultiRelation) {
+            MultiRelation mr = (MultiRelation) existingRel;
+            mr.addRelation(r);
+        } else if(existingRel.compareTo(r) != 0) {
+            MultiRelation mr = new MultiRelation();
+            mr.addRelation(existingRel);
+            mr.addRelation(r);
+            relMap.put(synId, mr);
+        }
     }
 
 
-    public static void removeRelation(Integer synId, Integer targetSynId, Neuron n) {
-        removeRelation(getRelationsMap(targetSynId, n), synId);
+    public static void removeRelation(Integer synId, Integer targetSynId, Neuron n, Relation r) {
+        removeRelation(getRelationsMap(targetSynId, n), synId, r);
     }
 
 
-    public static void removeRelation(Map<Integer, Relation> relMap, Integer synId) {
-        relMap.remove(synId);
+    public static void removeRelation(Map<Integer, Relation> relMap, Integer synId, Relation r) {
+        Relation existingRel = relMap.get(synId);
+        if(existingRel == null) {
+            return;
+        } else if(existingRel.compareTo(r) == 0) {
+            relMap.remove(synId);
+        } else if(existingRel instanceof MultiRelation) {
+            MultiRelation mr = (MultiRelation) existingRel;
+            mr.removeRelation(r);
+
+            if(mr.size() == 1) {
+                relMap.put(synId, mr.getRelations().get(0));
+            }
+        }
     }
 
 

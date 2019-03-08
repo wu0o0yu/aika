@@ -49,6 +49,32 @@ public class MultiRelation extends Relation {
     }
 
 
+    public int size() {
+        return relations.size();
+    }
+
+
+    public void addRelation(Relation r) {
+        for(Relation rel: relations) {
+            if(rel.compareTo(r) == 0) {
+                return;
+            }
+        }
+        relations.add(r);
+    }
+
+
+    public void removeRelation(Relation r) {
+        for(Iterator<Relation> it = relations.iterator(); it.hasNext();) {
+            Relation rel = it.next();
+
+            if(rel.compareTo(r) == 0) {
+                it.remove();
+            }
+        }
+    }
+
+
     @Override
     public int getType() {
         return ID;
