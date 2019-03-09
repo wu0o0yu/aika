@@ -188,6 +188,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
+    public Collection<Synapse> getOutputSynapses() {
+        return outputSynapses.values();
+    }
+
+
     public Collection<Synapse> getPassiveInputSynapses() {
         if(passiveInputSynapses == null) {
              return Collections.emptyList();
