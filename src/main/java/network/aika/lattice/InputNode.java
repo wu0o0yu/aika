@@ -20,7 +20,6 @@ package network.aika.lattice;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.Provider;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.relation.Relation;
@@ -57,23 +56,14 @@ public class InputNode extends Node<InputNode, InputActivation> {
     public InputNode() {
     }
 
+
     public InputNode(Model m) {
         super(m, 1);
     }
 
 
-    public static InputNode add(Model m, INeuron input) {
-        if (input.outputNode != null) {
-            return input.outputNode.get();
-        }
-        InputNode in = new InputNode(m);
-
-        if (input != null && in.inputNeuron == null) {
-            in.inputNeuron = input.getProvider();
-            input.outputNode = in.provider;
-            input.setModified();
-        }
-        return in;
+    public void setInputNeuron(Neuron n) {
+        inputNeuron = n;
     }
 
 
@@ -86,15 +76,10 @@ public class InputNode extends Node<InputNode, InputActivation> {
     }
 
 
-    public void propagate(InputActivation act) {
-        apply(act);
-    }
-
-
     public void reprocessInputs(Document doc) {
         inputNeuron.get(doc).getActivations(doc, false).forEach(act -> {
 //            act.repropagateV = markedCreated;
-            if(act.upperBound > 0.0) {
+            if(act.getUpperBound() > 0.0) {
                 act.getINeuron().propagate(act);
             }
         });
@@ -130,8 +115,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
     }
 
 
-
-    public RefValue extend(int threadId, Document doc, Refinement ref) {
+    public RefValue expand(int threadId, Document doc, Refinement ref) {
         if(!ref.isConvertible()) return null;
 
         Relation rel = ref.relations.get(0);
@@ -152,7 +136,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         rv = new RefValue(new Integer[] {0}, 1, provider);
         nlParents.add(new AndNode.Entry(ref, rv));
 
-        return AndNode.createAndNode(provider.model, doc, nlParents, level + 1) ? rv : null;
+        return AndNode.createAndNode(provider.getModel(), doc, nlParents, level + 1) ? rv : null;
     }
 
 
@@ -160,14 +144,14 @@ public class InputNode extends Node<InputNode, InputActivation> {
      * @param act
      */
     @Override
-    void apply(InputActivation act) {
+    protected void propagate(InputActivation act) {
         try {
             lock.acquireReadLock();
             if (andChildren != null) {
                 TreeMap<AndNode.Refinement, AndNode.RefValue> children;
                 if(andChildren.size() > CHILD_NODE_THRESHOLD) {
                     children = nonExactAndChildren;
-                    applyExactRelations(act);
+                    propagateWithExactRelations(act);
                 } else {
                     children = andChildren;
                 }
@@ -176,7 +160,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
                     children.forEach((ref, rv) -> {
                         InputNode in = ref.input.getIfNotSuspended();
                         if (in != null) {
-                            addNextLevelActivations(in, ref, rv.child.get(act.getDocument()), act);
+                            in.addNextLevelActivations(ref, rv.child.get(act.getDocument()), act);
                         }
                     });
                 }
@@ -185,37 +169,37 @@ public class InputNode extends Node<InputNode, InputActivation> {
             lock.releaseReadLock();
         }
 
-        OrNode.processCandidate(this, act, false);
+        propagateToOrNode(act);
     }
 
 
-    private void applyExactRelations(InputActivation act) {
+    private void propagateWithExactRelations(InputActivation act) {
         Activation iAct = act.input;
         Document doc = act.getDocument();
 
-        for (Map.Entry<Integer, Position> me : iAct.slots.entrySet()) {
+        for (Map.Entry<Integer, Position> me : iAct.getSlots().entrySet()) {
             for (Activation linkedAct : act.getDocument().getActivationsByPosition(me.getValue(), true, me.getValue(), true)) {
-                Provider<InputNode> in = linkedAct.getINeuron().outputNode;
+                Provider<InputNode> in = linkedAct.getINeuron().getOutputNode();
                 for (Map.Entry<AndNode.Refinement, AndNode.RefValue> mea : andChildren.subMap(
                         new Refinement(RelationsMap.MIN, in),
                         new Refinement(RelationsMap.MAX, in)).entrySet()) {
-                    addNextLevelActivations(in.get(doc), mea.getKey(), mea.getValue().child.get(doc), act);
+                    in.get(doc).addNextLevelActivations(mea.getKey(), mea.getValue().child.get(doc), act);
                 }
             }
         }
     }
 
 
-    private static void addNextLevelActivations(InputNode secondNode, Refinement ref, AndNode nln, InputActivation act) {
+    private void addNextLevelActivations(Refinement ref, AndNode nln, InputActivation act) {
         Document doc = act.getDocument();
 
-        if(secondNode.inputNeuron.get().isEmpty(doc)) return;
+        if(inputNeuron.get().isEmpty(doc)) return;
 
         Activation iAct = act.input;
 
         if(act.repropagateV != null && act.repropagateV != nln.markedCreated) return;
 
-        ref.relations.get(0).getActivations(secondNode.inputNeuron.get(doc), iAct)
+        ref.relations.get(0).getActivations(inputNeuron.get(doc), iAct)
                 .filter(secondIAct -> secondIAct.getOutputNodeActivation() != null)
                 .map(secondIAct -> secondIAct.getOutputNodeActivation())
                 .filter(secondAct -> secondAct != null && secondAct.registered)
@@ -245,7 +229,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         sb.append("[");
 
         if (inputNeuron != null) {
-            sb.append(inputNeuron.id);
+            sb.append(inputNeuron.getId());
             if (inputNeuron.getLabel() != null) {
                 sb.append(",");
                 sb.append(inputNeuron.getLabel());
@@ -267,7 +251,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         out.writeBoolean(inputNeuron != null);
         if (inputNeuron != null) {
-            out.writeInt(inputNeuron.id);
+            out.writeInt(inputNeuron.getId());
         }
     }
 

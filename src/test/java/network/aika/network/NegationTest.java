@@ -778,7 +778,7 @@ public class NegationTest {
 
 
         Neuron inG = m.createNeuron("G");
-        OrNode inGNode = inG.get().node.get();
+        OrNode inGNode = inG.get().getInputNode().get();
 
         Neuron pH = Neuron.init(m.createNeuron("H"),
                 0.001,

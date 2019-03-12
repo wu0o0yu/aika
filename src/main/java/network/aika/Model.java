@@ -20,6 +20,7 @@ package network.aika;
 import network.aika.lattice.InputNode;
 import network.aika.lattice.Node;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.INeuron.Type;
 import network.aika.neuron.Neuron;
 import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.activation.Linker;
@@ -159,12 +160,14 @@ public class Model {
 
 
     public Neuron createNeuron(String label, String outputText) {
-        INeuron n = new INeuron(this, label, outputText);
+        INeuron n = new INeuron(this, label, outputText, null, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT);
+        return n.getProvider();
+    }
 
-        InputNode iNode = InputNode.add(this, n);
-        iNode.setModified();
 
-        return n.provider;
+    public Neuron createNeuron(String label, String outputText, Type type, ActivationFunction actF) {
+        INeuron n = new INeuron(this, label, outputText, type, actF);
+        return n.getProvider();
     }
 
 
@@ -184,6 +187,18 @@ public class Model {
         }
 
         return doc;
+    }
+
+
+    public Collection<Neuron> getActiveNeurons() {
+        List<Neuron> tmp = new ArrayList<>();
+        for(Provider<?> p: activeProviders.values()) {
+            if(p instanceof Neuron) {
+                tmp.add((Neuron) p);
+            }
+        }
+
+        return tmp;
     }
 
 

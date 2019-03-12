@@ -31,11 +31,11 @@ public abstract class NodeActivation<T extends Node> implements Comparable<NodeA
 
     protected final Document doc;
 
-    public Long repropagateV;
+    Long repropagateV;
     public boolean registered;
 
-    public TreeMap<Integer, AndNode.Link> outputsToAndNode = new TreeMap<>();
-    public TreeMap<Integer, OrNode.Link> outputsToOrNode = new TreeMap<>();
+    TreeMap<Integer, AndNode.Link> outputsToAndNode = new TreeMap<>();
+    TreeMap<Integer, OrNode.Link> outputsToOrNode = new TreeMap<>();
 
 
     public NodeActivation(Document doc, T node) {

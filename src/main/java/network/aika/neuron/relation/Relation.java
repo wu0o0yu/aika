@@ -134,6 +134,17 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     }
 
 
+    public static void link(Neuron n, Relation rel, int from, int to) {
+        addRelation(to, from, n, rel);
+        addRelation(from, to, n, rel.invert());
+    }
+
+
+    public static void addRelation(Integer synId, Integer targetSynId, Neuron n, Relation rel) {
+        addRelation(getRelationsMap(targetSynId, n), synId, targetSynId, n, rel);
+    }
+
+
     public static void addRelation(Map<Integer, Relation> relMap, Integer synId, Integer targetSynId, Neuron n, Relation r) {
         if(targetSynId == OUTPUT) {
             Synapse s = n.getSynapseById(synId);
@@ -142,17 +153,46 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             }
         }
 
-        relMap.put(synId, r);
+        Relation existingRel = relMap.get(synId);
+        if (existingRel == null) {
+            relMap.put(synId, r);
+        } else if(existingRel instanceof MultiRelation) {
+            MultiRelation mr = (MultiRelation) existingRel;
+            mr.addRelation(r);
+        } else if(existingRel.compareTo(r) != 0) {
+            MultiRelation mr = new MultiRelation();
+            mr.addRelation(existingRel);
+            mr.addRelation(r);
+            relMap.put(synId, mr);
+        }
+    }
+
+
+    public static void removeRelation(Integer synId, Integer targetSynId, Neuron n, Relation r) {
+        removeRelation(getRelationsMap(targetSynId, n), synId, r);
+    }
+
+
+    public static void removeRelation(Map<Integer, Relation> relMap, Integer synId, Relation r) {
+        Relation existingRel = relMap.get(synId);
+        if(existingRel == null) {
+            return;
+        } else if(existingRel.compareTo(r) == 0) {
+            relMap.remove(synId);
+        } else if(existingRel instanceof MultiRelation) {
+            MultiRelation mr = (MultiRelation) existingRel;
+            mr.removeRelation(r);
+
+            if(mr.size() == 1) {
+                relMap.put(synId, mr.getRelations().get(0));
+            }
+        }
     }
 
 
     public static Map<Integer, Relation> getRelationsMap(int synapseId, Neuron n) {
         if(synapseId == OUTPUT) {
-            INeuron in = n.get();
-            if (in.outputRelations == null) {
-                in.outputRelations = new TreeMap<>();
-            }
-            return in.outputRelations;
+            return n.get().getOutputRelations();
         } else {
             Synapse s = n.getSynapseById(synapseId);
             return s.getRelations();
@@ -204,17 +244,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         public void connect(Neuron n) {
-            Map<Integer, Relation> fromRel = getRelationsMap(from, n);
-            Map<Integer, Relation> toRel = getRelationsMap(to, n);
-
-            Relation rel = getRelation();
-            if(from != to) {
-                addRelation(fromRel, to, from, n, rel);
-                addRelation(toRel, from, to, n, rel.invert());
-            } else {
-                MultiRelation mr = new MultiRelation(Arrays.asList(rel, rel.invert()));
-                addRelation(fromRel, to, from, n, mr);
-            }
+            link(n, getRelation(), from, to);
         }
 
         @Override

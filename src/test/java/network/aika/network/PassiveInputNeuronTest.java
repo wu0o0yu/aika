@@ -25,7 +25,7 @@ public class PassiveInputNeuronTest {
         Neuron inA = m.createNeuron("A");
 
         Neuron inB = m.createNeuron("B");
-        Neuron.registerPassiveInputNeuron(inB, (s, oAct) -> 1.0);
+        inB.setPassiveInputFunction((s, oAct) -> 1.0);
 
         Neuron out = Neuron.init(m.createNeuron("OUT"), 5.0, INeuron.Type.EXCITATORY,
                 new Synapse.Builder()

@@ -221,13 +221,13 @@ public class WeakInputProcessingTest {
         System.out.println(doc.activationsToString());
 
         Activation act = patternA.getActivation(doc, 0, 1, false);
-        Assert.assertTrue(act.getFinalState().value < 0.5);
+        Assert.assertTrue(act.getValue() < 0.5);
 
         act = patternB.getActivation(doc, 0, 1, false);
-        Assert.assertTrue(act.getFinalState().value > 0.5);
+        Assert.assertTrue(act.getValue() > 0.5);
 
         act = patternC.getActivation(doc, 0, 1, false);
-        Assert.assertTrue(act.getFinalState().value < 0.5);
+        Assert.assertTrue(act.getValue() < 0.5);
     }
 
 }

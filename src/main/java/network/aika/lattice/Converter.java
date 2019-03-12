@@ -18,10 +18,13 @@ package network.aika.lattice;
 
 import network.aika.Document;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.relation.Relation;
 
 import java.util.*;
+
+import static network.aika.neuron.Synapse.State.CURRENT;
 
 /**
  * Converts the synapse weights of a neuron into a boolean logic representation of this neuron.
@@ -65,86 +68,88 @@ public class Converter {
 
 
     private boolean convert() {
-        outputNode = neuron.node.get();
+        outputNode = neuron.getInputNode().get();
 
         initSlotFlags();
 
-        INeuron.SynapseSummary ss = neuron.getSynapseSummary();
+        SynapseSummary ss = neuron.getSynapseSummary();
 
         if(ss.getBiasSum() + ss.getPosDirSum() + ss.getPosRecSum() <= 0.0) {
             outputNode.removeParents(threadId);
             return false;
         }
 
-        List<Synapse> candidates = prepareCandidates();
-
-        NodeContext nodeContext = null;
-        boolean noFurtherRefinement = false;
-        TreeSet<Synapse> reqSyns = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
-        double sum = 0.0;
-
         if(ss.getNumDisjunctiveSynapses() == 0) {
-            double remainingSum = ss.getPosDirSum();
-            int i = 0;
-            for (Synapse s : candidates) {
-                double v = s.getMaxInputValue();
-                final boolean isOptionalInput = sum + remainingSum - v + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0;
-                final boolean maxAndNodesReached = i >= MAX_AND_NODE_SIZE;
-                if (isOptionalInput || maxAndNodesReached) {
-                    break;
-                }
-
-                remainingSum -= v;
-                reqSyns.add(s);
-
-                NodeContext nlNodeContext = expandNode(nodeContext, s);
-                if(nlNodeContext == null) {
-                    break;
-                }
-                nodeContext = nlNodeContext;
-
-                i++;
-
-                sum += v;
-
-                final boolean sumOfSynapseWeightsAboveThreshold = sum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0;
-                if (sumOfSynapseWeightsAboveThreshold) {
-                    noFurtherRefinement = true;
-                    break;
-                }
-            }
-
-            outputNode.removeParents(threadId);
-
-            if (noFurtherRefinement || (i > 0 && (i == MAX_AND_NODE_SIZE || i == candidates.size()))) {
-                outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node, true);
-            } else {
-                for (Synapse s : candidates) {
-                    double v = s.getMaxInputValue();
-                    boolean belowThreshold = sum + v + remainingSum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() <= 0.0;
-                    if (belowThreshold) {
-                        break;
-                    }
-
-                    if (!reqSyns.contains(s)) {
-                        NodeContext nlNodeContext = expandNode(nodeContext, s);
-                        if(nlNodeContext != null) {
-                            outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, true);
-                            remainingSum -= v;
-                        }
-                    }
-                }
-            }
+            convertConjunction();
         } else {
-            for (Synapse s : modifiedSynapses) {
-                if (s.isDisjunction() && !s.isRecurrent()) {
-                    NodeContext nlNodeContext = expandNode(nodeContext, s);
-                    outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
-                }
-            }
+            convertDisjunction();
         }
 
         return true;
+    }
+
+
+    private void convertConjunction() {
+        SynapseSummary ss = neuron.getSynapseSummary();
+
+        outputNode.removeParents(threadId);
+
+        List<Synapse> candidates = prepareCandidates();
+        double sum = 0.0;
+        NodeContext nodeContext = null;
+        double remainingSum = ss.getPosDirSum();
+        int i = 0;
+        boolean optionalInputMode = false;
+
+        for (Synapse s : candidates) {
+            double v = s.getMaxInputValue();
+            boolean belowThreshold = sum + v + remainingSum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() <= 0.0;
+            if (belowThreshold) {
+                return;
+            }
+
+            if(sum + remainingSum - v + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0) {
+                optionalInputMode = true;
+            }
+
+            if (!optionalInputMode) {
+                NodeContext nlNodeContext = expandNode(nodeContext, s);
+                if (nlNodeContext == null) {
+                    return;
+                }
+                nodeContext = nlNodeContext;
+
+                remainingSum -= v;
+                sum += v;
+                i++;
+            } else {
+                NodeContext nlNodeContext = expandNode(nodeContext, s);
+                if (nlNodeContext != null) {
+                    outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, true);
+                    remainingSum -= v;
+                }
+            }
+
+            final boolean sumOfSynapseWeightsAboveThreshold = sum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0;
+            final boolean maxAndNodesReached = i >= MAX_AND_NODE_SIZE;
+            if (sumOfSynapseWeightsAboveThreshold || maxAndNodesReached) {
+                break;
+            }
+        }
+
+        if(nodeContext != null && !optionalInputMode) {
+            outputNode.addInput(nodeContext.getSynapseIds(), threadId, nodeContext.node, true);
+        }
+    }
+
+
+    private void convertDisjunction() {
+        for (Synapse s : modifiedSynapses) {
+            if (s.isDisjunction() && !s.isRecurrent() && !s.isWeak(CURRENT)) {
+                NodeContext nlNodeContext = expandNode(null, s);
+                outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
+            }
+        }
     }
 
 
@@ -161,7 +166,7 @@ public class Converter {
 
 
     private List<Synapse> prepareCandidates() {
-        Synapse syn = getBestSynapse(neuron.inputSynapses.values());
+        Synapse syn = getStrongestSynapse(neuron.getInputSynapses());
 
         TreeSet<Integer> alreadyCollected = new TreeSet<>();
         ArrayList<Synapse> selectedCandidates = new ArrayList<>();
@@ -181,17 +186,17 @@ public class Converter {
                 }
             }
 
-            syn = getBestSynapse(relatedSyns.values());
+            syn = getStrongestSynapse(relatedSyns.values());
         }
 
         return selectedCandidates;
     }
 
 
-    private Synapse getBestSynapse(Collection<Synapse> synapses) {
+    private Synapse getStrongestSynapse(Collection<Synapse> synapses) {
         Synapse maxSyn = null;
         for(Synapse s: synapses) {
-            if(!s.isNegative() && !s.isRecurrent() && !s.isInactive() && !s.getInput().get().isPassiveInputNeuron()) {
+            if(!s.isNegative(CURRENT) && !s.isRecurrent() && !s.isInactive() && !s.getInput().get().isPassiveInputNeuron()) {
                 if(maxSyn == null || SYNAPSE_COMP.compare(maxSyn, s) > 0) {
                     maxSyn = s;
                 }
@@ -204,7 +209,7 @@ public class Converter {
     private NodeContext expandNode(NodeContext nc, Synapse s) {
         if (nc == null) {
             NodeContext nln = new NodeContext();
-            nln.node = s.getInput().get().outputNode.get();
+            nln.node = s.getInput().get().getOutputNode().get();
             nln.offsets = new Synapse[] {s};
             return nln;
         } else {
@@ -216,8 +221,8 @@ public class Converter {
 
             NodeContext nln = new NodeContext();
             nln.offsets = new Synapse[nc.offsets.length + 1];
-            AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.getInput().get().outputNode);
-            AndNode.RefValue rv = nc.node.extend(threadId, doc, ref);
+            AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.getInput().get().getOutputNode());
+            AndNode.RefValue rv = nc.node.expand(threadId, doc, ref);
             if(rv == null) {
                 return null;
             }

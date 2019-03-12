@@ -52,22 +52,22 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
     int level;
 
-    public AtomicInteger numberOfNeuronRefs = new AtomicInteger(0);
+    private AtomicInteger numberOfNeuronRefs = new AtomicInteger(0);
     volatile boolean isRemoved;
 
     // Only the children maps are locked.
-    public ReadWriteLock lock = new ReadWriteLock();
+    protected ReadWriteLock lock = new ReadWriteLock();
 
     private ThreadState<A>[] threads;
 
-    public long markedCreated;
+    long markedCreated;
 
     /**
      * Propagate an activation to the next node or the next neuron that is depending on the current node.
      *
      * @param act
      */
-    public abstract void propagate(A act);
+    protected abstract void propagate(A act);
 
 
     /**
@@ -100,7 +100,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             th = new ThreadState();
             threads[threadId] = th;
         }
-        th.lastUsed = provider.model.docIdCounter.get();
+        th.lastUsed = provider.getModel().docIdCounter.get();
         return th;
     }
 
@@ -113,9 +113,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public abstract AndNode.RefValue extend(int threadId, Document doc, AndNode.Refinement ref);
-
-    abstract void apply(A act);
+    abstract AndNode.RefValue expand(int threadId, Document doc, AndNode.Refinement ref);
 
     public abstract void reprocessInputs(Document doc);
 
@@ -195,6 +193,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public void register(A act) {
+        if(act.registered) {
+            return;
+        }
+
         Document doc = act.getDocument();
 
         assert act.getNode() == this;
@@ -225,7 +227,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     public void clearActivations() {
-        for (int i = 0; i < provider.model.numberOfThreads; i++) {
+        for (int i = 0; i < provider.getModel().numberOfThreads; i++) {
             clearActivations(i);
         }
     }
@@ -246,6 +248,21 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
+    protected void propagateToOrNode(NodeActivation inputAct) {
+        Document doc = inputAct.getDocument();
+        try {
+            lock.acquireReadLock();
+            if (orChildren != null) {
+                for (OrNode.OrEntry oe : orChildren) {
+                    oe.child.get(doc).addActivation(oe, inputAct);
+                }
+            }
+        } finally {
+            lock.releaseReadLock();
+        }
+    }
+
+
     /**
      * Add a new activation to this logic node and further propagate this activation through the network.
      * This activation, however, will not be added immediately. This method only adds a request to the activations
@@ -257,7 +274,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public void addActivation(A act) {
         ThreadState<A> th = getThreadState(act.getThreadId(), true);
         th.added.add(act);
-        act.getDocument().addToNodeQueue(this);
+        act.getDocument().getNodeQueue().add(this);
     }
 
 
@@ -292,7 +309,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    public void changeNumberOfNeuronRefs(int threadId, long v, int d) {
+    protected void changeNumberOfNeuronRefs(int threadId, long v, int d) {
         ThreadState th = getThreadState(threadId, true);
         if (th.visited == v) return;
         th.visited = v;
@@ -429,7 +446,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         }
         n.provider = p;
 
-        n.readFields(in, p.model);
+        n.readFields(in, p.getModel());
         return n;
     }
 }

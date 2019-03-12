@@ -20,10 +20,11 @@ package network.aika;
 import network.aika.lattice.Converter;
 import network.aika.lattice.Node;
 import network.aika.lattice.NodeActivation;
+import network.aika.lattice.NodeQueue;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Activation.Link;
+import network.aika.neuron.activation.Activation.Option;
 import network.aika.neuron.activation.Candidate;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.SearchNode;
@@ -72,7 +73,7 @@ public class Document implements Comparable<Document> {
     private Model model;
     private int threadId;
 
-    private NodeQueue nodeQueue = new NodeQueue();
+    private NodeQueue nodeQueue = new NodeQueue(this);
     private ValueQueue valueQueue = new ValueQueue();
     private UpperBoundQueue ubQueue = new UpperBoundQueue();
     private Linker linker;
@@ -233,7 +234,17 @@ public class Document implements Comparable<Document> {
 	}
 
 
-	public Position lookupFinalPosition(int pos) {
+    public UpperBoundQueue getUpperBoundQueue() {
+        return ubQueue;
+    }
+
+
+    public NodeQueue getNodeQueue() {
+        return nodeQueue;
+    }
+
+
+    public Position lookupFinalPosition(int pos) {
         Position p = positions.get(pos);
 
         if(p == null) {
@@ -245,6 +256,9 @@ public class Document implements Comparable<Document> {
 
 
     public String getText(Position begin, Position end) {
+        if(begin == null || end == null) {
+            return "";
+        }
         return getText(begin.getFinalPosition(), end.getFinalPosition());
     }
 
@@ -262,7 +276,7 @@ public class Document implements Comparable<Document> {
 
 
     public void addActivation(Activation act) {
-        for(Map.Entry<Integer, Position> me : act.slots.entrySet()) {
+        for(Map.Entry<Integer, Position> me : act.getSlots().entrySet()) {
             Position pos = me.getValue();
             if (pos != null && pos.getFinalPosition() != null) {
                 ActKey dak = new ActKey(me.getKey(), pos, act.getINeuron(), act.getId());
@@ -329,7 +343,7 @@ public class Document implements Comparable<Document> {
     public void propagate() {
         boolean flag = true;
         while(flag) {
-            nodeQueue.processChanges();
+            nodeQueue.process();
             flag = ubQueue.process();
         }
     }
@@ -344,7 +358,7 @@ public class Document implements Comparable<Document> {
         }
 
         for(Activation act: activationsById.subMap(INCREMENTAL_MODE ? lastProcessedActivationId : -1, false, Integer.MAX_VALUE, true).values()) {
-            if (act.decision == UNKNOWN && act.upperBound > 0.0) {
+            if (act.getDecision() == UNKNOWN && act.getUpperBound() > 0.0) {
                 SearchNode.invalidateCachedDecision(act);
                 tmp.add(new Candidate(act, i++));
 
@@ -419,16 +433,16 @@ public class Document implements Comparable<Document> {
     private void computeSoftMax(SearchNode rootNode) {
         for (Activation act : activationsById.values()) {
             double offset = Double.MAX_VALUE;
-            for (Activation.Option option : act.options) {
+            for (Option option : act.getOptions()) {
                 offset = Math.min(offset, Math.log(option.cacheFactor) + option.weight);
             }
 
             double norm = 0.0;
-            for (Activation.Option option : act.options) {
+            for (Option option : act.getOptions()) {
                 norm += Math.exp(Math.log(option.cacheFactor) + option.weight - offset);
             }
 
-            for (Activation.Option option : act.options) {
+            for (Option option : act.getOptions()) {
                 if (option.decision == SELECTED) {
                     option.p = Math.exp(Math.log(option.cacheFactor) + option.weight - offset) / norm;
                 }
@@ -454,6 +468,10 @@ public class Document implements Comparable<Document> {
     }
 
 
+    public Map<INeuron, Set<Synapse>> getModifiedWeights() {
+        return modifiedWeights;
+    }
+
     /**
      * Updates the model after the training step.
      * It applies the weight and bias delta values and reflects the changes in the logic node structure.
@@ -464,22 +482,6 @@ public class Document implements Comparable<Document> {
             Converter.convert(threadId, this, n, inputSyns);
         });
         modifiedWeights.clear();
-    }
-
-
-
-
-    public void addToUpperBoundQueue(Link l) {
-        ubQueue.add(l);
-    }
-
-    public void addToUpperBoundQueue(Activation act) {
-        ubQueue.add(act);
-    }
-
-
-    public void addToNodeQueue(Node n) {
-        nodeQueue.add(n);
     }
 
 
@@ -570,7 +572,7 @@ public class Document implements Comparable<Document> {
         sb.append("\n");
 
         for(Activation act: acts) {
-            if(act.upperBound <= 0.0 && (act.targetValue == null || act.targetValue <= 0.0)) {
+            if(act.getUpperBound() <= 0.0 && (act.getTargetValue() == null || act.getTargetValue() <= 0.0)) {
                 continue;
             }
 
@@ -585,66 +587,12 @@ public class Document implements Comparable<Document> {
     }
 
 
-    private class NodeQueue {
-
-        private final TreeSet<Node> queue = new TreeSet<>(
-                (n1, n2) -> Node.compareRank(threadId, n1, n2)
-        );
-
-        private long queueIdCounter = 0;
-
-        private void add(Node n) {
-            if(!n.isQueued(threadId, queueIdCounter++)) {
-                queue.add(n);
-            }
-        }
-
-        private void processChanges() {
-            while(!queue.isEmpty()) {
-                Node n = queue.pollFirst();
-
-                n.setNotQueued(threadId);
-                n.processChanges(Document.this);
-            }
-        }
-    }
-
-
-    private class UpperBoundQueue {
-        private final ArrayDeque<Activation> queue = new ArrayDeque<>();
-
-        private void add(Link l) {
-            if(!l.isRecurrent()) {
-                add(l.getOutput());
-            }
-        }
-
-        private void add(Activation act) {
-            if(!act.ubQueued && act.inputValue == null) {
-                act.ubQueued = true;
-                queue.addLast(act);
-            }
-        }
-
-        private boolean process() {
-            boolean flag = false;
-            while(!queue.isEmpty()) {
-                flag = true;
-                Activation act = queue.pollFirst();
-                act.ubQueued = false;
-
-                act.processBounds();
-            }
-            return flag;
-        }
-    }
-
     public void dumpOscillatingActivations() {
         activatedNeurons.stream()
                 .flatMap(n -> n.getActivations(this, false))
-                .filter(act -> act.rounds.getLastRound() != null && act.rounds.getLastRound() > MAX_ROUND - 5)
+                .filter(act -> act.isOscillating())
                 .forEach(act -> {
-                    log.error(act.getId() + " " + act.slotsToString() + " " + act.decision + " " + act.rounds);
+                    log.error(act.getId() + " " + act.slotsToString() + " " + act.getDecision());
                     log.error(act.linksToString());
                     log.error("");
                 });

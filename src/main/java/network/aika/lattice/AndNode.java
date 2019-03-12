@@ -70,8 +70,24 @@ class AndNode extends Node<AndNode, AndActivation> {
     }
 
 
-    public void propagate(AndActivation act) {
-        apply(act);
+    @Override
+    protected void propagate(AndActivation act) {
+        if (andChildren != null) {
+            for (Link fl : act.inputs) {
+                if(fl == null) continue;
+
+                NodeActivation<?> pAct = fl.input;
+
+                for (Link sl : pAct.outputsToAndNode.values()) {
+                    NodeActivation secondAct = sl.output;
+                    if (act != secondAct) {
+                        applyIntern(act, fl.refAct, fl.ref, fl.rv, secondAct, sl.refAct, sl.ref, sl.rv);
+                    }
+                }
+            }
+        }
+
+        propagateToOrNode(act);
     }
 
 
@@ -94,26 +110,6 @@ class AndNode extends Node<AndNode, AndActivation> {
         }
     }
 
-
-    @Override
-    void apply(AndActivation act) {
-        if (andChildren != null) {
-            for (Link fl : act.inputs) {
-                if(fl == null) continue;
-
-                NodeActivation<?> pAct = fl.input;
-
-                for (Link sl : pAct.outputsToAndNode.values()) {
-                    NodeActivation secondAct = sl.output;
-                    if (act != secondAct) {
-                        applyIntern(act, fl.refAct, fl.ref, fl.rv, secondAct, sl.refAct, sl.ref, sl.rv);
-                    }
-                }
-            }
-        }
-
-        OrNode.processCandidate(this, act, false);
-    }
 
 
     private void applyIntern(AndActivation act, InputActivation refAct, Refinement ref, RefValue rv, NodeActivation secondAct, InputActivation secondRefAct, Refinement secondRef, RefValue secondRv) {
@@ -159,7 +155,7 @@ class AndNode extends Node<AndNode, AndActivation> {
     }
 
 
-    public RefValue extend(int threadId, Document doc, Refinement firstRef) {
+    RefValue expand(int threadId, Document doc, Refinement firstRef) {
         if(!firstRef.isConvertible()) return null;
 
         RefValue firstRV = getAndChild(firstRef);
@@ -178,53 +174,64 @@ class AndNode extends Node<AndNode, AndActivation> {
         for(Entry firstParent: parents) {
             Node parentNode = firstParent.rv.parent.get(doc);
 
-            Relation[] secondParentRelations = new Relation[firstRef.relations.length() - 1];
-            for(int i = 0; i < firstRef.relations.length(); i++) {
-                Integer j = firstParent.rv.reverseOffsets[i];
-                if(j != null) {
-                    secondParentRelations[j] = firstRef.relations.get(i);
-                }
-            }
-
-            Refinement secondParentRef = new Refinement(new RelationsMap(secondParentRelations), firstRef.input);
-
-            RefValue secondParentRV = parentNode.extend(threadId, doc, secondParentRef);
+            Refinement secondParentRef = new Refinement(getParentRelations(firstRef, firstParent), firstRef.input);
+            RefValue secondParentRV = parentNode.expand(threadId, doc, secondParentRef);
 
             if(secondParentRV == null) {
                 continue;
             }
 
-            Relation[] secondRelations = new Relation[firstParent.ref.relations.length() + 1];
-            for(int i = 0; i < firstParent.ref.relations.length(); i++) {
-                int j = secondParentRV.offsets[i];
-                secondRelations[j] = firstParent.ref.relations.get(i);
-            }
+            Refinement secondRef = new Refinement(getRelations(firstRef, firstParent, secondParentRV), firstParent.ref.input);
+            RefValue secondRV = new RefValue(getOffsets(firstRefOffset, firstParent, secondParentRV), firstOffsets[firstParent.rv.refOffset], secondParentRV.child);
 
-            Relation rel = firstRef.relations.get(firstParent.rv.refOffset);
-            if(rel != null) {
-                secondRelations[secondParentRV.refOffset] = rel.invert();
-            }
-
-            Refinement secondRef = new Refinement(new RelationsMap(secondRelations), firstParent.ref.input);
-
-            Integer[] secondOffsets = new Integer[secondParentRV.offsets.length + 1];
-            for(int i = 0; i < firstParent.rv.reverseOffsets.length; i++) {
-                Integer j = firstParent.rv.reverseOffsets[i];
-                if(j != null) {
-                    secondOffsets[secondParentRV.offsets[j]] = i;
-                }
-            }
-            secondOffsets[secondParentRV.refOffset] = firstRefOffset;
-
-            nextLevelParents.add(new Entry(secondRef, new RefValue(secondOffsets, firstOffsets[firstParent.rv.refOffset], secondParentRV.child)));
+            nextLevelParents.add(new Entry(secondRef, secondRV));
         }
 
         firstRV = new RefValue(firstOffsets, firstRefOffset, provider);
         nextLevelParents.add(new Entry(firstRef, firstRV));
 
-        return createAndNode(provider.model, doc, nextLevelParents, level + 1) ? firstRV : null;
+        return createAndNode(provider.getModel(), doc, nextLevelParents, level + 1) ? firstRV : null;
     }
 
+
+    private RelationsMap getParentRelations(Refinement firstRef, Entry firstParent) {
+        Relation[] secondParentRelations = new Relation[firstRef.relations.length() - 1];
+        for(int i = 0; i < firstRef.relations.length(); i++) {
+            Integer j = firstParent.rv.reverseOffsets[i];
+            if(j != null) {
+                secondParentRelations[j] = firstRef.relations.get(i);
+            }
+        }
+        return new RelationsMap(secondParentRelations);
+    }
+
+
+    private static RelationsMap getRelations(Refinement firstRef, Entry firstParent, RefValue secondParentRV) {
+        Relation[] secondRelations = new Relation[firstParent.ref.relations.length() + 1];
+        for(int i = 0; i < firstParent.ref.relations.length(); i++) {
+            int j = secondParentRV.offsets[i];
+            secondRelations[j] = firstParent.ref.relations.get(i);
+        }
+
+        Relation rel = firstRef.relations.get(firstParent.rv.refOffset);
+        if(rel != null) {
+            secondRelations[secondParentRV.refOffset] = rel.invert();
+        }
+        return new RelationsMap(secondRelations);
+    }
+
+
+    private static Integer[] getOffsets(int firstRefOffset, Entry firstParent, RefValue secondParentRV) {
+        Integer[] secondOffsets = new Integer[secondParentRV.offsets.length + 1];
+        for(int i = 0; i < firstParent.rv.reverseOffsets.length; i++) {
+            Integer j = firstParent.rv.reverseOffsets[i];
+            if(j != null) {
+                secondOffsets[secondParentRV.offsets[j]] = i;
+            }
+        }
+        secondOffsets[secondParentRV.refOffset] = firstRefOffset;
+        return secondOffsets;
+    }
 
 
     static boolean createAndNode(Model m, Document doc, List<Entry> parents, int level) {
@@ -366,7 +373,7 @@ class AndNode extends Node<AndNode, AndActivation> {
 
         public void write(DataOutput out) throws IOException {
             relations.write(out);
-            out.writeInt(input.id);
+            out.writeInt(input.getId());
         }
 
 
@@ -547,8 +554,8 @@ class AndNode extends Node<AndNode, AndActivation> {
                 out.writeInt(ofs);
             }
             out.writeInt(refOffset);
-            out.writeInt(parent.id);
-            out.writeInt(child.id);
+            out.writeInt(parent.getId());
+            out.writeInt(child.getId());
         }
 
         public static RefValue read(DataInput in, Model m)  throws IOException {

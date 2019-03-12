@@ -12,7 +12,7 @@ public class Candidate  implements Comparable<Candidate> {
      */
     SearchNode.Decision cachedDecision = SearchNode.Decision.UNKNOWN;
     boolean repeat = false;
-    double alternativeCachedWeightExpSum;
+    double alternativeCachedWeightSum;
 
     /**
      * The cached search node is used to avoid having to recompute the activation values and weights that are associated
@@ -55,7 +55,7 @@ public class Candidate  implements Comparable<Candidate> {
 
     public boolean checkDependenciesSatisfied(long v) {
         return !activation.getInputLinks(false)
-                .anyMatch(l -> l.getInput().markedHasCandidate != v && !l.isRecurrent() && l.getInput().upperBound > 0.0);
+                .anyMatch(l -> l.getInput().markedHasCandidate != v && !l.isRecurrent() && l.getInput().getUpperBound() > 0.0);
     }
 
 
@@ -84,8 +84,8 @@ public class Candidate  implements Comparable<Candidate> {
         if(!isConflicting() && c.isConflicting()) return -1;
         if(isConflicting() && !c.isConflicting()) return 1;
 
-        Iterator<Map.Entry<Integer, Position>> ita = activation.slots.entrySet().iterator();
-        Iterator<Map.Entry<Integer, Position>> itb = c.activation.slots.entrySet().iterator();
+        Iterator<Map.Entry<Integer, Position>> ita = activation.getSlots().entrySet().iterator();
+        Iterator<Map.Entry<Integer, Position>> itb = c.activation.getSlots().entrySet().iterator();
 
         Map.Entry<Integer, Position> mea;
         Map.Entry<Integer, Position> meb;

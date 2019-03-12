@@ -23,9 +23,13 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Position;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.activation.Activation.BEGIN;
@@ -80,7 +84,7 @@ public class ActivationsTest {
         Model m = new Model();
 
         Neuron in = m.createNeuron("A");
-        OrNode inNode = in.get().node.get();
+        OrNode inNode = in.get().getInputNode().get();
 
         Document doc = m.createDocument("aaaaaaaaaa", 0);
 
@@ -97,13 +101,15 @@ public class ActivationsTest {
 
 
     private OrNode.OrActivation createActivation(Document doc, OrNode inNode) {
-        Activation act = new Activation(doc, inNode.neuron.get());
+        Map<Integer, Position> slots = new TreeMap<>();
+        slots.put(BEGIN, doc.lookupFinalPosition(0));
+        slots.put(END, doc.lookupFinalPosition(1));
+
+        Activation act = new Activation(doc, inNode.getOutputNeuron().get(), slots);
         OrNode.OrActivation orAct = new OrNode.OrActivation(doc, inNode);
         act.setInputNodeActivation(orAct);
         orAct.setOutputAct(act);
 
-        act.setSlot(BEGIN, doc.lookupFinalPosition(0));
-        act.setSlot(END, doc.lookupFinalPosition(1));
         return orAct;
     }
 

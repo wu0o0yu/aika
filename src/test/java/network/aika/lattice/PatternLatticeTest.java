@@ -92,9 +92,9 @@ public class PatternLatticeTest {
         Document doc = m.createDocument("", 0);
 
 
-        InputNode pA = inA.get().outputNode.get();
-        InputNode pB = inB.get().outputNode.get();
-        InputNode pC = inC.get().outputNode.get();
+        InputNode pA = inA.get().getOutputNode().get();
+        InputNode pB = inB.get().getOutputNode().get();
+        InputNode pC = inC.get().getOutputNode().get();
 
         AndNode pAB = pA.andChildren.firstEntry().getValue().child.get();
         Assert.assertNotNull(pAB.getProvider());

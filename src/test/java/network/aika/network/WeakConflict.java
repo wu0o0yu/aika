@@ -8,6 +8,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static network.aika.neuron.Synapse.OUTPUT;
@@ -16,6 +17,7 @@ import static network.aika.neuron.relation.Relation.EQUALS;
 public class WeakConflict {
 
 
+    @Ignore
     @Test
     public void testWeakConflict() {
         Model m = new Model();

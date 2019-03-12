@@ -17,8 +17,6 @@
 package network.aika.neuron.activation;
 
 import network.aika.Document;
-import network.aika.lattice.OrNode;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation.Link;
@@ -26,6 +24,7 @@ import network.aika.neuron.activation.Activation.Link;
 import java.util.*;
 
 import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.Synapse.State.CURRENT;
 
 /**
  * The {@code Linker} class is responsible for for the linkage of neuron activations. These links mirror the synapses between
@@ -55,39 +54,15 @@ public class Linker {
     }
 
 
-    /**
-     * Adds the incoming links between neuron activations.
-     *
-     * @param act
-     */
-    public void link(Activation act, OrNode.Link ol) {
-        linkOrNodeRelations(act, ol);
-        process();
-    }
-
-
-    private void linkOrNodeRelations(Activation act, OrNode.Link ol) {
-        for (int i = 0; i < ol.oe.synapseIds.length; i++) {
-            int synId = ol.oe.synapseIds[i];
-            Synapse s = act.getSynapseById(synId);
-            Activation iAct = ol.input.getInputActivation(i);
-            link(s, iAct, act);
-        }
-    }
-
-
     private void linkOutputRelations(Activation act) {
-        INeuron n = act.getINeuron();
-        if(n.outputRelations != null) {
-            linkRelated(act, act, n.outputRelations);
-        }
+        linkRelated(act, act, act.getINeuron().getOutputRelations());
     }
 
 
     public void linkInput(Activation act) {
         Document doc = act.getDocument();
 
-        for(Synapse s: act.getNeuron().inMemoryInputSynapses.values()) {
+        for(Synapse s: act.getNeuron().getActiveInputSynapses()) {
             for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
                 Relation rel = me.getValue();
                 if(me.getKey() == OUTPUT) {
@@ -140,7 +115,7 @@ public class Linker {
     }
 
 
-    protected void link(Synapse s, Activation iAct, Activation oAct) {
+    public void link(Synapse s, Activation iAct, Activation oAct) {
         iAct = computeInputActivation(s, iAct);
 
         if(iAct == null || iAct.blocked || !checkRelations(s, iAct, oAct)) {
@@ -190,9 +165,9 @@ public class Linker {
         if(l == null) {
             return;
         }
-        if(!l.getSynapse().isNegative()) {
+        if(!l.getSynapse().isNegative(CURRENT)) {
             queue.add(l);
         }
-        doc.addToUpperBoundQueue(l);
+        doc.getUpperBoundQueue().add(l);
     }
 }
