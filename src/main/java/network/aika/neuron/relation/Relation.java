@@ -184,7 +184,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             mr.removeRelation(r);
 
             if(mr.size() == 1) {
-                relMap.put(synId, mr.getRelations().get(0));
+                relMap.put(synId, mr.getRelations().first());
             }
         }
     }
