@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 
@@ -205,7 +206,7 @@ public class NamedEntityRecognitionTest {
                 forenameCategory,
                 0.0,
                 ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
-                EXCITATORY,
+                INHIBITORY,
                 new Synapse.Builder() // In this example there is only one forename considered.
                         .setSynapseId(0)
                         .setNeuron(jacksonForenameEntity)
@@ -220,7 +221,7 @@ public class NamedEntityRecognitionTest {
                 surnameCategory,
                 0.0,
                 ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
-                EXCITATORY,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(cookSurnameEntity)
@@ -236,7 +237,7 @@ public class NamedEntityRecognitionTest {
                 inhibitingN,
                 0.0,
                 ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
-                INeuron.Type.INHIBITORY,
+                INHIBITORY,
                 new Synapse.Builder().setNeuron(cookProfessionEntity)
                         .setSynapseId(0)
                         .setWeight(1.0)

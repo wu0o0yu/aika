@@ -482,8 +482,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         biasDelta = 0.0;
 
         for (Synapse s : modifiedSynapses) {
-            synapseSummary.updateDisjunctiveSynapses(s);
-
             s.commit();
 
             if(s.isZero()) {
@@ -877,8 +875,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         private volatile double posRecSumDelta = 0.0;
         private volatile double posPassiveSumDelta = 0.0;
 
-        private volatile int numDisjunctiveSynapses = 0;
-
 
         public double getBiasSum() {
             return biasSum;
@@ -925,10 +921,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             return state == CURRENT ? posPassiveSum : posPassiveSum + posPassiveSumDelta;
         }
 
-        public int getNumDisjunctiveSynapses() {
-            return numDisjunctiveSynapses;
-        }
-
         public void updateNeuronBias(double biasDelta) {
             biasSum += biasDelta;
         }
@@ -938,22 +930,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 updateSynapse(CURRENT, s);
                 updateSynapse(NEXT, s);
             }
-        }
-
-        public void updateDisjunctiveSynapses(Synapse s) {
-            if (!s.isInactive() && !s.isRecurrent()) {
-                boolean csd = isStrongDisjunction(s, CURRENT);
-                boolean nsd = isStrongDisjunction(s, NEXT);
-                if (!csd && nsd) {
-                    numDisjunctiveSynapses++;
-                } else if (csd && !nsd) {
-                    numDisjunctiveSynapses--;
-                }
-            }
-        }
-
-        private boolean isStrongDisjunction(Synapse s, Synapse.State state) {
-            return s.isDisjunction(state) && !s.isWeak(state);
         }
 
         private void updateSynapse(Synapse.State state, Synapse s) {
@@ -1018,8 +994,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             out.writeDouble(negRecSum);
             out.writeDouble(posRecSum);
             out.writeDouble(posPassiveSum);
-
-            out.writeInt(numDisjunctiveSynapses);
         }
 
         @Override
@@ -1030,8 +1004,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             negRecSum = in.readDouble();
             posRecSum = in.readDouble();
             posPassiveSum = in.readDouble();
-
-            numDisjunctiveSynapses = in.readInt();
         }
     }
 }

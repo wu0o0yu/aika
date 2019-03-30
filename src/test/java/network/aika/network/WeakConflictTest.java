@@ -14,7 +14,7 @@ import org.junit.Test;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
-public class WeakConflict {
+public class WeakConflictTest {
 
 
     @Ignore

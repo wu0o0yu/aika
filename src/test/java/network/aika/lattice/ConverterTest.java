@@ -131,7 +131,7 @@ public class ConverterTest {
 
         Neuron out = Neuron.init(m.createNeuron("ABCD"),
                 -5.0,
-                INeuron.Type.EXCITATORY,
+                INeuron.Type.INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)

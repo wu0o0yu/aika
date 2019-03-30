@@ -12,7 +12,7 @@ import org.junit.Test;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 
-public class TestNextWord {
+public class TestNextWordTest {
 
     @Test
     public void testMatchTheWord() {

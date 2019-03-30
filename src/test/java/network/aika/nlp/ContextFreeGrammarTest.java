@@ -21,6 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static network.aika.ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
+import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 
@@ -76,11 +80,11 @@ public class ContextFreeGrammarTest {
 
 
         for(Neuron n: new Neuron[] {I, NP, VP}) {
-            Neuron.init(n, 0.0, ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
+            Neuron.init(n, 0.0, LIMITED_RECTIFIED_LINEAR_UNIT, INHIBITORY);
         }
 
         for(Neuron n: new Neuron[] {ART, N, ADJ, V, AUX}) {
-            Neuron.init(n, 0.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+            Neuron.init(n, 0.0, RECTIFIED_HYPERBOLIC_TANGENT, INHIBITORY,
                     new Synapse.Builder()
                             .setSynapseId(0)
                             .setNeuron(I)
@@ -212,7 +216,7 @@ public class ContextFreeGrammarTest {
                 .setRelation(OVERLAPS)
         );
 
-        Neuron.init(andN, weight, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY, in.toArray(new Neuron.Builder[in.size()]));
+        Neuron.init(andN, weight, RECTIFIED_HYPERBOLIC_TANGENT, EXCITATORY, in.toArray(new Neuron.Builder[in.size()]));
     }
 
 

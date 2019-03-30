@@ -79,10 +79,16 @@ public class Converter {
             return false;
         }
 
-        if(ss.getNumDisjunctiveSynapses() == 0) {
-            convertConjunction();
-        } else {
-            convertDisjunction();
+
+        switch(neuron.getType()) {
+            case EXCITATORY:
+                convertConjunction();
+                break;
+            case INHIBITORY:
+                convertDisjunction();
+                break;
+            case INPUT:
+                break;
         }
 
         return true;

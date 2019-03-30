@@ -20,6 +20,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static network.aika.Document.MAX_ROUND;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.activation.Linker.Direction.INPUT;
 import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
 import static network.aika.neuron.activation.SearchNode.Decision.EXCLUDED;
@@ -696,14 +697,19 @@ public final class Activation implements Comparable<Activation> {
     private void collectIncomingConflicts(List<Activation> conflicts, long v) {
         if(markedPredecessor == v) return;
 
-        if (getType() != INeuron.Type.INHIBITORY) {
-            conflicts.add(this);
-        } else {
-            for (Link l : inputLinks.values()) {
-                if (!l.isNegative(CURRENT) && !l.isRecurrent()) {
-                    l.input.collectIncomingConflicts(conflicts, v);
+        switch(getType()) {
+            case EXCITATORY:
+                conflicts.add(this);
+                break;
+            case INHIBITORY:
+                for (Link l : inputLinks.values()) {
+                    if (!l.isNegative(CURRENT) && !l.isRecurrent()) {
+                        l.input.collectIncomingConflicts(conflicts, v);
+                    }
                 }
-            }
+                break;
+            case INPUT:
+                break;
         }
     }
 
@@ -712,7 +718,7 @@ public final class Activation implements Comparable<Activation> {
         if(markedPredecessor == v) return;
 
         for(Link l: outputLinks.values()) {
-            if (l.output.getType() != INeuron.Type.INHIBITORY) {
+            if (l.output.getType() != INHIBITORY) {
                 if (l.isNegative(CURRENT) && l.isRecurrent()) {
                     conflicts.add(l.output);
                 }

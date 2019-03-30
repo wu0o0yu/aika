@@ -119,7 +119,7 @@ public class LinkerTest {
 
         Neuron out = m.createNeuron("Out");
 
-        Neuron.init(out, 0.0, INeuron.Type.EXCITATORY,
+        Neuron.init(out, 0.0, INeuron.Type.INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(ina)
