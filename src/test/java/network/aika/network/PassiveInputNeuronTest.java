@@ -10,6 +10,7 @@ import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -27,17 +28,18 @@ public class PassiveInputNeuronTest {
         Neuron inB = m.createNeuron("B");
         inB.setPassiveInputFunction((s, oAct) -> 1.0);
 
-        Neuron out = Neuron.init(m.createNeuron("OUT"), 5.0, INeuron.Type.EXCITATORY,
+        Neuron out = Neuron.init(
+                m.createNeuron("OUT"),
+                5.0,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)

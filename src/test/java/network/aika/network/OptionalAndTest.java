@@ -25,6 +25,8 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 import static network.aika.neuron.relation.Relation.OVERLAPS;
@@ -48,19 +50,17 @@ public class OptionalAndTest {
 
         Neuron hintNoun = Neuron.init(m.createNeuron("HINT-NOUN"),
                 0.0,
-                INeuron.Type.EXCITATORY,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wordEssen)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(wordHamburg)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -72,19 +72,17 @@ public class OptionalAndTest {
         );
         Neuron hintVerb = Neuron.init(m.createNeuron("HINT-VERB"),
                 0.0,
-                INeuron.Type.EXCITATORY,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wordEssen)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(wordGehen)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -97,26 +95,23 @@ public class OptionalAndTest {
 
 
         Neuron noun = Neuron.init(m.createNeuron("NOUN"),
-                0.001,
-                INeuron.Type.EXCITATORY,
+                0.501,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(hintNoun)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(upperCase)
                         .setWeight(0.5)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-1.0)
-                        .setRecurrent(true)
-                        .setBias(0.0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -133,19 +128,17 @@ public class OptionalAndTest {
 
         Neuron verb = Neuron.init(m.createNeuron("VERB"),
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(hintVerb)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(suppr)
                         .setWeight(-1.0)
-                        .setRecurrent(true)
-                        .setBias(0.0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -158,18 +151,16 @@ public class OptionalAndTest {
 
         Neuron.init(suppr,
                 0.0,
-                INeuron.Type.INHIBITORY,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(noun)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(verb)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)

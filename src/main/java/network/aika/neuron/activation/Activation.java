@@ -380,8 +380,8 @@ public final class Activation implements Comparable<Activation> {
         INeuron n = getINeuron();
         SynapseSummary ss = n.getSynapseSummary();
 
-        double net = ss.getBiasSum();
-        double posNet = ss.getBiasSum();
+        double net = n.getTotalBias(CURRENT);
+        double posNet = n.getTotalBias(CURRENT);
 
         int fired = -1;
 
@@ -451,7 +451,7 @@ public final class Activation implements Comparable<Activation> {
         INeuron n = getINeuron();
         SynapseSummary ss = n.getSynapseSummary();
 
-        double net = ss.getBiasSum();
+        double net = n.getTotalBias(CURRENT);
 
         for (Link l: inputLinks.values()) {
             if(l.isInactive()) {
@@ -506,8 +506,8 @@ public final class Activation implements Comparable<Activation> {
         INeuron n = getINeuron();
         SynapseSummary ss = n.getSynapseSummary();
 
-        double ub = ss.getBiasSum() + ss.getPosRecSum();
-        double lb = ss.getBiasSum() + ss.getPosRecSum();
+        double ub = n.getTotalBias(CURRENT) + ss.getPosRecSum();
+        double lb = n.getTotalBias(CURRENT) + ss.getPosRecSum();
 
         long v = doc.getNewVisitedId();
         markPredecessor(v, 0);

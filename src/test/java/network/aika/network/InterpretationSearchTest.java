@@ -30,6 +30,10 @@ import org.junit.Test;
 
 import java.util.stream.Collectors;
 
+import static network.aika.ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
+import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 
@@ -54,17 +58,15 @@ public class InterpretationSearchTest {
 
         Neuron suppr = m.createNeuron("SUPPR");
 
-        Neuron.init(eJoergSurname, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(eJoergSurname, 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wJoerg)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
@@ -75,17 +77,15 @@ public class InterpretationSearchTest {
                         .setTo(OUTPUT)
                         .setRelation(EQUALS)
         );
-        Neuron.init(eZimmermannCompany, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(eZimmermannCompany, 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wZimmermann)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
@@ -97,23 +97,20 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(eJoergForename, 6.0, INeuron.Type.EXCITATORY,
+        Neuron.init(eJoergForename, 6.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wJoerg)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(eZimmermannSurname)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
@@ -129,23 +126,20 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(eZimmermannSurname, 6.0, INeuron.Type.EXCITATORY,
+        Neuron.init(eZimmermannSurname, 6.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wZimmermann)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(eJoergForename)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
@@ -162,27 +156,23 @@ public class InterpretationSearchTest {
         );
 
 
-        Neuron.init(suppr, 0.0, INeuron.Type.INHIBITORY,
+        Neuron.init(suppr, 0.0, INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(eJoergForename)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(eJoergSurname)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(eZimmermannCompany)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(eZimmermannSurname)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -244,17 +234,15 @@ public class InterpretationSearchTest {
 
         Neuron nF = m.createNeuron("F");
 
-        Neuron nC = Neuron.init(m.createNeuron("C"), 6.0, INeuron.Type.EXCITATORY,
+        Neuron nC = Neuron.init(m.createNeuron("C"), 6.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -266,22 +254,19 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron nD = Neuron.init(m.createNeuron("D"), 7.0, INeuron.Type.EXCITATORY,
+        Neuron nD = Neuron.init(m.createNeuron("D"), 7.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(nF)
-                        .setWeight(2.0)
-                        .setBias(-2.0),
+                        .setWeight(2.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -297,17 +282,15 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron nE = Neuron.init(m.createNeuron("E"), 5.0, INeuron.Type.EXCITATORY,
+        Neuron nE = Neuron.init(m.createNeuron("E"), 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -319,17 +302,15 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(nF, 6.0, INeuron.Type.EXCITATORY,
+        Neuron.init(nF, 6.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -342,27 +323,23 @@ public class InterpretationSearchTest {
         );
 
 
-        Neuron.init(inhib, 0.0, INeuron.Type.INHIBITORY,
+        Neuron.init(inhib, 0.0, INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(nC)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(nD)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(nE)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(nF)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -403,24 +380,22 @@ public class InterpretationSearchTest {
         Neuron inB = m.createNeuron("IN B");
 
         Neuron inhib = m.createNeuron("INHIB");
-        Neuron.init(inhib, 0.0, INeuron.Type.INHIBITORY);
+        Neuron.init(inhib, 0.0, INHIBITORY);
 
 
         Neuron nE = m.createNeuron("E");
         Neuron nF = m.createNeuron("F");
 
 
-        Neuron nC = Neuron.init(m.createNeuron("C"), 6.0, INeuron.Type.EXCITATORY,
+        Neuron nC = Neuron.init(m.createNeuron("C"), 6.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -432,17 +407,15 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
+        Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -458,8 +431,7 @@ public class InterpretationSearchTest {
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(nC)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -470,8 +442,7 @@ public class InterpretationSearchTest {
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(nD)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
@@ -496,28 +467,27 @@ public class InterpretationSearchTest {
 
         Neuron.init(doc,
                 nD,
+                7.0,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(nF)
-                        .setWeight(2.0)
-                        .setBias(0.0),
+                        .setWeight(2.0),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
                         .setRelation(ANY)
         );
 
-        Neuron.init(doc, nE, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(doc, nE, 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -529,17 +499,15 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(doc, nF, 6.0, INeuron.Type.EXCITATORY,
+        Neuron.init(doc, nF, 6.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -557,8 +525,7 @@ public class InterpretationSearchTest {
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(nE)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(OUTPUT)
@@ -571,8 +538,7 @@ public class InterpretationSearchTest {
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(nF)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(OUTPUT)
@@ -601,34 +567,30 @@ public class InterpretationSearchTest {
         Neuron out = m.createNeuron("OUT");
 
 
-        Neuron.init(inhib, 0.0, ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY,
+        Neuron.init(inhib, 0.0, LIMITED_RECTIFIED_LINEAR_UNIT, INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(out)
-                        .setWeight(1.0)
-                        .setBias(0.0),
+                        .setWeight(1.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(out, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+        Neuron.init(out, 5.0, RECTIFIED_HYPERBOLIC_TANGENT, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(in)
-                        .setWeight(20.0)
-                        .setBias(-20.0),
+                        .setWeight(20.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(in)
-                        .setWeight(20.0)
-                        .setBias(-20.0),
+                        .setWeight(20.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(out)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)

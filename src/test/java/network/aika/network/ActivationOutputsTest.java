@@ -31,6 +31,7 @@ import org.junit.Test;
 
 import java.util.stream.Stream;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.BEGIN_EQUALS;
 import static network.aika.neuron.relation.Relation.END_EQUALS;
@@ -53,19 +54,17 @@ public class ActivationOutputsTest {
 
         Neuron pAB = Neuron.init(m.createNeuron("pAB"),
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -141,12 +140,11 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        Neuron outB = Neuron.init(m.createNeuron("B"), 0.5, INeuron.Type.EXCITATORY,
+        Neuron outB = Neuron.init(m.createNeuron("B"), 0.5, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setBias(-1.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
@@ -172,13 +170,12 @@ public class ActivationOutputsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        Neuron outB = Neuron.init(m.createNeuron("B"), 0.001, INeuron.Type.EXCITATORY,
+        Neuron outB = Neuron.init(m.createNeuron("B"), 0.001, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)

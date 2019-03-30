@@ -30,6 +30,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 import static network.aika.neuron.activation.Activation.BEGIN;
@@ -63,25 +64,22 @@ public class OverlappingOrTest {
         Neuron pattern = Neuron.init(
                 m.createNeuron("BCD"),
                 3.0,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(4.0)
-                        .setRecurrent(false)
-                        .setBias(-4.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(4.0)
-                        .setRecurrent(false)
-                        .setBias(-4.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)

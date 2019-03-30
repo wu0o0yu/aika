@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.AncestorRelation.COMMON_ANCESTOR;
 import static network.aika.neuron.relation.AncestorRelation.IS_ANCESTOR_OF;
@@ -31,14 +32,13 @@ public class AncestorRelationTest {
 
         Neuron inB = Neuron.init(m.createNeuron("B"),
                 5.0,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setRecurrent(false)
-                        .setIdentity(true)
-                        .setBias(-10.0),
+                        .setIdentity(true),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -47,19 +47,17 @@ public class AncestorRelationTest {
 
         Neuron outC = Neuron.init(m.createNeuron("C"),
                 5.0,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setRecurrent(false)
-                        .setBias(-10.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setRecurrent(false)
-                        .setBias(-10.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -93,12 +91,11 @@ public class AncestorRelationTest {
 
         Neuron inA = m.createNeuron("A");
 
-        Neuron nB = Neuron.init(m.createNeuron("B"), 5.0, INeuron.Type.EXCITATORY,
+        Neuron nB = Neuron.init(m.createNeuron("B"), 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setIdentity(true),
                 new Relation.Builder()
@@ -107,12 +104,11 @@ public class AncestorRelationTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron nC = Neuron.init(m.createNeuron("C"), 5.0, INeuron.Type.EXCITATORY,
+        Neuron nC = Neuron.init(m.createNeuron("C"), 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setIdentity(true),
                 new Relation.Builder()
@@ -121,19 +117,17 @@ public class AncestorRelationTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, INeuron.Type.EXCITATORY,
+        Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(nB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setSynapseId(0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(nC)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setSynapseId(1),
                 new Relation.Builder()
@@ -164,19 +158,17 @@ public class AncestorRelationTest {
 
         Neuron inB = m.createNeuron("B");
 
-        Neuron nC = Neuron.init(m.createNeuron("C"), 5.0, INeuron.Type.EXCITATORY,
+        Neuron nC = Neuron.init(m.createNeuron("C"), 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setSynapseId(0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false)
                         .setSynapseId(1),
                 new Relation.Builder()
@@ -225,18 +217,16 @@ public class AncestorRelationTest {
 */
         Neuron outC = Neuron.init(m.createNeuron("C"),
                 5.0,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)

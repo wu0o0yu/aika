@@ -89,7 +89,6 @@ public class ContextFreeGrammarTest {
                             .setSynapseId(0)
                             .setNeuron(I)
                             .setWeight(-50.0)
-                            .setBias(0.0)
                             .setRecurrent(true),
                     new Relation.Builder()
                             .setFrom(0)
@@ -134,8 +133,7 @@ public class ContextFreeGrammarTest {
                     new Synapse.Builder()
                             .setSynapseId(wtSynId)
                             .setNeuron(wordN)
-                            .setWeight(3.0)
-                            .setBias(0.0),
+                            .setWeight(3.0),
                     new Relation.Builder()
                             .setFrom(wtSynId)
                             .setTo(OUTPUT)
@@ -173,7 +171,6 @@ public class ContextFreeGrammarTest {
                         .setSynapseId(i)
                         .setNeuron(inputs[i])
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setIdentity(true)
             );
 
@@ -207,7 +204,6 @@ public class ContextFreeGrammarTest {
                 .setSynapseId(inputs.length)
                 .setNeuron(I)
                 .setWeight(-100.0)
-                .setBias(0.0)
                 .setRecurrent(true)
         );
         in.add(new Relation.Builder()

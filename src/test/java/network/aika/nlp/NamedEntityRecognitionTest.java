@@ -31,6 +31,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+import static network.aika.ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
 import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
@@ -81,13 +82,11 @@ public class NamedEntityRecognitionTest {
                         .setWeight(10.0)
                         // This input requires the input activation to have an
                         // activation value of at least 0.9
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder() // The previous word needs to be a forename
                         .setSynapseId(1)
                         .setNeuron(forenameCategory)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(true), // this input is a positive feedback loop
 
                 // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
@@ -97,7 +96,6 @@ public class NamedEntityRecognitionTest {
                         .setSynapseId(2)
                         .setNeuron(inhibitingN)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true), // this input is a negative feedback loop
                 new Relation.Builder()  // references the previous word
                         .setFrom(1)
@@ -121,13 +119,11 @@ public class NamedEntityRecognitionTest {
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get("cook"))
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibitingN)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -147,19 +143,16 @@ public class NamedEntityRecognitionTest {
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get("jackson"))
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(surnameCategory)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inhibitingN)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -184,13 +177,11 @@ public class NamedEntityRecognitionTest {
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get("jackson"))
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibitingN)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -205,13 +196,12 @@ public class NamedEntityRecognitionTest {
         Neuron.init(
                 forenameCategory,
                 0.0,
-                ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
+                LIMITED_RECTIFIED_LINEAR_UNIT,
                 INHIBITORY,
                 new Synapse.Builder() // In this example there is only one forename considered.
                         .setSynapseId(0)
                         .setNeuron(jacksonForenameEntity)
-                        .setWeight(1.0)
-                        .setBias(0.0),
+                        .setWeight(1.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -220,13 +210,12 @@ public class NamedEntityRecognitionTest {
         Neuron.init(
                 surnameCategory,
                 0.0,
-                ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
+                LIMITED_RECTIFIED_LINEAR_UNIT,
                 INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(cookSurnameEntity)
-                        .setWeight(1.0)
-                        .setBias(0.0),
+                        .setWeight(1.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -236,27 +225,23 @@ public class NamedEntityRecognitionTest {
         Neuron.init(
                 inhibitingN,
                 0.0,
-                ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
+                LIMITED_RECTIFIED_LINEAR_UNIT,
                 INHIBITORY,
                 new Synapse.Builder().setNeuron(cookProfessionEntity)
                         .setSynapseId(0)
-                        .setWeight(1.0)
-                        .setBias(0.0),
+                        .setWeight(1.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(cookSurnameEntity)
-                        .setWeight(1.0)
-                        .setBias(0.0),
+                        .setWeight(1.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(jacksonCityEntity)
-                        .setWeight(1.0)
-                        .setBias(0.0),
+                        .setWeight(1.0),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(jacksonForenameEntity)
-                        .setWeight(1.0)
-                        .setBias(0.0),
+                        .setWeight(1.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)

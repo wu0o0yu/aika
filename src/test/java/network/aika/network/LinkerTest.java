@@ -9,6 +9,8 @@ import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.ANY;
 import static network.aika.neuron.relation.Relation.EQUALS;
@@ -45,17 +47,15 @@ public class LinkerTest {
 
             Neuron nc = m.createNeuron("C");
 
-            Neuron.init(nc, 5.0, INeuron.Type.EXCITATORY,
+            Neuron.init(nc, 6.0, EXCITATORY,
                     new Synapse.Builder()
                             .setSynapseId(0)
                             .setNeuron(na)
-                            .setWeight(1.0)
-                            .setBias(0.0),
+                            .setWeight(1.0),
                     new Synapse.Builder()
                             .setSynapseId(1)
                             .setNeuron(nb)
-                            .setWeight(10.0)
-                            .setBias(-10.0),
+                            .setWeight(10.0),
                     new Relation.Builder()
                             .setFrom(1)
                             .setTo(0)
@@ -89,12 +89,11 @@ public class LinkerTest {
         Neuron na = m.createNeuron("A");
         Neuron nb = m.createNeuron("B");
 
-        Neuron.init(nb, -0.5, INeuron.Type.EXCITATORY,
+        Neuron.init(nb, -0.5, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(na)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
@@ -119,17 +118,15 @@ public class LinkerTest {
 
         Neuron out = m.createNeuron("Out");
 
-        Neuron.init(out, 0.0, INeuron.Type.INHIBITORY,
+        Neuron.init(out, 0.0, INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(ina)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inb)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)

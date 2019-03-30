@@ -87,13 +87,11 @@ public class MutualExclusionTest {
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -114,13 +112,11 @@ public class MutualExclusionTest {
                         .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -141,13 +137,11 @@ public class MutualExclusionTest {
                         .setSynapseId(0)
                         .setNeuron(inC)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -169,19 +163,16 @@ public class MutualExclusionTest {
                         .setSynapseId(0)
                         .setNeuron(pA)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pB)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(pC)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
@@ -205,7 +196,6 @@ public class MutualExclusionTest {
                         .setSynapseId(0)
                         .setNeuron(pB)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)

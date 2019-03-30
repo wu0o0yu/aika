@@ -28,6 +28,7 @@ import org.junit.Test;
 
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.BEGIN_EQUALS;
 import static network.aika.neuron.relation.Relation.END_EQUALS;
@@ -48,25 +49,22 @@ public class PatternLatticeTest {
 
         Neuron.init(m.createNeuron("ABC"),
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -122,24 +120,21 @@ public class PatternLatticeTest {
 
         Neuron nABC = Neuron.init(m.createNeuron("ABC"),
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setBias(-1.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
-                        .setBias(-1.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(1.0)
-                        .setBias(-1.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)

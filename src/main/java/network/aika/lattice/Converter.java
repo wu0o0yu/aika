@@ -74,7 +74,7 @@ public class Converter {
 
         SynapseSummary ss = neuron.getSynapseSummary();
 
-        if(ss.getBiasSum() + ss.getPosDirSum() + ss.getPosRecSum() <= 0.0) {
+        if(neuron.getTotalBias(CURRENT) + ss.getPosDirSum() + ss.getPosRecSum() <= 0.0) {
             outputNode.removeParents(threadId);
             return false;
         }
@@ -109,12 +109,12 @@ public class Converter {
 
         for (Synapse s : candidates) {
             double v = s.getMaxInputValue();
-            boolean belowThreshold = sum + v + remainingSum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() <= 0.0;
+            boolean belowThreshold = sum + v + remainingSum + ss.getPosRecSum() + ss.getPosPassiveSum() + neuron.getTotalBias(CURRENT) <= 0.0;
             if (belowThreshold) {
                 return;
             }
 
-            if(sum + remainingSum - v + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0) {
+            if(sum + remainingSum - v + ss.getPosRecSum() + ss.getPosPassiveSum() + neuron.getTotalBias(CURRENT) > 0.0) {
                 optionalInputMode = true;
             }
 
@@ -136,7 +136,7 @@ public class Converter {
                 }
             }
 
-            final boolean sumOfSynapseWeightsAboveThreshold = sum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0;
+            final boolean sumOfSynapseWeightsAboveThreshold = sum + ss.getPosRecSum() + ss.getPosPassiveSum() + neuron.getTotalBias(CURRENT) > 0.0;
             final boolean maxAndNodesReached = i >= MAX_AND_NODE_SIZE;
             if (sumOfSynapseWeightsAboveThreshold || maxAndNodesReached) {
                 break;

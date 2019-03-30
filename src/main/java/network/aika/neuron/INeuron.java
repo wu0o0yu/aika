@@ -465,9 +465,18 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public void commit(Collection<Synapse> modifiedSynapses) {
-        synapseSummary.updateNeuronBias(biasDelta);
+    public double getTotalBias(Synapse.State state) {
+        switch(type) {
+            case EXCITATORY:
+                return getBias(state) - synapseSummary.getPosSum(state);
+            case INHIBITORY:
+                return getBias(state);
+        }
+        return getBias(state);
+    }
 
+
+    public void commit(Collection<Synapse> modifiedSynapses) {
         for (Synapse s : modifiedSynapses) {
             INeuron in = s.getInput().get();
             in.lock.acquireWriteLock();
@@ -784,6 +793,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
+    private double getBias(Synapse.State state) {
+        return state == CURRENT ? bias : bias + biasDelta;
+    }
+
+
     public double getNewBias() {
         return bias + biasDelta;
     }
@@ -861,24 +875,18 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     public static class SynapseSummary implements Writable {
-        private volatile double biasSum;
         private volatile double posDirSum;
         private volatile double negDirSum;
         private volatile double negRecSum;
         private volatile double posRecSum;
         private volatile double posPassiveSum;
 
-        private volatile double biasSumDelta = 0.0;
         private volatile double posDirSumDelta = 0.0;
         private volatile double negDirSumDelta = 0.0;
         private volatile double negRecSumDelta = 0.0;
         private volatile double posRecSumDelta = 0.0;
         private volatile double posPassiveSumDelta = 0.0;
 
-
-        public double getBiasSum() {
-            return biasSum;
-        }
 
         public double getPosDirSum() {
             return posDirSum;
@@ -901,13 +909,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         public double getPosSum(Synapse.State state) {
-            return getPosDirSum(state) + getPosRecSum(state) + getPosPassiveSum(state);
+            return getPosDirSum(state) + getPosRecSum(state);
         }
 
-
-        public double getBiasSum(Synapse.State state) {
-            return state == CURRENT ? biasSum : biasSum + biasSumDelta;
-        }
 
         private double getPosDirSum(Synapse.State state) {
             return state == CURRENT ? posDirSum : posDirSum + posDirSumDelta;
@@ -921,9 +925,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             return state == CURRENT ? posPassiveSum : posPassiveSum + posPassiveSumDelta;
         }
 
-        public void updateNeuronBias(double biasDelta) {
-            biasSum += biasDelta;
-        }
 
         public void updateSynapse(Synapse s) {
             if (!s.isInactive()) {
@@ -934,8 +935,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         private void updateSynapse(Synapse.State state, Synapse s) {
             double sign = (state == CURRENT ? -1.0 : 1.0);
-
-            biasSumDelta += sign * s.getBias(state);
 
             updateSum(s.isRecurrent(), s.isNegative(state), sign * (s.getLimit(state) * s.getWeight(state)));
 
@@ -962,21 +961,17 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
         public void commit() {
-            biasSum += biasSumDelta;
             posDirSum += posDirSumDelta;
             negDirSum += negDirSumDelta;
             posRecSum += posRecSumDelta;
             negRecSum += negRecSumDelta;
             posPassiveSum += posPassiveSumDelta;
 
-            biasSumDelta = 0.0;
             posDirSumDelta = 0.0;
             negDirSumDelta = 0.0;
             negRecSumDelta = 0.0;
             posDirSumDelta = 0.0;
             posPassiveSumDelta = 0.0;
-
-            assert Double.isFinite(biasSum);
         }
 
 
@@ -988,7 +983,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         @Override
         public void write(DataOutput out) throws IOException {
-            out.writeDouble(biasSum);
             out.writeDouble(posDirSum);
             out.writeDouble(negDirSum);
             out.writeDouble(negRecSum);
@@ -998,7 +992,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         @Override
         public void readFields(DataInput in, Model m) throws IOException {
-            biasSum = in.readDouble();
             posDirSum = in.readDouble();
             negDirSum = in.readDouble();
             negRecSum = in.readDouble();
