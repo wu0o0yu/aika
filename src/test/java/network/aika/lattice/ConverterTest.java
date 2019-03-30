@@ -28,6 +28,8 @@ import org.junit.Test;
 
 import java.util.stream.Collectors;
 
+import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -394,4 +396,54 @@ public class ConverterTest {
         Assert.assertFalse(out.getActivations(doc, false).collect(Collectors.toList()).isEmpty());
     }
 
+
+    @Test
+    public void testOnlyOptionalInputs() {
+        Model model = new Model();
+
+        Neuron inA = model.createNeuron("A");
+        Neuron inB = model.createNeuron("B");
+        Neuron inC = model.createNeuron("C");
+
+        Neuron testNeuron = model.createNeuron("Test");
+
+        Neuron.init(testNeuron, 2.1, RECTIFIED_HYPERBOLIC_TANGENT, EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(inA)
+                        .setWeight(2.0)
+                        .setBias(-2.0),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(inB)
+                        .setWeight(2.0)
+                        .setBias(-2.0),
+                new Synapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(inC)
+                        .setWeight(2.0)
+                        .setBias(-2.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS)
+        );
+
+
+        Document doc = model.createDocument("Bla");
+        inB.addInput(doc, 0, 3);
+        inC.addInput(doc, 0, 3);
+
+        doc.process();
+
+        Assert.assertNotNull(testNeuron.getActivation(doc, 0, 3, false));
+    }
 }
