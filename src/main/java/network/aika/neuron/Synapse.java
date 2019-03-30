@@ -337,7 +337,7 @@ public class Synapse implements Writable {
     }
 
 
-    public void updateDelta(Document doc, double weightDelta, double biasDelta, double limitDelta) {
+    public void updateDelta(Document doc, double weightDelta, double limitDelta) {
         this.weightDelta += weightDelta;
         this.limitDelta += limitDelta;
 
