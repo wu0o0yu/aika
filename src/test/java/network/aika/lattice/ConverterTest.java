@@ -265,7 +265,7 @@ public class ConverterTest {
         Assert.assertEquals(2, out.get().getInputNode().get().andParents.size());
 
 
-        out.getSynapseById(3).updateDelta(null, -1.5, 0, 0);
+        out.getSynapseById(3).updateDelta(null, -1.5, 0.0);
 
         out.get().commit(out.get().getInputSynapses());
         Converter.convert( 0, null, out.get(), out.get().getInputSynapses());
