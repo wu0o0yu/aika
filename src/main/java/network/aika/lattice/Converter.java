@@ -82,7 +82,11 @@ public class Converter {
 
         switch(neuron.getType()) {
             case EXCITATORY:
-                convertConjunction();
+                if(hasOnlyWeakSynapses()) {
+                    convertWeakSynapses();
+                } else {
+                    convertConjunction();
+                }
                 break;
             case INHIBITORY:
                 convertDisjunction();
@@ -101,6 +105,7 @@ public class Converter {
         outputNode.removeParents(threadId);
 
         List<Synapse> candidates = prepareCandidates();
+
         double sum = 0.0;
         NodeContext nodeContext = null;
         double remainingSum = ss.getPosDirSum();
@@ -149,6 +154,41 @@ public class Converter {
     }
 
 
+    private boolean hasOnlyWeakSynapses() {
+        for(Synapse s: neuron.getInputSynapses()) {
+            if(!s.isWeak(CURRENT)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    private void convertWeakSynapses() {
+        TreeSet<Synapse> synapsesSortedByWeight = new TreeSet<Synapse>((s1, s2) -> {
+            int r = Double.compare(s2.getWeight(), s1.getWeight());
+            if(r != 0) return r;
+            return SYNAPSE_COMP.compare(s1, s2);
+        });
+
+        synapsesSortedByWeight.addAll(neuron.getInputSynapses());
+
+        double sum = 0.0;
+        for (Synapse s : synapsesSortedByWeight) {
+            if (!s.isRecurrent()) {
+                sum += s.getWeight();
+
+                NodeContext nlNodeContext = expandNode(null, s);
+                outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
+
+                if(sum > neuron.getBias()) {
+                    break;
+                }
+            }
+        }
+    }
+
+
     private void convertDisjunction() {
         for (Synapse s : modifiedSynapses) {
             if (!s.isRecurrent() && !s.isWeak(CURRENT)) {
@@ -173,6 +213,9 @@ public class Converter {
 
     private List<Synapse> prepareCandidates() {
         Synapse syn = getStrongestSynapse(neuron.getInputSynapses());
+        if(syn == null) {
+            return Collections.EMPTY_LIST;
+        }
 
         TreeSet<Integer> alreadyCollected = new TreeSet<>();
         ArrayList<Synapse> selectedCandidates = new ArrayList<>();
