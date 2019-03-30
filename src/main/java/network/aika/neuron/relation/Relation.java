@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.Activation.END;
@@ -148,7 +149,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public static void addRelation(Map<Integer, Relation> relMap, Integer synId, Integer targetSynId, Neuron n, Relation r) {
         if(targetSynId == OUTPUT) {
             Synapse s = n.getSynapseById(synId);
-            if(s == null || (r.isExact() && s.isDisjunction() && !s.isInactive())) {
+            if(s == null || (r.isExact() && n.getType() == INHIBITORY && !s.isInactive())) {
                 return;
             }
         }

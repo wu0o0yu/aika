@@ -62,6 +62,10 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
+    public Type getType() {
+        return get().getType();
+    }
+
         /**
      * Propagate an input activation into the network.
      *
