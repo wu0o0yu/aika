@@ -178,7 +178,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         Synapse maxSyn = null;
         for(Synapse s: getInputSynapses()) {
-            if(!s.isInactive() && !s.isWeak(state)) {
+            if(!s.isInactive()) {
                 if(maxSyn == null || maxSyn.getNewWeight() < s.getNewWeight()) {
                     maxSyn = s;
                 }
