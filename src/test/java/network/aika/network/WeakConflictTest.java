@@ -11,10 +11,12 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static network.aika.ActivationFunction.RECTIFIED_LINEAR_UNIT;
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
-public class WeakConflict {
+public class WeakConflictTest {
 
 
     @Ignore
@@ -27,17 +29,15 @@ public class WeakConflict {
         Neuron na = m.createNeuron("A");
         Neuron nb = m.createNeuron("B");
 
-        Neuron.init(na, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.EXCITATORY,
+        Neuron.init(na, 10.0, RECTIFIED_LINEAR_UNIT, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(in)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(nb)
                         .setWeight(-2.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
@@ -49,12 +49,11 @@ public class WeakConflict {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(nb, 0.0, ActivationFunction.RECTIFIED_LINEAR_UNIT, INeuron.Type.EXCITATORY,
+        Neuron.init(nb, 10.0, RECTIFIED_LINEAR_UNIT, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(in)
-                        .setWeight(10.0)
-                        .setBias(0.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)

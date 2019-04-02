@@ -47,14 +47,12 @@ public class PositionRelationTest {
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setRecurrent(false)
-                        .setBias(-10.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setRecurrent(false)
-                        .setBias(-10.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -97,20 +95,17 @@ public class PositionRelationTest {
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -168,7 +163,6 @@ public class PositionRelationTest {
                         .setNeuron(rec)
                         .setWeight(begin || end ? 2.0 : 1.0)
                         .setRecurrent(false)
-                        .setBias(begin || end ? -2.0 : -1.0)
                 );
                 if(begin) {
                     inputs.add(
@@ -242,25 +236,21 @@ public class PositionRelationTest {
                         .setSynapseId(0)
                         .setNeuron(inputChar)
                         .setWeight(15.0)
-                        .setBias(-15.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inputChar)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inputChar)
                         .setWeight(15.0)
-                        .setBias(-15.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(wordPlaceholder)
                         .setWeight(30.0)
-                        .setBias(-30.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)

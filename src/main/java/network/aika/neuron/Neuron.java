@@ -62,6 +62,10 @@ public class Neuron extends Provider<INeuron> {
     }
 
 
+    public Type getType() {
+        return get().getType();
+    }
+
         /**
      * Propagate an input activation into the network.
      *
@@ -230,7 +234,7 @@ public class Neuron extends Provider<INeuron> {
         // s.link requires an updated n.biasSumDelta value.
         synapseBuilders.forEach(input -> {
             Synapse s = input.getSynapse(this);
-            s.update(doc, input.weight, input.bias, input.limit);
+            s.update(doc, input.weight, input.limit);
             modifiedSynapses.add(s);
         });
 

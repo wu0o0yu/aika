@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -27,17 +28,15 @@ public class PositiveFeedbackLoopTest {
         Neuron nC = m.createNeuron("N C");
         Neuron nD = m.createNeuron("N D");
 
-        Neuron.init(nC, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(nC, 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(nD)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -49,17 +48,15 @@ public class PositiveFeedbackLoopTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(nD, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(nD, 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(nC)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)

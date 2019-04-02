@@ -31,6 +31,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static network.aika.neuron.INeuron.Type.INPUT;
+
 
 /**
  * The model consists of two layers. The first layer is the actual neural network consisting of neurons and synapses.
@@ -160,7 +162,7 @@ public class Model {
 
 
     public Neuron createNeuron(String label, String outputText) {
-        INeuron n = new INeuron(this, label, outputText, null, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT);
+        INeuron n = new INeuron(this, label, outputText, INPUT, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT);
         return n.getProvider();
     }
 

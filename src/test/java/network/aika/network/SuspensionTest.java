@@ -79,13 +79,11 @@ public class SuspensionTest {
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
@@ -103,13 +101,12 @@ public class SuspensionTest {
 
 
         Neuron outD = Neuron.init(m.createNeuron("D"),
-                5.0,
+                6.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(nC)
                         .setWeight(10.0)
-                        .setBias(-9.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
@@ -187,13 +184,11 @@ public class SuspensionTest {
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
@@ -207,13 +202,12 @@ public class SuspensionTest {
 
 
         Neuron outD = Neuron.init(m.createNeuron("D"),
-                5.0,
+                6.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(nC)
                         .setWeight(10.0)
-                        .setBias(-9.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)

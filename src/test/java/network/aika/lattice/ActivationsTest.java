@@ -31,6 +31,7 @@ import org.junit.Test;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.Activation.END;
@@ -49,12 +50,11 @@ public class ActivationsTest {
 
         Neuron inA = m.createNeuron("A");
 
-        Neuron pA = Neuron.init(m.createNeuron("pA"), 0.5, INeuron.Type.EXCITATORY,
+        Neuron pA = Neuron.init(m.createNeuron("pA"), 0.5, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setBias(-1.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)

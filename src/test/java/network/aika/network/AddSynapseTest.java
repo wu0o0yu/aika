@@ -17,8 +17,10 @@
 package network.aika.network;
 
 
+import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Model;
+import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -29,6 +31,8 @@ import org.junit.Test;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -42,7 +46,7 @@ public class AddSynapseTest {
     public void testAddSynapse() {
         Model m = new Model();
 
-        Neuron n = m.createNeuron("OR");
+        Neuron n = m.createNeuron("OR", null, INHIBITORY, RECTIFIED_HYPERBOLIC_TANGENT);
 
         TreeMap<String, Neuron> inputNeurons = new TreeMap<>();
 

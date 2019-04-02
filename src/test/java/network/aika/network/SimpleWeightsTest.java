@@ -25,6 +25,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -43,20 +44,18 @@ public class SimpleWeightsTest {
 
         Neuron pC = m.createNeuron("C");
         Neuron.init(pC,
-                0.0,
-                INeuron.Type.EXCITATORY,
+                0.7,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
-                        .setWeight(0.3f)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setWeight(0.3)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
-                        .setWeight(0.4f)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setWeight(0.4)
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -103,18 +102,16 @@ public class SimpleWeightsTest {
         Neuron pC = m.createNeuron("C");
         Neuron.init(pC,
                 0.01,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(3.0)
-                        .setBias(-3.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(3.0)
-                        .setBias(-3.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(1)

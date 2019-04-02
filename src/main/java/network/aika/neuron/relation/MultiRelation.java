@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 public class MultiRelation extends Relation {
     public static final int ID = 1;
 
-    private List<Relation> relations;
+    private SortedSet<Relation> relations;
 
     static {
         registerRelation(ID, () -> new MultiRelation());
@@ -24,27 +24,27 @@ public class MultiRelation extends Relation {
 
 
     public MultiRelation() {
-        relations = new ArrayList<>();
+        relations = new TreeSet<>();
     }
 
 
-    public MultiRelation(boolean optional, boolean follow, List<Relation> relations) {
+    public MultiRelation(boolean optional, boolean follow, SortedSet<Relation> relations) {
         super(optional, follow);
         this.relations = relations;
     }
 
     public MultiRelation(Relation... rels) {
-        relations = Arrays.asList(rels);
+        relations = new TreeSet<>(Arrays.asList(rels));
     }
 
 
 
-    public MultiRelation(List<Relation> rels) {
+    public MultiRelation(SortedSet<Relation> rels) {
         relations = rels;
     }
 
 
-    public List<Relation> getRelations() {
+    public SortedSet<Relation> getRelations() {
         return relations;
     }
 
@@ -65,13 +65,7 @@ public class MultiRelation extends Relation {
 
 
     public void removeRelation(Relation r) {
-        for(Iterator<Relation> it = relations.iterator(); it.hasNext();) {
-            Relation rel = it.next();
-
-            if(rel.compareTo(r) == 0) {
-                it.remove();
-            }
-        }
+        relations.removeIf(rel -> rel.compareTo(r) == 0);
     }
 
 
@@ -94,7 +88,7 @@ public class MultiRelation extends Relation {
 
     @Override
     public Relation invert() {
-        List<Relation> invRels = new ArrayList<>();
+        SortedSet<Relation> invRels = new TreeSet<>();
         for(Relation rel: relations) {
             invRels.add(rel.invert());
         }
@@ -182,9 +176,13 @@ public class MultiRelation extends Relation {
         MultiRelation mr = (MultiRelation) rel;
         r = Integer.compare(relations.size(), mr.relations.size());
         if(r != 0) return r;
-        for(int i = 0; i < relations.size(); i++) {
-            Relation a = relations.get(i);
-            Relation b = mr.relations.get(i);
+
+        Iterator<Relation> ita = relations.iterator();
+        Iterator<Relation> itb = mr.relations.iterator();
+
+        while(ita.hasNext() || itb.hasNext()) {
+            Relation a = ita.next();
+            Relation b = itb.next();
             r = a.compareTo(b);
             if(r != 0) return r;
         }

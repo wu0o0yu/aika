@@ -27,19 +27,17 @@ public class AsymmetricSuppressionTest {
         Neuron inB = m.createNeuron("B");
 
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
-                0.0,
+                10.0,
                 INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)

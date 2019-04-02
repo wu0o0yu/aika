@@ -74,15 +74,25 @@ public class Converter {
 
         SynapseSummary ss = neuron.getSynapseSummary();
 
-        if(ss.getBiasSum() + ss.getPosDirSum() + ss.getPosRecSum() <= 0.0) {
+        if(neuron.getTotalBias(CURRENT) + ss.getPosDirSum() + ss.getPosRecSum() <= 0.0) {
             outputNode.removeParents(threadId);
             return false;
         }
 
-        if(ss.getNumDisjunctiveSynapses() == 0) {
-            convertConjunction();
-        } else {
-            convertDisjunction();
+
+        switch(neuron.getType()) {
+            case EXCITATORY:
+                if(hasOnlyWeakSynapses()) {
+                    convertWeakSynapses();
+                } else {
+                    convertConjunction();
+                }
+                break;
+            case INHIBITORY:
+                convertDisjunction();
+                break;
+            case INPUT:
+                break;
         }
 
         return true;
@@ -95,6 +105,7 @@ public class Converter {
         outputNode.removeParents(threadId);
 
         List<Synapse> candidates = prepareCandidates();
+
         double sum = 0.0;
         NodeContext nodeContext = null;
         double remainingSum = ss.getPosDirSum();
@@ -103,12 +114,12 @@ public class Converter {
 
         for (Synapse s : candidates) {
             double v = s.getMaxInputValue();
-            boolean belowThreshold = sum + v + remainingSum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() <= 0.0;
+            boolean belowThreshold = sum + v + remainingSum + ss.getPosRecSum() + ss.getPosPassiveSum() + neuron.getTotalBias(CURRENT) <= 0.0;
             if (belowThreshold) {
                 return;
             }
 
-            if(sum + remainingSum - v + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0) {
+            if(sum + remainingSum - v + ss.getPosRecSum() + ss.getPosPassiveSum() + neuron.getTotalBias(CURRENT) > 0.0) {
                 optionalInputMode = true;
             }
 
@@ -130,7 +141,7 @@ public class Converter {
                 }
             }
 
-            final boolean sumOfSynapseWeightsAboveThreshold = sum + ss.getPosRecSum() + ss.getPosPassiveSum() + ss.getBiasSum() > 0.0;
+            final boolean sumOfSynapseWeightsAboveThreshold = sum + ss.getPosRecSum() + ss.getPosPassiveSum() + neuron.getTotalBias(CURRENT) > 0.0;
             final boolean maxAndNodesReached = i >= MAX_AND_NODE_SIZE;
             if (sumOfSynapseWeightsAboveThreshold || maxAndNodesReached) {
                 break;
@@ -143,9 +154,44 @@ public class Converter {
     }
 
 
+    private boolean hasOnlyWeakSynapses() {
+        for(Synapse s: neuron.getInputSynapses()) {
+            if(!s.isWeak(CURRENT)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    private void convertWeakSynapses() {
+        TreeSet<Synapse> synapsesSortedByWeight = new TreeSet<Synapse>((s1, s2) -> {
+            int r = Double.compare(s2.getWeight(), s1.getWeight());
+            if(r != 0) return r;
+            return SYNAPSE_COMP.compare(s1, s2);
+        });
+
+        synapsesSortedByWeight.addAll(neuron.getInputSynapses());
+
+        double sum = 0.0;
+        for (Synapse s : synapsesSortedByWeight) {
+            if (!s.isRecurrent()) {
+                sum += s.getWeight();
+
+                NodeContext nlNodeContext = expandNode(null, s);
+                outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
+
+                if(sum > neuron.getBias()) {
+                    break;
+                }
+            }
+        }
+    }
+
+
     private void convertDisjunction() {
         for (Synapse s : modifiedSynapses) {
-            if (s.isDisjunction() && !s.isRecurrent() && !s.isWeak(CURRENT)) {
+            if (!s.isRecurrent() && !s.isWeak(CURRENT)) {
                 NodeContext nlNodeContext = expandNode(null, s);
                 outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
             }
@@ -167,6 +213,9 @@ public class Converter {
 
     private List<Synapse> prepareCandidates() {
         Synapse syn = getStrongestSynapse(neuron.getInputSynapses());
+        if(syn == null) {
+            return Collections.EMPTY_LIST;
+        }
 
         TreeSet<Integer> alreadyCollected = new TreeSet<>();
         ArrayList<Synapse> selectedCandidates = new ArrayList<>();

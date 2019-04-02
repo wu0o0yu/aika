@@ -29,6 +29,10 @@ import org.junit.Test;
 
 import java.util.stream.Collectors;
 
+import static network.aika.ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
+import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -77,19 +81,17 @@ public class MutualExclusionTest {
         Neuron pA = Neuron.init(
                 m.createNeuron("A"),
                 3.0,
-                ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
-                INeuron.Type.EXCITATORY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -104,19 +106,17 @@ public class MutualExclusionTest {
         Neuron pB = Neuron.init(
                 m.createNeuron("B"),
                 5.0,
-                ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
-                INeuron.Type.EXCITATORY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -131,19 +131,17 @@ public class MutualExclusionTest {
         Neuron pC = Neuron.init(
                 m.createNeuron("C"),
                 2.0,
-                ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
-                INeuron.Type.EXCITATORY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inC)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -159,25 +157,22 @@ public class MutualExclusionTest {
         Neuron.init(
                 inhibN,
                 0.0,
-                ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT,
-                INeuron.Type.INHIBITORY,
+                LIMITED_RECTIFIED_LINEAR_UNIT,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pA)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pB)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(pC)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
@@ -195,13 +190,12 @@ public class MutualExclusionTest {
 
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
                 0.0,
-                ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
-                INeuron.Type.EXCITATORY,
+                RECTIFIED_HYPERBOLIC_TANGENT,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pB)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)

@@ -26,6 +26,8 @@ import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.AncestorRelation.IS_DESCENDANT_OF;
 import static network.aika.neuron.relation.Relation.*;
@@ -64,22 +66,19 @@ public class GenerateTextTest {
 
         // Word aaaaaaa is only added to the resulting text if input a is active and this neuron
         // is not suppressed by another neuron. Output aaaaaaa may start a text.
-        Neuron.init(phraseA, 4.0, INeuron.Type.EXCITATORY,
+        Neuron.init(phraseA, 4.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(outputFrame)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -95,22 +94,19 @@ public class GenerateTextTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(phraseB, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(phraseB, 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(outputFrame)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -127,12 +123,11 @@ public class GenerateTextTest {
         );
 
 
-        Neuron.init(outputFrame, 4.0, INeuron.Type.EXCITATORY,
+        Neuron.init(outputFrame, 4.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inOut)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -140,12 +135,11 @@ public class GenerateTextTest {
         );
 
 
-        Neuron.init(outA, 4.0, INeuron.Type.EXCITATORY,
+        Neuron.init(outA, 4.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(phraseA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setIdentity(true),
                 new Relation.Builder()
                         .setFrom(0)
@@ -156,17 +150,15 @@ public class GenerateTextTest {
 
 
         // OutC is only activated if the previous word was outA.
-        Neuron.init(outC, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(outC, 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(phraseA)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(outA)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -185,12 +177,11 @@ public class GenerateTextTest {
         // Word bbb is only added to the resulting text if input b is active and this neuron
         // is not suppressed by another neuron. Output bbb may start a text.
         // Neuron outB has a slightly higher weight than outA.
-        Neuron.init(outB, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(outB, 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(phraseB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setIdentity(true),
                 new Relation.Builder()
                         .setFrom(0)
@@ -200,17 +191,15 @@ public class GenerateTextTest {
 
 
         // OutD is only activated if the previous word was outB.
-        Neuron.init(outD, 5.0, INeuron.Type.EXCITATORY,
+        Neuron.init(outD, 5.0, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(phraseB)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(outB)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -227,17 +216,15 @@ public class GenerateTextTest {
 
 
         // All outputs suppress each other.
-        Neuron.init(inhib, 0.0, ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY,
+        Neuron.init(inhib, 0.0, ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT, INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(phraseA)
-                        .setWeight(1.0)
-                        .setBias(0.0),
+                        .setWeight(1.0),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(phraseB)
-                        .setWeight(1.0)
-                        .setBias(0.0),
+                        .setWeight(1.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -288,12 +275,11 @@ public class GenerateTextTest {
         Neuron outB = m.createNeuron("OUT B", "bbb ");
 
 
-        Neuron.init(intermediate, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+        Neuron.init(intermediate, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(in)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setIdentity(true),
                 new Relation.Builder()
                         .setFrom(0)
@@ -301,12 +287,11 @@ public class GenerateTextTest {
                         .setRelation(END_TO_BEGIN_EQUALS)
         );
 
-        Neuron.init(outA, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+        Neuron.init(outA, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(intermediate)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -314,12 +299,11 @@ public class GenerateTextTest {
         );
 
 
-        Neuron.init(outB, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+        Neuron.init(outB, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(intermediate)
-                        .setWeight(10.0)
-                        .setBias(-10.0),
+                        .setWeight(10.0),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)

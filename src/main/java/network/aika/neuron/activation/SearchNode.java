@@ -632,14 +632,13 @@ public class SearchNode implements Comparable<SearchNode> {
         } else {
             bestPath = false;
         }
-
+/*
         if(COMPUTE_SOFT_MAX) {
             dumpDebugState();
-//            System.out.println(accumulatedWeight);
-//            System.out.println();
-
+            System.out.println(accumulatedWeight);
+            System.out.println();
         }
-
+*/
         return accumulatedWeight;
     }
 

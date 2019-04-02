@@ -28,8 +28,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
-import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.Synapse.State.NEXT;
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 
 /**
  * The {@code Synapse} class connects two neurons with each other. When propagating an activation signal, the
@@ -61,9 +61,6 @@ import static network.aika.neuron.Synapse.State.NEXT;
 public class Synapse implements Writable {
 
     public static final int OUTPUT = -1;
-
-    public static double DISJUNCTION_THRESHOLD = 0.6;
-    public static double CONJUNCTION_THRESHOLD = 0.4;
 
     public static double TOLERANCE = 0.0000001;
 
@@ -101,14 +98,8 @@ public class Synapse implements Writable {
     private double weight;
     private double weightDelta;
 
-    private double bias;
-    private double biasDelta;
-
     private double limit = 1.0;
     private double limitDelta;
-
-    private boolean isConjunction;
-    private boolean isDisjunction;
 
 
     public Synapse() {
@@ -186,21 +177,8 @@ public class Synapse implements Writable {
         this.inactive = inactive;
     }
 
-    public boolean isConjunction() {
-        return isConjunction;
-    }
-
-    public boolean isDisjunction() {
-        return isDisjunction;
-    }
-
-
     public double getWeight() {
         return weight;
-    }
-
-    public double getBias() {
-        return bias;
     }
 
     public double getLimit() {
@@ -211,10 +189,6 @@ public class Synapse implements Writable {
         return weight + weightDelta;
     }
 
-    public double getNewBias() {
-        return bias + biasDelta;
-    }
-
     public double getNewLimit() {
         return limit + limitDelta;
     }
@@ -223,20 +197,12 @@ public class Synapse implements Writable {
         return s == State.CURRENT ? weight : getNewWeight();
     }
 
-    public double getBias(State s) {
-        return s == State.CURRENT ? bias : getNewBias();
-    }
-
     public double getLimit(State s) {
         return s == State.CURRENT ? limit : getNewLimit();
     }
 
     public double getWeightDelta() {
         return weightDelta;
-    }
-
-    public double getBiasDelta() {
-        return biasDelta;
     }
 
     public double getLimitDelta() {
@@ -263,14 +229,12 @@ public class Synapse implements Writable {
 
         removeLinkInternal(in, out);
 
-        isConjunction = isConjunction(NEXT);
-        if(isConjunction) {
+        if(out.getType() == EXCITATORY) {
             out.inputSynapses.put(this, this);
             out.setModified();
         }
 
-        isDisjunction = isDisjunction(State.NEXT);
-        if(isDisjunction){
+        if(out.getType() == INHIBITORY){
             in.outputSynapses.put(this, this);
             in.setModified();
         }
@@ -283,53 +247,6 @@ public class Synapse implements Writable {
 
         (dir ? in : out).lock.releaseWriteLock();
         (dir ? out : in).lock.releaseWriteLock();
-    }
-
-
-    public void relink() {
-        boolean newIsConjunction = isConjunction(NEXT);
-        if(newIsConjunction != isConjunction) {
-            INeuron in = input.get();
-            INeuron out = output.get();
-
-            boolean dir = in.getId() < out.getId();
-            (dir ? in : out).lock.acquireWriteLock();
-            (dir ? out : in).lock.acquireWriteLock();
-
-            isConjunction = newIsConjunction;
-            if (isConjunction) {
-                out.inputSynapses.put(this, this);
-                out.setModified();
-            } else {
-                out.inputSynapses.remove(this);
-                out.setModified();
-            }
-
-            (dir ? in : out).lock.releaseWriteLock();
-            (dir ? out : in).lock.releaseWriteLock();
-        }
-
-        boolean newIsDisjunction = isDisjunction(NEXT);
-        if(newIsDisjunction != isDisjunction) {
-            INeuron in = input.get();
-            INeuron out = output.get();
-
-            boolean dir = in.getId() < out.getId();
-            (dir ? in : out).lock.acquireWriteLock();
-            (dir ? out : in).lock.acquireWriteLock();
-
-            isDisjunction = newIsDisjunction;
-            if (isDisjunction) {
-                in.outputSynapses.put(this, this);
-                in.setModified();
-            } else {
-                in.outputSynapses.remove(this);
-                in.setModified();
-            }
-
-            (dir ? in : out).lock.releaseWriteLock();
-            (dir ? out : in).lock.releaseWriteLock();
-        }
     }
 
 
@@ -359,12 +276,12 @@ public class Synapse implements Writable {
 
 
     private void removeLinkInternal(INeuron in, INeuron out) {
-        if(isConjunction(CURRENT)) {
+        if(out.getType() == EXCITATORY) {
             if(out.inputSynapses.remove(this) != null) {
                 out.setModified();
             }
         }
-        if(isDisjunction(CURRENT)) {
+        if(out.getType() == INHIBITORY) {
             if(in.outputSynapses.remove(this) != null) {
                 in.setModified();
             }
@@ -388,16 +305,13 @@ public class Synapse implements Writable {
         weight += weightDelta;
         weightDelta = 0.0;
 
-        bias += biasDelta;
-        biasDelta = 0.0;
-
         limit += limitDelta;
         limitDelta = 0.0;
     }
 
 
     public boolean isZero() {
-        return Math.abs(weight) < TOLERANCE && Math.abs(bias) < TOLERANCE ;
+        return Math.abs(weight) < TOLERANCE;
     }
 
 
@@ -407,52 +321,36 @@ public class Synapse implements Writable {
     }
 
 
-    public boolean isConjunction(State state) {
-        double w = getLimit(state) * getWeight(state);
-        double b = getBias(state);
-        return w < 0.0 || (w > 0.0 && (-b / w) >= CONJUNCTION_THRESHOLD);
-    }
-
-
-    public boolean isDisjunction(State state) {
-        double w = getLimit(state) * getWeight(state);
-        double b = getBias(state);
-        return w > 0.0 && (-b / w) <= DISJUNCTION_THRESHOLD;
-    }
-
-
     public boolean isWeak(State state) {
         double w = getLimit(state) * getWeight(state);
 
-        SynapseSummary ss = output.get().getSynapseSummary();
-        if(w > -ss.getBiasSum(state)) {
-            return false;
+        INeuron n = output.get();
+        switch(n.getType()) {
+            case EXCITATORY:
+                return w < n.getBias();
+            case INHIBITORY:
+                return w < -n.getBias();
+            case INPUT:
+                return false;
         }
-
-        if(w > ss.getBiasSum(state) + ss.getPosSum(state)) {
-            return false;
-        }
-        return true;
+        return false;
     }
 
 
-    public void updateDelta(Document doc, double weightDelta, double biasDelta, double limitDelta) {
+    public void updateDelta(Document doc, double weightDelta, double limitDelta) {
         this.weightDelta += weightDelta;
-        this.biasDelta += biasDelta;
         this.limitDelta += limitDelta;
-        relink();
+
         if(doc != null) {
             doc.notifyWeightModified(this);
         }
     }
 
 
-    public void update(Document doc, double weight, double bias, double limit) {
+    public void update(Document doc, double weight, double limit) {
         this.weightDelta = weight - this.weight;
         this.limitDelta = limit - this.limit;
-        this.biasDelta = bias - this.bias;
 
-        relink();
         if(doc != null) {
             doc.notifyWeightModified(this);
         }
@@ -470,7 +368,7 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S ID:" + id + " NW:" + getNewWeight() + " NB:" + getNewBias() + " rec:" + isRecurrent + " " +  input + "->" + output;
+        return "S ID:" + id + " NW:" + getNewWeight() + " rec:" + isRecurrent + " " +  input + "->" + output;
     }
 
 
@@ -497,11 +395,7 @@ public class Synapse implements Writable {
         }
 
         out.writeDouble(weight);
-        out.writeDouble(bias);
         out.writeDouble(limit);
-
-        out.writeBoolean(isConjunction);
-        out.writeBoolean(isDisjunction);
 
         out.writeBoolean(inactive);
 
@@ -533,11 +427,7 @@ public class Synapse implements Writable {
         }
 
         weight = in.readDouble();
-        bias = in.readDouble();
         limit = in.readDouble();
-
-        isConjunction = in.readBoolean();
-        isDisjunction = in.readBoolean();
 
         inactive = in.readBoolean();
 
@@ -608,17 +498,13 @@ public class Synapse implements Writable {
      */
     public static class Builder implements Neuron.Builder {
 
-        public boolean recurrent;
-        public Neuron neuron;
-        public double weight;
-        public double bias;
-        public double limit = 1.0;
-
-        public DistanceFunction distanceFunction;
-
-        public boolean identity;
-
-        public Integer synapseId;
+        private boolean recurrent;
+        private Neuron neuron;
+        double weight;
+        double limit = 1.0;
+        private DistanceFunction distanceFunction;
+        private boolean identity;
+        private Integer synapseId;
 
 
         /**
@@ -661,17 +547,6 @@ public class Synapse implements Writable {
             return this;
         }
 
-        /**
-         * The bias of this input that will later on be added to the neurons bias.
-         *
-         * @param bias
-         * @return
-         */
-        public Builder setBias(double bias) {
-            this.bias = bias;
-            return this;
-        }
-
 
         public Builder setLimit(double limit) {
             this.limit = limit;
@@ -683,8 +558,6 @@ public class Synapse implements Writable {
             this.distanceFunction = distFunc;
             return this;
         }
-
-
 
 
         public Builder setIdentity(boolean identity) {

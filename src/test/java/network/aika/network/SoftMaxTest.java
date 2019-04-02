@@ -53,13 +53,11 @@ public class SoftMaxTest {
                         new Synapse.Builder()
                                 .setSynapseId(0)
                                 .setNeuron(inputs[j])
-                                .setWeight(10.0)
-                                .setBias(-10.0),
+                                .setWeight(10.0),
                         new Synapse.Builder()
                                 .setSynapseId(1)
                                 .setNeuron(inhib)
                                 .setWeight(-100.0)
-                                .setBias(0.0)
                                 .setRecurrent(true),
                         new Relation.Builder()
                                 .setFrom(1)
@@ -77,8 +75,7 @@ public class SoftMaxTest {
                         new Synapse.Builder()
                                 .setSynapseId(inhibSynId)
                                 .setNeuron(n)
-                                .setWeight(1.0)
-                                .setBias(0.0),
+                                .setWeight(1.0),
                         new Relation.Builder()
                                 .setFrom(inhibSynId)
                                 .setTo(OUTPUT)

@@ -28,6 +28,8 @@ import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.Activation.END;
@@ -50,25 +52,22 @@ public class NegationTest {
         Neuron abcN = m.createNeuron("ABC");
 
         Neuron.init(abcN,
-                5.0,
-                INeuron.Type.EXCITATORY,
+                5.5,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-9.5)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(-10.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(-10.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
@@ -114,14 +113,13 @@ public class NegationTest {
         Neuron abcN = m.createNeuron("ABC");
 
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
-                0.0,
-                INeuron.Type.EXCITATORY,
+                1.0,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(abcN)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -130,25 +128,22 @@ public class NegationTest {
 
         Neuron.init(abcN,
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(-1.0)
-                        .setRecurrent(true)
-                        .setBias(0.0),
+                        .setRecurrent(true),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(-1.0)
-                        .setRecurrent(true)
-                        .setBias(0.0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -187,12 +182,11 @@ public class NegationTest {
 
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
                 0.0,
-                INeuron.Type.EXCITATORY,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
@@ -202,18 +196,16 @@ public class NegationTest {
 
         Neuron.init(asN,
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setBias(-1.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inS)
                         .setWeight(-1.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -253,12 +245,11 @@ public class NegationTest {
 
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
                 0.0,
-                INeuron.Type.EXCITATORY,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
@@ -268,18 +259,16 @@ public class NegationTest {
 
         Neuron.init(asN,
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setBias(-1.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inS)
                         .setWeight(-1.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -318,12 +307,11 @@ public class NegationTest {
 
         Neuron outN = Neuron.init(m.createNeuron("OUT"),
                 0.0,
-                INeuron.Type.EXCITATORY,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
@@ -333,18 +321,16 @@ public class NegationTest {
 
         Neuron.init(asN,
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setBias(-1.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inS)
                         .setWeight(-1.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -381,19 +367,17 @@ public class NegationTest {
 
         Neuron inS = Neuron.init(m.createNeuron("S"),
                 0.0,
-                INeuron.Type.INHIBITORY,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(absN)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -406,19 +390,17 @@ public class NegationTest {
 
         Neuron.init(asN,
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inS)
                         .setWeight(-1.0)
-                        .setRecurrent(true)
-                        .setBias(0.0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -430,25 +412,22 @@ public class NegationTest {
         );
         Neuron.init(absN,
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inS)
                         .setWeight(-1.0)
-                        .setRecurrent(true)
-                        .setBias(0.0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
@@ -516,25 +495,22 @@ public class NegationTest {
 
         Neuron inS = Neuron.init(m.createNeuron("S"),
                 0.0,
-                INeuron.Type.INHIBITORY,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(ascN)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(bsN)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -551,19 +527,17 @@ public class NegationTest {
 
         Neuron.init(asN,
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inS)
                         .setWeight(-1.0)
-                        .setRecurrent(true)
-                        .setBias(0.0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -579,25 +553,22 @@ public class NegationTest {
         );
         Neuron.init(ascN,
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inC)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inS)
                         .setWeight(-1.0)
-                        .setRecurrent(true)
-                        .setBias(0.0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -622,19 +593,17 @@ public class NegationTest {
 
         Neuron.init(bsN,
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inS)
                         .setWeight(-1.0)
-                        .setRecurrent(true)
-                        .setBias(0.0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -651,13 +620,12 @@ public class NegationTest {
 
         Neuron outA = Neuron.init(m.createNeuron("OUT A"),
                 0.0,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -665,27 +633,25 @@ public class NegationTest {
         );
         Neuron outAC = Neuron.init(m.createNeuron("OUT AC"),
                 0.0,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(ascN)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
                         .setRelation(EQUALS)
         );
         Neuron outB = Neuron.init(m.createNeuron("OUT B"),
-                0.0,
-                INeuron.Type.EXCITATORY,
+                1.0,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(bsN)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(0.0),
+                        .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(OUTPUT)
@@ -736,18 +702,16 @@ public class NegationTest {
 
         Neuron.init(pC,
                 0.5,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(2.0)
-                        .setBias(-2.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pD)
                         .setWeight(-2.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
@@ -757,18 +721,16 @@ public class NegationTest {
 
         Neuron.init(pD,
                 0.5,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(2.0)
-                        .setBias(-2.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pC)
                         .setWeight(-2.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(0)
@@ -782,24 +744,21 @@ public class NegationTest {
 
         Neuron pH = Neuron.init(m.createNeuron("H"),
                 0.001,
-                INeuron.Type.EXCITATORY,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pC)
-                        .setBias(-2.0)
                         .setWeight(2.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pD)
                         .setWeight(2.0)
-                        .setBias(-2.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inG)
                         .setWeight(2.0)
-                        .setBias(-2.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)

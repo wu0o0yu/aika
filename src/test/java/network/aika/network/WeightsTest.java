@@ -25,6 +25,8 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.CONTAINED_IN;
 import static network.aika.neuron.relation.Relation.EQUALS;
@@ -60,18 +62,16 @@ public class WeightsTest {
         Neuron pOrA = m.createNeuron("pOrA");
         Neuron.init(pOrA,
                 0.0,
-                INeuron.Type.EXCITATORY,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inAA)
                         .setWeight(3.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inBA)
                         .setWeight(4.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
@@ -86,25 +86,22 @@ public class WeightsTest {
         pDA = m.createNeuron("DA");
 
         Neuron.init(pDA,
-                0.001,
-                INeuron.Type.EXCITATORY,
+                1.401,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pOrA)
                         .setWeight(1.0)
-                        .setBias(-0.6)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inCA)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(pSuppr)
                         .setWeight(-2.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -132,18 +129,16 @@ public class WeightsTest {
         Neuron pOrB = m.createNeuron("pOrB");
         Neuron.init(pOrB,
                 0.0,
-                INeuron.Type.EXCITATORY,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inAB)
                         .setWeight(2.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inBB)
                         .setWeight(5.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(1)
@@ -161,25 +156,22 @@ public class WeightsTest {
 
         pDB = m.createNeuron("DB");
         Neuron.init(pDB,
-                0.001,
-                INeuron.Type.EXCITATORY,
+                0.401,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pOrB)
                         .setWeight(1.0)
-                        .setBias(-0.6)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inCB)
                         .setWeight(1.0)
-                        .setBias(-1.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(pSuppr)
                         .setWeight(-2.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -202,18 +194,16 @@ public class WeightsTest {
 
         Neuron.init(pSuppr,
                 0.0,
-                INeuron.Type.INHIBITORY,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pDA)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pDB)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)

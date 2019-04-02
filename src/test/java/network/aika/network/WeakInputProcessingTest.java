@@ -27,6 +27,8 @@ import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 import static network.aika.neuron.relation.Relation.OVERLAPS;
@@ -52,26 +54,23 @@ public class WeakInputProcessingTest {
 
         Neuron patternA = Neuron.init(
                 m.createNeuron("Pattern A"),
-                0.4,
-                INeuron.Type.EXCITATORY,
+                5.4,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(strongInput)
                         .setWeight(50.0)
-                        .setRecurrent(false)
-                        .setBias(-45.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(weakInputA)
                         .setWeight(1.0)
-                        .setRecurrent(false)
-                        .setBias(-1.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
-                        .setRecurrent(true)
-                        .setBias(0.0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -88,26 +87,23 @@ public class WeakInputProcessingTest {
 
         Neuron patternB = Neuron.init(
                 m.createNeuron("Pattern B"),
-                0.4,
-                INeuron.Type.EXCITATORY,
+                5.4,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(strongInput)
                         .setWeight(50.0)
-                        .setRecurrent(false)
-                        .setBias(-45.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(weakInputB)
-                        .setWeight(1.5f)
-                        .setRecurrent(false)
-                        .setBias(-1.5),
+                        .setWeight(1.5)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
-                        .setRecurrent(true)
-                        .setBias(0.0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -132,26 +128,23 @@ public class WeakInputProcessingTest {
 
         Neuron patternC = Neuron.init(
                 m.createNeuron("Pattern C"),
-                0.4,
-                INeuron.Type.EXCITATORY,
+                5.4,
+                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(strongInput)
                         .setWeight(50.0)
-                        .setRecurrent(false)
-                        .setBias(-45.0),
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(weakInputC)
-                        .setWeight(0.5f)
-                        .setRecurrent(false)
-                        .setBias(-0.5),
+                        .setWeight(0.5)
+                        .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(suppr)
                         .setWeight(-60.0)
-                        .setRecurrent(true)
-                        .setBias(0.0),
+                        .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -177,24 +170,21 @@ public class WeakInputProcessingTest {
 
         Neuron.init(suppr,
                 0.0,
-                INeuron.Type.INHIBITORY,
+                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(patternA)
                         .setWeight(10.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(patternB)
                         .setWeight(10.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(patternC)
                         .setWeight(10.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
