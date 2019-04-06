@@ -23,13 +23,14 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
+import org.junit.Assert;
 import org.junit.Test;
 
+import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.relation.Relation.EQUALS;
-import static network.aika.neuron.relation.Relation.OVERLAPS;
+import static network.aika.neuron.relation.Relation.*;
 
 /**
  *
@@ -194,4 +195,61 @@ public class OptionalAndTest {
             doc.clearActivations();
         }
     }
+
+
+
+    @Test
+    public void testOnlyOptionalInputs() {
+        Model model = new Model();
+
+        Neuron inA = model.createNeuron("A");
+        Neuron inB = model.createNeuron("B");
+        Neuron inC = model.createNeuron("C");
+
+        Neuron testNeuron = model.createNeuron("Test");
+
+        Neuron.init(testNeuron,
+                2.1,
+                RECTIFIED_HYPERBOLIC_TANGENT,
+                EXCITATORY,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(inA)
+                        .setWeight(2.0),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(inB)
+                        .setWeight(2.0),
+                new Synapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(inC)
+                        .setWeight(2.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRelation(END_EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRelation(END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRelation(END_TO_BEGIN_EQUALS)
+        );
+
+
+        Document doc = model.createDocument("ABC");
+        inA.addInput(doc, 0, 1);
+        inB.addInput(doc, 1, 2);
+
+        doc.process();
+
+        Assert.assertEquals(1, testNeuron.getActivations(doc, false).count());
+    }
+
 }
