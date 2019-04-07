@@ -991,7 +991,7 @@ public final class Activation implements Comparable<Activation> {
 
 
     public String toString() {
-        return id + " " + getLabel() + " " + slotsToString() + " " + identityToString() + " - " +
+        return id + " " + getNeuron().getId() + ":" + getLabel() + " " + slotsToString() + " " + identityToString() + " - " +
                 (extension != null ? extension.toString() + " -" : "") +
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
