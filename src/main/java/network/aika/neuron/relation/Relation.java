@@ -200,8 +200,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
     }
 
-    public abstract void registerRequiredSlots(Neuron input);
-
 
     public static class Builder implements Neuron.Builder {
         private int from;
@@ -311,10 +309,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         @Override
         public Relation setOptionalAndFollow(boolean optional, boolean follow) {
             return new Any(optional, follow);
-        }
-
-        @Override
-        public void registerRequiredSlots(Neuron input) {
         }
     }
 }

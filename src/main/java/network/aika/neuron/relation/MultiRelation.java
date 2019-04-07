@@ -161,14 +161,6 @@ public class MultiRelation extends Relation {
 
 
     @Override
-    public void registerRequiredSlots(Neuron input) {
-        for(Relation rel: relations) {
-            rel.registerRequiredSlots(input);
-        }
-    }
-
-
-    @Override
     public int compareTo(Relation rel) {
         int r = super.compareTo(rel);
         if(r != 0) return r;

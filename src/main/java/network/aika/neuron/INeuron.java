@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.Synapse.State.NEXT;
 
@@ -76,9 +77,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     private volatile double biasDelta;
 
     private SynapseSummary synapseSummary = new SynapseSummary();
-
-    public Set<Integer> slotHasInputs = new TreeSet<>();
-    public Set<Integer> slotRequired = new TreeSet<>();
 
     private Writable extension;
 
@@ -199,11 +197,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         return passiveInputSynapses.values();
-    }
-
-
-    public void addRequiredSlot(int slot) {
-        slotRequired.add(slot);
     }
 
 
@@ -411,8 +404,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public void setOutputText(String outputText) {
         this.outputText = outputText;
-        slotRequired.add(Activation.BEGIN);
-        slotRequired.add(Activation.END);
     }
 
 
@@ -438,8 +429,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         doc.addInputNeuronActivation(act);
         doc.addFinallyActivatedNeuron(act.getINeuron());
 
-        doc.getLinker().linkInput(act);
-        doc.getLinker().process();
+        if(getType() != INPUT) {
+            doc.getLinker().linkInput(act);
+            doc.getLinker().process();
+        }
 
         propagate(act);
 
@@ -502,22 +495,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         setModified();
     }
-
-
-
-    public boolean checkRequiredSlots(Document doc, SortedMap<Integer, Position> slots) {
-        for(Integer slot : slotRequired) {
-            if (!slots.containsKey(slot)) {
-                if (!slotHasInputs.contains(slot)) {
-                    slots.put(slot, new Position(doc));
-                } else {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
 
 
     public Activation lookupActivation(Document doc, SortedMap<Integer, Position> slots, Predicate<Activation.Link> filter) {
@@ -614,16 +591,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         out.writeUTF(activationFunction.name());
 
-        out.writeInt(slotHasInputs.size());
-        for(Integer slot: slotHasInputs) {
-            out.writeInt(slot);
-        }
-
-        out.writeInt(slotRequired.size());
-        for(Integer slot: slotRequired) {
-            out.writeInt(slot);
-        }
-
         out.writeInt(outputNode.getId());
 
         out.writeBoolean(inputNode != null);
@@ -686,16 +653,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         activationFunction = ActivationFunction.valueOf(in.readUTF());
 
-        int l = in.readInt();
-        for(int i = 0; i < l; i++) {
-            slotHasInputs.add(in.readInt());
-        }
-
-        l = in.readInt();
-        for(int i = 0; i < l; i++) {
-            slotRequired.add(in.readInt());
-        }
-
         outputNode = m.lookupNodeProvider(in.readInt());
 
         if (in.readBoolean()) {
@@ -718,7 +675,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             outputSynapses.put(syn, syn);
         }
 
-        l = in.readInt();
+        int l = in.readInt();
         if(l > 0) {
             outputRelations = new TreeMap<>();
             for(int i = 0; i < l; i++) {

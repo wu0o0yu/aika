@@ -105,12 +105,6 @@ public abstract class PositionRelation extends Relation {
     public abstract Stream<Activation> getActivations(INeuron n, Position pos);
 
 
-    @Override
-    public void registerRequiredSlots(Neuron input) {
-        input.get().addRequiredSlot(fromSlot);
-    }
-
-
     public static class Equals extends PositionRelation {
         public static int TYPE = 0;
 

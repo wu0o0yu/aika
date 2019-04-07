@@ -70,8 +70,6 @@ public class Converter {
     private boolean convert() {
         outputNode = neuron.getInputNode().get();
 
-        initSlotFlags();
-
         SynapseSummary ss = neuron.getSynapseSummary();
 
         if(neuron.getTotalBias(CURRENT) + ss.getPosDirSum() + ss.getPosRecSum() <= 0.0) {
@@ -165,7 +163,7 @@ public class Converter {
 
 
     private void convertWeakSynapses() {
-        TreeSet<Synapse> synapsesSortedByWeight = new TreeSet<Synapse>((s1, s2) -> {
+        TreeSet<Synapse> synapsesSortedByWeight = new TreeSet<>((s1, s2) -> {
             int r = Double.compare(s2.getWeight(), s1.getWeight());
             if(r != 0) return r;
             return SYNAPSE_COMP.compare(s1, s2);
@@ -179,10 +177,10 @@ public class Converter {
                 sum += s.getWeight();
 
                 NodeContext nlNodeContext = expandNode(null, s);
-                outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
+                outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, true);
 
                 if(sum > neuron.getBias()) {
-                    break;
+//                    break;  // siehe: AIKA-1
                 }
             }
         }
@@ -196,18 +194,6 @@ public class Converter {
                 outputNode.addInput(nlNodeContext.getSynapseIds(), threadId, nlNodeContext.node, false);
             }
         }
-    }
-
-
-    private void initSlotFlags() {
-        modifiedSynapses.forEach(s -> {
-            for(Integer slot: s.linksOutput()) {
-                neuron.slotHasInputs.add(slot);
-            }
-            for(Relation rel: s.getRelations().values()) {
-                rel.registerRequiredSlots(s.getInput());
-            }
-        });
     }
 
 

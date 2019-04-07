@@ -246,6 +246,7 @@ public class OptionalAndTest {
         Document doc = model.createDocument("ABC");
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 1, 2);
+        inC.addInput(doc, 2, 3);
 
         doc.process();
 

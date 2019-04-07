@@ -49,8 +49,6 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
     private static final Logger log = LoggerFactory.getLogger(OrNode.class);
 
-    public static boolean CHECK_REQUIRED_SLOTS = true;
-
     TreeSet<OrEntry> andParents = new TreeSet<>();
 
     private Neuron outputNeuron = null;
@@ -76,10 +74,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
         Document doc = inputAct.getDocument();
         INeuron n = outputNeuron.get(doc);
 
-        SortedMap<Integer, Position> slots = getSlots(oe, inputAct);
-        if (CHECK_REQUIRED_SLOTS && n.checkRequiredSlots(doc, slots)) return;
-
-        Activation act = lookupActivation(l);
+        Activation act = lookupActivation(ol);
         /*Activation act = n.lookupActivation(doc, slots, l -> {
             Synapse s = l.getSynapse();
             if(!s.isIdentity()) return true;
@@ -93,7 +88,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
             OrActivation orAct = new OrActivation(doc, this);
             register(orAct);
 
-            act = new Activation(doc, n, slots);
+            act = new Activation(doc, n, getSlots(oe, inputAct));
 
             act.setInputNodeActivation(orAct);
             orAct.setOutputAct(act);
@@ -127,7 +122,11 @@ public class OrNode extends Node<OrNode, OrActivation> {
                                 .orElse(null);
                     }
                 } else {
-
+                    existingAct = rel
+                            .invert()
+                            .getActivations(outputNeuron.get(), l.getInput())
+                            .findFirst()
+                            .orElse(null);
                 }
 
                 if(existingAct != null) {

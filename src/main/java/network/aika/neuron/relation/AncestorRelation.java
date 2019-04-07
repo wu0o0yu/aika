@@ -21,10 +21,6 @@ public abstract class AncestorRelation extends Relation {
     AncestorRelation() {}
 
 
-    @Override
-    public void registerRequiredSlots(Neuron input) {
-    }
-
 
     private static void collectCommonAncestor(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
         if(linkedAct.getVisitedId() == v) return;
