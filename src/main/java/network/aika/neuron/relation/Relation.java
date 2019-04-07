@@ -81,7 +81,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public abstract int getType();
 
-    public abstract boolean test(Activation act, Activation linkedAct);
+    public abstract boolean test(Activation act, Activation linkedAct, boolean allowUndefined);
 
     public abstract Relation invert();
 
@@ -274,7 +274,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         @Override
-        public boolean test(Activation act, Activation linkedAct) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
             return true;
         }
 

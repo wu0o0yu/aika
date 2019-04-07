@@ -1,9 +1,7 @@
 package network.aika.neuron.relation;
 
-import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
 
@@ -40,8 +38,12 @@ public abstract class PositionRelation extends Relation {
 
 
     @Override
-    public boolean test(Activation act, Activation linkedAct) {
-        return optional || test(act.getSlot(fromSlot), linkedAct.getSlot(toSlot));
+    public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
+        Position toPos = linkedAct.getSlot(toSlot);
+        if(allowUndefined && toPos == null) {
+            return true;
+        }
+        return optional || test(act.getSlot(fromSlot), toPos);
     }
 
 
@@ -99,7 +101,7 @@ public abstract class PositionRelation extends Relation {
         }
 
         return getActivations(n, pos)
-                .filter(act -> test(act, linkedAct));
+                .filter(act -> test(act, linkedAct, false));
     }
 
     public abstract Stream<Activation> getActivations(INeuron n, Position pos);

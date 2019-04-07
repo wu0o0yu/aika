@@ -157,7 +157,7 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public boolean test(Activation act, Activation linkedAct) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
             return hasCommonAncestor(act, linkedAct);
         }
 
@@ -206,7 +206,7 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public boolean test(Activation act, Activation linkedAct) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
             return contains(act, linkedAct, act.getNewVisitedId());
         }
 
@@ -256,7 +256,7 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public boolean test(Activation act, Activation linkedAct) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
             return contains(linkedAct, act, act.getNewVisitedId());
         }
 
@@ -305,7 +305,7 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public boolean test(Activation act, Activation linkedAct) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
             return !contains(act, linkedAct, act.getNewVisitedId());
         }
 
@@ -356,7 +356,7 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public boolean test(Activation act, Activation linkedAct) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
             return !contains(linkedAct, act, act.getNewVisitedId());
         }
 
