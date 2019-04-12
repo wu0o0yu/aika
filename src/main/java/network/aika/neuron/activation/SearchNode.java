@@ -52,6 +52,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public static int MAX_SEARCH_STEPS = Integer.MAX_VALUE;
     public static boolean ENABLE_CACHING = true;
+    public static boolean ENABLE_CACHING_COMPARISON = true;
     public static boolean OPTIMIZE_SEARCH = true;
     public static boolean COMPUTE_SOFT_MAX = false;
 
@@ -172,12 +173,14 @@ public class SearchNode implements Comparable<SearchNode> {
                 }
             } else {
                 weightDelta = doc.getValueQueue().process(doc, this);
-                if (Math.abs(weightDelta - csn.weightDelta) > 0.00001 || !compareNewState(csn)) {
+                if (ENABLE_CACHING_COMPARISON && (Math.abs(weightDelta - csn.weightDelta) > 0.00001 || !compareNewState(csn))) {
                     log.error("Cached search node activation do not match the newly computed results.");
-                    log.info("Computed results:");
+                    log.info("Computed results (" + weightDelta + "):");
                     dumpDebugState();
-                    log.info("Cached results:");
+                    log.info("Cached results (" + csn.weightDelta + "):");
                     csn.dumpDebugState();
+
+                    throw new RuntimeException("Comparison between cached and computed search node failed!");
                 }
             }
         }
@@ -300,7 +303,7 @@ public class SearchNode implements Comparable<SearchNode> {
         String weights = "";
         Decision decision = UNKNOWN;
         while (n != null && n.level >= 0) {
-            System.out.println(
+            log.info(
                     n.level + " " +
                             n.debugState +
                             " DECISION:" + decision +
