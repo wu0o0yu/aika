@@ -5,7 +5,7 @@
     <groupId>org.aika-software</groupId>
     <artifactId>aika</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <name>aika</name>
     <url>http://aika.network</url>
     <description>An artificial intelligence for knowledge acquisition</description>
@@ -82,7 +82,7 @@
                     </includes>
                 </configuration>
             </plugin>
-
+<!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -100,7 +100,7 @@
                     </additionalOptions>
                 </configuration>
             </plugin>
-
+-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
