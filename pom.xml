@@ -5,7 +5,7 @@
     <groupId>org.aika-software</groupId>
     <artifactId>aika</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.2-SNAPSHOT</version>
     <name>aika</name>
     <url>http://aika.network</url>
     <description>An artificial intelligence for knowledge acquisition</description>
