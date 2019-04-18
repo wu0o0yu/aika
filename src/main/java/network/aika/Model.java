@@ -54,10 +54,6 @@ public class Model {
 
     public SuspensionHook suspensionHook;
 
-    private WritableFactory neuronExtensionFactory;
-    private WritableFactory synapseExtensionFactory;
-    private WritableFactory activationExtensionFactory;
-
     public LinkerFactory linkerFactory = (doc) -> new Linker(doc);
     public SearchNode.SkipSelectStep skipSelectStep = (act) -> false;
 
@@ -101,35 +97,6 @@ public class Model {
 
     public void setSuspensionHook(SuspensionHook suspensionHook) {
         this.suspensionHook = suspensionHook;
-    }
-
-
-    public WritableFactory getNeuronExtensionFactory() {
-        return neuronExtensionFactory;
-    }
-
-
-    public void setNeuronExtensionFactory(WritableFactory neuronExtensionFactory) {
-        this.neuronExtensionFactory = neuronExtensionFactory;
-    }
-
-    public WritableFactory getSynapseExtensionFactory() {
-        return synapseExtensionFactory;
-    }
-
-
-    public void setSynapseExtensionFactory(WritableFactory synapseExtensionFactory) {
-        this.synapseExtensionFactory = synapseExtensionFactory;
-    }
-
-
-    public WritableFactory getActivationExtensionFactory() {
-        return activationExtensionFactory;
-    }
-
-
-    public void setActivationExtensionFactory(WritableFactory activationExtensionFactory) {
-        this.activationExtensionFactory = activationExtensionFactory;
     }
 
 

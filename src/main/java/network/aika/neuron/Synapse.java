@@ -90,9 +90,6 @@ public class Synapse implements Writable {
 
     private DistanceFunction distanceFunction = null;
 
-    private Writable extension;
-
-
     private boolean inactive;
 
     private double weight;
@@ -110,10 +107,6 @@ public class Synapse implements Writable {
         this.id = id;
         this.input = input;
         this.output = output;
-
-        if(output.getModel().getSynapseExtensionFactory() != null) {
-            extension = output.getModel().getSynapseExtensionFactory().createObject();
-        }
     }
 
 
@@ -159,14 +152,6 @@ public class Synapse implements Writable {
 
     public void setDistanceFunction(DistanceFunction distanceFunction) {
         this.distanceFunction = distanceFunction;
-    }
-
-    public <T extends Writable> T getExtension() {
-        return (T) extension;
-    }
-
-    public void setExtension(Writable extension) {
-        this.extension = extension;
     }
 
     public boolean isInactive() {
@@ -398,11 +383,6 @@ public class Synapse implements Writable {
         out.writeDouble(limit);
 
         out.writeBoolean(inactive);
-
-        out.writeBoolean(extension != null);
-        if(extension != null) {
-            extension.write(out);
-        }
     }
 
 
@@ -430,11 +410,6 @@ public class Synapse implements Writable {
         limit = in.readDouble();
 
         inactive = in.readBoolean();
-
-        if(in.readBoolean()) {
-            extension = m.getSynapseExtensionFactory().createObject();
-            extension.readFields(in, m);
-        }
     }
 
 

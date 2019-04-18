@@ -78,8 +78,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private SynapseSummary synapseSummary = new SynapseSummary();
 
-    private Writable extension;
-
     ActivationFunction activationFunction;
 
 
@@ -202,11 +200,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public ActivationFunction getActivationFunction() {
         return activationFunction;
-    }
-
-
-    public <T extends Writable> T getExtension() {
-        return (T) extension;
     }
 
 
@@ -378,10 +371,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         this.activationFunction = actF;
 
         setOutputText(outputText);
-
-        if(m.getNeuronExtensionFactory() != null) {
-            extension = m.getNeuronExtensionFactory().createObject();
-        }
 
         threads = new ThreadState[m.numberOfThreads];
 
@@ -580,11 +569,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             out.writeUTF(outputText);
         }
 
-        out.writeBoolean(extension != null);
-        if(extension != null) {
-            extension.write(out);
-        }
-
         out.writeDouble(bias);
 
         synapseSummary.write(out);
@@ -641,11 +625,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         if(in.readBoolean()) {
             outputText = in.readUTF();
-        }
-
-        if(in.readBoolean()) {
-            extension = m.getNeuronExtensionFactory().createObject();
-            extension.readFields(in, m);
         }
 
         bias = in.readDouble();
