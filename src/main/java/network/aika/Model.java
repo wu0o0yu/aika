@@ -23,6 +23,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.INeuron.Type;
 import network.aika.neuron.Neuron;
 import network.aika.Provider.SuspensionMode;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Linker;
 import network.aika.neuron.activation.SearchNode;
 
@@ -54,7 +55,11 @@ public class Model {
 
     public SuspensionHook suspensionHook;
 
-    public LinkerFactory linkerFactory = (doc) -> new Linker(doc);
+
+    protected SynapseFactory synapseFactory =  (input, output, id) -> new Synapse(input, output, id);
+    protected NeuronFactory neuronFactory = (label, outputText, type, actF) -> new INeuron(this, label, outputText, type, actF);
+    protected LinkerFactory linkerFactory = (doc) -> new Linker(doc);
+
     public SearchNode.SkipSelectStep skipSelectStep = (act) -> false;
 
     public AtomicInteger docIdCounter = new AtomicInteger(0);
@@ -67,10 +72,7 @@ public class Model {
     public Map<Integer, PassiveInputFunction> passiveActivationFunctions = new TreeMap<>();
 
     public int defaultThreadId = 0;
-
-
     public static AtomicLong visitedCounter = new AtomicLong(1);
-
 
     /**
      * Creates a model with a single thread.
@@ -89,6 +91,22 @@ public class Model {
         suspensionHook = sh;
     }
 
+
+    public SynapseFactory getSynapseFactory() {
+        return synapseFactory;
+    }
+
+    public void setSynapseFactory(SynapseFactory synapseFactory) {
+        this.synapseFactory = synapseFactory;
+    }
+
+    public NeuronFactory getNeuronFactory() {
+        return neuronFactory;
+    }
+
+    public void setNeuronFactory(NeuronFactory neuronFactory) {
+        this.neuronFactory = neuronFactory;
+    }
 
     public SuspensionHook getSuspensionHook() {
         return suspensionHook;
@@ -129,13 +147,13 @@ public class Model {
 
 
     public Neuron createNeuron(String label, String outputText) {
-        INeuron n = new INeuron(this, label, outputText, INPUT, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT);
+        INeuron n = neuronFactory.createNeuron(label, outputText, INPUT, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT);
         return n.getProvider();
     }
 
 
     public Neuron createNeuron(String label, String outputText, Type type, ActivationFunction actF) {
-        INeuron n = new INeuron(this, label, outputText, type, actF);
+        INeuron n = neuronFactory.createNeuron(label, outputText, type, actF);
         return n.getProvider();
     }
 
@@ -271,9 +289,13 @@ public class Model {
     }
 
 
-    public interface WritableFactory {
+    public interface SynapseFactory {
+        Synapse createSynapse(Neuron input, Neuron output, Integer id);
+    }
 
-        Writable createObject();
+
+    public interface NeuronFactory {
+        INeuron createNeuron(String label, String outputText, Type type, ActivationFunction actF);
     }
 
     public interface LinkerFactory {

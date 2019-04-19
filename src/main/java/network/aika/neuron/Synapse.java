@@ -20,7 +20,6 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Document;
 import network.aika.neuron.relation.Relation;
-import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.Writable;
 
 import java.io.DataInput;
@@ -432,7 +431,7 @@ public class Synapse implements Writable {
         outputNeuron.lock.releaseWriteLock();
 
         if(synapse == null) {
-            synapse = new Synapse(inputNeuron, outputNeuron, synapseId);
+            synapse = doc.getModel().getSynapseFactory().createSynapse(inputNeuron, outputNeuron, synapseId);
         } else {
             synapse.input = inputNeuron;
             synapse.output = outputNeuron;
