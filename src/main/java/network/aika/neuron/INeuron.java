@@ -474,10 +474,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         for (Synapse s : modifiedSynapses) {
             s.commit();
-
-            if(s.isZero()) {
-                s.unlink();
-            }
         }
 
         synapseSummary.commit();
