@@ -284,6 +284,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
+    public Model getModel() {
+        return provider.getModel();
+    }
+
+
     public Stream<Activation> getActivations(Document doc, int fromSlot, Position fromPos, boolean fromInclusive, int toSlot, Position toPos, boolean toInclusive) {
         ThreadState th = getThreadState(doc.getThreadId(), false);
         if(th == null) {
