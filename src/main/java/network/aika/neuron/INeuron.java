@@ -864,15 +864,15 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
         public void updateSynapse(Synapse s) {
-            if (!s.isInactive()) {
-                updateSynapse(CURRENT, s);
-                updateSynapse(NEXT, s);
+            if (!s.isInactive(CURRENT)) {
+                updateSynapse(CURRENT, -1.0, s);
+            }
+            if (!s.isInactive(NEXT)) {
+                updateSynapse(NEXT, 1.0, s);
             }
         }
 
-        private void updateSynapse(Synapse.State state, Synapse s) {
-            double sign = (state == CURRENT ? -1.0 : 1.0);
-
+        private void updateSynapse(Synapse.State state, double sign, Synapse s) {
             updateSum(s.isRecurrent(), s.isNegative(state), sign * (s.getLimit(state) * s.getWeight(state)));
 
             if(s.getInput().get().isPassiveInputNeuron() && !s.isNegative(state)) {

@@ -156,8 +156,13 @@ public class Synapse implements Writable {
         this.distanceFunction = distanceFunction;
     }
 
+
     public boolean isInactive() {
         return inactive;
+    }
+
+    public boolean isInactive(State s) {
+        return s == CURRENT ? inactive : inactiveNew;
     }
 
     public void setInactive(State s, boolean inactive) {
