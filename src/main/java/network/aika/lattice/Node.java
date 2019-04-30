@@ -76,6 +76,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      */
     private static class ThreadState<A extends NodeActivation> {
         public long lastUsed;
+        public Document doc;
 
         public List<A> added;
         public List<A> activations;
@@ -202,6 +203,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         assert act.getNode() == this;
 
         ThreadState th = getThreadState(doc.getThreadId(), true);
+        if(th.doc == null) {
+            th.doc = doc;
+        }
+        if(th.doc != doc) {
+            throw new Model.StaleDocumentException();
+        }
+
         if (th.activations.isEmpty()) {
             doc.addActivatedNode(act.getNode());
         }
@@ -223,6 +231,8 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         th.activations.clear();
 
         th.added.clear();
+
+        th.doc = null;
     }
 
 
@@ -273,6 +283,13 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
      */
     public void addActivation(A act) {
         ThreadState<A> th = getThreadState(act.getThreadId(), true);
+        if(th.doc == null) {
+            th.doc = act.doc;
+        }
+        if(th.doc != act.doc) {
+            throw new Model.StaleDocumentException();
+        }
+
         th.added.add(act);
         act.getDocument().getNodeQueue().add(this);
     }

@@ -181,7 +181,7 @@ public class Model {
 
         if (txt != null) {
             if (docs[threadId] != null) {
-                throw new RuntimeException("Two documents are using the same thread. Call clearActivations() first, before processing the next document.");
+                throw new StaleDocumentException();
             }
             docs[threadId] = doc;
         }
@@ -298,5 +298,13 @@ public class Model {
     public interface LinkerFactory {
 
         Linker createLinker(Document doc);
+    }
+
+
+    public static class StaleDocumentException extends RuntimeException {
+
+        public StaleDocumentException() {
+            super("Two documents are using the same thread. Call clearActivations() first, before processing the next document.");
+        }
     }
 }

@@ -115,6 +115,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      */
     private static class ThreadState {
         public long lastUsed;
+        public Document doc;
 
         private TreeMap<ActKey, Activation> activationsBySlotAndPosition;
         private TreeMap<Integer, Activation> activations;
@@ -194,6 +195,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public boolean addActivation(Activation act) {
         ThreadState th = getThreadState(act.getThreadId(), true);
+        if(th.doc == null) {
+            th.doc = act.getDocument();
+        }
+        if(th.doc != act.getDocument()) {
+            throw new Model.StaleDocumentException();
+        }
 
         boolean first = th.activationsBySlotAndPosition.isEmpty();
 
@@ -249,6 +256,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
         th.activationsBySlotAndPosition.clear();
         th.activations.clear();
+        th.doc = null;
     }
 
 
@@ -270,6 +278,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         if (th == null) return;
         th.activationsBySlotAndPosition.clear();
         th.activations.clear();
+        th.doc = null;
     }
 
 
