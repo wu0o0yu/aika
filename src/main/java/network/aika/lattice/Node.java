@@ -205,14 +205,12 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         ThreadState th = getThreadState(doc.getThreadId(), true);
         if(th.doc == null) {
             th.doc = doc;
+            doc.addActivatedNode(act.getNode());
         }
         if(th.doc != doc) {
             throw new Model.StaleDocumentException();
         }
 
-        if (th.activations.isEmpty()) {
-            doc.addActivatedNode(act.getNode());
-        }
         th.activations.add(act);
 
         doc.addedNodeActivations.add(act);
@@ -285,6 +283,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         ThreadState<A> th = getThreadState(act.getThreadId(), true);
         if(th.doc == null) {
             th.doc = act.doc;
+            act.doc.addActivatedNode(act.getNode());
         }
         if(th.doc != act.doc) {
             throw new Model.StaleDocumentException();
