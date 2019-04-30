@@ -96,8 +96,6 @@ public final class Activation implements Comparable<Activation> {
     private Double targetValue;
     private Double inputValue;
 
-    private Writable extension;
-
     Decision inputDecision = Decision.UNKNOWN;
     Decision decision = Decision.UNKNOWN;
     Decision finalDecision = Decision.UNKNOWN;
@@ -121,10 +119,6 @@ public final class Activation implements Comparable<Activation> {
         this.doc = doc;
         this.neuron = neuron;
         this.slots = slots;
-
-        if(doc != null && doc.getModel().getActivationExtensionFactory() != null) {
-            extension = doc.getModel().getActivationExtensionFactory().createObject();
-        }
 
         neuron.register(this);
     }
@@ -992,7 +986,6 @@ public final class Activation implements Comparable<Activation> {
 
     public String toString() {
         return id + " " + getNeuron().getId() + ":" + getLabel() + " " + slotsToString() + " " + identityToString() + " - " +
-                (extension != null ? extension.toString() + " -" : "") +
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
                 (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +
@@ -1021,10 +1014,6 @@ public final class Activation implements Comparable<Activation> {
         sb.append(" - ");
 
         sb.append(getLabel());
-
-        if(extension != null) {
-            sb.append(" - " + extension);
-        }
 
         if(DEBUG_OUTPUT) {
             sb.append(" - UB:");

@@ -78,8 +78,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private SynapseSummary synapseSummary = new SynapseSummary();
 
-    private Writable extension;
-
     ActivationFunction activationFunction;
 
 
@@ -206,11 +204,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public <T extends Writable> T getExtension() {
-        return (T) extension;
-    }
-
-
     public Stream<Activation> getActivations(Document doc) {
         ThreadState th = getThreadState(doc.getThreadId(), false);
         if(th == null) {
@@ -270,6 +263,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         th.activationsBySlotAndPosition.clear();
         th.activations.clear();
         th.doc = null;
+    }
+
+
+    public Model getModel() {
+        return provider.getModel();
     }
 
 
@@ -360,10 +358,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         this.activationFunction = actF;
 
         setOutputText(outputText);
-
-        if(m.getNeuronExtensionFactory() != null) {
-            extension = m.getNeuronExtensionFactory().createObject();
-        }
 
         threads = new ThreadState[m.numberOfThreads];
 
@@ -467,10 +461,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         for (Synapse s : modifiedSynapses) {
             s.commit();
-
-            if(s.isZero()) {
-                s.unlink();
-            }
         }
 
         synapseSummary.commit();
@@ -562,11 +552,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             out.writeUTF(outputText);
         }
 
-        out.writeBoolean(extension != null);
-        if(extension != null) {
-            extension.write(out);
-        }
-
         out.writeDouble(bias);
 
         synapseSummary.write(out);
@@ -623,11 +608,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         if(in.readBoolean()) {
             outputText = in.readUTF();
-        }
-
-        if(in.readBoolean()) {
-            extension = m.getNeuronExtensionFactory().createObject();
-            extension.readFields(in, m);
         }
 
         bias = in.readDouble();
@@ -883,15 +863,15 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
         public void updateSynapse(Synapse s) {
-            if (!s.isInactive()) {
-                updateSynapse(CURRENT, s);
-                updateSynapse(NEXT, s);
+            if (!s.isInactive(CURRENT)) {
+                updateSynapse(CURRENT, -1.0, s);
+            }
+            if (!s.isInactive(NEXT)) {
+                updateSynapse(NEXT, 1.0, s);
             }
         }
 
-        private void updateSynapse(Synapse.State state, Synapse s) {
-            double sign = (state == CURRENT ? -1.0 : 1.0);
-
+        private void updateSynapse(Synapse.State state, double sign, Synapse s) {
             updateSum(s.isRecurrent(), s.isNegative(state), sign * (s.getLimit(state) * s.getWeight(state)));
 
             if(s.getInput().get().isPassiveInputNeuron() && !s.isNegative(state)) {
