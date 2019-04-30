@@ -807,13 +807,13 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             th.maxLength = Math.max(th.maxLength, l);
         }
 
-        for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
+        for(Map.Entry<Integer, Position> me: act.getSlots().entrySet()) {
             ActKey ak = new ActKey(me.getKey(), me.getValue(), act.getId());
             th.activationsBySlotAndPosition.put(ak, act);
             th.activations.put(act.getId(), act);
         }
 
-        for(Map.Entry<Integer, Position> me: act.slots.entrySet()) {
+        for(Map.Entry<Integer, Position> me: act.getSlots().entrySet()) {
             me.getValue().addActivation(me.getKey(), act);
         }
 
