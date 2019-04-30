@@ -113,6 +113,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
      */
     private static class ThreadState {
         public long lastUsed;
+        public Document doc;
 
         private TreeMap<ActKey, Activation> activationsBySlotAndPosition;
         private TreeMap<Integer, Activation> activations;
@@ -210,27 +211,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public boolean addActivation(Activation act) {
-        ThreadState th = getThreadState(act.getThreadId(), true);
-
-        boolean first = th.activationsBySlotAndPosition.isEmpty();
-
-        Integer l = act.length();
-        if(l != null) {
-            th.minLength = Math.min(th.minLength, l);
-            th.maxLength = Math.max(th.maxLength, l);
-        }
-
-        for(Map.Entry<Integer, Position> me: act.getSlots().entrySet()) {
-            ActKey ak = new ActKey(me.getKey(), me.getValue(), act.getId());
-            th.activationsBySlotAndPosition.put(ak, act);
-            th.activations.put(act.getId(), act);
-        }
-
-        return first;
-    }
-
-
     public Stream<Activation> getActivations(Document doc) {
         ThreadState th = getThreadState(doc.getThreadId(), false);
         if(th == null) {
@@ -267,6 +247,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
         th.activationsBySlotAndPosition.clear();
         th.activations.clear();
+        th.doc = null;
     }
 
 
@@ -288,6 +269,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         if (th == null) return;
         th.activationsBySlotAndPosition.clear();
         th.activations.clear();
+        th.doc = null;
     }
 
 
@@ -767,8 +749,25 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public void register(Activation act) {
         Document doc = act.getDocument();
 
-        if (addActivation(act)) {
+        ThreadState th = getThreadState(act.getThreadId(), true);
+        if(th.doc == null) {
+            th.doc = doc;
             doc.addActivatedNeuron(act.getINeuron());
+        }
+        if(th.doc != doc) {
+            throw new Model.StaleDocumentException();
+        }
+
+        Integer l = act.length();
+        if(l != null) {
+            th.minLength = Math.min(th.minLength, l);
+            th.maxLength = Math.max(th.maxLength, l);
+        }
+
+        for(Map.Entry<Integer, Position> me: act.getSlots().entrySet()) {
+            ActKey ak = new ActKey(me.getKey(), me.getValue(), act.getId());
+            th.activationsBySlotAndPosition.put(ak, act);
+            th.activations.put(act.getId(), act);
         }
 
         for(Map.Entry<Integer, Position> me: act.getSlots().entrySet()) {
