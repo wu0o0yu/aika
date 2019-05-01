@@ -445,7 +445,7 @@ public class Synapse implements Writable {
         outputNeuron.lock.releaseWriteLock();
 
         if(synapse == null) {
-            synapse = doc.getModel().getSynapseFactory().createSynapse(inputNeuron, outputNeuron, synapseId);
+            synapse = outputNeuron.getModel().getSynapseFactory().createSynapse(inputNeuron, outputNeuron, synapseId);
         } else {
             synapse.input = inputNeuron;
             synapse.output = outputNeuron;
