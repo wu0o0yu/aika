@@ -39,11 +39,11 @@ public abstract class PositionRelation extends Relation {
 
     @Override
     public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
-        Position toPos = linkedAct.getSlot(toSlot);
+        Position toPos = linkedAct.lookupSlot(toSlot);
         if(allowUndefined && toPos == null) {
             return true;
         }
-        return optional || test(act.getSlot(fromSlot), toPos);
+        return optional || test(act.lookupSlot(fromSlot), toPos);
     }
 
 
@@ -95,7 +95,7 @@ public abstract class PositionRelation extends Relation {
 
     @Override
     public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-        Position pos = linkedAct.getSlot(toSlot);
+        Position pos = linkedAct.lookupSlot(toSlot);
         if(pos == null) {
             return Stream.empty();
         }
@@ -148,7 +148,7 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public void mapSlots(Map<Integer, Position> slots, Activation act) {
-            slots.put(toSlot, act.getSlot(fromSlot));
+            slots.put(toSlot, act.lookupSlot(fromSlot));
         }
 
         @Override

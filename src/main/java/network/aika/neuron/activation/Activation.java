@@ -3,7 +3,6 @@ package network.aika.neuron.activation;
 import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Utils;
-import network.aika.Writable;
 import network.aika.lattice.InputNode.InputActivation;
 import network.aika.lattice.OrNode.OrActivation;
 import network.aika.neuron.INeuron;
@@ -30,7 +29,6 @@ import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
 import static network.aika.neuron.INeuron.ALLOW_WEAK_NEGATIVE_WEIGHTS;
 import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
 import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.Synapse.State.NEXT;
 
 
 /**
@@ -146,8 +144,14 @@ public final class Activation implements Comparable<Activation> {
         return slots;
     }
 
-    public Position getSlot(int slot) {
-        return slots.get(slot);
+    public Position lookupSlot(int slot) {
+        Position pos = slots.get(slot);
+        if(pos == null) {
+            pos = new Position(doc);
+            slots.put(slot, pos);
+        }
+
+        return pos;
     }
 
 
@@ -209,7 +213,7 @@ public final class Activation implements Comparable<Activation> {
     }
 
     public String getText() {
-        return doc.getText(getSlot(BEGIN), getSlot(END));
+        return doc.getText(lookupSlot(BEGIN), lookupSlot(END));
     }
 
 
@@ -326,7 +330,7 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
-    public double process(SearchNode sn, int round, long v) {
+    public double process(SearchNode sn, int round, long v) throws OscillatingActivationsException, RecursiveDepthExceededException {
         double delta = 0.0;
         State s;
         if(inputValue != null) {
@@ -346,10 +350,7 @@ public final class Activation implements Comparable<Activation> {
 
             if (propagate) {
                 if(round > MAX_ROUND) {
-                    log.error("Error: Maximum number of rounds reached. The network might be oscillating.");
-
-                    doc.dumpOscillatingActivations();
-                    throw new RuntimeException("Maximum number of rounds reached. The network might be oscillating.");
+                    throw new OscillatingActivationsException(doc.dumpOscillatingActivations());
                 } else {
                     if(Document.ROUND_LIMIT < 0 || round < Document.ROUND_LIMIT) {
                         doc.getValueQueue().propagateActivationValue(round, this);
@@ -370,7 +371,7 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
-    public State computeValueAndWeight(int round) {
+    public State computeValueAndWeight(int round) throws RecursiveDepthExceededException {
         INeuron n = getINeuron();
         SynapseSummary ss = n.getSynapseSummary();
 
@@ -479,7 +480,7 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
-    public void processBounds() {
+    public void processBounds() throws RecursiveDepthExceededException {
         double oldUpperBound = upperBound;
 
         computeBounds();
@@ -496,7 +497,7 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
-    public void computeBounds() {
+    public void computeBounds() throws RecursiveDepthExceededException {
         INeuron n = getINeuron();
         SynapseSummary ss = n.getSynapseSummary();
 
@@ -670,7 +671,7 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
-    public Collection<Activation> getConflicts() {
+    public Collection<Activation> getConflicts() throws RecursiveDepthExceededException {
         if(conflicts != null) {
             return conflicts;
         }
@@ -802,9 +803,9 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
-    public void markPredecessor(long v, int depth) {
+    public void markPredecessor(long v, int depth) throws RecursiveDepthExceededException {
         if(depth > MAX_PREDECESSOR_DEPTH) {
-            throw new RuntimeException("MAX_PREDECESSOR_DEPTH limit exceeded. Probable cause is a non recurrent loop.");
+            throw new RecursiveDepthExceededException();
         }
 
         markedPredecessor = v;
@@ -1006,7 +1007,7 @@ public final class Activation implements Comparable<Activation> {
         if (getINeuron().getOutputText() != null) {
             sb.append(Utils.collapseText(getINeuron().getOutputText(), 7));
         } else {
-            sb.append(Utils.collapseText(doc.getText(getSlot(BEGIN), getSlot(END)), 7));
+            sb.append(Utils.collapseText(doc.getText(lookupSlot(BEGIN), lookupSlot(END)), 7));
         }
         sb.append("\"");
 
@@ -1354,6 +1355,31 @@ public final class Activation implements Comparable<Activation> {
                 slots.put(me.getKey(), doc.lookupFinalPosition(me.getValue()));
             }
             return slots;
+        }
+    }
+
+
+    public static class OscillatingActivationsException extends RuntimeException {
+
+        private String activationsDump;
+
+        public OscillatingActivationsException(String activationsDump) {
+            super("Maximum number of rounds reached. The network might be oscillating.");
+
+            this.activationsDump = activationsDump;
+        }
+
+
+        public String getActivationsDump() {
+            return activationsDump;
+        }
+    }
+
+
+    public static class RecursiveDepthExceededException extends RuntimeException {
+
+        public RecursiveDepthExceededException() {
+            super("MAX_PREDECESSOR_DEPTH limit exceeded. Probable cause is a non recurrent loop.");
         }
     }
 }

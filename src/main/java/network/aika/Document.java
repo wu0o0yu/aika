@@ -25,9 +25,11 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.Option;
+import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 import network.aika.neuron.activation.Candidate;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.SearchNode;
+import network.aika.neuron.activation.SearchNode.TimeoutException;
 import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,7 +136,7 @@ public class Document implements Comparable<Document> {
 
 
     public static Comparator<Activation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
-        int r = Position.compare(act1.getSlot(Activation.BEGIN), act2.getSlot(Activation.BEGIN));
+        int r = Position.compare(act1.lookupSlot(Activation.BEGIN), act2.lookupSlot(Activation.BEGIN));
         if (r != 0) return r;
         r = act1.getINeuron().compareTo(act2.getINeuron());
         if (r != 0) return r;
@@ -349,7 +351,7 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public void generateCandidates() {
+    public void generateCandidates() throws CyclicDependencyException {
         TreeSet<Candidate> tmp = new TreeSet<>();
         int i = 0;
 
@@ -385,9 +387,7 @@ public class Document implements Comparable<Document> {
             }
 
             if(tmp.size() == oldSize) {
-                log.error("Cycle detected in the activations that is not marked recurrent.");
-
-                throw new RuntimeException("Cycle detected in the activations that is not marked recurrent.");
+                throw new CyclicDependencyException();
             }
         }
     }
@@ -397,12 +397,12 @@ public class Document implements Comparable<Document> {
      * The method <code>process</code> needs to be called after all the input activations have been added to the
      * network. It performs the search for the best interpretation.
      */
-    public void process() {
+    public void process() throws TimeoutException, CyclicDependencyException, OscillatingActivationsException {
         process(null);
     }
 
 
-    public void process(Long timeoutInMilliSeconds) throws SearchNode.TimeoutException {
+    public void process(Long timeoutInMilliSeconds) throws TimeoutException, CyclicDependencyException, OscillatingActivationsException {
         linker.lateLinking();
 
         inputNeuronActivations.forEach(act -> valueQueue.propagateActivationValue(0, act));
@@ -425,12 +425,12 @@ public class Document implements Comparable<Document> {
 
         if(SearchNode.COMPUTE_SOFT_MAX) {
             SearchNode.computeCachedFactor(rootNode);
-            computeSoftMax(rootNode);
+            computeSoftMax();
         }
     }
 
 
-    private void computeSoftMax(SearchNode rootNode) {
+    private void computeSoftMax() {
         for (Activation act : activationsById.values()) {
             double offset = Double.MAX_VALUE;
             for (Option option : act.getOptions()) {
@@ -526,8 +526,8 @@ public class Document implements Comparable<Document> {
         TreeSet<Position> queue = new TreeSet<>(Comparator.comparingInt(p -> p.getId()));
 
         for(Activation act: activationsById.values()) {
-            if(act.getINeuron().getOutputText() != null && act.getSlot(Activation.BEGIN).getFinalPosition() != null && act.getSlot(Activation.END).getFinalPosition() == null) {
-                queue.add(act.getSlot(Activation.BEGIN));
+            if(act.getINeuron().getOutputText() != null && act.lookupSlot(Activation.BEGIN).getFinalPosition() != null && act.lookupSlot(Activation.END).getFinalPosition() == null) {
+                queue.add(act.lookupSlot(Activation.BEGIN));
             }
         }
 
@@ -538,10 +538,10 @@ public class Document implements Comparable<Document> {
                     .filter(act -> act.getINeuron().getOutputText() != null && act.isFinalActivation())
                     .forEach(act -> {
                         String outText = act.getINeuron().getOutputText();
-                        Position nextPos = act.getSlot(Activation.END);
+                        Position nextPos = act.lookupSlot(Activation.END);
                         nextPos.setFinalPosition(pos.getFinalPosition() + outText.length());
 
-                        content.replace(act.getSlot(Activation.BEGIN).getFinalPosition(), act.getSlot(Activation.END).getFinalPosition(), outText);
+                        content.replace(act.lookupSlot(Activation.BEGIN).getFinalPosition(), act.lookupSlot(Activation.END).getFinalPosition(), outText);
 
                         queue.add(nextPos);
                     });
@@ -587,14 +587,24 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public void dumpOscillatingActivations() {
+    public String dumpOscillatingActivations() {
+        StringBuilder sb = new StringBuilder();
         activatedNeurons.stream()
                 .flatMap(n -> n.getActivations(this, false))
                 .filter(act -> act.isOscillating())
                 .forEach(act -> {
-                    log.error(act.getId() + " " + act.slotsToString() + " " + act.getDecision());
-                    log.error(act.linksToString());
-                    log.error("");
+                    sb.append(act.getId() + " " + act.slotsToString() + " " + act.getDecision() + "\n");
+                    sb.append(act.linksToString() + "\n");
+                    sb.append("\n");
                 });
+        return sb.toString();
+    }
+
+
+    public static class CyclicDependencyException extends RuntimeException {
+
+        public CyclicDependencyException() {
+            super("Cycle detected in the activations that is not marked recurrent.");
+        }
     }
 }

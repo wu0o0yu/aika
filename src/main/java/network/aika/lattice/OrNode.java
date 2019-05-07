@@ -34,6 +34,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Predicate;
 
 import static network.aika.neuron.Synapse.OUTPUT;
 
@@ -74,8 +75,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
         Document doc = inputAct.getDocument();
         INeuron n = outputNeuron.get(doc);
 
-        Activation act = lookupActivation(ol);
-        /*Activation act = n.lookupActivation(doc, slots, l -> {
+        Activation act = lookupActivation(ol, l -> {
             Synapse s = l.getSynapse();
             if(!s.isIdentity()) return true;
 
@@ -83,7 +83,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
             Activation iAct = doc.getLinker().computeInputActivation(s, inputAct.getInputActivation(i));
             return i != null && l.getInput() == iAct;
         });
-*/
+
         if(act == null) {
             OrActivation orAct = new OrActivation(doc, this);
             register(orAct);
@@ -103,7 +103,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
     }
 
 
-    private Activation lookupActivation(Link ol) {
+    private Activation lookupActivation(Link ol, Predicate<Activation.Link> filter) {
         for(Activation.Link l: ol.getInputLinks(outputNeuron)) {
             for(Map.Entry<Integer, Relation> me: l.getSynapse().getRelations().entrySet()) {
                 Integer relSynId = me.getKey();
@@ -129,7 +129,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
                             .orElse(null);
                 }
 
-                if(existingAct != null) {
+                if(existingAct != null && existingAct.match(filter)) {
                     return existingAct;
                 }
             }
