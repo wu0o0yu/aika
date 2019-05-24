@@ -426,15 +426,7 @@ public class Synapse implements Writable {
     }
 
 
-    public static Synapse read(DataInput in, Model m) throws IOException {
-        Synapse s = new Synapse();
-        s.readFields(in, m);
-        return s;
-    }
-
-
-
-    public static Synapse createOrReplace(Document doc, Integer synapseId, Neuron inputNeuron, Neuron outputNeuron) {
+    public static Synapse createOrReplace(Document doc, Integer synapseId, Neuron inputNeuron, Neuron outputNeuron, SynapseFactory synapseFactory) {
         outputNeuron.get(doc);
         inputNeuron.get(doc);
         outputNeuron.lock.acquireWriteLock();
@@ -445,7 +437,7 @@ public class Synapse implements Writable {
         outputNeuron.lock.releaseWriteLock();
 
         if(synapse == null) {
-            synapse = outputNeuron.getModel().getSynapseFactory().createSynapse(inputNeuron, outputNeuron, synapseId);
+            synapse = synapseFactory.createSynapse(inputNeuron, outputNeuron, synapseId);
         } else {
             synapse.input = inputNeuron;
             synapse.output = outputNeuron;
@@ -580,7 +572,7 @@ public class Synapse implements Writable {
 
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            Synapse s = createOrReplace(null, synapseId, neuron, outputNeuron);
+            Synapse s = createOrReplace(null, synapseId, neuron, outputNeuron, (input, output, id) -> new Synapse(input, output, id));
 
             s.isRecurrent = recurrent;
             s.identity = identity;
@@ -588,5 +580,9 @@ public class Synapse implements Writable {
 
             return s;
         }
+    }
+
+    public interface SynapseFactory {
+        Synapse createSynapse(Neuron input, Neuron output, Integer id);
     }
 }

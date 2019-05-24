@@ -160,9 +160,14 @@ public class Document implements Comparable<Document> {
 
         this.model = model;
         this.threadId = threadId;
-        this.linker = model.getLinkerFactory().createLinker(this);
+        this.linker = initLinker();
 
         model.acquireThread(threadId, this);
+    }
+
+
+    protected Linker initLinker() {
+        return new Linker(this);
     }
 
 

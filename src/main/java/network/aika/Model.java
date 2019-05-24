@@ -26,6 +26,9 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Linker;
 import network.aika.neuron.activation.SearchNode;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -53,10 +56,6 @@ public class Model {
     public Document[] docs;
 
     public SuspensionHook suspensionHook;
-
-
-    protected SynapseFactory synapseFactory =  (input, output, id) -> new Synapse(input, output, id);
-    protected LinkerFactory linkerFactory = (doc) -> new Linker(doc);
 
     public SearchNode.SkipSelectStep skipSelectStep = (act) -> false;
 
@@ -90,14 +89,6 @@ public class Model {
     }
 
 
-    public SynapseFactory getSynapseFactory() {
-        return synapseFactory;
-    }
-
-    public void setSynapseFactory(SynapseFactory synapseFactory) {
-        this.synapseFactory = synapseFactory;
-    }
-
     public SuspensionHook getSuspensionHook() {
         return suspensionHook;
     }
@@ -105,15 +96,6 @@ public class Model {
 
     public void setSuspensionHook(SuspensionHook suspensionHook) {
         this.suspensionHook = suspensionHook;
-    }
-
-
-    public LinkerFactory getLinkerFactory() {
-        return linkerFactory;
-    }
-
-    public void setLinkerFactory(LinkerFactory linkerFactory) {
-        this.linkerFactory = linkerFactory;
     }
 
 
@@ -147,6 +129,25 @@ public class Model {
 
     public Neuron createNeuron(String label, Type type, ActivationFunction actF, String outputText) {
         return new INeuron(this, label, outputText, type, actF).getProvider();
+    }
+
+
+    public INeuron readNeuron(DataInput in, Neuron p) throws IOException {
+        INeuron n = new INeuron(p);
+        n.readFields(in, this);
+        return n;
+    }
+
+
+    public Synapse readSynapse(DataInput in) throws IOException {
+        Synapse s = new Synapse();
+        s.readFields(in, this);
+        return s;
+    }
+
+
+    public void writeSynapse(Synapse s, DataOutput out) throws IOException {
+        s.write(out);
     }
 
 
@@ -272,17 +273,6 @@ public class Model {
         synchronized (providers) {
             providers.remove(p.id);
         }
-    }
-
-
-    public interface SynapseFactory {
-        Synapse createSynapse(Neuron input, Neuron output, Integer id);
-    }
-
-
-    public interface LinkerFactory {
-
-        Linker createLinker(Document doc);
     }
 
 

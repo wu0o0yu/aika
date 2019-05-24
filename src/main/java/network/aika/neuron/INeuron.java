@@ -362,6 +362,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
+    public INeuron(Neuron p) {
+        provider = p;
+        threads = new INeuron.ThreadState[p.getModel().numberOfThreads];
+    }
+
+
     public INeuron(Model m, String label, Type type, ActivationFunction actF) {
         this(m, label, null, type, actF);
     }
@@ -575,7 +581,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         for (Synapse s : inputSynapses.values()) {
             if (s.getInput() != null) {
                 out.writeBoolean(true);
-                s.write(out);
+                getModel().writeSynapse(s, out);
 
                 out.writeBoolean(passiveInputSynapses != null && passiveInputSynapses.containsKey(s));
             }
@@ -584,7 +590,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         for (Synapse s : outputSynapses.values()) {
             if (s.getOutput() != null) {
                 out.writeBoolean(true);
-                s.write(out);
+                getModel().writeSynapse(s, out);
             }
         }
         out.writeBoolean(false);
@@ -630,7 +636,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         synapseIdCounter = in.readInt();
         while (in.readBoolean()) {
-            Synapse syn = Synapse.read(in, m);
+            Synapse syn = m.readSynapse(in);
             inputSynapses.put(syn, syn);
 
             if(in.readBoolean()) {
@@ -639,7 +645,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         while (in.readBoolean()) {
-            Synapse syn = Synapse.read(in, m);
+            Synapse syn = m.readSynapse(in);
             outputSynapses.put(syn, syn);
         }
 
@@ -761,15 +767,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
 
         doc.addActivation(act);
-    }
-
-
-    public static INeuron readNeuron(DataInput in, Neuron p) throws IOException {
-        INeuron n = new INeuron();
-        n.provider = p;
-        n.threads = new ThreadState[p.getModel().numberOfThreads];
-        n.readFields(in, p.getModel());
-        return n;
     }
 
 

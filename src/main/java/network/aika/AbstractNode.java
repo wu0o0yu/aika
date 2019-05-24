@@ -51,7 +51,7 @@ public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> i
     public static <P extends Provider> AbstractNode read(DataInput in, P p) throws IOException {
         AbstractNode n;
         if(in.readBoolean()) {
-            n = INeuron.readNeuron(in, (Neuron) p);
+            n = p.getModel().readNeuron(in, (Neuron) p);
         } else {
             n = Node.readNode(in, p);
         }
