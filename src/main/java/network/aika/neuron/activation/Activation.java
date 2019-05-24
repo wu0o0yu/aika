@@ -775,7 +775,7 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
-    State getFinalState() {
+    public State getFinalState() {
         return finalRounds.getLast();
     }
 
