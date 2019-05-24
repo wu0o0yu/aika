@@ -56,7 +56,6 @@ public class Model {
 
 
     protected SynapseFactory synapseFactory =  (input, output, id) -> new Synapse(input, output, id);
-    protected NeuronFactory neuronFactory = (label, outputText, type, actF) -> new INeuron(this, label, outputText, type, actF);
     protected LinkerFactory linkerFactory = (doc) -> new Linker(doc);
 
     public SearchNode.SkipSelectStep skipSelectStep = (act) -> false;
@@ -99,14 +98,6 @@ public class Model {
         this.synapseFactory = synapseFactory;
     }
 
-    public NeuronFactory getNeuronFactory() {
-        return neuronFactory;
-    }
-
-    public void setNeuronFactory(NeuronFactory neuronFactory) {
-        this.neuronFactory = neuronFactory;
-    }
-
     public SuspensionHook getSuspensionHook() {
         return suspensionHook;
     }
@@ -135,25 +126,27 @@ public class Model {
     }
 
 
-    public Neuron createNeuron() {
-        return createNeuron(null);
+    public Neuron createNeuron(Type type) {
+        return createNeuron(null, type);
     }
 
 
-    public Neuron createNeuron(String label) {
-        return createNeuron(label, null);
+    public Neuron createNeuron(String label, Type type) {
+        return createNeuron(label, type, type.getDefaultActivationFunction(), null);
     }
 
 
-    public Neuron createNeuron(String label, String outputText) {
-        INeuron n = neuronFactory.createNeuron(label, outputText, INPUT, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT);
-        return n.getProvider();
+    public Neuron createNeuron(String label, Type type, ActivationFunction actF) {
+        return new INeuron(this, label, null, type, type.getDefaultActivationFunction()).getProvider();
+    }
+
+    public Neuron createNeuron(String label, Type type, String outputText) {
+        return new INeuron(this, label, outputText, type, type.getDefaultActivationFunction()).getProvider();
     }
 
 
-    public Neuron createNeuron(String label, String outputText, Type type, ActivationFunction actF) {
-        INeuron n = neuronFactory.createNeuron(label, outputText, type, actF);
-        return n.getProvider();
+    public Neuron createNeuron(String label, Type type, ActivationFunction actF, String outputText) {
+        return new INeuron(this, label, outputText, type, actF).getProvider();
     }
 
 
@@ -286,10 +279,6 @@ public class Model {
         Synapse createSynapse(Neuron input, Neuron output, Integer id);
     }
 
-
-    public interface NeuronFactory {
-        INeuron createNeuron(String label, String outputText, Type type, ActivationFunction actF);
-    }
 
     public interface LinkerFactory {
 

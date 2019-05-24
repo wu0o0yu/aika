@@ -21,14 +21,11 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 
@@ -42,16 +39,15 @@ public class OptionalAndTest {
     public void testOptionalAnd() {
         Model m = new Model(null, 2);
 
-        Neuron wordEssen = m.createNeuron("word:essen");
-        Neuron wordHamburg = m.createNeuron("word:hamburg");
-        Neuron wordGehen = m.createNeuron("word:gehen");
-        Neuron upperCase = m.createNeuron("upper case");
+        Neuron wordEssen = m.createNeuron("word:essen", INPUT);
+        Neuron wordHamburg = m.createNeuron("word:hamburg", INPUT);
+        Neuron wordGehen = m.createNeuron("word:gehen", INPUT);
+        Neuron upperCase = m.createNeuron("upper case", INPUT);
 
-        Neuron suppr = m.createNeuron("SUPPRESS");
+        Neuron suppr = m.createNeuron("SUPPRESS", INHIBITORY);
 
-        Neuron hintNoun = Neuron.init(m.createNeuron("HINT-NOUN"),
+        Neuron hintNoun = Neuron.init(m.createNeuron("HINT-NOUN", INHIBITORY),
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wordEssen)
@@ -71,9 +67,8 @@ public class OptionalAndTest {
                         .setTo(OUTPUT)
                         .setRelation(EQUALS)
         );
-        Neuron hintVerb = Neuron.init(m.createNeuron("HINT-VERB"),
+        Neuron hintVerb = Neuron.init(m.createNeuron("HINT-VERB", INHIBITORY),
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wordEssen)
@@ -95,9 +90,8 @@ public class OptionalAndTest {
         );
 
 
-        Neuron noun = Neuron.init(m.createNeuron("NOUN"),
+        Neuron noun = Neuron.init(m.createNeuron("NOUN", EXCITATORY),
                 0.501,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(hintNoun)
@@ -127,9 +121,8 @@ public class OptionalAndTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron verb = Neuron.init(m.createNeuron("VERB"),
+        Neuron verb = Neuron.init(m.createNeuron("VERB", EXCITATORY),
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(hintVerb)
@@ -152,7 +145,6 @@ public class OptionalAndTest {
 
         Neuron.init(suppr,
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(noun)
@@ -202,16 +194,14 @@ public class OptionalAndTest {
     public void testOnlyOptionalInputs() {
         Model model = new Model();
 
-        Neuron inA = model.createNeuron("A");
-        Neuron inB = model.createNeuron("B");
-        Neuron inC = model.createNeuron("C");
+        Neuron inA = model.createNeuron("A", INPUT);
+        Neuron inB = model.createNeuron("B", INPUT);
+        Neuron inC = model.createNeuron("C", INPUT);
 
-        Neuron testNeuron = model.createNeuron("Test");
+        Neuron testNeuron = model.createNeuron("Test", EXCITATORY);
 
         Neuron.init(testNeuron,
                 2.1,
-                RECTIFIED_HYPERBOLIC_TANGENT,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)

@@ -98,23 +98,11 @@ public class Neuron extends Provider<INeuron> {
 
 
     public static Neuron init(Document doc, Neuron n, Builder... inputs) {
-        if(n.init(doc, null, null, null, getSynapseBuilders(inputs), getRelationBuilders(inputs))) {
+        if(n.init(doc, null, getSynapseBuilders(inputs), getRelationBuilders(inputs))) {
             return n;
         } else return null;
     }
 
-    /**
-     * Creates a neuron with the given bias.
-     *
-     * @param n
-     * @param bias
-     * @param inputs
-     * @return
-     */
-    public static Neuron init(Neuron n, double bias, Type type, Builder... inputs) {
-        return init(n, bias, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
-    }
-
 
     /**
      * Creates a neuron with the given bias.
@@ -124,8 +112,8 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Document doc, Neuron n, double bias, Type type, Builder... inputs) {
-        return init(doc, n, bias, null, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
+    public static Neuron init(Neuron n, double bias, Builder... inputs) {
+        return init(n, bias, getSynapseBuilders(inputs), getRelationBuilders(inputs));
     }
 
 
@@ -137,41 +125,10 @@ public class Neuron extends Provider<INeuron> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Neuron n, double bias, ActivationFunction activationFunction, Type type, Builder... inputs) {
-        return init(n, bias, activationFunction, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
+    public static Neuron init(Document doc, Neuron n, double bias, Builder... inputs) {
+        return init(doc, n, bias, getSynapseBuilders(inputs), getRelationBuilders(inputs));
     }
 
-
-    /**
-     * Creates a neuron with the given bias.
-     *
-     * @param n
-     * @param bias
-     * @param inputs
-     * @return
-     */
-    public static Neuron init(Document doc, Neuron n, double bias, ActivationFunction activationFunction, Type type, Builder... inputs) {
-        return init(doc, n, bias, activationFunction, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
-    }
-
-    
-    /**
-     * Creates a neuron with the given bias.
-     *
-     * @param n
-     * @param bias
-     * @param synapseBuilders
-     * @param relationBuilders
-     * @return
-     */
-    public static Neuron init(Neuron n, double bias, Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
-        return init(n, bias, null, type, synapseBuilders, relationBuilders);
-    }
-
-
-    public static Neuron init(Neuron n, double bias, Type type, Collection<Neuron.Builder> inputs) {
-        return init(n, bias, null, type, getSynapseBuilders(inputs), getRelationBuilders(inputs));
-    }
 
 
     /**
@@ -183,14 +140,14 @@ public class Neuron extends Provider<INeuron> {
      * @param relationBuilders
      * @return
      */
-    public static Neuron init(Neuron n, double bias, ActivationFunction activationFunction, Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
-        if(n.init((Document) null, bias, activationFunction, type, synapseBuilders, relationBuilders)) return n;
+    public static Neuron init(Neuron n, double bias, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
+        if(n.init((Document) null, bias, synapseBuilders, relationBuilders)) return n;
         return null;
     }
 
 
-    public static Neuron init(Neuron n, double bias, ActivationFunction activationFunction, Type type, Collection<Neuron.Builder> inputs) {
-        if(n.init((Document) null, bias, activationFunction, type, getSynapseBuilders(inputs), getRelationBuilders(inputs))) return n;
+    public static Neuron init(Neuron n, double bias, Collection<Neuron.Builder> inputs) {
+        if(n.init((Document) null, bias, getSynapseBuilders(inputs), getRelationBuilders(inputs))) return n;
         return null;
     }
 
@@ -203,28 +160,20 @@ public class Neuron extends Provider<INeuron> {
      * @param relationBuilders
      * @return
      */
-    public static Neuron init(Document doc, Neuron n, double bias, ActivationFunction activationFunction, Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
-        if(n.init(doc, bias, activationFunction, type, synapseBuilders, relationBuilders)) return n;
+    public static Neuron init(Document doc, Neuron n, double bias, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
+        if(n.init(doc, bias, synapseBuilders, relationBuilders)) return n;
         return null;
     }
 
 
-    public static Neuron init(Document doc, Neuron n, double bias, ActivationFunction activationFunction, Type type, Collection<Neuron.Builder> inputs) {
-        if(n.init(doc, bias, activationFunction, type, getSynapseBuilders(inputs), getRelationBuilders(inputs))) return n;
+    public static Neuron init(Document doc, Neuron n, double bias, Collection<Neuron.Builder> inputs) {
+        if(n.init(doc, bias, getSynapseBuilders(inputs), getRelationBuilders(inputs))) return n;
         return null;
     }
 
 
-    private boolean init(Document doc, Double bias, ActivationFunction activationFunction, Type type, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
+    private boolean init(Document doc, Double bias, Collection<Synapse.Builder> synapseBuilders, Collection<Relation.Builder> relationBuilders) {
         INeuron n = get();
-
-        if(activationFunction != null) {
-            n.activationFunction = activationFunction;
-        }
-
-        if(type != null) {
-            n.type = type;
-        }
 
         if(bias != null) {
             n.setBias(bias);

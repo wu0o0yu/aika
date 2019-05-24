@@ -9,8 +9,7 @@ import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.ANY;
 import static network.aika.neuron.relation.Relation.EQUALS;
@@ -42,12 +41,12 @@ public class LinkerTest {
         for (int dir = 0; dir < 2; dir++) {
             Model m = new Model();
 
-            Neuron na = m.createNeuron("A");
-            Neuron nb = m.createNeuron("B");
+            Neuron na = m.createNeuron("A", INPUT);
+            Neuron nb = m.createNeuron("B", INPUT);
 
-            Neuron nc = m.createNeuron("C");
+            Neuron nc = m.createNeuron("C", EXCITATORY);
 
-            Neuron.init(nc, 6.0, EXCITATORY,
+            Neuron.init(nc, 6.0,
                     new Synapse.Builder()
                             .setSynapseId(0)
                             .setNeuron(na)
@@ -86,10 +85,10 @@ public class LinkerTest {
     public void testLinkInputActivation() {
         Model m = new Model();
 
-        Neuron na = m.createNeuron("A");
-        Neuron nb = m.createNeuron("B");
+        Neuron na = m.createNeuron("A", INPUT);
+        Neuron nb = m.createNeuron("B", EXCITATORY);
 
-        Neuron.init(nb, -0.5, EXCITATORY,
+        Neuron.init(nb, -0.5,
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(na)
@@ -113,12 +112,12 @@ public class LinkerTest {
     public void testLinkReverseFromOutputActivation() {
         Model m = new Model();
 
-        Neuron ina = m.createNeuron("A");
-        Neuron inb = m.createNeuron("B");
+        Neuron ina = m.createNeuron("A", INPUT);
+        Neuron inb = m.createNeuron("B", INPUT);
 
-        Neuron out = m.createNeuron("Out");
+        Neuron out = m.createNeuron("Out", INHIBITORY);
 
-        Neuron.init(out, 0.0, INHIBITORY,
+        Neuron.init(out, 0.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(ina)

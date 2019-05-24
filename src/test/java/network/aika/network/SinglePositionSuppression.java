@@ -12,6 +12,7 @@ import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.AncestorRelation.IS_ANCESTOR_OF;
 import static network.aika.neuron.relation.AncestorRelation.IS_DESCENDANT_OF;
@@ -25,9 +26,9 @@ public class SinglePositionSuppression {
     public void testSinglePositionSuppression() {
         Model m = new Model();
 
-        Neuron inABegin = m.createNeuron("IN-A-BEGIN");
-        Neuron inAEnd = m.createNeuron("IN-A-END");
-        Neuron.init(inAEnd, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+        Neuron inABegin = m.createNeuron("IN-A-BEGIN", EXCITATORY);
+        Neuron inAEnd = m.createNeuron("IN-A-END", EXCITATORY);
+        Neuron.init(inAEnd, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inABegin)
@@ -39,9 +40,9 @@ public class SinglePositionSuppression {
                         .setRelation(END_TO_BEGIN_EQUALS)
         );
 
-        Neuron inBBegin = m.createNeuron("IN-B-BEGIN");
-        Neuron inBEnd = m.createNeuron("IN-B-END");
-        Neuron.init(inBEnd, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+        Neuron inBBegin = m.createNeuron("IN-B-BEGIN", EXCITATORY);
+        Neuron inBEnd = m.createNeuron("IN-B-END", EXCITATORY);
+        Neuron.init(inBEnd, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inBBegin)
@@ -53,9 +54,9 @@ public class SinglePositionSuppression {
                         .setRelation(END_TO_BEGIN_EQUALS)
         );
 
-        Neuron inCBegin = m.createNeuron("IN-C-BEGIN");
-        Neuron inCEnd = m.createNeuron("IN-C-END");
-        Neuron.init(inCEnd, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+        Neuron inCBegin = m.createNeuron("IN-C-BEGIN", EXCITATORY);
+        Neuron inCEnd = m.createNeuron("IN-C-END", EXCITATORY);
+        Neuron.init(inCEnd, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inCBegin)
@@ -67,9 +68,9 @@ public class SinglePositionSuppression {
                         .setRelation(END_TO_BEGIN_EQUALS)
         );
 
-        Neuron inDBegin = m.createNeuron("IN-D-BEGIN");
-        Neuron inDEnd = m.createNeuron("IN-D-END");
-        Neuron.init(inDEnd, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+        Neuron inDBegin = m.createNeuron("IN-D-BEGIN", EXCITATORY);
+        Neuron inDEnd = m.createNeuron("IN-D-END", EXCITATORY);
+        Neuron.init(inDEnd, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inDBegin)
@@ -82,16 +83,14 @@ public class SinglePositionSuppression {
         );
 
 
-        Neuron mBegin = m.createNeuron("M-BEGIN");
-        Neuron mEnd = m.createNeuron("M-END");
+        Neuron mBegin = m.createNeuron("M-BEGIN", EXCITATORY);
+        Neuron mEnd = m.createNeuron("M-END", EXCITATORY);
 
-        Neuron nBegin = m.createNeuron("N-BEGIN");
-        Neuron nEnd = m.createNeuron("N-END");
-
-        Neuron inhibit = m.createNeuron("Inhib");
+        Neuron nBegin = m.createNeuron("N-BEGIN", EXCITATORY);
+        Neuron nEnd = m.createNeuron("N-END", EXCITATORY);
 
 
-        Neuron.init(mBegin, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+        Neuron.init(mBegin, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inABegin)
@@ -143,7 +142,7 @@ public class SinglePositionSuppression {
         );
 
 
-        Neuron.init(mEnd, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+        Neuron.init(mEnd, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inABegin)
@@ -196,7 +195,7 @@ public class SinglePositionSuppression {
 
 
 
-        Neuron.init(nBegin, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+        Neuron.init(nBegin, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inBBegin)
@@ -248,7 +247,7 @@ public class SinglePositionSuppression {
         );
 
 
-        Neuron.init(nEnd, 5.0, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+        Neuron.init(nEnd, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inBBegin)

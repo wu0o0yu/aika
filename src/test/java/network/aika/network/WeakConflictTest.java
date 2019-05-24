@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import static network.aika.ActivationFunction.RECTIFIED_LINEAR_UNIT;
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -24,12 +25,12 @@ public class WeakConflictTest {
     public void testWeakConflict() {
         Model m = new Model();
 
-        Neuron in = m.createNeuron("IN");
+        Neuron in = m.createNeuron("IN", INPUT);
 
-        Neuron na = m.createNeuron("A");
-        Neuron nb = m.createNeuron("B");
+        Neuron na = m.createNeuron("A", EXCITATORY, RECTIFIED_LINEAR_UNIT);
+        Neuron nb = m.createNeuron("B", EXCITATORY, RECTIFIED_LINEAR_UNIT);
 
-        Neuron.init(na, 10.0, RECTIFIED_LINEAR_UNIT, EXCITATORY,
+        Neuron.init(na, 10.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(in)
@@ -49,7 +50,7 @@ public class WeakConflictTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(nb, 10.0, RECTIFIED_LINEAR_UNIT, EXCITATORY,
+        Neuron.init(nb, 10.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(in)

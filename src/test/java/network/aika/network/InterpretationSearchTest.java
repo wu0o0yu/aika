@@ -32,8 +32,7 @@ import java.util.stream.Collectors;
 
 import static network.aika.ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
 import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 
@@ -48,17 +47,17 @@ public class InterpretationSearchTest {
     public void testJoergZimmermann() {
         Model m = new Model();
 
-        Neuron wJoerg = m.createNeuron("W-Joerg");
-        Neuron wZimmermann = m.createNeuron("W-Zimmermann");
+        Neuron wJoerg = m.createNeuron("W-Joerg", INPUT);
+        Neuron wZimmermann = m.createNeuron("W-Zimmermann", INPUT);
 
-        Neuron eJoergForename = m.createNeuron("E-Joerg (Forename)");
-        Neuron eJoergSurname = m.createNeuron("E-Joerg (Surname)");
-        Neuron eZimmermannSurname = m.createNeuron("E-Zimmermann (Surname)");
-        Neuron eZimmermannCompany = m.createNeuron("E-Zimmermann (Company)");
+        Neuron eJoergForename = m.createNeuron("E-Joerg (Forename)", EXCITATORY);
+        Neuron eJoergSurname = m.createNeuron("E-Joerg (Surname)", EXCITATORY);
+        Neuron eZimmermannSurname = m.createNeuron("E-Zimmermann (Surname)", EXCITATORY);
+        Neuron eZimmermannCompany = m.createNeuron("E-Zimmermann (Company)", EXCITATORY);
 
-        Neuron suppr = m.createNeuron("SUPPR");
+        Neuron suppr = m.createNeuron("SUPPR", INHIBITORY);
 
-        Neuron.init(eJoergSurname, 5.0, EXCITATORY,
+        Neuron.init(eJoergSurname, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wJoerg)
@@ -77,7 +76,7 @@ public class InterpretationSearchTest {
                         .setTo(OUTPUT)
                         .setRelation(EQUALS)
         );
-        Neuron.init(eZimmermannCompany, 5.0, EXCITATORY,
+        Neuron.init(eZimmermannCompany, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wZimmermann)
@@ -97,7 +96,7 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(eJoergForename, 6.0, EXCITATORY,
+        Neuron.init(eJoergForename, 6.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wJoerg)
@@ -126,7 +125,7 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(eZimmermannSurname, 6.0, EXCITATORY,
+        Neuron.init(eZimmermannSurname, 6.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wZimmermann)
@@ -156,7 +155,7 @@ public class InterpretationSearchTest {
         );
 
 
-        Neuron.init(suppr, 0.0, INHIBITORY,
+        Neuron.init(suppr, 0.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(eJoergForename)
@@ -227,14 +226,14 @@ public class InterpretationSearchTest {
     public void testBackwardReferencingSynapses() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("IN A");
-        Neuron inB = m.createNeuron("IN B");
+        Neuron inA = m.createNeuron("IN A", INPUT);
+        Neuron inB = m.createNeuron("IN B", INPUT);
 
-        Neuron inhib = m.createNeuron("INHIB");
+        Neuron inhib = m.createNeuron("INHIB", INHIBITORY);
 
-        Neuron nF = m.createNeuron("F");
+        Neuron nF = m.createNeuron("F", EXCITATORY);
 
-        Neuron nC = Neuron.init(m.createNeuron("C"), 6.0, EXCITATORY,
+        Neuron nC = Neuron.init(m.createNeuron("C", EXCITATORY), 6.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -254,7 +253,7 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron nD = Neuron.init(m.createNeuron("D"), 7.0, EXCITATORY,
+        Neuron nD = Neuron.init(m.createNeuron("D", EXCITATORY), 7.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -282,7 +281,7 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron nE = Neuron.init(m.createNeuron("E"), 5.0, EXCITATORY,
+        Neuron nE = Neuron.init(m.createNeuron("E", EXCITATORY), 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
@@ -302,7 +301,7 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(nF, 6.0, EXCITATORY,
+        Neuron.init(nF, 6.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
@@ -323,7 +322,7 @@ public class InterpretationSearchTest {
         );
 
 
-        Neuron.init(inhib, 0.0, INHIBITORY,
+        Neuron.init(inhib, 0.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(nC)
@@ -376,18 +375,18 @@ public class InterpretationSearchTest {
     public void testReversePositiveFeedbackSynapse() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("IN A");
-        Neuron inB = m.createNeuron("IN B");
+        Neuron inA = m.createNeuron("IN A", INPUT);
+        Neuron inB = m.createNeuron("IN B", INPUT);
 
-        Neuron inhib = m.createNeuron("INHIB");
-        Neuron.init(inhib, 0.0, INHIBITORY);
-
-
-        Neuron nE = m.createNeuron("E");
-        Neuron nF = m.createNeuron("F");
+        Neuron inhib = m.createNeuron("INHIB", INHIBITORY);
+        Neuron.init(inhib, 0.0);
 
 
-        Neuron nC = Neuron.init(m.createNeuron("C"), 6.0, EXCITATORY,
+        Neuron nE = m.createNeuron("E", EXCITATORY);
+        Neuron nF = m.createNeuron("F", EXCITATORY);
+
+
+        Neuron nC = Neuron.init(m.createNeuron("C", EXCITATORY), 6.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -407,7 +406,7 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron nD = Neuron.init(m.createNeuron("D"), 5.0, EXCITATORY,
+        Neuron nD = Neuron.init(m.createNeuron("D", EXCITATORY), 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -468,7 +467,6 @@ public class InterpretationSearchTest {
         Neuron.init(doc,
                 nD,
                 7.0,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(nF)
@@ -479,7 +477,7 @@ public class InterpretationSearchTest {
                         .setRelation(ANY)
         );
 
-        Neuron.init(doc, nE, 5.0, EXCITATORY,
+        Neuron.init(doc, nE, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
@@ -499,7 +497,7 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(doc, nF, 6.0, EXCITATORY,
+        Neuron.init(doc, nF, 6.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
@@ -561,13 +559,13 @@ public class InterpretationSearchTest {
     public void testAvoidUnnecessaryExcludeSteps() {
         Model m = new Model();
 
-        Neuron in = m.createNeuron("IN");
+        Neuron in = m.createNeuron("IN", INPUT);
 
-        Neuron inhib = m.createNeuron("INHIB");
-        Neuron out = m.createNeuron("OUT");
+        Neuron inhib = m.createNeuron("INHIB", INHIBITORY, LIMITED_RECTIFIED_LINEAR_UNIT);
+        Neuron out = m.createNeuron("OUT", EXCITATORY);
 
 
-        Neuron.init(inhib, 0.0, LIMITED_RECTIFIED_LINEAR_UNIT, INHIBITORY,
+        Neuron.init(inhib, 0.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(out)
@@ -578,7 +576,7 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(out, 5.0, RECTIFIED_HYPERBOLIC_TANGENT, EXCITATORY,
+        Neuron.init(out, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(in)

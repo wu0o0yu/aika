@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 
@@ -49,7 +51,7 @@ public class PatternMatchingTest {
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            Neuron in = m.createNeuron(c + "");
+            Neuron in = m.createNeuron(c + "", INPUT);
 
             inputNeurons.put(c, in);
         }
@@ -59,9 +61,8 @@ public class PatternMatchingTest {
         // of the inputs relative to each other. The following flag specifies whether this relativeRid
         // is relative or absolute.
         Neuron pattern = Neuron.init(
-                m.createNeuron("BCD"),
+                m.createNeuron("BCD", EXCITATORY),
                 1.0,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))
@@ -140,7 +141,7 @@ public class PatternMatchingTest {
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e', 'f'}) {
-            Neuron in = m.createNeuron(c + "");
+            Neuron in = m.createNeuron(c + "", INPUT);
 
             inputNeurons.put(c, in);
         }
@@ -150,10 +151,8 @@ public class PatternMatchingTest {
         // of the inputs relative to each other. The following flag specifies whether this relativeRid
         // is relative or absolute.
         Neuron pattern = Neuron.init(
-                m.createNeuron("BCDE"),
+                m.createNeuron("BCDE", EXCITATORY),
                 5.0,
-                ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))
@@ -238,15 +237,14 @@ public class PatternMatchingTest {
     public void testPatternMatching3() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
-        Neuron inC = m.createNeuron("C");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
+        Neuron inC = m.createNeuron("C", INPUT);
 
 
         Neuron pattern = Neuron.init(
-                m.createNeuron("ABC"),
+                m.createNeuron("ABC", EXCITATORY),
                 1.0,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -316,16 +314,15 @@ public class PatternMatchingTest {
     public void testPatternMatching4() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
-        Neuron inC = m.createNeuron("C");
-        Neuron inD = m.createNeuron("D");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
+        Neuron inC = m.createNeuron("C", INPUT);
+        Neuron inD = m.createNeuron("D", INPUT);
 
 
         Neuron pattern = Neuron.init(
-                m.createNeuron("ABCD"),
+                m.createNeuron("ABCD", EXCITATORY),
                 1.0,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -413,12 +410,12 @@ public class PatternMatchingTest {
     public void testPatternMatching5() {
         Model m = new Model();
 
-        Neuron word = m.createNeuron("Word");
+        Neuron word = m.createNeuron("Word", INPUT);
         Map<Character, Neuron> inputNeurons = new HashMap<>();
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            Neuron in = m.createNeuron(c + "");
+            Neuron in = m.createNeuron(c + "", INPUT);
 
             inputNeurons.put(c, in);
         }
@@ -428,9 +425,8 @@ public class PatternMatchingTest {
         // of the inputs relative to each other. The following flag specifies whether this relativeRid
         // is relative or absolute.
         Neuron pattern = Neuron.init(
-                m.createNeuron("BCD"),
+                m.createNeuron("BCD", EXCITATORY),
                 1.0,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))
@@ -515,12 +511,12 @@ public class PatternMatchingTest {
     public void testPatternMatching6() {
         Model m = new Model();
 
-        Neuron word = m.createNeuron("Word");
+        Neuron word = m.createNeuron("Word", INPUT);
         Map<Character, Neuron> inputNeurons = new HashMap<>();
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            Neuron in = m.createNeuron(c + "");
+            Neuron in = m.createNeuron(c + "", INPUT);
 
             inputNeurons.put(c, in);
         }
@@ -530,9 +526,8 @@ public class PatternMatchingTest {
         // of the inputs relative to each other. The following flag specifies whether this relativeRid
         // is relative or absolute.
         Neuron pattern = Neuron.init(
-                m.createNeuron("BCD"),
+                m.createNeuron("BCD", EXCITATORY),
                 5.0,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))

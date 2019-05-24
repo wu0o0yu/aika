@@ -29,8 +29,7 @@ import org.junit.Test;
 import java.util.stream.Collectors;
 
 import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -45,14 +44,13 @@ public class ConverterTest {
     public void testConverter() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
-        Neuron inC = m.createNeuron("C");
-        Neuron inD = m.createNeuron("D");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
+        Neuron inC = m.createNeuron("C", INPUT);
+        Neuron inD = m.createNeuron("D", INPUT);
 
-        Neuron out = Neuron.init(m.createNeuron("ABCD"),
+        Neuron out = Neuron.init(m.createNeuron("ABCD", EXCITATORY),
                 0.5,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -121,14 +119,13 @@ public class ConverterTest {
     public void testConverter1() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
-        Neuron inC = m.createNeuron("C");
-        Neuron inD = m.createNeuron("D");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
+        Neuron inC = m.createNeuron("C", INPUT);
+        Neuron inD = m.createNeuron("D", INPUT);
 
-        Neuron out = Neuron.init(m.createNeuron("ABCD"),
+        Neuron out = Neuron.init(m.createNeuron("ABCD", INHIBITORY),
                 -5.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -188,15 +185,14 @@ public class ConverterTest {
     public void testConverter2() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
-        Neuron inC = m.createNeuron("C");
-        Neuron inD = m.createNeuron("D");
-        Neuron inE = m.createNeuron("E");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
+        Neuron inC = m.createNeuron("C", INPUT);
+        Neuron inD = m.createNeuron("D", INPUT);
+        Neuron inE = m.createNeuron("E", INPUT);
 
-        Neuron out = Neuron.init(m.createNeuron("ABCD"),
+        Neuron out = Neuron.init(m.createNeuron("ABCD", EXCITATORY),
                 3.5,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -278,14 +274,13 @@ public class ConverterTest {
     public void testConverter3() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
-        Neuron inC = m.createNeuron("C");
-        Neuron inD = m.createNeuron("D");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
+        Neuron inC = m.createNeuron("C", INPUT);
+        Neuron inD = m.createNeuron("D", INPUT);
 
-        Neuron out = Neuron.init(m.createNeuron("ABCD"),
+        Neuron out = Neuron.init(m.createNeuron("ABCD", EXCITATORY),
                 5.5,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -346,11 +341,10 @@ public class ConverterTest {
     public void testDuplicates() {
         Model m = new Model();
 
-        Neuron in = m.createNeuron("IN");
+        Neuron in = m.createNeuron("IN", INPUT);
 
-        Neuron out = Neuron.init(m.createNeuron("OUT"),
+        Neuron out = Neuron.init(m.createNeuron("OUT", EXCITATORY),
                 5.0,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(in)
@@ -383,16 +377,14 @@ public class ConverterTest {
     public void testOnlyOptionalInputs() {
         Model model = new Model();
 
-        Neuron inA = model.createNeuron("A");
-        Neuron inB = model.createNeuron("B");
-        Neuron inC = model.createNeuron("C");
+        Neuron inA = model.createNeuron("A", INPUT);
+        Neuron inB = model.createNeuron("B", INPUT);
+        Neuron inC = model.createNeuron("C", INPUT);
 
-        Neuron testNeuron = model.createNeuron("Test");
+        Neuron testNeuron = model.createNeuron("Test", EXCITATORY);
 
         Neuron.init(testNeuron,
                 2.1,
-                RECTIFIED_HYPERBOLIC_TANGENT,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)

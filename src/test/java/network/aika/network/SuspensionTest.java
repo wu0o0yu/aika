@@ -33,6 +33,8 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 
@@ -47,7 +49,7 @@ public class SuspensionTest {
     public void testSuspendInputNeuron() {
         Model m = new Model(new DummySuspensionHook(), 1);
 
-        Neuron n = m.createNeuron("A");
+        Neuron n = m.createNeuron("A", INPUT);
         n.get().getInputNode().suspend(Provider.SuspensionMode.SAVE);
         n.suspend(Provider.SuspensionMode.SAVE);
 
@@ -66,15 +68,14 @@ public class SuspensionTest {
     public void testSuspendAndNeuron() {
         Model m = new Model(new DummySuspensionHook(), 1);
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
 
         int idA = inA.getId();
         int idB = inB.getId();
 
-        Neuron nC = Neuron.init(m.createNeuron("C"),
+        Neuron nC = Neuron.init(m.createNeuron("C", EXCITATORY),
                 5.0,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -100,9 +101,8 @@ public class SuspensionTest {
         );
 
 
-        Neuron outD = Neuron.init(m.createNeuron("D"),
+        Neuron outD = Neuron.init(m.createNeuron("D", EXCITATORY),
                 6.0,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(nC)
@@ -171,15 +171,14 @@ public class SuspensionTest {
     public void testSuspendNegativeNeuron() {
         Model m = new Model(new DummySuspensionHook(), 1);
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
 
         int idA = inA.getId();
         int idB = inB.getId();
 
-        Neuron nC = Neuron.init(m.createNeuron("C"),
+        Neuron nC = Neuron.init(m.createNeuron("C", EXCITATORY),
                 5.0,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -201,9 +200,8 @@ public class SuspensionTest {
         );
 
 
-        Neuron outD = Neuron.init(m.createNeuron("D"),
+        Neuron outD = Neuron.init(m.createNeuron("D", EXCITATORY),
                 6.0,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(nC)

@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -46,13 +47,13 @@ public class AddSynapseTest {
     public void testAddSynapse() {
         Model m = new Model();
 
-        Neuron n = m.createNeuron("OR", null, INHIBITORY, RECTIFIED_HYPERBOLIC_TANGENT);
+        Neuron n = m.createNeuron("OR", INHIBITORY, RECTIFIED_HYPERBOLIC_TANGENT);
 
         TreeMap<String, Neuron> inputNeurons = new TreeMap<>();
 
         int i = 0;
         for(String l: new String[] {"A", "B", "C", "D"}) {
-            Neuron in = m.createNeuron(l);
+            Neuron in = m.createNeuron(l, INPUT);
             inputNeurons.put(l, in);
             int synId = i++;
             Neuron.init(n,

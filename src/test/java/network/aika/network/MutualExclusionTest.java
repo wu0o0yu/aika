@@ -31,8 +31,7 @@ import java.util.stream.Collectors;
 
 import static network.aika.ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
 import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -70,19 +69,17 @@ public class MutualExclusionTest {
         Model m = new Model();
 
         // Create the input neurons for the network.
-        Neuron inA = m.createNeuron("IN-A");
-        Neuron inB = m.createNeuron("IN-B");
-        Neuron inC = m.createNeuron("IN-C");
+        Neuron inA = m.createNeuron("IN-A", INPUT);
+        Neuron inB = m.createNeuron("IN-B", INPUT);
+        Neuron inC = m.createNeuron("IN-C", INPUT);
 
         // Instantiate the inhibitory neuron. Its inputs will be added later on.
-        Neuron inhibN = m.createNeuron("INHIB");
+        Neuron inhibN = m.createNeuron("INHIB", INHIBITORY, LIMITED_RECTIFIED_LINEAR_UNIT);
 
         // Create three neurons that might be suppressed by the inhibitory neuron.
         Neuron pA = Neuron.init(
-                m.createNeuron("A"),
+                m.createNeuron("A", EXCITATORY),
                 3.0,
-                RECTIFIED_HYPERBOLIC_TANGENT,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -104,10 +101,8 @@ public class MutualExclusionTest {
         );
 
         Neuron pB = Neuron.init(
-                m.createNeuron("B"),
+                m.createNeuron("B", EXCITATORY),
                 5.0,
-                RECTIFIED_HYPERBOLIC_TANGENT,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
@@ -129,10 +124,8 @@ public class MutualExclusionTest {
         );
 
         Neuron pC = Neuron.init(
-                m.createNeuron("C"),
+                m.createNeuron("C", EXCITATORY),
                 2.0,
-                RECTIFIED_HYPERBOLIC_TANGENT,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inC)
@@ -157,8 +150,6 @@ public class MutualExclusionTest {
         Neuron.init(
                 inhibN,
                 0.0,
-                LIMITED_RECTIFIED_LINEAR_UNIT,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pA)
@@ -188,10 +179,8 @@ public class MutualExclusionTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron outN = Neuron.init(m.createNeuron("OUT"),
+        Neuron outN = Neuron.init(m.createNeuron("OUT", INHIBITORY, RECTIFIED_HYPERBOLIC_TANGENT),
                 0.0,
-                RECTIFIED_HYPERBOLIC_TANGENT,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pB)

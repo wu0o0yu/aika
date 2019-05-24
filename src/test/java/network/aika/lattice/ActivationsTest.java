@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.Activation.END;
@@ -48,9 +49,9 @@ public class ActivationsTest {
     public void addActivationsTest() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A", INPUT);
 
-        Neuron pA = Neuron.init(m.createNeuron("pA"), 0.5, EXCITATORY,
+        Neuron pA = Neuron.init(m.createNeuron("pA", EXCITATORY), 0.5,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -83,7 +84,7 @@ public class ActivationsTest {
     public void testGetActivationReturnsFirstFired() {
         Model m = new Model();
 
-        Neuron in = m.createNeuron("A");
+        Neuron in = m.createNeuron("A", INPUT);
         OrNode inNode = in.get().getInputNode().get();
 
         Document doc = new Document(m, "aaaaaaaaaa", 0);

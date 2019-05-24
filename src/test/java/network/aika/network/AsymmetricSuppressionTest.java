@@ -12,6 +12,8 @@ import org.junit.Test;
 
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -22,13 +24,12 @@ public class AsymmetricSuppressionTest {
     public void testAsymmetricSuppression() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A", INPUT);
 
-        Neuron inB = m.createNeuron("B");
+        Neuron inB = m.createNeuron("B", INPUT);
 
-        Neuron outN = Neuron.init(m.createNeuron("OUT"),
+        Neuron outN = Neuron.init(m.createNeuron("OUT", EXCITATORY),
                 10.0,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)

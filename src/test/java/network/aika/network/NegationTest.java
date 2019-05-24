@@ -19,7 +19,6 @@ package network.aika.network;
 
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.lattice.OrNode;
@@ -28,8 +27,7 @@ import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.Activation.END;
@@ -45,15 +43,14 @@ public class NegationTest {
     @Test
     public void testTwoNegativeInputs1() {
         Model m = new Model();
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
-        Neuron inC = m.createNeuron("C");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
+        Neuron inC = m.createNeuron("C", INPUT);
 
-        Neuron abcN = m.createNeuron("ABC");
+        Neuron abcN = m.createNeuron("ABC", EXCITATORY);
 
         Neuron.init(abcN,
                 5.5,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -104,17 +101,16 @@ public class NegationTest {
     public void testTwoNegativeInputs2() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A", INPUT);
 
-        Neuron inB = m.createNeuron("B");
+        Neuron inB = m.createNeuron("B", INPUT);
 
-        Neuron inC = m.createNeuron("C");
+        Neuron inC = m.createNeuron("C", INPUT);
 
-        Neuron abcN = m.createNeuron("ABC");
+        Neuron abcN = m.createNeuron("ABC", EXCITATORY);
 
-        Neuron outN = Neuron.init(m.createNeuron("OUT"),
+        Neuron outN = Neuron.init(m.createNeuron("OUT", EXCITATORY),
                 1.0,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(abcN)
@@ -128,7 +124,6 @@ public class NegationTest {
 
         Neuron.init(abcN,
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -174,15 +169,14 @@ public class NegationTest {
     public void testSimpleNegation1() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A", INPUT);
 
-        Neuron asN = m.createNeuron("AS");
+        Neuron asN = m.createNeuron("AS", EXCITATORY);
 
-        Neuron inS = m.createNeuron("S");
+        Neuron inS = m.createNeuron("S", INPUT);
 
-        Neuron outN = Neuron.init(m.createNeuron("OUT"),
+        Neuron outN = Neuron.init(m.createNeuron("OUT", INHIBITORY),
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
@@ -196,7 +190,6 @@ public class NegationTest {
 
         Neuron.init(asN,
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -237,15 +230,14 @@ public class NegationTest {
     public void testSimpleNegation2() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A", INPUT);
 
-        Neuron asN = m.createNeuron("AS");
+        Neuron asN = m.createNeuron("AS", EXCITATORY);
 
-        Neuron inS = m.createNeuron("S");
+        Neuron inS = m.createNeuron("S", INPUT);
 
-        Neuron outN = Neuron.init(m.createNeuron("OUT"),
+        Neuron outN = Neuron.init(m.createNeuron("OUT", INHIBITORY),
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
@@ -259,7 +251,6 @@ public class NegationTest {
 
         Neuron.init(asN,
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -299,15 +290,14 @@ public class NegationTest {
     public void testSimpleNegation3() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A", INPUT);
 
-        Neuron asN = m.createNeuron("AS");
+        Neuron asN = m.createNeuron("AS", EXCITATORY);
 
-        Neuron inS = m.createNeuron("S");
+        Neuron inS = m.createNeuron("S", INPUT);
 
-        Neuron outN = Neuron.init(m.createNeuron("OUT"),
+        Neuron outN = Neuron.init(m.createNeuron("OUT", INHIBITORY),
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
@@ -321,7 +311,6 @@ public class NegationTest {
 
         Neuron.init(asN,
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -358,16 +347,14 @@ public class NegationTest {
     @Test
     public void testNegation1() {
         Model m = new Model();
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
 
-        Neuron asN = m.createNeuron("AS");
-        Neuron absN = m.createNeuron("ABS");
-        Neuron bsN = m.createNeuron("BS");
+        Neuron asN = m.createNeuron("AS", EXCITATORY);
+        Neuron absN = m.createNeuron("ABS", EXCITATORY);
 
-        Neuron inS = Neuron.init(m.createNeuron("S"),
+        Neuron inS = Neuron.init(m.createNeuron("S", INHIBITORY),
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
@@ -390,7 +377,6 @@ public class NegationTest {
 
         Neuron.init(asN,
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -412,7 +398,6 @@ public class NegationTest {
         );
         Neuron.init(absN,
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -485,17 +470,16 @@ public class NegationTest {
     public void testNegation2() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
-        Neuron inC = m.createNeuron("C");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
+        Neuron inC = m.createNeuron("C", INPUT);
 
-        Neuron asN = m.createNeuron("AS");
-        Neuron ascN = m.createNeuron("ASC");
-        Neuron bsN = m.createNeuron("BS");
+        Neuron asN = m.createNeuron("AS", EXCITATORY);
+        Neuron ascN = m.createNeuron("ASC", EXCITATORY);
+        Neuron bsN = m.createNeuron("BS", EXCITATORY);
 
-        Neuron inS = Neuron.init(m.createNeuron("S"),
+        Neuron inS = Neuron.init(m.createNeuron("S", INHIBITORY),
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
@@ -527,7 +511,6 @@ public class NegationTest {
 
         Neuron.init(asN,
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -553,7 +536,6 @@ public class NegationTest {
         );
         Neuron.init(ascN,
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -593,7 +575,6 @@ public class NegationTest {
 
         Neuron.init(bsN,
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
@@ -618,9 +599,8 @@ public class NegationTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron outA = Neuron.init(m.createNeuron("OUT A"),
+        Neuron outA = Neuron.init(m.createNeuron("OUT A", EXCITATORY),
                 0.0,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(asN)
@@ -631,9 +611,8 @@ public class NegationTest {
                         .setTo(OUTPUT)
                         .setRelation(EQUALS)
         );
-        Neuron outAC = Neuron.init(m.createNeuron("OUT AC"),
+        Neuron outAC = Neuron.init(m.createNeuron("OUT AC", EXCITATORY),
                 0.0,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(ascN)
@@ -644,9 +623,8 @@ public class NegationTest {
                         .setTo(OUTPUT)
                         .setRelation(EQUALS)
         );
-        Neuron outB = Neuron.init(m.createNeuron("OUT B"),
+        Neuron outB = Neuron.init(m.createNeuron("OUT B", EXCITATORY),
                 1.0,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(bsN)
@@ -694,15 +672,14 @@ public class NegationTest {
     public void testOptions() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
 
-        Neuron pC = m.createNeuron("C");
-        Neuron pD = m.createNeuron("D");
+        Neuron pC = m.createNeuron("C", EXCITATORY);
+        Neuron pD = m.createNeuron("D", EXCITATORY);
 
         Neuron.init(pC,
                 0.5,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -721,7 +698,6 @@ public class NegationTest {
 
         Neuron.init(pD,
                 0.5,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
@@ -739,12 +715,11 @@ public class NegationTest {
         );
 
 
-        Neuron inG = m.createNeuron("G");
+        Neuron inG = m.createNeuron("G", INPUT);
         OrNode inGNode = inG.get().getInputNode().get();
 
-        Neuron pH = Neuron.init(m.createNeuron("H"),
+        Neuron pH = Neuron.init(m.createNeuron("H", EXCITATORY),
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pC)

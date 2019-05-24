@@ -12,6 +12,8 @@ import network.aika.neuron.activation.SearchNode;
 import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
+import static network.aika.ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -34,12 +36,12 @@ public class SoftMaxTest {
     public double[][] initModel(double[][] x) {
         Model m = new Model();
 
-        Neuron inhib = m.createNeuron("INHIBITORY");
-        Neuron.init(inhib, 0.0, ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT, INeuron.Type.INHIBITORY);
+        Neuron inhib = m.createNeuron("INHIBITORY", INHIBITORY, LIMITED_RECTIFIED_LINEAR_UNIT);
+        Neuron.init(inhib, 0.0);
 
         Neuron[] inputs = new Neuron[]{
-                m.createNeuron("INPUT A"),
-                m.createNeuron("INPUT B")
+                m.createNeuron("INPUT A", INPUT),
+                m.createNeuron("INPUT B", INPUT)
         };
 
         Neuron[][] output = new Neuron[2][2];
@@ -49,7 +51,7 @@ public class SoftMaxTest {
             int i = 0;
 
             for (double a : y) {
-                Neuron n = Neuron.init(m.createNeuron(j + "-" + i), a, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT, INeuron.Type.EXCITATORY,
+                Neuron n = Neuron.init(m.createNeuron(j + "-" + i, EXCITATORY), a,
                         new Synapse.Builder()
                                 .setSynapseId(0)
                                 .setNeuron(inputs[j])

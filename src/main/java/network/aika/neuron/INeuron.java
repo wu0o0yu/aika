@@ -28,10 +28,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static network.aika.ActivationFunction.*;
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.State.CURRENT;
@@ -60,14 +60,24 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public static final INeuron MIN_NEURON = new INeuron();
     public static final INeuron MAX_NEURON = new INeuron();
 
-    String label;
-    Type type;
+    private String label;
+    private Type type;
 
 
     public enum Type {
-        INPUT,
-        EXCITATORY,
-        INHIBITORY
+        INPUT(NULL_FUNCTION),
+        EXCITATORY(RECTIFIED_HYPERBOLIC_TANGENT),
+        INHIBITORY(RECTIFIED_LINEAR_UNIT);
+
+        private ActivationFunction defaultActivationFunction;
+
+        Type(ActivationFunction defaultActivationFunction) {
+            this.defaultActivationFunction = defaultActivationFunction;
+        }
+
+        public ActivationFunction getDefaultActivationFunction() {
+            return defaultActivationFunction;
+        }
     }
 
 
@@ -349,6 +359,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     private INeuron() {
+    }
+
+
+    public INeuron(Model m, String label, Type type, ActivationFunction actF) {
+        this(m, label, null, type, actF);
     }
 
 
