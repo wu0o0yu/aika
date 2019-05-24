@@ -83,7 +83,7 @@ public class NegationTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("aaaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 11);
 
@@ -158,7 +158,7 @@ public class NegationTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("aaaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 11);
         inB.addInput(doc, 2, 7);
@@ -217,7 +217,7 @@ public class NegationTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("aaaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaaa", 0);
 
         inS.addInput(doc, 3, 8);
 
@@ -280,7 +280,7 @@ public class NegationTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("aaaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaaa", 0);
 
         inS.addInput(doc, 3, 8);
 
@@ -342,7 +342,7 @@ public class NegationTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("aaaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 11);
         inS.addInput(doc, 3, 8);
@@ -451,7 +451,7 @@ public class NegationTest {
         );
 
         {
-            Document doc = m.createDocument("aaaaaaaaaa", 0);
+            Document doc = new Document(m, "aaaaaaaaaa", 0);
 
             inA.addInput(doc, 0, 6);
             inB.addInput(doc, 0, 6);
@@ -465,7 +465,7 @@ public class NegationTest {
         }
 
         {
-            Document doc = m.createDocument("aaaaaaaaaa", 0);
+            Document doc = new Document(m, "aaaaaaaaaa", 0);
 
             inA.addInput(doc, 0, 6);
             inB.addInput(doc, 3, 9);
@@ -658,7 +658,7 @@ public class NegationTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
 
         inA.addInput(doc, 0, 6);
@@ -774,7 +774,7 @@ public class NegationTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);

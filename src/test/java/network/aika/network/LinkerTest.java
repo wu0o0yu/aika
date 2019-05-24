@@ -66,7 +66,7 @@ public class LinkerTest {
                             .setRelation(EQUALS)
             );
 
-            Document doc = m.createDocument("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+            Document doc = new Document(m, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
             if (dir == 0) {
                 na.addInput(doc, beginA, endA);
                 nb.addInput(doc, beginB, endB);
@@ -100,7 +100,7 @@ public class LinkerTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("X");
+        Document doc = new Document(m, "X");
 
         na.addInput(doc, 0, 1);
         nb.addInput(doc, 0, 1);
@@ -137,7 +137,7 @@ public class LinkerTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("X");
+        Document doc = new Document(m, "X");
 
         ina.addInput(doc, 0, 1);
         inb.addInput(doc, 0, 1);

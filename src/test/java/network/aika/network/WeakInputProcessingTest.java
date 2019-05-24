@@ -200,7 +200,7 @@ public class WeakInputProcessingTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("a ");
+        Document doc = new Document(m, "a ");
 
         strongInput.addInput(doc,0,1);
 

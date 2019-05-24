@@ -17,7 +17,6 @@
 package network.aika;
 
 
-import network.aika.lattice.InputNode;
 import network.aika.lattice.Node;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.INeuron.Type;
@@ -158,22 +157,16 @@ public class Model {
     }
 
 
-    public Document createDocument(String txt) {
-        return createDocument(txt, 0);
+    public int getNewDocumentId() {
+        return docIdCounter.addAndGet(1);
     }
 
 
-    public Document createDocument(String txt, int threadId) {
-        Document doc = new Document(docIdCounter.addAndGet(1), txt, this, threadId);
-
-        if (txt != null) {
-            if (docs[threadId] != null) {
-                throw new StaleDocumentException();
-            }
-            docs[threadId] = doc;
+    public void acquireThread(int threadId, Document doc) {
+        if (docs[threadId] != null) {
+            throw new StaleDocumentException();
         }
-
-        return doc;
+        docs[threadId] = doc;
     }
 
 

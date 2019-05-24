@@ -80,7 +80,7 @@ public class ActivationOutputsTest {
         );
 
 
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);
@@ -136,7 +136,7 @@ public class ActivationOutputsTest {
     @Test
     public void simpleAddActivationTest1() {
         Model m = new Model();
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         Neuron inA = m.createNeuron("A");
 
@@ -166,7 +166,7 @@ public class ActivationOutputsTest {
     @Test
     public void removeRemoveDestinationActivation() {
         Model m = new Model();
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         Neuron inA = m.createNeuron("A");
 

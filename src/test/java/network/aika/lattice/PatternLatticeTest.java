@@ -87,7 +87,7 @@ public class PatternLatticeTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("", 0);
+        Document doc = new Document(m, "", 0);
 
 
         InputNode pA = inA.get().getOutputNode().get();
@@ -154,7 +154,7 @@ public class PatternLatticeTest {
                         .setRelation(END_EQUALS)
         );
 
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);

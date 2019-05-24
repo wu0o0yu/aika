@@ -97,7 +97,7 @@ public class PatternMatchingTest {
 
 
         // Create a simple text document.
-        Document doc = m.createDocument("a b c d e ", 0);
+        Document doc = new Document(m, "a b c d e ", 0);
 
         // Then add the characters
         int wordPos = 0;
@@ -198,7 +198,7 @@ public class PatternMatchingTest {
 
 
         // Create a simple text document.
-        Document doc = m.createDocument("a b c d e ", 0);
+        Document doc = new Document(m, "a b c d e ", 0);
 
         // Then add the characters
         int wordPos = 0;
@@ -285,7 +285,7 @@ public class PatternMatchingTest {
         );
 
 
-        Document doc = m.createDocument("X", 0);
+        Document doc = new Document(m, "X", 0);
 
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);
@@ -381,7 +381,7 @@ public class PatternMatchingTest {
         );
 
 
-        Document doc = m.createDocument("X", 0);
+        Document doc = new Document(m, "X", 0);
 
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);
@@ -475,7 +475,7 @@ public class PatternMatchingTest {
 
 
         // Create a simple text document.
-        Document doc = m.createDocument("a b c d e ", 0);
+        Document doc = new Document(m, "a b c d e ", 0);
 
         word.addInput(doc, 2, 8);
 
@@ -581,7 +581,7 @@ public class PatternMatchingTest {
 
 
         // Create a simple text document.
-        Document doc = m.createDocument("a b c d e ", 0);
+        Document doc = new Document(m, "a b c d e ", 0);
 
         word.addInput(doc, 2, 8);
 

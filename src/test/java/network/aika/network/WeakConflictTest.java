@@ -61,7 +61,7 @@ public class WeakConflictTest {
         );
 
 
-        Document doc = m.createDocument("X ");
+        Document doc = new Document(m,"X ");
 
         in.addInput(doc, 0, 1);
 

@@ -144,13 +144,25 @@ public class Document implements Comparable<Document> {
     };
 
 
-    public Document(int id, String content, Model model, int threadId) {
+    public Document(Model model, String content) {
+        this(model, content, 0);
+    }
+
+
+    public Document(Model model, String content, int threadId) {
+        this(model, model.getNewDocumentId(), content, threadId);
+    }
+
+
+    public Document(Model model, int id, String content, int threadId) {
         this.id = id;
         this.content = new StringBuilder(content);
 
         this.model = model;
         this.threadId = threadId;
         this.linker = model.getLinkerFactory().createLinker(this);
+
+        model.acquireThread(threadId, this);
     }
 
 

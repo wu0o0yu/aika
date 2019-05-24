@@ -57,7 +57,7 @@ public class SuspensionTest {
         // Reactivate
         n = m.lookupNeuron(id);
 
-        Document doc = m.createDocument("Bla");
+        Document doc = new Document(m, "Bla");
         n.addInput(doc, 0, 1);
     }
 
@@ -120,7 +120,7 @@ public class SuspensionTest {
 
         // Reactivate
 
-        Document doc = m.createDocument("Bla");
+        Document doc = new Document(m, "Bla");
 
         inA = m.lookupNeuron(idA);
         inA.addInput(doc, 0, 1);
@@ -221,7 +221,7 @@ public class SuspensionTest {
 
         // Reactivate
 
-        Document doc = m.createDocument("Bla");
+        Document doc = new Document(m, "Bla");
 
         inA = m.lookupNeuron(idA);
         inA.addInput(doc, 0, 1);

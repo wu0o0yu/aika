@@ -523,6 +523,18 @@ public class Synapse implements Writable {
             return this;
         }
 
+        /**
+         * Determines the input neuron.
+         *
+         * @param neuron
+         * @return
+         */
+        public Builder setNeuron(INeuron neuron) {
+            assert neuron != null;
+            this.neuron = neuron.getProvider();
+            return this;
+        }
+
 
         /**
          * The synapse weight of this input.

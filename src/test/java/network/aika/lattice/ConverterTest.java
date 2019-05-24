@@ -371,7 +371,7 @@ public class ConverterTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("IN");
+        Document doc = new Document(m, "IN");
 
         in.addInput(doc, 0, 2);
 
@@ -420,7 +420,7 @@ public class ConverterTest {
         );
 
 
-        Document doc = model.createDocument("Bla");
+        Document doc = new Document(model, "Bla");
         inB.addInput(doc, 0, 3);
         inC.addInput(doc, 0, 3);
 

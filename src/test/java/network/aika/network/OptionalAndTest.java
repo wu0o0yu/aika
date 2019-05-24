@@ -174,8 +174,8 @@ public class OptionalAndTest {
         );
 
 
-        Document doc1 = m.createDocument("Essen");
-        Document doc2 = m.createDocument("essen", 1);
+        Document doc1 = new Document(m, "Essen");
+        Document doc2 = new Document(m, "essen", 1);
 
         for(Document doc: new Document[] {doc1, doc2}) {
             String txt = doc.getContent();
@@ -243,7 +243,7 @@ public class OptionalAndTest {
         );
 
 
-        Document doc = model.createDocument("ABC");
+        Document doc = new Document(model, "ABC");
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 1, 2);
         inC.addInput(doc, 2, 3);

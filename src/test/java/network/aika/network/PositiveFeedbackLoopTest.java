@@ -69,7 +69,7 @@ public class PositiveFeedbackLoopTest {
         );
 
 
-        Document doc = m.createDocument("Bla ");
+        Document doc = new Document(m, "Bla ");
         inA.addInput(doc, 0, 3);
         inB.addInput(doc, 0, 3);
 

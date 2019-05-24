@@ -73,7 +73,7 @@ public class AncestorRelationTest {
         );
 
 
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 1);
 
@@ -87,7 +87,7 @@ public class AncestorRelationTest {
     @Test
     public void testAncestorRelation1() {
         Model m = new Model();
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         Neuron inA = m.createNeuron("A");
 
@@ -152,7 +152,7 @@ public class AncestorRelationTest {
     @Test
     public void testAncestorRelation2() {
         Model m = new Model();
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         Neuron inA = m.createNeuron("A");
 
@@ -243,7 +243,7 @@ public class AncestorRelationTest {
         );
 
 
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);

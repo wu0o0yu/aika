@@ -262,7 +262,7 @@ public class NamedEntityRecognitionTest {
 
 
         // Now that the model is complete, start processing an actual text.
-        Document doc = m.createDocument("mr. jackson cook was born in new york ");
+        Document doc = new Document(m, "mr. jackson cook was born in new york ");
 
         int i = 0;
         for(String w: doc.getContent().split(" ")) {

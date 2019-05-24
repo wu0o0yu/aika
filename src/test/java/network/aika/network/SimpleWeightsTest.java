@@ -67,7 +67,7 @@ public class SimpleWeightsTest {
         );
 
         {
-            Document doc = m.createDocument("aaaaaaaaaa", 0);
+            Document doc = new Document(m, "aaaaaaaaaa", 0);
 
             inA.addInput(doc, 0, 6);
 
@@ -78,7 +78,7 @@ public class SimpleWeightsTest {
             doc.clearActivations();
         }
         {
-            Document doc = m.createDocument("aaaaaaaaaa", 0);
+            Document doc = new Document(m, "aaaaaaaaaa", 0);
 
             inA.addInput(doc, 0, 6);
             inB.addInput(doc, 0, 6);
@@ -124,7 +124,7 @@ public class SimpleWeightsTest {
         );
 
         {
-            Document doc = m.createDocument("aaaaaaaaaa", 0);
+            Document doc = new Document(m, "aaaaaaaaaa", 0);
 
             inA.addInput(doc, 0, 6);
             inB.addInput(doc, 0, 6);

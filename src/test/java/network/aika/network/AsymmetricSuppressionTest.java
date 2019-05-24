@@ -49,7 +49,7 @@ public class AsymmetricSuppressionTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("a");
+        Document doc = new Document(m, "a");
 
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);

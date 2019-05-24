@@ -191,7 +191,7 @@ public class InterpretationSearchTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("Joerg Zimmermann");
+        Document doc = new Document(m, "Joerg Zimmermann");
 
         wJoerg.addInput(doc, 0, 6);
         wZimmermann.addInput(doc, 6, 16);
@@ -205,7 +205,7 @@ public class InterpretationSearchTest {
 
         doc.clearActivations();
 
-        doc = m.createDocument("Joerg Zimmermann Joerg Zimmermann");
+        doc = new Document(m, "Joerg Zimmermann Joerg Zimmermann");
 
         wJoerg.addInput(doc, 0, 6);
         wZimmermann.addInput(doc, 6, 17);
@@ -359,7 +359,7 @@ public class InterpretationSearchTest {
         );
 
 
-        Document doc = m.createDocument("aaaa bbbb ");
+        Document doc = new Document(m, "aaaa bbbb ");
 
         inA.addInput(doc, 0, 5);
         inB.addInput(doc, 5, 10);
@@ -453,7 +453,7 @@ public class InterpretationSearchTest {
 
         // Create the document even though the model is not yet complete
 
-        Document doc = m.createDocument("aaaa bbbb ");
+        Document doc = new Document(m, "aaaa bbbb ");
 
 //        inA.addInput(doc, 0, 5);
 //        inB.addInput(doc, 5, 10);
@@ -615,7 +615,7 @@ public class InterpretationSearchTest {
         SearchNode.COMPUTE_SOFT_MAX = true;
         SearchNode.OPTIMIZE_SEARCH = false;
 
-        Document doc = m.createDocument("aaaa");
+        Document doc = new Document(m, "aaaa");
         in.addInput(doc, 0, 1);
         in.addInput(doc, 1, 2);
         in.addInput(doc, 2, 3);

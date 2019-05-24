@@ -67,7 +67,7 @@ public class AddSynapseTest {
             );
         }
 
-        Document doc = m.createDocument("                   ");
+        Document doc = new Document(m, "                   ");
 
         i = 0;
         for(Neuron in: inputNeurons.values()) {

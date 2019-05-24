@@ -102,7 +102,7 @@ public class OverlappingOrTest {
                         .setRelation(END_EQUALS)
         );
 
-        Document doc = m.createDocument("a b c d e ", 0);
+        Document doc = new Document(m, "a b c d e ", 0);
 
 
         for(int i = 0; i < doc.length(); i++) {

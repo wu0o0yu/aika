@@ -301,7 +301,7 @@ public class SinglePositionSuppression {
 
 
 
-        Document doc = m.createDocument("abcd");
+        Document doc = new Document(m, "abcd");
 
         Activation actInABegin = inABegin.addInput(doc, 0, 1);
         Activation actInBBegin = inBBegin.addInput(doc, 1, 2);

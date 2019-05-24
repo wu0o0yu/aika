@@ -86,7 +86,7 @@ public class SoftMaxTest {
             j++;
         }
 
-        Document doc = m.createDocument("A B ");
+        Document doc = new Document(m , "A B ");
         inputs[0].addInput(doc, 0, 1);
         inputs[1].addInput(doc, 2, 3);
 

@@ -62,7 +62,7 @@ public class ActivationsTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 1);
         inA.addInput(doc, 2, 3);
@@ -86,7 +86,7 @@ public class ActivationsTest {
         Neuron in = m.createNeuron("A");
         OrNode inNode = in.get().getInputNode().get();
 
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         inNode.processActivation(createActivation(doc, inNode));
 

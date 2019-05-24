@@ -236,7 +236,7 @@ public class GenerateTextTest {
         );
 
 
-        Document doc = m.createDocument("Bla");
+        Document doc = new Document(m, "Bla");
 
         // Add both input a and input b.
         inA.addInput(doc, 0, 3);
@@ -310,7 +310,7 @@ public class GenerateTextTest {
                         .setRelation(END_TO_BEGIN_EQUALS)
         );
 
-        Document doc = m.createDocument("in ");
+        Document doc = new Document(m, "in ");
 
         in.addInput(doc, 0, 3);
 

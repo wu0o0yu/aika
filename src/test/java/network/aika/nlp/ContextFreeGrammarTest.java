@@ -217,7 +217,7 @@ public class ContextFreeGrammarTest {
 
 
     public Document parse(String txt) {
-        Document doc = m.createDocument(txt);
+        Document doc = new Document(m, txt);
 
         int i = 0;
         for(String word: txt.split(" ")) {

@@ -205,7 +205,7 @@ public class MutualExclusionTest {
 
         // Now that the model is complete, apply it to a document.
 
-        Document doc = m.createDocument("foobar", 0);
+        Document doc = new Document(m, "foobar", 0);
 
         // Add input activations starting at char 0 and ending at char 1
         // These inputs will be immediately propagated through the network.
