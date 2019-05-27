@@ -5,6 +5,7 @@ import network.aika.Document;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeSet;
+import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 
 public class ValueQueue {
     private final ArrayList<TreeSet<Activation>> queue = new ArrayList<>();
@@ -49,7 +50,7 @@ public class ValueQueue {
     }
 
 
-    public double process(Document doc, SearchNode sn) {
+    public double process(Document doc, SearchNode sn) throws OscillatingActivationsException {
         long v = doc.getNewVisitedId();
 
         add(sn.getActivation());

@@ -1,9 +1,7 @@
 package network.aika.neuron.relation;
 
-import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
 
@@ -40,8 +38,12 @@ public abstract class PositionRelation extends Relation {
 
 
     @Override
-    public boolean test(Activation act, Activation linkedAct) {
-        return optional || test(act.getSlot(fromSlot), linkedAct.getSlot(toSlot));
+    public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
+        Position toPos = linkedAct.lookupSlot(toSlot);
+        if(allowUndefined && toPos == null) {
+            return true;
+        }
+        return optional || test(act.lookupSlot(fromSlot), toPos);
     }
 
 
@@ -93,22 +95,16 @@ public abstract class PositionRelation extends Relation {
 
     @Override
     public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-        Position pos = linkedAct.getSlot(toSlot);
+        Position pos = linkedAct.lookupSlot(toSlot);
         if(pos == null) {
             return Stream.empty();
         }
 
         return getActivations(n, pos)
-                .filter(act -> test(act, linkedAct));
+                .filter(act -> test(act, linkedAct, false));
     }
 
     public abstract Stream<Activation> getActivations(INeuron n, Position pos);
-
-
-    @Override
-    public void registerRequiredSlots(Neuron input) {
-        input.get().addRequiredSlot(fromSlot);
-    }
 
 
     public static class Equals extends PositionRelation {
@@ -152,7 +148,7 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public void mapSlots(Map<Integer, Position> slots, Activation act) {
-            slots.put(toSlot, act.getSlot(fromSlot));
+            slots.put(toSlot, act.lookupSlot(fromSlot));
         }
 
         @Override

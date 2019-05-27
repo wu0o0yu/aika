@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.Activation.END;
@@ -36,13 +38,12 @@ public class PositionRelationTest {
     public void testRangeRelation() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
 
 
-        Neuron outC = Neuron.init(m.createNeuron("C"),
+        Neuron outC = Neuron.init(m.createNeuron("C", EXCITATORY),
                 5.0,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -68,7 +69,7 @@ public class PositionRelationTest {
         );
 
 
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);
@@ -84,13 +85,12 @@ public class PositionRelationTest {
     public void testABCPattern() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
-        Neuron inC = m.createNeuron("C");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
+        Neuron inC = m.createNeuron("C", INPUT);
 
-        Neuron outD = Neuron.init(m.createNeuron("D"),
+        Neuron outD = Neuron.init(m.createNeuron("D" ,EXCITATORY),
                 0.001,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -124,7 +124,7 @@ public class PositionRelationTest {
                         .setRelation(END_EQUALS)
         );
 
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 1, 2);
@@ -142,7 +142,7 @@ public class PositionRelationTest {
 
         HashMap<Character, Neuron> chars = new HashMap<>();
         for (char c = 'a'; c <= 'z'; c++) {
-            Neuron rec = m.createNeuron("IN-" + c);
+            Neuron rec = m.createNeuron("IN-" + c, INPUT);
             chars.put(c, rec);
         }
 
@@ -198,11 +198,11 @@ public class PositionRelationTest {
             }
         }
 
-        Neuron n = Neuron.init(m.createNeuron("PATTERN"), 0.5, INeuron.Type.EXCITATORY, inputs.toArray(new Neuron.Builder[inputs.size()]));
+        Neuron n = Neuron.init(m.createNeuron("PATTERN", EXCITATORY), 0.5, inputs.toArray(new Neuron.Builder[inputs.size()]));
 
         System.out.println(n.get().getInputNode().get().logicToString());
 
-        Document doc = m.createDocument("abc Huettenheim cba", 0);
+        Document doc = new Document(m, "abc Huettenheim cba", 0);
 
         for (int i = 0; i < doc.length(); i++) {
             char c = doc.getContent().toLowerCase().charAt(i);
@@ -223,15 +223,14 @@ public class PositionRelationTest {
     public void testOptionalRelation() {
         Model m = new Model();
 
-        Neuron inputChar = m.createNeuron("CHAR");
+        Neuron inputChar = m.createNeuron("CHAR", INPUT);
 
-        Neuron wordPlaceholder = m.createNeuron("Placeholder");
+        Neuron wordPlaceholder = m.createNeuron("Placeholder", INPUT);
 
 
         Neuron pattern = Neuron.init(
-                m.createNeuron("BCDEFG"),
+                m.createNeuron("BCDEFG", EXCITATORY),
                 1.0,
-                INeuron.Type.EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputChar)
@@ -289,7 +288,7 @@ public class PositionRelationTest {
         );
 
 
-        Document doc = m.createDocument("a b c d e f g h ", 0);
+        Document doc = new Document(m, "a b c d e f g h ", 0);
 
         wordPlaceholder.addInput(doc, 2, 14);
 

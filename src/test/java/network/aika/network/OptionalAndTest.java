@@ -21,15 +21,13 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
+import org.junit.Assert;
 import org.junit.Test;
 
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
-import static network.aika.neuron.relation.Relation.EQUALS;
-import static network.aika.neuron.relation.Relation.OVERLAPS;
+import static network.aika.neuron.relation.Relation.*;
 
 /**
  *
@@ -41,16 +39,15 @@ public class OptionalAndTest {
     public void testOptionalAnd() {
         Model m = new Model(null, 2);
 
-        Neuron wordEssen = m.createNeuron("word:essen");
-        Neuron wordHamburg = m.createNeuron("word:hamburg");
-        Neuron wordGehen = m.createNeuron("word:gehen");
-        Neuron upperCase = m.createNeuron("upper case");
+        Neuron wordEssen = m.createNeuron("word:essen", INPUT);
+        Neuron wordHamburg = m.createNeuron("word:hamburg", INPUT);
+        Neuron wordGehen = m.createNeuron("word:gehen", INPUT);
+        Neuron upperCase = m.createNeuron("upper case", INPUT);
 
-        Neuron suppr = m.createNeuron("SUPPRESS");
+        Neuron suppr = m.createNeuron("SUPPRESS", INHIBITORY);
 
-        Neuron hintNoun = Neuron.init(m.createNeuron("HINT-NOUN"),
+        Neuron hintNoun = Neuron.init(m.createNeuron("HINT-NOUN", INHIBITORY),
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wordEssen)
@@ -70,9 +67,8 @@ public class OptionalAndTest {
                         .setTo(OUTPUT)
                         .setRelation(EQUALS)
         );
-        Neuron hintVerb = Neuron.init(m.createNeuron("HINT-VERB"),
+        Neuron hintVerb = Neuron.init(m.createNeuron("HINT-VERB", INHIBITORY),
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wordEssen)
@@ -94,9 +90,8 @@ public class OptionalAndTest {
         );
 
 
-        Neuron noun = Neuron.init(m.createNeuron("NOUN"),
+        Neuron noun = Neuron.init(m.createNeuron("NOUN", EXCITATORY),
                 0.501,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(hintNoun)
@@ -126,9 +121,8 @@ public class OptionalAndTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron verb = Neuron.init(m.createNeuron("VERB"),
+        Neuron verb = Neuron.init(m.createNeuron("VERB", EXCITATORY),
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(hintVerb)
@@ -151,7 +145,6 @@ public class OptionalAndTest {
 
         Neuron.init(suppr,
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(noun)
@@ -173,8 +166,8 @@ public class OptionalAndTest {
         );
 
 
-        Document doc1 = m.createDocument("Essen");
-        Document doc2 = m.createDocument("essen", 1);
+        Document doc1 = new Document(m, "Essen");
+        Document doc2 = new Document(m, "essen", 1);
 
         for(Document doc: new Document[] {doc1, doc2}) {
             String txt = doc.getContent();
@@ -194,4 +187,60 @@ public class OptionalAndTest {
             doc.clearActivations();
         }
     }
+
+
+
+    @Test
+    public void testOnlyOptionalInputs() {
+        Model model = new Model();
+
+        Neuron inA = model.createNeuron("A", INPUT);
+        Neuron inB = model.createNeuron("B", INPUT);
+        Neuron inC = model.createNeuron("C", INPUT);
+
+        Neuron testNeuron = model.createNeuron("Test", EXCITATORY);
+
+        Neuron.init(testNeuron,
+                2.1,
+                new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(inA)
+                        .setWeight(2.0),
+                new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(inB)
+                        .setWeight(2.0),
+                new Synapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(inC)
+                        .setWeight(2.0),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(2)
+                        .setTo(OUTPUT)
+                        .setRelation(END_EQUALS),
+                new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRelation(END_TO_BEGIN_EQUALS),
+                new Relation.Builder()
+                        .setFrom(1)
+                        .setTo(2)
+                        .setRelation(END_TO_BEGIN_EQUALS)
+        );
+
+
+        Document doc = new Document(model, "ABC");
+        inA.addInput(doc, 0, 1);
+        inB.addInput(doc, 1, 2);
+        inC.addInput(doc, 2, 3);
+
+        doc.process();
+
+        Assert.assertEquals(1, testNeuron.getActivations(doc, false).count());
+    }
+
 }

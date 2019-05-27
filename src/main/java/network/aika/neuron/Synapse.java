@@ -20,7 +20,6 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Document;
 import network.aika.neuron.relation.Relation;
-import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.Writable;
 
 import java.io.DataInput;
@@ -30,6 +29,8 @@ import java.util.*;
 
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.Synapse.State.NEXT;
 
 /**
  * The {@code Synapse} class connects two neurons with each other. When propagating an activation signal, the
@@ -90,10 +91,8 @@ public class Synapse implements Writable {
 
     private DistanceFunction distanceFunction = null;
 
-    private Writable extension;
-
-
     private boolean inactive;
+    private boolean inactiveNew;
 
     private double weight;
     private double weightDelta;
@@ -110,10 +109,6 @@ public class Synapse implements Writable {
         this.id = id;
         this.input = input;
         this.output = output;
-
-        if(output.getModel().getSynapseExtensionFactory() != null) {
-            extension = output.getModel().getSynapseExtensionFactory().createObject();
-        }
     }
 
 
@@ -161,20 +156,21 @@ public class Synapse implements Writable {
         this.distanceFunction = distanceFunction;
     }
 
-    public <T extends Writable> T getExtension() {
-        return (T) extension;
-    }
-
-    public void setExtension(Writable extension) {
-        this.extension = extension;
-    }
 
     public boolean isInactive() {
         return inactive;
     }
 
-    public void setInactive(boolean inactive) {
-        this.inactive = inactive;
+    public boolean isInactive(State s) {
+        return s == CURRENT ? inactive : inactiveNew;
+    }
+
+    public void setInactive(State s, boolean inactive) {
+        if(s == CURRENT) {
+            this.inactive = inactive;
+        } else if(s == NEXT) {
+            this.inactiveNew = inactive;
+        }
     }
 
     public double getWeight() {
@@ -194,11 +190,11 @@ public class Synapse implements Writable {
     }
 
     public double getWeight(State s) {
-        return s == State.CURRENT ? weight : getNewWeight();
+        return s == CURRENT ? weight : getNewWeight();
     }
 
     public double getLimit(State s) {
-        return s == State.CURRENT ? limit : getNewLimit();
+        return s == CURRENT ? limit : getNewLimit();
     }
 
     public double getWeightDelta() {
@@ -307,6 +303,8 @@ public class Synapse implements Writable {
 
         limit += limitDelta;
         limitDelta = 0.0;
+
+        inactive = inactiveNew;
     }
 
 
@@ -398,11 +396,6 @@ public class Synapse implements Writable {
         out.writeDouble(limit);
 
         out.writeBoolean(inactive);
-
-        out.writeBoolean(extension != null);
-        if(extension != null) {
-            extension.write(out);
-        }
     }
 
 
@@ -430,23 +423,10 @@ public class Synapse implements Writable {
         limit = in.readDouble();
 
         inactive = in.readBoolean();
-
-        if(in.readBoolean()) {
-            extension = m.getSynapseExtensionFactory().createObject();
-            extension.readFields(in, m);
-        }
     }
 
 
-    public static Synapse read(DataInput in, Model m) throws IOException {
-        Synapse s = new Synapse();
-        s.readFields(in, m);
-        return s;
-    }
-
-
-
-    public static Synapse createOrReplace(Document doc, Integer synapseId, Neuron inputNeuron, Neuron outputNeuron) {
+    public static Synapse createOrReplace(Document doc, Integer synapseId, Neuron inputNeuron, Neuron outputNeuron, SynapseFactory synapseFactory) {
         outputNeuron.get(doc);
         inputNeuron.get(doc);
         outputNeuron.lock.acquireWriteLock();
@@ -457,7 +437,7 @@ public class Synapse implements Writable {
         outputNeuron.lock.releaseWriteLock();
 
         if(synapse == null) {
-            synapse = new Synapse(inputNeuron, outputNeuron, synapseId);
+            synapse = synapseFactory.createSynapse(inputNeuron, outputNeuron, synapseId);
         } else {
             synapse.input = inputNeuron;
             synapse.output = outputNeuron;
@@ -535,6 +515,18 @@ public class Synapse implements Writable {
             return this;
         }
 
+        /**
+         * Determines the input neuron.
+         *
+         * @param neuron
+         * @return
+         */
+        public Builder setNeuron(INeuron neuron) {
+            assert neuron != null;
+            this.neuron = neuron.getProvider();
+            return this;
+        }
+
 
         /**
          * The synapse weight of this input.
@@ -580,7 +572,7 @@ public class Synapse implements Writable {
 
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            Synapse s = createOrReplace(null, synapseId, neuron, outputNeuron);
+            Synapse s = createOrReplace(null, synapseId, neuron, outputNeuron, getSynapseFactory());
 
             s.isRecurrent = recurrent;
             s.identity = identity;
@@ -588,5 +580,14 @@ public class Synapse implements Writable {
 
             return s;
         }
+
+
+        protected SynapseFactory getSynapseFactory() {
+            return (input, output, id) -> new Synapse(input, output, id);
+        }
+    }
+
+    public interface SynapseFactory {
+        Synapse createSynapse(Neuron input, Neuron output, Integer id);
     }
 }

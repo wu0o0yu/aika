@@ -32,6 +32,7 @@ import org.junit.Test;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.BEGIN_EQUALS;
 import static network.aika.neuron.relation.Relation.END_EQUALS;
@@ -49,12 +50,11 @@ public class ActivationOutputsTest {
     public void addActivationsTest() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
 
-        Neuron pAB = Neuron.init(m.createNeuron("pAB"),
+        Neuron pAB = Neuron.init(m.createNeuron("pAB", EXCITATORY),
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -80,7 +80,7 @@ public class ActivationOutputsTest {
         );
 
 
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);
@@ -136,11 +136,11 @@ public class ActivationOutputsTest {
     @Test
     public void simpleAddActivationTest1() {
         Model m = new Model();
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
-        Neuron inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A", INPUT);
 
-        Neuron outB = Neuron.init(m.createNeuron("B"), 0.5, EXCITATORY,
+        Neuron outB = Neuron.init(m.createNeuron("B", EXCITATORY), 0.5,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -166,11 +166,11 @@ public class ActivationOutputsTest {
     @Test
     public void removeRemoveDestinationActivation() {
         Model m = new Model();
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
-        Neuron inA = m.createNeuron("A");
+        Neuron inA = m.createNeuron("A", INPUT);
 
-        Neuron outB = Neuron.init(m.createNeuron("B"), 0.001, EXCITATORY,
+        Neuron outB = Neuron.init(m.createNeuron("B", EXCITATORY), 0.001,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)

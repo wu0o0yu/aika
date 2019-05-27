@@ -17,15 +17,18 @@
 package network.aika;
 
 
-import network.aika.lattice.InputNode;
 import network.aika.lattice.Node;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.INeuron.Type;
 import network.aika.neuron.Neuron;
 import network.aika.Provider.SuspensionMode;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Linker;
 import network.aika.neuron.activation.SearchNode;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,11 +57,6 @@ public class Model {
 
     public SuspensionHook suspensionHook;
 
-    private WritableFactory neuronExtensionFactory;
-    private WritableFactory synapseExtensionFactory;
-    private WritableFactory activationExtensionFactory;
-
-    public LinkerFactory linkerFactory = (doc) -> new Linker(doc);
     public SearchNode.SkipSelectStep skipSelectStep = (act) -> false;
 
     public AtomicInteger docIdCounter = new AtomicInteger(0);
@@ -71,10 +69,7 @@ public class Model {
     public Map<Integer, PassiveInputFunction> passiveActivationFunctions = new TreeMap<>();
 
     public int defaultThreadId = 0;
-
-
     public static AtomicLong visitedCounter = new AtomicLong(1);
-
 
     /**
      * Creates a model with a single thread.
@@ -104,44 +99,6 @@ public class Model {
     }
 
 
-    public WritableFactory getNeuronExtensionFactory() {
-        return neuronExtensionFactory;
-    }
-
-
-    public void setNeuronExtensionFactory(WritableFactory neuronExtensionFactory) {
-        this.neuronExtensionFactory = neuronExtensionFactory;
-    }
-
-    public WritableFactory getSynapseExtensionFactory() {
-        return synapseExtensionFactory;
-    }
-
-
-    public void setSynapseExtensionFactory(WritableFactory synapseExtensionFactory) {
-        this.synapseExtensionFactory = synapseExtensionFactory;
-    }
-
-
-    public WritableFactory getActivationExtensionFactory() {
-        return activationExtensionFactory;
-    }
-
-
-    public void setActivationExtensionFactory(WritableFactory activationExtensionFactory) {
-        this.activationExtensionFactory = activationExtensionFactory;
-    }
-
-
-    public LinkerFactory getLinkerFactory() {
-        return linkerFactory;
-    }
-
-    public void setLinkerFactory(LinkerFactory linkerFactory) {
-        this.linkerFactory = linkerFactory;
-    }
-
-
     public SearchNode.SkipSelectStep getSkipSelectStep() {
         return skipSelectStep;
     }
@@ -151,44 +108,59 @@ public class Model {
     }
 
 
-    public Neuron createNeuron() {
-        return createNeuron(null);
+    public Neuron createNeuron(Type type) {
+        return createNeuron(null, type);
     }
 
 
-    public Neuron createNeuron(String label) {
-        return createNeuron(label, null);
+    public Neuron createNeuron(String label, Type type) {
+        return createNeuron(label, type, type.getDefaultActivationFunction(), null);
     }
 
 
-    public Neuron createNeuron(String label, String outputText) {
-        INeuron n = new INeuron(this, label, outputText, INPUT, ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT);
-        return n.getProvider();
+    public Neuron createNeuron(String label, Type type, ActivationFunction actF) {
+        return new INeuron(this, label, null, type, type.getDefaultActivationFunction()).getProvider();
+    }
+
+    public Neuron createNeuron(String label, Type type, String outputText) {
+        return new INeuron(this, label, outputText, type, type.getDefaultActivationFunction()).getProvider();
     }
 
 
-    public Neuron createNeuron(String label, String outputText, Type type, ActivationFunction actF) {
-        INeuron n = new INeuron(this, label, outputText, type, actF);
-        return n.getProvider();
+    public Neuron createNeuron(String label, Type type, ActivationFunction actF, String outputText) {
+        return new INeuron(this, label, outputText, type, actF).getProvider();
     }
 
 
-    public Document createDocument(String txt) {
-        return createDocument(txt, 0);
+    public INeuron readNeuron(DataInput in, Neuron p) throws IOException {
+        INeuron n = new INeuron(p);
+        n.readFields(in, this);
+        return n;
     }
 
 
-    public Document createDocument(String txt, int threadId) {
-        Document doc = new Document(docIdCounter.addAndGet(1), txt, this, threadId);
+    public Synapse readSynapse(DataInput in) throws IOException {
+        Synapse s = new Synapse();
+        s.readFields(in, this);
+        return s;
+    }
 
-        if (txt != null) {
-            if (docs[threadId] != null) {
-                throw new StaleDocumentException();
-            }
-            docs[threadId] = doc;
+
+    public void writeSynapse(Synapse s, DataOutput out) throws IOException {
+        s.write(out);
+    }
+
+
+    public int getNewDocumentId() {
+        return docIdCounter.addAndGet(1);
+    }
+
+
+    public void acquireThread(int threadId, Document doc) {
+        if (docs[threadId] != null) {
+            throw new StaleDocumentException();
         }
-
-        return doc;
+        docs[threadId] = doc;
     }
 
 
@@ -301,17 +273,6 @@ public class Model {
         synchronized (providers) {
             providers.remove(p.id);
         }
-    }
-
-
-    public interface WritableFactory {
-
-        Writable createObject();
-    }
-
-    public interface LinkerFactory {
-
-        Linker createLinker(Document doc);
     }
 
 

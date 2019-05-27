@@ -25,8 +25,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.CONTAINED_IN;
 import static network.aika.neuron.relation.Relation.EQUALS;
@@ -53,16 +52,15 @@ public class WeightsTest {
     public void testAndWithMultipleIO() {
         Model m = new Model();
 
-        Neuron pSuppr = m.createNeuron("SUPPR");
+        Neuron pSuppr = m.createNeuron("SUPPR", INHIBITORY);
 
-        inAA = m.createNeuron("AA");
-        inBA = m.createNeuron("BA");
-        inCA = m.createNeuron("CA");
+        inAA = m.createNeuron("AA", INPUT);
+        inBA = m.createNeuron("BA", INPUT);
+        inCA = m.createNeuron("CA", INPUT);
 
-        Neuron pOrA = m.createNeuron("pOrA");
+        Neuron pOrA = m.createNeuron("pOrA", INHIBITORY);
         Neuron.init(pOrA,
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inAA)
@@ -83,11 +81,10 @@ public class WeightsTest {
                         .setRelation(EQUALS)
         );
 
-        pDA = m.createNeuron("DA");
+        pDA = m.createNeuron("DA", EXCITATORY);
 
         Neuron.init(pDA,
                 1.401,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pOrA)
@@ -122,14 +119,13 @@ public class WeightsTest {
         );
 
 
-        inAB = m.createNeuron("AB");
-        inBB = m.createNeuron("BB");
-        inCB = m.createNeuron("CB");
+        inAB = m.createNeuron("AB", INPUT);
+        inBB = m.createNeuron("BB", INPUT);
+        inCB = m.createNeuron("CB", INPUT);
 
-        Neuron pOrB = m.createNeuron("pOrB");
+        Neuron pOrB = m.createNeuron("pOrB", INHIBITORY);
         Neuron.init(pOrB,
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inAB)
@@ -154,10 +150,9 @@ public class WeightsTest {
                         .setRelation(EQUALS)
         );
 
-        pDB = m.createNeuron("DB");
+        pDB = m.createNeuron("DB", EXCITATORY);
         Neuron.init(pDB,
                 0.401,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pOrB)
@@ -194,7 +189,6 @@ public class WeightsTest {
 
         Neuron.init(pSuppr,
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pDA)
@@ -225,7 +219,7 @@ public class WeightsTest {
 
 
     private void testVariant(Model m, int i) {
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         if(getBit(i, 0)) {
             inAA.addInput(doc, 0, 6);

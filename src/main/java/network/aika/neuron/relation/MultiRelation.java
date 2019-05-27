@@ -76,9 +76,9 @@ public class MultiRelation extends Relation {
 
 
     @Override
-    public boolean test(Activation act, Activation linkedAct) {
+    public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
         for (Relation rel : relations) {
-            if (!rel.test(act, linkedAct)) {
+            if (!rel.test(act, linkedAct, allowUndefined)) {
                 return false;
             }
         }
@@ -141,7 +141,7 @@ public class MultiRelation extends Relation {
                     .flatMap(r -> r.getActivations(n, linkedAct))
                     .filter(act -> {
                         for (Relation rel : relations) {
-                            if (!rel.test(act, linkedAct)) {
+                            if (!rel.test(act, linkedAct, false)) {
                                 return false;
                             }
                         }
@@ -157,14 +157,6 @@ public class MultiRelation extends Relation {
         }
 
         return false;
-    }
-
-
-    @Override
-    public void registerRequiredSlots(Neuron input) {
-        for(Relation rel: relations) {
-            rel.registerRequiredSlots(input);
-        }
     }
 
 

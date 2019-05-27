@@ -103,7 +103,7 @@ public class Candidate  implements Comparable<Candidate> {
 
             int r = Integer.compare(mea.getKey(), meb.getKey());
             if (r != 0) return r;
-            r = Position.compare(activation.getSlot(mea.getKey()), c.activation.getSlot(meb.getKey()));
+            r = Position.compare(activation.lookupSlot(mea.getKey()), c.activation.lookupSlot(meb.getKey()));
             if (r != 0) return r;
         }
 

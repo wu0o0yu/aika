@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -22,13 +23,13 @@ public class PositiveFeedbackLoopTest {
     public void testSimplePosFeedbackLoop() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("IN A");
-        Neuron inB = m.createNeuron("IN B");
+        Neuron inA = m.createNeuron("IN A", INPUT);
+        Neuron inB = m.createNeuron("IN B", INPUT);
 
-        Neuron nC = m.createNeuron("N C");
-        Neuron nD = m.createNeuron("N D");
+        Neuron nC = m.createNeuron("N C", EXCITATORY);
+        Neuron nD = m.createNeuron("N D", EXCITATORY);
 
-        Neuron.init(nC, 5.0, EXCITATORY,
+        Neuron.init(nC, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -48,7 +49,7 @@ public class PositiveFeedbackLoopTest {
                         .setRelation(EQUALS)
         );
 
-        Neuron.init(nD, 5.0, EXCITATORY,
+        Neuron.init(nD, 5.0,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
@@ -69,7 +70,7 @@ public class PositiveFeedbackLoopTest {
         );
 
 
-        Document doc = m.createDocument("Bla ");
+        Document doc = new Document(m, "Bla ");
         inA.addInput(doc, 0, 3);
         inB.addInput(doc, 0, 3);
 

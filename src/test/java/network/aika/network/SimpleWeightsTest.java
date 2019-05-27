@@ -26,6 +26,7 @@ import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
@@ -39,13 +40,12 @@ public class SimpleWeightsTest {
     public void testWeightsOR() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
 
-        Neuron pC = m.createNeuron("C");
+        Neuron pC = m.createNeuron("C", EXCITATORY);
         Neuron.init(pC,
                 0.7,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -67,7 +67,7 @@ public class SimpleWeightsTest {
         );
 
         {
-            Document doc = m.createDocument("aaaaaaaaaa", 0);
+            Document doc = new Document(m, "aaaaaaaaaa", 0);
 
             inA.addInput(doc, 0, 6);
 
@@ -78,7 +78,7 @@ public class SimpleWeightsTest {
             doc.clearActivations();
         }
         {
-            Document doc = m.createDocument("aaaaaaaaaa", 0);
+            Document doc = new Document(m, "aaaaaaaaaa", 0);
 
             inA.addInput(doc, 0, 6);
             inB.addInput(doc, 0, 6);
@@ -96,13 +96,12 @@ public class SimpleWeightsTest {
     public void testWeightsAND() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
 
-        Neuron pC = m.createNeuron("C");
+        Neuron pC = m.createNeuron("C", EXCITATORY);
         Neuron.init(pC,
                 0.01,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -124,7 +123,7 @@ public class SimpleWeightsTest {
         );
 
         {
-            Document doc = m.createDocument("aaaaaaaaaa", 0);
+            Document doc = new Document(m, "aaaaaaaaaa", 0);
 
             inA.addInput(doc, 0, 6);
             inB.addInput(doc, 0, 6);

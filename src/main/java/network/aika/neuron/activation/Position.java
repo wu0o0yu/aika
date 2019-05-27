@@ -43,7 +43,10 @@ public class Position {
 
 
     public static int compare(Position a, Position b) {
-        return a.compare(b);
+        if(a == null && b != null) return -1;
+        else if(a != null && b == null) return 1;
+        else if(a == null && b == null) return 0;
+        else return a.compare(b);
     }
 
     public int compare(Position pos) {

@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 import static network.aika.neuron.activation.Activation.BEGIN;
@@ -52,7 +53,7 @@ public class OverlappingOrTest {
 
         // Create an input neuron and a recurrent neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e'}) {
-            Neuron in = m.createNeuron(c + "");
+            Neuron in = m.createNeuron(c + "", INPUT);
 
             inputNeurons.put(c, in);
         }
@@ -62,9 +63,8 @@ public class OverlappingOrTest {
         // of the inputs relative to each other. The following flag specifies whether this relativeRid is
         // relative or absolute.
         Neuron pattern = Neuron.init(
-                m.createNeuron("BCD"),
+                m.createNeuron("BCD", EXCITATORY),
                 3.0,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))
@@ -102,7 +102,7 @@ public class OverlappingOrTest {
                         .setRelation(END_EQUALS)
         );
 
-        Document doc = m.createDocument("a b c d e ", 0);
+        Document doc = new Document(m, "a b c d e ", 0);
 
 
         for(int i = 0; i < doc.length(); i++) {

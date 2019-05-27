@@ -21,10 +21,6 @@ public abstract class AncestorRelation extends Relation {
     AncestorRelation() {}
 
 
-    @Override
-    public void registerRequiredSlots(Neuron input) {
-    }
-
 
     private static void collectCommonAncestor(Collection<Activation> results, INeuron n, Activation linkedAct, long v) {
         if(linkedAct.getVisitedId() == v) return;
@@ -161,7 +157,7 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public boolean test(Activation act, Activation linkedAct) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
             return hasCommonAncestor(act, linkedAct);
         }
 
@@ -210,7 +206,7 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public boolean test(Activation act, Activation linkedAct) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
             return contains(act, linkedAct, act.getNewVisitedId());
         }
 
@@ -260,7 +256,7 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public boolean test(Activation act, Activation linkedAct) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
             return contains(linkedAct, act, act.getNewVisitedId());
         }
 
@@ -309,7 +305,7 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public boolean test(Activation act, Activation linkedAct) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
             return !contains(act, linkedAct, act.getNewVisitedId());
         }
 
@@ -360,7 +356,7 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public boolean test(Activation act, Activation linkedAct) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
             return !contains(linkedAct, act, act.getNewVisitedId());
         }
 

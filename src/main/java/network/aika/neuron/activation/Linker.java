@@ -145,13 +145,13 @@ public class Linker {
             Integer relSynId = me.getKey();
             Relation rel = me.getValue();
             if(relSynId == Synapse.OUTPUT) {
-                if (!rel.test(iAct, oAct)) {
+                if (!rel.test(iAct, oAct, true)) {
                     return false;
                 }
             } else {
                 Synapse relSyn = oAct.getSynapseById(relSynId);
                 if(relSyn!= null && oAct.getInputLinksBySynapse(relSyn)
-                        .anyMatch(l -> !rel.test(iAct, l.getInput()))) {
+                        .anyMatch(l -> !rel.test(iAct, l.getInput(), false))) {
                     return false;
                 }
             }

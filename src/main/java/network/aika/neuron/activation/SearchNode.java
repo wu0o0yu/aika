@@ -21,6 +21,8 @@ import network.aika.Document;
 import network.aika.Utils;
 import network.aika.neuron.activation.Activation.StateChange;
 import network.aika.neuron.activation.Activation.Option;
+import network.aika.neuron.activation.Activation.RecursiveDepthExceededException;
+import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,7 +126,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, int level) {
+    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, int level) throws OscillatingActivationsException {
         id = doc.searchNodeIdCounter++;
         this.level = level;
         visited = doc.getNewVisitedId();
@@ -331,7 +333,7 @@ public class SearchNode implements Comparable<SearchNode> {
      * @param doc
      * @param root
      */
-    public static void search(Document doc, SearchNode root, long v, Long timeoutInMilliSeconds) throws TimeoutException {
+    public static void search(Document doc, SearchNode root, long v, Long timeoutInMilliSeconds) throws TimeoutException, RecursiveDepthExceededException, OscillatingActivationsException {
         SearchNode sn = root;
         double returnWeight = 0.0;
         double returnWeightSum = 0.0;
@@ -413,7 +415,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private static void checkTimeoutCondition(Long timeoutInMilliSeconds, long startTime) {
+    private static void checkTimeoutCondition(Long timeoutInMilliSeconds, long startTime) throws TimeoutException {
         if(timeoutInMilliSeconds != null && System.currentTimeMillis() > startTime + timeoutInMilliSeconds) {
             throw new TimeoutException("Interpretation search took too long: " + (System.currentTimeMillis() - startTime) + "ms");
         }
@@ -425,7 +427,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private void initStep(Document doc) {
+    private void initStep(Document doc) throws RecursiveDepthExceededException {
         candidate = doc.candidates.get(level);
 
         boolean precondition = candidate.activation.isActiveable();
@@ -481,7 +483,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean prepareSelectStep(Document doc) {
+    private boolean prepareSelectStep(Document doc) throws OscillatingActivationsException {
         candidate.repeat = false;
 
         if(preDecision == EXCLUDED) {
@@ -512,7 +514,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean prepareExcludeStep(Document doc) {
+    private boolean prepareExcludeStep(Document doc) throws RecursiveDepthExceededException, OscillatingActivationsException {
         if(preDecision == SELECTED) {
             return false;
         }
@@ -537,7 +539,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean generatesUnsuppressedExcluded() {
+    private boolean generatesUnsuppressedExcluded() throws RecursiveDepthExceededException {
         x: for (Activation cAct : candidate.activation.getConflicts()) {
             if(cAct.decision == EXCLUDED && cAct.isActiveable()) {
                 for (Activation icAct : cAct.getConflicts()) {
@@ -605,7 +607,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public static void invalidateCachedDecision(Activation act) {
+    public static void invalidateCachedDecision(Activation act) throws RecursiveDepthExceededException {
         Candidate pos = act.candidate;
         if (pos != null) {
             if (pos.cachedDecision == Decision.EXCLUDED) {
@@ -721,7 +723,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean checkExcluded(Activation ref) {
+    private boolean checkExcluded(Activation ref) throws RecursiveDepthExceededException {
         for (Activation cn : ref.getConflicts()) {
             if (cn.decision == SELECTED) return true;
         }

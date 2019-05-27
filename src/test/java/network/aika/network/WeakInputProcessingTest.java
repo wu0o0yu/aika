@@ -27,8 +27,7 @@ import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.EQUALS;
 import static network.aika.neuron.relation.Relation.OVERLAPS;
@@ -44,18 +43,17 @@ public class WeakInputProcessingTest {
     public void testWeakInputProcessing() {
         Model m = new Model();
 
-        Neuron strongInput = m.createNeuron("Strong Input");
+        Neuron strongInput = m.createNeuron("Strong Input", INPUT);
 
-        Neuron weakInputA = m.createNeuron("Weak Input A");
-        Neuron weakInputB = m.createNeuron("Weak Input B");
-        Neuron weakInputC = m.createNeuron("Weak Input C");
+        Neuron weakInputA = m.createNeuron("Weak Input A", INPUT);
+        Neuron weakInputB = m.createNeuron("Weak Input B", INPUT);
+        Neuron weakInputC = m.createNeuron("Weak Input C", INPUT);
 
-        Neuron suppr = m.createNeuron("suppr");
+        Neuron suppr = m.createNeuron("suppr", INHIBITORY);
 
         Neuron patternA = Neuron.init(
-                m.createNeuron("Pattern A"),
+                m.createNeuron("Pattern A", EXCITATORY),
                 5.4,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(strongInput)
@@ -86,9 +84,8 @@ public class WeakInputProcessingTest {
         );
 
         Neuron patternB = Neuron.init(
-                m.createNeuron("Pattern B"),
+                m.createNeuron("Pattern B", EXCITATORY),
                 5.4,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(strongInput)
@@ -127,9 +124,8 @@ public class WeakInputProcessingTest {
         );
 
         Neuron patternC = Neuron.init(
-                m.createNeuron("Pattern C"),
+                m.createNeuron("Pattern C", EXCITATORY),
                 5.4,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(strongInput)
@@ -170,7 +166,6 @@ public class WeakInputProcessingTest {
 
         Neuron.init(suppr,
                 0.0,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(patternA)
@@ -200,7 +195,7 @@ public class WeakInputProcessingTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("a ");
+        Document doc = new Document(m, "a ");
 
         strongInput.addInput(doc,0,1);
 

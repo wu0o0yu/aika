@@ -29,6 +29,7 @@ import org.junit.Test;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.BEGIN_EQUALS;
 import static network.aika.neuron.relation.Relation.END_EQUALS;
@@ -43,13 +44,12 @@ public class PatternLatticeTest {
     @Test
     public void testPredefinedPatterns() {
         Model m = new Model();
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
-        Neuron inC = m.createNeuron("C");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
+        Neuron inC = m.createNeuron("C", INPUT);
 
-        Neuron.init(m.createNeuron("ABC"),
+        Neuron.init(m.createNeuron("ABC", EXCITATORY),
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -87,7 +87,7 @@ public class PatternLatticeTest {
                         .setRelation(EQUALS)
         );
 
-        Document doc = m.createDocument("", 0);
+        Document doc = new Document(m, "", 0);
 
 
         InputNode pA = inA.get().getOutputNode().get();
@@ -114,13 +114,12 @@ public class PatternLatticeTest {
     public void testMultipleActivation() {
         Model m = new Model();
 
-        Neuron inA = m.createNeuron("A");
-        Neuron inB = m.createNeuron("B");
-        Neuron inC = m.createNeuron("C");
+        Neuron inA = m.createNeuron("A", INPUT);
+        Neuron inB = m.createNeuron("B", INPUT);
+        Neuron inC = m.createNeuron("C", INPUT);
 
-        Neuron nABC = Neuron.init(m.createNeuron("ABC"),
+        Neuron nABC = Neuron.init(m.createNeuron("ABC", EXCITATORY),
                 0.001,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
@@ -154,7 +153,7 @@ public class PatternLatticeTest {
                         .setRelation(END_EQUALS)
         );
 
-        Document doc = m.createDocument("aaaaaaaaaa", 0);
+        Document doc = new Document(m, "aaaaaaaaaa", 0);
 
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);

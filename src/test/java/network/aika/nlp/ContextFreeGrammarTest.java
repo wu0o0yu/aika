@@ -23,8 +23,7 @@ import java.util.TreeMap;
 
 import static network.aika.ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
 import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 
@@ -59,32 +58,32 @@ public class ContextFreeGrammarTest {
     public void init() {
         m = new Model();
 
-        I = m.createNeuron("Inhibitory");
+        I = m.createNeuron("Inhibitory", INHIBITORY, LIMITED_RECTIFIED_LINEAR_UNIT);
 
-        S = m.createNeuron("Sentence");
-        NP = m.createNeuron("Noun Phrase");
-        VP = m.createNeuron("Verb Phrase");
+        S = m.createNeuron("Sentence", EXCITATORY);
+        NP = m.createNeuron("Noun Phrase", INHIBITORY, LIMITED_RECTIFIED_LINEAR_UNIT);
+        VP = m.createNeuron("Verb Phrase", INHIBITORY, LIMITED_RECTIFIED_LINEAR_UNIT);
 
-        NP_ART_ADJ_N = m.createNeuron("NP <- ART ADJ N");
-        NP_ART_N = m.createNeuron("NP <- ART N");
-        NP_ADJ_N = m.createNeuron("NP <- ADJ N");
+        NP_ART_ADJ_N = m.createNeuron("NP <- ART ADJ N", EXCITATORY);
+        NP_ART_N = m.createNeuron("NP <- ART N", EXCITATORY);
+        NP_ADJ_N = m.createNeuron("NP <- ADJ N", EXCITATORY);
 
-        VP_AUX_V_NP = m.createNeuron("VP <- AUX V NP");
-        VP_V_NP = m.createNeuron("VP <- V NP");
+        VP_AUX_V_NP = m.createNeuron("VP <- AUX V NP", EXCITATORY);
+        VP_V_NP = m.createNeuron("VP <- V NP", EXCITATORY);
 
-        ART = m.createNeuron("Article");
-        N = m.createNeuron("Noun");
-        ADJ = m.createNeuron("Adjective");
-        V = m.createNeuron("Verb");
-        AUX = m.createNeuron("Auxiliary");
+        ART = m.createNeuron("Article", INHIBITORY, RECTIFIED_HYPERBOLIC_TANGENT);
+        N = m.createNeuron("Noun", INHIBITORY, RECTIFIED_HYPERBOLIC_TANGENT);
+        ADJ = m.createNeuron("Adjective", INHIBITORY, RECTIFIED_HYPERBOLIC_TANGENT);
+        V = m.createNeuron("Verb", INHIBITORY, RECTIFIED_HYPERBOLIC_TANGENT);
+        AUX = m.createNeuron("Auxiliary", INHIBITORY, RECTIFIED_HYPERBOLIC_TANGENT);
 
 
         for(Neuron n: new Neuron[] {I, NP, VP}) {
-            Neuron.init(n, 0.0, LIMITED_RECTIFIED_LINEAR_UNIT, INHIBITORY);
+            Neuron.init(n, 0.0);
         }
 
         for(Neuron n: new Neuron[] {ART, N, ADJ, V, AUX}) {
-            Neuron.init(n, 0.0, RECTIFIED_HYPERBOLIC_TANGENT, INHIBITORY,
+            Neuron.init(n, 0.0,
                     new Synapse.Builder()
                             .setSynapseId(0)
                             .setNeuron(I)
@@ -123,7 +122,7 @@ public class ContextFreeGrammarTest {
 
 
     private void initWord(String word, Neuron... wordTypes) {
-        Neuron wordN = m.createNeuron("W-" + word);
+        Neuron wordN = m.createNeuron("W-" + word, INPUT);
 
         dictionary.put(word, wordN);
 
@@ -212,12 +211,12 @@ public class ContextFreeGrammarTest {
                 .setRelation(OVERLAPS)
         );
 
-        Neuron.init(andN, weight, RECTIFIED_HYPERBOLIC_TANGENT, EXCITATORY, in.toArray(new Neuron.Builder[in.size()]));
+        Neuron.init(andN, weight, in.toArray(new Neuron.Builder[in.size()]));
     }
 
 
     public Document parse(String txt) {
-        Document doc = m.createDocument(txt);
+        Document doc = new Document(m, txt);
 
         int i = 0;
         for(String word: txt.split(" ")) {
