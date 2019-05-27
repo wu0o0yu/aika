@@ -572,13 +572,18 @@ public class Synapse implements Writable {
 
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            Synapse s = createOrReplace(null, synapseId, neuron, outputNeuron, (input, output, id) -> new Synapse(input, output, id));
+            Synapse s = createOrReplace(null, synapseId, neuron, outputNeuron, getSynapseFactory());
 
             s.isRecurrent = recurrent;
             s.identity = identity;
             s.distanceFunction = distanceFunction;
 
             return s;
+        }
+
+
+        protected SynapseFactory getSynapseFactory() {
+            return (input, output, id) -> new Synapse(input, output, id);
         }
     }
 
