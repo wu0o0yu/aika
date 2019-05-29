@@ -119,7 +119,7 @@ public class Model {
 
 
     public Neuron createNeuron(String label, Type type, ActivationFunction actF) {
-        return new INeuron(this, label, null, type, type.getDefaultActivationFunction()).getProvider();
+        return new INeuron(this, label, null, type, actF).getProvider();
     }
 
     public Neuron createNeuron(String label, Type type, String outputText) {
