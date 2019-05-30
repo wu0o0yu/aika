@@ -34,7 +34,7 @@ public class ValueQueue {
 
 
     public void add(int round, Activation act) {
-        if(act.rounds.isQueued(round) || act.decision == SearchNode.Decision.UNKNOWN) return;
+        if(act.rounds.isQueued(round) || act.getDecision() == SearchNode.Decision.UNKNOWN) return;
 
         TreeSet<Activation> q;
         if(round < queue.size()) {

@@ -73,8 +73,6 @@ public final class Activation implements Comparable<Activation> {
     private TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
     private TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
 
-    private Integer sequence;
-
     private double upperBound;
     private double lowerBound;
 
@@ -95,16 +93,51 @@ public final class Activation implements Comparable<Activation> {
     private Double inputValue;
 
     Decision inputDecision = Decision.UNKNOWN;
-    Decision decision = Decision.UNKNOWN;
     Decision finalDecision = Decision.UNKNOWN;
-    Candidate candidate;
+    CurrentSearchState currentSearchState = new CurrentSearchState();
+
+    private Integer sequence;
+    private Integer candidateId;
+
     private long visitedState;
     public long markedAncDesc;
 
     public boolean blocked;
 
 
-    private List<Activation> conflicts;
+    public static Comparator<Activation> CANDIDATE_COMP = (act1, act2) -> {
+            if(!act1.isConflicting() && act2.isConflicting()) return -1;
+            if(act1.isConflicting() && !act2.isConflicting()) return 1;
+
+            Iterator<Map.Entry<Integer, Position>> ita = act1.getSlots().entrySet().iterator();
+            Iterator<Map.Entry<Integer, Position>> itb = act2.getSlots().entrySet().iterator();
+
+            Map.Entry<Integer, Position> mea;
+            Map.Entry<Integer, Position> meb;
+            while(ita.hasNext() || itb.hasNext()) {
+                mea = ita.hasNext() ? ita.next() : null;
+                meb = itb.hasNext() ? itb.next() : null;
+
+                if(mea == null && meb == null) {
+                    break;
+                } else if(mea == null && meb != null) {
+                    return -1;
+                } else if(mea != null && meb == null) {
+                    return 1;
+                }
+
+                int r = Integer.compare(mea.getKey(), meb.getKey());
+                if (r != 0) return r;
+                r = Position.compare(act1.lookupSlot(mea.getKey()), act2.lookupSlot(meb.getKey()));
+                if (r != 0) return r;
+            }
+
+            int r = Integer.compare(act1.getSequence(), act2.getSequence());
+            if (r != 0) return r;
+
+            return Integer.compare(act1.getCandidateId(), act2.getCandidateId());
+
+    };
 
 
     private Activation(int id) {
@@ -232,6 +265,12 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
+    public boolean checkDependenciesSatisfied(long v) {
+        return !getInputLinks(false)
+                .anyMatch(l -> l.getInput().markedHasCandidate != v && !l.isRecurrent() && l.getInput().getUpperBound() > 0.0);
+    }
+
+
     public double getUpperBound() {
         return upperBound;
     }
@@ -264,7 +303,7 @@ public final class Activation implements Comparable<Activation> {
     }
 
     public Decision getDecision() {
-        return decision;
+        return currentSearchState.decision;
     }
 
     public Decision getFinalDecision() {
@@ -277,7 +316,7 @@ public final class Activation implements Comparable<Activation> {
                 outputLinks.put(l, l);
                 break;
             case OUTPUT:
-                if(l.input.decision == SELECTED) {
+                if(l.input.getDecision() == SELECTED) {
                     selectedInputLinks.add(l);
                 }
                 inputLinks.put(l, l);
@@ -418,9 +457,9 @@ public final class Activation implements Comparable<Activation> {
         double w = Math.min(-ss.getNegRecSum(), net);
 
         // Compute only the recurrent part is above the threshold.
-        double newWeight = decision == SELECTED ? Math.max(0.0, w) : 0.0;
+        double newWeight = getDecision() == SELECTED ? Math.max(0.0, w) : 0.0;
 
-        if(decision == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS) {
+        if(getDecision() == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS) {
             return new State(
                     actValue,
                     posActValue,
@@ -459,7 +498,7 @@ public final class Activation implements Comparable<Activation> {
             if (iAct == this) continue;
 
             double iv = 0.0;
-            if(!l.isNegative(CURRENT) && l.input.decision != EXCLUDED) {
+            if(!l.isNegative(CURRENT) && l.input.getDecision() != EXCLUDED) {
                 iv = Math.min(l.synapse.getLimit(), l.input.upperBound);
             }
 
@@ -595,7 +634,7 @@ public final class Activation implements Comparable<Activation> {
      */
     public boolean hasUndecidedPositiveFeedbackLinks() {
         return getInputLinks(false)
-                .anyMatch(l -> l.isRecurrent() && !l.isNegative(CURRENT) && l.input.decision == UNKNOWN);
+                .anyMatch(l -> l.isRecurrent() && !l.isNegative(CURRENT) && l.input.getDecision() == UNKNOWN);
     }
 
 
@@ -625,6 +664,7 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
+
     private static class InputState {
         public InputState(Link l, State s) {
             this.l = l;
@@ -640,7 +680,7 @@ public final class Activation implements Comparable<Activation> {
         State is = State.ZERO;
         if (s.isRecurrent()) {
             if (!s.isNegative(CURRENT) || !checkSelfReferencing(true, 0, v)) {
-                is = round == 0 ? getInitialState(decision) : rounds.get(round - 1);
+                is = round == 0 ? getInitialState(getDecision()) : rounds.get(round - 1);
             }
         } else {
             is = rounds.get(round);
@@ -668,59 +708,6 @@ public final class Activation implements Comparable<Activation> {
             }
         }
         return results;
-    }
-
-
-    public Collection<Activation> getConflicts() throws RecursiveDepthExceededException {
-        if(conflicts != null) {
-            return conflicts;
-        }
-
-        long v = doc.getNewVisitedId();
-        markPredecessor(v, 0);
-        conflicts = new ArrayList<>();
-        for(Link l: inputLinks.values()) {
-            if (l.isNegative(CURRENT) && l.isRecurrent()) {
-                l.input.collectIncomingConflicts(conflicts, v);
-            }
-        }
-        collectOutgoingConflicts(conflicts, v);
-        return conflicts;
-    }
-
-
-    private void collectIncomingConflicts(List<Activation> conflicts, long v) {
-        if(markedPredecessor == v) return;
-
-        switch(getType()) {
-            case EXCITATORY:
-                conflicts.add(this);
-                break;
-            case INHIBITORY:
-                for (Link l : inputLinks.values()) {
-                    if (!l.isNegative(CURRENT) && !l.isRecurrent()) {
-                        l.input.collectIncomingConflicts(conflicts, v);
-                    }
-                }
-                break;
-            case INPUT:
-                break;
-        }
-    }
-
-
-    private void collectOutgoingConflicts(List<Activation> conflicts, long v) {
-        if(markedPredecessor == v) return;
-
-        for(Link l: outputLinks.values()) {
-            if (l.output.getType() != INHIBITORY) {
-                if (l.isNegative(CURRENT) && l.isRecurrent()) {
-                    conflicts.add(l.output);
-                }
-            } else if (!l.isNegative(CURRENT) && !l.isRecurrent()) {
-                l.output.collectOutgoingConflicts(conflicts, v);
-            }
-        }
     }
 
 
@@ -761,12 +748,39 @@ public final class Activation implements Comparable<Activation> {
 
         if (newDecision == Decision.UNKNOWN && v != visitedState) return;
 
-        if(decision == Decision.SELECTED != (newDecision == Decision.SELECTED)) {
+        if(getDecision() == Decision.SELECTED != (newDecision == Decision.SELECTED)) {
             adjustSelectedNeuronInputs(newDecision);
         }
 
-        decision = newDecision;
+        currentSearchState.decision = newDecision;
         visitedState = v;
+
+        for(Link l: outputLinks.values()) {
+            if(l.getOutput().getType() == INHIBITORY) {
+                l.getOutput().setDecision(newDecision, v);
+            }
+        }
+    }
+
+
+    public boolean isConflicting() {
+        for(Link l: inputLinks.values()) {
+            if(l.isRecurrent() && l.isNegative(CURRENT)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public Collection<Activation> getConflicts() {
+        ArrayList<Activation> results = new ArrayList<>();
+        for(Link l: inputLinks.values()) {
+            if(l.isRecurrent() && l.isNegative(CURRENT)) {
+                results.add(l.input);
+            }
+        }
+        return results;
     }
 
 
@@ -795,6 +809,15 @@ public final class Activation implements Comparable<Activation> {
                 .filter(l -> !l.isRecurrent())
                 .forEach(l -> sequence = Math.max(sequence, l.input.getSequence() + 1));
         return sequence;
+    }
+
+
+    public Integer getCandidateId() {
+        return candidateId;
+    }
+
+    public void setCandidateId(Integer candidateId) {
+        this.candidateId = candidateId;
     }
 
 
@@ -995,6 +1018,11 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
+    public String searchStateToString() {
+        return id + " " + getNeuron().getId() + ":" + getLabel() + " " + currentSearchState.toString();
+    }
+
+
     public String toStringDetailed() {
         StringBuilder sb = new StringBuilder();
         sb.append(id + " - ");
@@ -1145,13 +1173,13 @@ public final class Activation implements Comparable<Activation> {
         StateChange sc = currentStateChange;
 
         sc.newRounds = rounds.copy();
-        sc.newState = decision;
+        sc.newState = getDecision();
     }
 
 
     /**
      * The {@code StateChange} class is used to store the state change of an activation that occurs in each node of
-     * the binary search tree. When a candidate refinement is selected during the search, then the activation values of
+     * the binary search tree. When a currentSearchState refinement is selected during the search, then the activation values of
      * all affected activation objects are adjusted. The changes to the activation values are also propagated through
      * the network. The old state needs to be stored here in order for the search to be able to restore the old network
      * state before following the alternative search branch.
@@ -1199,10 +1227,10 @@ public final class Activation implements Comparable<Activation> {
             this.weight = weight;
 
             for(Link l: inputLinks.values()) {
-                if(l.input.decision == SELECTED) {
-                    if(l.input.candidate != null) {
-                        if (l.input.candidate.id < candidate.id) {
-                            SearchNode inputSN = l.input.candidate.currentSearchNode.getParent();
+                if(l.input.getDecision() == SELECTED) {
+                    if(l.input.candidateId != null) {
+                        if (l.input.candidateId < candidateId) {
+                            SearchNode inputSN = l.input.currentSearchState.currentSearchNode.getParent();
 
                             link(l, inputSN.getCurrentOption());
                         }
@@ -1213,10 +1241,10 @@ public final class Activation implements Comparable<Activation> {
             }
 
             for(Link l: outputLinks.values()) {
-                if(l.input.decision == SELECTED) {
-                    if(l.output.candidate != null) {
-                        if(l.output.candidate.id < candidate.id) {
-                            SearchNode outputSN = l.output.candidate.currentSearchNode.getParent();
+                if(l.input.getDecision() == SELECTED) {
+                    if(l.output.candidateId != null) {
+                        if(l.output.candidateId < candidateId) {
+                            SearchNode outputSN = l.output.currentSearchState.currentSearchNode.getParent();
 
                             outputSN.getCurrentOption().link(l, this);
                         }

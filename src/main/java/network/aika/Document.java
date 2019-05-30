@@ -26,7 +26,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.Option;
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
-import network.aika.neuron.activation.Candidate;
+import network.aika.neuron.activation.CurrentSearchState;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.SearchNode;
 import network.aika.neuron.activation.SearchNode.TimeoutException;
@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.activation.Activation.CANDIDATE_COMP;
 import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
 import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
 
@@ -130,7 +132,7 @@ public class Document implements Comparable<Document> {
 
 
     public SearchNode selectedSearchNode;
-    public ArrayList<Candidate> candidates = new ArrayList<>();
+    public ArrayList<Activation> candidates = new ArrayList<>();
 
     public long createV;
 
@@ -369,17 +371,18 @@ public class Document implements Comparable<Document> {
 
 
     public void generateCandidates() throws CyclicDependencyException {
-        TreeSet<Candidate> tmp = new TreeSet<>();
+        TreeSet<Activation> tmp = new TreeSet<>(CANDIDATE_COMP);
         int i = 0;
 
         if(!INCREMENTAL_MODE) {
             candidates.clear();
         }
 
-        for(Activation act: activationsById.subMap(INCREMENTAL_MODE ? lastProcessedActivationId : -1, false, Integer.MAX_VALUE, true).values()) {
-            if (act.getDecision() == UNKNOWN && act.getUpperBound() > 0.0) {
+        for (Activation act : activationsById.subMap(INCREMENTAL_MODE ? lastProcessedActivationId : -1, false, Integer.MAX_VALUE, true).values()) {
+            if (act.getType() == EXCITATORY && act.getDecision() == UNKNOWN && act.getUpperBound() > 0.0) {
                 SearchNode.invalidateCachedDecision(act);
-                tmp.add(new Candidate(act, i++));
+                act.setCandidateId(i++);
+                tmp.add(act);
 
                 lastProcessedActivationId = Math.max(lastProcessedActivationId, act.getId());
             }
@@ -392,13 +395,13 @@ public class Document implements Comparable<Document> {
 
         while (!tmp.isEmpty()) {
             int oldSize = tmp.size();
-            for (Candidate c : tmp) {
-                if (c.checkDependenciesSatisfied(v)) {
-                    tmp.remove(c);
-                    c.setId(candidates.size());
-                    candidates.add(c);
+            for (Activation act : tmp) {
+                if (act.checkDependenciesSatisfied(v)) {
+                    tmp.remove(act);
+                    act.setCandidateId(candidates.size());
+                    candidates.add(act);
 
-                    c.getActivation().markedHasCandidate = v;
+                    act.markedHasCandidate = v;
                     break;
                 }
             }
@@ -469,8 +472,8 @@ public class Document implements Comparable<Document> {
 
 
     public void dumpDebugCandidateStatistics() {
-        for (Candidate c : candidates) {
-            log.info(c.toString());
+        for (Activation act : candidates) {
+            log.info(act.searchStateToString());
         }
     }
 

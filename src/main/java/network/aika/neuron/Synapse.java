@@ -206,6 +206,8 @@ public class Synapse implements Writable {
     }
 
     public void link() {
+        verify();
+
         INeuron in = input.get();
         INeuron out = output.get();
 
@@ -268,6 +270,13 @@ public class Synapse implements Writable {
 
         (dir ? in : out).lock.releaseWriteLock();
         (dir ? out : in).lock.releaseWriteLock();
+    }
+
+
+    private void verify() {
+        if((isRecurrent || isNegative(CURRENT)) && output.getType() == INHIBITORY) {
+            throw new InvalidInhibitoryNeuronSynapse();
+        }
     }
 
 
@@ -589,5 +598,12 @@ public class Synapse implements Writable {
 
     public interface SynapseFactory {
         Synapse createSynapse(Neuron input, Neuron output, Integer id);
+    }
+
+    public class InvalidInhibitoryNeuronSynapse extends RuntimeException {
+
+        public InvalidInhibitoryNeuronSynapse() {
+            super("An inhibitory neuron is not allowed to have recurrent or negative input synapses.");
+        }
     }
 }
