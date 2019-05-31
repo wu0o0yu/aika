@@ -427,7 +427,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         Activation act = getActivation(doc, input);
 
         if (act == null) {
-            act = new Activation(doc, this, input.getSlots(doc));
+            act = createActivation(doc, input.getSlots(doc));
         }
 
         act.setInputState(input);
@@ -445,6 +445,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         doc.propagate();
 
         return act;
+    }
+
+
+    protected Activation createActivation(Document doc, Map<Integer, Position> slots) {
+        return new Activation(doc, this, slots);
     }
 
 

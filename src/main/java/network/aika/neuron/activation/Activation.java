@@ -46,7 +46,7 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  *
  * @author Lukas Molzberger
  */
-public final class Activation implements Comparable<Activation> {
+public class Activation implements Comparable<Activation> {
 
     public static int BEGIN = 0;
     public static int END = 1;
