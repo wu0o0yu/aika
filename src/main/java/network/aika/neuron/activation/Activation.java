@@ -390,9 +390,6 @@ public final class Activation implements Comparable<Activation> {
             if (iAct == this) continue;
 
             double x = Math.min(s.getLimit(), is.s.value) * s.getWeight();
-            if(s.getDistanceFunction() != null) {
-                x *= s.getDistanceFunction().f(iAct, this);
-            }
             net += x;
             if(!s.isNegative(CURRENT)) {
                 posNet += x;
@@ -464,9 +461,6 @@ public final class Activation implements Comparable<Activation> {
             }
 
             double x = iv * s.getWeight();
-            if(s.getDistanceFunction() != null) {
-                x *= s.getDistanceFunction().f(iAct, this);
-            }
             net += x;
         }
 
@@ -518,9 +512,6 @@ public final class Activation implements Comparable<Activation> {
             if (iAct == this) continue;
 
             double x = s.getWeight();
-            if(s.getDistanceFunction() != null) {
-                x *= s.getDistanceFunction().f(iAct, this);
-            }
 
             if (s.isNegative(CURRENT)) {
                 if (!s.isRecurrent() && !iAct.checkSelfReferencing(false, 0, v)) {
