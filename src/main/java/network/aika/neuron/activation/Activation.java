@@ -1171,7 +1171,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public class Option {
+    public class Option implements Comparable<Option> {
         public int snId;
         public State state;
         public Decision decision;
@@ -1240,6 +1240,13 @@ public class Activation implements Comparable<Activation> {
 
         public String toString() {
             return " snId:" + snId + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " " + state;
+        }
+
+        @Override
+        public int compareTo(Option o) {
+            int r = Integer.compare(getAct().getId(), o.getAct().getId());
+            if(r != 0) return r;
+            return Integer.compare(snId, o.snId);
         }
     }
 
