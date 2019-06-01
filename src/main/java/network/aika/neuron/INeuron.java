@@ -152,6 +152,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         return type;
     }
 
+    public void setType(Type t) {
+        this.type = t;
+    }
+
 
     public Provider<InputNode> getOutputNode() {
         return outputNode;
@@ -211,6 +215,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     public ActivationFunction getActivationFunction() {
         return activationFunction;
+    }
+
+
+    public void setActivationFunction(ActivationFunction actF) {
+        activationFunction = actF;
     }
 
 
@@ -418,24 +427,29 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         Activation act = getActivation(doc, input);
 
         if (act == null) {
-            act = new Activation(doc, this, input.getSlots(doc));
+            act = createActivation(doc, input.getSlots(doc));
         }
 
         act.setInputState(input);
 
         doc.addInputNeuronActivation(act);
         doc.addFinallyActivatedNeuron(act.getINeuron());
-
+/*
         if(getType() != INPUT) {
             doc.getLinker().linkInput(act);
             doc.getLinker().process();
         }
-
+*/
         propagate(act);
 
         doc.propagate();
 
         return act;
+    }
+
+
+    protected Activation createActivation(Document doc, Map<Integer, Position> slots) {
+        return new Activation(doc, this, slots);
     }
 
 
@@ -568,7 +582,10 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         synapseSummary.write(out);
 
-        out.writeUTF(activationFunction.name());
+        out.writeBoolean(activationFunction != null);
+        if(activationFunction != null) {
+            out.writeUTF(activationFunction.name());
+        }
 
         out.writeInt(outputNode.getId());
 
@@ -625,7 +642,9 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         bias = in.readDouble();
         synapseSummary = SynapseSummary.read(in, m);
 
-        activationFunction = ActivationFunction.valueOf(in.readUTF());
+        if(in.readBoolean()) {
+            activationFunction = ActivationFunction.valueOf(in.readUTF());
+        }
 
         outputNode = m.lookupNodeProvider(in.readInt());
 

@@ -46,7 +46,7 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  *
  * @author Lukas Molzberger
  */
-public final class Activation implements Comparable<Activation> {
+public class Activation implements Comparable<Activation> {
 
     public static int BEGIN = 0;
     public static int END = 1;
@@ -390,9 +390,6 @@ public final class Activation implements Comparable<Activation> {
             if (iAct == this) continue;
 
             double x = Math.min(s.getLimit(), is.s.value) * s.getWeight();
-            if(s.getDistanceFunction() != null) {
-                x *= s.getDistanceFunction().f(iAct, this);
-            }
             net += x;
             if(!s.isNegative(CURRENT)) {
                 posNet += x;
@@ -464,9 +461,6 @@ public final class Activation implements Comparable<Activation> {
             }
 
             double x = iv * s.getWeight();
-            if(s.getDistanceFunction() != null) {
-                x *= s.getDistanceFunction().f(iAct, this);
-            }
             net += x;
         }
 
@@ -518,9 +512,6 @@ public final class Activation implements Comparable<Activation> {
             if (iAct == this) continue;
 
             double x = s.getWeight();
-            if(s.getDistanceFunction() != null) {
-                x *= s.getDistanceFunction().f(iAct, this);
-            }
 
             if (s.isNegative(CURRENT)) {
                 if (!s.isRecurrent() && !iAct.checkSelfReferencing(false, 0, v)) {
@@ -1171,7 +1162,7 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
-    public class Option {
+    public class Option implements Comparable<Option> {
         public int snId;
         public State state;
         public Decision decision;
@@ -1240,6 +1231,13 @@ public final class Activation implements Comparable<Activation> {
 
         public String toString() {
             return " snId:" + snId + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " " + state;
+        }
+
+        @Override
+        public int compareTo(Option o) {
+            int r = Integer.compare(getAct().getId(), o.getAct().getId());
+            if(r != 0) return r;
+            return Integer.compare(snId, o.snId);
         }
     }
 
