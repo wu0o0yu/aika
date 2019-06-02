@@ -19,6 +19,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Document;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.relation.Relation;
 import network.aika.Writable;
 
@@ -299,6 +300,14 @@ public class Synapse implements Writable {
 
     public boolean isZero() {
         return Math.abs(weight) < TOLERANCE;
+    }
+
+    public double computeRelationWeights(Activation.Link l) {
+        return 0;
+    }
+
+    public double computeMaxRelationWeights() {
+        return 0;
     }
 
 
