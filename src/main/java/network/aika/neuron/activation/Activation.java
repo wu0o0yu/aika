@@ -391,6 +391,9 @@ public class Activation implements Comparable<Activation> {
 
             double x = Math.min(s.getLimit(), is.s.value) * s.getWeight();
             net += x;
+
+            net += s.computeRelationWeights(is.l);
+
             if(!s.isNegative(CURRENT)) {
                 posNet += x;
             }
@@ -441,7 +444,6 @@ public class Activation implements Comparable<Activation> {
 
     public boolean isActiveable() {
         INeuron n = getINeuron();
-        SynapseSummary ss = n.getSynapseSummary();
 
         double net = n.getTotalBias(CURRENT);
 
@@ -462,6 +464,8 @@ public class Activation implements Comparable<Activation> {
 
             double x = iv * s.getWeight();
             net += x;
+
+            net += s.computeRelationWeights(l);
         }
 
         for(Synapse s: n.getPassiveInputSynapses()) {
@@ -522,6 +526,10 @@ public class Activation implements Comparable<Activation> {
             } else {
                 ub += Math.min(s.getLimit(), iAct.upperBound) * x;
                 lb += Math.min(s.getLimit(), iAct.lowerBound) * x;
+
+                double rlw = s.computeRelationWeights(l);
+                ub += rlw;
+                lb += rlw;
             }
         }
 
