@@ -807,27 +807,29 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
+    protected String toDetailedString() {
+        return getNeuronTypeIdentifier() + " " + label + " B:" + Utils.round(bias);
+    }
+
+
+    protected String getNeuronTypeIdentifier() {
+        return "N";
+    }
+
+
     public String toStringWithSynapses() {
-        SortedSet<Synapse> is = new TreeSet<>((s1, s2) -> {
-            int r = Double.compare(s2.getWeight(), s1.getWeight());
-            if (r != 0) return r;
-            return Integer.compare(s1.getInput().getId(), s2.getInput().getId());
-        });
+        SortedSet<Synapse> is = new TreeSet<>(Comparator.comparing(s -> s.getInput().getId()));
 
         is.addAll(inputSynapses.values());
 
         StringBuilder sb = new StringBuilder();
-        sb.append(toString());
-        sb.append("<");
-        sb.append("B:");
-        sb.append(Utils.round(bias));
+        sb.append(toDetailedString());
+        sb.append("\n");
         for (Synapse s : is) {
-            sb.append(", ");
-            sb.append(Utils.round(s.getWeight()));
-            sb.append(":");
-            sb.append(s.getInput().toString());
+            sb.append("  ");
+            sb.append(s.toString());
+            sb.append("\n");
         }
-        sb.append(">");
         return sb.toString();
     }
 
