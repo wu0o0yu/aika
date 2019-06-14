@@ -32,8 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.ActivationFunction.*;
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INPUT;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.Synapse.State.NEXT;
 
@@ -820,7 +819,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     public String toStringWithSynapses() {
         SortedSet<Synapse> is = new TreeSet<>(Comparator.comparing(s -> s.getInput().getId()));
 
-        is.addAll(inputSynapses.values());
+        if(type == EXCITATORY) {
+            is.addAll(inputSynapses.values());
+        } else if(type == INHIBITORY) {
+            is.addAll(getProvider().getActiveInputSynapses());
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append(toDetailedString());

@@ -159,6 +159,15 @@ public class MultiRelation extends Relation {
         return false;
     }
 
+    @Override
+    public Relation newInstance() {
+        MultiRelation mr = new MultiRelation();
+        for(Relation r: relations) {
+            mr.addRelation(r.newInstance());
+        }
+        return mr;
+    }
+
 
     @Override
     public int compareTo(Relation rel) {
