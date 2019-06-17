@@ -147,11 +147,13 @@ public class OrNode extends Node<OrNode, OrActivation> {
             int synapseId = oe.synapseIds[i];
 
             Synapse s = outputNeuron.getSynapseById(synapseId);
-            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
-                Relation rel = me.getValue();
-                if(me.getKey() == Synapse.OUTPUT) {
-                    Activation iAct = inputAct.getInputActivation(i);
-                    rel.mapSlots(slots, iAct);
+            if(s != null) {
+                for (Map.Entry<Integer, Relation> me : s.getRelations().entrySet()) {
+                    Relation rel = me.getValue();
+                    if (me.getKey() == Synapse.OUTPUT) {
+                        Activation iAct = inputAct.getInputActivation(i);
+                        rel.mapSlots(slots, iAct);
+                    }
                 }
             }
         }
