@@ -425,8 +425,10 @@ public class OrNode extends Node<OrNode, OrActivation> {
             for (int i = 0; i < size(); i++) {
                 int synId = get(i);
                 Synapse s = act.getSynapseById(synId);
-                Activation iAct = input.getInputActivation(i);
-                l.link(s, iAct, act);
+                if(s != null) {
+                    Activation iAct = input.getInputActivation(i);
+                    l.link(s, iAct, act);
+                }
             }
             l.process();
         }
