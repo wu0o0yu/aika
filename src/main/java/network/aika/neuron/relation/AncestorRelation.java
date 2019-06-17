@@ -169,6 +169,11 @@ public abstract class AncestorRelation extends Relation {
             return results.stream();
         }
 
+        @Override
+        public Relation newInstance() {
+            return new CommonAncestor(optional, follow);
+        }
+
         public String toString() {
             return "COMMON-ANCESTOR";
         }
@@ -216,6 +221,11 @@ public abstract class AncestorRelation extends Relation {
             List<Activation> results = new ArrayList<>();
             collectContains(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
+        }
+
+        @Override
+        public Relation newInstance() {
+            return new IsDescendantOf(optional, follow);
         }
 
 
@@ -266,6 +276,11 @@ public abstract class AncestorRelation extends Relation {
             List<Activation> results = new ArrayList<>();
             collectContainedIn(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
+        }
+
+        @Override
+        public Relation newInstance() {
+            return new IsAncestorOf(optional, follow);
         }
 
         public String toString() {
@@ -319,6 +334,11 @@ public abstract class AncestorRelation extends Relation {
                     .filter(act -> act.markedAncDesc != v);
         }
 
+        @Override
+        public Relation newInstance() {
+            return new NotDescendantOf(optional, follow);
+        }
+
         public String toString() {
             return "NOT-DESCENDANT-OF";
         }
@@ -368,6 +388,11 @@ public abstract class AncestorRelation extends Relation {
 
             return n.getActivations(linkedAct.getDocument())
                     .filter(act -> act.markedAncDesc != v);
+        }
+
+        @Override
+        public Relation newInstance() {
+            return new NotAncestorOf(optional, follow);
         }
 
         public String toString() {

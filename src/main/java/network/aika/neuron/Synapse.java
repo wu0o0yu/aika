@@ -364,7 +364,7 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S ID:" + id + " NW:" + Utils.round(getNewWeight()) + " rec:" + isRecurrent + " " +  input + "->" + output;
+        return "S ID:" + id + " NW:" + Utils.round(getNewWeight()) + " rec:" + isRecurrent + " " + input + "->" + output;
     }
 
 
