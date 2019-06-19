@@ -426,7 +426,7 @@ public class Activation implements Comparable<Activation> {
                     posActValue,
                     net,
                     posNet,
-                    -1,
+                    fired,
                     newWeight
             );
         } else {
