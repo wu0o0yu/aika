@@ -46,7 +46,7 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  *
  * @author Lukas Molzberger
  */
-public final class Activation implements Comparable<Activation> {
+public class Activation implements Comparable<Activation> {
 
     public static int BEGIN = 0;
     public static int END = 1;
@@ -429,10 +429,10 @@ public final class Activation implements Comparable<Activation> {
             if (iAct == this) continue;
 
             double x = Math.min(s.getLimit(), is.s.value) * s.getWeight();
-            if(s.getDistanceFunction() != null) {
-                x *= s.getDistanceFunction().f(iAct, this);
-            }
             net += x;
+
+            net += s.computeRelationWeights(is.l);
+
             if(!s.isNegative(CURRENT)) {
                 posNet += x;
             }
@@ -465,7 +465,7 @@ public final class Activation implements Comparable<Activation> {
                     posActValue,
                     net,
                     posNet,
-                    -1,
+                    fired,
                     newWeight
             );
         } else {
@@ -483,7 +483,6 @@ public final class Activation implements Comparable<Activation> {
 
     public boolean isActiveable() {
         INeuron n = getINeuron();
-        SynapseSummary ss = n.getSynapseSummary();
 
         double net = n.getTotalBias(CURRENT);
 
@@ -503,10 +502,9 @@ public final class Activation implements Comparable<Activation> {
             }
 
             double x = iv * s.getWeight();
-            if(s.getDistanceFunction() != null) {
-                x *= s.getDistanceFunction().f(iAct, this);
-            }
             net += x;
+
+            net += s.computeRelationWeights(l);
         }
 
         for(Synapse s: n.getPassiveInputSynapses()) {
@@ -557,9 +555,6 @@ public final class Activation implements Comparable<Activation> {
             if (iAct == this) continue;
 
             double x = s.getWeight();
-            if(s.getDistanceFunction() != null) {
-                x *= s.getDistanceFunction().f(iAct, this);
-            }
 
             if (s.isNegative(CURRENT)) {
                 if (!s.isRecurrent() && !iAct.checkSelfReferencing(false, 0, v)) {
@@ -570,6 +565,10 @@ public final class Activation implements Comparable<Activation> {
             } else {
                 ub += Math.min(s.getLimit(), iAct.upperBound) * x;
                 lb += Math.min(s.getLimit(), iAct.lowerBound) * x;
+
+                double rlw = s.computeRelationWeights(l);
+                ub += rlw;
+                lb += rlw;
             }
         }
 
@@ -831,13 +830,18 @@ public final class Activation implements Comparable<Activation> {
             throw new RecursiveDepthExceededException();
         }
 
-        markedPredecessor = v;
+        markPredecessor(v);
 
         for(Link l: inputLinks.values()) {
             if(!l.isNegative(CURRENT) && !l.isRecurrent()) {
                 l.input.markPredecessor(v, depth + 1);
             }
         }
+    }
+
+
+    public void markPredecessor(long v) {
+        markedPredecessor = v;
     }
 
 
@@ -1199,7 +1203,7 @@ public final class Activation implements Comparable<Activation> {
     }
 
 
-    public class Option {
+    public class Option implements Comparable<Option> {
         public int snId;
         public State state;
         public Decision decision;
@@ -1268,6 +1272,13 @@ public final class Activation implements Comparable<Activation> {
 
         public String toString() {
             return " snId:" + snId + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " " + state;
+        }
+
+        @Override
+        public int compareTo(Option o) {
+            int r = Integer.compare(getAct().getId(), o.getAct().getId());
+            if(r != 0) return r;
+            return Integer.compare(snId, o.snId);
         }
     }
 

@@ -19,6 +19,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Document;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.relation.Relation;
 import network.aika.Writable;
 
@@ -89,8 +90,6 @@ public class Synapse implements Writable {
 
     private Map<Integer, Relation> relations = new TreeMap<>();
 
-    private DistanceFunction distanceFunction = null;
-
     private boolean inactive;
     private boolean inactiveNew;
 
@@ -147,15 +146,6 @@ public class Synapse implements Writable {
     public void setRelations(Map<Integer, Relation> relations) {
         this.relations = relations;
     }
-
-    public DistanceFunction getDistanceFunction() {
-        return distanceFunction;
-    }
-
-    public void setDistanceFunction(DistanceFunction distanceFunction) {
-        this.distanceFunction = distanceFunction;
-    }
-
 
     public boolean isInactive() {
         return inactive;
@@ -321,6 +311,14 @@ public class Synapse implements Writable {
         return Math.abs(weight) < TOLERANCE;
     }
 
+    public double computeRelationWeights(Activation.Link l) {
+        return 0;
+    }
+
+    public double computeMaxRelationWeights() {
+        return 0;
+    }
+
 
     public enum State {
         NEXT,
@@ -375,7 +373,7 @@ public class Synapse implements Writable {
 
 
     public String toString() {
-        return "S ID:" + id + " NW:" + Utils.round(getNewWeight()) + " rec:" + isRecurrent + " " +  input + "->" + output;
+        return "S ID:" + id + " NW:" + Utils.round(getNewWeight()) + " rec:" + isRecurrent + " " + input + "->" + output;
     }
 
 
@@ -394,11 +392,6 @@ public class Synapse implements Writable {
             out.writeInt(me.getKey());
 
             me.getValue().write(out);
-        }
-
-        out.writeBoolean(distanceFunction != null);
-        if(distanceFunction != null) {
-            out.writeUTF(distanceFunction.name());
         }
 
         out.writeDouble(weight);
@@ -422,10 +415,6 @@ public class Synapse implements Writable {
         for(int i = 0; i < l; i++) {
             Integer relId = in.readInt();
             relations.put(relId, Relation.read(in, m));
-        }
-
-        if(in.readBoolean()) {
-            distanceFunction = DistanceFunction.valueOf(in.readUTF());
         }
 
         weight = in.readDouble();
@@ -491,7 +480,6 @@ public class Synapse implements Writable {
         private Neuron neuron;
         double weight;
         double limit = 1.0;
-        private DistanceFunction distanceFunction;
         private boolean identity;
         private Integer synapseId;
 
@@ -555,12 +543,6 @@ public class Synapse implements Writable {
         }
 
 
-        public Builder setDistanceFunction(DistanceFunction distFunc) {
-            this.distanceFunction = distFunc;
-            return this;
-        }
-
-
         public Builder setIdentity(boolean identity) {
             this.identity = identity;
             return this;
@@ -585,7 +567,6 @@ public class Synapse implements Writable {
 
             s.isRecurrent = recurrent;
             s.identity = identity;
-            s.distanceFunction = distanceFunction;
 
             return s;
         }

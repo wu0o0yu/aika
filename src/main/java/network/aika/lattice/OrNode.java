@@ -105,7 +105,9 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
     private Activation lookupActivation(Link ol, Predicate<Activation.Link> filter) {
         for(Activation.Link l: ol.getInputLinks(outputNeuron)) {
-            for(Map.Entry<Integer, Relation> me: l.getSynapse().getRelations().entrySet()) {
+            Synapse syn = l.getSynapse();
+            Map<Integer, Relation> rels = syn.getRelations();
+            for(Map.Entry<Integer, Relation> me: rels.entrySet()) {
                 Integer relSynId = me.getKey();
                 Relation rel = me.getValue();
 
@@ -145,11 +147,13 @@ public class OrNode extends Node<OrNode, OrActivation> {
             int synapseId = oe.synapseIds[i];
 
             Synapse s = outputNeuron.getSynapseById(synapseId);
-            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
-                Relation rel = me.getValue();
-                if(me.getKey() == Synapse.OUTPUT) {
-                    Activation iAct = inputAct.getInputActivation(i);
-                    rel.mapSlots(slots, iAct);
+            if(s != null) {
+                for (Map.Entry<Integer, Relation> me : s.getRelations().entrySet()) {
+                    Relation rel = me.getValue();
+                    if (me.getKey() == Synapse.OUTPUT) {
+                        Activation iAct = inputAct.getInputActivation(i);
+                        rel.mapSlots(slots, iAct);
+                    }
                 }
             }
         }
@@ -423,8 +427,10 @@ public class OrNode extends Node<OrNode, OrActivation> {
             for (int i = 0; i < size(); i++) {
                 int synId = get(i);
                 Synapse s = act.getSynapseById(synId);
-                Activation iAct = input.getInputActivation(i);
-                l.link(s, iAct, act);
+                if(s != null) {
+                    Activation iAct = input.getInputActivation(i);
+                    l.link(s, iAct, act);
+                }
             }
             l.process();
         }

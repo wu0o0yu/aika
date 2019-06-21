@@ -32,8 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.ActivationFunction.*;
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INPUT;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.Synapse.State.NEXT;
 
@@ -427,7 +426,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         Activation act = getActivation(doc, input);
 
         if (act == null) {
-            act = new Activation(doc, this, input.getSlots(doc));
+            act = createActivation(doc, input.getSlots(doc));
         }
 
         act.setInputState(input);
@@ -445,6 +444,11 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         doc.propagate();
 
         return act;
+    }
+
+
+    protected Activation createActivation(Document doc, Map<Integer, Position> slots) {
+        return new Activation(doc, this, slots);
     }
 
 
@@ -802,27 +806,33 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public String toStringWithSynapses() {
-        SortedSet<Synapse> is = new TreeSet<>((s1, s2) -> {
-            int r = Double.compare(s2.getWeight(), s1.getWeight());
-            if (r != 0) return r;
-            return Integer.compare(s1.getInput().getId(), s2.getInput().getId());
-        });
+    protected String toDetailedString() {
+        return getNeuronTypeIdentifier() + " " + label + " B:" + Utils.round(bias);
+    }
 
-        is.addAll(inputSynapses.values());
+
+    protected String getNeuronTypeIdentifier() {
+        return "N";
+    }
+
+
+    public String toStringWithSynapses() {
+        SortedSet<Synapse> is = new TreeSet<>(Comparator.comparing(s -> s.getInput().getId()));
+
+        if(type == EXCITATORY) {
+            is.addAll(inputSynapses.values());
+        } else if(type == INHIBITORY) {
+            is.addAll(getProvider().getActiveInputSynapses());
+        }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(toString());
-        sb.append("<");
-        sb.append("B:");
-        sb.append(Utils.round(bias));
+        sb.append(toDetailedString());
+        sb.append("\n");
         for (Synapse s : is) {
-            sb.append(", ");
-            sb.append(Utils.round(s.getWeight()));
-            sb.append(":");
-            sb.append(s.getInput().toString());
+            sb.append("  ");
+            sb.append(s.toString());
+            sb.append("\n");
         }
-        sb.append(">");
         return sb.toString();
     }
 
@@ -890,6 +900,8 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         private void updateSynapse(Synapse.State state, double sign, Synapse s) {
             updateSum(s.isRecurrent(), s.isNegative(state), sign * (s.getLimit(state) * s.getWeight(state)));
+
+            posDirSumDelta += sign * s.computeMaxRelationWeights();
 
             if(s.getInput().get().isPassiveInputNeuron() && !s.isNegative(state)) {
                 posPassiveSumDelta += sign * (!s.isNegative(state) ? (s.getLimit(state) * s.getWeight(state)) : 0.0);

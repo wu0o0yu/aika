@@ -407,6 +407,7 @@ public class Document implements Comparable<Document> {
             }
 
             if(tmp.size() == oldSize) {
+                log.info(activationsToString());
                 throw new CyclicDependencyException();
             }
         }

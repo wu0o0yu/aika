@@ -157,6 +157,11 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
+        public Relation newInstance() {
+            return new Equals(fromSlot, toSlot, optional, follow);
+        }
+
+        @Override
         public Stream<Activation> getActivations(INeuron n, Position pos) {
             if(!follow) return Stream.empty();
             return n.getActivations(pos.getDocument(),
@@ -215,6 +220,11 @@ public abstract class PositionRelation extends Relation {
         @Override
         public boolean isExact() {
             return false;
+        }
+
+        @Override
+        public Relation newInstance() {
+            return new LessThan(fromSlot, toSlot, orEquals, optional, follow, maxLength);
         }
 
         @Override
@@ -303,6 +313,11 @@ public abstract class PositionRelation extends Relation {
         @Override
         public boolean isExact() {
             return false;
+        }
+
+        @Override
+        public Relation newInstance() {
+            return new GreaterThan(fromSlot, toSlot, orEquals, optional, follow, maxLength);
         }
 
         @Override
