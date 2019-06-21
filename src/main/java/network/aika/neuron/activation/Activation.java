@@ -497,7 +497,7 @@ public class Activation implements Comparable<Activation> {
             if (iAct == this) continue;
 
             double iv = 0.0;
-            if(!l.isNegative(CURRENT) && l.input.getDecision() != EXCLUDED) {
+            if(l.input.getDecision() != EXCLUDED) {
                 iv = Math.min(l.synapse.getLimit(), l.input.upperBound);
             }
 
@@ -508,9 +508,9 @@ public class Activation implements Comparable<Activation> {
         }
 
         for(Synapse s: n.getPassiveInputSynapses()) {
-                double x = s.getWeight() * s.getInput().getPassiveInputFunction().getActivationValue(s, this);
+            double x = s.getWeight() * s.getInput().getPassiveInputFunction().getActivationValue(s, this);
 
-                net += x;
+            net += x;
         }
 
         return net > 0.0;
@@ -646,12 +646,6 @@ public class Activation implements Comparable<Activation> {
         State s = new State(input.value, input.value, input.net, 0.0, input.fired, 0.0);
         rounds.set(0, s);
 
-        if(SearchNode.COMPUTE_SOFT_MAX) {
-            Option o = new Option(-1, SELECTED);
-            o.p = 1.0;
-            o.state = s;
-        }
-
         inputValue = input.value;
         upperBound = input.value;
         lowerBound = input.value;
@@ -659,7 +653,13 @@ public class Activation implements Comparable<Activation> {
 
         inputDecision = SELECTED;
         finalDecision = inputDecision;
-        setDecision(inputDecision, doc.getNewVisitedId());
+        setDecision(inputDecision, doc.getNewVisitedId(), null);
+
+        if(SearchNode.COMPUTE_SOFT_MAX) {
+            Option o = options.get(0);
+            o.p = 1.0;
+            o.state = s;
+        }
     }
 
 
@@ -742,7 +742,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public void setDecision(Decision newDecision, long v) {
+    public void setDecision(Decision newDecision, long v, SearchNode sn) {
         if(inputDecision != Decision.UNKNOWN && newDecision != inputDecision) return;
 
         if (newDecision == Decision.UNKNOWN && v != visitedState) return;
@@ -754,9 +754,17 @@ public class Activation implements Comparable<Activation> {
         currentSearchState.decision = newDecision;
         visitedState = v;
 
+        if(SearchNode.COMPUTE_SOFT_MAX && newDecision != UNKNOWN) {
+            Option o = new Option(sn != null ? sn.getId() : -1, newDecision);
+
+            if(sn != null) {
+                sn.getChild(newDecision).setOption(o);
+            }
+        }
+
         for(Link l: outputLinks.values()) {
             if(l.getOutput().getType() == INHIBITORY) {
-                l.getOutput().setDecision(newDecision, v);
+                l.getOutput().setDecision(newDecision, v, sn);
             }
         }
     }
@@ -815,8 +823,15 @@ public class Activation implements Comparable<Activation> {
         return candidateId;
     }
 
+
     public void setCandidateId(Integer candidateId) {
         this.candidateId = candidateId;
+
+        for(Link l: outputLinks.values()) {
+            if(l.getOutput().getType() == INHIBITORY) {
+                l.getOutput().setCandidateId(candidateId);
+            }
+        }
     }
 
 

@@ -72,16 +72,79 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public enum Decision {
-        SELECTED('S'),
-        EXCLUDED('E'),
-        UNKNOWN('U');
+        SELECTED(
+                'S',
+                sn -> sn.selectedChild,
+                sn -> sn.excludedChild
+        ),
+        EXCLUDED(
+                'E',
+                sn -> sn.excludedChild,
+                sn -> sn.selectedChild
+        ),
+        UNKNOWN('U',
+                sn -> null,
+                sn -> null
+        );
 
         char s;
+        ChildNode childNode;
+        ChildNode invertedChildNode;
 
-        Decision(char s) {
+        Decision(char s, ChildNode cn, ChildNode icn) {
             this.s = s;
+            this.childNode = cn;
+            this.invertedChildNode = icn;
+        }
+
+        public SearchNode getChild(SearchNode sn) {
+            return childNode.getChild(sn);
+        }
+
+        public SearchNode getInvertedChild(SearchNode sn) {
+            return invertedChildNode.getChild(sn);
+        }
+
+        interface ChildNode {
+            SearchNode getChild(SearchNode sn);
         }
     }
+
+
+    public SearchNode getChild(Decision d) {
+        return d.getChild(this);
+    }
+
+
+    public SearchNode getAlternative() {
+        return getDecision().getInvertedChild(getParent());
+    }
+
+
+    private double getWeightSum(Decision d) {
+        switch(d) {
+            case SELECTED:
+                return excludedWeightSum;
+            case EXCLUDED:
+                return selectedWeightSum;
+            default:
+                return 0.0;
+        }
+    }
+
+
+    private void setWeightSum(Decision d, double weightSum) {
+        switch (d) {
+            case SELECTED:
+                excludedWeightSum = weightSum;
+                break;
+            case EXCLUDED:
+                selectedWeightSum = weightSum;
+                break;
+        }
+    }
+
+
 
 
     public enum DebugState {
@@ -126,13 +189,16 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, int level) throws OscillatingActivationsException {
+    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, int level) {
         id = doc.searchNodeIdCounter++;
         this.level = level;
         visited = doc.getNewVisitedId();
         selectedParent = selParent;
         excludedParent = exclParent;
+    }
 
+
+    public void updateActivations(Document doc) throws OscillatingActivationsException {
         Activation parentAct = getParent() != null ? getParent().act : null;
         CurrentSearchState c = parentAct != null ? parentAct.currentSearchState : null;
 
@@ -210,6 +276,11 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
+    public void setOption(Option o) {
+        option = o;
+    }
+
+
     public Map<Activation, StateChange> getModifiedActivations() {
         return modifiedActs;
     }
@@ -229,14 +300,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public Option getCurrentOption()  {
-        switch(currentDecision) {
-            case SELECTED:
-                return selectedChild.option;
-            case EXCLUDED:
-                return excludedChild.option;
-            default:
-                return null;
-        }
+        return getChild(currentDecision).getOption();
     }
 
 
@@ -466,18 +530,6 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public SearchNode getAlternative() {
-        SearchNode pn = getParent();
-        switch(getDecision()) {
-            case SELECTED:
-                return pn.excludedChild;
-            case EXCLUDED:
-                return pn.selectedChild;
-        }
-        return null;
-    }
-
-
     private Decision getCachedDecision() {
         return preDecision != EXCLUDED ? act.currentSearchState.cachedDecision : Decision.UNKNOWN;
     }
@@ -497,19 +549,16 @@ public class SearchNode implements Comparable<SearchNode> {
             return false;
         }
 
-        act.setDecision(SELECTED, visited);
+        selectedChild = new SearchNode(doc, this, excludedParent, level + 1);
+        act.setDecision(SELECTED, visited, this);
 
         if (c.cachedDecision == UNKNOWN) {
             invalidateCachedDecisions();
         }
 
-        selectedChild = new SearchNode(doc, this, excludedParent, level + 1);
+        selectedChild.updateActivations(doc);
 
         c.debugDecisionCounts[0]++;
-
-        if(COMPUTE_SOFT_MAX) {
-            selectedChild.option = act.new Option(id, SELECTED);
-        }
 
         return true;
     }
@@ -526,15 +575,13 @@ public class SearchNode implements Comparable<SearchNode> {
             return false;
         }
 
-        act.setDecision(EXCLUDED, visited);
-
         excludedChild = new SearchNode(doc, selectedParent, this, level + 1);
 
-        act.currentSearchState.debugDecisionCounts[1]++;
+        act.setDecision(EXCLUDED, visited, this);
 
-        if(COMPUTE_SOFT_MAX) {
-            excludedChild.option = act.new Option(id, EXCLUDED);
-        }
+        excludedChild.updateActivations(doc);
+
+        act.currentSearchState.debugDecisionCounts[1]++;
 
         return true;
     }
@@ -563,7 +610,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private void postReturn(SearchNode child) {
         child.changeState(Activation.Mode.OLD);
 
-        act.setDecision(UNKNOWN, visited);
+        act.setDecision(UNKNOWN, visited, this);
         act.rounds.reset();
     }
 
@@ -685,31 +732,6 @@ public class SearchNode implements Comparable<SearchNode> {
             }
         }
     }
-
-
-    private double getWeightSum(Decision d) {
-        switch(d) {
-            case SELECTED:
-                return excludedWeightSum;
-            case EXCLUDED:
-                return selectedWeightSum;
-            default:
-                return 0.0;
-        }
-    }
-
-
-    private void setWeightSum(Decision d, double weightSum) {
-        switch (d) {
-            case SELECTED:
-                excludedWeightSum = weightSum;
-                break;
-            case EXCLUDED:
-                selectedWeightSum = weightSum;
-                break;
-        }
-    }
-
 
 
     private void computeCacheFactor() {

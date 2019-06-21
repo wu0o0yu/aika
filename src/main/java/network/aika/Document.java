@@ -426,13 +426,18 @@ public class Document implements Comparable<Document> {
     public void process(Long timeoutInMilliSeconds) throws TimeoutException, CyclicDependencyException, OscillatingActivationsException {
         linker.lateLinking();
 
-        inputNeuronActivations.forEach(act -> valueQueue.propagateActivationValue(0, act));
+        inputNeuronActivations.forEach(act -> {
+            act.setDecision(act.getInputDecision(), getNewVisitedId(), null);
+            valueQueue.propagateActivationValue(0, act);
+        });
 
         generateCandidates();
 
         SearchNode rootNode = null;
         if(selectedSearchNode == null || !INCREMENTAL_MODE) {
             selectedSearchNode = new SearchNode(this, null, null, 0);
+            selectedSearchNode.updateActivations(this);
+
             rootNode = selectedSearchNode;
         }
 
