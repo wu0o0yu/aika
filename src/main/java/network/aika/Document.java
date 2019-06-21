@@ -390,7 +390,7 @@ public class Document implements Comparable<Document> {
 
         long v = visitedCounter++;
         for(Activation act: inputNeuronActivations) {
-            act.markedHasCandidate = v;
+            act.markHasCandidate(v);
         }
 
         while (!tmp.isEmpty()) {
@@ -401,7 +401,7 @@ public class Document implements Comparable<Document> {
                     act.setCandidateId(candidates.size());
                     candidates.add(act);
 
-                    act.markedHasCandidate = v;
+                    act.markHasCandidate(v);
                     break;
                 }
             }

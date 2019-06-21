@@ -82,7 +82,7 @@ public class Activation implements Comparable<Activation> {
     Rounds finalRounds = rounds;
 
     boolean ubQueued = false;
-    public long markedHasCandidate;
+    private long markedHasCandidate;
 
     private long currentStateV;
     private StateChange currentStateChange;
@@ -268,6 +268,17 @@ public class Activation implements Comparable<Activation> {
     public boolean checkDependenciesSatisfied(long v) {
         return !getInputLinks(false)
                 .anyMatch(l -> l.getInput().markedHasCandidate != v && !l.isRecurrent() && l.getInput().getUpperBound() > 0.0);
+    }
+
+
+    public void markHasCandidate(long v) {
+        markedHasCandidate = v;
+
+        for(Link l: outputLinks.values()) {
+            if(l.getOutput().getType() == INHIBITORY) {
+                l.getOutput().markHasCandidate(v);
+            }
+        }
     }
 
 
