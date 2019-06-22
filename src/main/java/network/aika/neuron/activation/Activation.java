@@ -508,8 +508,12 @@ public class Activation implements Comparable<Activation> {
             if (iAct == this) continue;
 
             double iv = 0.0;
-            if(l.input.getDecision() != EXCLUDED) {
-                iv = Math.min(l.synapse.getLimit(), l.input.upperBound);
+            if(!l.isNegative(CURRENT)) {
+                if (l.input.getDecision() != EXCLUDED) {
+                    iv = Math.min(l.synapse.getLimit(), l.input.upperBound);
+                }
+            } else {
+                iv = l.input.rounds.getLast().value;
             }
 
             double x = iv * s.getWeight();

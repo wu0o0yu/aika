@@ -623,7 +623,7 @@ public class InterpretationSearchTest {
 
         System.out.println(doc.activationsToString());
 
-        Assert.assertEquals(5, doc.searchNodeIdCounter);
+        Assert.assertEquals(8, doc.searchNodeIdCounter);
 
         SearchNode.COMPUTE_SOFT_MAX = false;
     }
