@@ -384,7 +384,7 @@ public class Activation implements Comparable<Activation> {
         double delta = 0.0;
         State s;
         if(inputValue != null) {
-            s = new State(inputValue, inputValue, 0.0, 0.0, 0, 0.0);
+            s = new State(inputValue, inputValue, inputValue, inputValue, 0.0, 0.0, 0, 0.0);
         } else {
             s = computeValueAndWeight(round);
         }
@@ -426,7 +426,9 @@ public class Activation implements Comparable<Activation> {
         SynapseSummary ss = n.getSynapseSummary();
 
         double net = n.getTotalBias(CURRENT);
-        double posNet = n.getTotalBias(CURRENT);
+        double netUB = net;
+        double netLB = net;
+        double posNet = net;
 
         int fired = -1;
 
@@ -441,6 +443,22 @@ public class Activation implements Comparable<Activation> {
 
             double x = Math.min(s.getLimit(), is.s.value) * s.getWeight();
             net += x;
+
+            if(is.l.getInput().getType() == INHIBITORY || is.l.getInput().currentSearchState.decision == UNKNOWN) {
+                netUB += Math.min(s.getLimit(), is.s.ub) * s.getWeight();
+                netLB += Math.min(s.getLimit(), is.s.lb) * s.getWeight();
+            } else {
+                if(is.l.getInput().currentSearchState.decision == SELECTED) {
+                    double ub = Math.min(s.getLimit(), is.s.ub) * s.getWeight();
+                    netUB += ub;
+                    netLB += ub;
+                } else if(is.l.getInput().currentSearchState.decision == EXCLUDED) {
+                    double lb = Math.min(s.getLimit(), is.s.lb) * s.getWeight();
+                    netUB += lb;
+                    netLB += lb;
+                }
+            }
+
 
             net += s.computeRelationWeights(is.l);
 
@@ -457,12 +475,17 @@ public class Activation implements Comparable<Activation> {
             double x = s.getWeight() * s.getInput().getPassiveInputFunction().getActivationValue(s, this);
 
             net += x;
+            netUB += x;
+            netLB += x;
+
             if (!s.isNegative(CURRENT)) {
                 posNet += x;
             }
         }
 
         double actValue = n.getActivationFunction().f(net);
+        double actUB = n.getActivationFunction().f(netUB);
+        double actLB = n.getActivationFunction().f(netLB);
         double posActValue = n.getActivationFunction().f(posNet);
 
         double w = Math.min(-ss.getNegRecSum(), net);
@@ -473,6 +496,8 @@ public class Activation implements Comparable<Activation> {
         if(getDecision() == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS) {
             return new State(
                     actValue,
+                    actUB,
+                    actLB,
                     posActValue,
                     net,
                     posNet,
@@ -481,6 +506,8 @@ public class Activation implements Comparable<Activation> {
             );
         } else {
             return new State(
+                    0.0,
+                    0.0,
                     0.0,
                     posActValue,
                     0.0,
@@ -602,6 +629,8 @@ public class Activation implements Comparable<Activation> {
     private static State getInitialState(Decision c) {
         return new State(
                 c == SELECTED ? 1.0 : 0.0,
+                1.0,
+                0.0,
                 0.0,
                 0.0,
                 0.0,
@@ -658,7 +687,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public void setInputState(Builder input) {
-        State s = new State(input.value, input.value, input.net, 0.0, input.fired, 0.0);
+        State s = new State(input.value, input.value, input.value, input.value, input.net, 0.0, input.fired, 0.0);
         rounds.set(0, s);
 
         inputValue = input.value;
@@ -1008,6 +1037,8 @@ public class Activation implements Comparable<Activation> {
      */
     public static class State {
         public final double value;
+        public final double ub;
+        public final double lb;
         public final double posValue;
         public final double net;
         public final double posNet;
@@ -1015,11 +1046,13 @@ public class Activation implements Comparable<Activation> {
         public final int fired;
         public final double weight;
 
-        public static final State ZERO = new State(0.0, 0.0, 0.0, 0.0, -1, 0.0);
+        public static final State ZERO = new State(0.0, 1.0, 0.0, 0.0, 0.0, 0.0, -1, 0.0);
 
-        public State(double value, double posValue, double net, double posNet, int fired, double weight) {
+        public State(double value, double ub, double lb, double posValue, double net, double posNet, int fired, double weight) {
             assert !Double.isNaN(value);
             this.value = value;
+            this.ub = ub;
+            this.lb = lb;
             this.posValue = posValue;
             this.net = net;
             this.posNet = posNet;
@@ -1037,7 +1070,7 @@ public class Activation implements Comparable<Activation> {
         }
 
         public String toString() {
-            return "V:" + Utils.round(value) + (DEBUG_OUTPUT ? " pV:" + Utils.round(posValue) : "") + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
+            return "V:" + Utils.round(value) + " UB:" + Utils.round(ub) + " LB:" + Utils.round(lb) + (DEBUG_OUTPUT ? " pV:" + Utils.round(posValue) : "") + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
         }
     }
 
@@ -1113,6 +1146,8 @@ public class Activation implements Comparable<Activation> {
         }
 
         double value = 0.0;
+        double ub = 0.0;
+        double lb = 0.0;
         double posValue = 0.0;
         double net = 0.0;
         double posNet = 0.0;
@@ -1123,12 +1158,14 @@ public class Activation implements Comparable<Activation> {
                 Activation.State s = option.state;
 
                 value += p * s.value;
+                ub += p * s.ub;
+                lb += p * s.lb;
                 posValue += p * s.posValue;
                 net += p * s.net;
                 posNet += p * s.posNet;
             }
         }
-        return new Activation.State(value, posValue, net, posNet, 0, 0.0);
+        return new Activation.State(value, ub, lb, posValue, net, posNet, 0, 0.0);
     }
 
 

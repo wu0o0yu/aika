@@ -433,12 +433,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         doc.addInputNeuronActivation(act);
         doc.addFinallyActivatedNeuron(act.getINeuron());
-/*
+
         if(getType() != INPUT) {
             doc.getLinker().linkInput(act);
             doc.getLinker().process();
         }
-*/
+
         propagate(act);
 
         doc.propagate();

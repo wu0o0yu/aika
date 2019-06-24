@@ -82,7 +82,7 @@ public class LinkerTest {
 
 
     @Test
-    public void testLinkInputActivation() {
+    public void testLinkInputActivationExcitatory() {
         Model m = new Model();
 
         Neuron na = m.createNeuron("A", INPUT);
@@ -106,6 +106,7 @@ public class LinkerTest {
 
         Assert.assertTrue(nb.getActivations(doc, false).iterator().next().getInputLinks(false).findAny().isPresent());
     }
+
 
 
     @Test

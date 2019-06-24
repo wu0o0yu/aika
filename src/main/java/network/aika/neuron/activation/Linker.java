@@ -17,6 +17,8 @@
 package network.aika.neuron.activation;
 
 import network.aika.Document;
+import network.aika.neuron.INeuron;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation.Link;
@@ -62,12 +64,15 @@ public class Linker {
     public void linkInput(Activation act) {
         Document doc = act.getDocument();
 
-        for(Synapse s: act.getNeuron().getActiveInputSynapses()) {
-            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
-                Relation rel = me.getValue();
-                if(me.getKey() == OUTPUT) {
-                    rel.getActivations(s.getInput().get(doc), act)
-                            .forEach(iAct -> link(s, iAct, act));
+        Neuron n = act.getNeuron();
+        if(n.getType() == INeuron.Type.EXCITATORY) {
+            for (Synapse s : n.getActiveInputSynapses()) {
+                for (Map.Entry<Integer, Relation> me : s.getRelations().entrySet()) {
+                    Relation rel = me.getValue();
+                    if (me.getKey() == OUTPUT) {
+                        rel.getActivations(s.getInput().get(doc), act)
+                                .forEach(iAct -> link(s, iAct, act));
+                    }
                 }
             }
         }
