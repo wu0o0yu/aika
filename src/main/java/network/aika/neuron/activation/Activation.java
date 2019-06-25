@@ -69,14 +69,13 @@ public class Activation implements Comparable<Activation> {
     private Map<Integer, Position> slots = new TreeMap<>();
     private OrActivation inputNodeActivation;
     private InputActivation outputNodeActivation;
-    private TreeSet<Link> selectedInputLinks = new TreeSet<>(INPUT_COMP);
     private TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
     private TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
 
     private double upperBound;
     private double lowerBound;
 
-    private List<Option> options;
+    public List<Option> options;
 
     Rounds rounds = new Rounds();
     Rounds finalRounds = rounds;
@@ -106,37 +105,33 @@ public class Activation implements Comparable<Activation> {
 
 
     public static Comparator<Activation> CANDIDATE_COMP = (act1, act2) -> {
-            if(!act1.isConflicting() && act2.isConflicting()) return -1;
-            if(act1.isConflicting() && !act2.isConflicting()) return 1;
+        Iterator<Map.Entry<Integer, Position>> ita = act1.getSlots().entrySet().iterator();
+        Iterator<Map.Entry<Integer, Position>> itb = act2.getSlots().entrySet().iterator();
 
-            Iterator<Map.Entry<Integer, Position>> ita = act1.getSlots().entrySet().iterator();
-            Iterator<Map.Entry<Integer, Position>> itb = act2.getSlots().entrySet().iterator();
+        Map.Entry<Integer, Position> mea;
+        Map.Entry<Integer, Position> meb;
+        while (ita.hasNext() || itb.hasNext()) {
+            mea = ita.hasNext() ? ita.next() : null;
+            meb = itb.hasNext() ? itb.next() : null;
 
-            Map.Entry<Integer, Position> mea;
-            Map.Entry<Integer, Position> meb;
-            while(ita.hasNext() || itb.hasNext()) {
-                mea = ita.hasNext() ? ita.next() : null;
-                meb = itb.hasNext() ? itb.next() : null;
-
-                if(mea == null && meb == null) {
-                    break;
-                } else if(mea == null && meb != null) {
-                    return -1;
-                } else if(mea != null && meb == null) {
-                    return 1;
-                }
-
-                int r = Integer.compare(mea.getKey(), meb.getKey());
-                if (r != 0) return r;
-                r = Position.compare(act1.lookupSlot(mea.getKey()), act2.lookupSlot(meb.getKey()));
-                if (r != 0) return r;
+            if (mea == null && meb == null) {
+                break;
+            } else if (mea == null && meb != null) {
+                return -1;
+            } else if (mea != null && meb == null) {
+                return 1;
             }
 
-            int r = Integer.compare(act1.getSequence(), act2.getSequence());
+            int r = Integer.compare(mea.getKey(), meb.getKey());
             if (r != 0) return r;
+            r = Position.compare(act1.lookupSlot(mea.getKey()), act2.lookupSlot(meb.getKey()));
+            if (r != 0) return r;
+        }
 
-            return Integer.compare(act1.getCandidateId(), act2.getCandidateId());
+        int r = Integer.compare(act1.getSequence(), act2.getSequence());
+        if (r != 0) return r;
 
+        return Integer.compare(act1.getCandidateId(), act2.getCandidateId());
     };
 
 
@@ -266,7 +261,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public boolean checkDependenciesSatisfied(long v) {
-        return !getInputLinks(false)
+        return !getInputLinks()
                 .anyMatch(l -> l.getInput().markedHasCandidate != v && !l.isRecurrent() && l.getInput().getUpperBound() > 0.0);
     }
 
@@ -327,9 +322,6 @@ public class Activation implements Comparable<Activation> {
                 outputLinks.put(l, l);
                 break;
             case OUTPUT:
-                if(l.input.getDecision() == SELECTED) {
-                    selectedInputLinks.add(l);
-                }
                 inputLinks.put(l, l);
                 break;
         }
@@ -347,8 +339,8 @@ public class Activation implements Comparable<Activation> {
 
 
 
-    public Stream<Link> getInputLinks(boolean onlySelected) {
-        return (onlySelected ? selectedInputLinks : inputLinks.values()).stream();
+    public Stream<Link> getInputLinks() {
+        return inputLinks.values().stream();
     }
 
 
@@ -384,7 +376,7 @@ public class Activation implements Comparable<Activation> {
         double delta = 0.0;
         State s;
         if(inputValue != null) {
-            s = new State(inputValue, inputValue, inputValue, inputValue, 0.0, 0.0, 0, 0.0);
+            s = new State(inputValue, inputValue, 0.0, 0.0, 0, 0.0);
         } else {
             s = computeValueAndWeight(round);
         }
@@ -418,144 +410,6 @@ public class Activation implements Comparable<Activation> {
             }
         }
         return delta;
-    }
-
-
-    public State computeValueAndWeight(int round) throws RecursiveDepthExceededException {
-        INeuron n = getINeuron();
-        SynapseSummary ss = n.getSynapseSummary();
-
-        double net = n.getTotalBias(CURRENT);
-        double netUB = net;
-        double netLB = net;
-        double posNet = net;
-
-        int fired = -1;
-
-        long v = doc.getNewVisitedId();
-        markPredecessor(v, 0);
-
-        for (InputState is: getInputStates(round, v)) {
-            Synapse s = is.l.synapse;
-            Activation iAct = is.l.input;
-
-            if (iAct == this) continue;
-
-            double x = Math.min(s.getLimit(), is.s.value) * s.getWeight();
-            net += x;
-
-            if(is.l.getInput().getType() == INHIBITORY || is.l.getInput().currentSearchState.decision == UNKNOWN) {
-                netUB += Math.min(s.getLimit(), is.s.ub) * s.getWeight();
-                netLB += Math.min(s.getLimit(), is.s.lb) * s.getWeight();
-            } else {
-                if(is.l.getInput().currentSearchState.decision == SELECTED) {
-                    double ub = Math.min(s.getLimit(), is.s.ub) * s.getWeight();
-                    netUB += ub;
-                    netLB += ub;
-                } else if(is.l.getInput().currentSearchState.decision == EXCLUDED) {
-                    double lb = Math.min(s.getLimit(), is.s.lb) * s.getWeight();
-                    netUB += lb;
-                    netLB += lb;
-                }
-            }
-
-
-            net += s.computeRelationWeights(is.l);
-
-            if(!s.isNegative(CURRENT)) {
-                posNet += x;
-            }
-
-            if (!s.isRecurrent() && !s.isNegative(CURRENT) && net >= 0.0 && fired < 0) {
-                fired = iAct.rounds.get(round).fired + 1;
-            }
-        }
-
-        for(Synapse s : n.getPassiveInputSynapses()) {
-            double x = s.getWeight() * s.getInput().getPassiveInputFunction().getActivationValue(s, this);
-
-            net += x;
-            netUB += x;
-            netLB += x;
-
-            if (!s.isNegative(CURRENT)) {
-                posNet += x;
-            }
-        }
-
-        double actValue = n.getActivationFunction().f(net);
-        double actUB = n.getActivationFunction().f(netUB);
-        double actLB = n.getActivationFunction().f(netLB);
-        double posActValue = n.getActivationFunction().f(posNet);
-
-        double w = Math.min(-ss.getNegRecSum(), net);
-
-        // Compute only the recurrent part is above the threshold.
-        double newWeight = getDecision() == SELECTED ? Math.max(0.0, w) : 0.0;
-
-        if(getDecision() == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS) {
-            return new State(
-                    actValue,
-                    actUB,
-                    actLB,
-                    posActValue,
-                    net,
-                    posNet,
-                    fired,
-                    newWeight
-            );
-        } else {
-            return new State(
-                    0.0,
-                    0.0,
-                    0.0,
-                    posActValue,
-                    0.0,
-                    posNet,
-                    -1,
-                    newWeight
-            );
-        }
-    }
-
-
-    public boolean isActiveable() {
-        INeuron n = getINeuron();
-
-        double net = n.getTotalBias(CURRENT);
-
-        for (Link l: inputLinks.values()) {
-            if(l.isInactive()) {
-                continue;
-            }
-
-            Synapse s = l.synapse;
-            Activation iAct = l.input;
-
-            if (iAct == this) continue;
-
-            double iv = 0.0;
-            if(!l.isNegative(CURRENT)) {
-                if (l.input.getDecision() != EXCLUDED) {
-                    iv = Math.min(l.synapse.getLimit(), l.input.upperBound);
-                }
-            } else {
-                iv = l.input.rounds.getLast().value;
-            }
-
-            double x = iv * s.getWeight();
-            net += x;
-
-            net += s.computeRelationWeights(l);
-        }
-
-        for(Synapse s: n.getPassiveInputSynapses()) {
-            double x = s.getWeight() * s.getInput().getPassiveInputFunction().getActivationValue(s, this);
-
-            net += x;
-        }
-
-        return net > 0.0;
     }
 
 
@@ -629,8 +483,6 @@ public class Activation implements Comparable<Activation> {
     private static State getInitialState(Decision c) {
         return new State(
                 c == SELECTED ? 1.0 : 0.0,
-                1.0,
-                0.0,
                 0.0,
                 0.0,
                 0.0,
@@ -641,10 +493,10 @@ public class Activation implements Comparable<Activation> {
 
 
 
-    private List<InputState> getInputStates(int round, long v) {
-        ArrayList<InputState> tmp = new ArrayList<>();
+    public List<Link> getInputStates(int round, long v) {
+        ArrayList<Link> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
-        InputState maxInputState = null;
+        Link maxInputState = null;
         for (Link l : inputLinks.values()) {
             if(l.isInactive()) {
                 continue;
@@ -656,7 +508,7 @@ public class Activation implements Comparable<Activation> {
 
             State s = l.input.getInputState(round, l.synapse, v);
             if (maxInputState == null || maxInputState.s.value < s.value) {
-                maxInputState = new InputState(l, s);
+                maxInputState = l;
             }
             lastSynapse = l.synapse;
         }
@@ -672,13 +524,6 @@ public class Activation implements Comparable<Activation> {
         return getINeuron().getActivationFunction();
     }
 
-    /*
-    An activable activation object might still be suppressed by an undecided positive feedback link.
-     */
-    public boolean hasUndecidedPositiveFeedbackLinks() {
-        return getInputLinks(false)
-                .anyMatch(l -> l.isRecurrent() && !l.isNegative(CURRENT) && l.input.getDecision() == UNKNOWN);
-    }
 
 
     public boolean isOscillating() {
@@ -687,7 +532,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public void setInputState(Builder input) {
-        State s = new State(input.value, input.value, input.value, input.value, input.net, 0.0, input.fired, 0.0);
+        State s = new State(input.value, input.value, input.net, 0.0, input.fired, 0.0);
         rounds.set(0, s);
 
         inputValue = input.value;
@@ -704,18 +549,6 @@ public class Activation implements Comparable<Activation> {
             o.p = 1.0;
             o.state = s;
         }
-    }
-
-
-
-    private static class InputState {
-        public InputState(Link l, State s) {
-            this.l = l;
-            this.s = s;
-        }
-
-        Link l;
-        State s;
     }
 
 
@@ -799,7 +632,7 @@ public class Activation implements Comparable<Activation> {
         visitedState = v;
 
         if(SearchNode.COMPUTE_SOFT_MAX && newDecision != UNKNOWN) {
-            Option o = new Option(sn != null ? sn.getId() : -1, newDecision);
+            Option o = new Option(this, sn != null ? sn.getId() : -1, newDecision);
 
             if(sn != null) {
                 sn.getChild(newDecision).setOption(o);
@@ -811,16 +644,6 @@ public class Activation implements Comparable<Activation> {
                 l.getOutput().setDecision(newDecision, v, sn);
             }
         }
-    }
-
-
-    public boolean isConflicting() {
-        for(Link l: inputLinks.values()) {
-            if(l.isRecurrent() && l.isNegative(CURRENT)) {
-                return true;
-            }
-        }
-        return false;
     }
 
 
@@ -1037,8 +860,6 @@ public class Activation implements Comparable<Activation> {
      */
     public static class State {
         public final double value;
-        public final double ub;
-        public final double lb;
         public final double posValue;
         public final double net;
         public final double posNet;
@@ -1046,13 +867,11 @@ public class Activation implements Comparable<Activation> {
         public final int fired;
         public final double weight;
 
-        public static final State ZERO = new State(0.0, 1.0, 0.0, 0.0, 0.0, 0.0, -1, 0.0);
+        public static final State ZERO = new State(0.0, 0.0, 0.0, 0.0, -1, 0.0);
 
-        public State(double value, double ub, double lb, double posValue, double net, double posNet, int fired, double weight) {
+        public State(double value, double posValue, double net, double posNet, int fired, double weight) {
             assert !Double.isNaN(value);
             this.value = value;
-            this.ub = ub;
-            this.lb = lb;
             this.posValue = posValue;
             this.net = net;
             this.posNet = posNet;
@@ -1070,7 +889,7 @@ public class Activation implements Comparable<Activation> {
         }
 
         public String toString() {
-            return "V:" + Utils.round(value) + " UB:" + Utils.round(ub) + " LB:" + Utils.round(lb) + (DEBUG_OUTPUT ? " pV:" + Utils.round(posValue) : "") + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
+            return "V:" + Utils.round(value) + (DEBUG_OUTPUT ? " pV:" + Utils.round(posValue) : "") + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
         }
     }
 
@@ -1146,8 +965,6 @@ public class Activation implements Comparable<Activation> {
         }
 
         double value = 0.0;
-        double ub = 0.0;
-        double lb = 0.0;
         double posValue = 0.0;
         double net = 0.0;
         double posNet = 0.0;
@@ -1158,14 +975,12 @@ public class Activation implements Comparable<Activation> {
                 Activation.State s = option.state;
 
                 value += p * s.value;
-                ub += p * s.ub;
-                lb += p * s.lb;
                 posValue += p * s.posValue;
                 net += p * s.net;
                 posNet += p * s.posNet;
             }
         }
-        return new Activation.State(value, ub, lb, posValue, net, posNet, 0, 0.0);
+        return new Activation.State(value, posValue, net, posNet, 0, 0.0);
     }
 
 
@@ -1266,86 +1081,6 @@ public class Activation implements Comparable<Activation> {
 
         public Activation getActivation() {
             return Activation.this;
-        }
-    }
-
-
-    public class Option implements Comparable<Option> {
-        public int snId;
-        public State state;
-        public Decision decision;
-
-        public double weight;
-        public int cacheFactor = 1;
-        public double p;
-
-        public Map<Link, Option> inputOptions = new TreeMap<>(INPUT_COMP);
-        public Map<Link, Option> outputOptions = new TreeMap<>(OUTPUT_COMP); // TODO:
-
-
-        public Option(int snId, Decision d) {
-            this.snId = snId;
-            this.state = rounds.getLast();
-            this.decision = d;
-
-            if (options == null) {
-                options = new ArrayList<>();
-            }
-            options.add(this);
-        }
-
-        public void setWeight(double weight) {
-            this.weight = weight;
-
-            for(Link l: inputLinks.values()) {
-                if(l.input.getDecision() == SELECTED) {
-                    if(l.input.candidateId != null) {
-                        if (l.input.candidateId < candidateId) {
-                            SearchNode inputSN = l.input.currentSearchState.currentSearchNode.getParent();
-
-                            link(l, inputSN.getCurrentOption());
-                        }
-                    } else {
-                        link(l, l.input.options.get(0));
-                    }
-                }
-            }
-
-            for(Link l: outputLinks.values()) {
-                if(l.input.getDecision() == SELECTED) {
-                    if(l.output.candidateId != null) {
-                        if(l.output.candidateId < candidateId) {
-                            SearchNode outputSN = l.output.currentSearchState.currentSearchNode.getParent();
-
-                            outputSN.getCurrentOption().link(l, this);
-                        }
-                    }
-                }
-            }
-        }
-
-        public void link(Link l, Option in) {
-            inputOptions.put(l, in);
-            in.outputOptions.put(l, this);
-        }
-
-        public void setCacheFactor(int cf) {
-            cacheFactor = cf;
-        }
-
-        public Activation getAct() {
-            return Activation.this;
-        }
-
-        public String toString() {
-            return " snId:" + snId + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " " + state;
-        }
-
-        @Override
-        public int compareTo(Option o) {
-            int r = Integer.compare(getAct().getId(), o.getAct().getId());
-            if(r != 0) return r;
-            return Integer.compare(snId, o.snId);
         }
     }
 

@@ -17,17 +17,17 @@ public class ValueQueue {
     };
 
 
-    public void propagateActivationValue(int round, Activation act)  {
-        act.getOutputLinks()
+    public void propagateActivationValue(int round, Option o)  {
+        o.getOutputLinks()
                 .forEach(l -> add(l.isRecurrent() ? round + 1 : round, l.getOutput()));
     }
 
 
-    private void add(Activation act) {
-        if(act == null) return;
+    private void add(Option o) {
+        if(o == null) return;
 
-        add(0, act);
-        act.getOutputLinks()
+        add(0, o);
+        o.getOutputLinks()
                 .filter(l -> l.isRecurrent())
                 .forEach(l -> add(0, l.getOutput()));
     }

@@ -20,7 +20,6 @@ package network.aika.neuron.activation;
 import network.aika.Document;
 import network.aika.Utils;
 import network.aika.neuron.activation.Activation.StateChange;
-import network.aika.neuron.activation.Activation.Option;
 import network.aika.neuron.activation.Activation.RecursiveDepthExceededException;
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 import org.slf4j.Logger;
@@ -198,7 +197,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public void updateActivations(Document doc) throws OscillatingActivationsException {
+    public boolean updateActivations(Document doc) throws OscillatingActivationsException {
         Activation parentAct = getParent() != null ? getParent().act : null;
         CurrentSearchState c = parentAct != null ? parentAct.currentSearchState : null;
 
@@ -230,7 +229,6 @@ public class SearchNode implements Comparable<SearchNode> {
             if(c != null) {
                 c.cachedSearchNode = this;
             }
-
         } else {
             if(ENABLE_CACHING) {
                 c.cachedSearchNode.changeState(Activation.Mode.NEW);
@@ -436,9 +434,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.selectedWeight = returnWeight;
                     sn.selectedWeightSum = returnWeightSum;
 
-                    if(COMPUTE_SOFT_MAX) {
-                        sn.selectedChild.option.setWeight(returnWeightSum);
-                    }
+                    sn.selectedChild.option.setWeight(returnWeightSum);
 
                     sn.postReturn(sn.selectedChild);
                     sn.step = Step.PREPARE_EXCLUDE;
@@ -455,9 +451,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.excludedWeight = returnWeight;
                     sn.excludedWeightSum = returnWeightSum;
 
-                    if(COMPUTE_SOFT_MAX) {
-                        sn.excludedChild.option.setWeight(returnWeightSum);
-                    }
+                    sn.excludedChild.option.setWeight(returnWeightSum);
 
                     sn.postReturn(sn.excludedChild);
                     sn.step = sn.act.currentSearchState.repeat && OPTIMIZE_SEARCH ? Step.PREPARE_SELECT : Step.FINAL;
@@ -494,16 +488,8 @@ public class SearchNode implements Comparable<SearchNode> {
     private void initStep(Document doc) throws RecursiveDepthExceededException {
         act = doc.candidates.get(level);
 
-        boolean precondition = act.isActiveable();
-
         preDecision = act.inputDecision;
-        if(preDecision == UNKNOWN && (!precondition || checkExcluded(act))) {
-            preDecision = EXCLUDED;
-        }
 
-        if(preDecision == UNKNOWN && !act.isConflicting() && !act.hasUndecidedPositiveFeedbackLinks()) {
-            preDecision = SELECTED;
-        }
         if(preDecision == UNKNOWN && OPTIMIZE_SEARCH) {
             Decision cd = getCachedDecision();
 
@@ -552,11 +538,14 @@ public class SearchNode implements Comparable<SearchNode> {
         selectedChild = new SearchNode(doc, this, excludedParent, level + 1);
         act.setDecision(SELECTED, visited, this);
 
+        if(!selectedChild.updateActivations(doc)) {
+            return false;
+        }
+
         if (c.cachedDecision == UNKNOWN) {
             invalidateCachedDecisions();
         }
 
-        selectedChild.updateActivations(doc);
 
         c.debugDecisionCounts[0]++;
 
@@ -571,37 +560,16 @@ public class SearchNode implements Comparable<SearchNode> {
         if(skip == EXCLUDED) {
             return false;
         }
-        if(preDecision != EXCLUDED && generatesUnsuppressedExcluded() && !act.hasUndecidedPositiveFeedbackLinks()) {
-            return false;
-        }
 
         excludedChild = new SearchNode(doc, selectedParent, this, level + 1);
 
         act.setDecision(EXCLUDED, visited, this);
 
-        excludedChild.updateActivations(doc);
+        if(!excludedChild.updateActivations(doc)) {
+            return false;
+        }
 
         act.currentSearchState.debugDecisionCounts[1]++;
-
-        return true;
-    }
-
-
-    private boolean generatesUnsuppressedExcluded() throws RecursiveDepthExceededException {
-        x: for (Activation cAct : act.getConflicts()) {
-            if(cAct.getDecision() == EXCLUDED && cAct.isActiveable()) {
-                for (Activation icAct : cAct.getConflicts()) {
-                    if (act != icAct && icAct.getDecision() != EXCLUDED) {
-                        continue x;
-                    }
-                }
-                return true;
-            }
-        }
-
-        for (Activation cAct : act.getConflicts()) {
-            if (cAct.getDecision() != EXCLUDED) return false;
-        }
 
         return true;
     }
@@ -745,15 +713,6 @@ public class SearchNode implements Comparable<SearchNode> {
     private double getSelectedAccumulatedWeight(Document doc) {
         return doc.selectedSearchNode != null ? doc.selectedSearchNode.accumulatedWeight : -1.0;
     }
-
-
-    private boolean checkExcluded(Activation ref) throws RecursiveDepthExceededException {
-        for (Activation cn : ref.getConflicts()) {
-            if (cn.getDecision() == SELECTED) return true;
-        }
-        return false;
-    }
-
 
 
     public String pathToString() {
