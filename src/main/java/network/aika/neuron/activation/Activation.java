@@ -413,6 +413,76 @@ public class Activation implements Comparable<Activation> {
     }
 
 
+    public Activation.State computeValueAndWeight(int round) throws Activation.RecursiveDepthExceededException {
+        INeuron n = getINeuron();
+        INeuron.SynapseSummary ss = n.getSynapseSummary();
+
+        double net = n.getTotalBias(CURRENT);
+        double posNet = n.getTotalBias(CURRENT);
+
+        int fired = -1;
+
+        long v = getDocument().getNewVisitedId();
+        markPredecessor(v, 0);
+
+        for (Activation.InputState is: getInputStates(round, v)) {
+            Synapse s = is.l.synapse;
+            Activation iAct = is.l.input;
+
+            if (iAct == this) continue;
+
+            double x = Math.min(s.getLimit(), is.s.value) * s.getWeight();
+            net += x;
+
+            net += s.computeRelationWeights(is.l);
+
+            if(!s.isNegative(CURRENT)) {
+                posNet += x;
+            }
+
+            if (!s.isRecurrent() && !s.isNegative(CURRENT) && net >= 0.0 && fired < 0) {
+                fired = iAct.rounds.get(round).fired + 1;
+            }
+        }
+
+        for(Synapse s : n.getPassiveInputSynapses()) {
+            double x = s.getWeight() * s.getInput().getPassiveInputFunction().getActivationValue(s, this);
+
+            net += x;
+            if (!s.isNegative(CURRENT)) {
+                posNet += x;
+            }
+        }
+
+        double actValue = n.getActivationFunction().f(net);
+        double posActValue = n.getActivationFunction().f(posNet);
+
+        double w = Math.min(-ss.getNegRecSum(), net);
+
+        // Compute only the recurrent part is above the threshold.
+        double newWeight = getDecision() == SELECTED ? Math.max(0.0, w) : 0.0;
+
+        if(getDecision() == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS) {
+            return new Activation.State(
+                    actValue,
+                    posActValue,
+                    net,
+                    posNet,
+                    fired,
+                    newWeight
+            );
+        } else {
+            return new Activation.State(
+                    0.0,
+                    posActValue,
+                    0.0,
+                    posNet,
+                    -1,
+                    newWeight
+            );
+        }
+    }
+
     public void processBounds() throws RecursiveDepthExceededException {
         double oldUpperBound = upperBound;
 
