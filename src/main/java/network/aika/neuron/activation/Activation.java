@@ -19,10 +19,10 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static network.aika.Document.MAX_ROUND;
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.activation.Linker.Direction.INPUT;
 import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
-import static network.aika.neuron.activation.SearchNode.Decision.EXCLUDED;
 import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
@@ -75,10 +75,9 @@ public class Activation implements Comparable<Activation> {
     private double upperBound;
     private double lowerBound;
 
-    public List<Option> options;
-
-    Rounds rounds = new Rounds();
-    Rounds finalRounds = rounds;
+    Option rootOption;
+    Option currentOption;
+    Option finalOption;
 
     boolean ubQueued = false;
     private long markedHasCandidate;
@@ -86,7 +85,6 @@ public class Activation implements Comparable<Activation> {
     private long currentStateV;
     private StateChange currentStateChange;
     long markedDirty;
-    private long markedPredecessor;
 
     private Double targetValue;
     private Double inputValue;
@@ -223,12 +221,6 @@ public class Activation implements Comparable<Activation> {
         if(visited == v) return false;
         visited = v;
         return true;
-    }
-
-
-    public Collection<Option> getOptions() {
-        if(options == null) return Collections.emptyList();
-        return options;
     }
 
 
@@ -381,12 +373,12 @@ public class Activation implements Comparable<Activation> {
             s = computeValueAndWeight(round);
         }
 
-        if (round == 0 || !rounds.get(round).equalsWithWeights(s)) {
+        if (round == 0 || !currentOption.get(round).equalsWithWeights(s)) {
             saveOldState(sn.getModifiedActivations(), v);
 
-            State oldState = rounds.get(round);
+            State oldState = currentOption.get(round);
 
-            boolean propagate = rounds.set(round, s) && (oldState == null || !oldState.equals(s));
+            boolean propagate = currentOption.set(round, s) && (oldState == null || !oldState.equals(s));
 
             saveNewState();
 
@@ -405,7 +397,7 @@ public class Activation implements Comparable<Activation> {
                 doc.getValueQueue().add(1, this);
             }
 
-            if (rounds.getLastRound() != null && round >= rounds.getLastRound()) { // Consider only the final round.
+            if (currentOption.getLastRound() != null && round >= currentOption.getLastRound()) { // Consider only the final round.
                 delta += s.weight - oldState.weight;
             }
         }
@@ -413,19 +405,20 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public Activation.State computeValueAndWeight(int round) throws Activation.RecursiveDepthExceededException {
+    public State computeValueAndWeight(int round) throws RecursiveDepthExceededException {
         INeuron n = getINeuron();
         INeuron.SynapseSummary ss = n.getSynapseSummary();
 
         double net = n.getTotalBias(CURRENT);
-        double posNet = n.getTotalBias(CURRENT);
+        double netUB = net;
+        double posNet = net;
 
         int fired = -1;
 
         long v = getDocument().getNewVisitedId();
         markPredecessor(v, 0);
 
-        for (Activation.InputState is: getInputStates(round, v)) {
+        for (InputState is: getInputStates(round, v)) {
             Synapse s = is.l.synapse;
             Activation iAct = is.l.input;
 
@@ -433,6 +426,7 @@ public class Activation implements Comparable<Activation> {
 
             double x = Math.min(s.getLimit(), is.s.value) * s.getWeight();
             net += x;
+            netUB += Math.min(s.getLimit(), is.s.ub) * s.getWeight();
 
             net += s.computeRelationWeights(is.l);
 
@@ -441,7 +435,7 @@ public class Activation implements Comparable<Activation> {
             }
 
             if (!s.isRecurrent() && !s.isNegative(CURRENT) && net >= 0.0 && fired < 0) {
-                fired = iAct.rounds.get(round).fired + 1;
+                fired = iAct.currentOption.get(round).fired + 1;
             }
         }
 
@@ -449,12 +443,14 @@ public class Activation implements Comparable<Activation> {
             double x = s.getWeight() * s.getInput().getPassiveInputFunction().getActivationValue(s, this);
 
             net += x;
+            netUB += x;
             if (!s.isNegative(CURRENT)) {
                 posNet += x;
             }
         }
 
         double actValue = n.getActivationFunction().f(net);
+        double actUBValue = n.getActivationFunction().f(netUB);
         double posActValue = n.getActivationFunction().f(posNet);
 
         double w = Math.min(-ss.getNegRecSum(), net);
@@ -462,26 +458,17 @@ public class Activation implements Comparable<Activation> {
         // Compute only the recurrent part is above the threshold.
         double newWeight = getDecision() == SELECTED ? Math.max(0.0, w) : 0.0;
 
-        if(getDecision() == SELECTED || ALLOW_WEAK_NEGATIVE_WEIGHTS) {
-            return new Activation.State(
-                    actValue,
-                    posActValue,
-                    net,
-                    posNet,
-                    fired,
-                    newWeight
-            );
-        } else {
-            return new Activation.State(
-                    0.0,
-                    posActValue,
-                    0.0,
-                    posNet,
-                    -1,
-                    newWeight
-            );
-        }
+        return new State(
+                actValue,
+                actUBValue,
+                posActValue,
+                net,
+                posNet,
+                fired,
+                newWeight
+        );
     }
+
 
     public void processBounds() throws RecursiveDepthExceededException {
         double oldUpperBound = upperBound;
@@ -508,7 +495,6 @@ public class Activation implements Comparable<Activation> {
         double lb = n.getTotalBias(CURRENT) + ss.getPosRecSum();
 
         long v = doc.getNewVisitedId();
-        markPredecessor(v, 0);
 
         for (Link l : inputLinks.values()) {
             Synapse s = l.synapse;
@@ -553,6 +539,7 @@ public class Activation implements Comparable<Activation> {
     private static State getInitialState(Decision c) {
         return new State(
                 c == SELECTED ? 1.0 : 0.0,
+                1.0,
                 0.0,
                 0.0,
                 0.0,
@@ -563,10 +550,11 @@ public class Activation implements Comparable<Activation> {
 
 
 
-    public List<Link> getInputStates(int round, long v) {
-        ArrayList<Link> tmp = new ArrayList<>();
+
+    private List<InputState> getInputStates(int round, long v) {
+        ArrayList<InputState> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
-        Link maxInputState = null;
+        InputState maxInputState = null;
         for (Link l : inputLinks.values()) {
             if(l.isInactive()) {
                 continue;
@@ -578,7 +566,7 @@ public class Activation implements Comparable<Activation> {
 
             State s = l.input.getInputState(round, l.synapse, v);
             if (maxInputState == null || maxInputState.s.value < s.value) {
-                maxInputState = l;
+                maxInputState = new InputState(l, s);
             }
             lastSynapse = l.synapse;
         }
@@ -597,13 +585,13 @@ public class Activation implements Comparable<Activation> {
 
 
     public boolean isOscillating() {
-         return rounds.getLastRound() != null && rounds.getLastRound() > MAX_ROUND - 5;
+         return currentOption.getLastRound() != null && currentOption.getLastRound() > MAX_ROUND - 5;
     }
 
 
     public void setInputState(Builder input) {
-        State s = new State(input.value, input.value, input.net, 0.0, input.fired, 0.0);
-        rounds.set(0, s);
+        State s = new State(input.value, input.value, input.value, input.net, 0.0, input.fired, 0.0);
+        currentOption.set(0, s);
 
         inputValue = input.value;
         upperBound = input.value;
@@ -622,14 +610,25 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    private State getInputState(int round, Synapse s, long v) {
+    private static class InputState {
+        public InputState(Link l, State s) {
+            this.l = l;
+            this.s = s;
+        }
+
+        Link l;
+        State s;
+    }
+
+
+    private State getInputState(int round, Synapse s, Activation act) {
         State is = State.ZERO;
         if (s.isRecurrent()) {
-            if (!s.isNegative(CURRENT) || !checkSelfReferencing(true, 0, v)) {
-                is = round == 0 ? getInitialState(getDecision()) : rounds.get(round - 1);
+            if (!s.isNegative(CURRENT) || !checkSelfReferencing(act, 0)) {
+                is = round == 0 ? getInitialState(getDecision()) : currentOption.get(round - 1);
             }
         } else {
-            is = rounds.get(round);
+            is = currentOption.get(round);
         }
         return is;
     }
@@ -657,35 +656,26 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public void adjustSelectedNeuronInputs(Decision d) {
-        for(Link l: outputLinks.values()) {
-            if(d == SELECTED) {
-                l.output.selectedInputLinks.add(l);
-            } else {
-                l.output.selectedInputLinks.remove(l);
-            }
-        }
-    }
-
-
-    public boolean checkSelfReferencing(boolean onlySelected, int depth, long v) {
-        if (markedPredecessor == v) {
+    public boolean checkSelfReferencing(Activation act, int depth) {
+        if (this == act) {
             return true;
         }
 
-        if (depth > MAX_SELF_REFERENCING_DEPTH) {
+        if(getType() != INHIBITORY || depth > MAX_SELF_REFERENCING_DEPTH) {
             return false;
         }
 
-        for (Link l: onlySelected ? selectedInputLinks : inputLinks.values()) {
-            if(!l.synapse.isNegative(CURRENT)) {
-                if (l.input.checkSelfReferencing(onlySelected, depth + 1, v)) {
-                    return true;
-                }
+        Link maxLink = null;
+        double maxValue = 0.0;
+        for (Link l: inputLinks.values()) {
+            double v = maxLink.getInput().currentOption.getLast().value;
+            if(maxLink == null || v < maxValue) {
+                maxLink = l;
+                maxValue = v;
             }
         }
 
-        return false;
+        return maxLink.input.checkSelfReferencing(act, depth + 1);
     }
 
 
@@ -694,26 +684,13 @@ public class Activation implements Comparable<Activation> {
 
         if (newDecision == Decision.UNKNOWN && v != visitedState) return;
 
-        if(getDecision() == Decision.SELECTED != (newDecision == Decision.SELECTED)) {
-            adjustSelectedNeuronInputs(newDecision);
-        }
-
         currentSearchState.decision = newDecision;
         visitedState = v;
-
+/*
         if(SearchNode.COMPUTE_SOFT_MAX && newDecision != UNKNOWN) {
-            Option o = new Option(this, sn != null ? sn.getId() : -1, newDecision);
-
-            if(sn != null) {
-                sn.getChild(newDecision).setOption(o);
-            }
+            new Option(this, sn, newDecision);
         }
-
-        for(Link l: outputLinks.values()) {
-            if(l.getOutput().getType() == INHIBITORY) {
-                l.getOutput().setDecision(newDecision, v, sn);
-            }
-        }
+*/
     }
 
 
@@ -734,7 +711,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public State getFinalState() {
-        return finalRounds.getLast();
+        return finalOption.getLast();
     }
 
 
@@ -777,26 +754,6 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public void markPredecessor(long v, int depth) throws RecursiveDepthExceededException {
-        if(depth > MAX_PREDECESSOR_DEPTH) {
-            throw new RecursiveDepthExceededException();
-        }
-
-        markPredecessor(v);
-
-        for(Link l: inputLinks.values()) {
-            if(!l.isNegative(CURRENT) && !l.isRecurrent()) {
-                l.input.markPredecessor(v, depth + 1);
-            }
-        }
-    }
-
-
-    public void markPredecessor(long v) {
-        markedPredecessor = v;
-    }
-
-
     public boolean match(Predicate<Link> filter) {
         Synapse ls = null;
         boolean matched = false;
@@ -820,108 +777,6 @@ public class Activation implements Comparable<Activation> {
         return matched;
     }
 
-    /**
-     * Since Aika is a recurrent neural network, it is necessary to compute several rounds of activation values. The
-     * computation stops if no further changes occur to the state. Only the recurrent synapses depend on the previous
-     * round.
-     *
-     */
-    public static class Rounds {
-        private boolean[] isQueued = new boolean[3];
-
-        public TreeMap<Integer, State> rounds = new TreeMap<>();
-
-
-        public Rounds() {
-            rounds.put(0, State.ZERO);
-        }
-
-
-        public boolean set(int r, State s) {
-            State lr = get(r - 1);
-            if(lr != null && lr.equalsWithWeights(s)) {
-                State or = rounds.get(r);
-                if(or != null) {
-                    rounds.remove(r);
-                    return !or.equalsWithWeights(s);
-                }
-                return false;
-            } else {
-                State or = rounds.put(r, s);
-
-                for(Iterator<Map.Entry<Integer, State>> it = rounds.tailMap(r + 1).entrySet().iterator(); it.hasNext(); ) {
-                    Map.Entry<Integer, State> me = it.next();
-                    if(me.getValue().equalsWithWeights(s)) it.remove();
-                }
-                return or == null || !or.equalsWithWeights(s);
-            }
-        }
-
-
-        public State get(int r) {
-            Map.Entry<Integer, State> me = rounds.floorEntry(r);
-            return me != null ? me.getValue() : null;
-        }
-
-        public Rounds copy() {
-            Rounds nr = new Rounds();
-            nr.rounds.putAll(rounds);
-            return nr;
-        }
-
-        public Integer getLastRound() {
-            return !rounds.isEmpty() ? rounds.lastKey() : null;
-        }
-
-        public State getLast() {
-            return !rounds.isEmpty() ? rounds.lastEntry().getValue() : State.ZERO;
-        }
-
-        public void setQueued(int r, boolean v) {
-            if(r >= isQueued.length) {
-                isQueued = Arrays.copyOf(isQueued, isQueued.length * 2);
-            }
-            isQueued[r] = v;
-        }
-
-        public boolean isQueued(int r) {
-            return r < isQueued.length ? isQueued[r] : false;
-        }
-
-
-        public void reset() {
-            rounds.clear();
-            rounds.put(0, State.ZERO);
-        }
-
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            rounds.forEach((r, s) -> sb.append(r + ":" + s.value + " "));
-            return sb.toString();
-        }
-
-
-        public boolean compare(Rounds r) {
-            if(rounds.size() != r.rounds.size()) {
-                return false;
-            }
-            for(Map.Entry<Integer, State> me: rounds.entrySet()) {
-                State sa = me.getValue();
-                State sb = r.rounds.get(me.getKey());
-                if(sb == null || Math.abs(sa.value - sb.value) > 0.0000001) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-
-        public boolean isActive() {
-            return rounds.size() <= 1 && getLast().value > 0.0;
-        }
-    }
-
 
     /**
      * A <code>State</code> object contains the activation value of an activation object that belongs to a neuron.
@@ -930,6 +785,7 @@ public class Activation implements Comparable<Activation> {
      */
     public static class State {
         public final double value;
+        public final double ub;
         public final double posValue;
         public final double net;
         public final double posNet;
@@ -937,11 +793,12 @@ public class Activation implements Comparable<Activation> {
         public final int fired;
         public final double weight;
 
-        public static final State ZERO = new State(0.0, 0.0, 0.0, 0.0, -1, 0.0);
+        public static final State ZERO = new State(0.0, 0.0, 0.0, 0.0, 0.0, -1, 0.0);
 
-        public State(double value, double posValue, double net, double posNet, int fired, double weight) {
+        public State(double value, double ub, double posValue, double net, double posNet, int fired, double weight) {
             assert !Double.isNaN(value);
             this.value = value;
+            this.ub = ub;
             this.posValue = posValue;
             this.net = net;
             this.posNet = posNet;
@@ -959,7 +816,7 @@ public class Activation implements Comparable<Activation> {
         }
 
         public String toString() {
-            return "V:" + Utils.round(value) + (DEBUG_OUTPUT ? " pV:" + Utils.round(posValue) : "") + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
+            return "V:" + Utils.round(value) + " UB:" + Utils.round(ub) + (DEBUG_OUTPUT ? " pV:" + Utils.round(posValue) : "") + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
         }
     }
 
@@ -969,8 +826,8 @@ public class Activation implements Comparable<Activation> {
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
                 (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +
-                " V:" + Utils.round(rounds.getLast().value) +
-                " FV:" + Utils.round(finalRounds.getLast().value);
+                " V:" + Utils.round(currentOption.getLast().value) +
+                " FV:" + Utils.round(finalOption.getLast().value);
     }
 
 
@@ -1042,7 +899,7 @@ public class Activation implements Comparable<Activation> {
         for (Option option : options) {
             if (option.decision == SELECTED) {
                 double p = option.p;
-                Activation.State s = option.state;
+                State s = option.getLast();
 
                 value += p * s.value;
                 posValue += p * s.posValue;
@@ -1116,7 +973,8 @@ public class Activation implements Comparable<Activation> {
         StateChange sc = currentStateChange;
         if (sc == null || currentStateV != v) {
             sc = new StateChange();
-            sc.oldRounds = rounds.copy();
+            assert currentOption.fixed;
+            sc.oldOption = currentOption;
             currentStateChange = sc;
             currentStateV = v;
             if (changes != null) {
@@ -1128,7 +986,8 @@ public class Activation implements Comparable<Activation> {
     public void saveNewState() {
         StateChange sc = currentStateChange;
 
-        sc.newRounds = rounds.copy();
+        assert currentOption.fixed;
+        sc.newOption = currentOption;
         sc.newState = getDecision();
     }
 
@@ -1141,12 +1000,13 @@ public class Activation implements Comparable<Activation> {
      * state before following the alternative search branch.
      */
     public class StateChange {
-        public Rounds oldRounds;
-        public Rounds newRounds;
+        public Option oldOption;
+        public Option newOption;
         public Decision newState;
 
         public void restoreState(Mode m) {
-            rounds = (m == Mode.OLD ? oldRounds : newRounds).copy();
+            currentOption = (m == Mode.OLD ? oldOption : newOption);
+            assert currentOption.fixed;
         }
 
         public Activation getActivation() {

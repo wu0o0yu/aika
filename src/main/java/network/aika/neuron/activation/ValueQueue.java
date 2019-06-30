@@ -34,7 +34,7 @@ public class ValueQueue {
 
 
     public void add(int round, Activation act) {
-        if(act.rounds.isQueued(round) || act.getDecision() == SearchNode.Decision.UNKNOWN) return;
+        if(act.currentOption.isQueued(round) || act.getDecision() == SearchNode.Decision.UNKNOWN) return;
 
         TreeSet<Activation> q;
         if(round < queue.size()) {
@@ -45,7 +45,7 @@ public class ValueQueue {
             queue.add(q);
         }
 
-        act.rounds.setQueued(round, true);
+        act.currentOption.setQueued(round, true);
         q.add(act);
     }
 
@@ -60,7 +60,7 @@ public class ValueQueue {
             TreeSet<Activation> q = queue.get(round);
             while (!q.isEmpty()) {
                 Activation act = q.pollFirst();
-                act.rounds.setQueued(round, false);
+                act.currentOption.setQueued(round, false);
 
                 delta += act.process(sn, round, v);
             }

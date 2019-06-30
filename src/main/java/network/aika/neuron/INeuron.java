@@ -52,7 +52,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
     private static final Logger log = LoggerFactory.getLogger(INeuron.class);
 
-    public static boolean ALLOW_WEAK_NEGATIVE_WEIGHTS = false;
     public static double WEIGHT_TOLERANCE = 0.001;
 
 

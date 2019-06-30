@@ -87,7 +87,7 @@ public class Linker {
             while((act = doc.getNextActivation(act)) != null) {
                 linkOutputRelations(act);
 
-                act.getInputLinks(false)
+                act.getInputLinks()
                         .forEach(l -> addToQueue(l));
             }
             doc.getLinker().process();

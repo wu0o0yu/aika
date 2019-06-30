@@ -4,9 +4,7 @@ import network.aika.Utils;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.INeuron.ALLOW_WEAK_NEGATIVE_WEIGHTS;
@@ -14,14 +12,16 @@ import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
 import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
-
+import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
 
 
 public class Option implements Comparable<Option> {
 
     Activation act;
-    public int snId;
-    public Activation.State state;
+    public SearchNode searchNode;
+
+    boolean fixed = false;
+
     public SearchNode.Decision decision;
 
     public double weight;
@@ -31,22 +31,107 @@ public class Option implements Comparable<Option> {
     public Map<Activation.Link, Option> inputOptions = new TreeMap<>(INPUT_COMP);
     public Map<Activation.Link, Option> outputOptions = new TreeMap<>(OUTPUT_COMP); // TODO:
 
+    private boolean[] isQueued = new boolean[3];
 
-    public Option(Activation act, int snId, SearchNode.Decision d) {
-        this.snId = snId;
-        this.state = act.rounds.getLast();
+    public TreeMap<Integer, Activation.State> rounds = new TreeMap<>();
+
+
+
+    public Option(Activation act, SearchNode sn, SearchNode.Decision d) {
+        this.act = act;
+        this.searchNode = sn;
         this.decision = d;
 
-        if (act.options == null) {
-            act.options = new ArrayList<>();
+        rounds.put(0, Activation.State.ZERO);
+    }
+
+    public boolean set(int r, Activation.State s) {
+        Activation.State lr = get(r - 1);
+        if(lr != null && lr.equalsWithWeights(s)) {
+            Activation.State or = rounds.get(r);
+            if(or != null) {
+                rounds.remove(r);
+                return !or.equalsWithWeights(s);
+            }
+            return false;
+        } else {
+            Activation.State or = rounds.put(r, s);
+
+            for(Iterator<Map.Entry<Integer, Activation.State>> it = rounds.tailMap(r + 1).entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<Integer, Activation.State> me = it.next();
+                if(me.getValue().equalsWithWeights(s)) it.remove();
+            }
+            return or == null || !or.equalsWithWeights(s);
         }
-        act.options.add(this);
+    }
+
+
+    public Activation.State get(int r) {
+        Map.Entry<Integer, Activation.State> me = rounds.floorEntry(r);
+        return me != null ? me.getValue() : null;
+    }
+
+
+    public Integer getLastRound() {
+        return !rounds.isEmpty() ? rounds.lastKey() : null;
+    }
+
+    public Activation.State getLast() {
+        return !rounds.isEmpty() ? rounds.lastEntry().getValue() : Activation.State.ZERO;
+    }
+
+    public void setQueued(int r, boolean v) {
+        if(r >= isQueued.length) {
+            isQueued = Arrays.copyOf(isQueued, isQueued.length * 2);
+        }
+        isQueued[r] = v;
+    }
+
+    public boolean isQueued(int r) {
+        return r < isQueued.length ? isQueued[r] : false;
+    }
+
+
+    public void reset() {
+        rounds.clear();
+        rounds.put(0, Activation.State.ZERO);
+    }
+
+
+    public boolean compare(Option r) {
+        if(rounds.size() != r.rounds.size()) {
+            return false;
+        }
+        for(Map.Entry<Integer, Activation.State> me: rounds.entrySet()) {
+            Activation.State sa = me.getValue();
+            Activation.State sb = r.rounds.get(me.getKey());
+            if(sb == null || Math.abs(sa.value - sb.value) > 0.0000001) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    public boolean isActive() {
+        return rounds.size() <= 1 && getLast().value > 0.0;
+    }
+
+
+    public void link() {
+        for(Activation.Link l: act.getInputLinks().collect(Collectors.toList())) {
+            Activation iAct = l.getInput();
+            if(iAct.currentOption != null && iAct.currentOption.decision != UNKNOWN && iAct.currentOption.isActive()) {
+                link(l, iAct.currentOption);
+            }
+        }
     }
 
 
     public void setWeight(double weight) {
         this.weight = weight;
-
+/*
         for(Activation.Link l: act.getInputLinks().collect(Collectors.toList())) {
             if(l.getInput().getDecision() == SELECTED) {
                 if(l.getInput().getCandidateId() != null) {
@@ -72,6 +157,7 @@ public class Option implements Comparable<Option> {
                 }
             }
         }
+*/
     }
 
 
@@ -88,6 +174,13 @@ public class Option implements Comparable<Option> {
 
     public Activation getAct() {
         return act;
+    }
+
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        rounds.forEach((r, s) -> sb.append(r + ":" + s.value + " "));
+        return sb.toString();
     }
 
     public String toString() {

@@ -171,8 +171,6 @@ public class SearchNode implements Comparable<SearchNode> {
     private int cachedCount = 1;
     private int cachedFactor = 1;
 
-    private Option option;
-
     // Avoids having to search the same path twice.
     private Decision skip = UNKNOWN;
 
@@ -269,16 +267,6 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public Option getOption() {
-        return option;
-    }
-
-
-    public void setOption(Option o) {
-        option = o;
-    }
-
-
     public Map<Activation, StateChange> getModifiedActivations() {
         return modifiedActs;
     }
@@ -297,17 +285,12 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public Option getCurrentOption()  {
-        return getChild(currentDecision).getOption();
-    }
-
-
     private boolean isModified() {
         for (StateChange sc : modifiedActs.values()) {
             if (sc.getActivation().markedDirty > visited || sc.newState != sc.getActivation().getDecision()) {
                 return true;
             }
-            if(sc.newRounds.isActive()) {
+            if(sc.newOption.isActive()) {
                 if(sc.getActivation()
                         .getOutputLinks()
                         .anyMatch(l -> l.getOutput().getDecision() != UNKNOWN && l.getOutput().markedDirty > visited)
@@ -335,7 +318,7 @@ public class SearchNode implements Comparable<SearchNode> {
             StateChange sca = modifiedActs.get(act);
             StateChange scb = csn != null ? csn.modifiedActs.get(act) : null;
 
-            if (sca == null || scb == null || !sca.newRounds.compare(scb.newRounds)) {
+            if (sca == null || scb == null || !sca.newOption.compare(scb.newOption)) {
                 act.getOutputLinks()
                         .forEach(l -> l.getOutput().markDirty(visited));
             }
@@ -354,7 +337,7 @@ public class SearchNode implements Comparable<SearchNode> {
             StateChange sca = me.getValue();
             StateChange scb = cachedNode.modifiedActs.get(me.getKey());
 
-            if (!sca.newRounds.compare(scb.newRounds)) {
+            if (!sca.newOption.compare(scb.newOption)) {
                 return false;
             }
         }
@@ -434,7 +417,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.selectedWeight = returnWeight;
                     sn.selectedWeightSum = returnWeightSum;
 
-                    sn.selectedChild.option.setWeight(returnWeightSum);
+                    sn.selectedChild.setWeight(returnWeightSum);
 
                     sn.postReturn(sn.selectedChild);
                     sn.step = Step.PREPARE_EXCLUDE;
@@ -451,7 +434,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.excludedWeight = returnWeight;
                     sn.excludedWeightSum = returnWeightSum;
 
-                    sn.excludedChild.option.setWeight(returnWeightSum);
+                    sn.excludedChild.setWeight(returnWeightSum);
 
                     sn.postReturn(sn.excludedChild);
                     sn.step = sn.act.currentSearchState.repeat && OPTIMIZE_SEARCH ? Step.PREPARE_SELECT : Step.FINAL;
@@ -470,6 +453,13 @@ public class SearchNode implements Comparable<SearchNode> {
                 default:
             }
         } while(sn != null);
+    }
+
+
+    public void setWeight(double w) {
+        for(StateChange sc: modifiedActs.values()) {
+            sc.newOption.setWeight(w);
+        }
     }
 
 
@@ -579,7 +569,7 @@ public class SearchNode implements Comparable<SearchNode> {
         child.changeState(Activation.Mode.OLD);
 
         act.setDecision(UNKNOWN, visited, this);
-        act.rounds.reset();
+        act.currentOption.reset();
     }
 
 
@@ -669,7 +659,8 @@ public class SearchNode implements Comparable<SearchNode> {
         while(sn != null) {
             if(sn.act != null) {
                 Activation act = sn.act;
-                act.finalRounds = act.rounds.copy();
+                assert act.currentOption.fixed;
+                act.finalOption = act.currentOption;
                 act.finalDecision = act.getDecision();
             }
             sn = sn.getParent();
@@ -706,7 +697,9 @@ public class SearchNode implements Comparable<SearchNode> {
         SearchNode pn = getParent();
         cachedFactor = (pn != null ? pn.cachedFactor : 1) * cachedCount;
 
-        option.setCacheFactor(cachedFactor);
+        for(StateChange sc: modifiedActs.values()) {
+            sc.newOption.setCacheFactor(cachedFactor);
+        }
     }
 
 

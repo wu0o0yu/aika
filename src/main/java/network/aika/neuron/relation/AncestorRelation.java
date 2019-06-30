@@ -27,7 +27,7 @@ public abstract class AncestorRelation extends Relation {
 
         collectContains(results, n, linkedAct, v);
 
-        linkedAct.getInputLinks(false)
+        linkedAct.getInputLinks()
                 .filter(l -> l.isIdentity())
                 .forEach(l -> collectCommonAncestor(results, n, l.getInput(), v));
     }
@@ -53,7 +53,7 @@ public abstract class AncestorRelation extends Relation {
             results.add(linkedAct);
         }
 
-        linkedAct.getInputLinks(false)
+        linkedAct.getInputLinks()
                 .filter(l -> l.isIdentity())
                 .forEach(l -> collectContainedIn(results, n, l.getInput(), v));
     }
@@ -74,7 +74,7 @@ public abstract class AncestorRelation extends Relation {
 
         if(actA == actB) return true;
 
-        return actA.getInputLinks(false)
+        return actA.getInputLinks()
                 .filter(l -> l.isIdentity())
                 .anyMatch(l -> contains(l.getInput(), actB, v));
     }
@@ -92,7 +92,7 @@ public abstract class AncestorRelation extends Relation {
 
         act.markedAncDesc = v;
 
-        act.getInputLinks(false)
+        act.getInputLinks()
                 .filter(l -> l.isIdentity())
                 .forEach(l -> markAncestors(l.getInput(), v));
     }
@@ -114,7 +114,7 @@ public abstract class AncestorRelation extends Relation {
 
         if(act.markedAncDesc == v1) return true;
 
-        return act.getInputLinks(false)
+        return act.getInputLinks()
                 .filter(l -> l.isIdentity())
                 .anyMatch(l -> hasCommonAncestor(l.getInput(), v1, v2));
     }
