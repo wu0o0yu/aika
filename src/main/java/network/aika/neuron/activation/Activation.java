@@ -26,8 +26,6 @@ import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
 import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
-import static network.aika.neuron.INeuron.ALLOW_WEAK_NEGATIVE_WEIGHTS;
-import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
 import static network.aika.neuron.Synapse.State.CURRENT;
 
 
@@ -892,6 +890,7 @@ public class Activation implements Comparable<Activation> {
         }
 
         double value = 0.0;
+        double ub = 0.0;
         double posValue = 0.0;
         double net = 0.0;
         double posNet = 0.0;
@@ -902,12 +901,13 @@ public class Activation implements Comparable<Activation> {
                 State s = option.getLast();
 
                 value += p * s.value;
+                ub += p * s.ub;
                 posValue += p * s.posValue;
                 net += p * s.net;
                 posNet += p * s.posNet;
             }
         }
-        return new Activation.State(value, posValue, net, posNet, 0, 0.0);
+        return new Activation.State(value, ub, posValue, net, posNet, 0, 0.0);
     }
 
 
@@ -973,7 +973,7 @@ public class Activation implements Comparable<Activation> {
         StateChange sc = currentStateChange;
         if (sc == null || currentStateV != v) {
             sc = new StateChange();
-            assert currentOption.fixed;
+            currentOption.fixed = true;
             sc.oldOption = currentOption;
             currentStateChange = sc;
             currentStateV = v;
@@ -986,7 +986,7 @@ public class Activation implements Comparable<Activation> {
     public void saveNewState() {
         StateChange sc = currentStateChange;
 
-        assert currentOption.fixed;
+        currentOption.fixed = true;
         sc.newOption = currentOption;
         sc.newState = getDecision();
     }
