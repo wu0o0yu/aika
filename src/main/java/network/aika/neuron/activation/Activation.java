@@ -366,7 +366,7 @@ public class Activation implements Comparable<Activation> {
         double delta = 0.0;
         State s;
         if(inputValue != null) {
-            s = new State(inputValue, inputValue, 0.0, 0.0, 0, 0.0);
+            s = new State(inputValue, inputValue, inputValue, 0.0, 0.0, 0, 0.0);
         } else {
             s = computeValueAndWeight(round);
         }
@@ -414,7 +414,6 @@ public class Activation implements Comparable<Activation> {
         int fired = -1;
 
         long v = getDocument().getNewVisitedId();
-        markPredecessor(v, 0);
 
         for (InputState is: getInputStates(round, v)) {
             Synapse s = is.l.synapse;
@@ -507,7 +506,7 @@ public class Activation implements Comparable<Activation> {
             double x = s.getWeight();
 
             if (s.isNegative(CURRENT)) {
-                if (!s.isRecurrent() && !iAct.checkSelfReferencing(false, 0, v)) {
+                if (!s.isRecurrent() && !iAct.checkSelfReferencing(this, 0)) {
                     ub += Math.min(s.getLimit(), iAct.lowerBound) * x;
                 }
 
@@ -562,7 +561,7 @@ public class Activation implements Comparable<Activation> {
                 maxInputState = null;
             }
 
-            State s = l.input.getInputState(round, l.synapse, v);
+            State s = l.input.getInputState(round, l.synapse, this);
             if (maxInputState == null || maxInputState.s.value < s.value) {
                 maxInputState = new InputState(l, s);
             }
@@ -589,7 +588,11 @@ public class Activation implements Comparable<Activation> {
 
     public void setInputState(Builder input) {
         State s = new State(input.value, input.value, input.value, input.net, 0.0, input.fired, 0.0);
-        currentOption.set(0, s);
+        rootOption = new Option(this, null, SELECTED);
+        rootOption.p = 1.0;
+        rootOption.set(0, s);
+        currentOption = rootOption;
+        finalOption = rootOption;
 
         inputValue = input.value;
         upperBound = input.value;
@@ -599,12 +602,6 @@ public class Activation implements Comparable<Activation> {
         inputDecision = SELECTED;
         finalDecision = inputDecision;
         setDecision(inputDecision, doc.getNewVisitedId(), null);
-
-        if(SearchNode.COMPUTE_SOFT_MAX) {
-            Option o = options.get(0);
-            o.p = 1.0;
-            o.state = s;
-        }
     }
 
 

@@ -1,17 +1,12 @@
 package network.aika.neuron.activation;
 
 import network.aika.Utils;
-import network.aika.neuron.INeuron;
-import network.aika.neuron.Synapse;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.INeuron.ALLOW_WEAK_NEGATIVE_WEIGHTS;
-import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
-import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
 import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
 
 
@@ -179,18 +174,16 @@ public class Option implements Comparable<Option> {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(" snId:" + searchNode.getId() + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p);
         rounds.forEach((r, s) -> sb.append(r + ":" + s.value + " "));
         return sb.toString();
     }
 
-    public String toString() {
-        return " snId:" + snId + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " " + state;
-    }
 
     @Override
     public int compareTo(Option o) {
         int r = Integer.compare(getAct().getId(), o.getAct().getId());
         if(r != 0) return r;
-        return Integer.compare(snId, o.snId);
+        return Integer.compare(searchNode.getId(), o.searchNode.getId());
     }
 }
