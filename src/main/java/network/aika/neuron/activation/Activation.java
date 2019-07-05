@@ -50,7 +50,6 @@ public class Activation implements Comparable<Activation> {
 
     public static final Comparator<Activation> ACTIVATION_ID_COMP = Comparator.comparingInt(act -> act.id);
     public static int MAX_SELF_REFERENCING_DEPTH = 5;
-    public static int MAX_PREDECESSOR_DEPTH = 100;
     public static boolean DEBUG_OUTPUT = false;
 
     public static final Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE);
@@ -79,8 +78,6 @@ public class Activation implements Comparable<Activation> {
     boolean ubQueued = false;
     private long markedHasCandidate;
 
-    private long currentStateV;
-    private StateChange currentStateChange;
     long markedDirty;
 
     private Double targetValue;
@@ -362,38 +359,37 @@ public class Activation implements Comparable<Activation> {
 
 
     public double process(SearchNode sn, int round, long v) throws OscillatingActivationsException, RecursiveDepthExceededException {
-        double delta = 0.0;
         State s = computeValueAndWeight(round);
 
-        if (round == 0 || !currentOption.get(round).equalsWithWeights(s)) {
-            saveOldState(sn.getModifiedActivations(), v);
+        if (currentOption.decision == UNKNOWN || currentOption.searchNode != sn) {
+            if(currentOption.get(round).equalsWithWeights(s)) {
+                return 0.0;
+            }
 
-            State oldState = currentOption.get(round);
+            saveState(sn);
+        }
 
-            boolean propagate = currentOption.set(round, s) && (oldState == null || !oldState.equals(s));
-
-            saveNewState();
-
-            if (propagate) {
-                if(round > MAX_ROUND) {
-                    throw new OscillatingActivationsException(doc.dumpOscillatingActivations());
-                } else {
-                    if(Document.ROUND_LIMIT < 0 || round < Document.ROUND_LIMIT) {
-                        doc.getValueQueue().propagateActivationValue(round, this);
-                    }
+        State oldState = currentOption.get(round);
+        if (currentOption.set(round, s) && (oldState == null || !oldState.equals(s))) {
+            if(round > MAX_ROUND) {
+                throw new OscillatingActivationsException(doc.dumpOscillatingActivations());
+            } else {
+                if(Document.ROUND_LIMIT < 0 || round < Document.ROUND_LIMIT) {
+                    doc.getValueQueue().propagateActivationValue(round, this);
                 }
             }
-
-            if (round == 0) {
-                // In case that there is a positive feedback loop.
-                doc.getValueQueue().add(1, this);
-            }
-
-            if (currentOption.getLastRound() != null && round >= currentOption.getLastRound()) { // Consider only the final round.
-                delta += s.weight - oldState.weight;
-            }
         }
-        return delta;
+
+        if (round == 0) {
+            // In case that there is a positive feedback loop.
+            doc.getValueQueue().add(1, this);
+        }
+
+        if (currentOption.getLastRound() != null && round >= currentOption.getLastRound()) { // Consider only the final round.
+            return s.weight - oldState.weight;
+        }
+
+        return 0.0;
     }
 
 
@@ -916,24 +912,17 @@ public class Activation implements Comparable<Activation> {
 
     public enum Mode {OLD, NEW}
 
-    public void saveOldState(Map<Activation, StateChange> changes, long v) {
-        StateChange sc = currentStateChange;
-        if (sc == null || currentStateV != v) {
-            sc = new StateChange();
-            currentOption.fixed = true;
-            sc.oldOption = currentOption;
-            currentStateChange = sc;
-            currentStateV = v;
-            if (changes != null) {
-                changes.put(sc.getActivation(), sc);
-            }
-        }
-    }
 
-    public void saveNewState() {
-        StateChange sc = currentStateChange;
-
+    public void saveState(SearchNode sn) {
+        StateChange sc = new StateChange();
         currentOption.fixed = true;
+        sc.oldOption = currentOption;
+
+        if (sn.getModifiedActivations() != null) {
+            sn.getModifiedActivations().put(sc.getActivation(), sc);
+        }
+
+        currentOption = new Option(this, sn, getDecision());
         sc.newOption = currentOption;
         sc.newState = getDecision();
     }

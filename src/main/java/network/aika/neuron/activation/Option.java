@@ -36,7 +36,6 @@ public class Option implements Comparable<Option> {
 
 
     public Option(Activation act, SearchNode sn, Decision d) {
-
         this.act = act;
         this.searchNode = sn;
         this.decision = d;
@@ -46,6 +45,7 @@ public class Option implements Comparable<Option> {
 
 
     public boolean set(int r, State s) {
+        assert !fixed;
         State lr = get(r - 1);
         if(lr != null && lr.equalsWithWeights(s)) {
             State or = rounds.get(r);

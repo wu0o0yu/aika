@@ -194,8 +194,7 @@ public class SearchNode implements Comparable<SearchNode> {
                 weightDelta = c.cachedSearchNode.weightDelta;
 
                 for(Activation mAct: c.cachedSearchNode.modifiedActs.keySet()) {
-                    mAct.saveOldState(modifiedActs, doc.getNewVisitedId());
-                    mAct.saveNewState();
+                    mAct.saveState(this, doc.getNewVisitedId());
                 }
             } else {
                 weightDelta = doc.getValueQueue().process(doc, this);
