@@ -27,9 +27,10 @@ import org.slf4j.LoggerFactory;
 
 
 import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
-import static network.aika.neuron.activation.SearchNode.Decision.EXCLUDED;
-import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
+import static network.aika.neuron.activation.Decision.EXCLUDED;
+import static network.aika.neuron.activation.Decision.SELECTED;
+import static network.aika.neuron.activation.Decision.UNKNOWN;
+
 
 import java.util.*;
 
@@ -68,46 +69,6 @@ public class SearchNode implements Comparable<SearchNode> {
     private int level;
 
     private DebugState debugState;
-
-
-    public enum Decision {
-        SELECTED(
-                'S',
-                sn -> sn.selectedChild,
-                sn -> sn.excludedChild
-        ),
-        EXCLUDED(
-                'E',
-                sn -> sn.excludedChild,
-                sn -> sn.selectedChild
-        ),
-        UNKNOWN('U',
-                sn -> null,
-                sn -> null
-        );
-
-        char s;
-        ChildNode childNode;
-        ChildNode invertedChildNode;
-
-        Decision(char s, ChildNode cn, ChildNode icn) {
-            this.s = s;
-            this.childNode = cn;
-            this.invertedChildNode = icn;
-        }
-
-        public SearchNode getChild(SearchNode sn) {
-            return childNode.getChild(sn);
-        }
-
-        public SearchNode getInvertedChild(SearchNode sn) {
-            return invertedChildNode.getChild(sn);
-        }
-
-        interface ChildNode {
-            SearchNode getChild(SearchNode sn);
-        }
-    }
 
 
     public SearchNode getChild(Decision d) {
@@ -160,8 +121,8 @@ public class SearchNode implements Comparable<SearchNode> {
     private Step step = Step.INIT;
     private Decision currentDecision = UNKNOWN;
     private Decision preDecision;
-    private SearchNode selectedChild = null;
-    private SearchNode excludedChild = null;
+    SearchNode selectedChild = null;
+    SearchNode excludedChild = null;
     private double selectedWeight = 0.0;
     private double excludedWeight = 0.0;
     private double selectedWeightSum = 0.0;
@@ -507,7 +468,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private Decision getCachedDecision() {
-        return preDecision != EXCLUDED ? act.currentSearchState.cachedDecision : Decision.UNKNOWN;
+        return preDecision != EXCLUDED ? act.currentSearchState.cachedDecision : UNKNOWN;
     }
 
 
@@ -617,7 +578,7 @@ public class SearchNode implements Comparable<SearchNode> {
     public static void invalidateCachedDecision(Activation act) {
         CurrentSearchState pos = act.currentSearchState;
         if (pos != null) {
-            if (pos.cachedDecision == Decision.EXCLUDED) {
+            if (pos.cachedDecision == EXCLUDED) {
                 pos.cachedDecision = UNKNOWN;
                 pos.repeat = true;
             }
@@ -626,7 +587,7 @@ public class SearchNode implements Comparable<SearchNode> {
         for (Activation c : act.getConflicts()) {
             CurrentSearchState neg = c.currentSearchState;
             if (neg != null) {
-                if (neg.cachedDecision == Decision.SELECTED) {
+                if (neg.cachedDecision == SELECTED) {
                     neg.cachedDecision = UNKNOWN;
                 }
             }

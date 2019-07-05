@@ -1,14 +1,13 @@
 package network.aika.neuron.activation;
 
 import network.aika.Utils;
-import network.aika.neuron.activation.SearchNode.Decision;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
-import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
+import static network.aika.neuron.activation.Decision.UNKNOWN;
 
 
 public class Option implements Comparable<Option> {
@@ -36,7 +35,7 @@ public class Option implements Comparable<Option> {
 
 
 
-    public Option(Activation act, SearchNode sn, SearchNode.Decision d) {
+    public Option(Activation act, SearchNode sn, Decision d) {
 
         this.act = act;
         this.searchNode = sn;

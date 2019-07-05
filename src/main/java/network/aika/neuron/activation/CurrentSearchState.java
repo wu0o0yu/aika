@@ -1,5 +1,7 @@
 package network.aika.neuron.activation;
 
+import static network.aika.neuron.activation.Decision.UNKNOWN;
+
 public class CurrentSearchState {
     SearchNode currentSearchNode;
 
@@ -7,7 +9,7 @@ public class CurrentSearchState {
      * The cached decision is used to avoid having to explore the same currentSearchState twice even though nothing that
      * influences this currentSearchState has changed.
      */
-    SearchNode.Decision cachedDecision = SearchNode.Decision.UNKNOWN;
+    Decision cachedDecision = UNKNOWN;
     boolean repeat = false;
     double alternativeCachedWeightSum;
 
@@ -23,7 +25,7 @@ public class CurrentSearchState {
     int[] debugComputed = new int[3];
 
 
-    SearchNode.Decision decision = SearchNode.Decision.UNKNOWN;
+    Decision decision = UNKNOWN;
 
 
     public String toString() {

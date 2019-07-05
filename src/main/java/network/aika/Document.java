@@ -37,8 +37,8 @@ import java.util.stream.Collectors;
 
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.activation.Activation.CANDIDATE_COMP;
-import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
-import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
+import static network.aika.neuron.activation.Decision.SELECTED;
+import static network.aika.neuron.activation.Decision.UNKNOWN;
 
 
 /**

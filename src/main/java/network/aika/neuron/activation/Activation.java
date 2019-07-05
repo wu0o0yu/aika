@@ -10,7 +10,6 @@ import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.neuron.INeuron.Type;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.SearchNode.Decision;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,15 +18,14 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static network.aika.Document.MAX_ROUND;
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.activation.Linker.Direction.INPUT;
 import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
-import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
+import static network.aika.neuron.activation.Decision.SELECTED;
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
+import static network.aika.neuron.activation.Decision.UNKNOWN;
 
 
 /**
