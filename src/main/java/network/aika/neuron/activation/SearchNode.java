@@ -220,6 +220,13 @@ public class SearchNode implements Comparable<SearchNode> {
 
             accumulatedWeight = weightDelta + pn.accumulatedWeight;
         }
+
+        return getActivation().currentOption.searchNode == this || getDecision() == getPreferedDecision(getActivation().currentOption);
+    }
+
+
+    private static Decision getPreferedDecision(Option o) {
+        return o.getLast().value > 0.0 ? SELECTED : EXCLUDED;
     }
 
 

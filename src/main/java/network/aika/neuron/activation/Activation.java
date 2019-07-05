@@ -856,6 +856,7 @@ public class Activation implements Comparable<Activation> {
         }
         return new State(value, ub, posValue, net, posNet, 0, 0.0);
 */
+        return State.ZERO;
     }
 
 
