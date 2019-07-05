@@ -455,7 +455,7 @@ public class Document implements Comparable<Document> {
 
 
     private void computeSoftMax() {
-        for (Activation act : activationsById.values()) {
+/*        for (Activation act : activationsById.values()) {
             double offset = Double.MAX_VALUE;
             for (Option option : act.getOptions()) {
                 offset = Math.min(offset, Math.log(option.cacheFactor) + option.weight);
@@ -472,6 +472,7 @@ public class Document implements Comparable<Document> {
                 }
             }
         }
+        */
     }
 
 

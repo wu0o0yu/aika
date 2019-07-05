@@ -94,13 +94,13 @@ public class ActivationOutputsTest {
         Activation actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inA.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false), inA)
+                selectInputActivation(actAB.getInputLinks(), inA)
         );
 
         actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inB.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false), inB)
+                selectInputActivation(actAB.getInputLinks(), inB)
         );
 
 
@@ -110,13 +110,13 @@ public class ActivationOutputsTest {
         actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inA.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false), inA)
+                selectInputActivation(actAB.getInputLinks(), inA)
         );
 
         actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inB.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false), inB)
+                selectInputActivation(actAB.getInputLinks(), inB)
         );
     }
 
