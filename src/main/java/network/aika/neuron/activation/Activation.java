@@ -832,7 +832,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public State getExpectedState() {
-        if (options == null) {
+/*        if (options == null) {
             return null;
         }
 
@@ -855,6 +855,7 @@ public class Activation implements Comparable<Activation> {
             }
         }
         return new State(value, ub, posValue, net, posNet, 0, 0.0);
+*/
     }
 
 
