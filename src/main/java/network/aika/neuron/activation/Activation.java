@@ -27,6 +27,7 @@ import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
 
 
 /**
@@ -73,8 +74,8 @@ public class Activation implements Comparable<Activation> {
     private double upperBound;
     private double lowerBound;
 
-    Option rootOption;
-    Option currentOption;
+    Option rootOption = new Option(this, null, UNKNOWN);
+    Option currentOption = rootOption;
     Option finalOption;
 
     boolean ubQueued = false;
@@ -364,12 +365,7 @@ public class Activation implements Comparable<Activation> {
 
     public double process(SearchNode sn, int round, long v) throws OscillatingActivationsException, RecursiveDepthExceededException {
         double delta = 0.0;
-        State s;
-        if(inputValue != null) {
-            s = new State(inputValue, inputValue, inputValue, 0.0, 0.0, 0, 0.0);
-        } else {
-            s = computeValueAndWeight(round);
-        }
+        State s = computeValueAndWeight(round);
 
         if (round == 0 || !currentOption.get(round).equalsWithWeights(s)) {
             saveOldState(sn.getModifiedActivations(), v);
@@ -587,10 +583,9 @@ public class Activation implements Comparable<Activation> {
 
 
     public void setInputState(Builder input) {
-        State s = new State(input.value, input.value, input.value, input.net, 0.0, input.fired, 0.0);
-        rootOption = new Option(this, null, SELECTED);
+        rootOption.decision = SELECTED;
         rootOption.p = 1.0;
-        rootOption.set(0, s);
+        rootOption.set(0, new State(input.value, input.value, input.value, input.net, 0.0, input.fired, 0.0));
         currentOption = rootOption;
         finalOption = rootOption;
 
@@ -773,49 +768,6 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    /**
-     * A <code>State</code> object contains the activation value of an activation object that belongs to a neuron.
-     * It furthermore contains a weight that is used to check the interpretations during the search for the best
-     * interpretation.
-     */
-    public static class State {
-        public final double value;
-        public final double ub;
-        public final double posValue;
-        public final double net;
-        public final double posNet;
-
-        public final int fired;
-        public final double weight;
-
-        public static final State ZERO = new State(0.0, 0.0, 0.0, 0.0, 0.0, -1, 0.0);
-
-        public State(double value, double ub, double posValue, double net, double posNet, int fired, double weight) {
-            assert !Double.isNaN(value);
-            this.value = value;
-            this.ub = ub;
-            this.posValue = posValue;
-            this.net = net;
-            this.posNet = posNet;
-            this.fired = fired;
-            this.weight = weight;
-        }
-
-
-        public boolean equals(State s) {
-            return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE;
-        }
-
-        public boolean equalsWithWeights(State s) {
-            return equals(s) && Math.abs(weight - s.weight) <= INeuron.WEIGHT_TOLERANCE;
-        }
-
-        public String toString() {
-            return "V:" + Utils.round(value) + " UB:" + Utils.round(ub) + (DEBUG_OUTPUT ? " pV:" + Utils.round(posValue) : "") + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
-        }
-    }
-
-
     public String toString() {
         return id + " " + getNeuron().getId() + ":" + getLabel() + " " + slotsToString() + " " + identityToString() + " - " +
                 " UB:" + Utils.round(upperBound) +
@@ -904,7 +856,7 @@ public class Activation implements Comparable<Activation> {
                 posNet += p * s.posNet;
             }
         }
-        return new Activation.State(value, ub, posValue, net, posNet, 0, 0.0);
+        return new State(value, ub, posValue, net, posNet, 0, 0.0);
     }
 
 

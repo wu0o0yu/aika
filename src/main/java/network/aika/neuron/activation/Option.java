@@ -1,6 +1,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Utils;
+import network.aika.neuron.activation.SearchNode.Decision;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,9 +16,12 @@ public class Option implements Comparable<Option> {
     Activation act;
     public SearchNode searchNode;
 
+    public Option parent;
+    public Option child;
+
     boolean fixed = false;
 
-    public SearchNode.Decision decision;
+    public Decision decision;
 
     public double weight;
     public int cacheFactor = 1;
@@ -28,32 +32,34 @@ public class Option implements Comparable<Option> {
 
     private boolean[] isQueued = new boolean[3];
 
-    public TreeMap<Integer, Activation.State> rounds = new TreeMap<>();
+    public TreeMap<Integer, State> rounds = new TreeMap<>();
 
 
 
     public Option(Activation act, SearchNode sn, SearchNode.Decision d) {
+
         this.act = act;
         this.searchNode = sn;
         this.decision = d;
 
-        rounds.put(0, Activation.State.ZERO);
+        rounds.put(0, State.ZERO);
     }
 
-    public boolean set(int r, Activation.State s) {
-        Activation.State lr = get(r - 1);
+
+    public boolean set(int r, State s) {
+        State lr = get(r - 1);
         if(lr != null && lr.equalsWithWeights(s)) {
-            Activation.State or = rounds.get(r);
+            State or = rounds.get(r);
             if(or != null) {
                 rounds.remove(r);
                 return !or.equalsWithWeights(s);
             }
             return false;
         } else {
-            Activation.State or = rounds.put(r, s);
+            State or = rounds.put(r, s);
 
-            for(Iterator<Map.Entry<Integer, Activation.State>> it = rounds.tailMap(r + 1).entrySet().iterator(); it.hasNext(); ) {
-                Map.Entry<Integer, Activation.State> me = it.next();
+            for(Iterator<Map.Entry<Integer, State>> it = rounds.tailMap(r + 1).entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<Integer, State> me = it.next();
                 if(me.getValue().equalsWithWeights(s)) it.remove();
             }
             return or == null || !or.equalsWithWeights(s);
@@ -61,8 +67,8 @@ public class Option implements Comparable<Option> {
     }
 
 
-    public Activation.State get(int r) {
-        Map.Entry<Integer, Activation.State> me = rounds.floorEntry(r);
+    public State get(int r) {
+        Map.Entry<Integer, State> me = rounds.floorEntry(r);
         return me != null ? me.getValue() : null;
     }
 
@@ -71,9 +77,11 @@ public class Option implements Comparable<Option> {
         return !rounds.isEmpty() ? rounds.lastKey() : null;
     }
 
-    public Activation.State getLast() {
-        return !rounds.isEmpty() ? rounds.lastEntry().getValue() : Activation.State.ZERO;
+
+    public State getLast() {
+        return !rounds.isEmpty() ? rounds.lastEntry().getValue() : State.ZERO;
     }
+
 
     public void setQueued(int r, boolean v) {
         if(r >= isQueued.length) {
@@ -82,6 +90,7 @@ public class Option implements Comparable<Option> {
         isQueued[r] = v;
     }
 
+
     public boolean isQueued(int r) {
         return r < isQueued.length ? isQueued[r] : false;
     }
@@ -89,7 +98,7 @@ public class Option implements Comparable<Option> {
 
     public void reset() {
         rounds.clear();
-        rounds.put(0, Activation.State.ZERO);
+        rounds.put(0, State.ZERO);
     }
 
 
@@ -97,10 +106,10 @@ public class Option implements Comparable<Option> {
         if(rounds.size() != r.rounds.size()) {
             return false;
         }
-        for(Map.Entry<Integer, Activation.State> me: rounds.entrySet()) {
-            Activation.State sa = me.getValue();
-            Activation.State sb = r.rounds.get(me.getKey());
-            if(sb == null || Math.abs(sa.value - sb.value) > 0.0000001) {
+        for(Map.Entry<Integer, State> me: rounds.entrySet()) {
+            State sa = me.getValue();
+            State sb = r.rounds.get(me.getKey());
+            if(sb == null || !sa.equalsWithWeights(sb)) {
                 return false;
             }
         }
