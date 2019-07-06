@@ -82,6 +82,8 @@ public class AddSynapseTest {
 
         doc.process();
 
+        System.out.println(doc.activationsToString());
+
         Assert.assertEquals(4, n.getActivations(doc, true).collect(Collectors.toList()).size());
     }
 }

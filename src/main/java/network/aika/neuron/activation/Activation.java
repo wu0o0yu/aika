@@ -71,9 +71,9 @@ public class Activation implements Comparable<Activation> {
     private double upperBound;
     private double lowerBound;
 
-    Option rootOption = new Option(this, null, UNKNOWN);
-    Option currentOption = rootOption;
-    Option finalOption;
+    public Option rootOption = new Option(this, null, UNKNOWN);
+    public Option currentOption = rootOption;
+    public Option finalOption;
 
     boolean ubQueued = false;
     private long markedHasCandidate;
@@ -84,7 +84,7 @@ public class Activation implements Comparable<Activation> {
     private Double inputValue;
 
     Decision inputDecision = Decision.UNKNOWN;
-    Decision finalDecision = Decision.UNKNOWN;
+    public Decision finalDecision = Decision.UNKNOWN;
     CurrentSearchState currentSearchState = new CurrentSearchState();
 
     private Integer sequence;

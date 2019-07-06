@@ -435,6 +435,7 @@ public class Document implements Comparable<Document> {
         if(selectedSearchNode == null || !INCREMENTAL_MODE) {
             selectedSearchNode = new SearchNode(this, null, null, 0);
             selectedSearchNode.updateActivations(this);
+            storeFinalState();
 
             rootNode = selectedSearchNode;
         }
@@ -450,6 +451,14 @@ public class Document implements Comparable<Document> {
         if(SearchNode.COMPUTE_SOFT_MAX) {
             SearchNode.computeCachedFactor(rootNode);
             computeSoftMax();
+        }
+    }
+
+
+    public void storeFinalState() {
+        for(Activation act: activationsById.values()) {
+            act.finalOption = act.currentOption;
+            act.finalDecision = act.getDecision();
         }
     }
 

@@ -156,7 +156,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public boolean updateActivations(Document doc) throws OscillatingActivationsException {
+    public void updateActivations(Document doc) throws OscillatingActivationsException {
         Activation parentAct = getParent() != null ? getParent().act : null;
         CurrentSearchState c = parentAct != null ? parentAct.currentSearchState : null;
 
@@ -219,7 +219,10 @@ public class SearchNode implements Comparable<SearchNode> {
 
             accumulatedWeight = weightDelta + pn.accumulatedWeight;
         }
+    }
 
+
+    private boolean followPath() {
         return getActivation().currentOption.searchNode == this || getDecision() == getPreferedDecision(getActivation().currentOption);
     }
 
@@ -495,7 +498,9 @@ public class SearchNode implements Comparable<SearchNode> {
         selectedChild = new SearchNode(doc, this, excludedParent, level + 1);
         act.setDecision(SELECTED, visited, this);
 
-        if(!selectedChild.updateActivations(doc)) {
+        selectedChild.updateActivations(doc);
+
+        if(!selectedChild.followPath()) {
             return false;
         }
 
@@ -522,7 +527,9 @@ public class SearchNode implements Comparable<SearchNode> {
 
         act.setDecision(EXCLUDED, visited, this);
 
-        if(!excludedChild.updateActivations(doc)) {
+        excludedChild.updateActivations(doc);
+
+        if(!excludedChild.followPath()) {
             return false;
         }
 
@@ -606,7 +613,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if (level > doc.selectedSearchNode.level || accNW > getSelectedAccumulatedWeight(doc)) {
             doc.selectedSearchNode = this;
-            storeFinalState(this);
+            doc.storeFinalState();
             bestPath = true;
         } else {
             bestPath = false;
@@ -619,19 +626,6 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 */
         return accumulatedWeight;
-    }
-
-
-    private static void storeFinalState(SearchNode sn) {
-        while(sn != null) {
-            if(sn.act != null) {
-                Activation act = sn.act;
-                assert act.currentOption.fixed;
-                act.finalOption = act.currentOption;
-                act.finalDecision = act.getDecision();
-            }
-            sn = sn.getParent();
-        }
     }
 
 
