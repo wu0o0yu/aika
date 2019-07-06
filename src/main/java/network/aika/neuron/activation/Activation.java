@@ -920,14 +920,16 @@ public class Activation implements Comparable<Activation> {
         StateChange sc = new StateChange();
         currentOption.fixed = true;
         sc.oldOption = currentOption;
+        currentOption = new Option(this, sn, getDecision());
+        sc.newOption = currentOption;
+        sc.newState = currentOption.decision;
+
+        sc.oldOption.child = sc.newOption;
+        sc.newOption.parent = sc.oldOption;
 
         if (sn.getModifiedActivations() != null) {
             sn.getModifiedActivations().put(sc.getActivation(), sc);
         }
-
-        currentOption = new Option(this, sn, getDecision());
-        sc.newOption = currentOption;
-        sc.newState = getDecision();
     }
 
 
