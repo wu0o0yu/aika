@@ -5,7 +5,12 @@ import network.aika.Document;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeSet;
+
+import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
+
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.activation.Decision.UNKNOWN;
 
 public class ValueQueue {
     private final ArrayList<TreeSet<Activation>> queue = new ArrayList<>();
@@ -23,7 +28,7 @@ public class ValueQueue {
     }
 
 
-    private void add(Activation act) {
+    public void add(Activation act) {
         if(act == null) return;
 
         add(0, act);
@@ -34,7 +39,7 @@ public class ValueQueue {
 
 
     public void add(int round, Activation act) {
-        if(act.currentOption.isQueued(round) || act.getDecision() == Decision.UNKNOWN) return;
+        if(act.currentOption.isQueued(round) || (act.getDecision() == UNKNOWN && act.getType() == EXCITATORY)) return;
 
         TreeSet<Activation> q;
         if(round < queue.size()) {

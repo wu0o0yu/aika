@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.activation.Activation.CANDIDATE_COMP;
 import static network.aika.neuron.activation.Decision.SELECTED;
 import static network.aika.neuron.activation.Decision.UNKNOWN;
@@ -434,6 +434,7 @@ public class Document implements Comparable<Document> {
         SearchNode rootNode = null;
         if(selectedSearchNode == null || !INCREMENTAL_MODE) {
             selectedSearchNode = new SearchNode(this, null, null, 0);
+
             selectedSearchNode.updateActivations(this);
             storeFinalState();
 

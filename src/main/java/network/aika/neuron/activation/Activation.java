@@ -26,6 +26,7 @@ import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Decision.UNKNOWN;
+import static network.aika.neuron.activation.State.ZERO;
 
 
 /**
@@ -606,7 +607,7 @@ public class Activation implements Comparable<Activation> {
 
 
     private State getInputState(int round, Synapse s, Activation act) {
-        State is = State.ZERO;
+        State is = ZERO;
         if (s.isRecurrent()) {
             if (!s.isNegative(CURRENT) || !checkSelfReferencing(act, 0)) {
                 is = round == 0 ? getInitialState(getDecision()) : currentOption.get(round - 1);
@@ -695,7 +696,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public State getFinalState() {
-        return finalOption.getLast();
+        return finalOption != null ? finalOption.getLast() : ZERO;
     }
 
 
@@ -781,7 +782,7 @@ public class Activation implements Comparable<Activation> {
         StringBuilder sb = new StringBuilder();
         sb.append(id + " - ");
 
-        sb.append(finalDecision + " - ");
+        sb.append((finalDecision != null ? finalDecision : "X") + " - ");
 
         sb.append(slotsToString());
 
@@ -852,7 +853,7 @@ public class Activation implements Comparable<Activation> {
         }
         return new State(value, ub, posValue, net, posNet, 0, 0.0);
 */
-        return State.ZERO;
+        return ZERO;
     }
 
 

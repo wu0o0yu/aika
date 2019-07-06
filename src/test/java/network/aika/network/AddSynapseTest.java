@@ -80,6 +80,8 @@ public class AddSynapseTest {
             i++;
         }
 
+        System.out.println(doc.activationsToString());
+
         doc.process();
 
         System.out.println(doc.activationsToString());
