@@ -14,7 +14,7 @@ import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 
-public class TestNextWordTest {
+public class NextWordTest {
 
     @Test
     public void testMatchTheWord() {

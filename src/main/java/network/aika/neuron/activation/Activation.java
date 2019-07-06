@@ -653,7 +653,7 @@ public class Activation implements Comparable<Activation> {
         Link maxLink = null;
         double maxValue = 0.0;
         for (Link l: inputLinks.values()) {
-            double v = maxLink.getInput().currentOption.getLast().value;
+            double v = l.getInput().currentOption.getLast().value;
             if(maxLink == null || v < maxValue) {
                 maxLink = l;
                 maxValue = v;
