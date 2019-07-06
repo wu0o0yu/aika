@@ -725,12 +725,6 @@ public class Activation implements Comparable<Activation> {
 
     public void setCandidateId(Integer candidateId) {
         this.candidateId = candidateId;
-
-        for(Link l: outputLinks.values()) {
-            if(l.getOutput().getType() == INHIBITORY) {
-                l.getOutput().setCandidateId(candidateId);
-            }
-        }
     }
 
 
