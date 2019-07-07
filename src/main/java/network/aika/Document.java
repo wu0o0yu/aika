@@ -426,7 +426,7 @@ public class Document implements Comparable<Document> {
 
         inputNeuronActivations.forEach(act -> {
             act.setDecision(act.getInputDecision(), getNewVisitedId(), null);
-            valueQueue.propagateActivationValue(0, act);
+            valueQueue.propagateActivationValue(act);
         });
 
         generateCandidates();
@@ -618,20 +618,6 @@ public class Document implements Comparable<Document> {
         if(selectedSearchNode != null) {
             sb.append("\n Final SearchNode:" + selectedSearchNode.getId() + "  WeightSum:" + selectedSearchNode.getAccumulatedWeight() + "\n");
         }
-        return sb.toString();
-    }
-
-
-    public String dumpOscillatingActivations() {
-        StringBuilder sb = new StringBuilder();
-        activatedNeurons.stream()
-                .flatMap(n -> n.getActivations(this, false))
-                .filter(act -> act.isOscillating())
-                .forEach(act -> {
-                    sb.append(act.getId() + " " + act.slotsToString() + " " + act.getDecision() + "\n");
-                    sb.append(act.linksToString() + "\n");
-                    sb.append("\n");
-                });
         return sb.toString();
     }
 

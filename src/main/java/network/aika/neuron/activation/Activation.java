@@ -359,19 +359,19 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public double process(SearchNode sn, int round, long v) throws OscillatingActivationsException, RecursiveDepthExceededException {
-        State s = computeValueAndWeight(round);
+    public double process(SearchNode sn) throws OscillatingActivationsException, RecursiveDepthExceededException {
+        State s = computeValueAndWeight();
 
         if (currentOption.decision == UNKNOWN || currentOption.searchNode != sn) {
-            if(currentOption.get(round).equalsWithWeights(s)) {
+            if(currentOption.get().equalsWithWeights(s)) {
                 return 0.0;
             }
 
             saveState(sn);
         }
 
-        State oldState = currentOption.get(round);
-        if (currentOption.set(round, s) && (oldState == null || !oldState.equals(s))) {
+        State oldState = currentOption.get();
+        if (currentOption.set(s) && (oldState == null || !oldState.equals(s))) {
             if(round > MAX_ROUND) {
                 throw new OscillatingActivationsException(doc.dumpOscillatingActivations());
             } else {
@@ -379,11 +379,6 @@ public class Activation implements Comparable<Activation> {
                     doc.getValueQueue().propagateActivationValue(round, this);
                 }
             }
-        }
-
-        if (round == 0) {
-            // In case that there is a positive feedback loop.
-            doc.getValueQueue().add(1, this);
         }
 
         if (currentOption.getLastRound() != null && round >= currentOption.getLastRound()) { // Consider only the final round.
@@ -394,7 +389,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public State computeValueAndWeight(int round) throws RecursiveDepthExceededException {
+    public State computeValueAndWeight() throws RecursiveDepthExceededException {
         INeuron n = getINeuron();
         INeuron.SynapseSummary ss = n.getSynapseSummary();
 
@@ -404,9 +399,7 @@ public class Activation implements Comparable<Activation> {
 
         int fired = -1;
 
-        long v = getDocument().getNewVisitedId();
-
-        for (InputState is: getInputStates(round, v)) {
+        for (InputState is: getInputStates()) {
             Synapse s = is.l.synapse;
             Activation iAct = is.l.input;
 
@@ -423,7 +416,7 @@ public class Activation implements Comparable<Activation> {
             }
 
             if (!s.isRecurrent() && !s.isNegative(CURRENT) && net >= 0.0 && fired < 0) {
-                fired = iAct.currentOption.get(round).fired + 1;
+                fired = iAct.currentOption.get().fired + 1;
             }
         }
 
@@ -539,7 +532,7 @@ public class Activation implements Comparable<Activation> {
 
 
 
-    private List<InputState> getInputStates(int round, long v) {
+    private List<InputState> getInputStates() {
         ArrayList<InputState> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
         InputState maxInputState = null;
@@ -552,7 +545,7 @@ public class Activation implements Comparable<Activation> {
                 maxInputState = null;
             }
 
-            State s = l.input.getInputState(round, l.synapse, this);
+            State s = l.input.getInputState(l.synapse, this);
             if (maxInputState == null || maxInputState.s.value < s.value) {
                 maxInputState = new InputState(l, s);
             }
@@ -571,16 +564,10 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-
-    public boolean isOscillating() {
-         return currentOption.getLastRound() != null && currentOption.getLastRound() > MAX_ROUND - 5;
-    }
-
-
     public void setInputState(Builder input) {
         rootOption.decision = SELECTED;
         rootOption.p = 1.0;
-        rootOption.set(0, new State(input.value, input.value, input.value, input.net, 0.0, input.fired, 0.0));
+        rootOption.set(new State(input.value, input.value, input.value, input.net, 0.0, input.fired, 0.0));
         currentOption = rootOption;
         finalOption = rootOption;
 
@@ -606,14 +593,33 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    private State getInputState(int round, Synapse s, Activation act) {
-        State is = ZERO;
+    private State getInputState(Synapse s, Activation act) {
+        double value = 0.0;
+        double ub = 0.0;
+
         if (s.isRecurrent()) {
+            if(getDecision() == UNKNOWN) {
+                if(getType() == INHIBITORY) {
+
+                }
+            } else {
+
+            }
+
+            if(s.isNegative(CURRENT)) {
+
+            } else {
+
+            }
+
+
+
             if (!s.isNegative(CURRENT) || !checkSelfReferencing(act, 0)) {
                 is = round == 0 ? getInitialState(getDecision()) : currentOption.get(round - 1);
             }
         } else {
-            is = currentOption.get(round);
+            State is = currentOption.get(round);
+
         }
         return is;
     }
