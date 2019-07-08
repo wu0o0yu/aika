@@ -19,13 +19,12 @@ import java.util.stream.Stream;
 
 import static network.aika.Document.MAX_ROUND;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.activation.Decision.*;
 import static network.aika.neuron.activation.Linker.Direction.INPUT;
 import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
-import static network.aika.neuron.activation.Decision.SELECTED;
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.activation.Decision.UNKNOWN;
 import static network.aika.neuron.activation.State.ZERO;
 
 
@@ -517,21 +516,6 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    private static State getInitialState(Decision c) {
-        return new State(
-                c == SELECTED ? 1.0 : 0.0,
-                1.0,
-                0.0,
-                0.0,
-                0.0,
-                0,
-                0.0
-        );
-    }
-
-
-
-
     private List<InputState> getInputStates() {
         ArrayList<InputState> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
@@ -597,31 +581,44 @@ public class Activation implements Comparable<Activation> {
         double value = 0.0;
         double ub = 0.0;
 
-        if (s.isRecurrent()) {
-            if(getDecision() == UNKNOWN) {
-                if(getType() == INHIBITORY) {
-
-                }
+        State is = currentOption.get();
+        if (getType() == INHIBITORY) {
+            if(act.getDecision() == SELECTED) {
+                value = is.ub;
             } else {
-
-            }
-
-            if(s.isNegative(CURRENT)) {
-
-            } else {
-
-            }
-
-
-
-            if (!s.isNegative(CURRENT) || !checkSelfReferencing(act, 0)) {
-                is = round == 0 ? getInitialState(getDecision()) : currentOption.get(round - 1);
+                value = is.value;
             }
         } else {
-            State is = currentOption.get(round);
-
+            if(getDecision() == UNKNOWN) {
+                if (s.isNegative(CURRENT)) {
+                    if(!checkSelfReferencing(act, 0)) {
+                        if(act.getDecision() == EXCLUDED) {
+                            value = s.getLimit();
+                        }
+                    }
+                } else {
+                    if(act.getDecision() == SELECTED) {
+                        ub = s.getLimit();
+                        value = s.getLimit();
+                    } else if(act.getDecision() == UNKNOWN) {
+                        ub = s.getLimit();
+                    }
+                }
+            } else {
+                ub = is.value;
+                value = is.value;
+            }
         }
-        return is;
+
+        return new State(
+                value,
+                ub,
+                0.0,
+                0.0,
+                0.0,
+                0,
+                0.0
+        );
     }
 
 
