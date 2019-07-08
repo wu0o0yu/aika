@@ -426,7 +426,7 @@ public class Activation implements Comparable<Activation> {
                     posActValue,
                     net,
                     posNet,
-                    -1,
+                    fired,
                     newWeight
             );
         } else {
@@ -807,13 +807,18 @@ public class Activation implements Comparable<Activation> {
             throw new RecursiveDepthExceededException();
         }
 
-        markedPredecessor = v;
+        markPredecessor(v);
 
         for(Link l: inputLinks.values()) {
             if(!l.isNegative(CURRENT) && !l.isRecurrent()) {
                 l.input.markPredecessor(v, depth + 1);
             }
         }
+    }
+
+
+    public void markPredecessor(long v) {
+        markedPredecessor = v;
     }
 
 
