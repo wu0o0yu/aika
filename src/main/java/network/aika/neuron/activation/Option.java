@@ -36,14 +36,13 @@ public class Option implements Comparable<Option> {
     private boolean isQueued;
 
 
-    public Option(Activation act, SearchNode sn, Decision d) {
+    public Option(Activation act, SearchNode sn) {
         this.act = act;
         this.searchNode = sn;
-        this.decision = d;
     }
 
 
-    public boolean set(State s) {
+    public boolean setState(State s) {
         assert !fixed;
         if(state.equalsWithWeights(s)) {
             return false;
@@ -54,12 +53,7 @@ public class Option implements Comparable<Option> {
     }
 
 
-    public State get() {
-        return state;
-    }
-
-
-    public State getLast() {
+    public State getState() {
         return state;
     }
 
@@ -101,33 +95,6 @@ public class Option implements Comparable<Option> {
 
     public void setWeight(double weight) {
         this.weight = weight;
-/*
-        for(Activation.Link l: act.getInputLinks().collect(Collectors.toList())) {
-            if(l.getInput().getDecision() == SELECTED) {
-                if(l.getInput().getCandidateId() != null) {
-                    if (l.getInput().getCandidateId() < act.getCandidateId()) {
-                        SearchNode inputSN = l.getInput().currentSearchState.currentSearchNode.getParent();
-
-                        link(l, inputSN.getCurrentOption());
-                    }
-                } else {
-                    link(l, l.getInput().options.get(0));
-                }
-            }
-        }
-
-        for(Activation.Link l: act.getOutputLinks().collect(Collectors.toList())) {
-            if(l.getInput().getDecision() == SELECTED) {
-                if(l.getOutput().getCandidateId() != null) {
-                    if(l.getOutput().getCandidateId() < act.getCandidateId()) {
-                        SearchNode outputSN = l.getOutput().currentSearchState.currentSearchNode.getParent();
-
-                        outputSN.getCurrentOption().link(l, this);
-                    }
-                }
-            }
-        }
-*/
     }
 
 
@@ -149,8 +116,7 @@ public class Option implements Comparable<Option> {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(" snId:" + (searchNode != null ? searchNode.getId() : "-") + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p);
-        sb.append(state.value + " ");
+        sb.append(" snId:" + (searchNode != null ? searchNode.getId() : "-") + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " value:" + Utils.round(state.value));
         return sb.toString();
     }
 

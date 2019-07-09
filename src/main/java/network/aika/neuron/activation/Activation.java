@@ -56,8 +56,6 @@ public class Activation implements Comparable<Activation> {
     public static final Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE);
     public static final Activation MAX_ACTIVATION = new Activation(Integer.MAX_VALUE);
 
-    private static final Logger log = LoggerFactory.getLogger(Activation.class);
-
     private int id;
     private INeuron neuron;
     private Document doc;
@@ -72,7 +70,7 @@ public class Activation implements Comparable<Activation> {
     private double upperBound;
     private double lowerBound;
 
-    public Option rootOption = new Option(this, null, UNKNOWN);
+    public Option rootOption = new Option(this, null);
     public Option currentOption = rootOption;
     public Option finalOption;
 
@@ -84,8 +82,6 @@ public class Activation implements Comparable<Activation> {
     private Double targetValue;
     private Double inputValue;
 
-    Decision inputDecision = Decision.UNKNOWN;
-    public Decision finalDecision = Decision.UNKNOWN;
     CurrentSearchState currentSearchState = new CurrentSearchState();
 
     private Integer sequence;
@@ -291,16 +287,13 @@ public class Activation implements Comparable<Activation> {
         return inputValue;
     }
 
-    public Decision getInputDecision() {
-        return inputDecision;
-    }
 
     public Decision getDecision() {
-        return currentSearchState.decision;
+        return currentOption.decision;
     }
 
     public Decision getFinalDecision() {
-        return finalDecision;
+        return finalOption.decision;
     }
 
     public void addLink(Linker.Direction dir, Link l) {
@@ -360,18 +353,18 @@ public class Activation implements Comparable<Activation> {
 
 
     public double process(SearchNode sn) throws OscillatingActivationsException, RecursiveDepthExceededException {
-        State oldState = currentOption.get();
+        State oldState = currentOption.getState();
         State s = computeValueAndWeight();
 
         if (currentOption.decision == UNKNOWN || currentOption.searchNode != sn) {
-            if(currentOption.get().equalsWithWeights(s)) {
+            if(currentOption.getState().equalsWithWeights(s)) {
                 return 0.0;
             }
 
             saveState(sn);
         }
 
-        if (currentOption.set(s) && (oldState == null || !oldState.equals(s))) {
+        if (currentOption.setState(s) && (oldState == null || !oldState.equals(s))) {
             doc.getValueQueue().propagateActivationValue(this);
         }
 
@@ -406,7 +399,7 @@ public class Activation implements Comparable<Activation> {
             }
 
             if (!s.isRecurrent() && !s.isNegative(CURRENT) && net >= 0.0 && fired < 0) {
-                fired = iAct.currentOption.get().fired + 1;
+                fired = iAct.currentOption.getState().fired + 1;
             }
         }
 
@@ -542,7 +535,7 @@ public class Activation implements Comparable<Activation> {
     public void setInputState(Builder input) {
         rootOption.decision = SELECTED;
         rootOption.p = 1.0;
-        rootOption.set(new State(input.value, input.value, input.value, input.net, 0.0, input.fired, 0.0));
+        rootOption.setState(new State(input.value, input.value, input.value, input.net, 0.0, input.fired, 0.0));
         currentOption = rootOption;
         finalOption = rootOption;
 
@@ -550,10 +543,6 @@ public class Activation implements Comparable<Activation> {
         upperBound = input.value;
         lowerBound = input.value;
         targetValue = input.targetValue;
-
-        inputDecision = SELECTED;
-        finalDecision = inputDecision;
-        setDecision(inputDecision, doc.getNewVisitedId(), null);
     }
 
 
@@ -568,48 +557,33 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    private State getInputState(Synapse s, Activation act) {
-        double value = 0.0;
-        double ub = 0.0;
 
-        State is = currentOption.get();
-        if (getType() == INHIBITORY) {
-            if(act.getDecision() == SELECTED) {
-                value = s.isNegative(CURRENT) ? is.value : is.ub;
-            } else {
-                value = s.isNegative(CURRENT) ? is.ub : is.value;
-            }
+// TODO: prüfen ob posValue, net, posNet usw. noch gebraucht werden.
+    private State getInputState(Synapse s, Activation act) {
+        State is;
+
+        if(getType() != EXCITATORY || getDecision() != UNKNOWN) {
+            is = currentOption.getState();
         } else {
-            if(getDecision() == UNKNOWN) {
-                if (s.isNegative(CURRENT)) {
-                    if(!checkSelfReferencing(act, 0)) {
-                        if(act.getDecision() == EXCLUDED) {
-                            value = s.getLimit();
-                        }
-                    }
-                } else {
-                    if(act.getDecision() == SELECTED) {
-                        ub = s.getLimit();
-                        value = s.getLimit();
-                    } else if(act.getDecision() == UNKNOWN) {
-                        ub = s.getLimit();
-                    }
-                }
+            is = new State(0.0, s.getLimit(), 0.0, 0.0, 0.0, 0, 0.0);
+        }
+
+        if(s.isNegative(CURRENT)) {
+            if(!checkSelfReferencing(act, 0)) {  // Warum greift das nicht?
+                is = new State(is.ub, is.value, 0.0, 0.0, 0.0, 0, 0.0);
             } else {
-                ub = is.value;
-                value = is.value;
+                is = ZERO;
             }
         }
 
-        return new State(
-                value,
-                ub,
-                0.0,
-                0.0,
-                0.0,
-                0,
-                0.0
-        );
+        if(act.getType() == INHIBITORY) {
+            return is;
+        } else if(act.getDecision() == SELECTED) {
+            return new State(is.ub, is.ub, 0.0, 0.0, 0.0, 0, 0.0);
+        } else if(act.getDecision() == EXCLUDED) {
+            return new State(is.value, is.value, 0.0, 0.0, 0.0, 0, 0.0);
+        }
+        return null;
     }
 
 
@@ -647,8 +621,8 @@ public class Activation implements Comparable<Activation> {
         Link maxLink = null;
         double maxValue = 0.0;
         for (Link l: inputLinks.values()) {
-            double v = l.getInput().currentOption.getLast().value;
-            if(maxLink == null || v < maxValue) {
+            double v = l.getInput().currentOption.getState().value;
+            if(maxLink == null || v >= maxValue) {
                 maxLink = l;
                 maxValue = v;
             }
@@ -659,17 +633,11 @@ public class Activation implements Comparable<Activation> {
 
 
     public void setDecision(Decision newDecision, long v, SearchNode sn) {
-        if(inputDecision != Decision.UNKNOWN && newDecision != inputDecision) return;
-
         if (newDecision == Decision.UNKNOWN && v != visitedState) return;
 
-        currentSearchState.decision = newDecision;
+        currentOption.decision = newDecision;
+
         visitedState = v;
-/*
-        if(SearchNode.COMPUTE_SOFT_MAX && newDecision != UNKNOWN) {
-            new Option(this, sn, newDecision);
-        }
-*/
     }
 
 
@@ -690,7 +658,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public State getFinalState() {
-        return finalOption != null ? finalOption.getLast() : ZERO;
+        return finalOption != null ? finalOption.getState() : ZERO;
     }
 
 
@@ -756,8 +724,8 @@ public class Activation implements Comparable<Activation> {
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
                 (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +
-                " V:" + Utils.round(currentOption.getLast().value) +
-                " FV:" + Utils.round(finalOption.getLast().value);
+                " V:" + Utils.round(currentOption.getState().value) +
+                " FV:" + Utils.round(finalOption.getState().value);
     }
 
 
@@ -771,7 +739,7 @@ public class Activation implements Comparable<Activation> {
         sb.append(id + " - ");
 
         if(getType() == EXCITATORY) {
-            sb.append((finalDecision != null ? finalDecision : "X") + " - ");
+            sb.append((getFinalDecision() != null ? getFinalDecision() : "X") + " - ");
         }
 
         sb.append(slotsToString());
@@ -910,7 +878,7 @@ public class Activation implements Comparable<Activation> {
         StateChange sc = new StateChange();
         currentOption.fixed = true;
         sc.oldOption = currentOption;
-        currentOption = new Option(this, sn, getDecision());
+        currentOption = new Option(this, sn);
         sc.newOption = currentOption;
         sc.newState = currentOption.decision;
 

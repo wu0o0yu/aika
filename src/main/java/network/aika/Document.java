@@ -425,7 +425,6 @@ public class Document implements Comparable<Document> {
         linker.lateLinking();
 
         inputNeuronActivations.forEach(act -> {
-            act.setDecision(act.getInputDecision(), getNewVisitedId(), null);
             valueQueue.propagateActivationValue(act);
         });
 
@@ -459,7 +458,6 @@ public class Document implements Comparable<Document> {
     public void storeFinalState() {
         for(Activation act: activationsById.values()) {
             act.finalOption = act.currentOption;
-            act.finalDecision = act.getDecision();
         }
     }
 

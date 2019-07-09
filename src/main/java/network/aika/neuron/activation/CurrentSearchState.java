@@ -25,9 +25,6 @@ public class CurrentSearchState {
     int[] debugComputed = new int[3];
 
 
-    Decision decision = UNKNOWN;
-
-
     public String toString() {
         return " CD:" + cachedDecision +
                 " REPEAT:" + repeat +

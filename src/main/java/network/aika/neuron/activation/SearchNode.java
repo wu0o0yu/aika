@@ -228,7 +228,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private static Decision getPreferedDecision(Option o) {
-        return o.getLast().value > 0.0 ? SELECTED : EXCLUDED;
+        return o.getState().value > 0.0 ? SELECTED : EXCLUDED;
     }
 
 
@@ -448,9 +448,9 @@ public class SearchNode implements Comparable<SearchNode> {
     private void initStep(Document doc) throws RecursiveDepthExceededException {
         act = doc.candidates.get(level);
 
-        preDecision = act.inputDecision;
+        preDecision = UNKNOWN;
 
-        if(preDecision == UNKNOWN && OPTIMIZE_SEARCH) {
+        if(OPTIMIZE_SEARCH) {
             Decision cd = getCachedDecision();
 
             setWeightSum(cd, act.currentSearchState.alternativeCachedWeightSum);
@@ -675,7 +675,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public String toString() {
-        return "id:" + id + " actId:" + act.getId() + " Decision:" + getDecision() + " curDec:" + currentDecision;
+        return "id:" + id + " actId:" + (act != null ? act.getId() : "-") + " Decision:" + getDecision() + " curDec:" + currentDecision;
     }
 
 
