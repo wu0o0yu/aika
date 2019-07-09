@@ -18,6 +18,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static network.aika.Document.MAX_ROUND;
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.activation.Decision.*;
 import static network.aika.neuron.activation.Linker.Direction.INPUT;
@@ -359,6 +360,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public double process(SearchNode sn) throws OscillatingActivationsException, RecursiveDepthExceededException {
+        State oldState = currentOption.get();
         State s = computeValueAndWeight();
 
         if (currentOption.decision == UNKNOWN || currentOption.searchNode != sn) {
@@ -369,22 +371,11 @@ public class Activation implements Comparable<Activation> {
             saveState(sn);
         }
 
-        State oldState = currentOption.get();
         if (currentOption.set(s) && (oldState == null || !oldState.equals(s))) {
-            if(round > MAX_ROUND) {
-                throw new OscillatingActivationsException(doc.dumpOscillatingActivations());
-            } else {
-                if(Document.ROUND_LIMIT < 0 || round < Document.ROUND_LIMIT) {
-                    doc.getValueQueue().propagateActivationValue(round, this);
-                }
-            }
+            doc.getValueQueue().propagateActivationValue(this);
         }
 
-        if (currentOption.getLastRound() != null && round >= currentOption.getLastRound()) { // Consider only the final round.
-            return s.weight - oldState.weight;
-        }
-
-        return 0.0;
+        return s.weight - oldState.weight;
     }
 
 
@@ -779,7 +770,9 @@ public class Activation implements Comparable<Activation> {
         StringBuilder sb = new StringBuilder();
         sb.append(id + " - ");
 
-        sb.append((finalDecision != null ? finalDecision : "X") + " - ");
+        if(getType() == EXCITATORY) {
+            sb.append((finalDecision != null ? finalDecision : "X") + " - ");
+        }
 
         sb.append(slotsToString());
 
