@@ -575,9 +575,9 @@ public class Activation implements Comparable<Activation> {
         State is = currentOption.get();
         if (getType() == INHIBITORY) {
             if(act.getDecision() == SELECTED) {
-                value = is.ub;
+                value = s.isNegative(CURRENT) ? is.value : is.ub;
             } else {
-                value = is.value;
+                value = s.isNegative(CURRENT) ? is.ub : is.value;
             }
         } else {
             if(getDecision() == UNKNOWN) {

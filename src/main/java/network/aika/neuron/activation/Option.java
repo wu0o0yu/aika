@@ -12,7 +12,9 @@ import static network.aika.neuron.activation.Decision.UNKNOWN;
 
 public class Option implements Comparable<Option> {
 
-    public State state = State.ZERO;
+    public static final State INITIAL_STATE = new State(0.0, 1.0, 0.0, 0.0, 0.0, 0, 0.0);
+
+    public State state = INITIAL_STATE;
 
     Activation act;
     public SearchNode searchNode;
@@ -147,7 +149,7 @@ public class Option implements Comparable<Option> {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(" snId:" + searchNode.getId() + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p);
+        sb.append(" snId:" + (searchNode != null ? searchNode.getId() : "-") + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p);
         sb.append(state.value + " ");
         return sb.toString();
     }
