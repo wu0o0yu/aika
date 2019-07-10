@@ -19,7 +19,6 @@ package network.aika.neuron.activation;
 
 import network.aika.Document;
 import network.aika.Utils;
-import network.aika.neuron.activation.Activation.StateChange;
 import network.aika.neuron.activation.Activation.RecursiveDepthExceededException;
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 import org.slf4j.Logger;
@@ -116,7 +115,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private double weightDelta;
     private double accumulatedWeight = 0.0;
 
-    private Map<Activation, Activation.StateChange> modifiedActs = new TreeMap<>(Activation.ACTIVATION_ID_COMP);
+    private Map<Activation, Option> modifiedActs = new TreeMap<>(Activation.ACTIVATION_ID_COMP);
 
     private Step step = Step.INIT;
     private Decision currentDecision = UNKNOWN;
@@ -237,7 +236,7 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public Map<Activation, StateChange> getModifiedActivations() {
+    public Map<Activation, Option> getModifiedActivations() {
         return modifiedActs;
     }
 
@@ -256,12 +255,12 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean isModified() {
-        for (StateChange sc : modifiedActs.values()) {
-            if (sc.getActivation().markedDirty > visited || sc.newState != sc.getActivation().getDecision()) {
+        for (Option sc : modifiedActs.values()) {
+            if (sc.act.markedDirty > visited || sc.decision != sc.act.getDecision()) {
                 return true;
             }
-            if(sc.newOption.isActive()) {
-                if(sc.getActivation()
+            if(sc.isActive()) {
+                if(sc.act
                         .getOutputLinks()
                         .anyMatch(l -> l.getOutput().getDecision() != UNKNOWN && l.getOutput().markedDirty > visited)
                         ) {
@@ -285,10 +284,10 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         acts.forEach(act -> {
-            StateChange sca = modifiedActs.get(act);
-            StateChange scb = csn != null ? csn.modifiedActs.get(act) : null;
+            Option sca = modifiedActs.get(act);
+            Option scb = csn != null ? csn.modifiedActs.get(act) : null;
 
-            if (sca == null || scb == null || !sca.newOption.compare(scb.newOption)) {
+            if (sca == null || scb == null || !sca.compare(scb)) {
                 act.getOutputLinks()
                         .forEach(l -> l.getOutput().markDirty(visited));
             }
@@ -303,11 +302,11 @@ public class SearchNode implements Comparable<SearchNode> {
         if (modifiedActs.size() != cachedNode.modifiedActs.size()) {
             return false;
         }
-        for (Map.Entry<Activation, StateChange> me: modifiedActs.entrySet()) {
-            StateChange sca = me.getValue();
-            StateChange scb = cachedNode.modifiedActs.get(me.getKey());
+        for (Map.Entry<Activation, Option> me: modifiedActs.entrySet()) {
+            Option sca = me.getValue();
+            Option scb = cachedNode.modifiedActs.get(me.getKey());
 
-            if (!sca.newOption.compare(scb.newOption)) {
+            if (!sca.compare(scb)) {
                 return false;
             }
         }
@@ -427,8 +426,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public void setWeight(double w) {
-        for(StateChange sc: modifiedActs.values()) {
-            sc.newOption.setWeight(w);
+        for(Option sc: modifiedActs.values()) {
+            sc.setWeight(w);
         }
     }
 
@@ -496,7 +495,6 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         selectedChild = new SearchNode(doc, this, excludedParent, level + 1);
-        act.setDecision(SELECTED, visited, this);
 
         selectedChild.updateActivations(doc);
 
@@ -525,8 +523,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
         excludedChild = new SearchNode(doc, selectedParent, this, level + 1);
 
-        act.setDecision(EXCLUDED, visited, this);
-
         excludedChild.updateActivations(doc);
 
         if(!excludedChild.followPath()) {
@@ -541,9 +537,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private void postReturn(SearchNode child) {
         child.changeState(Activation.Mode.OLD);
-
-        act.setDecision(UNKNOWN, visited, this);
-        act.currentOption.reset();
     }
 
 
@@ -658,8 +651,8 @@ public class SearchNode implements Comparable<SearchNode> {
         SearchNode pn = getParent();
         cachedFactor = (pn != null ? pn.cachedFactor : 1) * cachedCount;
 
-        for(StateChange sc: modifiedActs.values()) {
-            sc.newOption.setCacheFactor(cachedFactor);
+        for(Option sc: modifiedActs.values()) {
+            sc.setCacheFactor(cachedFactor);
         }
     }
 
@@ -680,7 +673,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public void changeState(Activation.Mode m) {
-        for (Activation.StateChange sc : modifiedActs.values()) {
+        for (Option sc : modifiedActs.values()) {
             sc.restoreState(m);
         }
     }

@@ -632,15 +632,6 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public void setDecision(Decision newDecision, long v, SearchNode sn) {
-        if (newDecision == Decision.UNKNOWN && v != visitedState) return;
-
-        currentOption.decision = newDecision;
-
-        visitedState = v;
-    }
-
-
     public Collection<Activation> getConflicts() {
         ArrayList<Activation> results = new ArrayList<>();
         for(Link l: inputLinks.values()) {
@@ -875,41 +866,16 @@ public class Activation implements Comparable<Activation> {
 
 
     public void saveState(SearchNode sn) {
-        StateChange sc = new StateChange();
         currentOption.fixed = true;
-        sc.oldOption = currentOption;
+        Option oldOpt = currentOption;
         currentOption = new Option(this, sn);
-        sc.newOption = currentOption;
-        sc.newState = currentOption.decision;
+        Option newOpt = currentOption;
 
-        sc.oldOption.child = sc.newOption;
-        sc.newOption.parent = sc.oldOption;
+        oldOpt.child = newOpt;
+        newOpt.parent = oldOpt;
 
         if (sn.getModifiedActivations() != null) {
-            sn.getModifiedActivations().put(sc.getActivation(), sc);
-        }
-    }
-
-
-    /**
-     * The {@code StateChange} class is used to store the state change of an activation that occurs in each node of
-     * the binary search tree. When a currentSearchState refinement is selected during the search, then the activation values of
-     * all affected activation objects are adjusted. The changes to the activation values are also propagated through
-     * the network. The old state needs to be stored here in order for the search to be able to restore the old network
-     * state before following the alternative search branch.
-     */
-    public class StateChange {
-        public Option oldOption;
-        public Option newOption;
-        public Decision newState;
-
-        public void restoreState(Mode m) {
-            currentOption = (m == Mode.OLD ? oldOption : newOption);
-            assert currentOption.fixed;
-        }
-
-        public Activation getActivation() {
-            return Activation.this;
+            sn.getModifiedActivations().put(currentOption.act, currentOption);
         }
     }
 

@@ -24,7 +24,7 @@ public class Option implements Comparable<Option> {
 
     boolean fixed = false;
 
-    public Decision decision;
+    public Decision decision = UNKNOWN;
 
     public double weight;
     public int cacheFactor = 1;
@@ -68,8 +68,9 @@ public class Option implements Comparable<Option> {
     }
 
 
-    public void reset() {
-        state = State.ZERO;
+    public void restoreState(Activation.Mode m) {
+        act.currentOption = (m == Activation.Mode.OLD ? parent : this);
+        assert act.currentOption.fixed;
     }
 
 
