@@ -70,7 +70,7 @@ public class Activation implements Comparable<Activation> {
     private double upperBound;
     private double lowerBound;
 
-    public Option rootOption = new Option(this, null);
+    public Option rootOption = new Option(null, this, null);
     public Option currentOption = rootOption;
     public Option finalOption;
 
@@ -364,7 +364,7 @@ public class Activation implements Comparable<Activation> {
             saveState(sn);
         }
 
-        if (currentOption.setState(s) && (oldState == null || !oldState.equals(s))) {
+        if (currentOption.setState(s) && !oldState.equals(s)) {
             doc.getValueQueue().propagateActivationValue(this);
         }
 
@@ -584,28 +584,6 @@ public class Activation implements Comparable<Activation> {
             return new State(is.value, is.value, 0.0, 0.0, 0.0, 0, 0.0);
         }
         return null;
-    }
-
-
-    public List<Link> getFinalInputActivationLinks() {
-        ArrayList<Link> results = new ArrayList<>();
-        for (Link l : inputLinks.values()) {
-            if (l.input.isFinalActivation()) {
-                results.add(l);
-            }
-        }
-        return results;
-    }
-
-
-    public List<Link> getFinalOutputActivationLinks() {
-        ArrayList<Link> results = new ArrayList<>();
-        for (Link l : outputLinks.values()) {
-            if (l.output.isFinalActivation()) {
-                results.add(l);
-            }
-        }
-        return results;
     }
 
 
@@ -867,12 +845,7 @@ public class Activation implements Comparable<Activation> {
 
     public void saveState(SearchNode sn) {
         currentOption.fixed = true;
-        Option oldOpt = currentOption;
-        currentOption = new Option(this, sn);
-        Option newOpt = currentOption;
-
-        oldOpt.child = newOpt;
-        newOpt.parent = oldOpt;
+        currentOption = new Option(currentOption, this, sn);
 
         if (sn.getModifiedActivations() != null) {
             sn.getModifiedActivations().put(currentOption.act, currentOption);

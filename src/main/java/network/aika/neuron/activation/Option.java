@@ -24,7 +24,7 @@ public class Option implements Comparable<Option> {
 
     boolean fixed = false;
 
-    public Decision decision = UNKNOWN;
+    public Decision decision;
 
     public double weight;
     public int cacheFactor = 1;
@@ -36,9 +36,23 @@ public class Option implements Comparable<Option> {
     private boolean isQueued;
 
 
-    public Option(Activation act, SearchNode sn) {
+    public Option(Option parent, Activation act, SearchNode sn) {
         this.act = act;
         this.searchNode = sn;
+
+        this.parent = parent;
+
+        if(parent != null) {
+            parent.child = this;
+        }
+
+        if(sn == null) {
+            decision = UNKNOWN;
+        } else if(act == sn.getActivation()) {
+            decision = sn.getDecision();
+        } else {
+            decision = parent.decision;
+        }
     }
 
 
