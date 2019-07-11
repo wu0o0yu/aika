@@ -157,14 +157,13 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public void updateActivations(Document doc) throws OscillatingActivationsException {
         Activation parentAct = getParent() != null ? getParent().act : null;
-        CurrentSearchState c = parentAct != null ? parentAct.currentSearchState : null;
 
         SearchNode csn = null;
         boolean modified = true;
-        if (c != null) {
-            c.currentSearchNode = this;
+        if (parentAct != null) {
+            parentAct.currentSearchNode = this;
 
-            csn = c.cachedSearchNode;
+            csn = parentAct.cachedSearchNode;
 
             if (csn == null || csn.getDecision() != getDecision()) {
                 parentAct.markDirty(visited);
@@ -175,28 +174,28 @@ public class SearchNode implements Comparable<SearchNode> {
                 modified = csn.isModified();
 
                 if (modified) {
-                    c.debugComputed[2]++;
+                    parentAct.debugComputed[2]++;
                 }
             }
         }
 
         if(modified) {
-            weightDelta = doc.getValueQueue().process(doc, this);
+            weightDelta = doc.getValueQueue().process(this);
             markDirty();
 
-            if(c != null) {
-                c.cachedSearchNode = this;
+            if(parentAct != null) {
+                parentAct.cachedSearchNode = this;
             }
         } else {
             if(ENABLE_CACHING) {
-                c.cachedSearchNode.changeState(Activation.Mode.NEW);
-                weightDelta = c.cachedSearchNode.weightDelta;
+                parentAct.cachedSearchNode.changeState(Activation.Mode.NEW);
+                weightDelta = parentAct.cachedSearchNode.weightDelta;
 
-                for(Activation mAct: c.cachedSearchNode.modifiedActs.keySet()) {
+                for(Activation mAct: parentAct.cachedSearchNode.modifiedActs.keySet()) {
                     mAct.saveState(this);
                 }
             } else {
-                weightDelta = doc.getValueQueue().process(doc, this);
+                weightDelta = doc.getValueQueue().process(this);
                 if (ENABLE_CACHING_COMPARISON && (Math.abs(weightDelta - csn.weightDelta) > 0.00001 || !compareNewState(csn))) {
                     log.error("Cached search node activation do not match the newly computed results.");
                     log.info("Computed results (" + weightDelta + "):");
@@ -209,8 +208,8 @@ public class SearchNode implements Comparable<SearchNode> {
             }
         }
 
-        if (c != null) {
-            c.debugComputed[modified ? 1 : 0]++;
+        if (parentAct != null) {
+            parentAct.debugComputed[modified ? 1 : 0]++;
         }
 
         if (getParent() != null) {
@@ -275,7 +274,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private void markDirty() {
         if(getParent() == null || getParent().act == null) return;
 
-        SearchNode csn = getParent().act.currentSearchState.cachedSearchNode;
+        SearchNode csn = getParent().act.cachedSearchNode;
 
         Set<Activation> acts = new TreeSet<>(Activation.ACTIVATION_ID_COMP);
         acts.addAll(modifiedActs.keySet());
@@ -406,7 +405,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.excludedChild.setWeight(returnWeightSum);
 
                     sn.postReturn(sn.excludedChild);
-                    sn.step = sn.act.currentSearchState.repeat && OPTIMIZE_SEARCH ? Step.PREPARE_SELECT : Step.FINAL;
+                    sn.step = sn.act.repeat && OPTIMIZE_SEARCH ? Step.PREPARE_SELECT : Step.FINAL;
                     break;
                 case FINAL:
                     returnWeight = sn.finalStep();
@@ -452,10 +451,10 @@ public class SearchNode implements Comparable<SearchNode> {
         if(OPTIMIZE_SEARCH) {
             Decision cd = getCachedDecision();
 
-            setWeightSum(cd, act.currentSearchState.alternativeCachedWeightSum);
+            setWeightSum(cd, act.alternativeCachedWeightSum);
 
             if(COMPUTE_SOFT_MAX && cd != null && cd != UNKNOWN) {
-                SearchNode asn = act.currentSearchState.cachedSearchNode.getAlternative();
+                SearchNode asn = act.cachedSearchNode.getAlternative();
                 if(asn != null) {
                     asn.cachedCount++;
                 }
@@ -476,13 +475,12 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private Decision getCachedDecision() {
-        return preDecision != EXCLUDED ? act.currentSearchState.cachedDecision : UNKNOWN;
+        return preDecision != EXCLUDED ? act.cachedDecision : UNKNOWN;
     }
 
 
     private boolean prepareSelectStep(Document doc) throws OscillatingActivationsException {
-        CurrentSearchState c = act.currentSearchState;
-        c.repeat = false;
+        act.repeat = false;
 
         if(preDecision == EXCLUDED) {
             return false;
@@ -502,12 +500,12 @@ public class SearchNode implements Comparable<SearchNode> {
             return false;
         }
 
-        if (c.cachedDecision == UNKNOWN) {
+        if (act.cachedDecision == UNKNOWN) {
             invalidateCachedDecisions();
         }
 
 
-        c.debugDecisionCounts[0]++;
+        act.debugDecisionCounts[0]++;
 
         return true;
     }
@@ -529,7 +527,7 @@ public class SearchNode implements Comparable<SearchNode> {
             return false;
         }
 
-        act.currentSearchState.debugDecisionCounts[1]++;
+        act.debugDecisionCounts[1]++;
 
         return true;
     }
@@ -541,15 +539,14 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private double finalStep() {
-        CurrentSearchState c = act.currentSearchState;
         Decision d;
         Decision cd = getCachedDecision();
         if(cd == UNKNOWN) {
             d = preDecision != UNKNOWN ? preDecision : (selectedWeight >= excludedWeight ? SELECTED : EXCLUDED);
 
             if (preDecision != EXCLUDED) {
-                c.cachedDecision = d;
-                c.alternativeCachedWeightSum = getWeightSum(c.cachedDecision);
+                act.cachedDecision = d;
+                act.alternativeCachedWeightSum = getWeightSum(act.cachedDecision);
             }
         } else {
             d = cd;
@@ -557,7 +554,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
         SearchNode cn = d == SELECTED ? selectedChild : excludedChild;
         if(cn != null && cn.bestPath) {
-            c.bestChildNode = cn;
+            act.bestChildNode = cn;
             bestPath = true;
         }
 
@@ -582,19 +579,17 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public static void invalidateCachedDecision(Activation act) {
-        CurrentSearchState pos = act.currentSearchState;
-        if (pos != null) {
-            if (pos.cachedDecision == EXCLUDED) {
-                pos.cachedDecision = UNKNOWN;
-                pos.repeat = true;
+        if (act != null) {
+            if (act.cachedDecision == EXCLUDED) {
+                act.cachedDecision = UNKNOWN;
+                act.repeat = true;
             }
         }
 
         for (Activation c : act.getConflicts()) {
-            CurrentSearchState neg = c.currentSearchState;
-            if (neg != null) {
-                if (neg.cachedDecision == SELECTED) {
-                    neg.cachedDecision = UNKNOWN;
+            if (c != null) {
+                if (c.cachedDecision == SELECTED) {
+                    c.cachedDecision = UNKNOWN;
                 }
             }
         }
@@ -704,7 +699,7 @@ public class SearchNode implements Comparable<SearchNode> {
             debugState = DebugState.EXPLORE;
         }
 
-        act.currentSearchState.debugCounts[debugState.ordinal()]++;
+        act.debugCounts[debugState.ordinal()]++;
     }
 
 

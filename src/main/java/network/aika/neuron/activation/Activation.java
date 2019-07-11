@@ -82,15 +82,36 @@ public class Activation implements Comparable<Activation> {
     private Double targetValue;
     private Double inputValue;
 
-    CurrentSearchState currentSearchState = new CurrentSearchState();
-
     private Integer sequence;
     private Integer candidateId;
 
-    private long visitedState;
     public long markedAncDesc;
 
     public boolean blocked;
+
+
+    SearchNode currentSearchNode;
+
+    /**
+     * The cached decision is used to avoid having to explore the same currentSearchState twice even though nothing that
+     * influences this currentSearchState has changed.
+     */
+    Decision cachedDecision = UNKNOWN;
+    boolean repeat = false;
+    double alternativeCachedWeightSum;
+
+    /**
+     * The cached search node is used to avoid having to recompute the activation values and weights that are associated
+     * with this search node.
+     */
+    SearchNode cachedSearchNode;
+    SearchNode bestChildNode;
+
+    int[] debugCounts = new int[3];
+    int[] debugDecisionCounts = new int[3];
+    int[] debugComputed = new int[3];
+
+
 
 
     public static Comparator<Activation> CANDIDATE_COMP = (act1, act2) -> {
@@ -699,7 +720,19 @@ public class Activation implements Comparable<Activation> {
 
 
     public String searchStateToString() {
-        return id + " " + getNeuron().getId() + ":" + getLabel() + " " + currentSearchState.toString();
+        return id + " " +
+                getNeuron().getId() + ":" +
+                getLabel() + " " +
+                " CD:" + cachedDecision +
+                " REPEAT:" + repeat +
+                " LIMITED:" + debugCounts[SearchNode.DebugState.LIMITED.ordinal()] +
+                " CACHED:" + debugCounts[SearchNode.DebugState.CACHED.ordinal()] +
+                " EXPLORE:" + debugCounts[SearchNode.DebugState.EXPLORE.ordinal()] +
+                " SELECTED:" + debugDecisionCounts[0] +
+                " EXCLUDED:" + debugDecisionCounts[1] +
+                " SIM-CACHED:" + debugComputed[0] +
+                " SIM-COMPUTED:" + debugComputed[1] +
+                " MODIFIED:" + debugComputed[2];
     }
 
 
@@ -753,6 +786,7 @@ public class Activation implements Comparable<Activation> {
 
         return sb.toString();
     }
+
 
 
     public State getExpectedState() {

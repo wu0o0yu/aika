@@ -1,6 +1,5 @@
 package network.aika.neuron.activation;
 
-import network.aika.Document;
 
 import java.util.ArrayDeque;
 
@@ -13,13 +12,13 @@ public class ValueQueue {
     private final ArrayDeque<Activation> queue = new ArrayDeque<>();
 
 
-    public void propagateActivationValue(Activation act)  {
+    public void propagateActivationValue(Activation act, SearchNode sn)  {
         act.getOutputLinks()
-                .forEach(l -> add(l.getOutput()));
+                .forEach(l -> add(l.getOutput(), sn));
     }
 
 
-    public void add(Activation act) {
+    public void add(Activation act, SearchNode sn) {
         if(act == null || act.currentOption.isQueued() || (act.getDecision() == UNKNOWN && act.getType() == EXCITATORY)) return;
 
         queue.add(act);
@@ -27,8 +26,8 @@ public class ValueQueue {
     }
 
 
-    public double process(Document doc, SearchNode sn) throws OscillatingActivationsException {
-        add(sn.getActivation());
+    public double process(SearchNode sn) throws OscillatingActivationsException {
+        add(sn.getActivation(), sn);
 
         double delta = 0.0;
         while (!queue.isEmpty()) {
