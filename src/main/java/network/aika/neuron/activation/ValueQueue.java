@@ -19,7 +19,9 @@ public class ValueQueue {
 
 
     public void add(Activation act, SearchNode sn) {
-        if(act == null || act.currentOption.isQueued() || (act.getDecision() == UNKNOWN && act.getType() == EXCITATORY)) return;
+        if(act == null || act.currentOption.isQueued()) return;
+
+        if(act.getNextDecision(act.currentOption, sn) == UNKNOWN && act.getType() == EXCITATORY) return;
 
         queue.add(act);
         act.currentOption.setQueued(true);

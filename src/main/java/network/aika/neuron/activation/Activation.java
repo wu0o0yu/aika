@@ -313,6 +313,18 @@ public class Activation implements Comparable<Activation> {
         return currentOption.decision;
     }
 
+
+    public Decision getNextDecision(Option parent, SearchNode sn) {
+        if(sn == null) {
+            return UNKNOWN;
+        } else if(this == sn.getActivation()) {
+            return sn.getDecision();
+        } else {
+            return parent.decision;
+        }
+    }
+
+
     public Decision getFinalDecision() {
         return finalOption.decision;
     }
@@ -386,7 +398,7 @@ public class Activation implements Comparable<Activation> {
         }
 
         if (currentOption.setState(s) && !oldState.equals(s)) {
-            doc.getValueQueue().propagateActivationValue(this);
+            doc.getValueQueue().propagateActivationValue(this, sn);
         }
 
         return s.weight - oldState.weight;
@@ -714,8 +726,8 @@ public class Activation implements Comparable<Activation> {
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
                 (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +
-                " V:" + Utils.round(currentOption.getState().value) +
-                " FV:" + Utils.round(finalOption.getState().value);
+                " V:" + (currentOption != null ? Utils.round(currentOption.getState().value) : "-") +
+                " FV:" + (finalOption != null ? Utils.round(finalOption.getState().value) : "-");
     }
 
 

@@ -46,18 +46,7 @@ public class Option implements Comparable<Option> {
             parent.child = this;
         }
 
-        decision = parent.getNextDecision(act, sn);
-    }
-
-
-    public Decision getNextDecision(Activation act, SearchNode sn) {
-        if(sn == null) {
-            return UNKNOWN;
-        } else if(act == sn.getActivation()) {
-            return sn.getDecision();
-        } else {
-            return decision;
-        }
+        decision = act.getNextDecision(parent, sn);
     }
 
 
