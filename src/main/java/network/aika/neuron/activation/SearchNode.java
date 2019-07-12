@@ -183,7 +183,7 @@ public class SearchNode implements Comparable<SearchNode> {
             weightDelta = doc.getValueQueue().process(this);
             markDirty();
 
-            if(parentAct != null) {
+            if(parentAct != null && followPath()) {
                 parentAct.cachedSearchNode = this;
             }
         } else {

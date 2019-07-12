@@ -20,7 +20,7 @@ public class Option implements Comparable<Option> {
     public SearchNode searchNode;
 
     public Option parent;
-    public Option child;
+    public List<Option> children = new ArrayList<>();
 
     boolean fixed = false;
 
@@ -43,7 +43,7 @@ public class Option implements Comparable<Option> {
         this.parent = parent;
 
         if(parent != null) {
-            parent.child = this;
+            parent.children.add(this);
         }
 
         decision = act.getNextDecision(parent, sn);

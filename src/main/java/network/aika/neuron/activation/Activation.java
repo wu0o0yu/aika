@@ -387,7 +387,7 @@ public class Activation implements Comparable<Activation> {
 
     public double process(SearchNode sn) throws OscillatingActivationsException, RecursiveDepthExceededException {
         State oldState = currentOption.getState();
-        State s = computeValueAndWeight();
+        State s = computeValueAndWeight(sn);
 
         if (currentOption.decision == UNKNOWN || currentOption.searchNode != sn) {
             if(currentOption.getState().equalsWithWeights(s)) {
@@ -405,7 +405,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public State computeValueAndWeight() throws RecursiveDepthExceededException {
+    public State computeValueAndWeight(SearchNode sn) throws RecursiveDepthExceededException {
         INeuron n = getINeuron();
         INeuron.SynapseSummary ss = n.getSynapseSummary();
 
@@ -415,7 +415,7 @@ public class Activation implements Comparable<Activation> {
 
         int fired = -1;
 
-        for (InputState is: getInputStates()) {
+        for (InputState is: getInputStates(sn)) {
             Synapse s = is.l.synapse;
             Activation iAct = is.l.input;
 
@@ -533,7 +533,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    private List<InputState> getInputStates() {
+    private List<InputState> getInputStates(SearchNode sn) {
         ArrayList<InputState> tmp = new ArrayList<>();
         Synapse lastSynapse = null;
         InputState maxInputState = null;
@@ -546,7 +546,7 @@ public class Activation implements Comparable<Activation> {
                 maxInputState = null;
             }
 
-            State s = l.input.getInputState(l.synapse, this);
+            State s = l.input.getInputState(l.synapse, this, sn);
             if (maxInputState == null || maxInputState.s.value < s.value) {
                 maxInputState = new InputState(l, s);
             }
@@ -592,7 +592,7 @@ public class Activation implements Comparable<Activation> {
 
 
 // TODO: prüfen ob posValue, net, posNet usw. noch gebraucht werden.
-    private State getInputState(Synapse s, Activation act) {
+    private State getInputState(Synapse s, Activation act, SearchNode sn) {
         State is;
 
         if(getType() != EXCITATORY || getDecision() != UNKNOWN) {
@@ -611,10 +611,13 @@ public class Activation implements Comparable<Activation> {
 
         if(act.getType() == INHIBITORY) {
             return is;
-        } else if(act.getDecision() == SELECTED) {
-            return new State(is.ub, is.ub, 0.0, 0.0, 0.0, 0, 0.0);
-        } else if(act.getDecision() == EXCLUDED) {
-            return new State(is.value, is.value, 0.0, 0.0, 0.0, 0, 0.0);
+        } else {
+            Decision nd = act.getNextDecision(act.currentOption, sn);
+            if (nd == SELECTED) {
+                return new State(is.ub, is.ub, 0.0, 0.0, 0.0, 0, 0.0);
+            } else if (nd == EXCLUDED) {
+                return new State(is.value, is.value, 0.0, 0.0, 0.0, 0, 0.0);
+            }
         }
         return null;
     }
