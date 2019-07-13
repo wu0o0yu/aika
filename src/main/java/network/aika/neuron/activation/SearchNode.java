@@ -104,8 +104,6 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-
-
     public enum DebugState {
         CACHED,
         LIMITED,
@@ -119,7 +117,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private Step step = Step.INIT;
     private Decision currentDecision = UNKNOWN;
-    private Decision preDecision;
+    private boolean selectBranchSearched;
+    private boolean excludeBranchSearched;
     SearchNode selectedChild = null;
     SearchNode excludedChild = null;
     private double selectedWeight = 0.0;
@@ -405,7 +404,14 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.excludedChild.setWeight(returnWeightSum);
 
                     sn.postReturn(sn.excludedChild);
-                    sn.step = sn.act.repeat && OPTIMIZE_SEARCH ? Step.PREPARE_SELECT : Step.FINAL;
+
+                    if(sn.act.repeat && OPTIMIZE_SEARCH) {
+                        sn.step = Step.PREPARE_SELECT;
+                        sn.selectBranchSearched = false;
+                    } else {
+                        sn.step = Step.FINAL;
+                    }
+
                     break;
                 case FINAL:
                     returnWeight = sn.finalStep();
@@ -446,8 +452,6 @@ public class SearchNode implements Comparable<SearchNode> {
     private void initStep(Document doc) throws RecursiveDepthExceededException {
         act = doc.candidates.get(level);
 
-        preDecision = UNKNOWN;
-
         if(OPTIMIZE_SEARCH) {
             Decision cd = getCachedDecision();
 
@@ -459,8 +463,6 @@ public class SearchNode implements Comparable<SearchNode> {
                     asn.cachedCount++;
                 }
             }
-
-            preDecision = cd;
         }
 
         if (doc.searchStepCounter > MAX_SEARCH_STEPS) {
@@ -475,14 +477,14 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private Decision getCachedDecision() {
-        return preDecision != EXCLUDED ? act.cachedDecision : UNKNOWN;
+        return act.cachedDecision;
     }
 
 
     private boolean prepareSelectStep(Document doc) throws OscillatingActivationsException {
         act.repeat = false;
 
-        if(preDecision == EXCLUDED) {
+        if(OPTIMIZE_SEARCH && getCachedDecision() == EXCLUDED) {
             return false;
         }
         if(skip == SELECTED) {
@@ -504,6 +506,7 @@ public class SearchNode implements Comparable<SearchNode> {
             invalidateCachedDecisions();
         }
 
+        selectBranchSearched = true;
 
         act.debugDecisionCounts[0]++;
 
@@ -512,7 +515,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean prepareExcludeStep(Document doc) throws RecursiveDepthExceededException, OscillatingActivationsException {
-        if(preDecision == SELECTED) {
+        if(OPTIMIZE_SEARCH && getCachedDecision() == SELECTED) {
             return false;
         }
         if(skip == EXCLUDED) {
@@ -527,6 +530,8 @@ public class SearchNode implements Comparable<SearchNode> {
             return false;
         }
 
+        excludeBranchSearched = true;
+
         act.debugDecisionCounts[1]++;
 
         return true;
@@ -539,17 +544,11 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private double finalStep() {
-        Decision d;
-        Decision cd = getCachedDecision();
-        if(cd == UNKNOWN) {
-            d = preDecision != UNKNOWN ? preDecision : (selectedWeight >= excludedWeight ? SELECTED : EXCLUDED);
+        Decision d = selectedWeight >= excludedWeight ? SELECTED : EXCLUDED;
 
-            if (preDecision != EXCLUDED) {
-                act.cachedDecision = d;
-                act.alternativeCachedWeightSum = getWeightSum(act.cachedDecision);
-            }
-        } else {
-            d = cd;
+        if (selectBranchSearched && excludeBranchSearched) {
+            act.cachedDecision = d;
+            act.alternativeCachedWeightSum = getWeightSum(act.cachedDecision);
         }
 
         SearchNode cn = d == SELECTED ? selectedChild : excludedChild;
@@ -691,7 +690,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private void storeDebugInfos() {
-        if (preDecision != UNKNOWN) {
+        if (!selectBranchSearched || !excludeBranchSearched) {
             debugState = DebugState.LIMITED;
         } else if (getCachedDecision() != UNKNOWN) {
             debugState = DebugState.CACHED;
