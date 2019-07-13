@@ -51,6 +51,8 @@ public class NextWordTest {
         inA.addInput(doc, 0, 5);
         inB.addInput(doc, 5, 10);
 
+        doc.process();
+
         System.out.println(doc.activationsToString());
     }
 }

@@ -159,6 +159,8 @@ public class NegationTest {
         inB.addInput(doc, 2, 7);
         inC.addInput(doc, 4, 9);
 
+        doc.process();
+
         System.out.println(doc.activationsToString());
 
 //        Assert.assertNull(Activation.get(t, outN.node, 0, new Range(0, 11), Range.Relation.EQUALS, null, null, null));
@@ -218,6 +220,8 @@ public class NegationTest {
 
         inA.addInput(doc, 0, 11);
 
+        doc.process();
+
         System.out.println(doc.activationsToString());
 
         Assert.assertNotNull(outN.getActivation(doc, 0, 11, false));
@@ -275,8 +279,9 @@ public class NegationTest {
 
         inS.addInput(doc, 3, 8);
 
-
         inA.addInput(doc, 0, 11);
+
+        doc.process();
 
         System.out.println(doc.activationsToString());
 
@@ -335,6 +340,8 @@ public class NegationTest {
 
         inA.addInput(doc, 0, 11);
         inS.addInput(doc, 3, 8);
+
+        doc.process();
 
         System.out.println(doc.activationsToString());
 
@@ -441,6 +448,8 @@ public class NegationTest {
             inA.addInput(doc, 0, 6);
             inB.addInput(doc, 0, 6);
 
+            doc.process();
+
             System.out.println(doc.activationsToString());
 
             Assert.assertNotNull(inS.getActivation(doc, 0, 6, false));
@@ -454,6 +463,8 @@ public class NegationTest {
 
             inA.addInput(doc, 0, 6);
             inB.addInput(doc, 3, 9);
+
+            doc.process();
 
             System.out.println(doc.activationsToString());
 
@@ -754,6 +765,8 @@ public class NegationTest {
         inA.addInput(doc, 0, 1);
         inB.addInput(doc, 0, 1);
         inG.addInput(doc, 0, 1);
+
+        doc.process();
 
         System.out.println(doc.activationsToString());
 
