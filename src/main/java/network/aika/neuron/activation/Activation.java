@@ -411,7 +411,6 @@ public class Activation implements Comparable<Activation> {
 
         double net = n.getTotalBias(CURRENT);
         double netUB = net;
-        double posNet = net;
 
         int fired = -1;
 
@@ -427,10 +426,6 @@ public class Activation implements Comparable<Activation> {
 
             net += s.computeRelationWeights(is.l);
 
-            if(!s.isNegative(CURRENT)) {
-                posNet += x;
-            }
-
             if (!s.isRecurrent() && !s.isNegative(CURRENT) && net >= 0.0 && fired < 0) {
                 fired = iAct.currentOption.getState().fired + 1;
             }
@@ -441,14 +436,10 @@ public class Activation implements Comparable<Activation> {
 
             net += x;
             netUB += x;
-            if (!s.isNegative(CURRENT)) {
-                posNet += x;
-            }
         }
 
         double actValue = n.getActivationFunction().f(net);
         double actUBValue = n.getActivationFunction().f(netUB);
-        double posActValue = n.getActivationFunction().f(posNet);
 
         double w = Math.min(-ss.getNegRecSum(), net);
 
@@ -458,9 +449,7 @@ public class Activation implements Comparable<Activation> {
         return new State(
                 actValue,
                 actUBValue,
-                posActValue,
                 net,
-                posNet,
                 fired,
                 newWeight
         );
@@ -568,7 +557,7 @@ public class Activation implements Comparable<Activation> {
     public void setInputState(Builder input) {
         rootOption.decision = SELECTED;
         rootOption.p = 1.0;
-        rootOption.setState(new State(input.value, input.value, input.value, input.net, 0.0, input.fired, 0.0));
+        rootOption.setState(new State(input.value, input.value, input.net, input.fired, 0.0));
         currentOption = rootOption;
         finalOption = rootOption;
 
@@ -598,12 +587,12 @@ public class Activation implements Comparable<Activation> {
         if(getType() != EXCITATORY || getDecision() != UNKNOWN) {
             is = currentOption.getState();
         } else {
-            is = new State(0.0, s.getLimit(), 0.0, 0.0, 0.0, 0, 0.0);
+            is = new State(0.0, s.getLimit(), 0.0, 0, 0.0);
         }
 
         if(s.isNegative(CURRENT)) {
             if(!checkSelfReferencing(act, 0)) {  // Warum greift das nicht?
-                is = new State(is.ub, is.value, 0.0, 0.0, 0.0, 0, 0.0);
+                is = new State(is.ub, is.value, 0.0, 0, 0.0);
             } else {
                 is = ZERO;
             }
@@ -614,9 +603,9 @@ public class Activation implements Comparable<Activation> {
         } else {
             Decision nd = act.getNextDecision(act.currentOption, sn);
             if (nd == SELECTED) {
-                return new State(is.ub, is.ub, 0.0, 0.0, 0.0, 0, 0.0);
+                return new State(is.ub, is.ub, 0.0, 0, 0.0);
             } else if (nd == EXCLUDED) {
-                return new State(is.value, is.value, 0.0, 0.0, 0.0, 0, 0.0);
+                return new State(is.value, is.value, 0.0, 0, 0.0);
             }
         }
         return null;

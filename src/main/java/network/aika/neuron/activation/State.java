@@ -12,22 +12,18 @@ import network.aika.neuron.INeuron;
 public class State {
     public final double value;
     public final double ub;
-    public final double posValue;
     public final double net;
-    public final double posNet;
 
     public final int fired;
     public final double weight;
 
-    public static final State ZERO = new State(0.0, 0.0, 0.0, 0.0, 0.0, -1, 0.0);
+    public static final State ZERO = new State(0.0, 0.0, 0.0, -1, 0.0);
 
-    public State(double value, double ub, double posValue, double net, double posNet, int fired, double weight) {
+    public State(double value, double ub, double net, int fired, double weight) {
         assert !Double.isNaN(value);
         this.value = value;
         this.ub = ub;
-        this.posValue = posValue;
         this.net = net;
-        this.posNet = posNet;
         this.fired = fired;
         this.weight = weight;
     }
@@ -42,6 +38,6 @@ public class State {
     }
 
     public String toString() {
-        return "V:" + Utils.round(value) + " UB:" + Utils.round(ub) + (Activation.DEBUG_OUTPUT ? " pV:" + Utils.round(posValue) : "") + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
+        return "V:" + Utils.round(value) + " UB:" + Utils.round(ub) + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
     }
 }
