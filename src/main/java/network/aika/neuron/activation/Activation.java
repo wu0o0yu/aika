@@ -990,7 +990,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public String toString() {
-        return id + " " + getNeuron().getId() + ":" + getLabel() + " " + slotsToString() + " " + identityToString() + " - " +
+        return id + " " + getNeuron().getId() + ":" + getINeuron().typeToString() + " " + getLabel() + " " + slotsToString() + " " + identityToString() + " - " +
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
                 (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +
@@ -1001,7 +1001,9 @@ public class Activation implements Comparable<Activation> {
 
     public String toStringDetailed() {
         StringBuilder sb = new StringBuilder();
-        sb.append(id + " - ");
+        sb.append(id + " ");
+
+        sb.append(getINeuron().typeToString() + " - ");
 
         sb.append(finalDecision + " - ");
 
