@@ -3,6 +3,9 @@ package network.aika.neuron.activation;
 import network.aika.Utils;
 import network.aika.neuron.INeuron;
 
+import static network.aika.neuron.activation.Decision.EXCLUDED;
+import static network.aika.neuron.activation.Decision.SELECTED;
+
 
 /**
  * A <code>State</code> object contains the activation value of an activation object that belongs to a neuron.
@@ -36,6 +39,12 @@ public class State {
     public boolean equalsWithWeights(State s) {
         return equals(s) && Math.abs(weight - s.weight) <= INeuron.WEIGHT_TOLERANCE;
     }
+
+
+    public Decision getPreferredDecision() {
+        return value > 0.0 ? SELECTED : EXCLUDED;
+    }
+
 
     public String toString() {
         return "V:" + Utils.round(value) + " UB:" + Utils.round(ub) + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
