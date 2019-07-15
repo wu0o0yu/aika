@@ -219,12 +219,12 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    private boolean followPath() {
-        return getActivation().currentOption.searchNode == this || getDecision() == getPreferedDecision(getActivation().currentOption);
+    public boolean followPath() {
+        return getActivation().currentOption.searchNode == this || getDecision() == getPreferredDecision(getActivation().currentOption);
     }
 
 
-    private static Decision getPreferedDecision(Option o) {
+    private static Decision getPreferredDecision(Option o) {
         return o.getState().value > 0.0 ? SELECTED : EXCLUDED;
     }
 

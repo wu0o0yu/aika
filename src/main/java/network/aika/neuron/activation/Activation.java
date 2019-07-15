@@ -390,7 +390,7 @@ public class Activation implements Comparable<Activation> {
         State s = computeValueAndWeight(sn);
 
         if (currentOption.decision == UNKNOWN || currentOption.searchNode != sn) {
-            if(currentOption.getState().equalsWithWeights(s)) {
+            if((currentOption.decision != UNKNOWN && currentOption.getState().equalsWithWeights(s)) || !sn.followPath()) {
                 return 0.0;
             }
 
@@ -776,8 +776,8 @@ public class Activation implements Comparable<Activation> {
         }
 
         sb.append(" - ");
-        if (isFinalActivation()) {
-            State fs = getFinalState();
+        State fs = getFinalState();
+        if (fs != null) {
             sb.append(fs);
         }
 
