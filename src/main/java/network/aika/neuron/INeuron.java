@@ -807,12 +807,12 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
 
     protected String toDetailedString() {
-        return getNeuronTypeIdentifier() + " " + label + " B:" + Utils.round(bias);
+        return typeToString() + " " + label + " B:" + Utils.round(bias);
     }
 
 
-    protected String getNeuronTypeIdentifier() {
-        return "N";
+    public String typeToString() {
+        return getType().toString();
     }
 
 
