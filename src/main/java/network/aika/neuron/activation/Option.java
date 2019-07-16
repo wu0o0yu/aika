@@ -35,10 +35,13 @@ public class Option implements Comparable<Option> {
 
     private boolean isQueued;
 
+    public int round;
 
-    public Option(Option parent, Activation act, SearchNode sn) {
+
+    public Option(Option parent, Activation act, SearchNode sn, int round) {
         this.act = act;
         this.searchNode = sn;
+        this.round = round;
 
         this.parent = parent;
 

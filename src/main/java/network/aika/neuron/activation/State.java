@@ -15,12 +15,14 @@ import static network.aika.neuron.activation.Decision.SELECTED;
 public class State {
     public final double value;
     public final double ub;
+
     public final double net;
 
     public final int fired;
     public final double weight;
 
     public static final State ZERO = new State(0.0, 0.0, 0.0, -1, 0.0);
+
 
     public State(double value, double ub, double net, int fired, double weight) {
         assert !Double.isNaN(value);
@@ -33,8 +35,9 @@ public class State {
 
 
     public boolean equals(State s) {
-        return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE;
+        return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE && Math.abs(ub - s.ub) <= INeuron.WEIGHT_TOLERANCE;
     }
+
 
     public boolean equalsWithWeights(State s) {
         return equals(s) && Math.abs(weight - s.weight) <= INeuron.WEIGHT_TOLERANCE;

@@ -70,7 +70,7 @@ public class Activation implements Comparable<Activation> {
     private double upperBound;
     private double lowerBound;
 
-    public Option rootOption = new Option(null, this, null);
+    public Option rootOption = new Option(null, this, null, 0);
     public Option currentOption = rootOption;
     public Option finalOption;
 
@@ -448,7 +448,7 @@ public class Activation implements Comparable<Activation> {
         double w = Math.min(-ss.getNegRecSum(), net);
 
         // Compute only the recurrent part is above the threshold.
-        double newWeight = getDecision() == SELECTED ? Math.max(0.0, w) : 0.0;
+        double newWeight = getDecision() == SELECTED ? Math.max(0.0, w) : 0.0;  // TODO: Prüfen!
 
         return new State(
                 actValue,
@@ -635,6 +635,10 @@ public class Activation implements Comparable<Activation> {
             }
         }
 
+        if(maxLink == null) {
+            return false;
+        }
+
         return maxLink.input.checkSelfReferencing(act, depth + 1);
     }
 
@@ -644,6 +648,29 @@ public class Activation implements Comparable<Activation> {
         for(Link l: inputLinks.values()) {
             if(l.isRecurrent() && l.isNegative(CURRENT)) {
                 results.add(l.input);
+            }
+        }
+        return results;
+    }
+
+
+
+    public List<Link> getFinalInputActivationLinks() {
+        ArrayList<Link> results = new ArrayList<>();
+        for (Link l : inputLinks.values()) {
+            if (l.input.isFinalActivation()) {
+                results.add(l);
+            }
+        }
+        return results;
+    }
+
+
+    public List<Link> getFinalOutputActivationLinks() {
+        ArrayList<Link> results = new ArrayList<>();
+        for (Link l : outputLinks.values()) {
+            if (l.output.isFinalActivation()) {
+                results.add(l);
             }
         }
         return results;
@@ -889,7 +916,11 @@ public class Activation implements Comparable<Activation> {
 
     public void saveState(SearchNode sn) {
         currentOption.fixed = true;
-        currentOption = new Option(currentOption, this, sn);
+        currentOption = new Option(currentOption, this, sn, currentOption.searchNode == sn ? currentOption.round + 1 : 0);
+
+        if(currentOption.round > MAX_ROUND) {
+            throw new OscillatingActivationsException(doc.activationsToString());
+        }
 
         if (sn.getModifiedActivations() != null) {
             sn.getModifiedActivations().put(currentOption.act, currentOption);
