@@ -394,6 +394,10 @@ public class Activation implements Comparable<Activation> {
                 return 0.0;
             }
 
+            if(this == sn.getActivation() && s.getPreferredDecision() != sn.getDecision()) {
+                return 0.0;
+            }
+
             saveState(sn);
         }
 
