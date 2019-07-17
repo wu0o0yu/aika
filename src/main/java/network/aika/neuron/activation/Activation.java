@@ -621,25 +621,34 @@ public class Activation implements Comparable<Activation> {
             return true;
         }
 
-        if(getType() != INHIBITORY || depth > MAX_SELF_REFERENCING_DEPTH) {
+        if(depth > MAX_SELF_REFERENCING_DEPTH) {
             return false;
         }
 
-        Link maxLink = null;
-        double maxValue = 0.0;
-        for (Link l: inputLinks.values()) {
-            double v = l.getInput().currentOption.getState().value;
-            if(maxLink == null || v >= maxValue) {
-                maxLink = l;
-                maxValue = v;
+        if(getType() == INHIBITORY) {
+            Link maxLink = null;
+            double maxValue = 0.0;
+            for (Link l : inputLinks.values()) {
+                double v = l.getInput().currentOption.getState().value;
+                if (maxLink == null || v >= maxValue) {
+                    maxLink = l;
+                    maxValue = v;
+                }
             }
-        }
 
-        if(maxLink == null) {
+            if (maxLink == null) {
+                return false;
+            }
+
+            return maxLink.input.checkSelfReferencing(act, depth + 1);
+        } else {
+            for (Link l : inputLinks.values()) {
+                if(!l.getSynapse().isWeak(CURRENT) && l.getSynapse().isNegative(CURRENT) && l.getInput().checkSelfReferencing(act, depth + 1)) {
+                    return true;
+                }
+            }
             return false;
         }
-
-        return maxLink.input.checkSelfReferencing(act, depth + 1);
     }
 
 
@@ -773,13 +782,11 @@ public class Activation implements Comparable<Activation> {
 
     public String toStringDetailed() {
         StringBuilder sb = new StringBuilder();
-        sb.append(id + " ");
+        sb.append(Utils.addPadding("" + id, 3) + " ");
 
-        sb.append(getINeuron().typeToString() + " - ");
+        sb.append(Utils.addPadding(getINeuron().typeToString(), 10) + " - ");
 
-        if(getType() == EXCITATORY) {
-            sb.append((getFinalDecision() != null ? getFinalDecision() : "X") + " - ");
-        }
+        sb.append(Utils.addPadding(getType() == EXCITATORY ? "" + (getFinalDecision() != null ? getFinalDecision() : "X") : "", 8) + " - ");
 
         sb.append(slotsToString());
 

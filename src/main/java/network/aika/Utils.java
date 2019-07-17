@@ -37,4 +37,14 @@ public class Utils {
         }
     }
 
+
+    public static String addPadding(String s, int targetSize) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(s);
+        for(int i = s.length(); i < targetSize; i++) {
+            sb.append(' ');
+        }
+
+        return sb.toString();
+    }
 }
