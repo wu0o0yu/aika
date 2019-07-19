@@ -134,8 +134,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         return !optional && follow;
     }
 
-    public abstract Relation newInstance();
-
     public void link(Neuron n, int from, int to) {
         addRelation(to, from, n, this);
         addRelation(from, to, n, invert());
@@ -203,10 +201,10 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
 
     public static class Builder implements Neuron.Builder {
-        private int from;
-        private int to;
+        protected int from;
+        protected int to;
 
-        private Relation relation;
+        protected Relation relation;
 
 
         /**
@@ -305,11 +303,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         @Override
         public boolean isConvertible() {
             return true;
-        }
-
-        @Override
-        public Relation newInstance() {
-            return new Any(optional, follow);
         }
 
         @Override
