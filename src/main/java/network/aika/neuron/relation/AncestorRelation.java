@@ -64,11 +64,6 @@ public abstract class AncestorRelation extends Relation {
     }
 
 
-    @Override
-    public void linksOutputs(Set<Integer> results) {
-    }
-
-
     private static boolean contains(Activation actA, Activation actB, long v) {
         if(!actA.checkVisited(v)) return false;
 

@@ -111,14 +111,6 @@ public class MultiRelation extends Relation {
 
 
     @Override
-    public void linksOutputs(Set<Integer> results) {
-        for(Relation rel: relations) {
-            rel.linksOutputs(results);
-        }
-    }
-
-
-    @Override
     public boolean isExact() {
         for(Relation rel: relations) {
             if(rel.isExact()) {

@@ -56,12 +56,6 @@ public abstract class PositionRelation extends Relation {
 
 
     @Override
-    public void linksOutputs(Set<Integer> results) {
-        results.add(toSlot);
-    }
-
-
-    @Override
     public int compareTo(Relation rel) {
         int r = super.compareTo(rel);
         if(r != 0) return r;

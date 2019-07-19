@@ -87,8 +87,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public abstract void mapSlots(Map<Integer, Position> slots, Activation act);
 
-    public abstract void linksOutputs(Set<Integer> outputs);
-
     public abstract Relation setOptionalAndFollow(boolean optional, boolean follow);
 
 
@@ -284,10 +282,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
         @Override
         public void mapSlots(Map<Integer, Position> slots, Activation act) {
-        }
-
-        @Override
-        public void linksOutputs(Set<Integer> outputs) {
         }
 
         @Override
