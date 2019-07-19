@@ -30,7 +30,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public static Relation EQUALS = new MultiRelation(
             new Equals(BEGIN, BEGIN),
-            new Equals(END, END, false, false)
+            new Equals(END, END, false)
     );
     public static Relation BEGIN_EQUALS = new Equals(BEGIN, BEGIN);
     public static Relation END_EQUALS = new Equals(END, END);
@@ -38,28 +38,23 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public static Relation END_TO_BEGIN_EQUALS = new Equals(END, BEGIN);
     public static Relation CONTAINS = new MultiRelation(
             new LessThan(BEGIN, BEGIN, true),
-            new GreaterThan(END, END, true, false, false, Integer.MAX_VALUE)
+            new GreaterThan(END, END, true, false, Integer.MAX_VALUE)
     );
     public static Relation CONTAINED_IN = new MultiRelation(
             new GreaterThan(BEGIN, BEGIN, true),
-            new LessThan(END, END, true, false, false, Integer.MAX_VALUE)
+            new LessThan(END, END, true, false, Integer.MAX_VALUE)
     );
     public static Relation OVERLAPS = new MultiRelation(
             new LessThan(BEGIN, END, false),
-            new GreaterThan(END, BEGIN, false, false, false, Integer.MAX_VALUE)
+            new GreaterThan(END, BEGIN, false, false, Integer.MAX_VALUE)
     );
     public static Relation BEFORE = new LessThan(END, BEGIN, true);
     public static Relation AFTER = new GreaterThan(BEGIN, END, true);
 
     public static Relation ANY = new Any();
 
-    protected boolean optional;
     protected boolean follow = true;
 
-
-    public boolean isOptional() {
-        return optional;
-    }
 
     public boolean isFollow() {
         return follow;
@@ -87,22 +82,18 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public abstract void mapSlots(Map<Integer, Position> slots, Activation act);
 
-    public abstract Relation setOptionalAndFollow(boolean optional, boolean follow);
-
 
     public Relation() {
     }
 
 
-    public Relation(boolean optional, boolean follow) {
-        this.optional = optional;
+    public Relation(boolean follow) {
         this.follow = follow;
     }
 
 
     public void write(DataOutput out) throws IOException {
         out.writeInt(getType());
-        out.writeBoolean(optional);
         out.writeBoolean(follow);
     }
 
@@ -117,7 +108,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        optional = in.readBoolean();
         follow = in.readBoolean();
     }
 
@@ -129,7 +119,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
 
     public boolean isConvertible() {
-        return !optional && follow;
+        return follow;
     }
 
     public void link(Neuron n, int from, int to) {
@@ -261,8 +251,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         public Any() {
         }
 
-        public Any(boolean optional, boolean follow) {
-            super(optional, follow);
+        public Any(boolean follow) {
+            super(follow);
         }
 
         @Override
@@ -297,11 +287,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         @Override
         public boolean isConvertible() {
             return true;
-        }
-
-        @Override
-        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
-            return new Any(optional, follow);
         }
     }
 }

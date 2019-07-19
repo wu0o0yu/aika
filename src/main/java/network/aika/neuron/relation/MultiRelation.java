@@ -28,8 +28,8 @@ public class MultiRelation extends Relation {
     }
 
 
-    public MultiRelation(boolean optional, boolean follow, SortedSet<Relation> relations) {
-        super(optional, follow);
+    public MultiRelation(boolean follow, SortedSet<Relation> relations) {
+        super(follow);
         this.relations = relations;
     }
 
@@ -92,13 +92,7 @@ public class MultiRelation extends Relation {
         for(Relation rel: relations) {
             invRels.add(rel.invert());
         }
-        return new MultiRelation(optional, follow, invRels);
-    }
-
-
-    @Override
-    public Relation setOptionalAndFollow(boolean optional, boolean follow) {
-        return new MultiRelation(optional, follow, relations);
+        return new MultiRelation(follow, invRels);
     }
 
 

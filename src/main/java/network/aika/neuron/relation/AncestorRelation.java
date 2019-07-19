@@ -131,8 +131,7 @@ public abstract class AncestorRelation extends Relation {
         public CommonAncestor() {
         }
 
-        public CommonAncestor(boolean optional, boolean follow) {
-            this.optional = optional;
+        public CommonAncestor(boolean follow) {
             this.follow = follow;
         }
 
@@ -143,12 +142,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new CommonAncestor(optional, follow);
-        }
-
-        @Override
-        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
-            return new CommonAncestor(optional, follow);
+            return new CommonAncestor(follow);
         }
 
         @Override
@@ -180,8 +174,7 @@ public abstract class AncestorRelation extends Relation {
         public IsDescendantOf() {
         }
 
-        public IsDescendantOf(boolean optional, boolean follow) {
-            this.optional = optional;
+        public IsDescendantOf(boolean follow) {
             this.follow = follow;
         }
 
@@ -192,12 +185,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new IsAncestorOf(optional, follow);
-        }
-
-        @Override
-        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
-            return new IsDescendantOf(optional, follow);
+            return new IsAncestorOf(follow);
         }
 
         @Override
@@ -229,8 +217,7 @@ public abstract class AncestorRelation extends Relation {
         public IsAncestorOf() {
         }
 
-        public IsAncestorOf(boolean optional, boolean follow) {
-            this.optional = optional;
+        public IsAncestorOf(boolean follow) {
             this.follow = follow;
         }
 
@@ -241,13 +228,9 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new IsDescendantOf(optional, follow);
+            return new IsDescendantOf(follow);
         }
 
-        @Override
-        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
-            return new IsAncestorOf(optional, follow);
-        }
 
         @Override
         public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
@@ -278,8 +261,7 @@ public abstract class AncestorRelation extends Relation {
         public NotDescendantOf() {
         }
 
-        public NotDescendantOf(boolean optional, boolean follow) {
-            this.optional = optional;
+        public NotDescendantOf(boolean follow) {
             this.follow = follow;
         }
 
@@ -290,12 +272,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new NotAncestorOf(optional, follow);
-        }
-
-        @Override
-        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
-            return new NotDescendantOf(optional, follow);
+            return new NotAncestorOf(follow);
         }
 
         @Override
@@ -329,8 +306,7 @@ public abstract class AncestorRelation extends Relation {
         public NotAncestorOf() {
         }
 
-        public NotAncestorOf(boolean optional, boolean follow) {
-            this.optional = optional;
+        public NotAncestorOf(boolean follow) {
             this.follow = follow;
         }
 
@@ -341,12 +317,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new NotDescendantOf(optional, follow);
-        }
-
-        @Override
-        public Relation setOptionalAndFollow(boolean optional, boolean follow) {
-            return new NotAncestorOf(optional, follow);
+            return new NotDescendantOf(follow);
         }
 
         @Override
