@@ -28,8 +28,7 @@ public class MultiRelation extends Relation {
     }
 
 
-    public MultiRelation(boolean optional, boolean follow, SortedSet<Relation> relations) {
-        super(optional, follow);
+    public MultiRelation(boolean follow, SortedSet<Relation> relations) {
         this.relations = relations;
     }
 
@@ -92,13 +91,7 @@ public class MultiRelation extends Relation {
         for(Relation rel: relations) {
             invRels.add(rel.invert());
         }
-        return new MultiRelation(optional, follow, invRels);
-    }
-
-
-    @Override
-    public Relation setOptionalAndFollow(boolean optional, boolean follow) {
-        return new MultiRelation(optional, follow, relations);
+        return new MultiRelation(invRels);
     }
 
 
@@ -106,14 +99,6 @@ public class MultiRelation extends Relation {
     public void mapSlots(Map<Integer, Position> slots, Activation act) {
         for(Relation rel: relations) {
             rel.mapSlots(slots, act);
-        }
-    }
-
-
-    @Override
-    public void linksOutputs(Set<Integer> results) {
-        for(Relation rel: relations) {
-            rel.linksOutputs(results);
         }
     }
 
@@ -131,14 +116,11 @@ public class MultiRelation extends Relation {
 
     @Override
     public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-        if(!follow) return Stream.empty();
-
         if(relations.isEmpty()) {
             return n.getActivations(linkedAct.getDocument());
         } else {
-            return relations
-                    .stream()
-                    .flatMap(r -> r.getActivations(n, linkedAct))
+            return relations.first()
+                    .getActivations(n, linkedAct)
                     .filter(act -> {
                         for (Relation rel : relations) {
                             if (!rel.test(act, linkedAct, false)) {
@@ -148,24 +130,6 @@ public class MultiRelation extends Relation {
                         return true;
                     });
         }
-    }
-
-    @Override
-    public boolean isConvertible() {
-        for(Relation rel: relations) {
-            if(rel.isConvertible()) return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public Relation newInstance() {
-        MultiRelation mr = new MultiRelation();
-        for(Relation r: relations) {
-            mr.addRelation(r.newInstance());
-        }
-        return mr;
     }
 
 

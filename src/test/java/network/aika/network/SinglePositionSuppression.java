@@ -102,7 +102,7 @@ public class SinglePositionSuppression {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRelation(new AncestorRelation.IsAncestorOf(false, true)),
+                        .setRelation(new AncestorRelation.IsAncestorOf()),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inAEnd)
@@ -118,7 +118,7 @@ public class SinglePositionSuppression {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(3)
-                        .setRelation(new AncestorRelation.IsAncestorOf(false, true)),
+                        .setRelation(new AncestorRelation.IsAncestorOf()),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inBEnd)
@@ -134,7 +134,7 @@ public class SinglePositionSuppression {
                 new Relation.Builder()
                         .setFrom(4)
                         .setTo(5)
-                        .setRelation(new AncestorRelation.IsAncestorOf(false, true)),
+                        .setRelation(new AncestorRelation.IsAncestorOf()),
                 new Synapse.Builder()
                         .setSynapseId(5)
                         .setNeuron(inCEnd)
@@ -150,7 +150,7 @@ public class SinglePositionSuppression {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRelation(new AncestorRelation.IsAncestorOf(false, true)),
+                        .setRelation(new AncestorRelation.IsAncestorOf()),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inAEnd)
@@ -166,7 +166,7 @@ public class SinglePositionSuppression {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(3)
-                        .setRelation(new AncestorRelation.IsAncestorOf(false, true)),
+                        .setRelation(new AncestorRelation.IsAncestorOf()),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inBEnd)
@@ -182,7 +182,7 @@ public class SinglePositionSuppression {
                 new Relation.Builder()
                         .setFrom(4)
                         .setTo(5)
-                        .setRelation(new AncestorRelation.IsAncestorOf(false, true)),
+                        .setRelation(new AncestorRelation.IsAncestorOf()),
                 new Synapse.Builder()
                         .setSynapseId(5)
                         .setNeuron(inCEnd)
@@ -207,7 +207,7 @@ public class SinglePositionSuppression {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRelation(new AncestorRelation.IsAncestorOf(false, true)),
+                        .setRelation(new AncestorRelation.IsAncestorOf()),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inBEnd)
@@ -223,7 +223,7 @@ public class SinglePositionSuppression {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(3)
-                        .setRelation(new AncestorRelation.IsAncestorOf(false, true)),
+                        .setRelation(new AncestorRelation.IsAncestorOf()),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inCEnd)
@@ -239,7 +239,7 @@ public class SinglePositionSuppression {
                 new Relation.Builder()
                         .setFrom(4)
                         .setTo(5)
-                        .setRelation(new AncestorRelation.IsAncestorOf(false, true)),
+                        .setRelation(new AncestorRelation.IsAncestorOf()),
                 new Synapse.Builder()
                         .setSynapseId(5)
                         .setNeuron(inDEnd)
@@ -255,7 +255,7 @@ public class SinglePositionSuppression {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(1)
-                        .setRelation(new AncestorRelation.IsAncestorOf(false, true)),
+                        .setRelation(new AncestorRelation.IsAncestorOf()),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inBEnd)
@@ -271,7 +271,7 @@ public class SinglePositionSuppression {
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(3)
-                        .setRelation(new AncestorRelation.IsAncestorOf(false, true)),
+                        .setRelation(new AncestorRelation.IsAncestorOf()),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inCEnd)
@@ -287,7 +287,7 @@ public class SinglePositionSuppression {
                 new Relation.Builder()
                         .setFrom(4)
                         .setTo(5)
-                        .setRelation(new AncestorRelation.IsAncestorOf(false, true)),
+                        .setRelation(new AncestorRelation.IsAncestorOf()),
                 new Synapse.Builder()
                         .setSynapseId(5)
                         .setNeuron(inDEnd)

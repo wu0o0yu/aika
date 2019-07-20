@@ -356,7 +356,7 @@ class AndNode extends Node<AndNode, AndActivation> {
 
         public boolean isConvertible() {
             for(Relation rel: relations.relations) {
-                if(rel != null && rel.isConvertible()) return true;
+                if(rel != null) return true;
             }
             return false;
         }
