@@ -131,10 +131,6 @@ public abstract class AncestorRelation extends Relation {
         public CommonAncestor() {
         }
 
-        public CommonAncestor(boolean follow) {
-            this.follow = follow;
-        }
-
         @Override
         public int getType() {
             return TYPE;
@@ -142,7 +138,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new CommonAncestor(follow);
+            return new CommonAncestor();
         }
 
         @Override
@@ -152,7 +148,6 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-            if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
             collectCommonAncestor(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
@@ -174,10 +169,6 @@ public abstract class AncestorRelation extends Relation {
         public IsDescendantOf() {
         }
 
-        public IsDescendantOf(boolean follow) {
-            this.follow = follow;
-        }
-
         @Override
         public int getType() {
             return TYPE;
@@ -185,7 +176,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new IsAncestorOf(follow);
+            return new IsAncestorOf();
         }
 
         @Override
@@ -195,7 +186,6 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-            if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
             collectContains(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
@@ -217,10 +207,6 @@ public abstract class AncestorRelation extends Relation {
         public IsAncestorOf() {
         }
 
-        public IsAncestorOf(boolean follow) {
-            this.follow = follow;
-        }
-
         @Override
         public int getType() {
             return TYPE;
@@ -228,7 +214,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new IsDescendantOf(follow);
+            return new IsDescendantOf();
         }
 
 
@@ -239,7 +225,6 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-            if(!follow) return Stream.empty();
             List<Activation> results = new ArrayList<>();
             collectContainedIn(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
@@ -261,10 +246,6 @@ public abstract class AncestorRelation extends Relation {
         public NotDescendantOf() {
         }
 
-        public NotDescendantOf(boolean follow) {
-            this.follow = follow;
-        }
-
         @Override
         public int getType() {
             return TYPE;
@@ -272,7 +253,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new NotAncestorOf(follow);
+            return new NotAncestorOf();
         }
 
         @Override
@@ -282,7 +263,6 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-            if(!follow) return Stream.empty();
             long v = linkedAct.getNewVisitedId();
             markDescendants(linkedAct, v);
 
@@ -306,10 +286,6 @@ public abstract class AncestorRelation extends Relation {
         public NotAncestorOf() {
         }
 
-        public NotAncestorOf(boolean follow) {
-            this.follow = follow;
-        }
-
         @Override
         public int getType() {
             return TYPE;
@@ -317,7 +293,7 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new NotDescendantOf(follow);
+            return new NotDescendantOf();
         }
 
         @Override
@@ -327,7 +303,6 @@ public abstract class AncestorRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-            if(!follow) return Stream.empty();
             long v = linkedAct.getNewVisitedId();
             markAncestors(linkedAct, v);
 

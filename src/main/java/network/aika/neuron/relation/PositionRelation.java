@@ -29,12 +29,6 @@ public abstract class PositionRelation extends Relation {
         this.toSlot = toSlot;
     }
 
-    public PositionRelation(int fromSlot, int toSlot, boolean follow) {
-        this.fromSlot = fromSlot;
-        this.toSlot = toSlot;
-        this.follow = follow;
-    }
-
 
     @Override
     public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
@@ -115,10 +109,6 @@ public abstract class PositionRelation extends Relation {
             super(fromSlot, toSlot);
         }
 
-        public Equals(int fromSlot, int toSlot, boolean follow) {
-            super(fromSlot, toSlot, follow);
-        }
-
         @Override
         public int getType() {
             return TYPE;
@@ -126,7 +116,7 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new Equals(toSlot, fromSlot, follow);
+            return new Equals(toSlot, fromSlot);
         }
 
         @Override
@@ -146,7 +136,6 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Position pos) {
-            if(!follow) return Stream.empty();
             return n.getActivations(pos.getDocument(),
                     fromSlot, pos, true,
                     fromSlot, pos, true
@@ -179,8 +168,8 @@ public abstract class PositionRelation extends Relation {
             this.orEquals = orEquals;
         }
 
-        public LessThan(int fromSlot, int toSlot, boolean orEquals, boolean follow, int maxLength) {
-            super(fromSlot, toSlot, follow);
+        public LessThan(int fromSlot, int toSlot, boolean orEquals, int maxLength) {
+            super(fromSlot, toSlot);
             this.orEquals = orEquals;
             this.maxLength = maxLength;
         }
@@ -192,7 +181,7 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new GreaterThan(toSlot, fromSlot, orEquals, follow, maxLength);
+            return new GreaterThan(toSlot, fromSlot, orEquals, maxLength);
         }
 
 
@@ -213,7 +202,6 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Position pos) {
-            if(!follow) return Stream.empty();
             return n.getActivations(
                     pos.getDocument(),
                     fromSlot, new Position(pos.getDocument(), maxLength != Integer.MAX_VALUE ? pos.getFinalPosition() - maxLength : Integer.MIN_VALUE), true,
@@ -264,8 +252,8 @@ public abstract class PositionRelation extends Relation {
             this.orEquals = orEquals;
         }
 
-        public GreaterThan(int fromSlot, int toSlot, boolean orEquals, boolean follow, int maxLength) {
-            super(fromSlot, toSlot, follow);
+        public GreaterThan(int fromSlot, int toSlot, boolean orEquals, int maxLength) {
+            super(fromSlot, toSlot);
             this.orEquals = orEquals;
             this.maxLength = maxLength;
         }
@@ -277,7 +265,7 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public Relation invert() {
-            return new LessThan(toSlot, fromSlot, orEquals, follow, maxLength);
+            return new LessThan(toSlot, fromSlot, orEquals, maxLength);
         }
 
         @Override
@@ -296,7 +284,6 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Position pos) {
-            if(!follow) return Stream.empty();
             return n.getActivations(
                     pos.getDocument(),
                     fromSlot, pos, orEquals,

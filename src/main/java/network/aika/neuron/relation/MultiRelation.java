@@ -29,7 +29,6 @@ public class MultiRelation extends Relation {
 
 
     public MultiRelation(boolean follow, SortedSet<Relation> relations) {
-        super(follow);
         this.relations = relations;
     }
 
@@ -92,7 +91,7 @@ public class MultiRelation extends Relation {
         for(Relation rel: relations) {
             invRels.add(rel.invert());
         }
-        return new MultiRelation(follow, invRels);
+        return new MultiRelation(invRels);
     }
 
 
@@ -117,14 +116,11 @@ public class MultiRelation extends Relation {
 
     @Override
     public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-        if(!follow) return Stream.empty();
-
         if(relations.isEmpty()) {
             return n.getActivations(linkedAct.getDocument());
         } else {
-            return relations
-                    .stream()
-                    .flatMap(r -> r.getActivations(n, linkedAct))
+            return relations.first()
+                    .getActivations(n, linkedAct)
                     .filter(act -> {
                         for (Relation rel : relations) {
                             if (!rel.test(act, linkedAct, false)) {
@@ -134,15 +130,6 @@ public class MultiRelation extends Relation {
                         return true;
                     });
         }
-    }
-
-    @Override
-    public boolean isConvertible() {
-        for(Relation rel: relations) {
-            if(rel.isConvertible()) return true;
-        }
-
-        return false;
     }
 
 

@@ -30,7 +30,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public static Relation EQUALS = new MultiRelation(
             new Equals(BEGIN, BEGIN),
-            new Equals(END, END, false)
+            new Equals(END, END)
     );
     public static Relation BEGIN_EQUALS = new Equals(BEGIN, BEGIN);
     public static Relation END_EQUALS = new Equals(END, END);
@@ -38,27 +38,21 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public static Relation END_TO_BEGIN_EQUALS = new Equals(END, BEGIN);
     public static Relation CONTAINS = new MultiRelation(
             new LessThan(BEGIN, BEGIN, true),
-            new GreaterThan(END, END, true, false, Integer.MAX_VALUE)
+            new GreaterThan(END, END, true, Integer.MAX_VALUE)
     );
     public static Relation CONTAINED_IN = new MultiRelation(
             new GreaterThan(BEGIN, BEGIN, true),
-            new LessThan(END, END, true, false, Integer.MAX_VALUE)
+            new LessThan(END, END, true, Integer.MAX_VALUE)
     );
     public static Relation OVERLAPS = new MultiRelation(
             new LessThan(BEGIN, END, false),
-            new GreaterThan(END, BEGIN, false, false, Integer.MAX_VALUE)
+            new GreaterThan(END, BEGIN, false, Integer.MAX_VALUE)
     );
     public static Relation BEFORE = new LessThan(END, BEGIN, true);
     public static Relation AFTER = new GreaterThan(BEGIN, END, true);
 
     public static Relation ANY = new Any();
 
-    protected boolean follow = true;
-
-
-    public boolean isFollow() {
-        return follow;
-    }
 
     @Override
     public int compareTo(Relation rel) {
@@ -87,14 +81,8 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     }
 
 
-    public Relation(boolean follow) {
-        this.follow = follow;
-    }
-
-
     public void write(DataOutput out) throws IOException {
         out.writeInt(getType());
-        out.writeBoolean(follow);
     }
 
 
@@ -108,7 +96,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        follow = in.readBoolean();
     }
 
 
@@ -117,10 +104,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public abstract Stream<Activation> getActivations(INeuron n, Activation linkedAct);
 
-
-    public boolean isConvertible() {
-        return follow;
-    }
 
     public void link(Neuron n, int from, int to) {
         addRelation(to, from, n, this);
@@ -251,10 +234,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         public Any() {
         }
 
-        public Any(boolean follow) {
-            super(follow);
-        }
-
         @Override
         public int getType() {
             return ID;
@@ -282,11 +261,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         @Override
         public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
             return n.getActivations(linkedAct.getDocument());
-        }
-
-        @Override
-        public boolean isConvertible() {
-            return true;
         }
     }
 }
