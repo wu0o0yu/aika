@@ -28,14 +28,9 @@ public class MultiRelation extends Relation {
     }
 
 
-    public MultiRelation(boolean follow, SortedSet<Relation> relations) {
-        this.relations = relations;
-    }
-
     public MultiRelation(Relation... rels) {
         relations = new TreeSet<>(Arrays.asList(rels));
     }
-
 
 
     public MultiRelation(SortedSet<Relation> rels) {
