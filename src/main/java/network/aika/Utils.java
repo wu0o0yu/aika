@@ -47,4 +47,12 @@ public class Utils {
 
         return sb.toString();
     }
+
+
+    public static Integer max(Integer a, Integer b) {
+        if(a == null) return b;
+        if(b == null) return a;
+
+        return Math.max(a, b);
+    }
 }

@@ -18,13 +18,13 @@ public class State {
 
     public final double net;
 
-    public final int fired;
+    public final Integer fired;
     public final double weight;
 
-    public static final State ZERO = new State(0.0, 0.0, 0.0, -1, 0.0);
+    public static final State ZERO = new State(0.0, 0.0, 0.0, null, 0.0);
 
 
-    public State(double value, double ub, double net, int fired, double weight) {
+    public State(double value, double ub, double net, Integer fired, double weight) {
         assert !Double.isNaN(value);
         this.value = value;
         this.ub = ub;

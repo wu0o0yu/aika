@@ -416,7 +416,7 @@ public class Activation implements Comparable<Activation> {
         double net = n.getTotalBias(CURRENT);
         double netUB = net;
 
-        int fired = -1;
+        Integer fired = null;
 
         for (InputState is: getInputStates(sn)) {
             Synapse s = is.l.synapse;
@@ -430,8 +430,8 @@ public class Activation implements Comparable<Activation> {
 
             net += s.computeRelationWeights(is.l);
 
-            if (!s.isRecurrent() && !s.isNegative(CURRENT) && net >= 0.0 && fired < 0) {
-                fired = iAct.currentOption.getState().fired + 1;
+            if (!s.isRecurrent() && !s.isNegative(CURRENT)) {
+                fired = Utils.max(fired, iAct.currentOption.getState().fired);
             }
         }
 
@@ -454,7 +454,7 @@ public class Activation implements Comparable<Activation> {
                 actValue,
                 actUBValue,
                 net,
-                fired,
+                net > 0.0 ? fired + (getType() == EXCITATORY ? 1 : 0) : null,
                 newWeight
         );
     }
@@ -484,8 +484,6 @@ public class Activation implements Comparable<Activation> {
         double ub = n.getTotalBias(CURRENT) + ss.getPosRecSum();
         double lb = n.getTotalBias(CURRENT) + ss.getPosRecSum();
 
-        long v = doc.getNewVisitedId();
-
         for (Link l : inputLinks.values()) {
             Synapse s = l.synapse;
             if(s.isInactive()) {
@@ -499,7 +497,7 @@ public class Activation implements Comparable<Activation> {
             double x = s.getWeight();
 
             if (s.isNegative(CURRENT)) {
-                if (!s.isRecurrent() && !iAct.checkSelfReferencing(this, 0)) {
+                if (!s.isRecurrent()) {
                     ub += Math.min(s.getLimit(), iAct.lowerBound) * x;
                 }
 
@@ -591,12 +589,12 @@ public class Activation implements Comparable<Activation> {
         if(getType() != EXCITATORY || getDecision() != UNKNOWN) {
             is = currentOption.getState();
         } else {
-            is = new State(0.0, s.getLimit(), 0.0, 0, 0.0);
+            is = new State(0.0, s.getLimit(), 0.0, null, 0.0);
         }
 
         if(s.isNegative(CURRENT)) {
-            if(!checkSelfReferencing(act, 0)) {  // Warum greift das nicht?
-                is = new State(is.ub, is.value, 0.0, 0, 0.0);
+            if(!checkSelfReferencing(act)) {  // Warum greift das nicht?
+                is = new State(is.ub, is.value, 0.0, null, 0.0);
             } else {
                 is = ZERO;
             }
@@ -616,9 +614,29 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public boolean checkSelfReferencing(Activation act, int depth) {
+    public boolean checkSelfReferencing(Activation act) {
+        Activation act1 = getInputExcitatoryActivation();
+
+        Integer f1 = act1.currentOption.getState().fired;
+        Integer f2 = act.currentOption.getState().fired;
+        if(f1 == null) {
+            return false;
+        } else if (f2 != null && f1 <= f2) {
+            return act1.checkSelfReferencingRecursiveStep(act, 0);
+        } else {
+            return act.checkSelfReferencingRecursiveStep(act1, 0);
+        }
+    }
+
+
+    private boolean checkSelfReferencingRecursiveStep(Activation act, int depth) {
         if (this == act) {
             return true;
+        }
+
+        // The activation at depth 0 might not yet be computed.
+        if(depth > 0 && currentOption.getState().value <= 0.0) {
+            return false;
         }
 
         if(depth > MAX_SELF_REFERENCING_DEPTH) {
@@ -626,29 +644,44 @@ public class Activation implements Comparable<Activation> {
         }
 
         if(getType() == INHIBITORY) {
-            Link maxLink = null;
-            double maxValue = 0.0;
-            for (Link l : inputLinks.values()) {
-                double v = l.getInput().currentOption.getState().value;
-                if (maxLink == null || v >= maxValue) {
-                    maxLink = l;
-                    maxValue = v;
-                }
-            }
+            Link strongestLink = getStrongestLink();
 
-            if (maxLink == null) {
+            if (strongestLink == null) {
                 return false;
             }
 
-            return maxLink.input.checkSelfReferencing(act, depth + 1);
+            return strongestLink.input.checkSelfReferencingRecursiveStep(act, depth + 1);
         } else {
             for (Link l : inputLinks.values()) {
-                if(!l.getSynapse().isWeak(CURRENT) && l.getSynapse().isNegative(CURRENT) && l.getInput().checkSelfReferencing(act, depth + 1)) {
+                Synapse s = l.getSynapse();
+                if(!s.isWeak(CURRENT) && !s.isNegative(CURRENT) && l.getInput().checkSelfReferencingRecursiveStep(act, depth + 1)) {
                     return true;
                 }
             }
             return false;
         }
+    }
+
+
+    private Activation getInputExcitatoryActivation() {
+        if(getType() != INHIBITORY) {
+            return this;
+        } else {
+            Link l = getStrongestLink();
+            if(l == null) {
+                return null;
+            }
+            return l.getInput().getInputExcitatoryActivation();
+        }
+    }
+
+
+    private Link getStrongestLink() {
+        return inputLinks
+                .values()
+                .stream()
+                .max(Comparator.comparing(l -> l.getInput().currentOption.getState().value))
+                .orElseGet(null);
     }
 
 

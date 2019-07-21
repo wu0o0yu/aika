@@ -13,7 +13,7 @@ import static network.aika.neuron.activation.Decision.UNKNOWN;
 
 public class Option implements Comparable<Option> {
 
-    public static final State INITIAL_STATE = new State(0.0, 1.0, 0.0, 0, 0.0);
+    public static final State INITIAL_STATE = new State(0.0, 1.0, 0.0, null, 0.0);
 
     public State state = INITIAL_STATE;
 
