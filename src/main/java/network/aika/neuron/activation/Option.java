@@ -5,6 +5,7 @@ import network.aika.Utils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static network.aika.Document.MAX_ROUND;
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
 import static network.aika.neuron.activation.Decision.UNKNOWN;
@@ -38,10 +39,9 @@ public class Option implements Comparable<Option> {
     public int round;
 
 
-    public Option(Option parent, Activation act, SearchNode sn, int round) {
+    public Option(Option parent, Activation act, SearchNode sn) {
         this.act = act;
         this.searchNode = sn;
-        this.round = round;
 
         this.parent = parent;
 
@@ -57,6 +57,12 @@ public class Option implements Comparable<Option> {
         assert !fixed;
         if(state.equalsWithWeights(s)) {
             return false;
+        }
+
+        round++;
+
+        if(round > MAX_ROUND) {
+            throw new Activation.OscillatingActivationsException(act.getDocument().activationsToString());
         }
 
         state = s;

@@ -6,6 +6,7 @@ import java.util.ArrayDeque;
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.activation.Decision.UNKNOWN;
 
 public class ValueQueue {
@@ -23,7 +24,12 @@ public class ValueQueue {
 
         if(act.getNextDecision(act.currentOption, sn) == UNKNOWN && act.getType() == EXCITATORY) return;
 
-        queue.add(act);
+        if(act.getType() == INHIBITORY) {
+            queue.addFirst(act);
+        } else {
+            queue.addLast(act);
+        }
+
         act.currentOption.setQueued(true);
     }
 

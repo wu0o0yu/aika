@@ -70,7 +70,7 @@ public class Activation implements Comparable<Activation> {
     private double upperBound;
     private double lowerBound;
 
-    public Option rootOption = new Option(null, this, null, 0);
+    public Option rootOption = new Option(null, this, null);
     public Option currentOption = rootOption;
     public Option finalOption;
 
@@ -389,7 +389,7 @@ public class Activation implements Comparable<Activation> {
         State oldState = currentOption.getState();
         State s = computeValueAndWeight(sn);
 
-        if (currentOption.decision == UNKNOWN || currentOption.searchNode != sn) {
+        if (currentOption.searchNode != sn) {
             if((currentOption.decision != UNKNOWN && currentOption.getState().equalsWithWeights(s))) {
                 return 0.0;
             }
@@ -923,11 +923,7 @@ public class Activation implements Comparable<Activation> {
 
     public void saveState(SearchNode sn) {
         currentOption.fixed = true;
-        currentOption = new Option(currentOption, this, sn, currentOption.searchNode == sn ? currentOption.round + 1 : 0);
-
-        if(currentOption.round > MAX_ROUND) {
-            throw new OscillatingActivationsException(doc.activationsToString());
-        }
+        currentOption = new Option(currentOption, this, sn);
 
         if (sn.getModifiedActivations() != null) {
             sn.getModifiedActivations().put(currentOption.act, currentOption);
