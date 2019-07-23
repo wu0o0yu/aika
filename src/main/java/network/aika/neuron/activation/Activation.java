@@ -77,8 +77,6 @@ public class Activation implements Comparable<Activation> {
     boolean ubQueued = false;
     private long markedHasCandidate;
 
-    long markedDirty;
-
     private Double targetValue;
     private Double inputValue;
 
@@ -109,7 +107,6 @@ public class Activation implements Comparable<Activation> {
 
     int[] debugCounts = new int[3];
     int[] debugDecisionCounts = new int[3];
-    int[] debugComputed = new int[3];
 
 
 
@@ -763,11 +760,6 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public void markDirty(long v) {
-        markedDirty = Math.max(markedDirty, v);
-    }
-
-
     public boolean match(Predicate<Link> filter) {
         Synapse ls = null;
         boolean matched = false;
@@ -812,10 +804,7 @@ public class Activation implements Comparable<Activation> {
                 " CACHED:" + debugCounts[SearchNode.DebugState.CACHED.ordinal()] +
                 " EXPLORE:" + debugCounts[SearchNode.DebugState.EXPLORE.ordinal()] +
                 " SELECTED:" + debugDecisionCounts[0] +
-                " EXCLUDED:" + debugDecisionCounts[1] +
-                " SIM-CACHED:" + debugComputed[0] +
-                " SIM-COMPUTED:" + debugComputed[1] +
-                " MODIFIED:" + debugComputed[2];
+                " EXCLUDED:" + debugDecisionCounts[1];
     }
 
 
