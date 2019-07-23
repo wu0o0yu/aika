@@ -135,10 +135,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private enum Step {
         INIT,
-        PREPARE_SELECT,
         SELECT,
         POST_SELECT,
-        PREPARE_EXCLUDE,
         EXCLUDE,
         POST_EXCLUDE,
         FINAL
@@ -364,16 +362,18 @@ public class SearchNode implements Comparable<SearchNode> {
                         sn = sn.getParent();
                     } else {
                         sn.initStep(doc);
-                        sn.step = Step.PREPARE_SELECT;
+                        sn.step = Step.SELECT;
                     }
                     break;
-                case PREPARE_SELECT:
-                    sn.step = sn.prepareSelectStep(doc) ? Step.SELECT : Step.PREPARE_EXCLUDE;
-                    break;
                 case SELECT:
-                    sn.step = Step.POST_SELECT;
-                    sn.currentDecision = SELECTED;
-                    sn = sn.selectedChild;
+                    if(sn.prepareSelectStep(doc)) {
+                        sn.step = Step.POST_SELECT;
+                        sn.currentDecision = SELECTED;
+                        sn = sn.selectedChild;
+                    } else {
+                        sn.step = Step.EXCLUDE;
+                    }
+
                     break;
                 case POST_SELECT:
                     sn.selectedWeight = returnWeight;
@@ -382,15 +382,17 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.selectedChild.setWeight(returnWeightSum);
 
                     sn.postReturn(sn.selectedChild);
-                    sn.step = Step.PREPARE_EXCLUDE;
-                    break;
-                case PREPARE_EXCLUDE:
-                    sn.step = sn.prepareExcludeStep(doc) ? Step.EXCLUDE : Step.FINAL;
+                    sn.step = Step.EXCLUDE;
                     break;
                 case EXCLUDE:
-                    sn.step = Step.POST_EXCLUDE;
-                    sn.currentDecision = EXCLUDED;
-                    sn = sn.excludedChild;
+                    if(sn.prepareExcludeStep(doc)) {
+                        sn.step = Step.POST_EXCLUDE;
+                        sn.currentDecision = EXCLUDED;
+                        sn = sn.excludedChild;
+                    } else {
+                        sn.step = Step.FINAL;
+                    }
+
                     break;
                 case POST_EXCLUDE:
                     sn.excludedWeight = returnWeight;
@@ -401,7 +403,7 @@ public class SearchNode implements Comparable<SearchNode> {
                     sn.postReturn(sn.excludedChild);
 
                     if(sn.act.repeat && OPTIMIZE_SEARCH) {
-                        sn.step = Step.PREPARE_SELECT;
+                        sn.step = Step.SELECT;
                         sn.selectBranchSearched = false;
                     } else {
                         sn.step = Step.FINAL;

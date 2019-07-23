@@ -626,7 +626,7 @@ public class Activation implements Comparable<Activation> {
         Integer f2 = act.currentOption.getState().fired;
         if(f1 == null) {
             return false;
-        } else if (f2 != null && f1 <= f2) {
+        } else if (f2 != null && f1 > f2) {
             return act1.checkSelfReferencingRecursiveStep(act, 0);
         } else {
             return act.checkSelfReferencingRecursiveStep(act1, 0);
@@ -682,12 +682,12 @@ public class Activation implements Comparable<Activation> {
 
 
     private Link getStrongestLink() {
-        Link rl = inputLinks
+        return inputLinks
                 .values()
                 .stream()
+                .filter(l -> l.getInput().currentOption.getState().value > 0.0)
                 .max(Comparator.comparing(l -> l.getInput().currentOption.getState().value))
-                .orElseGet(null);
-        return rl.getInput().currentOption.getState().value > 0.0 ? rl : null;
+                .orElse(null);
     }
 
 
