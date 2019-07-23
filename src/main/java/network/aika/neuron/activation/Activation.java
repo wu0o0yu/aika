@@ -616,6 +616,11 @@ public class Activation implements Comparable<Activation> {
 
     public boolean checkSelfReferencing(Activation act) {
         Activation act1 = getInputExcitatoryActivation();
+        if(act1 == null) {
+            return false;
+        } else if(act == act1) {
+            return true;
+        }
 
         Integer f1 = act1.currentOption.getState().fired;
         Integer f2 = act.currentOption.getState().fired;
@@ -677,11 +682,12 @@ public class Activation implements Comparable<Activation> {
 
 
     private Link getStrongestLink() {
-        return inputLinks
+        Link rl = inputLinks
                 .values()
                 .stream()
                 .max(Comparator.comparing(l -> l.getInput().currentOption.getState().value))
                 .orElseGet(null);
+        return rl.getInput().currentOption.getState().value > 0.0 ? rl : null;
     }
 
 
