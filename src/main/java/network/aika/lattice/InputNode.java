@@ -20,15 +20,15 @@ package network.aika.lattice;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.Provider;
+import network.aika.lattice.refinement.RefValue;
+import network.aika.lattice.refinement.Refinement;
+import network.aika.lattice.refinement.RelationsMap;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
 import network.aika.lattice.AndNode.AndActivation;
 import network.aika.lattice.InputNode.InputActivation;
-import network.aika.lattice.AndNode.Refinement;
-import network.aika.lattice.AndNode.RefValue;
-import network.aika.lattice.AndNode.RelationsMap;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -50,7 +50,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
     private Neuron inputNeuron;
 
-    private TreeMap<AndNode.Refinement, AndNode.RefValue> nonExactAndChildren;
+    private TreeMap<Refinement, RefValue> nonExactAndChildren;
 
 
     public InputNode() {
@@ -86,7 +86,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
     }
 
 
-    void addAndChild(AndNode.Refinement ref, AndNode.RefValue child) {
+    void addAndChild(Refinement ref, RefValue child) {
         super.addAndChild(ref, child);
 
         if(!ref.relations.isExact()) {
@@ -94,13 +94,13 @@ public class InputNode extends Node<InputNode, InputActivation> {
                 nonExactAndChildren = new TreeMap<>();
             }
 
-            AndNode.RefValue n = nonExactAndChildren.put(ref, child);
+            RefValue n = nonExactAndChildren.put(ref, child);
             assert n == null;
         }
     }
 
 
-    void removeAndChild(AndNode.Refinement ref) {
+    void removeAndChild(Refinement ref) {
         super.removeAndChild(ref);
 
         if(!ref.relations.isExact()) {
@@ -130,7 +130,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         List<AndNode.Entry> nlParents = new ArrayList<>();
 
-        Refinement mirrorRef = new Refinement(new AndNode.RelationsMap(new Relation[]{rel.invert()}), provider);
+        Refinement mirrorRef = new Refinement(new RelationsMap(new Relation[]{rel.invert()}), provider);
         nlParents.add(new AndNode.Entry(mirrorRef, new RefValue(new Integer[] {1}, 0, ref.input)));
 
         rv = new RefValue(new Integer[] {0}, 1, provider);
@@ -148,7 +148,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         try {
             lock.acquireReadLock();
             if (andChildren != null) {
-                TreeMap<AndNode.Refinement, AndNode.RefValue> children;
+                TreeMap<Refinement, RefValue> children;
                 if(andChildren.size() > CHILD_NODE_THRESHOLD) {
                     children = nonExactAndChildren;
                     propagateWithExactRelations(act);
@@ -180,7 +180,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
         for (Map.Entry<Integer, Position> me : iAct.getSlots().entrySet()) {
             for (Activation linkedAct : act.getDocument().getActivationsByPosition(me.getValue(), true, me.getValue(), true)) {
                 Provider<InputNode> in = linkedAct.getINeuron().getOutputNode();
-                for (Map.Entry<AndNode.Refinement, AndNode.RefValue> mea : andChildren.subMap(
+                for (Map.Entry<Refinement, RefValue> mea : andChildren.subMap(
                         new Refinement(RelationsMap.MIN, in),
                         new Refinement(RelationsMap.MAX, in)).entrySet()) {
                     in.get(doc).addNextLevelActivations(mea.getKey(), mea.getValue().child.get(doc), act);

@@ -283,19 +283,10 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public void setUpperBound(double upperBound) {
-        this.upperBound = upperBound;
-    }
-
-
     public double getLowerBound() {
         return lowerBound;
     }
 
-
-    public void setLowerBound(double lowerBound) {
-        this.lowerBound = lowerBound;
-    }
 
     public Double getTargetValue() {
         return targetValue;
@@ -578,8 +569,6 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-
-// TODO: prüfen ob posValue, net, posNet usw. noch gebraucht werden.
     private State getInputState(Synapse s, Activation act, SearchNode sn) {
         State is;
 

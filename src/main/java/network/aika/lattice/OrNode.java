@@ -18,6 +18,8 @@ package network.aika.lattice;
 
 
 import network.aika.*;
+import network.aika.lattice.refinement.RefValue;
+import network.aika.lattice.refinement.Refinement;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
@@ -64,7 +66,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
 
     @Override
-    public AndNode.RefValue expand(int threadId, Document doc, AndNode.Refinement ref) {
+    public RefValue expand(int threadId, Document doc, Refinement ref) {
         throw new UnsupportedOperationException();
     }
 
