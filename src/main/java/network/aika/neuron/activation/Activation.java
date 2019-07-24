@@ -688,18 +688,6 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public Collection<Activation> getConflicts() {
-        ArrayList<Activation> results = new ArrayList<>();
-        for(Link l: inputLinks.values()) {
-            if(l.isRecurrent() && l.isNegative(CURRENT)) {
-                results.add(l.input);
-            }
-        }
-        return results;
-    }
-
-
-
     public List<Link> getFinalInputActivationLinks() {
         ArrayList<Link> results = new ArrayList<>();
         for (Link l : inputLinks.values()) {
@@ -1049,20 +1037,12 @@ public class Activation implements Comparable<Activation> {
             return this;
         }
 
-        public Builder setNet(double net) {
-            this.net = net;
-            return this;
-        }
 
         public Builder setTargetValue(Double targetValue) {
             this.targetValue = targetValue;
             return this;
         }
 
-        public Builder setFired(int fired) {
-            this.fired = fired;
-            return this;
-        }
 
         public Map<Integer, Position> getSlots(Document doc) {
             TreeMap<Integer, Position> slots = new TreeMap<>();

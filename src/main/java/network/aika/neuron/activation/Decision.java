@@ -1,40 +1,26 @@
 package network.aika.neuron.activation;
 
+
 public enum Decision {
-    SELECTED(
-            'S',
-            sn -> sn.selectedChild,
-            sn -> sn.excludedChild
-    ),
-    EXCLUDED(
-            'E',
-            sn -> sn.excludedChild,
-            sn -> sn.selectedChild
-    ),
-    UNKNOWN('U',
-            sn -> null,
-            sn -> null
-    );
+    SELECTED('S'),
+    EXCLUDED('E'),
+    UNKNOWN('U');
 
     char s;
-    ChildNode childNode;
-    ChildNode invertedChildNode;
 
-    Decision(char s, ChildNode cn, ChildNode icn) {
+    Decision(char s) {
         this.s = s;
-        this.childNode = cn;
-        this.invertedChildNode = icn;
     }
 
-    public SearchNode getChild(SearchNode sn) {
-        return childNode.getChild(sn);
-    }
 
-    public SearchNode getInvertedChild(SearchNode sn) {
-        return invertedChildNode.getChild(sn);
-    }
-
-    interface ChildNode {
-        SearchNode getChild(SearchNode sn);
+    Decision getInverted() {
+        switch(this) {
+            case SELECTED:
+                return EXCLUDED;
+            case EXCLUDED:
+                return SELECTED;
+            default:
+                return UNKNOWN;
+        }
     }
 }
