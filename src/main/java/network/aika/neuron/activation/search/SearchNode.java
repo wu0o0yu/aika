@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.activation.search;
 
 
 import network.aika.Document;
 import network.aika.Utils;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.RecursiveDepthExceededException;
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 import org.slf4j.Logger;
@@ -26,9 +27,9 @@ import org.slf4j.LoggerFactory;
 
 
 import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.activation.Decision.EXCLUDED;
-import static network.aika.neuron.activation.Decision.SELECTED;
-import static network.aika.neuron.activation.Decision.UNKNOWN;
+import static network.aika.neuron.activation.search.Decision.EXCLUDED;
+import static network.aika.neuron.activation.search.Decision.SELECTED;
+import static network.aika.neuron.activation.search.Decision.UNKNOWN;
 
 
 import java.util.*;
@@ -73,36 +74,6 @@ public class SearchNode implements Comparable<SearchNode> {
         EXPLORE
     }
 
-
-    public static class Branch {
-        boolean searched;
-        double weight = 0.0;
-        double weightSum = 0.0;
-
-        SearchNode child = null;
-
-        private boolean prepareStep(Document doc, SearchNode c) {
-            child = c;
-
-            child.updateActivations(doc);
-
-            if (!child.followPath()) {
-                return true;
-            }
-
-            searched = true;
-            return false;
-        }
-
-
-        public void postStep(double returnWeight, double returnWeightSum) {
-            weight = returnWeight;
-            weightSum = returnWeightSum;
-
-            child.setWeight(returnWeightSum);
-            child.changeState(Activation.Mode.OLD);
-        }
-    }
 
     public Branch selected = new Branch();
     public Branch excluded = new Branch();

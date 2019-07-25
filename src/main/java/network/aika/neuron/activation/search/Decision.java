@@ -1,4 +1,4 @@
-package network.aika.neuron.activation;
+package network.aika.neuron.activation.search;
 
 
 public enum Decision {
@@ -13,7 +13,7 @@ public enum Decision {
     }
 
 
-    Decision getInverted() {
+    public Decision getInverted() {
         switch(this) {
             case SELECTED:
                 return EXCLUDED;

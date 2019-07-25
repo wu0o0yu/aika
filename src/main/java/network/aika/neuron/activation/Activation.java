@@ -10,17 +10,17 @@ import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.neuron.INeuron.Type;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import network.aika.neuron.activation.search.Decision;
+import network.aika.neuron.activation.search.Option;
+import network.aika.neuron.activation.search.SearchNode;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static network.aika.Document.MAX_ROUND;
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
-import static network.aika.neuron.activation.Decision.*;
+import static network.aika.neuron.activation.search.Decision.*;
 import static network.aika.neuron.activation.Linker.Direction.INPUT;
 import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
@@ -88,25 +88,25 @@ public class Activation implements Comparable<Activation> {
     public boolean blocked;
 
 
-    SearchNode currentSearchNode;
+    public SearchNode currentSearchNode;
 
     /**
      * The cached decision is used to avoid having to explore the same currentSearchState twice even though nothing that
      * influences this currentSearchState has changed.
      */
-    Decision cachedDecision = UNKNOWN;
-    boolean repeat = false;
-    double alternativeCachedWeightSum;
+    public Decision cachedDecision = UNKNOWN;
+    public boolean repeat = false;
+    public double alternativeCachedWeightSum;
 
     /**
      * The cached search node is used to avoid having to recompute the activation values and weights that are associated
      * with this search node.
      */
-    SearchNode cachedSearchNode;
-    SearchNode bestChildNode;
+    public SearchNode cachedSearchNode;
+    public SearchNode bestChildNode;
 
-    int[] debugCounts = new int[3];
-    int[] debugDecisionCounts = new int[3];
+    public int[] debugCounts = new int[3];
+    public int[] debugDecisionCounts = new int[3];
 
 
 

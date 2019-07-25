@@ -26,8 +26,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 import network.aika.neuron.activation.Position;
-import network.aika.neuron.activation.SearchNode;
-import network.aika.neuron.activation.SearchNode.TimeoutException;
+import network.aika.neuron.activation.search.SearchNode;
+import network.aika.neuron.activation.search.SearchNode.TimeoutException;
 import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +37,7 @@ import java.util.stream.Collectors;
 
 import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.activation.Activation.CANDIDATE_COMP;
-import static network.aika.neuron.activation.Decision.SELECTED;
-import static network.aika.neuron.activation.Decision.UNKNOWN;
+import static network.aika.neuron.activation.search.Decision.UNKNOWN;
 
 
 /**

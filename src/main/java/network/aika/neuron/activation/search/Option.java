@@ -1,6 +1,8 @@
-package network.aika.neuron.activation;
+package network.aika.neuron.activation.search;
 
 import network.aika.Utils;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.State;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -8,7 +10,7 @@ import java.util.stream.Collectors;
 import static network.aika.Document.MAX_ROUND;
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
-import static network.aika.neuron.activation.Decision.UNKNOWN;
+import static network.aika.neuron.activation.search.Decision.UNKNOWN;
 
 
 public class Option implements Comparable<Option> {
@@ -17,13 +19,13 @@ public class Option implements Comparable<Option> {
 
     public State state = INITIAL_STATE;
 
-    Activation act;
+    public Activation act;
     public SearchNode searchNode;
 
     public Option parent;
     public List<Option> children = new ArrayList<>();
 
-    boolean fixed = false;
+    public boolean fixed = false;
 
     public Decision decision;
 

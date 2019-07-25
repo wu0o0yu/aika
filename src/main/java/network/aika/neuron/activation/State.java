@@ -2,9 +2,10 @@ package network.aika.neuron.activation;
 
 import network.aika.Utils;
 import network.aika.neuron.INeuron;
+import network.aika.neuron.activation.search.Decision;
 
-import static network.aika.neuron.activation.Decision.EXCLUDED;
-import static network.aika.neuron.activation.Decision.SELECTED;
+import static network.aika.neuron.activation.search.Decision.EXCLUDED;
+import static network.aika.neuron.activation.search.Decision.SELECTED;
 
 
 /**

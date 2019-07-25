@@ -4,10 +4,11 @@ package network.aika.neuron.activation;
 import java.util.ArrayDeque;
 
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
+import network.aika.neuron.activation.search.SearchNode;
 
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
-import static network.aika.neuron.activation.Decision.UNKNOWN;
+import static network.aika.neuron.activation.search.Decision.UNKNOWN;
 
 public class ValueQueue {
     private final ArrayDeque<Activation> queue = new ArrayDeque<>();
