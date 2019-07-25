@@ -58,8 +58,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
     private int id;
 
-    private SearchNode excludedParent;
-    private SearchNode selectedParent;
+    private SearchNode parent;
+    private Decision decision;
 
     private Activation act;
     private int level;
@@ -114,7 +114,7 @@ public class SearchNode implements Comparable<SearchNode> {
     private Map<Activation, Option> modifiedActs = new TreeMap<>(Activation.ACTIVATION_ID_COMP);
 
     private Step step = Step.INIT;
-    private Decision currentDecision = UNKNOWN;
+    private Decision currentChildDecision = UNKNOWN;
 
 
     private long processVisited;
@@ -135,11 +135,11 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public SearchNode(Document doc, SearchNode selParent, SearchNode exclParent, int level) {
+    public SearchNode(Document doc, Decision d, SearchNode p, int level) {
         id = doc.searchNodeIdCounter++;
+        decision = d;
+        parent = p;
         this.level = level;
-        selectedParent = selParent;
-        excludedParent = exclParent;
     }
 
 
@@ -155,12 +155,12 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public SearchNode getAlternative() {
-        return getParent().getBranch(getDecision().getInverted()).child;
+        return parent.getBranch(decision.getInverted()).child;
     }
 
 
     public void updateActivations(Document doc) throws OscillatingActivationsException {
-        Activation parentAct = getParent() != null ? getParent().act : null;
+        Activation parentAct = parent != null ? parent.act : null;
 
         if (parentAct != null) {
             parentAct.currentSearchNode = this;
@@ -172,16 +172,14 @@ public class SearchNode implements Comparable<SearchNode> {
             parentAct.cachedSearchNode = this;
         }
 
-        if (getParent() != null) {
-            SearchNode pn = getParent();
-
-            accumulatedWeight = weightDelta + pn.accumulatedWeight;
+        if (parent != null) {
+            accumulatedWeight = weightDelta + parent.accumulatedWeight;
         }
     }
 
 
     public boolean followPath() {
-        return getActivation().currentOption.searchNode == this && getDecision() == getActivation().currentOption.getState().getPreferredDecision();
+        return getActivation().currentOption.searchNode == this && decision == getActivation().currentOption.getState().getPreferredDecision();
     }
 
 
@@ -201,10 +199,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public Activation getActivation() {
-        if (getParent() != null && getParent().act != null) {
-            return getParent().act;
-        }
-        return null;
+        return parent != null ? parent.act : null;
     }
 
 
@@ -222,11 +217,11 @@ public class SearchNode implements Comparable<SearchNode> {
                             " MOD-ACTS:" + n.modifiedActs.size()
             );
 
-            decision = n.getDecision();
+            decision = n.decision;
             weights = " AW:" + Utils.round(n.accumulatedWeight) +
                     " DW:" + Utils.round(n.weightDelta);
 
-            n = n.getParent();
+            n = n.parent;
         }
     }
 
@@ -261,7 +256,7 @@ public class SearchNode implements Comparable<SearchNode> {
                         returnWeightSum = returnWeight;
 
                         sn.step = Step.FINAL;
-                        sn = sn.getParent();
+                        sn = sn.parent;
                     } else {
                         sn.initStep(doc);
                         sn.step = Step.SELECT;
@@ -305,10 +300,10 @@ public class SearchNode implements Comparable<SearchNode> {
                         returnWeight = sn.finalStep();
                         returnWeightSum = sn.getWeightSum();
 
-                        sn.currentDecision = UNKNOWN;
-                        SearchNode pn = sn.getParent();
+                        sn.currentChildDecision = UNKNOWN;
+                        SearchNode pn = sn.parent;
                         if (pn != null) {
-                            pn.skip = sn.getDecision();
+                            pn.skip = sn.decision;
                         }
                         sn = pn;
                     }
@@ -384,11 +379,7 @@ public class SearchNode implements Comparable<SearchNode> {
             return false;
         }
 
-        SearchNode child = new SearchNode(
-                doc, d == SELECTED ? this : selectedParent,
-                d == SELECTED ? excludedParent : this,
-                level + 1
-        );
+        SearchNode child = new SearchNode(doc, d, this, level + 1);
 
         if (getBranch(d).prepareStep(doc, child)) return false;
 
@@ -398,7 +389,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
         act.debugDecisionCounts[d.ordinal()]++;
 
-        currentDecision = d;
+        currentChildDecision = d;
 
         return true;
     }
@@ -478,23 +469,23 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public static void computeCachedFactor(SearchNode sn) {
         while (sn != null) {
-            switch (sn.currentDecision) {
+            switch (sn.currentChildDecision) {
                 case UNKNOWN:
-                    sn.currentDecision = SELECTED;
+                    sn.currentChildDecision = SELECTED;
                     if (sn.selected.child != null) {
                         sn = sn.selected.child;
                         sn.computeCacheFactor();
                     }
                     break;
                 case SELECTED:
-                    sn.currentDecision = EXCLUDED;
+                    sn.currentChildDecision = EXCLUDED;
                     if (sn.excluded.child != null) {
                         sn = sn.excluded.child;
                         sn.computeCacheFactor();
                     }
                     break;
                 case EXCLUDED:
-                    sn = sn.getParent();
+                    sn = sn.parent;
                     break;
             }
         }
@@ -502,8 +493,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private void computeCacheFactor() {
-        SearchNode pn = getParent();
-        cachedFactor = (pn != null ? pn.cachedFactor : 1) * cachedCount;
+        cachedFactor = (parent != null ? parent.cachedFactor : 1) * cachedCount;
 
         for (Option sc : modifiedActs.values()) {
             sc.setCacheFactor(cachedFactor);
@@ -516,20 +506,15 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public String pathToString() {
-        return (selectedParent != null ? selectedParent.pathToString() : "") + " - " + toString();
-    }
-
-
     public String toString() {
-        return "id:" + id + " actId:" + (act != null ? act.getId() : "-") + " Decision:" + getDecision() + " curDec:" + currentDecision;
+        return "id:" + id + " actId:" + (act != null ? act.getId() : "-") + " Decision:" + getDecision() + " curDec:" + currentChildDecision;
     }
 
 
     public void changeState(Activation.Mode m) {
-        for (Option sc : modifiedActs.values()) {
-            sc.restoreState(m);
-        }
+        modifiedActs
+                .values()
+                .forEach(sc -> sc.restoreState(m));
     }
 
 
@@ -539,13 +524,8 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public SearchNode getParent() {
-        return getDecision() == SELECTED ? selectedParent : excludedParent;
-    }
-
-
     public Decision getDecision() {
-        return excludedParent == null || (selectedParent != null && selectedParent.id > excludedParent.id) ? SELECTED : EXCLUDED;
+        return decision;
     }
 
 
