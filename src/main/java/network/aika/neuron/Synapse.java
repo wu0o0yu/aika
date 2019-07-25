@@ -441,21 +441,10 @@ public class Synapse implements Writable {
         return synapse;
     }
 
-    public Set<Integer> linksOutput() {
-        Set<Integer> results = new TreeSet<>();
-        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
-            Relation rel = me.getValue();
-            if(me.getKey() == OUTPUT) {
-                rel.linksOutputs(results);
-            }
-        }
-        return results;
-    }
-
 
     public boolean linksAnyOutput() {
-        Set<Integer> tmp = linksOutput();
-        return !tmp.isEmpty();
+        // Output Relations are always PositionRelations.
+        return relations.get(OUTPUT) != null;
     }
 
 

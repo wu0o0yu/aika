@@ -213,7 +213,7 @@ public class Converter {
             for(Map.Entry<Integer, Relation> me: syn.getRelations().entrySet()) {
                 Integer relId = me.getKey();
                 Relation rel = me.getValue();
-                if(rel.isConvertible() && !alreadyCollected.contains(relId)) {
+                if(!alreadyCollected.contains(relId)) {
                     Synapse rs = syn.getOutput().getSynapseById(relId);
                     if(rs != null) {
                         relatedSyns.put(relId, rs);
