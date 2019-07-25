@@ -20,13 +20,12 @@ package network.aika.lattice;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.Provider;
+import network.aika.lattice.activation.AndActivation;
+import network.aika.lattice.activation.InputActivation;
 import network.aika.lattice.refinement.RefValue;
 import network.aika.lattice.refinement.Refinement;
 import network.aika.lattice.refinement.RelationsMap;
 import network.aika.neuron.relation.Relation;
-import network.aika.neuron.activation.Activation;
-import network.aika.lattice.InputNode.InputActivation;
-import network.aika.lattice.AndNode.AndActivation;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -46,7 +45,7 @@ import java.util.*;
  */
 public class AndNode extends Node<AndNode, AndActivation> {
 
-    List<Entry> parents;
+    public List<Entry> parents;
 
 
     public AndNode() {
@@ -74,12 +73,12 @@ public class AndNode extends Node<AndNode, AndActivation> {
     @Override
     protected void propagate(AndActivation act) {
         if (andChildren != null) {
-            for (Link fl : act.inputs) {
+            for (AndActivation.Link fl : act.inputs) {
                 if(fl == null) continue;
 
                 NodeActivation<?> pAct = fl.input;
 
-                for (Link sl : pAct.outputsToAndNode.values()) {
+                for (AndActivation.Link sl : pAct.outputsToAndNode.values()) {
                     NodeActivation secondAct = sl.output;
                     if (act != secondAct) {
                         applyIntern(act, fl.refAct, fl.ref, fl.rv, secondAct, sl.refAct, sl.ref, sl.rv);
@@ -147,7 +146,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
 
     private AndActivation lookupAndActivation(NodeActivation<?> input, Refinement ref) {
-        for (Link l : input.outputsToAndNode.values()) {
+        for (AndActivation.Link l : input.outputsToAndNode.values()) {
             if(l.ref.compareTo(ref) == 0) {
                 return l.output;
             }
@@ -346,85 +345,6 @@ public class AndNode extends Node<AndNode, AndActivation> {
         public Entry(Refinement ref, RefValue rv) {
             this.ref = ref;
             this.rv = rv;
-        }
-    }
-
-
-    public static class AndActivation extends NodeActivation<AndNode> {
-
-        public Link[] inputs;
-
-        public AndActivation(Document doc, AndNode node) {
-            super(doc, node);
-            inputs = new Link[node.level];
-        }
-
-        public void link(Refinement ref, RefValue rv, InputActivation refAct, NodeActivation<?> input) {
-            Link l = new Link(ref, rv, refAct, input, this);
-            inputs[rv.refOffset] = l;
-            input.outputsToAndNode.put(id, l);
-        }
-
-        public Activation getInputActivation(int i) {
-            Link l = inputs[i];
-            if(l != null) {
-                return l.refAct.input;
-            } else {
-                for(int j = 0; j < inputs.length; j++) {
-                    if (j != i) {
-                        l = inputs[j];
-                        if(l != null) {
-                            return l.input.getInputActivation(l.rv.reverseOffsets[i]);
-                        }
-                    }
-                }
-                return null;
-            }
-        }
-
-        public boolean isComplete() {
-            int numberOfLinks = 0;
-            for (Link l : inputs) {
-                if (l != null) numberOfLinks++;
-            }
-            return getNode().parents.size() == numberOfLinks;
-        }
-
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("A-ACT(");
-            boolean first = true;
-            for(int i = 0; i < inputs.length; i++) {
-                Activation iAct = getInputActivation(i);
-                if(iAct != null) {
-                    if(!first) {
-                        sb.append(",");
-                    }
-                    sb.append(i + ":" + iAct.getLabel() + " " + iAct.slotsToString() + " (" + iAct.getId() + ")");
-
-                    first = false;
-                }
-            }
-            sb.append(")");
-            return sb.toString();
-        }
-    }
-
-
-    public static class Link {
-        public Refinement ref;
-        public RefValue rv;
-
-        public NodeActivation<?> input;
-        public InputActivation refAct;
-        public AndActivation output;
-
-        public Link(Refinement ref, RefValue rv, InputActivation refAct, NodeActivation<?> input, AndActivation output) {
-            this.ref = ref;
-            this.rv = rv;
-            this.refAct = refAct;
-            this.input = input;
-            this.output = output;
         }
     }
 }

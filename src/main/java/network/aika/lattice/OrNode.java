@@ -18,17 +18,19 @@ package network.aika.lattice;
 
 
 import network.aika.*;
+import network.aika.lattice.activation.OrActivation;
+import network.aika.lattice.refinement.OrEntry;
 import network.aika.lattice.refinement.RefValue;
 import network.aika.lattice.refinement.Refinement;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Linker;
 import network.aika.neuron.activation.Position;
 import network.aika.Document;
 import network.aika.neuron.relation.Relation;
-import network.aika.lattice.OrNode.OrActivation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +74,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
 
     protected void addActivation(OrEntry oe, NodeActivation inputAct) {
-        Link ol = new Link(oe, inputAct);
+        OrActivation.Link ol = new OrActivation.Link(oe, inputAct);
 
         Document doc = inputAct.getDocument();
         INeuron n = outputNeuron.get(doc);
@@ -105,7 +107,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
     }
 
 
-    private Activation lookupActivation(Link ol, Predicate<Activation.Link> filter) {
+    private Activation lookupActivation(OrActivation.Link ol, Predicate<Activation.Link> filter) {
         for(Activation.Link l: ol.getInputLinks(outputNeuron)) {
             Synapse syn = l.getSynapse();
             Map<Integer, Relation> rels = syn.getRelations();
@@ -120,7 +122,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
                         existingAct = rel
                                 .invert()
                                 .getActivations(s.getInput().get(), l.getInput())
-                                .flatMap(act -> act.getOutputLinksBySynapse(s))
+                                .flatMap(act -> act.getLinksBySynapse(Direction.OUTPUT, s))
                                 .map(rl -> rl.getOutput())
                                 .findFirst()
                                 .orElse(null);
@@ -298,159 +300,5 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
     public Neuron getOutputNeuron() {
         return outputNeuron;
-    }
-
-
-    static class OrEntry implements Comparable<OrEntry>, Writable {
-        int[] synapseIds;
-        TreeMap<Integer, Integer> revSynapseIds = new TreeMap<>();
-        Provider<? extends Node> parent;
-        Provider<OrNode> child;
-
-        private OrEntry() {}
-
-        public OrEntry(int[] synapseIds, Provider<? extends Node> parent, Provider<OrNode> child) {
-            this.synapseIds = synapseIds;
-            for(int ofs = 0; ofs < synapseIds.length; ofs++) {
-                revSynapseIds.put(synapseIds[ofs], ofs);
-            }
-
-            this.parent = parent;
-            this.child = child;
-        }
-
-
-        @Override
-        public void write(DataOutput out) throws IOException {
-            out.writeInt(synapseIds.length);
-            for(int i = 0; i < synapseIds.length; i++) {
-                Integer ofs = synapseIds[i];
-                out.writeBoolean(ofs != null);
-                out.writeInt(ofs);
-            }
-            out.writeInt(parent.getId());
-            out.writeInt(child.getId());
-        }
-
-        public static OrEntry read(DataInput in, Model m)  throws IOException {
-            OrEntry rv = new OrEntry();
-            rv.readFields(in, m);
-            return rv;
-        }
-
-        @Override
-        public void readFields(DataInput in, Model m) throws IOException {
-            int l = in.readInt();
-            synapseIds = new int[l];
-            for(int i = 0; i < l; i++) {
-                if(in.readBoolean()) {
-                    Integer ofs = in.readInt();
-                    synapseIds[i] = ofs;
-                    revSynapseIds.put(ofs, i);
-                }
-            }
-            parent = m.lookupNodeProvider(in.readInt());
-            child = m.lookupNodeProvider(in.readInt());
-        }
-
-
-        @Override
-        public int compareTo(OrEntry oe) {
-            int r = child.compareTo(oe.child);
-            if(r != 0) return r;
-
-            r = parent.compareTo(oe.parent);
-            if(r != 0) return r;
-
-            r = Integer.compare(synapseIds.length, oe.synapseIds.length);
-            if(r != 0) return r;
-
-            for(int i = 0; i < synapseIds.length; i++) {
-                r = Integer.compare(synapseIds[i], oe.synapseIds[i]);
-                if(r != 0) return r;
-            }
-            return 0;
-        }
-    }
-
-
-    public static class OrActivation extends NodeActivation<OrNode> {
-        private Map<Integer, Link> orInputs = new TreeMap<>();
-        private Activation outputAct;
-
-        public OrActivation(Document doc, OrNode node) {
-            super(doc, node);
-        }
-
-        public Activation getOutputAct() {
-            return outputAct;
-        }
-
-        public void setOutputAct(Activation outputAct) {
-            this.outputAct = outputAct;
-        }
-
-        @Override
-        public Activation getInputActivation(int i) {
-            throw new UnsupportedOperationException();
-        }
-
-        public void link(Link l) {
-            l.setOutput(this);
-            orInputs.put(l.input.id, l);
-            l.input.outputsToOrNode.put(id, l);
-        }
-    }
-
-
-    protected static class Link {
-        public OrEntry oe;
-
-        private NodeActivation<?> input;
-        private OrActivation output;
-
-        public Link(OrEntry oe, NodeActivation<?> input) {
-            this.oe = oe;
-            this.input = input;
-        }
-
-
-        public int size() {
-            return oe.synapseIds.length;
-        }
-
-        public int get(int i) {
-            return oe.synapseIds[i];
-        }
-
-
-        void linkOutputActivation(Activation act) {
-            Linker l = act.getDocument().getLinker();
-            for (int i = 0; i < size(); i++) {
-                int synId = get(i);
-                Synapse s = act.getSynapseById(synId);
-                if(s != null) {
-                    Activation iAct = input.getInputActivation(i);
-                    l.link(s, iAct, act);
-                }
-            }
-            l.process();
-        }
-
-
-        Collection<Activation.Link> getInputLinks(Neuron n) {
-            List<Activation.Link> inputActs = new ArrayList<>();
-            for (int i = 0; i < size(); i++) {
-                int synId = get(i);
-                Synapse s = n.getSynapseById(synId);
-                Activation iAct = input.getInputActivation(i);
-                inputActs.add(new Activation.Link(s, iAct, null));
-            }
-            return inputActs;
-        }
-
-        public void setOutput(OrActivation output) {
-            this.output = output;
-        }
     }
 }

@@ -18,6 +18,8 @@ package network.aika.lattice;
 
 
 import network.aika.Document;
+import network.aika.lattice.activation.AndActivation;
+import network.aika.lattice.activation.OrActivation;
 import network.aika.neuron.activation.Activation;
 
 import java.util.*;
@@ -31,11 +33,11 @@ public abstract class NodeActivation<T extends Node> implements Comparable<NodeA
 
     protected final Document doc;
 
-    Long repropagateV;
+    public Long repropagateV;
     public boolean registered;
 
-    TreeMap<Integer, AndNode.Link> outputsToAndNode = new TreeMap<>();
-    TreeMap<Integer, OrNode.Link> outputsToOrNode = new TreeMap<>();
+    public TreeMap<Integer, AndActivation.Link> outputsToAndNode = new TreeMap<>();
+    public TreeMap<Integer, OrActivation.Link> outputsToOrNode = new TreeMap<>();
 
 
     public NodeActivation(Document doc, T node) {

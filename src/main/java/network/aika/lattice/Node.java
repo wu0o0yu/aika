@@ -19,6 +19,7 @@ package network.aika.lattice;
 
 import network.aika.*;
 import network.aika.Document;
+import network.aika.lattice.refinement.OrEntry;
 import network.aika.lattice.refinement.RefValue;
 import network.aika.lattice.refinement.Refinement;
 
@@ -50,9 +51,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
 
     TreeMap<Refinement, RefValue> andChildren;
-    TreeSet<OrNode.OrEntry> orChildren;
+    TreeSet<OrEntry> orChildren;
 
-    int level;
+    public int level;
 
     private AtomicInteger numberOfNeuronRefs = new AtomicInteger(0);
     volatile boolean isRemoved;
@@ -145,7 +146,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void addOrChild(OrNode.OrEntry rv) {
+    void addOrChild(OrEntry rv) {
         lock.acquireWriteLock();
         if (orChildren == null) {
             orChildren = new TreeSet<>();
@@ -155,7 +156,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void removeOrChild(OrNode.OrEntry rv) {
+    void removeOrChild(OrEntry rv) {
         lock.acquireWriteLock();
         if (orChildren != null) {
             orChildren.remove(rv);
@@ -263,7 +264,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         try {
             lock.acquireReadLock();
             if (orChildren != null) {
-                for (OrNode.OrEntry oe : orChildren) {
+                for (OrEntry oe : orChildren) {
                     oe.child.get(doc).addActivation(oe, inputAct);
                 }
             }
@@ -416,7 +417,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         if (orChildren != null) {
             out.writeInt(orChildren.size());
-            for (OrNode.OrEntry oe : orChildren) {
+            for (OrEntry oe : orChildren) {
                 oe.write(out);
             }
         } else {
@@ -441,7 +442,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             if (orChildren == null) {
                 orChildren = new TreeSet<>();
             }
-            orChildren.add(OrNode.OrEntry.read(in, m));
+            orChildren.add(OrEntry.read(in, m));
         }
 
         threads = new ThreadState[m.numberOfThreads];

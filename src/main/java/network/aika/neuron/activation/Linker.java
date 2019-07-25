@@ -27,6 +27,7 @@ import java.util.*;
 
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
  * The {@code Linker} class is responsible for for the linkage of neuron activations. These links mirror the synapses between
@@ -38,12 +39,6 @@ public class Linker {
 
     private Document doc;
     private ArrayDeque<Link> queue = new ArrayDeque<>();
-
-
-    public enum Direction {
-        INPUT,
-        OUTPUT
-    }
 
 
     public Linker(Document doc) {
@@ -155,7 +150,7 @@ public class Linker {
                 }
             } else {
                 Synapse relSyn = oAct.getSynapseById(relSynId);
-                if(relSyn!= null && oAct.getInputLinksBySynapse(relSyn)
+                if(relSyn!= null && oAct.getLinksBySynapse(INPUT, relSyn)
                         .anyMatch(l -> !rel.test(iAct, l.getInput(), false))) {
                     return false;
                 }

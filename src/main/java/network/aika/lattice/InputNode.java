@@ -20,6 +20,8 @@ package network.aika.lattice;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.Provider;
+import network.aika.lattice.activation.AndActivation;
+import network.aika.lattice.activation.InputActivation;
 import network.aika.lattice.refinement.RefValue;
 import network.aika.lattice.refinement.Refinement;
 import network.aika.lattice.refinement.RelationsMap;
@@ -27,8 +29,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.activation.Activation;
-import network.aika.lattice.AndNode.AndActivation;
-import network.aika.lattice.InputNode.InputActivation;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -262,28 +262,6 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         if (in.readBoolean()) {
             inputNeuron = m.lookupNeuron(in.readInt());
-        }
-    }
-
-
-    public static class InputActivation extends NodeActivation<InputNode> {
-
-        public Activation input;
-
-        public InputActivation(Activation iAct, InputNode node) {
-            super(iAct.getDocument(), node);
-            input = iAct;
-            iAct.setOutputNodeActivation(this);
-        }
-
-        public Activation getInputActivation(int i) {
-            assert i == 0;
-            return input;
-        }
-
-
-        public String toString() {
-            return "I-ACT(" + input.getLabel() + " " + input.slotsToString() + ")";
         }
     }
 }

@@ -19,6 +19,7 @@ package network.aika.lattice;
 
 import network.aika.Document;
 import network.aika.Model;
+import network.aika.lattice.activation.OrActivation;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
@@ -101,13 +102,13 @@ public class ActivationsTest {
     }
 
 
-    private OrNode.OrActivation createActivation(Document doc, OrNode inNode) {
+    private OrActivation createActivation(Document doc, OrNode inNode) {
         Map<Integer, Position> slots = new TreeMap<>();
         slots.put(BEGIN, doc.lookupFinalPosition(0));
         slots.put(END, doc.lookupFinalPosition(1));
 
         Activation act = new Activation(doc, inNode.getOutputNeuron().get(), slots);
-        OrNode.OrActivation orAct = new OrNode.OrActivation(doc, inNode);
+        OrActivation orAct = new OrActivation(doc, inNode);
         act.setInputNodeActivation(orAct);
         orAct.setOutputAct(act);
 

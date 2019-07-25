@@ -65,19 +65,8 @@ public class SearchNode implements Comparable<SearchNode> {
     private Activation act;
     private int level;
 
-    private DebugState debugState;
-
-
-    public enum DebugState {
-        CACHED,
-        LIMITED,
-        EXPLORE
-    }
-
-
     public Branch selected = new Branch();
     public Branch excluded = new Branch();
-
 
     private double weightDelta;
     private double accumulatedWeight = 0.0;
@@ -87,7 +76,6 @@ public class SearchNode implements Comparable<SearchNode> {
     private Step step = Step.INIT;
     private Decision currentChildDecision = UNKNOWN;
 
-
     private long processVisited;
     private boolean bestPath;
     private int cachedCount = 1;
@@ -96,6 +84,9 @@ public class SearchNode implements Comparable<SearchNode> {
     // Avoids having to search the same path twice.
     private Decision skip = UNKNOWN;
 
+    private DebugState debugState;
+
+
     private enum Step {
         INIT,
         SELECT,
@@ -103,6 +94,13 @@ public class SearchNode implements Comparable<SearchNode> {
         EXCLUDE,
         POST_EXCLUDE,
         FINAL
+    }
+
+
+    public enum DebugState {
+        CACHED,
+        LIMITED,
+        EXPLORE
     }
 
 
@@ -171,29 +169,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public Activation getActivation() {
         return parent != null ? parent.act : null;
-    }
-
-
-    public void dumpDebugState() {
-        SearchNode n = this;
-        String weights = "";
-        Decision decision = UNKNOWN;
-        while (n != null && n.level >= 0) {
-            log.info(
-                    n.level + " " +
-                            n.debugState +
-                            " DECISION:" + decision +
-                            weights +
-                            " " + (n.act != null ? n.act.toString() : "") +
-                            " MOD-ACTS:" + n.modifiedActs.size()
-            );
-
-            decision = n.decision;
-            weights = " AW:" + Utils.round(n.accumulatedWeight) +
-                    " DW:" + Utils.round(n.weightDelta);
-
-            n = n.parent;
-        }
     }
 
 
@@ -374,23 +349,21 @@ public class SearchNode implements Comparable<SearchNode> {
             act.alternativeCachedWeightSum = getBranch(act.cachedDecision).weightSum;
         }
 
-        SearchNode cn = d == SELECTED ? selected.child : excluded.child;
+        Branch b = getBranch(d);
+        SearchNode cn = b.child;
         if (cn != null && cn.bestPath) {
             act.bestChildNode = cn;
             bestPath = true;
         }
 
         if(!COMPUTE_SOFT_MAX) {
-            if (!bestPath || d != SELECTED) {
-                selected.child = null;
+            if(!bestPath) {
+                b.child = null;
             }
-
-            if (!bestPath || d != EXCLUDED) {
-                excluded.child = null;
-            }
+            getBranch(d.getInverted()).child = null;
         }
 
-        return d == SELECTED ? selected.weight : excluded.weight;
+        return b.weight;
     }
 
 
@@ -402,11 +375,9 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public static void invalidateCachedDecision(Activation act) {
-        if (act != null) {
-            if (act.cachedDecision == EXCLUDED) {
-                act.cachedDecision = UNKNOWN;
-                act.repeat = true;
-            }
+        if (act != null && act.cachedDecision == EXCLUDED) {
+            act.cachedDecision = UNKNOWN;
+            act.repeat = true;
         }
 
         act.getInputLinks()
@@ -477,11 +448,6 @@ public class SearchNode implements Comparable<SearchNode> {
     }
 
 
-    public String toString() {
-        return "id:" + id + " actId:" + (act != null ? act.getId() : "-") + " Decision:" + getDecision() + " curDec:" + currentChildDecision;
-    }
-
-
     public void changeState(Activation.Mode m) {
         modifiedActs
                 .values()
@@ -501,15 +467,47 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private void storeDebugInfos() {
-        if (!selected.searched || !excluded.searched) {
-            debugState = DebugState.LIMITED;
-        } else if (getCachedDecision() != UNKNOWN) {
-            debugState = DebugState.CACHED;
-        } else {
-            debugState = DebugState.EXPLORE;
-        }
-
+        debugState = getDebugState();
         act.debugCounts[debugState.ordinal()]++;
+    }
+
+
+    private DebugState getDebugState() {
+        if (!selected.searched || !excluded.searched) {
+            return DebugState.LIMITED;
+        } else if (getCachedDecision() != UNKNOWN) {
+            return DebugState.CACHED;
+        } else {
+            return DebugState.EXPLORE;
+        }
+    }
+
+
+    public void dumpDebugState() {
+        SearchNode n = this;
+        String weights = "";
+        Decision decision = UNKNOWN;
+        while (n != null && n.level >= 0) {
+            log.info(
+                    n.level + " " +
+                            n.debugState +
+                            " DECISION:" + decision +
+                            weights +
+                            " " + (n.act != null ? n.act.toString() : "") +
+                            " MOD-ACTS:" + n.modifiedActs.size()
+            );
+
+            decision = n.decision;
+            weights = " AW:" + Utils.round(n.accumulatedWeight) +
+                    " DW:" + Utils.round(n.weightDelta);
+
+            n = n.parent;
+        }
+    }
+
+
+    public String toString() {
+        return "id:" + id + " actId:" + (act != null ? act.getId() : "-") + " Decision:" + getDecision() + " curDec:" + currentChildDecision;
     }
 
 

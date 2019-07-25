@@ -3,8 +3,8 @@ package network.aika.neuron.activation;
 import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Utils;
-import network.aika.lattice.InputNode.InputActivation;
-import network.aika.lattice.OrNode.OrActivation;
+import network.aika.lattice.activation.InputActivation;
+import network.aika.lattice.activation.OrActivation;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.neuron.INeuron.Type;
@@ -21,8 +21,8 @@ import java.util.stream.Stream;
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.activation.search.Decision.*;
-import static network.aika.neuron.activation.Linker.Direction.INPUT;
-import static network.aika.neuron.activation.Linker.Direction.OUTPUT;
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
 import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
@@ -317,15 +317,20 @@ public class Activation implements Comparable<Activation> {
         return finalOption.decision;
     }
 
-    public void addLink(Linker.Direction dir, Link l) {
+
+    public void addLink(Direction dir, Link l) {
+        getLinks(dir.getInverted()).put(l, l); // TODO: Warum inverted?
+    }
+
+
+    public TreeMap<Link, Link> getLinks(Direction dir) {
         switch(dir) {
             case INPUT:
-                outputLinks.put(l, l);
-                break;
+                return inputLinks;
             case OUTPUT:
-                inputLinks.put(l, l);
-                break;
+                return outputLinks;
         }
+        return null;
     }
 
 
@@ -337,7 +342,6 @@ public class Activation implements Comparable<Activation> {
         }
         return null;
     }
-
 
 
     public Stream<Link> getInputLinks() {
@@ -355,17 +359,8 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public Stream<Link> getInputLinksBySynapse(Synapse syn) {
-        return inputLinks.subMap(
-                new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION),
-                new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION))
-                .values()
-                .stream();
-    }
-
-
-    public Stream<Link> getOutputLinksBySynapse(Synapse syn) {
-        return outputLinks.subMap(
+    public Stream<Link> getLinksBySynapse(Direction dir, Synapse syn) {
+        return getLinks(dir).subMap(
                 new Link(syn, MIN_ACTIVATION, MIN_ACTIVATION),
                 new Link(syn, MAX_ACTIVATION, MAX_ACTIVATION))
                 .values()
