@@ -35,8 +35,8 @@ public class State {
     }
 
 
-    public boolean equals(State s) {
-        return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE && Math.abs(ub - s.ub) <= INeuron.WEIGHT_TOLERANCE;
+    public boolean equals(State s, INeuron.Type t) {
+        return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE && (t == INeuron.Type.EXCITATORY || Math.abs(ub - s.ub) <= INeuron.WEIGHT_TOLERANCE);
     }
 
 

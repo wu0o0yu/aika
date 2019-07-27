@@ -384,7 +384,7 @@ public class Activation implements Comparable<Activation> {
             saveState(sn);
         }
 
-        if (currentOption.setState(s) && !oldState.equals(s)) {
+        if (currentOption.setState(s) && !oldState.equals(s, getType())) {
             doc.getValueQueue().propagateActivationValue(this, sn);
         }
 

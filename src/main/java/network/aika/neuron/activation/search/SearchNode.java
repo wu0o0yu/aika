@@ -315,7 +315,8 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean prepareStep(Document doc, Decision d) throws OscillatingActivationsException {
-        if (OPTIMIZE_SEARCH && getCachedDecision() == d.getInverted()) {
+        if (OPTIMIZE_SEARCH && getCachedDecision() == d.getInverted() &&
+                (selected.searched || d == SELECTED)) {  // In case there is a tie between two cached conflicting activations.
             return false;
         }
         if (skip == d) {
@@ -342,7 +343,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private double finalStep() {
-        Decision d = selected.weight > excluded.weight ? SELECTED : EXCLUDED;
+        Decision d = selected.weight >= excluded.weight ? SELECTED : EXCLUDED;
 
         if (selected.searched && excluded.searched) {
             act.cachedDecision = d;
