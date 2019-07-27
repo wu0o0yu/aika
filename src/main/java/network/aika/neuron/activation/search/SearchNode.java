@@ -514,9 +514,4 @@ public class SearchNode implements Comparable<SearchNode> {
             super(message);
         }
     }
-
-
-    public interface SkipSelectStep {
-        boolean evaluate(Activation act);
-    }
 }
