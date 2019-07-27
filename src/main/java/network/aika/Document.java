@@ -56,11 +56,6 @@ public class Document implements Comparable<Document> {
     public static int MAX_ROUND = 20;
     public static int ROUND_LIMIT = -1;
 
-    /**
-     * Experimental code: not working yet!
-     */
-    public static boolean INCREMENTAL_MODE = false;
-
     private final int id;
     private final StringBuilder content;
 
@@ -107,8 +102,6 @@ public class Document implements Comparable<Document> {
 
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
-
-    private int lastProcessedActivationId = -1;
 
     private static class ActKey {
         int slot;
@@ -371,17 +364,10 @@ public class Document implements Comparable<Document> {
         TreeSet<Activation> tmp = new TreeSet<>(CANDIDATE_COMP);
         int i = 0;
 
-        if(!INCREMENTAL_MODE) {
-            candidates.clear();
-        }
-
-        for (Activation act : activationsById.subMap(INCREMENTAL_MODE ? lastProcessedActivationId : -1, false, Integer.MAX_VALUE, true).values()) {
+        for (Activation act : activationsById.values()) {
             if (act.getType() == EXCITATORY && act.getDecision() == UNKNOWN && act.getUpperBound() > 0.0) {
-                SearchNode.invalidateCachedDecision(act);
                 act.setCandidateId(i++);
                 tmp.add(act);
-
-                lastProcessedActivationId = Math.max(lastProcessedActivationId, act.getId());
             }
         }
 
@@ -429,15 +415,11 @@ public class Document implements Comparable<Document> {
 
         generateCandidates();
 
-        SearchNode rootNode = null;
-        if(selectedSearchNode == null || !INCREMENTAL_MODE) {
-            selectedSearchNode = new SearchNode(this, null, null, 0);
+        selectedSearchNode = new SearchNode(this, null, null, 0);
+        selectedSearchNode.updateActivations(this);
+        storeFinalState();
 
-            selectedSearchNode.updateActivations(this);
-            storeFinalState();
-
-            rootNode = selectedSearchNode;
-        }
+        SearchNode rootNode = selectedSearchNode;
 
         SearchNode.search(this, selectedSearchNode, visitedCounter++, timeoutInMilliSeconds);
 
