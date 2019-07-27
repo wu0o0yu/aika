@@ -565,13 +565,7 @@ public class Activation implements Comparable<Activation> {
 
 
     private State getInputState(Synapse s, Activation act, SearchNode sn) {
-        State is;
-
-        if(getType() != EXCITATORY || getDecision() != UNKNOWN) {
-            is = currentOption.getState();
-        } else {
-            is = new State(0.0, s.getLimit(), 0.0, null, 0.0);
-        }
+        State is = currentOption.getState();
 
         if(s.isNegative(CURRENT)) {
             if(!checkSelfReferencing(act)) {  // Warum greift das nicht?
