@@ -25,10 +25,7 @@ import network.aika.lattice.refinement.Refinement;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Direction;
-import network.aika.neuron.activation.Linker;
-import network.aika.neuron.activation.Position;
+import network.aika.neuron.activation.*;
 import network.aika.Document;
 import network.aika.neuron.relation.Relation;
 import org.slf4j.Logger;
@@ -107,8 +104,8 @@ public class OrNode extends Node<OrNode, OrActivation> {
     }
 
 
-    private Activation lookupActivation(OrActivation.Link ol, Predicate<Activation.Link> filter) {
-        for(Activation.Link l: ol.getInputLinks(outputNeuron)) {
+    private Activation lookupActivation(OrActivation.Link ol, Predicate<Link> filter) {
+        for(Link l: ol.getInputLinks(outputNeuron)) {
             Synapse syn = l.getSynapse();
             Map<Integer, Relation> rels = syn.getRelations();
             for(Map.Entry<Integer, Relation> me: rels.entrySet()) {

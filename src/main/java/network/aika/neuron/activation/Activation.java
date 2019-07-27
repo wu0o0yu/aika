@@ -23,8 +23,8 @@ import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.activation.search.Decision.*;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
-import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
-import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
+import static network.aika.neuron.activation.Link.INPUT_COMP;
+import static network.aika.neuron.activation.Link.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.State.ZERO;
 
@@ -336,7 +336,7 @@ public class Activation implements Comparable<Activation> {
 
     public Link getLinkBySynapseId(int synapseId) {
         for(Link l: inputLinks.values()) {
-            if(l.synapse.getId() == synapseId) {
+            if(l.getSynapse().getId() == synapseId) {
                 return l;
             }
         }
@@ -402,8 +402,8 @@ public class Activation implements Comparable<Activation> {
         Integer fired = null;
 
         for (InputState is: getInputStates(sn)) {
-            Synapse s = is.l.synapse;
-            Activation iAct = is.l.input;
+            Synapse s = is.l.getSynapse();
+            Activation iAct = is.l.getInput();
 
             if (iAct == this) continue;
 
@@ -468,12 +468,12 @@ public class Activation implements Comparable<Activation> {
         double lb = n.getTotalBias(CURRENT) + ss.getPosRecSum();
 
         for (Link l : inputLinks.values()) {
-            Synapse s = l.synapse;
+            Synapse s = l.getSynapse();
             if(s.isInactive()) {
                 continue;
             }
 
-            Activation iAct = l.input;
+            Activation iAct = l.getInput();
 
             if (iAct == this) continue;
 
@@ -515,16 +515,16 @@ public class Activation implements Comparable<Activation> {
             if(l.isInactive()) {
                 continue;
             }
-            if (lastSynapse != null && lastSynapse != l.synapse) {
+            if (lastSynapse != null && lastSynapse != l.getSynapse()) {
                 tmp.add(maxInputState);
                 maxInputState = null;
             }
 
-            State s = l.input.getInputState(l.synapse, this, sn);
+            State s = l.getInput().getInputState(l.getSynapse(), this, sn);
             if (maxInputState == null || maxInputState.s.value < s.value) {
                 maxInputState = new InputState(l, s);
             }
-            lastSynapse = l.synapse;
+            lastSynapse = l.getSynapse();
         }
         if (maxInputState != null) {
             tmp.add(maxInputState);
@@ -645,7 +645,7 @@ public class Activation implements Comparable<Activation> {
                 return false;
             }
 
-            return strongestLink.input.checkSelfReferencingRecursiveStep(act, depth + 1);
+            return strongestLink.getInput().checkSelfReferencingRecursiveStep(act, depth + 1);
         } else {
             for (Link l : inputLinks.values()) {
                 Synapse s = l.getSynapse();
@@ -684,7 +684,7 @@ public class Activation implements Comparable<Activation> {
     public List<Link> getFinalInputActivationLinks() {
         ArrayList<Link> results = new ArrayList<>();
         for (Link l : inputLinks.values()) {
-            if (l.input.isFinalActivation()) {
+            if (l.getInput().isFinalActivation()) {
                 results.add(l);
             }
         }
@@ -695,7 +695,7 @@ public class Activation implements Comparable<Activation> {
     public List<Link> getFinalOutputActivationLinks() {
         ArrayList<Link> results = new ArrayList<>();
         for (Link l : outputLinks.values()) {
-            if (l.output.isFinalActivation()) {
+            if (l.getOutput().isFinalActivation()) {
                 results.add(l);
             }
         }
@@ -726,7 +726,7 @@ public class Activation implements Comparable<Activation> {
                 .values()
                 .stream()
                 .filter(l -> !l.isRecurrent())
-                .forEach(l -> sequence = Math.max(sequence, l.input.getSequence() + 1));
+                .forEach(l -> sequence = Math.max(sequence, l.getInput().getSequence() + 1));
         return sequence;
     }
 
@@ -907,7 +907,7 @@ public class Activation implements Comparable<Activation> {
                     sb.append(", ");
                 }
 
-                sb.append(l.input.id);
+                sb.append(l.getInput().id);
 
                 first = false;
             }
@@ -920,7 +920,7 @@ public class Activation implements Comparable<Activation> {
     public String linksToString() {
         StringBuilder sb = new StringBuilder();
         for(Link l: inputLinks.values()) {
-            sb.append("  " + l.input.getLabel() + "  W:" + l.synapse.getWeight() + "\n");
+            sb.append("  " + l.getInput().getLabel() + "  W:" + l.getSynapse().getWeight() + "\n");
         }
 
         return sb.toString();
@@ -936,72 +936,6 @@ public class Activation implements Comparable<Activation> {
 
         if (sn.getModifiedActivations() != null) {
             sn.getModifiedActivations().put(currentOption.act, currentOption);
-        }
-    }
-
-
-    /**
-     * The {@code SynapseActivation} mirror the synapse link in the network of activations.
-     */
-    public static class Link {
-        private final Synapse synapse;
-        private final Activation input;
-        private final Activation output;
-
-        public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
-            int r = Synapse.INPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
-            if (r != 0) return r;
-            return Integer.compare(l1.input.id, l2.input.id);
-        };
-
-        public static Comparator<Link> OUTPUT_COMP = (l1, l2) -> {
-            int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
-            if (r != 0) return r;
-            return Integer.compare(l1.output.id, l2.output.id);
-        };
-
-
-        public Link(Synapse s, Activation input, Activation output) {
-            this.synapse = s;
-            this.input = input;
-            this.output = output;
-        }
-
-        public Synapse getSynapse() {
-            return synapse;
-        }
-
-        public Activation getInput() {
-            return input;
-        }
-
-        public Activation getOutput() {
-            return output;
-        }
-
-        public boolean isRecurrent() {
-            return synapse.isRecurrent();
-        }
-
-        public boolean isIdentity() {
-            return synapse.isIdentity();
-        }
-
-        public boolean isNegative(Synapse.State s) {
-            return synapse.isNegative(s);
-        }
-
-        public boolean isInactive() {
-            return synapse.isInactive();
-        }
-
-        public void link() {
-            input.addLink(INPUT, this);
-            output.addLink(OUTPUT, this);
-        }
-
-        public String toString() {
-            return synapse + ": " + input + " --> " + output;
         }
     }
 

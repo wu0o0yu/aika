@@ -2,8 +2,6 @@ package network.aika.neuron.activation;
 
 import java.util.ArrayDeque;
 
-import network.aika.neuron.activation.Activation.Link;
-
 
 public class UpperBoundQueue {
     private final ArrayDeque<Activation> queue = new ArrayDeque<>();

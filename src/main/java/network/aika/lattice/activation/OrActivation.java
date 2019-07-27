@@ -75,13 +75,13 @@ public class OrActivation extends NodeActivation<OrNode> {
         }
 
 
-        public Collection<Activation.Link> getInputLinks(Neuron n) {
-            List<Activation.Link> inputActs = new ArrayList<>();
+        public Collection<network.aika.neuron.activation.Link> getInputLinks(Neuron n) {
+            List<network.aika.neuron.activation.Link> inputActs = new ArrayList<>();
             for (int i = 0; i < size(); i++) {
                 int synId = get(i);
                 Synapse s = n.getSynapseById(synId);
                 Activation iAct = input.getInputActivation(i);
-                inputActs.add(new Activation.Link(s, iAct, null));
+                inputActs.add(new network.aika.neuron.activation.Link(s, iAct, null));
             }
             return inputActs;
         }

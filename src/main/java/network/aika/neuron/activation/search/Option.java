@@ -2,14 +2,15 @@ package network.aika.neuron.activation.search;
 
 import network.aika.Utils;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.State;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static network.aika.Document.MAX_ROUND;
-import static network.aika.neuron.activation.Activation.Link.INPUT_COMP;
-import static network.aika.neuron.activation.Activation.Link.OUTPUT_COMP;
+import static network.aika.neuron.activation.Link.INPUT_COMP;
+import static network.aika.neuron.activation.Link.OUTPUT_COMP;
 import static network.aika.neuron.activation.search.Decision.UNKNOWN;
 
 
@@ -33,8 +34,8 @@ public class Option implements Comparable<Option> {
     public int cacheFactor = 1;
     public double p;
 
-    public Map<Activation.Link, Option> inputOptions = new TreeMap<>(INPUT_COMP);
-    public Map<Activation.Link, Option> outputOptions = new TreeMap<>(OUTPUT_COMP); // TODO:
+    public Map<Link, Option> inputOptions = new TreeMap<>(INPUT_COMP);
+    public Map<Link, Option> outputOptions = new TreeMap<>(OUTPUT_COMP); // TODO:
 
     private boolean isQueued;
 
@@ -104,7 +105,7 @@ public class Option implements Comparable<Option> {
 
 
     public void link() {
-        for(Activation.Link l: act.getInputLinks().collect(Collectors.toList())) {
+        for(Link l: act.getInputLinks().collect(Collectors.toList())) {
             Activation iAct = l.getInput();
             if(iAct.currentOption != null && iAct.currentOption.decision != UNKNOWN && iAct.currentOption.isActive()) {
                 link(l, iAct.currentOption);
@@ -118,7 +119,7 @@ public class Option implements Comparable<Option> {
     }
 
 
-    public void link(Activation.Link l, Option in) {
+    public void link(Link l, Option in) {
         inputOptions.put(l, in);
         in.outputOptions.put(l, this);
     }
