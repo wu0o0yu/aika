@@ -81,7 +81,7 @@ public class AsymmetricConflictTest {
         Document doc = new Document(m, "X ");
 
         in.addInput(doc, 0, 1);
-//        inNeg.addInput(doc, 0, 1);
+        inNeg.addInput(doc, 0, 1);
 
         doc.process();
 
