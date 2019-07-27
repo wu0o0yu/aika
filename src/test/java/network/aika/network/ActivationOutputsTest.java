@@ -19,12 +19,10 @@ package network.aika.network;
 
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.lattice.Node;
+import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;

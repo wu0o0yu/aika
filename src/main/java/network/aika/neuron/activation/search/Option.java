@@ -2,15 +2,15 @@ package network.aika.neuron.activation.search;
 
 import network.aika.Utils;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.State;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static network.aika.Document.MAX_ROUND;
-import static network.aika.neuron.activation.Link.INPUT_COMP;
-import static network.aika.neuron.activation.Link.OUTPUT_COMP;
+import static network.aika.neuron.activation.link.Link.INPUT_COMP;
+import static network.aika.neuron.activation.link.Link.OUTPUT_COMP;
 import static network.aika.neuron.activation.search.Decision.UNKNOWN;
 
 

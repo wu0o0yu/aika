@@ -27,6 +27,8 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.Document;
+import network.aika.neuron.activation.link.Direction;
+import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.relation.Relation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

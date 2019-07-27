@@ -19,8 +19,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Document;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.relation.Relation;
 import network.aika.Writable;
 

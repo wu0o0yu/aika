@@ -26,6 +26,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 import network.aika.neuron.activation.Position;
+import network.aika.neuron.activation.link.Linker;
 import network.aika.neuron.activation.search.SearchNode;
 import network.aika.neuron.activation.search.SearchNode.TimeoutException;
 import network.aika.neuron.activation.*;

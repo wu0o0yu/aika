@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.activation.link;
 
 import network.aika.Document;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
 
@@ -26,7 +27,7 @@ import java.util.*;
 
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.link.Direction.INPUT;
 
 /**
  * The {@code Linker} class is responsible for for the linkage of neuron activations. These links mirror the synapses between

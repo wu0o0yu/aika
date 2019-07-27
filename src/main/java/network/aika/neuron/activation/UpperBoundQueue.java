@@ -1,5 +1,7 @@
 package network.aika.neuron.activation;
 
+import network.aika.neuron.activation.link.Link;
+
 import java.util.ArrayDeque;
 
 

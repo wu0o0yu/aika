@@ -1,11 +1,12 @@
-package network.aika.neuron.activation;
+package network.aika.neuron.activation.link;
 
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 
 import java.util.Comparator;
 
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
+import static network.aika.neuron.activation.link.Direction.INPUT;
+import static network.aika.neuron.activation.link.Direction.OUTPUT;
 
 
 public class Link {

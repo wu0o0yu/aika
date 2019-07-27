@@ -1,4 +1,4 @@
-package network.aika.neuron.activation;
+package network.aika.neuron.activation.link;
 
 
 public enum Direction {

@@ -7,7 +7,7 @@ import network.aika.lattice.refinement.OrEntry;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Linker;
+import network.aika.neuron.activation.link.Linker;
 
 import java.util.*;
 
@@ -75,13 +75,13 @@ public class OrActivation extends NodeActivation<OrNode> {
         }
 
 
-        public Collection<network.aika.neuron.activation.Link> getInputLinks(Neuron n) {
-            List<network.aika.neuron.activation.Link> inputActs = new ArrayList<>();
+        public Collection<network.aika.neuron.activation.link.Link> getInputLinks(Neuron n) {
+            List<network.aika.neuron.activation.link.Link> inputActs = new ArrayList<>();
             for (int i = 0; i < size(); i++) {
                 int synId = get(i);
                 Synapse s = n.getSynapseById(synId);
                 Activation iAct = input.getInputActivation(i);
-                inputActs.add(new network.aika.neuron.activation.Link(s, iAct, null));
+                inputActs.add(new network.aika.neuron.activation.link.Link(s, iAct, null));
             }
             return inputActs;
         }
