@@ -35,8 +35,17 @@ public class State {
     }
 
 
-    public boolean equals(State s, INeuron.Type t) {
-        return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE && (t == INeuron.Type.EXCITATORY || Math.abs(ub - s.ub) <= INeuron.WEIGHT_TOLERANCE);
+    public boolean equals(State s) {
+        return lowerBoundEquals(s) && upperBoundEquals(s);
+    }
+
+
+    public boolean lowerBoundEquals(State s) {
+        return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE;
+    }
+
+    public boolean upperBoundEquals(State s) {
+        return Math.abs(ub - s.ub) <= INeuron.WEIGHT_TOLERANCE;
     }
 
 
@@ -51,6 +60,6 @@ public class State {
 
 
     public String toString() {
-        return "V:" + Utils.round(value) + " UB:" + Utils.round(ub) + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
+        return "V:" + Utils.round(value) + " UB:" + (ub == Double.MAX_VALUE ? "MAX" : Utils.round(ub)) + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
     }
 }

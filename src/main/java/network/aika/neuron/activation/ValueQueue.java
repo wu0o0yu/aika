@@ -14,8 +14,12 @@ public class ValueQueue {
     private final ArrayDeque<Activation> queue = new ArrayDeque<>();
 
 
-    public void propagateActivationValue(Activation act, SearchNode sn)  {
+    public void propagateActivationValue(Activation act, SearchNode sn, boolean lowerBoundChange, boolean upperBoundChange)  {
+        if(!lowerBoundChange && !upperBoundChange)
+            return;
+
         act.getOutputLinks()
+                .filter(l -> l.getOutput().needsPropagation(sn, lowerBoundChange, upperBoundChange))
                 .forEach(l -> add(l.getOutput(), sn));
     }
 

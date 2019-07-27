@@ -410,7 +410,7 @@ public class Document implements Comparable<Document> {
         linker.lateLinking();
 
         inputNeuronActivations.forEach(act -> {
-            valueQueue.propagateActivationValue(act, null);
+            valueQueue.propagateActivationValue(act, null, true, true);
         });
 
         generateCandidates();

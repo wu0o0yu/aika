@@ -384,8 +384,8 @@ public class Activation implements Comparable<Activation> {
             saveState(sn);
         }
 
-        if (currentOption.setState(s) && !oldState.equals(s, getType())) {
-            doc.getValueQueue().propagateActivationValue(this, sn);
+        if (currentOption.setState(s)) {
+            doc.getValueQueue().propagateActivationValue(this, sn, !oldState.lowerBoundEquals(s), !oldState.upperBoundEquals(s));
         }
 
         return s.weight - oldState.weight;
@@ -431,7 +431,7 @@ public class Activation implements Comparable<Activation> {
         double w = Math.min(-ss.getNegRecSum(), net);
 
         // Compute only the recurrent part is above the threshold.
-        double newWeight = getDecision() == SELECTED ? Math.max(0.0, w) : 0.0;  // TODO: Prüfen!
+        double newWeight = getNextDecision(currentOption, sn) == SELECTED ? Math.max(0.0, w) : 0.0;  // TODO: Prüfen!
 
         return new State(
                 actValue,
@@ -568,7 +568,7 @@ public class Activation implements Comparable<Activation> {
         State is = currentOption.getState();
 
         if(s.isNegative(CURRENT)) {
-            if(!checkSelfReferencing(act)) {  // Warum greift das nicht?
+            if(!checkSelfReferencing(act)) {
                 is = new State(is.ub, is.value, 0.0, null, 0.0);
             } else {
                 is = ZERO;
@@ -586,6 +586,21 @@ public class Activation implements Comparable<Activation> {
             }
         }
         return null;
+    }
+
+
+    public boolean needsPropagation(SearchNode sn, boolean lowerBoundChange, boolean upperBoundChange) {
+        if(getType() == INHIBITORY) {
+            return upperBoundChange || lowerBoundChange;
+        } else if(getType() == EXCITATORY) {
+           Decision nd = getNextDecision(currentOption, sn);
+            if(nd == SELECTED) {
+                return upperBoundChange;
+            } else if(nd == EXCLUDED) {
+                return lowerBoundChange;
+            }
+        }
+        return false;
     }
 
 
