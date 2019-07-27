@@ -54,8 +54,6 @@ public class Model {
 
     public SuspensionHook suspensionHook;
 
-    public SearchNode.SkipSelectStep skipSelectStep = (act) -> false;
-
     public AtomicInteger docIdCounter = new AtomicInteger(0);
     public AtomicInteger currentId = new AtomicInteger(0);
 
@@ -93,15 +91,6 @@ public class Model {
 
     public void setSuspensionHook(SuspensionHook suspensionHook) {
         this.suspensionHook = suspensionHook;
-    }
-
-
-    public SearchNode.SkipSelectStep getSkipSelectStep() {
-        return skipSelectStep;
-    }
-
-    public void setSkipSelectStep(SearchNode.SkipSelectStep skipSelectStep) {
-        this.skipSelectStep = skipSelectStep;
     }
 
 

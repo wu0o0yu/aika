@@ -322,9 +322,6 @@ public class SearchNode implements Comparable<SearchNode> {
         if (skip == d) {
             return false;
         }
-        if (doc.getModel().getSkipSelectStep().evaluate(act)) {
-            return false;
-        }
 
         SearchNode child = new SearchNode(doc, d, this, level + 1);
 
