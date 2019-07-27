@@ -1,6 +1,9 @@
 package network.aika;
 
-
+/**
+ *
+ * @author Lukas Molzberger
+ */
 public enum ActivationFunction {
 
     NULL_FUNCTION(x -> 0.0),

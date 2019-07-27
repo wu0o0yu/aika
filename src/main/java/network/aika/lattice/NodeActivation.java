@@ -25,6 +25,10 @@ import network.aika.neuron.activation.Activation;
 import java.util.*;
 
 
+/**
+ *
+ * @author Lukas Molzberger
+ */
 public abstract class NodeActivation<T extends Node> implements Comparable<NodeActivation<T>> {
 
     public final int id;

@@ -6,7 +6,10 @@ import java.lang.ref.WeakReference;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-
+/**
+ *
+ * @author Lukas Molzberger
+ */
 public class Provider<T extends AbstractNode> implements Comparable<Provider<?>> {
 
     protected Model model;
