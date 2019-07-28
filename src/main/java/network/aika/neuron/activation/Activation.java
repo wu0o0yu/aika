@@ -538,11 +538,6 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public ActivationFunction getActivationFunction() {
-        return getINeuron().getActivationFunction();
-    }
-
-
     public void setInputState(Builder input) {
         rootOption.decision = SELECTED;
         rootOption.p = 1.0;
