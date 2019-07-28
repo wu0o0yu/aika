@@ -449,7 +449,7 @@ public class Activation implements Comparable<Activation> {
                 actValue,
                 actUBValue,
                 net,
-                net > 0.0 ? fired + (getType() == EXCITATORY ? 1 : 0) : null,
+                net > 0.0 ? (fired != null ? fired : 0) + (getType() == EXCITATORY ? 1 : 0) : null,
                 newWeight
         );
     }
