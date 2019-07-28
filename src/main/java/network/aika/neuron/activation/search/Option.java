@@ -22,6 +22,10 @@ import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.State;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static network.aika.Document.MAX_ROUND;
@@ -50,6 +54,7 @@ public class Option implements Comparable<Option> {
     public Decision decision;
 
     public double weight;
+    public double remainingWeight;
     public int cacheFactor = 1;
     public double p;
 
@@ -151,6 +156,24 @@ public class Option implements Comparable<Option> {
 
     public Activation getAct() {
         return act;
+    }
+
+
+    public void computeRemainingWeight() {
+        double sum = 0.0;
+        for(Option c: children) {
+            sum += c.weight;
+        }
+
+        remainingWeight = weight - sum;
+    }
+
+
+    public void traverse(Consumer<Option> f) {
+        for(Option c: children) {
+            c.traverse(f);
+            f.accept(c);
+        }
     }
 
 

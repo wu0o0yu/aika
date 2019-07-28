@@ -27,6 +27,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.link.Linker;
+import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.activation.search.SearchNode;
 import network.aika.neuron.activation.search.SearchNode.TimeoutException;
 import network.aika.neuron.activation.*;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 
 import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.activation.Activation.CANDIDATE_COMP;
+import static network.aika.neuron.activation.search.Decision.SELECTED;
 import static network.aika.neuron.activation.search.Decision.UNKNOWN;
 
 
@@ -445,24 +447,9 @@ public class Document implements Comparable<Document> {
 
 
     private void computeSoftMax() {
-/*        for (Activation act : activationsById.values()) {
-            double offset = Double.MAX_VALUE;
-            for (Option option : act.getOptions()) {
-                offset = Math.min(offset, Math.log(option.cacheFactor) + option.weight);
-            }
-
-            double norm = 0.0;
-            for (Option option : act.getOptions()) {
-                norm += Math.exp(Math.log(option.cacheFactor) + option.weight - offset);
-            }
-
-            for (Option option : act.getOptions()) {
-                if (option.decision == SELECTED) {
-                    option.p = Math.exp(Math.log(option.cacheFactor) + option.weight - offset) / norm;
-                }
-            }
+        for (Activation act : activationsById.values()) {
+            act.computeSoftMax();
         }
-        */
     }
 
 

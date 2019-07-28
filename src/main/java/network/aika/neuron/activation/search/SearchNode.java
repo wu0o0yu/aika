@@ -233,7 +233,6 @@ public class SearchNode implements Comparable<SearchNode> {
                     returnWeight = sn.finalStep();
                     returnWeightSum = sn.getWeightSum();
 
-                    sn.currentChildDecision = UNKNOWN;
                     sn = sn.parent;
                     break;
                 default:
@@ -318,8 +317,6 @@ public class SearchNode implements Comparable<SearchNode> {
         }
 
         act.debugDecisionCounts[d.ordinal()]++;
-
-        currentChildDecision = d;
 
         return true;
     }

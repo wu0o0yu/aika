@@ -777,6 +777,23 @@ public class Activation implements Comparable<Activation> {
     }
 
 
+    public void computeSoftMax() {
+        rootOption.traverse((o) -> o.computeRemainingWeight());
+
+        final double[] offset = new double[] {Double.MAX_VALUE};
+        rootOption.traverse(o -> offset[0] = Math.min(offset[0], Math.log(o.cacheFactor) + o.remainingWeight));
+
+        final double[] norm = new double[] {0.0};
+        rootOption.traverse(o -> norm[0] += Math.log(o.cacheFactor) + o.remainingWeight - offset[0]);
+
+        rootOption.traverse(o -> {
+            if (o.decision == SELECTED) {
+                o.p = Math.exp(Math.log(o.cacheFactor) + o.remainingWeight - offset[0]) / norm[0];
+            }
+        });
+    }
+
+
     public String toString() {
         return id + " " + getNeuron().getId() + ":" + getINeuron().typeToString() + " " + getLabel() + " " + slotsToString() + " " + identityToString() + " - " +
                 " UB:" + Utils.round(upperBound) +
