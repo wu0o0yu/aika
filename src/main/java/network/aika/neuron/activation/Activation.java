@@ -437,20 +437,12 @@ public class Activation implements Comparable<Activation> {
             netUB += x;
         }
 
-        double actValue = n.getActivationFunction().f(net);
-        double actUBValue = n.getActivationFunction().f(netUB);
-
-        double w = Math.min(-ss.getNegRecSum(), net);
-
-        // Compute only the recurrent part is above the threshold.
-        double newWeight = getNextDecision(currentOption, sn) == SELECTED ? Math.max(0.0, w) : 0.0;  // TODO: Prüfen!
-
         return new State(
-                actValue,
-                actUBValue,
+                n.getActivationFunction().f(net),
+                n.getActivationFunction().f(netUB),
                 net,
                 net > 0.0 ? (fired != null ? fired : 0) + (getType() == EXCITATORY ? 1 : 0) : null,
-                newWeight
+                Math.max(0.0, Math.min(-ss.getNegRecSum(), net))
         );
     }
 
