@@ -81,9 +81,6 @@ public class SearchNode implements Comparable<SearchNode> {
     private int cachedCount = 1;
     private int cachedFactor = 1;
 
-    // Avoids having to search the same path twice.
-    private Decision skip = UNKNOWN;
-
     private DebugState debugState;
 
 
@@ -129,16 +126,12 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public void updateActivations(Document doc) throws OscillatingActivationsException {
-        Activation parentAct = parent != null ? parent.act : null;
-
-        if (parentAct != null) {
-            parentAct.currentSearchNode = this;
-        }
+        Activation act = getActivation();
 
         weightDelta = doc.getValueQueue().process(this);
 
-        if (parentAct != null && followPath()) {
-            parentAct.cachedSearchNode = this;
+        if (act != null && followPath()) {
+            act.cachedSearchNode = this;
         }
 
         if (parent != null) {
@@ -209,8 +202,6 @@ public class SearchNode implements Comparable<SearchNode> {
                     }
                     break;
                 case SELECT:
-                    sn.act.repeat = false;
-
                     if (sn.prepareStep(doc, SELECTED)) {
                         sn.step = Step.POST_SELECT;
                         sn = sn.selected.child; // Recursive Step
@@ -222,7 +213,7 @@ public class SearchNode implements Comparable<SearchNode> {
                 case POST_SELECT:
                     sn.selected.postStep(returnWeight, returnWeightSum);
 
-                    sn.step = Step.EXCLUDE;
+                    sn.step = Step.SELECT;
                     break;
                 case EXCLUDE:
                     if (sn.prepareStep(doc, EXCLUDED)) {
@@ -236,23 +227,14 @@ public class SearchNode implements Comparable<SearchNode> {
                 case POST_EXCLUDE:
                     sn.excluded.postStep(returnWeight, returnWeightSum);
 
-                    sn.step = Step.FINAL;
+                    sn.step = Step.SELECT;
                     break;
                 case FINAL:
-                    if (sn.act.repeat && OPTIMIZE_SEARCH) {
-                        sn.step = Step.SELECT;
-                        sn.selected.searched = false;
-                    } else {
-                        returnWeight = sn.finalStep();
-                        returnWeightSum = sn.getWeightSum();
+                    returnWeight = sn.finalStep();
+                    returnWeightSum = sn.getWeightSum();
 
-                        sn.currentChildDecision = UNKNOWN;
-                        SearchNode pn = sn.parent;
-                        if (pn != null) {
-                            pn.skip = sn.decision;
-                        }
-                        sn = pn;
-                    }
+                    sn.currentChildDecision = UNKNOWN;
+                    sn = sn.parent;
                     break;
                 default:
             }
@@ -315,17 +297,21 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     private boolean prepareStep(Document doc, Decision d) throws OscillatingActivationsException {
-        if (OPTIMIZE_SEARCH && getCachedDecision() == d.getInverted() &&
-                (selected.searched || d == SELECTED)) {  // In case there is a tie between two cached conflicting activations.
+        Branch b = getBranch(d);
+
+        if(b.visited) {
             return false;
         }
-        if (skip == d) {
+        b.visited = true;
+
+        if (OPTIMIZE_SEARCH && getCachedDecision() == d.getInverted() &&
+                (selected.searched || d == SELECTED)) {  // In case there is a tie between two cached conflicting activations.
             return false;
         }
 
         SearchNode child = new SearchNode(doc, d, this, level + 1);
 
-        if (getBranch(d).prepareStep(doc, child)) return false;
+        if (b.prepareStep(doc, child)) return false;
 
         if (d == SELECTED && act.cachedDecision == UNKNOWN) {
             invalidateCachedDecisions();
@@ -375,7 +361,11 @@ public class SearchNode implements Comparable<SearchNode> {
     public static void invalidateCachedDecision(Activation act) {
         if (act != null && act.cachedDecision == EXCLUDED) {
             act.cachedDecision = UNKNOWN;
-            act.repeat = true;
+
+            SearchNode pn = act.cachedSearchNode.parent;
+            if(pn != null) {
+                pn.selected.repeat();
+            }
         }
 
         act.getInputLinks()

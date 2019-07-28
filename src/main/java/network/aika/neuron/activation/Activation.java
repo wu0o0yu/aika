@@ -103,15 +103,11 @@ public class Activation implements Comparable<Activation> {
 
     public boolean blocked;
 
-
-    public SearchNode currentSearchNode;
-
     /**
      * The cached decision is used to avoid having to explore the same currentSearchState twice even though nothing that
      * influences this currentSearchState has changed.
      */
     public Decision cachedDecision = UNKNOWN;
-    public boolean repeat = false;
     public double alternativeCachedWeightSum;
 
     /**
@@ -796,7 +792,6 @@ public class Activation implements Comparable<Activation> {
                 getNeuron().getId() + ":" +
                 getLabel() + " " +
                 " CD:" + cachedDecision +
-                " REPEAT:" + repeat +
                 " LIMITED:" + debugCounts[SearchNode.DebugState.LIMITED.ordinal()] +
                 " CACHED:" + debugCounts[SearchNode.DebugState.CACHED.ordinal()] +
                 " EXPLORE:" + debugCounts[SearchNode.DebugState.EXPLORE.ordinal()] +

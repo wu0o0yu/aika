@@ -25,6 +25,7 @@ import network.aika.neuron.activation.Activation;
  * @author Lukas Molzberger
  */
 public class Branch {
+    boolean visited;
     boolean searched;
     double weight = 0.0;
     double weightSum = 0.0;
@@ -51,5 +52,10 @@ public class Branch {
 
         child.setWeight(returnWeightSum);
         child.changeState(Activation.Mode.OLD);
+    }
+
+    public void repeat() {
+        visited = false;
+        searched = false;
     }
 }
