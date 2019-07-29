@@ -121,8 +121,6 @@ public class Activation implements Comparable<Activation> {
     public int[] debugDecisionCounts = new int[3];
 
 
-
-
     public static Comparator<Activation> CANDIDATE_COMP = (act1, act2) -> {
         Iterator<Map.Entry<Integer, Position>> ita = act1.getSlots().entrySet().iterator();
         Iterator<Map.Entry<Integer, Position>> itb = act2.getSlots().entrySet().iterator();
