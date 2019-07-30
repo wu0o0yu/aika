@@ -78,6 +78,8 @@ public class AncestorRelationTest {
 
         Activation outC1 = outC.getActivation(doc, 0, 1, false);
 
+        doc.process();
+
         System.out.println(doc.activationsToString());
 
         Assert.assertNotNull(outC1);
@@ -247,6 +249,8 @@ public class AncestorRelationTest {
         inB.addInput(doc, 0, 1);
 
         Activation outC1 = outC.getActivation(doc, 0, 1, false);
+
+        doc.process();
 
         System.out.println(doc.activationsToString());
 

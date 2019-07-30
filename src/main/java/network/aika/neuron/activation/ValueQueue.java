@@ -1,69 +1,74 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package network.aika.neuron.activation;
 
-import network.aika.Document;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.TreeSet;
+import java.util.ArrayDeque;
+
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
+import network.aika.neuron.activation.search.SearchNode;
 
+import static network.aika.neuron.INeuron.Type.EXCITATORY;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.activation.search.Decision.UNKNOWN;
+
+
+/**
+ *
+ * @author Lukas Molzberger
+ */
 public class ValueQueue {
-    private final ArrayList<TreeSet<Activation>> queue = new ArrayList<>();
-
-    private static Comparator<Activation> VALUE_QUEUE_COMP = (a, b) -> {
-        int r = Integer.compare(a.getSequence(), b.getSequence());
-        if(r != 0) return r;
-        return Integer.compare(a.getId(), b.getId());
-    };
+    private final ArrayDeque<Activation> queue = new ArrayDeque<>();
 
 
-    public void propagateActivationValue(int round, Activation act)  {
+    public void propagateActivationValue(Activation act, SearchNode sn, boolean lowerBoundChange, boolean upperBoundChange)  {
+        if(!lowerBoundChange && !upperBoundChange)
+            return;
+
         act.getOutputLinks()
-                .forEach(l -> add(l.isRecurrent() ? round + 1 : round, l.getOutput()));
+                .filter(l -> l.getOutput().needsPropagation(sn, lowerBoundChange, upperBoundChange))
+                .forEach(l -> add(l.getOutput(), sn));
     }
 
 
-    private void add(Activation act) {
-        if(act == null) return;
+    public void add(Activation act, SearchNode sn) {
+        if(act == null || act.currentOption.isQueued()) return;
 
-        add(0, act);
-        act.getOutputLinks()
-                .filter(l -> l.isRecurrent())
-                .forEach(l -> add(0, l.getOutput()));
-    }
+        if(act.getNextDecision(act.currentOption, sn) == UNKNOWN && act.getType() == EXCITATORY) return;
 
-
-    public void add(int round, Activation act) {
-        if(act.rounds.isQueued(round) || act.decision == SearchNode.Decision.UNKNOWN) return;
-
-        TreeSet<Activation> q;
-        if(round < queue.size()) {
-            q = queue.get(round);
+        if(act.getType() == INHIBITORY) {
+            queue.addFirst(act);
         } else {
-            assert round == queue.size();
-            q = new TreeSet<>(VALUE_QUEUE_COMP);
-            queue.add(q);
+            queue.addLast(act);
         }
 
-        act.rounds.setQueued(round, true);
-        q.add(act);
+        act.currentOption.setQueued(true);
     }
 
 
-    public double process(Document doc, SearchNode sn) throws OscillatingActivationsException {
-        long v = doc.getNewVisitedId();
-
-        add(sn.getActivation());
+    public double process(SearchNode sn) throws OscillatingActivationsException {
+        add(sn.getActivation(), sn);
 
         double delta = 0.0;
-        for(int round = 0; round < queue.size(); round++) {
-            TreeSet<Activation> q = queue.get(round);
-            while (!q.isEmpty()) {
-                Activation act = q.pollFirst();
-                act.rounds.setQueued(round, false);
+        while (!queue.isEmpty()) {
+            Activation act = queue.pollFirst();
+            act.currentOption.setQueued(false);
 
-                delta += act.process(sn, round, v);
-            }
+            delta += act.process(sn);
         }
         return delta;
     }

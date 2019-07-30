@@ -14,45 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
-
+package network.aika.neuron.activation.link;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Utils {
+public enum Direction {
+    INPUT,
+    OUTPUT;
 
-
-    public static double round(double x) {
-        return Math.round(x * 1000.0) / 1000.0;
-    }
-
-
-    public static String collapseText(String txt, int length) {
-        if (txt.length() <= 2 * length) {
-            return txt;
-        } else {
-            return txt.substring(0, length) + "..." + txt.substring(txt.length() - length);
+    public Direction getInverted() {
+        switch (this) {
+            case INPUT:
+                return OUTPUT;
+            case OUTPUT:
+                return INPUT;
         }
-    }
-
-
-    public static String addPadding(String s, int targetSize) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(s);
-        for(int i = s.length(); i < targetSize; i++) {
-            sb.append(' ');
-        }
-
-        return sb.toString();
-    }
-
-
-    public static Integer max(Integer a, Integer b) {
-        if(a == null) return b;
-        if(b == null) return a;
-
-        return Math.max(a, b);
+        return null;
     }
 }

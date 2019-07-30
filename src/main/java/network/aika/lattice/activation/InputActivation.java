@@ -14,45 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.lattice.activation;
 
+import network.aika.lattice.InputNode;
+import network.aika.lattice.NodeActivation;
+import network.aika.neuron.activation.Activation;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Utils {
+public class InputActivation extends NodeActivation<InputNode> {
 
+    public Activation input;
 
-    public static double round(double x) {
-        return Math.round(x * 1000.0) / 1000.0;
+    public InputActivation(Activation iAct, InputNode node) {
+        super(iAct.getDocument(), node);
+        input = iAct;
+        iAct.setOutputNodeActivation(this);
+    }
+
+    public Activation getInputActivation(int i) {
+        assert i == 0;
+        return input;
     }
 
 
-    public static String collapseText(String txt, int length) {
-        if (txt.length() <= 2 * length) {
-            return txt;
-        } else {
-            return txt.substring(0, length) + "..." + txt.substring(txt.length() - length);
-        }
-    }
-
-
-    public static String addPadding(String s, int targetSize) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(s);
-        for(int i = s.length(); i < targetSize; i++) {
-            sb.append(' ');
-        }
-
-        return sb.toString();
-    }
-
-
-    public static Integer max(Integer a, Integer b) {
-        if(a == null) return b;
-        if(b == null) return a;
-
-        return Math.max(a, b);
+    public String toString() {
+        return "I-ACT(" + input.getLabel() + " " + input.slotsToString() + ")";
     }
 }

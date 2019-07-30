@@ -17,6 +17,9 @@
 package network.aika.lattice;
 
 import network.aika.Document;
+import network.aika.lattice.refinement.RefValue;
+import network.aika.lattice.refinement.Refinement;
+import network.aika.lattice.refinement.RelationsMap;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.neuron.Synapse;
@@ -256,8 +259,8 @@ public class Converter {
 
             NodeContext nln = new NodeContext();
             nln.offsets = new Synapse[nc.offsets.length + 1];
-            AndNode.Refinement ref = new AndNode.Refinement(new AndNode.RelationsMap(relations), s.getInput().get().getOutputNode());
-            AndNode.RefValue rv = nc.node.expand(threadId, doc, ref);
+            Refinement ref = new Refinement(new RelationsMap(relations), s.getInput().get().getOutputNode());
+            RefValue rv = nc.node.expand(threadId, doc, ref);
             if(rv == null) {
                 return null;
             }

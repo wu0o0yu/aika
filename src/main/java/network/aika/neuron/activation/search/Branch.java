@@ -14,45 +14,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.neuron.activation.search;
+
+import network.aika.Document;
+import network.aika.neuron.activation.Activation;
 
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Utils {
+public class Branch {
+    boolean visited;
+    boolean searched;
+    double weight = 0.0;
+    double weightSum = 0.0;
 
+    SearchNode child = null;
 
-    public static double round(double x) {
-        return Math.round(x * 1000.0) / 1000.0;
-    }
+    public boolean prepareStep(Document doc, SearchNode c) {
+        child = c;
 
+        child.updateActivations(doc);
 
-    public static String collapseText(String txt, int length) {
-        if (txt.length() <= 2 * length) {
-            return txt;
-        } else {
-            return txt.substring(0, length) + "..." + txt.substring(txt.length() - length);
-        }
-    }
-
-
-    public static String addPadding(String s, int targetSize) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(s);
-        for(int i = s.length(); i < targetSize; i++) {
-            sb.append(' ');
+        if (!child.followPath()) {
+            return true;
         }
 
-        return sb.toString();
+        searched = true;
+        return false;
     }
 
 
-    public static Integer max(Integer a, Integer b) {
-        if(a == null) return b;
-        if(b == null) return a;
+    public void postStep(double returnWeight, double returnWeightSum) {
+        weight = returnWeight;
+        weightSum = returnWeightSum;
 
-        return Math.max(a, b);
+        child.setWeight(returnWeightSum);
+        child.changeState(Activation.Mode.OLD);
+    }
+
+    public void repeat() {
+        visited = false;
+        searched = false;
     }
 }

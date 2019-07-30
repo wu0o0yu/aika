@@ -19,7 +19,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Document;
-import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.relation.Relation;
 import network.aika.Writable;
 
@@ -196,6 +196,8 @@ public class Synapse implements Writable {
     }
 
     public void link() {
+        verify();
+
         INeuron in = input.get();
         INeuron out = output.get();
 
@@ -261,6 +263,13 @@ public class Synapse implements Writable {
     }
 
 
+    private void verify() {
+        if((isRecurrent || isNegative(CURRENT)) && output.getType() == INHIBITORY) {
+            throw new InvalidInhibitoryNeuronSynapse();
+        }
+    }
+
+
     private void removeLinkInternal(INeuron in, INeuron out) {
         if(out.getType() == EXCITATORY) {
             if(out.inputSynapses.remove(this) != null) {
@@ -302,7 +311,7 @@ public class Synapse implements Writable {
         return Math.abs(weight) < TOLERANCE;
     }
 
-    public double computeRelationWeights(Activation.Link l) {
+    public double computeRelationWeights(Link l) {
         return 0;
     }
 
@@ -559,5 +568,12 @@ public class Synapse implements Writable {
 
     public interface SynapseFactory {
         Synapse createSynapse(Neuron input, Neuron output, Integer id);
+    }
+
+    public class InvalidInhibitoryNeuronSynapse extends RuntimeException {
+
+        public InvalidInhibitoryNeuronSynapse() {
+            super("An inhibitory neuron is not allowed to have recurrent or negative input synapses.");
+        }
     }
 }

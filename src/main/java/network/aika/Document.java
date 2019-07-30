@@ -24,12 +24,12 @@ import network.aika.lattice.NodeQueue;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Activation.Option;
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
-import network.aika.neuron.activation.Candidate;
 import network.aika.neuron.activation.Position;
-import network.aika.neuron.activation.SearchNode;
-import network.aika.neuron.activation.SearchNode.TimeoutException;
+import network.aika.neuron.activation.link.Linker;
+import network.aika.neuron.activation.search.Option;
+import network.aika.neuron.activation.search.SearchNode;
+import network.aika.neuron.activation.search.SearchNode.TimeoutException;
 import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +37,10 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.SearchNode.Decision.SELECTED;
-import static network.aika.neuron.activation.SearchNode.Decision.UNKNOWN;
+import static network.aika.neuron.INeuron.Type.*;
+import static network.aika.neuron.activation.Activation.CANDIDATE_COMP;
+import static network.aika.neuron.activation.search.Decision.SELECTED;
+import static network.aika.neuron.activation.search.Decision.UNKNOWN;
 
 
 /**
@@ -56,11 +58,6 @@ public class Document implements Comparable<Document> {
     public static int CLEANUP_INTERVAL = 500;
     public static int MAX_ROUND = 20;
     public static int ROUND_LIMIT = -1;
-
-    /**
-     * Experimental code: not working yet!
-     */
-    public static boolean INCREMENTAL_MODE = false;
 
     private final int id;
     private final StringBuilder content;
@@ -109,8 +106,6 @@ public class Document implements Comparable<Document> {
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
-    private int lastProcessedActivationId = -1;
-
     private static class ActKey {
         int slot;
         Position pos;
@@ -130,7 +125,7 @@ public class Document implements Comparable<Document> {
 
 
     public SearchNode selectedSearchNode;
-    public ArrayList<Candidate> candidates = new ArrayList<>();
+    public ArrayList<Activation> candidates = new ArrayList<>();
 
     public long createV;
 
@@ -369,36 +364,30 @@ public class Document implements Comparable<Document> {
 
 
     public void generateCandidates() throws CyclicDependencyException {
-        TreeSet<Candidate> tmp = new TreeSet<>();
+        TreeSet<Activation> tmp = new TreeSet<>(CANDIDATE_COMP);
         int i = 0;
 
-        if(!INCREMENTAL_MODE) {
-            candidates.clear();
-        }
-
-        for(Activation act: activationsById.subMap(INCREMENTAL_MODE ? lastProcessedActivationId : -1, false, Integer.MAX_VALUE, true).values()) {
-            if (act.getDecision() == UNKNOWN && act.getUpperBound() > 0.0) {
-                SearchNode.invalidateCachedDecision(act);
-                tmp.add(new Candidate(act, i++));
-
-                lastProcessedActivationId = Math.max(lastProcessedActivationId, act.getId());
+        for (Activation act : activationsById.values()) {
+            if (act.getType() == EXCITATORY && act.getDecision() == UNKNOWN && act.getUpperBound() > 0.0) {
+                act.setCandidateId(i++);
+                tmp.add(act);
             }
         }
 
         long v = visitedCounter++;
         for(Activation act: inputNeuronActivations) {
-            act.markedHasCandidate = v;
+            act.markHasCandidate(v);
         }
 
         while (!tmp.isEmpty()) {
             int oldSize = tmp.size();
-            for (Candidate c : tmp) {
-                if (c.checkDependenciesSatisfied(v)) {
-                    tmp.remove(c);
-                    c.setId(candidates.size());
-                    candidates.add(c);
+            for (Activation act : tmp) {
+                if (act.checkDependenciesSatisfied(v)) {
+                    tmp.remove(act);
+                    act.setCandidateId(candidates.size());
+                    candidates.add(act);
 
-                    c.getActivation().markedHasCandidate = v;
+                    act.markHasCandidate(v);
                     break;
                 }
             }
@@ -423,15 +412,17 @@ public class Document implements Comparable<Document> {
     public void process(Long timeoutInMilliSeconds) throws TimeoutException, CyclicDependencyException, OscillatingActivationsException {
         linker.lateLinking();
 
-        inputNeuronActivations.forEach(act -> valueQueue.propagateActivationValue(0, act));
+        inputNeuronActivations.forEach(act -> {
+            valueQueue.propagateActivationValue(act, null, true, true);
+        });
 
         generateCandidates();
 
-        SearchNode rootNode = null;
-        if(selectedSearchNode == null || !INCREMENTAL_MODE) {
-            selectedSearchNode = new SearchNode(this, null, null, 0);
-            rootNode = selectedSearchNode;
-        }
+        selectedSearchNode = new SearchNode(this, null, null, 0);
+        selectedSearchNode.updateActivations(this);
+        storeFinalState();
+
+        SearchNode rootNode = selectedSearchNode;
 
         SearchNode.search(this, selectedSearchNode, visitedCounter++, timeoutInMilliSeconds);
 
@@ -448,30 +439,23 @@ public class Document implements Comparable<Document> {
     }
 
 
+    public void storeFinalState() {
+        for(Activation act: activationsById.values()) {
+            act.finalOption = act.currentOption;
+        }
+    }
+
+
     private void computeSoftMax() {
         for (Activation act : activationsById.values()) {
-            double offset = Double.MAX_VALUE;
-            for (Option option : act.getOptions()) {
-                offset = Math.min(offset, Math.log(option.cacheFactor) + option.weight);
-            }
-
-            double norm = 0.0;
-            for (Option option : act.getOptions()) {
-                norm += Math.exp(Math.log(option.cacheFactor) + option.weight - offset);
-            }
-
-            for (Option option : act.getOptions()) {
-                if (option.decision == SELECTED) {
-                    option.p = Math.exp(Math.log(option.cacheFactor) + option.weight - offset) / norm;
-                }
-            }
+            act.computeSoftMax();
         }
     }
 
 
     public void dumpDebugCandidateStatistics() {
-        for (Candidate c : candidates) {
-            log.info(c.toString());
+        for (Activation act : candidates) {
+            log.info(act.searchStateToString());
         }
     }
 
@@ -601,20 +585,6 @@ public class Document implements Comparable<Document> {
         if(selectedSearchNode != null) {
             sb.append("\n Final SearchNode:" + selectedSearchNode.getId() + "  WeightSum:" + selectedSearchNode.getAccumulatedWeight() + "\n");
         }
-        return sb.toString();
-    }
-
-
-    public String dumpOscillatingActivations() {
-        StringBuilder sb = new StringBuilder();
-        activatedNeurons.stream()
-                .flatMap(n -> n.getActivations(this, false))
-                .filter(act -> act.isOscillating())
-                .forEach(act -> {
-                    sb.append(act.getId() + " " + act.slotsToString() + " " + act.getDecision() + "\n");
-                    sb.append(act.linksToString() + "\n");
-                    sb.append("\n");
-                });
         return sb.toString();
     }
 

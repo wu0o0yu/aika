@@ -29,11 +29,11 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
-     * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
-     * Aika uses the provider pattern to store and reload rarely used neurons or logic nodes.
-     *
-     * @author Lukas Molzberger
-     */
+ * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
+ * Aika uses the provider pattern to store and reload rarely used neurons or logic nodes.
+ *
+ * @author Lukas Molzberger
+ */
 public class Neuron extends Provider<INeuron> {
 
     public static final Neuron MIN_NEURON = new Neuron(null, Integer.MIN_VALUE);

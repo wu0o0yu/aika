@@ -1,14 +1,11 @@
 package network.aika.network;
 
-import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.Utils;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.SearchNode;
+import network.aika.neuron.activation.search.SearchNode;
 import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
