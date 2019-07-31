@@ -677,6 +677,9 @@ public class Activation implements Comparable<Activation> {
 
 
     private Link getStrongestLink() {
+        if(inputLinks.size() == 1) {
+            return inputLinks.firstEntry().getValue();
+        }
         return inputLinks
                 .values()
                 .stream()
