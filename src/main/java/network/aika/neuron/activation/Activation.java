@@ -292,11 +292,19 @@ public class Activation implements Comparable<Activation> {
         return upperBound;
     }
 
+    public void setUpperBound(double ub) {
+        upperBound = ub;
+    }
+
 
     public double getLowerBound() {
         return lowerBound;
     }
 
+
+    public void setLowerBound(double lb) {
+        lowerBound = lb;
+    }
 
     public Double getTargetValue() {
         return targetValue;
