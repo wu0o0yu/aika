@@ -41,19 +41,17 @@ public class Option implements Comparable<Option> {
 
     public static final State INITIAL_STATE = new State(0.0, Double.MAX_VALUE, 0.0, null, 0.0);
 
-    public State state = INITIAL_STATE;
+    private State state = INITIAL_STATE;
 
     public Activation act;
     public SearchNode searchNode;
 
-    public Option parent;
-    public List<Option> children = new ArrayList<>();
-
-    public boolean fixed = false;
+    private Option parent;
+    private List<Option> children = new ArrayList<>();
 
     public Decision decision;
 
-    public double weight;
+    private double weight;
     public double remainingWeight;
     public int cacheFactor = 1;
     public double p;
@@ -81,7 +79,6 @@ public class Option implements Comparable<Option> {
 
 
     public boolean setState(State s) {
-        assert !fixed;
         if(state.equalsWithWeights(s)) {
             return false;
         }
@@ -114,7 +111,6 @@ public class Option implements Comparable<Option> {
 
     public void restoreState(Activation.Mode m) {
         act.currentOption = (m == Activation.Mode.OLD ? parent : this);
-        assert act.currentOption.fixed;
     }
 
 

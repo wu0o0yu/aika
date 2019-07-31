@@ -955,7 +955,6 @@ public class Activation implements Comparable<Activation> {
 
 
     public void saveState(SearchNode sn) {
-        currentOption.fixed = true;
         currentOption = new Option(currentOption, this, sn);
 
         if (sn.getModifiedActivations() != null) {
