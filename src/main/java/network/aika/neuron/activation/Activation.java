@@ -865,35 +865,33 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-
     public State getExpectedState() {
-/*        if (options == null) {
-            return null;
-        }
-
         double value = 0.0;
         double ub = 0.0;
-        double posValue = 0.0;
         double net = 0.0;
-        double posNet = 0.0;
 
-        for (Option option : options) {
+        for (Option option : getOptions()) {
             if (option.decision == SELECTED) {
                 double p = option.p;
-                State s = option.getLast();
+                State s = option.getState();
 
                 value += p * s.value;
                 ub += p * s.ub;
-                posValue += p * s.posValue;
                 net += p * s.net;
-                posNet += p * s.posNet;
             }
         }
-        return new State(value, ub, posValue, net, posNet, 0, 0.0);
-*/
-        return ZERO;
+        return new State(value, ub, net, 0, 0.0);
     }
 
+
+    public Collection<Option> getOptions() {
+        if (rootOption == null) {
+            return Collections.EMPTY_LIST;
+        }
+        ArrayList<Option> results = new ArrayList<>();
+        rootOption.traverse(o -> results.add(o));
+        return results;
+    }
 
 
     @Override
