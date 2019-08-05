@@ -132,6 +132,10 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if (act != null && followPath()) {
             act.cachedSearchNode = this;
+
+            if(COMPUTE_SOFT_MAX) {
+                modifiedActs.values().forEach(o -> o.link());
+            }
         }
 
         if (parent != null) {
