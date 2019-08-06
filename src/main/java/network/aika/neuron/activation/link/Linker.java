@@ -14,17 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.activation.link;
 
 import network.aika.Document;
+import network.aika.neuron.INeuron;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation.Link;
 
 import java.util.*;
 
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.activation.link.Direction.INPUT;
 
 /**
  * The {@code Linker} class is responsible for for the linkage of neuron activations. These links mirror the synapses between
@@ -36,12 +39,6 @@ public class Linker {
 
     private Document doc;
     private ArrayDeque<Link> queue = new ArrayDeque<>();
-
-
-    public enum Direction {
-        INPUT,
-        OUTPUT
-    }
 
 
     public Linker(Document doc) {
@@ -62,12 +59,15 @@ public class Linker {
     public void linkInput(Activation act) {
         Document doc = act.getDocument();
 
-        for(Synapse s: act.getNeuron().getActiveInputSynapses()) {
-            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
-                Relation rel = me.getValue();
-                if(me.getKey() == OUTPUT) {
-                    rel.getActivations(s.getInput().get(doc), act)
-                            .forEach(iAct -> link(s, iAct, act));
+        Neuron n = act.getNeuron();
+        if(n.getType() == INeuron.Type.EXCITATORY) {
+            for (Synapse s : n.getActiveInputSynapses()) {
+                for (Map.Entry<Integer, Relation> me : s.getRelations().entrySet()) {
+                    Relation rel = me.getValue();
+                    if (me.getKey() == OUTPUT) {
+                        rel.getActivations(s.getInput().get(doc), act)
+                                .forEach(iAct -> link(s, iAct, act));
+                    }
                 }
             }
         }
@@ -82,7 +82,7 @@ public class Linker {
             while((act = doc.getNextActivation(act)) != null) {
                 linkOutputRelations(act);
 
-                act.getInputLinks(false)
+                act.getInputLinks()
                         .forEach(l -> addToQueue(l));
             }
             doc.getLinker().process();
@@ -150,7 +150,7 @@ public class Linker {
                 }
             } else {
                 Synapse relSyn = oAct.getSynapseById(relSynId);
-                if(relSyn!= null && oAct.getInputLinksBySynapse(relSyn)
+                if(relSyn!= null && oAct.getLinksBySynapse(INPUT, relSyn)
                         .anyMatch(l -> !rel.test(iAct, l.getInput(), false))) {
                     return false;
                 }

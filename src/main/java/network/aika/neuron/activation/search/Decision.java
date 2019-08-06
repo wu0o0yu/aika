@@ -14,45 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
-
+package network.aika.neuron.activation.search;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Utils {
+public enum Decision {
+    SELECTED('S'),
+    EXCLUDED('E'),
+    UNKNOWN('U');
 
+    char s;
 
-    public static double round(double x) {
-        return Math.round(x * 1000.0) / 1000.0;
+    Decision(char s) {
+        this.s = s;
     }
 
 
-    public static String collapseText(String txt, int length) {
-        if (txt.length() <= 2 * length) {
-            return txt;
-        } else {
-            return txt.substring(0, length) + "..." + txt.substring(txt.length() - length);
+    public Decision getInverted() {
+        switch(this) {
+            case SELECTED:
+                return EXCLUDED;
+            case EXCLUDED:
+                return SELECTED;
+            default:
+                return UNKNOWN;
         }
-    }
-
-
-    public static String addPadding(String s, int targetSize) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(s);
-        for(int i = s.length(); i < targetSize; i++) {
-            sb.append(' ');
-        }
-
-        return sb.toString();
-    }
-
-
-    public static Integer max(Integer a, Integer b) {
-        if(a == null) return b;
-        if(b == null) return a;
-
-        return Math.max(a, b);
     }
 }

@@ -20,11 +20,12 @@ package network.aika.lattice;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.Provider;
-import network.aika.Writable;
+import network.aika.lattice.activation.AndActivation;
+import network.aika.lattice.activation.InputActivation;
+import network.aika.lattice.refinement.RefValue;
+import network.aika.lattice.refinement.Refinement;
+import network.aika.lattice.refinement.RelationsMap;
 import network.aika.neuron.relation.Relation;
-import network.aika.neuron.activation.Activation;
-import network.aika.lattice.InputNode.InputActivation;
-import network.aika.lattice.AndNode.AndActivation;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -42,10 +43,9 @@ import java.util.*;
  *
  * @author Lukas Molzberger
  */
-class AndNode extends Node<AndNode, AndActivation> {
+public class AndNode extends Node<AndNode, AndActivation> {
 
-
-    List<Entry> parents;
+    public List<Entry> parents;
 
 
     public AndNode() {
@@ -73,12 +73,12 @@ class AndNode extends Node<AndNode, AndActivation> {
     @Override
     protected void propagate(AndActivation act) {
         if (andChildren != null) {
-            for (Link fl : act.inputs) {
+            for (AndActivation.Link fl : act.inputs) {
                 if(fl == null) continue;
 
                 NodeActivation<?> pAct = fl.input;
 
-                for (Link sl : pAct.outputsToAndNode.values()) {
+                for (AndActivation.Link sl : pAct.outputsToAndNode.values()) {
                     NodeActivation secondAct = sl.output;
                     if (act != secondAct) {
                         applyIntern(act, fl.refAct, fl.ref, fl.rv, secondAct, sl.refAct, sl.ref, sl.rv);
@@ -146,7 +146,7 @@ class AndNode extends Node<AndNode, AndActivation> {
 
 
     private AndActivation lookupAndActivation(NodeActivation<?> input, Refinement ref) {
-        for (Link l : input.outputsToAndNode.values()) {
+        for (AndActivation.Link l : input.outputsToAndNode.values()) {
             if(l.ref.compareTo(ref) == 0) {
                 return l.output;
             }
@@ -338,251 +338,6 @@ class AndNode extends Node<AndNode, AndActivation> {
     }
 
 
-    /**
-     *
-     */
-    public static class Refinement implements Comparable<Refinement>, Writable {
-
-        public RelationsMap relations;
-        public Provider<InputNode> input;
-
-        private Refinement() {}
-
-
-        public Refinement(RelationsMap relations, Provider<InputNode> input) {
-            this.relations = relations;
-            this.input = input;
-        }
-
-        public boolean isConvertible() {
-            for(Relation rel: relations.relations) {
-                if(rel != null) return true;
-            }
-            return false;
-        }
-
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("(");
-            sb.append(relations);
-            sb.append(input.get().logicToString());
-            sb.append(")");
-            return sb.toString();
-        }
-
-
-        public void write(DataOutput out) throws IOException {
-            relations.write(out);
-            out.writeInt(input.getId());
-        }
-
-
-        public void readFields(DataInput in, Model m) throws IOException {
-            relations = RelationsMap.read(in, m);
-            input = m.lookupNodeProvider(in.readInt());
-        }
-
-
-        public static Refinement read(DataInput in, Model m) throws IOException {
-            Refinement k = new Refinement();
-            k.readFields(in, m);
-            return k;
-        }
-
-
-        @Override
-        public int compareTo(Refinement ref) {
-            int r = input.compareTo(ref.input);
-            if(r != 0) return r;
-
-            return relations.compareTo(ref.relations);
-        }
-
-        public boolean contains(Refinement ref, RefValue rv) {
-            for(int i = 0; i < ref.relations.length(); i++) {
-                Relation ra = ref.relations.get(i);
-                Relation rb = relations.get(rv.offsets[i]);
-
-                if((ra == null && rb != null) || (ra != null && rb == null)) return false;
-
-                if(ra != null && rb != null && ra.compareTo(rb) != 0) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-    }
-
-
-    public static class RelationsMap implements Comparable<RelationsMap>, Writable {
-
-        public static final RelationsMap MIN = new RelationsMap();
-        public static final RelationsMap MAX = new RelationsMap();
-
-        public Relation[] relations;
-
-
-        public RelationsMap() {}
-
-
-        public RelationsMap(Relation[] relations) {
-            this.relations = relations;
-        }
-
-
-        public void write(DataOutput out) throws IOException {
-            out.writeInt(relations.length);
-            for(int i = 0; i < relations.length; i++) {
-                Relation rel = relations[i];
-                out.writeBoolean(rel != null);
-                if(rel != null) {
-                    rel.write(out);
-                }
-            }
-        }
-
-
-        public void readFields(DataInput in, Model m) throws IOException {
-            int l = in.readInt();
-            relations = new Relation[l];
-            for(int i = 0; i < l; i++) {
-                if(in.readBoolean()) {
-                    relations[i] = Relation.read(in, m);
-                }
-            }
-        }
-
-
-        public static RelationsMap read(DataInput in, Model m) throws IOException {
-            RelationsMap k = new RelationsMap();
-            k.readFields(in, m);
-            return k;
-        }
-
-
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < relations.length; i++) {
-                Relation rel = relations[i];
-                if(rel != null) {
-                    sb.append(i + ":" + rel + ", ");
-                }
-            }
-            return sb.toString();
-        }
-
-
-        @Override
-        public int compareTo(RelationsMap rm) {
-            if (this == MIN) return -1;
-            if (rm == MIN) return 1;
-            if (this == MAX) return 1;
-            if (rm == MAX) return -1;
-
-            int r = Integer.compare(relations.length, rm.relations.length);
-            if(r != 0) return r;
-
-            for(int i = 0; i < relations.length; i++) {
-                Relation ra = relations[i];
-                Relation rb = rm.relations[i];
-
-                if(ra == null && rb == null) continue;
-                if(ra == null && rb != null) return -1;
-                if(ra != null && rb == null) return 1;
-
-                r = ra.compareTo(rb);
-                if(r != 0) return r;
-            }
-            return 0;
-        }
-
-        public int length() {
-            return relations.length;
-        }
-
-        public Relation get(int i) {
-            return relations[i];
-        }
-
-        public int size() {
-            if(relations.length == 0) return 0;
-            int count = 0;
-            for(int i = 0; i < relations.length; i++) {
-                if(relations[i] != null) count++;
-            }
-            return count;
-        }
-
-        public boolean isExact() {
-            for(Relation rel: relations) {
-                if(!rel.isExact()) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
-
-    public static class RefValue implements Writable {
-        public Integer[] offsets;  // input offsets -> output offsets
-        public Integer[] reverseOffsets;  // output offsets -> input offsets
-        public int refOffset;
-        public Provider<? extends Node> parent;
-        public Provider<AndNode> child;
-
-        private RefValue() {}
-
-        public RefValue(Integer[] offsets, int refOffset, Provider<? extends Node> parent) {
-            this.offsets = offsets;
-            reverseOffsets = new Integer[offsets.length + 1];
-            for(int i = 0; i < offsets.length; i++) {
-                reverseOffsets[offsets[i]] = i;
-            }
-
-            this.refOffset = refOffset;
-            this.parent = parent;
-        }
-
-        @Override
-        public void write(DataOutput out) throws IOException {
-            out.writeInt(offsets.length);
-            for(int i = 0; i < offsets.length; i++) {
-                Integer ofs = offsets[i];
-                out.writeBoolean(ofs != null);
-                out.writeInt(ofs);
-            }
-            out.writeInt(refOffset);
-            out.writeInt(parent.getId());
-            out.writeInt(child.getId());
-        }
-
-        public static RefValue read(DataInput in, Model m)  throws IOException {
-            RefValue rv = new RefValue();
-            rv.readFields(in, m);
-            return rv;
-        }
-
-        @Override
-        public void readFields(DataInput in, Model m) throws IOException {
-            int l = in.readInt();
-            offsets = new Integer[l];
-            reverseOffsets = new Integer[l + 1];
-            for(int i = 0; i < l; i++) {
-                if(in.readBoolean()) {
-                    Integer ofs = in.readInt();
-                    offsets[i] = ofs;
-                    reverseOffsets[ofs] = i;
-                }
-            }
-            refOffset = in.readInt();
-            parent = m.lookupNodeProvider(in.readInt());
-            child = m.lookupNodeProvider(in.readInt());
-        }
-    }
-
-
     public static class Entry {
         public Refinement ref;
         public RefValue rv;
@@ -590,85 +345,6 @@ class AndNode extends Node<AndNode, AndActivation> {
         public Entry(Refinement ref, RefValue rv) {
             this.ref = ref;
             this.rv = rv;
-        }
-    }
-
-
-    public static class AndActivation extends NodeActivation<AndNode> {
-
-        public Link[] inputs;
-
-        public AndActivation(Document doc, AndNode node) {
-            super(doc, node);
-            inputs = new Link[node.level];
-        }
-
-        public void link(Refinement ref, RefValue rv, InputActivation refAct, NodeActivation<?> input) {
-            Link l = new Link(ref, rv, refAct, input, this);
-            inputs[rv.refOffset] = l;
-            input.outputsToAndNode.put(id, l);
-        }
-
-        public Activation getInputActivation(int i) {
-            Link l = inputs[i];
-            if(l != null) {
-                return l.refAct.input;
-            } else {
-                for(int j = 0; j < inputs.length; j++) {
-                    if (j != i) {
-                        l = inputs[j];
-                        if(l != null) {
-                            return l.input.getInputActivation(l.rv.reverseOffsets[i]);
-                        }
-                    }
-                }
-                return null;
-            }
-        }
-
-        public boolean isComplete() {
-            int numberOfLinks = 0;
-            for (Link l : inputs) {
-                if (l != null) numberOfLinks++;
-            }
-            return getNode().parents.size() == numberOfLinks;
-        }
-
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("A-ACT(");
-            boolean first = true;
-            for(int i = 0; i < inputs.length; i++) {
-                Activation iAct = getInputActivation(i);
-                if(iAct != null) {
-                    if(!first) {
-                        sb.append(",");
-                    }
-                    sb.append(i + ":" + iAct.getLabel() + " " + iAct.slotsToString() + " (" + iAct.getId() + ")");
-
-                    first = false;
-                }
-            }
-            sb.append(")");
-            return sb.toString();
-        }
-    }
-
-
-    public static class Link {
-        public Refinement ref;
-        public RefValue rv;
-
-        public NodeActivation<?> input;
-        public InputActivation refAct;
-        public AndActivation output;
-
-        public Link(Refinement ref, RefValue rv, InputActivation refAct, NodeActivation<?> input, AndActivation output) {
-            this.ref = ref;
-            this.rv = rv;
-            this.refAct = refAct;
-            this.input = input;
-            this.output = output;
         }
     }
 }

@@ -16,22 +16,18 @@
  */
 package network.aika.network;
 
-import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.INeuron;
-import network.aika.neuron.activation.SearchNode;
+import network.aika.neuron.activation.search.SearchNode;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.stream.Collectors;
 
 import static network.aika.ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
-import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;

@@ -76,6 +76,8 @@ public class PositionRelationTest {
 
         Activation outC1 = outC.getActivation(doc, 0, 1, false);
 
+        doc.process();
+
         System.out.println(doc.activationsToString());
 
         Assert.assertNotNull(outC1);
@@ -212,6 +214,8 @@ public class PositionRelationTest {
                 inputNeuron.addInput(doc, i, i + 1);
             }
         }
+
+        doc.process();
 
         System.out.println(doc.activationsToString());
 

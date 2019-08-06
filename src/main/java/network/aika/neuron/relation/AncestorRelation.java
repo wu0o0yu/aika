@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package network.aika.neuron.relation;
 
 import network.aika.neuron.INeuron;
@@ -9,6 +25,10 @@ import java.util.*;
 import java.util.stream.Stream;
 
 
+/**
+ *
+ * @author Lukas Molzberger
+ */
 public abstract class AncestorRelation extends Relation {
 
     public static AncestorRelation COMMON_ANCESTOR = new CommonAncestor();
@@ -27,7 +47,7 @@ public abstract class AncestorRelation extends Relation {
 
         collectContains(results, n, linkedAct, v);
 
-        linkedAct.getInputLinks(false)
+        linkedAct.getInputLinks()
                 .filter(l -> l.isIdentity())
                 .forEach(l -> collectCommonAncestor(results, n, l.getInput(), v));
     }
@@ -53,7 +73,7 @@ public abstract class AncestorRelation extends Relation {
             results.add(linkedAct);
         }
 
-        linkedAct.getInputLinks(false)
+        linkedAct.getInputLinks()
                 .filter(l -> l.isIdentity())
                 .forEach(l -> collectContainedIn(results, n, l.getInput(), v));
     }
@@ -69,7 +89,7 @@ public abstract class AncestorRelation extends Relation {
 
         if(actA == actB) return true;
 
-        return actA.getInputLinks(false)
+        return actA.getInputLinks()
                 .filter(l -> l.isIdentity())
                 .anyMatch(l -> contains(l.getInput(), actB, v));
     }
@@ -87,7 +107,7 @@ public abstract class AncestorRelation extends Relation {
 
         act.markedAncDesc = v;
 
-        act.getInputLinks(false)
+        act.getInputLinks()
                 .filter(l -> l.isIdentity())
                 .forEach(l -> markAncestors(l.getInput(), v));
     }
@@ -109,7 +129,7 @@ public abstract class AncestorRelation extends Relation {
 
         if(act.markedAncDesc == v1) return true;
 
-        return act.getInputLinks(false)
+        return act.getInputLinks()
                 .filter(l -> l.isIdentity())
                 .anyMatch(l -> hasCommonAncestor(l.getInput(), v1, v2));
     }

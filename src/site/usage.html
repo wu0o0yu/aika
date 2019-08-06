@@ -26,9 +26,12 @@
 			<a href="index.html"></a>
 		</div>
 		<ul id="navigation">
-			<li>
-				<a href="index.html">Overall idea</a>
-			</li>
+            <li>
+                <a href="index.html">Overall idea</a>
+            </li>
+            <li>
+                <a href="blog.html">Blog</a>
+            </li>
             <li>
                 <a href="inference.html">Inference</a>
             </li>
@@ -58,7 +61,7 @@
                 &lt;dependency&gt;<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;org.aika-software&lt;&#47;groupId&gt;<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;aika&lt;&#47;artifactId&gt;<br/>
-                &nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;1.1.0&lt;&#47;version&gt;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;1.3.0&lt;&#47;version&gt;<br/>
                 &lt;&#47;dependency&gt;<br/>
                 </b>
             </p>
@@ -80,7 +83,7 @@
     HashMap&lt;String, Neuron&gt; inputNeurons = new HashMap<>();
 
     for(String word: new String[] {"jackson", "cook"}) {
-        Neuron in = m.createNeuron("W-" + word);
+        Neuron in = m.createNeuron("W-" + word, INPUT);
 
         inputNeurons.put(word, in);
     }
@@ -93,9 +96,9 @@
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-    Neuron forenameCategory = m.createNeuron("C-forename");
-    Neuron surnameCategory = m.createNeuron("C-surname");
-    Neuron inhibitingN = m.createNeuron("INHIB");
+    Neuron forenameCategory = m.createNeuron("C-forename", INHIBITORY, LIMITED_RECTIFIED_LINEAR_UNIT);
+    Neuron surnameCategory = m.createNeuron("C-surname", INHIBITORY, LIMITED_RECTIFIED_LINEAR_UNIT);
+    Neuron inhibitingN = m.createNeuron("INHIB", INHIBITORY, LIMITED_RECTIFIED_LINEAR_UNIT);
                 </code>
 			</pre>
             </div>
@@ -114,21 +117,17 @@
             <pre class="prettyprint">
 				<code class="language-java">
     Neuron cookSurnameEntity = Neuron.init(
-            m.createNeuron("E-cook (surname)"),
+            m.createNeuron("E-cook (surname)", EXCITATORY, RECTIFIED_HYPERBOLIC_TANGENT),
             6.0, // adjusts the bias
-            RECTIFIED_HYPERBOLIC_TANGENT,
-            EXCITATORY,
             new Synapse.Builder() // Requires the word to be recognized
                     .setSynapseId(0)
                     .setNeuron(inputNeurons.get("cook"))
                     .setWeight(10.0)
-                    .setBias(-10.0)
                     .setRecurrent(false),
             new Synapse.Builder() // The previous word needs to be a forename
                     .setSynapseId(1)
                     .setNeuron(forenameCategory)
                     .setWeight(10.0)
-                    .setBias(-10.0)
                     .setRecurrent(true), // this input is a positive feedback loop
 
                     // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
@@ -138,7 +137,6 @@
                     .setSynapseId(2)
                     .setNeuron(inhibitingN)
                     .setWeight(-100.0)
-                    .setBias(0.0)
                     .setRecurrent(true), // this input is a negative feedback loop
             new Relation.Builder()  // references the previous word
                     .setFrom(1)  // From Synpase Id
@@ -165,13 +163,10 @@
     Neuron.init(
             forenameCategory,
             0.0,
-            RECTIFIED_LINEAR_UNIT,
-            EXCITATORY,
             new Synapse.Builder() // In this example there is only one forename considered.
                     .setSynapseId(0)
                     .setNeuron(jacksonForenameEntity)
-                    .setWeight(1.0)
-                    .setBias(0.0),
+                    .setWeight(1.0),
             new Relation.Builder()
                     .setFrom(0)
                     .setTo(OUTPUT)
@@ -180,13 +175,10 @@
     Neuron.init(
             surnameCategory,
             0.0,
-            RECTIFIED_LINEAR_UNIT,
-            EXCITATORY,
             new Synapse.Builder()
                     .setSynapseId(0)
                     .setNeuron(cookSurnameEntity)
-                    .setWeight(1.0)
-                    .setBias(0.0),
+                    .setWeight(1.0),
             new Relation.Builder()
                     .setFrom(0)
                     .setTo(OUTPUT)
@@ -204,27 +196,21 @@
     Neuron.init(
             inhibitingN,
             0.0,
-            RECTIFIED_LINEAR_UNIT,
-            INHIBITORY,
             new Synapse.Builder().setNeuron(cookProfessionEntity)
                     .setSynapseId(0)
-                    .setWeight(1.0)
-                    .setBias(0.0),
+                    .setWeight(1.0),
             new Synapse.Builder()
                     .setSynapseId(1)
                     .setNeuron(cookSurnameEntity)
-                    .setWeight(1.0)
-                    .setBias(0.0),
+                    .setWeight(1.0),
             new Synapse.Builder()
                     .setSynapseId(2)
                     .setNeuron(jacksonCityEntity)
-                    .setWeight(1.0)
-                    .setBias(0.0),
+                    .setWeight(1.0),
             new Synapse.Builder()
                     .setSynapseId(3)
                     .setNeuron(jacksonForenameEntity)
-                    .setWeight(1.0)
-                    .setBias(0.0),
+                    .setWeight(1.0),
             new Relation.Builder()
                     .setFrom(0)
                     .setTo(OUTPUT)
@@ -279,23 +265,27 @@ slots simply specify the range begin (slot 0) and the range end (slot 1).
             <pre class="prettyprint">
 				<code class="language-java">
 
-Activation ID - Final Decision - Slots | Identity - Neuron Label - Logic Layer - Upper Bound -
+Activation ID - Neuron Type - Final Decision - Slots (Ranges) | Identity - Neuron Label - Logic Layer - Upper Bound -
 Value | Sum | Weight - Input Value | Target Value
 
-    ...
-3 - SELECTED - (0:4, 1:12) () - C-forename - OR[] - V:1.0 Net:1.0 W:0.0
-4 - SELECTED - (0:4, 1:12) () - INHIB - OR[] - V:1.0 Net:1.0 W:0.0
-1 - SELECTED - (0:4, 1:12) () - W-jackson - OR[] - V:1.0 Net:0.0 W:0.0 - IV:1.0
-2 - SELECTED - (0:4, 1:12) () - E-jackson (forename) - V:1.0 Net:6.0 W:6.0
-5 - EXCLUDED - (0:4, 1:12) () - E-jackson (city) -
-8 - SELECTED - (0:12, 1:17) () - C-surname - OR[] - V:1.0 Net:1.0 W:0.0
-9 - SELECTED - (0:12, 1:17) () - INHIB - OR[] - V:1.0 Net:1.0 W:0.0
-6 - SELECTED - (0:12, 1:17) () - W-cook - OR[] - V:1.0 Net:0.0 W:0.0 - IV:1.0
-7 - SELECTED - (0:12, 1:17) () - E-cook (surname) - V:1.0 Net:8.0 W:8.0
-10 - EXCLUDED - (0:12, 1:17) () - E-cook (profession) -
-    ...
+0   INPUT      -          - (0:0, 1:4) "mr. " () - W-mr. - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+4   INHIBITORY -          - (0:4, 1:12) "jackson " () - C-forename - V:1.0 UB:1.0 Net:1.0 W:0.0
+5   INHIBITORY -          - (0:4, 1:12) "jackson " () - INHIB - V:1.0 UB:1.0 Net:1.0 W:0.0
+1   INPUT      -          - (0:4, 1:12) "jackson " () - W-jackson - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+2   EXCITATORY - SELECTED - (0:4, 1:12) "jackson " () - E-jackson (forename) - V:1.0 UB:1.0 Net:6.0 W:6.0
+3   EXCITATORY - EXCLUDED - (0:4, 1:12) "jackson " () - E-jackson (city) - V:0.0 UB:0.0 Net:-95.0 W:0.0
+9   INHIBITORY -          - (0:12, 1:17) "cook " () - C-surname - V:1.0 UB:1.0 Net:1.0 W:0.0
+10  INHIBITORY -          - (0:12, 1:17) "cook " () - INHIB - V:1.0 UB:1.0 Net:1.0 W:0.0
+6   INPUT      -          - (0:12, 1:17) "cook " () - W-cook - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+7   EXCITATORY - SELECTED - (0:12, 1:17) "cook " () - E-cook (surname) - V:1.0 UB:1.0 Net:6.0 W:6.0
+8   EXCITATORY - EXCLUDED - (0:12, 1:17) "cook " () - E-cook (profession) - V:0.0 UB:0.0 Net:-95.0 W:0.0
+11  INPUT      -          - (0:17, 1:21) "was " () - W-was - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+12  INPUT      -          - (0:21, 1:26) "born " () - W-born - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+13  INPUT      -          - (0:26, 1:29) "in " () - W-in - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+14  INPUT      -          - (0:29, 1:33) "new " () - W-new - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+15  INPUT      -          - (0:33, 1:38) "york " () - W-york - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
 
- Final SearchNode:8  WeightSum:13.999
+ Final SearchNode:6  WeightSum:12.0
                 </code>
 			</pre>
             </div>
@@ -316,30 +306,26 @@ Value | Sum | Weight - Input Value | Target Value
         Model m = new Model();
 
         // Create the input neurons for the network.
-        Neuron inA = m.createNeuron("IN-A");
-        Neuron inB = m.createNeuron("IN-B");
-        Neuron inC = m.createNeuron("IN-C");
+        Neuron inA = m.createNeuron("IN-A", INPUT);
+        Neuron inB = m.createNeuron("IN-B", INPUT);
+        Neuron inC = m.createNeuron("IN-C", INPUT);
 
         // Instantiate the inhibitory neuron. Its inputs will be added later on.
         Neuron inhibN = m.createNeuron("INHIB");
 
         // Create three neurons that might be suppressed by the inhibitory neuron.
         Neuron pA = Neuron.init(
-                m.createNeuron("A"),
+                m.createNeuron("A", EXCITATORY),
                 3.0,
-                RECTIFIED_HYPERBOLIC_TANGENT,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -352,21 +338,17 @@ Value | Sum | Weight - Input Value | Target Value
         );
 
         Neuron pB = Neuron.init(
-                m.createNeuron("B"),
+                m.createNeuron("B", EXCITATORY),
                 5.0,
-                RECTIFIED_HYPERBOLIC_TANGENT,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inB)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -379,21 +361,17 @@ Value | Sum | Weight - Input Value | Target Value
         );
 
         Neuron pC = Neuron.init(
-                m.createNeuron("C"),
+                m.createNeuron("C", EXCITATORY),
                 2.0,
-                RECTIFIED_HYPERBOLIC_TANGENT,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inC)
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inhibN)
                         .setWeight(-100.0)
-                        .setBias(0.0)
                         .setRecurrent(true),
                 new Relation.Builder()
                         .setFrom(1)
@@ -409,25 +387,20 @@ Value | Sum | Weight - Input Value | Target Value
         Neuron.init(
                 inhibN,
                 0.0,
-                RECTIFIED_LINEAR_UNIT,
-                INHIBITORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(pA)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(pB)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(pC)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
@@ -443,15 +416,13 @@ Value | Sum | Weight - Input Value | Target Value
                         .setRelation(EQUALS)
         );
 
-        Neuron outN = Neuron.init(m.createNeuron("OUT"),
+        Neuron outN = Neuron.init(
+                m.createNeuron("OUT", EXCITATORY),
                 0.0,
-                RECTIFIED_HYPERBOLIC_TANGENT,
-                EXCITATORY,
                 new Synapse.Builder()
                          .setSynapseId(0)
                         .setNeuron(pB)
                         .setWeight(1.0)
-                        .setBias(0.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
@@ -486,17 +457,17 @@ Value | Sum | Weight - Input Value | Target Value
 
 			<pre class="prettyprint">
 				<code class="language-java">
- Activation ID - Final Decision - Slots | Identity - Neuron Label - Upper Bound -
+ Activation ID - Neuron Type - Final Decision - Slots | Identity - Neuron Label - Upper Bound -
  Value | Net | Weight - Input Value | Target Value
 
-0 - SELECTED - (0:0, 1:1) () - IN-A - V:1.0 Net:0.0 W:0.0 - IV:1.0
-3 - SELECTED - (0:0, 1:1) () - IN-B - V:1.0 Net:0.0 W:0.0 - IV:1.0
-6 - SELECTED - (0:0, 1:1) () - IN-C - V:1.0 Net:0.0 W:0.0 - IV:1.0
-2 - SELECTED - (0:0, 1:1) () - INHIB - V:1.0 Net:1.0 W:0.0
-1 - EXCLUDED - (0:0, 1:1) () - A -
-4 - SELECTED - (0:0, 1:1) () - B - V:1.0 Net:5.0 W:5.0
-7 - EXCLUDED - (0:0, 1:1) () - C -
-5 - SELECTED - (0:0, 1:1) () - OUT - V:0.762 Net:1.0 W:0.0
+0   INPUT      -          - (0:0, 1:1) "f" () - IN-A - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+3   INPUT      -          - (0:0, 1:1) "f" () - IN-B - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+6   INPUT      -          - (0:0, 1:1) "f" () - IN-C - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+2   INHIBITORY -          - (0:0, 1:1) "f" () - INHIB - V:1.0 UB:1.0 Net:1.0 W:0.0
+1   EXCITATORY - EXCLUDED - (0:0, 1:1) "f" () - A - V:0.0 UB:0.0 Net:-97.0 W:0.0
+4   EXCITATORY - SELECTED - (0:0, 1:1) "f" () - B - V:1.0 UB:1.0 Net:5.0 W:5.0
+7   EXCITATORY - EXCLUDED - (0:0, 1:1) "f" () - C - V:0.0 UB:0.0 Net:-98.0 W:0.0
+5   INHIBITORY -          - (0:0, 1:1) "f" () - OUT - V:0.762 UB:0.762 Net:1.0 W:0.0
 
 Final SearchNode:10  WeightSum:5.0
 				</code>
@@ -518,39 +489,33 @@ Final SearchNode:10  WeightSum:5.0
 
         // Create an input neuron for every letter in this example.
         for(char c: new char[] {'a', 'b', 'c', 'd', 'e', 'f'}) {
-            Neuron in = m.createNeuron(c + "");
+            Neuron in = m.createNeuron(c + "", INPUT);
 
             inputNeurons.put(c, in);
         }
 
         Neuron pattern = Neuron.init(
-                m.createNeuron("BCDE"),
+                m.createNeuron("BCDE", EXCITATORY),
                 5.0,
-                RECTIFIED_HYPERBOLIC_TANGENT,
-                EXCITATORY,
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputNeurons.get('b'))
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inputNeurons.get('c'))
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inputNeurons.get('d'))
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Synapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inputNeurons.get('e'))
                         .setWeight(10.0)
-                        .setBias(-10.0)
                         .setRecurrent(false),
                 new Relation.Builder()
                         .setFrom(0)
@@ -605,15 +570,15 @@ Final SearchNode:10  WeightSum:5.0
             <div class="prettyprint-code">
             <pre class="prettyprint">
 				<code class="language-java">
-Activation ID - Final Decision - Slots | Identity - Neuron Label - Upper Bound -
+Activation ID - Neuron Type - Final Decision - Slots | Identity - Neuron Label - Upper Bound -
 Value | Net | Weight - Input Value | Target Value
 
-0 - SELECTED - (0:0, 1:2) () - a - V:1.0 Net:0.0 W:0.0 - IV:1.0
-1 - SELECTED - (0:2, 1:4) () - b - V:1.0 Net:0.0 W:0.0 - IV:1.0
-5 - SELECTED - (0:2, 1:10) () - BCDE - V:1.0 Net:5.0 W:0.0
-2 - SELECTED - (0:4, 1:6) () - c - V:1.0 Net:0.0 W:0.0 - IV:1.0
-3 - SELECTED - (0:6, 1:8) () - d - V:1.0 Net:0.0 W:0.0 - IV:1.0
-4 - SELECTED - (0:8, 1:10) () - e - V:1.0 Net:0.0 W:0.0 - IV:1.0
+0   INPUT      -          - (0:0, 1:2) "a " () - a - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+1   INPUT      -          - (0:2, 1:4) "b " () - b - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+5   EXCITATORY - SELECTED - (0:2, 1:10) "b c d e " () - BCDE - V:1.0 UB:1.0 Net:5.0 W:0.0
+2   INPUT      -          - (0:4, 1:6) "c " () - c - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+3   INPUT      -          - (0:6, 1:8) "d " () - d - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
+4   INPUT      -          - (0:8, 1:10) "e " () - e - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
 
  Final SearchNode:1  WeightSum:0.0
 				</code>

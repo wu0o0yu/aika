@@ -14,7 +14,7 @@ import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.relation.Relation.*;
 
-public class TestNextWordTest {
+public class NextWordTest {
 
     @Test
     public void testMatchTheWord() {
@@ -50,6 +50,8 @@ public class TestNextWordTest {
 
         inA.addInput(doc, 0, 5);
         inB.addInput(doc, 5, 10);
+
+        doc.process();
 
         System.out.println(doc.activationsToString());
     }

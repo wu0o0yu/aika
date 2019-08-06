@@ -23,8 +23,7 @@ import network.aika.neuron.INeuron.Type;
 import network.aika.neuron.Neuron;
 import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Linker;
-import network.aika.neuron.activation.SearchNode;
+import network.aika.neuron.activation.search.SearchNode;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -33,8 +32,6 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static network.aika.neuron.INeuron.Type.INPUT;
 
 
 /**
@@ -56,8 +53,6 @@ public class Model {
     public Document[] docs;
 
     public SuspensionHook suspensionHook;
-
-    public SearchNode.SkipSelectStep skipSelectStep = (act) -> false;
 
     public AtomicInteger docIdCounter = new AtomicInteger(0);
     public AtomicInteger currentId = new AtomicInteger(0);
@@ -96,15 +91,6 @@ public class Model {
 
     public void setSuspensionHook(SuspensionHook suspensionHook) {
         this.suspensionHook = suspensionHook;
-    }
-
-
-    public SearchNode.SkipSelectStep getSkipSelectStep() {
-        return skipSelectStep;
-    }
-
-    public void setSkipSelectStep(SearchNode.SkipSelectStep skipSelectStep) {
-        this.skipSelectStep = skipSelectStep;
     }
 
 

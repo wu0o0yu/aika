@@ -19,12 +19,10 @@ package network.aika.network;
 
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Activation.Link;
-import network.aika.lattice.Node;
+import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Test;
@@ -94,13 +92,13 @@ public class ActivationOutputsTest {
         Activation actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inA.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false), inA)
+                selectInputActivation(actAB.getInputLinks(), inA)
         );
 
         actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inB.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false), inB)
+                selectInputActivation(actAB.getInputLinks(), inB)
         );
 
 
@@ -110,13 +108,13 @@ public class ActivationOutputsTest {
         actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inA.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false), inA)
+                selectInputActivation(actAB.getInputLinks(), inA)
         );
 
         actAB = pAB.getActivation(doc, 0, 1, false);
         Assert.assertEquals(
                 inB.getActivation(doc, 0, 1, false),
-                selectInputActivation(actAB.getInputLinks(false), inB)
+                selectInputActivation(actAB.getInputLinks(), inB)
         );
     }
 

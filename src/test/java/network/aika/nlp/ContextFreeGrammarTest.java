@@ -11,6 +11,7 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Before;
@@ -82,20 +83,6 @@ public class ContextFreeGrammarTest {
             Neuron.init(n, 0.0);
         }
 
-        for(Neuron n: new Neuron[] {ART, N, ADJ, V, AUX}) {
-            Neuron.init(n, 0.0,
-                    new Synapse.Builder()
-                            .setSynapseId(0)
-                            .setNeuron(I)
-                            .setWeight(-50.0)
-                            .setRecurrent(true),
-                    new Relation.Builder()
-                            .setFrom(0)
-                            .setTo(Synapse.OUTPUT)
-                            .setRelation(OVERLAPS)
-            );
-        }
-
 
         initOrNeuron(I, NP, VP, ART, N, ADJ, V, AUX);
         initOrNeuron(NP, NP_ART_ADJ_N, NP_ART_N, NP_ADJ_N);
@@ -127,11 +114,34 @@ public class ContextFreeGrammarTest {
         dictionary.put(word, wordN);
 
         for (Neuron wordType : wordTypes) {
+            Neuron entity = m.createNeuron("E-" + word + "(" + wordType.getLabel() + ")", EXCITATORY);
+
+            Neuron.init(entity, 2.0,
+                    new Synapse.Builder()
+                        .setSynapseId(0)
+                        .setNeuron(wordN)
+                        .setWeight(10)
+                        .setRecurrent(false),
+                    new Synapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(I)
+                        .setWeight(-50.0)
+                        .setRecurrent(true),
+                    new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(1)
+                        .setRelation(OVERLAPS),
+                    new Relation.Builder()
+                        .setFrom(0)
+                        .setTo(OUTPUT)
+                        .setRelation(EQUALS)
+            );
+
             int wtSynId = wordType.getNewSynapseId();
             Neuron.init(wordType,
                     new Synapse.Builder()
                             .setSynapseId(wtSynId)
-                            .setNeuron(wordN)
+                            .setNeuron(entity)
                             .setWeight(3.0),
                     new Relation.Builder()
                             .setFrom(wtSynId)

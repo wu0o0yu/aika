@@ -19,6 +19,9 @@ package network.aika.lattice;
 
 import network.aika.*;
 import network.aika.Document;
+import network.aika.lattice.refinement.OrEntry;
+import network.aika.lattice.refinement.RefValue;
+import network.aika.lattice.refinement.Refinement;
 
 import java.io.*;
 import java.util.*;
@@ -47,10 +50,10 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     public static final Node MAX_NODE = new InputNode();
 
 
-    TreeMap<AndNode.Refinement, AndNode.RefValue> andChildren;
-    TreeSet<OrNode.OrEntry> orChildren;
+    TreeMap<Refinement, RefValue> andChildren;
+    TreeSet<OrEntry> orChildren;
 
-    int level;
+    public int level;
 
     private AtomicInteger numberOfNeuronRefs = new AtomicInteger(0);
     volatile boolean isRemoved;
@@ -114,7 +117,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    abstract AndNode.RefValue expand(int threadId, Document doc, AndNode.Refinement ref);
+    abstract RefValue expand(int threadId, Document doc, Refinement ref);
 
     public abstract void reprocessInputs(Document doc);
 
@@ -143,7 +146,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void addOrChild(OrNode.OrEntry rv) {
+    void addOrChild(OrEntry rv) {
         lock.acquireWriteLock();
         if (orChildren == null) {
             orChildren = new TreeSet<>();
@@ -153,7 +156,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void removeOrChild(OrNode.OrEntry rv) {
+    void removeOrChild(OrEntry rv) {
         lock.acquireWriteLock();
         if (orChildren != null) {
             orChildren.remove(rv);
@@ -165,7 +168,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void addAndChild(AndNode.Refinement ref, AndNode.RefValue child) {
+    void addAndChild(Refinement ref, RefValue child) {
         if (andChildren == null) {
             andChildren = new TreeMap<>();
         }
@@ -176,7 +179,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    void removeAndChild(AndNode.Refinement ref) {
+    void removeAndChild(Refinement ref) {
         if (andChildren != null) {
             andChildren.remove(ref);
 
@@ -261,7 +264,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
         try {
             lock.acquireReadLock();
             if (orChildren != null) {
-                for (OrNode.OrEntry oe : orChildren) {
+                for (OrEntry oe : orChildren) {
                     oe.child.get(doc).addActivation(oe, inputAct);
                 }
             }
@@ -312,9 +315,9 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
     }
 
 
-    AndNode.RefValue getAndChild(AndNode.Refinement ref) {
+    RefValue getAndChild(Refinement ref) {
         lock.acquireReadLock();
-        AndNode.RefValue result = andChildren != null ? andChildren.get(ref) : null;
+        RefValue result = andChildren != null ? andChildren.get(ref) : null;
         lock.releaseReadLock();
         return result;
     }
@@ -404,7 +407,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         if (andChildren != null) {
             out.writeInt(andChildren.size());
-            for (Map.Entry<AndNode.Refinement, AndNode.RefValue> me : andChildren.entrySet()) {
+            for (Map.Entry<Refinement, RefValue> me : andChildren.entrySet()) {
                 me.getKey().write(out);
                 me.getValue().write(out);
             }
@@ -414,7 +417,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         if (orChildren != null) {
             out.writeInt(orChildren.size());
-            for (OrNode.OrEntry oe : orChildren) {
+            for (OrEntry oe : orChildren) {
                 oe.write(out);
             }
         } else {
@@ -431,7 +434,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
 
         int s = in.readInt();
         for (int i = 0; i < s; i++) {
-            addAndChild(AndNode.Refinement.read(in, m), AndNode.RefValue.read(in, m));
+            addAndChild(Refinement.read(in, m), RefValue.read(in, m));
         }
 
         s = in.readInt();
@@ -439,7 +442,7 @@ public abstract class Node<T extends Node, A extends NodeActivation<T>> extends 
             if (orChildren == null) {
                 orChildren = new TreeSet<>();
             }
-            orChildren.add(OrNode.OrEntry.read(in, m));
+            orChildren.add(OrEntry.read(in, m));
         }
 
         threads = new ThreadState[m.numberOfThreads];
