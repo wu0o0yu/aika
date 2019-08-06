@@ -27,7 +27,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.link.Linker;
-import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.activation.search.SearchNode;
 import network.aika.neuron.activation.search.SearchNode.TimeoutException;
 import network.aika.neuron.activation.*;
@@ -39,7 +38,6 @@ import java.util.stream.Collectors;
 
 import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.activation.Activation.CANDIDATE_COMP;
-import static network.aika.neuron.activation.search.Decision.SELECTED;
 import static network.aika.neuron.activation.search.Decision.UNKNOWN;
 
 
@@ -434,7 +432,7 @@ public class Document implements Comparable<Document> {
 
         if(SearchNode.COMPUTE_SOFT_MAX) {
             SearchNode.computeCachedFactor(rootNode);
-            computeSoftMax();
+            computeOptionProbabilities();
         }
     }
 
@@ -446,9 +444,9 @@ public class Document implements Comparable<Document> {
     }
 
 
-    private void computeSoftMax() {
+    private void computeOptionProbabilities() {
         for (Activation act : activationsById.values()) {
-            act.computeSoftMax();
+            act.computeOptionProbabilities();
         }
     }
 

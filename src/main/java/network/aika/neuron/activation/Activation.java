@@ -36,8 +36,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
+import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.activation.search.Decision.*;
 import static network.aika.neuron.activation.link.Link.INPUT_COMP;
 import static network.aika.neuron.activation.link.Link.OUTPUT_COMP;
@@ -773,7 +772,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public void computeSoftMax() {
+    public void computeOptionProbabilities() {
         rootOption.traverse((o) -> o.computeRemainingWeight());
 
         final double[] offset = new double[] {Double.MAX_VALUE};
@@ -783,8 +782,8 @@ public class Activation implements Comparable<Activation> {
         rootOption.traverse(o -> norm[0] += Math.log(o.cacheFactor) + o.remainingWeight - offset[0]);
 
         rootOption.traverse(o -> {
-            if (o.decision == SELECTED) {
-                o.p = Math.exp(Math.log(o.cacheFactor) + o.remainingWeight - offset[0]) / norm[0];
+            if (o.getAct().getType() != INPUT && o.decision == SELECTED) {
+                o.p = norm[0] != 0.0 ? Math.exp(Math.log(o.cacheFactor) + o.remainingWeight - offset[0]) / norm[0] : 1.0;
             }
         });
     }
@@ -871,14 +870,12 @@ public class Activation implements Comparable<Activation> {
         double net = 0.0;
 
         for (Option option : getOptions()) {
-            if (option.decision == SELECTED) {
-                double p = option.p;
-                State s = option.getState();
+            double p = option.p;
+            State s = option.getState();
 
-                value += p * s.value;
-                ub += p * s.ub;
-                net += p * s.net;
-            }
+            value += p * s.value;
+            ub += p * s.ub;
+            net += p * s.net;
         }
         return new State(value, ub, net, 0, 0.0);
     }
