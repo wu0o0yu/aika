@@ -166,9 +166,9 @@ public class Option implements Comparable<Option> {
 
 
     public void traverse(Consumer<Option> f) {
+        f.accept(this);
         for(Option c: children) {
             c.traverse(f);
-            f.accept(c);
         }
     }
 
