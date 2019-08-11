@@ -104,7 +104,7 @@ public class MultiRelation extends Relation {
     public Relation invert() {
         SortedSet<Relation> invRels = new TreeSet<>();
         for(Relation rel: relations) {
-            invRels.add(rel.invert());
+            invRels.add(rel.getCachedInverted());
         }
         return new MultiRelation(invRels);
     }

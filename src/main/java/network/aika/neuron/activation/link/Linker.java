@@ -107,7 +107,7 @@ public class Linker {
             if(relId != OUTPUT) {
                 Synapse s = oAct.getSynapseById(relId);
                 if (s != null) {
-                    rel.invert().getActivations(s.getInput().get(doc), rAct)
+                    rel.getCachedInverted().getActivations(s.getInput().get(doc), rAct)
                             .forEach(iAct -> link(s, iAct, oAct));
                 }
             }
