@@ -130,7 +130,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         List<AndNode.Entry> nlParents = new ArrayList<>();
 
-        Refinement mirrorRef = new Refinement(new RelationsMap(new Relation[]{rel.getCachedInverted()}), provider);
+        Refinement mirrorRef = new Refinement(new RelationsMap(new Relation[]{rel.invert()}), provider);
         nlParents.add(new AndNode.Entry(mirrorRef, new RefValue(new Integer[] {1}, 0, ref.input)));
 
         rv = new RefValue(new Integer[] {0}, 1, provider);

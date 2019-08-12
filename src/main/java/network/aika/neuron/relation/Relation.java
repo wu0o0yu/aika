@@ -72,7 +72,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public static Relation ANY = new Any();
 
-    private Relation cachedInverted;
 
     @Override
     public int compareTo(Relation rel) {
@@ -98,14 +97,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
 
     public Relation() {
-    }
-
-
-    public Relation getCachedInverted() {
-        if(cachedInverted == null) {
-            cachedInverted = invert();
-        }
-        return cachedInverted;
     }
 
 
@@ -135,7 +126,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public void link(Neuron n, int from, int to) {
         addRelation(to, from, n, this);
-        addRelation(from, to, n, getCachedInverted());
+        addRelation(from, to, n, invert());
     }
 
 

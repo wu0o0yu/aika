@@ -215,7 +215,7 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
         Relation rel = firstRef.relations.get(firstParent.rv.refOffset);
         if(rel != null) {
-            secondRelations[secondParentRV.refOffset] = rel.getCachedInverted();
+            secondRelations[secondParentRV.refOffset] = rel.invert();
         }
         return new RelationsMap(secondRelations);
     }

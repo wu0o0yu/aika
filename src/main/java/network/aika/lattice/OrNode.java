@@ -119,7 +119,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
                     Synapse s = outputNeuron.getSynapseById(relSynId);
                     if (s != null) {
                         existingAct = rel
-                                .getCachedInverted()
+                                .invert()
                                 .getActivations(s.getInput().get(), l.getInput())
                                 .flatMap(act -> act.getLinksBySynapse(Direction.OUTPUT, s))
                                 .map(rl -> rl.getOutput())
@@ -128,7 +128,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
                     }
                 } else {
                     existingAct = rel
-                            .getCachedInverted()
+                            .invert()
                             .getActivations(outputNeuron.get(), l.getInput())
                             .findFirst()
                             .orElse(null);
