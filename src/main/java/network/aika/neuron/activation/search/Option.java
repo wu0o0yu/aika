@@ -174,7 +174,7 @@ public class Option implements Comparable<Option> {
 
 
     public void cleanup() {
-        children = null;
+        children.clear();
     }
 
 
