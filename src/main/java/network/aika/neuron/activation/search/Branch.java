@@ -54,8 +54,21 @@ public class Branch {
         child.changeState(Activation.Mode.OLD);
     }
 
+
     public void repeat() {
         visited = false;
         searched = false;
+    }
+
+
+    public void cleanup() {
+        if(child == null) {
+            return;
+        }
+        child.getModifiedActivations()
+                .values()
+                .forEach(o -> o.cleanup());
+
+        child = null;
     }
 }

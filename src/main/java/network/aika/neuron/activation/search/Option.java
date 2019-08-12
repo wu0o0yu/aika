@@ -173,6 +173,11 @@ public class Option implements Comparable<Option> {
     }
 
 
+    public void cleanup() {
+        children = null;
+    }
+
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(" snId:" + (searchNode != null ? searchNode.getId() : "-") + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " value:" + Utils.round(state.value));
