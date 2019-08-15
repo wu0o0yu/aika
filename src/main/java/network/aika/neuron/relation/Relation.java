@@ -100,6 +100,26 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     }
 
 
+    public Collection<Relation> getLeafRelations() {
+        return Collections.singletonList(this);
+    }
+
+
+    public Relation getRelation(Relation r) {
+        if(compareTo(r) == 0) {
+            return this;
+        }
+        return null;
+    }
+
+
+    public void setFromSynapseId(int fromSynapseId) {
+    }
+
+    public void setToSynapseId(int toSynapseId) {
+    }
+
+
     public void write(DataOutput out) throws IOException {
         out.writeInt(getType());
     }
@@ -174,7 +194,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             mr.removeRelation(r);
 
             if(mr.size() == 1) {
-                relMap.put(synId, mr.getRelations().first());
+                relMap.put(synId, mr.getLeafRelations().iterator().next());
             }
         }
     }
@@ -239,6 +259,9 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         public void registerSynapseIds(Neuron n) {
             n.registerSynapseId(from);
             n.registerSynapseId(to);
+
+            relation.setFromSynapseId(from);
+            relation.setToSynapseId(to);
         }
     }
 
