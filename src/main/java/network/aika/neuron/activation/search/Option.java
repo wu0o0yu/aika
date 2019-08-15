@@ -47,7 +47,7 @@ public class Option implements Comparable<Option> {
     public SearchNode searchNode;
 
     private Option parent;
-    private List<Option> children = new ArrayList<>();
+    private Set<Option> children = new TreeSet<>();
 
     public Decision decision;
 
@@ -174,7 +174,8 @@ public class Option implements Comparable<Option> {
 
 
     public void cleanup() {
-        children.clear();
+        parent.children.remove(this);
+        parent = null;
     }
 
 
