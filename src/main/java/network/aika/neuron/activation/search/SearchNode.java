@@ -343,9 +343,9 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if(!COMPUTE_SOFT_MAX) {
             if(!bestPath) {
-                b.child = null;
+                b.cleanup();
             }
-            getBranch(d.getInverted()).child = null;
+            getBranch(d.getInverted()).cleanup();
         }
 
         return b.weight;

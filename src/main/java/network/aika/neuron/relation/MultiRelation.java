@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 public class MultiRelation extends Relation {
     public static final int ID = 1;
 
-    private SortedSet<Relation> relations;
+    private SortedMap<Relation, Relation> relations;
 
     static {
         registerRelation(ID, () -> new MultiRelation());
@@ -44,42 +44,45 @@ public class MultiRelation extends Relation {
 
 
     public MultiRelation() {
-        relations = new TreeSet<>();
+        relations = new TreeMap<>();
     }
 
 
     public MultiRelation(Relation... rels) {
-        relations = new TreeSet<>(Arrays.asList(rels));
+        relations = new TreeMap<>();
+
+        for(Relation r: rels) {
+            relations.put(r, r);
+        }
     }
 
 
-    public MultiRelation(SortedSet<Relation> rels) {
+    public MultiRelation(SortedMap<Relation, Relation> rels) {
         relations = rels;
     }
 
 
-    public SortedSet<Relation> getRelations() {
-        return relations;
+    public Collection<Relation> getLeafRelations() {
+        return relations.values();
     }
-
 
     public int size() {
         return relations.size();
     }
 
 
+    public Relation getRelation(Relation r) {
+        return relations.get(r);
+    }
+
+
     public void addRelation(Relation r) {
-        for(Relation rel: relations) {
-            if(rel.compareTo(r) == 0) {
-                return;
-            }
-        }
-        relations.add(r);
+        relations.put(r, r);
     }
 
 
     public void removeRelation(Relation r) {
-        relations.removeIf(rel -> rel.compareTo(r) == 0);
+        relations.remove(r);
     }
 
 
@@ -91,7 +94,7 @@ public class MultiRelation extends Relation {
 
     @Override
     public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
-        for (Relation rel : relations) {
+        for (Relation rel : relations.values()) {
             if (!rel.test(act, linkedAct, allowUndefined)) {
                 return false;
             }
@@ -102,9 +105,10 @@ public class MultiRelation extends Relation {
 
     @Override
     public Relation invert() {
-        SortedSet<Relation> invRels = new TreeSet<>();
-        for(Relation rel: relations) {
-            invRels.add(rel.invert());
+        SortedMap<Relation, Relation> invRels = new TreeMap<>();
+        for(Relation rel: relations.values()) {
+            Relation ir = rel.invert();
+            invRels.put(ir, ir);
         }
         return new MultiRelation(invRels);
     }
@@ -112,7 +116,7 @@ public class MultiRelation extends Relation {
 
     @Override
     public void mapSlots(Map<Integer, Position> slots, Activation act) {
-        for(Relation rel: relations) {
+        for(Relation rel: relations.values()) {
             rel.mapSlots(slots, act);
         }
     }
@@ -120,7 +124,7 @@ public class MultiRelation extends Relation {
 
     @Override
     public boolean isExact() {
-        for(Relation rel: relations) {
+        for(Relation rel: relations.values()) {
             if(rel.isExact()) {
                 return true;
             }
@@ -134,10 +138,10 @@ public class MultiRelation extends Relation {
         if(relations.isEmpty()) {
             return n.getActivations(linkedAct.getDocument());
         } else {
-            return relations.first()
+            return relations.firstKey()
                     .getActivations(n, linkedAct)
                     .filter(act -> {
-                        for (Relation rel : relations) {
+                        for (Relation rel : relations.values()) {
                             if (!rel.test(act, linkedAct, false)) {
                                 return false;
                             }
@@ -157,8 +161,8 @@ public class MultiRelation extends Relation {
         r = Integer.compare(relations.size(), mr.relations.size());
         if(r != 0) return r;
 
-        Iterator<Relation> ita = relations.iterator();
-        Iterator<Relation> itb = mr.relations.iterator();
+        Iterator<Relation> ita = relations.values().iterator();
+        Iterator<Relation> itb = mr.relations.values().iterator();
 
         while(ita.hasNext() || itb.hasNext()) {
             Relation a = ita.next();
@@ -174,7 +178,7 @@ public class MultiRelation extends Relation {
     public void write(DataOutput out) throws IOException {
         super.write(out);
         out.writeInt(relations.size());
-        for(Relation rel: relations) {
+        for(Relation rel: relations.values()) {
             rel.write(out);
         }
     }
@@ -185,7 +189,8 @@ public class MultiRelation extends Relation {
         super.readFields(in, m);
         int l = in.readInt();
         for(int i = 0; i < l; i++) {
-            relations.add(Relation.read(in, m));
+            Relation r = Relation.read(in, m);
+            relations.put(r, r);
         }
     }
 
@@ -193,7 +198,7 @@ public class MultiRelation extends Relation {
         StringBuilder sb = new StringBuilder();
         sb.append("MULTI(");
         boolean first = true;
-        for(Relation rel: relations) {
+        for(Relation rel: relations.values()) {
             if(!first) {
                 sb.append(", ");
             }
