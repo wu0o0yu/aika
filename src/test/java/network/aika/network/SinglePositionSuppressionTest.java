@@ -19,7 +19,7 @@ import static network.aika.neuron.relation.AncestorRelation.IS_DESCENDANT_OF;
 import static network.aika.neuron.relation.Relation.END_TO_BEGIN_EQUALS;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
-public class SinglePositionSuppression {
+public class SinglePositionSuppressionTest {
 
 
     @Test
