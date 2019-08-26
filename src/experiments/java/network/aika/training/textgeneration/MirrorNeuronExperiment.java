@@ -3,12 +3,15 @@ package network.aika.training.textgeneration;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.search.SearchNode;
+import network.aika.neuron.relation.MultiRelation;
+import network.aika.neuron.relation.PositionRelation;
 import network.aika.training.MetaModel;
 import network.aika.training.TDocument;
 import network.aika.training.excitatory.ExcitatoryNeuron;
 import network.aika.training.meta.MetaNeuron;
 import network.aika.training.meta.MetaSynapse;
 import network.aika.neuron.relation.Relation;
+import network.aika.training.relation.WeightedRelation;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +21,8 @@ import java.util.TreeMap;
 
 import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.Synapse.OUTPUT;
+import static network.aika.neuron.activation.Activation.BEGIN;
+import static network.aika.neuron.activation.Activation.END;
 import static network.aika.neuron.relation.AncestorRelation.IS_DESCENDANT_OF;
 import static network.aika.neuron.relation.Relation.*;
 
@@ -98,27 +103,30 @@ public class MirrorNeuronExperiment {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRelation(BEGIN_TO_END_EQUALS),
+                        .setRelation(new WeightedRelation(BEGIN_TO_END_EQUALS, 1.0)),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(1)
-                        .setRelation(BEGIN_TO_END_EQUALS),
+                        .setRelation(new WeightedRelation(BEGIN_TO_END_EQUALS, 1.0)),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(2)
-                        .setRelation(BEGIN_TO_END_EQUALS),
+                        .setRelation(new WeightedRelation(BEGIN_TO_END_EQUALS, 1.0)),
                 new Relation.Builder()
                         .setFrom(4)
                         .setTo(OUTPUT)
-                        .setRelation(OVERLAPS),
+                        .setRelation(new MultiRelation(
+                                new WeightedRelation(new PositionRelation.LessThan(BEGIN, END, false), 1.0),
+                                new WeightedRelation(new PositionRelation.GreaterThan(END, BEGIN, false, Integer.MAX_VALUE), 1.0)
+                        )),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(Synapse.OUTPUT)
-                        .setRelation(BEGIN_EQUALS),
+                        .setRelation(new WeightedRelation(BEGIN_EQUALS, 1.0)),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(Synapse.OUTPUT)
-                        .setRelation(END_EQUALS)
+                        .setRelation(new WeightedRelation(END_EQUALS, 1.0))
         );
 
         model.initMetaNeuron(wordTriggerNeuron,
@@ -149,15 +157,21 @@ public class MirrorNeuronExperiment {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRelation(EQUALS),
+                        .setRelation(new MultiRelation(
+                                new WeightedRelation(new PositionRelation.Equals(BEGIN, BEGIN), 1.0),
+                                new WeightedRelation(new PositionRelation.Equals(END, END), 1.0)
+                        )),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(1)
-                        .setRelation(ANY),
+                        .setRelation(new WeightedRelation(ANY, 1.0)),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(Synapse.OUTPUT)
-                        .setRelation(EQUALS)
+                        .setRelation(new MultiRelation(
+                                new WeightedRelation(new PositionRelation.Equals(BEGIN, BEGIN), 1.0),
+                                new WeightedRelation(new PositionRelation.Equals(END, END), 1.0)
+                        ))
         );
 
         model.initMetaNeuron(letterOutputNeuron,
@@ -194,15 +208,15 @@ public class MirrorNeuronExperiment {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRelation(BEGIN_EQUALS),
+                        .setRelation(new WeightedRelation(BEGIN_EQUALS, 1.0)),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(0)
-                        .setRelation(END_EQUALS),
+                        .setRelation(new WeightedRelation(END_EQUALS, 1.0)),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(0)
-                        .setRelation(END_TO_BEGIN_EQUALS),
+                        .setRelation(new WeightedRelation(END_TO_BEGIN_EQUALS, 1.0)),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(2)
@@ -210,19 +224,22 @@ public class MirrorNeuronExperiment {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(Synapse.OUTPUT)
-                        .setRelation(EQUALS),
+                        .setRelation(new MultiRelation(
+                                new WeightedRelation(new PositionRelation.Equals(BEGIN, BEGIN), 1.0),
+                                new WeightedRelation(new PositionRelation.Equals(END, END), 1.0)
+                        )),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(Synapse.OUTPUT)
-                        .setRelation(BEGIN_EQUALS),
+                        .setRelation(new WeightedRelation(BEGIN_EQUALS, 1.0)),
                 new Relation.Builder()
                         .setFrom(2)
                         .setTo(Synapse.OUTPUT)
-                        .setRelation(END_EQUALS),
+                        .setRelation(new WeightedRelation(END_EQUALS, 1.0)),
                 new Relation.Builder()
                         .setFrom(3)
                         .setTo(Synapse.OUTPUT)
-                        .setRelation(END_TO_BEGIN_EQUALS)
+                        .setRelation(new WeightedRelation(END_TO_BEGIN_EQUALS, 1.0))
         );
 
 
@@ -247,11 +264,17 @@ public class MirrorNeuronExperiment {
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
-                        .setRelation(EQUALS),
+                        .setRelation(new MultiRelation(
+                                new WeightedRelation(new PositionRelation.Equals(BEGIN, BEGIN), 1.0),
+                                new WeightedRelation(new PositionRelation.Equals(END, END), 1.0)
+                        )),
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(Synapse.OUTPUT)
-                        .setRelation(EQUALS)
+                        .setRelation(new MultiRelation(
+                                new WeightedRelation(new PositionRelation.Equals(BEGIN, BEGIN), 1.0),
+                                new WeightedRelation(new PositionRelation.Equals(END, END), 1.0)
+                        ))
         );
 
         outputLetter.setOutputMetaNeuron(true);
@@ -276,7 +299,10 @@ public class MirrorNeuronExperiment {
                 new Relation.Builder()
                         .setFrom(0)
                         .setTo(Synapse.OUTPUT)
-                        .setRelation(EQUALS)
+                        .setRelation(new MultiRelation(
+                                new PositionRelation.Equals(BEGIN, BEGIN),
+                                new PositionRelation.Equals(END, END)
+                        ))
         );
 
 
