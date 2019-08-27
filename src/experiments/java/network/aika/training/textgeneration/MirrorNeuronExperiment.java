@@ -8,6 +8,8 @@ import network.aika.neuron.relation.PositionRelation;
 import network.aika.training.MetaModel;
 import network.aika.training.TDocument;
 import network.aika.training.excitatory.ExcitatoryNeuron;
+import network.aika.training.inhibitory.InhibitoryNeuron;
+import network.aika.training.input.InputNeuron;
 import network.aika.training.meta.MetaNeuron;
 import network.aika.training.meta.MetaSynapse;
 import network.aika.neuron.relation.Relation;
@@ -54,14 +56,17 @@ public class MirrorNeuronExperiment {
         wordTriggerNeuron = model.createMetaNeuron("WordTriggerNeuron"); // LIMITED_RECTIFIED_LINEAR_UNIT
         wordOutputNeuron = model.createMetaNeuron("WordOutputNeuron");
         letterOutputNeuron = model.createMetaNeuron("LetterOutputNeuron");
-        outputTrigger = model.createNeuron("OutputTrigger", INPUT);
-        trainExampleFrame = model.createNeuron("TrainExampleFrame", INPUT);
-        outputFrame = model.createNeuron("OutputFrame", INHIBITORY);
+        outputTrigger = new InputNeuron(model, "OutputTrigger").getProvider();
+        trainExampleFrame = new InputNeuron(model, "TrainExampleFrame").getProvider();
+        outputFrame = new InhibitoryNeuron(model, "OutputFrame").getProvider();
 
         model.initMetaNeuron(inputLetter,
                 0.0,
                 -10.0,
-                EQUALS
+                new MultiRelation(
+                        new WeightedRelation(new PositionRelation.Equals(BEGIN, BEGIN), 1.0),
+                        new WeightedRelation(new PositionRelation.Equals(END, END), 1.0)
+                )
         );
 
         String letters = "abcdefghijklmnopqrstuvwxyz";
@@ -69,7 +74,10 @@ public class MirrorNeuronExperiment {
         model.initMetaNeuron(wordInputNeuron,
                 5.0,
                 -10.0,
-                EQUALS,
+                new MultiRelation(
+                        new WeightedRelation(new PositionRelation.Equals(BEGIN, BEGIN), 1.0),
+                        new WeightedRelation(new PositionRelation.Equals(END, END), 1.0)
+                ),
                 new MetaSynapse.Builder() // First word of the phrase
                         .setIsMetaVariable(true)
                         .setSynapseId(0)
@@ -132,13 +140,19 @@ public class MirrorNeuronExperiment {
         model.initMetaNeuron(wordTriggerNeuron,
                 0.0,
                 -10.0,
-                EQUALS
+                new MultiRelation(
+                        new WeightedRelation(new PositionRelation.Equals(BEGIN, BEGIN), 1.0),
+                        new WeightedRelation(new PositionRelation.Equals(END, END), 1.0)
+                )
         );
 
         model.initMetaNeuron(wordOutputNeuron,
                 5.0,
                 -10.0,
-                EQUALS,
+                new MultiRelation(
+                        new WeightedRelation(new PositionRelation.Equals(BEGIN, BEGIN), 1.0),
+                        new WeightedRelation(new PositionRelation.Equals(END, END), 1.0)
+                ),
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(wordInputNeuron.getInhibitoryNeuron())
@@ -177,7 +191,10 @@ public class MirrorNeuronExperiment {
         model.initMetaNeuron(letterOutputNeuron,
                 0.0,
                 -5.0,
-                EQUALS,
+                new MultiRelation(
+                        new WeightedRelation(new PositionRelation.Equals(BEGIN, BEGIN), 1.0),
+                        new WeightedRelation(new PositionRelation.Equals(END, END), 1.0)
+                ),
                 new Synapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inputLetter.getInhibitoryNeuron())
@@ -246,7 +263,10 @@ public class MirrorNeuronExperiment {
         model.initMetaNeuron(outputLetter,
                 0.0,
                 -5.0,
-                EQUALS,
+                new MultiRelation(
+                        new WeightedRelation(new PositionRelation.Equals(BEGIN, BEGIN), 1.0),
+                        new WeightedRelation(new PositionRelation.Equals(END, END), 1.0)
+                ),
                 new MetaSynapse.Builder()
                         .setIsMetaVariable(true)
                         .setSynapseId(0)

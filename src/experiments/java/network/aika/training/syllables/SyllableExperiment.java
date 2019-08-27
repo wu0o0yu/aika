@@ -5,6 +5,7 @@ import network.aika.Document;
 import network.aika.neuron.Neuron;
 import network.aika.training.MetaModel;
 import network.aika.training.TDocument;
+import network.aika.training.input.InputNeuron;
 import network.aika.training.utils.Parser;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +38,7 @@ public class SyllableExperiment {
         for(int i = 0; i < letters.length(); i++) {
             char c = letters.charAt(i);
 
-            inputLetters.put(c, model.createNeuron("" + c, INPUT));
+            inputLetters.put(c, new InputNeuron(model, "" + c).getProvider());
         }
 
         doc.clearActivations();
@@ -68,7 +69,7 @@ public class SyllableExperiment {
     public void testTraining() throws IOException {
         Document.CLEANUP_INTERVAL = 5000;
 
-        for(String word: Parser.loadExamplesAsWords()) {
+        for(String word: Parser.loadExamplesAsWords(new File(System.getProperty("data.dir")))) {
             train( word + " ");
         }
 

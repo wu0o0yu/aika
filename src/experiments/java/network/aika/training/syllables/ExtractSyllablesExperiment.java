@@ -73,7 +73,7 @@ public class ExtractSyllablesExperiment {
         SearchNode.OPTIMIZE_SEARCH = false;
         SearchNode.COMPUTE_SOFT_MAX = true;
 
-        List<String> inputs = Parser.loadExamplesAsWords();
+        List<String> inputs = Parser.loadExamplesAsWords(new File(System.getProperty("data.dir")));
 
         for(int round = 0; round < 1; round++) {
             for (String txt : inputs) {

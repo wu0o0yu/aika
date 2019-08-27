@@ -9,6 +9,7 @@ import network.aika.training.inhibitory.InhibitoryNeuron;
 import network.aika.training.meta.MetaNeuron;
 import network.aika.training.meta.MetaSynapse;
 import network.aika.neuron.relation.Relation;
+import network.aika.training.relation.WeightedRelation;
 import network.aika.training.utils.Dictionary;
 import network.aika.training.utils.Parser;
 import org.junit.Before;

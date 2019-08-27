@@ -103,7 +103,9 @@ public class WeightedRelation extends Relation {
 
 
     public WeightedRelation createTargetRelation(Activation act, Activation relatedAct) {
-        return null;
+        // TODO
+
+        return new WeightedRelation(rel, statistic.copy());
     }
 
     public WeightedRelation copy() {

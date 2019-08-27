@@ -12,7 +12,7 @@ import java.util.List;
 public class Parser {
 
 
-    public static List<String> loadExamplesAsWords() throws IOException {
+    public static List<String> loadExamplesAsWords(File dir) throws IOException {
         String[] files = new String[]{
                 "Aschenputtel",
                 "BruederchenUndSchwesterchen",
@@ -48,7 +48,7 @@ public class Parser {
 
         ArrayList<String> words = new ArrayList<>();
         for (String fn : files) {
-            File f = new File("./src/test/resources/maerchen/" + fn + ".txt");
+            File f = new File( dir, fn + ".txt");
             InputStream is = new FileInputStream(f);
             StringWriter writer = new StringWriter();
             IOUtils.copy(is, writer, "UTF-8");
@@ -74,67 +74,6 @@ public class Parser {
         return words;
     }
 
-    /*
-    public static ArrayList<String> loadExamplesAsWords() throws IOException {
-        String[] files = new String[]{
-                "Aschenputtel",
-                "BruederchenUndSchwesterchen",
-                "DasTapfereSchneiderlein",
-                "DerFroschkoenig",
-                "DerGestiefelteKater",
-                "DerGoldeneSchluessel",
-                "DerSuesseBrei",
-                "DerTeufelMitDenDreiGoldenenHaaren",
-                "DerWolfUndDieSiebenJungenGeisslein",
-                "DieBremerStadtmusikanten",
-                "DieDreiFedern"/*,
-                "DieSterntaler",
-                "DieWeisseSchlange",
-                "DieZwoelfBrueder",
-                "Dornroeschen",
-                "FrauHolle",
-                "HaenselUndGretel",
-                "HansImGlueck",
-                "JorindeUndJoringel",
-                "KatzeUndMausInGesellschaft",
-                "MaerchenVonEinemDerAuszogDasFuerchtenZuLernen",
-                "Marienkind",
-                "Rapunzel",
-                "Rotkaeppchen",
-                "Rumpelstilzchen",
-                "SchneeweisschenUndRosenrot",
-                "Schneewitchen",
-                "TischleinDeckDich",
-                "VonDemFischerUndSeinerFrau"
-        };
-
-
-        ArrayList<String> inputs = new ArrayList<>();
-        for (String fn : files) {
-            InputStream is = Parser.class.getResourceAsStream("../../../resources/maerchen/" + fn + ".txt");
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(is, writer, "UTF-8");
-            String txt = writer.toString();
-
-            txt = txt.replace('.', ' ');
-            txt = txt.replace(',', ' ');
-            txt = txt.replace('?', ' ');
-            txt = txt.replace('!', ' ');
-            txt = txt.replace('"', ' ');
-            txt = txt.replace('-', ' ');
-            txt = txt.replace(':', ' ');
-            txt = txt.replace(';', ' ');
-            txt = txt.replace('\n', ' ');
-            txt = txt.replace("  ", " ");
-            txt = txt.replace("  ", " ");
-
-            for(String word: txt.split(" ")) {
-                inputs.add(word);
-            }
-        }
-        return inputs;
-    }
-*/
 
     public static TDocument parse(MetaModel model, String txt, DictionaryLookup lookup) {
         TDocument doc = new TDocument(model, txt);
