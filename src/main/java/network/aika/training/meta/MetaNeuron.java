@@ -228,6 +228,8 @@ public class MetaNeuron extends TNeuron {
             metaSyn.targetSynapses.put((ExcitatoryNeuron) targetSyn.getOutput().get(), ml);
             targetSyn.metaSynapses.put(metaSyn, ml);
 
+            metaSyn.link();
+
             return metaSyn;
         }
     }

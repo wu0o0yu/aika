@@ -286,7 +286,10 @@ public class ExcitatoryNeuron extends TNeuron {
 
         s.setInactive(CURRENT, true);
         s.setInactive(NEXT, true);
-        s.setRecurrent(inputOpt.getState().fired > targetOpt.getState().fired);
+
+        if(inputOpt.getState().fired != null && targetOpt.getState().fired != null) {
+            s.setRecurrent(inputOpt.getState().fired > targetOpt.getState().fired);
+        }
 
         establishRelations(inputOpt, targetOpt, s);
 

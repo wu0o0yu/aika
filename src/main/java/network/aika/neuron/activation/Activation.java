@@ -331,7 +331,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public Decision getFinalDecision() {
-        return finalOption.decision;
+        return finalOption != null ? finalOption.decision : null;
     }
 
 
