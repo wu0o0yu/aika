@@ -251,7 +251,7 @@ public class MetaNeuron extends TNeuron {
                 new MetaSynapse.MappingLink(nms, ts).link();
             }
 
-            Relation newRelation = null; //ref.rel.newInstance();
+            Relation newRelation = null; //ref.keyRelation.newInstance();
             newRelation.link(getProvider(), ref.anchor.getId(), nms.getId());
         }
     }

@@ -5,6 +5,7 @@ import network.aika.neuron.Neuron;
 import network.aika.training.MetaModel;
 import network.aika.training.TDocument;
 import network.aika.training.excitatory.ExcitatoryNeuron;
+import network.aika.training.input.InputNeuron;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,7 +32,7 @@ public class MinimalExperiment {
         for(int i = 0; i < letters.length(); i++) {
             char c = letters.charAt(i);
 
-            inputLetters.put(c, model.createNeuron("" + c, INPUT));
+            inputLetters.put(c, new InputNeuron(model, "" + c).getProvider());
         }
 
         doc.clearActivations();

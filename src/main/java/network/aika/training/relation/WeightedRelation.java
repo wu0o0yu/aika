@@ -18,24 +18,24 @@ public class WeightedRelation extends Relation {
     public int toSynapseId;
 
 
-    public Relation rel;
+    public Relation keyRelation;
     public RelationStatistic statistic;
 
 
     public WeightedRelation(Relation rel, double weight) {
-        this.rel = rel;
+        this.keyRelation = rel;
         this.statistic = new RelationStatistic(weight);
     }
 
 
     public WeightedRelation(Relation rel, RelationStatistic statistic) {
-        this.rel = rel;
+        this.keyRelation = rel;
         this.statistic = statistic;
     }
 
 
     public WeightedRelation(Relation rel, RelationStatistic statistic, int fromSynapseId, int toSynapseId) {
-        this.rel = rel;
+        this.keyRelation = rel;
         this.statistic = statistic;
         this.fromSynapseId = fromSynapseId;
         this.toSynapseId = toSynapseId;
@@ -43,7 +43,7 @@ public class WeightedRelation extends Relation {
 
 
     public Relation getKeyRelation() {
-        return rel;
+        return keyRelation;
     }
 
 
@@ -63,22 +63,22 @@ public class WeightedRelation extends Relation {
     }
 
     public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
-        return rel.test(act, linkedAct, allowUndefined);
+        return keyRelation.test(act, linkedAct, allowUndefined);
     }
 
     @Override
     public Relation invert() {
-        return new WeightedRelation(rel.invert(), statistic, toSynapseId, fromSynapseId);
+        return new WeightedRelation(keyRelation.invert(), statistic, toSynapseId, fromSynapseId);
     }
 
 
     public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-        return rel.getActivations(n, linkedAct);
+        return keyRelation.getActivations(n, linkedAct);
     }
 
 
     public boolean isExact() {
-        return rel.isExact();
+        return keyRelation.isExact();
     }
 
 
@@ -98,17 +98,32 @@ public class WeightedRelation extends Relation {
 
 
     public void mapSlots(Map<Integer, Position> slots, Activation act) {
-        rel.mapSlots(slots, act);
+        keyRelation.mapSlots(slots, act);
     }
 
 
     public WeightedRelation createTargetRelation(Activation act, Activation relatedAct) {
         // TODO
 
-        return new WeightedRelation(rel, statistic.copy());
+        return new WeightedRelation(keyRelation, statistic.copy());
     }
 
     public WeightedRelation copy() {
-        return new WeightedRelation(rel, statistic.copy());
+        return new WeightedRelation(keyRelation, statistic.copy());
+    }
+
+
+    public String toString() {
+        return "WEIGHTED-REL(" + keyRelation + ":" + statistic + ")";
+    }
+
+    @Override
+    public int compareTo(Relation rel) {
+        int r = super.compareTo(rel);
+        if(r != 0) return r;
+
+        WeightedRelation wr = (WeightedRelation) rel;
+
+        return keyRelation.compareTo(wr.keyRelation);
     }
 }

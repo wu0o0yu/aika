@@ -97,8 +97,6 @@ public class TDocument extends Document {
 
     public void generateSynapses() {
         for(Activation targetAct: new ArrayList<>(getActivations(false))) {
-//            if (!targetAct.getLabel().startsWith("DERIVED-FROM-(W-Hund)")) continue;
-
             ((TNeuron) targetAct.getINeuron()).generateSynapses(targetAct);
         }
     }

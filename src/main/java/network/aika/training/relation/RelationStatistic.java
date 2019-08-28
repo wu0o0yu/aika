@@ -114,4 +114,9 @@ public class RelationStatistic {
         rs.weight = weight;
         return rs;
     }
+
+
+    public String toString() {
+        return "" + weight;
+    }
 }
