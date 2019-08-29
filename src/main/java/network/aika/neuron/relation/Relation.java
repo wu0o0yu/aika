@@ -163,17 +163,14 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             }
         }
 
-        Relation existingRel = relMap.get(synId);
-        if (existingRel == null) {
-            relMap.put(synId, r);
-        } else if(existingRel instanceof MultiRelation) {
-            MultiRelation mr = (MultiRelation) existingRel;
-            mr.addRelation(r);
-        } else if(existingRel.compareTo(r) != 0) {
-            MultiRelation mr = new MultiRelation();
-            mr.addRelation(existingRel);
-            mr.addRelation(r);
+        MultiRelation mr = (MultiRelation) relMap.get(synId);
+        if (mr == null) {
+            mr = new MultiRelation();
             relMap.put(synId, mr);
+        }
+
+        for(Relation lr: r.getLeafRelations()) {
+            mr.addRelation(lr);
         }
     }
 
@@ -187,15 +184,9 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         Relation existingRel = relMap.get(synId);
         if(existingRel == null) {
             return;
-        } else if(existingRel.compareTo(r) == 0) {
-            relMap.remove(synId);
         } else if(existingRel instanceof MultiRelation) {
             MultiRelation mr = (MultiRelation) existingRel;
             mr.removeRelation(r);
-
-            if(mr.size() == 1) {
-                relMap.put(synId, mr.getLeafRelations().iterator().next());
-            }
         }
     }
 

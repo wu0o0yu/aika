@@ -61,6 +61,9 @@ public class MultiRelation extends Relation {
         relations = rels;
     }
 
+    public SortedMap<Relation, Relation> getRelations() {
+        return relations;
+    }
 
     public Collection<Relation> getLeafRelations() {
         return relations.values();
@@ -208,4 +211,5 @@ public class MultiRelation extends Relation {
         sb.append(")");
         return sb.toString();
     }
+
 }
