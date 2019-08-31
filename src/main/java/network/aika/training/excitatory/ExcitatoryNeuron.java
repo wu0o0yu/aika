@@ -258,7 +258,11 @@ public class ExcitatoryNeuron extends TNeuron {
 
 
     private Option getMaxOption(Activation inputAct) {
-        return inputAct.getOptions().stream().max(Comparator.comparingDouble(o -> o.p)).orElse(null);
+        return inputAct
+                .getOptions()
+                .stream()
+                .max(Comparator.comparingDouble(o -> o.p))
+                .orElse(null);
     }
 
 
