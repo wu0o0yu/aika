@@ -84,7 +84,7 @@ public abstract class TNeuron extends INeuron {
 
 
     public void count(Option o) {
-        countValue += o.getState().value * o.p;
+        countValue += o.getState().value * o.getP();
 
         countSynapses(o, INPUT);
         countSynapses(o, OUTPUT);
@@ -227,7 +227,7 @@ public abstract class TNeuron extends INeuron {
         doc.createV = doc.getNewVisitedId();
 
         for (Option o : metaAct.getOptions()) {
-            if (o.p > threshold && getTrainingNetValue(o) > 0.0) {
+            if (o.getP() > threshold && getTrainingNetValue(o) > 0.0) {
                 ExcitatoryNeuron targetNeuron = getTargetNeuron(metaAct, callback);
 
                 collectTarget((TDocument) doc, o, targetNeuron);
@@ -347,6 +347,10 @@ public abstract class TNeuron extends INeuron {
 
 
     public static boolean checkSelfReferencing(Option current, Option inhib) {
+        if(inhib == null) {
+            return false;
+        }
+
         for(Option in: inhib.inputOptions.values()) {
             if(in == current) {
                 return true;

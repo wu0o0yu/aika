@@ -545,7 +545,7 @@ public class Activation implements Comparable<Activation> {
 
     public void setInputState(Builder input) {
         rootOption.decision = SELECTED;
-        rootOption.p = 1.0;
+        rootOption.setP(1.0);
         rootOption.setState(new State(input.value, input.value, input.net, input.fired, 0.0));
         currentOption = rootOption;
         finalOption = rootOption;
@@ -628,7 +628,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    private boolean checkSelfReferencingRecursiveStep(Activation act, int depth) {
+    public boolean checkSelfReferencingRecursiveStep(Activation act, int depth) {
         if (this == act) {
             return true;
         }
@@ -783,7 +783,7 @@ public class Activation implements Comparable<Activation> {
 
         rootOption.traverse(o -> {
             if (o.getAct().getType() != INPUT && o.decision == SELECTED) {
-                o.p = norm[0] != 0.0 ? Math.exp(Math.log(o.cacheFactor) + o.remainingWeight - offset[0]) / norm[0] : 1.0;
+                o.setP(norm[0] != 0.0 ? Math.exp(Math.log(o.cacheFactor) + o.remainingWeight - offset[0]) / norm[0] : 1.0);
             }
         });
     }
@@ -870,7 +870,7 @@ public class Activation implements Comparable<Activation> {
         double net = 0.0;
 
         for (Option option : getOptions()) {
-            double p = option.p;
+            double p = option.getP();
             State s = option.getState();
 
             value += p * s.value;

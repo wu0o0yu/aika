@@ -446,7 +446,9 @@ public class Document implements Comparable<Document> {
 
     private void computeOptionProbabilities() {
         for (Activation act : activationsById.values()) {
-            act.computeOptionProbabilities();
+            if(act.getType() == EXCITATORY) {
+                act.computeOptionProbabilities();
+            }
         }
     }
 

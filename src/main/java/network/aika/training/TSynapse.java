@@ -108,7 +108,7 @@ public class TSynapse extends Synapse {
         }
         needsCountUpdate = false;
 
-        double optionProp = (io != null ? io.p : 1.0) * (oo != null ? oo.p : 1.0);
+        double optionProp = (io != null ? io.getP() : 1.0) * (oo != null ? oo.getP() : 1.0);
 
         countValueIPosOPos += (Sign.POS.getX(inputValue) * Sign.POS.getX(outputValue) * optionProp);
         countValueIPosONeg += (Sign.POS.getX(inputValue) * Sign.NEG.getX(outputValue) * optionProp);

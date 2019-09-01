@@ -200,7 +200,7 @@ public class TDocument extends Document {
         List<Synapse> targetInputSynapses = new ArrayList();
 
         metaActOption.inputOptions.entrySet().stream()
-                .filter(me -> me.getValue() != null && me.getValue().p >= threshold)
+                .filter(me -> me.getValue() != null && me.getValue().getP() >= threshold)
                 .forEach(me -> {
                     Link l = me.getKey();
                     Option inOption = me.getValue();

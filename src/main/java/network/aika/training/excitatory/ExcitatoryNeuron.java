@@ -176,7 +176,7 @@ public class ExcitatoryNeuron extends TNeuron {
         double value = getActivationFunction().f(net);
 
         targetAct.setUpperBound(value);
-        targetOpt.p = inputOpt.p;
+        targetOpt.setP(inputOpt.getP());
 //        targetOpt.state = targetAct.computeValueAndWeight(0);
         targetOpt.setState(new State(value, value, net, inputOpt.getState().fired + 1, 0.0));
 
@@ -261,7 +261,7 @@ public class ExcitatoryNeuron extends TNeuron {
         return inputAct
                 .getOptions()
                 .stream()
-                .max(Comparator.comparingDouble(o -> o.p))
+                .max(Comparator.comparingDouble(o -> o.getP()))
                 .orElse(null);
     }
 
@@ -291,9 +291,7 @@ public class ExcitatoryNeuron extends TNeuron {
         s.setInactive(CURRENT, true);
         s.setInactive(NEXT, true);
 
-        if(inputOpt.getState().fired != null && targetOpt.getState().fired != null) {
-            s.setRecurrent(inputOpt.getState().fired > targetOpt.getState().fired);
-        }
+        s.setRecurrent(inputOpt.checkSelfReferencing(targetOpt));
 
         establishRelations(inputOpt, targetOpt, s);
 
@@ -455,7 +453,7 @@ public class ExcitatoryNeuron extends TNeuron {
 
                 double IGDelta = u.getActDelta(l, out) * delta;
 
-                double d = config.learnRate * out.p * l.getP() * l.getReliability() * IGDelta;
+                double d = config.learnRate * out.getP() * l.getP() * l.getReliability() * IGDelta;
 
                 if (d == 0.0) {
                     continue;
@@ -475,7 +473,7 @@ public class ExcitatoryNeuron extends TNeuron {
                 if (DEBUG1) {
                     XlModeParameters xlParams = dsyn.lookup(u);
                     xlParams.lRel = l.getReliability();
-                    xlParams.pOut = out.p;
+                    xlParams.pOut = out.getP();
                     xlParams.pl = l.getP();
                     xlParams.actDelta = u.getActDelta(l, out);
                     xlParams.IGDelta = IGDelta;
@@ -705,7 +703,7 @@ public class ExcitatoryNeuron extends TNeuron {
         }
 
         public double getP() {
-            return o != null ? o.p : 1.0;
+            return o != null ? o.getP() : 1.0;
         }
 
         public double getReliability() {
