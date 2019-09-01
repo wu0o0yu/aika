@@ -8,6 +8,7 @@ import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
@@ -194,6 +195,7 @@ public class CoreferenceResolutionExperiment {
     }
 
 
+    @Ignore
     @Test
     public void testCoref() {
         String txt = "john richard robert susan he";

@@ -16,6 +16,7 @@ import network.aika.neuron.relation.Relation;
 import network.aika.training.relation.WeightedRelation;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
@@ -338,6 +339,7 @@ public class MirrorNeuronExperiment {
     }
 
 
+    @Ignore
     @Test
     public void testMirrorNeurons() {
         SearchNode.COMPUTE_SOFT_MAX = true;
