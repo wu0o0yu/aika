@@ -26,7 +26,7 @@ public class MetaNeuronInduction {
             List<ExcitatorySynapse> candidateSynapses = n
                     .getActiveOutputSynapses()
                     .stream()
-                    .filter(s -> s.getOutput().getType() == EXCITATORY)
+                    .filter(s -> s.getOutput().get() instanceof ExcitatoryNeuron)
                     .map(s -> (ExcitatorySynapse) s)
                     .collect(Collectors.toList());
 

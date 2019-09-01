@@ -74,15 +74,13 @@ public class MetaNeuronTrainingExperiment {
                         .setSynapseId(1)
                         .setNeuron(word.getInhibitoryNeuron())
                         .setWeight(0.5),
-/*                new MetaSynapse.Builder()
+                new MetaSynapse.Builder()
                         .setIsMetaVariable(true)
                         .setRecurrent(true)
                         .setIdentity(false)
                         .setSynapseId(2)
                         .setNeuron(phraseInhib)
-                        .setWeight(0.0)
-                        .setBias(0.0)
-                        .setRangeInput(VARIABLE),*/
+                        .setWeight(0.0),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(0)
@@ -165,6 +163,7 @@ public class MetaNeuronTrainingExperiment {
                         .setIdentity(true),
                 new MetaSynapse.Builder()
                         .setIsMetaVariable(false)
+                        .setSynapseId(3)
                         .setNeuron(phraseInhib)
                         .setWeight(-100.0)
                         .setRecurrent(true),
@@ -177,7 +176,7 @@ public class MetaNeuronTrainingExperiment {
                         .setTo(1)
                         .setRelation(BEGIN_TO_END_EQUALS),
                 new Relation.Builder()
-                        .setFrom(2)
+                        .setFrom(3)
                         .setTo(OUTPUT)
                         .setRelation(OVERLAPS),
                 new Relation.Builder()

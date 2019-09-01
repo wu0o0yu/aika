@@ -216,9 +216,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
          * @param synapseId
          * @return
          */
-
-
-
         public Builder setFrom(int synapseId) {
             assert synapseId >= -1;
             from = synapseId;
