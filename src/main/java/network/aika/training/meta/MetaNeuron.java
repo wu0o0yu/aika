@@ -66,23 +66,24 @@ public class MetaNeuron extends TNeuron {
     }
 
 
-
     public static void induce(MetaModel model, int threadId) {
         for(Neuron n: model.getActiveNeurons()) {
-            List<ExcitatorySynapse> candidateSynapses = n
-                    .getActiveOutputSynapses()
-                    .stream()
-                    .filter(s -> s.getOutput().get() instanceof ExcitatoryNeuron)
-                    .map(s -> (ExcitatorySynapse) s)
-                    .collect(Collectors.toList());
+            if(n.get() instanceof ExcitatoryNeuron) {
+                List<ExcitatorySynapse> candidateSynapses = n
+                        .getActiveOutputSynapses()
+                        .stream()
+                        .map(s -> (ExcitatorySynapse) s)
+                        .collect(Collectors.toList());
 
-            double coveredScore = coveredSum(candidateSynapses);
+                double coveredScore = coveredSum(candidateSynapses);
 
-            if(coveredScore > COVERED_THRESHOLD) {
-                createNewMetaNeuron(model, threadId, n, candidateSynapses);
+                if (coveredScore > COVERED_THRESHOLD) {
+                    createNewMetaNeuron(model, threadId, n, candidateSynapses);
+                }
             }
         }
     }
+
 
     public static void createNewMetaNeuron(MetaModel model, int threadId, Neuron inputNeuron, List<ExcitatorySynapse> candidateSynapses) {
         MetaNeuron mn = new MetaNeuron(model,"");
