@@ -82,11 +82,39 @@ public class MetaNeuron extends TNeuron {
                 }
             } while (diff > 1.0);
 
+            trainOutputRelations();
+
             propagateToOutgoingInhibNeurons(threadId);
 
         } while(induceInputInhibNeurons() || expand(threadId));
 
         Converter.convert(threadId, null, this, getInputSynapses());
+    }
+
+
+    private void trainOutputRelations() {
+        for(Map.Entry<Integer, Relation> me: getOutputRelations().entrySet()) {
+            Synapse relSyn = getProvider().getSynapseById(me.getKey());
+            relSyn.getRelations().remove(OUTPUT);
+        }
+        getOutputRelations().clear();
+
+        for (MappingLink ml : targetNeurons.values()) {
+            ExcitatoryNeuron tn = ml.targetNeuron;
+
+            for(Map.Entry<Integer, Relation> me: tn.getOutputRelations().entrySet()) {
+                WeightedRelation tr = (WeightedRelation) me.getValue();
+                ExcitatorySynapse ts = (ExcitatorySynapse) tn.getProvider().getSynapseById(me.getKey());
+
+                for(Map.Entry<MetaSynapse, MetaSynapse.MappingLink> mea: ts.metaSynapses.entrySet()) {
+                    if(mea.getKey().getOutput().getId() == getId()) {
+                        MetaSynapse ms = mea.getKey();
+
+                        tr.copy();
+                    }
+                }
+            }
+        }
     }
 
 

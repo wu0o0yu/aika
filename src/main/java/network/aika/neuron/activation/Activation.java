@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Utils;
 import network.aika.lattice.activation.InputActivation;
@@ -140,7 +139,7 @@ public class Activation implements Comparable<Activation> {
 
             int r = Integer.compare(mea.getKey(), meb.getKey());
             if (r != 0) return r;
-            r = Position.compare(act1.lookupSlot(mea.getKey()), act2.lookupSlot(meb.getKey()));
+            r = Position.compare(act1.getSlot(mea.getKey()), act2.getSlot(meb.getKey()));
             if (r != 0) return r;
         }
 
@@ -188,14 +187,8 @@ public class Activation implements Comparable<Activation> {
         return slots;
     }
 
-    public Position lookupSlot(int slot) {
-        Position pos = slots.get(slot);
-        if(pos == null) {
-            pos = new Position(doc);
-            slots.put(slot, pos);
-        }
-
-        return pos;
+    public Position getSlot(int slot) {
+        return slots.get(slot);
     }
 
 
@@ -251,7 +244,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public String getText() {
-        return doc.getText(lookupSlot(BEGIN), lookupSlot(END));
+        return doc.getText(getSlot(BEGIN), getSlot(END));
     }
 
 
@@ -826,7 +819,7 @@ public class Activation implements Comparable<Activation> {
         if (getINeuron().getOutputText() != null) {
             sb.append(Utils.collapseText(getINeuron().getOutputText(), 7));
         } else {
-            sb.append(Utils.collapseText(doc.getText(lookupSlot(BEGIN), lookupSlot(END)), 7));
+            sb.append(Utils.collapseText(doc.getText(getSlot(BEGIN), getSlot(END)), 7));
         }
         sb.append("\"");
 

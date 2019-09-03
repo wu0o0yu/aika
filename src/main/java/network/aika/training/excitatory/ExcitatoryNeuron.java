@@ -141,7 +141,7 @@ public class ExcitatoryNeuron extends TNeuron {
         setBias(2.0);
 
 
-        int actBegin = iAct.lookupSlot(BEGIN).getFinalPosition();
+        int actBegin = iAct.getSlot(BEGIN).getFinalPosition();
         lastCount += actBegin;
 
         ExcitatorySynapse s = new ExcitatorySynapse(iAct.getNeuron(), getProvider(), getProvider().getNewSynapseId(), actBegin);
@@ -279,7 +279,7 @@ public class ExcitatoryNeuron extends TNeuron {
         }
 
         int synId = targetAct.getNeuron().getNewSynapseId();
-        int lastCount = iAct.lookupSlot(BEGIN).getFinalPosition();
+        int lastCount = iAct.getSlot(BEGIN).getFinalPosition();
 
         ExcitatorySynapse s;
         if(inputOpt.getAct().getINeuron() instanceof InhibitoryNeuron && checkSelfReferencing(targetOpt, inputOpt)) {

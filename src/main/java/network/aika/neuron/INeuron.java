@@ -319,7 +319,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
                 .filter( act -> {
                     for(Map.Entry<Integer, Position> me: slots.entrySet()) {
                         Position pos = me.getValue();
-                        if(pos.getFinalPosition() != null && pos.compare(act.lookupSlot(me.getKey())) != 0) {
+                        if(pos.getFinalPosition() != null && pos.compare(act.getSlot(me.getKey())) != 0) {
                             return false;
                         }
                     }
@@ -456,7 +456,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         Position firstPos = doc.lookupFinalPosition(input.positions.get(firstSlot));
         x: for(Activation a: getActivations(doc, firstSlot, firstPos, true, firstSlot, firstPos, true).collect(Collectors.toList())) {
             for(Map.Entry<Integer, Integer> me: input.positions.entrySet()) {
-                Position pos = a.lookupSlot(me.getKey());
+                Position pos = a.getSlot(me.getKey());
                 if(pos == null || me.getValue().compareTo(pos.getFinalPosition()) != 0) {
                     continue x;
                 }

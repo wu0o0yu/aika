@@ -255,7 +255,7 @@ public class Neuron extends Provider<INeuron> {
 
     public Activation getActivation(Document doc, int begin, int end, boolean onlyFinal) {
         return getActivations(doc, Activation.BEGIN, doc.lookupFinalPosition(begin), onlyFinal)
-                .filter(act -> act.lookupSlot(Activation.END).getFinalPosition() == end)
+                .filter(act -> act.getSlot(Activation.END).getFinalPosition() == end)
                 .findFirst()
                 .orElse(null);
     }

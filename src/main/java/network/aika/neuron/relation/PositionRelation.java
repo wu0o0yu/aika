@@ -25,7 +25,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Stream;
 
 
@@ -51,11 +50,11 @@ public abstract class PositionRelation extends Relation {
 
     @Override
     public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
-        Position toPos = linkedAct.lookupSlot(toSlot);
+        Position toPos = linkedAct.getSlot(toSlot);
         if(allowUndefined && toPos == null) {
             return true;
         }
-        return test(act.lookupSlot(fromSlot), toPos);
+        return test(act.getSlot(fromSlot), toPos);
     }
 
 
@@ -101,7 +100,7 @@ public abstract class PositionRelation extends Relation {
 
     @Override
     public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-        Position pos = linkedAct.lookupSlot(toSlot);
+        Position pos = linkedAct.getSlot(toSlot);
         if(pos == null) {
             return Stream.empty();
         }
@@ -145,7 +144,10 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public void mapSlots(Map<Integer, Position> slots, Activation act) {
-            slots.put(toSlot, act.lookupSlot(fromSlot));
+            Position pos = act.getSlot(fromSlot);
+            if(pos != null) {
+                slots.put(toSlot, pos);
+            }
         }
 
         @Override
