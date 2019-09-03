@@ -9,6 +9,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.search.Option;
+import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.MetaModel;
@@ -148,6 +149,11 @@ public class MetaNeuron extends TNeuron {
         }
         getOutputRelations().clear();
 
+        double nijSum = 0.0;
+        for (MappingLink ml : targetNeurons.values()) {
+            nijSum += ml.nij;
+        }
+
         for (MappingLink ml : targetNeurons.values()) {
             ExcitatoryNeuron tn = ml.targetNeuron;
 
@@ -159,7 +165,15 @@ public class MetaNeuron extends TNeuron {
                     if(mea.getKey().getOutput().getId() == getId()) {
                         MetaSynapse ms = mea.getKey();
 
-                        tr.copy();
+                        MultiRelation multiRel = (MultiRelation) ms.getRelationById(OUTPUT);
+                        WeightedRelation mr = (WeightedRelation) multiRel.getRelation(tr);
+
+                        if(mr == null) {
+                            mr = (WeightedRelation) tr.copy().invert();
+                            multiRel.addRelation(mr);
+                        }
+
+                        mr.statistic.weight += ml.nij / nijSum;
                     }
                 }
             }

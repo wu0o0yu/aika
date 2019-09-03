@@ -74,8 +74,8 @@ public class MultiRelation extends Relation {
     }
 
 
-    public Relation getRelation(Relation r) {
-        return relations.get(r);
+    public Relation getRelation(Relation key) {
+        return relations.get(key);
     }
 
 
