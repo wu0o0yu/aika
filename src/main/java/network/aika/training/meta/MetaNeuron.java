@@ -24,11 +24,14 @@ import network.aika.training.relation.WeightedRelation;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.Synapse.State.CURRENT;
 
 public class MetaNeuron extends TNeuron {
+
+    public static double COVERED_THRESHOLD = 5.0;
 
     public InhibitoryNeuron inhibitoryNeuron;
 
@@ -61,6 +64,51 @@ public class MetaNeuron extends TNeuron {
 
         return sb.toString();
     }
+
+
+
+    public static void induce(MetaModel model, int threadId) {
+        for(Neuron n: model.getActiveNeurons()) {
+            List<ExcitatorySynapse> candidateSynapses = n
+                    .getActiveOutputSynapses()
+                    .stream()
+                    .filter(s -> s.getOutput().get() instanceof ExcitatoryNeuron)
+                    .map(s -> (ExcitatorySynapse) s)
+                    .collect(Collectors.toList());
+
+            double coveredScore = coveredSum(candidateSynapses);
+
+            if(coveredScore > COVERED_THRESHOLD) {
+                createNewMetaNeuron(model, threadId, n, candidateSynapses);
+            }
+        }
+    }
+
+    public static void createNewMetaNeuron(MetaModel model, int threadId, Neuron inputNeuron, List<ExcitatorySynapse> candidateSynapses) {
+        MetaNeuron mn = new MetaNeuron(model,"");
+
+        MetaSynapse ms = new MetaSynapse(inputNeuron, mn.getProvider(), 0, model.charCounter);
+        ms.link();
+
+        for(ExcitatorySynapse ts: candidateSynapses) {
+            new MetaNeuron.MappingLink(mn, (ExcitatoryNeuron) ts.getOutput().get(), ts.getUncovered()).link();
+            new MetaSynapse.MappingLink(ms, ts).link();
+        }
+
+        mn.train(threadId);
+
+        InhibitoryNeuron.induceOutgoing(threadId, mn);
+    }
+
+
+    public static double coveredSum(List<ExcitatorySynapse> syns) {
+        double sum = 0.0;
+        for(ExcitatorySynapse s: syns) {
+            sum += s.getUncovered();
+        }
+        return sum;
+    }
+
 
 
     public void train(int threadId) {

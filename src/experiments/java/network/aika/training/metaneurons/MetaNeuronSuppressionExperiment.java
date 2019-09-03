@@ -6,10 +6,10 @@ import network.aika.training.TDocument;
 import network.aika.training.excitatory.ExcitatoryNeuron;
 import network.aika.training.excitatory.ExcitatorySynapse;
 import network.aika.training.input.InputNeuron;
-import network.aika.training.meta.MetaNeuronInduction;
 import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
+import network.aika.training.meta.MetaNeuron;
 import network.aika.training.relation.WeightedRelation;
 import org.junit.Test;
 
@@ -67,8 +67,8 @@ public class MetaNeuronSuppressionExperiment {
         );
 
 
-        MetaNeuronInduction mni = new MetaNeuronInduction(model);
-        mni.createNewMetaNeuron(
+        MetaNeuron.createNewMetaNeuron(
+                model,
                 0,
                 inDer.getProvider(),
                 Collections.singletonList((ExcitatorySynapse) phraseDerHund.getProvider().getSynapseById(0))

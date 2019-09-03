@@ -11,6 +11,7 @@ import network.aika.training.inhibitory.InhibitorySynapse;
 import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
+import network.aika.training.meta.MetaNeuron;
 import network.aika.training.relation.WeightedRelation;
 import network.aika.training.utils.Dictionary;
 import network.aika.training.utils.Parser;
@@ -109,10 +110,7 @@ public class MetaNeuronInductionExperiment {
         }
         System.out.println();
 
-
-        network.aika.training.meta.MetaNeuronInduction mni = new network.aika.training.meta.MetaNeuronInduction(model);
-
-        mni.process(0);
+        MetaNeuron.induce(model, 0);
 
         model.dumpModel();
     }
