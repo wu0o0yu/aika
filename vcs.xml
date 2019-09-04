@@ -46,4 +46,7 @@
     </option>
     <option name="cloneParentDir" value="$USER_HOME$/ws" />
   </component>
+  <component name="Vcs.Log.App.Settings">
+    <option name="SHOW_CHANGES_FROM_PARENTS" value="true" />
+  </component>
 </application>
