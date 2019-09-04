@@ -384,14 +384,6 @@ public class ExcitatoryNeuron extends TNeuron {
             // PXi und PXout aus den beiden unterschiedlichen Quellen müssen annähernd gleich sein.
             double[] pXi = i.getPXi();
 
-            double diff = Math.abs(Math.log(i.getPXi()[0]) - Math.log(pXiXout[0] + pXiXout[2]));
-/*        if(diff > 0.001) {
-            System.out.println("Diff - " + i.getLabel());
-            System.out.println("  Diff:" + diff + "  pXin:" + pXi[0] + "  pXis:" + (pXiXout[0] + pXiXout[2]) + "  nRel:" + i.getNeuron().getReliability() + "  sRel:" + i.getSynapse().getReliability());
-            System.out.println("  Nn:" + i.getNeuron().N + "  Ns:" + i.getSynapse().N);
-        }
-*/
-
             double covi = i.getSynapse().getCoverage();
             if (covi == 0.0) {
                 continue;
