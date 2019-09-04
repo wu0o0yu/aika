@@ -158,22 +158,31 @@ public class MetaNeuron extends TNeuron {
             ExcitatoryNeuron tn = ml.targetNeuron;
 
             for(Map.Entry<Integer, Relation> me: tn.getOutputRelations().entrySet()) {
-                WeightedRelation tr = (WeightedRelation) me.getValue();
+                MultiRelation tmr = (MultiRelation) me.getValue();
                 ExcitatorySynapse ts = (ExcitatorySynapse) tn.getProvider().getSynapseById(me.getKey());
 
-                for(Map.Entry<MetaSynapse, MetaSynapse.MappingLink> mea: ts.metaSynapses.entrySet()) {
-                    if(mea.getKey().getOutput().getId() == getId()) {
-                        MetaSynapse ms = mea.getKey();
+                for(Relation tr: tmr.getLeafRelations()) {
+                    WeightedRelation twr = (WeightedRelation) tr;
 
-                        MultiRelation multiRel = (MultiRelation) ms.getRelationById(OUTPUT);
-                        WeightedRelation mr = (WeightedRelation) multiRel.getRelation(tr);
+                    for (Map.Entry<MetaSynapse, MetaSynapse.MappingLink> mea : ts.metaSynapses.entrySet()) {
+                        if (mea.getKey().getOutput().getId() == getId()) {
+                            MetaSynapse ms = mea.getKey();
 
-                        if(mr == null) {
-                            mr = (WeightedRelation) tr.copy().invert();
-                            multiRel.addRelation(mr);
+                            MultiRelation multiRel = (MultiRelation) ms.getRelationById(OUTPUT);
+                            if(multiRel == null) {
+                                multiRel = new MultiRelation();
+
+                            }
+
+                            WeightedRelation mr = (WeightedRelation) multiRel.getRelation(tr);
+
+                            if (mr == null) {
+                                mr = (WeightedRelation) twr.copy().invert();
+                                multiRel.addRelation(mr);
+                            }
+
+                            mr.statistic.weight += ml.nij / nijSum;
                         }
-
-                        mr.statistic.weight += ml.nij / nijSum;
                     }
                 }
             }
