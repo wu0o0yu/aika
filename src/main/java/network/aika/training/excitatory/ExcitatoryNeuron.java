@@ -141,7 +141,7 @@ public class ExcitatoryNeuron extends TNeuron {
         setBias(2.0);
 
 
-        int actBegin = iAct.lookupSlot(BEGIN).getFinalPosition();
+        int actBegin = iAct.getSlot(BEGIN).getFinalPosition();
         lastCount += actBegin;
 
         ExcitatorySynapse s = new ExcitatorySynapse(iAct.getNeuron(), getProvider(), getProvider().getNewSynapseId(), actBegin);
@@ -176,7 +176,7 @@ public class ExcitatoryNeuron extends TNeuron {
         double value = getActivationFunction().f(net);
 
         targetAct.setUpperBound(value);
-        targetOpt.p = inputOpt.p;
+        targetOpt.setP(inputOpt.getP());
 //        targetOpt.state = targetAct.computeValueAndWeight(0);
         targetOpt.setState(new State(value, value, net, inputOpt.getState().fired + 1, 0.0));
 
@@ -258,7 +258,11 @@ public class ExcitatoryNeuron extends TNeuron {
 
 
     private Option getMaxOption(Activation inputAct) {
-        return inputAct.getOptions().stream().max(Comparator.comparingDouble(o -> o.p)).orElse(null);
+        return inputAct
+                .getOptions()
+                .stream()
+                .max(Comparator.comparingDouble(o -> o.getP()))
+                .orElse(null);
     }
 
 
@@ -275,7 +279,7 @@ public class ExcitatoryNeuron extends TNeuron {
         }
 
         int synId = targetAct.getNeuron().getNewSynapseId();
-        int lastCount = iAct.lookupSlot(BEGIN).getFinalPosition();
+        int lastCount = iAct.getSlot(BEGIN).getFinalPosition();
 
         ExcitatorySynapse s;
         if(inputOpt.getAct().getINeuron() instanceof InhibitoryNeuron && checkSelfReferencing(targetOpt, inputOpt)) {
@@ -287,9 +291,7 @@ public class ExcitatoryNeuron extends TNeuron {
         s.setInactive(CURRENT, true);
         s.setInactive(NEXT, true);
 
-        if(inputOpt.getState().fired != null && targetOpt.getState().fired != null) {
-            s.setRecurrent(inputOpt.getState().fired > targetOpt.getState().fired);
-        }
+        s.setRecurrent(inputOpt.checkSelfReferencing(targetOpt));
 
         establishRelations(inputOpt, targetOpt, s);
 
@@ -382,14 +384,6 @@ public class ExcitatoryNeuron extends TNeuron {
             // PXi und PXout aus den beiden unterschiedlichen Quellen müssen annähernd gleich sein.
             double[] pXi = i.getPXi();
 
-            double diff = Math.abs(Math.log(i.getPXi()[0]) - Math.log(pXiXout[0] + pXiXout[2]));
-/*        if(diff > 0.001) {
-            System.out.println("Diff - " + i.getLabel());
-            System.out.println("  Diff:" + diff + "  pXin:" + pXi[0] + "  pXis:" + (pXiXout[0] + pXiXout[2]) + "  nRel:" + i.getNeuron().getReliability() + "  sRel:" + i.getSynapse().getReliability());
-            System.out.println("  Nn:" + i.getNeuron().N + "  Ns:" + i.getSynapse().N);
-        }
-*/
-
             double covi = i.getSynapse().getCoverage();
             if (covi == 0.0) {
                 continue;
@@ -451,7 +445,7 @@ public class ExcitatoryNeuron extends TNeuron {
 
                 double IGDelta = u.getActDelta(l, out) * delta;
 
-                double d = config.learnRate * out.p * l.getP() * l.getReliability() * IGDelta;
+                double d = config.learnRate * out.getP() * l.getP() * l.getReliability() * IGDelta;
 
                 if (d == 0.0) {
                     continue;
@@ -471,7 +465,7 @@ public class ExcitatoryNeuron extends TNeuron {
                 if (DEBUG1) {
                     XlModeParameters xlParams = dsyn.lookup(u);
                     xlParams.lRel = l.getReliability();
-                    xlParams.pOut = out.p;
+                    xlParams.pOut = out.getP();
                     xlParams.pl = l.getP();
                     xlParams.actDelta = u.getActDelta(l, out);
                     xlParams.IGDelta = IGDelta;
@@ -701,7 +695,7 @@ public class ExcitatoryNeuron extends TNeuron {
         }
 
         public double getP() {
-            return o != null ? o.p : 1.0;
+            return o != null ? o.getP() : 1.0;
         }
 
         public double getReliability() {

@@ -9,6 +9,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.search.Option;
+import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.MetaModel;
@@ -24,11 +25,14 @@ import network.aika.training.relation.WeightedRelation;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.Synapse.State.CURRENT;
 
 public class MetaNeuron extends TNeuron {
+
+    public static double COVERED_THRESHOLD = 5.0;
 
     public InhibitoryNeuron inhibitoryNeuron;
 
@@ -63,6 +67,52 @@ public class MetaNeuron extends TNeuron {
     }
 
 
+    public static void induce(MetaModel model, int threadId) {
+        for(Neuron n: model.getActiveNeurons()) {
+            if(n.get() instanceof ExcitatoryNeuron) {
+                List<ExcitatorySynapse> candidateSynapses = n
+                        .getActiveOutputSynapses()
+                        .stream()
+                        .map(s -> (ExcitatorySynapse) s)
+                        .collect(Collectors.toList());
+
+                double coveredScore = coveredSum(candidateSynapses);
+
+                if (coveredScore > COVERED_THRESHOLD) {
+                    createNewMetaNeuron(model, threadId, n, candidateSynapses);
+                }
+            }
+        }
+    }
+
+
+    public static void createNewMetaNeuron(MetaModel model, int threadId, Neuron inputNeuron, List<ExcitatorySynapse> candidateSynapses) {
+        MetaNeuron mn = new MetaNeuron(model,"");
+
+        MetaSynapse ms = new MetaSynapse(inputNeuron, mn.getProvider(), 0, model.charCounter);
+        ms.link();
+
+        for(ExcitatorySynapse ts: candidateSynapses) {
+            new MetaNeuron.MappingLink(mn, (ExcitatoryNeuron) ts.getOutput().get(), ts.getUncovered()).link();
+            new MetaSynapse.MappingLink(ms, ts).link();
+        }
+
+        mn.train(threadId);
+
+        InhibitoryNeuron.induceOutgoing(threadId, mn);
+    }
+
+
+    public static double coveredSum(List<ExcitatorySynapse> syns) {
+        double sum = 0.0;
+        for(ExcitatorySynapse s: syns) {
+            sum += s.getUncovered();
+        }
+        return sum;
+    }
+
+
+
     public void train(int threadId) {
         do {
             double diff;
@@ -82,11 +132,61 @@ public class MetaNeuron extends TNeuron {
                 }
             } while (diff > 1.0);
 
+            trainOutputRelations();
+
             propagateToOutgoingInhibNeurons(threadId);
 
         } while(induceInputInhibNeurons() || expand(threadId));
 
         Converter.convert(threadId, null, this, getInputSynapses());
+    }
+
+
+    private void trainOutputRelations() {
+        for(Map.Entry<Integer, Relation> me: getOutputRelations().entrySet()) {
+            Synapse relSyn = getProvider().getSynapseById(me.getKey());
+            relSyn.getRelations().remove(OUTPUT);
+        }
+        getOutputRelations().clear();
+
+        double nijSum = 0.0;
+        for (MappingLink ml : targetNeurons.values()) {
+            nijSum += ml.nij;
+        }
+
+        for (MappingLink ml : targetNeurons.values()) {
+            ExcitatoryNeuron tn = ml.targetNeuron;
+
+            for(Map.Entry<Integer, Relation> me: tn.getOutputRelations().entrySet()) {
+                MultiRelation tmr = (MultiRelation) me.getValue();
+                ExcitatorySynapse ts = (ExcitatorySynapse) tn.getProvider().getSynapseById(me.getKey());
+
+                for(Relation tr: tmr.getLeafRelations()) {
+                    WeightedRelation twr = (WeightedRelation) tr;
+
+                    for (Map.Entry<MetaSynapse, MetaSynapse.MappingLink> mea : ts.metaSynapses.entrySet()) {
+                        if (mea.getKey().getOutput().getId() == getId()) {
+                            MetaSynapse ms = mea.getKey();
+
+                            MultiRelation multiRel = (MultiRelation) ms.getRelationById(OUTPUT);
+                            if(multiRel == null) {
+                                multiRel = new MultiRelation();
+
+                            }
+
+                            WeightedRelation mr = (WeightedRelation) multiRel.getRelation(tr);
+
+                            if (mr == null) {
+                                mr = (WeightedRelation) twr.copy().invert();
+                                multiRel.addRelation(mr);
+                            }
+
+                            mr.statistic.weight += ml.nij / nijSum;
+                        }
+                    }
+                }
+            }
+        }
     }
 
 

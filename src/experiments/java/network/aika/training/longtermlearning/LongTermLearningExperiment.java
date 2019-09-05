@@ -31,23 +31,23 @@ public class LongTermLearningExperiment {
     public void testStrongSynapseWithVotesAgainstIt() {
         MetaModel model = new MetaModel();
 
-        Neuron inA = model.createNeuron("A", INPUT);
-        Neuron inB = model.createNeuron("B", INPUT);
-        Neuron inC = model.createNeuron("C", INPUT);
+        Neuron inA = new InputNeuron(model, "A").getProvider();
+        Neuron inB = new InputNeuron(model, "B").getProvider();
+        Neuron inC = new InputNeuron(model, "C").getProvider();
 
-        Neuron testNeuron = model.createNeuron("Test", EXCITATORY);
+        Neuron testNeuron = new ExcitatoryNeuron(model, "Test").getProvider();
 
         Neuron.init(testNeuron,
                 3.0,
-                new Synapse.Builder()
+                new ExcitatorySynapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(5.0),
-                new Synapse.Builder()
+                new ExcitatorySynapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(1.0),
-                new Synapse.Builder()
+                new ExcitatorySynapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(1.0),
@@ -100,28 +100,28 @@ public class LongTermLearningExperiment {
     public void testCoveredSynapsesWithOneVoteAgainst() {
         MetaModel model = new MetaModel();
 
-        Neuron inA = model.createNeuron("A", INPUT);
-        Neuron inB = model.createNeuron("B", INPUT);
-        Neuron inC = model.createNeuron("C", INPUT);
-        Neuron inD = model.createNeuron("D", INPUT);
+        Neuron inA = new InputNeuron(model, "A").getProvider();
+        Neuron inB = new InputNeuron(model, "B").getProvider();
+        Neuron inC = new InputNeuron(model, "C").getProvider();
+        Neuron inD = new InputNeuron(model, "D").getProvider();
 
-        Neuron testNeuron = model.createNeuron("Test", EXCITATORY);
+        Neuron testNeuron = new ExcitatoryNeuron(model, "Test").getProvider();
 
         Neuron.init(testNeuron,
                 2.1,
-                new Synapse.Builder()
+                new ExcitatorySynapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(inA)
                         .setWeight(2.0),
-                new Synapse.Builder()
+                new ExcitatorySynapse.Builder()
                         .setSynapseId(1)
                         .setNeuron(inB)
                         .setWeight(2.0),
-                new Synapse.Builder()
+                new ExcitatorySynapse.Builder()
                         .setSynapseId(2)
                         .setNeuron(inC)
                         .setWeight(2.0),
-                new Synapse.Builder()
+                new ExcitatorySynapse.Builder()
                         .setSynapseId(3)
                         .setNeuron(inD)
                         .setWeight(2.0),

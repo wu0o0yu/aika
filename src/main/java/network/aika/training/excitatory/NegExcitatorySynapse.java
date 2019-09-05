@@ -29,7 +29,7 @@ public class NegExcitatorySynapse extends ExcitatorySynapse {
         }
         needsCountUpdate = false;
 
-        double optionProp = (io != null ? io.p : 1.0) * (oo != null ? oo.p : 1.0);
+        double optionProp = (io != null ? io.getP() : 1.0) * (oo != null ? oo.getP() : 1.0);
 
         if(TNeuron.checkSelfReferencing(oo, io)) {
             countValueIPosOPos += (Sign.POS.getX(inputValue) * Sign.POS.getX(outputValue) * optionProp);

@@ -129,7 +129,7 @@ public class Document implements Comparable<Document> {
 
 
     public static Comparator<Activation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
-        int r = Position.compare(act1.lookupSlot(Activation.BEGIN), act2.lookupSlot(Activation.BEGIN));
+        int r = Position.compare(act1.getSlot(Activation.BEGIN), act2.getSlot(Activation.BEGIN));
         if (r != 0) return r;
         r = act1.getINeuron().compareTo(act2.getINeuron());
         if (r != 0) return r;
@@ -446,7 +446,9 @@ public class Document implements Comparable<Document> {
 
     private void computeOptionProbabilities() {
         for (Activation act : activationsById.values()) {
-            act.computeOptionProbabilities();
+            if(act.getType() == EXCITATORY) {
+                act.computeOptionProbabilities();
+            }
         }
     }
 
@@ -526,8 +528,8 @@ public class Document implements Comparable<Document> {
         TreeSet<Position> queue = new TreeSet<>(Comparator.comparingInt(p -> p.getId()));
 
         for(Activation act: activationsById.values()) {
-            if(act.getINeuron().getOutputText() != null && act.lookupSlot(Activation.BEGIN).getFinalPosition() != null && act.lookupSlot(Activation.END).getFinalPosition() == null) {
-                queue.add(act.lookupSlot(Activation.BEGIN));
+            if(act.getINeuron().getOutputText() != null && act.getSlot(Activation.BEGIN).getFinalPosition() != null && act.getSlot(Activation.END).getFinalPosition() == null) {
+                queue.add(act.getSlot(Activation.BEGIN));
             }
         }
 
@@ -538,10 +540,10 @@ public class Document implements Comparable<Document> {
                     .filter(act -> act.getINeuron().getOutputText() != null && act.isFinalActivation())
                     .forEach(act -> {
                         String outText = act.getINeuron().getOutputText();
-                        Position nextPos = act.lookupSlot(Activation.END);
+                        Position nextPos = act.getSlot(Activation.END);
                         nextPos.setFinalPosition(pos.getFinalPosition() + outText.length());
 
-                        content.replace(act.lookupSlot(Activation.BEGIN).getFinalPosition(), act.lookupSlot(Activation.END).getFinalPosition(), outText);
+                        content.replace(act.getSlot(Activation.BEGIN).getFinalPosition(), act.getSlot(Activation.END).getFinalPosition(), outText);
 
                         queue.add(nextPos);
                     });

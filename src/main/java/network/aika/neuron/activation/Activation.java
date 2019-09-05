@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Utils;
 import network.aika.lattice.activation.InputActivation;
@@ -140,7 +139,7 @@ public class Activation implements Comparable<Activation> {
 
             int r = Integer.compare(mea.getKey(), meb.getKey());
             if (r != 0) return r;
-            r = Position.compare(act1.lookupSlot(mea.getKey()), act2.lookupSlot(meb.getKey()));
+            r = Position.compare(act1.getSlot(mea.getKey()), act2.getSlot(meb.getKey()));
             if (r != 0) return r;
         }
 
@@ -188,14 +187,8 @@ public class Activation implements Comparable<Activation> {
         return slots;
     }
 
-    public Position lookupSlot(int slot) {
-        Position pos = slots.get(slot);
-        if(pos == null) {
-            pos = new Position(doc);
-            slots.put(slot, pos);
-        }
-
-        return pos;
+    public Position getSlot(int slot) {
+        return slots.get(slot);
     }
 
 
@@ -251,7 +244,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public String getText() {
-        return doc.getText(lookupSlot(BEGIN), lookupSlot(END));
+        return doc.getText(getSlot(BEGIN), getSlot(END));
     }
 
 
@@ -545,7 +538,7 @@ public class Activation implements Comparable<Activation> {
 
     public void setInputState(Builder input) {
         rootOption.decision = SELECTED;
-        rootOption.p = 1.0;
+        rootOption.setP(1.0);
         rootOption.setState(new State(input.value, input.value, input.net, input.fired, 0.0));
         currentOption = rootOption;
         finalOption = rootOption;
@@ -628,7 +621,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    private boolean checkSelfReferencingRecursiveStep(Activation act, int depth) {
+    public boolean checkSelfReferencingRecursiveStep(Activation act, int depth) {
         if (this == act) {
             return true;
         }
@@ -783,7 +776,7 @@ public class Activation implements Comparable<Activation> {
 
         rootOption.traverse(o -> {
             if (o.getAct().getType() != INPUT && o.decision == SELECTED) {
-                o.p = norm[0] != 0.0 ? Math.exp(Math.log(o.cacheFactor) + o.remainingWeight - offset[0]) / norm[0] : 1.0;
+                o.setP(norm[0] != 0.0 ? Math.exp(Math.log(o.cacheFactor) + o.remainingWeight - offset[0]) / norm[0] : 1.0);
             }
         });
     }
@@ -826,7 +819,7 @@ public class Activation implements Comparable<Activation> {
         if (getINeuron().getOutputText() != null) {
             sb.append(Utils.collapseText(getINeuron().getOutputText(), 7));
         } else {
-            sb.append(Utils.collapseText(doc.getText(lookupSlot(BEGIN), lookupSlot(END)), 7));
+            sb.append(Utils.collapseText(doc.getText(getSlot(BEGIN), getSlot(END)), 7));
         }
         sb.append("\"");
 
@@ -870,7 +863,7 @@ public class Activation implements Comparable<Activation> {
         double net = 0.0;
 
         for (Option option : getOptions()) {
-            double p = option.p;
+            double p = option.getP();
             State s = option.getState();
 
             value += p * s.value;

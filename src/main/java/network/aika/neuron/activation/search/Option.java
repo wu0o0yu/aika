@@ -17,6 +17,7 @@
 package network.aika.neuron.activation.search;
 
 import network.aika.Utils;
+import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.State;
@@ -29,6 +30,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static network.aika.Document.MAX_ROUND;
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.activation.link.Link.INPUT_COMP;
 import static network.aika.neuron.activation.link.Link.OUTPUT_COMP;
 import static network.aika.neuron.activation.search.Decision.UNKNOWN;
@@ -54,9 +56,9 @@ public class Option implements Comparable<Option> {
     private double weight;
     public double remainingWeight;
     public int cacheFactor = 1;
-    public double p;
+    private double p;
 
-    public Map<Link, Option> inputOptions = new TreeMap<>(INPUT_COMP);
+    public TreeMap<Link, Option> inputOptions = new TreeMap<>(INPUT_COMP);
     public Map<Link, Option> outputOptions = new TreeMap<>(OUTPUT_COMP); // TODO:
 
     private boolean isQueued;
@@ -155,6 +157,23 @@ public class Option implements Comparable<Option> {
     }
 
 
+    public void setP(double p) {
+        this.p = p;
+    }
+
+
+    public double getP() {
+        if(act.getType() != INeuron.Type.INHIBITORY) {
+            return p;
+        } else {
+            if(inputOptions.isEmpty()) {
+                return 0.0;
+            }
+            return inputOptions.firstEntry().getValue().getP();
+        }
+    }
+
+
     public void computeRemainingWeight() {
         double sum = 0.0;
         for(Option c: children) {
@@ -162,6 +181,41 @@ public class Option implements Comparable<Option> {
         }
 
         remainingWeight = weight - sum;
+    }
+
+
+
+    private Option getInputExcitatoryOption() {
+        if(getAct().getType() != INHIBITORY) {
+            return this;
+        } else {
+            if(inputOptions.isEmpty()) {
+                return null;
+            }
+
+            Option io = inputOptions.firstEntry().getValue();
+
+            return io.getInputExcitatoryOption();
+        }
+    }
+
+    public boolean checkSelfReferencing(Option o) {
+        Option o1 = getInputExcitatoryOption();
+        if(o1 == null) {
+            return false;
+        } else if(o == o1) {
+            return true;
+        }
+
+        Integer f1 = o1.getState().fired;
+        Integer f2 = o.getState().fired;
+        if(f1 == null) {
+            return false;
+        } else if (f2 != null && f1 > f2) {
+            return o1.getAct().checkSelfReferencingRecursiveStep(o.getAct(), 0);
+        } else {
+            return o.getAct().checkSelfReferencingRecursiveStep(o1.getAct(), 0);
+        }
     }
 
 

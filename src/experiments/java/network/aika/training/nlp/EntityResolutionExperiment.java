@@ -109,11 +109,11 @@ public class EntityResolutionExperiment {
         Assert.assertFalse(eJaguar.get().getActivations(doc, false).collect(Collectors.toList()).isEmpty());
         Assert.assertFalse(ePuma.get().getActivations(doc, false).collect(Collectors.toList()).isEmpty());
 
-        Assert.assertEquals(2, eJaguar.getActivation(doc, 0, 6, true).getId());
-        Assert.assertEquals(6, ePuma.getActivation(doc, 7, 11, true).getId());
+        Assert.assertEquals(1, eJaguar.getActivation(doc, 0, 6, true).getId());
+        Assert.assertEquals(3, ePuma.getActivation(doc, 7, 11, true).getId());
 
         Assert.assertEquals(0, eJaguar.getActivation(doc, 0, 6, true).getInputLinks().findFirst().orElse(null).getInput().getId());
-        Assert.assertEquals(4, ePuma.getActivation(doc, 7, 11, true).getInputLinks().findFirst().orElse(null).getInput().getId());
+        Assert.assertEquals(2, ePuma.getActivation(doc, 7, 11, true).getInputLinks().findFirst().orElse(null).getInput().getId());
 
         Assert.assertEquals(2, eJaguar.getActivation(doc, 0, 6, true).getInputLinks().count());
         Assert.assertEquals(2, ePuma.getActivation(doc, 7, 11, true).getInputLinks().count());
