@@ -36,10 +36,8 @@ import static network.aika.neuron.activation.link.Link.INPUT_COMP;
 
 public class ExcitatoryNeuron extends TNeuron {
     public static boolean DEBUG = true;
-    public static boolean DEBUG1 = true;
-    public static boolean DEBUG2 = true;
-
     public static int MATURITY_THRESHOLD = 10;
+
 
     public InhibitoryNeuron inhibitoryNeuron;
 
@@ -187,19 +185,13 @@ public class ExcitatoryNeuron extends TNeuron {
     int debugCounter = 0;
 
     public void train(Activation act, TDocument.Config config, TDocument.DebugDocument ddoc) {
-        DebugAct dact = null;
-        if (DEBUG1) {
-            dact = new DebugAct(act);
-            ddoc.acts.put(act, dact);
-        }
-
         if(DEBUG) {
             System.out.println("Train Excitatory: " + act.toString() + "  DBG:" + debugCounter);
         }
         debugCounter++;
 
         for (Option out : act.getOptions()) {
-            trainSynapse(config, out, dact);
+            trainSynapse(config, out);
 
             if (DEBUG) {
                 dumpRelations();
@@ -207,7 +199,7 @@ public class ExcitatoryNeuron extends TNeuron {
 
         }
 
-        if(DEBUG || DEBUG2) {
+        if(DEBUG) {
             System.out.println();
         }
     }
@@ -360,18 +352,8 @@ public class ExcitatoryNeuron extends TNeuron {
     }
 
 
-    private void dumpRelations() {
-        for(Synapse s: getInputSynapses()) {
-            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
-                if(s.getId() <= me.getKey() || me.getKey() == OUTPUT) {
-                    System.out.println("   Relation: From:" + s.getId() + " To:" + (me.getKey() == OUTPUT ? "OUTPUT" : me.getKey()) + " Rel:" + me.getValue());
-                }
-            }
-        }
-    }
 
-
-    public void trainSynapse(TDocument.Config config, Option out, DebugAct dact) {
+    public void trainSynapse(TDocument.Config config, Option out) {
         Activation act = out.getAct();
         Document doc = act.getDocument();
         double[] pXout = getP();
@@ -379,7 +361,7 @@ public class ExcitatoryNeuron extends TNeuron {
         double delta = getReliability() * Math.log(pXout[0]);
 
         for(Input i : getInputs(out)) {
-            TSynapse si = i.getSynapse();
+            ExcitatorySynapse si = i.getSynapse();
             double[] pXiXout = si.getPXiXout();
             // PXi und PXout aus den beiden unterschiedlichen Quellen müssen annähernd gleich sein.
             double[] pXi = i.getPXi();
@@ -389,7 +371,9 @@ public class ExcitatoryNeuron extends TNeuron {
                 continue;
             }
 
-            System.out.print("  i:" + i.getLabel() + " covi:" + covi + " iRel:" + i.getReliability() + " p:" + i.getP());
+            if(DEBUG) {
+                System.out.print("  i:" + i.getLabel() + " covi:" + covi + " iRel:" + i.getReliability() + " p:" + i.getP());
+            }
 
             for(Sign k : Sign.values()) {
                 int sii = k.ordinal();
@@ -403,7 +387,9 @@ public class ExcitatoryNeuron extends TNeuron {
                 double d = Xi * i.getReliability() * i.getP() * covi * G;
                 delta += d;
 
-                System.out.print("  " + k.name() + ":(d:" + d + " Xi:" + Xi + " G:" + G + ")");
+                if(DEBUG) {
+                    System.out.print("  " + k.name() + ":(d:" + d + " Xi:" + Xi + " G:" + G + ")");
+                }
 
                 if(si.getWeight() <= getBias()) {
                     double covDelta = config.learnRate * Xi * i.getReliability() * i.getP() * out.getState().value * G;
@@ -419,7 +405,10 @@ public class ExcitatoryNeuron extends TNeuron {
                     updateBiasDelta(biasDelta);
                 }
             }
-            System.out.println();
+
+            if(DEBUG) {
+                System.out.println();
+            }
         }
 
         if(delta == 0.0) {
@@ -435,8 +424,6 @@ public class ExcitatoryNeuron extends TNeuron {
         for(Input l : getInputs(out)) {
             double weightDelta = 0.0;
             double biasDelta = 0.0;
-
-            LDebugSynapse dsyn = getlDebugSynapse(dact, l.getSynapse());
 
             for (XlMode u : XlMode.values()) {
                 if(delta < 0.0 && u.getK() == Sign.POS || delta > 0.0 && u.getK() == Sign.NEG) {
@@ -460,15 +447,6 @@ public class ExcitatoryNeuron extends TNeuron {
 
                 if (DEBUG) {
                     System.out.println("    l:" + l.getLabel() + " u:" + u.name() + (u.getWB() == WeightBias.WEIGHT ? " W:" + l.getSynapse().getWeight() : " B:" + out.getAct().getINeuron().getBias()) + " d:" + d);
-                }
-
-                if (DEBUG1) {
-                    XlModeParameters xlParams = dsyn.lookup(u);
-                    xlParams.lRel = l.getReliability();
-                    xlParams.pOut = out.getP();
-                    xlParams.pl = l.getP();
-                    xlParams.actDelta = u.getActDelta(l, out);
-                    xlParams.IGDelta = IGDelta;
                 }
             }
 
@@ -558,82 +536,6 @@ public class ExcitatoryNeuron extends TNeuron {
     }
 
 
-    private LDebugSynapse getlDebugSynapse(DebugAct dact, Synapse sl) {
-        LDebugSynapse dsyn = null;
-        if (DEBUG1) {
-            dsyn = new LDebugSynapse();
-
-            dact.lSynapses.put(sl, dsyn);
-        }
-        return dsyn;
-    }
-
-
-    private IDebugSynapse getiDebugSynapse(DebugAct dact, Input i) {
-        IDebugSynapse dsyn = null;
-        if(DEBUG1) {
-            dsyn = new IDebugSynapse();
-
-            dact.getIDebugSynapses().put(i.getSynapse(), dsyn);
-        }
-        return dsyn;
-    }
-
-
-    public class DebugAct {
-        Map<Synapse, IDebugSynapse> iSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
-        Map<Synapse, LDebugSynapse> lSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
-
-        INeuron n;
-
-        public Map<Synapse, IDebugSynapse> getIDebugSynapses() {
-            return iSynapses;
-        }
-
-        public DebugAct(Activation act) {
-            n = act.getINeuron();
-        }
-    }
-
-
-    public class LDebugSynapse {
-        public double N;
-        public double pl;
-
-
-        public TreeMap<XlMode, XlModeParameters> xlModeParameters = new TreeMap<>();
-
-        public XlModeParameters lookup(XlMode m) {
-            XlModeParameters p = xlModeParameters.get(m);
-            if(p == null) {
-                p = new XlModeParameters();
-                xlModeParameters.put(m, p);
-            }
-            return p;
-        }
-
-        public String toString() {
-            return "  pl:" + Utils.round(pl) +
-                    "  N:" + Utils.round(N);
-        }
-    }
-
-
-    public static class IDebugSynapse {
-
-    }
-
-
-    public static class XlModeParameters {
-
-        public double lRel;
-        public double pOut;
-        public double pl;
-        public double actDelta;
-        public double IGDelta;
-    }
-
-
     public List<Input> getInputs(Option out) {
         ArrayList<Input> results = new ArrayList<>();
         Set<Synapse> inputSynapses = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
@@ -712,6 +614,17 @@ public class ExcitatoryNeuron extends TNeuron {
 
         public String toString() {
             return "id:" + getId() + " " + getSynapse().getInput().getLabel();
+        }
+    }
+
+
+    private void dumpRelations() {
+        for(Synapse s: getInputSynapses()) {
+            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
+                if(s.getId() <= me.getKey() || me.getKey() == OUTPUT) {
+                    System.out.println("   Relation: From:" + s.getId() + " To:" + (me.getKey() == OUTPUT ? "OUTPUT" : me.getKey()) + " Rel:" + me.getValue());
+                }
+            }
         }
     }
 }
