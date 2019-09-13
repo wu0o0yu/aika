@@ -12,6 +12,7 @@ import network.aika.neuron.activation.State;
 import network.aika.neuron.activation.link.Direction;
 import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.search.Option;
+import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.*;
@@ -346,8 +347,9 @@ public class ExcitatoryNeuron extends TNeuron {
                                 s.getId()
                         );
 
-                        Relation.addRelation(s.getRelations(), l.getSynapse().getId(), s.getId(), null, rel);
-                        Relation.addRelation(l.getSynapse().getRelations(), s.getId(), l.getSynapse().getId(), null, rel.invert());
+                        rel.link(l.getSynapse().getRelations(), s.getRelations(), l.getSynapse().getId(), s.getId(), null);
+//                        Relation.addRelation(s.getRelations(), l.getSynapse().getId(), s.getId(), null, rel);
+//                        Relation.addRelation(l.getSynapse().getRelations(), s.getId(), l.getSynapse().getId(), null, rel.invert());
                     }
                 }
             }
@@ -362,7 +364,7 @@ public class ExcitatoryNeuron extends TNeuron {
 
     private void dumpRelations() {
         for(Synapse s: getInputSynapses()) {
-            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
+            for(Map.Entry<Integer, MultiRelation> me: s.getRelations().entrySet()) {
                 if(s.getId() <= me.getKey() || me.getKey() == OUTPUT) {
                     System.out.println("   Relation: From:" + s.getId() + " To:" + (me.getKey() == OUTPUT ? "OUTPUT" : me.getKey()) + " Rel:" + me.getValue());
                 }
@@ -509,8 +511,8 @@ public class ExcitatoryNeuron extends TNeuron {
 
 
     private static Synapse followRelation(Synapse s, Dir dir) {
-        for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
-            Relation rel = me.getValue();
+        for(Map.Entry<Integer, MultiRelation> me: s.getRelations().entrySet()) {
+            MultiRelation rel = me.getValue();
 
             if(rel instanceof PositionRelation.Equals) {
                 PositionRelation.Equals r = (PositionRelation.Equals) rel;

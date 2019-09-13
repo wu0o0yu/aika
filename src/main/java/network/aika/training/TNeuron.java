@@ -261,7 +261,7 @@ public abstract class TNeuron extends INeuron {
 
 
     public void clearOutputRelations() {
-        for(Map.Entry<Integer, Relation> me: getOutputRelations().entrySet()) {
+        for(Map.Entry<Integer, MultiRelation> me: getOutputRelations().entrySet()) {
             Relation rel = me.getValue();
 
             if(rel instanceof MultiRelation) {
@@ -328,8 +328,8 @@ public abstract class TNeuron extends INeuron {
 
     public List<Integer> getOutputSlots() {
         List<Integer> slots = new ArrayList<>();
-        for(Map.Entry<Integer, Relation> me: getOutputRelations().entrySet()) {
-            Relation rel = me.getValue();
+        for(Map.Entry<Integer, MultiRelation> me: getOutputRelations().entrySet()) {
+            MultiRelation rel = me.getValue();
             if(rel instanceof PositionRelation) {
                 PositionRelation posRel = (PositionRelation) rel;
 

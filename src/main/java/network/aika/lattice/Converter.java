@@ -23,6 +23,7 @@ import network.aika.lattice.refinement.RelationsMap;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.Relation;
 
 import java.util.*;
@@ -213,9 +214,9 @@ public class Converter {
             relatedSyns.remove(syn.getId());
             selectedCandidates.add(syn);
             alreadyCollected.add(syn.getId());
-            for(Map.Entry<Integer, Relation> me: syn.getRelations().entrySet()) {
+            for(Map.Entry<Integer, MultiRelation> me: syn.getRelations().entrySet()) {
                 Integer relId = me.getKey();
-                Relation rel = me.getValue();
+                MultiRelation rel = me.getValue();
                 if(!alreadyCollected.contains(relId)) {
                     Synapse rs = syn.getOutput().getSynapseById(relId);
                     if(rs != null) {

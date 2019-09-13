@@ -98,6 +98,7 @@ public class MultiRelation extends Relation {
 
     public void addRelation(Relation r) {
         relations.put(r, r);
+        inverted.relations.put(r, r);
     }
 
 
@@ -124,7 +125,7 @@ public class MultiRelation extends Relation {
 
 
     @Override
-    public Relation invert() {
+    public MultiRelation invert() {
         return inverted;
     }
 

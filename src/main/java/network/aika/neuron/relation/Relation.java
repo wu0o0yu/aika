@@ -145,33 +145,47 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
 
     public void link(Neuron n, int from, int to) {
-        addRelation(to, from, n, this);
-        addRelation(from, to, n, invert());
+        link(
+                getRelationsMap(from, n),
+                getRelationsMap(to, n),
+                from,
+                to,
+                n
+        );
     }
 
 
-    public static void addRelation(Integer synId, Integer targetSynId, Neuron n, Relation rel) {
-        addRelation(getRelationsMap(targetSynId, n), synId, targetSynId, n, rel);
-    }
-
-
-    public static void addRelation(Map<Integer, Relation> relMap, Integer synId, Integer targetSynId, Neuron n, Relation r) {
-        if(targetSynId == OUTPUT) {
-            Synapse s = n.getSynapseById(synId);
-            if(s == null || (r.isExact() && n.getType() == INHIBITORY && !s.isInactive())) {
-                return;
+    public void link(Map<Integer, MultiRelation> fromRelMap, Map<Integer, MultiRelation> toRelMap, Integer fromSynId, Integer toSynId, Neuron n) {
+        MultiRelation mr;
+        if(toSynId != OUTPUT) {
+            mr = toRelMap.get(fromSynId);
+        } else {
+            mr = fromRelMap.get(toSynId);
+            if(mr != null) {
+                mr = mr.invert();
             }
         }
 
-        MultiRelation mr = (MultiRelation) relMap.get(synId);
         if (mr == null) {
+            boolean ior = isInhibitoryOutputRelation(n);
+
             mr = new MultiRelation();
-            relMap.put(synId, mr);
+            if(!ior || fromSynId != OUTPUT) {
+                fromRelMap.put(toSynId, mr.invert());
+            }
+            if(!ior || toSynId != OUTPUT) {
+                toRelMap.put(fromSynId, mr);
+            }
         }
 
-        for(Relation lr: r.getLeafRelations()) {
+        for(Relation lr: getLeafRelations()) {
             mr.addRelation(lr);
         }
+    }
+
+
+    private boolean isInhibitoryOutputRelation(Neuron n) {
+        return isExact() && n.getType() == INHIBITORY;
     }
 
 
@@ -180,7 +194,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     }
 
 
-    public static void removeRelation(Map<Integer, Relation> relMap, Integer synId, Relation r) {
+    public static void removeRelation(Map<Integer, MultiRelation> relMap, Integer synId, Relation r) {
         Relation existingRel = relMap.get(synId);
         if(existingRel == null) {
             return;
@@ -191,7 +205,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     }
 
 
-    public static Map<Integer, Relation> getRelationsMap(int synapseId, Neuron n) {
+    public static Map<Integer, MultiRelation> getRelationsMap(int synapseId, Neuron n) {
         if(synapseId == OUTPUT) {
             return n.get().getOutputRelations();
         } else {

@@ -85,7 +85,7 @@ public class MetaSynapse extends TSynapse {
 
 
     public void countTargetRelations(Map<Relation, Double> outputRelations, MappingLink sml, double nij) {
-        for(Map.Entry<Integer, Relation> me: sml.targetSynapse.getRelations().entrySet()) {
+        for(Map.Entry<Integer, MultiRelation> me: sml.targetSynapse.getRelations().entrySet()) {
             if(me.getKey() == OUTPUT) {
                 Relation rel = me.getValue();
 
