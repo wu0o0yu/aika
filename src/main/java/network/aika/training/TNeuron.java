@@ -15,6 +15,7 @@ import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.excitatory.ExcitatoryNeuron;
+import network.aika.training.relation.WeightedRelation;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -329,11 +330,16 @@ public abstract class TNeuron extends INeuron {
     public List<Integer> getOutputSlots() {
         List<Integer> slots = new ArrayList<>();
         for(Map.Entry<Integer, MultiRelation> me: getOutputRelations().entrySet()) {
-            MultiRelation rel = me.getValue();
-            if(rel instanceof PositionRelation) {
-                PositionRelation posRel = (PositionRelation) rel;
+            for(Relation rel: me.getValue().getLeafRelations()) {
+                if(rel instanceof WeightedRelation) {
+                    rel = ((WeightedRelation) rel).keyRelation;
+                }
 
-                slots.add(posRel.toSlot);
+                if (rel instanceof PositionRelation) {
+                    PositionRelation posRel = (PositionRelation) rel;
+
+                    slots.add(posRel.toSlot);
+                }
             }
         }
 

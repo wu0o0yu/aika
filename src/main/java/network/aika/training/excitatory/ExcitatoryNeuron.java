@@ -53,12 +53,15 @@ public class ExcitatoryNeuron extends TNeuron {
 
     enum XlMode {
         WEIGHT_KPOS_UPOS((l, out) -> l.getX(Sign.POS) * actFDelta(out), Sign.POS, WeightBias.WEIGHT),
-        WEIGHT_KPOS_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.POS, WeightBias.WEIGHT),
         BIAS_KPOS_UPOS((l, out) -> 0.0, Sign.POS, WeightBias.BIAS),
+
+        WEIGHT_KPOS_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.POS, WeightBias.WEIGHT),
         BIAS_KPOS_UNEG((l, out) -> l.getX(Sign.NEG) * actFDelta(out), Sign.POS, WeightBias.BIAS),
+
         WEIGHT_KNEG_UPOS((l, out) -> 0.0, Sign.NEG, WeightBias.WEIGHT),
-        WEIGHT_KNEG_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.NEG, WeightBias.WEIGHT),
         BIAS_KNEG_UPOS((l, out) -> l.getX(Sign.POS) * actFDelta(out), Sign.NEG, WeightBias.BIAS),
+
+        WEIGHT_KNEG_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.NEG, WeightBias.WEIGHT),
         BIAS_KNEG_UNEG((l, out) -> l.getX(Sign.NEG) * actFDelta(out), Sign.NEG, WeightBias.BIAS);
 
         ActDelta actDelta;
@@ -512,15 +515,15 @@ public class ExcitatoryNeuron extends TNeuron {
 
     private static Synapse followRelation(Synapse s, Dir dir) {
         for(Map.Entry<Integer, MultiRelation> me: s.getRelations().entrySet()) {
-            MultiRelation rel = me.getValue();
+            for(Relation rel: me.getValue().getLeafRelations()) {
+                if (rel instanceof PositionRelation.Equals) {
+                    PositionRelation.Equals r = (PositionRelation.Equals) rel;
 
-            if(rel instanceof PositionRelation.Equals) {
-                PositionRelation.Equals r = (PositionRelation.Equals) rel;
-
-                if((r.fromSlot == BEGIN && dir == Dir.BEFORE) || (r.fromSlot == END && dir == Dir.AFTER)) {
-                    Synapse relSyn = s.getOutput().getSynapseById(me.getKey());
-                    if(relSyn != null && !relSyn.isInactive() && !relSyn.isWeak(NEXT)) {
-                        return relSyn;
+                    if ((r.fromSlot == BEGIN && dir == Dir.BEFORE) || (r.fromSlot == END && dir == Dir.AFTER)) {
+                        Synapse relSyn = s.getOutput().getSynapseById(me.getKey());
+                        if (relSyn != null && !relSyn.isInactive() && !relSyn.isWeak(NEXT)) {
+                            return relSyn;
+                        }
                     }
                 }
             }
