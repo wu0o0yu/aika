@@ -217,7 +217,7 @@ public abstract class TNeuron extends INeuron {
     }
 
 
-    public void train(Activation act, TDocument.Config config, TDocument.DebugDocument ddoc) {
+    public void train(Activation act, TDocument.Config config) {
 
     }
 
