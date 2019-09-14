@@ -194,11 +194,6 @@ public class ExcitatoryNeuron extends TNeuron {
 
         for (Option out : act.getOptions()) {
             trainSynapse(config, out);
-
-            if(log.isDebugEnabled()) {
-                dumpRelations();
-            }
-
         }
     }
 
@@ -596,17 +591,6 @@ public class ExcitatoryNeuron extends TNeuron {
 
         public String toString() {
             return "id:" + getId() + " " + getSynapse().getInput().getLabel();
-        }
-    }
-
-
-    private void dumpRelations() {
-        for(Synapse s: getInputSynapses()) {
-            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
-                if(s.getId() <= me.getKey() || me.getKey() == OUTPUT) {
-                    System.out.println("   Relation: From:" + s.getId() + " To:" + (me.getKey() == OUTPUT ? "OUTPUT" : me.getKey()) + " Rel:" + me.getValue());
-                }
-            }
         }
     }
 }
