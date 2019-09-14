@@ -171,10 +171,10 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
             mr = new MultiRelation();
             if(!ior || fromSynId != OUTPUT) {
-                fromRelMap.put(toSynId, mr.invert());
+                fromRelMap.put(toSynId, mr);
             }
             if(!ior || toSynId != OUTPUT) {
-                toRelMap.put(fromSynId, mr);
+                toRelMap.put(fromSynId, mr.invert());
             }
         }
 

@@ -98,7 +98,8 @@ public class MultiRelation extends Relation {
 
     public void addRelation(Relation r) {
         relations.put(r, r);
-        inverted.relations.put(r, r);
+        Relation ir = r.invert();
+        inverted.relations.put(ir, ir);
     }
 
 
