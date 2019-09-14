@@ -2,7 +2,6 @@ package network.aika.training.excitatory;
 
 import network.aika.ActivationFunction;
 import network.aika.Document;
-import network.aika.Utils;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
@@ -12,7 +11,6 @@ import network.aika.neuron.activation.State;
 import network.aika.neuron.activation.link.Direction;
 import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.search.Option;
-import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.*;
@@ -331,7 +329,7 @@ public class ExcitatoryNeuron extends TNeuron {
                                 s.getId()
                         );
 
-                        rel.link(l.getSynapse().getRelations(), s.getRelations(), l.getSynapse().getId(), s.getId(), null);
+                        rel.link(l.getSynapse(), s, l.getSynapse().getId(), s.getId(), null);
 //                        Relation.addRelation(s.getRelations(), l.getSynapse().getId(), s.getId(), null, rel);
 //                        Relation.addRelation(l.getSynapse().getRelations(), s.getId(), l.getSynapse().getId(), null, rel.invert());
                     }
@@ -460,20 +458,19 @@ public class ExcitatoryNeuron extends TNeuron {
 
 
     private static Synapse followRelation(Synapse s, Dir dir) {
-        for(Map.Entry<Integer, MultiRelation> me: s.getRelations().entrySet()) {
-            for(Relation rel: me.getValue().getRelations().values()) {
-                if(rel instanceof WeightedRelation) {
-                    rel = ((WeightedRelation) rel).keyRelation;
-                }
+        for(Relation.Key rk : s.getRelations()) {
+            Relation rel = rk.getRelation();
+            if (rel instanceof WeightedRelation) {
+                rel = ((WeightedRelation) rel).keyRelation;
+            }
 
-                if (rel instanceof PositionRelation.Equals) {
-                    PositionRelation.Equals r = (PositionRelation.Equals) rel;
+            if (rel instanceof PositionRelation.Equals) {
+                PositionRelation.Equals r = (PositionRelation.Equals) rel;
 
-                    if ((r.fromSlot == BEGIN && dir == Dir.BEFORE) || (r.fromSlot == END && dir == Dir.AFTER)) {
-                        Synapse relSyn = s.getOutput().getSynapseById(me.getKey());
-                        if (relSyn != null && !relSyn.isInactive() && !relSyn.isWeak(NEXT)) {
-                            return relSyn;
-                        }
+                if ((r.fromSlot == BEGIN && dir == Dir.BEFORE) || (r.fromSlot == END && dir == Dir.AFTER)) {
+                    Synapse relSyn = s.getOutput().getSynapseById(rk.getRelatedId());
+                    if (relSyn != null && !relSyn.isInactive() && !relSyn.isWeak(NEXT)) {
+                        return relSyn;
                     }
                 }
             }

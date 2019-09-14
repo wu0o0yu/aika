@@ -22,7 +22,6 @@ import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.inhibitory.InhibitoryNeuron;
@@ -41,7 +40,6 @@ import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.Activation.END;
 import static network.aika.neuron.activation.search.SearchNode.COMPUTE_SOFT_MAX;
-import static network.aika.neuron.relation.Relation.OVERLAPS;
 
 
 /**
@@ -100,10 +98,10 @@ public class MetaModel extends Model {
                 new Relation.Builder()
                         .setFrom(inhibSynId)
                         .setTo(OUTPUT)
-                        .setRelation(new MultiRelation(
+                        .setRelation(new Relation[] {
                                 new WeightedRelation(new PositionRelation.LessThan(BEGIN, END, false), 1.0),
                                 new WeightedRelation(new PositionRelation.GreaterThan(END, BEGIN, false, Integer.MAX_VALUE), 1.0)
-                        ))
+                        })
         );
 
         metaNeuron.trainingBias = trainingBias;

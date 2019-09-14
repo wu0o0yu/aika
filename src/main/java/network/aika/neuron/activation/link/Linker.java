@@ -20,9 +20,9 @@ import network.aika.Document;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.relation.RelationEndpoint;
 
 import java.util.*;
 
@@ -53,7 +53,7 @@ public class Linker {
 
 
     private void linkOutputRelations(Activation act) {
-        linkRelated(act, act, act.getINeuron().getOutputRelations());
+        linkRelated(act, act, act.getINeuron());
     }
 
 
@@ -63,12 +63,9 @@ public class Linker {
         Neuron n = act.getNeuron();
         if(n.getType() == INeuron.Type.EXCITATORY) {
             for (Synapse s : n.getActiveInputSynapses()) {
-                for (Map.Entry<Integer, MultiRelation> me : s.getRelations().entrySet()) {
-                    Relation rel = me.getValue();
-                    if (me.getKey() == OUTPUT) {
-                        rel.getActivations(s.getInput().get(doc), act)
+                for (Relation.Key rk : s.getOutputRelations()) {
+                    rk.getRelation().getActivations(s.getInput().get(doc), act, rk.getDirection())
                                 .forEach(iAct -> link(s, iAct, act));
-                    }
                 }
             }
         }
@@ -95,20 +92,18 @@ public class Linker {
     public void process() {
         while(!queue.isEmpty()) {
             Link l = queue.pollFirst();
-            linkRelated(l.getInput(), l.getOutput(), l.getSynapse().getRelations());
+            linkRelated(l.getInput(), l.getOutput(), l.getSynapse());
         }
     }
 
 
-    private void linkRelated(Activation rAct, Activation oAct, Map<Integer, MultiRelation> relations) {
+    private void linkRelated(Activation rAct, Activation oAct, RelationEndpoint re) {
         Document doc = rAct.getDocument();
-        for(Map.Entry<Integer, MultiRelation> me: relations.entrySet()) {
-            Relation rel = me.getValue();
-            Integer relId = me.getKey();
-            if(relId != OUTPUT) {
-                Synapse s = oAct.getSynapseById(relId);
+        for(Relation.Key rk: re.getRelations()) {
+            if(rk.getRelatedId() != OUTPUT) {
+                Synapse s = oAct.getSynapseById(rk.getRelatedId());
                 if (s != null) {
-                    rel.invert().getActivations(s.getInput().get(doc), rAct)
+                    rk.getRelation().getActivations(s.getInput().get(doc), rAct, rk.getInvertedDirection())
                             .forEach(iAct -> link(s, iAct, oAct));
                 }
             }
@@ -142,17 +137,15 @@ public class Linker {
 
 
     private boolean checkRelations(Synapse s, Activation iAct, Activation oAct) {
-        for(Map.Entry<Integer, MultiRelation> me: s.getRelations().entrySet()) {
-            Integer relSynId = me.getKey();
-            Relation rel = me.getValue();
-            if(relSynId == Synapse.OUTPUT) {
-                if (!rel.test(iAct, oAct, true)) {
+        for(Relation.Key rk: s.getRelations()) {
+            if(rk.getRelatedId() == Synapse.OUTPUT) {
+                if (!rk.getRelation().test(iAct, oAct, true, rk.getDirection())) {
                     return false;
                 }
             } else {
-                Synapse relSyn = oAct.getSynapseById(relSynId);
+                Synapse relSyn = oAct.getSynapseById(rk.getRelatedId());
                 if(relSyn!= null && oAct.getLinksBySynapse(INPUT, relSyn)
-                        .anyMatch(l -> !rel.test(iAct, l.getInput(), false))) {
+                        .anyMatch(l -> !rk.getRelation().test(iAct, l.getInput(), false, rk.getDirection()))) {
                     return false;
                 }
             }

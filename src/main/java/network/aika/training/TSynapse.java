@@ -7,7 +7,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.search.Option;
-import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.relation.WeightedRelation;
 
@@ -72,11 +71,9 @@ public class TSynapse extends Synapse {
 
     public double computeRelationWeights(Link l) {
         double sum = 0.0;
-        for(Map.Entry<Integer, MultiRelation> me: getRelations().entrySet()) {
-            Relation r = me.getValue();
-
-            if(r instanceof WeightedRelation) {
-                WeightedRelation wr = (WeightedRelation) r;
+        for(Relation.Key rk: getRelations()) {
+            if(rk.getRelation() instanceof WeightedRelation) {
+                WeightedRelation wr = (WeightedRelation) rk.getRelation();
 
                 sum += wr.computeWeight(l);
             }

@@ -22,7 +22,6 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.link.Link;
-import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.MetaModel;
@@ -86,17 +85,15 @@ public class MetaSynapse extends TSynapse {
 
 
     public void countTargetRelations(Map<Relation, Double> outputRelations, MappingLink sml, double nij) {
-        for(Map.Entry<Integer, MultiRelation> me: sml.targetSynapse.getRelations().entrySet()) {
-            if(me.getKey() == OUTPUT) {
-                for(Relation rel: me.getValue().getRelations().values()) {
-                    if(rel instanceof WeightedRelation) {
-                        rel = ((WeightedRelation) rel).keyRelation;
-                    }
+        for(Relation.Key rk : sml.targetSynapse.getOutputRelations()) {
+            Relation rel = rk.getRelation();
 
-                    if(rel instanceof PositionRelation) {
-                        countRelation(outputRelations, rel, nij);
-                    }
-                }
+            if (rel instanceof WeightedRelation) {
+                rel = ((WeightedRelation) rel).keyRelation;
+            }
+
+            if (rel instanceof PositionRelation) {
+                countRelation(outputRelations, rel, nij);
             }
         }
     }

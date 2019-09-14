@@ -80,7 +80,7 @@ public abstract class AncestorRelation extends Relation {
 
 
     @Override
-    public void mapSlots(Map<Integer, Position> slots, Activation act) {
+    public void mapSlots(Map<Integer, Position> slots, Activation act, Direction dir) {
     }
 
 
@@ -157,17 +157,12 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public Relation invert() {
-            return new CommonAncestor();
-        }
-
-        @Override
-        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined, Direction dir) {
             return hasCommonAncestor(act, linkedAct);
         }
 
         @Override
-        public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+        public Stream<Activation> getActivations(INeuron n, Activation linkedAct, Direction dir) {
             List<Activation> results = new ArrayList<>();
             collectCommonAncestor(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
@@ -195,17 +190,12 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public Relation invert() {
-            return new IsAncestorOf();
-        }
-
-        @Override
-        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined, Direction dir) {
             return contains(act, linkedAct, act.getNewVisitedId());
         }
 
         @Override
-        public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+        public Stream<Activation> getActivations(INeuron n, Activation linkedAct, Direction dir) {
             List<Activation> results = new ArrayList<>();
             collectContains(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
@@ -233,18 +223,12 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public Relation invert() {
-            return new IsDescendantOf();
-        }
-
-
-        @Override
-        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined, Direction dir) {
             return contains(linkedAct, act, act.getNewVisitedId());
         }
 
         @Override
-        public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+        public Stream<Activation> getActivations(INeuron n, Activation linkedAct, Direction dir) {
             List<Activation> results = new ArrayList<>();
             collectContainedIn(results, n, linkedAct, linkedAct.getNewVisitedId());
             return results.stream();
@@ -272,17 +256,12 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public Relation invert() {
-            return new NotAncestorOf();
-        }
-
-        @Override
-        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined, Direction dir) {
             return !contains(act, linkedAct, act.getNewVisitedId());
         }
 
         @Override
-        public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+        public Stream<Activation> getActivations(INeuron n, Activation linkedAct, Direction dir) {
             long v = linkedAct.getNewVisitedId();
             markDescendants(linkedAct, v);
 
@@ -312,17 +291,12 @@ public abstract class AncestorRelation extends Relation {
         }
 
         @Override
-        public Relation invert() {
-            return new NotDescendantOf();
-        }
-
-        @Override
-        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined, Direction dir) {
             return !contains(linkedAct, act, act.getNewVisitedId());
         }
 
         @Override
-        public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+        public Stream<Activation> getActivations(INeuron n, Activation linkedAct, Direction dir) {
             long v = linkedAct.getNewVisitedId();
             markAncestors(linkedAct, v);
 

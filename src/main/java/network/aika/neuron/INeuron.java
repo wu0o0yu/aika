@@ -22,8 +22,9 @@ import network.aika.lattice.OrNode;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
 import network.aika.lattice.InputNode;
-import network.aika.neuron.relation.MultiRelation;
+import network.aika.neuron.relation.Direction;
 import network.aika.neuron.relation.Relation;
+import network.aika.neuron.relation.RelationEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,7 @@ import java.util.stream.Stream;
 
 import static network.aika.ActivationFunction.*;
 import static network.aika.neuron.INeuron.Type.*;
+import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.Synapse.State.NEXT;
 
@@ -49,7 +51,7 @@ import static network.aika.neuron.Synapse.State.NEXT;
  *
  * @author Lukas Molzberger
  */
-public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron> {
+public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>, RelationEndpoint {
 
     private static final Logger log = LoggerFactory.getLogger(INeuron.class);
 
@@ -93,7 +95,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     private volatile int synapseIdCounter = 0;
 
     // synapseId -> relation
-    private Map<Integer, MultiRelation> outputRelations = new TreeMap<>();
+    private NavigableSet<Relation.Key> outputRelations = new TreeSet<>();
 
 
     // A synapse is stored only in one direction, depending on the synapse weight.
@@ -171,10 +173,15 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public Map<Integer, MultiRelation> getOutputRelations() {
+    public NavigableSet<Relation.Key> getRelations() {
         return outputRelations;
     }
 
+
+    @Override
+    public NavigableSet<Relation.Key> getOutputRelationsTmp() {
+        return outputRelations.subSet(new Relation.Key(OUTPUT, Relation.MIN, Direction.FORWARD), true, new Relation.Key(OUTPUT, Relation.MAX, Direction.FORWARD), false);
+    }
 
     public Collection<Synapse> getInputSynapses() {
         return inputSynapses.values();

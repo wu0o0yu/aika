@@ -49,26 +49,26 @@ public abstract class PositionRelation extends Relation {
 
 
     @Override
-    public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
-        Position toPos = linkedAct.getSlot(toSlot);
+    public boolean test(Activation act, Activation linkedAct, boolean allowUndefined, Direction dir) {
+        Position toPos = linkedAct.getSlot(dir == Direction.FORWARD ? toSlot : fromSlot);
         if(allowUndefined && toPos == null) {
             return true;
         }
-        return test(act.getSlot(fromSlot), toPos);
+        return test(act.getSlot(dir == Direction.FORWARD ? fromSlot : toSlot), toPos, dir);
     }
 
 
-    public abstract boolean test(Position a, Position b);
+    public abstract boolean test(Position a, Position b, Direction dir);
 
 
     @Override
-    public void mapSlots(Map<Integer, Position> slots, Activation act) {
+    public void mapSlots(Map<Integer, Position> slots, Activation act, Direction dir) {
     }
 
 
     @Override
-    public int compareTo(Relation rel) {
-        int r = super.compareTo(rel);
+    public int compareTo(Relation rel, Direction dir) {
+        int r = super.compareTo(rel, dir);
         if(r != 0) return r;
 
         PositionRelation pr = (PositionRelation) rel;
@@ -99,17 +99,17 @@ public abstract class PositionRelation extends Relation {
 
 
     @Override
-    public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-        Position pos = linkedAct.getSlot(toSlot);
+    public Stream<Activation> getActivations(INeuron n, Activation linkedAct, Direction dir) {
+        Position pos = linkedAct.getSlot(dir == Direction.FORWARD ? toSlot : fromSlot);
         if(pos == null) {
             return Stream.empty();
         }
 
-        return getActivations(n, pos)
-                .filter(act -> test(act, linkedAct, false));
+        return getActivations(n, pos, dir)
+                .filter(act -> test(act, linkedAct, false, dir));
     }
 
-    public abstract Stream<Activation> getActivations(INeuron n, Position pos);
+    public abstract Stream<Activation> getActivations(INeuron n, Position pos, Direction dir);
 
 
     public static class Equals extends PositionRelation {
@@ -133,17 +133,12 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public Relation invert() {
-            return new Equals(toSlot, fromSlot);
-        }
-
-        @Override
-        public boolean test(Position a, Position b) {
+        public boolean test(Position a, Position b, Direction dir) {
             return a == b;
         }
 
         @Override
-        public void mapSlots(Map<Integer, Position> slots, Activation act) {
+        public void mapSlots(Map<Integer, Position> slots, Activation act, Direction dir) {
             Position pos = act.getSlot(fromSlot);
             if(pos != null) {
                 slots.put(toSlot, pos);
@@ -156,7 +151,7 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public Stream<Activation> getActivations(INeuron n, Position pos) {
+        public Stream<Activation> getActivations(INeuron n, Position pos, Direction dir) {
             return n.getActivations(pos.getDocument(),
                     fromSlot, pos, true,
                     fromSlot, pos, true
@@ -201,19 +196,13 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public Relation invert() {
-            return new GreaterThan(toSlot, fromSlot, orEquals, maxLength);
-        }
-
-
-        @Override
         public boolean isExact() {
             return false;
         }
 
 
         @Override
-        public boolean test(Position a, Position b) {
+        public boolean test(Position a, Position b, Direction dir) {
             if(a == b) {
                 return orEquals;
             }
@@ -222,7 +211,7 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public Stream<Activation> getActivations(INeuron n, Position pos) {
+        public Stream<Activation> getActivations(INeuron n, Position pos, Direction dir) {
             return n.getActivations(
                     pos.getDocument(),
                     fromSlot, new Position(pos.getDocument(), maxLength != Integer.MAX_VALUE ? pos.getFinalPosition() - maxLength : Integer.MIN_VALUE), true,
@@ -285,17 +274,12 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public Relation invert() {
-            return new LessThan(toSlot, fromSlot, orEquals, maxLength);
-        }
-
-        @Override
         public boolean isExact() {
             return false;
         }
 
         @Override
-        public boolean test(Position a, Position b) {
+        public boolean test(Position a, Position b, Direction dir) {
             if(a == b) {
                 return orEquals;
             }
@@ -304,7 +288,7 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public Stream<Activation> getActivations(INeuron n, Position pos) {
+        public Stream<Activation> getActivations(INeuron n, Position pos, Direction dir) {
             return n.getActivations(
                     pos.getDocument(),
                     fromSlot, pos, orEquals,

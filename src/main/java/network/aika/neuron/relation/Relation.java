@@ -43,38 +43,41 @@ import static network.aika.neuron.relation.PositionRelation.GreaterThan;
  *
  * @author Lukas Molzberger
  */
-public abstract class Relation implements Comparable<Relation>, Writable {
+public abstract class Relation implements Writable {
+
+    public static final Relation MIN = new Any();
+    public static final Relation MAX = new Any();
+
 
     public static Map<Integer, RelationFactory> relationRegistry = new TreeMap<>();
 
-    public static Relation EQUALS = new MultiRelation(
+    public static Relation[] EQUALS = new Relation[] {
             new Equals(BEGIN, BEGIN),
             new Equals(END, END)
-    );
+    };
     public static Relation BEGIN_EQUALS = new Equals(BEGIN, BEGIN);
     public static Relation END_EQUALS = new Equals(END, END);
     public static Relation BEGIN_TO_END_EQUALS = new Equals(BEGIN, END);
     public static Relation END_TO_BEGIN_EQUALS = new Equals(END, BEGIN);
-    public static Relation CONTAINS = new MultiRelation(
+    public static Relation[] CONTAINS = new Relation[] {
             new LessThan(BEGIN, BEGIN, true),
             new GreaterThan(END, END, true, Integer.MAX_VALUE)
-    );
-    public static Relation CONTAINED_IN = new MultiRelation(
+    };
+    public static Relation[] CONTAINED_IN = new Relation[]{
             new GreaterThan(BEGIN, BEGIN, true),
             new LessThan(END, END, true, Integer.MAX_VALUE)
-    );
-    public static Relation OVERLAPS = new MultiRelation(
+    };
+    public static Relation[] OVERLAPS = new Relation[] {
             new LessThan(BEGIN, END, false),
             new GreaterThan(END, BEGIN, false, Integer.MAX_VALUE)
-    );
+    };
     public static Relation BEFORE = new LessThan(END, BEGIN, true);
     public static Relation AFTER = new GreaterThan(BEGIN, END, true);
 
     public static Relation ANY = new Any();
 
 
-    @Override
-    public int compareTo(Relation rel) {
+    public int compareTo(Relation rel, Direction dir) {
         return Integer.compare(getType(), rel.getType());
     }
 
@@ -89,24 +92,13 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
     public abstract int getType();
 
-    public abstract boolean test(Activation act, Activation linkedAct, boolean allowUndefined);
+    public abstract boolean test(Activation act, Activation linkedAct, boolean allowUndefined, Direction dir);
 
-    public abstract Relation invert();
-
-    public abstract void mapSlots(Map<Integer, Position> slots, Activation act);
+    public abstract void mapSlots(Map<Integer, Position> slots, Activation act, Direction dir);
 
 
     public Relation() {
     }
-
-
-    public Relation getRelation(Relation r) {
-        if(compareTo(r) == 0) {
-            return this;
-        }
-        return null;
-    }
-
 
     public void setFromSynapseId(int fromSynapseId) {
     }
@@ -136,7 +128,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     public abstract boolean isExact();
 
 
-    public abstract Stream<Activation> getActivations(INeuron n, Activation linkedAct);
+    public abstract Stream<Activation> getActivations(INeuron n, Activation linkedAct, Direction dir);
 
 
     public void link(Neuron n, int from, int to) {
@@ -150,7 +142,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     }
 
 
-    public void link(Map<Integer, MultiRelation> fromRelMap, Map<Integer, MultiRelation> toRelMap, Integer fromSynId, Integer toSynId, Neuron n) {
+    public void link(RelationEndpoint fromEndpoint, RelationEndpoint toEndpoint, Integer fromSynId, Integer toSynId, Neuron n) {
         MultiRelation mr;
         if(toSynId != OUTPUT) {
             mr = toRelMap.get(fromSynId);
@@ -212,7 +204,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         protected int from;
         protected int to;
 
-        protected Relation relation;
+        protected Relation[] relation;
 
 
         /**
@@ -236,13 +228,13 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
 
-        public Builder setRelation(Relation rel) {
+        public Builder setRelation(Relation... rel) {
             this.relation = rel;
             return this;
         }
 
 
-        public Relation getRelation() {
+        public Relation[] getRelation() {
             return relation;
         }
 
@@ -257,6 +249,46 @@ public abstract class Relation implements Comparable<Relation>, Writable {
 
             relation.setFromSynapseId(from);
             relation.setToSynapseId(to);
+        }
+    }
+
+
+
+
+    public static class Key implements Comparable<Key> {
+        private Integer relId;
+        private Relation rel;
+        private Direction dir;
+
+        public Key(Integer relId, Relation rel, Direction dir) {
+            this.relId = relId;
+            this.rel = rel;
+            this.dir = dir;
+        }
+
+
+        public Integer getRelatedId() {
+            return relId;
+        }
+
+        public Relation getRelation() {
+            return rel;
+        }
+
+        public Direction getDirection() {
+            return dir;
+        }
+
+        @Override
+        public int compareTo(Key k) {
+            int r = Integer.compare(relId, k.relId);
+            if(r != 0) return r;
+
+            return 0;
+        }
+
+        public Direction getInvertedDirection() {
+            return null;
         }
     }
 
@@ -277,17 +309,12 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         @Override
-        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
+        public boolean test(Activation act, Activation linkedAct, boolean allowUndefined, Direction dir) {
             return true;
         }
 
         @Override
-        public Relation invert() {
-            return this;
-        }
-
-        @Override
-        public void mapSlots(Map<Integer, Position> slots, Activation act) {
+        public void mapSlots(Map<Integer, Position> slots, Activation act, Direction dir) {
         }
 
         @Override
@@ -296,7 +323,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
         }
 
         @Override
-        public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
+        public Stream<Activation> getActivations(INeuron n, Activation linkedAct, Direction dir) {
             return n.getActivations(linkedAct.getDocument());
         }
     }

@@ -20,9 +20,10 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Document;
 import network.aika.neuron.activation.link.Link;
-import network.aika.neuron.relation.MultiRelation;
+import network.aika.neuron.relation.Direction;
 import network.aika.neuron.relation.Relation;
 import network.aika.Writable;
+import network.aika.neuron.relation.RelationEndpoint;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -61,7 +62,7 @@ import static network.aika.neuron.Synapse.State.NEXT;
  *
  * @author Lukas Molzberger
  */
-public class Synapse implements Writable {
+public class Synapse implements RelationEndpoint, Writable {
 
     public static final int OUTPUT = -1;
 
@@ -89,7 +90,7 @@ public class Synapse implements Writable {
     private boolean isRecurrent;
     private boolean identity;
 
-    private Map<Integer, MultiRelation> relations = new TreeMap<>();
+    private NavigableSet<Relation.Key> relations = new TreeSet<>();
 
     private boolean inactive;
     private boolean inactiveNew;
@@ -140,11 +141,16 @@ public class Synapse implements Writable {
         this.identity = identity;
     }
 
-    public Map<Integer, MultiRelation> getRelations() {
+    public NavigableSet<Relation.Key> getRelations() {
         return relations;
     }
 
-    public void setRelations(Map<Integer, MultiRelation> relations) {
+    @Override
+    public NavigableSet<Relation.Key> getOutputRelationsTmp() {
+        return relations.subSet(new Relation.Key(OUTPUT, Relation.MIN, Direction.FORWARD), true, new Relation.Key(OUTPUT, Relation.MAX, Direction.FORWARD), false);
+    }
+
+    public void setRelations(NavigableSet<Relation.Key> relations) {
         this.relations = relations;
     }
 
@@ -368,8 +374,8 @@ public class Synapse implements Writable {
     }
 
 
-    public MultiRelation getRelationById(Integer id) {
-        return relations.get(id);
+    public Set<Relation.Key> getRelationById(Integer id) {
+        return relations.subSet(new Relation.Key(id, Relation.MIN, Direction.FORWARD), new Relation.Key(id, Relation.MAX, Direction.FORWARD));
     }
 
 

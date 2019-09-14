@@ -4,8 +4,8 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
-import network.aika.neuron.activation.link.Direction;
 import network.aika.neuron.activation.link.Link;
+import network.aika.neuron.relation.Direction;
 import network.aika.neuron.relation.Relation;
 
 import java.util.Map;
@@ -62,18 +62,13 @@ public class WeightedRelation extends Relation {
         return 0;
     }
 
-    public boolean test(Activation act, Activation linkedAct, boolean allowUndefined) {
-        return keyRelation.test(act, linkedAct, allowUndefined);
-    }
-
-    @Override
-    public Relation invert() {
-        return new WeightedRelation(keyRelation.invert(), statistic, toSynapseId, fromSynapseId);
+    public boolean test(Activation act, Activation linkedAct, boolean allowUndefined, Direction dir) {
+        return keyRelation.test(act, linkedAct, allowUndefined, dir);
     }
 
 
-    public Stream<Activation> getActivations(INeuron n, Activation linkedAct) {
-        return keyRelation.getActivations(n, linkedAct);
+    public Stream<Activation> getActivations(INeuron n, Activation linkedAct, Direction dir) {
+        return keyRelation.getActivations(n, linkedAct, dir);
     }
 
 
@@ -90,15 +85,15 @@ public class WeightedRelation extends Relation {
         Activation oAct = l.getOutput();
 
         Synapse s = oAct.getSynapseById(fromSynapseId);
-        for(Link relLink: oAct.getLinksBySynapse(Direction.INPUT, s).collect(Collectors.toList())) {
+        for(Link relLink: oAct.getLinksBySynapse(network.aika.neuron.activation.link.Direction.INPUT, s).collect(Collectors.toList())) {
 
         }
         return 0;
     }
 
 
-    public void mapSlots(Map<Integer, Position> slots, Activation act) {
-        keyRelation.mapSlots(slots, act);
+    public void mapSlots(Map<Integer, Position> slots, Activation act, Direction dir) {
+        keyRelation.mapSlots(slots, act, dir);
     }
 
 
@@ -118,12 +113,12 @@ public class WeightedRelation extends Relation {
     }
 
     @Override
-    public int compareTo(Relation rel) {
-        int r = super.compareTo(rel);
+    public int compareTo(Relation rel, Direction dir) {
+        int r = super.compareTo(rel, dir);
         if(r != 0) return r;
 
         WeightedRelation wr = (WeightedRelation) rel;
 
-        return keyRelation.compareTo(wr.keyRelation);
+        return keyRelation.compareTo(wr.keyRelation, dir);
     }
 }

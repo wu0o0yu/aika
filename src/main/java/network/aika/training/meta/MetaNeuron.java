@@ -9,7 +9,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.search.Option;
-import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.MetaModel;
@@ -143,11 +142,11 @@ public class MetaNeuron extends TNeuron {
 
 
     private void trainOutputRelations() {
-        for(Map.Entry<Integer, MultiRelation> me: getOutputRelations().entrySet()) {
-            Synapse relSyn = getProvider().getSynapseById(me.getKey());
+        for(Relation.Key rk: getRelations()) {
+            Synapse relSyn = getProvider().getSynapseById(rk.getRelatedId());
             relSyn.getRelations().remove(OUTPUT);
         }
-        getOutputRelations().clear();
+        getRelations().clear();
 
         double nijSum = 0.0;
         for (MappingLink ml : targetNeurons.values()) {
@@ -157,32 +156,29 @@ public class MetaNeuron extends TNeuron {
         for (MappingLink ml : targetNeurons.values()) {
             ExcitatoryNeuron tn = ml.targetNeuron;
 
-            for(Map.Entry<Integer, MultiRelation> me: tn.getOutputRelations().entrySet()) {
-                MultiRelation tmr = me.getValue();
-                ExcitatorySynapse ts = (ExcitatorySynapse) tn.getProvider().getSynapseById(me.getKey());
+            for(Relation.Key rk: tn.getRelations()) {
+                ExcitatorySynapse ts = (ExcitatorySynapse) tn.getProvider().getSynapseById(rk.getRelatedId());
 
-                for(Relation tr: tmr.getRelations().values()) {
-                    WeightedRelation twr = (WeightedRelation) tr;
+                WeightedRelation twr = (WeightedRelation) rk.getRelation();
 
-                    for (Map.Entry<MetaSynapse, MetaSynapse.MappingLink> mea : ts.metaSynapses.entrySet()) {
-                        if (mea.getKey().getOutput().getId() == getId()) {
-                            MetaSynapse ms = mea.getKey();
+                for (Map.Entry<MetaSynapse, MetaSynapse.MappingLink> mea : ts.metaSynapses.entrySet()) {
+                    if (mea.getKey().getOutput().getId() == getId()) {
+                        MetaSynapse ms = mea.getKey();
 
-                            MultiRelation multiRel = ms.getRelationById(OUTPUT);
-                            if(multiRel == null) {
-                                multiRel = new MultiRelation();
+                        MultiRelation multiRel = ms.getRelationById(OUTPUT);
+                        if (multiRel == null) {
+                            multiRel = new MultiRelation();
 
-                            }
-
-                            WeightedRelation mr = (WeightedRelation) multiRel.getRelation(tr);
-
-                            if (mr == null) {
-                                mr = (WeightedRelation) twr.copy().invert();
-                                multiRel.addRelation(mr);
-                            }
-
-                            mr.statistic.weight += ml.nij / nijSum;
                         }
+
+                        WeightedRelation mr = (WeightedRelation) multiRel.getRelation(rk.getRelation());
+
+                        if (mr == null) {
+                            mr = (WeightedRelation) twr.copy().invert();
+                            multiRel.addRelation(mr);
+                        }
+
+                        mr.statistic.weight += ml.nij / nijSum;
                     }
                 }
             }
