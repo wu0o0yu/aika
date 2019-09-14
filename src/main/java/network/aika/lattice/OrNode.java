@@ -29,6 +29,7 @@ import network.aika.neuron.activation.*;
 import network.aika.Document;
 import network.aika.neuron.activation.link.Direction;
 import network.aika.neuron.activation.link.Link;
+import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.Relation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,8 +110,8 @@ public class OrNode extends Node<OrNode, OrActivation> {
     private Activation lookupActivation(OrActivation.Link ol, Predicate<Link> filter) {
         for(Link l: ol.getInputLinks(outputNeuron)) {
             Synapse syn = l.getSynapse();
-            Map<Integer, Relation> rels = syn.getRelations();
-            for(Map.Entry<Integer, Relation> me: rels.entrySet()) {
+            Map<Integer, MultiRelation> rels = syn.getRelations();
+            for(Map.Entry<Integer, MultiRelation> me: rels.entrySet()) {
                 Integer relSynId = me.getKey();
                 Relation rel = me.getValue();
 
@@ -151,7 +152,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
             Synapse s = outputNeuron.getSynapseById(synapseId);
             if(s != null) {
-                for (Map.Entry<Integer, Relation> me : s.getRelations().entrySet()) {
+                for (Map.Entry<Integer, MultiRelation> me : s.getRelations().entrySet()) {
                     Relation rel = me.getValue();
                     if (me.getKey() == Synapse.OUTPUT) {
                         Activation iAct = inputAct.getInputActivation(i);

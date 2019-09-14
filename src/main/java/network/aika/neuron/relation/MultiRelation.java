@@ -38,35 +38,48 @@ public class MultiRelation extends Relation {
 
     private SortedMap<Relation, Relation> relations;
 
+    private MultiRelation inverted;
+
     static {
         registerRelation(ID, () -> new MultiRelation());
     }
 
 
+    private MultiRelation(MultiRelation im) {
+        inverted = im;
+        relations = new TreeMap<>();
+    }
+
+
     public MultiRelation() {
+        inverted = new MultiRelation(this);
         relations = new TreeMap<>();
     }
 
 
     public MultiRelation(Relation... rels) {
-        relations = new TreeMap<>();
+        this();
 
         for(Relation r: rels) {
             relations.put(r, r);
+            Relation ir = r.invert();
+            inverted.relations.put(ir, ir);
         }
     }
 
 
     public MultiRelation(SortedMap<Relation, Relation> rels) {
         relations = rels;
+        inverted = new MultiRelation(this);
+
+        for(Relation r: rels.values()) {
+            Relation ir = r.invert();
+            inverted.relations.put(ir, ir);
+        }
     }
 
     public SortedMap<Relation, Relation> getRelations() {
         return relations;
-    }
-
-    public Collection<Relation> getLeafRelations() {
-        return relations.values();
     }
 
     public int size() {
@@ -81,6 +94,8 @@ public class MultiRelation extends Relation {
 
     public void addRelation(Relation r) {
         relations.put(r, r);
+        Relation ir = r.invert();
+        inverted.relations.put(ir, ir);
     }
 
 
@@ -107,13 +122,8 @@ public class MultiRelation extends Relation {
 
 
     @Override
-    public Relation invert() {
-        SortedMap<Relation, Relation> invRels = new TreeMap<>();
-        for(Relation rel: relations.values()) {
-            Relation ir = rel.invert();
-            invRels.put(ir, ir);
-        }
-        return new MultiRelation(invRels);
+    public MultiRelation invert() {
+        return inverted;
     }
 
 

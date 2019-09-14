@@ -143,7 +143,7 @@ public class MetaNeuron extends TNeuron {
 
 
     private void trainOutputRelations() {
-        for(Map.Entry<Integer, Relation> me: getOutputRelations().entrySet()) {
+        for(Map.Entry<Integer, MultiRelation> me: getOutputRelations().entrySet()) {
             Synapse relSyn = getProvider().getSynapseById(me.getKey());
             relSyn.getRelations().remove(OUTPUT);
         }
@@ -157,18 +157,18 @@ public class MetaNeuron extends TNeuron {
         for (MappingLink ml : targetNeurons.values()) {
             ExcitatoryNeuron tn = ml.targetNeuron;
 
-            for(Map.Entry<Integer, Relation> me: tn.getOutputRelations().entrySet()) {
-                MultiRelation tmr = (MultiRelation) me.getValue();
+            for(Map.Entry<Integer, MultiRelation> me: tn.getOutputRelations().entrySet()) {
+                MultiRelation tmr = me.getValue();
                 ExcitatorySynapse ts = (ExcitatorySynapse) tn.getProvider().getSynapseById(me.getKey());
 
-                for(Relation tr: tmr.getLeafRelations()) {
+                for(Relation tr: tmr.getRelations().values()) {
                     WeightedRelation twr = (WeightedRelation) tr;
 
                     for (Map.Entry<MetaSynapse, MetaSynapse.MappingLink> mea : ts.metaSynapses.entrySet()) {
                         if (mea.getKey().getOutput().getId() == getId()) {
                             MetaSynapse ms = mea.getKey();
 
-                            MultiRelation multiRel = (MultiRelation) ms.getRelationById(OUTPUT);
+                            MultiRelation multiRel = ms.getRelationById(OUTPUT);
                             if(multiRel == null) {
                                 multiRel = new MultiRelation();
 
@@ -223,7 +223,7 @@ public class MetaNeuron extends TNeuron {
                 for (MetaSynapse.MappingLink ml : ms.targetSynapses.values()) {
                     ExcitatorySynapse ts = ml.targetSynapse;
 
-                    for (Map.Entry<Integer, Relation> me : ts.getRelations().entrySet()) {
+                    for (Map.Entry<Integer, MultiRelation> me : ts.getRelations().entrySet()) {
                         Integer relSynId = me.getKey();
 
                         if (relSynId != OUTPUT) {
@@ -237,7 +237,7 @@ public class MetaNeuron extends TNeuron {
 
                                 Relation mmr = ms.getRelations().get(relMetaSyn.getId());
 
-                                for (Relation tr : me.getValue().getLeafRelations()) {
+                                for (Relation tr : me.getValue().getRelations().values()) {
                                     WeightedRelation wtr = (WeightedRelation) tr;
 
                                     Relation mr = null;
@@ -248,7 +248,7 @@ public class MetaNeuron extends TNeuron {
                                     if (mr == null) {
                                         mr = wtr.copy();
 
-                                        Relation.addRelation(ms.getId(), relMetaSyn.getId(), getProvider(), mr);
+                                        mr.link(getProvider(), ms.getId(), relMetaSyn.getId());
                                     }
                                 }
                             }
@@ -269,9 +269,9 @@ public class MetaNeuron extends TNeuron {
 
             if (ms.getWeight() > 0.5) {
                 Map<InduceKey, List<MetaSynapse>> tmp = new TreeMap<>();
-                for(Map.Entry<Integer, Relation> me: ms.getRelations().entrySet()) {
+                for(Map.Entry<Integer, MultiRelation> me: ms.getRelations().entrySet()) {
                     MetaSynapse relMS = (MetaSynapse) getProvider().getSynapseById(me.getKey());
-                    for(Relation rel: me.getValue().getLeafRelations()) {
+                    for(Relation rel: me.getValue().getRelations().values()) {
                         WeightedRelation wr = (WeightedRelation) rel;
 
                         Relation keyRel = wr.getKeyRelation();

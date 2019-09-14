@@ -69,6 +69,8 @@ public class ActivationsTest {
         inA.addInput(doc, 0, 1);
         inA.addInput(doc, 2, 3);
 
+        System.out.println(doc.activationsToString());
+
         Assert.assertNotNull(pA.getActivation(doc, 0, 1, false));
         Assert.assertNull(pA.getActivation(doc, 1, 2, false));
         Assert.assertNotNull(pA.getActivation(doc, 2, 3, false));

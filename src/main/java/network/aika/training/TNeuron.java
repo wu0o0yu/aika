@@ -15,6 +15,7 @@ import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.excitatory.ExcitatoryNeuron;
+import network.aika.training.relation.WeightedRelation;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -261,16 +262,8 @@ public abstract class TNeuron extends INeuron {
 
 
     public void clearOutputRelations() {
-        for(Map.Entry<Integer, Relation> me: getOutputRelations().entrySet()) {
-            Relation rel = me.getValue();
-
-            if(rel instanceof MultiRelation) {
-                MultiRelation mr = (MultiRelation) rel;
-
-                for(Relation r: mr.getLeafRelations()) {
-                    Relation.removeRelation(Synapse.OUTPUT, me.getKey(), getProvider(), r.invert());
-                }
-            } else {
+        for(Map.Entry<Integer, MultiRelation> me: getOutputRelations().entrySet()) {
+            for(Relation rel: me.getValue().getRelations().values()) {
                 Relation.removeRelation(Synapse.OUTPUT, me.getKey(), getProvider(), rel.invert());
             }
         }
@@ -328,12 +321,17 @@ public abstract class TNeuron extends INeuron {
 
     public List<Integer> getOutputSlots() {
         List<Integer> slots = new ArrayList<>();
-        for(Map.Entry<Integer, Relation> me: getOutputRelations().entrySet()) {
-            Relation rel = me.getValue();
-            if(rel instanceof PositionRelation) {
-                PositionRelation posRel = (PositionRelation) rel;
+        for(Map.Entry<Integer, MultiRelation> me: getOutputRelations().entrySet()) {
+            for(Relation rel: me.getValue().getRelations().values()) {
+                if(rel instanceof WeightedRelation) {
+                    rel = ((WeightedRelation) rel).keyRelation;
+                }
 
-                slots.add(posRel.toSlot);
+                if (rel instanceof PositionRelation) {
+                    PositionRelation posRel = (PositionRelation) rel;
+
+                    slots.add(posRel.toSlot);
+                }
             }
         }
 

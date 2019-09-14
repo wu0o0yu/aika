@@ -12,6 +12,7 @@ import network.aika.neuron.activation.State;
 import network.aika.neuron.activation.link.Direction;
 import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.search.Option;
+import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.*;
@@ -54,12 +55,15 @@ public class ExcitatoryNeuron extends TNeuron {
 
     enum XlMode {
         WEIGHT_KPOS_UPOS((l, out) -> l.getX(Sign.POS) * actFDelta(out), Sign.POS, WeightBias.WEIGHT),
-        WEIGHT_KPOS_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.POS, WeightBias.WEIGHT),
         BIAS_KPOS_UPOS((l, out) -> 0.0, Sign.POS, WeightBias.BIAS),
+
+        WEIGHT_KPOS_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.POS, WeightBias.WEIGHT),
         BIAS_KPOS_UNEG((l, out) -> l.getX(Sign.NEG) * actFDelta(out), Sign.POS, WeightBias.BIAS),
+
         WEIGHT_KNEG_UPOS((l, out) -> 0.0, Sign.NEG, WeightBias.WEIGHT),
-        WEIGHT_KNEG_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.NEG, WeightBias.WEIGHT),
         BIAS_KNEG_UPOS((l, out) -> l.getX(Sign.POS) * actFDelta(out), Sign.NEG, WeightBias.BIAS),
+
+        WEIGHT_KNEG_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.NEG, WeightBias.WEIGHT),
         BIAS_KNEG_UNEG((l, out) -> l.getX(Sign.NEG) * actFDelta(out), Sign.NEG, WeightBias.BIAS);
 
         ActDelta actDelta;
@@ -190,11 +194,6 @@ public class ExcitatoryNeuron extends TNeuron {
 
         for (Option out : act.getOptions()) {
             trainSynapse(config, out);
-
-            if(log.isDebugEnabled()) {
-                dumpRelations();
-            }
-
         }
     }
 
@@ -332,8 +331,9 @@ public class ExcitatoryNeuron extends TNeuron {
                                 s.getId()
                         );
 
-                        Relation.addRelation(s.getRelations(), l.getSynapse().getId(), s.getId(), null, rel);
-                        Relation.addRelation(l.getSynapse().getRelations(), s.getId(), l.getSynapse().getId(), null, rel.invert());
+                        rel.link(l.getSynapse().getRelations(), s.getRelations(), l.getSynapse().getId(), s.getId(), null);
+//                        Relation.addRelation(s.getRelations(), l.getSynapse().getId(), s.getId(), null, rel);
+//                        Relation.addRelation(l.getSynapse().getRelations(), s.getId(), l.getSynapse().getId(), null, rel.invert());
                     }
                 }
             }
@@ -460,16 +460,20 @@ public class ExcitatoryNeuron extends TNeuron {
 
 
     private static Synapse followRelation(Synapse s, Dir dir) {
-        for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
-            Relation rel = me.getValue();
+        for(Map.Entry<Integer, MultiRelation> me: s.getRelations().entrySet()) {
+            for(Relation rel: me.getValue().getRelations().values()) {
+                if(rel instanceof WeightedRelation) {
+                    rel = ((WeightedRelation) rel).keyRelation;
+                }
 
-            if(rel instanceof PositionRelation.Equals) {
-                PositionRelation.Equals r = (PositionRelation.Equals) rel;
+                if (rel instanceof PositionRelation.Equals) {
+                    PositionRelation.Equals r = (PositionRelation.Equals) rel;
 
-                if((r.fromSlot == BEGIN && dir == Dir.BEFORE) || (r.fromSlot == END && dir == Dir.AFTER)) {
-                    Synapse relSyn = s.getOutput().getSynapseById(me.getKey());
-                    if(relSyn != null && !relSyn.isInactive() && !relSyn.isWeak(NEXT)) {
-                        return relSyn;
+                    if ((r.fromSlot == BEGIN && dir == Dir.BEFORE) || (r.fromSlot == END && dir == Dir.AFTER)) {
+                        Synapse relSyn = s.getOutput().getSynapseById(me.getKey());
+                        if (relSyn != null && !relSyn.isInactive() && !relSyn.isWeak(NEXT)) {
+                            return relSyn;
+                        }
                     }
                 }
             }
@@ -587,17 +591,6 @@ public class ExcitatoryNeuron extends TNeuron {
 
         public String toString() {
             return "id:" + getId() + " " + getSynapse().getInput().getLabel();
-        }
-    }
-
-
-    private void dumpRelations() {
-        for(Synapse s: getInputSynapses()) {
-            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
-                if(s.getId() <= me.getKey() || me.getKey() == OUTPUT) {
-                    System.out.println("   Relation: From:" + s.getId() + " To:" + (me.getKey() == OUTPUT ? "OUTPUT" : me.getKey()) + " Rel:" + me.getValue());
-                }
-            }
         }
     }
 }
