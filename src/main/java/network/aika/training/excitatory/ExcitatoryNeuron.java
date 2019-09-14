@@ -515,7 +515,11 @@ public class ExcitatoryNeuron extends TNeuron {
 
     private static Synapse followRelation(Synapse s, Dir dir) {
         for(Map.Entry<Integer, MultiRelation> me: s.getRelations().entrySet()) {
-            for(Relation rel: me.getValue().getLeafRelations()) {
+            for(Relation rel: me.getValue().getRelations().values()) {
+                if(rel instanceof WeightedRelation) {
+                    rel = ((WeightedRelation) rel).keyRelation;
+                }
+
                 if (rel instanceof PositionRelation.Equals) {
                     PositionRelation.Equals r = (PositionRelation.Equals) rel;
 

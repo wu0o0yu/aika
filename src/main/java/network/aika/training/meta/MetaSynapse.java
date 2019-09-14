@@ -31,6 +31,7 @@ import network.aika.training.TNeuron;
 import network.aika.training.TSynapse;
 import network.aika.training.excitatory.ExcitatoryNeuron;
 import network.aika.training.excitatory.ExcitatorySynapse;
+import network.aika.training.relation.WeightedRelation;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -87,16 +88,13 @@ public class MetaSynapse extends TSynapse {
     public void countTargetRelations(Map<Relation, Double> outputRelations, MappingLink sml, double nij) {
         for(Map.Entry<Integer, MultiRelation> me: sml.targetSynapse.getRelations().entrySet()) {
             if(me.getKey() == OUTPUT) {
-                Relation rel = me.getValue();
+                for(Relation rel: me.getValue().getRelations().values()) {
+                    if(rel instanceof WeightedRelation) {
+                        rel = ((WeightedRelation) rel).keyRelation;
+                    }
 
-                if(rel instanceof PositionRelation) {
-                    countRelation(outputRelations, rel, nij);
-                } else if(rel instanceof MultiRelation) {
-                    MultiRelation mr = (MultiRelation) rel;
-                    for(Relation r: mr.getLeafRelations()) {
-                        if(r instanceof PositionRelation) {
-                            countRelation(outputRelations, r, nij);
-                        }
+                    if(rel instanceof PositionRelation) {
+                        countRelation(outputRelations, rel, nij);
                     }
                 }
             }

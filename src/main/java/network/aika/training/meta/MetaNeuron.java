@@ -161,14 +161,14 @@ public class MetaNeuron extends TNeuron {
                 MultiRelation tmr = me.getValue();
                 ExcitatorySynapse ts = (ExcitatorySynapse) tn.getProvider().getSynapseById(me.getKey());
 
-                for(Relation tr: tmr.getLeafRelations()) {
+                for(Relation tr: tmr.getRelations().values()) {
                     WeightedRelation twr = (WeightedRelation) tr;
 
                     for (Map.Entry<MetaSynapse, MetaSynapse.MappingLink> mea : ts.metaSynapses.entrySet()) {
                         if (mea.getKey().getOutput().getId() == getId()) {
                             MetaSynapse ms = mea.getKey();
 
-                            MultiRelation multiRel = (MultiRelation) ms.getRelationById(OUTPUT);
+                            MultiRelation multiRel = ms.getRelationById(OUTPUT);
                             if(multiRel == null) {
                                 multiRel = new MultiRelation();
 
@@ -237,7 +237,7 @@ public class MetaNeuron extends TNeuron {
 
                                 Relation mmr = ms.getRelations().get(relMetaSyn.getId());
 
-                                for (Relation tr : me.getValue().getLeafRelations()) {
+                                for (Relation tr : me.getValue().getRelations().values()) {
                                     WeightedRelation wtr = (WeightedRelation) tr;
 
                                     Relation mr = null;
@@ -271,7 +271,7 @@ public class MetaNeuron extends TNeuron {
                 Map<InduceKey, List<MetaSynapse>> tmp = new TreeMap<>();
                 for(Map.Entry<Integer, MultiRelation> me: ms.getRelations().entrySet()) {
                     MetaSynapse relMS = (MetaSynapse) getProvider().getSynapseById(me.getKey());
-                    for(Relation rel: me.getValue().getLeafRelations()) {
+                    for(Relation rel: me.getValue().getRelations().values()) {
                         WeightedRelation wr = (WeightedRelation) rel;
 
                         Relation keyRel = wr.getKeyRelation();

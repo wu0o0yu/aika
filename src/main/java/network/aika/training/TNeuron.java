@@ -263,15 +263,7 @@ public abstract class TNeuron extends INeuron {
 
     public void clearOutputRelations() {
         for(Map.Entry<Integer, MultiRelation> me: getOutputRelations().entrySet()) {
-            Relation rel = me.getValue();
-
-            if(rel instanceof MultiRelation) {
-                MultiRelation mr = (MultiRelation) rel;
-
-                for(Relation r: mr.getLeafRelations()) {
-                    Relation.removeRelation(Synapse.OUTPUT, me.getKey(), getProvider(), r.invert());
-                }
-            } else {
+            for(Relation rel: me.getValue().getRelations().values()) {
                 Relation.removeRelation(Synapse.OUTPUT, me.getKey(), getProvider(), rel.invert());
             }
         }
@@ -330,7 +322,7 @@ public abstract class TNeuron extends INeuron {
     public List<Integer> getOutputSlots() {
         List<Integer> slots = new ArrayList<>();
         for(Map.Entry<Integer, MultiRelation> me: getOutputRelations().entrySet()) {
-            for(Relation rel: me.getValue().getLeafRelations()) {
+            for(Relation rel: me.getValue().getRelations().values()) {
                 if(rel instanceof WeightedRelation) {
                     rel = ((WeightedRelation) rel).keyRelation;
                 }

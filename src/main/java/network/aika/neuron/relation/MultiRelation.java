@@ -82,10 +82,6 @@ public class MultiRelation extends Relation {
         return relations;
     }
 
-    public Collection<Relation> getLeafRelations() {
-        return relations.values();
-    }
-
     public int size() {
         return relations.size();
     }

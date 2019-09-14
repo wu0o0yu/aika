@@ -100,11 +100,6 @@ public abstract class Relation implements Comparable<Relation>, Writable {
     }
 
 
-    public Collection<Relation> getLeafRelations() {
-        return Collections.singletonList(this);
-    }
-
-
     public Relation getRelation(Relation r) {
         if(compareTo(r) == 0) {
             return this;
@@ -178,9 +173,7 @@ public abstract class Relation implements Comparable<Relation>, Writable {
             }
         }
 
-        for(Relation lr: getLeafRelations()) {
-            mr.addRelation(lr);
-        }
+        mr.addRelation(this);
     }
 
 

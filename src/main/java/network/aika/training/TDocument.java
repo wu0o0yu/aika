@@ -250,7 +250,7 @@ public class TDocument extends Document {
             for (Map.Entry<Integer, MultiRelation> me : templateSynapse.getRelations().entrySet()) {
                 Integer relId = me.getKey();
 
-                for(Relation r: me.getValue().getLeafRelations()) {
+                for(Relation r: me.getValue().getRelations().values()) {
                     WeightedRelation rel = (WeightedRelation) r;
 
                     if (relId != OUTPUT) {
@@ -288,7 +288,7 @@ public class TDocument extends Document {
         if (!targetSynapse.isConverted()) {
             for (Map.Entry<Integer, MultiRelation> me : templateSynapse.getRelations().entrySet()) {
                 Integer relId = me.getKey();
-                for(Relation leafRel: me.getValue().getLeafRelations()) {
+                for(Relation leafRel: me.getValue().getRelations().values()) {
                     WeightedRelation rel = (WeightedRelation) leafRel;
 
                     if (relId == OUTPUT) {
