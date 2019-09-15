@@ -25,6 +25,8 @@ import network.aika.neuron.relation.Relation;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 
 /**
  *
@@ -32,22 +34,19 @@ import java.io.IOException;
  */
 public class Refinement implements Comparable<Refinement>, Writable {
 
-    public RelationsMap relations;
+    public NavigableSet<Relation.Key> relations;
     public Provider<InputNode> input;
 
     private Refinement() {}
 
 
-    public Refinement(RelationsMap relations, Provider<InputNode> input) {
+    public Refinement(NavigableSet<Relation.Key> relations, Provider<InputNode> input) {
         this.relations = relations;
         this.input = input;
     }
 
     public boolean isConvertible() {
-        for(Relation rel: relations.relations) {
-            if(rel != null) return true;
-        }
-        return false;
+        return !relations.isEmpty();
     }
 
     public String toString() {
