@@ -130,15 +130,5 @@ public class RelationsMap implements Comparable<RelationsMap>, Writable {
         }
         return count;
     }
-
-
-    public boolean isExact() {
-        for(Relation rel: relations) {
-            if(!rel.isExact()) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
 

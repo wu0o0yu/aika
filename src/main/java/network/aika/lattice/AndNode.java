@@ -32,6 +32,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
+import static network.aika.lattice.refinement.Refinement.RELATIONS_MAX;
+import static network.aika.lattice.refinement.Refinement.RELATIONS_MIN;
+
 
 /**
  * The {@code InputNode} and the {@code AndNode} classes together form a pattern lattice, containing all
@@ -117,8 +120,8 @@ public class AndNode extends Node<AndNode, AndActivation> {
 
         lock.acquireReadLock();
         for(Map.Entry<Refinement, RefValue> me: andChildren.subMap(
-                new Refinement(RelationsMap.MIN, secondRef.input),
-                new Refinement(RelationsMap.MAX, secondRef.input)).entrySet()) {
+                new Refinement(RELATIONS_MIN, secondRef.input),
+                new Refinement(RELATIONS_MAX, secondRef.input)).entrySet()) {
             Refinement nRef = me.getKey();
             RefValue nRv = me.getValue();
             if(nRef.contains(secondRef, rv)) {
@@ -194,30 +197,33 @@ public class AndNode extends Node<AndNode, AndActivation> {
     }
 
 
-    private RelationsMap getParentRelations(Refinement firstRef, Entry firstParent) {
-        Relation[] secondParentRelations = new Relation[firstRef.relations.length() - 1];
-        for(int i = 0; i < firstRef.relations.length(); i++) {
-            Integer j = firstParent.rv.reverseOffsets[i];
+    private NavigableMap<Relation.Key, Relation.Key> getParentRelations(Refinement firstRef, Entry firstParent) {
+        NavigableMap<Relation.Key, Relation.Key> secondParentRelations = new TreeMap<>();
+        for(Relation.Key rk: firstRef.relations.values()) {
+            Integer j = firstParent.rv.reverseOffsets[rk.getRelatedId()];
             if(j != null) {
-                secondParentRelations[j] = firstRef.relations.get(i);
+                Relation.Key nrk = new Relation.Key(j, rk.getRelation(), rk.getDirection());
+                secondParentRelations.put(nrk, nrk);
             }
         }
-        return new RelationsMap(secondParentRelations);
+        return secondParentRelations;
     }
 
 
-    private static RelationsMap getRelations(Refinement firstRef, Entry firstParent, RefValue secondParentRV) {
-        Relation[] secondRelations = new Relation[firstParent.ref.relations.length() + 1];
-        for(int i = 0; i < firstParent.ref.relations.length(); i++) {
-            int j = secondParentRV.offsets[i];
-            secondRelations[j] = firstParent.ref.relations.get(i);
+    private static NavigableMap<Relation.Key, Relation.Key> getRelations(Refinement firstRef, Entry firstParent, RefValue secondParentRV) {
+        NavigableMap<Relation.Key, Relation.Key> secondRelations = new TreeMap<>();
+        for(Relation.Key rk: firstParent.ref.relations.values()) {
+            int j = secondParentRV.offsets[rk.getRelatedId()];
+            Relation.Key nrk = new Relation.Key(j, rk.getRelation(), rk.getDirection());
+            secondRelations.put(nrk, nrk);
         }
 
-        Relation rel = firstRef.relations.get(firstParent.rv.refOffset);
-        if(rel != null) {
-            secondRelations[secondParentRV.refOffset] = rel.invert();
+        Integer offset = firstParent.rv.refOffset;
+        for(Relation.Key rk: firstRef.relations.subMap(new Relation.Key(offset, Relation.MIN, null), new Relation.Key(offset, Relation.MAX, null)).values()) {
+            Relation.Key nrk = new Relation.Key(secondParentRV.refOffset, rk.getRelation(), rk.getInvertedDirection());
+            secondRelations.put(nrk, nrk);
         }
-        return new RelationsMap(secondRelations);
+        return secondRelations;
     }
 
 

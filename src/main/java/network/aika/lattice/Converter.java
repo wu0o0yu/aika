@@ -23,7 +23,6 @@ import network.aika.lattice.refinement.RelationsMap;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.Relation;
 
 import java.util.*;
@@ -214,9 +213,8 @@ public class Converter {
             relatedSyns.remove(syn.getId());
             selectedCandidates.add(syn);
             alreadyCollected.add(syn.getId());
-            for(Map.Entry<Integer, MultiRelation> me: syn.getRelations().entrySet()) {
-                Integer relId = me.getKey();
-                MultiRelation rel = me.getValue();
+            for(Relation.Key rk: syn.getRelations()) {
+                Integer relId = rk.getRelatedId();
                 if(!alreadyCollected.contains(relId)) {
                     Synapse rs = syn.getOutput().getSynapseById(relId);
                     if(rs != null) {
@@ -252,15 +250,18 @@ public class Converter {
             nln.offsets = new Synapse[] {s};
             return nln;
         } else {
-            Relation[] relations = new Relation[nc.offsets.length];
+            NavigableMap<Relation.Key, Relation.Key> relations = new TreeMap<>();
             for(int i = 0; i < nc.offsets.length; i++) {
                 Synapse linkedSynapse = nc.offsets[i];
-                relations[i] = s.getRelationById(linkedSynapse.getId());
+                for(Relation.Key rk: s.getRelationById(linkedSynapse.getId())) {
+                    Relation.Key refRK = new Relation.Key(i, rk.getRelation(), rk.getDirection());
+                    relations.put(refRK, refRK);
+                }
             }
 
             NodeContext nln = new NodeContext();
             nln.offsets = new Synapse[nc.offsets.length + 1];
-            Refinement ref = new Refinement(new RelationsMap(relations), s.getInput().get().getOutputNode());
+            Refinement ref = new Refinement(relations, s.getInput().get().getOutputNode());
             RefValue rv = nc.node.expand(threadId, doc, ref);
             if(rv == null) {
                 return null;

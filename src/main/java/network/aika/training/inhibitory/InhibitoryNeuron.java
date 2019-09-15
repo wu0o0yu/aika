@@ -37,8 +37,7 @@ public class InhibitoryNeuron extends TNeuron {
 
             is.link();
 
-            MultiRelation isRel = createInhibitoryRelations((TNeuron) es.getInput().get());
-            isRel.link(n.getProvider(), isSynId, Synapse.OUTPUT);
+            n.createInhibitoryRelations((TNeuron) es.getInput().get(), isSynId);
 
             is.update(null, 1.0, 1.0);
         }
@@ -59,8 +58,7 @@ public class InhibitoryNeuron extends TNeuron {
         MetaInhibSynapse mis = new MetaInhibSynapse(mn.getProvider(), n.getProvider(), misSynId);
         mis.link();
 
-        MultiRelation misRel = createInhibitoryRelations(mn);
-        misRel.link(n.getProvider(), misSynId, Synapse.OUTPUT);
+        n.createInhibitoryRelations(mn, misSynId);
 
         mis.update(null, 1.0, 1.0);
 
@@ -72,8 +70,7 @@ public class InhibitoryNeuron extends TNeuron {
 
             is.link();
 
-            MultiRelation isRel = createInhibitoryRelations(targetNeuron);
-            isRel.link(n.getProvider(), isSynId, Synapse.OUTPUT);
+            n.createInhibitoryRelations(targetNeuron, isSynId);
 
             is.update(null, ml.nij, 1.0);
         }
@@ -84,18 +81,15 @@ public class InhibitoryNeuron extends TNeuron {
     }
 
 
-    public static MultiRelation createInhibitoryRelations(TNeuron mn) {
-        MultiRelation misRel = new MultiRelation();
-
+    public void createInhibitoryRelations(TNeuron mn, Integer relSynId) {
         for(Integer slot: mn. getOutputSlots()) {
             PositionRelation rel = new PositionRelation.Equals();
 
             rel.fromSlot = slot;
             rel.toSlot = slot;
 
-            misRel.addRelation(rel);
+            rel.link(getProvider(), relSynId, Synapse.OUTPUT);
         }
-        return misRel;
     }
 
 

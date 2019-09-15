@@ -35,6 +35,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
+import static network.aika.lattice.refinement.Refinement.RELATIONS_MAX;
+import static network.aika.lattice.refinement.Refinement.RELATIONS_MIN;
+
 
 /**
  * The {@code InputNode} class is the input layer for the boolean logic. The input-node has two sources of
@@ -86,7 +89,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
     void addAndChild(Refinement ref, RefValue child) {
         super.addAndChild(ref, child);
 
-        if(!ref.relations.isExact()) {
+        if(!ref.isExact()) {
             if (nonExactAndChildren == null) {
                 nonExactAndChildren = new TreeMap<>();
             }
@@ -100,7 +103,7 @@ public class InputNode extends Node<InputNode, InputActivation> {
     void removeAndChild(Refinement ref) {
         super.removeAndChild(ref);
 
-        if(!ref.relations.isExact()) {
+        if(!ref.isExact()) {
             if (nonExactAndChildren != null) {
                 nonExactAndChildren.remove(ref);
 
@@ -115,8 +118,8 @@ public class InputNode extends Node<InputNode, InputActivation> {
     public RefValue expand(int threadId, Document doc, Refinement ref) {
         if(!ref.isConvertible()) return null;
 
-        Relation rel = ref.relations.get(0);
-        if(rel == null) {
+        Relation.Key rk = ref.relations.firstKey();
+        if(rk == null) {
             return null;
         }
 
@@ -127,7 +130,10 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         List<AndNode.Entry> nlParents = new ArrayList<>();
 
-        Refinement mirrorRef = new Refinement(new RelationsMap(new Relation[]{rel.invert()}), provider);
+        NavigableMap<Relation.Key, Relation.Key> relations = new TreeMap<>();
+        Relation.Key refRK = new Relation.Key(0, rk.getRelation(), rk.getInvertedDirection());
+        relations.put(refRK, refRK);
+        Refinement mirrorRef = new Refinement(relations, provider);
         nlParents.add(new AndNode.Entry(mirrorRef, new RefValue(new Integer[] {1}, 0, ref.input)));
 
         rv = new RefValue(new Integer[] {0}, 1, provider);
@@ -178,8 +184,8 @@ public class InputNode extends Node<InputNode, InputActivation> {
             for (Activation linkedAct : act.getDocument().getActivationsByPosition(me.getValue(), true, me.getValue(), true)) {
                 Provider<InputNode> in = linkedAct.getINeuron().getOutputNode();
                 for (Map.Entry<Refinement, RefValue> mea : andChildren.subMap(
-                        new Refinement(RelationsMap.MIN, in),
-                        new Refinement(RelationsMap.MAX, in)).entrySet()) {
+                        new Refinement(RELATIONS_MIN, in),
+                        new Refinement(RELATIONS_MAX, in)).entrySet()) {
                     in.get(doc).addNextLevelActivations(mea.getKey(), mea.getValue().child.get(doc), act);
                 }
             }
@@ -196,19 +202,18 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
         if(act.repropagateV != null && act.repropagateV != nln.markedCreated) return;
 
-        ref.relations.get(0).getActivations(inputNeuron.get(doc), iAct)
+        Relation.Key rk = ref.relations.firstEntry().getValue();
+        rk.getRelation().getActivations(inputNeuron.get(doc), iAct, rk.getDirection())
                 .filter(secondIAct -> secondIAct.getOutputNodeActivation() != null)
                 .map(secondIAct -> secondIAct.getOutputNodeActivation())
                 .filter(secondAct -> secondAct != null && secondAct.registered)
                 .forEach(secondAct -> {
-                    //    if (!Conflicts.isConflicting(iAct, secondIAct)) {
                     AndActivation oAct = new AndActivation(doc, nln);
                     for (AndNode.Entry e : nln.parents) {
                         boolean match = e.ref.compareTo(ref) == 0;
                         oAct.link(e.ref, e.rv, match ? secondAct : act, match ? act : secondAct);
                     }
                     nln.addActivation(oAct);
-                    // }
                 }
         );
     }

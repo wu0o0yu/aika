@@ -25,7 +25,9 @@ import network.aika.neuron.relation.Relation;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.NavigableMap;
 import java.util.NavigableSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
@@ -34,13 +36,17 @@ import java.util.TreeSet;
  */
 public class Refinement implements Comparable<Refinement>, Writable {
 
-    public NavigableSet<Relation.Key> relations;
+    public static final NavigableMap<Relation.Key, Relation.Key> RELATIONS_MIN = new TreeMap<>();
+    public static final NavigableMap<Relation.Key, Relation.Key> RELATIONS_MAX = new TreeMap<>();
+
+
+    public NavigableMap<Relation.Key, Relation.Key> relations;
     public Provider<InputNode> input;
 
     private Refinement() {}
 
 
-    public Refinement(NavigableSet<Relation.Key> relations, Provider<InputNode> input) {
+    public Refinement(NavigableMap<Relation.Key, Relation.Key> relations, Provider<InputNode> input) {
         this.relations = relations;
         this.input = input;
     }
@@ -98,6 +104,16 @@ public class Refinement implements Comparable<Refinement>, Writable {
             }
         }
 
+        return true;
+    }
+
+
+    public boolean isExact() {
+        for(Relation.Key rk: relations.values()) {
+            if(!rk.getRelation().isExact()) {
+                return false;
+            }
+        }
         return true;
     }
 }

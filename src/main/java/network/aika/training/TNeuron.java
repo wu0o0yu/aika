@@ -262,7 +262,8 @@ public abstract class TNeuron extends INeuron {
 
     public void clearOutputRelations() {
         for(Relation.Key rk: getRelations()) {
-            Relation.removeRelation(Synapse.OUTPUT, rk.getRelatedId(), getProvider(), rk.getRelation().invert());
+            Synapse relSyn = getProvider().getSynapseById(rk.getRelatedId());
+            relSyn.removeRelation(Synapse.OUTPUT, rk.getRelation(), rk.getInvertedDirection());
         }
 
         getRelations().clear();

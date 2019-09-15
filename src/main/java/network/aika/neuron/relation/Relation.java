@@ -164,11 +164,6 @@ public abstract class Relation implements Writable {
     }
 
 
-    public static void removeRelation(RelationEndpoint relMap, Integer synId, Relation r, Direction dir) {
-        relMap.getRelations().remove(new Relation.Key(synId, r, dir));
-    }
-
-
     public static RelationEndpoint getRelationsMap(int synapseId, Neuron n) {
         return synapseId == OUTPUT ?
                 n.get() :
