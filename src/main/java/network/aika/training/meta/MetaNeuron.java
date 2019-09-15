@@ -9,6 +9,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.activation.search.Option;
+import network.aika.neuron.relation.Direction;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.MetaModel;
@@ -164,21 +165,20 @@ public class MetaNeuron extends TNeuron {
                 for (Map.Entry<MetaSynapse, MetaSynapse.MappingLink> mea : ts.metaSynapses.entrySet()) {
                     if (mea.getKey().getOutput().getId() == getId()) {
                         MetaSynapse ms = mea.getKey();
+                        // Todo: Die relSyn Ids müssen zwischen meta und target gemapped werden.
+/*
+                        Relation.Key mrk = ms.getRelation(rk);
 
-                        MultiRelation multiRel = ms.getRelationById(OUTPUT);
-                        if (multiRel == null) {
-                            multiRel = new MultiRelation();
-
-                        }
-
-                        WeightedRelation mr = (WeightedRelation) multiRel.getRelation(rk.getRelation());
-
-                        if (mr == null) {
-                            mr = (WeightedRelation) twr.copy().invert();
-                            multiRel.addRelation(mr);
+                        WeightedRelation mr = null;
+                        if (mrk == null) {
+                            mr = twr.copy();
+                            mr.link();
+                        } else {
+                            mr = (WeightedRelation) mrk.getRelation();
                         }
 
                         mr.statistic.weight += ml.nij / nijSum;
+                        */
                     }
                 }
             }
@@ -219,8 +219,8 @@ public class MetaNeuron extends TNeuron {
                 for (MetaSynapse.MappingLink ml : ms.targetSynapses.values()) {
                     ExcitatorySynapse ts = ml.targetSynapse;
 
-                    for (Map.Entry<Integer, MultiRelation> me : ts.getRelations().entrySet()) {
-                        Integer relSynId = me.getKey();
+                    for (Relation.Key trk : ts.getRelations()) {
+                        Integer relSynId = trk.getRelatedId();
 
                         if (relSynId != OUTPUT) {
                             ExcitatorySynapse relTargetSyn = (ExcitatorySynapse) ts.getOutput().getSynapseById(relSynId);
@@ -231,21 +231,13 @@ public class MetaNeuron extends TNeuron {
                             for (Neuron cand : candidates) {
                                 MetaSynapse relMetaSyn = lookupMetaSynapse(relTargetSyn, cand);
 
-                                Relation mmr = ms.getRelations().get(relMetaSyn.getId());
+                                Relation.Key mrk = ms.getRelation(new Relation.Key(relMetaSyn.getId(), trk.getRelation(), trk.getDirection()));
+                                WeightedRelation wtr = (WeightedRelation) trk.getRelation();
 
-                                for (Relation tr : me.getValue().getRelations().values()) {
-                                    WeightedRelation wtr = (WeightedRelation) tr;
+                                if (mrk == null) {
+                                    Relation mr = wtr.copy();
 
-                                    Relation mr = null;
-                                    if (mmr != null) {
-                                        mr = mmr.getRelation(tr);
-                                    }
-
-                                    if (mr == null) {
-                                        mr = wtr.copy();
-
-                                        mr.link(getProvider(), ms.getId(), relMetaSyn.getId());
-                                    }
+                                    mr.link(getProvider(), ms.getId(), relMetaSyn.getId());
                                 }
                             }
                         }
@@ -265,25 +257,22 @@ public class MetaNeuron extends TNeuron {
 
             if (ms.getWeight() > 0.5) {
                 Map<InduceKey, List<MetaSynapse>> tmp = new TreeMap<>();
-                for(Map.Entry<Integer, MultiRelation> me: ms.getRelations().entrySet()) {
-                    MetaSynapse relMS = (MetaSynapse) getProvider().getSynapseById(me.getKey());
-                    for(Relation rel: me.getValue().getRelations().values()) {
-                        WeightedRelation wr = (WeightedRelation) rel;
+                for(Relation.Key rk : ms.getRelations()) {
+                    MetaSynapse relMS = (MetaSynapse) getProvider().getSynapseById(rk.getRelatedId());
+                    WeightedRelation wr = (WeightedRelation) rk.getRelation();
 
-                        Relation keyRel = wr.getKeyRelation();
-                        if(keyRel instanceof PositionRelation) {
-                            PositionRelation pr = (PositionRelation) keyRel;
-                            InduceKey ik = new InduceKey(pr.fromSlot, keyRel);
+                    Relation keyRel = wr.getKeyRelation();
+                    if (keyRel instanceof PositionRelation) {
+                        PositionRelation pr = (PositionRelation) keyRel;
+                        InduceKey ik = new InduceKey(pr.fromSlot, keyRel, rk.getDirection());
 
-                            List<MetaSynapse> l = tmp.get(ik);
-                            if(l == null) {
-                                l = new ArrayList<>();
-                                tmp.put(ik, l);
-                            }
-
-                            l.add(relMS);
+                        List<MetaSynapse> l = tmp.get(ik);
+                        if (l == null) {
+                            l = new ArrayList<>();
+                            tmp.put(ik, l);
                         }
 
+                        l.add(relMS);
                     }
                 }
             }
@@ -295,17 +284,19 @@ public class MetaNeuron extends TNeuron {
     public static class InduceKey implements Comparable<InduceKey> {
         public int beginSlot;
         Relation rel;
+        Direction dir;
 
-        public InduceKey(int beginSlot, Relation rel) {
+        public InduceKey(int beginSlot, Relation rel, Direction dir) {
             this.beginSlot = beginSlot;
             this.rel = rel;
+            this.dir = dir;
         }
 
         @Override
         public int compareTo(InduceKey ik) {
             int r = Integer.compare(beginSlot, ik.beginSlot);
             if(r != 0) return r;
-            return rel.compareTo(ik.rel);
+            return rel.compareTo(ik.rel, dir);
         }
     }
 

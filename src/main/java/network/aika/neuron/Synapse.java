@@ -90,7 +90,7 @@ public class Synapse implements RelationEndpoint, Writable {
     private boolean isRecurrent;
     private boolean identity;
 
-    private NavigableSet<Relation.Key> relations = new TreeSet<>();
+    private NavigableMap<Relation.Key, Relation.Key> relations = new TreeMap<>();
 
     private boolean inactive;
     private boolean inactiveNew;
@@ -141,18 +141,32 @@ public class Synapse implements RelationEndpoint, Writable {
         this.identity = identity;
     }
 
-    public NavigableSet<Relation.Key> getRelations() {
-        return relations;
+    public Collection<Relation.Key> getRelations() {
+        return relations.values();
     }
 
     @Override
-    public NavigableSet<Relation.Key> getOutputRelationsTmp() {
-        return relations.subSet(new Relation.Key(OUTPUT, Relation.MIN, Direction.FORWARD), true, new Relation.Key(OUTPUT, Relation.MAX, Direction.FORWARD), false);
+    public Collection<Relation.Key> getOutputRelationsTmp() {
+        return relations.subMap(new Relation.Key(OUTPUT, Relation.MIN, Direction.FORWARD), true, new Relation.Key(OUTPUT, Relation.MAX, Direction.FORWARD), false).values();
     }
 
-    public void setRelations(NavigableSet<Relation.Key> relations) {
-        this.relations = relations;
+    public Collection<Relation.Key> getRelationById(Integer id) {
+        return relations.subMap(new Relation.Key(id, Relation.MIN, Direction.FORWARD), new Relation.Key(id, Relation.MAX, Direction.FORWARD)).values();
     }
+
+    public void addRelation(Integer synId, Relation rel, Direction dir) {
+        Relation.Key rk = new Relation.Key(synId, rel, dir);
+        relations.put(rk, rk);
+    }
+
+    public void removeRelation(Integer synId, Relation rel, Direction dir) {
+        relations.remove(new Relation.Key(synId, rel, dir));
+    }
+
+    public Relation.Key getRelation(Relation.Key rk) {
+        return relations.get(rk);
+    }
+
 
     public boolean isInactive() {
         return inactive;
@@ -371,11 +385,6 @@ public class Synapse implements RelationEndpoint, Writable {
 
     public boolean isNegative(State s) {
         return getWeight(s) < 0.0;
-    }
-
-
-    public Set<Relation.Key> getRelationById(Integer id) {
-        return relations.subSet(new Relation.Key(id, Relation.MIN, Direction.FORWARD), new Relation.Key(id, Relation.MAX, Direction.FORWARD));
     }
 
 

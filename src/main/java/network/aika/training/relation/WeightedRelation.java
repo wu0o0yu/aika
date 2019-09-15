@@ -47,12 +47,12 @@ public class WeightedRelation extends Relation {
     }
 
 
-    public void setFromSynapseId(int fromSynapseId) {
+    public void setFromSynapseId(int fromSynapseId, Direction dir) {
         this.fromSynapseId = fromSynapseId;
     }
 
 
-    public void setToSynapseId(int toSynapseId) {
+    public void setToSynapseId(int toSynapseId, Direction dir) {
         this.toSynapseId = toSynapseId;
     }
 

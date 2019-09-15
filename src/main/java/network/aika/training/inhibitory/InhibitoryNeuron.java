@@ -4,7 +4,6 @@ import network.aika.ActivationFunction;
 import network.aika.lattice.Converter;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.training.MetaModel;
 import network.aika.training.TNeuron;

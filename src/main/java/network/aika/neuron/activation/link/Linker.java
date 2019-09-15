@@ -63,7 +63,7 @@ public class Linker {
         Neuron n = act.getNeuron();
         if(n.getType() == INeuron.Type.EXCITATORY) {
             for (Synapse s : n.getActiveInputSynapses()) {
-                for (Relation.Key rk : s.getOutputRelations()) {
+                for (Relation.Key rk : s.getOutputRelationsTmp()) {
                     rk.getRelation().getActivations(s.getInput().get(doc), act, rk.getDirection())
                                 .forEach(iAct -> link(s, iAct, act));
                 }

@@ -100,10 +100,10 @@ public abstract class Relation implements Writable {
     public Relation() {
     }
 
-    public void setFromSynapseId(int fromSynapseId) {
+    public void setFromSynapseId(int fromSynapseId, Direction dir) {
     }
 
-    public void setToSynapseId(int toSynapseId) {
+    public void setToSynapseId(int toSynapseId, Direction dir) {
     }
 
 
@@ -141,62 +141,38 @@ public abstract class Relation implements Writable {
         );
     }
 
+    public void unlink(Neuron n, int from, int to) {
+        unlink(
+                getRelationsMap(from, n),
+                getRelationsMap(to, n),
+                from,
+                to,
+                n
+        );
+    }
+
 
     public void link(RelationEndpoint fromEndpoint, RelationEndpoint toEndpoint, Integer fromSynId, Integer toSynId, Neuron n) {
-        MultiRelation mr;
-        if(toSynId != OUTPUT) {
-            mr = toRelMap.get(fromSynId);
-        } else {
-            mr = fromRelMap.get(toSynId);
-            if(mr != null) {
-                mr = mr.invert();
-            }
-        }
-
-        if (mr == null) {
-            boolean ior = isInhibitoryOutputRelation(n);
-
-            mr = new MultiRelation();
-            if(!ior || fromSynId != OUTPUT) {
-                fromRelMap.put(toSynId, mr);
-            }
-            if(!ior || toSynId != OUTPUT) {
-                toRelMap.put(fromSynId, mr.invert());
-            }
-        }
-
-        mr.addRelation(this);
+        fromEndpoint.addRelation(toSynId, this, Direction.FORWARD);
+        toEndpoint.addRelation(fromSynId, this, Direction.BACKWARD);
     }
 
 
-    private boolean isInhibitoryOutputRelation(Neuron n) {
-        return isExact() && n.getType() == INHIBITORY;
+    public void unlink(RelationEndpoint fromEndpoint, RelationEndpoint toEndpoint, Integer fromSynId, Integer toSynId, Neuron n) {
+        fromEndpoint.removeRelation(toSynId, this, Direction.FORWARD);
+        toEndpoint.removeRelation(fromSynId, this, Direction.BACKWARD);
     }
 
 
-    public static void removeRelation(Integer synId, Integer targetSynId, Neuron n, Relation r) {
-        removeRelation(getRelationsMap(targetSynId, n), synId, r);
+    public static void removeRelation(RelationEndpoint relMap, Integer synId, Relation r, Direction dir) {
+        relMap.getRelations().remove(new Relation.Key(synId, r, dir));
     }
 
 
-    public static void removeRelation(Map<Integer, MultiRelation> relMap, Integer synId, Relation r) {
-        Relation existingRel = relMap.get(synId);
-        if(existingRel == null) {
-            return;
-        } else if(existingRel instanceof MultiRelation) {
-            MultiRelation mr = (MultiRelation) existingRel;
-            mr.removeRelation(r);
-        }
-    }
-
-
-    public static Map<Integer, MultiRelation> getRelationsMap(int synapseId, Neuron n) {
-        if(synapseId == OUTPUT) {
-            return n.get().getOutputRelations();
-        } else {
-            Synapse s = n.getSynapseById(synapseId);
-            return s.getRelations();
-        }
+    public static RelationEndpoint getRelationsMap(int synapseId, Neuron n) {
+        return synapseId == OUTPUT ?
+                n.get() :
+                n.getSynapseById(synapseId);
     }
 
 
@@ -204,7 +180,7 @@ public abstract class Relation implements Writable {
         protected int from;
         protected int to;
 
-        protected Relation[] relation;
+        protected Relation[] relations;
 
 
         /**
@@ -229,26 +205,30 @@ public abstract class Relation implements Writable {
 
 
         public Builder setRelation(Relation... rel) {
-            this.relation = rel;
+            this.relations = rel;
             return this;
         }
 
 
-        public Relation[] getRelation() {
-            return relation;
+        public Relation[] getRelations() {
+            return relations;
         }
 
         public void connect(Neuron n) {
-            getRelation().link(n, from, to);
+            for(Relation rel: getRelations()) {
+                rel.link(n, from, to);
+            }
         }
 
         @Override
         public void registerSynapseIds(Neuron n) {
-            n.registerSynapseId(from);
-            n.registerSynapseId(to);
+            for(Relation rel: getRelations()) {
+                n.registerSynapseId(from);
+                n.registerSynapseId(to);
 
-            relation.setFromSynapseId(from);
-            relation.setToSynapseId(to);
+                rel.setFromSynapseId(from, Direction.FORWARD);
+                rel.setToSynapseId(to, Direction.FORWARD);
+            }
         }
     }
 

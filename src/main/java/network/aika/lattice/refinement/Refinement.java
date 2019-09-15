@@ -87,7 +87,7 @@ public class Refinement implements Comparable<Refinement>, Writable {
     }
 
     public boolean contains(Refinement ref, RefValue rv) {
-        for(int i = 0; i < ref.relations.length(); i++) {
+        for(int i = 0; i < ref.relations.size(); i++) {
             Relation ra = ref.relations.get(i);
             Relation rb = relations.get(rv.offsets[i]);
 

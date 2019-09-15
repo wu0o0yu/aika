@@ -95,7 +95,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     private volatile int synapseIdCounter = 0;
 
     // synapseId -> relation
-    private NavigableSet<Relation.Key> outputRelations = new TreeSet<>();
+    private NavigableMap<Relation.Key, Relation.Key> outputRelations = new TreeMap<>();
 
 
     // A synapse is stored only in one direction, depending on the synapse weight.
@@ -173,20 +173,35 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public NavigableSet<Relation.Key> getRelations() {
-        return outputRelations;
+    public Collection<Relation.Key> getRelations() {
+        return outputRelations.values();
     }
 
-
     @Override
-    public NavigableSet<Relation.Key> getOutputRelationsTmp() {
-        return outputRelations.subSet(new Relation.Key(OUTPUT, Relation.MIN, Direction.FORWARD), true, new Relation.Key(OUTPUT, Relation.MAX, Direction.FORWARD), false);
+    public Collection<Relation.Key> getOutputRelationsTmp() {
+        return outputRelations.subMap(new Relation.Key(OUTPUT, Relation.MIN, Direction.FORWARD), true, new Relation.Key(OUTPUT, Relation.MAX, Direction.FORWARD), false).values();
+    }
+
+    public Collection<Relation.Key> getRelationById(Integer id) {
+        return outputRelations.subMap(new Relation.Key(id, Relation.MIN, Direction.FORWARD), new Relation.Key(id, Relation.MAX, Direction.FORWARD)).values();
+    }
+
+    public void addRelation(Integer synId, Relation rel, Direction dir) {
+        Relation.Key rk = new Relation.Key(synId, rel, dir);
+        outputRelations.put(rk, rk);
+    }
+
+    public void removeRelation(Integer synId, Relation rel, Direction dir) {
+        outputRelations.remove(new Relation.Key(synId, rel, dir));
+    }
+
+    public Relation.Key getRelation(Relation.Key rk) {
+        return outputRelations.get(rk);
     }
 
     public Collection<Synapse> getInputSynapses() {
         return inputSynapses.values();
     }
-
 
     public Synapse getMaxInputSynapse(Synapse.State state) {
         if(type != EXCITATORY) {
