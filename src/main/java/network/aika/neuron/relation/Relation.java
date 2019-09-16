@@ -77,7 +77,7 @@ public abstract class Relation implements Writable {
     public static Relation ANY = new Any();
 
 
-    public int compareTo(Relation rel, Direction dir) {
+    public int compareTo(Relation rel, boolean sameDirection) {
         return Integer.compare(getType(), rel.getType());
     }
 
@@ -254,16 +254,15 @@ public abstract class Relation implements Writable {
             return dir;
         }
 
+        public Direction getInvertedDirection() {
+            return null;
+        }
         @Override
         public int compareTo(Key k) {
             int r = Integer.compare(relId, k.relId);
             if(r != 0) return r;
 
-            return 0;
-        }
-
-        public Direction getInvertedDirection() {
-            return null;
+            return rel.compareTo(k.rel, dir == k.dir);
         }
     }
 

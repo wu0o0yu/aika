@@ -25,10 +25,7 @@ import network.aika.neuron.relation.Relation;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.NavigableMap;
-import java.util.NavigableSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  *
@@ -89,22 +86,46 @@ public class Refinement implements Comparable<Refinement>, Writable {
         int r = input.compareTo(ref.input);
         if(r != 0) return r;
 
-        return relations.compareTo(ref.relations);
+        return compareRelations(ref);
     }
 
     public boolean contains(Refinement ref, RefValue rv) {
-        for(int i = 0; i < ref.relations.size(); i++) {
-            Relation ra = ref.relations.get(i);
-            Relation rb = relations.get(rv.offsets[i]);
+        for(Relation.Key rka: ref.relations.values()) {
+            Relation ra = rka.getRelation();
+            Relation.Key rkb = relations.get(new Relation.Key(rv.offsets[rka.getRelatedId()], rka.getRelation(), rka.getDirection()));
+            Relation rb = rkb.getRelation();
 
             if((ra == null && rb != null) || (ra != null && rb == null)) return false;
 
-            if(ra != null && rb != null && ra.compareTo(rb) != 0) {
+            if(ra != null && rb != null && ra.compareTo(rb, rka.getDirection() == rkb.getDirection()) != 0) {
                 return false;
             }
         }
 
         return true;
+    }
+
+
+    public int compareRelations(Refinement ref) {
+        if (relations == RELATIONS_MIN) return -1;
+        if (ref.relations == RELATIONS_MIN) return 1;
+        if (relations == RELATIONS_MAX) return 1;
+        if (ref.relations == RELATIONS_MAX) return -1;
+
+        int r = Integer.compare(relations.size(), ref.relations.size());
+        if(r != 0) return r;
+
+        Iterator<Relation.Key> ita = relations.keySet().iterator();
+        Iterator<Relation.Key> itb = ref.relations.keySet().iterator();
+        while(ita.hasNext() && itb.hasNext()) {
+            Relation.Key rka = ita.next();
+            Relation.Key rkb = itb.next();
+
+            r = rka.compareTo(rkb);
+            if(r != 0) return r;
+        }
+
+        return 0;
     }
 
 
