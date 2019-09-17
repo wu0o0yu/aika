@@ -403,17 +403,30 @@ public class Synapse implements RelationEndpoint, Writable {
         out.writeInt(input.getId());
         out.writeInt(output.getId());
 
-        out.writeInt(relations.size());
-        for(Map.Entry<Integer, MultiRelation> me: relations.entrySet()) {
-            out.writeInt(me.getKey());
-
-            me.getValue().write(out);
-        }
-
         out.writeDouble(weight);
         out.writeDouble(limit);
 
         out.writeBoolean(inactive);
+    }
+
+
+
+    public void writeRelations(DataOutput out) throws IOException {
+        out.writeInt(relations.size());
+
+        ArrayList<Relation.Key> tmp = new ArrayList<>();
+        for(Relation.Key rk: relations.keySet()) {
+            if(rk.getDirection() == Direction.FORWARD) {
+                tmp.add(rk);
+            }
+        }
+
+        out.writeInt(tmp.size());
+
+        for(Relation.Key rk: tmp) {
+            out.writeInt(rk.getRelatedId());
+            rk.getRelation().write(out);
+        }
     }
 
 
@@ -427,16 +440,21 @@ public class Synapse implements RelationEndpoint, Writable {
         input = m.lookupNeuron(in.readInt());
         output = m.lookupNeuron(in.readInt());
 
-        int l = in.readInt();
-        for(int i = 0; i < l; i++) {
-            Integer relId = in.readInt();
-            relations.put(relId, (MultiRelation) Relation.read(in, m));
-        }
-
         weight = in.readDouble();
         limit = in.readDouble();
 
         inactive = in.readBoolean();
+    }
+
+
+    public void readRelations(DataInput in, Model m) throws IOException {
+        int l = in.readInt();
+        for(int i = 0; i < l; i++) {
+            Integer relId = in.readInt();
+            Relation rel = Relation.read(in, m);
+
+            rel.link(getOutput(), getId(), relId);
+        }
     }
 
 

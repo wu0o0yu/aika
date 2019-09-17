@@ -296,7 +296,7 @@ public class MetaNeuron extends TNeuron {
         public int compareTo(InduceKey ik) {
             int r = Integer.compare(beginSlot, ik.beginSlot);
             if(r != 0) return r;
-            return rel.compareTo(ik.rel, dir);
+            return rel.compareTo(ik.rel, dir == ik.dir);
         }
     }
 

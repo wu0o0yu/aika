@@ -113,12 +113,12 @@ public class WeightedRelation extends Relation {
     }
 
     @Override
-    public int compareTo(Relation rel, Direction dir) {
-        int r = super.compareTo(rel, dir);
+    public int compareTo(Relation rel, boolean sameDir) {
+        int r = super.compareTo(rel, sameDir);
         if(r != 0) return r;
 
         WeightedRelation wr = (WeightedRelation) rel;
 
-        return keyRelation.compareTo(wr.keyRelation, dir);
+        return keyRelation.compareTo(wr.keyRelation, sameDir);
     }
 }

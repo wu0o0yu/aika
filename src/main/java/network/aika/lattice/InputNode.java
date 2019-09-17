@@ -24,7 +24,6 @@ import network.aika.lattice.activation.AndActivation;
 import network.aika.lattice.activation.InputActivation;
 import network.aika.lattice.refinement.RefValue;
 import network.aika.lattice.refinement.Refinement;
-import network.aika.lattice.refinement.RelationsMap;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.relation.Relation;

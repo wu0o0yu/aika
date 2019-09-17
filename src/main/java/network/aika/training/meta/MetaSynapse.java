@@ -85,7 +85,7 @@ public class MetaSynapse extends TSynapse {
 
 
     public void countTargetRelations(Map<Relation, Double> outputRelations, MappingLink sml, double nij) {
-        for(Relation.Key rk : sml.targetSynapse.getOutputRelations()) {
+        for(Relation.Key rk : sml.targetSynapse.getOutputRelationsTmp()) {
             Relation rel = rk.getRelation();
 
             if (rel instanceof WeightedRelation) {

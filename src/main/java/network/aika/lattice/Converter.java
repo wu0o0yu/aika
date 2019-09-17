@@ -19,7 +19,6 @@ package network.aika.lattice;
 import network.aika.Document;
 import network.aika.lattice.refinement.RefValue;
 import network.aika.lattice.refinement.Refinement;
-import network.aika.lattice.refinement.RelationsMap;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.neuron.Synapse;

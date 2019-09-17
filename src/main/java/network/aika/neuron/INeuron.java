@@ -633,16 +633,17 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         }
         out.writeBoolean(false);
 
-        if(outputRelations != null) {
-            out.writeInt(outputRelations.size());
-            for (Map.Entry<Integer, MultiRelation> me : outputRelations.entrySet()) {
-                out.writeInt(me.getKey());
-
-                me.getValue().write(out);
-            }
-        } else  {
-            out.writeInt(0);
+        for (Synapse s : inputSynapses.values()) {
+            out.writeBoolean(true);
+            s.writeRelations(out);
         }
+        out.writeBoolean(false);
+
+        for (Synapse s : outputSynapses.values()) {
+            out.writeBoolean(true);
+            s.writeRelations(out);
+        }
+        out.writeBoolean(false);
     }
 
 
@@ -687,17 +688,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         while (in.readBoolean()) {
             Synapse syn = m.readSynapse(in);
             outputSynapses.put(syn, syn);
-        }
-
-        int l = in.readInt();
-        if(l > 0) {
-            outputRelations = new TreeMap<>();
-            for(int i = 0; i < l; i++) {
-                Integer relId = in.readInt();
-
-                MultiRelation r = (MultiRelation) Relation.read(in, m);
-                outputRelations.put(relId, r);
-            }
         }
 
         passiveInputFunction = m.passiveActivationFunctions.get(getId());
