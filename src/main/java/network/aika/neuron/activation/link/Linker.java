@@ -20,6 +20,7 @@ import network.aika.Document;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
 
@@ -62,7 +63,7 @@ public class Linker {
         Neuron n = act.getNeuron();
         if(n.getType() == INeuron.Type.EXCITATORY) {
             for (Synapse s : n.getActiveInputSynapses()) {
-                for (Map.Entry<Integer, Relation> me : s.getRelations().entrySet()) {
+                for (Map.Entry<Integer, MultiRelation> me : s.getRelations().entrySet()) {
                     Relation rel = me.getValue();
                     if (me.getKey() == OUTPUT) {
                         rel.getActivations(s.getInput().get(doc), act)
@@ -99,9 +100,9 @@ public class Linker {
     }
 
 
-    private void linkRelated(Activation rAct, Activation oAct, Map<Integer, Relation> relations) {
+    private void linkRelated(Activation rAct, Activation oAct, Map<Integer, MultiRelation> relations) {
         Document doc = rAct.getDocument();
-        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
+        for(Map.Entry<Integer, MultiRelation> me: relations.entrySet()) {
             Relation rel = me.getValue();
             Integer relId = me.getKey();
             if(relId != OUTPUT) {
@@ -141,7 +142,7 @@ public class Linker {
 
 
     private boolean checkRelations(Synapse s, Activation iAct, Activation oAct) {
-        for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
+        for(Map.Entry<Integer, MultiRelation> me: s.getRelations().entrySet()) {
             Integer relSynId = me.getKey();
             Relation rel = me.getValue();
             if(relSynId == Synapse.OUTPUT) {

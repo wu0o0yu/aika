@@ -12,6 +12,7 @@ import network.aika.neuron.activation.State;
 import network.aika.neuron.activation.link.Direction;
 import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.search.Option;
+import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.*;
@@ -20,6 +21,8 @@ import network.aika.training.meta.MetaNeuron;
 import network.aika.training.meta.MetaSynapse;
 import network.aika.training.relation.RelationStatistic;
 import network.aika.training.relation.WeightedRelation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -35,8 +38,10 @@ import static network.aika.neuron.activation.link.Link.INPUT_COMP;
 
 
 public class ExcitatoryNeuron extends TNeuron {
-    public static boolean DEBUG = true;
     public static int MATURITY_THRESHOLD = 10;
+
+
+    private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 
 
     public InhibitoryNeuron inhibitoryNeuron;
@@ -50,12 +55,15 @@ public class ExcitatoryNeuron extends TNeuron {
 
     enum XlMode {
         WEIGHT_KPOS_UPOS((l, out) -> l.getX(Sign.POS) * actFDelta(out), Sign.POS, WeightBias.WEIGHT),
-        WEIGHT_KPOS_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.POS, WeightBias.WEIGHT),
         BIAS_KPOS_UPOS((l, out) -> 0.0, Sign.POS, WeightBias.BIAS),
+
+        WEIGHT_KPOS_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.POS, WeightBias.WEIGHT),
         BIAS_KPOS_UNEG((l, out) -> l.getX(Sign.NEG) * actFDelta(out), Sign.POS, WeightBias.BIAS),
+
         WEIGHT_KNEG_UPOS((l, out) -> 0.0, Sign.NEG, WeightBias.WEIGHT),
-        WEIGHT_KNEG_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.NEG, WeightBias.WEIGHT),
         BIAS_KNEG_UPOS((l, out) -> l.getX(Sign.POS) * actFDelta(out), Sign.NEG, WeightBias.BIAS),
+
+        WEIGHT_KNEG_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.NEG, WeightBias.WEIGHT),
         BIAS_KNEG_UNEG((l, out) -> l.getX(Sign.NEG) * actFDelta(out), Sign.NEG, WeightBias.BIAS);
 
         ActDelta actDelta;
@@ -132,9 +140,6 @@ public class ExcitatoryNeuron extends TNeuron {
     public Option init(Option inputOpt) {
         Activation iAct = inputOpt.getAct();
         Document doc = iAct.getDocument();
-        if(DEBUG) {
-            System.out.println("Created Neuron: " + getId() + ":" +getLabel());
-        }
 
         setBias(2.0);
 
@@ -150,8 +155,8 @@ public class ExcitatoryNeuron extends TNeuron {
 
         s.link();
 
-        if(DEBUG) {
-            System.out.println("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
+        if(log.isDebugEnabled()) {
+            log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
         }
 
         commit(Collections.singletonList(s));
@@ -182,25 +187,13 @@ public class ExcitatoryNeuron extends TNeuron {
     }
 
 
-    int debugCounter = 0;
-
-    public void train(Activation act, TDocument.Config config, TDocument.DebugDocument ddoc) {
-        if(DEBUG) {
-            System.out.println("Train Excitatory: " + act.toString() + "  DBG:" + debugCounter);
+    public void train(Activation act, TDocument.Config config) {
+        if(log.isDebugEnabled()) {
+            log.debug("Train Excitatory: " + act.toString());
         }
-        debugCounter++;
 
         for (Option out : act.getOptions()) {
             trainSynapse(config, out);
-
-            if (DEBUG) {
-                dumpRelations();
-            }
-
-        }
-
-        if(DEBUG) {
-            System.out.println();
         }
     }
 
@@ -212,8 +205,8 @@ public class ExcitatoryNeuron extends TNeuron {
     }
 
     private void collectCandidateSynapses(Option targetOpt) {
-        if(DEBUG) {
-            System.out.println("Created Synapses for Neuron: " + targetOpt.getAct().getINeuron().getId() + ":" + targetOpt.getAct().getINeuron().getLabel());
+        if(log.isDebugEnabled()) {
+            log.debug("Created Synapses for Neuron: " + targetOpt.getAct().getINeuron().getId() + ":" + targetOpt.getAct().getINeuron().getLabel());
         }
 
         TreeMap<Link, Option> tmp = new TreeMap<>(INPUT_COMP);
@@ -289,8 +282,8 @@ public class ExcitatoryNeuron extends TNeuron {
 
         s.link();
 
-        if(DEBUG) {
-            System.out.println("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
+        if(log.isDebugEnabled()) {
+            log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
         }
 
         Link l = new Link(s, inputOpt.getAct(), targetAct);
@@ -338,8 +331,9 @@ public class ExcitatoryNeuron extends TNeuron {
                                 s.getId()
                         );
 
-                        Relation.addRelation(s.getRelations(), l.getSynapse().getId(), s.getId(), null, rel);
-                        Relation.addRelation(l.getSynapse().getRelations(), s.getId(), l.getSynapse().getId(), null, rel.invert());
+                        rel.link(l.getSynapse().getRelations(), s.getRelations(), l.getSynapse().getId(), s.getId(), null);
+//                        Relation.addRelation(s.getRelations(), l.getSynapse().getId(), s.getId(), null, rel);
+//                        Relation.addRelation(l.getSynapse().getRelations(), s.getId(), l.getSynapse().getId(), null, rel.invert());
                     }
                 }
             }
@@ -363,7 +357,7 @@ public class ExcitatoryNeuron extends TNeuron {
         for(Input i : getInputs(out)) {
             ExcitatorySynapse si = i.getSynapse();
             double[] pXiXout = si.getPXiXout();
-            // PXi und PXout aus den beiden unterschiedlichen Quellen müssen annähernd gleich sein.
+
             double[] pXi = i.getPXi();
 
             double covi = i.getSynapse().getCoverage();
@@ -371,9 +365,6 @@ public class ExcitatoryNeuron extends TNeuron {
                 continue;
             }
 
-            if(DEBUG) {
-                System.out.print("  i:" + i.getLabel() + " covi:" + covi + " iRel:" + i.getReliability() + " p:" + i.getP());
-            }
 
             for(Sign k : Sign.values()) {
                 int sii = k.ordinal();
@@ -386,10 +377,6 @@ public class ExcitatoryNeuron extends TNeuron {
 
                 double d = Xi * i.getReliability() * i.getP() * covi * G;
                 delta += d;
-
-                if(DEBUG) {
-                    System.out.print("  " + k.name() + ":(d:" + d + " Xi:" + Xi + " G:" + G + ")");
-                }
 
                 if(si.getWeight() <= getBias()) {
                     double covDelta = config.learnRate * Xi * i.getReliability() * i.getP() * out.getState().value * G;
@@ -405,21 +392,11 @@ public class ExcitatoryNeuron extends TNeuron {
                     updateBiasDelta(biasDelta);
                 }
             }
-
-            if(DEBUG) {
-                System.out.println();
-            }
         }
 
         if(delta == 0.0) {
             return;
         }
-
-        if (DEBUG) {
-            System.out.println("  delta:" + delta);
-            System.out.println();
-        }
-
 
         for(Input l : getInputs(out)) {
             double weightDelta = 0.0;
@@ -443,10 +420,6 @@ public class ExcitatoryNeuron extends TNeuron {
                     biasDelta += d;
                 } else if (u.getWB() == WeightBias.BIAS) {
                     biasDelta += d;
-                }
-
-                if (DEBUG) {
-                    System.out.println("    l:" + l.getLabel() + " u:" + u.name() + (u.getWB() == WeightBias.WEIGHT ? " W:" + l.getSynapse().getWeight() : " B:" + out.getAct().getINeuron().getBias()) + " d:" + d);
                 }
             }
 
@@ -487,16 +460,20 @@ public class ExcitatoryNeuron extends TNeuron {
 
 
     private static Synapse followRelation(Synapse s, Dir dir) {
-        for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
-            Relation rel = me.getValue();
+        for(Map.Entry<Integer, MultiRelation> me: s.getRelations().entrySet()) {
+            for(Relation rel: me.getValue().getRelations().values()) {
+                if(rel instanceof WeightedRelation) {
+                    rel = ((WeightedRelation) rel).keyRelation;
+                }
 
-            if(rel instanceof PositionRelation.Equals) {
-                PositionRelation.Equals r = (PositionRelation.Equals) rel;
+                if (rel instanceof PositionRelation.Equals) {
+                    PositionRelation.Equals r = (PositionRelation.Equals) rel;
 
-                if((r.fromSlot == BEGIN && dir == Dir.BEFORE) || (r.fromSlot == END && dir == Dir.AFTER)) {
-                    Synapse relSyn = s.getOutput().getSynapseById(me.getKey());
-                    if(relSyn != null && !relSyn.isInactive() && !relSyn.isWeak(NEXT)) {
-                        return relSyn;
+                    if ((r.fromSlot == BEGIN && dir == Dir.BEFORE) || (r.fromSlot == END && dir == Dir.AFTER)) {
+                        Synapse relSyn = s.getOutput().getSynapseById(me.getKey());
+                        if (relSyn != null && !relSyn.isInactive() && !relSyn.isWeak(NEXT)) {
+                            return relSyn;
+                        }
                     }
                 }
             }
@@ -614,17 +591,6 @@ public class ExcitatoryNeuron extends TNeuron {
 
         public String toString() {
             return "id:" + getId() + " " + getSynapse().getInput().getLabel();
-        }
-    }
-
-
-    private void dumpRelations() {
-        for(Synapse s: getInputSynapses()) {
-            for(Map.Entry<Integer, Relation> me: s.getRelations().entrySet()) {
-                if(s.getId() <= me.getKey() || me.getKey() == OUTPUT) {
-                    System.out.println("   Relation: From:" + s.getId() + " To:" + (me.getKey() == OUTPUT ? "OUTPUT" : me.getKey()) + " Rel:" + me.getValue());
-                }
-            }
         }
     }
 }

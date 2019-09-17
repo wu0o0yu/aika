@@ -7,6 +7,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.link.Linker;
 import network.aika.neuron.activation.search.Option;
+import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.excitatory.ExcitatoryNeuron;
 import network.aika.training.meta.MetaSynapse;
@@ -20,11 +21,6 @@ import static network.aika.neuron.Synapse.OUTPUT;
 
 public class TDocument extends Document {
 
-    public static boolean DEBUG = true;
-    public static boolean DEBUG1 = true;
-
-
-
     public static class Config {
         public double learnRate;
 
@@ -35,8 +31,6 @@ public class TDocument extends Document {
     }
 
     public Map<Option, List<ExcitatoryNeuron>> metaActivations = new TreeMap<>();
-
-    DebugDocument debugDocument;
 
     public TDocument(MetaModel model, String content) {
         super(model, content, 0);
@@ -78,19 +72,8 @@ public class TDocument extends Document {
 
 
     public void generateNeurons() {
-
-        if(DEBUG) {
-//            System.out.println("Generate Neurons");
-        }
-
         for(Activation seedAct: new ArrayList<>(getActivations(false))) {
-            if(!"W-Hund".equalsIgnoreCase(seedAct.getLabel())) continue;
-
             ((TNeuron) seedAct.getINeuron()).generateNeuron(seedAct);
-        }
-
-        if(DEBUG) {
-            System.out.println();
         }
     }
 
@@ -103,10 +86,6 @@ public class TDocument extends Document {
 
 
     public void count() {
-        if(DEBUG) {
-            System.out.println("Counting");
-        }
-
         for(Activation act: getActivations(false)) {
             TNeuron n = (TNeuron) act.getINeuron();
 
@@ -126,39 +105,19 @@ public class TDocument extends Document {
         }
 
         getModel().charCounter += length();
-
-        if(DEBUG) {
-//            dumpStat();
-//            System.out.println();
-        }
     }
 
 
     public void trainLTL(Config config) {
-        if(DEBUG) {
-            System.out.println("Long Term Learning");
-        }
-
-        if(DEBUG1) {
-            debugDocument = new DebugDocument(this);
-        }
-
         for(Activation act: getActivations(false)) {
             if(act.getUpperBound() > 0.0) {
-                ((TNeuron)act.getINeuron()).train(act, config, debugDocument);
+                ((TNeuron)act.getINeuron()).train(act, config);
             }
         }
 
         computeOutputRelations(this);
 
-        if(DEBUG) {
-            System.out.println("Commit!");
-        }
         commit();
-
-        if(DEBUG) {
-            System.out.println();
-        }
     }
 
 
@@ -246,31 +205,35 @@ public class TDocument extends Document {
 
     public static void transferInputMetaRelations(Option metaActOption, Link metaLink, Synapse templateSynapse, TSynapse targetSynapse, Map<Link, List<Synapse>> targetMapping) {
         if (!targetSynapse.isConverted()) {
-            for (Map.Entry<Integer, Relation> me : templateSynapse.getRelations().entrySet()) {
+            for (Map.Entry<Integer, MultiRelation> me : templateSynapse.getRelations().entrySet()) {
                 Integer relId = me.getKey();
-                WeightedRelation rel = (WeightedRelation) me.getValue();
 
-                if (relId != OUTPUT) {
-                    getRelatedLinks(metaActOption.getAct(), metaLink, relId, rel)
-                            .forEach(rl -> {
-                                List<Synapse> syns = targetMapping.get(rl);
-                                if (syns != null) {
-                                    WeightedRelation targetRel = rel.createTargetRelation( metaLink.getInput(), rl.getInput());
-                                    if(targetRel != null) {
-                                        syns.forEach(relTargetSynapse -> {
-                                            Relation.addRelation(targetSynapse.getRelations(), relTargetSynapse.getId(), targetSynapse.getId(), targetSynapse.getOutput(), targetRel);
-                                            Relation.addRelation(relTargetSynapse.getRelations(), targetSynapse.getId(), relTargetSynapse.getId(), targetSynapse.getOutput(), targetRel.invert());
+                for(Relation r: me.getValue().getRelations().values()) {
+                    WeightedRelation rel = (WeightedRelation) r;
 
-                                            System.out.println("  Transfer Template Relation:" +
-                                                    " From: " + relTargetSynapse.getId() +
-                                                    " To: " + targetSynapse.getId() +
-                                                    " Template Rel: " + rel +
-                                                    " Target Rel: " + targetRel
-                                            );
-                                        });
+                    if (relId != OUTPUT) {
+                        getRelatedLinks(metaActOption.getAct(), metaLink, relId, rel)
+                                .forEach(rl -> {
+                                    List<Synapse> syns = targetMapping.get(rl);
+                                    if (syns != null) {
+                                        WeightedRelation targetRel = rel.createTargetRelation(metaLink.getInput(), rl.getInput());
+                                        if (targetRel != null) {
+                                            syns.forEach(relTargetSynapse -> {
+                                                targetRel.link(relTargetSynapse.getRelations(), targetSynapse.getRelations(), relTargetSynapse.getId(), targetSynapse.getId(), targetSynapse.getOutput());
+//                                            Relation.addRelation(targetSynapse.getRelations(), relTargetSynapse.getId(), targetSynapse.getId(), targetSynapse.getOutput(), targetRel);
+//                                            Relation.addRelation(relTargetSynapse.getRelations(), targetSynapse.getId(), relTargetSynapse.getId(), targetSynapse.getOutput(), targetRel.invert());
+
+                                                System.out.println("  Transfer Template Relation:" +
+                                                        " From: " + relTargetSynapse.getId() +
+                                                        " To: " + targetSynapse.getId() +
+                                                        " Template Rel: " + rel +
+                                                        " Target Rel: " + targetRel
+                                                );
+                                            });
+                                        }
                                     }
-                                }
-                            });
+                                });
+                    }
                 }
 
             }
@@ -281,16 +244,17 @@ public class TDocument extends Document {
 
     public static void transferOutputMetaRelations(TSynapse templateSynapse, TSynapse targetSynapse, Activation act, Activation relatedAct) {
         if (!targetSynapse.isConverted()) {
-            for (Map.Entry<Integer, Relation> me : templateSynapse.getRelations().entrySet()) {
+            for (Map.Entry<Integer, MultiRelation> me : templateSynapse.getRelations().entrySet()) {
                 Integer relId = me.getKey();
-                for(Relation leafRel: me.getValue().getLeafRelations()) {
+                for(Relation leafRel: me.getValue().getRelations().values()) {
                     WeightedRelation rel = (WeightedRelation) leafRel;
 
                     if (relId == OUTPUT) {
                         WeightedRelation targetRel = rel.createTargetRelation(act, relatedAct);
 
-                        Relation.addRelation(targetSynapse.getRelations(), OUTPUT, targetSynapse.getId(), targetSynapse.getOutput(), targetRel);
-                        Relation.addRelation(Relation.getRelationsMap(OUTPUT, targetSynapse.getOutput()), targetSynapse.getId(), OUTPUT, targetSynapse.getOutput(), targetRel.invert());
+                        targetRel.link(Relation.getRelationsMap(OUTPUT, targetSynapse.getOutput()), targetSynapse.getRelations(), OUTPUT, targetSynapse.getId(), targetSynapse.getOutput());
+//                        Relation.addRelation(targetSynapse.getRelations(), OUTPUT, targetSynapse.getId(), targetSynapse.getOutput(), targetRel);
+//                        Relation.addRelation(Relation.getRelationsMap(OUTPUT, targetSynapse.getOutput()), targetSynapse.getId(), OUTPUT, targetSynapse.getOutput(), targetRel.invert());
 
                         System.out.println("  Transfer Template Relation:" +
                                 " From: OUTPUT" +
@@ -311,27 +275,4 @@ public class TDocument extends Document {
                 .filter(l -> rel.test(metaLink.getInput(), l.getInput(), false))
                 .collect(Collectors.toList());
     }
-
-
-    public static int debugCounter = 0;
-
-    public static class DebugDocument {
-        int id;
-        String text;
-
-        public Map<Activation, ExcitatoryNeuron.DebugAct> acts = new TreeMap<>();
-
-        int debugId = debugCounter++;
-
-        public DebugDocument(Document doc) {
-            id = doc.getId();
-            text = doc.getContent();
-        }
-
-        public String toString() {
-            return id + " " + text;
-        }
-    }
-
-
 }

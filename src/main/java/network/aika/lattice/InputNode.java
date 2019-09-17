@@ -68,8 +68,6 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
 
     public void addActivation(Activation inputAct) {
-//        if(inputAct.repropagateV != null && inputAct.repropagateV != markedCreated) return;
-
         InputActivation act = new InputActivation(inputAct, this);
 
         addActivation(act);
@@ -78,7 +76,6 @@ public class InputNode extends Node<InputNode, InputActivation> {
 
     public void reprocessInputs(Document doc) {
         inputNeuron.get(doc).getActivations(doc, false).forEach(act -> {
-//            act.repropagateV = markedCreated;
             if(act.getUpperBound() > 0.0) {
                 act.getINeuron().propagate(act);
             }

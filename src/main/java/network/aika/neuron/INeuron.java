@@ -22,6 +22,7 @@ import network.aika.lattice.OrNode;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
 import network.aika.lattice.InputNode;
+import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.Relation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +93,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     private volatile int synapseIdCounter = 0;
 
     // synapseId -> relation
-    private Map<Integer, Relation> outputRelations = new TreeMap<>();
+    private Map<Integer, MultiRelation> outputRelations = new TreeMap<>();
 
 
     // A synapse is stored only in one direction, depending on the synapse weight.
@@ -170,7 +171,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
 
-    public Map<Integer, Relation> getOutputRelations() {
+    public Map<Integer, MultiRelation> getOutputRelations() {
         return outputRelations;
     }
 
@@ -612,7 +613,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
 
         if(outputRelations != null) {
             out.writeInt(outputRelations.size());
-            for (Map.Entry<Integer, Relation> me : outputRelations.entrySet()) {
+            for (Map.Entry<Integer, MultiRelation> me : outputRelations.entrySet()) {
                 out.writeInt(me.getKey());
 
                 me.getValue().write(out);
@@ -672,7 +673,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             for(int i = 0; i < l; i++) {
                 Integer relId = in.readInt();
 
-                Relation r = Relation.read(in, m);
+                MultiRelation r = (MultiRelation) Relation.read(in, m);
                 outputRelations.put(relId, r);
             }
         }

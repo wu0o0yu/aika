@@ -20,6 +20,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Document;
 import network.aika.neuron.activation.link.Link;
+import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.Writable;
 
@@ -88,7 +89,7 @@ public class Synapse implements Writable {
     private boolean isRecurrent;
     private boolean identity;
 
-    private Map<Integer, Relation> relations = new TreeMap<>();
+    private Map<Integer, MultiRelation> relations = new TreeMap<>();
 
     private boolean inactive;
     private boolean inactiveNew;
@@ -139,11 +140,11 @@ public class Synapse implements Writable {
         this.identity = identity;
     }
 
-    public Map<Integer, Relation> getRelations() {
+    public Map<Integer, MultiRelation> getRelations() {
         return relations;
     }
 
-    public void setRelations(Map<Integer, Relation> relations) {
+    public void setRelations(Map<Integer, MultiRelation> relations) {
         this.relations = relations;
     }
 
@@ -367,7 +368,7 @@ public class Synapse implements Writable {
     }
 
 
-    public Relation getRelationById(Integer id) {
+    public MultiRelation getRelationById(Integer id) {
         return relations.get(id);
     }
 
@@ -388,7 +389,7 @@ public class Synapse implements Writable {
         out.writeInt(output.getId());
 
         out.writeInt(relations.size());
-        for(Map.Entry<Integer, Relation> me: relations.entrySet()) {
+        for(Map.Entry<Integer, MultiRelation> me: relations.entrySet()) {
             out.writeInt(me.getKey());
 
             me.getValue().write(out);
@@ -414,7 +415,7 @@ public class Synapse implements Writable {
         int l = in.readInt();
         for(int i = 0; i < l; i++) {
             Integer relId = in.readInt();
-            relations.put(relId, Relation.read(in, m));
+            relations.put(relId, (MultiRelation) Relation.read(in, m));
         }
 
         weight = in.readDouble();
