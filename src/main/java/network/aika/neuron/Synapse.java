@@ -411,25 +411,6 @@ public class Synapse implements RelationEndpoint, Writable {
 
 
 
-    public void writeRelations(DataOutput out) throws IOException {
-        out.writeInt(relations.size());
-
-        ArrayList<Relation.Key> tmp = new ArrayList<>();
-        for(Relation.Key rk: relations.keySet()) {
-            if(rk.getDirection() == Direction.FORWARD) {
-                tmp.add(rk);
-            }
-        }
-
-        out.writeInt(tmp.size());
-
-        for(Relation.Key rk: tmp) {
-            out.writeInt(rk.getRelatedId());
-            rk.getRelation().write(out);
-        }
-    }
-
-
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         id = in.readInt();
@@ -447,9 +428,26 @@ public class Synapse implements RelationEndpoint, Writable {
     }
 
 
+    public void writeRelations(DataOutput out) throws IOException {
+        ArrayList<Relation.Key> tmp = new ArrayList<>();
+        for(Relation.Key rk: relations.keySet()) {
+            if(rk.getDirection() == Direction.FORWARD) {
+                tmp.add(rk);
+            }
+        }
+
+        for(Relation.Key rk: tmp) {
+            out.writeBoolean(true);
+
+            out.writeInt(rk.getRelatedId());
+            rk.getRelation().write(out);
+        }
+        out.writeBoolean(false);
+    }
+
+
     public void readRelations(DataInput in, Model m) throws IOException {
-        int l = in.readInt();
-        for(int i = 0; i < l; i++) {
+        while (in.readBoolean()) {
             Integer relId = in.readInt();
             Relation rel = Relation.read(in, m);
 
