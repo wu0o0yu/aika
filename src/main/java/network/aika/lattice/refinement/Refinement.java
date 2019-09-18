@@ -20,6 +20,7 @@ import network.aika.Model;
 import network.aika.Provider;
 import network.aika.Writable;
 import network.aika.lattice.InputNode;
+import network.aika.neuron.relation.Direction;
 import network.aika.neuron.relation.Relation;
 
 import java.io.DataInput;
@@ -63,13 +64,31 @@ public class Refinement implements Comparable<Refinement>, Writable {
 
 
     public void write(DataOutput out) throws IOException {
-        relations.write(out);
+        for(Relation.Key rk: relations.keySet()) {
+            out.writeBoolean(true);
+
+            out.writeInt(rk.getRelatedId());
+            rk.getRelation().write(out);
+            out.writeBoolean(rk.getDirection() == Direction.FORWARD);
+        }
+        out.writeBoolean(false);
+
         out.writeInt(input.getId());
     }
 
 
     public void readFields(DataInput in, Model m) throws IOException {
-        relations = RelationsMap.read(in, m);
+        relations = new TreeMap<>();
+        while (in.readBoolean()) {
+            Integer relId = in.readInt();
+            Relation rel = Relation.read(in, m);
+            boolean dir = in.readBoolean();
+
+            Relation.Key rk = new Relation.Key(relId, rel, dir ? Direction.FORWARD : Direction.BACKWARD);
+
+            relations.put(rk, rk);
+        }
+
         input = m.lookupNodeProvider(in.readInt());
     }
 

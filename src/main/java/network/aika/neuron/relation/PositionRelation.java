@@ -61,21 +61,38 @@ public abstract class PositionRelation extends Relation {
     public abstract boolean test(Position a, Position b, Direction dir);
 
 
+    protected int getFromSlot(boolean dir) {
+        return dir ? fromSlot : toSlot;
+    }
+
+    protected int getToSlot(boolean dir) {
+        return dir ? toSlot : fromSlot;
+    }
+
+    protected int getFromSlot(Direction dir) {
+        return dir == Direction.FORWARD ? fromSlot : toSlot;
+    }
+
+    protected int getToSlot(Direction dir) {
+        return dir == Direction.FORWARD ? toSlot : fromSlot;
+    }
+
+
     @Override
     public void mapSlots(Map<Integer, Position> slots, Activation act, Direction dir) {
     }
 
 
     @Override
-    public int compareTo(Relation rel, Direction dir) {
-        int r = super.compareTo(rel, dir);
+    public int compareTo(Relation rel, boolean sameDir) {
+        int r = super.compareTo(rel, sameDir);
         if(r != 0) return r;
 
         PositionRelation pr = (PositionRelation) rel;
 
-        r = Integer.compare(fromSlot, pr.fromSlot);
+        r = Integer.compare(fromSlot, pr.getFromSlot(sameDir));
         if(r != 0) return r;
-        r = Integer.compare(toSlot, pr.toSlot);
+        r = Integer.compare(toSlot, pr.getToSlot(sameDir));
         return r;
     }
 
@@ -139,9 +156,9 @@ public abstract class PositionRelation extends Relation {
 
         @Override
         public void mapSlots(Map<Integer, Position> slots, Activation act, Direction dir) {
-            Position pos = act.getSlot(fromSlot);
+            Position pos = act.getSlot(getFromSlot(dir));
             if(pos != null) {
-                slots.put(toSlot, pos);
+                slots.put(getToSlot(dir), pos);
             }
         }
 
@@ -153,8 +170,8 @@ public abstract class PositionRelation extends Relation {
         @Override
         public Stream<Activation> getActivations(INeuron n, Position pos, Direction dir) {
             return n.getActivations(pos.getDocument(),
-                    fromSlot, pos, true,
-                    fromSlot, pos, true
+                    getFromSlot(dir), pos, true,
+                    getFromSlot(dir), pos, true
             );
         }
 
@@ -207,7 +224,16 @@ public abstract class PositionRelation extends Relation {
                 return orEquals;
             }
 
-            return a.getFinalPosition() != null && b.getFinalPosition() != null && a.getFinalPosition() < b.getFinalPosition() && (b.getFinalPosition() - a.getFinalPosition() < maxLength);
+            Position c, d;
+            if(dir == Direction.FORWARD) {
+                c = a;
+                d = b;
+            } else {
+                c = b;
+                d = a;
+            }
+
+            return c.getFinalPosition() != null && d.getFinalPosition() != null && c.getFinalPosition() < d.getFinalPosition() && (d.getFinalPosition() - c.getFinalPosition() < maxLength);
         }
 
         @Override
