@@ -34,6 +34,7 @@ import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.Synapse.State.NEXT;
+import static network.aika.neuron.relation.Relation.MIN;
 
 /**
  * The {@code Synapse} class connects two neurons with each other. When propagating an activation signal, the
@@ -147,11 +148,11 @@ public class Synapse implements RelationEndpoint, Writable {
 
     @Override
     public Collection<Relation.Key> getOutputRelations() {
-        return relations.subMap(new Relation.Key(OUTPUT, Relation.MIN, Direction.FORWARD), true, new Relation.Key(OUTPUT, Relation.MAX, Direction.FORWARD), false).values();
+        return relations.subMap(new Relation.Key(OUTPUT, MIN, Direction.FORWARD), true, new Relation.Key(OUTPUT, Relation.MAX, Direction.FORWARD), false).values();
     }
 
     public Collection<Relation.Key> getRelationById(Integer id) {
-        return relations.subMap(new Relation.Key(id, Relation.MIN, Direction.FORWARD), new Relation.Key(id, Relation.MAX, Direction.FORWARD)).values();
+        return relations.subMap(new Relation.Key(id, MIN, Direction.FORWARD), new Relation.Key(id, Relation.MAX, Direction.FORWARD)).values();
     }
 
     public void addRelation(Integer synId, Relation rel, Direction dir) {
@@ -485,7 +486,9 @@ public class Synapse implements RelationEndpoint, Writable {
 
     public boolean linksAnyOutput() {
         // Output Relations are always PositionRelations.
-        return relations.get(OUTPUT) != null;
+        Relation.Key rk = relations.higherKey(new Relation.Key(OUTPUT, MIN, Direction.FORWARD));
+
+        return rk != null && rk.getRelatedId() == OUTPUT;
     }
 
 
