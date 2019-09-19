@@ -78,7 +78,7 @@ public class MetaModel extends Model {
     }
 
 
-    public void initMetaNeuron(MetaNeuron metaNeuron, double bias, double trainingBias, Relation inhibOutputRelation, Neuron.Builder... inputs) {
+    public void initMetaNeuron(MetaNeuron metaNeuron, double bias, double trainingBias, Relation[] inhibOutputRelation, Neuron.Builder... inputs) {
         InhibitoryNeuron inhibNeuron = metaNeuron.getInhibitoryNeuron();
 
         List<Neuron.Builder> inputsList = new ArrayList<>(Arrays.asList(inputs));

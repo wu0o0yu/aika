@@ -6,7 +6,6 @@ import network.aika.training.TDocument;
 import network.aika.training.excitatory.ExcitatoryNeuron;
 import network.aika.training.excitatory.ExcitatorySynapse;
 import network.aika.training.input.InputNeuron;
-import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.meta.MetaNeuron;
@@ -50,19 +49,19 @@ public class MetaNeuronSuppressionExperiment {
                         .setFrom(0)
                         .setTo(OUTPUT)
                         .setRelation(
-                                new MultiRelation(
+                                new Relation[]{
                                         new WeightedRelation(new PositionRelation.Equals(BEGIN, 0), 1.0),
                                         new WeightedRelation(new PositionRelation.Equals(END, 1), 1.0)
-                                )
+                                }
                         ),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
                         .setRelation(
-                                new MultiRelation(
+                                new Relation[]{
                                         new WeightedRelation(new PositionRelation.Equals(BEGIN, 2), 1.0),
                                         new WeightedRelation(new PositionRelation.Equals(END, 3), 1.0)
-                                )
+                                }
                         )
         );
 

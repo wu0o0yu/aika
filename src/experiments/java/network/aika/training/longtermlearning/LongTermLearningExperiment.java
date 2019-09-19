@@ -11,7 +11,6 @@ import network.aika.training.excitatory.ExcitatorySynapse;
 import network.aika.training.inhibitory.InhibitoryNeuron;
 import network.aika.training.inhibitory.InhibitorySynapse;
 import network.aika.training.input.InputNeuron;
-import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import org.junit.Test;
@@ -204,19 +203,19 @@ public class LongTermLearningExperiment {
                         .setFrom(0)
                         .setTo(OUTPUT)
                         .setRelation(
-                                new MultiRelation(
+                                new Relation[]{
                                         new PositionRelation.Equals(BEGIN, 0),
                                         new PositionRelation.Equals(END, 1)
-                                )
+                                }
                         ),
                 new Relation.Builder()
                         .setFrom(1)
                         .setTo(OUTPUT)
                         .setRelation(
-                                new MultiRelation(
+                                new Relation[]{
                                         new PositionRelation.Equals(BEGIN, 2),
                                         new PositionRelation.Equals(END, 3)
-                                )
+                                }
                         )
         );
 
@@ -233,10 +232,10 @@ public class LongTermLearningExperiment {
                         .setFrom(synId)
                         .setTo(OUTPUT)
                         .setRelation(
-                                new MultiRelation(
+                                new Relation[]{
                                         new PositionRelation.Equals(2, BEGIN),
                                         new PositionRelation.Equals(3, END)
-                                )
+                                }
                         )
         );
 

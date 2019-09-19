@@ -8,7 +8,6 @@ import network.aika.training.excitatory.ExcitatoryNeuron;
 import network.aika.training.excitatory.ExcitatorySynapse;
 import network.aika.training.inhibitory.InhibitoryNeuron;
 import network.aika.training.inhibitory.InhibitorySynapse;
-import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import network.aika.training.meta.MetaNeuron;
@@ -141,10 +140,10 @@ public class MetaNeuronInductionExperiment {
                             .setFrom(synId1)
                             .setTo(OUTPUT)
                             .setRelation(
-                                    new MultiRelation(
+                                    new Relation[]{
                                             new PositionRelation.Equals(0, BEGIN),
                                             new PositionRelation.Equals(1, END)
-                                    )
+                                    }
                             )
             );
 
@@ -161,10 +160,10 @@ public class MetaNeuronInductionExperiment {
                             .setFrom(synId2)
                             .setTo(OUTPUT)
                             .setRelation(
-                                    new MultiRelation(
+                                    new Relation[]{
                                             new PositionRelation.Equals(2, BEGIN),
                                             new PositionRelation.Equals(3, END)
-                                    )
+                                    }
                             )
             );
         }
@@ -227,19 +226,19 @@ public class MetaNeuronInductionExperiment {
                             .setTo(1),
                     new Relation.Builder()
                             .setRelation(
-                                    new MultiRelation(
+                                    new Relation[]{
                                             new WeightedRelation(new PositionRelation.Equals(BEGIN, 0), 1.0),
                                             new WeightedRelation(new PositionRelation.Equals(END, 1), 1.0)
-                                    )
+                                    }
                             )
                             .setFrom(0)
                             .setTo(OUTPUT),
                     new Builder()
                             .setRelation(
-                                    new MultiRelation(
+                                    new Relation[]{
                                             new WeightedRelation(new PositionRelation.Equals(BEGIN, 2), 1.0),
                                             new WeightedRelation(new PositionRelation.Equals(END, 3), 1.0)
-                                    )
+                                    }
                             )
                             .setFrom(1)
                             .setTo(OUTPUT)

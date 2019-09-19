@@ -54,11 +54,11 @@ public abstract class PositionRelation extends Relation {
         if(allowUndefined && toPos == null) {
             return true;
         }
-        return test(act.getSlot(dir == Direction.FORWARD ? fromSlot : toSlot), toPos, dir);
+        return test(act.getSlot(dir == Direction.FORWARD ? fromSlot : toSlot), toPos);
     }
 
 
-    public abstract boolean test(Position a, Position b, Direction dir);
+    public abstract boolean test(Position a, Position b);
 
 
     protected int getFromSlot(boolean dir) {
@@ -150,7 +150,7 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public boolean test(Position a, Position b, Direction dir) {
+        public boolean test(Position a, Position b) {
             return a == b;
         }
 
@@ -219,21 +219,12 @@ public abstract class PositionRelation extends Relation {
 
 
         @Override
-        public boolean test(Position a, Position b, Direction dir) {
+        public boolean test(Position a, Position b) {
             if(a == b) {
                 return orEquals;
             }
 
-            Position c, d;
-            if(dir == Direction.FORWARD) {
-                c = a;
-                d = b;
-            } else {
-                c = b;
-                d = a;
-            }
-
-            return c.getFinalPosition() != null && d.getFinalPosition() != null && c.getFinalPosition() < d.getFinalPosition() && (d.getFinalPosition() - c.getFinalPosition() < maxLength);
+            return a.getFinalPosition() != null && b.getFinalPosition() != null && a.getFinalPosition() < b.getFinalPosition() && (b.getFinalPosition() - a.getFinalPosition() < maxLength);
         }
 
         @Override
@@ -305,7 +296,7 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public boolean test(Position a, Position b, Direction dir) {
+        public boolean test(Position a, Position b) {
             if(a == b) {
                 return orEquals;
             }

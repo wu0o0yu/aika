@@ -45,11 +45,11 @@ import static network.aika.neuron.relation.PositionRelation.GreaterThan;
  */
 public abstract class Relation implements Writable {
 
+    public static Map<Integer, RelationFactory> relationRegistry = new TreeMap<>();
+
     public static final Relation MIN = new Any();
     public static final Relation MAX = new Any();
 
-
-    public static Map<Integer, RelationFactory> relationRegistry = new TreeMap<>();
 
     public static Relation[] EQUALS = new Relation[] {
             new Equals(BEGIN, BEGIN),

@@ -5,9 +5,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.relation.MultiRelation;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import org.junit.Assert;
@@ -16,7 +14,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
@@ -25,9 +22,6 @@ import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.Activation.END;
 import static network.aika.neuron.relation.Relation.*;
-import static network.aika.neuron.relation.PositionRelation.Equals;
-import static network.aika.neuron.relation.PositionRelation.LessThan;
-import static network.aika.neuron.relation.PositionRelation.GreaterThan;
 import static network.aika.neuron.relation.Relation.EQUALS;
 
 
