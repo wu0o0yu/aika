@@ -78,6 +78,11 @@ public abstract class Relation implements Writable {
 
 
     public int compareTo(Relation rel, boolean sameDirection) {
+        if (this == MIN) return -1;
+        if (rel == MIN) return 1;
+        if (this == MAX) return 1;
+        if (rel == MAX) return -1;
+
         return Integer.compare(getType(), rel.getType());
     }
 
@@ -241,7 +246,6 @@ public abstract class Relation implements Writable {
             this.dir = dir;
         }
 
-
         public Integer getRelatedId() {
             return relId;
         }
@@ -263,6 +267,10 @@ public abstract class Relation implements Writable {
             if(r != 0) return r;
 
             return rel.compareTo(k.rel, dir == k.dir);
+        }
+
+        public String toString() {
+            return relId + " " + rel + " " + dir.name();
         }
     }
 

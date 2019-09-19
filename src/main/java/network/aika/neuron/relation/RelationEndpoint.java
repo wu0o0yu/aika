@@ -14,5 +14,5 @@ public interface RelationEndpoint {
 
     Collection<Relation.Key> getRelations();
 
-    Collection<Relation.Key> getOutputRelationsTmp();
+    Collection<Relation.Key> getOutputRelations();
 }

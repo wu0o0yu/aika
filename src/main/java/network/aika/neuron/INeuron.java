@@ -178,7 +178,7 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
     }
 
     @Override
-    public Collection<Relation.Key> getOutputRelationsTmp() {
+    public Collection<Relation.Key> getOutputRelations() {
         return outputRelations.subMap(new Relation.Key(OUTPUT, Relation.MIN, Direction.FORWARD), true, new Relation.Key(OUTPUT, Relation.MAX, Direction.FORWARD), false).values();
     }
 

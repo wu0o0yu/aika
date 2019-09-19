@@ -146,7 +146,7 @@ public class Synapse implements RelationEndpoint, Writable {
     }
 
     @Override
-    public Collection<Relation.Key> getOutputRelationsTmp() {
+    public Collection<Relation.Key> getOutputRelations() {
         return relations.subMap(new Relation.Key(OUTPUT, Relation.MIN, Direction.FORWARD), true, new Relation.Key(OUTPUT, Relation.MAX, Direction.FORWARD), false).values();
     }
 

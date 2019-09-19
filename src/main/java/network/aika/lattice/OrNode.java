@@ -148,7 +148,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
             Synapse s = outputNeuron.getSynapseById(synapseId);
             if(s != null) {
-                for (Relation.Key rk : s.getOutputRelationsTmp()) {
+                for (Relation.Key rk : s.getOutputRelations()) {
                     Relation rel = rk.getRelation();
                     Activation iAct = inputAct.getInputActivation(i);
                     rel.mapSlots(slots, iAct, rk.getDirection());
