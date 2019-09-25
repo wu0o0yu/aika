@@ -112,7 +112,7 @@ public class Refinement implements Comparable<Refinement>, Writable {
         for(Relation.Key rka: ref.relations.values()) {
             Relation ra = rka.getRelation();
             Relation.Key rkb = relations.get(new Relation.Key(rv.offsets[rka.getRelatedId()], rka.getRelation(), rka.getDirection()));
-            Relation rb = rkb.getRelation();
+            Relation rb = rkb != null ? rkb.getRelation() : null;
 
             if((ra == null && rb != null) || (ra != null && rb == null)) return false;
 

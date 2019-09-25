@@ -259,8 +259,10 @@ public abstract class Relation implements Writable {
         }
 
         public Direction getInvertedDirection() {
-            return null;
+            return dir == Direction.FORWARD ? Direction.BACKWARD : Direction.FORWARD;
         }
+
+
         @Override
         public int compareTo(Key k) {
             int r = Integer.compare(relId, k.relId);
