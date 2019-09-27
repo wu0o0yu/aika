@@ -21,7 +21,6 @@ import network.aika.Model;
 import network.aika.Writable;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
 
@@ -31,7 +30,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.Activation.END;
@@ -138,8 +136,8 @@ public abstract class Relation implements Writable {
 
     public void link(Neuron n, int from, int to) {
         link(
-                getRelationsMap(from, n),
-                getRelationsMap(to, n),
+                getRelationsEndpoint(from, n),
+                getRelationsEndpoint(to, n),
                 from,
                 to,
                 n
@@ -148,8 +146,8 @@ public abstract class Relation implements Writable {
 
     public void unlink(Neuron n, int from, int to) {
         unlink(
-                getRelationsMap(from, n),
-                getRelationsMap(to, n),
+                getRelationsEndpoint(from, n),
+                getRelationsEndpoint(to, n),
                 from,
                 to,
                 n
@@ -169,7 +167,7 @@ public abstract class Relation implements Writable {
     }
 
 
-    public static RelationEndpoint getRelationsMap(int synapseId, Neuron n) {
+    public static RelationEndpoint getRelationsEndpoint(int synapseId, Neuron n) {
         return synapseId == OUTPUT ?
                 n.get() :
                 n.getSynapseById(synapseId);

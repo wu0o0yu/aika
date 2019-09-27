@@ -240,6 +240,8 @@ public class OptionalAndTest {
 
         doc.process();
 
+        System.out.println(doc.activationsToString());
+
         Assert.assertEquals(1, testNeuron.getActivations(doc, false).count());
     }
 

@@ -54,11 +54,11 @@ public abstract class PositionRelation extends Relation {
         if(allowUndefined && toPos == null) {
             return true;
         }
-        return test(act.getSlot(dir == Direction.FORWARD ? fromSlot : toSlot), toPos);
+        return test(act.getSlot(dir == Direction.FORWARD ? fromSlot : toSlot), toPos, dir);
     }
 
 
-    public abstract boolean test(Position a, Position b);
+    public abstract boolean test(Position a, Position b, Direction dir);
 
 
     protected int getFromSlot(boolean dir) {
@@ -117,7 +117,7 @@ public abstract class PositionRelation extends Relation {
 
     @Override
     public Stream<Activation> getActivations(INeuron n, Activation linkedAct, Direction dir) {
-        Position pos = linkedAct.getSlot(dir == Direction.FORWARD ? toSlot : fromSlot);
+        Position pos = linkedAct.getSlot(getToSlot(dir));
         if(pos == null) {
             return Stream.empty();
         }
@@ -127,6 +127,42 @@ public abstract class PositionRelation extends Relation {
     }
 
     public abstract Stream<Activation> getActivations(INeuron n, Position pos, Direction dir);
+
+
+    protected Stream<Activation> getActivationsGreaterThan(INeuron n, int slot, Position pos, boolean orEquals, int maxLength) {
+        return n.getActivations(
+                pos.getDocument(),
+                slot, pos, orEquals,
+                slot, new Position(pos.getDocument(), maxLength != Integer.MAX_VALUE ? pos.getFinalPosition() + maxLength : Integer.MAX_VALUE), true
+        );
+    }
+
+
+    protected Stream<Activation> getActivationsLessThan(INeuron n, int slot, Position pos, boolean orEquals, int maxLength) {
+        return n.getActivations(
+                pos.getDocument(),
+                slot, new Position(pos.getDocument(), maxLength != Integer.MAX_VALUE ? pos.getFinalPosition() - maxLength : Integer.MIN_VALUE), true,
+                slot, pos, orEquals
+        );
+    }
+
+
+    protected boolean testGreaterThan(Position a, Position b, boolean orEquals, int maxLength) {
+        if(a == b) {
+            return orEquals;
+        }
+
+        return a.getFinalPosition() != null && b.getFinalPosition() != null && a.getFinalPosition() > b.getFinalPosition() && (a.getFinalPosition() - b.getFinalPosition() < maxLength);
+    }
+
+
+    protected boolean testLessThan(Position a, Position b, boolean orEquals, int maxLength) {
+        if(a == b) {
+            return orEquals;
+        }
+
+        return a.getFinalPosition() != null && b.getFinalPosition() != null && a.getFinalPosition() < b.getFinalPosition() && (b.getFinalPosition() - a.getFinalPosition() < maxLength);
+    }
 
 
     public static class Equals extends PositionRelation {
@@ -150,7 +186,7 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public boolean test(Position a, Position b) {
+        public boolean test(Position a, Position b, Direction dir) {
             return a == b;
         }
 
@@ -219,21 +255,17 @@ public abstract class PositionRelation extends Relation {
 
 
         @Override
-        public boolean test(Position a, Position b) {
-            if(a == b) {
-                return orEquals;
-            }
-
-            return a.getFinalPosition() != null && b.getFinalPosition() != null && a.getFinalPosition() < b.getFinalPosition() && (b.getFinalPosition() - a.getFinalPosition() < maxLength);
+        public boolean test(Position a, Position b, Direction dir) {
+            return dir == Direction.FORWARD ?
+                    testLessThan(a, b, orEquals, maxLength) :
+                    testGreaterThan(a, b, orEquals, maxLength);
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Position pos, Direction dir) {
-            return n.getActivations(
-                    pos.getDocument(),
-                    fromSlot, new Position(pos.getDocument(), maxLength != Integer.MAX_VALUE ? pos.getFinalPosition() - maxLength : Integer.MIN_VALUE), true,
-                    fromSlot, pos, orEquals
-            );
+            return dir == Direction.FORWARD ?
+                    getActivationsLessThan(n, getFromSlot(dir), pos, orEquals, maxLength) :
+                    getActivationsGreaterThan(n, getFromSlot(dir), pos, orEquals, maxLength);
         }
 
         @Override
@@ -296,21 +328,17 @@ public abstract class PositionRelation extends Relation {
         }
 
         @Override
-        public boolean test(Position a, Position b) {
-            if(a == b) {
-                return orEquals;
-            }
-
-            return a.getFinalPosition() != null && b.getFinalPosition() != null && a.getFinalPosition() > b.getFinalPosition() && (a.getFinalPosition() - b.getFinalPosition() < maxLength);
+        public boolean test(Position a, Position b, Direction dir) {
+            return dir == Direction.FORWARD ?
+                    testGreaterThan(a, b, orEquals, maxLength) :
+                    testLessThan(a, b, orEquals, maxLength);
         }
 
         @Override
         public Stream<Activation> getActivations(INeuron n, Position pos, Direction dir) {
-            return n.getActivations(
-                    pos.getDocument(),
-                    fromSlot, pos, orEquals,
-                    fromSlot, new Position(pos.getDocument(), maxLength != Integer.MAX_VALUE ? pos.getFinalPosition() + maxLength : Integer.MAX_VALUE), true
-            );
+            return dir == Direction.FORWARD ?
+                    getActivationsGreaterThan(n, getFromSlot(dir), pos, orEquals, maxLength) :
+                    getActivationsLessThan(n, getFromSlot(dir), pos, orEquals, maxLength);
         }
 
 

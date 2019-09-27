@@ -30,6 +30,7 @@ import network.aika.Document;
 import network.aika.neuron.activation.link.Direction;
 import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.relation.Relation;
+import network.aika.neuron.relation.RelationEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,13 +106,79 @@ public class OrNode extends Node<OrNode, OrActivation> {
         ol.linkOutputActivation(act);
     }
 
+    private Activation lookupActivation(OrActivation.Link ol, Predicate<Link> filter) {
+        switch (outputNeuron.getType()) {
+            case EXCITATORY:
+                return lookupExcitatoryActivation(ol, filter);
+            case INHIBITORY:
+                return lookupInhibitoryActivation(ol, filter);
+        }
+        return null;
+    }
 
+    private Activation lookupExcitatoryActivation(OrActivation.Link ol, Predicate<Link> filter) {
+        for(Link l: ol.getInputLinks(outputNeuron)) {
+            Synapse syn = l.getSynapse();
+            for(Relation.Key rk: syn.getRelations()) {
+                Integer relSynId = rk.getRelatedId();
+                Relation rel = rk.getRelation();
+
+                Activation existingAct = null;
+                if(relSynId != OUTPUT) {
+                    Synapse s = outputNeuron.getSynapseById(relSynId);
+                    if (s != null) {
+                        existingAct = rel
+                                .getActivations(s.getInput().get(), l.getInput(), rk.getInvertedDirection())
+                                .flatMap(act -> act.getLinksBySynapse(Direction.OUTPUT, s))
+                                .map(rl -> rl.getOutput())
+                                .findFirst()
+                                .orElse(null);
+                    }
+                }
+
+                if(existingAct != null && existingAct.match(filter)) {
+                    return existingAct;
+                }
+            }
+        }
+
+        return null;
+    }
+
+
+    private Activation lookupInhibitoryActivation(OrActivation.Link ol, Predicate<Link> filter) {
+        for (Link l : ol.getInputLinks(outputNeuron)) {
+            Synapse syn = l.getSynapse();
+            for (Relation.Key rk : syn.getOutputRelations()) {
+                Activation outputAct = rk.getRelation().getActivations(outputNeuron.get(), l.getInput(), rk.getInvertedDirection())
+                        .filter(act ->
+                            syn.getOutputRelations()
+                                    .stream()
+                                    .allMatch(r ->
+                                            r.getRelation().test(act, l.getInput(), true, r.getInvertedDirection())
+                                    )
+                        ).findFirst()
+                        .orElse(null);
+
+                if(outputAct != null) return outputAct;
+            }
+        }
+        return null;
+    }
+
+/*
     private Activation lookupActivation(OrActivation.Link ol, Predicate<Link> filter) {
         for(Link l: ol.getInputLinks(outputNeuron)) {
             Synapse syn = l.getSynapse();
             for(Relation.Key rk: syn.getRelations()) {
                 Integer relSynId = rk.getRelatedId();
                 Relation rel = rk.getRelation();
+
+                RelationEndpoint re = Relation.getRelationsEndpoint(relSynId, outputNeuron);
+                if(re != null) {
+                    Activation existingAct = rel
+                            .getActivations()
+                }
 
                 Activation existingAct = null;
                 if(relSynId != OUTPUT) {
@@ -139,7 +206,7 @@ public class OrNode extends Node<OrNode, OrActivation> {
 
         return null;
     }
-
+*/
 
     private SortedMap<Integer, Position> getSlots(OrEntry oe, NodeActivation inputAct) {
         SortedMap<Integer, Position> slots = new TreeMap<>();

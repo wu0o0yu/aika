@@ -250,7 +250,7 @@ public class TDocument extends Document {
 
                     targetRel.link(targetSynapse.getOutput().get(), targetSynapse, OUTPUT, targetSynapse.getId(), targetSynapse.getOutput());
 //                        Relation.addRelation(targetSynapse.getRelations(), OUTPUT, targetSynapse.getId(), targetSynapse.getOutput(), targetRel);
-//                        Relation.addRelation(Relation.getRelationsMap(OUTPUT, targetSynapse.getOutput()), targetSynapse.getId(), OUTPUT, targetSynapse.getOutput(), targetRel.invert());
+//                        Relation.addRelation(Relation.getRelationsEndpoint(OUTPUT, targetSynapse.getOutput()), targetSynapse.getId(), OUTPUT, targetSynapse.getOutput(), targetRel.invert());
 
                     System.out.println("  Transfer Template Relation:" +
                             " From: OUTPUT" +
