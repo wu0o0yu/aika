@@ -693,12 +693,6 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
             outputSynapses.put(syn, syn);
         }
 
-
-        while (in.readBoolean()) {
-            Synapse syn = m.readSynapse(in);
-            outputSynapses.put(syn, syn);
-        }
-
         while (in.readBoolean()) {
             Neuron out = m.lookupNeuron(in.readInt());
             Synapse s = out.getSynapseById(in.readInt());
