@@ -3,6 +3,7 @@ package network.aika.training.syllables;
 
 import network.aika.Document;
 import network.aika.neuron.Neuron;
+import network.aika.training.Config;
 import network.aika.training.MetaModel;
 import network.aika.training.TDocument;
 import network.aika.training.input.InputNeuron;
@@ -57,8 +58,10 @@ public class SyllableExperiment {
 
         doc.process();
         doc.train(
-                new TDocument.Config()
+                new Config()
                         .setLearnRate(0.025)
+                        .setMetaThreshold(0.3)
+                        .setMaturityThreshold(10)
         );
 
         doc.clearActivations();
@@ -69,7 +72,7 @@ public class SyllableExperiment {
     public void testTraining() throws IOException {
         Document.CLEANUP_INTERVAL = 5000;
 
-        for(String word: Parser.loadExamplesAsWords(new File(System.getProperty("data.dir")))) {
+        for(String word: Parser.loadExamplesAsWords(new File("C:/ws/aika-training/training/src/test/resources/maerchen"))) {
             train( word + " ");
         }
 

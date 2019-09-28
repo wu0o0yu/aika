@@ -2,10 +2,7 @@ package network.aika.training.longtermlearning;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.training.MetaModel;
-import network.aika.training.TDocument;
-import network.aika.training.TNeuron;
-import network.aika.training.TSynapse;
+import network.aika.training.*;
 import network.aika.training.excitatory.ExcitatoryNeuron;
 import network.aika.training.excitatory.ExcitatorySynapse;
 import network.aika.training.inhibitory.InhibitoryNeuron;
@@ -83,7 +80,7 @@ public class LongTermLearningExperiment {
         doc.process();
 
         doc.trainLTL(
-                new TDocument.Config()
+                new Config()
                 .setLearnRate(0.1)
         );
 
@@ -165,7 +162,7 @@ public class LongTermLearningExperiment {
         doc.process();
 
         doc.trainLTL(
-                new TDocument.Config()
+                new Config()
                         .setLearnRate(0.1)
         );
 
@@ -253,7 +250,7 @@ public class LongTermLearningExperiment {
             doc.count();
 
             doc.trainLTL(
-                    new TDocument.Config()
+                    new Config()
                             .setLearnRate(0.1)
             );
 

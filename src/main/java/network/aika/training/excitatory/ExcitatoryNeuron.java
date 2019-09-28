@@ -36,8 +36,6 @@ import static network.aika.neuron.activation.link.Link.INPUT_COMP;
 
 
 public class ExcitatoryNeuron extends TNeuron {
-    public static int MATURITY_THRESHOLD = 10;
-
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 
@@ -185,7 +183,7 @@ public class ExcitatoryNeuron extends TNeuron {
     }
 
 
-    public void train(Activation act, TDocument.Config config) {
+    public void train(Activation act, Config config) {
         if(log.isDebugEnabled()) {
             log.debug("Train Excitatory: " + act.toString());
         }
@@ -196,13 +194,13 @@ public class ExcitatoryNeuron extends TNeuron {
     }
 
 
-    public void generateSynapses(Activation act) {
+    public void generateSynapses(Config c, Activation act) {
         for (Option o : act.getOptions()) {
-            collectCandidateSynapses(o);
+            collectCandidateSynapses(c, o);
         }
     }
 
-    private void collectCandidateSynapses(Option targetOpt) {
+    private void collectCandidateSynapses(Config c, Option targetOpt) {
         if(log.isDebugEnabled()) {
             log.debug("Created Synapses for Neuron: " + targetOpt.getAct().getINeuron().getId() + ":" + targetOpt.getAct().getINeuron().getLabel());
         }
@@ -223,7 +221,7 @@ public class ExcitatoryNeuron extends TNeuron {
                         if (inputAct != l.getInput() && inputAct != targetOpt.getAct() && !conflicts.contains(inputAct)) {
                             Option inputOpt = getMaxOption(inputAct);
 
-                            createCandidateSynapse(inputOpt, targetOpt);
+                            createCandidateSynapse(c, inputOpt, targetOpt);
                         }
                     }
                 }
@@ -249,7 +247,7 @@ public class ExcitatoryNeuron extends TNeuron {
     }
 
 
-    private void createCandidateSynapse(Option inputOpt, Option targetOpt) {
+    private void createCandidateSynapse(Config c, Option inputOpt, Option targetOpt) {
         Activation targetAct = targetOpt.getAct();
         Activation iAct = inputOpt.getAct();
 
@@ -257,7 +255,7 @@ public class ExcitatoryNeuron extends TNeuron {
             return;
         }
 
-        if(!((TNeuron) inputOpt.getAct().getINeuron()).isMature()) {
+        if(!((TNeuron) inputOpt.getAct().getINeuron()).isMature(c)) {
             return;
         }
 
@@ -292,7 +290,7 @@ public class ExcitatoryNeuron extends TNeuron {
     }
 
 
-    public boolean isMature() {
+    public boolean isMature(Config c) {
         Synapse maxSyn = getMaxInputSynapse(CURRENT);
         if(maxSyn == null) {
             return false;
@@ -300,7 +298,7 @@ public class ExcitatoryNeuron extends TNeuron {
 
         TSynapse se = (TSynapse) maxSyn;
 
-        return se.getCounts()[1] >= MATURITY_THRESHOLD;  // Sign.NEG, Sign.POS
+        return se.getCounts()[1] >= c.getMaturityThreshold();  // Sign.NEG, Sign.POS
     }
 
 
@@ -345,7 +343,7 @@ public class ExcitatoryNeuron extends TNeuron {
 
 
 
-    public void trainSynapse(TDocument.Config config, Option out) {
+    public void trainSynapse(Config config, Option out) {
         Activation act = out.getAct();
         Document doc = act.getDocument();
         double[] pXout = getP();

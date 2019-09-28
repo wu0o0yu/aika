@@ -1,6 +1,7 @@
 package network.aika.training.metaneurons;
 
 import network.aika.neuron.Neuron;
+import network.aika.training.Config;
 import network.aika.training.MetaModel;
 import network.aika.training.TDocument;
 import network.aika.training.excitatory.ExcitatoryNeuron;
@@ -90,7 +91,7 @@ public class MetaNeuronSuppressionExperiment {
             doc.count();
 
             doc.trainLTL(
-                    new TDocument.Config()
+                    new Config()
                             .setLearnRate(0.1)
             );
 

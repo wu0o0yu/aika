@@ -3,6 +3,7 @@ package network.aika.training.metaneurons;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.search.SearchNode;
+import network.aika.training.Config;
 import network.aika.training.MetaModel;
 import network.aika.training.TDocument;
 import network.aika.training.inhibitory.InhibitoryNeuron;
@@ -286,7 +287,7 @@ public class MetaNeuronTrainingExperiment {
                 System.out.println(doc.activationsToString());
 
                 doc.train(
-                        new TDocument.Config()
+                        new Config()
                                 .setLearnRate(0.6)
                 );
 

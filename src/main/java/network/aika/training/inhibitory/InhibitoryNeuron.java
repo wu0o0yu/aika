@@ -5,6 +5,7 @@ import network.aika.lattice.Converter;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.relation.PositionRelation;
+import network.aika.training.Config;
 import network.aika.training.MetaModel;
 import network.aika.training.TNeuron;
 import network.aika.training.excitatory.ExcitatoryNeuron;
@@ -107,7 +108,7 @@ public class InhibitoryNeuron extends TNeuron {
     }
 
 
-    public boolean isMature() {
+    public boolean isMature(Config c) {
         return true;
     }
 

@@ -4,6 +4,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.search.SearchNode;
 import network.aika.neuron.relation.PositionRelation;
+import network.aika.training.Config;
 import network.aika.training.MetaModel;
 import network.aika.training.TDocument;
 import network.aika.training.excitatory.ExcitatoryNeuron;
@@ -360,7 +361,10 @@ public class MirrorNeuronExperiment {
 
         trainDoc.process();
 
-        trainDoc.trainMeta(0.3);
+        trainDoc.trainMeta(
+                new Config()
+                        .setMetaThreshold(0.3)
+        );
 
         System.out.println(trainDoc.activationsToString());
 

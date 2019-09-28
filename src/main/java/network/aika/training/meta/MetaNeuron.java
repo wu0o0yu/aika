@@ -12,10 +12,7 @@ import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.relation.Direction;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
-import network.aika.training.MetaModel;
-import network.aika.training.PActivation;
-import network.aika.training.TDocument;
-import network.aika.training.TNeuron;
+import network.aika.training.*;
 import network.aika.training.excitatory.ExcitatoryNeuron;
 import network.aika.training.excitatory.ExcitatorySynapse;
 import network.aika.training.inhibitory.InhibitoryNeuron;
@@ -391,7 +388,7 @@ public class MetaNeuron extends TNeuron {
     }
 
     @Override
-    public boolean isMature() {
+    public boolean isMature(Config c) {
         return false;
     }
 

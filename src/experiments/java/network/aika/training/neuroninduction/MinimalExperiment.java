@@ -2,6 +2,7 @@ package network.aika.training.neuroninduction;
 
 import network.aika.Document;
 import network.aika.neuron.Neuron;
+import network.aika.training.Config;
 import network.aika.training.MetaModel;
 import network.aika.training.TDocument;
 import network.aika.training.excitatory.ExcitatoryNeuron;
@@ -53,14 +54,17 @@ public class MinimalExperiment {
 
         System.out.println(doc.activationsToString());
 
-        doc.generateNeurons();
+        Config c = new Config()
+                .setLearnRate(0.1)
+                .setMaturityThreshold(10);
+
+        doc.generateNeurons(c);
         doc.generateSynapses();
 
         doc.count();
 
-        if(j > ExcitatoryNeuron.MATURITY_THRESHOLD) {
-            doc.trainLTL(new TDocument.Config()
-                    .setLearnRate(0.1));
+        if(j > c.getMaturityThreshold()) {
+            doc.trainLTL(c);
         }
 
         doc.clearActivations();

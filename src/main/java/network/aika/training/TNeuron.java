@@ -35,7 +35,6 @@ import static network.aika.neuron.activation.link.Direction.OUTPUT;
  */
 public abstract class TNeuron extends INeuron {
 
-    public static double THRESHOLD = 0.5;
     public static double RELIABILITY_THRESHOLD = 10.0;
 
 
@@ -216,18 +215,18 @@ public abstract class TNeuron extends INeuron {
     }
 
 
-    public void train(Activation act, TDocument.Config config) {
+    public void train(Activation act, Config config) {
 
     }
 
 
     // Implemented only for meta and target neurons
-    public void trainMeta(Activation metaAct, double threshold, Function<Activation, ExcitatoryNeuron> callback) {
+    public void trainMeta(Activation metaAct, Config c, Function<Activation, ExcitatoryNeuron> callback) {
         Document doc = metaAct.getDocument();
         doc.createV = doc.getNewVisitedId();
 
         for (Option o : metaAct.getOptions()) {
-            if (o.getP() > threshold && getTrainingNetValue(o) > 0.0) {
+            if (o.getP() > c.getMetaThreshold() && getTrainingNetValue(o) > 0.0) {
                 ExcitatoryNeuron targetNeuron = getTargetNeuron(metaAct, callback);
 
                 collectTarget((TDocument) doc, o, targetNeuron);
@@ -276,8 +275,8 @@ public abstract class TNeuron extends INeuron {
 
     static boolean alreadyCreated = false;
 
-    public void generateNeuron(Activation seedAct) {
-        if(isMature()) {
+    public void generateNeuron(Config c, Activation seedAct) {
+        if(isMature(c)) {
             for(Option o: seedAct.getOptions()) {
 //                if((o.p * (1.0 - getCoverage(o))) > THRESHOLD) {
                     if(!alreadyCreated) {
@@ -314,7 +313,7 @@ public abstract class TNeuron extends INeuron {
     }
 
 
-    public abstract boolean isMature();
+    public abstract boolean isMature(Config c);
 
 
     public List<Integer> getOutputSlots() {

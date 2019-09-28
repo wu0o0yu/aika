@@ -21,14 +21,6 @@ import static network.aika.neuron.Synapse.OUTPUT;
 
 public class TDocument extends Document {
 
-    public static class Config {
-        public double learnRate;
-
-        public Config setLearnRate(double learnRate) {
-            this.learnRate = learnRate;
-            return this;
-        }
-    }
 
     public Map<Option, List<ExcitatoryNeuron>> metaActivations = new TreeMap<>();
 
@@ -60,20 +52,20 @@ public class TDocument extends Document {
 
 
     public void train(Config c) {
-        generateNeurons();
+        generateNeurons(c);
         generateSynapses();
 
         count();
 
-//        trainMeta();
+        trainMeta(c);
 
         trainLTL(c);
     }
 
 
-    public void generateNeurons() {
+    public void generateNeurons(Config c) {
         for(Activation seedAct: new ArrayList<>(getActivations(false))) {
-            ((TNeuron) seedAct.getINeuron()).generateNeuron(seedAct);
+            ((TNeuron) seedAct.getINeuron()).generateNeuron(c, seedAct);
         }
     }
 
@@ -129,37 +121,37 @@ public class TDocument extends Document {
     }
 
 
-    public void trainMeta(double threshold) {
-        trainMeta(threshold, act -> new ExcitatoryNeuron(getModel(), act.getLabel(), null));
+    public void trainMeta(Config c) {
+        trainMeta(c, act -> new ExcitatoryNeuron(getModel(), act.getLabel(), null));
     }
 
 
-    public void trainMeta(double threshold, Function<Activation, ExcitatoryNeuron> callback) {
+    public void trainMeta(Config c, Function<Activation, ExcitatoryNeuron> callback) {
         for (Activation metaAct : getActivations(false)) {
             TNeuron n = (TNeuron) metaAct.getINeuron();
-            n.trainMeta(metaAct, threshold, callback);
+            n.trainMeta(metaAct, c, callback);
         }
 
-        processMetaActivations(threshold);
+        processMetaActivations(c);
     }
 
 
-    private void processMetaActivations(double threshold) {
+    private void processMetaActivations(Config c) {
         for(Map.Entry<Option, List<ExcitatoryNeuron>> me: metaActivations.entrySet()) {
             for(ExcitatoryNeuron tn: me.getValue()) {
-                transferMetaSynapses(threshold, me.getKey(), tn);
+                transferMetaSynapses(c, me.getKey(), tn);
             }
         }
 
         propagate();
     }
 
-    private void transferMetaSynapses(double threshold, Option metaActOption, ExcitatoryNeuron targetNeuron) {
+    private void transferMetaSynapses(Config c, Option metaActOption, ExcitatoryNeuron targetNeuron) {
         TreeMap<Link, List<Synapse>> targetMapping = new TreeMap<>(Link.INPUT_COMP);
         List<Synapse> targetInputSynapses = new ArrayList();
 
         metaActOption.inputOptions.entrySet().stream()
-                .filter(me -> me.getValue() != null && me.getValue().getP() >= threshold)
+                .filter(me -> me.getValue() != null && me.getValue().getP() >= c.getMetaThreshold())
                 .forEach(me -> {
                     Link l = me.getKey();
                     Option inOption = me.getValue();

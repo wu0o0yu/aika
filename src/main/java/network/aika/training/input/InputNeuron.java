@@ -2,7 +2,9 @@ package network.aika.training.input;
 
 import network.aika.ActivationFunction;
 import network.aika.neuron.INeuron;
+import network.aika.training.Config;
 import network.aika.training.MetaModel;
+import network.aika.training.TDocument;
 import network.aika.training.TNeuron;
 import network.aika.training.excitatory.ExcitatoryNeuron;
 
@@ -22,8 +24,8 @@ public class InputNeuron extends TNeuron {
     }
 
 
-    public boolean isMature() {
-        return posFrequency > ExcitatoryNeuron.MATURITY_THRESHOLD;
+    public boolean isMature(Config c) {
+        return posFrequency > c.getMaturityThreshold();
     }
 
 
