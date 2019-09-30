@@ -74,7 +74,9 @@ public class MetaNeuronSuppressionExperiment {
                 Collections.singletonList((ExcitatorySynapse) phraseDerHund.getProvider().getSynapseById(0))
         );
         
-
+        Config c = new Config()
+                .setLearnRate(0.1)
+                .setMaturityThreshold(10);
 
         for(int i = 0; i < 10; i++) {
             TDocument doc = new TDocument(model, "der Hund");
@@ -86,14 +88,11 @@ public class MetaNeuronSuppressionExperiment {
 
             System.out.println(doc.activationsToString());
 
-            doc.generateSynapses();
+            doc.generateSynapses(c);
 
             doc.count();
 
-            doc.trainLTL(
-                    new Config()
-                            .setLearnRate(0.1)
-            );
+            doc.trainLTL(c);
 
             doc.clearActivations();
         }

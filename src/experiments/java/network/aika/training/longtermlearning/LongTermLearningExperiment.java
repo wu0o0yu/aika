@@ -236,6 +236,9 @@ public class LongTermLearningExperiment {
                         )
         );
 
+        Config c = new Config()
+                .setLearnRate(0.1)
+                .setMaturityThreshold(10);
 
         for(int i = 0; i < 10; i++) {
             TDocument doc = new TDocument(model, "der Hund");
@@ -245,14 +248,11 @@ public class LongTermLearningExperiment {
 
             doc.process();
 
-            doc.generateSynapses();
+            doc.generateSynapses(c);
 
             doc.count();
 
-            doc.trainLTL(
-                    new Config()
-                            .setLearnRate(0.1)
-            );
+            doc.trainLTL(c);
 
             doc.clearActivations();
         }

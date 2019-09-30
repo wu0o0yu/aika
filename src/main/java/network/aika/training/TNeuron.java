@@ -336,7 +336,7 @@ public abstract class TNeuron extends INeuron {
     }
 
 
-    public void generateSynapses(Activation act) {
+    public void generateSynapses(Config c, Activation act) {
 
     }
 

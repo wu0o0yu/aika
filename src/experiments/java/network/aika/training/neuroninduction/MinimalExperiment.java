@@ -59,7 +59,7 @@ public class MinimalExperiment {
                 .setMaturityThreshold(10);
 
         doc.generateNeurons(c);
-        doc.generateSynapses();
+        doc.generateSynapses(c);
 
         doc.count();
 

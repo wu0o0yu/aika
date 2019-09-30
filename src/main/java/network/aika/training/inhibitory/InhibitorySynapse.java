@@ -13,8 +13,6 @@ public class InhibitorySynapse extends TSynapse {
     }
 
 
-
-
     public static class Builder extends Synapse.Builder {
         protected SynapseFactory getSynapseFactory() {
             return (input, output, id) -> new InhibitorySynapse(input, output, id);

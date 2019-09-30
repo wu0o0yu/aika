@@ -248,8 +248,8 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public INeuron getINeuron() {
-        return neuron;
+    public <N extends INeuron> N getINeuron() {
+        return (N) neuron;
     }
 
 
