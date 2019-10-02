@@ -21,7 +21,7 @@ import static network.aika.neuron.Synapse.OUTPUT;
 public class TDocument extends Document {
 
 
-    public Map<Option, List<ExcitatoryNeuron>> metaActivations = new TreeMap<>();
+    public Map<Option, ExcitatoryNeuron> metaActivations = new TreeMap<>();
 
     public TDocument(MetaModel model, String content) {
         super(model, content, 0);
@@ -56,7 +56,9 @@ public class TDocument extends Document {
 
         count();
 
-        trainMeta(c);
+        trainMeta(c,
+                act -> new ExcitatoryNeuron(getModel(), act.getLabel(), null)
+        );
 
         trainLTL(c);
     }
@@ -123,12 +125,6 @@ public class TDocument extends Document {
     }
 
 
-    public void trainMeta(Config c) {
-        trainMeta(c,
-                act -> new ExcitatoryNeuron(getModel(), act.getLabel(), null)
-        );
-    }
-
 
     public void trainMeta(Config c, Function<Activation, ExcitatoryNeuron> callback) {
         for (Activation metaAct : getActivations(false)) {
@@ -141,10 +137,8 @@ public class TDocument extends Document {
 
 
     private void processMetaActivations(Config c) {
-        for(Map.Entry<Option, List<ExcitatoryNeuron>> me: metaActivations.entrySet()) {
-            for(ExcitatoryNeuron tn: me.getValue()) {
-                transferMetaSynapses(c, me.getKey(), tn);
-            }
+        for(Map.Entry<Option, ExcitatoryNeuron> me: metaActivations.entrySet()) {
+            transferMetaSynapses(c, me.getKey(), me.getValue());
         }
 
         propagate();
@@ -165,10 +159,9 @@ public class TDocument extends Document {
                     if (templateSynapse != null) {
                         TNeuron in = l.getInput().getINeuron();
 
-                        List<? extends TNeuron> inputTargets = in.getInputTargets(this, inOption);
+                        TNeuron inputNeuron = in.getInputTargets(this, inOption);
 
-                        for (TNeuron inputNeuron : inputTargets) {
-                            TSynapse targetSynapse = templateSynapse.transferTemplateSynapse(this, inputNeuron, targetNeuron, l);
+                        TSynapse targetSynapse = templateSynapse.transferTemplateSynapse(this, inputNeuron, targetNeuron, l);
 
                             if (targetSynapse != null) {
                                 transferInputMetaRelations(metaActOption, l, l.getSynapse(), targetSynapse, targetMapping);
@@ -177,15 +170,12 @@ public class TDocument extends Document {
 
                                 targetInputSynapses.add(targetSynapse);
                             }
-                        }
                     }
                 });
 
         targetNeuron.commit(targetInputSynapses);
         Converter.convert(getThreadId(), this, targetNeuron, targetInputSynapses);
     }
-
-
 
 
     private static void addTargetMapping(TreeMap<Link, List<Synapse>> targetMapping, Link l, Synapse targetSynapse) {

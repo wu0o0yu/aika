@@ -392,7 +392,7 @@ public class MetaNeuron extends TNeuron {
         return false;
     }
 
-    public List<? extends TNeuron> getInputTargets(TDocument doc, Option in) {
+    public TNeuron getInputTargets(TDocument doc, Option in) {
         return doc.metaActivations.get(in);
     }
 

@@ -179,8 +179,8 @@ public abstract class TNeuron extends INeuron {
     }
 
 
-    public List<? extends TNeuron> getInputTargets(TDocument doc, Option in) {
-        return Collections.singletonList(this);
+    public TNeuron getInputTargets(TDocument doc, Option in) {
+        return this;
     }
 
 
@@ -229,23 +229,9 @@ public abstract class TNeuron extends INeuron {
             if (o.getP() > c.getMetaThreshold() && getTrainingNetValue(o) > 0.0) {
                 ExcitatoryNeuron targetNeuron = getTargetNeuron(metaAct, callback);
 
-                collectTarget((TDocument) doc, o, targetNeuron);
+                ((TDocument) doc).metaActivations.put(o, targetNeuron);
             }
         }
-    }
-
-    private void collectTarget(TDocument mDoc, Option metaAct, ExcitatoryNeuron targetNeuron) {
-        if(metaAct == null) {
-            return;
-        }
-
-        List<ExcitatoryNeuron> targets = mDoc.metaActivations.get(metaAct);
-        if (targets == null) {
-            targets = new ArrayList<>();
-            mDoc.metaActivations.put(metaAct, targets);
-        }
-
-        targets.add(targetNeuron);
     }
 
 
