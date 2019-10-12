@@ -361,10 +361,9 @@ public class MirrorNeuronExperiment {
 
         trainDoc.process();
 
-        trainDoc.trainMeta(
+        trainDoc.train(
                 new Config()
-                        .setMetaThreshold(0.3),
-                act -> new ExcitatoryNeuron(model, act.getLabel(), null)
+                        .setMetaThreshold(0.3)
         );
 
         System.out.println(trainDoc.activationsToString());

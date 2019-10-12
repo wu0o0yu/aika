@@ -88,11 +88,7 @@ public class MetaNeuronSuppressionExperiment {
 
             System.out.println(doc.activationsToString());
 
-            doc.generateSynapses(c);
-
-            doc.count();
-
-            doc.trainLTL(c);
+            doc.train(c);
 
             doc.clearActivations();
         }

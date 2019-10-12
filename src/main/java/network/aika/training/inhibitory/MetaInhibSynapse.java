@@ -6,6 +6,7 @@ import network.aika.neuron.Synapse;
 import network.aika.training.TDocument;
 import network.aika.training.TNeuron;
 import network.aika.training.TSynapse;
+import network.aika.training.meta.MetaNeuron;
 
 
 public class MetaInhibSynapse extends TSynapse {
@@ -45,7 +46,7 @@ public class MetaInhibSynapse extends TSynapse {
 
         targetSynapse.applied = true;
 
-        TDocument.transferOutputMetaRelations(this, targetSynapse, null, null);
+        MetaNeuron.transferOutputMetaRelations(this, targetSynapse, null, null);
 
         return targetSynapse;
     }

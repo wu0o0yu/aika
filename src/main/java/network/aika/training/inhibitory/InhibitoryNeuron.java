@@ -4,6 +4,8 @@ import network.aika.ActivationFunction;
 import network.aika.lattice.Converter;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.training.Config;
 import network.aika.training.MetaModel;
@@ -13,6 +15,7 @@ import network.aika.training.excitatory.ExcitatorySynapse;
 import network.aika.training.meta.MetaNeuron;
 
 import java.util.List;
+import java.util.function.Function;
 
 public class InhibitoryNeuron extends TNeuron {
 
@@ -91,6 +94,11 @@ public class InhibitoryNeuron extends TNeuron {
 
             rel.link(getProvider(), relSynId, Synapse.OUTPUT);
         }
+    }
+
+
+    public void prepareMetaTraining(Config c, Option o, Function<Activation, ExcitatoryNeuron> callback) {
+        // Nothing to do.
     }
 
 

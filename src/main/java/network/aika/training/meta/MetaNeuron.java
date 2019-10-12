@@ -8,6 +8,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
+import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.relation.Direction;
 import network.aika.neuron.relation.PositionRelation;
@@ -391,11 +392,11 @@ public class MetaNeuron extends TNeuron {
     public boolean isMature(Config c) {
         return false;
     }
-
+/*
     public TNeuron getInputTargets(TDocument doc, Option in) {
         return doc.metaActivations.get(in);
     }
-
+*/
     public ExcitatoryNeuron getTargetNeuron(Activation metaAct, Function<Activation, ExcitatoryNeuron> callback) {
         ExcitatoryNeuron targetNeuron = createMetaNeuronTarget(metaAct, callback);
 
@@ -465,6 +466,120 @@ public class MetaNeuron extends TNeuron {
                 Converter.convert(doc.getThreadId(), doc, targetSynapse.getOutput().get(), modifiedSynapses);
             }
         }
+    }
+
+
+    public static void transferMetaSynapses(Config c, Option metaActOption) {
+        if(metaActOption.targetNeuron == null) {
+            return;
+        }
+
+        TDocument doc = (TDocument) metaActOption.getAct().getDocument();
+
+        TreeMap<Link, List<Synapse>> targetMapping = new TreeMap<>(Link.INPUT_COMP);
+        List<Synapse> targetInputSynapses = new ArrayList();
+
+        metaActOption.inputOptions.entrySet().stream()
+                .filter(me -> me.getValue() != null && me.getValue().getP() >= c.getMetaThreshold())
+                .forEach(me -> {
+                    Link l = me.getKey();
+                    Option inOption = me.getValue();
+
+                    MetaSynapse templateSynapse = (MetaSynapse) l.getSynapse();
+
+                    if (templateSynapse != null) {
+                        TNeuron inputNeuron = inOption.targetNeuron;
+
+                        TSynapse targetSynapse = templateSynapse.transferTemplateSynapse(doc, inputNeuron, metaActOption.targetNeuron, l);
+
+                        if (targetSynapse != null) {
+                            transferInputMetaRelations(metaActOption, l, l.getSynapse(), targetSynapse, targetMapping);
+
+                            addTargetMapping(targetMapping, l, targetSynapse);
+
+                            targetInputSynapses.add(targetSynapse);
+                        }
+                    }
+                });
+
+        metaActOption.targetNeuron.commit(targetInputSynapses);
+        Converter.convert(doc.getThreadId(), doc, metaActOption.targetNeuron, targetInputSynapses);
+    }
+
+
+    private static void addTargetMapping(TreeMap<Link, List<Synapse>> targetMapping, Link l, Synapse targetSynapse) {
+        List<Synapse> ts = targetMapping.get(l);
+        if (ts == null) {
+            ts = new ArrayList<>();
+            targetMapping.put(l, ts);
+        }
+
+        ts.add(targetSynapse);
+    }
+
+
+    public static void transferInputMetaRelations(Option metaActOption, Link metaLink, Synapse templateSynapse, TSynapse targetSynapse, Map<Link, List<Synapse>> targetMapping) {
+        if (!targetSynapse.isConverted()) {
+            for (Relation.Key rk : templateSynapse.getRelations()) {
+                Integer relId = rk.getRelatedId();
+
+                WeightedRelation rel = (WeightedRelation) rk.getRelation();
+
+                if (relId != Synapse.OUTPUT) {
+                    getRelatedLinks(metaActOption.getAct(), metaLink, rk)
+                            .forEach(rl -> {
+                                List<Synapse> syns = targetMapping.get(rl);
+                                if (syns != null) {
+                                    WeightedRelation targetRel = rel.createTargetRelation(metaLink.getInput(), rl.getInput());
+                                    if (targetRel != null) {
+                                        syns.forEach(relTargetSynapse -> {
+                                            targetRel.link(relTargetSynapse, targetSynapse, relTargetSynapse.getId(), targetSynapse.getId(), targetSynapse.getOutput());
+
+                                            System.out.println("  Transfer Template Relation:" +
+                                                    " From: " + relTargetSynapse.getId() +
+                                                    " To: " + targetSynapse.getId() +
+                                                    " Template Rel: " + rel +
+                                                    " Target Rel: " + targetRel
+                                            );
+                                        });
+                                    }
+                                }
+                            });
+                }
+            }
+
+            targetSynapse.setConverted(true);
+        }
+    }
+
+    public static void transferOutputMetaRelations(TSynapse templateSynapse, TSynapse targetSynapse, Activation act, Activation relatedAct) {
+        if (!targetSynapse.isConverted()) {
+            for (Relation.Key rk : templateSynapse.getRelations()) {
+                Integer relId = rk.getRelatedId();
+                WeightedRelation rel = (WeightedRelation) rk.getRelation();
+
+                if (relId == Synapse.OUTPUT) {
+                    WeightedRelation targetRel = rel.createTargetRelation(act, relatedAct);
+
+                    targetRel.link(targetSynapse.getOutput().get(), targetSynapse, Synapse.OUTPUT, targetSynapse.getId(), targetSynapse.getOutput());
+
+                    System.out.println("  Transfer Template Relation:" +
+                            " From: OUTPUT" +
+                            " To: " + targetSynapse.getId() +
+                            " Template Rel: " + rel +
+                            " Target Rel: " + targetRel
+                    );
+                }
+            }
+        }
+    }
+
+
+    private static Collection<Link> getRelatedLinks(Activation metaAct, Link metaLink, Relation.Key rk) {
+        return metaAct.getInputLinks()
+                .filter(l -> l.getSynapse().getId() == rk.getRelatedId())
+                .filter(l -> rk.getRelation().test(metaLink.getInput(), l.getInput(), false, rk.getDirection()))
+                .collect(Collectors.toList());
     }
 
 

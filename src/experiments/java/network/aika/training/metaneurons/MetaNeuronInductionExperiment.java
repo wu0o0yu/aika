@@ -99,12 +99,11 @@ public class MetaNeuronInductionExperiment {
 
                 System.out.println(doc.activationsToString());
 
-                doc.count();
-/*                doc.train(
-                        new TDocument.Config()
+                doc.train(
+                        new Config()
                                 .setLearnRate(0.6)
                 );
-*/
+
                 doc.clearActivations();
             }
         }

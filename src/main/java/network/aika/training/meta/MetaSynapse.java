@@ -138,7 +138,7 @@ public class MetaSynapse extends TSynapse {
 
         targetSynapse.applied = true;
 
-        TDocument.transferOutputMetaRelations(this, targetSynapse, metaLink!= null ? metaLink.getInput() : null, metaLink != null ? metaLink.getOutput() : null);
+        MetaNeuron.transferOutputMetaRelations(this, targetSynapse, metaLink!= null ? metaLink.getInput() : null, metaLink != null ? metaLink.getOutput() : null);
 
         return targetSynapse;
     }

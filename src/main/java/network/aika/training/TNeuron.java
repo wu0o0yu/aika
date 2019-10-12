@@ -2,7 +2,6 @@ package network.aika.training;
 
 
 import network.aika.ActivationFunction;
-import network.aika.Document;
 import network.aika.Model;
 import network.aika.Utils;
 import network.aika.neuron.INeuron;
@@ -27,6 +26,7 @@ import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.Activation.END;
 import static network.aika.neuron.activation.link.Direction.INPUT;
 import static network.aika.neuron.activation.link.Direction.OUTPUT;
+import static network.aika.training.meta.MetaNeuron.transferMetaSynapses;
 
 
 /**
@@ -54,7 +54,6 @@ public abstract class TNeuron extends INeuron {
 
     public boolean isOutputMetaNeuron;
 
-//    public boolean debugFirst = true;
 
 
     public Option init(Option inputOpt) {
@@ -179,11 +178,6 @@ public abstract class TNeuron extends INeuron {
     }
 
 
-    public TNeuron getInputTargets(TDocument doc, Option in) {
-        return this;
-    }
-
-
     public String freqToString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Pos:" + Utils.round(posFrequency));
@@ -215,22 +209,28 @@ public abstract class TNeuron extends INeuron {
     }
 
 
-    public void train(Activation act, Config config) {
+    public void prepareTrainingStep(Config c, Option o, Function<Activation, ExcitatoryNeuron> callback) {
+        prepareMetaTraining(c, o, callback);
+        count(o);
+    }
 
+
+    public void train(Config c, Option o) {
+        transferMetaSynapses(c, o);
+
+//      if((o.p * (1.0 - getCoverage(o))) > THRESHOLD) {
+        if (isMature(c) && !alreadyCreated) {
+            alreadyCreated = true;
+            generateNeuron(o);
+        }
+//      }
     }
 
 
     // Implemented only for meta and target neurons
-    public void trainMeta(Activation metaAct, Config c, Function<Activation, ExcitatoryNeuron> callback) {
-        Document doc = metaAct.getDocument();
-        doc.createV = doc.getNewVisitedId();
-
-        for (Option o : metaAct.getOptions()) {
-            if (o.getP() > c.getMetaThreshold() && getTrainingNetValue(o) > 0.0) {
-                ExcitatoryNeuron targetNeuron = getTargetNeuron(metaAct, callback);
-
-                ((TDocument) doc).metaActivations.put(o, targetNeuron);
-            }
+    public void prepareMetaTraining(Config c, Option o, Function<Activation, ExcitatoryNeuron> callback) {
+        if (o.getP() > c.getMetaThreshold() && getTrainingNetValue(o) > 0.0) {
+            o.targetNeuron = getTargetNeuron(o.getAct(), callback);
         }
     }
 
@@ -261,26 +261,12 @@ public abstract class TNeuron extends INeuron {
 
     static boolean alreadyCreated = false;
 
-    public void generateNeuron(Config c, Activation seedAct) {
-        if(isMature(c)) {
-            for(Option o: seedAct.getOptions()) {
-//                if((o.p * (1.0 - getCoverage(o))) > THRESHOLD) {
-                    if(!alreadyCreated) {
-                        alreadyCreated = true;
-                        generateNeurons(o);
-                    }
-//                }
-            }
-        }
-    }
 
-
-    private void generateNeurons(Option o) {
+    private void generateNeuron(Option o) {
         ExcitatoryNeuron targetNeuron = new ExcitatoryNeuron(getModel(), "DERIVED-FROM-(" + o.getAct().getLabel() + ")", null);
 
         targetNeuron.init(o);
     }
-
 
 
     private double getCoverage(Option seedOpt) {
@@ -319,11 +305,6 @@ public abstract class TNeuron extends INeuron {
         }
 
         return slots;
-    }
-
-
-    public void generateSynapses(Config c, Activation act) {
-
     }
 
 

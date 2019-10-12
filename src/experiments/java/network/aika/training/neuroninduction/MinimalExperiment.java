@@ -58,13 +58,8 @@ public class MinimalExperiment {
                 .setLearnRate(0.1)
                 .setMaturityThreshold(10);
 
-        doc.generateNeurons(c);
-        doc.generateSynapses(c);
-
-        doc.count();
-
         if(j > c.getMaturityThreshold()) {
-            doc.trainLTL(c);
+            doc.train(c);
         }
 
         doc.clearActivations();

@@ -21,6 +21,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.State;
+import network.aika.training.excitatory.ExcitatoryNeuron;
 
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -64,6 +65,8 @@ public class Option implements Comparable<Option> {
     private boolean isQueued;
 
     public int round;
+
+    public ExcitatoryNeuron targetNeuron;
 
 
     public Option(Option parent, Activation act, SearchNode sn) {

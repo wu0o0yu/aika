@@ -133,6 +133,15 @@ public class ExcitatoryNeuron extends TNeuron {
     }
 
 
+    public void train(Config c, Option o) {
+        super.train(c, o);
+
+        createCandidateSynapses(c, o);
+
+        trainLTL(c, o);
+    }
+
+
     public Option init(Option inputOpt) {
         Activation iAct = inputOpt.getAct();
         Document doc = iAct.getDocument();
@@ -183,29 +192,12 @@ public class ExcitatoryNeuron extends TNeuron {
     }
 
 
-    public void train(Activation act, Config config) {
-        if(log.isDebugEnabled()) {
-            log.debug("Train Excitatory: " + act.toString());
-        }
-
-        for (Option out : act.getOptions()) {
-            trainSynapse(config, out);
-        }
-    }
-
-
-    public void generateSynapses(Config c, Activation act) {
-        for (Option o : act.getOptions()) {
-            collectCandidateSynapses(c, o);
-        }
-    }
-
-    private void collectCandidateSynapses(Config c, Option targetOpt) {
+    private void createCandidateSynapses(Config c, Option targetOpt) {
         if(log.isDebugEnabled()) {
             log.debug("Created Synapses for Neuron: " + targetOpt.getAct().getINeuron().getId() + ":" + targetOpt.getAct().getINeuron().getLabel());
         }
 
-        TreeMap<Link, Option> tmp = new TreeMap<>(INPUT_COMP);
+        TreeMap<Link, Option> tmp = new TreeMap<>(INPUT_COMP); // Vermutlich aufgrund einer Conc. Mod. Exception notwendig.
         tmp.putAll(targetOpt.inputOptions);
         for(Map.Entry<Link, Option> me: tmp.entrySet()) {
             Link l = me.getKey();
@@ -343,7 +335,7 @@ public class ExcitatoryNeuron extends TNeuron {
 
 
 
-    public void trainSynapse(Config config, Option out) {
+    public void trainLTL(Config config, Option out) {
         Activation act = out.getAct();
         Document doc = act.getDocument();
         double[] pXout = getP();

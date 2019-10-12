@@ -79,7 +79,7 @@ public class LongTermLearningExperiment {
 
         doc.process();
 
-        doc.trainLTL(
+        doc.train(
                 new Config()
                 .setLearnRate(0.1)
         );
@@ -161,7 +161,7 @@ public class LongTermLearningExperiment {
 
         doc.process();
 
-        doc.trainLTL(
+        doc.train(
                 new Config()
                         .setLearnRate(0.1)
         );
@@ -248,11 +248,7 @@ public class LongTermLearningExperiment {
 
             doc.process();
 
-            doc.generateSynapses(c);
-
-            doc.count();
-
-            doc.trainLTL(c);
+            doc.train(c);
 
             doc.clearActivations();
         }
