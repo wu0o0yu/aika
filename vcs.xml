@@ -50,6 +50,10 @@
           <option name="url" value="gitlab@git.meinestadt.de:jobs/jobs-data.git" />
           <option name="userName" value="" />
         </UrlAndUserName>
+        <UrlAndUserName>
+          <option name="url" value="https://git.meinestadt.de/jobs/aika-model" />
+          <option name="userName" value="" />
+        </UrlAndUserName>
       </list>
     </option>
     <option name="cloneParentDir" value="$USER_HOME$/ws" />
