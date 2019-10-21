@@ -108,15 +108,15 @@ public class MetaSynapse extends TSynapse {
     }
 
 
-    public ExcitatorySynapse transferTemplateSynapse(Document doc, TNeuron inputNeuron, ExcitatoryNeuron targetNeuron, Link metaLink) {
+    public void transferTemplateSynapse(Document doc, TNeuron inputNeuron, ExcitatoryNeuron targetNeuron, Link metaLink) {
+        if(metaLink.getTargetSynapse() != null) {
+            return;
+        }
+
         ExcitatorySynapse targetSynapse = targetNeuron.createOrLookupSynapse(doc, this, inputNeuron.getProvider());
 
         targetSynapse.setRecurrent(isRecurrent());
         targetSynapse.setIdentity(isIdentity());
-
-        if(targetSynapse.applied) {
-            return targetSynapse;
-        }
 
         new MappingLink(this, targetSynapse).link();
 
@@ -136,11 +136,7 @@ public class MetaSynapse extends TSynapse {
                 " Ident:"  + targetSynapse.isIdentity()
         );
 
-        targetSynapse.applied = true;
-
-        MetaNeuron.transferOutputMetaRelations(this, targetSynapse, metaLink!= null ? metaLink.getInput() : null, metaLink != null ? metaLink.getOutput() : null);
-
-        return targetSynapse;
+        metaLink.setTargetSynapse(targetSynapse);
     }
 
 

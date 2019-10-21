@@ -142,6 +142,8 @@ public class ExcitatoryNeuron extends TNeuron {
     }
 
 
+
+    // TODO: entfernen und durch transferMetaSynapses ersetzen.
     public Option init(Option inputOpt) {
         Activation iAct = inputOpt.getAct();
         Document doc = iAct.getDocument();
@@ -163,8 +165,6 @@ public class ExcitatoryNeuron extends TNeuron {
         if(log.isDebugEnabled()) {
             log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
         }
-
-        commit(Collections.singletonList(s));
 
         Activation targetAct = new Activation(doc, this, new TreeMap<>(iAct.getSlots()));
         register(targetAct);
@@ -241,7 +241,10 @@ public class ExcitatoryNeuron extends TNeuron {
 
     private void createCandidateSynapse(Config c, Option inputOpt, Option targetOpt) {
         Activation targetAct = targetOpt.getAct();
+        Neuron targetNeuron = targetAct.getNeuron();
+
         Activation iAct = inputOpt.getAct();
+        Neuron inputNeuron = iAct.getNeuron();
 
         if(checkIfSynapseExists(inputOpt, targetOpt)) {
             return;
@@ -251,14 +254,14 @@ public class ExcitatoryNeuron extends TNeuron {
             return;
         }
 
-        int synId = targetAct.getNeuron().getNewSynapseId();
+        int synId = targetNeuron.getNewSynapseId();
         int lastCount = iAct.getSlot(BEGIN).getFinalPosition();
 
         ExcitatorySynapse s;
         if(inputOpt.getAct().getINeuron() instanceof InhibitoryNeuron && checkSelfReferencing(targetOpt, inputOpt)) {
-            s = new NegExcitatorySynapse(iAct.getNeuron(), targetAct.getNeuron(), synId, lastCount);
+            s = new NegExcitatorySynapse(inputNeuron, targetNeuron, synId, lastCount);
         } else {
-            s = new ExcitatorySynapse(iAct.getNeuron(), targetAct.getNeuron(), synId, lastCount);
+            s = new ExcitatorySynapse(inputNeuron, targetNeuron, synId, lastCount);
         }
 
         s.setInactive(CURRENT, true);
@@ -320,8 +323,6 @@ public class ExcitatoryNeuron extends TNeuron {
                         );
 
                         rel.link(l.getSynapse(), s, l.getSynapse().getId(), s.getId(), null);
-//                        Relation.addRelation(s.getRelations(), l.getSynapse().getId(), s.getId(), null, rel);
-//                        Relation.addRelation(l.getSynapse().getRelations(), s.getId(), l.getSynapse().getId(), null, rel.invert());
                     }
                 }
             }

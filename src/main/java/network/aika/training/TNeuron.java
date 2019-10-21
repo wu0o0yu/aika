@@ -55,11 +55,6 @@ public abstract class TNeuron extends INeuron {
     public boolean isOutputMetaNeuron;
 
 
-
-    public Option init(Option inputOpt) {
-        return null;
-    }
-
     public void initCountValues() {
         countValue = 0.0;
 
@@ -219,8 +214,7 @@ public abstract class TNeuron extends INeuron {
         transferMetaSynapses(c, o);
 
 //      if((o.p * (1.0 - getCoverage(o))) > THRESHOLD) {
-        if (isMature(c) && !alreadyCreated) {
-            alreadyCreated = true;
+        if (isMature(c)) {
             generateNeuron(o);
         }
 //      }
@@ -259,9 +253,8 @@ public abstract class TNeuron extends INeuron {
 
     }
 
-    static boolean alreadyCreated = false;
 
-
+    // Entfernen und durch transferMetaSynapses ersetzen.
     private void generateNeuron(Option o) {
         ExcitatoryNeuron targetNeuron = new ExcitatoryNeuron(getModel(), "DERIVED-FROM-(" + o.getAct().getLabel() + ")", null);
 

@@ -20,10 +20,6 @@ import static network.aika.neuron.activation.Activation.END;
 
 public class TSynapse extends Synapse {
 
-    public boolean applied = false;
-    public boolean converted = false;
-    public boolean rangeInputConverted = false;
-
     private double binaryFrequencyIPosOPos;
     private double frequencyIPosOPos;
     private double frequencyIPosONeg;
@@ -249,32 +245,9 @@ public class TSynapse extends Synapse {
     }
 
 
-    public boolean isConverted() {
-        return converted;
-    }
-
-
-    public void setConverted(boolean converted) {
-        this.converted = converted;
-    }
-
-
-    public boolean isRangeInputConverted() {
-        return rangeInputConverted;
-    }
-
-
-    public void setRangeInputConverted(boolean converted) {
-        rangeInputConverted = converted;
-    }
-
-
     // TODO: metaSynapse
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeBoolean(applied);
-        out.writeBoolean(converted);
-
         out.writeDouble(frequencyIPosOPos);
         out.writeDouble(frequencyIPosONeg);
         out.writeDouble(frequencyINegOPos);
@@ -287,9 +260,6 @@ public class TSynapse extends Synapse {
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        applied = in.readBoolean();
-        converted = in.readBoolean();
-
         frequencyIPosOPos = in.readDouble();
         frequencyIPosONeg = in.readDouble();
         frequencyINegOPos = in.readDouble();

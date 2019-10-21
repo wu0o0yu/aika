@@ -23,10 +23,13 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Position;
 import network.aika.neuron.relation.Relation;
 import network.aika.neuron.INeuron.Type;
+import network.aika.neuron.relation.RelationEndpoint;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import static network.aika.neuron.Synapse.OUTPUT;
 
 /**
  * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
@@ -224,6 +227,13 @@ public class Neuron extends Provider<INeuron> {
 
     public void setOutputText(String outputText) {
         get().setOutputText(outputText);
+    }
+
+
+    public RelationEndpoint getRelationsEndpoint(int synapseId) {
+        return synapseId == OUTPUT ?
+                get() :
+                getSynapseById(synapseId);
     }
 
 

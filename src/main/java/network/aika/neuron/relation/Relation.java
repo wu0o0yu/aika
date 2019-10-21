@@ -136,8 +136,8 @@ public abstract class Relation implements Writable {
 
     public void link(Neuron n, int from, int to) {
         link(
-                getRelationsEndpoint(from, n),
-                getRelationsEndpoint(to, n),
+                n.getRelationsEndpoint(from),
+                n.getRelationsEndpoint(to),
                 from,
                 to,
                 n
@@ -146,8 +146,8 @@ public abstract class Relation implements Writable {
 
     public void unlink(Neuron n, int from, int to) {
         unlink(
-                getRelationsEndpoint(from, n),
-                getRelationsEndpoint(to, n),
+                n.getRelationsEndpoint(from),
+                n.getRelationsEndpoint(to),
                 from,
                 to,
                 n
@@ -164,13 +164,6 @@ public abstract class Relation implements Writable {
     public void unlink(RelationEndpoint fromEndpoint, RelationEndpoint toEndpoint, Integer fromSynId, Integer toSynId, Neuron n) {
         fromEndpoint.removeRelation(toSynId, this, Direction.FORWARD);
         toEndpoint.removeRelation(fromSynId, this, Direction.BACKWARD);
-    }
-
-
-    public static RelationEndpoint getRelationsEndpoint(int synapseId, Neuron n) {
-        return synapseId == OUTPUT ?
-                n.get() :
-                n.getSynapseById(synapseId);
     }
 
 

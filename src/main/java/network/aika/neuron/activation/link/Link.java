@@ -18,6 +18,7 @@ package network.aika.neuron.activation.link;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.training.TSynapse;
 
 import java.util.Comparator;
 
@@ -30,6 +31,8 @@ import static network.aika.neuron.activation.link.Direction.OUTPUT;
  */
 public class Link {
     private final Synapse synapse;
+    private TSynapse targetSynapse;
+
     private final Activation input;
     private final Activation output;
 
@@ -48,6 +51,15 @@ public class Link {
 
     public Link(Synapse s, Activation input, Activation output) {
         this.synapse = s;
+        this.targetSynapse = null;
+        this.input = input;
+        this.output = output;
+    }
+
+
+    public Link(Synapse s, TSynapse targetSynapse, Activation input, Activation output) {
+        this.synapse = s;
+        this.targetSynapse = targetSynapse;
         this.input = input;
         this.output = output;
     }
@@ -55,6 +67,15 @@ public class Link {
 
     public Synapse getSynapse() {
         return synapse;
+    }
+
+
+    public TSynapse getTargetSynapse() {
+        return targetSynapse;
+    }
+
+    public void setTargetSynapse(TSynapse targetSynapse) {
+        this.targetSynapse = targetSynapse;
     }
 
 

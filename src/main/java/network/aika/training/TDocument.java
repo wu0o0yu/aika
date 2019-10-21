@@ -1,6 +1,7 @@
 package network.aika.training;
 
 import network.aika.Document;
+import network.aika.lattice.Converter;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.link.Linker;
 import network.aika.neuron.activation.search.Option;
@@ -63,6 +64,9 @@ public class TDocument extends Document {
 
                 for (Option o : act.getOptions()) {
                     n.train(c, o);
+
+                    o.targetNeuron.commit(o.targetNeuron.getInputSynapses());
+                    Converter.convert(getThreadId(), this, o.targetNeuron, o.targetNeuron.getInputSynapses());
                 }
             }
         }
