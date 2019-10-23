@@ -1,12 +1,16 @@
 package network.aika.neuron.relation;
 
+import network.aika.neuron.activation.Activation;
+
 import java.util.Collection;
 
 public interface RelationEndpoint {
 
-    void addRelation(Integer synId, Relation rel, Direction dir);
+    Integer getRelationEndpointId();
 
-    void removeRelation(Integer synId, Relation rel, Direction dir);
+    void addRelation(RelationEndpoint relEndpoint, Relation rel, Direction dir);
+
+    void removeRelation(RelationEndpoint relEndpoint, Relation rel, Direction dir);
 
     Collection<Relation.Key> getRelationById(Integer id);
 
@@ -15,4 +19,6 @@ public interface RelationEndpoint {
     Collection<Relation.Key> getRelations();
 
     Collection<Relation.Key> getOutputRelations();
+
+    Collection<Activation> getActivations(Activation outputAct);
 }

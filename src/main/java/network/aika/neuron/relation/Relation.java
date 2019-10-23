@@ -137,33 +137,27 @@ public abstract class Relation implements Writable {
     public void link(Neuron n, int from, int to) {
         link(
                 n.getRelationsEndpoint(from),
-                n.getRelationsEndpoint(to),
-                from,
-                to,
-                n
+                n.getRelationsEndpoint(to)
         );
     }
 
     public void unlink(Neuron n, int from, int to) {
         unlink(
                 n.getRelationsEndpoint(from),
-                n.getRelationsEndpoint(to),
-                from,
-                to,
-                n
+                n.getRelationsEndpoint(to)
         );
     }
 
 
-    public void link(RelationEndpoint fromEndpoint, RelationEndpoint toEndpoint, Integer fromSynId, Integer toSynId, Neuron n) {
-        fromEndpoint.addRelation(toSynId, this, Direction.FORWARD);
-        toEndpoint.addRelation(fromSynId, this, Direction.BACKWARD);
+    public void link(RelationEndpoint fromEndpoint, RelationEndpoint toEndpoint) {
+        fromEndpoint.addRelation(toEndpoint, this, Direction.FORWARD);
+        toEndpoint.addRelation(fromEndpoint, this, Direction.BACKWARD);
     }
 
 
-    public void unlink(RelationEndpoint fromEndpoint, RelationEndpoint toEndpoint, Integer fromSynId, Integer toSynId, Neuron n) {
-        fromEndpoint.removeRelation(toSynId, this, Direction.FORWARD);
-        toEndpoint.removeRelation(fromSynId, this, Direction.BACKWARD);
+    public void unlink(RelationEndpoint fromEndpoint, RelationEndpoint toEndpoint) {
+        fromEndpoint.removeRelation(toEndpoint, this, Direction.FORWARD);
+        toEndpoint.removeRelation(fromEndpoint, this, Direction.BACKWARD);
     }
 
 

@@ -182,17 +182,27 @@ public class INeuron extends AbstractNode<Neuron> implements Comparable<INeuron>
         return outputRelations.subMap(new Relation.Key(OUTPUT, Relation.MIN, Direction.FORWARD), true, new Relation.Key(OUTPUT, Relation.MAX, Direction.FORWARD), false).values();
     }
 
+    @Override
+    public Collection<Activation> getActivations(Activation outputAct) {
+        return Collections.singletonList(outputAct);
+    }
+
     public Collection<Relation.Key> getRelationById(Integer id) {
         return outputRelations.subMap(new Relation.Key(id, Relation.MIN, Direction.FORWARD), new Relation.Key(id, Relation.MAX, Direction.FORWARD)).values();
     }
 
-    public void addRelation(Integer synId, Relation rel, Direction dir) {
-        Relation.Key rk = new Relation.Key(synId, rel, dir);
+    @Override
+    public Integer getRelationEndpointId() {
+        return OUTPUT;
+    }
+
+    public void addRelation(RelationEndpoint relEndpoint, Relation rel, Direction dir) {
+        Relation.Key rk = new Relation.Key(relEndpoint.getRelationEndpointId(), rel, dir);
         outputRelations.put(rk, rk);
     }
 
-    public void removeRelation(Integer synId, Relation rel, Direction dir) {
-        outputRelations.remove(new Relation.Key(synId, rel, dir));
+    public void removeRelation(RelationEndpoint relEndpoint, Relation rel, Direction dir) {
+        outputRelations.remove(new Relation.Key(relEndpoint.getRelationEndpointId(), rel, dir));
     }
 
     public Relation.Key getRelation(Relation.Key rk) {

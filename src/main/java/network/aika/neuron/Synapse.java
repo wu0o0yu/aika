@@ -19,6 +19,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Document;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.relation.Direction;
 import network.aika.neuron.relation.Relation;
@@ -29,6 +30,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.INeuron.Type.EXCITATORY;
 import static network.aika.neuron.INeuron.Type.INHIBITORY;
@@ -151,17 +153,30 @@ public class Synapse implements RelationEndpoint, Writable {
         return relations.subMap(new Relation.Key(OUTPUT, MIN, Direction.FORWARD), true, new Relation.Key(OUTPUT, Relation.MAX, Direction.FORWARD), false).values();
     }
 
+    @Override
+    public Collection<Activation> getActivations(Activation outputAct) {
+        return outputAct.getInputLinks()
+                .filter(l -> l.getSynapse() == this)
+                .map(l -> l.getInput())
+                .collect(Collectors.toList());
+    }
+
     public Collection<Relation.Key> getRelationById(Integer id) {
         return relations.subMap(new Relation.Key(id, MIN, Direction.FORWARD), new Relation.Key(id, Relation.MAX, Direction.FORWARD)).values();
     }
 
-    public void addRelation(Integer synId, Relation rel, Direction dir) {
-        Relation.Key rk = new Relation.Key(synId, rel, dir);
+    @Override
+    public Integer getRelationEndpointId() {
+        return id;
+    }
+
+    public void addRelation(RelationEndpoint relEndpoint, Relation rel, Direction dir) {
+        Relation.Key rk = new Relation.Key(relEndpoint.getRelationEndpointId(), rel, dir);
         relations.put(rk, rk);
     }
 
-    public void removeRelation(Integer synId, Relation rel, Direction dir) {
-        relations.remove(new Relation.Key(synId, rel, dir));
+    public void removeRelation(RelationEndpoint relEndpoint, Relation rel, Direction dir) {
+        relations.remove(new Relation.Key(relEndpoint.getRelationEndpointId(), rel, dir));
     }
 
     public Relation.Key getRelation(Relation.Key rk) {
