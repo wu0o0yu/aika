@@ -22,6 +22,9 @@ public class WeightedRelation extends Relation {
     public RelationStatistic statistic;
 
 
+    public WeightedRelation targetRelation;
+
+
     public WeightedRelation(Relation rel, double weight) {
         this.keyRelation = rel;
         this.statistic = new RelationStatistic(weight);
@@ -39,6 +42,15 @@ public class WeightedRelation extends Relation {
         this.statistic = statistic;
         this.fromSynapseId = fromSynapseId;
         this.toSynapseId = toSynapseId;
+    }
+
+
+    public WeightedRelation getTargetRelation() {
+        return targetRelation;
+    }
+
+    public void setTargetRelation(WeightedRelation targetRelation) {
+        this.targetRelation = targetRelation;
     }
 
 

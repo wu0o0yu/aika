@@ -179,6 +179,12 @@ public class Synapse implements RelationEndpoint, Writable {
         relations.remove(new Relation.Key(relEndpoint.getRelationEndpointId(), rel, dir));
     }
 
+
+    public void removeRelation(Integer synId, Relation rel, Direction dir) {
+        relations.remove(new Relation.Key(synId, rel, dir));
+    }
+
+
     public Relation.Key getRelation(Relation.Key rk) {
         return relations.get(rk);
     }

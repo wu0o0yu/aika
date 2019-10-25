@@ -385,9 +385,12 @@ public class MetaNeuron extends TNeuron {
     }
 
 
-    public void generateNeuron(Activation seedAct) {
+    public void train(Config c, Option o) {
+        transferMetaSynapses(c, o);
 
+        super.train(c, o);
     }
+
 
     @Override
     public boolean isMature(Config c) {
@@ -494,11 +497,7 @@ public class MetaNeuron extends TNeuron {
 
         metaActOption.inputOptions.entrySet().stream()
                 .filter(me -> me.getValue() != null && me.getKey().getTargetSynapse() != null)
-                .forEach(me -> {
-                    Link l = me.getKey();
-
-                    transferMetaRelations(metaActOption.getAct(), l);
-                });
+                .forEach(me -> transferMetaRelations(metaActOption.getAct(), me.getKey()));
     }
 
 

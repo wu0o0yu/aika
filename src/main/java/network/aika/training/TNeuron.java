@@ -26,7 +26,6 @@ import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.Activation.END;
 import static network.aika.neuron.activation.link.Direction.INPUT;
 import static network.aika.neuron.activation.link.Direction.OUTPUT;
-import static network.aika.training.meta.MetaNeuron.transferMetaSynapses;
 
 
 /**
@@ -211,8 +210,6 @@ public abstract class TNeuron extends INeuron {
 
 
     public void train(Config c, Option o) {
-        transferMetaSynapses(c, o);
-
 //      if((o.p * (1.0 - getCoverage(o))) > THRESHOLD) {
         if (isMature(c)) {
             generateNeuron(o);

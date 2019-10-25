@@ -322,7 +322,7 @@ public class ExcitatoryNeuron extends TNeuron {
                                 s.getId()
                         );
 
-                        rel.link(l.getSynapse(), s, l.getSynapse().getId(), s.getId(), null);
+                        rel.link(l.getSynapse(), s);
                     }
                 }
             }
