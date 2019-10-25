@@ -463,7 +463,7 @@ public class MetaNeuron extends TNeuron {
             if(templateSynapse.getOutput().getId() == inhibNeuron.getId()) {
                 MetaInhibSynapse mis = (MetaInhibSynapse) templateSynapse;
 
-                InhibitorySynapse targetSynapse = mis.transferTemplateSynapse(doc, targetNeuron);
+                InhibitorySynapse targetSynapse = mis.transferMetaSynapse(doc, targetNeuron);
 
                 List<Synapse> modifiedSynapses = Collections.singletonList(targetSynapse);
                 targetSynapse.getOutput().get().commit(modifiedSynapses);

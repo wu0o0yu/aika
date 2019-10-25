@@ -3,10 +3,15 @@ package network.aika.training.inhibitory;
 import network.aika.Document;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.link.Link;
+import network.aika.neuron.relation.Relation;
+import network.aika.neuron.relation.RelationEndpoint;
 import network.aika.training.TDocument;
 import network.aika.training.TNeuron;
 import network.aika.training.TSynapse;
 import network.aika.training.meta.MetaNeuron;
+import network.aika.training.relation.WeightedRelation;
 
 
 public class MetaInhibSynapse extends TSynapse {
@@ -17,16 +22,12 @@ public class MetaInhibSynapse extends TSynapse {
     }
 
 
-    public InhibitorySynapse transferTemplateSynapse(Document doc, TNeuron inputNeuron) {
+    public InhibitorySynapse transferMetaSynapse(Document doc, TNeuron inputNeuron) {
         InhibitoryNeuron inhibNeuron = (InhibitoryNeuron) getOutput().get(doc);
         InhibitorySynapse targetSynapse = create(doc, inputNeuron.getProvider(), inhibNeuron);
 
         targetSynapse.setRecurrent(isRecurrent());
         targetSynapse.setIdentity(isIdentity());
-
-        if(targetSynapse.applied) {
-            return targetSynapse;
-        }
 
         targetSynapse.updateDelta(
                 doc,
@@ -44,13 +45,15 @@ public class MetaInhibSynapse extends TSynapse {
                 " Ident:"  + targetSynapse.isIdentity()
         );
 
-        targetSynapse.applied = true;
-
-        MetaNeuron.transferOutputMetaRelations(this, targetSynapse, null, null);
+        transferMetaRelations(this, targetSynapse);
 
         return targetSynapse;
     }
 
+
+    private void transferMetaRelations(MetaInhibSynapse metaInhibSynapse, InhibitorySynapse targetSynapse) {
+        // TODO
+    }
 
 
     public static InhibitorySynapse create(Document doc, Neuron inputNeuron, InhibitoryNeuron outputNeuron) {
