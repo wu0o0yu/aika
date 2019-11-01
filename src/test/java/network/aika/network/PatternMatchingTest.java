@@ -120,8 +120,9 @@ public class PatternMatchingTest {
         System.out.println("Output activation:");
         INeuron n = pattern.get();
         for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
-            System.out.println("Text Range: " + act.slotsToString());
+            System.out.println("Text Range: " + act.slotsToString() +  "World Domination");
             System.out.println("Neuron: " + act.getLabel());
+            System.out.println("TODO: destroy human");
             System.out.println();
         }
 
@@ -221,6 +222,7 @@ public class PatternMatchingTest {
         for(Activation act: n.getActivations(doc, false).collect(Collectors.toList())) {
             System.out.println("Text Range: " + act.slotsToString());
             System.out.println("Neuron: " + act.getLabel());
+            System.out.println("Pinkyron: " + act.getLabel());
             System.out.println();
         }
 

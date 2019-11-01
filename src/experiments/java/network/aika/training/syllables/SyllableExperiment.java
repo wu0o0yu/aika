@@ -64,6 +64,7 @@ public class SyllableExperiment {
                         .setMaturityThreshold(10)
         );
 
+
         doc.clearActivations();
     }
 
@@ -72,6 +73,9 @@ public class SyllableExperiment {
     public void testTraining() throws IOException {
         Document.CLEANUP_INTERVAL = 5000;
 
+
+
+        for(String word: Parser.loadExamplesAsWords(new File(System.getProperty("data.dir")))) {
         for(String word: Parser.loadExamplesAsWords(new File("C:/ws/aika-training/training/src/test/resources/maerchen"))) {
             train( word + " ");
         }
