@@ -18,11 +18,8 @@ package network.aika.neuron.activation;
 
 import network.aika.Document;
 import network.aika.Utils;
-import network.aika.lattice.activation.InputActivation;
-import network.aika.lattice.activation.OrActivation;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.INeuron.SynapseSummary;
-import network.aika.neuron.INeuron.Type;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.link.Direction;
@@ -35,7 +32,6 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.INeuron.Type.*;
 import static network.aika.neuron.activation.search.Decision.*;
 import static network.aika.neuron.activation.link.Link.INPUT_COMP;
 import static network.aika.neuron.activation.link.Link.OUTPUT_COMP;
@@ -73,11 +69,7 @@ public class Activation implements Comparable<Activation> {
     private int id;
     private INeuron neuron;
     private Document doc;
-    private long visited = 0;
 
-    private Map<Integer, Position> slots = new TreeMap<>();
-    private OrActivation inputNodeActivation;
-    private InputActivation outputNodeActivation;
     private TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
     private TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
 
@@ -96,8 +88,6 @@ public class Activation implements Comparable<Activation> {
 
     private Integer sequence;
     private Integer candidateId;
-
-    public long markedAncDesc;
 
     public boolean blocked;
 
@@ -155,57 +145,14 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public Activation(Document doc, INeuron neuron, Map<Integer, Position> slots) {
+    public Activation(Document doc, INeuron neuron) {
         this.id = doc.getNewActivationId();
         this.doc = doc;
         this.neuron = neuron;
-        this.slots = slots;
 
         neuron.register(this);
     }
 
-
-    public void setInputNodeActivation(OrActivation inputNodeActivation) {
-        this.inputNodeActivation = inputNodeActivation;
-    }
-
-
-    public OrActivation getInputNodeActivation() {
-        return inputNodeActivation;
-    }
-
-    public InputActivation getOutputNodeActivation() {
-        return outputNodeActivation;
-    }
-
-    public void setOutputNodeActivation(InputActivation outputNodeActivation) {
-        this.outputNodeActivation = outputNodeActivation;
-    }
-
-
-    public Map<Integer, Position> getSlots() {
-        return slots;
-    }
-
-    public Position getSlot(int slot) {
-        return slots.get(slot);
-    }
-
-
-    public Integer length() {
-        int min = Integer.MAX_VALUE;
-        int max = Integer.MIN_VALUE;
-        for(Position pos: slots.values()) {
-            if(pos.getFinalPosition() == null) {
-                return null;
-            }
-            min = Math.min(min, pos.getFinalPosition());
-            max = Math.max(max, pos.getFinalPosition());
-        }
-
-        if(min > max) return 0;
-        return max - min;
-    }
 
 
     public int getId() {
@@ -220,31 +167,9 @@ public class Activation implements Comparable<Activation> {
         return doc.getThreadId();
     }
 
-    public long getNewVisitedId() {
-        return doc.getNewVisitedId();
-    }
-
-    public long getVisitedId() {
-        return visited;
-    }
-
-    public boolean checkVisited(long v) {
-        if(visited == v) return false;
-        visited = v;
-        return true;
-    }
-
 
     public String getLabel() {
         return getINeuron().getLabel();
-    }
-
-    public Type getType() {
-        return getINeuron().getType();
-    }
-
-    public String getText() {
-        return doc.getText(getSlot(BEGIN), getSlot(END));
     }
 
 
@@ -979,15 +904,6 @@ public class Activation implements Comparable<Activation> {
         public Builder setTargetValue(Double targetValue) {
             this.targetValue = targetValue;
             return this;
-        }
-
-
-        public Map<Integer, Position> getSlots(Document doc) {
-            TreeMap<Integer, Position> slots = new TreeMap<>();
-            for(Map.Entry<Integer, Integer> me: positions.entrySet()) {
-                slots.put(me.getKey(), doc.lookupFinalPosition(me.getValue()));
-            }
-            return slots;
         }
     }
 

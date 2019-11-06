@@ -21,10 +21,7 @@ import network.aika.*;
 import network.aika.Document;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.link.Link;
-import network.aika.neuron.relation.Direction;
-import network.aika.neuron.relation.Relation;
 import network.aika.Writable;
-import network.aika.neuron.relation.RelationEndpoint;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -32,11 +29,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.Synapse.State.NEXT;
-import static network.aika.neuron.relation.Relation.MIN;
 
 /**
  * The {@code Synapse} class connects two neurons with each other. When propagating an activation signal, the
@@ -65,7 +59,7 @@ import static network.aika.neuron.relation.Relation.MIN;
  *
  * @author Lukas Molzberger
  */
-public class Synapse implements RelationEndpoint, Writable {
+public class Synapse implements Writable {
 
     public static final int OUTPUT = -1;
 
@@ -92,8 +86,6 @@ public class Synapse implements RelationEndpoint, Writable {
 
     private boolean isRecurrent;
     private boolean identity;
-
-    private NavigableMap<Relation.Key, Relation.Key> relations = new TreeMap<>();
 
     private boolean inactive;
     private boolean inactiveNew;
@@ -144,49 +136,12 @@ public class Synapse implements RelationEndpoint, Writable {
         this.identity = identity;
     }
 
-    public Collection<Relation.Key> getRelations() {
-        return relations.values();
-    }
 
-    @Override
-    public Collection<Relation.Key> getOutputRelations() {
-        return relations.subMap(new Relation.Key(OUTPUT, MIN, Direction.FORWARD), true, new Relation.Key(OUTPUT, Relation.MAX, Direction.FORWARD), false).values();
-    }
-
-    @Override
     public Collection<Activation> getActivations(Activation outputAct) {
         return outputAct.getInputLinks()
                 .filter(l -> l.getSynapse() == this)
                 .map(l -> l.getInput())
                 .collect(Collectors.toList());
-    }
-
-    public Collection<Relation.Key> getRelationById(Integer id) {
-        return relations.subMap(new Relation.Key(id, MIN, Direction.FORWARD), new Relation.Key(id, Relation.MAX, Direction.FORWARD)).values();
-    }
-
-    @Override
-    public Integer getRelationEndpointId() {
-        return id;
-    }
-
-    public void addRelation(RelationEndpoint relEndpoint, Relation rel, Direction dir) {
-        Relation.Key rk = new Relation.Key(relEndpoint.getRelationEndpointId(), rel, dir);
-        relations.put(rk, rk);
-    }
-
-    public void removeRelation(RelationEndpoint relEndpoint, Relation rel, Direction dir) {
-        relations.remove(new Relation.Key(relEndpoint.getRelationEndpointId(), rel, dir));
-    }
-
-
-    public void removeRelation(Integer synId, Relation rel, Direction dir) {
-        relations.remove(new Relation.Key(synId, rel, dir));
-    }
-
-
-    public Relation.Key getRelation(Relation.Key rk) {
-        return relations.get(rk);
     }
 
 
@@ -450,33 +405,6 @@ public class Synapse implements RelationEndpoint, Writable {
     }
 
 
-    public void writeRelations(DataOutput out) throws IOException {
-        ArrayList<Relation.Key> tmp = new ArrayList<>();
-        for(Relation.Key rk: relations.keySet()) {
-            if(rk.getDirection() == Direction.FORWARD) {
-                tmp.add(rk);
-            }
-        }
-
-        for(Relation.Key rk: tmp) {
-            out.writeBoolean(true);
-
-            out.writeInt(rk.getRelatedId());
-            rk.getRelation().write(out);
-        }
-        out.writeBoolean(false);
-    }
-
-
-    public void readRelations(DataInput in, Model m) throws IOException {
-        while (in.readBoolean()) {
-            Integer relId = in.readInt();
-            Relation rel = Relation.read(in, m);
-
-            rel.link(getOutput(), getId(), relId);
-        }
-    }
-
 
     public static Synapse createOrReplace(Document doc, Integer synapseId, Neuron inputNeuron, Neuron outputNeuron, SynapseFactory synapseFactory) {
         outputNeuron.get(doc);
@@ -504,13 +432,6 @@ public class Synapse implements RelationEndpoint, Writable {
         return synapse;
     }
 
-
-    public boolean linksAnyOutput() {
-        // Output Relations are always PositionRelations.
-        Relation.Key rk = relations.higherKey(new Relation.Key(OUTPUT, MIN, Direction.FORWARD));
-
-        return rk != null && rk.getRelatedId() == OUTPUT;
-    }
 
 
     /**

@@ -16,9 +16,6 @@
  */
 package network.aika;
 
-import network.aika.lattice.Node;
-import network.aika.lattice.NodeActivation;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 
 import java.io.DataInput;
@@ -49,13 +46,7 @@ public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> i
     public void reactivate() {}
 
     public static <P extends Provider> AbstractNode read(DataInput in, P p) throws IOException {
-        AbstractNode n;
-        if(in.readBoolean()) {
-            n = p.getModel().readNeuron(in, (Neuron) p);
-        } else {
-            n = Node.readNode(in, p);
-        }
-        return n;
+        return p.getModel().readNeuron(in, (Neuron) p);
     }
 
 }

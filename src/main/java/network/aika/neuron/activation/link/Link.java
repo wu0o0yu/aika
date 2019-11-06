@@ -18,7 +18,7 @@ package network.aika.neuron.activation.link;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.training.TSynapse;
+import network.aika.neuron.TSynapse;
 
 import java.util.Comparator;
 

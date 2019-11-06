@@ -1,15 +1,15 @@
 package network.aika.training.metaneurons;
 
 import network.aika.neuron.Neuron;
-import network.aika.training.Config;
+import network.aika.Config;
 import network.aika.training.MetaModel;
 import network.aika.training.TDocument;
-import network.aika.training.excitatory.ExcitatoryNeuron;
-import network.aika.training.excitatory.ExcitatorySynapse;
-import network.aika.training.input.InputNeuron;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.input.InputNeuron;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
-import network.aika.training.meta.MetaNeuron;
+import network.aika.neuron.meta.MetaNeuron;
 import network.aika.training.relation.WeightedRelation;
 import org.junit.Test;
 

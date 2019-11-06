@@ -1,24 +1,23 @@
 package network.aika.training.longtermlearning;
 
+import network.aika.Config;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
-import network.aika.training.*;
-import network.aika.training.excitatory.ExcitatoryNeuron;
-import network.aika.training.excitatory.ExcitatorySynapse;
-import network.aika.training.inhibitory.InhibitoryNeuron;
-import network.aika.training.inhibitory.InhibitorySynapse;
-import network.aika.training.input.InputNeuron;
+import network.aika.neuron.TNeuron;
+import network.aika.neuron.TSynapse;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.neuron.input.InputNeuron;
 import network.aika.neuron.relation.PositionRelation;
 import network.aika.neuron.relation.Relation;
 import org.junit.Test;
 
-import static network.aika.neuron.INeuron.Type.INPUT;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.Activation.END;
 import static network.aika.neuron.relation.Relation.END_TO_BEGIN_EQUALS;
 import static network.aika.neuron.relation.Relation.EQUALS;
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
 
 public class LongTermLearningExperiment {
 

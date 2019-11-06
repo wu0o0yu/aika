@@ -3,10 +3,10 @@ package network.aika.training.syllables;
 
 import network.aika.Document;
 import network.aika.neuron.Neuron;
-import network.aika.training.Config;
+import network.aika.Config;
 import network.aika.training.MetaModel;
 import network.aika.training.TDocument;
-import network.aika.training.input.InputNeuron;
+import network.aika.neuron.input.InputNeuron;
 import network.aika.training.utils.Parser;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,8 +14,6 @@ import org.junit.Test;
 import java.io.*;
 import java.util.Map;
 import java.util.TreeMap;
-
-import static network.aika.neuron.INeuron.Type.INPUT;
 
 
 /**

@@ -17,13 +17,16 @@
 package network.aika;
 
 
-import network.aika.lattice.Node;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.INeuron.Type;
 import network.aika.neuron.Neuron;
 import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.search.SearchNode;
+import network.aika.neuron.TNeuron;
+import network.aika.neuron.TSynapse;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.MetaInhibSynapse;
+import network.aika.neuron.meta.MetaNeuron;
+import network.aika.neuron.meta.MetaSynapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -32,6 +35,7 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
 
 
 /**
@@ -45,6 +49,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Lukas Molzberger
  */
 public class Model {
+
+    public int charCounter = 0;
+
 
     public int numberOfThreads = 1;
 
@@ -94,30 +101,6 @@ public class Model {
     }
 
 
-    public Neuron createNeuron(Type type) {
-        return createNeuron(null, type);
-    }
-
-
-    public Neuron createNeuron(String label, Type type) {
-        return createNeuron(label, type, type.getDefaultActivationFunction(), null);
-    }
-
-
-    public Neuron createNeuron(String label, Type type, ActivationFunction actF) {
-        return new INeuron(this, label, null, type, actF).getProvider();
-    }
-
-    public Neuron createNeuron(String label, Type type, String outputText) {
-        return new INeuron(this, label, outputText, type, type.getDefaultActivationFunction()).getProvider();
-    }
-
-
-    public Neuron createNeuron(String label, Type type, ActivationFunction actF, String outputText) {
-        return new INeuron(this, label, outputText, type, actF).getProvider();
-    }
-
-
     public INeuron readNeuron(DataInput in, Neuron p) throws IOException {
         INeuron n = new INeuron(p);
         n.readFields(in, this);
@@ -160,22 +143,6 @@ public class Model {
 
         return tmp;
     }
-
-
-    public <P extends Provider<? extends Node>> P lookupNodeProvider(int id) {
-        synchronized (providers) {
-            WeakReference<Provider<? extends AbstractNode>> wr = providers.get(id);
-            if(wr != null) {
-                P p = (P) wr.get();
-                if (p != null) {
-                    return p;
-                }
-            }
-
-            return (P) new Provider(this, id);
-        }
-    }
-
 
 
     public Neuron lookupNeuron(int id) {
@@ -266,6 +233,89 @@ public class Model {
 
         public StaleDocumentException() {
             super("Two documents are using the same thread. Call clearActivations() first, before processing the next document.");
+        }
+    }
+
+
+
+    public MetaNeuron createMetaNeuron(String label) {
+        MetaNeuron metaNeuron = new MetaNeuron(this, "M-" + label);
+        InhibitoryNeuron inhibNeuron = new InhibitoryNeuron(this, "I-" + label);
+        metaNeuron.setInhibitoryNeuron(inhibNeuron);
+
+        return metaNeuron;
+    }
+
+
+    public void initMetaNeuron(MetaNeuron metaNeuron, double bias, double trainingBias, Synapse.Builder... inputs) {
+        InhibitoryNeuron inhibNeuron = metaNeuron.getInhibitoryNeuron();
+
+        List<Synapse.Builder> inputsList = new ArrayList<>(Arrays.asList(inputs));
+
+        inputsList.forEach(b -> b.registerSynapseIds(metaNeuron.getProvider()));
+
+        Integer inhibSynId = metaNeuron.getNewSynapseId();
+        inputsList.add(
+                new MetaSynapse.Builder()
+                        .setIsMetaVariable(false)
+                        .setSynapseId(inhibSynId)
+                        .setNeuron(inhibNeuron.getProvider())
+                        .setWeight(-100.0)
+                        .setRecurrent(true)
+        );
+
+
+        metaNeuron.trainingBias = trainingBias;
+
+        Neuron.init(metaNeuron.getProvider(), bias + trainingBias, inputsList);
+
+        inhibSynId = inhibNeuron.getNewSynapseId();
+        Neuron.init(inhibNeuron.getProvider(),
+                new MetaInhibSynapse.Builder()
+                        .setSynapseId(inhibSynId)
+                        .setNeuron(metaNeuron.getProvider())
+                        .setIdentity(true)
+                        .setWeight(1.0)
+        );
+    }
+
+
+    public void dumpStat() {
+        for(Neuron n: getActiveNeurons()) {
+            if(n.getType() == INeuron.Type.INPUT) {
+                TNeuron tn = (TNeuron) n.get();
+                System.out.println(tn.getLabel() + "  Freq:(" + tn.freqToString() + ")  P(" + tn.propToString() + ")  Rel:" + tn.getReliability());
+            }
+        }
+
+        for(Neuron n: getActiveNeurons()) {
+            if(n.getType() == INeuron.Type.EXCITATORY && "DERIVED-FROM-(d)".equalsIgnoreCase(n.getLabel())) {
+                TNeuron tn = (TNeuron) n.get();
+                System.out.println("OUT:  " + tn.getLabel() + "  Freq:(" + tn.freqToString() + ")  P(" + tn.propToString() + ")");
+
+                for(Synapse s: n.getActiveInputSynapses()) {
+                    TSynapse ts = (TSynapse) s;
+
+                    System.out.println("IN:  " + ts.getInput().getLabel());
+                    System.out.println("     Freq:(" + ts.freqToString() + ")");
+                    System.out.println("     PXi(" + ts.pXiToString() + ")");
+                    System.out.println("     PXout(" + ts.pXoutToString() + ")");
+                    System.out.println("     P(" + ts.propToString() + ")");
+                    System.out.println("     Rel:" + ts.getReliability());
+                }
+            }
+        }
+        System.out.println();
+    }
+
+
+    public void dumpModel() {
+        System.out.println();
+        System.out.println("Dump Model:");
+        for(Neuron n: getActiveNeurons()) {
+            TNeuron tn = (TNeuron) n.get();
+            System.out.println(tn.toStringWithSynapses());
+            System.out.println();
         }
     }
 }

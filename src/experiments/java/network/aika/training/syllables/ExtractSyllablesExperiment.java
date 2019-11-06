@@ -3,12 +3,12 @@ package network.aika.training.syllables;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.search.SearchNode;
-import network.aika.training.Config;
+import network.aika.Config;
 import network.aika.training.MetaModel;
 import network.aika.training.TDocument;
-import network.aika.training.excitatory.ExcitatoryNeuron;
-import network.aika.training.meta.MetaNeuron;
-import network.aika.training.meta.MetaSynapse;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.meta.MetaNeuron;
+import network.aika.neuron.meta.MetaSynapse;
 import network.aika.training.utils.Parser;
 import org.junit.Before;
 import org.junit.Test;

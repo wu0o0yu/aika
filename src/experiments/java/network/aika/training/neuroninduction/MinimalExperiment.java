@@ -2,18 +2,16 @@ package network.aika.training.neuroninduction;
 
 import network.aika.Document;
 import network.aika.neuron.Neuron;
-import network.aika.training.Config;
+import network.aika.Config;
 import network.aika.training.MetaModel;
 import network.aika.training.TDocument;
-import network.aika.training.excitatory.ExcitatoryNeuron;
-import network.aika.training.input.InputNeuron;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.input.InputNeuron;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
 import java.util.TreeMap;
-
-import static network.aika.neuron.INeuron.Type.INPUT;
 
 public class MinimalExperiment {
 

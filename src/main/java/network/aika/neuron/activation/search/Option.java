@@ -21,17 +21,13 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.State;
-import network.aika.training.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static network.aika.Document.MAX_ROUND;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.activation.link.Link.INPUT_COMP;
 import static network.aika.neuron.activation.link.Link.OUTPUT_COMP;
 import static network.aika.neuron.activation.search.Decision.UNKNOWN;

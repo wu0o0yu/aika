@@ -2,7 +2,7 @@ package network.aika.training.utils;
 
 import network.aika.neuron.Neuron;
 import network.aika.training.MetaModel;
-import network.aika.training.input.InputNeuron;
+import network.aika.neuron.input.InputNeuron;
 
 import java.util.Map;
 import java.util.TreeMap;

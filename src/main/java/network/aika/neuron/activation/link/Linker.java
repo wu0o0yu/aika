@@ -20,12 +20,12 @@ import network.aika.Document;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.relation.Relation;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.relation.RelationEndpoint;
+import network.aika.neuron.meta.MetaSynapse;
 
 import java.util.*;
 
+import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.link.Direction.INPUT;
@@ -48,6 +48,17 @@ public class Linker {
 
 
     public Activation computeInputActivation(Synapse s, Activation iAct) {
+        if(iAct.getType() == INHIBITORY && s instanceof MetaSynapse) {
+            MetaSynapse ms = (MetaSynapse) s;
+            if(ms.isMetaVariable) {
+                Activation act = iAct.getInputLinks()
+                        .map(l -> l.getInput())
+                        .findAny()
+                        .orElse(null);
+
+                return act != null ? computeInputActivation(s, act) : null;
+            }
+        }
         return iAct;
     }
 
@@ -95,6 +106,7 @@ public class Linker {
             linkRelated(l.getInput(), l.getOutput(), l.getSynapse());
         }
     }
+
 
 
     private void linkRelated(Activation rAct, Activation oAct, RelationEndpoint re) {

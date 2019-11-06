@@ -22,8 +22,6 @@ import java.util.ArrayDeque;
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 import network.aika.neuron.activation.search.SearchNode;
 
-import static network.aika.neuron.INeuron.Type.EXCITATORY;
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.activation.search.Decision.UNKNOWN;
 
 
