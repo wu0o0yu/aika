@@ -1,7 +1,6 @@
 package network.aika.neuron;
 
 
-import network.aika.ActivationFunction;
 import network.aika.Config;
 import network.aika.Model;
 import network.aika.Utils;
@@ -47,8 +46,21 @@ public abstract class TNeuron<A extends Activation> extends INeuron<A> {
 
     public double trainingBias = 0.0;
 
-    public boolean isOutputMetaNeuron;
 
+    protected TNeuron() {
+        super();
+    }
+
+
+    public TNeuron(Neuron p) {
+        super(p);
+    }
+
+
+    public TNeuron(Model model, String label) {
+        super(model, label);
+        this.lastCount = model.charCounter;
+    }
 
     public void initCountValues() {
         countValue = 0.0;
@@ -72,7 +84,7 @@ public abstract class TNeuron<A extends Activation> extends INeuron<A> {
 
 
     public void count(Option o) {
-        countValue += o.getState().value * o.getP();
+        countValue += o.getState().value * o.getAct().getP();
 
         countSynapses(o, INPUT);
         countSynapses(o, OUTPUT);
@@ -189,16 +201,6 @@ public abstract class TNeuron<A extends Activation> extends INeuron<A> {
     }
 
 
-    public boolean isOutputMetaNeuron() {
-        return isOutputMetaNeuron;
-    }
-
-
-    public void setOutputMetaNeuron(boolean outputMetaNeuron) {
-        isOutputMetaNeuron = outputMetaNeuron;
-    }
-
-
     public void prepareTrainingStep(Config c, Option o, Function<Activation, ExcitatoryNeuron> callback) {
         prepareMetaTraining(c, o, callback);
         count(o);
@@ -216,7 +218,7 @@ public abstract class TNeuron<A extends Activation> extends INeuron<A> {
 
     // Implemented only for meta and target neurons
     public void prepareMetaTraining(Config c, Option o, Function<Activation, ExcitatoryNeuron> callback) {
-        if (o.getP() > c.getMetaThreshold() && getTrainingNetValue(o) > 0.0) {
+        if (o.getAct().getP(o) > c.getMetaThreshold() && getTrainingNetValue(o) > 0.0) {
             o.targetNeuron = getTargetNeuron(o.getAct(), callback);
         }
     }
@@ -284,11 +286,6 @@ public abstract class TNeuron<A extends Activation> extends INeuron<A> {
     }
 
 
-    public TNeuron(Model model, String label) {
-        super(model, label);
-        this.lastCount = model.charCounter;
-    }
-
 
     // TODO: store and retrieve targetSynapseIds
     @Override
@@ -309,5 +306,7 @@ public abstract class TNeuron<A extends Activation> extends INeuron<A> {
 
         trainingBias = in.readDouble();
     }
+
+    public abstract void dumpStat();
 
 }

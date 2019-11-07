@@ -126,7 +126,7 @@ public class Linker {
     public void link(Synapse s, Activation iAct, Activation oAct) {
         iAct = computeInputActivation(s, iAct);
 
-        if(iAct == null || iAct.blocked || !checkRelations(s, iAct, oAct)) {
+        if(iAct == null || !checkRelations(s, iAct, oAct)) {
             return;
         }
 

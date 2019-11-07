@@ -1,24 +1,62 @@
 package network.aika.neuron.input;
 
 import network.aika.ActivationFunction;
+import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.INeuron;
 import network.aika.Config;
+import network.aika.neuron.INeuron;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.InputActivation;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static network.aika.neuron.activation.Activation.BEGIN;
-import static network.aika.neuron.activation.Activation.END;
 
 public class InputNeuron extends TNeuron {
 
-    private List<Integer> outputSlots = Arrays.asList(BEGIN, END);
+
+    private InputNeuron() {
+        super();
+    }
+
+
+    public InputNeuron(Neuron p) {
+        super(p);
+    }
 
 
     public InputNeuron(Model model, String label) {
-        super(model, label, null, INeuron.Type.INPUT, ActivationFunction.NULL_FUNCTION);
+        super(model, label);
+    }
+
+
+    public boolean isWeak(Synapse s, Synapse.State state) {
+        return false;
+    }
+
+
+    public String getType() {
+        return "IN";
+    }
+
+    @Override
+    public ActivationFunction getActivationFunction() {
+        return ActivationFunction.NULL_FUNCTION;
+    }
+
+    @Override
+    protected Activation createActivation(Document doc) {
+        return new InputActivation(doc, this);
+    }
+
+    @Override
+    public double getTotalBias(Synapse.State state) {
+        return 0;
+    }
+
+    @Override
+    public void dumpStat() {
+        System.out.println(getLabel() + "  Freq:(" + freqToString() + ")  P(" + propToString() + ")  Rel:" + getReliability());
     }
 
 
@@ -27,17 +65,12 @@ public class InputNeuron extends TNeuron {
     }
 
 
-    public void setOutputSlots(Integer... slots) {
-        outputSlots = Arrays.asList(slots);
-    }
-
-
-    public List<Integer> getOutputSlots() {
-        return outputSlots;
-    }
-
-
     public String typeToString() {
         return "INPUT";
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return 0;
     }
 }

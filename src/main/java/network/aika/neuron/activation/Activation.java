@@ -54,7 +54,7 @@ import static network.aika.neuron.activation.State.ZERO;
  *
  * @author Lukas Molzberger
  */
-public class Activation implements Comparable<Activation> {
+public abstract class Activation implements Comparable<Activation> {
 
     public static int BEGIN = 0;
     public static int END = 1;
@@ -63,15 +63,15 @@ public class Activation implements Comparable<Activation> {
     public static int MAX_SELF_REFERENCING_DEPTH = 5;
     public static boolean DEBUG_OUTPUT = false;
 
-    public static final Activation MIN_ACTIVATION = new Activation(Integer.MIN_VALUE);
-    public static final Activation MAX_ACTIVATION = new Activation(Integer.MAX_VALUE);
+    public static final Activation MIN_ACTIVATION = new ExcitatoryActivation(Integer.MIN_VALUE);
+    public static final Activation MAX_ACTIVATION = new ExcitatoryActivation(Integer.MAX_VALUE);
 
     private int id;
-    private INeuron neuron;
+    private INeuron<?> neuron;
     private Document doc;
 
-    private TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
-    private TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
+    protected TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
+    protected TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
 
     private double upperBound;
     private double lowerBound;
@@ -88,8 +88,6 @@ public class Activation implements Comparable<Activation> {
 
     private Integer sequence;
     private Integer candidateId;
-
-    public boolean blocked;
 
     /**
      * The cached decision is used to avoid having to explore the same currentSearchState twice even though nothing that
@@ -109,38 +107,7 @@ public class Activation implements Comparable<Activation> {
     public int[] debugDecisionCounts = new int[3];
 
 
-    public static Comparator<Activation> CANDIDATE_COMP = (act1, act2) -> {
-        Iterator<Map.Entry<Integer, Position>> ita = act1.getSlots().entrySet().iterator();
-        Iterator<Map.Entry<Integer, Position>> itb = act2.getSlots().entrySet().iterator();
-
-        Map.Entry<Integer, Position> mea;
-        Map.Entry<Integer, Position> meb;
-        while (ita.hasNext() || itb.hasNext()) {
-            mea = ita.hasNext() ? ita.next() : null;
-            meb = itb.hasNext() ? itb.next() : null;
-
-            if (mea == null && meb == null) {
-                break;
-            } else if (mea == null && meb != null) {
-                return -1;
-            } else if (mea != null && meb == null) {
-                return 1;
-            }
-
-            int r = Integer.compare(mea.getKey(), meb.getKey());
-            if (r != 0) return r;
-            r = Position.compare(act1.getSlot(mea.getKey()), act2.getSlot(meb.getKey()));
-            if (r != 0) return r;
-        }
-
-        int r = Integer.compare(act1.getSequence(), act2.getSequence());
-        if (r != 0) return r;
-
-        return Integer.compare(act1.getCandidateId(), act2.getCandidateId());
-    };
-
-
-    private Activation(int id) {
+    public Activation(int id) {
         this.id = id;
     }
 
@@ -153,6 +120,9 @@ public class Activation implements Comparable<Activation> {
         neuron.register(this);
     }
 
+
+
+    public abstract double getP(Option o);
 
 
     public int getId() {
@@ -198,11 +168,12 @@ public class Activation implements Comparable<Activation> {
         markedHasCandidate = v;
 
         for(Link l: outputLinks.values()) {
-            if(l.getOutput().getType() == INHIBITORY) {
-                l.getOutput().markHasCandidate(v);
-            }
+            l.getOutput().markHasCandidateRecursiveStep(v);
         }
     }
+
+
+    protected abstract void markHasCandidateRecursiveStep(long v);
 
 
     public double getUpperBound() {
@@ -353,21 +324,17 @@ public class Activation implements Comparable<Activation> {
             }
         }
 
-        for(Synapse s : n.getPassiveInputSynapses()) {
-            double x = s.getWeight() * s.getInput().getPassiveInputFunction().getActivationValue(s, this);
-
-            net += x;
-            netUB += x;
-        }
-
         return new State(
                 n.getActivationFunction().f(net),
                 n.getActivationFunction().f(netUB),
                 net,
-                net > 0.0 ? (fired != null ? fired : 0) + (getType() == EXCITATORY ? 1 : 0) : null,
+                net > 0.0 ? (fired != null ? fired : 0) + getFiredIncrement() : null,
                 Math.max(0.0, Math.min(-ss.getNegRecSum(), net))
         );
     }
+
+
+    protected abstract int getFiredIncrement();
 
 
     public void processBounds() throws RecursiveDepthExceededException {
@@ -381,7 +348,7 @@ public class Activation implements Comparable<Activation> {
             }
         }
 
-        if (oldUpperBound <= 0.0 && upperBound > 0.0 && !blocked) {
+        if (oldUpperBound <= 0.0 && upperBound > 0.0) {
             getINeuron().propagate(this);
         }
     }
@@ -422,13 +389,6 @@ public class Activation implements Comparable<Activation> {
             }
         }
 
-        for(Synapse s : n.getPassiveInputSynapses()) {
-            double x = s.getWeight() * s.getInput().getPassiveInputFunction().getActivationValue(s, this);
-
-            ub += x;
-            lb += x;
-        }
-
         upperBound = n.getActivationFunction().f(ub);
         lowerBound = n.getActivationFunction().f(lb);
     }
@@ -464,7 +424,7 @@ public class Activation implements Comparable<Activation> {
     public void setInputState(Builder input) {
         rootOption.decision = SELECTED;
         rootOption.setP(1.0);
-        rootOption.setState(new State(input.value, input.value, input.net, input.fired, 0.0));
+        rootOption.setState(new State(input.value, input.value, 0.0, input.fired, 0.0));
         currentOption = rootOption;
         finalOption = rootOption;
 
@@ -473,6 +433,9 @@ public class Activation implements Comparable<Activation> {
         lowerBound = input.value;
         targetValue = input.targetValue;
     }
+
+
+    public abstract Option getInputExcitatoryOption(Option o);
 
 
     private static class InputState {
@@ -486,44 +449,10 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    private State getInputState(Synapse s, Activation act, SearchNode sn) {
-        State is = currentOption.getState();
-
-        if(s.isNegative(CURRENT)) {
-            if(!checkSelfReferencing(act)) {
-                is = new State(is.ub, is.value, 0.0, null, 0.0);
-            } else {
-                is = ZERO;
-            }
-        }
-
-        if(act.getType() == INHIBITORY) {
-            return is;
-        } else {
-            Decision nd = act.getNextDecision(act.currentOption, sn);
-            if (nd == SELECTED) {
-                return new State(is.ub, is.ub, 0.0, 0, 0.0);
-            } else if (nd == EXCLUDED) {
-                return new State(is.value, is.value, 0.0, 0, 0.0);
-            }
-        }
-        return null;
-    }
+    protected abstract State getInputState(Synapse s, Activation act, SearchNode sn);
 
 
-    public boolean needsPropagation(SearchNode sn, boolean lowerBoundChange, boolean upperBoundChange) {
-        if(getType() == INHIBITORY) {
-            return upperBoundChange || lowerBoundChange;
-        } else if(getType() == EXCITATORY) {
-           Decision nd = getNextDecision(currentOption, sn);
-            if(nd == SELECTED) {
-                return upperBoundChange;
-            } else if(nd == EXCLUDED) {
-                return lowerBoundChange;
-            }
-        }
-        return false;
-    }
+    public abstract boolean needsPropagation(SearchNode sn, boolean lowerBoundChange, boolean upperBoundChange);
 
 
     public boolean checkSelfReferencing(Activation act) {
@@ -546,54 +475,13 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public boolean checkSelfReferencingRecursiveStep(Activation act, int depth) {
-        if (this == act) {
-            return true;
-        }
-
-        // The activation at depth 0 might not yet be computed.
-        if(depth > 0 && currentOption.getState().value <= 0.0) {
-            return false;
-        }
-
-        if(depth > MAX_SELF_REFERENCING_DEPTH) {
-            return false;
-        }
-
-        if(getType() == INHIBITORY) {
-            Link strongestLink = getStrongestLink();
-
-            if (strongestLink == null) {
-                return false;
-            }
-
-            return strongestLink.getInput().checkSelfReferencingRecursiveStep(act, depth + 1);
-        } else {
-            for (Link l : inputLinks.values()) {
-                Synapse s = l.getSynapse();
-                if(!s.isWeak(CURRENT) && !s.isNegative(CURRENT) && l.getInput().checkSelfReferencingRecursiveStep(act, depth + 1)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
+    public abstract boolean checkSelfReferencingRecursiveStep(Activation act, int depth);
 
 
-    private Activation getInputExcitatoryActivation() {
-        if(getType() != INHIBITORY) {
-            return this;
-        } else {
-            Link l = getStrongestLink();
-            if(l == null) {
-                return null;
-            }
-            return l.getInput().getInputExcitatoryActivation();
-        }
-    }
+    protected abstract Activation getInputExcitatoryActivation();
 
 
-    private Link getStrongestLink() {
+    protected Link getStrongestLink() {
         if(inputLinks.size() == 1) {
             return inputLinks.firstEntry().getValue();
         }
@@ -691,24 +579,12 @@ public class Activation implements Comparable<Activation> {
 
 
     public void computeOptionProbabilities() {
-        rootOption.traverse((o) -> o.computeRemainingWeight());
 
-        final double[] offset = new double[] {Double.MAX_VALUE};
-        rootOption.traverse(o -> offset[0] = Math.min(offset[0], Math.log(o.cacheFactor) + o.remainingWeight));
-
-        final double[] norm = new double[] {0.0};
-        rootOption.traverse(o -> norm[0] += Math.log(o.cacheFactor) + o.remainingWeight - offset[0]);
-
-        rootOption.traverse(o -> {
-            if (o.getAct().getType() != INPUT && o.decision == SELECTED) {
-                o.setP(norm[0] != 0.0 ? Math.exp(Math.log(o.cacheFactor) + o.remainingWeight - offset[0]) / norm[0] : 1.0);
-            }
-        });
     }
 
 
     public String toString() {
-        return id + " " + getNeuron().getId() + ":" + getINeuron().typeToString() + " " + getLabel() + " " + slotsToString() + " " + identityToString() + " - " +
+        return id + " " + getNeuron().getId() + ":" + getINeuron().typeToString() + " " + getLabel() + " " + identityToString() + " - " +
                 " UB:" + Utils.round(upperBound) +
                 (inputValue != null ? " IV:" + Utils.round(inputValue) : "") +
                 (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +
@@ -736,17 +612,7 @@ public class Activation implements Comparable<Activation> {
 
         sb.append(Utils.addPadding(getINeuron().typeToString(), 10) + " - ");
 
-        sb.append(Utils.addPadding(getType() == EXCITATORY ? "" + (getFinalDecision() != null ? getFinalDecision() : "X") : "", 8) + " - ");
-
-        sb.append(slotsToString());
-
-        sb.append(" \"");
-        if (getINeuron().getOutputText() != null) {
-            sb.append(Utils.collapseText(getINeuron().getOutputText(), 7));
-        } else {
-            sb.append(Utils.collapseText(doc.getText(getSlot(BEGIN), getSlot(END)), 7));
-        }
-        sb.append("\"");
+        sb.append(getDecisionString() + " - ");
 
         sb.append(identityToString());
         sb.append(" - ");
@@ -782,13 +648,16 @@ public class Activation implements Comparable<Activation> {
     }
 
 
+    protected abstract String getDecisionString();
+
+
     public State getExpectedState() {
         double value = 0.0;
         double ub = 0.0;
         double net = 0.0;
 
         for (Option option : getOptions()) {
-            double p = option.getP();
+            double p = option.getAct().getP(option);
             State s = option.getState();
 
             value += p * s.value;
@@ -814,24 +683,6 @@ public class Activation implements Comparable<Activation> {
         return Integer.compare(id, act.id);
     }
 
-
-    public String slotsToString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("(");
-        boolean first = true;
-        for(Map.Entry<Integer, Position> me: slots.entrySet()) {
-            if(!first) {
-                sb.append(", ");
-            }
-            first = false;
-
-            sb.append(me.getKey());
-            sb.append(":");
-            sb.append(me.getValue());
-        }
-        sb.append(")");
-        return sb.toString();
-    }
 
 
     public String identityToString() {
@@ -877,23 +728,11 @@ public class Activation implements Comparable<Activation> {
 
 
     public static class Builder {
-        public SortedMap<Integer, Integer> positions = new TreeMap<>();
         public double value = 1.0;
-        public double net = 0.0;
         public Double targetValue;
         public int fired;
+        public Map<Integer, Activation> inputLinks = new TreeMap<>();
 
-
-        public Builder setRange(int begin, int end) {
-            setPosition(Activation.BEGIN, begin);
-            setPosition(Activation.END, end);
-            return this;
-        }
-
-        public Builder setPosition(int slot, int pos) {
-            positions.put(slot, pos);
-            return this;
-        }
 
         public Builder setValue(double value) {
             this.value = value;
@@ -904,6 +743,16 @@ public class Activation implements Comparable<Activation> {
         public Builder setTargetValue(Double targetValue) {
             this.targetValue = targetValue;
             return this;
+        }
+
+
+        public Map<Integer, Activation> getInputLinks() {
+            return this.inputLinks;
+        }
+
+
+        public void addInputLink(Integer synId, Activation iAct) {
+            inputLinks.put(synId, iAct);
         }
     }
 

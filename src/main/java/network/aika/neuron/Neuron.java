@@ -60,22 +60,6 @@ public class Neuron extends Provider<INeuron<? extends Activation>> {
 
 
 
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc   The current document
-     * @param begin The range begin
-     * @param end   The range end
-     */
-    public Activation addInput(Document doc, int begin, int end) {
-        return addInput(doc,
-                new Activation.Builder()
-                        .setRange(begin, end)
-        );
-    }
-
-
     /**
      * Propagate an input activation into the network.
      *
@@ -158,12 +142,6 @@ public class Neuron extends Provider<INeuron<? extends Activation>> {
     }
 
 
-    public void setOutputText(String outputText) {
-        get().setOutputText(outputText);
-    }
-
-
-
     public Synapse getSynapseById(int synapseId) {
         return inputSynapsesById.get(synapseId);
     }
@@ -183,19 +161,6 @@ public class Neuron extends Provider<INeuron<? extends Activation>> {
     }
 
 
-    public Stream<Activation> getActivations(Document doc, int slot, Position pos, boolean onlyFinal) {
-        INeuron n = getIfNotSuspended();
-        if(n == null) return Stream.empty();
-        return n.getActivations(doc, slot, pos, onlyFinal);
-    }
-
-
-    public Activation getActivation(Document doc, int begin, int end, boolean onlyFinal) {
-        return getActivations(doc, Activation.BEGIN, doc.lookupFinalPosition(begin), onlyFinal)
-                .filter(act -> act.getSlot(Activation.END).getFinalPosition() == end)
-                .findFirst()
-                .orElse(null);
-    }
 
 
     public Synapse selectInputSynapse(Neuron inputNeuron, Predicate<Synapse> filter) {

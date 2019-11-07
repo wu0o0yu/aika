@@ -53,7 +53,7 @@ public class Option implements Comparable<Option> {
     private double weight;
     public double remainingWeight;
     public int cacheFactor = 1;
-    private double p;
+    public double p;
 
     public TreeMap<Link, Option> inputOptions = new TreeMap<>(INPUT_COMP);
     public Map<Link, Option> outputOptions = new TreeMap<>(OUTPUT_COMP); // TODO:
@@ -161,18 +161,6 @@ public class Option implements Comparable<Option> {
     }
 
 
-    public double getP() {
-        if(act.getType() != INeuron.Type.INHIBITORY) {
-            return p;
-        } else {
-            if(inputOptions.isEmpty()) {
-                return 0.0;
-            }
-            return inputOptions.firstEntry().getValue().getP();
-        }
-    }
-
-
     public void computeRemainingWeight() {
         double sum = 0.0;
         for(Option c: children) {
@@ -184,22 +172,8 @@ public class Option implements Comparable<Option> {
 
 
 
-    private Option getInputExcitatoryOption() {
-        if(getAct().getType() != INHIBITORY) {
-            return this;
-        } else {
-            if(inputOptions.isEmpty()) {
-                return null;
-            }
-
-            Option io = inputOptions.firstEntry().getValue();
-
-            return io.getInputExcitatoryOption();
-        }
-    }
-
     public boolean checkSelfReferencing(Option o) {
-        Option o1 = getInputExcitatoryOption();
+        Option o1 = getAct().getInputExcitatoryOption(o);
         if(o1 == null) {
             return false;
         } else if(o == o1) {

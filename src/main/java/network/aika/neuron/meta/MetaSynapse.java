@@ -50,10 +50,6 @@ public class MetaSynapse extends TSynapse {
     }
 
 
-    public Integer getMetaSynapseId() {
-        return getId();
-    }
-
 
     public void updateWeight() {
         double sum = 0.0;
@@ -75,7 +71,7 @@ public class MetaSynapse extends TSynapse {
     }
 
 
-    public void transferTemplateSynapse(Document doc, TNeuron inputNeuron, ExcitatoryNeuron targetNeuron, Link metaLink) {
+    public void transferTemplateSynapse(Document doc, TNeuron<?> inputNeuron, ExcitatoryNeuron targetNeuron, Link metaLink) {
         if(metaLink.getTargetSynapse() != null) {
             return;
         }

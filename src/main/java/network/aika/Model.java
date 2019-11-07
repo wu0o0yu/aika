@@ -23,8 +23,10 @@ import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.TSynapse;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.MetaInhibSynapse;
+import network.aika.neuron.input.InputNeuron;
 import network.aika.neuron.meta.MetaNeuron;
 import network.aika.neuron.meta.MetaSynapse;
 
@@ -102,7 +104,22 @@ public class Model {
 
 
     public INeuron readNeuron(DataInput in, Neuron p) throws IOException {
-        INeuron n = new INeuron(p);
+        INeuron n = null;
+        switch(in.readUTF()) {
+            case "E":
+                n = new ExcitatoryNeuron(p);
+                break;
+            case "I":
+                n = new InhibitoryNeuron(p);
+                break;
+            case "M":
+                n = new MetaNeuron(p);
+                break;
+            case "IN":
+                n = new InputNeuron(p);
+                break;
+        }
+
         n.readFields(in, this);
         return n;
     }
@@ -282,28 +299,8 @@ public class Model {
 
     public void dumpStat() {
         for(Neuron n: getActiveNeurons()) {
-            if(n.getType() == INeuron.Type.INPUT) {
-                TNeuron tn = (TNeuron) n.get();
-                System.out.println(tn.getLabel() + "  Freq:(" + tn.freqToString() + ")  P(" + tn.propToString() + ")  Rel:" + tn.getReliability());
-            }
-        }
-
-        for(Neuron n: getActiveNeurons()) {
-            if(n.getType() == INeuron.Type.EXCITATORY && "DERIVED-FROM-(d)".equalsIgnoreCase(n.getLabel())) {
-                TNeuron tn = (TNeuron) n.get();
-                System.out.println("OUT:  " + tn.getLabel() + "  Freq:(" + tn.freqToString() + ")  P(" + tn.propToString() + ")");
-
-                for(Synapse s: n.getActiveInputSynapses()) {
-                    TSynapse ts = (TSynapse) s;
-
-                    System.out.println("IN:  " + ts.getInput().getLabel());
-                    System.out.println("     Freq:(" + ts.freqToString() + ")");
-                    System.out.println("     PXi(" + ts.pXiToString() + ")");
-                    System.out.println("     PXout(" + ts.pXoutToString() + ")");
-                    System.out.println("     P(" + ts.propToString() + ")");
-                    System.out.println("     Rel:" + ts.getReliability());
-                }
-            }
+            TNeuron tn = (TNeuron) n.get();
+            tn.dumpStat();
         }
         System.out.println();
     }

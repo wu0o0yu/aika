@@ -19,13 +19,13 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.link.Linker;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
@@ -75,6 +75,7 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
     private ThreadState<A>[] threads;
 
 
+
     /**
      * The {@code ThreadState} is a thread local data structure containing the activationsBySlotAndPosition of a single document for
      * a specific logic node.
@@ -83,18 +84,35 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
         public long lastUsed;
         public Document doc;
 
-        private TreeMap<ActKey, A> activationsBySlotAndPosition;
         private TreeMap<Integer, A> activations;
-        public int minLength = Integer.MAX_VALUE;
-        public int maxLength = 0;
-
 
         public ThreadState() {
-            activationsBySlotAndPosition = new TreeMap<>();
             activations = new TreeMap<>();
         }
     }
 
+
+    protected INeuron() {
+    }
+
+
+    public INeuron(Neuron p) {
+        provider = p;
+        threads = new INeuron.ThreadState[p.getModel().numberOfThreads];
+    }
+
+
+    public INeuron(Model m, String label) {
+        this.label = label;
+
+        threads = new ThreadState[m.numberOfThreads];
+
+        provider = new Neuron(m, this);
+
+        setModified();
+    }
+
+    public abstract boolean isWeak(Synapse synapse, Synapse.State state);
 
 
     public Integer getId() {
@@ -115,20 +133,9 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
         return inputSynapses.values();
     }
 
-    public Synapse getMaxInputSynapse(Synapse.State state) {
-        if(type != EXCITATORY) {
-            return null;
-        }
 
-        Synapse maxSyn = null;
-        for(Synapse s: getInputSynapses()) {
-            if(!s.isInactive()) {
-                if(maxSyn == null || maxSyn.getNewWeight() < s.getNewWeight()) {
-                    maxSyn = s;
-                }
-            }
-        }
-        return maxSyn;
+    public Synapse getMaxInputSynapse(Synapse.State state) {
+        return null;
     }
 
 
@@ -155,7 +162,7 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
         if(th == null) {
             return true;
         }
-        return th.activationsBySlotAndPosition.isEmpty();
+        return th.activations.isEmpty();
     }
 
 
@@ -174,15 +181,8 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
         if(th == null) {
             return;
         }
-        th.activationsBySlotAndPosition.clear();
         th.activations.clear();
         th.doc = null;
-    }
-
-
-    public Stream<Activation> getActivations(Document doc, int slot, Position pos, boolean onlyFinal) {
-        return getActivations(doc, slot, pos, true, slot, pos, false)
-                .filter(act -> !onlyFinal || act.isFinalActivation());
     }
 
 
@@ -196,7 +196,6 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
     public void clearActivations(int threadId) {
         ThreadState th = getThreadState(threadId, false);
         if (th == null) return;
-        th.activationsBySlotAndPosition.clear();
         th.activations.clear();
         th.doc = null;
     }
@@ -207,20 +206,6 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
     }
 
 
-    public Stream<Activation> getActivations(Document doc, int fromSlot, Position fromPos, boolean fromInclusive, int toSlot, Position toPos, boolean toInclusive) {
-        ThreadState th = getThreadState(doc.getThreadId(), false);
-        if(th == null) {
-            return Stream.empty();
-        }
-        return th.activationsBySlotAndPosition.subMap(
-                new INeuron.ActKey(fromSlot, fromPos, Integer.MIN_VALUE),
-                fromInclusive,
-                new INeuron.ActKey(toSlot, toPos, Integer.MAX_VALUE),
-                toInclusive
-        ).values()
-                .stream();
-    }
-
 
     public Stream<Activation> getActivations(Document doc, boolean onlyFinal) {
         return onlyFinal ?
@@ -228,25 +213,6 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
                         .filter(act -> act.isFinalActivation()) :
                 getActivations(doc);
     }
-
-
-    public Collection<Activation> getActivations(Document doc, SortedMap<Integer, Position> slots) {
-        Integer firstSlot = slots.firstKey();
-        Position firstPos = slots.get(firstSlot);
-
-        return getActivations(doc, firstSlot, firstPos, true, firstSlot, firstPos, true)
-                .filter( act -> {
-                    for(Map.Entry<Integer, Position> me: slots.entrySet()) {
-                        Position pos = me.getValue();
-                        if(pos.getFinalPosition() != null && pos.compare(act.getSlot(me.getKey())) != 0) {
-                            return false;
-                        }
-                    }
-                    return true;
-                })
-                .collect(Collectors.toList());
-    }
-
 
 
     private ThreadState<A> getThreadState(int threadId, boolean create) {
@@ -262,36 +228,6 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
     }
 
 
-    private INeuron() {
-    }
-
-
-    public INeuron(Neuron p) {
-        provider = p;
-        threads = new INeuron.ThreadState[p.getModel().numberOfThreads];
-    }
-
-
-    public INeuron(Model m, String label) {
-        this.label = label;
-
-        threads = new ThreadState[m.numberOfThreads];
-
-        provider = new Neuron(m, this);
-
-        setModified();
-    }
-
-
-    public void setOutputText(String outputText) {
-        this.outputText = outputText;
-    }
-
-
-    public String getOutputText() {
-        return outputText;
-    }
-
     /**
      * Propagate an input activation into the network.
      *
@@ -299,21 +235,15 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
      * @param input
      */
     public Activation addInput(Document doc, Activation.Builder input) {
-        Activation act = getActivation(doc, input);
+        Activation act = createActivation(doc);
 
-        if (act == null) {
-            act = createActivation(doc, input.getSlots(doc));
-        }
+        // TODO: add input links
 
         act.setInputState(input);
 
         doc.addInputNeuronActivation(act);
         doc.addFinallyActivatedNeuron(act.getINeuron());
 
-        if(getType() != INPUT) {
-            doc.getLinker().linkInput(act);
-            doc.getLinker().process();
-        }
 
         propagate(act);
 
@@ -324,22 +254,6 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
 
 
     protected abstract Activation createActivation(Document doc);
-
-
-    private Activation getActivation(Document doc, Activation.Builder input) {
-        Integer firstSlot = input.positions.firstKey();
-        Position firstPos = doc.lookupFinalPosition(input.positions.get(firstSlot));
-        x: for(Activation a: getActivations(doc, firstSlot, firstPos, true, firstSlot, firstPos, true).collect(Collectors.toList())) {
-            for(Map.Entry<Integer, Integer> me: input.positions.entrySet()) {
-                Position pos = a.getSlot(me.getKey());
-                if(pos == null || me.getValue().compareTo(pos.getFinalPosition()) != 0) {
-                    continue x;
-                }
-            }
-            return a;
-        }
-        return null;
-    }
 
 
 
@@ -372,7 +286,7 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
         clearActivations();
 
         for (Synapse s : inputSynapses.values()) {
-            INeuron in = s.getInput().get();
+            INeuron<?> in = s.getInput().get();
             in.provider.lock.acquireWriteLock();
             in.provider.activeOutputSynapses.remove(s);
             in.provider.lock.releaseWriteLock();
@@ -405,7 +319,13 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
 
     public void propagate(Activation act) {
         Document doc = act.getDocument();
-        outputNode.get(doc).addActivation(act);
+
+        // TODO: Prüfen, ob die Aktivierung schon existiert.
+
+        getOutputSynapses()
+                .forEach(s -> doc.getLinker().link(s, act, createActivation(doc));
+
+        doc.getLinker().process();
     }
 
 
@@ -424,6 +344,8 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
 
     @Override
     public void write(DataOutput out) throws IOException {
+        out.writeUTF(getType());
+
         out.writeBoolean(label != null);
         if(label != null) {
             out.writeUTF(label);
@@ -473,10 +395,6 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
         while (in.readBoolean()) {
             Synapse syn = m.readSynapse(in);
             inputSynapses.put(syn, syn);
-
-            if(in.readBoolean()) {
-                registerPassiveInputSynapse(syn);
-            }
         }
 
         while (in.readBoolean()) {
@@ -576,25 +494,13 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
             throw new Model.StaleDocumentException();
         }
 
-        Integer l = act.length();
-        if(l != null) {
-            th.minLength = Math.min(th.minLength, l);
-            th.maxLength = Math.max(th.maxLength, l);
-        }
-
-        for(Map.Entry<Integer, Position> me: act.getSlots().entrySet()) {
-            ActKey ak = new ActKey(me.getKey(), me.getValue(), act.getId());
-            th.activationsBySlotAndPosition.put(ak, act);
-            th.activations.put(act.getId(), act);
-        }
-
-        for(Map.Entry<Integer, Position> me: act.getSlots().entrySet()) {
-            me.getValue().addActivation(me.getKey(), act);
-        }
+        th.activations.put(act.getId(), act);
 
         doc.addActivation(act);
     }
 
+
+    public abstract String getType();
 
 
     public String toString() {
@@ -613,11 +519,7 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
     public String toStringWithSynapses() {
         SortedSet<Synapse> is = new TreeSet<>(Comparator.comparing(s -> s.getInput().getId()));
 
-        if(type == EXCITATORY) {
-            is.addAll(inputSynapses.values());
-        } else if(type == INHIBITORY) {
-            is.addAll(getProvider().getActiveInputSynapses());
-        }
+        is.addAll(getProvider().getActiveInputSynapses());
 
         StringBuilder sb = new StringBuilder();
         sb.append(toDetailedString());
@@ -696,10 +598,6 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
             updateSum(s.isRecurrent(), s.isNegative(state), sign * (s.getLimit(state) * s.getWeight(state)));
 
             posDirSumDelta += sign * s.computeMaxRelationWeights();
-
-            if(s.getInput().get().isPassiveInputNeuron() && !s.isNegative(state)) {
-                posPassiveSumDelta += sign * (!s.isNegative(state) ? (s.getLimit(state) * s.getWeight(state)) : 0.0);
-            }
         }
 
         private void updateSum(boolean rec, boolean neg, double delta) {

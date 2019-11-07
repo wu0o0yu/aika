@@ -83,10 +83,49 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation> {
     }
 
 
+    public ExcitatoryNeuron() {
+        super();
+    }
+
+
+    public ExcitatoryNeuron(Neuron p) {
+        super(p);
+    }
+
+
+    public ExcitatoryNeuron(Model model, String label) {
+        super(model, label);
+    }
+
+    public String getType() {
+        return "E";
+    }
+
+
+
+    public boolean isWeak(Synapse s, Synapse.State state) {
+        double w = s.getLimit(state) * s.getWeight(state);
+
+        return w < getBias();
+    }
+
+
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
     }
 
+
+    public Synapse getMaxInputSynapse(Synapse.State state) {
+        Synapse maxSyn = null;
+        for(Synapse s: getInputSynapses()) {
+            if(!s.isInactive()) {
+                if(maxSyn == null || maxSyn.getNewWeight() < s.getNewWeight()) {
+                    maxSyn = s;
+                }
+            }
+        }
+        return maxSyn;
+    }
 
 
     public double getTotalBias(Synapse.State state) {
@@ -94,8 +133,20 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation> {
     }
 
 
-    public ExcitatoryNeuron(Model model, String label) {
-        super(model, label);
+    @Override
+    public void dumpStat() {
+        System.out.println("OUT:  " +getLabel() + "  Freq:(" + freqToString() + ")  P(" + propToString() + ")");
+
+        for(Synapse s: getProvider().getActiveInputSynapses()) {
+            TSynapse ts = (TSynapse) s;
+
+            System.out.println("IN:  " + ts.getInput().getLabel());
+            System.out.println("     Freq:(" + ts.freqToString() + ")");
+            System.out.println("     PXi(" + ts.pXiToString() + ")");
+            System.out.println("     PXout(" + ts.pXoutToString() + ")");
+            System.out.println("     P(" + ts.propToString() + ")");
+            System.out.println("     Rel:" + ts.getReliability());
+        }
     }
 
 
@@ -169,7 +220,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation> {
             log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
         }
 
-        Activation targetAct = new Activation(doc, this, new TreeMap<>(iAct.getSlots()));
+        Activation targetAct = new ExcitatoryActivation(doc, this);
         register(targetAct);
 
         Link l = new Link(s, inputOpt.getAct(), targetAct);
@@ -187,7 +238,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation> {
         double value = getActivationFunction().f(net);
 
         targetAct.setUpperBound(value);
-        targetOpt.setP(inputOpt.getP());
+        targetOpt.setP(inputOpt.getAct().getP(inputOpt));
 //        targetOpt.state = targetAct.computeValueAndWeight(0);
         targetOpt.setState(new State(value, value, net, inputOpt.getState().fired + 1, 0.0));
 
@@ -237,7 +288,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation> {
         return inputAct
                 .getOptions()
                 .stream()
-                .max(Comparator.comparingDouble(o -> o.getP()))
+                .max(Comparator.comparingDouble(o -> o.getAct().getP(o)))
                 .orElse(null);
     }
 
@@ -378,7 +429,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation> {
 
                 double IGDelta = u.getActDelta(l, out) * delta;
 
-                double d = config.learnRate * out.getP() * l.getP() * l.getReliability() * IGDelta;
+                double d = config.learnRate * out.getAct().getP(out) * l.getP() * l.getReliability() * IGDelta;
 
                 if (d == 0.0) {
                     continue;
@@ -497,7 +548,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation> {
         }
 
         public double getP() {
-            return o != null ? o.getP() : 1.0;
+            return o != null ? o.getAct().getP(o) : 1.0;
         }
 
         public double getReliability() {

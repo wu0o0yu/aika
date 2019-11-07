@@ -227,10 +227,6 @@ public class Synapse implements Writable {
 
         out.registerSynapseId(id);
 
-        if(in.isPassiveInputNeuron()) {
-            out.registerPassiveInputSynapse(this);
-        }
-
         (dir ? in : out).lock.releaseWriteLock();
         (dir ? out : in).lock.releaseWriteLock();
     }
@@ -325,18 +321,7 @@ public class Synapse implements Writable {
 
 
     public boolean isWeak(State state) {
-        double w = getLimit(state) * getWeight(state);
-
-        INeuron n = output.get();
-        switch(n.getType()) {
-            case EXCITATORY:
-                return w < n.getBias();
-            case INHIBITORY:
-                return w < -n.getBias();
-            case INPUT:
-                return false;
-        }
-        return false;
+        return output.get().isWeak(this, state);
     }
 
 
@@ -484,7 +469,7 @@ public class Synapse implements Writable {
          * @param neuron
          * @return
          */
-        public Builder setNeuron(INeuron neuron) {
+        public Builder setNeuron(INeuron<?> neuron) {
             assert neuron != null;
             this.neuron = neuron.getProvider();
             return this;

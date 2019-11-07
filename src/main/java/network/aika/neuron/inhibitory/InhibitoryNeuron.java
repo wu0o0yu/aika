@@ -3,6 +3,8 @@ package network.aika.neuron.inhibitory;
 import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Model;
+import network.aika.neuron.INeuron;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.InhibitoryActivation;
@@ -19,8 +21,31 @@ import java.util.function.Function;
 public class InhibitoryNeuron extends TNeuron<InhibitoryActivation> {
 
 
+
+    protected InhibitoryNeuron() {
+        super();
+    }
+
+
+    public InhibitoryNeuron(Neuron p) {
+        super(p);
+    }
+
+
     public InhibitoryNeuron(Model model, String label) {
         super(model, label);
+    }
+
+
+    public boolean isWeak(Synapse s, Synapse.State state) {
+        double w = s.getLimit(state) * s.getWeight(state);
+
+        return w < -getBias();
+    }
+
+
+    public String getType() {
+        return "I";
     }
 
 
@@ -108,6 +133,11 @@ public class InhibitoryNeuron extends TNeuron<InhibitoryActivation> {
 
     public boolean isMature(Config c) {
         return true;
+    }
+
+    @Override
+    public void dumpStat() {
+
     }
 
 

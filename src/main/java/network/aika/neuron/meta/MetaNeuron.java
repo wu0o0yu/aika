@@ -31,10 +31,49 @@ public class MetaNeuron extends TNeuron<MetaActivation> {
     public Map<ExcitatoryNeuron, MappingLink> targetNeurons = new TreeMap<>();
 
 
+    private MetaNeuron() {
+        super();
+    }
+
+
+    public MetaNeuron(Neuron p) {
+        super(p);
+    }
+
+
     public MetaNeuron(Model model, String label) {
         super(model, label);
     }
 
+
+
+    public boolean isWeak(Synapse s, Synapse.State state) {
+        double w = s.getLimit(state) * s.getWeight(state);
+
+       return w < getBias();
+    }
+
+
+    public String getType() {
+        return "M";
+    }
+
+
+    @Override
+    public void dumpStat() {
+        System.out.println("OUT:  " +getLabel() + "  Freq:(" + freqToString() + ")  P(" + propToString() + ")");
+
+        for(Synapse s: getProvider().getActiveInputSynapses()) {
+            TSynapse ts = (TSynapse) s;
+
+            System.out.println("IN:  " + ts.getInput().getLabel());
+            System.out.println("     Freq:(" + ts.freqToString() + ")");
+            System.out.println("     PXi(" + ts.pXiToString() + ")");
+            System.out.println("     PXout(" + ts.pXoutToString() + ")");
+            System.out.println("     P(" + ts.propToString() + ")");
+            System.out.println("     Rel:" + ts.getReliability());
+        }
+    }
 
 
     public ActivationFunction getActivationFunction() {
@@ -230,26 +269,6 @@ public class MetaNeuron extends TNeuron<MetaActivation> {
     }
 
 
-    public static class InduceKey implements Comparable<InduceKey> {
-        public int beginSlot;
-        Relation rel;
-        Direction dir;
-
-        public InduceKey(int beginSlot, Relation rel, Direction dir) {
-            this.beginSlot = beginSlot;
-            this.rel = rel;
-            this.dir = dir;
-        }
-
-        @Override
-        public int compareTo(InduceKey ik) {
-            int r = Integer.compare(beginSlot, ik.beginSlot);
-            if(r != 0) return r;
-            return rel.compareTo(ik.rel, dir == ik.dir);
-        }
-    }
-
-
     private MetaSynapse lookupMetaSynapse(ExcitatorySynapse targetSyn, Neuron cand) {
         MetaSynapse.MappingLink ml = targetSyn.getMetaSynapse(cand, getProvider());
 
@@ -354,9 +373,6 @@ public class MetaNeuron extends TNeuron<MetaActivation> {
     public ExcitatoryNeuron getTargetNeuron(Activation metaAct, Function<Activation, ExcitatoryNeuron> callback) {
         ExcitatoryNeuron targetNeuron = createMetaNeuronTarget(metaAct, callback);
 
-        if (isOutputMetaNeuron()) {
-            targetNeuron.setOutputText(metaAct.getText());
-        }
         return targetNeuron;
     }
 
