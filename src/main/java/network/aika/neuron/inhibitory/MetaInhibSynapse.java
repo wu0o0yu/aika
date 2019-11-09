@@ -14,6 +14,16 @@ public class MetaInhibSynapse extends TSynapse {
         super(input, output, id);
     }
 
+    @Override
+    public boolean storeOnInputSide() {
+        return false;
+    }
+
+    @Override
+    public boolean storeOOutputSide() {
+        return true;
+    }
+
 
     public InhibitorySynapse transferMetaSynapse(Document doc, TNeuron inputNeuron) {
         InhibitoryNeuron inhibNeuron = (InhibitoryNeuron) getOutput().get(doc);

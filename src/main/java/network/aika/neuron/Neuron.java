@@ -161,8 +161,6 @@ public class Neuron extends Provider<INeuron<? extends Activation>> {
     }
 
 
-
-
     public Synapse selectInputSynapse(Neuron inputNeuron, Predicate<Synapse> filter) {
         lock.acquireWriteLock();
         Synapse synapse = activeInputSynapses.subMap(

@@ -161,6 +161,11 @@ public class Option implements Comparable<Option> {
     }
 
 
+    public double getP() {
+        return getAct().getP(this);
+    }
+
+
     public void computeRemainingWeight() {
         double sum = 0.0;
         for(Option c: children) {

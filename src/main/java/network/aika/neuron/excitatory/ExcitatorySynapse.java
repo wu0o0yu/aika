@@ -28,8 +28,20 @@ public class ExcitatorySynapse extends TSynapse {
         super(input, output, id);
     }
 
+
     public ExcitatorySynapse(Neuron input, Neuron output, Integer id, int lastCount) {
         super(input, output, id, lastCount);
+    }
+
+
+    @Override
+    public boolean storeOnInputSide() {
+        return true;
+    }
+
+    @Override
+    public boolean storeOOutputSide() {
+        return false; // TODO:
     }
 
 

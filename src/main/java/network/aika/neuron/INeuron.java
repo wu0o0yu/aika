@@ -323,7 +323,7 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
         // TODO: Prüfen, ob die Aktivierung schon existiert.
 
         getOutputSynapses()
-                .forEach(s -> doc.getLinker().link(s, act, createActivation(doc));
+                .forEach(s -> doc.getLinker().link(s, act, createActivation(doc)));
 
         doc.getLinker().process();
     }

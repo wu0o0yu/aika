@@ -50,6 +50,16 @@ public class MetaSynapse extends TSynapse {
     }
 
 
+    @Override
+    public boolean storeOnInputSide() {
+        return true;
+    }
+
+    @Override
+    public boolean storeOOutputSide() {
+        return false; // TODO:
+    }
+
 
     public void updateWeight() {
         double sum = 0.0;

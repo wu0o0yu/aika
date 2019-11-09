@@ -17,8 +17,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.Activation.BEGIN;
-import static network.aika.neuron.activation.Activation.END;
 import static network.aika.neuron.activation.link.Direction.INPUT;
 import static network.aika.neuron.activation.link.Direction.OUTPUT;
 
@@ -84,7 +82,7 @@ public abstract class TNeuron<A extends Activation> extends INeuron<A> {
 
 
     public void count(Option o) {
-        countValue += o.getState().value * o.getAct().getP();
+        countValue += o.getState().value * o.getP();
 
         countSynapses(o, INPUT);
         countSynapses(o, OUTPUT);
@@ -218,7 +216,7 @@ public abstract class TNeuron<A extends Activation> extends INeuron<A> {
 
     // Implemented only for meta and target neurons
     public void prepareMetaTraining(Config c, Option o, Function<Activation, ExcitatoryNeuron> callback) {
-        if (o.getAct().getP(o) > c.getMetaThreshold() && getTrainingNetValue(o) > 0.0) {
+        if (o.getP() > c.getMetaThreshold() && getTrainingNetValue(o) > 0.0) {
             o.targetNeuron = getTargetNeuron(o.getAct(), callback);
         }
     }

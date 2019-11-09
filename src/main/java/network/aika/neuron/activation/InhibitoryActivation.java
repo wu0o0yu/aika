@@ -8,6 +8,8 @@ import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.activation.search.SearchNode;
 
+import java.util.Deque;
+
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.State.ZERO;
 
@@ -26,6 +28,13 @@ public class InhibitoryActivation extends Activation {
         Option io = o.inputOptions.firstEntry().getValue();
 
         return io.getAct().getInputExcitatoryOption(io);
+    }
+
+
+    @Override
+    public boolean addToValueQueue(Deque<Activation> queue, SearchNode sn) {
+        queue.addFirst(this);
+        return true;
     }
 
 

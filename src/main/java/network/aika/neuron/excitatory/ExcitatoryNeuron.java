@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.Synapse.State.NEXT;
-import static network.aika.neuron.activation.Activation.BEGIN;
 import static network.aika.neuron.activation.link.Link.INPUT_COMP;
 
 
@@ -238,7 +237,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation> {
         double value = getActivationFunction().f(net);
 
         targetAct.setUpperBound(value);
-        targetOpt.setP(inputOpt.getAct().getP(inputOpt));
+        targetOpt.setP(inputOpt.getP());
 //        targetOpt.state = targetAct.computeValueAndWeight(0);
         targetOpt.setState(new State(value, value, net, inputOpt.getState().fired + 1, 0.0));
 
@@ -288,7 +287,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation> {
         return inputAct
                 .getOptions()
                 .stream()
-                .max(Comparator.comparingDouble(o -> o.getAct().getP(o)))
+                .max(Comparator.comparingDouble(o -> o.getP()))
                 .orElse(null);
     }
 
@@ -429,7 +428,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation> {
 
                 double IGDelta = u.getActDelta(l, out) * delta;
 
-                double d = config.learnRate * out.getAct().getP(out) * l.getP() * l.getReliability() * IGDelta;
+                double d = config.learnRate * out.getP() * l.getP() * l.getReliability() * IGDelta;
 
                 if (d == 0.0) {
                     continue;
@@ -548,7 +547,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation> {
         }
 
         public double getP() {
-            return o != null ? o.getAct().getP(o) : 1.0;
+            return o != null ? o.getP() : 1.0;
         }
 
         public double getReliability() {

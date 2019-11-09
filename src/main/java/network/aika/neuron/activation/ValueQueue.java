@@ -46,13 +46,7 @@ public class ValueQueue {
     public void add(Activation act, SearchNode sn) {
         if(act == null || act.currentOption.isQueued()) return;
 
-        if(act.getNextDecision(act.currentOption, sn) == UNKNOWN && act.getType() == EXCITATORY) return;
-
-        if(act.getType() == INHIBITORY) {
-            queue.addFirst(act);
-        } else {
-            queue.addLast(act);
-        }
+        if(!act.addToValueQueue(queue, sn)) return;
 
         act.currentOption.setQueued(true);
     }

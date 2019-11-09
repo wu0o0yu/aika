@@ -25,7 +25,6 @@ import network.aika.neuron.meta.MetaSynapse;
 
 import java.util.*;
 
-import static network.aika.neuron.INeuron.Type.INHIBITORY;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.link.Direction.INPUT;

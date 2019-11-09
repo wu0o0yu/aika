@@ -9,10 +9,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static network.aika.neuron.activation.Activation.BEGIN;
-import static network.aika.neuron.activation.Activation.END;
 
-public class TSynapse extends Synapse {
+
+public abstract class TSynapse extends Synapse {
 
     private double binaryFrequencyIPosOPos;
     private double frequencyIPosOPos;

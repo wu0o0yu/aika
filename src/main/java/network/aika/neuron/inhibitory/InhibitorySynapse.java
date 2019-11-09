@@ -12,6 +12,16 @@ public class InhibitorySynapse extends TSynapse {
         super(input, output, id);
     }
 
+    @Override
+    public boolean storeOnInputSide() {
+        return false;
+    }
+
+    @Override
+    public boolean storeOOutputSide() {
+        return true;
+    }
+
 
     public static class Builder extends Synapse.Builder {
         protected SynapseFactory getSynapseFactory() {

@@ -59,7 +59,7 @@ import static network.aika.neuron.Synapse.State.NEXT;
  *
  * @author Lukas Molzberger
  */
-public class Synapse implements Writable {
+public abstract class Synapse implements Writable {
 
     public static final int OUTPUT = -1;
 
@@ -106,6 +106,11 @@ public class Synapse implements Writable {
         this.input = input;
         this.output = output;
     }
+
+
+    public abstract boolean storeOnInputSide();
+
+    public abstract boolean storeOOutputSide();
 
 
     public Neuron getInput() {
@@ -194,8 +199,6 @@ public class Synapse implements Writable {
     }
 
     public void link() {
-        verify();
-
         INeuron in = input.get();
         INeuron out = output.get();
 
@@ -215,12 +218,12 @@ public class Synapse implements Writable {
 
         removeLinkInternal(in, out);
 
-        if(out.getType() == EXCITATORY) {
+        if(storeOnInputSide()) {
             out.inputSynapses.put(this, this);
             out.setModified();
         }
 
-        if(out.getType() == INHIBITORY){
+        if(storeOOutputSide()) {
             in.outputSynapses.put(this, this);
             in.setModified();
         }
@@ -257,20 +260,13 @@ public class Synapse implements Writable {
     }
 
 
-    private void verify() {
-        if((isRecurrent || isNegative(CURRENT)) && output.getType() == INHIBITORY) {
-            throw new InvalidInhibitoryNeuronSynapse();
-        }
-    }
-
-
     private void removeLinkInternal(INeuron in, INeuron out) {
-        if(out.getType() == EXCITATORY) {
+        if(storeOnInputSide()) {
             if(out.inputSynapses.remove(this) != null) {
                 out.setModified();
             }
         }
-        if(out.getType() == INHIBITORY) {
+        if(storeOOutputSide()) {
             if(in.outputSynapses.remove(this) != null) {
                 in.setModified();
             }
@@ -425,7 +421,7 @@ public class Synapse implements Writable {
      *
      * @author Lukas Molzberger
      */
-    public static class Builder implements Neuron.Builder {
+    public static abstract class Builder implements Neuron.Builder {
 
         private boolean recurrent;
         private Neuron neuron;
@@ -523,9 +519,7 @@ public class Synapse implements Writable {
         }
 
 
-        protected SynapseFactory getSynapseFactory() {
-            return (input, output, id) -> new Synapse(input, output, id);
-        }
+        protected abstract SynapseFactory getSynapseFactory();
     }
 
     public interface SynapseFactory {

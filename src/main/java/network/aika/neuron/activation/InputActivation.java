@@ -6,6 +6,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.activation.search.SearchNode;
 
+import java.util.Deque;
+
 public class InputActivation extends Activation {
 
 
@@ -27,6 +29,16 @@ public class InputActivation extends Activation {
     @Override
     protected int getFiredIncrement() {
         return 0;
+    }
+
+    @Override
+    public Option getInputExcitatoryOption(Option o) {
+        return null;
+    }
+
+    @Override
+    public boolean addToValueQueue(Deque<Activation> queue, SearchNode sn) {
+        return false;
     }
 
     @Override

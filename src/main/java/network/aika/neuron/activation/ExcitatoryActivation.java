@@ -9,10 +9,11 @@ import network.aika.neuron.activation.search.Decision;
 import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.activation.search.SearchNode;
 
+import java.util.Deque;
+
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.State.ZERO;
-import static network.aika.neuron.activation.search.Decision.EXCLUDED;
-import static network.aika.neuron.activation.search.Decision.SELECTED;
+import static network.aika.neuron.activation.search.Decision.*;
 
 
 public class ExcitatoryActivation extends Activation {
@@ -73,6 +74,16 @@ public class ExcitatoryActivation extends Activation {
     @Override
     public Option getInputExcitatoryOption(Option o) {
         return o;
+    }
+
+    @Override
+    public boolean addToValueQueue(Deque<Activation> queue, SearchNode sn) {
+        if(getNextDecision(currentOption, sn) != UNKNOWN) {
+            queue.addLast(this);
+            return true;
+        } else {
+            return false;
+        }
     }
 
 

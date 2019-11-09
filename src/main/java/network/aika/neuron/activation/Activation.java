@@ -56,9 +56,6 @@ import static network.aika.neuron.activation.State.ZERO;
  */
 public abstract class Activation implements Comparable<Activation> {
 
-    public static int BEGIN = 0;
-    public static int END = 1;
-
     public static final Comparator<Activation> ACTIVATION_ID_COMP = Comparator.comparingInt(act -> act.id);
     public static int MAX_SELF_REFERENCING_DEPTH = 5;
     public static boolean DEBUG_OUTPUT = false;
@@ -437,6 +434,8 @@ public abstract class Activation implements Comparable<Activation> {
 
     public abstract Option getInputExcitatoryOption(Option o);
 
+    public abstract boolean addToValueQueue(Deque<Activation> queue, SearchNode sn);
+
 
     private static class InputState {
         public InputState(Link l, State s) {
@@ -657,7 +656,7 @@ public abstract class Activation implements Comparable<Activation> {
         double net = 0.0;
 
         for (Option option : getOptions()) {
-            double p = option.getAct().getP(option);
+            double p = option.getP();
             State s = option.getState();
 
             value += p * s.value;
