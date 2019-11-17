@@ -248,7 +248,7 @@ public class Document implements Comparable<Document> {
 
 
     public void generateCandidates() throws CyclicDependencyException {
-        TreeSet<Activation> tmp = new TreeSet<>(CANDIDATE_COMP);
+        TreeSet<Activation> tmp = new TreeSet<>();
         int i = 0;
 
         for (Activation act : activationsById.values()) {
@@ -294,8 +294,6 @@ public class Document implements Comparable<Document> {
 
 
     public void process(Long timeoutInMilliSeconds) throws TimeoutException, CyclicDependencyException, OscillatingActivationsException {
-        linker.lateLinking();
-
         inputNeuronActivations.forEach(act -> {
             valueQueue.propagateActivationValue(act, null, true, true);
         });

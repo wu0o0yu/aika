@@ -88,9 +88,6 @@ public class MetaSynapse extends TSynapse {
 
         ExcitatorySynapse targetSynapse = targetNeuron.createOrLookupSynapse(doc, this, inputNeuron.getProvider());
 
-        targetSynapse.setRecurrent(isRecurrent());
-        targetSynapse.setIdentity(isIdentity());
-
         new MappingLink(this, targetSynapse).link();
 
         targetSynapse.updateDelta(
@@ -104,9 +101,7 @@ public class MetaSynapse extends TSynapse {
                 " OUT:" + targetNeuron.getLabel() +
                 " M-SynId:" + getId() +
                 " T-SynId:" + targetSynapse.getId() +
-                " W:" + targetSynapse.getNewWeight() +
-                " Rec:" + targetSynapse.isRecurrent() +
-                " Ident:"  + targetSynapse.isIdentity()
+                " W:" + targetSynapse.getNewWeight()
         );
 
         metaLink.setTargetSynapse(targetSynapse);

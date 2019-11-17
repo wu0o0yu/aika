@@ -247,11 +247,4 @@ public abstract class TSynapse extends Synapse {
 
         lastCount = in.readInt();
     }
-
-
-    public static class Builder extends Synapse.Builder {
-        protected SynapseFactory getSynapseFactory() {
-            return (input, output, id) -> new TSynapse(input, output, id);
-        }
-    }
 }

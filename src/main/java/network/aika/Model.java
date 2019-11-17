@@ -278,7 +278,6 @@ public class Model {
                         .setSynapseId(inhibSynId)
                         .setNeuron(inhibNeuron.getProvider())
                         .setWeight(-100.0)
-                        .setRecurrent(true)
         );
 
 
@@ -291,7 +290,6 @@ public class Model {
                 new MetaInhibSynapse.Builder()
                         .setSynapseId(inhibSynId)
                         .setNeuron(metaNeuron.getProvider())
-                        .setIdentity(true)
                         .setWeight(1.0)
         );
     }

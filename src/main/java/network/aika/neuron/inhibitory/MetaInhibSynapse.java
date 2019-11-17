@@ -25,12 +25,9 @@ public class MetaInhibSynapse extends TSynapse {
     }
 
 
-    public InhibitorySynapse transferMetaSynapse(Document doc, TNeuron inputNeuron) {
+    public InhibitorySynapse transferMetaSynapse(Document doc, TNeuron<?> inputNeuron) {
         InhibitoryNeuron inhibNeuron = (InhibitoryNeuron) getOutput().get(doc);
         InhibitorySynapse targetSynapse = create(doc, inputNeuron.getProvider(), inhibNeuron);
-
-        targetSynapse.setRecurrent(isRecurrent());
-        targetSynapse.setIdentity(isIdentity());
 
         targetSynapse.updateDelta(
                 doc,
@@ -43,9 +40,7 @@ public class MetaInhibSynapse extends TSynapse {
                 " OUT:" + inhibNeuron.getLabel() +
                 " M-SynId:" + getId() +
                 " T-SynId:" + targetSynapse.getId() +
-                " W:" + targetSynapse.getNewWeight() +
-                " Rec:" + targetSynapse.isRecurrent() +
-                " Ident:"  + targetSynapse.isIdentity()
+                " W:" + targetSynapse.getNewWeight()
         );
 
         transferMetaRelations(this, targetSynapse);

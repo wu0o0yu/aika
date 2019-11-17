@@ -89,16 +89,6 @@ public class Link {
     }
 
 
-    public boolean isRecurrent() {
-        return synapse.isRecurrent();
-    }
-
-
-    public boolean isIdentity() {
-        return synapse.isIdentity();
-    }
-
-
     public boolean isNegative(Synapse.State s) {
         return synapse.isNegative(s);
     }

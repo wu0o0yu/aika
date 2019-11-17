@@ -84,9 +84,6 @@ public abstract class Synapse implements Writable {
 
     private Integer id;
 
-    private boolean isRecurrent;
-    private boolean identity;
-
     private boolean inactive;
     private boolean inactiveNew;
 
@@ -123,22 +120,6 @@ public abstract class Synapse implements Writable {
 
     public Integer getId() {
         return id;
-    }
-
-    public boolean isRecurrent() {
-        return isRecurrent;
-    }
-
-    public void setRecurrent(boolean recurrent) {
-        isRecurrent = recurrent;
-    }
-
-    public boolean isIdentity() {
-        return identity;
-    }
-
-    public void setIdentity(boolean identity) {
-        this.identity = identity;
     }
 
 
@@ -347,16 +328,13 @@ public abstract class Synapse implements Writable {
 
 
     public String toString() {
-        return "S ID:" + id + " NW:" + Utils.round(getNewWeight()) + " rec:" + isRecurrent + " " + input + "->" + output;
+        return "S ID:" + id + " NW:" + Utils.round(getNewWeight()) + " " + input + "->" + output;
     }
 
 
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeInt(id);
-
-        out.writeBoolean(isRecurrent);
-        out.writeBoolean(identity);
 
         out.writeInt(input.getId());
         out.writeInt(output.getId());
@@ -372,9 +350,6 @@ public abstract class Synapse implements Writable {
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         id = in.readInt();
-
-        isRecurrent = in.readBoolean();
-        identity = in.readBoolean();
 
         input = m.lookupNeuron(in.readInt());
         output = m.lookupNeuron(in.readInt());
@@ -423,28 +398,10 @@ public abstract class Synapse implements Writable {
      */
     public static abstract class Builder implements Neuron.Builder {
 
-        private boolean recurrent;
         private Neuron neuron;
         double weight;
         double limit = 1.0;
-        private boolean identity;
         private Integer synapseId;
-
-
-        /**
-         * The property <code>recurrent</code> specifies if input is a recurrent feedback link. Recurrent
-         * feedback links can be either negative or positive depending on the weight of the synapse. Recurrent feedback links
-         * kind of allow to use future information as inputs of a current neuron. Aika allows this by making assumptions about
-         * the recurrent input neuron. The class <code>SearchNode</code> modifies these assumptions until the best interpretation
-         * for this document is found.
-         *
-         * @param recurrent
-         * @return
-         */
-        public Builder setRecurrent(boolean recurrent) {
-            this.recurrent = recurrent;
-            return this;
-        }
 
 
         /**
@@ -490,12 +447,6 @@ public abstract class Synapse implements Writable {
         }
 
 
-        public Builder setIdentity(boolean identity) {
-            this.identity = identity;
-            return this;
-        }
-
-
         public Builder setSynapseId(int synapseId) {
             assert synapseId >= 0;
             this.synapseId = synapseId;
@@ -511,10 +462,6 @@ public abstract class Synapse implements Writable {
 
         public Synapse getSynapse(Neuron outputNeuron) {
             Synapse s = createOrReplace(null, synapseId, neuron, outputNeuron, getSynapseFactory());
-
-            s.isRecurrent = recurrent;
-            s.identity = identity;
-
             return s;
         }
 
@@ -524,12 +471,5 @@ public abstract class Synapse implements Writable {
 
     public interface SynapseFactory {
         Synapse createSynapse(Neuron input, Neuron output, Integer id);
-    }
-
-    public class InvalidInhibitoryNeuronSynapse extends RuntimeException {
-
-        public InvalidInhibitoryNeuronSynapse() {
-            super("An inhibitory neuron is not allowed to have recurrent or negative input synapses.");
-        }
     }
 }
