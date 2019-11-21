@@ -37,6 +37,12 @@ public class InhibitoryNeuron extends TNeuron<InhibitoryActivation> {
     }
 
 
+    @Override
+    public boolean isRecurrent(boolean isNegativeSynapse) {
+        return isNegativeSynapse;
+    }
+
+
     public boolean isWeak(Synapse s, Synapse.State state) {
         double w = s.getLimit(state) * s.getWeight(state);
 

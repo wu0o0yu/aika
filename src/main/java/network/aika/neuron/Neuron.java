@@ -19,6 +19,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.excitatory.ExcitatorySynapse;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -164,8 +165,8 @@ public class Neuron extends Provider<INeuron<? extends Activation>> {
     public Synapse selectInputSynapse(Neuron inputNeuron, Predicate<Synapse> filter) {
         lock.acquireWriteLock();
         Synapse synapse = activeInputSynapses.subMap(
-                new Synapse(inputNeuron, this, Integer.MIN_VALUE), true,
-                new Synapse(inputNeuron, this, Integer.MAX_VALUE), true
+                new ExcitatorySynapse(inputNeuron, this, Integer.MIN_VALUE), true,
+                new ExcitatorySynapse(inputNeuron, this, Integer.MAX_VALUE), true
         )
                 .keySet()
                 .stream()
@@ -262,6 +263,9 @@ public class Neuron extends Provider<INeuron<? extends Activation>> {
         return result;
     }
 
+    public boolean isRecurrent(boolean isNegativeSynapse) {
+        return get().isRecurrent(isNegativeSynapse);
+    }
 
 
     public interface Builder {

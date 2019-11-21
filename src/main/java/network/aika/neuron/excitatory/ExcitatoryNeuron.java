@@ -96,6 +96,13 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation> {
         super(model, label);
     }
 
+
+    @Override
+    public boolean isRecurrent(boolean isNegativeSynapse) {
+        return false;
+    }
+
+
     public String getType() {
         return "E";
     }

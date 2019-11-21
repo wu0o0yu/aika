@@ -99,6 +99,11 @@ public class Link {
     }
 
 
+    public boolean isRecurrent() {
+        return synapse.isRecurrent();
+    }
+
+
     public void link() {
         input.addLink(INPUT, this);
         output.addLink(OUTPUT, this);

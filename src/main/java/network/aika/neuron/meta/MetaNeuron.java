@@ -46,6 +46,11 @@ public class MetaNeuron extends TNeuron<MetaActivation> {
     }
 
 
+    @Override
+    public boolean isRecurrent(boolean isNegativeSynapse) {
+        return false;
+    }
+
 
     public boolean isWeak(Synapse s, Synapse.State state) {
         double w = s.getLimit(state) * s.getWeight(state);

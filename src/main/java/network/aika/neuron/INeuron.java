@@ -75,7 +75,6 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
     private ThreadState<A>[] threads;
 
 
-
     /**
      * The {@code ThreadState} is a thread local data structure containing the activationsBySlotAndPosition of a single document for
      * a specific logic node.
@@ -111,6 +110,10 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
 
         setModified();
     }
+
+
+    public abstract boolean isRecurrent(boolean isNegativeSynapse);
+
 
     public abstract boolean isWeak(Synapse synapse, Synapse.State state);
 

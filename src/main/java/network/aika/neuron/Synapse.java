@@ -327,6 +327,11 @@ public abstract class Synapse implements Writable {
     }
 
 
+    public boolean isRecurrent() {
+        return input.isRecurrent(isNegative(CURRENT));
+    }
+
+
     public String toString() {
         return "S ID:" + id + " NW:" + Utils.round(getNewWeight()) + " " + input + "->" + output;
     }
