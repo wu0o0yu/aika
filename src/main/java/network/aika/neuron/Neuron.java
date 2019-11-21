@@ -32,7 +32,7 @@ import java.util.stream.Stream;
  *
  * @author Lukas Molzberger
  */
-public class Neuron extends Provider<INeuron<? extends Activation>> {
+public class Neuron extends Provider<INeuron<? extends Activation, ? extends Synapse>> {
 
     public static final Neuron MIN_NEURON = new Neuron(null, Integer.MIN_VALUE);
     public static final Neuron MAX_NEURON = new Neuron(null, Integer.MAX_VALUE);

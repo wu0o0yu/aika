@@ -64,7 +64,7 @@ public abstract class Activation implements Comparable<Activation> {
     public static final Activation MAX_ACTIVATION = new ExcitatoryActivation(Integer.MAX_VALUE);
 
     private int id;
-    private INeuron<?> neuron;
+    private INeuron<?, ?> neuron;
     private Document doc;
 
     protected TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);

@@ -26,7 +26,7 @@ import static network.aika.neuron.Synapse.State.NEXT;
 import static network.aika.neuron.activation.link.Link.INPUT_COMP;
 
 
-public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation> {
+public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation, ExcitatorySynapse> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 

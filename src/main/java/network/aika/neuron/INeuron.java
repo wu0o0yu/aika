@@ -43,7 +43,7 @@ import static network.aika.neuron.Synapse.State.NEXT;
  *
  * @author Lukas Molzberger
  */
-public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron> implements Comparable<INeuron> {
+public abstract class INeuron<A extends Activation, S extends Synapse> extends AbstractNode<Neuron> implements Comparable<INeuron> {
 
     private static final Logger log = LoggerFactory.getLogger(INeuron.class);
 
@@ -65,7 +65,7 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
 
 
     // A synapse is stored only in one direction, depending on the synapse weight.
-    TreeMap<Synapse, Synapse> inputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
+    TreeMap<S, S> inputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
     TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
 
 
@@ -132,12 +132,12 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
     }
 
 
-    public Collection<Synapse> getInputSynapses() {
+    public Collection<S> getInputSynapses() {
         return inputSynapses.values();
     }
 
 
-    public Synapse getMaxInputSynapse(Synapse.State state) {
+    public S getMaxInputSynapse(Synapse.State state) {
         return null;
     }
 
@@ -289,7 +289,7 @@ public abstract class INeuron<A extends Activation> extends AbstractNode<Neuron>
         clearActivations();
 
         for (Synapse s : inputSynapses.values()) {
-            INeuron<?> in = s.getInput().get();
+            INeuron<?, ?> in = s.getInput().get();
             in.provider.lock.acquireWriteLock();
             in.provider.activeOutputSynapses.remove(s);
             in.provider.lock.releaseWriteLock();

@@ -81,7 +81,7 @@ public class MetaSynapse extends TSynapse {
     }
 
 
-    public void transferTemplateSynapse(Document doc, TNeuron<?> inputNeuron, ExcitatoryNeuron targetNeuron, Link metaLink) {
+    public void transferTemplateSynapse(Document doc, TNeuron<?, ?> inputNeuron, ExcitatoryNeuron targetNeuron, Link metaLink) {
         if(metaLink.getTargetSynapse() != null) {
             return;
         }

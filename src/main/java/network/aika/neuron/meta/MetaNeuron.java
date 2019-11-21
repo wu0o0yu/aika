@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.Synapse.State.CURRENT;
 
-public class MetaNeuron extends TNeuron<MetaActivation> {
+public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
 
     public static double COVERED_THRESHOLD = 5.0;
 

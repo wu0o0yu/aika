@@ -25,7 +25,7 @@ public class MetaInhibSynapse extends TSynapse {
     }
 
 
-    public InhibitorySynapse transferMetaSynapse(Document doc, TNeuron<?> inputNeuron) {
+    public InhibitorySynapse transferMetaSynapse(Document doc, TNeuron<?, ?> inputNeuron) {
         InhibitoryNeuron inhibNeuron = (InhibitoryNeuron) getOutput().get(doc);
         InhibitorySynapse targetSynapse = create(doc, inputNeuron.getProvider(), inhibNeuron);
 

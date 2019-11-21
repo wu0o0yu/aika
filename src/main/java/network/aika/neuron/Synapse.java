@@ -427,7 +427,7 @@ public abstract class Synapse implements Writable {
          * @param neuron
          * @return
          */
-        public Builder setNeuron(INeuron<?> neuron) {
+        public Builder setNeuron(INeuron<?, ?> neuron) {
             assert neuron != null;
             this.neuron = neuron.getProvider();
             return this;

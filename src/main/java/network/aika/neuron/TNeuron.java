@@ -25,7 +25,7 @@ import static network.aika.neuron.activation.link.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public abstract class TNeuron<A extends Activation> extends INeuron<A> {
+public abstract class TNeuron<A extends Activation, S extends Synapse> extends INeuron<A, S> {
 
     public static double RELIABILITY_THRESHOLD = 10.0;
 

@@ -18,7 +18,7 @@ import network.aika.neuron.meta.MetaNeuron;
 import java.util.List;
 import java.util.function.Function;
 
-public class InhibitoryNeuron extends TNeuron<InhibitoryActivation> {
+public class InhibitoryNeuron extends TNeuron<InhibitoryActivation, InhibitorySynapse> {
 
 
 

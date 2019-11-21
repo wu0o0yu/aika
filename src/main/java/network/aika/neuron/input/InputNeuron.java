@@ -12,7 +12,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.InputActivation;
 
 
-public class InputNeuron extends TNeuron {
+public class InputNeuron extends TNeuron<InputActivation, Synapse> {
 
 
     private InputNeuron() {
@@ -75,8 +75,4 @@ public class InputNeuron extends TNeuron {
         return "INPUT";
     }
 
-    @Override
-    public int compareTo(Object o) {
-        return 0;
-    }
 }
