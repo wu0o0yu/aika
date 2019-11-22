@@ -53,7 +53,7 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
 
 
     public boolean isWeak(Synapse s, Synapse.State state) {
-        double w = s.getLimit(state) * s.getWeight(state);
+        double w = s.getWeight(state);
 
        return w < getBias();
     }

@@ -77,7 +77,7 @@ public class MetaSynapse extends TSynapse {
             norm += nij;
         }
 
-        update(null, sum / norm, 1.0);
+        update(null, sum / norm);
     }
 
 
@@ -92,8 +92,7 @@ public class MetaSynapse extends TSynapse {
 
         targetSynapse.updateDelta(
                 doc,
-                getWeight(),
-                getLimit()
+                getWeight()
         );
 
         System.out.println("  Transfer Template Synapse: IN:" +

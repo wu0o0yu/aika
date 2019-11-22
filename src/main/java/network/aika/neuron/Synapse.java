@@ -90,10 +90,6 @@ public abstract class Synapse implements Writable {
     private double weight;
     private double weightDelta;
 
-    private double limit = 1.0;
-    private double limitDelta;
-
-
     public Synapse() {
     }
 
@@ -151,32 +147,16 @@ public abstract class Synapse implements Writable {
         return weight;
     }
 
-    public double getLimit() {
-        return limit;
-    }
-
     public double getNewWeight() {
         return weight + weightDelta;
-    }
-
-    public double getNewLimit() {
-        return limit + limitDelta;
     }
 
     public double getWeight(State s) {
         return s == CURRENT ? weight : getNewWeight();
     }
 
-    public double getLimit(State s) {
-        return s == CURRENT ? limit : getNewLimit();
-    }
-
     public double getWeightDelta() {
         return weightDelta;
-    }
-
-    public double getLimitDelta() {
-        return limitDelta;
     }
 
     public void link() {
@@ -254,12 +234,6 @@ public abstract class Synapse implements Writable {
         }
     }
 
-
-    public double getMaxInputValue() {
-        return limit * weight;
-    }
-
-
     public boolean exists() {
         if(input.get().outputSynapses.containsKey(this)) return true;
         if(output.get().inputSynapses.containsKey(this)) return true;
@@ -270,9 +244,6 @@ public abstract class Synapse implements Writable {
     public void commit() {
         weight += weightDelta;
         weightDelta = 0.0;
-
-        limit += limitDelta;
-        limitDelta = 0.0;
 
         inactive = inactiveNew;
     }
@@ -302,9 +273,8 @@ public abstract class Synapse implements Writable {
     }
 
 
-    public void updateDelta(Document doc, double weightDelta, double limitDelta) {
+    public void updateDelta(Document doc, double weightDelta) {
         this.weightDelta += weightDelta;
-        this.limitDelta += limitDelta;
 
         if(doc != null) {
             doc.notifyWeightModified(this);
@@ -312,9 +282,8 @@ public abstract class Synapse implements Writable {
     }
 
 
-    public void update(Document doc, double weight, double limit) {
+    public void update(Document doc, double weight) {
         this.weightDelta = weight - this.weight;
-        this.limitDelta = limit - this.limit;
 
         if(doc != null) {
             doc.notifyWeightModified(this);
@@ -345,7 +314,6 @@ public abstract class Synapse implements Writable {
         out.writeInt(output.getId());
 
         out.writeDouble(weight);
-        out.writeDouble(limit);
 
         out.writeBoolean(inactive);
     }
@@ -360,7 +328,6 @@ public abstract class Synapse implements Writable {
         output = m.lookupNeuron(in.readInt());
 
         weight = in.readDouble();
-        limit = in.readDouble();
 
         inactive = in.readBoolean();
     }

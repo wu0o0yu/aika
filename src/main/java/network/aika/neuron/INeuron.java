@@ -598,7 +598,7 @@ public abstract class INeuron<A extends Activation, S extends Synapse> extends A
         }
 
         private void updateSynapse(Synapse.State state, double sign, Synapse s) {
-            updateSum(s.isRecurrent(), s.isNegative(state), sign * (s.getLimit(state) * s.getWeight(state)));
+            updateSum(s.isRecurrent(), s.isNegative(state), sign * (s.getWeight(state)));
 
             posDirSumDelta += sign * s.computeMaxRelationWeights();
         }

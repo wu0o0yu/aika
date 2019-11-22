@@ -305,16 +305,16 @@ public abstract class Activation implements Comparable<Activation> {
         Integer fired = null;
 
         for (InputState is: getInputStates(sn)) {
-            Synapse s = is.l.getSynapse();
-            Activation iAct = is.l.getInput();
+            Synapse s = is.link.getSynapse();
+            Activation iAct = is.link.getInput();
 
             if (iAct == this) continue;
 
-            double x = Math.min(s.getLimit(), is.s.value) * s.getWeight();
+            double x = is.state.value * s.getWeight();
             net += x;
-            netUB += Math.min(s.getLimit(), is.s.ub) * s.getWeight();
+            netUB += is.state.ub * s.getWeight();
 
-            net += s.computeRelationWeights(is.l);
+            net += s.computeRelationWeights(is.link);
 
             if (!s.isRecurrent() && !s.isNegative(CURRENT)) {
                 fired = Utils.max(fired, iAct.currentOption.getState().fired);
@@ -372,13 +372,13 @@ public abstract class Activation implements Comparable<Activation> {
 
             if (s.isNegative(CURRENT)) {
                 if (!s.isRecurrent()) {
-                    ub += Math.min(s.getLimit(), iAct.lowerBound) * x;
+                    ub += iAct.lowerBound * x;
                 }
 
-                lb += s.getLimit() * x;
+                lb += x;
             } else {
-                ub += Math.min(s.getLimit(), iAct.upperBound) * x;
-                lb += Math.min(s.getLimit(), iAct.lowerBound) * x;
+                ub += iAct.upperBound * x;
+                lb += iAct.lowerBound * x;
 
                 double rlw = s.computeRelationWeights(l);
                 ub += rlw;
@@ -405,7 +405,7 @@ public abstract class Activation implements Comparable<Activation> {
             }
 
             State s = l.getInput().getInputState(l.getSynapse(), this, sn);
-            if (maxInputState == null || maxInputState.s.value < s.value) {
+            if (maxInputState == null || maxInputState.state.value < s.value) {
                 maxInputState = new InputState(l, s);
             }
             lastSynapse = l.getSynapse();
@@ -438,13 +438,13 @@ public abstract class Activation implements Comparable<Activation> {
 
 
     private static class InputState {
-        public InputState(Link l, State s) {
-            this.l = l;
-            this.s = s;
+        public InputState(Link link, State state) {
+            this.link = link;
+            this.state = state;
         }
 
-        Link l;
-        State s;
+        Link link;
+        State state;
     }
 
 

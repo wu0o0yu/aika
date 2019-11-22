@@ -44,9 +44,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitoryActivation, InhibitorySy
 
 
     public boolean isWeak(Synapse s, Synapse.State state) {
-        double w = s.getLimit(state) * s.getWeight(state);
-
-        return w < -getBias();
+        return s.getWeight(state) < -getBias();
     }
 
 
@@ -82,7 +80,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitoryActivation, InhibitorySy
 
             is.link();
 
-            is.update(null, 1.0, 1.0);
+            is.update(null, 1.0);
         }
 
         n.commit(n.getProvider().getActiveInputSynapses());
@@ -100,7 +98,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitoryActivation, InhibitorySy
         MetaInhibSynapse mis = new MetaInhibSynapse(mn.getProvider(), n.getProvider(), misSynId);
         mis.link();
 
-        mis.update(null, 1.0, 1.0);
+        mis.update(null, 1.0);
 
         for(MetaNeuron.MappingLink ml: mn.targetNeurons.values()) {
             ExcitatoryNeuron targetNeuron = ml.targetNeuron;
@@ -110,7 +108,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitoryActivation, InhibitorySy
 
             is.link();
 
-            is.update(null, ml.nij, 1.0);
+            is.update(null, ml.nij);
         }
 
         n.commit(n.getProvider().getActiveInputSynapses());
@@ -131,7 +129,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitoryActivation, InhibitorySy
                 ExcitatoryNeuron targetNeuron = (ExcitatoryNeuron) is.getInput().get();
                 MetaNeuron.MappingLink ml = targetNeuron.metaNeurons.get(mn);
 
-                is.update(null, ml.nij, 1.0);
+                is.update(null, ml.nij);
             }
         }
     }

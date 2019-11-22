@@ -8,7 +8,6 @@ public enum ActivationFunction {
 
     NULL_FUNCTION(x -> 0.0),
     RECTIFIED_HYPERBOLIC_TANGENT(x -> Math.max(0.0, Math.tanh(x))),
-    RECTIFIED_LINEAR_UNIT(x -> Math.max(0.0, x)),
     LIMITED_RECTIFIED_LINEAR_UNIT(x -> Math.max(0.0, Math.min(1.0, x)));
 
     Function f;
