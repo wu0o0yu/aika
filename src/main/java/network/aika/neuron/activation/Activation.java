@@ -304,8 +304,8 @@ public abstract class Activation implements Comparable<Activation> {
             net += s.computeRelationWeights(is.link);
 
             if (!s.isRecurrent() && !s.isNegative(CURRENT)) {
-                firedLatest = Fired.max(firedLatest, is.s.firedLatest);
-                firedEarliest = Fired.max(firedEarliest, is.s.firedEarliest);
+                firedLatest = Fired.max(firedLatest, is.state.firedLatest);
+                firedEarliest = Fired.max(firedEarliest, is.state.firedEarliest);
             }
         }
 
@@ -359,8 +359,8 @@ public abstract class Activation implements Comparable<Activation> {
 
             double x = s.getWeight();
 
-            ub += Math.min(s.getLimit(), !s.isNegative(CURRENT) ? iAct.bounds.ub : iAct.bounds.lb) * x;
-            lb += Math.min(s.getLimit(), !s.isNegative(CURRENT) ? iAct.bounds.lb : iAct.bounds.ub) * x;
+            ub += !s.isNegative(CURRENT) ? iAct.bounds.ub : iAct.bounds.lb * x;
+            lb += !s.isNegative(CURRENT) ? iAct.bounds.lb : iAct.bounds.ub * x;
 
             firedLatest = computeFiredLatest(firedLatest, iAct.bounds.firedLatest);
             firedEarliest = computeFiredEarliest(firedEarliest, iAct.bounds.firedEarliest, s);
@@ -417,7 +417,7 @@ public abstract class Activation implements Comparable<Activation> {
     public void setInputState(Builder input) {
         Fired f = new Fired(input.getSlots(doc).get(Activation.END).getFinalPosition(), input.fired);
 
-        State is = new State(input.value, input.value, input.net, f, f, 0.0);
+        State is = new State(input.value, input.value, 0.0, f, f, 0.0);
 
         rootOption = new Option(null, this, null);
         rootOption.decision = SELECTED;
@@ -560,7 +560,7 @@ public abstract class Activation implements Comparable<Activation> {
 
 
     public String toString() {
-        return id + " " + getNeuron().getId() + ":" + getINeuron().typeToString() + " " + getLabel() + " " + slotsToString() + " " + identityToString() + " - " +
+        return id + " " + getNeuron().getId() + ":" + getINeuron().typeToString() + " " + getLabel() + " " + identityToString() + " - " +
                 " UB:" + Utils.round(bounds.ub) +
                 (inputState != null ? " IV:" + Utils.round(inputState.lb) : "") +
                 (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +

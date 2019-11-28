@@ -83,6 +83,13 @@ public class Document implements Comparable<Document> {
     public long createV;
 
 
+    public static Comparator<Activation> ACTIVATIONS_COMPARATOR = (act1, act2) -> {
+        int r = act1.getBounds().firedLatest.compareTo(act2.getBounds().firedLatest);
+        if (r != 0) return r;
+        return Integer.compare(act1.getId(), act2.getId());
+    };
+
+
     public Document(Model model, String content) {
         this(model, content, 0);
     }
@@ -248,39 +255,21 @@ public class Document implements Comparable<Document> {
 
 
     public void generateCandidates() throws CyclicDependencyException {
-        TreeSet<Activation> tmp = new TreeSet<>();
-        int i = 0;
+        TreeSet<Activation> tmp = new TreeSet<>(ACTIVATIONS_COMPARATOR);
 
-        for (Activation act : activationsById.values()) {
-            if (act.getType() == EXCITATORY && act.getDecision() == UNKNOWN && act.getUpperBound() > 0.0) {
-                act.setCandidateId(i++);
-                tmp.add(act);
-            }
-        }
+        activationsById
+                .values()
+                .stream()
+                .filter(act -> act.getType() == EXCITATORY && act.getDecision() == UNKNOWN && act.getBounds().ub > 0.0)
+                .forEach(act -> {
+                    if(act.getBounds().firedLatest == null) {
+                        throw new OscillatingActivationsException(act.searchStateToString());
+                    }
 
-        long v = visitedCounter++;
-        for(Activation act: inputNeuronActivations) {
-            act.markHasCandidate(v);
-        }
+                    tmp.add(act);
+                });
 
-        while (!tmp.isEmpty()) {
-            int oldSize = tmp.size();
-            for (Activation act : tmp) {
-                if (act.checkDependenciesSatisfied(v)) {
-                    tmp.remove(act);
-                    act.setCandidateId(candidates.size());
-                    candidates.add(act);
-
-                    act.markHasCandidate(v);
-                    break;
-                }
-            }
-
-            if(tmp.size() == oldSize) {
-                log.info(activationsToString());
-                throw new CyclicDependencyException();
-            }
-        }
+        candidates = new ArrayList<>(tmp);
     }
 
 
@@ -323,7 +312,7 @@ public class Document implements Comparable<Document> {
 
     public void storeFinalState() {
         for(Activation act: activationsById.values()) {
-            act.finalOption = act.currentOption;
+            act.finalOption = act.getCurrentOption();
         }
     }
 
@@ -408,7 +397,7 @@ public class Document implements Comparable<Document> {
         sb.append("\n");
 
         for(Activation act: acts) {
-            if(act.getUpperBound() <= 0.0 && (act.getTargetValue() == null || act.getTargetValue() <= 0.0)) {
+            if(act.getBounds().ub <= 0.0 && (act.getTargetValue() == null || act.getTargetValue() <= 0.0)) {
                 continue;
             }
 
@@ -438,7 +427,7 @@ public class Document implements Comparable<Document> {
         Function<Activation, ExcitatoryNeuron> callback = act -> new ExcitatoryNeuron(getModel(), act.getLabel());
 
         for(Activation act: new ArrayList<>(getActivations(false))) {
-            if(act.getUpperBound() > 0.0) {
+            if(act.getBounds().ub > 0.0) {
                 TNeuron n = act.getINeuron();
 
                 for (Option o : act.getOptions()) {
@@ -448,7 +437,7 @@ public class Document implements Comparable<Document> {
         }
 
         for(Activation act: new ArrayList<>(getActivations(false))) {
-            if(act.getUpperBound() > 0.0) {
+            if(act.getBounds().ub > 0.0) {
                 TNeuron n = act.getINeuron();
 
                 n.updateFrequencies(act);

@@ -133,7 +133,7 @@ public class Neuron extends Provider<INeuron<? extends Activation, ? extends Syn
         // s.link requires an updated n.biasSumDelta value.
         synapseBuilders.forEach(input -> {
             Synapse s = input.getSynapse(this);
-            s.update(doc, input.weight, input.limit);
+            s.update(doc, input.weight);
             modifiedSynapses.add(s);
         });
 
