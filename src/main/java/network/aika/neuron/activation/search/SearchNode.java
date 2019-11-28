@@ -145,7 +145,7 @@ public class SearchNode implements Comparable<SearchNode> {
 
 
     public boolean followPath() {
-        return getActivation().currentOption.searchNode == this && decision == getActivation().currentOption.getState().getPreferredDecision();
+        return getActivation().getCurrentOption().searchNode == this && decision == getActivation().getCurrentOption().getState().getPreferredDecision();
     }
 
 

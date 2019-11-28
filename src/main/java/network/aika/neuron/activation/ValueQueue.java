@@ -22,8 +22,6 @@ import java.util.ArrayDeque;
 import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 import network.aika.neuron.activation.search.SearchNode;
 
-import static network.aika.neuron.activation.search.Decision.UNKNOWN;
-
 
 /**
  *
@@ -44,11 +42,11 @@ public class ValueQueue {
 
 
     public void add(Activation act, SearchNode sn) {
-        if(act == null || act.currentOption.isQueued()) return;
+        if(act == null || act.getCurrentOption().isQueued()) return;
 
         if(!act.addToValueQueue(queue, sn)) return;
 
-        act.currentOption.setQueued(true);
+        act.getCurrentOption().setQueued(true);
     }
 
 
@@ -58,7 +56,7 @@ public class ValueQueue {
         double delta = 0.0;
         while (!queue.isEmpty()) {
             Activation act = queue.pollFirst();
-            act.currentOption.setQueued(false);
+            act.getCurrentOption().setQueued(false);
 
             delta += act.process(sn);
         }

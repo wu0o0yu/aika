@@ -32,27 +32,28 @@ public class ExcitatoryActivation extends Activation {
         return o.p;
     }
 
+    @Override
+    protected Fired incrementFired(Fired f) {
+        return new Fired(f.getInputTimestamp(), f.getFired() + 1);
+    }
+
 
     public void computeOptionProbabilities() {
-        rootOption.traverse((o) -> o.computeRemainingWeight());
+        getRootOption().traverse((o) -> o.computeRemainingWeight());
 
         final double[] offset = new double[] {Double.MAX_VALUE};
-        rootOption.traverse(o -> offset[0] = Math.min(offset[0], Math.log(o.cacheFactor) + o.remainingWeight));
+        getRootOption().traverse(o -> offset[0] = Math.min(offset[0], Math.log(o.cacheFactor) + o.remainingWeight));
 
         final double[] norm = new double[] {0.0};
-        rootOption.traverse(o -> norm[0] += Math.log(o.cacheFactor) + o.remainingWeight - offset[0]);
+        getRootOption().traverse(o -> norm[0] += Math.log(o.cacheFactor) + o.remainingWeight - offset[0]);
 
-        rootOption.traverse(o -> {
+        getRootOption().traverse(o -> {
             if (o.decision == SELECTED) {
                 o.setP(norm[0] != 0.0 ? Math.exp(Math.log(o.cacheFactor) + o.remainingWeight - offset[0]) / norm[0] : 1.0);
             }
         });
     }
 
-
-    @Override
-    protected void markHasCandidateRecursiveStep(long v) {
-    }
 
 
     protected Activation getInputExcitatoryActivation() {
@@ -63,11 +64,6 @@ public class ExcitatoryActivation extends Activation {
     @Override
     protected String getDecisionString() {
         return Utils.addPadding("" + (getFinalDecision() != null ? getFinalDecision() : "X"), 8);
-    }
-
-
-    protected int getFiredIncrement() {
-        return 1;
     }
 
 
@@ -92,7 +88,7 @@ public class ExcitatoryActivation extends Activation {
 
         if(s.isNegative(CURRENT)) {
             if(!checkSelfReferencing(act)) {
-                is = new State(is.ub, is.value, 0.0, null, 0.0);
+                is = new State(is.ub, is.lb, 0.0, null, null, 0.0);
             } else {
                 is = ZERO;
             }
@@ -100,9 +96,9 @@ public class ExcitatoryActivation extends Activation {
 
         Decision nd = act.getNextDecision(act.currentOption, sn);
         if (nd == SELECTED) {
-            return new State(is.ub, is.ub, 0.0, 0, 0.0);
+            return new State(is.ub, is.ub, 0.0, is.firedEarliest, is.firedLatest, 0.0);
         } else if (nd == EXCLUDED) {
-            return new State(is.value, is.value, 0.0, 0, 0.0);
+            return new State(is.lb, is.lb, 0.0, is.firedLatest, is.firedLatest, 0.0);
         }
 
         return null;
@@ -127,7 +123,7 @@ public class ExcitatoryActivation extends Activation {
         }
 
         // The activation at depth 0 might not yet be computed.
-        if(depth > 0 && currentOption.getState().value <= 0.0) {
+        if(depth > 0 && currentOption.getState().lb <= 0.0) {
             return false;
         }
 

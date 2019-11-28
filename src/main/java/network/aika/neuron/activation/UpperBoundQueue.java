@@ -37,7 +37,7 @@ public class UpperBoundQueue {
 
 
     public void add(Activation act) {
-        if(!act.ubQueued && act.getInputValue() == null) {
+        if(!act.ubQueued && act.getInputState() == null) {
             act.ubQueued = true;
             queue.addLast(act);
         }

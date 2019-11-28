@@ -46,13 +46,14 @@ public class InhibitoryActivation extends Activation {
     }
 
 
-    protected void markHasCandidateRecursiveStep(long v) {
-        markHasCandidate(v);
+    @Override
+    protected Fired incrementFired(Fired f) {
+        return f;
     }
 
 
-    protected int getFiredIncrement() {
-        return 0;
+    protected Fired computeFiredEarliest(Fired firedEarliest, Fired inputFiredEarliest, Synapse s) {
+        return Fired.min(firedEarliest, inputFiredEarliest);
     }
 
 
@@ -61,7 +62,7 @@ public class InhibitoryActivation extends Activation {
 
         if(s.isNegative(CURRENT)) {
             if(!checkSelfReferencing(act)) {
-                is = new State(is.ub, is.value, 0.0, null, 0.0);
+                is = new State(is.ub, is.lb, 0.0, null, null, 0.0);
             } else {
                 is = ZERO;
             }
@@ -97,7 +98,7 @@ public class InhibitoryActivation extends Activation {
         }
 
         // The activation at depth 0 might not yet be computed.
-        if(depth > 0 && currentOption.getState().value <= 0.0) {
+        if(depth > 0 && currentOption.getState().lb <= 0.0) {
             return false;
         }
 

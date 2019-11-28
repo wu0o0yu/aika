@@ -32,23 +32,25 @@ import static network.aika.neuron.activation.search.Decision.SELECTED;
  * @author Lukas Molzberger
  */
 public class State {
-    public final double value;
+    public final double lb;
     public final double ub;
 
-    public final double net;
+    public final Fired firedLatest;
+    public final Fired firedEarliest;
 
-    public final Integer fired;
+    public final double net;
     public final double weight;
 
-    public static final State ZERO = new State(0.0, 0.0, 0.0, null, 0.0);
+    public static final State ZERO = new State(0.0, 0.0, 0.0, null, null, 0.0);
 
 
-    public State(double value, double ub, double net, Integer fired, double weight) {
-        assert !Double.isNaN(value);
-        this.value = value;
+    public State(double lb, double ub, double net, Fired firedLatest, Fired firedEarliest, double weight) {
+        assert !Double.isNaN(lb);
+        this.lb = lb;
         this.ub = ub;
         this.net = net;
-        this.fired = fired;
+        this.firedLatest = firedLatest;
+        this.firedEarliest = firedEarliest;
         this.weight = weight;
     }
 
@@ -59,7 +61,7 @@ public class State {
 
 
     public boolean lowerBoundEquals(State s) {
-        return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE;
+        return Math.abs(lb - s.lb) <= INeuron.WEIGHT_TOLERANCE;
     }
 
     public boolean upperBoundEquals(State s) {
@@ -73,11 +75,11 @@ public class State {
 
 
     public Decision getPreferredDecision() {
-        return value > 0.0 ? SELECTED : EXCLUDED;
+        return lb > 0.0 ? SELECTED : EXCLUDED;
     }
 
 
     public String toString() {
-        return "V:" + Utils.round(value) + " UB:" + (ub == Double.MAX_VALUE ? "MAX" : Utils.round(ub)) + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
+        return "V:" + Utils.round(lb) + " UB:" + (ub == Double.MAX_VALUE ? "MAX" : Utils.round(ub)) + " Net:" + Utils.round(net) + " W:" + Utils.round(weight);
     }
 }

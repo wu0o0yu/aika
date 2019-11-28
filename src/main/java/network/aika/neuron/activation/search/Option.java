@@ -17,7 +17,6 @@
 package network.aika.neuron.activation.search;
 
 import network.aika.Utils;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.State;
@@ -38,9 +37,7 @@ import static network.aika.neuron.activation.search.Decision.UNKNOWN;
  */
 public class Option implements Comparable<Option> {
 
-    public static final State INITIAL_STATE = new State(0.0, Double.MAX_VALUE, 0.0, null, 0.0);
-
-    private State state = INITIAL_STATE;
+    private State state;
 
     public Activation act;
     public SearchNode searchNode;
@@ -80,7 +77,7 @@ public class Option implements Comparable<Option> {
 
 
     public boolean setState(State s) {
-        if(state.equalsWithWeights(s)) {
+        if(state != null && state.equalsWithWeights(s)) {
             return false;
         }
 
@@ -121,15 +118,15 @@ public class Option implements Comparable<Option> {
 
 
     public boolean isActive() {
-        return state.value > 0.0;
+        return state.lb > 0.0;
     }
 
 
     public void link() {
         for(Link l: act.getInputLinks().collect(Collectors.toList())) {
             Activation iAct = l.getInput();
-            if(iAct.currentOption != null && iAct.currentOption.decision != UNKNOWN && iAct.currentOption.isActive()) {
-                link(l, iAct.currentOption);
+            if(iAct.getCurrentOption() != null && iAct.getCurrentOption().decision != UNKNOWN && iAct.getCurrentOption().isActive()) {
+                link(l, iAct.getCurrentOption());
             }
         }
     }
@@ -213,7 +210,7 @@ public class Option implements Comparable<Option> {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(" snId:" + (searchNode != null ? searchNode.getId() : "-") + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " value:" + Utils.round(state.value));
+        sb.append(" snId:" + (searchNode != null ? searchNode.getId() : "-") + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " value:" + Utils.round(state.lb));
         return sb.toString();
     }
 

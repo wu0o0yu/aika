@@ -22,13 +22,8 @@ public class InputActivation extends Activation {
     }
 
     @Override
-    protected void markHasCandidateRecursiveStep(long v) {
-
-    }
-
-    @Override
-    protected int getFiredIncrement() {
-        return 0;
+    protected Fired incrementFired(Fired f) {
+        return f;
     }
 
     @Override
