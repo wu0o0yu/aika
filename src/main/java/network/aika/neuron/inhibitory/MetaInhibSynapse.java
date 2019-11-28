@@ -31,8 +31,7 @@ public class MetaInhibSynapse extends TSynapse {
 
         targetSynapse.updateDelta(
                 doc,
-                getWeight(),
-                getLimit()
+                getWeight()
         );
 
         System.out.println("  Transfer Template Synapse: IN:" +

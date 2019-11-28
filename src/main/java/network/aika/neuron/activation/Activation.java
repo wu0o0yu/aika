@@ -292,14 +292,16 @@ public abstract class Activation implements Comparable<Activation> {
         Fired firedEarliest = null;
 
         for (InputState is: getInputStates(sn)) {
-            Synapse s = is.l.getSynapse();
-            Activation iAct = is.l.getInput();
+            Synapse s = is.link.getSynapse();
+            Activation iAct = is.link.getInput();
 
             if (iAct == this) continue;
 
-            double x = Math.min(s.getLimit(), is.s.lb) * s.getWeight();
+            double x = is.state.lb * s.getWeight();
             net += x;
-            netUB += Math.min(s.getLimit(), is.s.ub) * s.getWeight();
+            netUB += is.state.ub * s.getWeight();
+
+            net += s.computeRelationWeights(is.link);
 
             if (!s.isRecurrent() && !s.isNegative(CURRENT)) {
                 firedLatest = Fired.max(firedLatest, is.s.firedLatest);
@@ -399,7 +401,7 @@ public abstract class Activation implements Comparable<Activation> {
             }
 
             State s = l.getInput().getInputState(l.getSynapse(), this, sn);
-            if (maxInputState == null || maxInputState.s.lb < s.lb) {
+            if (maxInputState == null || maxInputState.state.lb < s.lb) {
                 maxInputState = new InputState(l, s);
             }
             lastSynapse = l.getSynapse();
@@ -437,42 +439,17 @@ public abstract class Activation implements Comparable<Activation> {
 
 
     private static class InputState {
-        public InputState(Link l, State s) {
-            this.l = l;
-            this.s = s;
+        public InputState(Link link, State state) {
+            this.link = link;
+            this.state = state;
         }
 
-        Link l;
-        State s;
+        Link link;
+        State state;
     }
 
     protected abstract State getInputState(Synapse s, Activation act, SearchNode sn);
 
-    /*
-    private State getInputState(Synapse s, Activation act, SearchNode sn) {
-        State is = getCurrentOption().getState();
-
-        if(s.isNegative(CURRENT)) {
-            if(!checkSelfReferencing(act)) {
-                is = new State(is.ub, is.lb, 0.0, null, null, 0.0);
-            } else {
-                is = ZERO;
-            }
-        }
-
-        if(act.getType() == INHIBITORY) {
-            return is;
-        } else {
-            Decision nd = act.getNextDecision(act.getCurrentOption(), sn);
-            if (nd == SELECTED) {
-                return new State(is.ub, is.ub, 0.0, is.firedEarliest, is.firedLatest, 0.0);
-            } else if (nd == EXCLUDED) {
-                return new State(is.lb, is.lb, 0.0, is.firedLatest, is.firedLatest, 0.0);
-            }
-        }
-        return null;
-    }
-    */
 
     public abstract boolean needsPropagation(SearchNode sn, boolean lowerBoundChange, boolean upperBoundChange);
 
