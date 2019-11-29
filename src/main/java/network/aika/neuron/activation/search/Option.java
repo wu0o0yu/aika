@@ -18,6 +18,7 @@ package network.aika.neuron.activation.search;
 
 import network.aika.Utils;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.State;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
@@ -173,7 +174,7 @@ public class Option implements Comparable<Option> {
     }
 
 
-
+// Todo: remove duplicate code!
     public boolean checkSelfReferencing(Option o) {
         Option o1 = getAct().getInputExcitatoryOption(o);
         if(o1 == null) {
@@ -182,11 +183,11 @@ public class Option implements Comparable<Option> {
             return true;
         }
 
-        Integer f1 = o1.getState().fired;
-        Integer f2 = o.getState().fired;
+        Fired f1 = o1.getState().firedLatest;
+        Fired f2 = o.getState().firedLatest;
         if(f1 == null) {
             return false;
-        } else if (f2 != null && f1 > f2) {
+        } else if (f2 != null && f1.compareTo(f2) == 1) {
             return o1.getAct().checkSelfReferencingRecursiveStep(o.getAct(), 0);
         } else {
             return o.getAct().checkSelfReferencingRecursiveStep(o1.getAct(), 0);

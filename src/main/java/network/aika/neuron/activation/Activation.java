@@ -40,17 +40,6 @@ import static network.aika.neuron.activation.State.ZERO;
 
 
 /**
- * The {@code Activation} class is the most central class in Aika. On the one hand it stores the activation value
- * for a given neuron in the {@code State} substructure. On the other hand it specifies where this activation is
- * located within the document and to which interpretation it belongs. The {@code Activation.Key} therefore
- * consists of the logic node to which this activation belongs. If this logic node is an or-node, then this activation
- * automatically also belongs to the neuron as well. Furthermore, the key contains the char range within the document
- * and the relational id (rid). The relational id might be used to store the word pos for instance. Lastly, the key
- * contain the interpretation node of this activation, specifying to which interpretation this activation belongs.
- *
- * <p>The activations are linked to each other on two levels. The fields {@code inputs} and {@code outputs}
- * contain the activation links within the logic layer. The fields {@code inputLinks} and
- * {@code outputLinks} contain the links on the neural layer.
  *
  * @author Lukas Molzberger
  */
@@ -80,9 +69,6 @@ public abstract class Activation implements Comparable<Activation> {
 
     private Double targetValue;
     private State inputState;
-
-    private Integer sequence;
-    private Integer candidateId;
 
     /**
      * The cached decision is used to avoid having to explore the same currentSearchState twice even though nothing that
@@ -320,22 +306,6 @@ public abstract class Activation implements Comparable<Activation> {
     }
 
 
-    public void processBounds() throws RecursiveDepthExceededException {
-        State oldBounds = bounds;
-
-        computeBounds();
-
-        if(oldBounds == null || Math.abs(bounds.ub - oldBounds.ub) > 0.01) {
-            for(Link l: outputLinks.values()) {
-                doc.getUpperBoundQueue().add(l);
-            }
-        }
-
-        if ((oldBounds == null || oldBounds.ub <= 0.0) && bounds.ub > 0.0) {
-            getINeuron().propagate(this);
-        }
-    }
-
 
     public void computeBounds() throws RecursiveDepthExceededException {
         INeuron n = getINeuron();
@@ -366,8 +336,34 @@ public abstract class Activation implements Comparable<Activation> {
             firedEarliest = computeFiredEarliest(firedEarliest, iAct.bounds.firedEarliest, s);
         }
 
-        bounds = new State(n.getActivationFunction().f(lb), n.getActivationFunction().f(ub), 0.0, firedLatest, firedEarliest, 0.0);
+        bounds = new State(
+                n.getActivationFunction().f(lb),
+                n.getActivationFunction().f(ub),
+                0.0,
+                firedLatest,
+                firedEarliest,
+                0.0
+        );
     }
+
+
+
+    public void processBounds() throws RecursiveDepthExceededException {
+        State oldBounds = bounds;
+
+        computeBounds();
+
+        if(oldBounds == null || Math.abs(bounds.ub - oldBounds.ub) > 0.01) {
+            for(Link l: outputLinks.values()) {
+                doc.getUpperBoundQueue().add(l);
+            }
+        }
+
+        if ((oldBounds == null || oldBounds.ub <= 0.0) && bounds.ub > 0.0) {
+            getINeuron().propagate(this);
+        }
+    }
+
 
 
     protected abstract Fired incrementFired(Fired f);
@@ -415,7 +411,7 @@ public abstract class Activation implements Comparable<Activation> {
 
 
     public void setInputState(Builder input) {
-        Fired f = new Fired(input.getSlots(doc).get(Activation.END).getFinalPosition(), input.fired);
+        Fired f = new Fired(input.inputTimestamp, input.fired);
 
         State is = new State(input.value, input.value, 0.0, f, f, 0.0);
 
@@ -706,6 +702,7 @@ public abstract class Activation implements Comparable<Activation> {
     public static class Builder {
         public double value = 1.0;
         public Double targetValue;
+        public int inputTimestamp;
         public int fired;
         public Map<Integer, Activation> inputLinks = new TreeMap<>();
 
@@ -718,6 +715,17 @@ public abstract class Activation implements Comparable<Activation> {
 
         public Builder setTargetValue(Double targetValue) {
             this.targetValue = targetValue;
+            return this;
+        }
+
+
+        public Builder setInputTimestamp(int inputTimestamp) {
+            this.inputTimestamp = inputTimestamp;
+            return this;
+        }
+
+        public Builder setFired(int fired) {
+            this.fired = fired;
             return this;
         }
 

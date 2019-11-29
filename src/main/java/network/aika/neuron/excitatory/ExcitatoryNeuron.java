@@ -110,9 +110,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation, ExcitatorySy
 
 
     public boolean isWeak(Synapse s, Synapse.State state) {
-        double w = s.getLimit(state) * s.getWeight(state);
-
-        return w < getBias();
+        return s.getWeight(state) < getBias();
     }
 
 
@@ -121,9 +119,9 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation, ExcitatorySy
     }
 
 
-    public Synapse getMaxInputSynapse(Synapse.State state) {
-        Synapse maxSyn = null;
-        for(Synapse s: getInputSynapses()) {
+    public ExcitatorySynapse getMaxInputSynapse(Synapse.State state) {
+        ExcitatorySynapse maxSyn = null;
+        for(ExcitatorySynapse s: getInputSynapses()) {
             if(!s.isInactive()) {
                 if(maxSyn == null || maxSyn.getNewWeight() < s.getNewWeight()) {
                     maxSyn = s;
@@ -405,15 +403,14 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation, ExcitatorySy
                 delta += d;
 
                 if(si.getWeight() <= getBias()) {
-                    double covDelta = config.learnRate * Xi * i.getReliability() * i.getP() * out.getState().value * G;
+                    double covDelta = config.learnRate * Xi * i.getReliability() * i.getP() * out.getState().lb * G;
 
                     double weightDelta = covDelta * (1.0 / getBias());
                     double biasDelta = covDelta * -(si.getWeight() / Math.pow(getBias(), 2.0));
 
                     si.updateDelta(
                             doc,
-                            weightDelta,
-                            0.0
+                            weightDelta
                     );
                     updateBiasDelta(biasDelta);
                 }
@@ -452,8 +449,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation, ExcitatorySy
             Synapse sl = l.getSynapse();
             sl.updateDelta(
                     doc,
-                    weightDelta,
-                    0.0
+                    weightDelta
             );
             updateBiasDelta(biasDelta);
 
@@ -469,7 +465,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation, ExcitatorySy
         switch(o.getAct().getINeuron().getActivationFunction()) {
             case RECTIFIED_HYPERBOLIC_TANGENT:
                 return 1.0 - Math.pow(Math.tanh(net), 2.0);
-            case RECTIFIED_LINEAR_UNIT:
+            case LIMITED_RECTIFIED_LINEAR_UNIT:
                 return 1.0;
         }
 
@@ -566,7 +562,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation, ExcitatorySy
         }
 
         public double getX(Sign s) {
-            return s.getX(o != null ? o.getState().value : 0.0);
+            return s.getX(o != null ? o.getState().lb : 0.0);
         }
 
         public String toString() {

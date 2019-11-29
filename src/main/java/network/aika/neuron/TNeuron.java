@@ -82,7 +82,7 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
 
 
     public void count(Option o) {
-        countValue += o.getState().value * o.getP();
+        countValue += o.getState().lb * o.getP();
 
         countSynapses(o, INPUT);
         countSynapses(o, OUTPUT);

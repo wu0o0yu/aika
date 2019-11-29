@@ -38,7 +38,7 @@ public class InputActivation extends Activation {
 
     @Override
     protected State getInputState(Synapse s, Activation act, SearchNode sn) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override

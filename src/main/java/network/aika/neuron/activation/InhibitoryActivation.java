@@ -58,17 +58,8 @@ public class InhibitoryActivation extends Activation {
 
 
     protected State getInputState(Synapse s, Activation act, SearchNode sn) {
-        State is = currentOption.getState();
-
-        if(s.isNegative(CURRENT)) {
-            if(!checkSelfReferencing(act)) {
-                is = new State(is.ub, is.lb, 0.0, null, null, 0.0);
-            } else {
-                is = ZERO;
-            }
-        }
-
-        return is;
+        assert !s.isNegative(CURRENT);
+        return currentOption.getState();
     }
 
 
