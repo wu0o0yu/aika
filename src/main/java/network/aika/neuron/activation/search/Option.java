@@ -17,20 +17,19 @@
 package network.aika.neuron.activation.search;
 
 import network.aika.Utils;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
-import network.aika.neuron.activation.link.Link;
+import network.aika.neuron.activation.link.Direction;
 import network.aika.neuron.activation.State;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static network.aika.Document.MAX_ROUND;
-import static network.aika.neuron.activation.link.Link.INPUT_COMP;
-import static network.aika.neuron.activation.link.Link.OUTPUT_COMP;
-import static network.aika.neuron.activation.search.Decision.UNKNOWN;
+import static network.aika.neuron.activation.link.Direction.INPUT;
+import static network.aika.neuron.activation.link.Direction.OUTPUT;
 
 /**
  *
@@ -53,8 +52,8 @@ public class Option implements Comparable<Option> {
     public int cacheFactor = 1;
     public double p;
 
-    public TreeMap<Link, Option> inputOptions = new TreeMap<>(INPUT_COMP);
-    public Map<Link, Option> outputOptions = new TreeMap<>(OUTPUT_COMP); // TODO:
+    public TreeMap<Link, Link> inputOptions = new TreeMap<>(INPUT_COMP);
+    public Map<Link, Link> outputOptions = new TreeMap<>(OUTPUT_COMP); // TODO:
 
     private boolean isQueued;
 
@@ -63,33 +62,46 @@ public class Option implements Comparable<Option> {
     public ExcitatoryNeuron targetNeuron;
 
 
+    public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
+        int r = l1.input.state.firedLatest.compareTo(l2.input.state.firedLatest);
+        if (r != 0) return r;
+        return Activation.INPUT_COMP.compare(l1.actLink, l2.actLink);
+    };
+
+    public static Comparator<Link> OUTPUT_COMP = (l1, l2) -> {
+        int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
+        if (r != 0) return r;
+        return Integer.compare(l1.output.getId(), l2.output.getId());
+    };
+
     public Option(Option parent, Activation act, SearchNode sn) {
         this.act = act;
         this.searchNode = sn;
-
         this.parent = parent;
+        this.round = newSearchNode() ? 0 : parent.round + 1;
+
+        if(round > MAX_ROUND) {
+            throw new Activation.OscillatingActivationsException(act.getDocument().activationsToString());
+        }
 
         if(parent != null) {
             parent.children.add(this);
         }
 
         decision = act.getNextDecision(parent, sn);
+
+        link();
+        state = computeValueAndWeight(sn);
     }
 
 
-    public boolean setState(State s) {
-        if(state != null && state.equalsWithWeights(s)) {
-            return false;
-        }
+    public boolean newSearchNode() {
+        return parent.searchNode != searchNode;
+    }
 
-        round++;
 
-        if(round > MAX_ROUND) {
-            throw new Activation.OscillatingActivationsException(act.getDocument().activationsToString());
-        }
-
-        state = s;
-        return true;
+    public boolean hasChanged() {
+        return state != null && parent.state.equalsWithWeights(state);
     }
 
 
@@ -123,12 +135,26 @@ public class Option implements Comparable<Option> {
     }
 
 
-    public void link() {
-        for(Link l: act.getInputLinks().collect(Collectors.toList())) {
-            Activation iAct = l.getInput();
-            if(iAct.getCurrentOption() != null && iAct.getCurrentOption().decision != UNKNOWN && iAct.getCurrentOption().isActive()) {
-                link(l, iAct.getCurrentOption());
+    private void link() {
+        Synapse lastSynapse = null;
+        Link maxInputState = null;
+        for (Activation.Link al : act.inputLinks.values()) {
+            if(al.isInactive()) {
+                continue;
             }
+            if (lastSynapse != null && lastSynapse != al.getSynapse()) {
+                inputOptions.put(maxInputState, maxInputState);
+                maxInputState = null;
+            }
+
+            Option inputOption = al.getInput().getInputState(al.getSynapse(), act, searchNode);
+            if (maxInputState == null || maxInputState.input.state.lb < inputOption.state.lb) {
+                maxInputState = new Link(al, inputOption, this);
+            }
+            lastSynapse = al.getSynapse();
+        }
+        if (maxInputState != null) {
+            inputOptions.put(maxInputState, maxInputState);
         }
     }
 
@@ -138,9 +164,19 @@ public class Option implements Comparable<Option> {
     }
 
 
-    public void link(Link l, Option in) {
-        inputOptions.put(l, in);
-        in.outputOptions.put(l, this);
+    public Map<Link, Link> getLinks(Direction dir) {
+        switch(dir) {
+            case INPUT:
+                return inputOptions;
+            case OUTPUT:
+                return outputOptions;
+        }
+        return null;
+    }
+
+
+    private void addLink(Direction dir, Link l) {
+        getLinks(dir.getInverted()).put(l, l); // TODO: Warum inverted?
     }
 
 
@@ -222,4 +258,63 @@ public class Option implements Comparable<Option> {
         if(r != 0) return r;
         return Integer.compare(searchNode.getId(), o.searchNode.getId());
     }
+
+
+
+
+    public static class Link {
+        private final Activation.Link actLink;
+
+        private final Option input;
+        private final Option output;
+
+
+        public Link(Activation.Link actLink, Option input, Option output) {
+            this.actLink = actLink;
+            this.input = input;
+            this.output = output;
+        }
+
+
+        public Activation.Link getActivationLink() {
+            return actLink;
+        }
+
+
+        public Option getInput() {
+            return input;
+        }
+
+
+        public Option getOutput() {
+            return output;
+        }
+
+
+        public boolean isNegative(Synapse.State s) {
+            return actLink.isNegative(s);
+        }
+
+
+        public boolean isInactive() {
+            return actLink.isInactive();
+        }
+
+
+        public boolean isRecurrent() {
+            return actLink.isRecurrent();
+        }
+
+
+        public void link() {
+            input.addLink(INPUT, this);
+            output.addLink(OUTPUT, this);
+        }
+
+
+        public String toString() {
+            return actLink + ": " + input + " --> " + output;
+        }
+    }
+
 }

@@ -55,7 +55,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
     public static int MAX_SEARCH_STEPS = Integer.MAX_VALUE;
     public static boolean OPTIMIZE_SEARCH = true;
-    public static boolean COMPUTE_SOFT_MAX = false;
 
     private int id;
 
@@ -132,10 +131,6 @@ public class SearchNode implements Comparable<SearchNode> {
 
         if (act != null && followPath()) {
             act.cachedSearchNode = this;
-
-            if(COMPUTE_SOFT_MAX) {
-                modifiedActs.values().forEach(o -> o.link());
-            }
         }
 
         if (parent != null) {

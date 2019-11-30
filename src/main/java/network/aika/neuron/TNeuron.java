@@ -6,7 +6,7 @@ import network.aika.Model;
 import network.aika.Utils;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.link.Direction;
-import network.aika.neuron.activation.link.Link;
+import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 

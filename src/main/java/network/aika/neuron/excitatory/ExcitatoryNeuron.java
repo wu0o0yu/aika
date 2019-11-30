@@ -9,7 +9,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ExcitatoryActivation;
 import network.aika.neuron.activation.State;
 import network.aika.neuron.activation.link.Direction;
-import network.aika.neuron.activation.link.Link;
+import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.meta.MetaNeuron;

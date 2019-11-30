@@ -7,7 +7,7 @@ import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.MetaActivation;
-import network.aika.neuron.activation.link.Link;
+import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;

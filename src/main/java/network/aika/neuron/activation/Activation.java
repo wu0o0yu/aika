@@ -22,8 +22,8 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.INeuron.SynapseSummary;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.TSynapse;
 import network.aika.neuron.activation.link.Direction;
-import network.aika.neuron.activation.link.Link;
 import network.aika.neuron.activation.search.Decision;
 import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.activation.search.SearchNode;
@@ -32,9 +32,9 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.link.Direction.INPUT;
+import static network.aika.neuron.activation.link.Direction.OUTPUT;
 import static network.aika.neuron.activation.search.Decision.*;
-import static network.aika.neuron.activation.link.Link.INPUT_COMP;
-import static network.aika.neuron.activation.link.Link.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.State.ZERO;
 
@@ -56,8 +56,8 @@ public abstract class Activation implements Comparable<Activation> {
     private INeuron<?, ?> neuron;
     private Document doc;
 
-    protected TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
-    protected TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
+    public TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
+    public TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
 
     private State bounds;
 
@@ -86,6 +86,20 @@ public abstract class Activation implements Comparable<Activation> {
 
     public int[] debugCounts = new int[3];
     public int[] debugDecisionCounts = new int[3];
+
+
+
+    public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
+        int r = Synapse.INPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
+        if (r != 0) return r;
+        return Integer.compare(l1.input.getId(), l2.input.getId());
+    };
+
+    public static Comparator<Link> OUTPUT_COMP = (l1, l2) -> {
+        int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
+        if (r != 0) return r;
+        return Integer.compare(l1.output.getId(), l2.output.getId());
+    };
 
 
     public Activation(int id) {
@@ -240,26 +254,27 @@ public abstract class Activation implements Comparable<Activation> {
 
 
     public double process(SearchNode sn) throws OscillatingActivationsException, RecursiveDepthExceededException {
-        State oldState = getCurrentOption().getState();
-        State s = computeValueAndWeight(sn);
+        Option oldOption = getCurrentOption();
 
-        if (getCurrentOption().searchNode != sn) {
-            if((getCurrentOption().decision != UNKNOWN && getCurrentOption().getState().equalsWithWeights(s))) {
+        currentOption = new Option(oldOption, this, sn);
+
+        if (currentOption.newSearchNode()) {
+            if((oldOption.decision != UNKNOWN && oldOption.getState().equalsWithWeights(currentOption.getState()))) {
                 return 0.0;
             }
 
-            if(this == sn.getActivation() && s.getPreferredDecision() != sn.getDecision()) {
+            if(this == sn.getActivation() && currentOption.getState().getPreferredDecision() != sn.getDecision()) {
                 return 0.0;
             }
 
             saveState(sn);
         }
 
-        if (getCurrentOption().setState(s)) {
-            doc.getValueQueue().propagateActivationValue(this, sn, !oldState.lowerBoundEquals(s), !oldState.upperBoundEquals(s));
+        if (currentOption.hasChanged()) {
+            doc.getValueQueue().propagateActivationValue(this, sn, !oldOption.getState().lowerBoundEquals(currentOption.getState()), !oldOption.getState().upperBoundEquals(currentOption.getState()));
         }
 
-        return s.weight - oldState.weight;
+        return currentOption.getState().weight - oldOption.getState().weight;
     }
 
 
@@ -383,33 +398,6 @@ public abstract class Activation implements Comparable<Activation> {
     }
 
 
-    private List<InputState> getInputStates(SearchNode sn) {
-        ArrayList<InputState> tmp = new ArrayList<>();
-        Synapse lastSynapse = null;
-        InputState maxInputState = null;
-        for (Link l : inputLinks.values()) {
-            if(l.isInactive()) {
-                continue;
-            }
-            if (lastSynapse != null && lastSynapse != l.getSynapse()) {
-                tmp.add(maxInputState);
-                maxInputState = null;
-            }
-
-            State s = l.getInput().getInputState(l.getSynapse(), this, sn);
-            if (maxInputState == null || maxInputState.state.lb < s.lb) {
-                maxInputState = new InputState(l, s);
-            }
-            lastSynapse = l.getSynapse();
-        }
-        if (maxInputState != null) {
-            tmp.add(maxInputState);
-        }
-
-        return tmp;
-    }
-
-
     public void setInputState(Builder input) {
         Fired f = new Fired(input.inputTimestamp, input.fired);
 
@@ -444,7 +432,7 @@ public abstract class Activation implements Comparable<Activation> {
         State state;
     }
 
-    protected abstract State getInputState(Synapse s, Activation act, SearchNode sn);
+    public abstract Option getInputState(Synapse s, Activation act, SearchNode sn);
 
 
     public abstract boolean needsPropagation(SearchNode sn, boolean lowerBoundChange, boolean upperBoundChange);
@@ -691,8 +679,6 @@ public abstract class Activation implements Comparable<Activation> {
 
 
     public void saveState(SearchNode sn) {
-        currentOption = new Option(getCurrentOption(), this, sn);
-
         if (sn.getModifiedActivations() != null) {
             sn.getModifiedActivations().put(getCurrentOption().act, getCurrentOption());
         }
@@ -764,5 +750,82 @@ public abstract class Activation implements Comparable<Activation> {
             super("MAX_PREDECESSOR_DEPTH limit exceeded. Probable cause is a non recurrent loop.");
         }
     }
+
+
+
+    public static class Link {
+        private final Synapse synapse;
+        private TSynapse targetSynapse;
+
+        private final Activation input;
+        private final Activation output;
+
+
+        public Link(Synapse s, Activation input, Activation output) {
+            this.synapse = s;
+            this.targetSynapse = null;
+            this.input = input;
+            this.output = output;
+        }
+
+
+        public Link(Synapse s, TSynapse targetSynapse, Activation input, Activation output) {
+            this.synapse = s;
+            this.targetSynapse = targetSynapse;
+            this.input = input;
+            this.output = output;
+        }
+
+
+        public Synapse getSynapse() {
+            return synapse;
+        }
+
+
+        public TSynapse getTargetSynapse() {
+            return targetSynapse;
+        }
+
+        public void setTargetSynapse(TSynapse targetSynapse) {
+            this.targetSynapse = targetSynapse;
+        }
+
+
+        public Activation getInput() {
+            return input;
+        }
+
+
+        public Activation getOutput() {
+            return output;
+        }
+
+
+        public boolean isNegative(Synapse.State s) {
+            return synapse.isNegative(s);
+        }
+
+
+        public boolean isInactive() {
+            return synapse.isInactive();
+        }
+
+
+        public boolean isRecurrent() {
+            return synapse.isRecurrent();
+        }
+
+
+        public void link() {
+            input.addLink(INPUT, this);
+            output.addLink(OUTPUT, this);
+        }
+
+
+        public String toString() {
+            return synapse + ": " + input + " --> " + output;
+        }
+    }
+
 }
 
