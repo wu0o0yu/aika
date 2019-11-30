@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.Synapse.State.NEXT;
-import static network.aika.neuron.activation.link.Link.INPUT_COMP;
+import static network.aika.neuron.activation.Activation.INPUT_COMP;
 
 
 public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation, ExcitatorySynapse> {

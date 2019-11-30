@@ -260,7 +260,7 @@ public abstract class INeuron<A extends Activation, S extends Synapse> extends A
 
 
 
-    public void commit(Collection<Synapse> modifiedSynapses) {
+    public void commit(Collection<? extends Synapse> modifiedSynapses) {
         for (Synapse s : modifiedSynapses) {
             INeuron in = s.getInput().get();
             in.lock.acquireWriteLock();

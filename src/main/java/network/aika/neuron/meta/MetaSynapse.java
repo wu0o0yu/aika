@@ -21,7 +21,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.link.Link;
+import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.TSynapse;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;

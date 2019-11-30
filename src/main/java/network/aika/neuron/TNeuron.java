@@ -93,12 +93,11 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
         Set<Synapse> rest = new TreeSet<>(dir == INPUT ? Synapse.INPUT_SYNAPSE_COMP : Synapse.OUTPUT_SYNAPSE_COMP);
         rest.addAll(dir == INPUT ? getProvider().getActiveInputSynapses() : getProvider().getActiveOutputSynapses());
 
-        for(Map.Entry<Link, Option> me: (dir == INPUT ? o.inputOptions: o.outputOptions).entrySet()) {
-            Link l = me.getKey();
-            Option lo = me.getValue();
-            TSynapse ts = (TSynapse)l.getSynapse();
+        for(Option.Link ol: (dir == INPUT ? o.inputOptions: o.outputOptions).keySet()) {
+            TSynapse ts = (TSynapse)ol.getActivationLink().getSynapse();
+            Option lo = (dir == INPUT ? ol.getInput(): ol.getOutput());
 
-            rest.remove(l.getSynapse());
+            rest.remove(ol.getActivationLink().getSynapse());
 
             if(dir == INPUT) {
                 ts.updateCountValue(lo, o);

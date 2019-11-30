@@ -4,7 +4,7 @@ import network.aika.Document;
 import network.aika.Utils;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.link.Link;
+import network.aika.neuron.activation.Activation.Link;
 import network.aika.neuron.activation.search.Decision;
 import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.activation.search.SearchNode;
@@ -83,7 +83,7 @@ public class ExcitatoryActivation extends Activation {
     }
 
 
-    protected State getInputState(Synapse s, Activation act, SearchNode sn) {
+    public State getInputState(Synapse s, Activation act, SearchNode sn) {
         State is = currentOption.getState();
 
         if(s.isNegative(CURRENT)) {

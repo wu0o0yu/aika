@@ -432,7 +432,7 @@ public abstract class Activation implements Comparable<Activation> {
         State state;
     }
 
-    public abstract Option getInputState(Synapse s, Activation act, SearchNode sn);
+    public abstract State getInputState(Synapse s, Activation act, SearchNode sn);
 
 
     public abstract boolean needsPropagation(SearchNode sn, boolean lowerBoundChange, boolean upperBoundChange);
