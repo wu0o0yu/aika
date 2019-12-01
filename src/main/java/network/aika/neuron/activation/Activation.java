@@ -25,6 +25,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.TSynapse;
 import network.aika.neuron.activation.link.Direction;
 import network.aika.neuron.activation.search.Decision;
+import network.aika.neuron.activation.search.Input;
 import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.activation.search.SearchNode;
 
@@ -59,7 +60,7 @@ public abstract class Activation implements Comparable<Activation> {
     public TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
     public TreeMap<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
 
-    private State bounds;
+    private Bounds bounds;
 
     private Option rootOption;
     public Option currentOption;
@@ -169,7 +170,7 @@ public abstract class Activation implements Comparable<Activation> {
     }
 
 
-    public State getBounds() {
+    public Bounds getBounds() {
         return bounds;
     }
 
@@ -278,6 +279,77 @@ public abstract class Activation implements Comparable<Activation> {
     }
 
 
+
+
+    public State computeValueAndWeight() {
+        INeuron n = getINeuron();
+
+        double bias = n.getTotalBias(CURRENT);
+
+        return compute(bias, bias, inputs);
+    }
+
+
+    public void computeBounds() throws Activation.RecursiveDepthExceededException {
+        INeuron n = getINeuron();
+        INeuron.SynapseSummary ss = n.getSynapseSummary();
+
+        double bias = n.getTotalBias(CURRENT);
+
+        return compute(bias + ss.getNegRecSum(), bias + ss.getPosRecSum(), inputs);
+    }
+
+
+    private State compute(double net, Iterable<Input> inputs) {
+        if(inputState != null) {
+            return inputState;
+        }
+
+        INeuron n = getINeuron();
+        INeuron.SynapseSummary ss = n.getSynapseSummary();
+
+        Fired fired = null;
+
+        for (Input in: inputs) {
+            Synapse syn = in.getSynapse();
+            Bounds bounds = in.getBounds();
+
+            double w = syn.getWeight();
+
+            netLB += state.lb * w;
+            netUB += state.ub * w;
+
+            if (!syn.isRecurrent() && !syn.isNegative(CURRENT)) {
+                firedLatest = computeFiredLatest(firedLatest, state.firedLatest);
+            }
+
+
+            //----
+
+            double x = s.getWeight();
+
+            ub += !syn.isNegative(CURRENT) ? iAct.bounds.ub : iAct.bounds.lb * x;
+            lb += !syn.isNegative(CURRENT) ? iAct.bounds.lb : iAct.bounds.ub * x;
+
+            firedLatest = computeFiredLatest(firedLatest, iAct.bounds.firedLatest);
+            firedEarliest = computeFiredEarliest(firedEarliest, iAct.bounds.firedEarliest, s);
+
+
+        }
+
+        return new State(
+                n.getActivationFunction().f(netLB),
+                n.getActivationFunction().f(netUB),
+                netLB,
+                netLB > 0.0 ? incrementFired(firedLatest) : null,
+                netUB > 0.0 ? incrementFired(firedEarliest) : null,
+                Math.max(0.0, Math.min(-ss.getNegRecSum(), netLB))
+        );
+    }
+
+
+
+/*
     public State computeValueAndWeight(SearchNode sn) throws RecursiveDepthExceededException {
         if(inputState != null) {
             return inputState;
@@ -360,11 +432,11 @@ public abstract class Activation implements Comparable<Activation> {
                 0.0
         );
     }
-
+*/
 
 
     public void processBounds() throws RecursiveDepthExceededException {
-        State oldBounds = bounds;
+        Bounds oldBounds = bounds;
 
         computeBounds();
 
@@ -421,16 +493,6 @@ public abstract class Activation implements Comparable<Activation> {
 
     public abstract boolean addToValueQueue(Deque<Activation> queue, SearchNode sn);
 
-
-    private static class InputState {
-        public InputState(Link link, State state) {
-            this.link = link;
-            this.state = state;
-        }
-
-        Link link;
-        State state;
-    }
 
     public abstract State getInputState(Synapse s, Activation act, SearchNode sn);
 
@@ -514,30 +576,6 @@ public abstract class Activation implements Comparable<Activation> {
     }
 
 
-    public boolean match(Predicate<Link> filter) {
-        Synapse ls = null;
-        boolean matched = false;
-        for(Link l: inputLinks.navigableKeySet()) {
-            Synapse s = l.getSynapse();
-
-            if(ls != null && ls != s) {
-                if(!matched) {
-                    return false;
-                }
-                matched = false;
-            }
-
-            if(filter.test(l)) {
-                matched = true;
-            }
-
-            ls = s;
-        }
-
-        return matched;
-    }
-
-
     public void computeOptionProbabilities() {
 
     }
@@ -618,7 +656,7 @@ public abstract class Activation implements Comparable<Activation> {
 
         for (Option option : getOptions()) {
             double p = option.getP();
-            State s = option.getState();
+            Bounds b = option.getBounds();
 
             lb += p * s.lb;
             ub += p * s.ub;

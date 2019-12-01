@@ -19,6 +19,7 @@ package network.aika.neuron.activation.search;
 import network.aika.Utils;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Bounds;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.link.Direction;
 import network.aika.neuron.activation.State;
@@ -37,7 +38,7 @@ import static network.aika.neuron.activation.link.Direction.OUTPUT;
  */
 public class Option implements Comparable<Option> {
 
-    private State state;
+    private Bounds bounds;
 
     public Activation act;
     public SearchNode searchNode;
@@ -105,8 +106,8 @@ public class Option implements Comparable<Option> {
     }
 
 
-    public State getState() {
-        return state;
+    public Bounds getBounds() {
+        return bounds;
     }
 
 
