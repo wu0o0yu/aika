@@ -30,6 +30,7 @@ import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.activation.search.SearchNode;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -440,13 +441,13 @@ public abstract class Activation implements Comparable<Activation> {
 
         computeBounds();
 
-        if(oldBounds == null || Math.abs(bounds.ub - oldBounds.ub) > 0.01) {
+        if(oldBounds == null || Math.abs(bounds.ub.value - oldBounds.ub.value) > 0.01) {
             for(Link l: outputLinks.values()) {
                 doc.getUpperBoundQueue().add(l);
             }
         }
 
-        if ((oldBounds == null || oldBounds.ub <= 0.0) && bounds.ub > 0.0) {
+        if ((oldBounds == null || oldBounds.ub.value <= 0.0) && bounds.ub.value > 0.0) {
             getINeuron().propagate(this);
         }
     }
@@ -473,17 +474,17 @@ public abstract class Activation implements Comparable<Activation> {
     public void setInputState(Builder input) {
         Fired f = new Fired(input.inputTimestamp, input.fired);
 
-        State is = new State(input.value, input.value, 0.0, f, f, 0.0);
+        State is = new State(input.value, 0.0, f, 0.0);
+        bounds = new Bounds(is, is);
 
         rootOption = new Option(null, this, null);
         rootOption.decision = SELECTED;
         rootOption.p = 1.0;
-        rootOption.setState(is);
+        rootOption.setBounds(bounds);
         currentOption = rootOption;
         finalOption = rootOption;
 
         inputState = is;
-        bounds = is;
 
         targetValue = input.targetValue;
     }
@@ -533,8 +534,8 @@ public abstract class Activation implements Comparable<Activation> {
         return inputLinks
                 .values()
                 .stream()
-                .filter(l -> l.getInput().getCurrentOption().getState().lb > 0.0)
-                .max(Comparator.comparing(l -> l.getInput().getCurrentOption().getState().lb))
+                .filter(l -> l.getInput().getCurrentOption().getBounds().lb.value > 0.0)
+                .max(Comparator.comparing(l -> l.getInput().getCurrentOption().getBounds().lb.value))
                 .orElse(null);
     }
 
@@ -562,17 +563,17 @@ public abstract class Activation implements Comparable<Activation> {
 
 
     public boolean isFinalActivation() {
-        return getFinalState().lb > 0.0;
+        return getFinalState().value > 0.0;
     }
 
 
     public State getFinalState() {
-        return finalOption != null ? finalOption.getState() : ZERO;
+        return finalOption != null ? finalOption.getBounds().lb : ZERO;
     }
 
 
     public double getValue() {
-        return getFinalState().lb;
+        return getFinalState().value;
     }
 
 
@@ -583,11 +584,11 @@ public abstract class Activation implements Comparable<Activation> {
 
     public String toString() {
         return id + " " + getNeuron().getId() + ":" + getINeuron().typeToString() + " " + getLabel() + " " + identityToString() + " - " +
-                " UB:" + Utils.round(bounds.ub) +
-                (inputState != null ? " IV:" + Utils.round(inputState.lb) : "") +
+                " UB:" + Utils.round(bounds.ub.value) +
+                (inputState != null ? " IV:" + Utils.round(inputState.value) : "") +
                 (targetValue != null ? " TV:" + Utils.round(targetValue) : "") +
-                " V:" + (getCurrentOption() != null ? Utils.round(getCurrentOption().getState().lb) : "-") +
-                " FV:" + (finalOption != null ? Utils.round(finalOption.getState().lb) : "-");
+                " V:" + (getCurrentOption() != null ? Utils.round(getCurrentOption().getBounds().lb.value) : "-") +
+                " FV:" + (finalOption != null ? Utils.round(finalOption.getBounds().lb.value) : "-");
     }
 
 
@@ -619,13 +620,11 @@ public abstract class Activation implements Comparable<Activation> {
 
         if(DEBUG_OUTPUT) {
             sb.append(" - UB:");
-            sb.append(Utils.round(bounds.ub));
+            sb.append(Utils.round(bounds.ub.value));
         }
 
-        if(SearchNode.COMPUTE_SOFT_MAX) {
-            sb.append(" Exp:");
-            sb.append(getExpectedState());
-        }
+        sb.append(" Exp:");
+        sb.append(getExpectedState());
 
         sb.append(" - ");
         State fs = getFinalState();
@@ -635,7 +634,7 @@ public abstract class Activation implements Comparable<Activation> {
 
 
         if (inputState != null) {
-            sb.append(" - IV:" + Utils.round(inputState.lb));
+            sb.append(" - IV:" + Utils.round(inputState.value));
         }
 
         if (targetValue != null) {
@@ -649,20 +648,23 @@ public abstract class Activation implements Comparable<Activation> {
     protected abstract String getDecisionString();
 
 
-    public State getExpectedState() {
-        double lb = 0.0;
-        double ub = 0.0;
+    private State getExpectedState(Function<Bounds, State> callback) {
+        double value = 0.0;
         double net = 0.0;
 
         for (Option option : getOptions()) {
             double p = option.getP();
-            Bounds b = option.getBounds();
+            State s = callback.apply(option.getBounds());
 
-            lb += p * s.lb;
-            ub += p * s.ub;
+            value += p * s.value;
             net += p * s.net;
         }
-        return new State(lb, ub, net, Fired.MIN, Fired.MAX, 0.0);
+        return new State(value, net, null, 0.0);
+    }
+
+
+    public Bounds getExpectedBounds() {
+        return new Bounds(getExpectedState(b -> b.lb), getExpectedState(b -> b.ub));
     }
 
 

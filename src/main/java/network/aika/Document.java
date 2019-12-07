@@ -84,7 +84,7 @@ public class Document implements Comparable<Document> {
 
 
     public static Comparator<Activation> ACTIVATIONS_COMPARATOR = (act1, act2) -> {
-        int r = act1.getBounds().firedLatest.compareTo(act2.getBounds().firedLatest);
+        int r = act1.getBounds().lb.fired.compareTo(act2.getBounds().lb.fired);
         if (r != 0) return r;
         return Integer.compare(act1.getId(), act2.getId());
     };
@@ -260,7 +260,7 @@ public class Document implements Comparable<Document> {
         activationsById
                 .values()
                 .stream()
-                .filter(act -> act.getType() == EXCITATORY && act.getDecision() == UNKNOWN && act.getBounds().ub > 0.0)
+                .filter(act -> act.getType() == EXCITATORY && act.getDecision() == UNKNOWN && act.getBounds().ub.value > 0.0)
                 .forEach(act -> {
                     if(act.getBounds().firedLatest == null) {
                         throw new OscillatingActivationsException(act.searchStateToString());
@@ -303,10 +303,8 @@ public class Document implements Comparable<Document> {
             }
         }
 
-        if(SearchNode.COMPUTE_SOFT_MAX) {
-            SearchNode.computeCachedFactor(rootNode);
-            computeOptionProbabilities();
-        }
+        SearchNode.computeCachedFactor(rootNode);
+        computeOptionProbabilities();
     }
 
 
@@ -397,7 +395,7 @@ public class Document implements Comparable<Document> {
         sb.append("\n");
 
         for(Activation act: acts) {
-            if(act.getBounds().ub <= 0.0 && (act.getTargetValue() == null || act.getTargetValue() <= 0.0)) {
+            if(act.getBounds().ub.value <= 0.0 && (act.getTargetValue() == null || act.getTargetValue() <= 0.0)) {
                 continue;
             }
 
@@ -427,7 +425,7 @@ public class Document implements Comparable<Document> {
         Function<Activation, ExcitatoryNeuron> callback = act -> new ExcitatoryNeuron(getModel(), act.getLabel());
 
         for(Activation act: new ArrayList<>(getActivations(false))) {
-            if(act.getBounds().ub > 0.0) {
+            if(act.getBounds().ub.value > 0.0) {
                 TNeuron n = act.getINeuron();
 
                 for (Option o : act.getOptions()) {
@@ -437,7 +435,7 @@ public class Document implements Comparable<Document> {
         }
 
         for(Activation act: new ArrayList<>(getActivations(false))) {
-            if(act.getBounds().ub > 0.0) {
+            if(act.getBounds().ub.value > 0.0) {
                 TNeuron n = act.getINeuron();
 
                 n.updateFrequencies(act);

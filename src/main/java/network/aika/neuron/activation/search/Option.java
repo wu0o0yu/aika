@@ -64,15 +64,15 @@ public class Option implements Comparable<Option> {
 
 
     public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
-        int r = l1.input.state.firedLatest.compareTo(l2.input.state.firedLatest);
+        int r = l1.input.bounds.lb.fired.compareTo(l2.input.bounds.lb.fired);
         if (r != 0) return r;
         return Activation.INPUT_COMP.compare(l1.actLink, l2.actLink);
     };
 
     public static Comparator<Link> OUTPUT_COMP = (l1, l2) -> {
-        int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
+        int r =Activation.OUTPUT_COMP.compare(l1.actLink, l2.actLink);
         if (r != 0) return r;
-        return Integer.compare(l1.output.getId(), l2.output.getId());
+        return Integer.compare(l1.output.getAct().getId(), l2.output.getAct().getId());
     };
 
     public Option(Option parent, Activation act, SearchNode sn) {
@@ -102,9 +102,13 @@ public class Option implements Comparable<Option> {
 
 
     public boolean hasChanged() {
-        return state != null && parent.state.equalsWithWeights(state);
+        return bounds != null && parent.bounds.equalsWithWeights(bounds);
     }
 
+
+    public void setBounds(Bounds bounds) {
+        this.bounds = bounds;
+    }
 
     public Bounds getBounds() {
         return bounds;
@@ -127,12 +131,12 @@ public class Option implements Comparable<Option> {
 
 
     public boolean compare(Option r) {
-        return state.equalsWithWeights(r.state);
+        return bounds.equalsWithWeights(r.bounds);
     }
 
 
     public boolean isActive() {
-        return state.lb > 0.0;
+        return bounds.lb.value > 0.0;
     }
 
 
@@ -149,7 +153,7 @@ public class Option implements Comparable<Option> {
             }
 
             Option inputOption = al.getInput().getInputState(al.getSynapse(), act, searchNode);
-            if (maxInputState == null || maxInputState.input.state.lb < inputOption.state.lb) {
+            if (maxInputState == null || maxInputState.input.bounds.lb.value < inputOption.bounds.lb.value) {
                 maxInputState = new Link(al, inputOption, this);
             }
             lastSynapse = al.getSynapse();
@@ -220,8 +224,8 @@ public class Option implements Comparable<Option> {
             return true;
         }
 
-        Fired f1 = o1.getState().firedLatest;
-        Fired f2 = o.getState().firedLatest;
+        Fired f1 = o1.bounds.lb.fired;
+        Fired f2 = o.bounds.lb.fired;
         if(f1 == null) {
             return false;
         } else if (f2 != null && f1.compareTo(f2) == 1) {
@@ -248,7 +252,7 @@ public class Option implements Comparable<Option> {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(" snId:" + (searchNode != null ? searchNode.getId() : "-") + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " value:" + Utils.round(state.lb));
+        sb.append(" snId:" + (searchNode != null ? searchNode.getId() : "-") + " d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " value:" + Utils.round(bounds.lb.value));
         return sb.toString();
     }
 

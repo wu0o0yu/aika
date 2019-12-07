@@ -7,12 +7,15 @@ public class Bounds {
         this.ub = ub;
     }
 
-    State lb;
-    State ub;
+    public final State lb;
+    public final State ub;
 
 
-    public boolean equals(State s) {
-        return lb.equals(s) && ub.equals(s);
+    public boolean equals(Bounds b) {
+        return lb.equals(b.lb) && ub.equals(b.ub);
     }
 
+    public boolean equalsWithWeights(Bounds b) {
+        return lb.equalsWithWeights(b.lb) && ub.equalsWithWeights(b.ub);
+    }
 }
