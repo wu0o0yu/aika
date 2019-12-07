@@ -35,6 +35,10 @@ public abstract class TSynapse extends Synapse {
     public int numCounts = 0;
 
 
+    public TSynapse() {
+        super();
+    }
+
 
     public TSynapse(Neuron input, Neuron output, Integer id) {
         super(input, output, id);
@@ -73,8 +77,8 @@ public abstract class TSynapse extends Synapse {
 
 
     public void updateCountValue(Option io, Option oo) {
-        double inputValue = io != null ? io.getState().lb : 0.0;
-        double outputValue = oo != null ? oo.getState().lb : 0.0;
+        double inputValue = io != null ? io.getBounds().lb.value : 0.0;
+        double outputValue = oo != null ? oo.getBounds().lb.value : 0.0;
 
         if(!needsCountUpdate) {
             return;

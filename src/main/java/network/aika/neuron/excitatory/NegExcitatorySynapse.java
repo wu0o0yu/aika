@@ -9,6 +9,12 @@ import network.aika.neuron.TNeuron;
 
 public class NegExcitatorySynapse extends ExcitatorySynapse {
 
+    public static final String TYPE_STR = "NE";
+
+
+    public NegExcitatorySynapse() {
+        super();
+    }
 
     public NegExcitatorySynapse(Neuron input, Neuron output, Integer id) {
         super(input, output, id);
@@ -19,9 +25,15 @@ public class NegExcitatorySynapse extends ExcitatorySynapse {
     }
 
 
+    @Override
+    public String getType() {
+        return TYPE_STR;
+    }
+
+
     public void updateCountValue(Option io, Option oo) {
-        double inputValue = io != null ? io.getState().lb : 0.0;
-        double outputValue = oo != null ? oo.getState().lb : 0.0;
+        double inputValue = io != null ? io.getBounds().lb.value : 0.0;
+        double outputValue = oo != null ? oo.getBounds().lb.value : 0.0;
 
         if(!needsCountUpdate) {
             return;

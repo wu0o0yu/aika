@@ -16,6 +16,9 @@ import java.util.TreeMap;
 
 public class ExcitatorySynapse extends TSynapse {
 
+    public static final String TYPE_STR = "E";
+
+
     public static final Comparator<Synapse> META_SYNAPSE_COMP = Comparator
             .comparing(Synapse::getInput)
             .thenComparing(Synapse::getOutput);
@@ -23,9 +26,18 @@ public class ExcitatorySynapse extends TSynapse {
 
     public Map<MetaSynapse, MetaSynapse.MappingLink> metaSynapses = new TreeMap<>(META_SYNAPSE_COMP);
 
+    public ExcitatorySynapse() {
+        super();
+    }
 
     public ExcitatorySynapse(Neuron input, Neuron output, Integer id) {
         super(input, output, id);
+    }
+
+
+    @Override
+    public String getType() {
+        return TYPE_STR;
     }
 
 

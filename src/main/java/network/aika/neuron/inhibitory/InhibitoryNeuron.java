@@ -20,6 +20,7 @@ import java.util.function.Function;
 
 public class InhibitoryNeuron extends TNeuron<InhibitoryActivation, InhibitorySynapse> {
 
+    public static final String TYPE_STR = "I";
 
 
     protected InhibitoryNeuron() {
@@ -49,7 +50,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitoryActivation, InhibitorySy
 
 
     public String getType() {
-        return "I";
+        return TYPE_STR;
     }
 
 

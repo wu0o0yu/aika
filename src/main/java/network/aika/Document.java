@@ -262,7 +262,7 @@ public class Document implements Comparable<Document> {
                 .stream()
                 .filter(act -> act.getType() == EXCITATORY && act.getDecision() == UNKNOWN && act.getBounds().ub.value > 0.0)
                 .forEach(act -> {
-                    if(act.getBounds().firedLatest == null) {
+                    if(act.getBounds().lb.fired == null) {
                         throw new OscillatingActivationsException(act.searchStateToString());
                     }
 

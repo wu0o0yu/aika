@@ -33,29 +33,6 @@ import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.Synapse.State.NEXT;
 
 /**
- * The {@code Synapse} class connects two neurons with each other. When propagating an activation signal, the
- * weight of the synapse is multiplied with the activation value of the input neurons activation. The result is then added
- * to the output neurons weighted sum to compute the output activation value. In contrast to a conventional neural network
- * synapses in Aika do not just propagate the activation value from one neuron to the next, but also structural information
- * like the text range and the relational id (e.g. word position) and also the interpretation to which the input
- * activation belongs. To determine in which way the structural information should be propagated synapses in Aika possess
- * a few more properties.
- *
- * <p>The properties {@code relativeRid} and {@code absoluteRid} determine either the relative difference between
- * the {@code rid} of the input activation and the rid of the output activation or require a fixed rid as input.
- *
- * <p>The properties range match, range mapping and range output manipulate the ranges. The range match determines whether
- * the input range begin or end is required to be equal, greater than or less than the range of the output activation.
- * The range mapping can be used to map for example an input range end to an output range begin. Usually this simply maps
- * begin to begin and end to end. The range output property is a boolean flag which determines whether the input range
- * should be propagated to the output activation.
- *
- * <p>Furthermore, the property {@code isRecurrent} specifies if this synapse is a recurrent feedback link. Recurrent
- * feedback links can be either negative or positive depending on the weight of the synapse. Recurrent feedback links
- * kind of allow to use future information as inputs of a current neuron. Aika allows this by making assumptions about
- * the recurrent input neuron. The class {@code SearchNode} modifies these assumptions until the best interpretation
- * for this document is found.
- *
  *
  * @author Lukas Molzberger
  */
@@ -100,6 +77,8 @@ public abstract class Synapse implements Writable {
         this.output = output;
     }
 
+
+    public abstract String getType();
 
     public abstract boolean storeOnInputSide();
 
@@ -308,6 +287,8 @@ public abstract class Synapse implements Writable {
 
     @Override
     public void write(DataOutput out) throws IOException {
+        out.writeUTF(getType());
+
         out.writeInt(id);
 
         out.writeInt(input.getId());

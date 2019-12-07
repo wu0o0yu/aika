@@ -40,15 +40,26 @@ import java.util.TreeMap;
  */
 public class MetaSynapse extends TSynapse {
 
+    public static final String TYPE_STR = "M";
+
+
     public boolean isMetaVariable;
 
     Map<ExcitatoryNeuron, MappingLink> targetSynapses = new TreeMap<>();
 
+    public MetaSynapse() {
+        super();
+    }
 
     public MetaSynapse(Neuron input, Neuron output, Integer id, int lastCount) {
         super(input, output, id, lastCount);
     }
 
+
+    @Override
+    public String getType() {
+        return TYPE_STR;
+    }
 
     @Override
     public boolean storeOnInputSide() {

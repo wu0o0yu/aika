@@ -14,6 +14,8 @@ import network.aika.neuron.activation.InputActivation;
 
 public class InputNeuron extends TNeuron<InputActivation, Synapse> {
 
+    public static final String TYPE_STR = "IN";
+
 
     private InputNeuron() {
         super();
@@ -42,7 +44,7 @@ public class InputNeuron extends TNeuron<InputActivation, Synapse> {
 
 
     public String getType() {
-        return "IN";
+        return TYPE_STR;
     }
 
     @Override

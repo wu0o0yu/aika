@@ -82,7 +82,7 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
 
 
     public void count(Option o) {
-        countValue += o.getState().lb * o.getP();
+        countValue += o.getBounds().lb.value * o.getP();
 
         countSynapses(o, INPUT);
         countSynapses(o, OUTPUT);
@@ -227,7 +227,7 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
 
 
     public double getTrainingNetValue(Option o) {
-        return o.getState().net;
+        return o.getBounds().lb.net;
     }
 
 
@@ -246,7 +246,7 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
 
     private double getCoverage(Option seedOpt) {
         double maxCoverage = 0.0;
-        for(Map.Entry<Link, Option> me: seedOpt.outputOptions.entrySet()) {
+        for(Map.Entry<Option.Link, Option.Link> me: seedOpt.outputOptions.entrySet()) {
             maxCoverage = Math.max(maxCoverage, getCoverage(me.getKey(), seedOpt, me.getValue()));
         }
 
@@ -254,7 +254,7 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
     }
 
 
-    private static double getCoverage(Link l, Option in, Option out) {
+    private static double getCoverage(Option.Link ol) {
         INeuron n = out.getAct().getINeuron();
         return Math.min(Math.max(0.0, out.getState().net), Math.max(0.0, in.getState().value * l.getSynapse().getWeight())) / n.getBias();
     }

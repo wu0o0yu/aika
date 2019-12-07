@@ -396,7 +396,7 @@ public abstract class INeuron<A extends Activation, S extends Synapse> extends A
 
         synapseIdCounter = in.readInt();
         while (in.readBoolean()) {
-            Synapse syn = m.readSynapse(in);
+            S syn = (S) m.readSynapse(in);
             inputSynapses.put(syn, syn);
         }
 

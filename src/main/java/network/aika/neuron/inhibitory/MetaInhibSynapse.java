@@ -9,9 +9,19 @@ import network.aika.neuron.TSynapse;
 
 public class MetaInhibSynapse extends TSynapse {
 
+    public static final String TYPE_STR = "MI";
+
+    public MetaInhibSynapse() {
+        super();
+    }
 
     public MetaInhibSynapse(Neuron input, Neuron output, Integer id) {
         super(input, output, id);
+    }
+
+    @Override
+    public String getType() {
+        return TYPE_STR;
     }
 
     @Override

@@ -123,7 +123,7 @@ public class ExcitatoryActivation extends Activation {
         }
 
         // The activation at depth 0 might not yet be computed.
-        if(depth > 0 && currentOption.getState().lb <= 0.0) {
+        if(depth > 0 && currentOption.getBounds().lb.value <= 0.0) {
             return false;
         }
 

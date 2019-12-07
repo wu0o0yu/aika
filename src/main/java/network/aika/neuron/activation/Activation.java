@@ -261,7 +261,7 @@ public abstract class Activation implements Comparable<Activation> {
         currentOption = new Option(oldOption, this, sn);
 
         if (currentOption.newSearchNode()) {
-            if((oldOption.decision != UNKNOWN && oldOption.getState().equalsWithWeights(currentOption.getState()))) {
+            if((oldOption.decision != UNKNOWN && oldOption.getBounds().equalsWithWeights(currentOption.getBounds()))) {
                 return 0.0;
             }
 

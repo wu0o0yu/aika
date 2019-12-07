@@ -24,11 +24,17 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.TSynapse;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.NegExcitatorySynapse;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.inhibitory.MetaInhibSynapse;
 import network.aika.neuron.input.InputNeuron;
 import network.aika.neuron.meta.MetaNeuron;
+import network.aika.neuron.meta.MetaPatternNeuron;
 import network.aika.neuron.meta.MetaSynapse;
+import network.aika.neuron.meta.NegMetaSynapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -106,16 +112,22 @@ public class Model {
     public INeuron readNeuron(DataInput in, Neuron p) throws IOException {
         INeuron n = null;
         switch(in.readUTF()) {
-            case "E":
+            case PatternNeuron.TYPE_STR:
+                n = new PatternNeuron(p);
+                break;
+            case MetaPatternNeuron.TYPE_STR:
+                n = new MetaPatternNeuron(p);
+                break;
+            case ExcitatoryNeuron.TYPE_STR:
                 n = new ExcitatoryNeuron(p);
                 break;
-            case "I":
+            case InhibitoryNeuron.TYPE_STR:
                 n = new InhibitoryNeuron(p);
                 break;
-            case "M":
+            case MetaNeuron.TYPE_STR:
                 n = new MetaNeuron(p);
                 break;
-            case "IN":
+            case InputNeuron.TYPE_STR:
                 n = new InputNeuron(p);
                 break;
         }
@@ -126,7 +138,28 @@ public class Model {
 
 
     public Synapse readSynapse(DataInput in) throws IOException {
-        Synapse s = new Synapse();
+        Synapse s = null;
+        switch(in.readUTF()) {
+            case ExcitatorySynapse.TYPE_STR:
+                s = new ExcitatorySynapse();
+                break;
+            case NegExcitatorySynapse.TYPE_STR:
+                s = new NegExcitatorySynapse();
+                break;
+            case InhibitorySynapse.TYPE_STR:
+                s = new InhibitorySynapse();
+                break;
+            case MetaInhibSynapse.TYPE_STR:
+                s = new MetaInhibSynapse();
+                break;
+            case MetaSynapse.TYPE_STR:
+                s = new MetaSynapse();
+                break;
+            case NegMetaSynapse.TYPE_STR:
+                s = new NegMetaSynapse();
+                break;
+        }
+
         s.readFields(in, this);
         return s;
     }

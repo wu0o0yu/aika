@@ -24,6 +24,8 @@ import static network.aika.neuron.Synapse.State.CURRENT;
 
 public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
 
+    public static final String TYPE_STR = "M";
+
     public static double COVERED_THRESHOLD = 5.0;
 
     public InhibitoryNeuron inhibitoryNeuron;
@@ -60,7 +62,7 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
 
 
     public String getType() {
-        return "M";
+        return TYPE_STR;
     }
 
 

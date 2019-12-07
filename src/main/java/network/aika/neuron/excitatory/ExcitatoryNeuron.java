@@ -28,6 +28,8 @@ import static network.aika.neuron.activation.Activation.INPUT_COMP;
 
 public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation, ExcitatorySynapse> {
 
+    public static final String TYPE_STR = "E";
+
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 
 
@@ -104,7 +106,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatoryActivation, ExcitatorySy
 
 
     public String getType() {
-        return "E";
+        return TYPE_STR;
     }
 
 
