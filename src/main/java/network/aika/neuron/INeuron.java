@@ -19,7 +19,6 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.link.Linker;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +35,6 @@ import static network.aika.neuron.Synapse.State.NEXT;
  * input synapses and output synapses. The activation value of a neuron is calculated by computing the weighted sum
  * (input act. value * synapse weight) of the input synapses, adding the bias to it and sending the resulting value
  * through a transfer function (the upper part of tanh).
- * <p>
- * <p>The neuron does not store its activationsBySlotAndPosition by itself. The activation objects are stored within the
- * logic nodes. To access the activationsBySlotAndPosition of this neuron simply use the member variable {@code node} or use
- * the method {@code getFinalActivations(Document doc)} to ge the final activationsBySlotAndPosition of this neuron.
  *
  * @author Lukas Molzberger
  */
