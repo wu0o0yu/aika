@@ -6,9 +6,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.MetaActivation;
-import network.aika.neuron.activation.Activation.Link;
-import network.aika.neuron.activation.search.Option;
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
@@ -22,7 +20,7 @@ import java.util.stream.Collectors;
 import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.Synapse.State.CURRENT;
 
-public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
+public class MetaNeuron extends TNeuron<MetaSynapse> {
 
     public static final String TYPE_STR = "M";
 
@@ -49,8 +47,8 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
 
 
     @Override
-    public boolean isRecurrent(boolean isNegativeSynapse) {
-        return false;
+    public Fired incrementFired(Fired f) {
+        return new Fired(f.getInputTimestamp(), f.getFired() + 1);
     }
 
 
@@ -109,7 +107,7 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
         return sb.toString();
     }
 
-
+/*
     public static void induce(Model model, int threadId) {
         for(Neuron n: model.getActiveNeurons()) {
             if(n.get() instanceof ExcitatoryNeuron) {
@@ -127,8 +125,8 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
             }
         }
     }
-
-
+*/
+/*
     public static void createNewMetaNeuron(Model model, int threadId, Neuron inputNeuron, List<ExcitatorySynapse> candidateSynapses) {
         MetaNeuron mn = new MetaNeuron(model,"");
 
@@ -144,7 +142,7 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
 
         InhibitoryNeuron.induceOutgoing(threadId, mn);
     }
-
+*/
 
     public static double coveredSum(List<ExcitatorySynapse> syns) {
         double sum = 0.0;
@@ -155,7 +153,7 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
     }
 
 
-
+/*
     public void train(int threadId) {
         do {
             double diff;
@@ -179,7 +177,7 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
 
         } while(induceInputInhibNeurons() || expand(threadId));
     }
-
+*/
 
     private void propagateToOutgoingInhibNeurons(int threadId) {
         for(Synapse s: getProvider().getActiveOutputSynapses()) {
@@ -202,7 +200,7 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
         return sum;
     }
 
-
+/*
     private boolean expand(int threadId) {
         boolean changed = false;
         double sumNij = getNijSum();
@@ -296,7 +294,7 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
         }
     }
 
-/*
+
     private void applyRefinement(int threadId, Refinement ref, List<ExcitatorySynapse> targetSyns) {
         int newSynId = getNewSynapseId();
 
@@ -317,7 +315,7 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
             newRelation.link(getProvider(), ref.anchor.getId(), nms.getId());
         }
     }
-*/
+
 
     public static void collectCandidates(List<Neuron> results, Neuron n) {
         results.add(n);
@@ -328,7 +326,7 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
             }
         }
     }
-
+*/
 
     public void updateBias() {
         double sum = 0.0;
@@ -346,11 +344,6 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
     }
 
 
-    protected MetaActivation createActivation(Document doc) {
-        return new MetaActivation(doc, this);
-    }
-
-
     public InhibitoryNeuron getInhibitoryNeuron() {
         return inhibitoryNeuron;
     }
@@ -361,8 +354,8 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
     }
 
 
-    public void train(Config c, Option o) {
-        transferMetaSynapses(c, o);
+    public void train(Config c, Activation o) {
+//        transferMetaSynapses(c, o);
 
         super.train(c, o);
     }
@@ -373,7 +366,7 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
         return false;
     }
 /*
-    public TNeuron getInputTargets(TDocument doc, Option in) {
+    public TNeuron getInputTargets(TDocument doc, Activation in) {
         return doc.metaActivations.get(in);
     }
 */
@@ -443,30 +436,30 @@ public class MetaNeuron extends TNeuron<MetaActivation, MetaSynapse> {
         }
     }
 
-
-    public void transferMetaSynapses(Config config, Option metaActOption) {
-        if(metaActOption.targetNeuron == null) {
+/*
+    public void transferMetaSynapses(Config config, Activation metaActActivation) {
+        if(metaActActivation.targetNeuron == null) {
             return;
         }
 
-        Document doc = metaActOption.getAct().getDocument();
+        Document doc = metaActActivation.getAct().getDocument();
 
-        metaActOption.inputOptions.entrySet().stream()
+        metaActActivation.inputOptions.entrySet().stream()
                 .filter(me -> me.getValue() != null && me.getValue().getP() >= config.getMetaThreshold())
                 .forEach(me -> {
                     Link l = me.getKey();
-                    Option inOption = me.getValue();
+                    Activation inState = me.getValue();
 
                     MetaSynapse templateSynapse = (MetaSynapse) l.getSynapse();
 
                     if (templateSynapse != null) {
-                        TNeuron inputNeuron = inOption.targetNeuron;
+                        TNeuron inputNeuron = inState.targetNeuron;
 
-                        templateSynapse.transferTemplateSynapse(doc, inputNeuron, metaActOption.targetNeuron, l);
+                        templateSynapse.transferTemplateSynapse(doc, inputNeuron, metaActActivation.targetNeuron, l);
                     }
                 });
     }
-
+*/
 
 
     public static class MappingLink {

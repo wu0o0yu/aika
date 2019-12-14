@@ -16,43 +16,32 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.activation.Activation.Link;
 
-import java.util.ArrayDeque;
+import java.util.Comparator;
+import java.util.TreeSet;
+
+import network.aika.neuron.activation.Activation.OscillatingActivationsException;
 
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class UpperBoundQueue {
-    private final ArrayDeque<Activation> queue = new ArrayDeque<>();
+public class Queue {
+    private final TreeSet<Activation> queue = new TreeSet<>(Comparator.comparing(o -> o.fired));
 
 
-    public void add(Link l) {
-        if(!l.isRecurrent()) {
-            add(l.getOutput());
-        }
+    public void add(Activation o) {
+        queue.add(o);
     }
 
 
-    public void add(Activation act) {
-        if(!act.ubQueued && act.getInputState() == null) {
-            act.ubQueued = true;
-            queue.addLast(act);
+    public void process() throws OscillatingActivationsException {
+        while (!queue.isEmpty()) {
+            Activation o = queue.pollFirst();
+
+            o.process();
         }
-    }
-
-
-    public boolean process() {
-        boolean flag = false;
-        while(!queue.isEmpty()) {
-            flag = true;
-            Activation act = queue.pollFirst();
-            act.ubQueued = false;
-
-            act.processBounds();
-        }
-        return flag;
     }
 }
+

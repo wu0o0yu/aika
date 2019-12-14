@@ -61,7 +61,7 @@ public class ExcitatorySynapse extends TSynapse {
         return metaSynapses.get(new MetaSynapse(in, out, -1, 0));
     }
 
-
+/*
     public double getUncovered() {
         double max = 0.0;
         for(Map.Entry<MetaSynapse, MetaSynapse.MappingLink> me: metaSynapses.entrySet()) {
@@ -76,7 +76,7 @@ public class ExcitatorySynapse extends TSynapse {
 
         return 1.0 - max;
     }
-
+*/
 
 
     public boolean isMappedToMetaSynapse(MetaSynapse metaSyn) {

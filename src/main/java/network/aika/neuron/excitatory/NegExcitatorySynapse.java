@@ -2,9 +2,9 @@ package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.search.Option;
 import network.aika.neuron.Sign;
 import network.aika.neuron.TNeuron;
+import network.aika.neuron.activation.Activation;
 
 
 public class NegExcitatorySynapse extends ExcitatorySynapse {
@@ -31,7 +31,7 @@ public class NegExcitatorySynapse extends ExcitatorySynapse {
     }
 
 
-    public void updateCountValue(Option io, Option oo) {
+    public void updateCountValue(Activation io, Activation oo) {
         double inputValue = io != null ? io.getBounds().lb.value : 0.0;
         double outputValue = oo != null ? oo.getBounds().lb.value : 0.0;
 

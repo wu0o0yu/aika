@@ -3,7 +3,6 @@ package network.aika.neuron;
 import network.aika.Model;
 import network.aika.Utils;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.search.Option;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -76,7 +75,7 @@ public abstract class TSynapse extends Synapse {
     }
 
 
-    public void updateCountValue(Option io, Option oo) {
+    public void updateCountValue(Activation io, Activation oo) {
         double inputValue = io != null ? io.getBounds().lb.value : 0.0;
         double outputValue = oo != null ? oo.getBounds().lb.value : 0.0;
 

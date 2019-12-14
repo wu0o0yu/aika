@@ -4,15 +4,13 @@ import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.Config;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.InputActivation;
+import network.aika.neuron.activation.Fired;
 
 
-public class InputNeuron extends TNeuron<InputActivation, Synapse> {
+public class InputNeuron extends TNeuron<Synapse> {
 
     public static final String TYPE_STR = "IN";
 
@@ -33,8 +31,8 @@ public class InputNeuron extends TNeuron<InputActivation, Synapse> {
 
 
     @Override
-    public boolean isRecurrent(boolean isNegativeSynapse) {
-        return false;
+    public Fired incrementFired(Fired f) {
+        return f;
     }
 
 
@@ -52,10 +50,6 @@ public class InputNeuron extends TNeuron<InputActivation, Synapse> {
         return ActivationFunction.NULL_FUNCTION;
     }
 
-    @Override
-    protected Activation createActivation(Document doc) {
-        return new InputActivation(doc, this);
-    }
 
     @Override
     public double getTotalBias(Synapse.State state) {

@@ -20,7 +20,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Document;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Activation.Link;
+import network.aika.neuron.activation.Link;
 import network.aika.Writable;
 
 import java.io.DataInput;
@@ -99,7 +99,7 @@ public abstract class Synapse implements Writable {
 
 
     public Collection<Activation> getActivations(Activation outputAct) {
-        return outputAct.getInputLinks()
+        return outputAct.inputLinks.values().stream()
                 .filter(l -> l.getSynapse() == this)
                 .map(l -> l.getInput())
                 .collect(Collectors.toList());
@@ -375,7 +375,7 @@ public abstract class Synapse implements Writable {
          * @param neuron
          * @return
          */
-        public Builder setNeuron(INeuron<?, ?> neuron) {
+        public Builder setNeuron(INeuron<?> neuron) {
             assert neuron != null;
             this.neuron = neuron.getProvider();
             return this;

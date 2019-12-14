@@ -5,9 +5,8 @@ import network.aika.Config;
 import network.aika.Model;
 import network.aika.Utils;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.link.Direction;
-import network.aika.neuron.activation.Activation.Link;
-import network.aika.neuron.activation.search.Option;
+import network.aika.neuron.activation.Direction;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 import java.io.DataInput;
@@ -17,15 +16,15 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.link.Direction.INPUT;
-import static network.aika.neuron.activation.link.Direction.OUTPUT;
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class TNeuron<A extends Activation, S extends Synapse> extends INeuron<A, S> {
+public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 
     public static double RELIABILITY_THRESHOLD = 10.0;
 
@@ -81,23 +80,23 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
     }
 
 
-    public void count(Option o) {
-        countValue += o.getBounds().lb.value * o.getP();
+    public void count(Activation act) {
+        countValue += act.value * act.getP();
 
-        countSynapses(o, INPUT);
-        countSynapses(o, OUTPUT);
+        countSynapses(act, INPUT);
+        countSynapses(act, OUTPUT);
     }
 
 
-    private void countSynapses(Option o, Direction dir) {
+    private void countSynapses(Activation o, Direction dir) {
         Set<Synapse> rest = new TreeSet<>(dir == INPUT ? Synapse.INPUT_SYNAPSE_COMP : Synapse.OUTPUT_SYNAPSE_COMP);
         rest.addAll(dir == INPUT ? getProvider().getActiveInputSynapses() : getProvider().getActiveOutputSynapses());
 
-        for(Option.Link ol: (dir == INPUT ? o.inputOptions: o.outputOptions).keySet()) {
-            TSynapse ts = (TSynapse)ol.getActivationLink().getSynapse();
-            Option lo = (dir == INPUT ? ol.getInput(): ol.getOutput());
+        for(Link ol: (dir == INPUT ? o.inputLinks: o.outputLinks).keySet()) {
+            TSynapse ts = (TSynapse)ol.getSynapse();
+            Activation lo = (dir == INPUT ? ol.getInput(): ol.getOutput());
 
-            rest.remove(ol.getActivationLink().getSynapse());
+            rest.remove(ol.getSynapse());
 
             if(dir == INPUT) {
                 ts.updateCountValue(lo, o);
@@ -119,8 +118,8 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
 
 
     public void updateFrequencies(Activation act) {
-        int beginPos = StatUtil.getCurrentPos(act, BEGIN);
-        int endPos = StatUtil.getCurrentPos(act, END);
+        int beginPos = 0; //StatUtil.getCurrentPos(act, BEGIN);
+        int endPos = 0; //StatUtil.getCurrentPos(act, END);
 
         int stepsBefore = beginPos - lastCount;
         int stepsWithin = endPos - beginPos;
@@ -144,7 +143,7 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
         Set<Synapse> rest = new TreeSet<>(dir == INPUT ? Synapse.INPUT_SYNAPSE_COMP : Synapse.OUTPUT_SYNAPSE_COMP);
         rest.addAll(dir == INPUT ? getProvider().getActiveInputSynapses() : getProvider().getActiveOutputSynapses());
 
-        for(Link l: (dir == INPUT ? act.getInputLinks(): act.getOutputLinks()).collect(Collectors.toList())) {
+        for(Link l: (dir == INPUT ? act.inputLinks: act.outputLinks).values().stream().collect(Collectors.toList())) {
             TSynapse ts = (TSynapse) l.getSynapse();
 
             rest.remove(ts);
@@ -198,13 +197,13 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
     }
 
 
-    public void prepareTrainingStep(Config c, Option o, Function<Activation, ExcitatoryNeuron> callback) {
+    public void prepareTrainingStep(Config c, Activation o, Function<Activation, ExcitatoryNeuron> callback) {
         prepareMetaTraining(c, o, callback);
         count(o);
     }
 
 
-    public void train(Config c, Option o) {
+    public void train(Config c, Activation o) {
 //      if((o.p * (1.0 - getCoverage(o))) > THRESHOLD) {
         if (isMature(c)) {
             generateNeuron(o);
@@ -214,9 +213,9 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
 
 
     // Implemented only for meta and target neurons
-    public void prepareMetaTraining(Config c, Option o, Function<Activation, ExcitatoryNeuron> callback) {
-        if (o.getP() > c.getMetaThreshold() && getTrainingNetValue(o) > 0.0) {
-            o.targetNeuron = getTargetNeuron(o.getAct(), callback);
+    public void prepareMetaTraining(Config c, Activation act, Function<Activation, ExcitatoryNeuron> callback) {
+        if (act.getP() > c.getMetaThreshold() && getTrainingNetValue(act) > 0.0) {
+            act.targetNeuron = getTargetNeuron(act, callback);
         }
     }
 
@@ -226,8 +225,8 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
     }
 
 
-    public double getTrainingNetValue(Option o) {
-        return o.getBounds().lb.net;
+    public double getTrainingNetValue(Activation act) {
+        return act.net;
     }
 
 
@@ -237,16 +236,16 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
 
 
     // Entfernen und durch transferMetaSynapses ersetzen.
-    private void generateNeuron(Option o) {
-        ExcitatoryNeuron targetNeuron = new ExcitatoryNeuron(getModel(), "DERIVED-FROM-(" + o.getAct().getLabel() + ")");
+    private void generateNeuron(Activation act) {
+        ExcitatoryNeuron targetNeuron = new ExcitatoryNeuron(getModel(), "DERIVED-FROM-(" + act.getLabel() + ")");
 
-        targetNeuron.init(o);
+//        targetNeuron.init(o);
     }
 
-
-    private double getCoverage(Option seedOpt) {
+/*
+    private double getCoverage(Activation seedOpt) {
         double maxCoverage = 0.0;
-        for(Map.Entry<Option.Link, Option.Link> me: seedOpt.outputOptions.entrySet()) {
+        for(Map.Entry<Link, Link> me: seedOpt.outputLinks.entrySet()) {
             maxCoverage = Math.max(maxCoverage, getCoverage(me.getKey(), seedOpt, me.getValue()));
         }
 
@@ -254,28 +253,15 @@ public abstract class TNeuron<A extends Activation, S extends Synapse> extends I
     }
 
 
-    private static double getCoverage(Option.Link ol) {
+    private static double getCoverage(Link ol) {
         INeuron n = out.getAct().getINeuron();
         return Math.min(Math.max(0.0, out.getState().net), Math.max(0.0, in.getState().value * l.getSynapse().getWeight())) / n.getBias();
     }
-
+*/
 
     public abstract boolean isMature(Config c);
 
 
-    public static boolean checkSelfReferencing(Option current, Option inhib) {
-        if(inhib == null) {
-            return false;
-        }
-
-        for(Option in: inhib.inputOptions.values()) {
-            if(in == current) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
 
     protected String toDetailedString() {

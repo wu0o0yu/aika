@@ -19,6 +19,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ import static network.aika.neuron.Synapse.State.NEXT;
  *
  * @author Lukas Molzberger
  */
-public abstract class INeuron<A extends Activation, S extends Synapse> extends AbstractNode<Neuron> implements Comparable<INeuron> {
+public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> implements Comparable<INeuron> {
 
     private static final Logger log = LoggerFactory.getLogger(INeuron.class);
 
@@ -67,7 +68,7 @@ public abstract class INeuron<A extends Activation, S extends Synapse> extends A
     ReadWriteLock lock = new ReadWriteLock();
 
 
-    private ThreadState<A>[] threads;
+    private ThreadState<Activation>[] threads;
 
 
     /**
@@ -107,7 +108,7 @@ public abstract class INeuron<A extends Activation, S extends Synapse> extends A
     }
 
 
-    public abstract boolean isRecurrent(boolean isNegativeSynapse);
+    public abstract Fired incrementFired(Fired f);
 
 
     public abstract boolean isWeak(Synapse synapse, Synapse.State state);
@@ -129,11 +130,6 @@ public abstract class INeuron<A extends Activation, S extends Synapse> extends A
 
     public Collection<S> getInputSynapses() {
         return inputSynapses.values();
-    }
-
-
-    public S getMaxInputSynapse(Synapse.State state) {
-        return null;
     }
 
 
@@ -213,8 +209,8 @@ public abstract class INeuron<A extends Activation, S extends Synapse> extends A
     }
 
 
-    private ThreadState<A> getThreadState(int threadId, boolean create) {
-        ThreadState<A> th = threads[threadId];
+    private ThreadState<Activation> getThreadState(int threadId, boolean create) {
+        ThreadState<Activation> th = threads[threadId];
         if (th == null) {
             if (!create) return null;
 
@@ -233,25 +229,21 @@ public abstract class INeuron<A extends Activation, S extends Synapse> extends A
      * @param input
      */
     public Activation addInput(Document doc, Activation.Builder input) {
-        Activation act = createActivation(doc);
+        Fired f = new Fired(input.inputTimestamp, input.fired);
+
+        Activation act = new Activation(doc, this, input.value, f);
 
         // TODO: add input links
-
-        act.setInputState(input);
 
         doc.addInputNeuronActivation(act);
         doc.addFinallyActivatedNeuron(act.getINeuron());
 
-
         propagate(act);
 
-        doc.propagate();
+        doc.getQueue().process();
 
         return act;
     }
-
-
-    protected abstract Activation createActivation(Document doc);
 
 
 
@@ -284,7 +276,7 @@ public abstract class INeuron<A extends Activation, S extends Synapse> extends A
         clearActivations();
 
         for (Synapse s : inputSynapses.values()) {
-            INeuron<?, ?> in = s.getInput().get();
+            INeuron<?> in = s.getInput().get();
             in.provider.lock.acquireWriteLock();
             in.provider.activeOutputSynapses.remove(s);
             in.provider.lock.releaseWriteLock();
@@ -318,12 +310,8 @@ public abstract class INeuron<A extends Activation, S extends Synapse> extends A
     public void propagate(Activation act) {
         Document doc = act.getDocument();
 
-        // TODO: Prüfen, ob die Aktivierung schon existiert.
-
         getOutputSynapses()
-                .forEach(s -> doc.getLinker().link(s, act, createActivation(doc)));
-
-        doc.getLinker().process();
+                .forEach(s -> );
     }
 
 

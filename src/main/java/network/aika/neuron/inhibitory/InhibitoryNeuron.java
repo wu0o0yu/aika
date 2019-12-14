@@ -3,12 +3,11 @@ package network.aika.neuron.inhibitory;
 import network.aika.ActivationFunction;
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.InhibitoryActivation;
-import network.aika.neuron.activation.search.Option;
 import network.aika.Config;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
@@ -39,8 +38,8 @@ public class InhibitoryNeuron extends TNeuron<InhibitoryActivation, InhibitorySy
 
 
     @Override
-    public boolean isRecurrent(boolean isNegativeSynapse) {
-        return isNegativeSynapse;
+    public Fired incrementFired(Fired f) {
+        return f;
     }
 
 
@@ -118,7 +117,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitoryActivation, InhibitorySy
 
 
 
-    public void prepareMetaTraining(Config c, Option o, Function<Activation, ExcitatoryNeuron> callback) {
+    public void prepareMetaTraining(Config c, Activation o, Function<Activation, ExcitatoryNeuron> callback) {
         // Nothing to do.
     }
 

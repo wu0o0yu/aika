@@ -20,12 +20,7 @@ package network.aika;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Activation.OscillatingActivationsException;
-import network.aika.neuron.activation.link.Linker;
-import network.aika.neuron.activation.search.Option;
-import network.aika.neuron.activation.search.SearchNode;
-import network.aika.neuron.activation.search.SearchNode.TimeoutException;
-import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.Queue;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import org.slf4j.Logger;
@@ -34,8 +29,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static network.aika.neuron.activation.search.Decision.UNKNOWN;
 
 
 /**
@@ -58,16 +51,11 @@ public class Document implements Comparable<Document> {
 
     private long visitedCounter = 1;
     private int activationIdCounter = 0;
-    private int nodeActivationIdCounter = 0;
-    public int searchNodeIdCounter = 0;
-    public int searchStepCounter = 0;
 
     private Model model;
     private int threadId;
 
-    private ValueQueue valueQueue = new ValueQueue();
-    private UpperBoundQueue ubQueue = new UpperBoundQueue();
-    private Linker linker;
+    private Queue queue = new Queue();
 
     private TreeSet<INeuron> activatedNeurons = new TreeSet<>();
     private TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
@@ -76,18 +64,7 @@ public class Document implements Comparable<Document> {
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
-
-    public SearchNode selectedSearchNode;
-    public ArrayList<Activation> candidates = new ArrayList<>();
-
     public long createV;
-
-
-    public static Comparator<Activation> ACTIVATIONS_COMPARATOR = (act1, act2) -> {
-        int r = act1.getBounds().lb.fired.compareTo(act2.getBounds().lb.fired);
-        if (r != 0) return r;
-        return Integer.compare(act1.getId(), act2.getId());
-    };
 
 
     public Document(Model model, String content) {
@@ -106,15 +83,10 @@ public class Document implements Comparable<Document> {
 
         this.model = model;
         this.threadId = threadId;
-        this.linker = initLinker();
 
         model.acquireThread(threadId, this);
     }
 
-
-    protected Linker initLinker() {
-        return new Linker(this);
-    }
 
 
     public int getId() {
@@ -127,13 +99,8 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public Linker getLinker() {
-        return linker;
-    }
-
-
-    public ValueQueue getValueQueue() {
-        return valueQueue;
+    public Queue getQueue() {
+        return queue;
     }
 
     public long getNewVisitedId() {
@@ -143,10 +110,6 @@ public class Document implements Comparable<Document> {
 
     public int getNewActivationId() {
         return activationIdCounter++;
-    }
-
-    public int getNewNodeActivationId() {
-        return nodeActivationIdCounter++;
     }
 
 
@@ -192,12 +155,6 @@ public class Document implements Comparable<Document> {
     public String toString() {
 		return content.toString();
 	}
-
-
-    public UpperBoundQueue getUpperBoundQueue() {
-        return ubQueue;
-    }
-
 
 
     public String getText(Integer begin, Integer end) {
@@ -246,86 +203,6 @@ public class Document implements Comparable<Document> {
     @Override
     public int compareTo(Document doc) {
         return Integer.compare(id, doc.id);
-    }
-
-
-    public void propagate() {
-        while(ubQueue.process()) {}
-    }
-
-
-    public void generateCandidates() throws CyclicDependencyException {
-        TreeSet<Activation> tmp = new TreeSet<>(ACTIVATIONS_COMPARATOR);
-
-        activationsById
-                .values()
-                .stream()
-                .filter(act -> act.getType() == EXCITATORY && act.getDecision() == UNKNOWN && act.getBounds().ub.value > 0.0)
-                .forEach(act -> {
-                    if(act.getBounds().lb.fired == null) {
-                        throw new OscillatingActivationsException(act.searchStateToString());
-                    }
-
-                    tmp.add(act);
-                });
-
-        candidates = new ArrayList<>(tmp);
-    }
-
-
-    /**
-     * The method <code>process</code> needs to be called after all the input activations have been added to the
-     * network. It performs the search for the best interpretation.
-     */
-    public void process() throws TimeoutException, CyclicDependencyException, OscillatingActivationsException {
-        process(null);
-    }
-
-
-    public void process(Long timeoutInMilliSeconds) throws TimeoutException, CyclicDependencyException, OscillatingActivationsException {
-        inputNeuronActivations.forEach(act -> {
-            valueQueue.propagateActivationValue(act, null, true, true);
-        });
-
-        generateCandidates();
-
-        selectedSearchNode = new SearchNode(this, null, null, 0);
-        selectedSearchNode.updateActivations(this);
-        storeFinalState();
-
-        SearchNode rootNode = selectedSearchNode;
-
-        SearchNode.search(this, selectedSearchNode, visitedCounter++, timeoutInMilliSeconds);
-
-        for(Activation act: activationsById.values()) {
-            if(act.isFinalActivation()) {
-                finallyActivatedNeurons.add(act.getINeuron());
-            }
-        }
-
-        SearchNode.computeCachedFactor(rootNode);
-        computeOptionProbabilities();
-    }
-
-
-    public void storeFinalState() {
-        for(Activation act: activationsById.values()) {
-            act.finalOption = act.getCurrentOption();
-        }
-    }
-
-
-    private void computeOptionProbabilities() {
-        for (Activation act : activationsById.values()) {
-            act.computeOptionProbabilities();
-        }
-    }
-
-
-    public void dumpDebugCandidateStatistics() {
-        for (Activation act : candidates) {
-            log.info(act.searchStateToString());
-        }
     }
 
 
@@ -395,7 +272,7 @@ public class Document implements Comparable<Document> {
         sb.append("\n");
 
         for(Activation act: acts) {
-            if(act.getBounds().ub.value <= 0.0 && (act.getTargetValue() == null || act.getTargetValue() <= 0.0)) {
+            if(!act.isActive()) {
                 continue;
             }
 
@@ -403,20 +280,8 @@ public class Document implements Comparable<Document> {
             sb.append("\n");
         }
 
-        if(selectedSearchNode != null) {
-            sb.append("\n Final SearchNode:" + selectedSearchNode.getId() + "  WeightSum:" + selectedSearchNode.getAccumulatedWeight() + "\n");
-        }
         return sb.toString();
     }
-
-
-    public static class CyclicDependencyException extends RuntimeException {
-
-        public CyclicDependencyException() {
-            super("Cycle detected in the activations that is not marked recurrent.");
-        }
-    }
-
 
 
     public void train(Config c) {
@@ -425,31 +290,27 @@ public class Document implements Comparable<Document> {
         Function<Activation, ExcitatoryNeuron> callback = act -> new ExcitatoryNeuron(getModel(), act.getLabel());
 
         for(Activation act: new ArrayList<>(getActivations(false))) {
-            if(act.getBounds().ub.value > 0.0) {
+            if(act.isActive()) {
                 TNeuron n = act.getINeuron();
 
-                for (Option o : act.getOptions()) {
-                    n.prepareTrainingStep(c, o, callback);
-                }
+                n.prepareTrainingStep(c, act, callback);
             }
         }
 
         for(Activation act: new ArrayList<>(getActivations(false))) {
-            if(act.getBounds().ub.value > 0.0) {
+            if(act.isActive()) {
                 TNeuron n = act.getINeuron();
 
                 n.updateFrequencies(act);
                 n.initCountValues();
 
-                for (Option o : act.getOptions()) {
-                    n.train(c, o);
+                n.train(c, act);
 
-                    o.targetNeuron.commit(o.targetNeuron.getInputSynapses());
-                }
+                act.targetNeuron.commit(act.targetNeuron.getInputSynapses());
             }
         }
 
-        propagate();
+//        propagate();
 
         getModifiedWeights().forEach((n, inputSyns) -> {
             TNeuron tn = (TNeuron) n;
