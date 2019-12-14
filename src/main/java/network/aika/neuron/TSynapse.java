@@ -39,14 +39,14 @@ public abstract class TSynapse extends Synapse {
     }
 
 
-    public TSynapse(Neuron input, Neuron output, Integer id) {
-        super(input, output, id);
+    public TSynapse(Neuron input, Neuron output, Integer id, boolean recurrent) {
+        super(input, output, id, recurrent);
         this.lastCount = 0;
     }
 
 
-    public TSynapse(Neuron input, Neuron output, Integer id, int lastCount) {
-        super(input, output, id);
+    public TSynapse(Neuron input, Neuron output, Integer id, boolean recurrent, int lastCount) {
+        super(input, output, id, recurrent);
         this.lastCount = lastCount;
     }
 
@@ -76,8 +76,8 @@ public abstract class TSynapse extends Synapse {
 
 
     public void updateCountValue(Activation io, Activation oo) {
-        double inputValue = io != null ? io.getBounds().lb.value : 0.0;
-        double outputValue = oo != null ? oo.getBounds().lb.value : 0.0;
+        double inputValue = io != null ? io.value : 0.0;
+        double outputValue = oo != null ? oo.value : 0.0;
 
         if(!needsCountUpdate) {
             return;
@@ -104,8 +104,8 @@ public abstract class TSynapse extends Synapse {
         double stepsWithin;
         double stepsBefore;
         if(iAct != null) {
-            int beginPos = StatUtil.getCurrentPos(iAct, BEGIN);
-            int endPos = StatUtil.getCurrentPos(iAct, END);
+            int beginPos = 0; //StatUtil.getCurrentPos(iAct, BEGIN);
+            int endPos = 0; // StatUtil.getCurrentPos(iAct, END);
 
             stepsWithin = endPos - beginPos;
             stepsBefore = beginPos - lastCount;
@@ -116,7 +116,7 @@ public abstract class TSynapse extends Synapse {
         } else {
             stepsWithin = getAvgLength();
 
-            int endPos = StatUtil.getCurrentPos(oAct, END);
+            int endPos = 0; //StatUtil.getCurrentPos(oAct, END);
 
             stepsBefore = (endPos - stepsWithin) - lastCount;
             lastCount = endPos;

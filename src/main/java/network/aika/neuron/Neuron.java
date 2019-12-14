@@ -32,7 +32,7 @@ import java.util.stream.Stream;
  *
  * @author Lukas Molzberger
  */
-public class Neuron extends Provider<INeuron<? extends Activation, ? extends Synapse>> {
+public class Neuron extends Provider<INeuron<? extends Synapse>> {
 
     public static final Neuron MIN_NEURON = new Neuron(null, Integer.MIN_VALUE);
     public static final Neuron MAX_NEURON = new Neuron(null, Integer.MAX_VALUE);
@@ -147,26 +147,12 @@ public class Neuron extends Provider<INeuron<? extends Activation, ? extends Syn
         return inputSynapsesById.get(synapseId);
     }
 
-    /**
-     * {@code getFinalActivations} is a convenience method to retrieve all activations of the given neuron that
-     * are part of the final interpretation. Before calling this method, the {@code doc.process()} needs to
-     * be called first. {@code getFinalActivations} requires that the {@code doc.process()} method has been called first.
-     *
-     * @param doc The current document
-     * @return A collection with all final activations of this neuron.
-     */
-    public Stream<Activation> getActivations(Document doc, boolean onlyFinal) {
-        INeuron n = getIfNotSuspended();
-        if(n == null) return Stream.empty();
-        return n.getActivations(doc, onlyFinal);
-    }
-
 
     public Synapse selectInputSynapse(Neuron inputNeuron, Predicate<Synapse> filter) {
         lock.acquireWriteLock();
         Synapse synapse = activeInputSynapses.subMap(
-                new ExcitatorySynapse(inputNeuron, this, Integer.MIN_VALUE), true,
-                new ExcitatorySynapse(inputNeuron, this, Integer.MAX_VALUE), true
+                new ExcitatorySynapse(inputNeuron, this, Integer.MIN_VALUE, false), true,
+                new ExcitatorySynapse(inputNeuron, this, Integer.MAX_VALUE, false), true
         )
                 .keySet()
                 .stream()
@@ -261,10 +247,6 @@ public class Neuron extends Provider<INeuron<? extends Activation, ? extends Syn
             }
         }
         return result;
-    }
-
-    public boolean isRecurrent(boolean isNegativeSynapse) {
-        return get().isRecurrent(isNegativeSynapse);
     }
 
 

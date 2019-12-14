@@ -7,7 +7,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
-import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.Config;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
@@ -17,7 +16,7 @@ import network.aika.neuron.meta.MetaNeuron;
 import java.util.List;
 import java.util.function.Function;
 
-public class InhibitoryNeuron extends TNeuron<InhibitoryActivation, InhibitorySynapse> {
+public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
 
     public static final String TYPE_STR = "I";
 
@@ -55,11 +54,6 @@ public class InhibitoryNeuron extends TNeuron<InhibitoryActivation, InhibitorySy
 
     public double getTotalBias(Synapse.State state) {
         return getBias(state);
-    }
-
-
-    protected Activation createActivation(Document doc) {
-        return new InhibitoryActivation(doc, this);
     }
 
 

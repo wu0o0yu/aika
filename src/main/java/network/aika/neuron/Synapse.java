@@ -61,6 +61,8 @@ public abstract class Synapse implements Writable {
 
     private Integer id;
 
+    private boolean recurrent;
+
     private boolean inactive;
     private boolean inactiveNew;
 
@@ -71,10 +73,11 @@ public abstract class Synapse implements Writable {
     }
 
 
-    public Synapse(Neuron input, Neuron output, Integer id) {
+    public Synapse(Neuron input, Neuron output, Integer id, boolean recurrent) {
         this.id = id;
         this.input = input;
         this.output = output;
+        this.recurrent = recurrent;
     }
 
 
@@ -276,7 +279,7 @@ public abstract class Synapse implements Writable {
 
 
     public boolean isRecurrent() {
-        return input.isRecurrent(isNegative(CURRENT));
+        return recurrent;
     }
 
 
@@ -352,6 +355,8 @@ public abstract class Synapse implements Writable {
     public static abstract class Builder implements Neuron.Builder {
 
         private Neuron neuron;
+
+        protected boolean recurrent;
         double weight;
         double limit = 1.0;
         private Integer synapseId;
@@ -381,6 +386,12 @@ public abstract class Synapse implements Writable {
             return this;
         }
 
+
+
+        public Builder setRecurrent(boolean recurrent) {
+            this.recurrent = recurrent;
+            return this;
+        }
 
         /**
          * The synapse weight of this input.

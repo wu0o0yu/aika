@@ -58,8 +58,6 @@ public class Document implements Comparable<Document> {
     private Queue queue = new Queue();
 
     private TreeSet<INeuron> activatedNeurons = new TreeSet<>();
-    private TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
-    private TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
     private TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
@@ -83,8 +81,6 @@ public class Document implements Comparable<Document> {
 
         this.model = model;
         this.threadId = threadId;
-
-        model.acquireThread(threadId, this);
     }
 
 
@@ -110,16 +106,6 @@ public class Document implements Comparable<Document> {
 
     public int getNewActivationId() {
         return activationIdCounter++;
-    }
-
-
-    public void addInputNeuronActivation(Activation act) {
-        inputNeuronActivations.add(act);
-    }
-
-
-    public void addFinallyActivatedNeuron(INeuron n) {
-        finallyActivatedNeurons.add(n);
     }
 
 
@@ -230,24 +216,6 @@ public class Document implements Comparable<Document> {
         });
         modifiedWeights.clear();
     }
-
-
-    /**
-     * Removes the activations of this document from the model again.
-     */
-    public void clearActivations() {
-        activatedNeurons.forEach(n -> n.clearActivations(this));
-
-        activationsById.clear();
-        activatedNeurons.clear();
-
-        if(model.lastCleanup[threadId] + CLEANUP_INTERVAL < id) {
-            model.lastCleanup[threadId] = id;
-        }
-
-        model.docs[threadId] = null;
-    }
-
 
 
     public String activationsToString() {

@@ -21,8 +21,4 @@ public class MetaPatternNeuron extends MetaNeuron {
         return TYPE_STR;
     }
 
-    @Override
-    public boolean isRecurrent(boolean isNegativeSynapse) {
-        return true;
-    }
 }

@@ -166,7 +166,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatorySynapse> {
         );
 
         if(synapse == null) {
-            synapse = new ExcitatorySynapse(inputNeuron, getProvider(), getNewSynapseId());
+            synapse = new ExcitatorySynapse(inputNeuron, getProvider(), getNewSynapseId(), false);
 
             synapse.link();
         }

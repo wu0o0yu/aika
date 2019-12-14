@@ -21,7 +21,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation.Link;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.TSynapse;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
@@ -51,8 +51,8 @@ public class MetaSynapse extends TSynapse {
         super();
     }
 
-    public MetaSynapse(Neuron input, Neuron output, Integer id, int lastCount) {
-        super(input, output, id, lastCount);
+    public MetaSynapse(Neuron input, Neuron output, Integer id, boolean recurrent, int lastCount) {
+        super(input, output, id, recurrent, lastCount);
     }
 
 
@@ -92,7 +92,7 @@ public class MetaSynapse extends TSynapse {
     }
 
 
-    public void transferTemplateSynapse(Document doc, TNeuron<?, ?> inputNeuron, ExcitatoryNeuron targetNeuron, Link metaLink) {
+    public void transferTemplateSynapse(Document doc, TNeuron<?> inputNeuron, ExcitatoryNeuron targetNeuron, Link metaLink) {
         if(metaLink.getTargetSynapse() != null) {
             return;
         }
@@ -152,7 +152,7 @@ public class MetaSynapse extends TSynapse {
         }
 
         protected SynapseFactory getSynapseFactory() {
-            return (input, output, id) -> new MetaSynapse(input, output, id, output.getModel().charCounter);
+            return (input, output, id) -> new MetaSynapse(input, output, id, recurrent, output.getModel().charCounter);
         }
     }
 

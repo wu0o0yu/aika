@@ -61,11 +61,7 @@ public class Model {
     public int charCounter = 0;
 
 
-    public int numberOfThreads = 1;
-
     public int[] lastCleanup;
-
-    public Document[] docs;
 
     public SuspensionHook suspensionHook;
 
@@ -78,23 +74,15 @@ public class Model {
 
     public Map<Integer, PassiveInputFunction> passiveActivationFunctions = new TreeMap<>();
 
-    public int defaultThreadId = 0;
     public static AtomicLong visitedCounter = new AtomicLong(1);
 
-    /**
-     * Creates a model with a single thread.
-     */
+
     public Model() {
-        this(null, 1);
+        this(null);
     }
 
 
-    public Model(SuspensionHook sh, int numberOfThreads) {
-        assert numberOfThreads >= 1;
-        this.numberOfThreads = numberOfThreads;
-
-        lastCleanup = new int[numberOfThreads];
-        docs = new Document[numberOfThreads];
+    public Model(SuspensionHook sh) {
         suspensionHook = sh;
     }
 
@@ -175,14 +163,6 @@ public class Model {
     }
 
 
-    public void acquireThread(int threadId, Document doc) {
-        if (docs[threadId] != null) {
-            throw new StaleDocumentException();
-        }
-        docs[threadId] = doc;
-    }
-
-
     public Collection<Neuron> getActiveNeurons() {
         List<Neuron> tmp = new ArrayList<>();
         for(Provider<?> p: activeProviders.values()) {
@@ -223,41 +203,6 @@ public class Model {
         }
     }
 
-
-
-    /**
-     * Suspend all neurons and logic nodes whose last used document id is lower/older than docId.
-     *
-     * @param docId
-     */
-    public void suspendUnusedNodes(int docId, SuspensionMode sm) {
-        docId = Math.min(docId, getOldestDocIdInProcessing());
-        List<Provider> tmp;
-        synchronized (activeProviders) {
-            tmp = new ArrayList<>(activeProviders.values());
-        }
-        for (Provider p: tmp) {
-            suspend(docId, p, sm);
-        }
-    }
-
-
-    public int getOldestDocIdInProcessing() {
-        int oldestDocId = Integer.MAX_VALUE;
-        for(Document doc: docs) {
-            if(doc != null) oldestDocId = Math.min(oldestDocId, doc.getId());
-        }
-        return oldestDocId;
-    }
-
-
-    /**
-     * Suspend all neurons and logic nodes in memory.
-     *
-     */
-    public void suspendAll(SuspensionMode sm) {
-        suspendUnusedNodes(Integer.MAX_VALUE, sm);
-    }
 
 
     private boolean suspend(int docId, Provider<? extends AbstractNode> p, SuspensionMode sm) {

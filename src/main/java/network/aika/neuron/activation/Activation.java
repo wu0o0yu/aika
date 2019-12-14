@@ -39,14 +39,15 @@ public class Activation {
     public Fired fired;
     public double weight;
 
+    public Decision decision;
+    public Bound bound;
+
     private int id;
     private INeuron<?> neuron;
     private Document doc;
 
     private Activation parent;
     private Set<Activation> children = new TreeSet<>();
-
-    public Decision decision;
 
     public double remainingWeight;
     public int cacheFactor = 1;
@@ -62,6 +63,29 @@ public class Activation {
     public ExcitatoryNeuron targetNeuron;
 
 
+    public enum Decision {
+        SELECTED('S'),
+        UNKNOWN('U');
+
+        char s;
+
+        Decision(char s) {
+            this.s = s;
+        }
+    }
+
+    public enum Bound {
+        UPPER('U'),
+        LOWER('L');
+
+        char s;
+
+        Bound(char s) {
+            this.s = s;
+        }
+    }
+
+
     public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
         int r = l1.input.fired.compareTo(l2.input.fired);
         if (r != 0) return r;
@@ -75,7 +99,7 @@ public class Activation {
     };
 
 
-    public Activation(Document doc, INeuron<?> n, double value, Fired fired) {
+    public Activation(Document doc, INeuron<?> n, double value, Fired fired, Bound bound) {
         this.id = doc.getNewActivationId();
         this.doc = doc;
         this.neuron = n;
@@ -83,14 +107,18 @@ public class Activation {
         this.value = value;
         this.fired = fired;
 
+        this.bound = bound;
+
         isFinal = true;
     }
 
 
-    public Activation(Activation parent) {
+    public Activation(Activation parent, Decision decision, Bound bound) {
         this.doc = parent.doc;
         this.neuron = parent.neuron;
         this.parent = parent;
+        this.decision = decision;
+        this.bound = bound;
 //        this.round = newSearchNode() ? 0 : parent.round + 1;
 
         if(round > MAX_ROUND) {

@@ -147,7 +147,7 @@ public class MetaNeuron extends TNeuron<MetaSynapse> {
     public static double coveredSum(List<ExcitatorySynapse> syns) {
         double sum = 0.0;
         for(ExcitatorySynapse s: syns) {
-            sum += s.getUncovered();
+//            sum += s.getUncovered();
         }
         return sum;
     }

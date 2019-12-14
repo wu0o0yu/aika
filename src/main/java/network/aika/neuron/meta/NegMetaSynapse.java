@@ -12,8 +12,8 @@ public class NegMetaSynapse extends MetaSynapse {
         super();
     }
 
-    public NegMetaSynapse(Neuron input, Neuron output, Integer id, int lastCount) {
-        super(input, output, id, lastCount);
+    public NegMetaSynapse(Neuron input, Neuron output, Integer id, boolean recurrent, int lastCount) {
+        super(input, output, id, recurrent, lastCount);
     }
 
 
@@ -32,7 +32,7 @@ public class NegMetaSynapse extends MetaSynapse {
         }
 
         protected Synapse.SynapseFactory getSynapseFactory() {
-            return (input, output, id) -> new NegMetaSynapse(input, output, id, output.getModel().charCounter);
+            return (input, output, id) -> new NegMetaSynapse(input, output, id, recurrent, output.getModel().charCounter);
         }
     }
 }

@@ -10,11 +10,6 @@ public class PatternNeuron extends ExcitatoryNeuron {
         super(p);
     }
 
-    @Override
-    public boolean isRecurrent(boolean isNegativeSynapse) {
-        return true;
-    }
-
 
     @Override
     public String getType() {

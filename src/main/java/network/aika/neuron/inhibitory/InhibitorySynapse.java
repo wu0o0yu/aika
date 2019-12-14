@@ -14,7 +14,7 @@ public class InhibitorySynapse extends TSynapse {
     }
 
     public InhibitorySynapse(Neuron input, Neuron output, Integer id) {
-        super(input, output, id);
+        super(input, output, id, false);
     }
 
     @Override

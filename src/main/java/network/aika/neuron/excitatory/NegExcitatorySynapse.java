@@ -17,11 +17,11 @@ public class NegExcitatorySynapse extends ExcitatorySynapse {
     }
 
     public NegExcitatorySynapse(Neuron input, Neuron output, Integer id) {
-        super(input, output, id);
+        super(input, output, id, true);
     }
 
     public NegExcitatorySynapse(Neuron input, Neuron output, Integer id, int lastCount) {
-        super(input, output, id, lastCount);
+        super(input, output, id, true, lastCount);
     }
 
 
@@ -32,8 +32,8 @@ public class NegExcitatorySynapse extends ExcitatorySynapse {
 
 
     public void updateCountValue(Activation io, Activation oo) {
-        double inputValue = io != null ? io.getBounds().lb.value : 0.0;
-        double outputValue = oo != null ? oo.getBounds().lb.value : 0.0;
+        double inputValue = io != null ? io.value : 0.0;
+        double outputValue = oo != null ? oo.value : 0.0;
 
         if(!needsCountUpdate) {
             return;
@@ -42,11 +42,11 @@ public class NegExcitatorySynapse extends ExcitatorySynapse {
 
         double optionProp = (io != null ? io.getP() : 1.0) * (oo != null ? oo.getP() : 1.0);
 
-        if(TNeuron.checkSelfReferencing(oo, io)) {
+/*        if(TNeuron.checkSelfReferencing(oo, io)) {
             countValueIPosOPos += (Sign.POS.getX(inputValue) * Sign.POS.getX(outputValue) * optionProp);
         } else {
             countValueINegOPos += (Sign.NEG.getX(inputValue) * Sign.POS.getX(outputValue) * optionProp);
-        }
+        }*/
         countValueIPosONeg += (Sign.POS.getX(inputValue) * Sign.NEG.getX(outputValue) * optionProp);
         countValueINegONeg += (Sign.NEG.getX(inputValue) * Sign.NEG.getX(outputValue) * optionProp);
 

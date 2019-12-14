@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.Synapse.State.NEXT;
+import static network.aika.neuron.activation.Activation.Bound.*;
 
 /**
  * The {@code INeuron} class represents a internal neuron implementation in Aikas neural network and is connected to other neurons through
@@ -68,39 +69,17 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     ReadWriteLock lock = new ReadWriteLock();
 
 
-    private ThreadState<Activation>[] threads;
-
-
-    /**
-     * The {@code ThreadState} is a thread local data structure containing the activationsBySlotAndPosition of a single document for
-     * a specific logic node.
-     */
-    private static class ThreadState<A extends Activation> {
-        public long lastUsed;
-        public Document doc;
-
-        private TreeMap<Integer, A> activations;
-
-        public ThreadState() {
-            activations = new TreeMap<>();
-        }
-    }
-
-
     protected INeuron() {
     }
 
 
     public INeuron(Neuron p) {
         provider = p;
-        threads = new INeuron.ThreadState[p.getModel().numberOfThreads];
     }
 
 
     public INeuron(Model m, String label) {
         this.label = label;
-
-        threads = new ThreadState[m.numberOfThreads];
 
         provider = new Neuron(m, this);
 
@@ -141,85 +120,11 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public abstract ActivationFunction getActivationFunction();
 
 
-    public Stream<Activation> getActivations(Document doc) {
-        ThreadState th = getThreadState(doc.getThreadId(), false);
-        if(th == null) {
-            return Stream.empty();
-        }
-
-        return th.activations.values().stream();
-    }
-
-
-    public boolean isEmpty(Document doc) {
-        ThreadState th = getThreadState(doc.getThreadId(), false);
-        if(th == null) {
-            return true;
-        }
-        return th.activations.isEmpty();
-    }
-
-
-    public int size(Document doc) {
-        ThreadState th = getThreadState(doc.getThreadId(), false);
-        if(th == null) {
-            return 0;
-        }
-
-        return th.activations.size();
-    }
-
-
-    public void clearActivations(Document doc) {
-        ThreadState th = getThreadState(doc.getThreadId(), false);
-        if(th == null) {
-            return;
-        }
-        th.activations.clear();
-        th.doc = null;
-    }
-
-
-    public void clearActivations() {
-        for (int i = 0; i < provider.getModel().numberOfThreads; i++) {
-            clearActivations(i);
-        }
-    }
-
-
-    public void clearActivations(int threadId) {
-        ThreadState th = getThreadState(threadId, false);
-        if (th == null) return;
-        th.activations.clear();
-        th.doc = null;
-    }
-
 
     public Model getModel() {
         return provider.getModel();
     }
 
-
-
-    public Stream<Activation> getActivations(Document doc, boolean onlyFinal) {
-        return onlyFinal ?
-                getActivations(doc)
-                        .filter(act -> act.isFinalActivation()) :
-                getActivations(doc);
-    }
-
-
-    private ThreadState<Activation> getThreadState(int threadId, boolean create) {
-        ThreadState<Activation> th = threads[threadId];
-        if (th == null) {
-            if (!create) return null;
-
-            th = new ThreadState();
-            threads[threadId] = th;
-        }
-        th.lastUsed = provider.getModel().docIdCounter.get();
-        return th;
-    }
 
 
     /**
@@ -231,18 +136,17 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public Activation addInput(Document doc, Activation.Builder input) {
         Fired f = new Fired(input.inputTimestamp, input.fired);
 
-        Activation act = new Activation(doc, this, input.value, f);
+        Activation actUB = new Activation(doc, this, input.value, f, UPPER);
+        Activation actLB = new Activation(doc, this, input.value, f, LOWER);
 
         // TODO: add input links
 
-        doc.addInputNeuronActivation(act);
-        doc.addFinallyActivatedNeuron(act.getINeuron());
-
-        propagate(act);
+        propagate(actUB);
+        propagate(actLB);
 
         doc.getQueue().process();
 
-        return act;
+        return actUB;
     }
 
 
@@ -273,8 +177,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     // TODO
     public void remove() {
-        clearActivations();
-
         for (Synapse s : inputSynapses.values()) {
             INeuron<?> in = s.getInput().get();
             in.provider.lock.acquireWriteLock();
@@ -308,10 +210,13 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
 
     public void propagate(Activation act) {
-        Document doc = act.getDocument();
-
         getOutputSynapses()
-                .forEach(s -> );
+                .forEach(s -> s.getOutput().get().propagate(act, s));
+    }
+
+
+    private void propagate(Activation iAct, Synapse s) {
+
     }
 
 
@@ -470,18 +375,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public void register(Activation act) {
         Document doc = act.getDocument();
-
-        ThreadState th = getThreadState(act.getThreadId(), true);
-        if(th.doc == null) {
-            th.doc = doc;
-            doc.addActivatedNeuron(act.getINeuron());
-        }
-        if(th.doc != doc) {
-            throw new Model.StaleDocumentException();
-        }
-
-        th.activations.put(act.getId(), act);
-
         doc.addActivation(act);
     }
 

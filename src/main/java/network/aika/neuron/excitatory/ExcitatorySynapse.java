@@ -30,8 +30,8 @@ public class ExcitatorySynapse extends TSynapse {
         super();
     }
 
-    public ExcitatorySynapse(Neuron input, Neuron output, Integer id) {
-        super(input, output, id);
+    public ExcitatorySynapse(Neuron input, Neuron output, Integer id, boolean recurrent) {
+        super(input, output, id, recurrent);
     }
 
 
@@ -41,8 +41,8 @@ public class ExcitatorySynapse extends TSynapse {
     }
 
 
-    public ExcitatorySynapse(Neuron input, Neuron output, Integer id, int lastCount) {
-        super(input, output, id, lastCount);
+    public ExcitatorySynapse(Neuron input, Neuron output, Integer id, boolean recurrent, int lastCount) {
+        super(input, output, id, recurrent, lastCount);
     }
 
 
@@ -56,11 +56,11 @@ public class ExcitatorySynapse extends TSynapse {
         return false; // TODO:
     }
 
-
+/*
     public MetaSynapse.MappingLink getMetaSynapse(Neuron in, Neuron out) {
         return metaSynapses.get(new MetaSynapse(in, out, -1, 0));
     }
-
+*/
 /*
     public double getUncovered() {
         double max = 0.0;
@@ -106,7 +106,7 @@ public class ExcitatorySynapse extends TSynapse {
         }
 
         protected SynapseFactory getSynapseFactory() {
-            return (input, output, id) -> new ExcitatorySynapse(input, output, id, output.getModel().charCounter);
+            return (input, output, id) -> new ExcitatorySynapse(input, output, id, recurrent, output.getModel().charCounter);
         }
     }
 
