@@ -235,14 +235,6 @@ public abstract class Synapse implements Writable {
         return Math.abs(weight) < TOLERANCE;
     }
 
-    public double computeRelationWeights(Link l) {
-        return 0;
-    }
-
-    public double computeMaxRelationWeights() {
-        return 0;
-    }
-
 
     public enum State {
         NEXT,
@@ -358,7 +350,6 @@ public abstract class Synapse implements Writable {
 
         protected boolean recurrent;
         double weight;
-        double limit = 1.0;
         private Integer synapseId;
 
 
@@ -401,12 +392,6 @@ public abstract class Synapse implements Writable {
          */
         public Builder setWeight(double weight) {
             this.weight = weight;
-            return this;
-        }
-
-
-        public Builder setLimit(double limit) {
-            this.limit = limit;
             return this;
         }
 

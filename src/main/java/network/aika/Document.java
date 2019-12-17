@@ -43,7 +43,6 @@ import java.util.stream.Collectors;
 public class Document implements Comparable<Document> {
     private static final Logger log = LoggerFactory.getLogger(Document.class);
 
-    public static int CLEANUP_INTERVAL = 500;
     public static int MAX_ROUND = 20;
 
     private final int id;
@@ -53,11 +52,9 @@ public class Document implements Comparable<Document> {
     private int activationIdCounter = 0;
 
     private Model model;
-    private int threadId;
 
     private Queue queue = new Queue();
 
-    private TreeSet<INeuron> activatedNeurons = new TreeSet<>();
     private TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
@@ -66,23 +63,16 @@ public class Document implements Comparable<Document> {
 
 
     public Document(Model model, String content) {
-        this(model, content, 0);
+        this(model, model.getNewDocumentId(), content);
     }
 
 
-    public Document(Model model, String content, int threadId) {
-        this(model, model.getNewDocumentId(), content, threadId);
-    }
-
-
-    public Document(Model model, int id, String content, int threadId) {
+    public Document(Model model, int id, String content) {
         this.id = id;
         this.content = new StringBuilder(content);
 
         this.model = model;
-        this.threadId = threadId;
     }
-
 
 
     public int getId() {
@@ -99,6 +89,7 @@ public class Document implements Comparable<Document> {
         return queue;
     }
 
+
     public long getNewVisitedId() {
         return visitedCounter++;
     }
@@ -108,15 +99,6 @@ public class Document implements Comparable<Document> {
         return activationIdCounter++;
     }
 
-
-    public void addActivatedNeuron(INeuron n) {
-        activatedNeurons.add(n);
-    }
-
-
-    public int getThreadId() {
-        return threadId;
-    }
 
     public void append(String txt) {
         content.append(txt);
@@ -219,10 +201,6 @@ public class Document implements Comparable<Document> {
 
 
     public String activationsToString() {
-        Set<Activation> acts = new TreeSet<>();
-
-        acts.addAll(activationsById.values());
-
         StringBuilder sb = new StringBuilder();
 
         sb.append("Id -");
@@ -235,11 +213,10 @@ public class Document implements Comparable<Document> {
         sb.append(" Upper Bound -");
         sb.append(" Value | Net | Weight -");
         sb.append(" Input Value |");
-        sb.append(" Target Value");
         sb.append("\n");
         sb.append("\n");
 
-        for(Activation act: acts) {
+        for(Activation act: activationsById.values()) {
             if(!act.isActive()) {
                 continue;
             }

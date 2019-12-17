@@ -20,17 +20,17 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Queue;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.Synapse.State.NEXT;
-import static network.aika.neuron.activation.Activation.Bound.*;
 
 /**
  * The {@code INeuron} class represents a internal neuron implementation in Aikas neural network and is connected to other neurons through
@@ -136,17 +136,16 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public Activation addInput(Document doc, Activation.Builder input) {
         Fired f = new Fired(input.inputTimestamp, input.fired);
 
-        Activation actUB = new Activation(doc, this, input.value, f, UPPER);
-        Activation actLB = new Activation(doc, this, input.value, f, LOWER);
+        Activation act = new Activation(doc, this, input.value, f);
+        act.isFinal = true;
+
+        propagate(act);
 
         // TODO: add input links
 
-        propagate(actUB);
-        propagate(actLB);
-
         doc.getQueue().process();
 
-        return actUB;
+        return act;
     }
 
 
@@ -175,7 +174,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
 
-    // TODO
     public void remove() {
         for (Synapse s : inputSynapses.values()) {
             INeuron<?> in = s.getInput().get();
@@ -210,13 +208,25 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
 
     public void propagate(Activation act) {
-        getOutputSynapses()
+        provider.activeOutputSynapses.values()
                 .forEach(s -> s.getOutput().get().propagate(act, s));
     }
 
 
     private void propagate(Activation iAct, Synapse s) {
+        Activation oAct = iAct
+                .getDocument()
+                .getActivations(false)
+                .stream()
+                .filter(act -> act.getNeuron().get() == this)
+                .findAny()
+                .orElse(null);
 
+        if(oAct == null) {
+            oAct = new Activation(iAct.getDocument(), this);
+        }
+
+        oAct.addLink(iAct, s);
     }
 
 
@@ -373,12 +383,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
 
-    public void register(Activation act) {
-        Document doc = act.getDocument();
-        doc.addActivation(act);
-    }
-
-
     public abstract String getType();
 
 
@@ -475,8 +479,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
         private void updateSynapse(Synapse.State state, double sign, Synapse s) {
             updateSum(s.isRecurrent(), s.isNegative(state), sign * (s.getWeight(state)));
-
-            posDirSumDelta += sign * s.computeMaxRelationWeights();
         }
 
         private void updateSum(boolean rec, boolean neg, double delta) {

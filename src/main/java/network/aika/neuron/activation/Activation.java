@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static network.aika.Document.MAX_ROUND;
+import static network.aika.neuron.Synapse.State.CURRENT;
 
 /**
  *
@@ -40,7 +41,6 @@ public class Activation {
     public double weight;
 
     public Decision decision;
-    public Bound bound;
 
     private int id;
     private INeuron<?> neuron;
@@ -56,7 +56,7 @@ public class Activation {
     public TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
     public Map<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
 
-    boolean isFinal;
+    public boolean isFinal;
 
     public int round;
 
@@ -70,17 +70,6 @@ public class Activation {
         char s;
 
         Decision(char s) {
-            this.s = s;
-        }
-    }
-
-    public enum Bound {
-        UPPER('U'),
-        LOWER('L');
-
-        char s;
-
-        Bound(char s) {
             this.s = s;
         }
     }
@@ -99,7 +88,19 @@ public class Activation {
     };
 
 
-    public Activation(Document doc, INeuron<?> n, double value, Fired fired, Bound bound) {
+    public Activation(Document doc, INeuron<?> n) {
+        this.id = doc.getNewActivationId();
+        this.doc = doc;
+        this.neuron = n;
+
+        this.net = n.getTotalBias(CURRENT);
+        this.fired = null;
+
+        doc.addActivation(this);
+    }
+
+
+    public Activation(Document doc, INeuron<?> n, double value, Fired fired) {
         this.id = doc.getNewActivationId();
         this.doc = doc;
         this.neuron = n;
@@ -107,18 +108,15 @@ public class Activation {
         this.value = value;
         this.fired = fired;
 
-        this.bound = bound;
-
-        isFinal = true;
+        doc.addActivation(this);
     }
 
 
-    public Activation(Activation parent, Decision decision, Bound bound) {
+    public Activation(Activation parent, Decision decision) {
         this.doc = parent.doc;
         this.neuron = parent.neuron;
         this.parent = parent;
         this.decision = decision;
-        this.bound = bound;
 //        this.round = newSearchNode() ? 0 : parent.round + 1;
 
         if(round > MAX_ROUND) {
@@ -137,10 +135,6 @@ public class Activation {
 
     public Document getDocument() {
         return doc;
-    }
-
-    public int getThreadId() {
-        return doc.getThreadId();
     }
 
 
@@ -164,14 +158,47 @@ public class Activation {
     }
 
 
+    public Activation getOutputLink(Synapse s) {
+        return outputLinks.values().stream()
+                .filter(l -> l.synapse == s)
+                .findAny()
+                .map(l -> l.getOutput())
+                .orElse(null);
+    }
+
+
+    public void addLink(Activation iAct, Synapse s) {
+        Link l = new Link(s, iAct, this);
+        l.link();
+
+        assert !isFinal;
+
+        sumUpLink(iAct, s);
+    }
+
+    public void sumUpLink(Activation iAct, Synapse s) {
+        double w = s.getWeight();
+
+        net += iAct.value * w;
+        if(fired == null && net > 0.0) {
+            fired = neuron.incrementFired(iAct.fired);
+            doc.getQueue().add(this);
+        }
+    }
+
+
     public void process() {
+        INeuron.SynapseSummary ss = neuron.getSynapseSummary();
+        value = neuron.getActivationFunction().f(net);
+        weight = Math.max(0.0, Math.min(-ss.getNegRecSum(), net));
 
+        isFinal = true;
 
+        neuron.propagate(this);
     }
 
 
     private void compute() {
-        INeuron.SynapseSummary ss = neuron.getSynapseSummary();
 
         fired = null;
 
@@ -180,17 +207,9 @@ public class Activation {
             Activation is = l.input;
             Synapse syn = l.getSynapse();
 
-            double w = syn.getWeight();
-
-            net += is.value * w;
-
-            if(fired == null && net > 0.0) {
-                fired = neuron.incrementFired(is.fired);
-            }
+            sumUpLink(is, syn);
         }
 
-        value = neuron.getActivationFunction().f(net);
-        weight = Math.max(0.0, Math.min(-ss.getNegRecSum(), net));
     }
 
 
@@ -261,7 +280,6 @@ public class Activation {
 
     public static class Builder {
         public double value = 1.0;
-        public Double targetValue;
         public int inputTimestamp;
         public int fired;
         public Map<Integer, Activation> inputLinks = new TreeMap<>();
@@ -269,12 +287,6 @@ public class Activation {
 
         public Builder setValue(double value) {
             this.value = value;
-            return this;
-        }
-
-
-        public Builder setTargetValue(Double targetValue) {
-            this.targetValue = targetValue;
             return this;
         }
 

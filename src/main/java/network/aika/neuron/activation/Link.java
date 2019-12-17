@@ -3,8 +3,6 @@ package network.aika.neuron.activation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TSynapse;
 
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
 
 public class Link {
 

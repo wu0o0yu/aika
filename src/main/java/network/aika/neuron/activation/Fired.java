@@ -48,4 +48,9 @@ public class Fired implements Comparable<Fired> {
 
         return Integer.compare(fired, f.fired);
     }
+
+
+    public String toString() {
+        return "[" + inputTimestamp + "," + fired + "]";
+    }
 }
