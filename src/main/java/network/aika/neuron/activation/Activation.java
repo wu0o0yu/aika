@@ -24,7 +24,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static network.aika.Document.MAX_ROUND;
 import static network.aika.neuron.Synapse.State.CURRENT;
@@ -40,17 +40,11 @@ public class Activation {
     public Fired fired;
     public double weight;
 
-    public Decision decision;
-
     private int id;
     private INeuron<?> neuron;
     private Document doc;
 
-    private Activation parent;
-    private Set<Activation> children = new TreeSet<>();
-
     public double remainingWeight;
-    public int cacheFactor = 1;
     public double p;
 
     public TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
@@ -58,27 +52,18 @@ public class Activation {
 
     public boolean isFinal;
 
-    public int round;
+    public int round; // Nur als Abbruchbedingung
 
     public ExcitatoryNeuron targetNeuron;
 
-
-    public enum Decision {
-        SELECTED('S'),
-        UNKNOWN('U');
-
-        char s;
-
-        Decision(char s) {
-            this.s = s;
-        }
-    }
+    public long visitedUp;
+    public long visitedDown;
 
 
     public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
         int r = l1.input.fired.compareTo(l2.input.fired);
         if (r != 0) return r;
-        return Synapse.INPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
+        return l1.synapse.getInput().compareTo(l2.synapse.getInput());
     };
 
     public static Comparator<Link> OUTPUT_COMP = (l1, l2) -> {
@@ -88,10 +73,11 @@ public class Activation {
     };
 
 
-    public Activation(Document doc, INeuron<?> n) {
+    public Activation(Document doc, INeuron<?> n, int round) {
         this.id = doc.getNewActivationId();
         this.doc = doc;
         this.neuron = n;
+        this.round = round;
 
         this.net = n.getTotalBias(CURRENT);
         this.fired = null;
@@ -109,23 +95,6 @@ public class Activation {
         this.fired = fired;
 
         doc.addActivation(this);
-    }
-
-
-    public Activation(Activation parent, Decision decision) {
-        this.doc = parent.doc;
-        this.neuron = parent.neuron;
-        this.parent = parent;
-        this.decision = decision;
-//        this.round = newSearchNode() ? 0 : parent.round + 1;
-
-        if(round > MAX_ROUND) {
-            throw new Activation.OscillatingActivationsException(doc.activationsToString());
-        }
-
-        if(parent != null) {
-            parent.children.add(this);
-        }
     }
 
 
@@ -153,6 +122,34 @@ public class Activation {
     }
 
 
+
+    public void followDown(long v, Predicate<Activation> predicate) {
+        if(visitedDown == v) return;
+        visitedDown = v;
+
+        followUp(v, predicate);
+        inputLinks
+                .values()
+                .stream()
+                .forEach(l -> l.input.followDown(v, predicate));
+    }
+
+
+    public void followUp(long v, Predicate<Activation> predicate) {
+        if(visitedUp == v) return;
+        visitedUp = v;
+
+        if(predicate.test(this)) {
+            return;
+        }
+
+        outputLinks
+                .values()
+                .stream()
+                .forEach(l -> l.output.followUp(v, predicate));
+    }
+
+
     public Synapse getSynapseById(int synapseId) {
         return getNeuron().getSynapseById(synapseId);
     }
@@ -175,6 +172,7 @@ public class Activation {
 
         sumUpLink(iAct, s);
     }
+
 
     public void sumUpLink(Activation iAct, Synapse s) {
         double w = s.getWeight();
@@ -249,23 +247,9 @@ public class Activation {
     }
 
 
-    public void traverse(Consumer<Activation> f) {
-        f.accept(this);
-        for(Activation c: children) {
-            c.traverse(f);
-        }
-    }
-
-
-    public void cleanup() {
-        parent.children.remove(this);
-        parent = null;
-    }
-
-
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(" d:"  + decision + " cacheFactor:" + cacheFactor + " w:" + Utils.round(weight) + " p:" + p + " value:" + Utils.round(value));
+        sb.append(" w:" + Utils.round(weight) + " p:" + p + " value:" + Utils.round(value));
         return sb.toString();
     }
 
@@ -282,7 +266,7 @@ public class Activation {
         public double value = 1.0;
         public int inputTimestamp;
         public int fired;
-        public Map<Integer, Activation> inputLinks = new TreeMap<>();
+        public List<Activation> inputLinks = new ArrayList<>();
 
 
         public Builder setValue(double value) {
@@ -302,13 +286,13 @@ public class Activation {
         }
 
 
-        public Map<Integer, Activation> getInputLinks() {
+        public List<Activation> getInputLinks() {
             return this.inputLinks;
         }
 
 
         public void addInputLink(Integer synId, Activation iAct) {
-            inputLinks.put(synId, iAct);
+            inputLinks.add(iAct);
         }
     }
 

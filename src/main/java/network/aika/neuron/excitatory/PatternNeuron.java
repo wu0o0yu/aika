@@ -3,6 +3,7 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 
+
 public class PatternNeuron extends ExcitatoryNeuron {
 
     public static final String TYPE_STR = "P";
@@ -21,4 +22,5 @@ public class PatternNeuron extends ExcitatoryNeuron {
     public String getType() {
         return TYPE_STR;
     }
+
 }

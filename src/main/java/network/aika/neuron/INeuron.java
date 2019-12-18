@@ -20,8 +20,6 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Queue;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +60,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
 
     // A synapse is stored only in one direction, depending on the synapse weight.
-    TreeMap<S, S> inputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
-    TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
+    TreeMap<Neuron, S> inputSynapses = new TreeMap<>();
+    TreeMap<Neuron, Synapse> outputSynapses = new TreeMap<>();
 
 
     ReadWriteLock lock = new ReadWriteLock();
@@ -84,6 +82,11 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         provider = new Neuron(m, this);
 
         setModified();
+    }
+
+
+    public S getInputSynapse(Neuron iNeuron) {
+        return inputSynapses.get(iNeuron);
     }
 
 
@@ -141,7 +144,11 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
         propagate(act);
 
-        // TODO: add input links
+        for(Activation iAct: input.getInputLinks()) {
+            Synapse is = getInputSynapse(iAct.getNeuron());
+
+            act.addLink(iAct, is);
+        }
 
         doc.getQueue().process();
 
@@ -213,21 +220,27 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
 
-    private void propagate(Activation iAct, Synapse s) {
-        Activation oAct = iAct
-                .getDocument()
-                .getActivations(false)
-                .stream()
-                .filter(act -> act.getNeuron().get() == this)
-                .findAny()
-                .orElse(null);
+    protected void propagate(Activation iAct, Synapse s) {
+        ArrayList<Activation> results = new ArrayList<>();
+
+        iAct.followDown(iAct.getDocument().getNewVisitedId(), act -> {
+            if(act.getNeuron() == getProvider()) {
+                results.add(act);
+                return true;
+            }
+
+            return act.fired.compareTo(iAct.fired) > 0;
+        });
+
+        Activation oAct = results.size() > 0 ? results.get(0) : null;
 
         if(oAct == null) {
-            oAct = new Activation(iAct.getDocument(), this);
+            oAct = new Activation(iAct.getDocument(), this, oAct.round);
         }
 
         oAct.addLink(iAct, s);
     }
+
 
 
     public int compareTo(INeuron n) {
@@ -295,12 +308,12 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         synapseIdCounter = in.readInt();
         while (in.readBoolean()) {
             S syn = (S) m.readSynapse(in);
-            inputSynapses.put(syn, syn);
+            inputSynapses.put(syn.getInput(), syn);
         }
 
         while (in.readBoolean()) {
             Synapse syn = m.readSynapse(in);
-            outputSynapses.put(syn, syn);
+            outputSynapses.put(syn.getOutput(), syn);
         }
     }
 
