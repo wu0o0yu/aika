@@ -162,12 +162,12 @@ public abstract class Synapse implements Writable {
         removeLinkInternal(in, out);
 
         if(storeOnInputSide()) {
-            out.inputSynapses.put(this, this);
+            out.inputSynapses.put(input, this);
             out.setModified();
         }
 
         if(storeOOutputSide()) {
-            in.outputSynapses.put(this, this);
+            in.outputSynapses.put(output, this);
             in.setModified();
         }
 
@@ -205,12 +205,12 @@ public abstract class Synapse implements Writable {
 
     private void removeLinkInternal(INeuron in, INeuron out) {
         if(storeOnInputSide()) {
-            if(out.inputSynapses.remove(this) != null) {
+            if(out.inputSynapses.remove(input) != null) {
                 out.setModified();
             }
         }
         if(storeOOutputSide()) {
-            if(in.outputSynapses.remove(this) != null) {
+            if(in.outputSynapses.remove(output) != null) {
                 in.setModified();
             }
         }

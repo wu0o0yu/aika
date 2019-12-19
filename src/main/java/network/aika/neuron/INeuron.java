@@ -235,7 +235,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         Activation oAct = results.size() > 0 ? results.get(0) : null;
 
         if(oAct == null) {
-            oAct = new Activation(iAct.getDocument(), this, oAct.round);
+            oAct = new Activation(iAct.getDocument(), this, iAct.round);
         }
 
         oAct.addLink(iAct, s);

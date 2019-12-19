@@ -122,7 +122,6 @@ public class Activation {
     }
 
 
-
     public void followDown(long v, Predicate<Activation> predicate) {
         if(visited == v) return;
         visited = v;
@@ -138,6 +137,10 @@ public class Activation {
     public void followUp(long v, Predicate<Activation> predicate) {
         if(visited == v) return;
         visited = v;
+
+        if(checkAlternativeBranch(v)) {
+            return;
+        }
 
         if(predicate.test(this)) {
             return;
@@ -219,7 +222,6 @@ public class Activation {
 
 
     private void compute() {
-
         fired = null;
 
         net = 0.0;
@@ -229,7 +231,6 @@ public class Activation {
 
             sumUpLink(is, syn);
         }
-
     }
 
 
