@@ -25,6 +25,7 @@ import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static network.aika.Document.MAX_ROUND;
 import static network.aika.neuron.Synapse.State.CURRENT;
@@ -56,8 +57,7 @@ public class Activation {
 
     public ExcitatoryNeuron targetNeuron;
 
-    public long visitedUp;
-    public long visitedDown;
+    public long visited;
 
 
     public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
@@ -124,8 +124,8 @@ public class Activation {
 
 
     public void followDown(long v, Predicate<Activation> predicate) {
-        if(visitedDown == v) return;
-        visitedDown = v;
+        if(visited == v) return;
+        visited = v;
 
         followUp(v, predicate);
         inputLinks
@@ -136,8 +136,8 @@ public class Activation {
 
 
     public void followUp(long v, Predicate<Activation> predicate) {
-        if(visitedUp == v) return;
-        visitedUp = v;
+        if(visited == v) return;
+        visited = v;
 
         if(predicate.test(this)) {
             return;
@@ -150,17 +150,39 @@ public class Activation {
     }
 
 
+    public boolean checkAlternativeBranch(long v) {
+        // Siehe Grafik 18.12.2019
+        Link ld = inputLinks
+                .keySet()
+                .stream()
+                .filter(l -> !l.isRecurrent())  // Aktuell sind die rec links an den Anfang sortiert.
+                .findFirst()
+                .orElse(null);
+
+        if(ld == null) {
+            return false;
+        }
+
+        return ld.input
+                .getOutputLinks(ld.synapse)
+                .filter(act -> act != this) // An dieser Stelle wird über die alternativen Varianten iteriert.
+                .flatMap(act -> act.inputLinks.values().stream())
+                .filter(l -> l.isRecurrent() && l.isNegative(CURRENT))
+                .flatMap(l -> l.input.inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
+                .map(l -> l.input)
+                .anyMatch(act -> act.visited == v);
+    }
+
+
     public Synapse getSynapseById(int synapseId) {
         return getNeuron().getSynapseById(synapseId);
     }
 
 
-    public Activation getOutputLink(Synapse s) {
+    public Stream<Activation> getOutputLinks(Synapse s) {
         return outputLinks.values().stream()
                 .filter(l -> l.synapse == s)
-                .findAny()
-                .map(l -> l.getOutput())
-                .orElse(null);
+                .map(l -> l.getOutput());
     }
 
 
