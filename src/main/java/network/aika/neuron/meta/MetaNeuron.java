@@ -1,34 +1,48 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package network.aika.neuron.meta;
 
-import network.aika.ActivationFunction;
 import network.aika.Config;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Fired;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.inhibitory.MetaInhibSynapse;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import static network.aika.neuron.Synapse.OUTPUT;
 import static network.aika.neuron.Synapse.State.CURRENT;
 
-public class MetaNeuron extends TNeuron<MetaSynapse> {
 
-    public static final String TYPE_STR = "M";
+/**
+ *
+ * @author Lukas Molzberger
+ */
+public class MetaNeuron extends ConjunctiveNeuron<MetaSynapse> {
+
+    public static final String TYPE_STR = Model.register("NM", MetaNeuron.class);
 
     public static double COVERED_THRESHOLD = 5.0;
 
     public InhibitoryNeuron inhibitoryNeuron;
-
-    public Map<ExcitatoryNeuron, MappingLink> targetNeurons = new TreeMap<>();
 
 
     private MetaNeuron() {
@@ -46,66 +60,16 @@ public class MetaNeuron extends TNeuron<MetaSynapse> {
     }
 
 
-    @Override
-    public Fired incrementFired(Fired f) {
-        return new Fired(f.getInputTimestamp(), f.getFired() + 1);
-    }
-
-
-    public boolean isWeak(Synapse s, Synapse.State state) {
-        double w = s.getWeight(state);
-
-       return w < getBias();
-    }
-
-
     public String getType() {
         return TYPE_STR;
     }
 
-
-    @Override
-    public void dumpStat() {
-        System.out.println("OUT:  " +getLabel() + "  Freq:(" + freqToString() + ")  P(" + propToString() + ")");
-
-        for(Synapse s: getProvider().getActiveInputSynapses()) {
-            TSynapse ts = (TSynapse) s;
-
-            System.out.println("IN:  " + ts.getInput().getLabel());
-            System.out.println("     Freq:(" + ts.freqToString() + ")");
-            System.out.println("     PXi(" + ts.pXiToString() + ")");
-            System.out.println("     PXout(" + ts.pXoutToString() + ")");
-            System.out.println("     P(" + ts.propToString() + ")");
-            System.out.println("     Rel:" + ts.getReliability());
-        }
-    }
-
-
-    public ActivationFunction getActivationFunction() {
-        return ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-    }
-
-
-    public double getTotalBias(Synapse.State state) {
-        return getBias(state) - synapseSummary.getPosSum(state);
-    }
 
     public String typeToString() {
         return "META";
     }
 
 
-    public String toStringWithSynapses() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(super.toStringWithSynapses());
-        for (MappingLink ml : targetNeurons.values()) {
-            sb.append("  ");
-            sb.append(ml.toString());
-            sb.append("\n");
-        }
-
-        return sb.toString();
-    }
 
 /*
     public static void induce(Model model, int threadId) {
@@ -125,8 +89,8 @@ public class MetaNeuron extends TNeuron<MetaSynapse> {
             }
         }
     }
-*/
-/*
+
+
     public static void createNewMetaNeuron(Model model, int threadId, Neuron inputNeuron, List<ExcitatorySynapse> candidateSynapses) {
         MetaNeuron mn = new MetaNeuron(model,"");
 
@@ -142,18 +106,18 @@ public class MetaNeuron extends TNeuron<MetaSynapse> {
 
         InhibitoryNeuron.induceOutgoing(threadId, mn);
     }
-*/
+
 
     public static double coveredSum(List<ExcitatorySynapse> syns) {
         double sum = 0.0;
-        for(ExcitatorySynapse s: syns) {
-//            sum += s.getUncovered();
+        for (ExcitatorySynapse s : syns) {
+            sum += s.getUncovered();
         }
         return sum;
     }
 
 
-/*
+
     public void train(int threadId) {
         do {
             double diff;
@@ -177,30 +141,22 @@ public class MetaNeuron extends TNeuron<MetaSynapse> {
 
         } while(induceInputInhibNeurons() || expand(threadId));
     }
-*/
 
-    private void propagateToOutgoingInhibNeurons(int threadId) {
-        for(Synapse s: getProvider().getActiveOutputSynapses()) {
-            if(s instanceof MetaInhibSynapse) {
+
+    private void propagateToOutgoingInhibNeurons() {
+        for (Synapse s : getProvider().getActiveOutputSynapses()) {
+            if (s instanceof MetaInhibSynapse) {
                 MetaInhibSynapse ms = (MetaInhibSynapse) s;
 
                 InhibitoryNeuron in = (InhibitoryNeuron) ms.getOutput().get();
 
-                in.train(threadId, this);
+                in.train(this);
             }
         }
     }
 
 
-    private double getNijSum() {
-        double sum = 0.0;
-        for(MappingLink ml: targetNeurons.values()) {
-            sum += ml.nij;
-        }
-        return sum;
-    }
 
-/*
     private boolean expand(int threadId) {
         boolean changed = false;
         double sumNij = getNijSum();
@@ -332,12 +288,16 @@ public class MetaNeuron extends TNeuron<MetaSynapse> {
         double sum = 0.0;
         double norm = 0.0;
 
-        for(MappingLink nml: targetNeurons.values()) {
-            double nij = nml.nij;
-            double bj = nml.targetNeuron.getBias();
+        for (Synapse ts: inhibitoryNeuron.getOutputSynapses()) {
+            INeuron tn = ts.getOutput();
 
-            sum += nij * bj;
-            norm += nij;
+            if(tn instanceof ExcitatoryNeuron) {
+                ExcitatoryNeuron targetNeuron = (ExcitatoryNeuron) tn;
+                double bj = targetNeuron.getBias();
+
+                sum += bj;
+                norm += 1.0;
+            }
         }
 
         setBias(sum / norm);
@@ -365,11 +325,12 @@ public class MetaNeuron extends TNeuron<MetaSynapse> {
     public boolean isMature(Config c) {
         return false;
     }
-/*
-    public TNeuron getInputTargets(TDocument doc, Activation in) {
-        return doc.metaActivations.get(in);
-    }
-*/
+
+    /*
+        public TNeuron getInputTargets(TDocument doc, Activation in) {
+            return doc.metaActivations.get(in);
+        }
+    */
     public ExcitatoryNeuron getTargetNeuron(Activation metaAct, Function<Activation, ExcitatoryNeuron> callback) {
         ExcitatoryNeuron targetNeuron = createMetaNeuronTarget(metaAct, callback);
 
@@ -398,7 +359,6 @@ public class MetaNeuron extends TNeuron<MetaSynapse> {
 
     private void initMetaNeuronTarget(Document doc, ExcitatoryNeuron tn) {
         tn.setInhibitoryNeuron(getInhibitoryNeuron());
-        new MappingLink(this, tn, 1.0).link();
 
         transferNegativeMetaInputSynapses(doc, tn);
         transferMetaOutputSynapses(doc, getInhibitoryNeuron(), tn);
@@ -413,25 +373,25 @@ public class MetaNeuron extends TNeuron<MetaSynapse> {
 
 
     private void transferNegativeMetaInputSynapses(Document doc, ExcitatoryNeuron targetNeuron) {
-        for(Synapse templateSynapse: getProvider().getActiveInputSynapses()) {
+        for (Synapse templateSynapse : getProvider().getActiveInputSynapses()) {
             MetaSynapse ms = (MetaSynapse) templateSynapse;
 
-            if(ms != null && templateSynapse.isNegative(CURRENT)) {
-                ms.transferTemplateSynapse(doc, (TNeuron) templateSynapse.getInput().get(doc), targetNeuron, null);
+            if (ms != null && templateSynapse.isNegative(CURRENT)) {
+                ms.transferTemplateSynapse(doc, ms.getInput(), targetNeuron, null);
             }
         }
     }
 
 
     private void transferMetaOutputSynapses(Document doc, InhibitoryNeuron inhibNeuron, ExcitatoryNeuron targetNeuron) {
-        for(Synapse templateSynapse: getProvider().getActiveOutputSynapses()) {
-            if(templateSynapse.getOutput().getId() == inhibNeuron.getId()) {
+        for (Synapse templateSynapse : getProvider().getActiveOutputSynapses()) {
+            if (templateSynapse.getOutput().getId() == inhibNeuron.getId()) {
                 MetaInhibSynapse mis = (MetaInhibSynapse) templateSynapse;
 
                 InhibitorySynapse targetSynapse = mis.transferMetaSynapse(doc, targetNeuron);
 
                 List<Synapse> modifiedSynapses = Collections.singletonList(targetSynapse);
-                targetSynapse.getOutput().get().commit(modifiedSynapses);
+                targetSynapse.getOutput().commit(modifiedSynapses);
             }
         }
     }
@@ -460,49 +420,4 @@ public class MetaNeuron extends TNeuron<MetaSynapse> {
                 });
     }
 */
-
-
-    public static class MappingLink {
-        public MetaNeuron metaNeuron;
-        public ExcitatoryNeuron targetNeuron;
-
-        public double nij;
-
-        public MappingLink(MetaNeuron metaNeuron, ExcitatoryNeuron targetNeuron, double nij) {
-            this.metaNeuron = metaNeuron;
-            this.targetNeuron = targetNeuron;
-            this.nij = nij;
-        }
-
-
-        public void link() {
-            metaNeuron.targetNeurons.put(targetNeuron, this);
-            targetNeuron.metaNeurons.put(metaNeuron, this);
-        }
-
-
-        public String toString() {
-            return "TM \"" + targetNeuron.toString() + "\" nij:" + nij;
-        }
-
-        public double computeNij() {
-            double max = 0.0;
-            for(Synapse s: metaNeuron.getProvider().getActiveInputSynapses()) {
-                MetaSynapse ms = (MetaSynapse) s;
-
-                MetaSynapse.MappingLink ml = ms.targetSynapses.get(targetNeuron);
-                double targetCoverage = 0.0;
-                if(ml != null) {
-                    ExcitatorySynapse ts = ml.targetSynapse;
-                    targetCoverage = ts.getCoverage();
-                }
-                max = Math.max(max, ms.getCoverage() - targetCoverage);
-            }
-            double newNij = 1.0 - max;
-            double diff = Math.abs(newNij - nij);
-            nij = newNij;
-
-            return diff;
-        }
-    }
 }

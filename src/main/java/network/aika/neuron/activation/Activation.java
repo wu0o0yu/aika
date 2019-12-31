@@ -24,10 +24,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static network.aika.Document.MAX_ROUND;
 import static network.aika.neuron.Synapse.State.CURRENT;
 
 /**
@@ -39,13 +37,11 @@ public class Activation {
     public double value;
     public double net;
     public Fired fired;
-    public double weight;
 
     private int id;
     private INeuron<?> neuron;
     private Document doc;
 
-    public double remainingWeight;
     public double p;
 
     public TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
@@ -57,17 +53,18 @@ public class Activation {
 
     public ExcitatoryNeuron targetNeuron;
 
-    public long visited;
+    public long visitedDown;
+    public long visitedUp;
 
 
-    public static Comparator<Link> INPUT_COMP = (l1, l2) -> {
-        int r = l1.input.fired.compareTo(l2.input.fired);
-        if (r != 0) return r;
-        return l1.synapse.getInput().compareTo(l2.synapse.getInput());
-    };
+    public static Comparator<Link> INPUT_COMP =
+            Comparator.
+                    <Link, Fired>comparing(l -> l.getInput().getFired())
+                    .thenComparing(l -> l.getSynapse().getInput());
+
 
     public static Comparator<Link> OUTPUT_COMP = (l1, l2) -> {
-        int r =Synapse.OUTPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
+        int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
         if (r != 0) return r;
         return Integer.compare(l1.output.getId(), l2.output.getId());
     };
@@ -122,58 +119,66 @@ public class Activation {
     }
 
 
-    public void followDown(long v, Predicate<Activation> predicate) {
-        if(visited == v) return;
-        visited = v;
-
-        followUp(v, predicate);
-        inputLinks
-                .values()
-                .stream()
-                .forEach(l -> l.input.followDown(v, predicate));
+    public Fired getFired() {
+        return fired;
     }
 
 
-    public void followUp(long v, Predicate<Activation> predicate) {
-        if(visited == v) return;
-        visited = v;
+    public void followDown(long v, CollectResults c) {
+        if(visitedDown == v) return;
 
-        if(checkAlternativeBranch(v)) {
-            return;
-        }
+        followUp(v, false, c);
+        visitedDown = v;
 
-        if(predicate.test(this)) {
+        inputLinks
+                .values()
+                .stream()
+                .forEach(l -> l.input.followDown(v, c));
+    }
+
+
+    public void followUp(long v, boolean isConflict, CollectResults c) {
+        if(visitedDown == v || visitedUp == v) return;
+        visitedUp = v;
+
+        boolean ic = isConflict || !checkBranch(v, this);
+
+        if(c.collect(this, ic)) {
             return;
         }
 
         outputLinks
                 .values()
                 .stream()
-                .forEach(l -> l.output.followUp(v, predicate));
+                .forEach(l -> l.output.followUp(v, ic, c));
     }
 
 
-    public boolean checkAlternativeBranch(long v) {
-        // Siehe Grafik 18.12.2019
-        Link ld = inputLinks
-                .keySet()
-                .stream()
-                .filter(l -> !l.isRecurrent())  // Aktuell sind die rec links an den Anfang sortiert.
-                .findFirst()
-                .orElse(null);
+    public Activation cloneAct() {
+        Activation clonedAct = new Activation(doc, neuron, round);
 
-        if(ld == null) {
-            return false;
-        }
+        clonedAct.value = value;
+        clonedAct.net = net;
+        clonedAct.fired = fired;
+        clonedAct.p = p;
+        clonedAct.isFinal = isFinal;
+        clonedAct.targetNeuron = targetNeuron;
+        clonedAct.inputLinks.putAll(inputLinks);
 
-        return ld.input
-                .getOutputLinks(ld.synapse)
-                .filter(act -> act != this) // An dieser Stelle wird über die alternativen Varianten iteriert.
-                .flatMap(act -> act.inputLinks.values().stream())
+        return clonedAct;
+    }
+
+
+    public interface CollectResults {
+        boolean collect(Activation act, boolean isConflict);
+    }
+
+
+    public boolean checkBranch(long v, Activation act) {
+        return !act.inputLinks.values().stream()
                 .filter(l -> l.isRecurrent() && l.isNegative(CURRENT))
                 .flatMap(l -> l.input.inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
-                .map(l -> l.input)
-                .anyMatch(act -> act.visited == v);
+                .anyMatch(l -> l.input.visitedDown != v);
     }
 
 
@@ -182,38 +187,34 @@ public class Activation {
     }
 
 
-    public Stream<Activation> getOutputLinks(Synapse s) {
+    public Stream<Link> getOutputLinks(Synapse s) {
         return outputLinks.values().stream()
-                .filter(l -> l.synapse == s)
-                .map(l -> l.getOutput());
+                .filter(l -> l.synapse == s);
     }
 
 
-    public void addLink(Activation iAct, Synapse s) {
-        Link l = new Link(s, iAct, this);
+    public void addLink(Link l) {
         l.link();
 
         assert !isFinal;
 
-        sumUpLink(iAct, s);
+        sumUpLink(l);
     }
 
 
-    public void sumUpLink(Activation iAct, Synapse s) {
-        double w = s.getWeight();
+    public void sumUpLink(Link l) {
+        double w = l.synapse.getWeight();
 
-        net += iAct.value * w;
+        net += l.input.value * w;
         if(fired == null && net > 0.0) {
-            fired = neuron.incrementFired(iAct.fired);
+            fired = neuron.incrementFired(l.input.fired);
             doc.getQueue().add(this);
         }
     }
 
 
     public void process() {
-        INeuron.SynapseSummary ss = neuron.getSynapseSummary();
         value = neuron.getActivationFunction().f(net);
-        weight = Math.max(0.0, Math.min(-ss.getNegRecSum(), net));
 
         isFinal = true;
 
@@ -226,18 +227,10 @@ public class Activation {
 
         net = 0.0;
         for (Link l: inputLinks.values()) {
-            Activation is = l.input;
-            Synapse syn = l.getSynapse();
-
-            sumUpLink(is, syn);
+            sumUpLink(l);
         }
     }
 
-
-
-    public boolean isFinalActivation() {
-        return false;
-    }
 
     public boolean isActive() {
         return value > 0.0;
@@ -248,40 +241,15 @@ public class Activation {
     }
 
 
-    public boolean equalsWithWeights(Activation s) {
-        return equals(s) && Math.abs(weight - s.weight) <= INeuron.WEIGHT_TOLERANCE;
-    }
-
-
-
-    private void link() {
-
-    }
-
-
-    public void setWeight(double weight) {
-        this.weight = weight;
-    }
-
-
-
-    public boolean checkSelfReferencing(Activation act) {
-        return false;
-    }
-
-
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(" w:" + Utils.round(weight) + " p:" + p + " value:" + Utils.round(value));
-        return sb.toString();
+        return getINeuron().getType() + ":" + getLabel() +
+                " value:" + Utils.round(value) +
+                " net:" + Utils.round(net) +
+                " p:" + Utils.round(p);
     }
 
     public double getP() {
         return 0.0;
-    }
-
-    public String toStringDetailed() {
-        return null;
     }
 
 
@@ -314,7 +282,7 @@ public class Activation {
         }
 
 
-        public void addInputLink(Integer synId, Activation iAct) {
+        public void addInputLink(Activation iAct) {
             inputLinks.add(iAct);
         }
     }

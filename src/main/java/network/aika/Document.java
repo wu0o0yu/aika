@@ -20,6 +20,7 @@ package network.aika;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Linker;
 import network.aika.neuron.activation.Queue;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
@@ -54,6 +55,7 @@ public class Document implements Comparable<Document> {
     private Model model;
 
     private Queue queue = new Queue();
+    private Linker linker = new Linker();
 
     private TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
 
@@ -87,6 +89,11 @@ public class Document implements Comparable<Document> {
 
     public Queue getQueue() {
         return queue;
+    }
+
+
+    public Linker getLinker() {
+        return linker;
     }
 
 
@@ -142,16 +149,8 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public Collection<Activation> getActivations(boolean onlyFinal) {
-        if(!onlyFinal) {
-            return activationsById.values();
-        } else {
-            return activationsById
-                    .values()
-                    .stream()
-                    .filter(act -> act.isFinalActivation())
-                    .collect(Collectors.toList());
-        }
+    public Collection<Activation> getActivations() {
+        return activationsById.values();
     }
 
 
@@ -175,10 +174,10 @@ public class Document implements Comparable<Document> {
 
 
     public void notifyWeightModified(Synapse synapse) {
-        Set<Synapse> is = modifiedWeights.get(synapse.getOutput().get());
+        Set<Synapse> is = modifiedWeights.get(synapse.getOutput());
         if(is == null) {
             is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
-            modifiedWeights.put(synapse.getOutput().get(), is);
+            modifiedWeights.put(synapse.getOutput(), is);
         }
         is.add(synapse);
     }
@@ -221,7 +220,7 @@ public class Document implements Comparable<Document> {
                 continue;
             }
 
-            sb.append(act.toStringDetailed());
+            sb.append(act.toString());
             sb.append("\n");
         }
 
@@ -234,7 +233,7 @@ public class Document implements Comparable<Document> {
 
         Function<Activation, ExcitatoryNeuron> callback = act -> new ExcitatoryNeuron(getModel(), act.getLabel());
 
-        for(Activation act: new ArrayList<>(getActivations(false))) {
+        for(Activation act: new ArrayList<>(getActivations())) {
             if(act.isActive()) {
                 TNeuron n = act.getINeuron();
 
@@ -242,7 +241,7 @@ public class Document implements Comparable<Document> {
             }
         }
 
-        for(Activation act: new ArrayList<>(getActivations(false))) {
+        for(Activation act: new ArrayList<>(getActivations())) {
             if(act.isActive()) {
                 TNeuron n = act.getINeuron();
 

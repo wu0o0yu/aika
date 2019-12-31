@@ -1,16 +1,27 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package network.aika.neuron.excitatory;
 
-import network.aika.ActivationFunction;
 import network.aika.Config;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Fired;
-import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.meta.MetaNeuron;
 import network.aika.neuron.meta.MetaSynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,20 +31,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.Synapse.State.NEXT;
-import static network.aika.neuron.activation.Activation.INPUT_COMP;
 
 
-public class ExcitatoryNeuron extends TNeuron<ExcitatorySynapse> {
-
-    public static final String TYPE_STR = "E";
+/**
+ *
+ * @author Lukas Molzberger
+ */
+public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 
-
-    public InhibitoryNeuron inhibitoryNeuron;
-
-    public Map<MetaNeuron, MetaNeuron.MappingLink> metaNeurons = new TreeMap<>();
+    public static final String TYPE_STR = Model.register("NE", ExcitatoryNeuron.class);
 
     enum WeightBias {
         WEIGHT,
@@ -101,55 +109,17 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatorySynapse> {
         return TYPE_STR;
     }
 
-    @Override
-    public Fired incrementFired(Fired f) {
-        return new Fired(f.getInputTimestamp(), f.getFired() + 1);
-    }
-
-
-    public boolean isWeak(Synapse s, Synapse.State state) {
-        return s.getWeight(state) < getBias();
-    }
-
-
-    public ActivationFunction getActivationFunction() {
-        return ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-    }
-
 
     public ExcitatorySynapse getMaxInputSynapse(Synapse.State state) {
         ExcitatorySynapse maxSyn = null;
         for(ExcitatorySynapse s: getInputSynapses()) {
-            if(!s.isInactive()) {
-                if(maxSyn == null || maxSyn.getNewWeight() < s.getNewWeight()) {
-                    maxSyn = s;
-                }
+            if(maxSyn == null || maxSyn.getNewWeight() < s.getNewWeight()) {
+                maxSyn = s;
             }
         }
         return maxSyn;
     }
 
-
-    public double getTotalBias(Synapse.State state) {
-        return getBias(state) - synapseSummary.getPosSum(state);
-    }
-
-
-    @Override
-    public void dumpStat() {
-        System.out.println("OUT:  " +getLabel() + "  Freq:(" + freqToString() + ")  P(" + propToString() + ")");
-
-        for(Synapse s: getProvider().getActiveInputSynapses()) {
-            TSynapse ts = (TSynapse) s;
-
-            System.out.println("IN:  " + ts.getInput().getLabel());
-            System.out.println("     Freq:(" + ts.freqToString() + ")");
-            System.out.println("     PXi(" + ts.pXiToString() + ")");
-            System.out.println("     PXout(" + ts.pXoutToString() + ")");
-            System.out.println("     P(" + ts.propToString() + ")");
-            System.out.println("     Rel:" + ts.getReliability());
-        }
-    }
 
 
     public String typeToString() {
@@ -166,24 +136,14 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatorySynapse> {
         );
 
         if(synapse == null) {
-            synapse = new ExcitatorySynapse(inputNeuron, getProvider(), getNewSynapseId(), false);
+            synapse = new ExcitatorySynapse(inputNeuron, getProvider(), getNewSynapseId(), false, true);
 
             synapse.link();
         }
         return synapse;
     }
 
-
-    public InhibitoryNeuron getInhibitoryNeuron() {
-        return inhibitoryNeuron;
-    }
-
-
-    public void setInhibitoryNeuron(InhibitoryNeuron inhibitoryNeuron) {
-        this.inhibitoryNeuron = inhibitoryNeuron;
-    }
-
-
+/*
     public void train(Config c, Activation o) {
         super.train(c, o);
 
@@ -193,7 +153,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatorySynapse> {
     }
 
 
-/*
+
     // TODO: entfernen und durch transferMetaSynapses ersetzen.
     public Activation init(Activation inputOpt) {
         Activation iAct = inputOpt.getAct();
@@ -271,16 +231,8 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatorySynapse> {
             }
         }
     }
-*/
 
-    public Set<Activation> getConflicts(Activation act) {
-        return act.outputLinks.values().stream()
-                .filter(cl -> !cl.isNegative(CURRENT))
-                .map(cl -> cl.getInput())
-                .collect(Collectors.toSet());
-    }
 
-/*
     private Activation getMaxOption(Activation inputAct) {
         return inputAct
                 .getOptions()
@@ -288,8 +240,8 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatorySynapse> {
                 .max(Comparator.comparingDouble(o -> o.getP()))
                 .orElse(null);
     }
-*/
-/*
+
+
     private void createCandidateSynapse(Config c, Activation inputOpt, Activation targetOpt) {
         Activation targetAct = targetOpt.getAct();
         Neuron targetNeuron = targetAct.getNeuron();
@@ -332,7 +284,22 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatorySynapse> {
         inputOpt.getAct().addLink(Direction.INPUT, l);
         targetOpt.link(l, inputOpt);
     }
+
+
+
+
+    private boolean checkIfSynapseExists(Activation inputOpt, Activation targetOpt) {
+        for(Map.Entry<Link, Activation> me: targetOpt.inputOptions.entrySet()) {
+            Link l = me.getKey();
+
+            if(l.getInput() == inputOpt.getAct()) {
+                return true;
+            }
+        }
+        return false;
+    }
 */
+
 
     public boolean isMature(Config c) {
         Synapse maxSyn = getMaxInputSynapse(CURRENT);
@@ -345,18 +312,14 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatorySynapse> {
         return se.getCounts()[1] >= c.getMaturityThreshold();  // Sign.NEG, Sign.POS
     }
 
-/*
-    private boolean checkIfSynapseExists(Activation inputOpt, Activation targetOpt) {
-        for(Map.Entry<Link, Activation> me: targetOpt.inputOptions.entrySet()) {
-            Link l = me.getKey();
 
-            if(l.getInput() == inputOpt.getAct()) {
-                return true;
-            }
-        }
-        return false;
+    public Set<Activation> getConflicts(Activation act) {
+        return act.outputLinks.values().stream()
+                .filter(cl -> !cl.isNegative(CURRENT))
+                .map(cl -> cl.getInput())
+                .collect(Collectors.toSet());
     }
-*/
+
 
     private static boolean checkStrength(Link l) {
         return true;
@@ -445,7 +408,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatorySynapse> {
             );
             updateBiasDelta(biasDelta);
 
-            sl.setInactive(NEXT, sl.getWeight(NEXT) <= 0.0);
+            //sl.setInactive(NEXT, sl.getWeight(NEXT) <= 0.0);
         }
     }
 
@@ -462,12 +425,6 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatorySynapse> {
         }
 
         return 0.0;
-    }
-
-
-    private enum Dir {
-        BEFORE,
-        AFTER
     }
 
 
@@ -534,7 +491,7 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatorySynapse> {
         }
 
         public TNeuron getNeuron() {
-            return (TNeuron) s.getInput().get();
+            return s.getInput();
         }
 
         public String getLabel() {
@@ -546,11 +503,11 @@ public class ExcitatoryNeuron extends TNeuron<ExcitatorySynapse> {
         }
 
         public double getReliability() {
-            return Math.min(((TNeuron)s.getInput().get()).getReliability(), s.getReliability());
+            return Math.min((s.getInput()).getReliability(), s.getReliability());
         }
 
         public double[] getPXi() {
-            return ((TNeuron) getSynapse().getInput().get()).getP();
+            return (getSynapse().getInput()).getP();
         }
 
         public double getX(Sign s) {

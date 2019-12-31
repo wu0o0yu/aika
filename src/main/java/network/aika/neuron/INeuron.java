@@ -20,7 +20,9 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.excitatory.ExcitatorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,13 +30,8 @@ import java.io.*;
 import java.util.*;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.Synapse.State.NEXT;
 
 /**
- * The {@code INeuron} class represents a internal neuron implementation in Aikas neural network and is connected to other neurons through
- * input synapses and output synapses. The activation value of a neuron is calculated by computing the weighted sum
- * (input act. value * synapse weight) of the input synapses, adding the bias to it and sending the resulting value
- * through a transfer function (the upper part of tanh).
  *
  * @author Lukas Molzberger
  */
@@ -49,12 +46,9 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public static final INeuron MAX_NEURON = new ExcitatoryNeuron();
 
     private String label;
-    private String outputText;
 
     private volatile double bias;
     private volatile double biasDelta;
-
-    protected SynapseSummary synapseSummary = new SynapseSummary();
 
     private volatile int synapseIdCounter = 0;
 
@@ -105,11 +99,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
 
-    public SynapseSummary getSynapseSummary() {
-        return synapseSummary;
-    }
-
-
     public Collection<S> getInputSynapses() {
         return inputSynapses.values();
     }
@@ -142,13 +131,13 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         Activation act = new Activation(doc, this, input.value, f);
         act.isFinal = true;
 
-        propagate(act);
-
         for(Activation iAct: input.getInputLinks()) {
             Synapse is = getInputSynapse(iAct.getNeuron());
 
-            act.addLink(iAct, is);
+            act.addLink(new Link(is, iAct, act));
         }
+
+        propagate(act);
 
         doc.getQueue().process();
 
@@ -157,33 +146,18 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
 
 
-    public void commit(Collection<? extends Synapse> modifiedSynapses) {
-        for (Synapse s : modifiedSynapses) {
-            INeuron in = s.getInput().get();
-            in.lock.acquireWriteLock();
-            try {
-                synapseSummary.updateSynapse(s);
-            } finally {
-                in.lock.releaseWriteLock();
-            }
-        }
+    public abstract void commit(Collection<? extends Synapse> modifiedSynapses);
 
+
+    public void commitBias() {
         bias += biasDelta;
         biasDelta = 0.0;
-
-        for (Synapse s : modifiedSynapses) {
-            s.commit();
-        }
-
-        synapseSummary.commit();
-
-        setModified();
     }
 
 
     public void remove() {
         for (Synapse s : inputSynapses.values()) {
-            INeuron<?> in = s.getInput().get();
+            INeuron<?> in = s.getInput();
             in.provider.lock.acquireWriteLock();
             in.provider.activeOutputSynapses.remove(s);
             in.provider.lock.releaseWriteLock();
@@ -191,7 +165,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
         provider.lock.acquireReadLock();
         for (Synapse s : provider.activeOutputSynapses.values()) {
-            INeuron out = s.getOutput().get();
+            INeuron out = s.getOutput();
             out.lock.acquireWriteLock();
             out.inputSynapses.remove(s);
             out.lock.releaseWriteLock();
@@ -215,32 +189,20 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
 
     public void propagate(Activation act) {
-        provider.activeOutputSynapses.values()
-                .forEach(s -> s.getOutput().get().propagate(act, s));
+        provider.activeOutputSynapses.tailMap(ExcitatorySynapse.PROPAGATE_SYN, true)
+                .values()
+                .forEach(s -> s.getOutput().propagate(act, s));
     }
 
 
     protected void propagate(Activation iAct, Synapse s) {
-        ArrayList<Activation> results = new ArrayList<>();
+        Document doc = iAct.getDocument();
+        Activation oAct = new Activation(doc, this, iAct.round);
 
-        iAct.followDown(iAct.getDocument().getNewVisitedId(), act -> {
-            if(act.getNeuron() == getProvider()) {
-                results.add(act);
-                return true;
-            }
+        doc.getLinker().add(new Link(s, iAct, oAct));
 
-            return act.fired.compareTo(iAct.fired) > 0;
-        });
-
-        Activation oAct = results.size() > 0 ? results.get(0) : null;
-
-        if(oAct == null) {
-            oAct = new Activation(iAct.getDocument(), this, iAct.round);
-        }
-
-        oAct.addLink(iAct, s);
+        doc.getLinker().process();
     }
-
 
 
     public int compareTo(INeuron n) {
@@ -250,9 +212,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         if (this == MAX_NEURON) return 1;
         if (n == MAX_NEURON) return -1;
 
-        if (getId() < n.getId()) return -1;
-        else if (getId() > n.getId()) return 1;
-        else return 0;
+        return Integer.compare(getId(), n.getId());
     }
 
 
@@ -265,14 +225,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
             out.writeUTF(label);
         }
 
-        out.writeBoolean(outputText != null);
-        if(outputText != null) {
-            out.writeUTF(outputText);
-        }
-
         out.writeDouble(bias);
-
-        synapseSummary.write(out);
 
         out.writeInt(synapseIdCounter);
         for (Synapse s : inputSynapses.values()) {
@@ -293,27 +246,22 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
 
     @Override
-    public void readFields(DataInput in, Model m) throws IOException {
+    public void readFields(DataInput in, Model m) throws Exception {
         if(in.readBoolean()) {
             label = in.readUTF();
         }
 
-        if(in.readBoolean()) {
-            outputText = in.readUTF();
-        }
-
         bias = in.readDouble();
-        synapseSummary = SynapseSummary.read(in, m);
 
         synapseIdCounter = in.readInt();
         while (in.readBoolean()) {
             S syn = (S) m.readSynapse(in);
-            inputSynapses.put(syn.getInput(), syn);
+            inputSynapses.put(syn.getPInput(), syn);
         }
 
         while (in.readBoolean()) {
             Synapse syn = m.readSynapse(in);
-            outputSynapses.put(syn.getOutput(), syn);
+            outputSynapses.put(syn.getPOutput(), syn);
         }
     }
 
@@ -321,18 +269,18 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     @Override
     public void suspend() {
         for (Synapse s : inputSynapses.values()) {
-            s.getInput().removeActiveOutputSynapse(s);
+            s.getPInput().removeActiveOutputSynapse(s);
         }
         for (Synapse s : outputSynapses.values()) {
-            s.getOutput().removeActiveInputSynapse(s);
+            s.getPOutput().removeActiveInputSynapse(s);
         }
 
         provider.lock.acquireReadLock();
         for (Synapse s : provider.activeInputSynapses.values()) {
-            s.getInput().removeActiveOutputSynapse(s);
+            s.getPInput().removeActiveOutputSynapse(s);
         }
         for (Synapse s : provider.activeOutputSynapses.values()) {
-            s.getOutput().removeActiveInputSynapse(s);
+            s.getPOutput().removeActiveInputSynapse(s);
         }
         provider.lock.releaseReadLock();
     }
@@ -342,23 +290,23 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public void reactivate() {
         provider.lock.acquireReadLock();
         for (Synapse s : provider.activeInputSynapses.values()) {
-            s.getInput().addActiveOutputSynapse(s);
+            s.getPInput().addActiveOutputSynapse(s);
         }
         for (Synapse s : provider.activeOutputSynapses.values()) {
-            s.getOutput().addActiveInputSynapse(s);
+            s.getPOutput().addActiveInputSynapse(s);
         }
         provider.lock.releaseReadLock();
 
         for (Synapse s : inputSynapses.values()) {
-            s.getInput().addActiveOutputSynapse(s);
-            if (!s.getInput().isSuspended()) {
-                s.getOutput().addActiveInputSynapse(s);
+            s.getPInput().addActiveOutputSynapse(s);
+            if (!s.getPInput().isSuspended()) {
+                s.getPOutput().addActiveInputSynapse(s);
             }
         }
         for (Synapse s : outputSynapses.values()) {
-            s.getOutput().addActiveInputSynapse(s);
-            if (!s.getOutput().isSuspended()) {
-                s.getInput().addActiveOutputSynapse(s);
+            s.getPOutput().addActiveInputSynapse(s);
+            if (!s.getPOutput().isSuspended()) {
+                s.getPInput().addActiveOutputSynapse(s);
             }
         }
     }
@@ -373,7 +321,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
 
-
     public abstract double getTotalBias(Synapse.State state);
 
 
@@ -384,15 +331,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     protected double getBias(Synapse.State state) {
         return state == CURRENT ? bias : bias + biasDelta;
-    }
-
-
-    public double getNewBias() {
-        return bias + biasDelta;
-    }
-
-    public double getBiasDelta() {
-        return biasDelta;
     }
 
 
@@ -413,7 +351,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
 
     public String toStringWithSynapses() {
-        SortedSet<Synapse> is = new TreeSet<>(Comparator.comparing(s -> s.getInput().getId()));
+        SortedSet<Synapse> is = new TreeSet<>(Comparator.comparing(Synapse::getPInput));
 
         is.addAll(getProvider().getActiveInputSynapses());
 
@@ -426,128 +364,5 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
             sb.append("\n");
         }
         return sb.toString();
-    }
-
-
-    public static class SynapseSummary implements Writable {
-        private volatile double posDirSum;
-        private volatile double negDirSum;
-        private volatile double negRecSum;
-        private volatile double posRecSum;
-        private volatile double posPassiveSum;
-
-        private volatile double posDirSumDelta = 0.0;
-        private volatile double negDirSumDelta = 0.0;
-        private volatile double negRecSumDelta = 0.0;
-        private volatile double posRecSumDelta = 0.0;
-        private volatile double posPassiveSumDelta = 0.0;
-
-
-        public double getPosDirSum() {
-            return posDirSum;
-        }
-
-        public double getNegDirSum() {
-            return negDirSum;
-        }
-
-        public double getNegRecSum() {
-            return negRecSum;
-        }
-
-        public double getPosRecSum() {
-            return posRecSum;
-        }
-
-        public double getPosPassiveSum() {
-            return posPassiveSum;
-        }
-
-        public double getPosSum(Synapse.State state) {
-            return getPosDirSum(state) + getPosRecSum(state);
-        }
-
-
-        private double getPosDirSum(Synapse.State state) {
-            return state == CURRENT ? posDirSum : posDirSum + posDirSumDelta;
-        }
-
-        private double getPosRecSum(Synapse.State state) {
-            return state == CURRENT ? posRecSum : posRecSum + posRecSumDelta;
-        }
-
-        private double getPosPassiveSum(Synapse.State state) {
-            return state == CURRENT ? posPassiveSum : posPassiveSum + posPassiveSumDelta;
-        }
-
-
-        public void updateSynapse(Synapse s) {
-            if (!s.isInactive(CURRENT)) {
-                updateSynapse(CURRENT, -1.0, s);
-            }
-            if (!s.isInactive(NEXT)) {
-                updateSynapse(NEXT, 1.0, s);
-            }
-        }
-
-        private void updateSynapse(Synapse.State state, double sign, Synapse s) {
-            updateSum(s.isRecurrent(), s.isNegative(state), sign * (s.getWeight(state)));
-        }
-
-        private void updateSum(boolean rec, boolean neg, double delta) {
-            if(!rec) {
-                if(!neg) {
-                    posDirSumDelta += delta;
-                } else {
-                    negDirSumDelta += delta;
-                }
-            } else {
-                if(!neg) {
-                    posRecSumDelta += delta;
-                } else {
-                    negRecSumDelta += delta;
-                }
-            }
-        }
-
-
-        public void commit() {
-            posDirSum += posDirSumDelta;
-            negDirSum += negDirSumDelta;
-            posRecSum += posRecSumDelta;
-            negRecSum += negRecSumDelta;
-            posPassiveSum += posPassiveSumDelta;
-
-            posDirSumDelta = 0.0;
-            negDirSumDelta = 0.0;
-            negRecSumDelta = 0.0;
-            posDirSumDelta = 0.0;
-            posPassiveSumDelta = 0.0;
-        }
-
-
-        public static SynapseSummary read(DataInput in, Model m) throws IOException {
-            SynapseSummary ss = new SynapseSummary();
-            ss.readFields(in, m);
-            return ss;
-        }
-
-        @Override
-        public void write(DataOutput out) throws IOException {
-            out.writeDouble(posDirSum);
-            out.writeDouble(negDirSum);
-            out.writeDouble(negRecSum);
-            out.writeDouble(posRecSum);
-            out.writeDouble(posPassiveSum);
-        }
-
-        @Override
-        public void readFields(DataInput in, Model m) throws IOException {
-            posDirSum = in.readDouble();
-            negDirSum = in.readDouble();
-            negRecSum = in.readDouble();
-            posRecSum = in.readDouble();
-            posPassiveSum = in.readDouble();
-        }
     }
 }

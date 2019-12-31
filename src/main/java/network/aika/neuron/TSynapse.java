@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package network.aika.neuron;
 
 import network.aika.Model;
@@ -9,8 +25,11 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 
-
-public abstract class TSynapse extends Synapse {
+/**
+ *
+ * @author Lukas Molzberger
+ */
+public abstract class TSynapse<I extends TNeuron, O extends TNeuron> extends Synapse<I, O> {
 
     private double binaryFrequencyIPosOPos;
     private double frequencyIPosOPos;
@@ -39,14 +58,14 @@ public abstract class TSynapse extends Synapse {
     }
 
 
-    public TSynapse(Neuron input, Neuron output, Integer id, boolean recurrent) {
-        super(input, output, id, recurrent);
+    public TSynapse(Neuron input, Neuron output, Integer id, boolean recurrent, boolean propagate) {
+        super(input, output, id, recurrent, propagate);
         this.lastCount = 0;
     }
 
 
-    public TSynapse(Neuron input, Neuron output, Integer id, boolean recurrent, int lastCount) {
-        super(input, output, id, recurrent);
+    public TSynapse(Neuron input, Neuron output, Integer id, boolean recurrent, boolean propagate, int lastCount) {
+        super(input, output, id, recurrent, propagate);
         this.lastCount = lastCount;
     }
 
@@ -57,12 +76,7 @@ public abstract class TSynapse extends Synapse {
 
 
     private double getCoverageIntern() {
-        return getWeight() / getOutput().get().getBias();
-    }
-
-
-    public double computeMaxRelationWeights() {
-        return 0;
+        return getWeight() / getOutput().getBias();
     }
 
 
@@ -250,4 +264,7 @@ public abstract class TSynapse extends Synapse {
 
         lastCount = in.readInt();
     }
+
+
+
 }

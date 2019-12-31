@@ -140,7 +140,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
                 GZIPInputStream gzipis = new GZIPInputStream(bais);
                 DataInputStream dis = new DataInputStream(gzipis);) {
             n = (T) AbstractNode.read(dis, this);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
@@ -168,8 +168,6 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
 
     public int compareTo(Provider<?> n) {
-        if (id < n.id) return -1;
-        else if (id > n.id) return 1;
-        else return 0;
+        return Integer.compare(id, n.id);
     }
 }

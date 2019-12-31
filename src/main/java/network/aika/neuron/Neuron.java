@@ -23,7 +23,6 @@ import network.aika.neuron.excitatory.ExcitatorySynapse;
 
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 
 /**
@@ -151,8 +150,8 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
     public Synapse selectInputSynapse(Neuron inputNeuron, Predicate<Synapse> filter) {
         lock.acquireWriteLock();
         Synapse synapse = activeInputSynapses.subMap(
-                new ExcitatorySynapse(inputNeuron, this, Integer.MIN_VALUE, false), true,
-                new ExcitatorySynapse(inputNeuron, this, Integer.MAX_VALUE, false), true
+                new ExcitatorySynapse(inputNeuron, this, Integer.MIN_VALUE, false, false), true,
+                new ExcitatorySynapse(inputNeuron, this, Integer.MAX_VALUE, false, true), true
         )
                 .keySet()
                 .stream()

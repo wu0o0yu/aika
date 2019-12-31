@@ -45,7 +45,7 @@ public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> i
 
     public void reactivate() {}
 
-    public static <P extends Provider> AbstractNode read(DataInput in, P p) throws IOException {
+    public static <P extends Provider> AbstractNode read(DataInput in, P p) throws Exception {
         return p.getModel().readNeuron(in, (Neuron) p);
     }
 

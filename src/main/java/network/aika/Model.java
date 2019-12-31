@@ -22,24 +22,16 @@ import network.aika.neuron.Neuron;
 import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.TSynapse;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
-import network.aika.neuron.excitatory.NegExcitatorySynapse;
-import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.inhibitory.MetaInhibSynapse;
-import network.aika.neuron.input.InputNeuron;
 import network.aika.neuron.meta.MetaNeuron;
-import network.aika.neuron.meta.MetaPatternNeuron;
 import network.aika.neuron.meta.MetaSynapse;
-import network.aika.neuron.meta.NegMetaSynapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -61,7 +53,8 @@ public class Model {
     public int charCounter = 0;
 
 
-    public int[] lastCleanup;
+    public static Map<String, Class> typeRegistry = new HashMap<>();
+
 
     public SuspensionHook suspensionHook;
 
@@ -71,8 +64,6 @@ public class Model {
     // Important: the id field needs to be referenced by the provider!
     public WeakHashMap<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
     public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
-
-    public Map<Integer, PassiveInputFunction> passiveActivationFunctions = new TreeMap<>();
 
     public static AtomicLong visitedCounter = new AtomicLong(1);
 
@@ -87,6 +78,12 @@ public class Model {
     }
 
 
+    public static String register(String type, Class clazz) {
+        typeRegistry.put(type, clazz);
+        return type;
+    }
+
+
     public SuspensionHook getSuspensionHook() {
         return suspensionHook;
     }
@@ -97,57 +94,16 @@ public class Model {
     }
 
 
-    public INeuron readNeuron(DataInput in, Neuron p) throws IOException {
-        INeuron n = null;
-        switch(in.readUTF()) {
-            case PatternNeuron.TYPE_STR:
-                n = new PatternNeuron(p);
-                break;
-            case MetaPatternNeuron.TYPE_STR:
-                n = new MetaPatternNeuron(p);
-                break;
-            case ExcitatoryNeuron.TYPE_STR:
-                n = new ExcitatoryNeuron(p);
-                break;
-            case InhibitoryNeuron.TYPE_STR:
-                n = new InhibitoryNeuron(p);
-                break;
-            case MetaNeuron.TYPE_STR:
-                n = new MetaNeuron(p);
-                break;
-            case InputNeuron.TYPE_STR:
-                n = new InputNeuron(p);
-                break;
-        }
-
+    public INeuron readNeuron(DataInput in, Neuron p) throws Exception {
+        Constructor c = typeRegistry.get(in.readUTF()).getDeclaredConstructor(Neuron.class);
+        INeuron n = (INeuron) c.newInstance(p);
         n.readFields(in, this);
         return n;
     }
 
 
-    public Synapse readSynapse(DataInput in) throws IOException {
-        Synapse s = null;
-        switch(in.readUTF()) {
-            case ExcitatorySynapse.TYPE_STR:
-                s = new ExcitatorySynapse();
-                break;
-            case NegExcitatorySynapse.TYPE_STR:
-                s = new NegExcitatorySynapse();
-                break;
-            case InhibitorySynapse.TYPE_STR:
-                s = new InhibitorySynapse();
-                break;
-            case MetaInhibSynapse.TYPE_STR:
-                s = new MetaInhibSynapse();
-                break;
-            case MetaSynapse.TYPE_STR:
-                s = new MetaSynapse();
-                break;
-            case NegMetaSynapse.TYPE_STR:
-                s = new NegMetaSynapse();
-                break;
-        }
-
+    public Synapse readSynapse(DataInput in) throws Exception {
+        Synapse s = (Synapse) typeRegistry.get(in.readUTF()).getDeclaredConstructor().newInstance();
         s.readFields(in, this);
         return s;
     }
@@ -204,7 +160,6 @@ public class Model {
     }
 
 
-
     private boolean suspend(int docId, Provider<? extends AbstractNode> p, SuspensionMode sm) {
         AbstractNode an = p.getIfNotSuspended();
         if (an != null && an.lastUsedDocumentId < docId) {
@@ -222,15 +177,6 @@ public class Model {
             providers.remove(p.id);
         }
     }
-
-
-    public static class StaleDocumentException extends RuntimeException {
-
-        public StaleDocumentException() {
-            super("Two documents are using the same thread. Call clearActivations() first, before processing the next document.");
-        }
-    }
-
 
 
     public MetaNeuron createMetaNeuron(String label) {
@@ -291,4 +237,5 @@ public class Model {
             System.out.println();
         }
     }
+
 }

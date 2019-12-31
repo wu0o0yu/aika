@@ -20,7 +20,6 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Document;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.Writable;
 
 import java.io.DataInput;
@@ -30,41 +29,36 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.Synapse.State.NEXT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse implements Writable {
-
-    public static final int OUTPUT = -1;
+public abstract class Synapse<I extends INeuron, O extends INeuron> implements Writable {
 
     public static double TOLERANCE = 0.0000001;
 
 
-    public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = (s1, s2) -> {
-        int r = s1.input.compareTo(s2.input);
-        if (r != 0) return r;
-        return Integer.compare(s1.id, s2.id);
-    };
+    public static final Comparator<Synapse> INPUT_SYNAPSE_COMP =
+            Comparator
+                    .<Synapse, Neuron>comparing(s -> s.input)
+                    .thenComparingInt(Synapse::getId);
 
 
-    public static final Comparator<Synapse> OUTPUT_SYNAPSE_COMP = (s1, s2) -> {
-        int r = s1.output.compareTo(s2.output);
-        if (r != 0) return r;
-        return Integer.compare(s1.id, s2.id);
-    };
+    public static final Comparator<Synapse> OUTPUT_SYNAPSE_COMP =
+            Comparator
+                    .<Synapse, Boolean>comparing(Synapse::isPropagate)
+                    .thenComparing(s -> s.output)
+                    .thenComparingInt(Synapse::getId);
 
-    private Neuron input;
-    private Neuron output;
+
+    protected Neuron input;
+    protected Neuron output;
 
     private Integer id;
 
     private boolean recurrent;
-
-    private boolean inactive;
-    private boolean inactiveNew;
+    private boolean propagate;
 
     private double weight;
     private double weightDelta;
@@ -73,11 +67,12 @@ public abstract class Synapse implements Writable {
     }
 
 
-    public Synapse(Neuron input, Neuron output, Integer id, boolean recurrent) {
+    public Synapse(Neuron input, Neuron output, Integer id, boolean recurrent, boolean propagate) {
         this.id = id;
         this.input = input;
         this.output = output;
         this.recurrent = recurrent;
+        this.propagate = propagate;
     }
 
 
@@ -85,45 +80,32 @@ public abstract class Synapse implements Writable {
 
     public abstract boolean storeOnInputSide();
 
-    public abstract boolean storeOOutputSide();
+    public abstract boolean storeOnOutputSide();
 
 
-    public Neuron getInput() {
+    public Neuron getPInput() {
         return input;
     }
 
-    public Neuron getOutput() {
+    public Neuron getPOutput() {
         return output;
     }
+
+
+    public I getInput() {
+        return (I) input.get();
+    }
+
+
+    public O getOutput() {
+        return (O) output.get();
+    }
+
 
     public Integer getId() {
         return id;
     }
 
-
-    public Collection<Activation> getActivations(Activation outputAct) {
-        return outputAct.inputLinks.values().stream()
-                .filter(l -> l.getSynapse() == this)
-                .map(l -> l.getInput())
-                .collect(Collectors.toList());
-    }
-
-
-    public boolean isInactive() {
-        return inactive;
-    }
-
-    public boolean isInactive(State s) {
-        return s == CURRENT ? inactive : inactiveNew;
-    }
-
-    public void setInactive(State s, boolean inactive) {
-        if(s == CURRENT) {
-            this.inactive = inactive;
-        } else if(s == NEXT) {
-            this.inactiveNew = inactive;
-        }
-    }
 
     public double getWeight() {
         return weight;
@@ -166,7 +148,7 @@ public abstract class Synapse implements Writable {
             out.setModified();
         }
 
-        if(storeOOutputSide()) {
+        if(storeOnOutputSide()) {
             in.outputSynapses.put(output, this);
             in.setModified();
         }
@@ -209,7 +191,7 @@ public abstract class Synapse implements Writable {
                 out.setModified();
             }
         }
-        if(storeOOutputSide()) {
+        if(storeOnOutputSide()) {
             if(in.outputSynapses.remove(output) != null) {
                 in.setModified();
             }
@@ -226,8 +208,6 @@ public abstract class Synapse implements Writable {
     public void commit() {
         weight += weightDelta;
         weightDelta = 0.0;
-
-        inactive = inactiveNew;
     }
 
 
@@ -275,6 +255,16 @@ public abstract class Synapse implements Writable {
     }
 
 
+    public boolean isPropagate() {
+        return propagate;
+    }
+
+
+    public void setPropagate(boolean propagate) {
+        this.propagate = propagate;
+    }
+
+
     public String toString() {
         return "S ID:" + id + " NW:" + Utils.round(getNewWeight()) + " " + input + "->" + output;
     }
@@ -291,7 +281,8 @@ public abstract class Synapse implements Writable {
 
         out.writeDouble(weight);
 
-        out.writeBoolean(inactive);
+        out.writeBoolean(recurrent);
+        out.writeBoolean(propagate);
     }
 
 
@@ -305,7 +296,8 @@ public abstract class Synapse implements Writable {
 
         weight = in.readDouble();
 
-        inactive = in.readBoolean();
+        recurrent = in.readBoolean();
+        propagate = in.readBoolean();
     }
 
 
@@ -349,6 +341,7 @@ public abstract class Synapse implements Writable {
         private Neuron neuron;
 
         protected boolean recurrent;
+        protected boolean propagate;
         double weight;
         private Integer synapseId;
 

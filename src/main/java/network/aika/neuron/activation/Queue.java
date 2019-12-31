@@ -28,19 +28,20 @@ import network.aika.neuron.activation.Activation.OscillatingActivationsException
  * @author Lukas Molzberger
  */
 public class Queue {
-    private final TreeSet<Activation> queue = new TreeSet<>(Comparator.comparing(o -> o.fired));
-
+    private final TreeSet<Activation> queue = new TreeSet<>(
+            Comparator.<Activation, Fired>comparing(act -> act.fired)
+                    .thenComparing(Activation::getId)
+    );
 
     public void add(Activation o) {
         queue.add(o);
     }
 
-
     public void process() throws OscillatingActivationsException {
         while (!queue.isEmpty()) {
-            Activation o = queue.pollFirst();
-
-            o.process();
+            queue
+                    .pollFirst()
+                    .process();
         }
     }
 }

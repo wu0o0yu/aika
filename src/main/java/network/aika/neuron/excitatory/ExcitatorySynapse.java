@@ -1,9 +1,23 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package network.aika.neuron.excitatory;
 
 import network.aika.Model;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.TSynapse;
+import network.aika.neuron.*;
 import network.aika.neuron.meta.MetaNeuron;
 import network.aika.neuron.meta.MetaSynapse;
 
@@ -14,14 +28,20 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class ExcitatorySynapse extends TSynapse {
 
-    public static final String TYPE_STR = "E";
+/**
+ *
+ * @author Lukas Molzberger
+ */
+public class ExcitatorySynapse extends TSynapse<TNeuron, ConjunctiveNeuron> {
 
+    public static final String TYPE_STR = Model.register("SE", ExcitatorySynapse.class);
+
+    public static Synapse PROPAGATE_SYN = new ExcitatorySynapse(Neuron.MIN_NEURON, Neuron.MIN_NEURON, Integer.MIN_VALUE, false, true);
 
     public static final Comparator<Synapse> META_SYNAPSE_COMP = Comparator
-            .comparing(Synapse::getInput)
-            .thenComparing(Synapse::getOutput);
+            .<Synapse, Neuron>comparing(Synapse::getPInput)
+            .thenComparing(Synapse::getPOutput);
 
 
     public Map<MetaSynapse, MetaSynapse.MappingLink> metaSynapses = new TreeMap<>(META_SYNAPSE_COMP);
@@ -30,8 +50,8 @@ public class ExcitatorySynapse extends TSynapse {
         super();
     }
 
-    public ExcitatorySynapse(Neuron input, Neuron output, Integer id, boolean recurrent) {
-        super(input, output, id, recurrent);
+    public ExcitatorySynapse(Neuron input, Neuron output, Integer id, boolean recurrent, boolean propagate) {
+        super(input, output, id, recurrent, propagate);
     }
 
 
@@ -41,8 +61,8 @@ public class ExcitatorySynapse extends TSynapse {
     }
 
 
-    public ExcitatorySynapse(Neuron input, Neuron output, Integer id, boolean recurrent, int lastCount) {
-        super(input, output, id, recurrent, lastCount);
+    public ExcitatorySynapse(Neuron input, Neuron output, Integer id, boolean recurrent, boolean propagate, int lastCount) {
+        super(input, output, id, recurrent, propagate, lastCount);
     }
 
 
@@ -52,7 +72,7 @@ public class ExcitatorySynapse extends TSynapse {
     }
 
     @Override
-    public boolean storeOOutputSide() {
+    public boolean storeOnOutputSide() {
         return false; // TODO:
     }
 
@@ -60,15 +80,15 @@ public class ExcitatorySynapse extends TSynapse {
     public MetaSynapse.MappingLink getMetaSynapse(Neuron in, Neuron out) {
         return metaSynapses.get(new MetaSynapse(in, out, -1, 0));
     }
-*/
-/*
+
+
     public double getUncovered() {
         double max = 0.0;
         for(Map.Entry<MetaSynapse, MetaSynapse.MappingLink> me: metaSynapses.entrySet()) {
             MetaSynapse.MappingLink sml = me.getValue();
             MetaSynapse ms = sml.metaSynapse;
-            MetaNeuron mn = (MetaNeuron) ms.getOutput().get();
-            ExcitatoryNeuron tn = (ExcitatoryNeuron) getOutput().get();
+            MetaNeuron mn = ms.getOutput();
+            ExcitatoryNeuron tn = (ExcitatoryNeuron) getOutput();
             MetaNeuron.MappingLink nml = mn.targetNeurons.get(tn);
 
             max = Math.max(max, nml.nij * ms.getCoverage());
@@ -80,7 +100,7 @@ public class ExcitatorySynapse extends TSynapse {
 
 
     public boolean isMappedToMetaSynapse(MetaSynapse metaSyn) {
-        MetaSynapse.MappingLink ml = metaSynapses.get(metaSyn.getOutput().get());
+        MetaSynapse.MappingLink ml = metaSynapses.get(metaSyn.getOutput());
         return ml.metaSynapse.getId() == metaSyn.getId();
     }
 
@@ -106,7 +126,7 @@ public class ExcitatorySynapse extends TSynapse {
         }
 
         protected SynapseFactory getSynapseFactory() {
-            return (input, output, id) -> new ExcitatorySynapse(input, output, id, recurrent, output.getModel().charCounter);
+            return (input, output, id) -> new ExcitatorySynapse(input, output, id, recurrent, propagate, output.getModel().charCounter);
         }
     }
 

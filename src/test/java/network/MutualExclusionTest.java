@@ -69,6 +69,14 @@ public class MutualExclusionTest {
                 new InhibitorySynapse.Builder()
                         .setSynapseId(0)
                         .setNeuron(na.getProvider())
+                        .setWeight(1.0),
+                new InhibitorySynapse.Builder()
+                        .setSynapseId(1)
+                        .setNeuron(nb.getProvider())
+                        .setWeight(1.0),
+                new InhibitorySynapse.Builder()
+                        .setSynapseId(2)
+                        .setNeuron(nc.getProvider())
                         .setWeight(1.0)
                 );
 

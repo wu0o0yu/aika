@@ -38,9 +38,9 @@ import java.util.TreeMap;
  *
  * @author Lukas Molzberger
  */
-public class MetaSynapse extends TSynapse {
+public class MetaSynapse extends TSynapse<TNeuron, MetaNeuron> {
 
-    public static final String TYPE_STR = "M";
+    public static final String TYPE_STR = Model.register("SM", MetaSynapse.class);
 
 
     public boolean isMetaVariable;
@@ -51,8 +51,8 @@ public class MetaSynapse extends TSynapse {
         super();
     }
 
-    public MetaSynapse(Neuron input, Neuron output, Integer id, boolean recurrent, int lastCount) {
-        super(input, output, id, recurrent, lastCount);
+    public MetaSynapse(Neuron input, Neuron output, Integer id, boolean recurrent, boolean propagate, int lastCount) {
+        super(input, output, id, recurrent, propagate, lastCount);
     }
 
 
@@ -67,11 +67,11 @@ public class MetaSynapse extends TSynapse {
     }
 
     @Override
-    public boolean storeOOutputSide() {
+    public boolean storeOnOutputSide() {
         return false; // TODO:
     }
 
-
+/*
     public void updateWeight() {
         double sum = 0.0;
         double norm = 0.0;
@@ -90,7 +90,7 @@ public class MetaSynapse extends TSynapse {
 
         update(null, sum / norm);
     }
-
+*/
 
     public void transferTemplateSynapse(Document doc, TNeuron<?> inputNeuron, ExcitatoryNeuron targetNeuron, Link metaLink) {
         if(metaLink.getTargetSynapse() != null) {
@@ -152,7 +152,7 @@ public class MetaSynapse extends TSynapse {
         }
 
         protected SynapseFactory getSynapseFactory() {
-            return (input, output, id) -> new MetaSynapse(input, output, id, recurrent, output.getModel().charCounter);
+            return (input, output, id) -> new MetaSynapse(input, output, id, recurrent, propagate, output.getModel().charCounter);
         }
     }
 
@@ -167,7 +167,7 @@ public class MetaSynapse extends TSynapse {
         }
 
         public void link() {
-            metaSynapse.targetSynapses.put((ExcitatoryNeuron) targetSynapse.getOutput().get(), this);
+            metaSynapse.targetSynapses.put((ExcitatoryNeuron) targetSynapse.getOutput(), this);
             targetSynapse.metaSynapses.put(metaSynapse, this);
         }
     }
