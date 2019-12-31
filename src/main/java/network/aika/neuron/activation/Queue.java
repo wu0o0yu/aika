@@ -14,39 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.neuron.activation;
 
-import network.aika.neuron.Neuron;
 
-import java.io.DataInput;
-import java.io.IOException;
+import java.util.Comparator;
+import java.util.TreeSet;
+
+import network.aika.neuron.activation.Activation.OscillatingActivationsException;
+
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> implements Writable {
+public class Queue {
+    private final TreeSet<Activation> queue = new TreeSet<>(
+            Comparator.<Activation, Fired>comparing(act -> act.fired)
+                    .thenComparing(Activation::getId)
+    );
 
-    public volatile int lastUsedDocumentId = 0;
-
-    public volatile boolean modified;
-
-    protected P provider;
-
-    public P getProvider() {
-        return provider;
+    public void add(Activation o) {
+        queue.add(o);
     }
 
-    public void setModified() {
-        modified = true;
+    public void process() throws OscillatingActivationsException {
+        while (!queue.isEmpty()) {
+            queue
+                    .pollFirst()
+                    .process();
+        }
     }
-
-    public void suspend() {}
-
-    public void reactivate() {}
-
-    public static <P extends Provider> AbstractNode read(DataInput in, P p) throws Exception {
-        return p.getModel().readNeuron(in, (Neuron) p);
-    }
-
 }
+

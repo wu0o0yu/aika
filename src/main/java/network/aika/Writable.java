@@ -39,8 +39,8 @@ public interface Writable {
      * existing object where possible.</p>
      *
      * @param in <code>DataInput</code> to deseriablize this object from.
-     * @throws IOException
+     * @throws Exception
      */
-    void readFields(DataInput in, Model m) throws IOException;
+    void readFields(DataInput in, Model m) throws Exception;
 
 }
