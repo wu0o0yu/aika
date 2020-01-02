@@ -17,21 +17,25 @@
 package network.aika;
 
 
-import network.aika.lattice.Node;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.INeuron.Type;
 import network.aika.neuron.Neuron;
 import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.search.SearchNode;
+import network.aika.neuron.TNeuron;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.MetaInhibSynapse;
+import network.aika.neuron.meta.MetaNeuron;
+import network.aika.neuron.meta.MetaSynapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
 
 
 /**
@@ -46,11 +50,11 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Model {
 
-    public int numberOfThreads = 1;
+    public int charCounter = 0;
 
-    public int[] lastCleanup;
 
-    public Document[] docs;
+    public static Map<String, Class> typeRegistry = new HashMap<>();
+
 
     public SuspensionHook suspensionHook;
 
@@ -61,26 +65,22 @@ public class Model {
     public WeakHashMap<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
     public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
 
-    public Map<Integer, PassiveInputFunction> passiveActivationFunctions = new TreeMap<>();
-
-    public int defaultThreadId = 0;
     public static AtomicLong visitedCounter = new AtomicLong(1);
 
-    /**
-     * Creates a model with a single thread.
-     */
+
     public Model() {
-        this(null, 1);
+        this(null);
     }
 
 
-    public Model(SuspensionHook sh, int numberOfThreads) {
-        assert numberOfThreads >= 1;
-        this.numberOfThreads = numberOfThreads;
-
-        lastCleanup = new int[numberOfThreads];
-        docs = new Document[numberOfThreads];
+    public Model(SuspensionHook sh) {
         suspensionHook = sh;
+    }
+
+
+    public static String register(String type, Class clazz) {
+        typeRegistry.put(type, clazz);
+        return type;
     }
 
 
@@ -94,39 +94,16 @@ public class Model {
     }
 
 
-    public Neuron createNeuron(Type type) {
-        return createNeuron(null, type);
-    }
-
-
-    public Neuron createNeuron(String label, Type type) {
-        return createNeuron(label, type, type.getDefaultActivationFunction(), null);
-    }
-
-
-    public Neuron createNeuron(String label, Type type, ActivationFunction actF) {
-        return new INeuron(this, label, null, type, actF).getProvider();
-    }
-
-    public Neuron createNeuron(String label, Type type, String outputText) {
-        return new INeuron(this, label, outputText, type, type.getDefaultActivationFunction()).getProvider();
-    }
-
-
-    public Neuron createNeuron(String label, Type type, ActivationFunction actF, String outputText) {
-        return new INeuron(this, label, outputText, type, actF).getProvider();
-    }
-
-
-    public INeuron readNeuron(DataInput in, Neuron p) throws IOException {
-        INeuron n = new INeuron(p);
+    public INeuron readNeuron(DataInput in, Neuron p) throws Exception {
+        Constructor c = typeRegistry.get(in.readUTF()).getDeclaredConstructor(Neuron.class);
+        INeuron n = (INeuron) c.newInstance(p);
         n.readFields(in, this);
         return n;
     }
 
 
-    public Synapse readSynapse(DataInput in) throws IOException {
-        Synapse s = new Synapse();
+    public Synapse readSynapse(DataInput in) throws Exception {
+        Synapse s = (Synapse) typeRegistry.get(in.readUTF()).getDeclaredConstructor().newInstance();
         s.readFields(in, this);
         return s;
     }
@@ -142,14 +119,6 @@ public class Model {
     }
 
 
-    public void acquireThread(int threadId, Document doc) {
-        if (docs[threadId] != null) {
-            throw new StaleDocumentException();
-        }
-        docs[threadId] = doc;
-    }
-
-
     public Collection<Neuron> getActiveNeurons() {
         List<Neuron> tmp = new ArrayList<>();
         for(Provider<?> p: activeProviders.values()) {
@@ -160,22 +129,6 @@ public class Model {
 
         return tmp;
     }
-
-
-    public <P extends Provider<? extends Node>> P lookupNodeProvider(int id) {
-        synchronized (providers) {
-            WeakReference<Provider<? extends AbstractNode>> wr = providers.get(id);
-            if(wr != null) {
-                P p = (P) wr.get();
-                if (p != null) {
-                    return p;
-                }
-            }
-
-            return (P) new Provider(this, id);
-        }
-    }
-
 
 
     public Neuron lookupNeuron(int id) {
@@ -207,42 +160,6 @@ public class Model {
     }
 
 
-
-    /**
-     * Suspend all neurons and logic nodes whose last used document id is lower/older than docId.
-     *
-     * @param docId
-     */
-    public void suspendUnusedNodes(int docId, SuspensionMode sm) {
-        docId = Math.min(docId, getOldestDocIdInProcessing());
-        List<Provider> tmp;
-        synchronized (activeProviders) {
-            tmp = new ArrayList<>(activeProviders.values());
-        }
-        for (Provider p: tmp) {
-            suspend(docId, p, sm);
-        }
-    }
-
-
-    public int getOldestDocIdInProcessing() {
-        int oldestDocId = Integer.MAX_VALUE;
-        for(Document doc: docs) {
-            if(doc != null) oldestDocId = Math.min(oldestDocId, doc.getId());
-        }
-        return oldestDocId;
-    }
-
-
-    /**
-     * Suspend all neurons and logic nodes in memory.
-     *
-     */
-    public void suspendAll(SuspensionMode sm) {
-        suspendUnusedNodes(Integer.MAX_VALUE, sm);
-    }
-
-
     private boolean suspend(int docId, Provider<? extends AbstractNode> p, SuspensionMode sm) {
         AbstractNode an = p.getIfNotSuspended();
         if (an != null && an.lastUsedDocumentId < docId) {
@@ -262,10 +179,63 @@ public class Model {
     }
 
 
-    public static class StaleDocumentException extends RuntimeException {
+    public MetaNeuron createMetaNeuron(String label) {
+        MetaNeuron metaNeuron = new MetaNeuron(this, "M-" + label);
+        InhibitoryNeuron inhibNeuron = new InhibitoryNeuron(this, "I-" + label);
+        metaNeuron.setInhibitoryNeuron(inhibNeuron);
 
-        public StaleDocumentException() {
-            super("Two documents are using the same thread. Call clearActivations() first, before processing the next document.");
+        return metaNeuron;
+    }
+
+
+    public void initMetaNeuron(MetaNeuron metaNeuron, double bias, double trainingBias, Synapse.Builder... inputs) {
+        InhibitoryNeuron inhibNeuron = metaNeuron.getInhibitoryNeuron();
+
+        List<Synapse.Builder> inputsList = new ArrayList<>(Arrays.asList(inputs));
+
+        inputsList.forEach(b -> b.registerSynapseIds(metaNeuron.getProvider()));
+
+        Integer inhibSynId = metaNeuron.getNewSynapseId();
+        inputsList.add(
+                new MetaSynapse.Builder()
+                        .setIsMetaVariable(false)
+                        .setSynapseId(inhibSynId)
+                        .setNeuron(inhibNeuron.getProvider())
+                        .setWeight(-100.0)
+        );
+
+
+        metaNeuron.trainingBias = trainingBias;
+
+        Neuron.init(metaNeuron.getProvider(), bias + trainingBias, inputsList);
+
+        inhibSynId = inhibNeuron.getNewSynapseId();
+        Neuron.init(inhibNeuron.getProvider(),
+                new MetaInhibSynapse.Builder()
+                        .setSynapseId(inhibSynId)
+                        .setNeuron(metaNeuron.getProvider())
+                        .setWeight(1.0)
+        );
+    }
+
+
+    public void dumpStat() {
+        for(Neuron n: getActiveNeurons()) {
+            TNeuron tn = (TNeuron) n.get();
+            tn.dumpStat();
+        }
+        System.out.println();
+    }
+
+
+    public void dumpModel() {
+        System.out.println();
+        System.out.println("Dump Model:");
+        for(Neuron n: getActiveNeurons()) {
+            TNeuron tn = (TNeuron) n.get();
+            System.out.println(tn.toStringWithSynapses());
+            System.out.println();
         }
     }
+
 }

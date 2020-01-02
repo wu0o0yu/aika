@@ -14,39 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.neuron.excitatory;
 
+import network.aika.Model;
 import network.aika.neuron.Neuron;
-
-import java.io.DataInput;
-import java.io.IOException;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> implements Writable {
+public class PatternNeuron extends ExcitatoryNeuron {
 
-    public volatile int lastUsedDocumentId = 0;
+    public static final String TYPE_STR = Model.register("NP", PatternNeuron.class);
 
-    public volatile boolean modified;
-
-    protected P provider;
-
-    public P getProvider() {
-        return provider;
+    public PatternNeuron(Neuron p) {
+        super(p);
     }
 
-    public void setModified() {
-        modified = true;
+
+    public PatternNeuron(Model model, String label) {
+        super(model, label);
     }
 
-    public void suspend() {}
 
-    public void reactivate() {}
-
-    public static <P extends Provider> AbstractNode read(DataInput in, P p) throws Exception {
-        return p.getModel().readNeuron(in, (Neuron) p);
+    @Override
+    public String getType() {
+        return TYPE_STR;
     }
 
 }
