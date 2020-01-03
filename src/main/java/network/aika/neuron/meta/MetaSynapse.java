@@ -19,11 +19,8 @@ package network.aika.neuron.meta;
 
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
+import network.aika.neuron.*;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.TNeuron;
-import network.aika.neuron.TSynapse;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 
@@ -38,7 +35,7 @@ import java.util.TreeMap;
  *
  * @author Lukas Molzberger
  */
-public class MetaSynapse extends TSynapse<TNeuron, MetaNeuron> {
+public class MetaSynapse extends ConjunctiveSynapse<TNeuron, MetaNeuron> {
 
     public static final String TYPE_STR = Model.register("SM", MetaSynapse.class);
 
@@ -59,16 +56,6 @@ public class MetaSynapse extends TSynapse<TNeuron, MetaNeuron> {
     @Override
     public String getType() {
         return TYPE_STR;
-    }
-
-    @Override
-    public boolean storeOnInputSide() {
-        return true;
-    }
-
-    @Override
-    public boolean storeOnOutputSide() {
-        return false; // TODO:
     }
 
 /*

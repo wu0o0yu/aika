@@ -59,8 +59,12 @@ public class Linker {
             List<Link> conflicts = new ArrayList<>();
 
             cand.input.followDown(doc.getNewVisitedId(), (act, isConflict) -> {
-                Synapse is = targetAct.getINeuron().getInputSynapse(act.getNeuron());
-                if(is == null || act == cand.input) {
+                if(act == cand.input) {
+                    return false;
+                }
+
+                Synapse is = targetAct.getNeuron().getInputSynapse(act.getNeuron());
+                if(is == null) {
                     return false;
                 }
 

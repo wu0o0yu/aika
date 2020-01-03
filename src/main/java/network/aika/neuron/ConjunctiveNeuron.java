@@ -21,9 +21,14 @@ import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import static network.aika.neuron.Synapse.INPUT_SYNAPSE_COMP;
@@ -41,6 +46,8 @@ public abstract class ConjunctiveNeuron<S extends TSynapse> extends TNeuron<S> {
     private volatile double directConjunctiveBias;
     private volatile double recurrentConjunctiveBias;
 
+    TreeMap<Neuron, S> inputSynapses = new TreeMap<>();
+
 
     public ConjunctiveNeuron() {
         super();
@@ -55,6 +62,39 @@ public abstract class ConjunctiveNeuron<S extends TSynapse> extends TNeuron<S> {
         super(model, label);
     }
 
+
+    public void addInputSynapse(S s) {
+        inputSynapses.put(s.getPInput(), s);
+        setModified();
+    }
+
+    public void removeInputSynapse(S s) {
+        if(inputSynapses.remove(s.getPInput()) != null) {
+            setModified();
+        }
+    }
+
+
+    public void addOutputSynapse(Synapse s) {
+        outputSynapses.put(s.getPOutput(), s);
+        setModified();
+    }
+
+    public void removeOutputSynapse(Synapse s) {
+        if(outputSynapses.remove(s.getPOutput()) != null) {
+            setModified();
+        }
+    }
+
+
+    public S getInputSynapse(Neuron in) {
+        return inputSynapses.get(in);
+    }
+
+
+    public Collection<S> getInputSynapses() {
+        return inputSynapses.values();
+    }
 
 
     public InhibitoryNeuron getInhibitoryNeuron() {
@@ -91,6 +131,33 @@ public abstract class ConjunctiveNeuron<S extends TSynapse> extends TNeuron<S> {
     public double getConjunctiveBias() {
         return directConjunctiveBias + recurrentConjunctiveBias;
     }
+
+
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        for (Synapse s : inputSynapses.values()) {
+            if (s.getInput() != null) {
+                out.writeBoolean(true);
+                getModel().writeSynapse(s, out);
+            }
+        }
+        out.writeBoolean(false);
+    }
+
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        super.readFields(in, m);
+
+        while (in.readBoolean()) {
+            S syn = (S) m.readSynapse(in);
+            inputSynapses.put(syn.getPInput(), syn);
+        }
+    }
+
 
 
     public void commit(Collection<? extends Synapse> modifiedSynapses) {

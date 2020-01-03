@@ -53,9 +53,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     private volatile int synapseIdCounter = 0;
 
 
-    // A synapse is stored only in one direction, depending on the synapse weight.
-    TreeMap<Neuron, S> inputSynapses = new TreeMap<>();
     TreeMap<Neuron, Synapse> outputSynapses = new TreeMap<>();
+    Set<Neuron> propagateTargets = new TreeSet<>();
 
 
     ReadWriteLock lock = new ReadWriteLock();
@@ -79,11 +78,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
 
-    public S getInputSynapse(Neuron iNeuron) {
-        return inputSynapses.get(iNeuron);
-    }
-
-
     public abstract Fired incrementFired(Fired f);
 
 
@@ -96,11 +90,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public String getLabel() {
         return label;
-    }
-
-
-    public Collection<S> getInputSynapses() {
-        return inputSynapses.values();
     }
 
 
@@ -132,9 +121,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         act.isFinal = true;
 
         for(Activation iAct: input.getInputLinks()) {
-            Synapse is = getInputSynapse(iAct.getNeuron());
-
-            act.addLink(new Link(is, iAct, act));
+            act.addLink(new Link(null, iAct, act));
         }
 
         propagate(act);
@@ -145,6 +132,9 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
 
+    public abstract void addInputSynapse(S s);
+
+    public abstract void addOutputSynapse(Synapse synapse);
 
     public abstract void commit(Collection<? extends Synapse> modifiedSynapses);
 
@@ -152,25 +142,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public void commitBias() {
         bias += biasDelta;
         biasDelta = 0.0;
-    }
-
-
-    public void remove() {
-        for (Synapse s : inputSynapses.values()) {
-            INeuron<?> in = s.getInput();
-            in.provider.lock.acquireWriteLock();
-            in.provider.activeOutputSynapses.remove(s);
-            in.provider.lock.releaseWriteLock();
-        }
-
-        provider.lock.acquireReadLock();
-        for (Synapse s : provider.activeOutputSynapses.values()) {
-            INeuron out = s.getOutput();
-            out.lock.acquireWriteLock();
-            out.inputSynapses.remove(s);
-            out.lock.releaseWriteLock();
-        }
-        provider.lock.releaseReadLock();
     }
 
 
@@ -188,9 +159,22 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
 
+    public void addPropagateTarget(Neuron target) {
+        propagateTargets.add(target);
+    }
+
+
+    public void removePropagateTarget(Neuron target) {
+        propagateTargets.remove(target);
+    }
+
+
     public void propagate(Activation act) {
-        provider.activeOutputSynapses.tailMap(ExcitatorySynapse.PROPAGATE_SYN, true)
-                .values()
+        propagateTargets.forEach(n -> n.get());
+
+        propagateTargets
+                .stream()
+                .map(n -> provider.activeOutputSynapses.get(n))
                 .forEach(s -> s.getOutput().propagate(act, s));
     }
 
@@ -228,13 +212,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         out.writeDouble(bias);
 
         out.writeInt(synapseIdCounter);
-        for (Synapse s : inputSynapses.values()) {
-            if (s.getInput() != null) {
-                out.writeBoolean(true);
-                getModel().writeSynapse(s, out);
-            }
-        }
-        out.writeBoolean(false);
+
         for (Synapse s : outputSynapses.values()) {
             if (s.getOutput() != null) {
                 out.writeBoolean(true);
@@ -254,10 +232,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         bias = in.readDouble();
 
         synapseIdCounter = in.readInt();
-        while (in.readBoolean()) {
-            S syn = (S) m.readSynapse(in);
-            inputSynapses.put(syn.getPInput(), syn);
-        }
 
         while (in.readBoolean()) {
             Synapse syn = m.readSynapse(in);
@@ -268,48 +242,16 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     @Override
     public void suspend() {
-        for (Synapse s : inputSynapses.values()) {
-            s.getPInput().removeActiveOutputSynapse(s);
-        }
         for (Synapse s : outputSynapses.values()) {
             s.getPOutput().removeActiveInputSynapse(s);
         }
-
-        provider.lock.acquireReadLock();
-        for (Synapse s : provider.activeInputSynapses.values()) {
-            s.getPInput().removeActiveOutputSynapse(s);
-        }
-        for (Synapse s : provider.activeOutputSynapses.values()) {
-            s.getPOutput().removeActiveInputSynapse(s);
-        }
-        provider.lock.releaseReadLock();
     }
 
 
     @Override
     public void reactivate() {
-        provider.lock.acquireReadLock();
-        for (Synapse s : provider.activeInputSynapses.values()) {
-            s.getPInput().addActiveOutputSynapse(s);
-        }
-        for (Synapse s : provider.activeOutputSynapses.values()) {
-            s.getPOutput().addActiveInputSynapse(s);
-        }
-        provider.lock.releaseReadLock();
-
-        for (Synapse s : inputSynapses.values()) {
-            s.getPInput().addActiveOutputSynapse(s);
-            if (!s.getPInput().isSuspended()) {
-                s.getPOutput().addActiveInputSynapse(s);
-            }
-        }
-        for (Synapse s : outputSynapses.values()) {
-            s.getPOutput().addActiveInputSynapse(s);
-            if (!s.getPOutput().isSuspended()) {
-                s.getPInput().addActiveOutputSynapse(s);
-            }
-        }
     }
+
 
     public void setBias(double b) {
         biasDelta = b - bias;
@@ -365,4 +307,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         }
         return sb.toString();
     }
+
+    public abstract void removeInputSynapse(S s);
+
+    public abstract void removeOutputSynapse(Synapse s);
 }

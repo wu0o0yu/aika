@@ -18,10 +18,7 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.TNeuron;
-import network.aika.neuron.TSynapse;
+import network.aika.neuron.*;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.input.InputNeuron;
 
@@ -47,14 +44,14 @@ public class MetaInhibSynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
         return TYPE_STR;
     }
 
-    @Override
-    public boolean storeOnInputSide() {
-        return false;
+
+    protected void addLinkInternal(INeuron in, INeuron out) {
+        in.addOutputSynapse(this);
     }
 
-    @Override
-    public boolean storeOnOutputSide() {
-        return true;
+
+    protected void removeLinkInternal(INeuron in, INeuron out) {
+        in.removeOutputSynapse(this);
     }
 
 

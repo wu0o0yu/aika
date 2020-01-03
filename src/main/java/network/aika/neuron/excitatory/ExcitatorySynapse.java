@@ -33,11 +33,10 @@ import java.util.TreeMap;
  *
  * @author Lukas Molzberger
  */
-public class ExcitatorySynapse extends TSynapse<TNeuron, ConjunctiveNeuron> {
+public class ExcitatorySynapse extends ConjunctiveSynapse<TNeuron, ConjunctiveNeuron> {
 
     public static final String TYPE_STR = Model.register("SE", ExcitatorySynapse.class);
 
-    public static Synapse PROPAGATE_SYN = new ExcitatorySynapse(Neuron.MIN_NEURON, Neuron.MIN_NEURON, Integer.MIN_VALUE, false, true);
 
     public static final Comparator<Synapse> META_SYNAPSE_COMP = Comparator
             .<Synapse, Neuron>comparing(Synapse::getPInput)
@@ -55,11 +54,6 @@ public class ExcitatorySynapse extends TSynapse<TNeuron, ConjunctiveNeuron> {
     }
 
 
-    @Override
-    public String getType() {
-        return TYPE_STR;
-    }
-
 
     public ExcitatorySynapse(Neuron input, Neuron output, Integer id, boolean recurrent, boolean propagate, int lastCount) {
         super(input, output, id, recurrent, propagate, lastCount);
@@ -67,13 +61,8 @@ public class ExcitatorySynapse extends TSynapse<TNeuron, ConjunctiveNeuron> {
 
 
     @Override
-    public boolean storeOnInputSide() {
-        return true;
-    }
-
-    @Override
-    public boolean storeOnOutputSide() {
-        return false; // TODO:
+    public String getType() {
+        return TYPE_STR;
     }
 
 /*

@@ -47,8 +47,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
     public static final Comparator<Synapse> OUTPUT_SYNAPSE_COMP =
             Comparator
-                    .<Synapse, Boolean>comparing(Synapse::isPropagate)
-                    .thenComparing(s -> s.output)
+                    .<Synapse, Neuron>comparing(s -> s.output)
                     .thenComparingInt(Synapse::getId);
 
 
@@ -77,11 +76,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
 
     public abstract String getType();
-
-    public abstract boolean storeOnInputSide();
-
-    public abstract boolean storeOnOutputSide();
-
 
     public Neuron getPInput() {
         return input;
@@ -137,21 +131,11 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         input.lock.releaseWriteLock();
 
         output.lock.acquireWriteLock();
-        output.activeInputSynapses.put(this, this);
+        output.activeInputSynapses.put(input, this);
         output.inputSynapsesById.put(id, this);
         output.lock.releaseWriteLock();
 
-        removeLinkInternal(in, out);
-
-        if(storeOnInputSide()) {
-            out.inputSynapses.put(input, this);
-            out.setModified();
-        }
-
-        if(storeOnOutputSide()) {
-            in.outputSynapses.put(output, this);
-            in.setModified();
-        }
+        addLinkInternal(in, out);
 
         out.registerSynapseId(id);
 
@@ -185,24 +169,10 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     }
 
 
-    private void removeLinkInternal(INeuron in, INeuron out) {
-        if(storeOnInputSide()) {
-            if(out.inputSynapses.remove(input) != null) {
-                out.setModified();
-            }
-        }
-        if(storeOnOutputSide()) {
-            if(in.outputSynapses.remove(output) != null) {
-                in.setModified();
-            }
-        }
-    }
+    protected abstract void addLinkInternal(INeuron in, INeuron out);
 
-    public boolean exists() {
-        if(input.get().outputSynapses.containsKey(this)) return true;
-        if(output.get().inputSynapses.containsKey(this)) return true;
-        return false;
-    }
+
+    protected abstract void removeLinkInternal(INeuron in, INeuron out);
 
 
     public void commit() {
@@ -262,6 +232,12 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
     public void setPropagate(boolean propagate) {
         this.propagate = propagate;
+
+        if(propagate) {
+            input.get().addPropagateTarget(output);
+        } else {
+            input.get().removePropagateTarget(output);
+        }
     }
 
 
@@ -298,6 +274,9 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
         recurrent = in.readBoolean();
         propagate = in.readBoolean();
+
+        output.addActiveInputSynapse(this);
+        input.addActiveOutputSynapse(this);
     }
 
 

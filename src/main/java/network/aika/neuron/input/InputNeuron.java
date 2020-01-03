@@ -72,6 +72,25 @@ public class InputNeuron extends TNeuron<Synapse> {
         return ActivationFunction.NULL_FUNCTION;
     }
 
+    @Override
+    public void addInputSynapse(Synapse synapse) {
+
+    }
+
+    @Override
+    public void addOutputSynapse(Synapse synapse) {
+
+    }
+
+    @Override
+    public void removeInputSynapse(Synapse synapse) {
+
+    }
+
+    @Override
+    public void removeOutputSynapse(Synapse s) {
+
+    }
 
     @Override
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
@@ -82,6 +101,7 @@ public class InputNeuron extends TNeuron<Synapse> {
     public double getTotalBias(Synapse.State state) {
         return 0;
     }
+
 
     @Override
     public void dumpStat() {

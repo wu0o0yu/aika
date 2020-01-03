@@ -86,13 +86,33 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
     }
 
+    @Override
+    public void addInputSynapse(InhibitorySynapse inhibitorySynapse) {
+
+    }
+
+    @Override
+    public void addOutputSynapse(Synapse synapse) {
+
+    }
+
+    @Override
+    public void removeInputSynapse(InhibitorySynapse inhibitorySynapse) {
+
+    }
+
+    @Override
+    public void removeOutputSynapse(Synapse s) {
+
+    }
+
 
     public void propagate(Activation act) {
         super.propagate(act);
         Document doc = act.getDocument();
 
         act.followDown(doc.getNewVisitedId(), (cAct, isConflict) -> {
-            Synapse s = act.getINeuron().getInputSynapse(cAct.getNeuron());
+            Synapse s = act.getNeuron().getInputSynapse(cAct.getNeuron());
 
             if(s == null || !s.isRecurrent() || !s.isNegative(CURRENT)) {
                 return false;
@@ -210,4 +230,5 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
     public String typeToString() {
         return "INHIBITORY";
     }
+
 }

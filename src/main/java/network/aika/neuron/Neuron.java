@@ -19,10 +19,8 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 
 /**
@@ -40,7 +38,7 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
     ReadWriteLock lock = new ReadWriteLock();
 
     NavigableMap<Integer, Synapse> inputSynapsesById = new TreeMap<>();
-    NavigableMap<Synapse, Synapse> activeInputSynapses = new TreeMap<>(Synapse.INPUT_SYNAPSE_COMP);
+    NavigableMap<Neuron, Synapse> activeInputSynapses = new TreeMap<>();
     NavigableMap<Synapse, Synapse> activeOutputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
 
 
@@ -147,26 +145,18 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
     }
 
 
-    public Synapse selectInputSynapse(Neuron inputNeuron, Predicate<Synapse> filter) {
-        lock.acquireWriteLock();
-        Synapse synapse = activeInputSynapses.subMap(
-                new ExcitatorySynapse(inputNeuron, this, Integer.MIN_VALUE, false, false), true,
-                new ExcitatorySynapse(inputNeuron, this, Integer.MAX_VALUE, false, true), true
-        )
-                .keySet()
-                .stream()
-                .filter(filter)
-                .findAny()
-                .orElse(null);
+    public Synapse getInputSynapse(Neuron inputNeuron) {
+        lock.acquireReadLock();
+        Synapse synapse = activeInputSynapses.get(inputNeuron);
 
-        lock.releaseWriteLock();
+        lock.releaseReadLock();
         return synapse;
     }
 
 
     void addActiveInputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        activeInputSynapses.put(s, s);
+        activeInputSynapses.put(s.getPInput(), s);
         inputSynapsesById.put(s.getId(), s);
         lock.releaseWriteLock();
     }
@@ -174,7 +164,7 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
 
     void removeActiveInputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        activeInputSynapses.remove(s);
+        activeInputSynapses.remove(s.getPInput());
         inputSynapsesById.remove(s.getId());
         lock.releaseWriteLock();
     }

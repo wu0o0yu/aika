@@ -130,10 +130,9 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
     public ExcitatorySynapse createOrLookupSynapse(Document doc, MetaSynapse ms, Neuron inputNeuron) {
         inputNeuron.get(doc);
 
-        ExcitatorySynapse synapse = (ExcitatorySynapse) getProvider().selectInputSynapse(
-                inputNeuron,
-                s -> ((ExcitatorySynapse)s).isMappedToMetaSynapse(ms)
-        );
+        ExcitatorySynapse synapse = (ExcitatorySynapse) getProvider().getInputSynapse(inputNeuron);
+
+        // s -> ((ExcitatorySynapse)s).isMappedToMetaSynapse(ms)
 
         if(synapse == null) {
             synapse = new ExcitatorySynapse(inputNeuron, getProvider(), getNewSynapseId(), false, true);
@@ -439,9 +438,11 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
 
 
     public List<Input> getInputs(Activation act) {
+        assert act.getINeuron() == this;
+
         ArrayList<Input> results = new ArrayList<>();
         Set<Synapse> inputSynapses = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
-        inputSynapses.addAll(act.getINeuron().getInputSynapses());
+        inputSynapses.addAll(getInputSynapses());
 
         for(Link l: act.inputLinks.values()) {
             Input i = new Input(l, l.getInput());

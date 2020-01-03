@@ -104,20 +104,20 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
     }
 
 
-    private void countSynapses(Activation o, Direction dir) {
+    private void countSynapses(Activation act, Direction dir) {
         Set<Synapse> rest = new TreeSet<>(dir == INPUT ? Synapse.INPUT_SYNAPSE_COMP : Synapse.OUTPUT_SYNAPSE_COMP);
         rest.addAll(dir == INPUT ? getProvider().getActiveInputSynapses() : getProvider().getActiveOutputSynapses());
 
-        for(Link ol: (dir == INPUT ? o.inputLinks: o.outputLinks).keySet()) {
+        for(Link ol: (dir == INPUT ? act.inputLinks: act.outputLinks).keySet()) {
             TSynapse ts = (TSynapse)ol.getSynapse();
-            Activation lo = (dir == INPUT ? ol.getInput(): ol.getOutput());
+            Activation lAct = (dir == INPUT ? ol.getInput(): ol.getOutput());
 
             rest.remove(ol.getSynapse());
 
             if(dir == INPUT) {
-                ts.updateCountValue(lo, o);
+                ts.updateCountValue(lAct, act);
             } else if(dir == OUTPUT) {
-                ts.updateCountValue(o, lo);
+                ts.updateCountValue(act, lAct);
             }
         }
 
@@ -125,9 +125,9 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
             TSynapse ts = (TSynapse)s;
 
             if(dir == INPUT) {
-                ts.updateCountValue(null, o);
+                ts.updateCountValue(null, act);
             } else if(dir == OUTPUT) {
-                ts.updateCountValue(o, null);
+                ts.updateCountValue(act, null);
             }
         }
     }
@@ -312,7 +312,7 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 
 
     @Override
-    public void readFields(DataInput in, Model m) throws IOException {
+    public void readFields(DataInput in, Model m) throws Exception {
         posFrequency = in.readDouble();
         N = in.readDouble();
         lastCount = in.readInt();
