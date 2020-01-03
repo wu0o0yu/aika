@@ -127,7 +127,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         (dir ? out : in).lock.acquireWriteLock();
 
         input.lock.acquireWriteLock();
-        input.activeOutputSynapses.put(this, this);
+        input.activeOutputSynapses.put(output, this);
         input.lock.releaseWriteLock();
 
         output.lock.acquireWriteLock();

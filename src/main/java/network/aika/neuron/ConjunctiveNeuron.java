@@ -63,6 +63,24 @@ public abstract class ConjunctiveNeuron<S extends TSynapse> extends TNeuron<S> {
     }
 
 
+
+    @Override
+    public void suspend() {
+        for (Synapse s : inputSynapses.values()) {
+            s.getPInput().removeActiveOutputSynapse(s);
+        }
+
+        for (Synapse s : outputSynapses.values()) {
+            s.getPOutput().removeActiveInputSynapse(s);
+        }
+    }
+
+
+    @Override
+    public void reactivate() {
+    }
+
+
     public void addInputSynapse(S s) {
         inputSynapses.put(s.getPInput(), s);
         setModified();

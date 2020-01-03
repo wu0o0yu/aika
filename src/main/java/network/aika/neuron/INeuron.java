@@ -240,19 +240,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
 
-    @Override
-    public void suspend() {
-        for (Synapse s : outputSynapses.values()) {
-            s.getPOutput().removeActiveInputSynapse(s);
-        }
-    }
-
-
-    @Override
-    public void reactivate() {
-    }
-
-
     public void setBias(double b) {
         biasDelta = b - bias;
     }

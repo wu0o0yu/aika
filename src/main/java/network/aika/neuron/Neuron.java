@@ -39,7 +39,7 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
 
     NavigableMap<Integer, Synapse> inputSynapsesById = new TreeMap<>();
     NavigableMap<Neuron, Synapse> activeInputSynapses = new TreeMap<>();
-    NavigableMap<Synapse, Synapse> activeOutputSynapses = new TreeMap<>(Synapse.OUTPUT_SYNAPSE_COMP);
+    NavigableMap<Neuron, Synapse> activeOutputSynapses = new TreeMap<>();
 
 
     public Neuron(Model m, int id) {
@@ -172,14 +172,14 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
 
     void addActiveOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        activeOutputSynapses.put(s, s);
+        activeOutputSynapses.put(s.getPOutput(), s);
         lock.releaseWriteLock();
     }
 
 
     void removeActiveOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        activeOutputSynapses.remove(s);
+        activeOutputSynapses.remove(s.getPOutput());
         lock.releaseWriteLock();
     }
 
