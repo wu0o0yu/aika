@@ -71,7 +71,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         this.input = input;
         this.output = output;
         this.recurrent = recurrent;
-        this.propagate = propagate;
+        setPropagate(propagate);
     }
 
 
