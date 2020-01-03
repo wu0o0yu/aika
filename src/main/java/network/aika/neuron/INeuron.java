@@ -22,7 +22,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,16 +40,10 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public static double WEIGHT_TOLERANCE = 0.001;
 
-
-    public static final INeuron MIN_NEURON = new ExcitatoryNeuron();
-    public static final INeuron MAX_NEURON = new ExcitatoryNeuron();
-
     private String label;
 
     private volatile double bias;
     private volatile double biasDelta;
-
-    private volatile int synapseIdCounter = 0;
 
 
     TreeMap<Neuron, Synapse> outputSynapses = new TreeMap<>();
@@ -145,20 +138,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
 
-    public synchronized int getNewSynapseId() {
-        setModified();
-        return synapseIdCounter++;
-    }
-
-
-    public synchronized void registerSynapseId(Integer synId) {
-        if(synId >= synapseIdCounter) {
-            setModified();
-            synapseIdCounter = synId + 1;
-        }
-    }
-
-
     public void addPropagateTarget(Neuron target) {
         propagateTargets.add(target);
     }
@@ -191,11 +170,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public int compareTo(INeuron n) {
         if (this == n) return 0;
-        if (this == MIN_NEURON) return -1;
-        if (n == MIN_NEURON) return 1;
-        if (this == MAX_NEURON) return 1;
-        if (n == MAX_NEURON) return -1;
-
         return Integer.compare(getId(), n.getId());
     }
 
@@ -210,8 +184,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         }
 
         out.writeDouble(bias);
-
-        out.writeInt(synapseIdCounter);
 
         for (Synapse s : outputSynapses.values()) {
             if (s.getOutput() != null) {
@@ -230,8 +202,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         }
 
         bias = in.readDouble();
-
-        synapseIdCounter = in.readInt();
 
         while (in.readBoolean()) {
             Synapse syn = m.readSynapse(in);

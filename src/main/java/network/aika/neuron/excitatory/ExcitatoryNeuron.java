@@ -135,7 +135,7 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
         // s -> ((ExcitatorySynapse)s).isMappedToMetaSynapse(ms)
 
         if(synapse == null) {
-            synapse = new ExcitatorySynapse(inputNeuron, getProvider(), getNewSynapseId(), false, true);
+            synapse = new ExcitatorySynapse(inputNeuron, getProvider(), false, true);
 
             synapse.link();
         }
@@ -483,10 +483,6 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
             this.s = (ExcitatorySynapse) s;
         }
 
-        public int getId() {
-            return s.getId();
-        }
-
         public ExcitatorySynapse getSynapse() {
             return s;
         }
@@ -516,7 +512,7 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
         }
 
         public String toString() {
-            return "id:" + getId() + " " + getSynapse().getInput().getLabel();
+            return getSynapse().getInput().getLabel();
         }
     }
 }

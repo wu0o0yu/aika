@@ -36,12 +36,12 @@ public class NegExcitatorySynapse extends ExcitatorySynapse {
         super();
     }
 
-    public NegExcitatorySynapse(Neuron input, Neuron output, Integer id) {
-        super(input, output, id, true, false);
+    public NegExcitatorySynapse(Neuron input, Neuron output) {
+        super(input, output, true, false);
     }
 
-    public NegExcitatorySynapse(Neuron input, Neuron output, Integer id, int lastCount) {
-        super(input, output, id, true, false, lastCount);
+    public NegExcitatorySynapse(Neuron input, Neuron output, int lastCount) {
+        super(input, output, true, false, lastCount);
     }
 
 
@@ -83,7 +83,7 @@ public class NegExcitatorySynapse extends ExcitatorySynapse {
         }
 
         protected Synapse.SynapseFactory getSynapseFactory() {
-            return (input, output, id) -> new NegExcitatorySynapse(input, output, id, output.getModel().charCounter);
+            return (input, output) -> new NegExcitatorySynapse(input, output, output.getModel().charCounter);
         }
     }
 }

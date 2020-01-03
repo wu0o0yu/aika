@@ -38,23 +38,11 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
     public static double TOLERANCE = 0.0000001;
 
-
-    public static final Comparator<Synapse> INPUT_SYNAPSE_COMP =
-            Comparator
-                    .<Synapse, Neuron>comparing(s -> s.input)
-                    .thenComparingInt(Synapse::getId);
-
-
-    public static final Comparator<Synapse> OUTPUT_SYNAPSE_COMP =
-            Comparator
-                    .<Synapse, Neuron>comparing(s -> s.output)
-                    .thenComparingInt(Synapse::getId);
-
+    public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = Comparator.comparing(s -> s.input);
+    public static final Comparator<Synapse> OUTPUT_SYNAPSE_COMP = Comparator.comparing(s -> s.output);
 
     protected Neuron input;
     protected Neuron output;
-
-    private Integer id;
 
     private boolean recurrent;
     private boolean propagate;
@@ -66,8 +54,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     }
 
 
-    public Synapse(Neuron input, Neuron output, Integer id, boolean recurrent, boolean propagate) {
-        this.id = id;
+    public Synapse(Neuron input, Neuron output, boolean recurrent, boolean propagate) {
         this.input = input;
         this.output = output;
         this.recurrent = recurrent;
@@ -94,12 +81,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     public O getOutput() {
         return (O) output.get();
     }
-
-
-    public Integer getId() {
-        return id;
-    }
-
 
     public double getWeight() {
         return weight;
@@ -132,12 +113,9 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
         output.lock.acquireWriteLock();
         output.activeInputSynapses.put(input, this);
-        output.inputSynapsesById.put(id, this);
         output.lock.releaseWriteLock();
 
         addLinkInternal(in, out);
-
-        out.registerSynapseId(id);
 
         (dir ? in : out).lock.releaseWriteLock();
         (dir ? out : in).lock.releaseWriteLock();
@@ -159,7 +137,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
         output.lock.acquireWriteLock();
         output.activeInputSynapses.remove(this);
-        output.inputSynapsesById.remove(id);
         output.lock.releaseWriteLock();
 
         removeLinkInternal(in, out);
@@ -242,15 +219,13 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
 
     public String toString() {
-        return "S ID:" + id + " NW:" + Utils.round(getNewWeight()) + " " + input + "->" + output;
+        return "S W:" + Utils.round(getNewWeight()) + " " + input + "->" + output;
     }
 
 
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeUTF(getType());
-
-        out.writeInt(id);
 
         out.writeInt(input.getId());
         out.writeInt(output.getId());
@@ -265,8 +240,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        id = in.readInt();
-
         input = m.lookupNeuron(in.readInt());
         output = m.lookupNeuron(in.readInt());
 
@@ -281,30 +254,11 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
 
 
-    public static Synapse createOrReplace(Document doc, Integer synapseId, Neuron inputNeuron, Neuron outputNeuron, SynapseFactory synapseFactory) {
-        outputNeuron.get(doc);
-        inputNeuron.get(doc);
-        outputNeuron.lock.acquireWriteLock();
-        Synapse synapse = outputNeuron.inputSynapsesById.get(synapseId);
-        if(synapse != null) {
-            synapse.unlink();
-        }
-        outputNeuron.lock.releaseWriteLock();
+    public static Synapse createOrReplace(Neuron inputNeuron, Neuron outputNeuron, SynapseFactory synapseFactory) {
+        Synapse s = synapseFactory.createSynapse(inputNeuron, outputNeuron);
+        s.link();
 
-        if(synapse == null) {
-            synapse = synapseFactory.createSynapse(inputNeuron, outputNeuron, synapseId);
-        } else {
-            synapse.input = inputNeuron;
-            synapse.output = outputNeuron;
-        }
-
-        if (synapseId == null) {
-            synapse.id = outputNeuron.get(doc).getNewSynapseId();
-        }
-
-        synapse.link();
-
-        return synapse;
+        return s;
     }
 
 
@@ -322,7 +276,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         protected boolean recurrent;
         protected boolean propagate;
         double weight;
-        private Integer synapseId;
 
 
         /**
@@ -349,8 +302,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
             return this;
         }
 
-
-
         public Builder setRecurrent(boolean recurrent) {
             this.recurrent = recurrent;
             return this;
@@ -367,30 +318,14 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
             return this;
         }
 
-
-        public Builder setSynapseId(int synapseId) {
-            assert synapseId >= 0;
-            this.synapseId = synapseId;
-            return this;
-        }
-
-
-        @Override
-        public void registerSynapseIds(Neuron n) {
-            n.registerSynapseId(synapseId);
-        }
-
-
         public Synapse getSynapse(Neuron outputNeuron) {
-            Synapse s = createOrReplace(null, synapseId, neuron, outputNeuron, getSynapseFactory());
-            return s;
+            return createOrReplace(neuron, outputNeuron, getSynapseFactory());
         }
-
 
         protected abstract SynapseFactory getSynapseFactory();
     }
 
     public interface SynapseFactory {
-        Synapse createSynapse(Neuron input, Neuron output, Integer id);
+        Synapse createSynapse(Neuron input, Neuron output);
     }
 }

@@ -35,8 +35,8 @@ public class MetaInhibSynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
         super();
     }
 
-    public MetaInhibSynapse(Neuron input, Neuron output, Integer id) {
-        super(input, output, id, false, true);
+    public MetaInhibSynapse(Neuron input, Neuron output) {
+        super(input, output, false, true);
     }
 
     @Override
@@ -67,8 +67,8 @@ public class MetaInhibSynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
         System.out.println("  Transfer Template Synapse: IN:" +
                 inputNeuron.getLabel() +
                 " OUT:" + inhibNeuron.getLabel() +
-                " M-SynId:" + getId() +
-                " T-SynId:" + targetSynapse.getId() +
+//                " M-SynId:" + getId() +
+//                " T-SynId:" + targetSynapse.getId() +
                 " W:" + targetSynapse.getNewWeight()
         );
 
@@ -85,7 +85,7 @@ public class MetaInhibSynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
 
     public static InhibitorySynapse create(Document doc, Neuron inputNeuron, InhibitoryNeuron outputNeuron) {
         inputNeuron.get(doc);
-        InhibitorySynapse synapse = new InhibitorySynapse(inputNeuron, outputNeuron.getProvider(), outputNeuron.getNewSynapseId());
+        InhibitorySynapse synapse = new InhibitorySynapse(inputNeuron, outputNeuron.getProvider());
         synapse.link();
 
         return synapse;
@@ -94,7 +94,7 @@ public class MetaInhibSynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
 
     public static class Builder extends Synapse.Builder {
         protected SynapseFactory getSynapseFactory() {
-            return (input, output, id) -> new MetaInhibSynapse(input, output, id);
+            return (input, output) -> new MetaInhibSynapse(input, output);
         }
     }
 }

@@ -193,13 +193,9 @@ public class Model {
 
         List<Synapse.Builder> inputsList = new ArrayList<>(Arrays.asList(inputs));
 
-        inputsList.forEach(b -> b.registerSynapseIds(metaNeuron.getProvider()));
-
-        Integer inhibSynId = metaNeuron.getNewSynapseId();
         inputsList.add(
                 new MetaSynapse.Builder()
                         .setIsMetaVariable(false)
-                        .setSynapseId(inhibSynId)
                         .setNeuron(inhibNeuron.getProvider())
                         .setWeight(-100.0)
         );
@@ -209,10 +205,8 @@ public class Model {
 
         Neuron.init(metaNeuron.getProvider(), bias + trainingBias, inputsList);
 
-        inhibSynId = inhibNeuron.getNewSynapseId();
         Neuron.init(inhibNeuron.getProvider(),
                 new MetaInhibSynapse.Builder()
-                        .setSynapseId(inhibSynId)
                         .setNeuron(metaNeuron.getProvider())
                         .setWeight(1.0)
         );

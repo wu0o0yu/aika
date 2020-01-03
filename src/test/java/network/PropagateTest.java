@@ -21,8 +21,7 @@ public class PropagateTest {
 
         Neuron.init(na.getProvider(), 1.0,
                 new ExcitatorySynapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(in.getProvider())
+                        .setNeuron(in)
                         .setWeight(10.0)
                         .setRecurrent(false)
                 );
