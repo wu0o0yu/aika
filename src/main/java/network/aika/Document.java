@@ -17,28 +17,19 @@
 package network.aika;
 
 
-import network.aika.lattice.Converter;
-import network.aika.lattice.Node;
-import network.aika.lattice.NodeActivation;
-import network.aika.lattice.NodeQueue;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Activation.OscillatingActivationsException;
-import network.aika.neuron.activation.Position;
-import network.aika.neuron.activation.link.Linker;
-import network.aika.neuron.activation.search.SearchNode;
-import network.aika.neuron.activation.search.SearchNode.TimeoutException;
-import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.Linker;
+import network.aika.neuron.activation.Queue;
+import network.aika.neuron.TNeuron;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static network.aika.neuron.INeuron.Type.*;
-import static network.aika.neuron.activation.Activation.CANDIDATE_COMP;
-import static network.aika.neuron.activation.search.Decision.UNKNOWN;
 
 
 /**
@@ -53,114 +44,36 @@ import static network.aika.neuron.activation.search.Decision.UNKNOWN;
 public class Document implements Comparable<Document> {
     private static final Logger log = LoggerFactory.getLogger(Document.class);
 
-    public static int CLEANUP_INTERVAL = 500;
     public static int MAX_ROUND = 20;
-    public static int ROUND_LIMIT = -1;
 
     private final int id;
     private final StringBuilder content;
 
     private long visitedCounter = 1;
     private int activationIdCounter = 0;
-    private int nodeActivationIdCounter = 0;
-    public int searchNodeIdCounter = 0;
-    public int searchStepCounter = 0;
-    public int positionIdCounter = 0;
 
     private Model model;
-    private int threadId;
 
-    private NodeQueue nodeQueue = new NodeQueue(this);
-    private ValueQueue valueQueue = new ValueQueue();
-    private UpperBoundQueue ubQueue = new UpperBoundQueue();
-    private Linker linker;
+    private Queue queue = new Queue();
+    private Linker linker = new Linker();
 
-    private TreeMap<Integer, Position> positions = new TreeMap<>();
-    private TreeSet<Node> activatedNodes = new TreeSet<>();
-    private TreeSet<INeuron> activatedNeurons = new TreeSet<>();
-    private TreeSet<INeuron> finallyActivatedNeurons = new TreeSet<>();
-    private TreeSet<Activation> inputNeuronActivations = new TreeSet<>();
     private TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
 
-
-    private TreeMap<ActKey, Activation> activationsBySlotAndPosition = new TreeMap<>((ak1, ak2) -> {
-        int r = Integer.compare(ak1.slot, ak2.slot);
-        if (r != 0) return r;
-        r = Position.compare(ak1.pos, ak2.pos);
-        if (r != 0) return r;
-        r = ak1.neuron.compareTo(ak2.neuron);
-        if (r != 0) return r;
-        return Integer.compare(ak1.actId, ak2.actId);
-    });
-
-    private TreeMap<ActKey, Activation> activationsByPosition = new TreeMap<>((ak1, ak2) -> {
-        int r = Position.compare(ak1.pos, ak2.pos);
-        if (r != 0) return r;
-        r = ak1.neuron.compareTo(ak2.neuron);
-        if (r != 0) return r;
-        return Integer.compare(ak1.actId, ak2.actId);
-    });
-
-
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
-
-    private static class ActKey {
-        int slot;
-        Position pos;
-        INeuron neuron;
-        int actId;
-
-        public ActKey(int slot, Position pos, INeuron neuron, int actId) {
-            this.slot = slot;
-            this.pos = pos;
-            this.neuron = neuron;
-            this.actId = actId;
-        }
-    }
-
-    public TreeSet<Node> addedNodes = new TreeSet<>();
-    public ArrayList<NodeActivation> addedNodeActivations = new ArrayList<>();
-
-
-    public SearchNode selectedSearchNode;
-    public ArrayList<Activation> candidates = new ArrayList<>();
 
     public long createV;
 
 
-    public static Comparator<Activation> ACTIVATIONS_OUTPUT_COMPARATOR = (act1, act2) -> {
-        int r = Position.compare(act1.getSlot(Activation.BEGIN), act2.getSlot(Activation.BEGIN));
-        if (r != 0) return r;
-        r = act1.getINeuron().compareTo(act2.getINeuron());
-        if (r != 0) return r;
-        return Integer.compare(act1.getId(), act2.getId());
-    };
-
-
     public Document(Model model, String content) {
-        this(model, content, 0);
+        this(model, model.getNewDocumentId(), content);
     }
 
 
-    public Document(Model model, String content, int threadId) {
-        this(model, model.getNewDocumentId(), content, threadId);
-    }
-
-
-    public Document(Model model, int id, String content, int threadId) {
+    public Document(Model model, int id, String content) {
         this.id = id;
         this.content = new StringBuilder(content);
 
         this.model = model;
-        this.threadId = threadId;
-        this.linker = initLinker();
-
-        model.acquireThread(threadId, this);
-    }
-
-
-    protected Linker initLinker() {
-        return new Linker(this);
     }
 
 
@@ -174,14 +87,15 @@ public class Document implements Comparable<Document> {
     }
 
 
+    public Queue getQueue() {
+        return queue;
+    }
+
+
     public Linker getLinker() {
         return linker;
     }
 
-
-    public ValueQueue getValueQueue() {
-        return valueQueue;
-    }
 
     public long getNewVisitedId() {
         return visitedCounter++;
@@ -192,34 +106,6 @@ public class Document implements Comparable<Document> {
         return activationIdCounter++;
     }
 
-    public int getNewNodeActivationId() {
-        return nodeActivationIdCounter++;
-    }
-
-
-    public void addActivatedNode(Node n) {
-        activatedNodes.add(n);
-    }
-
-
-    public void addInputNeuronActivation(Activation act) {
-        inputNeuronActivations.add(act);
-    }
-
-
-    public void addFinallyActivatedNeuron(INeuron n) {
-        finallyActivatedNeurons.add(n);
-    }
-
-
-    public void addActivatedNeuron(INeuron n) {
-        activatedNeurons.add(n);
-    }
-
-
-    public int getThreadId() {
-        return threadId;
-    }
 
     public void append(String txt) {
         content.append(txt);
@@ -246,35 +132,6 @@ public class Document implements Comparable<Document> {
 	}
 
 
-    public UpperBoundQueue getUpperBoundQueue() {
-        return ubQueue;
-    }
-
-
-    public NodeQueue getNodeQueue() {
-        return nodeQueue;
-    }
-
-
-    public Position lookupFinalPosition(int pos) {
-        Position p = positions.get(pos);
-
-        if(p == null) {
-            p = new Position(this, pos);
-            positions.put(pos, p);
-        }
-        return p;
-    }
-
-
-    public String getText(Position begin, Position end) {
-        if(begin == null || end == null) {
-            return "";
-        }
-        return getText(begin.getFinalPosition(), end.getFinalPosition());
-    }
-
-
     public String getText(Integer begin, Integer end) {
         if(begin != null && end != null) {
             return content.substring(
@@ -288,48 +145,12 @@ public class Document implements Comparable<Document> {
 
 
     public void addActivation(Activation act) {
-        for(Map.Entry<Integer, Position> me : act.getSlots().entrySet()) {
-            Position pos = me.getValue();
-            if (pos != null && pos.getFinalPosition() != null) {
-                ActKey dak = new ActKey(me.getKey(), pos, act.getINeuron(), act.getId());
-                activationsBySlotAndPosition.put(dak, act);
-                activationsByPosition.put(dak, act);
-            }
-        }
         activationsById.put(act.getId(), act);
     }
 
 
-    public Collection<Activation> getActivations(boolean onlyFinal) {
-        if(!onlyFinal) {
-            return activationsById.values();
-        } else {
-            return activationsById
-                    .values()
-                    .stream()
-                    .filter(act -> act.isFinalActivation())
-                    .collect(Collectors.toList());
-        }
-    }
-
-
-    public Collection<Activation> getActivationsByPosition(int fromSlot, Position fromPos, boolean fromInclusive, int toSlot, Position toPos, boolean toInclusive) {
-        return activationsBySlotAndPosition.subMap(
-                new Document.ActKey(fromSlot, fromPos, INeuron.MIN_NEURON, Integer.MIN_VALUE),
-                fromInclusive,
-                new Document.ActKey(toSlot, toPos, INeuron.MAX_NEURON, Integer.MAX_VALUE),
-                toInclusive
-        ).values();
-    }
-
-
-    public Collection<Activation> getActivationsByPosition(Position fromPos, boolean fromInclusive, Position toPos, boolean toInclusive) {
-        return activationsByPosition.subMap(
-                new Document.ActKey(-1, fromPos, INeuron.MIN_NEURON, Integer.MIN_VALUE),
-                fromInclusive,
-                new Document.ActKey(-1, toPos, INeuron.MAX_NEURON, Integer.MAX_VALUE),
-                toInclusive
-        ).values();
+    public Collection<Activation> getActivations() {
+        return activationsById.values();
     }
 
 
@@ -352,119 +173,11 @@ public class Document implements Comparable<Document> {
     }
 
 
-    public void propagate() {
-        boolean flag = true;
-        while(flag) {
-            nodeQueue.process();
-            flag = ubQueue.process();
-        }
-    }
-
-
-    public void generateCandidates() throws CyclicDependencyException {
-        TreeSet<Activation> tmp = new TreeSet<>(CANDIDATE_COMP);
-        int i = 0;
-
-        for (Activation act : activationsById.values()) {
-            if (act.getType() == EXCITATORY && act.getDecision() == UNKNOWN && act.getUpperBound() > 0.0) {
-                act.setCandidateId(i++);
-                tmp.add(act);
-            }
-        }
-
-        long v = visitedCounter++;
-        for(Activation act: inputNeuronActivations) {
-            act.markHasCandidate(v);
-        }
-
-        while (!tmp.isEmpty()) {
-            int oldSize = tmp.size();
-            for (Activation act : tmp) {
-                if (act.checkDependenciesSatisfied(v)) {
-                    tmp.remove(act);
-                    act.setCandidateId(candidates.size());
-                    candidates.add(act);
-
-                    act.markHasCandidate(v);
-                    break;
-                }
-            }
-
-            if(tmp.size() == oldSize) {
-                log.info(activationsToString());
-                throw new CyclicDependencyException();
-            }
-        }
-    }
-
-
-    /**
-     * The method <code>process</code> needs to be called after all the input activations have been added to the
-     * network. It performs the search for the best interpretation.
-     */
-    public void process() throws TimeoutException, CyclicDependencyException, OscillatingActivationsException {
-        process(null);
-    }
-
-
-    public void process(Long timeoutInMilliSeconds) throws TimeoutException, CyclicDependencyException, OscillatingActivationsException {
-        linker.lateLinking();
-
-        inputNeuronActivations.forEach(act -> {
-            valueQueue.propagateActivationValue(act, null, true, true);
-        });
-
-        generateCandidates();
-
-        selectedSearchNode = new SearchNode(this, null, null, 0);
-        selectedSearchNode.updateActivations(this);
-        storeFinalState();
-
-        SearchNode rootNode = selectedSearchNode;
-
-        SearchNode.search(this, selectedSearchNode, visitedCounter++, timeoutInMilliSeconds);
-
-        for(Activation act: activationsById.values()) {
-            if(act.isFinalActivation()) {
-                finallyActivatedNeurons.add(act.getINeuron());
-            }
-        }
-
-        if(SearchNode.COMPUTE_SOFT_MAX) {
-            SearchNode.computeCachedFactor(rootNode);
-            computeOptionProbabilities();
-        }
-    }
-
-
-    public void storeFinalState() {
-        for(Activation act: activationsById.values()) {
-            act.finalOption = act.currentOption;
-        }
-    }
-
-
-    private void computeOptionProbabilities() {
-        for (Activation act : activationsById.values()) {
-            if(act.getType() == EXCITATORY) {
-                act.computeOptionProbabilities();
-            }
-        }
-    }
-
-
-    public void dumpDebugCandidateStatistics() {
-        for (Activation act : candidates) {
-            log.info(act.searchStateToString());
-        }
-    }
-
-
     public void notifyWeightModified(Synapse synapse) {
-        Set<Synapse> is = modifiedWeights.get(synapse.getOutput().get());
+        Set<Synapse> is = modifiedWeights.get(synapse.getOutput());
         if(is == null) {
             is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
-            modifiedWeights.put(synapse.getOutput().get(), is);
+            modifiedWeights.put(synapse.getOutput(), is);
         }
         is.add(synapse);
     }
@@ -481,82 +194,12 @@ public class Document implements Comparable<Document> {
     public void commit() {
         modifiedWeights.forEach((n, inputSyns) -> {
             n.commit(inputSyns);
-            Converter.convert(threadId, this, n, inputSyns);
         });
         modifiedWeights.clear();
     }
 
 
-    /**
-     * Removes the activations of this document from the model again.
-     */
-    public void clearActivations() {
-        activatedNeurons.forEach(n -> n.clearActivations(this));
-        activatedNodes.forEach(n -> n.clearActivations(this));
-
-        activationsById.clear();
-        addedNodeActivations.clear();
-        activatedNeurons.clear();
-        activatedNodes.clear();
-        addedNodes.clear();
-
-        if(model.lastCleanup[threadId] + CLEANUP_INTERVAL < id) {
-            model.lastCleanup[threadId] = id;
-
-            List<Provider<? extends AbstractNode>> tmp;
-            synchronized(model.activeProviders) {
-                tmp = new ArrayList<>(model.activeProviders.values());
-            }
-
-            tmp.forEach(np -> {
-                AbstractNode an = np.getIfNotSuspended();
-                if (an != null && an instanceof Node) {
-                    Node n = (Node) an;
-
-                    n.clearThreadState(threadId,  id - CLEANUP_INTERVAL);
-                }
-            });
-        }
-
-        model.docs[threadId] = null;
-    }
-
-
-    public String generateOutputText() {
-        int oldLength = length();
-
-        TreeSet<Position> queue = new TreeSet<>(Comparator.comparingInt(p -> p.getId()));
-
-        for(Activation act: activationsById.values()) {
-            if(act.getINeuron().getOutputText() != null && act.getSlot(Activation.BEGIN).getFinalPosition() != null && act.getSlot(Activation.END).getFinalPosition() == null) {
-                queue.add(act.getSlot(Activation.BEGIN));
-            }
-        }
-
-        while(!queue.isEmpty()) {
-            Position pos = queue.pollFirst();
-
-            pos.getActivations(Activation.BEGIN)
-                    .filter(act -> act.getINeuron().getOutputText() != null && act.isFinalActivation())
-                    .forEach(act -> {
-                        String outText = act.getINeuron().getOutputText();
-                        Position nextPos = act.getSlot(Activation.END);
-                        nextPos.setFinalPosition(pos.getFinalPosition() + outText.length());
-
-                        content.replace(act.getSlot(Activation.BEGIN).getFinalPosition(), act.getSlot(Activation.END).getFinalPosition(), outText);
-
-                        queue.add(nextPos);
-                    });
-        }
-        return content.substring(oldLength, length());
-    }
-
-
     public String activationsToString() {
-        Set<Activation> acts = new TreeSet<>(ACTIVATIONS_OUTPUT_COMPARATOR);
-
-        acts.addAll(activationsById.values());
-
         StringBuilder sb = new StringBuilder();
 
         sb.append("Id -");
@@ -569,30 +212,57 @@ public class Document implements Comparable<Document> {
         sb.append(" Upper Bound -");
         sb.append(" Value | Net | Weight -");
         sb.append(" Input Value |");
-        sb.append(" Target Value");
         sb.append("\n");
         sb.append("\n");
 
-        for(Activation act: acts) {
-            if(act.getUpperBound() <= 0.0 && (act.getTargetValue() == null || act.getTargetValue() <= 0.0)) {
+        for(Activation act: activationsById.values()) {
+            if(!act.isActive()) {
                 continue;
             }
 
-            sb.append(act.toStringDetailed());
+            sb.append(act.toString());
             sb.append("\n");
         }
 
-        if(selectedSearchNode != null) {
-            sb.append("\n Final SearchNode:" + selectedSearchNode.getId() + "  WeightSum:" + selectedSearchNode.getAccumulatedWeight() + "\n");
-        }
         return sb.toString();
     }
 
 
-    public static class CyclicDependencyException extends RuntimeException {
+    public void train(Config c) {
+        createV = getNewVisitedId();
 
-        public CyclicDependencyException() {
-            super("Cycle detected in the activations that is not marked recurrent.");
+        Function<Activation, ExcitatoryNeuron> callback = act -> new ExcitatoryNeuron(getModel(), act.getLabel());
+
+        for(Activation act: new ArrayList<>(getActivations())) {
+            if(act.isActive()) {
+                TNeuron n = act.getINeuron();
+
+                n.prepareTrainingStep(c, act, callback);
+            }
         }
+
+        for(Activation act: new ArrayList<>(getActivations())) {
+            if(act.isActive()) {
+                TNeuron n = act.getINeuron();
+
+                n.updateFrequencies(act);
+                n.initCountValues();
+
+                n.train(c, act);
+
+                act.targetNeuron.commit(act.targetNeuron.getInputSynapses());
+            }
+        }
+
+//        propagate();
+
+        getModifiedWeights().forEach((n, inputSyns) -> {
+            TNeuron tn = (TNeuron) n;
+            tn.computeOutputRelations();
+        });
+
+        commit();
+
+        getModel().charCounter += length();
     }
 }
