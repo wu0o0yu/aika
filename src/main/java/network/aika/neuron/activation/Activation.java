@@ -182,11 +182,6 @@ public class Activation {
     }
 
 
-    public Synapse getSynapseById(int synapseId) {
-        return getNeuron().getSynapseById(synapseId);
-    }
-
-
     public Stream<Link> getOutputLinks(Synapse s) {
         return outputLinks.values().stream()
                 .filter(l -> l.synapse == s);

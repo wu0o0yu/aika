@@ -37,7 +37,6 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
 
     ReadWriteLock lock = new ReadWriteLock();
 
-    NavigableMap<Integer, Synapse> inputSynapsesById = new TreeMap<>();
     NavigableMap<Neuron, Synapse> activeInputSynapses = new TreeMap<>();
     NavigableMap<Neuron, Synapse> activeOutputSynapses = new TreeMap<>();
 
@@ -140,24 +139,27 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
     }
 
 
-    public Synapse getSynapseById(int synapseId) {
-        return inputSynapsesById.get(synapseId);
-    }
 
-
-    public Synapse getInputSynapse(Neuron inputNeuron) {
+    public Synapse getInputSynapse(Neuron n) {
         lock.acquireReadLock();
-        Synapse synapse = activeInputSynapses.get(inputNeuron);
+        Synapse s = activeInputSynapses.get(n);
 
         lock.releaseReadLock();
-        return synapse;
+        return s;
+    }
+
+    public Synapse getOutputSynapse(Neuron n) {
+        lock.acquireReadLock();
+        Synapse s = activeOutputSynapses.get(n);
+
+        lock.releaseReadLock();
+        return s;
     }
 
 
     void addActiveInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         activeInputSynapses.put(s.getPInput(), s);
-        inputSynapsesById.put(s.getId(), s);
         lock.releaseWriteLock();
     }
 
@@ -165,7 +167,6 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
     void removeActiveInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         activeInputSynapses.remove(s.getPInput());
-        inputSynapsesById.remove(s.getId());
         lock.releaseWriteLock();
     }
 
@@ -189,16 +190,6 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         if(this == MAX_NEURON) return "MAX_NEURON";
 
         return super.toString();
-    }
-
-
-    public int getNewSynapseId() {
-        return get().getNewSynapseId();
-    }
-
-
-    public void registerSynapseId(int synId) {
-        get().registerSynapseId(synId);
     }
 
 
@@ -240,7 +231,6 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
 
 
     public interface Builder {
-        void registerSynapseIds(Neuron n);
     }
 
 }

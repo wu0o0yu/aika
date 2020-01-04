@@ -28,12 +28,10 @@ public class MutualExclusionTest {
 
         Neuron.init(na.getProvider(), 1.0,
                 new ExcitatorySynapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(in.getProvider())
+                        .setNeuron(in)
                         .setWeight(10.0)
                         .setRecurrent(false),
                 new NegExcitatorySynapse.Builder()
-                        .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setRecurrent(true)
@@ -41,12 +39,10 @@ public class MutualExclusionTest {
 
         Neuron.init(nb.getProvider(), 1.5,
                 new ExcitatorySynapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(in.getProvider())
+                        .setNeuron(in)
                         .setWeight(10.0)
                         .setRecurrent(false),
                 new NegExcitatorySynapse.Builder()
-                        .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setRecurrent(true)
@@ -54,12 +50,10 @@ public class MutualExclusionTest {
 
         Neuron.init(nc.getProvider(), 1.2,
                 new ExcitatorySynapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(in.getProvider())
+                        .setNeuron(in)
                         .setWeight(10.0)
                         .setRecurrent(false),
                 new NegExcitatorySynapse.Builder()
-                        .setSynapseId(1)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setRecurrent(true)
@@ -67,16 +61,13 @@ public class MutualExclusionTest {
 
         Neuron.init(inhib.getProvider(), 0.0,
                 new InhibitorySynapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(na.getProvider())
+                        .setNeuron(na)
                         .setWeight(1.0),
                 new InhibitorySynapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(nb.getProvider())
+                        .setNeuron(nb)
                         .setWeight(1.0),
                 new InhibitorySynapse.Builder()
-                        .setSynapseId(2)
-                        .setNeuron(nc.getProvider())
+                        .setNeuron(nc)
                         .setWeight(1.0)
                 );
 

@@ -112,7 +112,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
         Document doc = act.getDocument();
 
         act.followDown(doc.getNewVisitedId(), (cAct, isConflict) -> {
-            Synapse s = act.getNeuron().getInputSynapse(cAct.getNeuron());
+            Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
 
             if(s == null || !s.isRecurrent() || !s.isNegative(CURRENT)) {
                 return false;
@@ -158,8 +158,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
         n.setBias(0.0);
 
         for(ExcitatorySynapse es: targetSyns) {
-            int isSynId = n.getNewSynapseId();
-            InhibitorySynapse is = new InhibitorySynapse(es.getPInput(), n.getProvider(), isSynId);
+            InhibitorySynapse is = new InhibitorySynapse(es.getPInput(), n.getProvider());
 
             is.link();
 

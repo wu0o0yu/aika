@@ -34,8 +34,8 @@ public class InhibitorySynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
         super();
     }
 
-    public InhibitorySynapse(Neuron input, Neuron output, Integer id) {
-        super(input, output, id, false, true);
+    public InhibitorySynapse(Neuron input, Neuron output) {
+        super(input, output, false, true);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class InhibitorySynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
 
     public static class Builder extends Synapse.Builder {
         protected SynapseFactory getSynapseFactory() {
-            return (input, output, id) -> new InhibitorySynapse(input, output, id);
+            return (input, output) -> new InhibitorySynapse(input, output);
         }
     }
 }

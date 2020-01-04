@@ -9,12 +9,12 @@ public abstract class ConjunctiveSynapse<I extends TNeuron, O extends Conjunctiv
         super();
     }
 
-    public ConjunctiveSynapse(Neuron input, Neuron output, Integer id, boolean recurrent, boolean propagate) {
-        super(input, output, id, recurrent, propagate);
+    public ConjunctiveSynapse(Neuron input, Neuron output, boolean recurrent, boolean propagate) {
+        super(input, output, recurrent, propagate);
     }
 
-    public ConjunctiveSynapse(Neuron input, Neuron output, Integer id, boolean recurrent, boolean propagate, int lastCount) {
-        super(input, output, id, recurrent, propagate, lastCount);
+    public ConjunctiveSynapse(Neuron input, Neuron output, boolean recurrent, boolean propagate, int lastCount) {
+        super(input, output, recurrent, propagate, lastCount);
     }
 
 

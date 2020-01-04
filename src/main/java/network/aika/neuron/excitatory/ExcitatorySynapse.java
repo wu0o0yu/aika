@@ -49,14 +49,14 @@ public class ExcitatorySynapse extends ConjunctiveSynapse<TNeuron, ConjunctiveNe
         super();
     }
 
-    public ExcitatorySynapse(Neuron input, Neuron output, Integer id, boolean recurrent, boolean propagate) {
-        super(input, output, id, recurrent, propagate);
+    public ExcitatorySynapse(Neuron input, Neuron output, boolean recurrent, boolean propagate) {
+        super(input, output, recurrent, propagate);
     }
 
 
 
-    public ExcitatorySynapse(Neuron input, Neuron output, Integer id, boolean recurrent, boolean propagate, int lastCount) {
-        super(input, output, id, recurrent, propagate, lastCount);
+    public ExcitatorySynapse(Neuron input, Neuron output, boolean recurrent, boolean propagate, int lastCount) {
+        super(input, output, recurrent, propagate, lastCount);
     }
 
 
@@ -90,7 +90,7 @@ public class ExcitatorySynapse extends ConjunctiveSynapse<TNeuron, ConjunctiveNe
 
     public boolean isMappedToMetaSynapse(MetaSynapse metaSyn) {
         MetaSynapse.MappingLink ml = metaSynapses.get(metaSyn.getOutput());
-        return ml.metaSynapse.getId() == metaSyn.getId();
+        return ml.metaSynapse == metaSyn;
     }
 
 
@@ -115,7 +115,7 @@ public class ExcitatorySynapse extends ConjunctiveSynapse<TNeuron, ConjunctiveNe
         }
 
         protected SynapseFactory getSynapseFactory() {
-            return (input, output, id) -> new ExcitatorySynapse(input, output, id, recurrent, propagate, output.getModel().charCounter);
+            return (input, output) -> new ExcitatorySynapse(input, output, recurrent, propagate, output.getModel().charCounter);
         }
     }
 

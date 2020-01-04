@@ -48,8 +48,8 @@ public class MetaSynapse extends ConjunctiveSynapse<TNeuron, MetaNeuron> {
         super();
     }
 
-    public MetaSynapse(Neuron input, Neuron output, Integer id, boolean recurrent, boolean propagate, int lastCount) {
-        super(input, output, id, recurrent, propagate, lastCount);
+    public MetaSynapse(Neuron input, Neuron output, boolean recurrent, boolean propagate, int lastCount) {
+        super(input, output, recurrent, propagate, lastCount);
     }
 
 
@@ -96,8 +96,8 @@ public class MetaSynapse extends ConjunctiveSynapse<TNeuron, MetaNeuron> {
         System.out.println("  Transfer Template Synapse: IN:" +
                 inputNeuron.getLabel() +
                 " OUT:" + targetNeuron.getLabel() +
-                " M-SynId:" + getId() +
-                " T-SynId:" + targetSynapse.getId() +
+//                " M-SynId:" + getId() +
+//                " T-SynId:" + targetSynapse.getId() +
                 " W:" + targetSynapse.getNewWeight()
         );
 
@@ -139,7 +139,7 @@ public class MetaSynapse extends ConjunctiveSynapse<TNeuron, MetaNeuron> {
         }
 
         protected SynapseFactory getSynapseFactory() {
-            return (input, output, id) -> new MetaSynapse(input, output, id, recurrent, propagate, output.getModel().charCounter);
+            return (input, output) -> new MetaSynapse(input, output, recurrent, propagate, output.getModel().charCounter);
         }
     }
 
