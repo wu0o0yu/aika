@@ -264,7 +264,4 @@ public abstract class TSynapse<I extends TNeuron, O extends TNeuron> extends Syn
 
         lastCount = in.readInt();
     }
-
-
-
 }

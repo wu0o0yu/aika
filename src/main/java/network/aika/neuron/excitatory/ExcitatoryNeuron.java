@@ -142,33 +142,27 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
         return synapse;
     }
 
-/*
+
     public void train(Config c, Activation o) {
         super.train(c, o);
 
-//        createCandidateSynapses(c, o);
+        createCandidateSynapses(c, o);
 
         trainLTL(c, o);
     }
 
 
-
-    // TODO: entfernen und durch transferMetaSynapses ersetzen.
-    public Activation init(Activation inputOpt) {
-        Activation iAct = inputOpt.getAct();
+    public Activation init(Activation iAct) {
         Document doc = iAct.getDocument();
 
         setBias(2.0);
 
-
-        int actBegin = iAct.getSlot(BEGIN).getFinalPosition();
+        int actBegin = 0; // iAct.getSlot(BEGIN).getFinalPosition();
         lastCount += actBegin;
 
-        ExcitatorySynapse s = new ExcitatorySynapse(iAct.getNeuron(), getProvider(), getProvider().getNewSynapseId(), actBegin);
+        ExcitatorySynapse s = new ExcitatorySynapse(iAct.getNeuron(), getProvider(), false, true, actBegin);
 
-        s.updateDelta(doc, 2.0,  0.0);
-        s.setInactive(CURRENT, false);
-        s.setInactive(NEXT, false);
+        s.updateDelta(doc, 2.0);
 
         s.link();
 
@@ -176,100 +170,55 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
             log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
         }
 
-        Activation targetAct = new ExcitatoryActivation(doc, this);
-        register(targetAct);
+        Activation targetAct = new Activation(doc, this, 0);
 
-        Link l = new Link(s, inputOpt.getAct(), targetAct);
+        Link l = new Link(s, iAct, targetAct);
+        targetAct.addLink(l);
 
-        targetAct.addLink(Direction.OUTPUT, l);
-
-        Activation targetOpt = new Activation(null, targetAct, null);
-        targetAct.rootOption = targetOpt;
-        targetAct.currentState = targetOpt;
-        targetAct.finalState = targetOpt;
-
-        targetOpt.link(l, inputOpt);
-
-        double net = getBias();
-        double value = getActivationFunction().f(net);
-
-        targetAct.setUpperBound(value);
-        targetOpt.setP(inputOpt.getP());
-//        targetOpt.state = targetAct.computeValueAndWeight(0);
-        targetOpt.setState(new Activation(value, value, net, inputOpt.getState().fired + 1, 0.0));
-
-        return targetOpt;
+        return targetAct;
     }
 
 
-    private void createCandidateSynapses(Config c, Activation targetOpt) {
+    private void createCandidateSynapses(Config c, Activation targetAct) {
+        Document doc = targetAct.getDocument();
+
         if(log.isDebugEnabled()) {
-            log.debug("Created Synapses for Neuron: " + targetOpt.getAct().getINeuron().getId() + ":" + targetOpt.getAct().getINeuron().getLabel());
+            log.debug("Created Synapses for Neuron: " + targetAct.getINeuron().getId() + ":" + targetAct.getINeuron().getLabel());
         }
 
-        TreeMap<Link, Activation> tmp = new TreeMap<>(INPUT_COMP); // Vermutlich aufgrund einer Conc. Mod. Exception notwendig.
-        tmp.putAll(targetOpt.inputOptions);
-        for(Map.Entry<Link, Activation> me: tmp.entrySet()) {
-            Link l = me.getKey();
-            Activation o = me.getValue();
+        ArrayList<Activation> candidates = new ArrayList<>();
 
-            if (!l.isInactive() && !l.isNegative(CURRENT) && checkStrength(l)) {
-                Set<Activation> conflicts = getConflicts(l.getInput());
-
-                for (Map.Entry<Integer, Position> mea : l.getInput().getSlots().entrySet()) {
-                    Position p = mea.getValue();
-
-                    for (Activation inputAct : p.getActivations()) {  // TODO: Other Relations than EQUAL
-                        if (inputAct != l.getInput() && inputAct != targetOpt.getAct() && !conflicts.contains(inputAct)) {
-                            Activation inputOpt = getMaxOption(inputAct);
-
-                            createCandidateSynapse(c, inputOpt, targetOpt);
-                        }
-                    }
-                }
+        targetAct.followDown(doc.getNewVisitedId(), (act, isConflict) -> {
+            if(isConflict) {
+                return false;
             }
-        }
+
+            Synapse is = targetAct.getNeuron().getInputSynapse(act.getNeuron());
+            if(is != null) {
+                return false;
+            }
+            candidates.add(act);
+
+            return false;
+        });
+
+        candidates
+                .forEach(act -> createCandidateSynapse(c, act, targetAct));
     }
 
 
-    private Activation getMaxOption(Activation inputAct) {
-        return inputAct
-                .getOptions()
-                .stream()
-                .max(Comparator.comparingDouble(o -> o.getP()))
-                .orElse(null);
-    }
-
-
-    private void createCandidateSynapse(Config c, Activation inputOpt, Activation targetOpt) {
-        Activation targetAct = targetOpt.getAct();
+    private void createCandidateSynapse(Config c, Activation iAct, Activation targetAct) {
         Neuron targetNeuron = targetAct.getNeuron();
 
-        Activation iAct = inputOpt.getAct();
         Neuron inputNeuron = iAct.getNeuron();
 
-        if(checkIfSynapseExists(inputOpt, targetOpt)) {
+        if(!((TNeuron) inputNeuron.get()).isMature(c)) {
             return;
         }
 
-        if(!((TNeuron) inputOpt.getAct().getINeuron()).isMature(c)) {
-            return;
-        }
+        int lastCount = 0; //iAct.getSlot(BEGIN).getFinalPosition();
 
-        int synId = targetNeuron.getNewSynapseId();
-        int lastCount = iAct.getSlot(BEGIN).getFinalPosition();
-
-        ExcitatorySynapse s;
-        if(inputOpt.getAct().getINeuron() instanceof InhibitoryNeuron && checkSelfReferencing(targetOpt, inputOpt)) {
-            s = new NegExcitatorySynapse(inputNeuron, targetNeuron, synId, lastCount);
-        } else {
-            s = new ExcitatorySynapse(inputNeuron, targetNeuron, synId, lastCount);
-        }
-
-        s.setInactive(CURRENT, true);
-        s.setInactive(NEXT, true);
-
-        s.setRecurrent(inputOpt.checkSelfReferencing(targetOpt));
+        ExcitatorySynapse s = new ExcitatorySynapse(inputNeuron, targetNeuron, false, false, lastCount);
 
         s.link();
 
@@ -277,27 +226,11 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
             log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
         }
 
-        Link l = new Link(s, inputOpt.getAct(), targetAct);
+        Link l = new Link(s, iAct, targetAct);
 
-        targetAct.addLink(Direction.OUTPUT, l);
-        inputOpt.getAct().addLink(Direction.INPUT, l);
-        targetOpt.link(l, inputOpt);
+        targetAct.addLink(l);
     }
 
-
-
-
-    private boolean checkIfSynapseExists(Activation inputOpt, Activation targetOpt) {
-        for(Map.Entry<Link, Activation> me: targetOpt.inputOptions.entrySet()) {
-            Link l = me.getKey();
-
-            if(l.getInput() == inputOpt.getAct()) {
-                return true;
-            }
-        }
-        return false;
-    }
-*/
 
 
     public boolean isMature(Config c) {
@@ -309,19 +242,6 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
         TSynapse se = (TSynapse) maxSyn;
 
         return se.getCounts()[1] >= c.getMaturityThreshold();  // Sign.NEG, Sign.POS
-    }
-
-
-    public Set<Activation> getConflicts(Activation act) {
-        return act.outputLinks.values().stream()
-                .filter(cl -> !cl.isNegative(CURRENT))
-                .map(cl -> cl.getInput())
-                .collect(Collectors.toSet());
-    }
-
-
-    private static boolean checkStrength(Link l) {
-        return true;
     }
 
 
@@ -342,7 +262,6 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
             if (covi == 0.0) {
                 continue;
             }
-
 
             for(Sign k : Sign.values()) {
                 int sii = k.ordinal();
