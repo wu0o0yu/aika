@@ -19,6 +19,8 @@ package network.aika.neuron.activation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TSynapse;
 
+import static network.aika.neuron.Synapse.State.CURRENT;
+
 
 /**
  *
@@ -80,6 +82,11 @@ public class Link {
 
     public boolean isRecurrent() {
         return synapse.isRecurrent();
+    }
+
+
+    public boolean isConflict() {
+        return isRecurrent() && isNegative(CURRENT);
     }
 
 

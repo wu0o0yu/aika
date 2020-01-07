@@ -114,7 +114,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
         Link l = act.inputLinks.firstEntry().getValue();
         Activation pAct = l.getInput();
 
-        pAct.followDown(doc.getNewVisitedId(), (cAct, isConflict) -> {
+        pAct.followDown(doc.getNewVisitedId(), cAct -> {
             if(cAct == pAct) {
                 return false;
             }

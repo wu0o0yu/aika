@@ -127,7 +127,7 @@ public class Activation {
     public void followDown(long v, CollectResults c) {
         if(visitedDown == v) return;
 
-        followUp(v, false, c);
+        followUp(v, c);
         visitedDown = v;
 
         inputLinks
@@ -137,20 +137,18 @@ public class Activation {
     }
 
 
-    public void followUp(long v, boolean isConflict, CollectResults c) {
+    public void followUp(long v, CollectResults c) {
         if(visitedDown == v || visitedUp == v) return;
         visitedUp = v;
 
-        boolean ic = isConflict || !checkBranch(v, this);
-
-        if(c.collect(this, ic)) {
+        if(isConflicting(v, this) || c.collect(this)) {
             return;
         }
 
         outputLinks
                 .values()
                 .stream()
-                .forEach(l -> l.output.followUp(v, ic, c));
+                .forEach(l -> l.output.followUp(v, c));
     }
 
 
@@ -170,15 +168,23 @@ public class Activation {
 
 
     public interface CollectResults {
-        boolean collect(Activation act, boolean isConflict);
+        boolean collect(Activation act);
     }
 
 
-    public boolean checkBranch(long v, Activation act) {
-        return !act.inputLinks.values().stream()
+    public boolean isConflicting(long v, Activation act) {
+        return act.inputLinks.values().stream()
                 .filter(l -> l.isRecurrent() && l.isNegative(CURRENT))
                 .flatMap(l -> l.input.inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
                 .anyMatch(l -> l.input.visitedDown != v);
+    }
+
+
+    public boolean hasConflicts() {
+        return inputLinks
+                .values()
+                .stream()
+                .anyMatch(l -> l.isConflict());
     }
 
 
@@ -237,7 +243,7 @@ public class Activation {
 
 
     public String toString() {
-        return getINeuron().getType() + ":" + getLabel() +
+        return getINeuron().getClass().getSimpleName() + ":" + getLabel() +
                 " value:" + Utils.round(value) +
                 " net:" + Utils.round(net) +
                 " p:" + Utils.round(p);

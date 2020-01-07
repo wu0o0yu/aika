@@ -6,7 +6,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.pattern.PatternNeuron;
 import org.junit.Before;
 import org.junit.Test;
 
