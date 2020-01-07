@@ -277,8 +277,9 @@ public class Activation {
         }
 
 
-        public void addInputLink(Activation iAct) {
+        public Builder addInputLink(Activation iAct) {
             inputLinks.add(iAct);
+            return this;
         }
     }
 

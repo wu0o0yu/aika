@@ -6,7 +6,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
-import network.aika.neuron.input.InputNeuron;
 import org.junit.Test;
 
 public class PropagateTest {
@@ -16,7 +15,7 @@ public class PropagateTest {
     public void testPropagation() {
         Model m = new Model();
 
-        InputNeuron in = new InputNeuron(m, "IN");
+        ExcitatoryNeuron in = new ExcitatoryNeuron(m, "IN");
         ExcitatoryNeuron na = new ExcitatoryNeuron(m, "A");
 
         Neuron.init(na.getProvider(), 1.0,

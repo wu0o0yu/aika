@@ -19,8 +19,6 @@ package network.aika.neuron.inhibitory;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.*;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.input.InputNeuron;
 
 
 /**
