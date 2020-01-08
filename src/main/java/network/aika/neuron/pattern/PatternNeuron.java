@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.pattern;
 
 import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 /**
  *

@@ -251,18 +251,17 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
     }
 
 
-    // Entfernen und durch transferMetaSynapses ersetzen.
     private void generateNeuron(Activation act) {
         ExcitatoryNeuron targetNeuron = new ExcitatoryNeuron(getModel(), "DERIVED-FROM-(" + act.getLabel() + ")");
 
-//        targetNeuron.init(o);
+        targetNeuron.init(act);
     }
 
-/*
-    private double getCoverage(Activation seedOpt) {
+
+    private double getCoverage(Activation seedAct) {
         double maxCoverage = 0.0;
-        for(Map.Entry<Link, Link> me: seedOpt.outputLinks.entrySet()) {
-            maxCoverage = Math.max(maxCoverage, getCoverage(me.getKey(), seedOpt, me.getValue()));
+        for(Map.Entry<Link, Link> me: seedAct.outputLinks.entrySet()) {
+            maxCoverage = Math.max(maxCoverage, getCoverage(me.getValue()));
         }
 
         return maxCoverage;
@@ -270,14 +269,13 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 
 
     private static double getCoverage(Link ol) {
-        INeuron n = out.getAct().getINeuron();
-        return Math.min(Math.max(0.0, out.getState().net), Math.max(0.0, in.getState().value * l.getSynapse().getWeight())) / n.getBias();
+        Activation oAct = ol.getOutput();
+        INeuron n = oAct.getINeuron();
+        return Math.min(Math.max(0.0, oAct.net), Math.max(0.0, ol.getInput().value * ol.getSynapse().getWeight())) / n.getBias();
     }
-*/
+
 
     public abstract boolean isMature(Config c);
-
-
 
 
     protected String toDetailedString() {

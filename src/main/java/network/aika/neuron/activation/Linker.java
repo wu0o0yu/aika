@@ -55,44 +55,38 @@ public class Linker {
             Link cand = entry.candidates.pollFirst();
             Document doc = cand.input.getDocument();
 
-            List<Link> newCandidates = new ArrayList<>();
-            List<Link> conflicts = new ArrayList<>();
+            NavigableSet<Link> newCandidates = new TreeSet<>(entry.candidates);
+            if(cand.isConflict()) {
+                targetAct = targetAct.cloneAct();
+            } else {
+                cand.input.followDown(doc.getNewVisitedId(), act -> {
+                    if(act == cand.input) {
+                        return false;
+                    }
 
-            cand.input.followDown(doc.getNewVisitedId(), (act, isConflict) -> {
-                if(act == cand.input) {
+                    Synapse is = entry.act.getNeuron().getInputSynapse(act.getNeuron());
+                    if(is == null) {
+                        return false;
+                    }
+
+                    List<Link> ols = act
+                            .getOutputLinks(is)
+                            .filter(l -> l.output == entry.act)
+                            .collect(Collectors.toList());
+                    if (ols.isEmpty()) {
+                        ols.add(new Link(is, act, entry.act));
+                    }
+                    newCandidates.addAll(ols);
+
                     return false;
-                }
-
-                Synapse is = targetAct.getNeuron().getInputSynapse(act.getNeuron());
-                if(is == null) {
-                    return false;
-                }
-
-                List<Link> ols = act
-                        .getOutputLinks(is)
-                        .filter(l -> l.output == targetAct)
-                        .collect(Collectors.toList());
-                if (ols.isEmpty()) {
-                    ols.add(new Link(is, act, targetAct));
-                }
-                (!isConflict ? newCandidates : conflicts).addAll(ols);
-
-                return false;
-            });
-
-            if (!conflicts.isEmpty()) {
-                Entry alternativeEntry = new Entry(targetAct.cloneAct(), new TreeSet<>(entry.candidates));
-                alternativeEntry.candidates.addAll(conflicts);
-
-                queue.addLast(alternativeEntry);
+                });
             }
 
             targetAct.addLink(cand);
 
-            entry.candidates.addAll(newCandidates);
-
-            if (!entry.candidates.isEmpty()) {
-                queue.addLast(entry);
+            if(!newCandidates.isEmpty()) {
+                Entry newEntry = new Entry(targetAct, newCandidates);
+                queue.addLast(newEntry);
             }
         }
     }

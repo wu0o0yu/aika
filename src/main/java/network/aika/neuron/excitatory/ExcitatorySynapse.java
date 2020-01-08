@@ -85,14 +85,14 @@ public class ExcitatorySynapse extends ConjunctiveSynapse<TNeuron, ConjunctiveNe
 
         return 1.0 - max;
     }
-*/
+
 
 
     public boolean isMappedToMetaSynapse(MetaSynapse metaSyn) {
         MetaSynapse.MappingLink ml = metaSynapses.get(metaSyn.getOutput());
         return ml.metaSynapse == metaSyn;
     }
-
+*/
 
     @Override
     public void write(DataOutput out) throws IOException {

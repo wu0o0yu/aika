@@ -4,13 +4,11 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.NegExcitatorySynapse;
-import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.pattern.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.input.InputNeuron;
 import org.junit.Test;
 
 public class MutualExclusionTest {
@@ -20,7 +18,7 @@ public class MutualExclusionTest {
     public void testPropagation() {
         Model m = new Model();
 
-        InputNeuron in = new InputNeuron(m, "IN");
+        PatternNeuron in = new PatternNeuron(m, "IN");
         PatternNeuron na = new PatternNeuron(m, "A");
         PatternNeuron nb = new PatternNeuron(m, "B");
         PatternNeuron nc = new PatternNeuron(m, "C");

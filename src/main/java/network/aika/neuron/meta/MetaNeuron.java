@@ -313,24 +313,20 @@ public class MetaNeuron extends ConjunctiveNeuron<MetaSynapse> {
         this.inhibitoryNeuron = inhibitoryNeuron;
     }
 
-
+/*
     public void train(Config c, Activation o) {
-//        transferMetaSynapses(c, o);
+        transferMetaSynapses(c, o);
 
         super.train(c, o);
     }
-
+*/
 
     @Override
     public boolean isMature(Config c) {
         return false;
     }
 
-    /*
-        public TNeuron getInputTargets(TDocument doc, Activation in) {
-            return doc.metaActivations.get(in);
-        }
-    */
+
     public ExcitatoryNeuron getTargetNeuron(Activation metaAct, Function<Activation, ExcitatoryNeuron> callback) {
         ExcitatoryNeuron targetNeuron = createMetaNeuronTarget(metaAct, callback);
 

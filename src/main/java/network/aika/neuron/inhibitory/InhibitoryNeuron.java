@@ -111,19 +111,26 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
         super.propagate(act);
         Document doc = act.getDocument();
 
-        act.followDown(doc.getNewVisitedId(), (cAct, isConflict) -> {
+        Link l = act.inputLinks.firstEntry().getValue();
+        Activation pAct = l.getInput();
+
+        pAct.followDown(doc.getNewVisitedId(), cAct -> {
+            if(cAct == pAct) {
+                return false;
+            }
+
             Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
 
             if(s == null || !s.isRecurrent() || !s.isNegative(CURRENT)) {
                 return false;
             }
 
-            Link l = new Link(s, cAct, act);
-            if(cAct.outputLinks.containsKey(l)) {
+            Link nl = new Link(s, act, cAct);
+            if(cAct.inputLinks.containsKey(nl)) {
                 return false;
             }
 
-            doc.getLinker().add(l);
+            doc.getLinker().add(nl);
 
             return false;
         });
