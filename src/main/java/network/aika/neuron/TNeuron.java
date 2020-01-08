@@ -108,7 +108,7 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
         Set<Synapse> rest = new TreeSet<>(dir == INPUT ? Synapse.INPUT_SYNAPSE_COMP : Synapse.OUTPUT_SYNAPSE_COMP);
         rest.addAll(dir == INPUT ? getProvider().getActiveInputSynapses() : getProvider().getActiveOutputSynapses());
 
-        for(Link ol: (dir == INPUT ? act.inputLinks: act.outputLinks).keySet()) {
+        for(Link ol: (dir == INPUT ? act.inputLinks: act.outputLinks).values()) {
             TSynapse ts = (TSynapse)ol.getSynapse();
             Activation lAct = (dir == INPUT ? ol.getInput(): ol.getOutput());
 
@@ -260,7 +260,7 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 
     private double getCoverage(Activation seedAct) {
         double maxCoverage = 0.0;
-        for(Map.Entry<Link, Link> me: seedAct.outputLinks.entrySet()) {
+        for(Map.Entry<Activation, Link> me: seedAct.outputLinks.entrySet()) {
             maxCoverage = Math.max(maxCoverage, getCoverage(me.getValue()));
         }
 

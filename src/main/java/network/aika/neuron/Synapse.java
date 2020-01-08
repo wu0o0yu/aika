@@ -19,14 +19,12 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Document;
-import network.aika.neuron.activation.Activation;
 import network.aika.Writable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 
