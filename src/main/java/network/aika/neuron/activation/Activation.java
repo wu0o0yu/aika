@@ -197,14 +197,35 @@ public class Activation implements Comparable<Activation> {
 
         assert !isFinal;
 
-        sumUpLink(l);
+        if(inputLinks.isEmpty() || l.input.fired.compareTo(inputLinks.lastKey().fired) > 0) {
+            sumUpLink(l);
+        } else {
+            compute();
+        }
     }
 
 
     public void sumUpLink(Link l) {
+        if(l.synapse == null) return;
+
         double w = l.synapse.getWeight();
 
         net += l.input.value * w;
+
+        checkIfFired(l);
+    }
+
+
+    private void compute() {
+        fired = null;
+        net = 0.0;
+        for (Link l: inputLinks.values()) {
+            sumUpLink(l);
+        }
+    }
+
+
+    public void checkIfFired(Link l) {
         if(fired == null && net > 0.0) {
             fired = neuron.incrementFired(l.input.fired);
             doc.getQueue().add(this);
@@ -218,16 +239,6 @@ public class Activation implements Comparable<Activation> {
         isFinal = true;
 
         neuron.propagate(this);
-    }
-
-
-    private void compute() {
-        fired = null;
-
-        net = 0.0;
-        for (Link l: inputLinks.values()) {
-            sumUpLink(l);
-        }
     }
 
 
