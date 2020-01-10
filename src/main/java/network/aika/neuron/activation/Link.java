@@ -91,8 +91,8 @@ public class Link {
 
 
     public void link() {
-        input.outputLinks.put(this, this);
-        output.inputLinks.put(this, this);
+        input.outputLinks.put(output, this);
+        output.inputLinks.put(input, this);
     }
 
 

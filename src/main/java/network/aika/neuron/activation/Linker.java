@@ -57,6 +57,10 @@ public class Linker {
 
             NavigableSet<Link> newCandidates = new TreeSet<>(entry.candidates);
             if(cand.isConflict()) {
+                if(targetAct.hasConflicts()) {
+                    continue;
+                }
+
                 targetAct = targetAct.cloneAct();
             } else {
                 cand.input.followDown(doc.getNewVisitedId(), act -> {

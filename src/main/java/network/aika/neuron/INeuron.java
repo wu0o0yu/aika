@@ -111,11 +111,12 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         Fired f = new Fired(input.inputTimestamp, input.fired);
 
         Activation act = new Activation(doc, this, input.value, f);
-        act.isFinal = true;
 
         for(Activation iAct: input.getInputLinks()) {
             act.addLink(new Link(null, iAct, act));
         }
+
+        act.isFinal = true;
 
         propagate(act);
 

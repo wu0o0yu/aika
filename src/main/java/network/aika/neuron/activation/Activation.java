@@ -32,7 +32,7 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  *
  * @author Lukas Molzberger
  */
-public class Activation {
+public class Activation implements Comparable<Activation> {
 
     public double value;
     public double net;
@@ -44,8 +44,8 @@ public class Activation {
 
     public double p;
 
-    public TreeMap<Link, Link> inputLinks = new TreeMap<>(INPUT_COMP);
-    public Map<Link, Link> outputLinks = new TreeMap<>(OUTPUT_COMP);
+    public TreeMap<Activation, Link> inputLinks = new TreeMap<>(FIRED_COMP);
+    public Map<Activation, Link> outputLinks = new TreeMap<>();
 
     public boolean isFinal;
 
@@ -56,18 +56,15 @@ public class Activation {
     public long visitedDown;
     public long visitedUp;
 
+    public static Comparator<Activation> FIRED_COMP =
+            Comparator
+                    .<Activation, Fired>comparing(act -> act.getFired())
+                    .thenComparing(act -> act);
 
     public static Comparator<Link> INPUT_COMP =
             Comparator.
                     <Link, Fired>comparing(l -> l.getInput().getFired())
                     .thenComparing(l -> l.getSynapse().getInput());
-
-
-    public static Comparator<Link> OUTPUT_COMP = (l1, l2) -> {
-        int r = Synapse.OUTPUT_SYNAPSE_COMP.compare(l1.synapse, l2.synapse);
-        if (r != 0) return r;
-        return Integer.compare(l1.output.getId(), l2.output.getId());
-    };
 
 
     public Activation(Document doc, INeuron<?> n, int round) {
@@ -155,15 +152,16 @@ public class Activation {
     public Activation cloneAct() {
         Activation clonedAct = new Activation(doc, neuron, round);
 
-        clonedAct.value = value;
-        clonedAct.net = net;
-        clonedAct.fired = fired;
-        clonedAct.p = p;
-        clonedAct.isFinal = isFinal;
         clonedAct.targetNeuron = targetNeuron;
         clonedAct.inputLinks.putAll(inputLinks);
 
         return clonedAct;
+    }
+
+
+    @Override
+    public int compareTo(Activation act) {
+        return Integer.compare(id, act.id);
     }
 
 
@@ -199,14 +197,35 @@ public class Activation {
 
         assert !isFinal;
 
-        sumUpLink(l);
+        if(inputLinks.isEmpty() || l.input.fired.compareTo(inputLinks.lastKey().fired) > 0) {
+            sumUpLink(l);
+        } else {
+            compute();
+        }
     }
 
 
     public void sumUpLink(Link l) {
+        if(l.synapse == null) return;
+
         double w = l.synapse.getWeight();
 
         net += l.input.value * w;
+
+        checkIfFired(l);
+    }
+
+
+    private void compute() {
+        fired = null;
+        net = 0.0;
+        for (Link l: inputLinks.values()) {
+            sumUpLink(l);
+        }
+    }
+
+
+    public void checkIfFired(Link l) {
         if(fired == null && net > 0.0) {
             fired = neuron.incrementFired(l.input.fired);
             doc.getQueue().add(this);
@@ -220,16 +239,6 @@ public class Activation {
         isFinal = true;
 
         neuron.propagate(this);
-    }
-
-
-    private void compute() {
-        fired = null;
-
-        net = 0.0;
-        for (Link l: inputLinks.values()) {
-            sumUpLink(l);
-        }
     }
 
 
