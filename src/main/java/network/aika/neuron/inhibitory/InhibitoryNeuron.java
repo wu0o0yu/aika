@@ -107,46 +107,6 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
     }
 
 
-    public void propagate(Activation act) {
-        super.propagate(act);
-        Document doc = act.getDocument();
-
-        Link l = act.inputLinks.firstEntry().getValue();
-        Activation pAct = l.getInput();
-
-        pAct.followDown(doc.getNewVisitedId(), cAct -> {
-            if(cAct == pAct) {
-                return false;
-            }
-
-            Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
-
-            if(s == null || !s.isRecurrent() || !s.isNegative(CURRENT)) {
-                return false;
-            }
-
-            Link nl = new Link(s, act, cAct);
-            if(cAct.inputLinks.containsKey(nl)) {
-                return false;
-            }
-
-            doc.getLinker().add(nl);
-
-            return false;
-        });
-
-        doc.getLinker().process();
-    }
-
-
-    protected void propagate(Activation iAct, Synapse s) {
-        Document doc = iAct.getDocument();
-        Activation oAct = new Activation(doc, this, iAct.round);
-
-        oAct.addLink(new Link(s, iAct, oAct));
-    }
-
-
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
         commitBias();
 

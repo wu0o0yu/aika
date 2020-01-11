@@ -17,7 +17,9 @@
 package network.aika.neuron.activation;
 
 import network.aika.Document;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,7 +33,6 @@ import static network.aika.neuron.activation.Activation.INPUT_COMP;
  */
 public class Linker {
 
-
     private ArrayDeque<Entry> queue = new ArrayDeque<>();
 
     private static class Entry {
@@ -43,6 +44,31 @@ public class Linker {
             this.act = act;
             this.candidates = candidates;
         }
+    }
+
+
+    public void linkForward(Activation act, Activation oldAct) {
+        Document doc = act.getDocument();
+
+        TreeSet<Neuron> propagationTargets = new TreeSet(act.getINeuron().getPropagationTargets());
+
+        act.followDown(doc.getNewVisitedId(), cAct -> {
+            Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
+            if(s == null || cAct.inputLinks.containsKey(act.getNeuron())) {
+                return false;
+            }
+
+            addAndProcess(s, act, cAct);
+            propagationTargets.remove(cAct.getNeuron());
+
+            return false;
+        });
+
+        propagationTargets
+                .stream()
+                .map(n -> n.get().getProvider())
+                .map(n -> act.getNeuron().getOutputSynapse(n))
+                .forEach(s -> addAndProcess(s, act, new Activation(doc, s.getOutput(), act.round)));
     }
 
 
@@ -95,12 +121,21 @@ public class Linker {
         }
     }
 
+    private void addAndProcess(Synapse s, Activation input, Activation output) {
+        Link l = new Link(s, input, output);
+        if(!(l.output.getINeuron() instanceof InhibitoryNeuron)) {
+            add(l);
+            process();
+        } else {
+            l.output.addLink(l);
+        }
+    }
 
-    public void add(Link il) {
+    private void add(Link l) {
         NavigableSet<Link> candidates = new TreeSet<>(INPUT_COMP);
 
-        candidates.add(il);
+        candidates.add(l);
 
-        queue.addLast(new Entry(il.output, candidates));
+        queue.addLast(new Entry(l.output, candidates));
     }
 }

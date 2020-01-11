@@ -21,7 +21,6 @@ import network.aika.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,6 +99,9 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
 
+    public Set<Neuron> getPropagationTargets() {
+        return propagateTargets;
+    }
 
     /**
      * Propagate an input activation into the network.
@@ -118,7 +120,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
         act.isFinal = true;
 
-        propagate(act);
+        doc.getLinker().linkForward(act, null);
+//        propagate(act);
 
         doc.getQueue().process();
 
@@ -146,26 +149,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public void removePropagateTarget(Neuron target) {
         propagateTargets.remove(target);
-    }
-
-
-    public void propagate(Activation act) {
-        propagateTargets.forEach(n -> n.get());
-
-        propagateTargets
-                .stream()
-                .map(n -> provider.activeOutputSynapses.get(n))
-                .forEach(s -> s.getOutput().propagate(act, s));
-    }
-
-
-    protected void propagate(Activation iAct, Synapse s) {
-        Document doc = iAct.getDocument();
-        Activation oAct = new Activation(doc, this, iAct.round);
-
-        doc.getLinker().add(new Link(s, iAct, oAct));
-
-        doc.getLinker().process();
     }
 
 
@@ -269,4 +252,5 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public abstract void removeInputSynapse(S s);
 
     public abstract void removeOutputSynapse(Synapse s);
+
 }

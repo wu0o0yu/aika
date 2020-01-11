@@ -231,7 +231,7 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
     // Implemented only for meta and target neurons
     public void prepareMetaTraining(Config c, Activation act, Function<Activation, ExcitatoryNeuron> callback) {
         if (act.getP() > c.getMetaThreshold() && getTrainingNetValue(act) > 0.0) {
-            act.targetNeuron = getTargetNeuron(act, callback);
+//            act.targetNeuron = getTargetNeuron(act, callback);
         }
     }
 

@@ -22,6 +22,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.pattern.PatternNeuron;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -44,14 +45,13 @@ public class Activation implements Comparable<Activation> {
 
     public double p;
 
-    public TreeMap<Activation, Link> inputLinks = new TreeMap<>(FIRED_COMP);
+    public TreeMap<Activation, Link> inputLinksFiredOrder = new TreeMap<>(FIRED_COMP);
+    public Map<Neuron, Link> inputLinks = new TreeMap<>();
     public Map<Activation, Link> outputLinks = new TreeMap<>();
 
     public boolean isFinal;
 
     public int round; // Nur als Abbruchbedingung
-
-    public ExcitatoryNeuron targetNeuron;
 
     public long visitedDown;
     public long visitedUp;
@@ -123,14 +123,17 @@ public class Activation implements Comparable<Activation> {
 
     public void followDown(long v, CollectResults c) {
         if(visitedDown == v) return;
-
-        followUp(v, c);
         visitedDown = v;
 
         inputLinks
                 .values()
                 .stream()
-                .forEach(l -> l.input.followDown(v, c));
+                .forEach(l -> {
+                    if(!(l.input.getINeuron() instanceof PatternNeuron)) {
+                        l.input.followDown(v, c);
+                    }
+                    l.input.followUp(v, c);
+                });
     }
 
 
@@ -152,8 +155,9 @@ public class Activation implements Comparable<Activation> {
     public Activation cloneAct() {
         Activation clonedAct = new Activation(doc, neuron, round);
 
-        clonedAct.targetNeuron = targetNeuron;
-        clonedAct.inputLinks.putAll(inputLinks);
+        inputLinks
+                .values()
+                .forEach(l -> new Link(l.synapse, l.input, clonedAct).link());
 
         return clonedAct;
     }
@@ -197,7 +201,7 @@ public class Activation implements Comparable<Activation> {
 
         assert !isFinal;
 
-        if(inputLinks.isEmpty() || l.input.fired.compareTo(inputLinks.lastKey().fired) > 0) {
+        if(inputLinks.isEmpty() || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().fired) > 0) {
             sumUpLink(l);
         } else {
             compute();
@@ -219,7 +223,7 @@ public class Activation implements Comparable<Activation> {
     private void compute() {
         fired = null;
         net = 0.0;
-        for (Link l: inputLinks.values()) {
+        for (Link l: inputLinksFiredOrder.values()) {
             sumUpLink(l);
         }
     }
@@ -238,7 +242,8 @@ public class Activation implements Comparable<Activation> {
 
         isFinal = true;
 
-        neuron.propagate(this);
+        doc.getLinker().linkForward(this, null);
+//        neuron.propagate(this);
     }
 
 
@@ -252,7 +257,8 @@ public class Activation implements Comparable<Activation> {
 
 
     public String toString() {
-        return getINeuron().getClass().getSimpleName() + ":" + getLabel() +
+        return getId() + " " +
+                getINeuron().getClass().getSimpleName() + ":" + getLabel() +
                 " value:" + Utils.round(value) +
                 " net:" + Utils.round(net) +
                 " p:" + Utils.round(p);
