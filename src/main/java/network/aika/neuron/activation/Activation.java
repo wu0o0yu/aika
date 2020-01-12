@@ -21,7 +21,6 @@ import network.aika.Utils;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.pattern.PatternNeuron;
 
 import java.util.*;
@@ -51,10 +50,13 @@ public class Activation implements Comparable<Activation> {
 
     public boolean isFinal;
 
-    public int round; // Nur als Abbruchbedingung
 
     public long visitedDown;
     public long visitedUp;
+
+    public int round; // Nur als Abbruchbedingung
+    public Activation nextRound;
+    public Activation lastRound;
 
     public static Comparator<Activation> FIRED_COMP =
             Comparator
@@ -67,7 +69,7 @@ public class Activation implements Comparable<Activation> {
                     .thenComparing(l -> l.getSynapse().getInput());
 
 
-    public Activation(Document doc, INeuron<?> n, int round) {
+    public Activation(Document doc, INeuron<?> n, Activation lastRound, int round) {
         this.id = doc.getNewActivationId();
         this.doc = doc;
         this.neuron = n;
@@ -76,17 +78,8 @@ public class Activation implements Comparable<Activation> {
         this.net = n.getTotalBias(CURRENT);
         this.fired = null;
 
-        doc.addActivation(this);
-    }
-
-
-    public Activation(Document doc, INeuron<?> n, double value, Fired fired) {
-        this.id = doc.getNewActivationId();
-        this.doc = doc;
-        this.neuron = n;
-
-        this.value = value;
-        this.fired = fired;
+        this.lastRound = lastRound;
+        lastRound.nextRound = this;
 
         doc.addActivation(this);
     }
@@ -152,14 +145,30 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public Activation cloneAct() {
-        Activation clonedAct = new Activation(doc, neuron, round);
+    public Activation cloneAct(boolean branch) {
+        Activation clonedAct = new Activation(doc, neuron, this, round);
 
         inputLinks
                 .values()
-                .forEach(l -> new Link(l.synapse, l.input, clonedAct).link());
+                .forEach(l -> {
+                    if(!branch) {
+                        l.input.outputLinks.remove(this);
+                    }
+
+                    new Link(l.synapse, l.input, clonedAct).link();
+                });
 
         return clonedAct;
+    }
+
+
+    public void setValue(double v) {
+        this.value = v;
+    }
+
+
+    public void setFired(Fired fired) {
+        this.fired = fired;
     }
 
 
@@ -197,6 +206,20 @@ public class Activation implements Comparable<Activation> {
 
 
     public void addLink(Link l) {
+        if(isFinal && !l.isSelfRef()) {
+            l.output = l.output.cloneAct();
+        }
+
+/*        if(cand.isConflict()) {
+            if(targetAct.hasConflicts()) {
+                continue;
+            }
+
+            if(!isSelfReference(targetAct, cand.input)) {
+                targetAct = targetAct.cloneAct();
+            }
+        }
+ */
         l.link();
 
         assert !isFinal;
@@ -242,8 +265,9 @@ public class Activation implements Comparable<Activation> {
 
         isFinal = true;
 
-        doc.getLinker().linkForward(this, null);
-//        neuron.propagate(this);
+        doc.getLinker().linkForward(this);
+
+        lastRound = null;
     }
 
 

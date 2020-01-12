@@ -30,8 +30,8 @@ public class Link {
 
     final Synapse synapse;
 
-    final Activation input;
-    final Activation output;
+    Activation input;
+    Activation output;
 
 
     public Link(Synapse s, Activation input, Activation output) {
@@ -68,6 +68,11 @@ public class Link {
 
     public boolean isConflict() {
         return isRecurrent() && isNegative(CURRENT);
+    }
+
+
+    public boolean isSelfRef() {
+        return output == input.inputLinksFiredOrder.firstEntry().getValue().input;
     }
 
 

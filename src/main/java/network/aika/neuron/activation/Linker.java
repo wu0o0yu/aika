@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Document;
+import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
@@ -47,12 +48,25 @@ public class Linker {
     }
 
 
-    public void linkForward(Activation act, Activation oldAct) {
+    public void linkForward(Activation act) {
         Document doc = act.getDocument();
 
         TreeSet<Neuron> propagationTargets = new TreeSet(act.getINeuron().getPropagationTargets());
 
+        if(act.lastRound != null) {
+            act.lastRound.outputLinks
+                    .values()
+                    .stream()
+                    .forEach(l -> {
+                        Activation nAct = lookupNewActivation(doc, null, l.output);
+                        addAndProcess(l.synapse, act, nAct);
+                        propagationTargets.remove(nAct.getNeuron());
+                    });
+        }
+
         act.followDown(doc.getNewVisitedId(), cAct -> {
+            if(cAct.getINeuron() instanceof InhibitoryNeuron) return false;
+
             Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
             if(s == null || cAct.inputLinks.containsKey(act.getNeuron())) {
                 return false;
@@ -68,7 +82,18 @@ public class Linker {
                 .stream()
                 .map(n -> n.get().getProvider())
                 .map(n -> act.getNeuron().getOutputSynapse(n))
-                .forEach(s -> addAndProcess(s, act, new Activation(doc, s.getOutput(), act.round)));
+                .forEach(s -> addAndProcess(s, act, lookupNewActivation(doc, s.getOutput(), null)));
+    }
+
+
+    private Activation lookupNewActivation(Document doc, INeuron n, Activation oldAct) {
+        if(oldAct == null) {
+            return new Activation(doc, n, null, 0);
+        } else if(oldAct.nextRound != null) {
+            return oldAct.nextRound;
+        } else {
+            return oldAct.cloneAct(false);
+        }
     }
 
 
@@ -82,35 +107,27 @@ public class Linker {
             Document doc = cand.input.getDocument();
 
             NavigableSet<Link> newCandidates = new TreeSet<>(entry.candidates);
-            if(cand.isConflict()) {
-                if(targetAct.hasConflicts()) {
-                    continue;
+            cand.input.followDown(doc.getNewVisitedId(), act -> {
+                if (act == cand.input) {
+                    return false;
                 }
 
-                targetAct = targetAct.cloneAct();
-            } else {
-                cand.input.followDown(doc.getNewVisitedId(), act -> {
-                    if(act == cand.input) {
-                        return false;
-                    }
-
-                    Synapse is = entry.act.getNeuron().getInputSynapse(act.getNeuron());
-                    if(is == null) {
-                        return false;
-                    }
-
-                    List<Link> ols = act
-                            .getOutputLinks(is)
-                            .filter(l -> l.output == entry.act)
-                            .collect(Collectors.toList());
-                    if (ols.isEmpty()) {
-                        ols.add(new Link(is, act, entry.act));
-                    }
-                    newCandidates.addAll(ols);
-
+                Synapse is = entry.act.getNeuron().getInputSynapse(act.getNeuron());
+                if (is == null) {
                     return false;
-                });
-            }
+                }
+
+                List<Link> ols = act
+                        .getOutputLinks(is)
+                        .filter(l -> l.output == entry.act)
+                        .collect(Collectors.toList());
+                if (ols.isEmpty()) {
+                    ols.add(new Link(is, act, entry.act));
+                }
+                newCandidates.addAll(ols);
+
+                return false;
+            });
 
             targetAct.addLink(cand);
 
@@ -121,9 +138,10 @@ public class Linker {
         }
     }
 
+
     private void addAndProcess(Synapse s, Activation input, Activation output) {
         Link l = new Link(s, input, output);
-        if(!(l.output.getINeuron() instanceof InhibitoryNeuron)) {
+        if(!(l.output.getINeuron() instanceof InhibitoryNeuron) && !l.isConflict()) {
             add(l);
             process();
         } else {
