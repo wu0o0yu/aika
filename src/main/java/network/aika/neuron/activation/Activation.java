@@ -46,7 +46,7 @@ public class Activation implements Comparable<Activation> {
 
     public TreeMap<Activation, Link> inputLinksFiredOrder = new TreeMap<>(FIRED_COMP);
     public Map<Neuron, Link> inputLinks = new TreeMap<>();
-    public Map<Activation, Link> outputLinks = new TreeMap<>();
+    public Map<Neuron, Link> outputLinks = new TreeMap<>();
 
     public boolean isFinal;
 
@@ -146,13 +146,13 @@ public class Activation implements Comparable<Activation> {
 
 
     public Activation cloneAct(boolean branch) {
-        Activation clonedAct = new Activation(doc, neuron, this, round);
+        Activation clonedAct = new Activation(doc, neuron, this, round + 1);
 
         inputLinks
                 .values()
                 .forEach(l -> {
                     if(!branch) {
-                        l.input.outputLinks.remove(this);
+                        l.input.outputLinks.remove(getNeuron());
                     }
 
                     new Link(l.synapse, l.input, clonedAct).link();
@@ -205,7 +205,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public void addLink(Link l) {
+    public Activation addLink(Link l) {
         if(isFinal && !l.isSelfRef()) {
             l.output = l.output.cloneAct();
         }

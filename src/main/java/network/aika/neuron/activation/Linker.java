@@ -34,8 +34,6 @@ import static network.aika.neuron.activation.Activation.INPUT_COMP;
  */
 public class Linker {
 
-    private ArrayDeque<Entry> queue = new ArrayDeque<>();
-
     private static class Entry {
         Activation act;
         NavigableSet<Link> candidates;
@@ -58,9 +56,8 @@ public class Linker {
                     .values()
                     .stream()
                     .forEach(l -> {
-                        Activation nAct = lookupNewActivation(doc, null, l.output);
-                        addAndProcess(l.synapse, act, nAct);
-                        propagationTargets.remove(nAct.getNeuron());
+                        addAndProcess(l.synapse, act, l.output);
+                        propagationTargets.remove(l.output.getINeuron());
                     });
         }
 
@@ -68,7 +65,7 @@ public class Linker {
             if(cAct.getINeuron() instanceof InhibitoryNeuron) return false;
 
             Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
-            if(s == null || cAct.inputLinks.containsKey(act.getNeuron())) {
+            if(s == null || !act.outputLinks.containsKey(cAct.getNeuron())) {
                 return false;
             }
 
@@ -97,41 +94,26 @@ public class Linker {
     }
 
 
-    public void process() {
-        while(!queue.isEmpty()) {
+    private void addAndProcess(Synapse s, Activation input, Activation output) {
+        Link l = new Link(s, input, output);
+
+        ArrayDeque<Entry> queue = new ArrayDeque<>();
+
+        NavigableSet<Link> candidates = new TreeSet<>(INPUT_COMP);
+        candidates.add(l);
+        queue.add(new Entry(l.output, candidates));
+
+        while (!queue.isEmpty()) {
             Entry entry = queue.pollFirst();
 
             Activation targetAct = entry.act;
 
             Link cand = entry.candidates.pollFirst();
-            Document doc = cand.input.getDocument();
+            targetAct = targetAct.addLink(cand);
 
-            NavigableSet<Link> newCandidates = new TreeSet<>(entry.candidates);
-            cand.input.followDown(doc.getNewVisitedId(), act -> {
-                if (act == cand.input) {
-                    return false;
-                }
+            NavigableSet<Link> newCandidates = findLinkingCandidates(targetAct, cand, candidates);
 
-                Synapse is = entry.act.getNeuron().getInputSynapse(act.getNeuron());
-                if (is == null) {
-                    return false;
-                }
-
-                List<Link> ols = act
-                        .getOutputLinks(is)
-                        .filter(l -> l.output == entry.act)
-                        .collect(Collectors.toList());
-                if (ols.isEmpty()) {
-                    ols.add(new Link(is, act, entry.act));
-                }
-                newCandidates.addAll(ols);
-
-                return false;
-            });
-
-            targetAct.addLink(cand);
-
-            if(!newCandidates.isEmpty()) {
+            if (!newCandidates.isEmpty()) {
                 Entry newEntry = new Entry(targetAct, newCandidates);
                 queue.addLast(newEntry);
             }
@@ -139,21 +121,29 @@ public class Linker {
     }
 
 
-    private void addAndProcess(Synapse s, Activation input, Activation output) {
-        Link l = new Link(s, input, output);
-        if(!(l.output.getINeuron() instanceof InhibitoryNeuron) && !l.isConflict()) {
-            add(l);
-            process();
-        } else {
-            l.output.addLink(l);
-        }
+    public NavigableSet<Link> findLinkingCandidates(Activation targetAct, Link l, NavigableSet<Link> candidates) {
+        if(((targetAct.getINeuron() instanceof InhibitoryNeuron) || l.isConflict())) return candidates;
+
+        NavigableSet<Link> newCandidates = new TreeSet<>(candidates);
+        l.input.followDown(l.input.getDocument().getNewVisitedId(), act -> {
+            Synapse is = targetAct.getNeuron().getInputSynapse(act.getNeuron());
+            if (is == null) {
+                return false;
+            }
+
+            List<Link> ols = act
+                    .getOutputLinks(is)
+                    .filter(la -> la.output == targetAct)
+                    .collect(Collectors.toList());
+            if (ols.isEmpty()) {
+                ols.add(new Link(is, act, targetAct));
+            }
+            newCandidates.addAll(ols);
+
+            return false;
+        });
+
+        return newCandidates;
     }
 
-    private void add(Link l) {
-        NavigableSet<Link> candidates = new TreeSet<>(INPUT_COMP);
-
-        candidates.add(l);
-
-        queue.addLast(new Entry(l.output, candidates));
-    }
 }

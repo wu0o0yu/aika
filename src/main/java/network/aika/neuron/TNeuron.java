@@ -260,7 +260,7 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 
     private double getCoverage(Activation seedAct) {
         double maxCoverage = 0.0;
-        for(Map.Entry<Activation, Link> me: seedAct.outputLinks.entrySet()) {
+        for(Map.Entry<Neuron, Link> me: seedAct.outputLinks.entrySet()) {
             maxCoverage = Math.max(maxCoverage, getCoverage(me.getValue()));
         }
 
