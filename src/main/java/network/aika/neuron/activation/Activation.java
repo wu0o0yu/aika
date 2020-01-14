@@ -79,7 +79,9 @@ public class Activation implements Comparable<Activation> {
         this.fired = null;
 
         this.lastRound = lastRound;
-        lastRound.nextRound = this;
+        if(lastRound != null) {
+            lastRound.nextRound = this;
+        }
 
         doc.addActivation(this);
     }
@@ -134,9 +136,9 @@ public class Activation implements Comparable<Activation> {
         if(visitedDown == v || visitedUp == v) return;
         visitedUp = v;
 
-        if(isConflicting(v, this) || c.collect(this)) {
-            return;
-        }
+        if(isConflicting(v, this)) return;
+
+        c.collect(this);
 
         outputLinks
                 .values()
@@ -175,7 +177,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public interface CollectResults {
-        boolean collect(Activation act);
+        void collect(Activation act);
     }
 
 
@@ -196,9 +198,9 @@ public class Activation implements Comparable<Activation> {
     public void addLink(Link l) {
         l.link();
 
-        assert !isFinal;
+        if(isFinal) return;
 
-        if(inputLinks.isEmpty() || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().fired) > 0) {
+        if(inputLinks.size() == 1 || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().fired) > 0) {
             sumUpLink(l);
         } else {
             compute();

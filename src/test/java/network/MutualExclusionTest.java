@@ -4,6 +4,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.NegExcitatorySynapse;
 import network.aika.neuron.pattern.PatternNeuron;
@@ -19,9 +20,9 @@ public class MutualExclusionTest {
         Model m = new Model();
 
         PatternNeuron in = new PatternNeuron(m, "IN");
-        PatternNeuron na = new PatternNeuron(m, "A");
-        PatternNeuron nb = new PatternNeuron(m, "B");
-        PatternNeuron nc = new PatternNeuron(m, "C");
+        ExcitatoryNeuron na = new ExcitatoryNeuron(m, "A");
+        ExcitatoryNeuron nb = new ExcitatoryNeuron(m, "B");
+        ExcitatoryNeuron nc = new ExcitatoryNeuron(m, "C");
         InhibitoryNeuron inhib = new InhibitoryNeuron(m, "I");
 
         Neuron.init(na.getProvider(), 1.0,

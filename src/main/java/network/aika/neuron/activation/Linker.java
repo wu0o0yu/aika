@@ -34,27 +34,6 @@ import static network.aika.neuron.activation.Activation.INPUT_COMP;
  */
 public class Linker {
 
-    private static class Entry {
-        Activation act;
-        NavigableSet<Link> candidates = new TreeSet<>(INPUT_COMP);
-
-
-        private Entry() {
-        }
-
-        public Entry(Activation act, Link l) {
-            this.act = act;
-            candidates.add(l);
-        }
-
-        public Entry cloneEntry() {
-            Entry ce = new Entry();
-            ce.act = act.cloneAct();
-            ce.candidates.addAll(candidates);
-            return ce;
-        }
-    }
-
 
     public void linkForward(Activation act) {
         Document doc = act.getDocument();
@@ -72,17 +51,13 @@ public class Linker {
         }
 
         act.followDown(doc.getNewVisitedId(), cAct -> {
-            if(cAct.getINeuron() instanceof InhibitoryNeuron) return false;
+            if(cAct.getINeuron() instanceof InhibitoryNeuron) return;
 
             Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
-            if(s == null || !act.outputLinks.containsKey(cAct.getNeuron())) {
-                return false;
-            }
+            if(s == null || act.outputLinks.containsKey(cAct.getNeuron())) return;
 
             addAndProcess(s, act, cAct);
             propagationTargets.remove(cAct.getNeuron());
-
-            return false;
         });
 
         propagationTargets
@@ -104,14 +79,34 @@ public class Linker {
     }
 
 
+    private static class Entry {
+        Activation act;
+        NavigableSet<Link> candidates = new TreeSet<>(INPUT_COMP);
+
+
+        private Entry() {
+        }
+
+        public Entry(Link l) {
+            this.act = l.output;
+            candidates.add(l);
+        }
+
+        public Entry cloneEntry() {
+            Entry ce = new Entry();
+            ce.act = act.cloneAct();
+            ce.candidates.addAll(candidates);
+            return ce;
+        }
+    }
+
+
     private void addAndProcess(Synapse s, Activation input, Activation output) {
         ArrayDeque<Entry> queue = new ArrayDeque<>();
-
-        queue.add(new Entry(output, new Link(s, input, output)));
+        queue.add(new Entry(new Link(s, input, output)));
 
         while (!queue.isEmpty()) {
             Entry e = queue.pollFirst();
-
             Link l = e.candidates.pollFirst();
 
             if(e.act.isFinal && !l.isSelfRef()) {
@@ -135,9 +130,7 @@ public class Linker {
 
         l.input.followDown(l.input.getDocument().getNewVisitedId(), act -> {
             Synapse is = e.act.getNeuron().getInputSynapse(act.getNeuron());
-            if (is == null) {
-                return false;
-            }
+            if (is == null) return;
 
             List<Link> ols = act
                     .getOutputLinks(is)
@@ -147,8 +140,6 @@ public class Linker {
                 ols.add(new Link(is, act, e.act));
             }
             e.candidates.addAll(ols);
-
-            return false;
         });
     }
 
