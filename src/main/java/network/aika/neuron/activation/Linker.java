@@ -36,12 +36,22 @@ public class Linker {
 
     private static class Entry {
         Activation act;
-        NavigableSet<Link> candidates;
+        NavigableSet<Link> candidates = new TreeSet<>(INPUT_COMP);
 
 
-        public Entry(Activation act, NavigableSet<Link> candidates) {
+        private Entry() {
+        }
+
+        public Entry(Activation act, Link l) {
             this.act = act;
-            this.candidates = candidates;
+            candidates.add(l);
+        }
+
+        public Entry cloneEntry() {
+            Entry ce = new Entry();
+            ce.act = act.cloneAct();
+            ce.candidates.addAll(candidates);
+            return ce;
         }
     }
 
@@ -89,61 +99,57 @@ public class Linker {
         } else if(oldAct.nextRound != null) {
             return oldAct.nextRound;
         } else {
-            return oldAct.cloneAct(false);
+            return oldAct.cloneAct();
         }
     }
 
 
     private void addAndProcess(Synapse s, Activation input, Activation output) {
-        Link l = new Link(s, input, output);
-
         ArrayDeque<Entry> queue = new ArrayDeque<>();
 
-        NavigableSet<Link> candidates = new TreeSet<>(INPUT_COMP);
-        candidates.add(l);
-        queue.add(new Entry(l.output, candidates));
+        queue.add(new Entry(output, new Link(s, input, output)));
 
         while (!queue.isEmpty()) {
-            Entry entry = queue.pollFirst();
+            Entry e = queue.pollFirst();
 
-            Activation targetAct = entry.act;
+            Link l = e.candidates.pollFirst();
 
-            Link cand = entry.candidates.pollFirst();
-            targetAct = targetAct.addLink(cand);
+            if(e.act.isFinal && !l.isSelfRef()) {
+                queue.addLast(e);
+                e = e.cloneEntry();
+            }
 
-            NavigableSet<Link> newCandidates = findLinkingCandidates(targetAct, cand, candidates);
+            e.act.addLink(l);
 
-            if (!newCandidates.isEmpty()) {
-                Entry newEntry = new Entry(targetAct, newCandidates);
-                queue.addLast(newEntry);
+            findLinkingCandidates(e, l);
+
+            if (!e.candidates.isEmpty()) {
+                queue.addLast(e);
             }
         }
     }
 
 
-    public NavigableSet<Link> findLinkingCandidates(Activation targetAct, Link l, NavigableSet<Link> candidates) {
-        if(((targetAct.getINeuron() instanceof InhibitoryNeuron) || l.isConflict())) return candidates;
+    public void findLinkingCandidates(Entry e, Link l) {
+        if(((e.act.getINeuron() instanceof InhibitoryNeuron) || l.isConflict())) return;
 
-        NavigableSet<Link> newCandidates = new TreeSet<>(candidates);
         l.input.followDown(l.input.getDocument().getNewVisitedId(), act -> {
-            Synapse is = targetAct.getNeuron().getInputSynapse(act.getNeuron());
+            Synapse is = e.act.getNeuron().getInputSynapse(act.getNeuron());
             if (is == null) {
                 return false;
             }
 
             List<Link> ols = act
                     .getOutputLinks(is)
-                    .filter(la -> la.output == targetAct)
+                    .filter(la -> la.output == e.act)
                     .collect(Collectors.toList());
             if (ols.isEmpty()) {
-                ols.add(new Link(is, act, targetAct));
+                ols.add(new Link(is, act, e.act));
             }
-            newCandidates.addAll(ols);
+            e.candidates.addAll(ols);
 
             return false;
         });
-
-        return newCandidates;
     }
 
 }

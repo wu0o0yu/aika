@@ -145,16 +145,12 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public Activation cloneAct(boolean branch) {
+    public Activation cloneAct() {
         Activation clonedAct = new Activation(doc, neuron, this, round + 1);
 
         inputLinks
                 .values()
                 .forEach(l -> {
-                    if(!branch) {
-                        l.input.outputLinks.remove(getNeuron());
-                    }
-
                     new Link(l.synapse, l.input, clonedAct).link();
                 });
 
@@ -191,35 +187,13 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public boolean hasConflicts() {
-        return inputLinks
-                .values()
-                .stream()
-                .anyMatch(l -> l.isConflict());
-    }
-
-
     public Stream<Link> getOutputLinks(Synapse s) {
         return outputLinks.values().stream()
                 .filter(l -> l.synapse == s);
     }
 
 
-    public Activation addLink(Link l) {
-        if(isFinal && !l.isSelfRef()) {
-            l.output = l.output.cloneAct();
-        }
-
-/*        if(cand.isConflict()) {
-            if(targetAct.hasConflicts()) {
-                continue;
-            }
-
-            if(!isSelfReference(targetAct, cand.input)) {
-                targetAct = targetAct.cloneAct();
-            }
-        }
- */
+    public void addLink(Link l) {
         l.link();
 
         assert !isFinal;
