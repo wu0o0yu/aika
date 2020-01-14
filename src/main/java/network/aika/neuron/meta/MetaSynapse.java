@@ -80,10 +80,10 @@ public class MetaSynapse extends ConjunctiveSynapse<TNeuron, MetaNeuron> {
 */
 
     public void transferTemplateSynapse(Document doc, TNeuron<?> inputNeuron, ExcitatoryNeuron targetNeuron, Link metaLink) {
-        if(metaLink.getTargetSynapse() != null) {
+/*        if(metaLink.getTargetSynapse() != null) {
             return;
         }
-
+*/
         ExcitatorySynapse targetSynapse = targetNeuron.createOrLookupSynapse(doc, this, inputNeuron.getProvider());
 
         new MappingLink(this, targetSynapse).link();
@@ -101,7 +101,7 @@ public class MetaSynapse extends ConjunctiveSynapse<TNeuron, MetaNeuron> {
                 " W:" + targetSynapse.getNewWeight()
         );
 
-        metaLink.setTargetSynapse(targetSynapse);
+//        metaLink.setTargetSynapse(targetSynapse);
     }
 
 

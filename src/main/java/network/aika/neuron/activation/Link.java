@@ -29,23 +29,13 @@ import static network.aika.neuron.Synapse.State.CURRENT;
 public class Link {
 
     final Synapse synapse;
-    TSynapse targetSynapse;
 
-    final Activation input;
-    final Activation output;
+    Activation input;
+    Activation output;
 
 
     public Link(Synapse s, Activation input, Activation output) {
         this.synapse = s;
-        this.targetSynapse = null;
-        this.input = input;
-        this.output = output;
-    }
-
-
-    public Link(Synapse s, TSynapse targetSynapse, Activation input, Activation output) {
-        this.synapse = s;
-        this.targetSynapse = targetSynapse;
         this.input = input;
         this.output = output;
     }
@@ -53,15 +43,6 @@ public class Link {
 
     public Synapse getSynapse() {
         return synapse;
-    }
-
-
-    public TSynapse getTargetSynapse() {
-        return targetSynapse;
-    }
-
-    public void setTargetSynapse(TSynapse targetSynapse) {
-        this.targetSynapse = targetSynapse;
     }
 
 
@@ -90,9 +71,15 @@ public class Link {
     }
 
 
+    public boolean isSelfRef() {
+        return output == input.inputLinksFiredOrder.firstEntry().getValue().input;
+    }
+
+
     public void link() {
-        input.outputLinks.put(output, this);
-        output.inputLinks.put(input, this);
+        input.outputLinks.put(output.getNeuron(), this);
+        output.inputLinks.put(input.getNeuron(), this);
+        output.inputLinksFiredOrder.put(input, this);
     }
 
 

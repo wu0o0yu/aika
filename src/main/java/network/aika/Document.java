@@ -216,10 +216,10 @@ public class Document implements Comparable<Document> {
         sb.append("\n");
 
         for(Activation act: activationsById.values()) {
-            if(!act.isActive()) {
+/*            if(!act.isActive()) {
                 continue;
             }
-
+*/
             sb.append(act.toString());
             sb.append("\n");
         }
@@ -250,7 +250,7 @@ public class Document implements Comparable<Document> {
 
                 n.train(c, act);
 
-                act.targetNeuron.commit(act.targetNeuron.getInputSynapses());
+//                act.targetNeuron.commit(act.targetNeuron.getInputSynapses());
             }
         }
 

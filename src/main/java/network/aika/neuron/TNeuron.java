@@ -231,7 +231,7 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
     // Implemented only for meta and target neurons
     public void prepareMetaTraining(Config c, Activation act, Function<Activation, ExcitatoryNeuron> callback) {
         if (act.getP() > c.getMetaThreshold() && getTrainingNetValue(act) > 0.0) {
-            act.targetNeuron = getTargetNeuron(act, callback);
+//            act.targetNeuron = getTargetNeuron(act, callback);
         }
     }
 
@@ -260,7 +260,7 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 
     private double getCoverage(Activation seedAct) {
         double maxCoverage = 0.0;
-        for(Map.Entry<Activation, Link> me: seedAct.outputLinks.entrySet()) {
+        for(Map.Entry<Neuron, Link> me: seedAct.outputLinks.entrySet()) {
             maxCoverage = Math.max(maxCoverage, getCoverage(me.getValue()));
         }
 

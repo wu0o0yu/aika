@@ -170,7 +170,7 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
             log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
         }
 
-        Activation targetAct = new Activation(doc, this, 0);
+        Activation targetAct = new Activation(doc, this, null, 0);
 
         Link l = new Link(s, iAct, targetAct);
         targetAct.addLink(l);
