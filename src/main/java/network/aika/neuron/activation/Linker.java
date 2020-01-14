@@ -46,7 +46,7 @@ public class Linker {
                     .stream()
                     .forEach(l -> {
                         addAndProcess(l.synapse, act, l.output);
-                        propagationTargets.remove(l.output.getINeuron());
+                        propagationTargets.remove(l.output.getNeuron());
                     });
         }
 
@@ -110,7 +110,9 @@ public class Linker {
             Link l = e.candidates.pollFirst();
 
             if(e.act.isFinal && !l.isSelfRef()) {
-                queue.addLast(e);
+                if (!e.candidates.isEmpty()) {
+                    queue.addLast(e);
+                }
                 e = e.cloneEntry();
             }
 
