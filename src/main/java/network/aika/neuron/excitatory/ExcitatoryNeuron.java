@@ -190,12 +190,9 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
 
         targetAct.followDown(doc.getNewVisitedId(), act -> {
             Synapse is = targetAct.getNeuron().getInputSynapse(act.getNeuron());
-            if(is != null) {
-                return false;
-            }
-            candidates.add(act);
+            if(is != null) return;
 
-            return false;
+            candidates.add(act);
         });
 
         candidates

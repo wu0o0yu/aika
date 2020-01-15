@@ -44,7 +44,7 @@ public class Activation implements Comparable<Activation> {
 
     public double p;
 
-    public TreeMap<Activation, Link> inputLinksFiredOrder = new TreeMap<>(FIRED_COMP);
+    public TreeMap<Link, Link> inputLinksFiredOrder = new TreeMap<>(FIRED_COMP);
     public Map<Neuron, Link> inputLinks = new TreeMap<>();
     public Map<Neuron, Link> outputLinks = new TreeMap<>();
 
@@ -58,10 +58,11 @@ public class Activation implements Comparable<Activation> {
     public Activation nextRound;
     public Activation lastRound;
 
-    public static Comparator<Activation> FIRED_COMP =
+    public static Comparator<Link> FIRED_COMP =
             Comparator
-                    .<Activation, Fired>comparing(act -> act.getFired())
-                    .thenComparing(act -> act);
+                    .<Link, Boolean>comparing(l -> !l.synapse.isRecurrent())
+                    .thenComparing(l -> l.input.getFired())
+                    .thenComparing(l -> l.input);
 
     public static Comparator<Link> INPUT_COMP =
             Comparator.
@@ -79,7 +80,9 @@ public class Activation implements Comparable<Activation> {
         this.fired = null;
 
         this.lastRound = lastRound;
-        lastRound.nextRound = this;
+        if(lastRound != null) {
+            lastRound.nextRound = this;
+        }
 
         doc.addActivation(this);
     }
@@ -131,12 +134,12 @@ public class Activation implements Comparable<Activation> {
 
 
     public void followUp(long v, CollectResults c) {
-        if(visitedDown == v || visitedUp == v) return;
+        if(visitedUp == v) return;
         visitedUp = v;
 
-        if(isConflicting(v, this) || c.collect(this)) {
-            return;
-        }
+        if(isConflicting(v, this)) return;
+
+        c.collect(this);
 
         outputLinks
                 .values()
@@ -175,7 +178,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public interface CollectResults {
-        boolean collect(Activation act);
+        void collect(Activation act);
     }
 
 
@@ -196,9 +199,9 @@ public class Activation implements Comparable<Activation> {
     public void addLink(Link l) {
         l.link();
 
-        assert !isFinal;
+        if(isFinal) return;
 
-        if(inputLinks.isEmpty() || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().fired) > 0) {
+        if(inputLinks.size() == 1 || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().input.fired) > 0) {
             sumUpLink(l);
         } else {
             compute();

@@ -34,31 +34,10 @@ import static network.aika.neuron.activation.Activation.INPUT_COMP;
  */
 public class Linker {
 
-    private static class Entry {
-        Activation act;
-        NavigableSet<Link> candidates = new TreeSet<>(INPUT_COMP);
-
-
-        private Entry() {
-        }
-
-        public Entry(Activation act, Link l) {
-            this.act = act;
-            candidates.add(l);
-        }
-
-        public Entry cloneEntry() {
-            Entry ce = new Entry();
-            ce.act = act.cloneAct();
-            ce.candidates.addAll(candidates);
-            return ce;
-        }
-    }
-
 
     public void linkForward(Activation act) {
+        ArrayDeque<Entry> queue = new ArrayDeque<>();
         Document doc = act.getDocument();
-
         TreeSet<Neuron> propagationTargets = new TreeSet(act.getINeuron().getPropagationTargets());
 
         if(act.lastRound != null) {
@@ -66,30 +45,28 @@ public class Linker {
                     .values()
                     .stream()
                     .forEach(l -> {
-                        addAndProcess(l.synapse, act, l.output);
-                        propagationTargets.remove(l.output.getINeuron());
+                         queue.add(new Entry(new Link(l.synapse, act, l.output)));
+                        propagationTargets.remove(l.output.getNeuron());
                     });
         }
 
         act.followDown(doc.getNewVisitedId(), cAct -> {
-            if(cAct.getINeuron() instanceof InhibitoryNeuron) return false;
+            if(cAct.getINeuron() instanceof InhibitoryNeuron) return;
 
             Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
-            if(s == null || !act.outputLinks.containsKey(cAct.getNeuron())) {
-                return false;
-            }
+            if(s == null || act.outputLinks.containsKey(cAct.getNeuron())) return;
 
-            addAndProcess(s, act, cAct);
+            queue.add(new Entry(new Link(s, act, cAct)));
             propagationTargets.remove(cAct.getNeuron());
-
-            return false;
         });
 
         propagationTargets
                 .stream()
                 .map(n -> n.get().getProvider())
                 .map(n -> act.getNeuron().getOutputSynapse(n))
-                .forEach(s -> addAndProcess(s, act, lookupNewActivation(doc, s.getOutput(), null)));
+                .forEach(s -> queue.add(new Entry(new Link(s, act, lookupNewActivation(doc, s.getOutput(), null)))));
+
+        process(queue);
     }
 
 
@@ -104,18 +81,37 @@ public class Linker {
     }
 
 
-    private void addAndProcess(Synapse s, Activation input, Activation output) {
-        ArrayDeque<Entry> queue = new ArrayDeque<>();
+    private static class Entry {
+        Activation act;
+        NavigableSet<Link> candidates = new TreeSet<>(INPUT_COMP);
 
-        queue.add(new Entry(output, new Link(s, input, output)));
 
+        private Entry() {
+        }
+
+        public Entry(Link l) {
+            this.act = l.output;
+            candidates.add(l);
+        }
+
+        public Entry cloneEntry() {
+            Entry ce = new Entry();
+            ce.act = act.cloneAct();
+            ce.candidates.addAll(candidates);
+            return ce;
+        }
+    }
+
+
+    private void process(ArrayDeque<Entry> queue) {
         while (!queue.isEmpty()) {
             Entry e = queue.pollFirst();
-
             Link l = e.candidates.pollFirst();
 
             if(e.act.isFinal && !l.isSelfRef()) {
-                queue.addLast(e);
+                if (!e.candidates.isEmpty()) {
+                    queue.addLast(e);
+                }
                 e = e.cloneEntry();
             }
 
@@ -135,9 +131,7 @@ public class Linker {
 
         l.input.followDown(l.input.getDocument().getNewVisitedId(), act -> {
             Synapse is = e.act.getNeuron().getInputSynapse(act.getNeuron());
-            if (is == null) {
-                return false;
-            }
+            if (is == null) return;
 
             List<Link> ols = act
                     .getOutputLinks(is)
@@ -147,8 +141,6 @@ public class Linker {
                 ols.add(new Link(is, act, e.act));
             }
             e.candidates.addAll(ols);
-
-            return false;
         });
     }
 

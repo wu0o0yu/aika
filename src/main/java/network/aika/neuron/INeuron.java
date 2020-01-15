@@ -93,7 +93,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public abstract ActivationFunction getActivationFunction();
 
 
-
     public Model getModel() {
         return provider.getModel();
     }
@@ -122,8 +121,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         act.isFinal = true;
 
         doc.getLinker().linkForward(act);
-//        propagate(act);
-
         doc.getQueue().process();
 
         return act;
