@@ -202,7 +202,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
 
-    public abstract double getTotalBias(Synapse.State state);
+    public abstract double getTotalBias(boolean initialRound, Synapse.State state);
 
 
     public double getBias() {

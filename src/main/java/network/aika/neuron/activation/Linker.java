@@ -25,15 +25,12 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.Activation.INPUT_COMP;
-
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class Linker {
-
 
     public void linkForward(Activation act) {
         ArrayDeque<Entry> queue = new ArrayDeque<>();
@@ -54,7 +51,10 @@ public class Linker {
             if(cAct.getINeuron() instanceof InhibitoryNeuron) return;
 
             Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
-            if(s == null || act.outputLinks.containsKey(cAct.getNeuron())) return;
+            if(s == null || !act.outputLinks.subMap(
+                    new Activation(Integer.MIN_VALUE, cAct.getINeuron()),
+                    new Activation(Integer.MAX_VALUE, cAct.getINeuron())
+            ).isEmpty()) return;
 
             queue.add(new Entry(new Link(s, act, cAct)));
             propagationTargets.remove(cAct.getNeuron());
@@ -83,7 +83,10 @@ public class Linker {
 
     private static class Entry {
         Activation act;
-        NavigableSet<Link> candidates = new TreeSet<>(INPUT_COMP);
+        NavigableSet<Link> candidates = new TreeSet<>(Comparator.
+                <Link, Fired>comparing(l -> l.getInput().getFired())
+                .thenComparing(l -> l.getSynapse().getInput())
+        );
 
 
         private Entry() {

@@ -77,7 +77,7 @@ public class Link {
 
 
     public void link() {
-        input.outputLinks.put(output.getNeuron(), this);
+        input.outputLinks.put(output, this);
         output.inputLinks.put(input.getNeuron(), this);
         output.inputLinksFiredOrder.put(this, this);
     }

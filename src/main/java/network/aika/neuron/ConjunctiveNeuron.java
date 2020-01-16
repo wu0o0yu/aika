@@ -141,8 +141,8 @@ public abstract class ConjunctiveNeuron<S extends TSynapse> extends TNeuron<S> {
     }
 
 
-    public double getTotalBias(Synapse.State state) {
-        return getBias(state) - getConjunctiveBias();
+    public double getTotalBias(boolean initialRound, Synapse.State state) {
+        return getBias(state) - (initialRound ? 0.0 : getConjunctiveBias());
     }
 
 

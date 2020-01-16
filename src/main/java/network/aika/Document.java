@@ -24,6 +24,7 @@ import network.aika.neuron.activation.Linker;
 import network.aika.neuron.activation.Queue;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.pattern.PatternNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +95,15 @@ public class Document implements Comparable<Document> {
 
     public Linker getLinker() {
         return linker;
+    }
+
+
+    public void process() {
+        for(Activation act: activationsById.values()) {
+            if(act.getINeuron() instanceof PatternNeuron) {
+                linker.linkForward(act);
+            }
+        }
     }
 
 

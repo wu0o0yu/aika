@@ -44,9 +44,9 @@ public class Activation implements Comparable<Activation> {
 
     public double p;
 
-    public TreeMap<Link, Link> inputLinksFiredOrder = new TreeMap<>(FIRED_COMP);
-    public Map<Neuron, Link> inputLinks = new TreeMap<>();
-    public Map<Neuron, Link> outputLinks = new TreeMap<>();
+    public TreeMap<Link, Link> inputLinksFiredOrder;
+    public Map<Neuron, Link> inputLinks;
+    public NavigableMap<Activation, Link> outputLinks;
 
     public boolean isFinal;
 
@@ -58,17 +58,10 @@ public class Activation implements Comparable<Activation> {
     public Activation nextRound;
     public Activation lastRound;
 
-    public static Comparator<Link> FIRED_COMP =
-            Comparator
-                    .<Link, Boolean>comparing(l -> !l.synapse.isRecurrent())
-                    .thenComparing(l -> l.input.getFired())
-                    .thenComparing(l -> l.input);
 
-    public static Comparator<Link> INPUT_COMP =
-            Comparator.
-                    <Link, Fired>comparing(l -> l.getInput().getFired())
-                    .thenComparing(l -> l.getSynapse().getInput());
-
+    public Activation(int id, INeuron<?> n) {
+        this.neuron = n;
+    }
 
     public Activation(Document doc, INeuron<?> n, Activation lastRound, int round) {
         this.id = doc.getNewActivationId();
@@ -76,7 +69,7 @@ public class Activation implements Comparable<Activation> {
         this.neuron = n;
         this.round = round;
 
-        this.net = n.getTotalBias(CURRENT);
+        this.net = n.getTotalBias(isInitialRound(), CURRENT);
         this.fired = null;
 
         this.lastRound = lastRound;
@@ -85,6 +78,19 @@ public class Activation implements Comparable<Activation> {
         }
 
         doc.addActivation(this);
+
+        inputLinksFiredOrder = new TreeMap<>(Comparator
+                .<Link, Boolean>comparing(l -> !l.synapse.isRecurrent())
+                .thenComparing(l -> l.input.getFired())
+                .thenComparing(l -> l.input)
+        );
+
+        inputLinks = new TreeMap<>();
+
+        outputLinks = new TreeMap<>(Comparator
+                .<Activation, Neuron>comparing(act -> act.getNeuron())
+                .thenComparing(act -> act)
+        );
     }
 
 
@@ -101,6 +107,10 @@ public class Activation implements Comparable<Activation> {
         return getINeuron().getLabel();
     }
 
+
+    private boolean isInitialRound() {
+        return round == 0;
+    }
 
     public <N extends INeuron> N getINeuron() {
         return (N) neuron;
@@ -191,7 +201,9 @@ public class Activation implements Comparable<Activation> {
 
 
     public Stream<Link> getOutputLinks(Synapse s) {
-        return outputLinks.values().stream()
+        return outputLinks
+                .values()
+                .stream()
                 .filter(l -> l.synapse == s);
     }
 
@@ -199,7 +211,7 @@ public class Activation implements Comparable<Activation> {
     public void addLink(Link l) {
         l.link();
 
-        if(isFinal) return;
+        if(isFinal || (isInitialRound() && l.isRecurrent())) return;
 
         if(inputLinks.size() == 1 || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().input.fired) > 0) {
             sumUpLink(l);
