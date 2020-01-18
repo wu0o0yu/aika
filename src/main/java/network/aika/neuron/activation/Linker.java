@@ -88,7 +88,6 @@ public class Linker {
                 .thenComparing(l -> l.getSynapse().getInput())
         );
 
-
         private Entry() {
         }
 
@@ -101,7 +100,7 @@ public class Linker {
         public Entry cloneEntry() {
             Entry ce = new Entry();
             ce.act = act.cloneAct();
-            ce.candidates.addAll(candidates);
+            candidates.forEach(l -> ce.candidates.add(new Link(l.synapse, l.input, null)));
             return ce;
         }
 
@@ -139,14 +138,15 @@ public class Linker {
 
         l.input.followDown(l.input.getDocument().getNewVisitedId(), act -> {
             Synapse is = e.act.getNeuron().getInputSynapse(act.getNeuron());
-            if (is == null) return;
+            if (is == null || l.synapse == is) return;
 
             List<Link> ols = act
                     .getOutputLinks(is)
                     .filter(la -> la.output == e.act)
+                    .map(la -> new Link(la.synapse, la.input, null))
                     .collect(Collectors.toList());
             if (ols.isEmpty()) {
-                ols.add(new Link(is, act, e.act));
+                ols.add(new Link(is, act, null));
             }
             e.candidates.addAll(ols);
         });

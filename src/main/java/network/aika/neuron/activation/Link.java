@@ -62,7 +62,7 @@ public class Link {
 
 
     public boolean isRecurrent() {
-        return synapse.isRecurrent();
+        return synapse != null && synapse.isRecurrent();
     }
 
 

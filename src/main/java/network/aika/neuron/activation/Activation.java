@@ -81,7 +81,7 @@ public class Activation implements Comparable<Activation> {
         doc.addActivation(this);
 
         inputLinksFiredOrder = new TreeMap<>(Comparator
-                .<Link, Boolean>comparing(l -> !l.synapse.isRecurrent())
+                .<Link, Boolean>comparing(l -> !l.isRecurrent())
                 .thenComparing(l -> l.input.getFired())
                 .thenComparing(l -> l.input)
         );
