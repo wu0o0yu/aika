@@ -42,7 +42,7 @@ public class Linker {
                     .values()
                     .stream()
                     .forEach(l -> {
-                         queue.add(new Entry(new Link(l.synapse, act, l.output)));
+                         queue.add(new Entry(l.output, new Link(l.synapse, act, null)));
                         propagationTargets.remove(l.output.getNeuron());
                     });
         }
@@ -56,7 +56,7 @@ public class Linker {
                     new Activation(Integer.MAX_VALUE, cAct.getINeuron())
             ).isEmpty()) return;
 
-            queue.add(new Entry(new Link(s, act, cAct)));
+            queue.add(new Entry(cAct, new Link(s, act, null)));
             propagationTargets.remove(cAct.getNeuron());
         });
 
@@ -64,7 +64,7 @@ public class Linker {
                 .stream()
                 .map(n -> n.get().getProvider())
                 .map(n -> act.getNeuron().getOutputSynapse(n))
-                .forEach(s -> queue.add(new Entry(new Link(s, act, lookupNewActivation(doc, s.getOutput(), null)))));
+                .forEach(s -> queue.add(new Entry(lookupNewActivation(doc, s.getOutput(), null), new Link(s, act, null))));
 
         process(queue);
     }
@@ -92,8 +92,9 @@ public class Linker {
         private Entry() {
         }
 
-        public Entry(Link l) {
-            this.act = l.output;
+        public Entry(Activation act, Link l) {
+            assert l.output == null;
+            this.act = act;
             candidates.add(l);
         }
 

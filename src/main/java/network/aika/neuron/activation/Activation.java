@@ -60,6 +60,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public Activation(int id, INeuron<?> n) {
+        this.id = id;
         this.neuron = n;
     }
 
@@ -213,6 +214,9 @@ public class Activation implements Comparable<Activation> {
 
 
     public void addLink(Link l) {
+        assert l.output == null;
+
+        l.output = this;
         l.link();
 
         if(isFinal || (isInitialRound() && l.isRecurrent())) return;
