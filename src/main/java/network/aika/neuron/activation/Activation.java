@@ -147,7 +147,7 @@ public class Activation implements Comparable<Activation> {
         if(visitedUp == v) return;
         visitedUp = v;
 
-        if(isConflicting(v, this)) return;
+        if(isConflicting(v)) return;
 
         c.collect(this);
 
@@ -192,9 +192,13 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public boolean isConflicting(long v, Activation act) {
-        return act.inputLinks.values().stream()
-                .filter(l -> l.isRecurrent() && l.isNegative(CURRENT))
+    public boolean isConflicting(long v) {
+        if(isInitialRound()) {
+            return false;
+        }
+
+        return inputLinks.values().stream()
+                .filter(l -> l.isConflict())
                 .flatMap(l -> l.input.inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
                 .anyMatch(l -> l.input.visitedDown != v);
     }
@@ -274,7 +278,8 @@ public class Activation implements Comparable<Activation> {
                 getINeuron().getClass().getSimpleName() + ":" + getLabel() +
                 " value:" + Utils.round(value) +
                 " net:" + Utils.round(net) +
-                " p:" + Utils.round(p);
+                " p:" + Utils.round(p) +
+                " round:" + round;
     }
 
     public double getP() {

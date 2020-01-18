@@ -103,6 +103,10 @@ public class Linker {
             ce.candidates.addAll(candidates);
             return ce;
         }
+
+        public String toString() {
+            return "act:" + act;
+        }
     }
 
 

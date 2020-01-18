@@ -78,8 +78,11 @@ public class Link {
 
     public void link() {
         input.outputLinks.put(output, this);
-        output.inputLinks.put(input.getNeuron(), this);
         output.inputLinksFiredOrder.put(this, this);
+        Link ol = output.inputLinks.put(input.getNeuron(), this);
+        if(ol != null && ol != this) {
+            ol.input.outputLinks.remove(ol.output);
+        }
     }
 
 
