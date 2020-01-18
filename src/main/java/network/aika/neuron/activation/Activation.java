@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.activation.Fired.NOT_FIRED;
 
 /**
  *
@@ -36,7 +37,7 @@ public class Activation implements Comparable<Activation> {
 
     public double value;
     public double net;
-    public Fired fired;
+    public Fired fired = NOT_FIRED;
 
     private int id;
     private INeuron<?> neuron;
@@ -58,7 +59,6 @@ public class Activation implements Comparable<Activation> {
     public Activation nextRound;
     public Activation lastRound;
 
-
     public Activation(int id, INeuron<?> n) {
         this.id = id;
         this.neuron = n;
@@ -71,7 +71,6 @@ public class Activation implements Comparable<Activation> {
         this.round = round;
 
         this.net = n.getTotalBias(isInitialRound(), CURRENT);
-        this.fired = null;
 
         this.lastRound = lastRound;
         if(lastRound != null) {
@@ -241,7 +240,7 @@ public class Activation implements Comparable<Activation> {
 
 
     private void compute() {
-        fired = null;
+        fired = NOT_FIRED;
         net = 0.0;
         for (Link l: inputLinksFiredOrder.values()) {
             sumUpLink(l);
@@ -250,7 +249,7 @@ public class Activation implements Comparable<Activation> {
 
 
     public void checkIfFired(Link l) {
-        if(fired == null && net > 0.0) {
+        if(fired == NOT_FIRED && net > 0.0) {
             fired = neuron.incrementFired(l.input.fired);
             doc.getQueue().add(this);
         }
