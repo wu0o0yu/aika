@@ -140,15 +140,9 @@ public class Linker {
             Synapse is = e.act.getNeuron().getInputSynapse(act.getNeuron());
             if (is == null || l.synapse == is) return;
 
-            List<Link> ols = act
-                    .getOutputLinks(is)
-                    .filter(la -> la.output == e.act)
-                    .map(la -> new Link(la.synapse, la.input, null))
-                    .collect(Collectors.toList());
-            if (ols.isEmpty()) {
-                ols.add(new Link(is, act, null));
+            if (act.getOutputLinks(is).noneMatch(la -> la.output == e.act)) {
+                e.candidates.add(new Link(is, act, null));
             }
-            e.candidates.addAll(ols);
         });
     }
 
