@@ -158,7 +158,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public Activation cloneAct() {
+    public Activation cloneAct(boolean branch) {
         Activation clonedAct = new Activation(doc, neuron, this, round + 1);
 
         inputLinks

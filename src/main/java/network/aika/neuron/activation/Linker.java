@@ -23,7 +23,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -42,7 +41,7 @@ public class Linker {
                     .values()
                     .stream()
                     .forEach(l -> {
-                         queue.add(new Entry(l.output, new Link(l.synapse, act, null)));
+                        queue.add(new Entry(l.output, new Link(l.synapse, act, null)));
                         propagationTargets.remove(l.output.getNeuron());
                     });
         }
@@ -64,20 +63,9 @@ public class Linker {
                 .stream()
                 .map(n -> n.get().getProvider())
                 .map(n -> act.getNeuron().getOutputSynapse(n))
-                .forEach(s -> queue.add(new Entry(lookupNewActivation(doc, s.getOutput(), null), new Link(s, act, null))));
+                .forEach(s -> queue.add(new Entry(new Activation(doc, s.getOutput(), null, 0), new Link(s, act, null))));
 
         process(queue);
-    }
-
-
-    private Activation lookupNewActivation(Document doc, INeuron n, Activation oldAct) {
-        if(oldAct == null) {
-            return new Activation(doc, n, null, 0);
-        } else if(oldAct.nextRound != null) {
-            return oldAct.nextRound;
-        } else {
-            return oldAct.cloneAct();
-        }
     }
 
 
@@ -97,9 +85,9 @@ public class Linker {
             candidates.add(l);
         }
 
-        public Entry cloneEntry() {
+        public Entry cloneEntry(boolean branch) {
             Entry ce = new Entry();
-            ce.act = act.cloneAct();
+            ce.act = act.cloneAct(branch);
             candidates.forEach(l -> ce.candidates.add(new Link(l.synapse, l.input, null)));
             return ce;
         }
