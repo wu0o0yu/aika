@@ -17,7 +17,6 @@
 package network.aika.neuron.activation;
 
 import network.aika.Document;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
@@ -31,7 +30,7 @@ import java.util.*;
  */
 public class Linker {
 
-    public void linkForward(Activation act) {
+    public void linkForward(Activation act, boolean processMode) {
         ArrayDeque<Entry> queue = new ArrayDeque<>();
         Document doc = act.getDocument();
         TreeSet<Neuron> propagationTargets = new TreeSet(act.getINeuron().getPropagationTargets());
@@ -39,13 +38,14 @@ public class Linker {
         if(act.lastRound != null) {
             act.lastRound.outputLinks
                     .values()
-                    .stream()
                     .forEach(l -> {
                         new Entry(l.output)
                                 .addCandidate(l.synapse, act)
                                 .addToQueue(queue);
                         propagationTargets.remove(l.output.getNeuron());
                     });
+            act.lastRound.unlink();
+            act.lastRound = null;
         }
 
         act.followDown(doc.getNewVisitedId(), cAct -> {
@@ -70,7 +70,7 @@ public class Linker {
                                 .addToQueue(queue)
                 );
 
-        process(queue);
+        process(queue, processMode);
     }
 
     private static class Entry {
@@ -110,7 +110,7 @@ public class Linker {
         }
     }
 
-    private void process(ArrayDeque<Entry> queue) {
+    private void process(ArrayDeque<Entry> queue, boolean processMode) {
         while (!queue.isEmpty()) {
             Entry e = queue.pollFirst();
             Link l = e.candidates.pollFirst();
@@ -120,10 +120,8 @@ public class Linker {
                 e = e.cloneEntry(e.act.isInitialRound() && l.isConflict());
             }
 
-            e.act.addLink(l);
-
+            e.act.addLink(l, processMode);
             findLinkingCandidates(e, l);
-
             e.addToQueue(queue);
         }
     }

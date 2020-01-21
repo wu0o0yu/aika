@@ -173,7 +173,7 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
         Activation targetAct = new Activation(doc, this, null, 0);
 
         Link l = new Link(s, iAct, targetAct);
-        targetAct.addLink(l);
+        targetAct.addLink(l, false);
 
         return targetAct;
     }
@@ -221,7 +221,7 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
 
         Link l = new Link(s, iAct, targetAct);
 
-        targetAct.addLink(l);
+        targetAct.addLink(l, false);
     }
 
 

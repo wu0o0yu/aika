@@ -35,6 +35,8 @@ import static network.aika.neuron.activation.Fired.NOT_FIRED;
  */
 public class Activation implements Comparable<Activation> {
 
+    public static double TOLERANCE = 0.001;
+
     public double value;
     public double net;
     public Fired fired = NOT_FIRED;
@@ -93,7 +95,6 @@ public class Activation implements Comparable<Activation> {
         );
     }
 
-
     public int getId() {
         return id;
     }
@@ -102,11 +103,9 @@ public class Activation implements Comparable<Activation> {
         return doc;
     }
 
-
     public String getLabel() {
         return getINeuron().getLabel();
     }
-
 
     public boolean isInitialRound() {
         return round == 0;
@@ -116,16 +115,24 @@ public class Activation implements Comparable<Activation> {
         return (N) neuron;
     }
 
-
     public Neuron getNeuron() {
         return neuron.getProvider();
     }
-
 
     public Fired getFired() {
         return fired;
     }
 
+    public boolean hasPositiveRecurrentLinks() {
+        return inputLinks
+                .values()
+                .stream()
+                .anyMatch(l -> l.isRecurrent() && !l.isNegative(CURRENT));
+    }
+
+    public interface CollectResults {
+        void collect(Activation act);
+    }
 
     public void followDown(long v, CollectResults c) {
         if(visitedDown == v) return;
@@ -142,7 +149,6 @@ public class Activation implements Comparable<Activation> {
                 });
     }
 
-
     public void followUp(long v, CollectResults c) {
         if(visitedUp == v) return;
         visitedUp = v;
@@ -157,22 +163,17 @@ public class Activation implements Comparable<Activation> {
                 .forEach(l -> l.output.followUp(v, c));
     }
 
-
     public Activation cloneAct(boolean branch) {
-        Activation clonedAct = new Activation(doc, neuron, this, round + 1);
+        Activation clonedAct = new Activation(doc, neuron, branch ? null : this, round + 1);
 
         inputLinks
                 .values()
                 .forEach(l -> {
                     new Link(l.synapse, l.input, clonedAct).link();
-                    if(!branch) {
-                        l.unlink();
-                    }
                 });
 
         return clonedAct;
     }
-
 
     public void setValue(double v) {
         this.value = v;
@@ -182,20 +183,19 @@ public class Activation implements Comparable<Activation> {
         this.fired = fired;
     }
 
+    public boolean isActive() {
+        return value > 0.0;
+    }
+
+    public double getP() {
+        return 0.0;
+    }
+
     public boolean outputLinkExists(INeuron n) {
         return !outputLinks.subMap(
                 new Activation(Integer.MIN_VALUE, n),
                 new Activation(Integer.MAX_VALUE, n)
         ).isEmpty();
-    }
-
-    @Override
-    public int compareTo(Activation act) {
-        return Integer.compare(id, act.id);
-    }
-
-    public interface CollectResults {
-        void collect(Activation act);
     }
 
     public boolean isConflicting(long v) {
@@ -216,7 +216,7 @@ public class Activation implements Comparable<Activation> {
                 .filter(l -> l.synapse == s);
     }
 
-    public void addLink(Link l) {
+    public void addLink(Link l, boolean processMode) {
         assert l.output == null;
 
         l.output = this;
@@ -225,27 +225,26 @@ public class Activation implements Comparable<Activation> {
         if(isFinal || (isInitialRound() && l.isRecurrent())) return;
 
         if(inputLinks.size() == 1 || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().input.fired) > 0) {
-            sumUpLink(l);
+            sumUpLink(l, processMode);
         } else {
-            compute();
+            compute(processMode);
         }
     }
 
-    public void sumUpLink(Link l) {
-        if(l.synapse == null) return;
+    public void sumUpLink(Link l, boolean processMode) {
+        if(l.synapse == null && (processMode || !l.isRecurrent() || l.isNegative(CURRENT))) return;
 
         double w = l.synapse.getWeight();
-
         net += l.input.value * w;
 
         checkIfFired(l);
     }
 
-    private void compute() {
+    public void compute(boolean processMode) {
         fired = NOT_FIRED;
-        net = 0.0;
+        net = neuron.getTotalBias(isInitialRound(), CURRENT);
         for (Link l: inputLinksFiredOrder.values()) {
-            sumUpLink(l);
+            sumUpLink(l, processMode);
         }
     }
 
@@ -256,22 +255,22 @@ public class Activation implements Comparable<Activation> {
         }
     }
 
-    public void process() {
+    public void process(boolean processMode) {
         value = neuron.getActivationFunction().f(net);
-
         isFinal = true;
-
-        doc.getLinker().linkForward(this);
-
-        lastRound = null;
+        if(lastRound == null || !equals(lastRound)) {
+            doc.getLinker().linkForward(this, processMode);
+        }
     }
 
-    public boolean isActive() {
-        return value > 0.0;
+    public void unlink() {
+        inputLinks
+                .values()
+                .forEach(l -> l.unlink());
     }
 
-    public boolean equals(Activation s) {
-        return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE;
+    public boolean equals(Activation act) {
+        return Math.abs(value - act.value) <= TOLERANCE;
     }
 
     public String toString() {
@@ -283,10 +282,10 @@ public class Activation implements Comparable<Activation> {
                 " round:" + round;
     }
 
-    public double getP() {
-        return 0.0;
+    @Override
+    public int compareTo(Activation act) {
+        return Integer.compare(id, act.id);
     }
-
 
     public static class Builder {
         public double value = 1.0;
@@ -319,7 +318,6 @@ public class Activation implements Comparable<Activation> {
             return this;
         }
     }
-
 
     public static class OscillatingActivationsException extends RuntimeException {
 

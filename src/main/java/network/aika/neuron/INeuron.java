@@ -37,8 +37,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     private static final Logger log = LoggerFactory.getLogger(INeuron.class);
 
-    public static double WEIGHT_TOLERANCE = 0.001;
-
     private String label;
 
     private volatile double bias;
@@ -112,7 +110,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         Activation act = new Activation(doc, this, null, 0);
 
         for(Activation iAct: input.getInputLinks()) {
-            act.addLink(new Link(null, iAct, null));
+            act.addLink(new Link(null, iAct, null), false);
         }
 
         act.setValue(input.value);
@@ -120,8 +118,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
         act.isFinal = true;
 
-        doc.getLinker().linkForward(act);
-        doc.getQueue().process();
+        doc.getLinker().linkForward(act, false);
+        doc.getQueue().process(false);
 
         return act;
     }

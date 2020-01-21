@@ -37,11 +37,11 @@ public class Queue {
         queue.add(o);
     }
 
-    public void process() throws OscillatingActivationsException {
+    public void process(boolean processMode) throws OscillatingActivationsException {
         while (!queue.isEmpty()) {
             queue
                     .pollFirst()
-                    .process();
+                    .process(processMode);
         }
     }
 }
