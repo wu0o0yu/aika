@@ -59,7 +59,7 @@ public class Activation implements Comparable<Activation> {
     public Activation nextRound;
     public Activation lastRound;
 
-    public Activation(int id, INeuron<?> n) {
+    private Activation(int id, INeuron<?> n) {
         this.id = id;
         this.neuron = n;
     }
@@ -108,7 +108,7 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    private boolean isInitialRound() {
+    public boolean isInitialRound() {
         return round == 0;
     }
 
@@ -165,6 +165,9 @@ public class Activation implements Comparable<Activation> {
                 .values()
                 .forEach(l -> {
                     new Link(l.synapse, l.input, clonedAct).link();
+                    if(!branch) {
+                        l.unlink();
+                    }
                 });
 
         return clonedAct;
@@ -175,22 +178,25 @@ public class Activation implements Comparable<Activation> {
         this.value = v;
     }
 
-
     public void setFired(Fired fired) {
         this.fired = fired;
     }
 
+    public boolean outputLinkExists(INeuron n) {
+        return !outputLinks.subMap(
+                new Activation(Integer.MIN_VALUE, n),
+                new Activation(Integer.MAX_VALUE, n)
+        ).isEmpty();
+    }
 
     @Override
     public int compareTo(Activation act) {
         return Integer.compare(id, act.id);
     }
 
-
     public interface CollectResults {
         void collect(Activation act);
     }
-
 
     public boolean isConflicting(long v) {
         if(isInitialRound()) {
@@ -203,14 +209,12 @@ public class Activation implements Comparable<Activation> {
                 .anyMatch(l -> l.input.visitedDown != v);
     }
 
-
     public Stream<Link> getOutputLinks(Synapse s) {
         return outputLinks
                 .values()
                 .stream()
                 .filter(l -> l.synapse == s);
     }
-
 
     public void addLink(Link l) {
         assert l.output == null;
@@ -227,7 +231,6 @@ public class Activation implements Comparable<Activation> {
         }
     }
 
-
     public void sumUpLink(Link l) {
         if(l.synapse == null) return;
 
@@ -238,7 +241,6 @@ public class Activation implements Comparable<Activation> {
         checkIfFired(l);
     }
 
-
     private void compute() {
         fired = NOT_FIRED;
         net = 0.0;
@@ -247,14 +249,12 @@ public class Activation implements Comparable<Activation> {
         }
     }
 
-
     public void checkIfFired(Link l) {
         if(fired == NOT_FIRED && net > 0.0) {
             fired = neuron.incrementFired(l.input.fired);
             doc.getQueue().add(this);
         }
     }
-
 
     public void process() {
         value = neuron.getActivationFunction().f(net);
@@ -266,7 +266,6 @@ public class Activation implements Comparable<Activation> {
         lastRound = null;
     }
 
-
     public boolean isActive() {
         return value > 0.0;
     }
@@ -274,7 +273,6 @@ public class Activation implements Comparable<Activation> {
     public boolean equals(Activation s) {
         return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE;
     }
-
 
     public String toString() {
         return getId() + " " +
@@ -302,7 +300,6 @@ public class Activation implements Comparable<Activation> {
             return this;
         }
 
-
         public Builder setInputTimestamp(int inputTimestamp) {
             this.inputTimestamp = inputTimestamp;
             return this;
@@ -313,11 +310,9 @@ public class Activation implements Comparable<Activation> {
             return this;
         }
 
-
         public List<Activation> getInputLinks() {
             return this.inputLinks;
         }
-
 
         public Builder addInputLink(Activation iAct) {
             inputLinks.add(iAct);
@@ -336,10 +331,8 @@ public class Activation implements Comparable<Activation> {
             this.activationsDump = activationsDump;
         }
 
-
         public String getActivationsDump() {
             return activationsDump;
         }
     }
-
 }

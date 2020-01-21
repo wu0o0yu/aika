@@ -41,7 +41,9 @@ public class Linker {
                     .values()
                     .stream()
                     .forEach(l -> {
-                        queue.add(new Entry(l.output, new Link(l.synapse, act, null)));
+                        new Entry(l.output)
+                                .addCandidate(l.synapse, act)
+                                .addToQueue(queue);
                         propagationTargets.remove(l.output.getNeuron());
                     });
         }
@@ -50,12 +52,11 @@ public class Linker {
             if(cAct.getINeuron() instanceof InhibitoryNeuron) return;
 
             Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
-            if(s == null || !act.outputLinks.subMap(
-                    new Activation(Integer.MIN_VALUE, cAct.getINeuron()),
-                    new Activation(Integer.MAX_VALUE, cAct.getINeuron())
-            ).isEmpty()) return;
+            if(s == null || !act.outputLinkExists(cAct.getINeuron())) return;
 
-            queue.add(new Entry(cAct, new Link(s, act, null)));
+            new Entry(cAct)
+                    .addCandidate(s, act)
+                    .addToQueue(queue);
             propagationTargets.remove(cAct.getNeuron());
         });
 
@@ -63,11 +64,14 @@ public class Linker {
                 .stream()
                 .map(n -> n.get().getProvider())
                 .map(n -> act.getNeuron().getOutputSynapse(n))
-                .forEach(s -> queue.add(new Entry(new Activation(doc, s.getOutput(), null, 0), new Link(s, act, null))));
+                .forEach(s ->
+                        new Entry(new Activation(doc, s.getOutput(), null, 0))
+                                .addCandidate(s, act)
+                                .addToQueue(queue)
+                );
 
         process(queue);
     }
-
 
     private static class Entry {
         Activation act;
@@ -79,17 +83,26 @@ public class Linker {
         private Entry() {
         }
 
-        public Entry(Activation act, Link l) {
-            assert l.output == null;
+        public Entry(Activation act) {
             this.act = act;
-            candidates.add(l);
+       }
+
+        public Entry addCandidate(Synapse s, Activation input) {
+            candidates.add(new Link(s, input, null));
+            return this;
         }
 
         public Entry cloneEntry(boolean branch) {
             Entry ce = new Entry();
             ce.act = act.cloneAct(branch);
-            candidates.forEach(l -> ce.candidates.add(new Link(l.synapse, l.input, null)));
+            candidates.forEach(l -> ce.addCandidate(l.synapse, l.input));
             return ce;
+        }
+
+        public void addToQueue(ArrayDeque<Entry> queue) {
+            if (!candidates.isEmpty()) {
+                queue.addLast(this);
+            }
         }
 
         public String toString() {
@@ -97,29 +110,23 @@ public class Linker {
         }
     }
 
-
     private void process(ArrayDeque<Entry> queue) {
         while (!queue.isEmpty()) {
             Entry e = queue.pollFirst();
             Link l = e.candidates.pollFirst();
 
             if(e.act.isFinal && !l.isSelfRef()) {
-                if (!e.candidates.isEmpty()) {
-                    queue.addLast(e);
-                }
-                e = e.cloneEntry();
+                e.addToQueue(queue);
+                e = e.cloneEntry(e.act.isInitialRound() && l.isConflict());
             }
 
             e.act.addLink(l);
 
             findLinkingCandidates(e, l);
 
-            if (!e.candidates.isEmpty()) {
-                queue.addLast(e);
-            }
+            e.addToQueue(queue);
         }
     }
-
 
     public void findLinkingCandidates(Entry e, Link l) {
         if(((e.act.getINeuron() instanceof InhibitoryNeuron) || l.isConflict())) return;
@@ -129,9 +136,8 @@ public class Linker {
             if (is == null || l.synapse == is) return;
 
             if (act.getOutputLinks(is).noneMatch(la -> la.output == e.act)) {
-                e.candidates.add(new Link(is, act, null));
+                e.addCandidate(is, act);
             }
         });
     }
-
 }

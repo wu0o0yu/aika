@@ -81,13 +81,16 @@ public class Link {
         output.inputLinksFiredOrder.put(this, this);
         Link ol = output.inputLinks.put(input.getNeuron(), this);
         if(ol != null && ol != this) {
+            output.inputLinksFiredOrder.remove(ol);
             ol.input.outputLinks.remove(ol.output);
         }
     }
 
+    public void unlink() {
+        input.outputLinks.remove(this);
+    }
 
     public String toString() {
         return synapse + ": " + input + " --> " + output;
     }
-
 }
