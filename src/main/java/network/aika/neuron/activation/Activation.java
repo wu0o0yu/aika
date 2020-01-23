@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 
 /**
@@ -128,6 +129,10 @@ public class Activation implements Comparable<Activation> {
                 .values()
                 .stream()
                 .anyMatch(l -> l.isRecurrent() && !l.isNegative(CURRENT));
+    }
+
+    public Collection<Link> getLinks(Direction dir) {
+        return dir == INPUT ? inputLinks.values() : outputLinks.values();
     }
 
     public interface CollectResults {

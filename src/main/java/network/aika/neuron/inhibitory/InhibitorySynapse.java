@@ -28,7 +28,7 @@ import network.aika.neuron.excitatory.ExcitatoryNeuron;
  */
 public class InhibitorySynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
 
-    public static final String TYPE_STR = Model.register("SI", InhibitorySynapse.class);
+    private static byte type;
 
     public InhibitorySynapse() {
         super();
@@ -39,20 +39,17 @@ public class InhibitorySynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
     }
 
     @Override
-    public String getType() {
-        return TYPE_STR;
+    public byte getType() {
+        return type;
     }
-
 
     protected void addLinkInternal(INeuron in, INeuron out) {
         in.addOutputSynapse(this);
     }
 
-
     protected void removeLinkInternal(INeuron in, INeuron out) {
         in.removeOutputSynapse(this);
     }
-
 
     public static class Builder extends Synapse.Builder {
         protected SynapseFactory getSynapseFactory() {

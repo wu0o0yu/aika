@@ -93,4 +93,8 @@ public class Link {
     public String toString() {
         return synapse + ": " + input + " --> " + output;
     }
+
+    public Activation getActivation(Direction dir) {
+        return dir == Direction.INPUT ? input : output;
+    }
 }

@@ -27,8 +27,7 @@ import network.aika.neuron.excitatory.ExcitatoryNeuron;
  */
 public class NegMetaSynapse extends MetaSynapse {
 
-    public static final String TYPE_STR = Model.register("SNM", NegMetaSynapse.class);
-
+    public static byte type;
 
     public NegMetaSynapse() {
         super();
@@ -38,15 +37,12 @@ public class NegMetaSynapse extends MetaSynapse {
         super(input, output, recurrent, false, lastCount);
     }
 
-
     @Override
-    public String getType() {
-        return TYPE_STR;
+    public byte getType() {
+        return type;
     }
 
-
     public static class Builder extends Synapse.Builder {
-
         public Synapse getSynapse(Neuron outputNeuron) {
             NegMetaSynapse s = (NegMetaSynapse) super.getSynapse(outputNeuron);
 

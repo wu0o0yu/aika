@@ -19,6 +19,7 @@ package network.aika.neuron;
 
 import network.aika.ActivationFunction;
 import network.aika.Model;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
@@ -31,7 +32,6 @@ import java.util.Comparator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import static network.aika.neuron.Synapse.INPUT_SYNAPSE_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
 
 
@@ -197,7 +197,7 @@ public abstract class ConjunctiveNeuron<S extends TSynapse> extends TNeuron<S> {
 
         TreeSet<Synapse> sortedSynapses = new TreeSet<>(
                 Comparator.<Synapse>comparingDouble(s -> s.getWeight()).reversed()
-                        .thenComparing(INPUT_SYNAPSE_COMP)
+                        .thenComparing(Direction.INPUT.getSynapseComparator())
         );
 
         sortedSynapses.addAll(inputSynapses.values());

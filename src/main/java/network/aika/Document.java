@@ -20,6 +20,7 @@ package network.aika;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Linker;
 import network.aika.neuron.activation.Queue;
 import network.aika.neuron.TNeuron;
@@ -192,7 +193,7 @@ public class Document implements Comparable<Document> {
     public void notifyWeightModified(Synapse synapse) {
         Set<Synapse> is = modifiedWeights.get(synapse.getOutput());
         if(is == null) {
-            is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
+            is = new TreeSet<>(Direction.INPUT.getSynapseComparator());
             modifiedWeights.put(synapse.getOutput(), is);
         }
         is.add(synapse);

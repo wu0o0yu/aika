@@ -43,44 +43,36 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  */
 public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
 
-    public static final String TYPE_STR = Model.register("NI", InhibitoryNeuron.class);
-
+    public static byte type;
 
     protected InhibitoryNeuron() {
         super();
     }
 
-
     public InhibitoryNeuron(Neuron p) {
         super(p);
     }
 
-
     public InhibitoryNeuron(Model model, String label) {
         super(model, label);
     }
-
 
     @Override
     public Fired incrementFired(Fired f) {
         return f;
     }
 
-
     public boolean isWeak(Synapse s, Synapse.State state) {
         return s.getWeight(state) < -getBias();
     }
 
-
-    public String getType() {
-        return TYPE_STR;
+    public byte getType() {
+        return type;
     }
-
 
     public double getTotalBias(boolean initialRound, Synapse.State state) {
         return getBias(state);
     }
-
 
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
@@ -105,7 +97,6 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
     public void removeOutputSynapse(Synapse s) {
 
     }
-
 
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
         commitBias();
@@ -182,7 +173,6 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
         }
     }
 
-
     public boolean isMature(Config c) {
         return true;
     }
@@ -192,9 +182,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
 
     }
 
-
     public String typeToString() {
         return "INHIBITORY";
     }
-
 }

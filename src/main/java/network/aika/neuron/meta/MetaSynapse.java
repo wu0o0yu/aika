@@ -37,8 +37,7 @@ import java.util.TreeMap;
  */
 public class MetaSynapse extends ConjunctiveSynapse<TNeuron, MetaNeuron> {
 
-    public static final String TYPE_STR = Model.register("SM", MetaSynapse.class);
-
+    public static byte type;
 
     public boolean isMetaVariable;
 
@@ -54,8 +53,8 @@ public class MetaSynapse extends ConjunctiveSynapse<TNeuron, MetaNeuron> {
 
 
     @Override
-    public String getType() {
-        return TYPE_STR;
+    public byte getType() {
+        return type;
     }
 
 /*

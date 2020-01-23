@@ -36,9 +36,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
     public static double TOLERANCE = 0.0000001;
 
-    public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = Comparator.comparing(s -> s.input);
-    public static final Comparator<Synapse> OUTPUT_SYNAPSE_COMP = Comparator.comparing(s -> s.output);
-
     protected Neuron input;
     protected Neuron output;
 
@@ -60,7 +57,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     }
 
 
-    public abstract String getType();
+    public abstract byte getType();
 
     public Neuron getPInput() {
         return input;
@@ -223,7 +220,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeUTF(getType());
+        out.writeByte(getType());
 
         out.writeInt(input.getId());
         out.writeInt(output.getId());

@@ -19,6 +19,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import java.io.*;
 import java.util.*;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
  *
@@ -42,10 +44,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     private volatile double bias;
     private volatile double biasDelta;
 
-
     TreeMap<Neuron, Synapse> outputSynapses = new TreeMap<>();
     Set<Neuron> propagateTargets = new TreeSet<>();
-
 
     ReadWriteLock lock = new ReadWriteLock();
 
@@ -53,25 +53,33 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     protected INeuron() {
     }
 
-
     public INeuron(Neuron p) {
         provider = p;
     }
 
-
     public INeuron(Model m, String label) {
         this.label = label;
-
         provider = new Neuron(m, this);
-
         setModified();
     }
 
+    public abstract ActivationFunction getActivationFunction();
 
     public abstract Fired incrementFired(Fired f);
 
-
     public abstract boolean isWeak(Synapse synapse, Synapse.State state);
+
+    public abstract void addInputSynapse(S s);
+
+    public abstract void removeInputSynapse(S s);
+
+    public abstract void removeOutputSynapse(Synapse s);
+
+    public abstract void addOutputSynapse(Synapse synapse);
+
+    public abstract void commit(Collection<? extends Synapse> modifiedSynapses);
+
+    public abstract byte getType();
 
 
     public Integer getId() {
@@ -82,19 +90,17 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         return label;
     }
 
+    public Collection<? extends Synapse> getSynapses(Direction dir) {
+        return dir == INPUT ? getProvider().getActiveInputSynapses() : getProvider().getActiveOutputSynapses();
+    }
 
     public Collection<Synapse> getOutputSynapses() {
         return outputSynapses.values();
     }
 
-
-    public abstract ActivationFunction getActivationFunction();
-
-
     public Model getModel() {
         return provider.getModel();
     }
-
 
     public Set<Neuron> getPropagationTargets() {
         return propagateTargets;
@@ -124,39 +130,27 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         return act;
     }
 
-
-    public abstract void addInputSynapse(S s);
-
-    public abstract void addOutputSynapse(Synapse synapse);
-
-    public abstract void commit(Collection<? extends Synapse> modifiedSynapses);
-
-
     public void commitBias() {
         bias += biasDelta;
         biasDelta = 0.0;
     }
 
-
     public void addPropagateTarget(Neuron target) {
         propagateTargets.add(target);
     }
 
-
     public void removePropagateTarget(Neuron target) {
         propagateTargets.remove(target);
     }
-
 
     public int compareTo(INeuron n) {
         if (this == n) return 0;
         return Integer.compare(getId(), n.getId());
     }
 
-
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeUTF(getType());
+        out.writeByte(getType());
 
         out.writeBoolean(label != null);
         if(label != null) {
@@ -189,45 +183,33 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         }
     }
 
-
     public void setBias(double b) {
         biasDelta = b - bias;
     }
-
 
     public void updateBiasDelta(double biasDelta) {
         this.biasDelta += biasDelta;
     }
 
-
     public abstract double getTotalBias(boolean initialRound, Synapse.State state);
-
 
     public double getBias() {
         return bias;
     }
 
-
     protected double getBias(Synapse.State state) {
         return state == CURRENT ? bias : bias + biasDelta;
     }
-
-
-    public abstract String getType();
-
 
     public String toString() {
         return label;
     }
 
-
     protected String toDetailedString() {
         return typeToString() + " " + label + " B:" + Utils.round(bias);
     }
 
-
     public abstract String typeToString();
-
 
     public String toStringWithSynapses() {
         SortedSet<Synapse> is = new TreeSet<>(Comparator.comparing(Synapse::getPInput));
@@ -244,9 +226,4 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         }
         return sb.toString();
     }
-
-    public abstract void removeInputSynapse(S s);
-
-    public abstract void removeOutputSynapse(Synapse s);
-
 }

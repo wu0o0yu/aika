@@ -26,8 +26,7 @@ import network.aika.neuron.Neuron;
  */
 public class MetaPatternNeuron extends MetaNeuron {
 
-    public static final String TYPE_STR = Model.register("NMP", MetaPatternNeuron.class);
-
+    public static byte type;
 
     public MetaPatternNeuron(Neuron p) {
         super(p);
@@ -38,8 +37,7 @@ public class MetaPatternNeuron extends MetaNeuron {
     }
 
     @Override
-    public String getType() {
-        return TYPE_STR;
+    public byte getType() {
+        return type;
     }
-
 }

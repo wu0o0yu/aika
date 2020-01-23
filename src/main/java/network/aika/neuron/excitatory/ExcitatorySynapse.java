@@ -35,7 +35,7 @@ import java.util.TreeMap;
  */
 public class ExcitatorySynapse extends ConjunctiveSynapse<TNeuron, ConjunctiveNeuron> {
 
-    public static final String TYPE_STR = Model.register("SE", ExcitatorySynapse.class);
+    public static byte type;
 
 
     public static final Comparator<Synapse> META_SYNAPSE_COMP = Comparator
@@ -61,8 +61,8 @@ public class ExcitatorySynapse extends ConjunctiveSynapse<TNeuron, ConjunctiveNe
 
 
     @Override
-    public String getType() {
-        return TYPE_STR;
+    public byte getType() {
+        return type;
     }
 
 /*

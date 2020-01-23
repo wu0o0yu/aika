@@ -38,38 +38,31 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  */
 public class MetaNeuron extends ConjunctiveNeuron<MetaSynapse> {
 
-    public static final String TYPE_STR = Model.register("NM", MetaNeuron.class);
+    public static byte type;
 
     public static double COVERED_THRESHOLD = 5.0;
 
     public InhibitoryNeuron inhibitoryNeuron;
 
-
     private MetaNeuron() {
         super();
     }
-
 
     public MetaNeuron(Neuron p) {
         super(p);
     }
 
-
     public MetaNeuron(Model model, String label) {
         super(model, label);
     }
 
-
-    public String getType() {
-        return TYPE_STR;
+    public byte getType() {
+        return type;
     }
-
 
     public String typeToString() {
         return "META";
     }
-
-
 
 /*
     public static void induce(Model model, int threadId) {

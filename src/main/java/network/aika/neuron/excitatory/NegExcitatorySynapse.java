@@ -29,7 +29,7 @@ import network.aika.neuron.activation.Activation;
  */
 public class NegExcitatorySynapse extends ExcitatorySynapse {
 
-    public static final String TYPE_STR = Model.register("SNE", NegExcitatorySynapse.class);
+    public static byte type;
 
 
     public NegExcitatorySynapse() {
@@ -46,8 +46,8 @@ public class NegExcitatorySynapse extends ExcitatorySynapse {
 
 
     @Override
-    public String getType() {
-        return TYPE_STR;
+    public byte getType() {
+        return type;
     }
 
 

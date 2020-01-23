@@ -16,21 +16,44 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.Synapse;
+import network.aika.neuron.TSynapse;
+
+import java.util.Comparator;
+
 /**
  *
  * @author Lukas Molzberger
  */
 public enum Direction {
-    INPUT,
-    OUTPUT;
+    INPUT(
+            Comparator.comparing(s -> s.getInput()),
+            (ts, alpha, iAct, oAct) -> ts.updateFrequencies(alpha, iAct, oAct)
+    ),
 
-    public Direction getInverted() {
-        switch (this) {
-            case INPUT:
-                return OUTPUT;
-            case OUTPUT:
-                return INPUT;
-        }
-        return null;
+    OUTPUT(
+            Comparator.comparing(s -> s.getOutput()),
+            (ts, alpha, iAct, oAct) -> ts.updateFrequencies(alpha, oAct, iAct)
+    );
+
+
+    Comparator<Synapse> synapseComparator;
+    UpdateFrequencies updateFrequencies;
+
+    Direction(Comparator<Synapse> synComp, UpdateFrequencies uc) {
+        synapseComparator = synComp;
     }
+
+    public Comparator<Synapse> getSynapseComparator() {
+        return synapseComparator;
+    }
+
+    public UpdateFrequencies getUpdateFrequencies() {
+        return updateFrequencies;
+    }
+
+    public interface UpdateFrequencies {
+        void updateFrequencies(TSynapse ts, double alpha, Activation iAct, Activation oAct);
+    }
+
 }

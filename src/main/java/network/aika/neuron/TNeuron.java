@@ -105,11 +105,13 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 
 
     private void countSynapses(Activation act, Direction dir) {
-        Set<Synapse> rest = new TreeSet<>(dir == INPUT ? Synapse.INPUT_SYNAPSE_COMP : Synapse.OUTPUT_SYNAPSE_COMP);
+        Set<Synapse> rest = new TreeSet<>(dir.getSynapseComparator());
         rest.addAll(dir == INPUT ? getProvider().getActiveInputSynapses() : getProvider().getActiveOutputSynapses());
 
         for(Link ol: (dir == INPUT ? act.inputLinks: act.outputLinks).values()) {
             TSynapse ts = (TSynapse)ol.getSynapse();
+            if(ts == null) continue;
+
             Activation lAct = (dir == INPUT ? ol.getInput(): ol.getOutput());
 
             rest.remove(ol.getSynapse());
@@ -156,30 +158,22 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 
 
     private void updateSynapseFrequencies(Activation act, Direction dir) {
-        Set<Synapse> rest = new TreeSet<>(dir == INPUT ? Synapse.INPUT_SYNAPSE_COMP : Synapse.OUTPUT_SYNAPSE_COMP);
-        rest.addAll(dir == INPUT ? getProvider().getActiveInputSynapses() : getProvider().getActiveOutputSynapses());
+        Set<Synapse> rest = new TreeSet<>(dir.getSynapseComparator());
+        rest.addAll(getSynapses(dir));
 
-        for(Link l: (dir == INPUT ? act.inputLinks: act.outputLinks).values().stream().collect(Collectors.toList())) {
-            TSynapse ts = (TSynapse) l.getSynapse();
+        act.getLinks(dir)
+                .stream()
+                .forEach(l -> {
+                    TSynapse ts = (TSynapse) l.getSynapse();
 
-            rest.remove(ts);
+                    rest.remove(ts);
+                    dir.getUpdateFrequencies().updateFrequencies(ts, alpha, l.getActivation(dir), act);
+                });
 
-            if(dir == INPUT) {
-                ts.updateFrequencies(alpha, l.getInput(), act);
-            } else if(dir == OUTPUT) {
-                ts.updateFrequencies(alpha, act, l.getOutput());
-            }
-        }
-
-        for(Synapse s: rest) {
-            TSynapse ts = (TSynapse) s;
-
-            if(dir == INPUT) {
-                ts.updateFrequencies(alpha, null, act);
-            } else if(dir == OUTPUT) {
-                ts.updateFrequencies(alpha, act, null);
-            }
-        }
+        rest
+                .stream()
+                .map(s -> (TSynapse) s)
+                .forEach(s -> dir.getUpdateFrequencies().updateFrequencies(s, alpha, null, act));
     }
 
 

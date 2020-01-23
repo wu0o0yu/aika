@@ -21,6 +21,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.meta.MetaSynapse;
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 
-    public static final String TYPE_STR = Model.register("NE", ExcitatoryNeuron.class);
+    public static byte type;
 
     enum WeightBias {
         WEIGHT,
@@ -105,8 +106,8 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
     }
 
 
-    public String getType() {
-        return TYPE_STR;
+    public byte getType() {
+        return type;
     }
 
 
@@ -353,7 +354,7 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
         assert act.getINeuron() == this;
 
         ArrayList<Input> results = new ArrayList<>();
-        Set<Synapse> inputSynapses = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
+        Set<Synapse> inputSynapses = new TreeSet<>(Direction.INPUT.getSynapseComparator());
         inputSynapses.addAll(getInputSynapses());
 
         for(Link l: act.inputLinks.values()) {

@@ -27,7 +27,7 @@ import network.aika.neuron.*;
  */
 public class MetaInhibSynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
 
-    public static final String TYPE_STR = Model.register("SMI", MetaInhibSynapse.class);
+    public static byte type;
 
     public MetaInhibSynapse() {
         super();
@@ -38,20 +38,17 @@ public class MetaInhibSynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
     }
 
     @Override
-    public String getType() {
-        return TYPE_STR;
+    public byte getType() {
+        return type;
     }
-
 
     protected void addLinkInternal(INeuron in, INeuron out) {
         in.addOutputSynapse(this);
     }
 
-
     protected void removeLinkInternal(INeuron in, INeuron out) {
         in.removeOutputSynapse(this);
     }
-
 
     public InhibitorySynapse transferMetaSynapse(Document doc, TNeuron<?> inputNeuron) {
         InhibitoryNeuron inhibNeuron = getOutput();
@@ -75,11 +72,9 @@ public class MetaInhibSynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
         return targetSynapse;
     }
 
-
     private void transferMetaRelations(MetaInhibSynapse metaInhibSynapse, InhibitorySynapse targetSynapse) {
         // TODO
     }
-
 
     public static InhibitorySynapse create(Document doc, Neuron inputNeuron, InhibitoryNeuron outputNeuron) {
         inputNeuron.get(doc);
@@ -88,7 +83,6 @@ public class MetaInhibSynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
 
         return synapse;
     }
-
 
     public static class Builder extends Synapse.Builder {
         protected SynapseFactory getSynapseFactory() {

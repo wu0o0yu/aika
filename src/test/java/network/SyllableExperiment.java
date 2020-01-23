@@ -85,7 +85,7 @@ public class SyllableExperiment {
 
     @Test
     public void testTraining() throws IOException {
-        for(String word: Util.loadExamplesAsWords(new File(System.getProperty("data.dir")))) {
+        for(String word: Util.loadExamplesAsWords(new File("/Users/lukas.molzberger/aika-ws/maerchen"))) {
             train( word + " ");
         }
 

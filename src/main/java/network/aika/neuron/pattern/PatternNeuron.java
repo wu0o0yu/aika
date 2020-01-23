@@ -26,21 +26,18 @@ import network.aika.neuron.excitatory.ExcitatoryNeuron;
  */
 public class PatternNeuron extends ExcitatoryNeuron {
 
-    public static final String TYPE_STR = Model.register("NP", PatternNeuron.class);
+    public static byte type;
 
     public PatternNeuron(Neuron p) {
         super(p);
     }
 
-
     public PatternNeuron(Model model, String label) {
         super(model, label);
     }
 
-
     @Override
-    public String getType() {
-        return TYPE_STR;
+    public byte getType() {
+        return type;
     }
-
 }
