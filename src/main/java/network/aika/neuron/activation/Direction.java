@@ -28,28 +28,40 @@ import java.util.Comparator;
 public enum Direction {
     INPUT(
             Comparator.comparing(s -> s.getInput()),
+            (ts, iAct, oAct) -> ts.updateCountValue(iAct, oAct),
             (ts, alpha, iAct, oAct) -> ts.updateFrequencies(alpha, iAct, oAct)
     ),
 
     OUTPUT(
             Comparator.comparing(s -> s.getOutput()),
+            (ts, iAct, oAct) -> ts.updateCountValue(oAct, iAct),
             (ts, alpha, iAct, oAct) -> ts.updateFrequencies(alpha, oAct, iAct)
     );
 
-
     Comparator<Synapse> synapseComparator;
+    UpdateCounts updateCounts;
     UpdateFrequencies updateFrequencies;
 
-    Direction(Comparator<Synapse> synComp, UpdateFrequencies uc) {
+    Direction(Comparator<Synapse> synComp, UpdateCounts uc, UpdateFrequencies uf) {
         synapseComparator = synComp;
+        updateCounts = uc;
+        updateFrequencies = uf;
     }
 
     public Comparator<Synapse> getSynapseComparator() {
         return synapseComparator;
     }
 
+    public UpdateCounts getUpdateCounts() {
+        return updateCounts;
+    }
+
     public UpdateFrequencies getUpdateFrequencies() {
         return updateFrequencies;
+    }
+
+    public interface UpdateCounts {
+        void updateCounts(TSynapse ts, Activation iAct, Activation oAct);
     }
 
     public interface UpdateFrequencies {

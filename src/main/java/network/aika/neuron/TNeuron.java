@@ -106,32 +106,23 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 
     private void countSynapses(Activation act, Direction dir) {
         Set<Synapse> rest = new TreeSet<>(dir.getSynapseComparator());
-        rest.addAll(dir == INPUT ? getProvider().getActiveInputSynapses() : getProvider().getActiveOutputSynapses());
+        rest.addAll(getSynapses(dir));
 
-        for(Link ol: (dir == INPUT ? act.inputLinks: act.outputLinks).values()) {
-            TSynapse ts = (TSynapse)ol.getSynapse();
-            if(ts == null) continue;
+        act.getLinks(dir)
+                .stream()
+                .filter(l -> l.getSynapse() != null)
+                .forEach(l -> {
+                    TSynapse ts = (TSynapse) l.getSynapse();
 
-            Activation lAct = (dir == INPUT ? ol.getInput(): ol.getOutput());
+                    rest.remove(ts);
 
-            rest.remove(ol.getSynapse());
+                    dir.getUpdateCounts().updateCounts(ts, l.getActivation(dir), act);
+                });
 
-            if(dir == INPUT) {
-                ts.updateCountValue(lAct, act);
-            } else if(dir == OUTPUT) {
-                ts.updateCountValue(act, lAct);
-            }
-        }
-
-        for(Synapse s: rest) {
-            TSynapse ts = (TSynapse)s;
-
-            if(dir == INPUT) {
-                ts.updateCountValue(null, act);
-            } else if(dir == OUTPUT) {
-                ts.updateCountValue(act, null);
-            }
-        }
+        rest
+                .stream()
+                .map(s -> (TSynapse) s)
+                .forEach(s -> dir.getUpdateCounts().updateCounts(s, null, act));
     }
 
 
@@ -163,6 +154,7 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 
         act.getLinks(dir)
                 .stream()
+                .filter(l -> l.getSynapse() != null)
                 .forEach(l -> {
                     TSynapse ts = (TSynapse) l.getSynapse();
 
