@@ -57,28 +57,23 @@ public abstract class TSynapse<I extends TNeuron, O extends TNeuron> extends Syn
         super();
     }
 
-
     public TSynapse(Neuron input, Neuron output, boolean recurrent, boolean propagate) {
         super(input, output, recurrent, propagate);
         this.lastCount = 0;
     }
-
 
     public TSynapse(Neuron input, Neuron output, boolean recurrent, boolean propagate, int lastCount) {
         super(input, output, recurrent, propagate);
         this.lastCount = lastCount;
     }
 
-
     public double getCoverage() {
         return Math.max(0.0, Math.min(1.0, getCoverageIntern()));
     }
 
-
     private double getCoverageIntern() {
         return getWeight() / getOutput().getBias();
     }
-
 
     public void initCountValues() {
         countValueIPosOPos = 0.0;
@@ -87,7 +82,6 @@ public abstract class TSynapse<I extends TNeuron, O extends TNeuron> extends Syn
         countValueINegONeg = 0.0;
         needsCountUpdate = true;
     }
-
 
     public void updateCountValue(Activation io, Activation oo) {
         double inputValue = io != null ? io.value : 0.0;
@@ -107,7 +101,6 @@ public abstract class TSynapse<I extends TNeuron, O extends TNeuron> extends Syn
 
         needsFrequencyUpdate = true;
     }
-
 
     public void updateFrequencies(double alpha, Activation iAct, Activation oAct) {
         if(!needsFrequencyUpdate) {
@@ -148,14 +141,12 @@ public abstract class TSynapse<I extends TNeuron, O extends TNeuron> extends Syn
         numCounts++;
     }
 
-
     public void setFrequency(double fPP, double fPN, double fNP, double fNN) {
         frequencyIPosOPos = fPP;
         frequencyIPosONeg = fPN;
         frequencyINegOPos = fNP;
         frequencyINegONeg = fNN;
     }
-
 
     public double[] getPXiGivenXout() {
         double freqXoutPos = frequencyIPosOPos + frequencyINegOPos;
@@ -192,6 +183,31 @@ public abstract class TSynapse<I extends TNeuron, O extends TNeuron> extends Syn
         return lengthSum / (double) numActs;
     }
 
+    public double getReliability() {
+        return binaryFrequencyIPosOPos >= TNeuron.RELIABILITY_THRESHOLD ? Math.log(binaryFrequencyIPosOPos - (TNeuron.RELIABILITY_THRESHOLD - 1.0)) : 0.0;
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        out.writeDouble(frequencyIPosOPos);
+        out.writeDouble(frequencyIPosONeg);
+        out.writeDouble(frequencyINegOPos);
+        out.writeDouble(frequencyINegONeg);
+        out.writeDouble(N);
+
+        out.writeInt(lastCount);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws IOException {
+        frequencyIPosOPos = in.readDouble();
+        frequencyIPosONeg = in.readDouble();
+        frequencyINegOPos = in.readDouble();
+        frequencyINegONeg = in.readDouble();
+        N = in.readDouble();
+
+        lastCount = in.readInt();
+    }
 
     public String freqToString() {
         StringBuilder sb = new StringBuilder();
@@ -212,11 +228,9 @@ public abstract class TSynapse<I extends TNeuron, O extends TNeuron> extends Syn
         return sb.toString();
     }
 
-
     public String toString() {
         return super.toString() + " f:(" + freqToString() + ")";
     }
-
 
     public String pXiToString() {
         double[] pXiXout = getPXiXout();
@@ -226,42 +240,11 @@ public abstract class TSynapse<I extends TNeuron, O extends TNeuron> extends Syn
         return sb.toString();
     }
 
-
     public String pXoutToString() {
         double[] pXiXout = getPXiXout();
         StringBuilder sb = new StringBuilder();
         sb.append("Pos:" + Utils.round(pXiXout[0] + pXiXout[1]));
         sb.append(" Neg:" + Utils.round(pXiXout[2] + pXiXout[3]));
         return sb.toString();
-    }
-
-
-    public double getReliability() {
-        return binaryFrequencyIPosOPos >= TNeuron.RELIABILITY_THRESHOLD ? Math.log(binaryFrequencyIPosOPos - (TNeuron.RELIABILITY_THRESHOLD - 1.0)) : 0.0;
-    }
-
-
-    // TODO: metaSynapse
-    @Override
-    public void write(DataOutput out) throws IOException {
-        out.writeDouble(frequencyIPosOPos);
-        out.writeDouble(frequencyIPosONeg);
-        out.writeDouble(frequencyINegOPos);
-        out.writeDouble(frequencyINegONeg);
-        out.writeDouble(N);
-
-        out.writeInt(lastCount);
-    }
-
-
-    @Override
-    public void readFields(DataInput in, Model m) throws IOException {
-        frequencyIPosOPos = in.readDouble();
-        frequencyIPosONeg = in.readDouble();
-        frequencyINegOPos = in.readDouble();
-        frequencyINegONeg = in.readDouble();
-        N = in.readDouble();
-
-        lastCount = in.readInt();
     }
 }

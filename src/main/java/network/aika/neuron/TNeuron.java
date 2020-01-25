@@ -56,7 +56,6 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
     public double lengthSum;
     public int numActs;
 
-
     public double trainingBias = 0.0;
 
 
@@ -64,37 +63,31 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
         super();
     }
 
-
     public TNeuron(Neuron p) {
         super(p);
     }
-
 
     public TNeuron(Model model, String label) {
         super(model, label);
         this.lastCount = model.charCounter;
     }
 
+    public abstract boolean isMature(Config c);
+
     public void initCountValues() {
         countValue = 0.0;
 
-        for (Synapse s : getProvider().getActiveInputSynapses()) {
-            TSynapse ts = (TSynapse) s;
-
-            ts.initCountValues();
-        }
-        for (Synapse s : getProvider().getActiveOutputSynapses()) {
-            TSynapse ts = (TSynapse) s;
-
-            ts.initCountValues();
+        for(Direction dir: Direction.values()) {
+            getSynapses(dir)
+                    .stream()
+                    .map(s -> (TSynapse) s)
+                    .forEach(s -> s.initCountValues());
         }
     }
-
 
     public double getAvgLength() {
         return lengthSum / (double) numActs;
     }
-
 
     public void count(Activation act) {
         countValue += act.value * act.getP();
@@ -102,7 +95,6 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
         countSynapses(act, INPUT);
         countSynapses(act, OUTPUT);
     }
-
 
     private void countSynapses(Activation act, Direction dir) {
         Set<Synapse> rest = new TreeSet<>(dir.getSynapseComparator());
@@ -125,7 +117,6 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
                 .forEach(s -> dir.getUpdateCounts().updateCounts(s, null, act));
     }
 
-
     public void updateFrequencies(Activation act) {
         int beginPos = 0; //StatUtil.getCurrentPos(act, BEGIN);
         int endPos = 0; //StatUtil.getCurrentPos(act, END);
@@ -147,7 +138,6 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
         updateSynapseFrequencies(act, OUTPUT);
     }
 
-
     private void updateSynapseFrequencies(Activation act, Direction dir) {
         Set<Synapse> rest = new TreeSet<>(dir.getSynapseComparator());
         rest.addAll(getSynapses(dir));
@@ -168,7 +158,6 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
                 .forEach(s -> dir.getUpdateFrequencies().updateFrequencies(s, alpha, null, act));
     }
 
-
     public double[] getP() {
         double p = posFrequency / N;
         return new double[] {
@@ -177,6 +166,78 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
         };
     }
 
+    public double getReliability() {
+        return binaryFrequency >= RELIABILITY_THRESHOLD ? Math.log(binaryFrequency - (RELIABILITY_THRESHOLD - 1.0)) : 0.0;
+    }
+
+
+    public void prepareTrainingStep(Config c, Activation o, Function<Activation, ExcitatoryNeuron> callback) {
+        prepareMetaTraining(c, o, callback);
+        count(o);
+    }
+
+    public void train(Config c, Activation act) {
+//      if((o.p * (1.0 - getCoverage(o))) > THRESHOLD) {
+        if (isMature(c)) {
+            generateNeuron(act);
+        }
+//      }
+    }
+
+    // Implemented only for meta and target neurons
+    public void prepareMetaTraining(Config c, Activation act, Function<Activation, ExcitatoryNeuron> callback) {
+        if (act.getP() > c.getMetaThreshold() && getTrainingNetValue(act) > 0.0) {
+//            act.targetNeuron = getTargetNeuron(act, callback);
+        }
+    }
+
+    public ExcitatoryNeuron getTargetNeuron(Activation metaAct, Function<Activation, ExcitatoryNeuron> callback) {
+        return null;
+    }
+
+    public double getTrainingNetValue(Activation act) {
+        return act.net;
+    }
+
+    private void generateNeuron(Activation act) {
+        ExcitatoryNeuron targetNeuron = new ExcitatoryNeuron(getModel(), "DERIVED-FROM-(" + act.getLabel() + ")");
+
+        targetNeuron.init(act);
+    }
+
+    private double getCoverage(Activation seedAct) {
+        double maxCoverage = 0.0;
+        for(Map.Entry<Activation, Link> me: seedAct.outputLinks.entrySet()) {
+            maxCoverage = Math.max(maxCoverage, getCoverage(me.getValue()));
+        }
+
+        return maxCoverage;
+    }
+
+    private static double getCoverage(Link ol) {
+        Activation oAct = ol.getOutput();
+        INeuron n = oAct.getINeuron();
+        return Math.min(Math.max(0.0, oAct.net), Math.max(0.0, ol.getInput().value * ol.getSynapse().getWeight())) / n.getBias();
+    }
+
+    // TODO: store and retrieve targetSynapseIds
+    @Override
+    public void write(DataOutput out) throws IOException {
+        out.writeDouble(posFrequency);
+        out.writeDouble(N);
+        out.writeInt(lastCount);
+
+        out.writeDouble(trainingBias);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        posFrequency = in.readDouble();
+        N = in.readDouble();
+        lastCount = in.readInt();
+
+        trainingBias = in.readDouble();
+    }
 
     public String freqToString() {
         StringBuilder sb = new StringBuilder();
@@ -192,82 +253,9 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
         sb.append(" Neg:" + Utils.round(p[1]));
         return sb.toString();
     }
-
-
-    public double getReliability() {
-        return binaryFrequency >= RELIABILITY_THRESHOLD ? Math.log(binaryFrequency - (RELIABILITY_THRESHOLD - 1.0)) : 0.0;
-    }
-
-
-    public void prepareTrainingStep(Config c, Activation o, Function<Activation, ExcitatoryNeuron> callback) {
-        prepareMetaTraining(c, o, callback);
-        count(o);
-    }
-
-
-    public void train(Config c, Activation o) {
-//      if((o.p * (1.0 - getCoverage(o))) > THRESHOLD) {
-        if (isMature(c)) {
-            generateNeuron(o);
-        }
-//      }
-    }
-
-
-    // Implemented only for meta and target neurons
-    public void prepareMetaTraining(Config c, Activation act, Function<Activation, ExcitatoryNeuron> callback) {
-        if (act.getP() > c.getMetaThreshold() && getTrainingNetValue(act) > 0.0) {
-//            act.targetNeuron = getTargetNeuron(act, callback);
-        }
-    }
-
-
-    public ExcitatoryNeuron getTargetNeuron(Activation metaAct, Function<Activation, ExcitatoryNeuron> callback) {
-        return null;
-    }
-
-
-    public double getTrainingNetValue(Activation act) {
-        return act.net;
-    }
-
-
-    public void computeOutputRelations() {
-
-    }
-
-
-    private void generateNeuron(Activation act) {
-        ExcitatoryNeuron targetNeuron = new ExcitatoryNeuron(getModel(), "DERIVED-FROM-(" + act.getLabel() + ")");
-
-        targetNeuron.init(act);
-    }
-
-
-    private double getCoverage(Activation seedAct) {
-        double maxCoverage = 0.0;
-        for(Map.Entry<Activation, Link> me: seedAct.outputLinks.entrySet()) {
-            maxCoverage = Math.max(maxCoverage, getCoverage(me.getValue()));
-        }
-
-        return maxCoverage;
-    }
-
-
-    private static double getCoverage(Link ol) {
-        Activation oAct = ol.getOutput();
-        INeuron n = oAct.getINeuron();
-        return Math.min(Math.max(0.0, oAct.net), Math.max(0.0, ol.getInput().value * ol.getSynapse().getWeight())) / n.getBias();
-    }
-
-
-    public abstract boolean isMature(Config c);
-
-
     protected String toDetailedString() {
         return super.toDetailedString() + " f:(" + freqToString() + ")";
     }
-
 
     public void dumpStat() {
         System.out.println("OUT:  " +getLabel() + "  Freq:(" + freqToString() + ")  P(" + propToString() + ")");
@@ -283,25 +271,4 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
             System.out.println("     Rel:" + ts.getReliability());
         }
     }
-
-    // TODO: store and retrieve targetSynapseIds
-    @Override
-    public void write(DataOutput out) throws IOException {
-        out.writeDouble(posFrequency);
-        out.writeDouble(N);
-        out.writeInt(lastCount);
-
-        out.writeDouble(trainingBias);
-    }
-
-
-    @Override
-    public void readFields(DataInput in, Model m) throws Exception {
-        posFrequency = in.readDouble();
-        N = in.readDouble();
-        lastCount = in.readInt();
-
-        trainingBias = in.readDouble();
-    }
-
 }

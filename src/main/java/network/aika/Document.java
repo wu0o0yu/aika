@@ -180,11 +180,6 @@ public class Document implements Comparable<Document> {
 
 //        propagate();
 
-        getModifiedWeights().forEach((n, inputSyns) -> {
-            TNeuron tn = (TNeuron) n;
-            tn.computeOutputRelations();
-        });
-
         commit();
 
         getModel().charCounter += length();
