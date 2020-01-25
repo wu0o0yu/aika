@@ -16,11 +16,9 @@
  */
 package network.aika.neuron.excitatory;
 
-import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Sign;
-import network.aika.neuron.TNeuron;
 import network.aika.neuron.activation.Activation;
 
 /**

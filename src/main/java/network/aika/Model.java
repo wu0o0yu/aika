@@ -27,11 +27,6 @@ import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.NegExcitatorySynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.inhibitory.MetaInhibSynapse;
-import network.aika.neuron.meta.MetaNeuron;
-import network.aika.neuron.meta.MetaPatternNeuron;
-import network.aika.neuron.meta.MetaSynapse;
-import network.aika.neuron.meta.NegMetaSynapse;
 import network.aika.neuron.pattern.PatternNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,11 +66,6 @@ public class Model {
         register(NegExcitatorySynapse.class);
         register(InhibitoryNeuron.class);
         register(InhibitorySynapse.class);
-        register(MetaInhibSynapse.class);
-        register(MetaNeuron.class);
-        register(MetaPatternNeuron.class);
-        register(MetaSynapse.class);
-        register(NegMetaSynapse.class);
         register(PatternNeuron.class);
     }
 
@@ -190,38 +180,6 @@ public class Model {
         synchronized (providers) {
             providers.remove(p.id);
         }
-    }
-
-    public MetaNeuron createMetaNeuron(String label) {
-        MetaNeuron metaNeuron = new MetaNeuron(this, "M-" + label);
-        InhibitoryNeuron inhibNeuron = new InhibitoryNeuron(this, "I-" + label);
-        metaNeuron.setInhibitoryNeuron(inhibNeuron);
-
-        return metaNeuron;
-    }
-
-    public void initMetaNeuron(MetaNeuron metaNeuron, double bias, double trainingBias, Synapse.Builder... inputs) {
-        InhibitoryNeuron inhibNeuron = metaNeuron.getInhibitoryNeuron();
-
-        List<Synapse.Builder> inputsList = new ArrayList<>(Arrays.asList(inputs));
-
-        inputsList.add(
-                new MetaSynapse.Builder()
-                        .setIsMetaVariable(false)
-                        .setNeuron(inhibNeuron.getProvider())
-                        .setWeight(-100.0)
-        );
-
-
-        metaNeuron.trainingBias = trainingBias;
-
-        Neuron.init(metaNeuron.getProvider(), bias + trainingBias, inputsList);
-
-        Neuron.init(inhibNeuron.getProvider(),
-                new MetaInhibSynapse.Builder()
-                        .setNeuron(metaNeuron.getProvider())
-                        .setWeight(1.0)
-        );
     }
 
     public void dumpStat() {

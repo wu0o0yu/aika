@@ -18,8 +18,6 @@ package network.aika.neuron.excitatory;
 
 import network.aika.Model;
 import network.aika.neuron.*;
-import network.aika.neuron.meta.MetaNeuron;
-import network.aika.neuron.meta.MetaSynapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -38,13 +36,6 @@ public class ExcitatorySynapse extends ConjunctiveSynapse<TNeuron, ConjunctiveNe
     public static byte type;
 
 
-    public static final Comparator<Synapse> META_SYNAPSE_COMP = Comparator
-            .<Synapse, Neuron>comparing(Synapse::getPInput)
-            .thenComparing(Synapse::getPOutput);
-
-
-    public Map<MetaSynapse, MetaSynapse.MappingLink> metaSynapses = new TreeMap<>(META_SYNAPSE_COMP);
-
     public ExcitatorySynapse() {
         super();
     }
@@ -53,52 +44,19 @@ public class ExcitatorySynapse extends ConjunctiveSynapse<TNeuron, ConjunctiveNe
         super(input, output, recurrent, propagate);
     }
 
-
-
     public ExcitatorySynapse(Neuron input, Neuron output, boolean recurrent, boolean propagate, int lastCount) {
         super(input, output, recurrent, propagate, lastCount);
     }
-
 
     @Override
     public byte getType() {
         return type;
     }
 
-/*
-    public MetaSynapse.MappingLink getMetaSynapse(Neuron in, Neuron out) {
-        return metaSynapses.get(new MetaSynapse(in, out, -1, 0));
-    }
-
-
-    public double getUncovered() {
-        double max = 0.0;
-        for(Map.Entry<MetaSynapse, MetaSynapse.MappingLink> me: metaSynapses.entrySet()) {
-            MetaSynapse.MappingLink sml = me.getValue();
-            MetaSynapse ms = sml.metaSynapse;
-            MetaNeuron mn = ms.getOutput();
-            ExcitatoryNeuron tn = (ExcitatoryNeuron) getOutput();
-            MetaNeuron.MappingLink nml = mn.targetNeurons.get(tn);
-
-            max = Math.max(max, nml.nij * ms.getCoverage());
-        }
-
-        return 1.0 - max;
-    }
-
-
-
-    public boolean isMappedToMetaSynapse(MetaSynapse metaSyn) {
-        MetaSynapse.MappingLink ml = metaSynapses.get(metaSyn.getOutput());
-        return ml.metaSynapse == metaSyn;
-    }
-*/
-
     @Override
     public void write(DataOutput out) throws IOException {
         super.write(out);
     }
-
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
@@ -118,5 +76,4 @@ public class ExcitatorySynapse extends ConjunctiveSynapse<TNeuron, ConjunctiveNe
             return (input, output) -> new ExcitatorySynapse(input, output, recurrent, propagate, output.getModel().charCounter);
         }
     }
-
 }

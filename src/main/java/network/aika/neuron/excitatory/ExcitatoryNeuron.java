@@ -23,13 +23,11 @@ import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.meta.MetaSynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 
@@ -115,7 +113,7 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
         return maxSyn;
     }
 
-    public ExcitatorySynapse createOrLookupSynapse(Document doc, MetaSynapse ms, Neuron inputNeuron) {
+    public ExcitatorySynapse createOrLookupSynapse(Document doc, Neuron inputNeuron) {
         inputNeuron.get(doc);
 
         ExcitatorySynapse synapse = (ExcitatorySynapse) getProvider().getInputSynapse(inputNeuron);
