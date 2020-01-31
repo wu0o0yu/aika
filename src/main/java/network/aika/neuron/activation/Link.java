@@ -40,41 +40,33 @@ public class Link {
         this.output = output;
     }
 
-
     public Synapse getSynapse() {
         return synapse;
     }
-
 
     public Activation getInput() {
         return input;
     }
 
-
     public Activation getOutput() {
         return output;
     }
 
-
-    public boolean isNegative(Synapse.State s) {
-        return synapse.isNegative(s);
+    public boolean isNegative() {
+        return synapse.isNegative();
     }
-
 
     public boolean isRecurrent() {
         return synapse != null && synapse.isRecurrent();
     }
 
-
     public boolean isConflict() {
-        return isRecurrent() && isNegative(CURRENT);
+        return isRecurrent() && isNegative();
     }
-
 
     public boolean isSelfRef() {
         return output == input.inputLinksFiredOrder.firstEntry().getValue().input;
     }
-
 
     public void link() {
         input.outputLinks.put(output, this);

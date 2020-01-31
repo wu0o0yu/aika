@@ -179,7 +179,7 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
     public void train(Config c, Activation act) {
 //      if((o.p * (1.0 - getCoverage(o))) > THRESHOLD) {
         if (isMature(c)) {
-            generateNeuron(act);
+//            generateNeuron(act);
         }
 //      }
     }
@@ -199,12 +199,13 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
         return act.net;
     }
 
+    /*
     private void generateNeuron(Activation act) {
         ExcitatoryNeuron targetNeuron = new ExcitatoryNeuron(getModel(), "DERIVED-FROM-(" + act.getLabel() + ")");
 
         targetNeuron.init(act);
     }
-
+*/
     private double getCoverage(Activation seedAct) {
         double maxCoverage = 0.0;
         for(Map.Entry<Activation, Link> me: seedAct.outputLinks.entrySet()) {

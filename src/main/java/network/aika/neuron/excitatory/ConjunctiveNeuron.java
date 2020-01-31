@@ -190,7 +190,7 @@ public abstract class ConjunctiveNeuron<S extends TSynapse> extends TNeuron<S> {
         for (Synapse s : inputSynapses.values()) {
             s.commit();
 
-            if(!s.isNegative(CURRENT)) {
+            if(!s.isNegative()) {
                 if(!s.isRecurrent()) {
                     directConjunctiveBias += s.getWeight();
                 } else  {
@@ -208,7 +208,7 @@ public abstract class ConjunctiveNeuron<S extends TSynapse> extends TNeuron<S> {
 
         double sum = getBias(CURRENT);
         for(Synapse s: sortedSynapses) {
-            if(!s.isRecurrent() && !s.isNegative(CURRENT)) {
+            if(!s.isRecurrent() && !s.isNegative()) {
                 s.setPropagate(sum > 0.0);
 
                 sum -= s.getWeight();

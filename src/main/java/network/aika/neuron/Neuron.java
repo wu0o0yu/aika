@@ -157,28 +157,28 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
     }
 
 
-    void addActiveInputSynapse(Synapse s) {
+    public void addActiveInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         activeInputSynapses.put(s.getPInput(), s);
         lock.releaseWriteLock();
     }
 
 
-    void removeActiveInputSynapse(Synapse s) {
+    public void removeActiveInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         activeInputSynapses.remove(s.getPInput());
         lock.releaseWriteLock();
     }
 
 
-    void addActiveOutputSynapse(Synapse s) {
+    public void addActiveOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
         activeOutputSynapses.put(s.getPOutput(), s);
         lock.releaseWriteLock();
     }
 
 
-    void removeActiveOutputSynapse(Synapse s) {
+    public void removeActiveOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
         activeOutputSynapses.remove(s.getPOutput());
         lock.releaseWriteLock();

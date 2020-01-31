@@ -44,8 +44,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     private volatile double bias;
     private volatile double biasDelta;
 
-    TreeMap<Neuron, Synapse> outputSynapses = new TreeMap<>();
-    Set<Neuron> propagateTargets = new TreeSet<>();
+    protected TreeMap<Neuron, Synapse> outputSynapses = new TreeMap<>();
+    protected Set<Neuron> propagateTargets = new TreeSet<>();
 
     ReadWriteLock lock = new ReadWriteLock();
 

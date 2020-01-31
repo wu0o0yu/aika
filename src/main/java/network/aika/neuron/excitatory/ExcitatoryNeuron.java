@@ -97,6 +97,8 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
         super(model, label);
     }
 
+    protected abstract void createCandidateSynapse(Config c, Activation iAct, Activation targetAct);
+
     public ExcitatorySynapse getMaxInputSynapse(Synapse.State state) {
         ExcitatorySynapse maxSyn = null;
         for(ExcitatorySynapse s: getInputSynapses()) {
@@ -107,21 +109,6 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
         return maxSyn;
     }
 
-    public ExcitatorySynapse createOrLookupSynapse(Document doc, Neuron inputNeuron) {
-        inputNeuron.get(doc);
-
-        ExcitatorySynapse synapse = (ExcitatorySynapse) getProvider().getInputSynapse(inputNeuron);
-
-        // s -> ((ExcitatorySynapse)s).isMappedToMetaSynapse(ms)
-
-        if(synapse == null) {
-            synapse = new ExcitatorySynapse(inputNeuron, getProvider(), false, true);
-
-            synapse.link();
-        }
-        return synapse;
-    }
-
     public void train(Config c, Activation o) {
         super.train(c, o);
 
@@ -130,31 +117,6 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
         trainLTL(c, o);
     }
 
-    public Activation init(Activation iAct) {
-        Document doc = iAct.getDocument();
-
-        setBias(2.0);
-
-        int actBegin = 0; // iAct.getSlot(BEGIN).getFinalPosition();
-        lastCount += actBegin;
-
-        ExcitatorySynapse s = new ExcitatorySynapse(iAct.getNeuron(), getProvider(), false, true, actBegin);
-
-        s.updateDelta(doc, 2.0);
-
-        s.link();
-
-        if(log.isDebugEnabled()) {
-            log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
-        }
-
-        Activation targetAct = new Activation(doc, this, null, 0);
-
-        Link l = new Link(s, iAct, targetAct);
-        targetAct.addLink(l, false);
-
-        return targetAct;
-    }
 
     private void createCandidateSynapses(Config c, Activation targetAct) {
         Document doc = targetAct.getDocument();
@@ -174,29 +136,6 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
 
         candidates
                 .forEach(act -> createCandidateSynapse(c, act, targetAct));
-    }
-
-    private void createCandidateSynapse(Config c, Activation iAct, Activation targetAct) {
-        Neuron targetNeuron = targetAct.getNeuron();
-        Neuron inputNeuron = iAct.getNeuron();
-
-        if(!((TNeuron) inputNeuron.get()).isMature(c)) {
-            return;
-        }
-
-        int lastCount = 0; //iAct.getSlot(BEGIN).getFinalPosition();
-
-        ExcitatorySynapse s = new ExcitatorySynapse(inputNeuron, targetNeuron, false, false, lastCount);
-
-        s.link();
-
-        if(log.isDebugEnabled()) {
-            log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
-        }
-
-        Link l = new Link(s, iAct, targetAct);
-
-        targetAct.addLink(l, false);
     }
 
     public boolean isMature(Config c) {
@@ -348,7 +287,7 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
     public static class Input {
         Link l;
         Activation act;
-        ExcitatorySynapse s;
+        ExcitatorySynapse<?, ?> s;
 
         public Input(Link l, Activation act)  {
             this.l = l;
@@ -361,7 +300,7 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
             this.s = (ExcitatorySynapse) s;
         }
 
-        public ExcitatorySynapse getSynapse() {
+        public ExcitatorySynapse<?, ?> getSynapse() {
             return s;
         }
 

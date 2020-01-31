@@ -25,6 +25,7 @@ import network.aika.neuron.activation.Linker;
 import network.aika.neuron.activation.Queue;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.pattern.PatternPartNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,7 +156,7 @@ public class Document implements Comparable<Document> {
     public void train(Config c) {
         createV = getNewVisitedId();
 
-        Function<Activation, ExcitatoryNeuron> callback = act -> new ExcitatoryNeuron(getModel(), act.getLabel());
+        Function<Activation, ExcitatoryNeuron> callback = act -> new PatternPartNeuron(getModel(), act.getLabel());
 
         for(Activation act: new ArrayList<>(getActivations())) {
             if(act.isActive()) {
