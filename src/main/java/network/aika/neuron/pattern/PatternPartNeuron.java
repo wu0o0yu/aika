@@ -14,45 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.pattern;
 
 import network.aika.Model;
-import network.aika.neuron.*;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
+import network.aika.neuron.Neuron;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatorySynapse<I extends TNeuron, O extends ConjunctiveNeuron> extends ConjunctiveSynapse<I, O> {
+public class PatternPartNeuron extends ExcitatoryNeuron {
 
     public static byte type;
 
-
-    public ExcitatorySynapse() {
-        super();
+    public PatternPartNeuron(Neuron p) {
+        super(p);
     }
 
-    public ExcitatorySynapse(Neuron input, Neuron output, boolean propagate, int lastCount) {
-        super(input, output, propagate, lastCount);
+    public PatternPartNeuron(Model model, String label) {
+        super(model, label);
     }
 
     @Override
     public byte getType() {
         return type;
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws IOException {
-        super.readFields(in, m);
     }
 }

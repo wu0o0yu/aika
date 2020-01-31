@@ -14,11 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron;
+package network.aika.neuron.excitatory;
 
 
 import network.aika.ActivationFunction;
 import network.aika.Model;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.TNeuron;
+import network.aika.neuron.TSynapse;
 import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;

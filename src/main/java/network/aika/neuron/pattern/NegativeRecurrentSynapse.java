@@ -14,40 +14,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.pattern;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Sign;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class NegExcitatorySynapse extends ExcitatorySynapse {
+public class NegativeRecurrentSynapse extends ExcitatorySynapse<InhibitoryNeuron, PatternPartNeuron> {
 
     public static byte type;
 
-
-    public NegExcitatorySynapse() {
+    public NegativeRecurrentSynapse() {
         super();
     }
 
-    public NegExcitatorySynapse(Neuron input, Neuron output) {
-        super(input, output, true, false);
+    public NegativeRecurrentSynapse(Neuron input, Neuron output, int lastCount) {
+        super(input, output, false, lastCount);
     }
-
-    public NegExcitatorySynapse(Neuron input, Neuron output, int lastCount) {
-        super(input, output, true, false, lastCount);
-    }
-
 
     @Override
     public byte getType() {
         return type;
     }
 
+    @Override
+    public boolean isRecurrent() {
+        return true;
+    }
+
+    @Override
+    public boolean isNegative() {
+        return true;
+    }
 
     public void updateCountValue(Activation io, Activation oo) {
         double inputValue = io != null ? io.value : 0.0;
@@ -71,17 +76,16 @@ public class NegExcitatorySynapse extends ExcitatorySynapse {
         needsFrequencyUpdate = true;
     }
 
-
     public static class Builder extends Synapse.Builder {
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            NegExcitatorySynapse s = (NegExcitatorySynapse) super.getSynapse(outputNeuron);
+            NegativeRecurrentSynapse s = (NegativeRecurrentSynapse) super.getSynapse(outputNeuron);
 
             return s;
         }
 
         protected Synapse.SynapseFactory getSynapseFactory() {
-            return (input, output) -> new NegExcitatorySynapse(input, output, output.getModel().charCounter);
+            return (input, output) -> new NegativeRecurrentSynapse(input, output, output.getModel().charCounter);
         }
     }
 }

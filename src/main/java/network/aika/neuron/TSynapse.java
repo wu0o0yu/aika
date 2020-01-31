@@ -57,13 +57,8 @@ public abstract class TSynapse<I extends TNeuron, O extends TNeuron> extends Syn
         super();
     }
 
-    public TSynapse(Neuron input, Neuron output, boolean recurrent, boolean propagate) {
-        super(input, output, recurrent, propagate);
-        this.lastCount = 0;
-    }
-
-    public TSynapse(Neuron input, Neuron output, boolean recurrent, boolean propagate, int lastCount) {
-        super(input, output, recurrent, propagate);
+    public TSynapse(Neuron input, Neuron output, boolean propagate, int lastCount) {
+        super(input, output, propagate);
         this.lastCount = lastCount;
     }
 

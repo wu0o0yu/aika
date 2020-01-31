@@ -36,11 +36,9 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  *
  * @author Lukas Molzberger
  */
-public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
+public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
-
-    public static byte type;
 
     enum WeightBias {
         WEIGHT,
@@ -97,10 +95,6 @@ public class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
 
     public ExcitatoryNeuron(Model model, String label) {
         super(model, label);
-    }
-
-    public byte getType() {
-        return type;
     }
 
     public ExcitatorySynapse getMaxInputSynapse(Synapse.State state) {

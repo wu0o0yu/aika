@@ -6,7 +6,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
-import network.aika.neuron.excitatory.NegExcitatorySynapse;
+import network.aika.neuron.pattern.NegativeRecurrentSynapse;
 import network.aika.neuron.pattern.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
@@ -30,7 +30,7 @@ public class MutualExclusionTest {
                         .setNeuron(in)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new NegExcitatorySynapse.Builder()
+                new NegativeRecurrentSynapse.Builder()
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setRecurrent(true)
@@ -41,7 +41,7 @@ public class MutualExclusionTest {
                         .setNeuron(in)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new NegExcitatorySynapse.Builder()
+                new NegativeRecurrentSynapse.Builder()
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setRecurrent(true)
@@ -52,7 +52,7 @@ public class MutualExclusionTest {
                         .setNeuron(in)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new NegExcitatorySynapse.Builder()
+                new NegativeRecurrentSynapse.Builder()
                         .setNeuron(inhib)
                         .setWeight(-100.0)
                         .setRecurrent(true)

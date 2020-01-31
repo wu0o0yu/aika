@@ -19,7 +19,6 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.Model;
 import network.aika.neuron.*;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 
 /**
@@ -35,12 +34,22 @@ public class InhibitorySynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
     }
 
     public InhibitorySynapse(Neuron input, Neuron output) {
-        super(input, output, false, true);
+        super(input, output, true, 0);
     }
 
     @Override
     public byte getType() {
         return type;
+    }
+
+    @Override
+    public boolean isRecurrent() {
+        return false;
+    }
+
+    @Override
+    public boolean isNegative() {
+        return false;
     }
 
     protected void addLinkInternal(INeuron in, INeuron out) {

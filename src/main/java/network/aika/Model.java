@@ -22,12 +22,12 @@ import network.aika.neuron.Neuron;
 import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
-import network.aika.neuron.excitatory.NegExcitatorySynapse;
+import network.aika.neuron.pattern.NegativeRecurrentSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.pattern.PatternNeuron;
+import network.aika.neuron.pattern.PatternPartNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,12 +61,12 @@ public class Model {
     public static Map<Byte, Class> typeRegistry = new HashMap<>();
 
     static {
-        register(ExcitatoryNeuron.class);
+        register(PatternNeuron.class);
+        register(PatternPartNeuron.class);
         register(ExcitatorySynapse.class);
-        register(NegExcitatorySynapse.class);
+        register(NegativeRecurrentSynapse.class);
         register(InhibitoryNeuron.class);
         register(InhibitorySynapse.class);
-        register(PatternNeuron.class);
     }
 
     public SuspensionHook suspensionHook;

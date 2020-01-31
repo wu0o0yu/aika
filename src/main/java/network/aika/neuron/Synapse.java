@@ -39,25 +39,30 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     protected Neuron input;
     protected Neuron output;
 
-    private boolean recurrent;
     private boolean propagate;
 
     private double weight;
     private double weightDelta;
 
+
     public Synapse() {
     }
 
-
-    public Synapse(Neuron input, Neuron output, boolean recurrent, boolean propagate) {
+    public Synapse(Neuron input, Neuron output, boolean propagate) {
         this.input = input;
         this.output = output;
-        this.recurrent = recurrent;
         setPropagate(propagate);
     }
 
-
     public abstract byte getType();
+
+    public abstract boolean isRecurrent();
+
+    public abstract boolean isNegative();
+
+    protected abstract void addLinkInternal(INeuron in, INeuron out);
+
+    protected abstract void removeLinkInternal(INeuron in, INeuron out);
 
     public Neuron getPInput() {
         return input;
@@ -67,11 +72,9 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         return output;
     }
 
-
     public I getInput() {
         return (I) input.get();
     }
-
 
     public O getOutput() {
         return (O) output.get();
@@ -140,34 +143,23 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         (dir ? out : in).lock.releaseWriteLock();
     }
 
-
-    protected abstract void addLinkInternal(INeuron in, INeuron out);
-
-
-    protected abstract void removeLinkInternal(INeuron in, INeuron out);
-
-
     public void commit() {
         weight += weightDelta;
         weightDelta = 0.0;
     }
 
-
     public boolean isZero() {
         return Math.abs(weight) < TOLERANCE;
     }
-
 
     public enum State {
         NEXT,
         CURRENT
     }
 
-
     public boolean isWeak(State state) {
         return output.get().isWeak(this, state);
     }
-
 
     public void updateDelta(Document doc, double weightDelta) {
         this.weightDelta += weightDelta;
@@ -177,7 +169,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         }
     }
 
-
     public void update(Document doc, double weight) {
         this.weightDelta = weight - this.weight;
 
@@ -186,21 +177,9 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         }
     }
 
-
-    public boolean isNegative(State s) {
-        return getWeight(s) < 0.0;
-    }
-
-
-    public boolean isRecurrent() {
-        return recurrent;
-    }
-
-
     public boolean isPropagate() {
         return propagate;
     }
-
 
     public void setPropagate(boolean propagate) {
         this.propagate = propagate;
@@ -212,12 +191,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         }
     }
 
-
-    public String toString() {
-        return "S W:" + Utils.round(getNewWeight()) + " " + input + "->" + output;
-    }
-
-
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeByte(getType());
@@ -227,11 +200,8 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
         out.writeDouble(weight);
 
-        out.writeBoolean(recurrent);
         out.writeBoolean(propagate);
     }
-
-
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
@@ -240,14 +210,11 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
         weight = in.readDouble();
 
-        recurrent = in.readBoolean();
         propagate = in.readBoolean();
 
         output.addActiveInputSynapse(this);
         input.addActiveOutputSynapse(this);
     }
-
-
 
     public static Synapse createOrReplace(Neuron inputNeuron, Neuron outputNeuron, SynapseFactory synapseFactory) {
         Synapse s = synapseFactory.createSynapse(inputNeuron, outputNeuron);
@@ -256,7 +223,9 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         return s;
     }
 
-
+    public String toString() {
+        return "S W:" + Utils.round(getNewWeight()) + " " + input + "->" + output;
+    }
 
     /**
      * The {@code Builder} class is just a helper class which is used to initialize a neuron. Most of the parameters of this class
