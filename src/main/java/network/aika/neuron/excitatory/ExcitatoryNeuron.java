@@ -34,52 +34,7 @@ import java.util.*;
 public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
-/*
-    enum WeightBias {
-        WEIGHT,
-        BIAS
-    }
 
-    enum XlMode {
-        WEIGHT_KPOS_UPOS((l, out) -> l.getX(Sign.POS) * actFDelta(out), Sign.POS, WeightBias.WEIGHT),
-        BIAS_KPOS_UPOS((l, out) -> 0.0, Sign.POS, WeightBias.BIAS),
-
-        WEIGHT_KPOS_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.POS, WeightBias.WEIGHT),
-        BIAS_KPOS_UNEG((l, out) -> l.getX(Sign.NEG) * actFDelta(out), Sign.POS, WeightBias.BIAS),
-
-        WEIGHT_KNEG_UPOS((l, out) -> 0.0, Sign.NEG, WeightBias.WEIGHT),
-        BIAS_KNEG_UPOS((l, out) -> l.getX(Sign.POS) * actFDelta(out), Sign.NEG, WeightBias.BIAS),
-
-        WEIGHT_KNEG_UNEG((l, out) -> -l.getX(Sign.NEG) * actFDelta(out), Sign.NEG, WeightBias.WEIGHT),
-        BIAS_KNEG_UNEG((l, out) -> l.getX(Sign.NEG) * actFDelta(out), Sign.NEG, WeightBias.BIAS);
-
-        ActDelta actDelta;
-        Sign k;
-        WeightBias wb;
-
-        XlMode(ActDelta actDelta, Sign k, WeightBias wb) {
-            this.actDelta = actDelta;
-            this.k = k;
-            this.wb = wb;
-        }
-
-        public double getActDelta(Input l, Activation out) {
-            return actDelta.getActDelta(l, out);
-        }
-
-        public Sign getK() {
-            return k;
-        }
-
-        public WeightBias getWB() {
-            return wb;
-        }
-    }
-
-    public interface ActDelta {
-        double getActDelta(Link l, Activation out);
-    }
-*/
     public ExcitatoryNeuron() {
         super();
     }
