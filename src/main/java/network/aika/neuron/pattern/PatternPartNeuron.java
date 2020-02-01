@@ -20,7 +20,9 @@ import network.aika.Config;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Sign;
 import network.aika.neuron.TNeuron;
+import network.aika.neuron.TSynapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
@@ -48,6 +50,20 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
     @Override
     public byte getType() {
         return type;
+    }
+
+
+    public double getSurprisal(Sign si, Sign so) {
+        return Math.log(pXiXout[sii]) - (Math.log(pXi[sii]) + Math.log(pXout[0]));
+    }
+
+
+    public TSynapse getPrimaryInput() {
+        return null;
+    }
+
+    public TSynapse getPatternInput() {
+        return null;
     }
 
 
