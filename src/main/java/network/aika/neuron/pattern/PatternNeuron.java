@@ -16,8 +16,10 @@
  */
 package network.aika.neuron.pattern;
 
+import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 /**
@@ -39,5 +41,10 @@ public class PatternNeuron extends ExcitatoryNeuron {
     @Override
     public byte getType() {
         return type;
+    }
+
+    @Override
+    protected void createCandidateSynapse(Config c, Activation iAct, Activation targetAct) {
+
     }
 }

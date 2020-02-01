@@ -78,21 +78,18 @@ public abstract class TSynapse<I extends TNeuron, O extends TNeuron> extends Syn
         needsCountUpdate = true;
     }
 
-    public void updateCountValue(Activation io, Activation oo) {
-        double inputValue = io != null ? io.value : 0.0;
-        double outputValue = oo != null ? oo.value : 0.0;
-
+    public void updateCountValue(Activation iAct, Activation oAct) {
         if(!needsCountUpdate) {
             return;
         }
         needsCountUpdate = false;
 
-        double optionProp = (io != null ? io.getP() : 1.0) * (oo != null ? oo.getP() : 1.0);
+        double p = (iAct != null ? iAct.getP() : 1.0) * (oAct != null ? oAct.getP() : 1.0);
 
-        countValueIPosOPos += (Sign.POS.getX(inputValue) * Sign.POS.getX(outputValue) * optionProp);
-        countValueIPosONeg += (Sign.POS.getX(inputValue) * Sign.NEG.getX(outputValue) * optionProp);
-        countValueINegOPos += (Sign.NEG.getX(inputValue) * Sign.POS.getX(outputValue) * optionProp);
-        countValueINegONeg += (Sign.NEG.getX(inputValue) * Sign.NEG.getX(outputValue) * optionProp);
+        countValueIPosOPos += (Sign.POS.getX(iAct) * Sign.POS.getX(oAct) * p);
+        countValueIPosONeg += (Sign.POS.getX(iAct) * Sign.NEG.getX(oAct) * p);
+        countValueINegOPos += (Sign.NEG.getX(iAct) * Sign.POS.getX(oAct) * p);
+        countValueINegONeg += (Sign.NEG.getX(iAct) * Sign.NEG.getX(oAct) * p);
 
         needsFrequencyUpdate = true;
     }

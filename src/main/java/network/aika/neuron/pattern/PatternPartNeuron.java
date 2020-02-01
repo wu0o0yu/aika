@@ -51,6 +51,20 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
     }
 
 
+    public double computeWeightDelta(Link il) {
+        double g = il.getInput().value * getActivationFunction().outerGrad(il.getOutput().net);
+
+        double sum = g;
+        for(Link ol: il.getOutput().outputLinks.values()) {
+            Activation oAct = ol.getOutput();
+
+            sum += oAct.getINeuron().computeInputDelta(g, ol);
+        }
+
+        return sum;
+    }
+
+
     public Activation init(Activation iAct) {
         Document doc = iAct.getDocument();
 

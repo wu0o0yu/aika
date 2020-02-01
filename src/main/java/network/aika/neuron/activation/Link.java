@@ -16,6 +16,8 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.Neuron;
+import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TSynapse;
 
@@ -52,6 +54,10 @@ public class Link {
         return output;
     }
 
+    public double getP() {
+        return input != null ? input.getP() : 1.0;
+    }
+
     public boolean isNegative() {
         return synapse.isNegative();
     }
@@ -69,9 +75,13 @@ public class Link {
     }
 
     public void link() {
-        input.outputLinks.put(output, this);
-        output.inputLinksFiredOrder.put(this, this);
-        Link ol = output.inputLinks.put(input.getNeuron(), this);
+        if(input != null) {
+            input.outputLinks.put(output, this);
+            output.inputLinksFiredOrder.put(this, this);
+        }
+        Neuron inputN = input != null ? input.getNeuron() : synapse.getPInput();
+
+        Link ol = output.inputLinks.put(inputN, this);
         if(ol != null && ol != this) {
             output.inputLinksFiredOrder.remove(ol);
             ol.input.outputLinks.remove(ol.output);

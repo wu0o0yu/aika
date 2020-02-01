@@ -81,7 +81,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public abstract byte getType();
 
-
     public Integer getId() {
         return provider.getId();
     }
@@ -199,6 +198,10 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     protected double getBias(Synapse.State state) {
         return state == CURRENT ? bias : bias + biasDelta;
+    }
+
+    public double computeInputDelta(double g, Link l) {
+        return 0.0;
     }
 
     public String toString() {

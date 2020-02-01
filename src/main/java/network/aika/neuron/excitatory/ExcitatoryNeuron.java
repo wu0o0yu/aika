@@ -21,16 +21,11 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Function;
-
-import static network.aika.neuron.Synapse.State.CURRENT;
-
 
 /**
  *
@@ -39,7 +34,7 @@ import static network.aika.neuron.Synapse.State.CURRENT;
 public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
-
+/*
     enum WeightBias {
         WEIGHT,
         BIAS
@@ -82,9 +77,9 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
     }
 
     public interface ActDelta {
-        double getActDelta(Input l, Activation out);
+        double getActDelta(Link l, Activation out);
     }
-
+*/
     public ExcitatoryNeuron() {
         super();
     }
@@ -99,7 +94,7 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
 
     protected abstract void createCandidateSynapse(Config c, Activation iAct, Activation targetAct);
 
-    public ExcitatorySynapse getMaxInputSynapse(Synapse.State state) {
+    public ExcitatorySynapse getMaxInputSynapse() {
         ExcitatorySynapse maxSyn = null;
         for(ExcitatorySynapse s: getInputSynapses()) {
             if(maxSyn == null || maxSyn.getNewWeight() < s.getNewWeight()) {
@@ -109,14 +104,20 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
         return maxSyn;
     }
 
-    public void train(Config c, Activation o) {
-        super.train(c, o);
-
-        createCandidateSynapses(c, o);
-
-        trainLTL(c, o);
+    public void train(Config c, Activation act) {
+        addDummyLinks(act);
+        super.train(c, act);
+        createCandidateSynapses(c, act);
+        trainLTL(c, act);
     }
 
+    protected void addDummyLinks(Activation act) {
+        inputSynapses
+                .values()
+                .stream()
+                .filter(s -> !act.inputLinks.containsKey(s))
+                .forEach(s -> new Link(s, null, act).link());
+    }
 
     private void createCandidateSynapses(Config c, Activation targetAct) {
         Document doc = targetAct.getDocument();
@@ -139,7 +140,7 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
     }
 
     public boolean isMature(Config c) {
-        Synapse maxSyn = getMaxInputSynapse(CURRENT);
+        Synapse maxSyn = getMaxInputSynapse();
         if(maxSyn == null) {
             return false;
         }
@@ -233,28 +234,7 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
         }
     }
 
-    public static double actFDelta(Activation act) {
-        double net = act.net;
-        if(net <= 0.0) return 0.0;
-
-        switch(act.getINeuron().getActivationFunction()) {
-            case RECTIFIED_HYPERBOLIC_TANGENT:
-                return 1.0 - Math.pow(Math.tanh(net), 2.0);
-            case LIMITED_RECTIFIED_LINEAR_UNIT:
-                return 1.0;
-        }
-
-        return 0.0;
-    }
-
-    public ExcitatoryNeuron getTargetNeuron(Activation metaAct, Function<Activation, ExcitatoryNeuron> callback) {
-        return this;
-    }
-
-    public double getTrainingNetValue(Activation act) {
-        return act.net + trainingBias; //  + getInactiveWeights(o)
-    }
-
+/*
     public List<Input> getInputs(Activation act) {
         assert act.getINeuron() == this;
 
@@ -282,7 +262,6 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
 
         return results;
     }
-
 
     public static class Input {
         Link l;
@@ -332,7 +311,7 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
             return getSynapse().getInput().getLabel();
         }
     }
-
+*/
     public String typeToString() {
         return "EXCITATORY";
     }

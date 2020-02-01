@@ -22,26 +22,36 @@ package network.aika;
  */
 public enum ActivationFunction {
 
-    NULL_FUNCTION(x -> 0.0),
-    RECTIFIED_HYPERBOLIC_TANGENT(x -> Math.max(0.0, Math.tanh(x))),
-    LIMITED_RECTIFIED_LINEAR_UNIT(x -> Math.max(0.0, Math.min(1.0, x)));
+    NULL_FUNCTION(
+            x -> 0.0,
+            x -> 0.0
+    ),
+    RECTIFIED_HYPERBOLIC_TANGENT(
+            x -> Math.max(0.0, Math.tanh(x)),
+            x -> x >= 0.0 ? 1.0 - Math.pow(Math.tanh(x), 2.0) : 0.0
+    ),
+    LIMITED_RECTIFIED_LINEAR_UNIT(
+            x -> Math.max(0.0, Math.min(1.0, x)),
+            x -> x >= 0.0 && x <= 1.0 ? 1.0 : 0.0
+    );
 
     Function f;
+    Function outerGrad;
 
-    ActivationFunction(Function f) {
+    ActivationFunction(Function f, Function outerGrad) {
         this.f = f;
+        this.outerGrad = outerGrad;
     }
 
     public double f(double x) {
         return f.f(x);
     }
 
+    public double outerGrad(double x) {
+        return outerGrad.f(x);
+    }
 
     interface Function {
         double f(double x);
-    }
-
-    public static double sigmoid(double x) {
-        return 1.0 / (1.0 + Math.pow(Math.E, (-x)));
     }
 }

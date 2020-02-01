@@ -30,7 +30,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
@@ -158,21 +157,15 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
                 .forEach(s -> dir.getUpdateFrequencies().updateFrequencies(s, alpha, null, act));
     }
 
-    public double[] getP() {
-        double p = posFrequency / N;
-        return new double[] {
-                p,
-                1.0 - p
-        };
+    public double getP() {
+        return posFrequency / N;
     }
 
     public double getReliability() {
         return binaryFrequency >= RELIABILITY_THRESHOLD ? Math.log(binaryFrequency - (RELIABILITY_THRESHOLD - 1.0)) : 0.0;
     }
 
-
     public void prepareTrainingStep(Config c, Activation o, Function<Activation, ExcitatoryNeuron> callback) {
-        prepareMetaTraining(c, o, callback);
         count(o);
     }
 
@@ -182,21 +175,6 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 //            generateNeuron(act);
         }
 //      }
-    }
-
-    // Implemented only for meta and target neurons
-    public void prepareMetaTraining(Config c, Activation act, Function<Activation, ExcitatoryNeuron> callback) {
-        if (act.getP() > c.getMetaThreshold() && getTrainingNetValue(act) > 0.0) {
-//            act.targetNeuron = getTargetNeuron(act, callback);
-        }
-    }
-
-    public ExcitatoryNeuron getTargetNeuron(Activation metaAct, Function<Activation, ExcitatoryNeuron> callback) {
-        return null;
-    }
-
-    public double getTrainingNetValue(Activation act) {
-        return act.net;
     }
 
     /*
@@ -248,10 +226,9 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
     }
 
     public String propToString() {
-        double[] p = getP();
         StringBuilder sb = new StringBuilder();
-        sb.append("Pos:" + Utils.round(p[0]));
-        sb.append(" Neg:" + Utils.round(p[1]));
+        sb.append("Pos:" + Utils.round(Sign.POS.getP(this)));
+        sb.append(" Neg:" + Utils.round(Sign.NEG.getP(this)));
         return sb.toString();
     }
     protected String toDetailedString() {

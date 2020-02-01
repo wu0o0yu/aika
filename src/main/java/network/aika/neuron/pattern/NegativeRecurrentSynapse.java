@@ -54,24 +54,21 @@ public class NegativeRecurrentSynapse extends ExcitatorySynapse<InhibitoryNeuron
         return true;
     }
 
-    public void updateCountValue(Activation io, Activation oo) {
-        double inputValue = io != null ? io.value : 0.0;
-        double outputValue = oo != null ? oo.value : 0.0;
-
+    public void updateCountValue(Activation iAct, Activation oAct) {
         if(!needsCountUpdate) {
             return;
         }
         needsCountUpdate = false;
 
-        double optionProp = (io != null ? io.getP() : 1.0) * (oo != null ? oo.getP() : 1.0);
+        double p = (iAct != null ? iAct.getP() : 1.0) * (oAct != null ? oAct.getP() : 1.0);
 
 /*        if(TNeuron.checkSelfReferencing(oo, io)) {
             countValueIPosOPos += (Sign.POS.getX(inputValue) * Sign.POS.getX(outputValue) * optionProp);
         } else {
             countValueINegOPos += (Sign.NEG.getX(inputValue) * Sign.POS.getX(outputValue) * optionProp);
         }*/
-        countValueIPosONeg += (Sign.POS.getX(inputValue) * Sign.NEG.getX(outputValue) * optionProp);
-        countValueINegONeg += (Sign.NEG.getX(inputValue) * Sign.NEG.getX(outputValue) * optionProp);
+        countValueIPosONeg += (Sign.POS.getX(iAct) * Sign.NEG.getX(oAct) * p);
+        countValueINegONeg += (Sign.NEG.getX(iAct) * Sign.NEG.getX(oAct) * p);
 
         needsFrequencyUpdate = true;
     }

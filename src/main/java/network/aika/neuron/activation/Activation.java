@@ -128,7 +128,7 @@ public class Activation implements Comparable<Activation> {
         return inputLinks
                 .values()
                 .stream()
-                .anyMatch(l -> l.isRecurrent() && !l.isNegative(CURRENT));
+                .anyMatch(l -> l.isRecurrent() && !l.isNegative());
     }
 
     public Collection<Link> getLinks(Direction dir) {
@@ -237,7 +237,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void sumUpLink(Link l, boolean processMode) {
-        if(l.synapse == null && (processMode || !l.isRecurrent() || l.isNegative(CURRENT))) return;
+        if(l.synapse == null && (processMode || !l.isRecurrent() || l.isNegative())) return;
 
         double w = l.synapse.getWeight();
         net += l.input.value * w;
