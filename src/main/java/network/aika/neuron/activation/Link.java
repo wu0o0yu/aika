@@ -17,12 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.TSynapse;
-
-import static network.aika.neuron.Synapse.State.CURRENT;
-
 
 /**
  *

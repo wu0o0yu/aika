@@ -21,12 +21,11 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Sign;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.TSynapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,18 +51,45 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
         return type;
     }
 
+    public boolean isMature(Config c) {
+        return binaryFrequency >= c.getMaturityThreshold();  // Sign.NEG, Sign.POS
+    }
 
     public double getSurprisal(Sign si, Sign so) {
-        return Math.log(pXiXout[sii]) - (Math.log(pXi[sii]) + Math.log(pXout[0]));
+        double pXi = si.getP(getPrimaryInput().getInput());
+        double pXo = so.getP(getPatternInput().getInput());
+
+        double pXio = 0.0;
+        if(si == so) {
+            pXio = si.getP(this);
+        } else {
+            if(si == Sign.POS) {
+
+            } else if(so == Sign.POS) {
+
+            }
+        }
+
+        return Math.log(pXio) - (Math.log(pXi) + Math.log(pXo));
     }
 
 
-    public TSynapse getPrimaryInput() {
-        return null;
+    private Synapse<TNeuron, TNeuron> getPatternSynapse(boolean isRecurrent) {
+        return inputSynapses
+                .values()
+                .stream()
+                .filter(s -> isRecurrent == s.isRecurrent())
+                .filter(s -> s.getInput() instanceof PatternNeuron)
+                .findFirst()
+                .orElse(null);
     }
 
-    public TSynapse getPatternInput() {
-        return null;
+    public Synapse<TNeuron, TNeuron> getPrimaryInput() {
+        return getPatternSynapse(false);
+    }
+
+    public Synapse<TNeuron, TNeuron> getPatternInput() {
+        return getPatternSynapse(true);
     }
 
 
@@ -87,9 +113,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
         setBias(2.0);
 
         int actBegin = 0; // iAct.getSlot(BEGIN).getFinalPosition();
-        lastCount += actBegin;
 
-        PatternPartSynapse s = new PatternPartSynapse(iAct.getNeuron(), getProvider(), true, actBegin);
+        PatternPartSynapse s = new PatternPartSynapse(iAct.getNeuron(), getProvider(), true);
 
         s.updateDelta(doc, 2.0);
 
@@ -115,9 +140,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
             return;
         }
 
-        int lastCount = 0; //iAct.getSlot(BEGIN).getFinalPosition();
-
-        PatternPartSynapse s = new PatternPartSynapse(inputNeuron, targetNeuron, false, lastCount);
+        PatternPartSynapse s = new PatternPartSynapse(inputNeuron, targetNeuron, false);
 
         s.link();
 

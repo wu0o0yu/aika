@@ -49,19 +49,8 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
 
     protected abstract void createCandidateSynapse(Config c, Activation iAct, Activation targetAct);
 
-    public ExcitatorySynapse getMaxInputSynapse() {
-        ExcitatorySynapse maxSyn = null;
-        for(ExcitatorySynapse s: getInputSynapses()) {
-            if(maxSyn == null || maxSyn.getNewWeight() < s.getNewWeight()) {
-                maxSyn = s;
-            }
-        }
-        return maxSyn;
-    }
-
     public void train(Config c, Activation act) {
         addDummyLinks(act);
-        super.train(c, act);
         createCandidateSynapses(c, act);
     }
 
@@ -91,17 +80,6 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
 
         candidates
                 .forEach(act -> createCandidateSynapse(c, act, targetAct));
-    }
-
-    public boolean isMature(Config c) {
-        Synapse maxSyn = getMaxInputSynapse();
-        if(maxSyn == null) {
-            return false;
-        }
-
-        TSynapse se = (TSynapse) maxSyn;
-
-        return se.getCounts()[1] >= c.getMaturityThreshold();  // Sign.NEG, Sign.POS
     }
 
     public String typeToString() {

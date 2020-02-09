@@ -10,6 +10,8 @@ import network.aika.neuron.pattern.NegativeRecurrentSynapse;
 import network.aika.neuron.pattern.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.neuron.pattern.PatternPartNeuron;
+import network.aika.neuron.pattern.PatternPartSynapse;
 import org.junit.Test;
 
 public class MutualExclusionTest {
@@ -20,13 +22,13 @@ public class MutualExclusionTest {
         Model m = new Model();
 
         PatternNeuron in = new PatternNeuron(m, "IN");
-        ExcitatoryNeuron na = new ExcitatoryNeuron(m, "A");
-        ExcitatoryNeuron nb = new ExcitatoryNeuron(m, "B");
-        ExcitatoryNeuron nc = new ExcitatoryNeuron(m, "C");
+        PatternPartNeuron na = new PatternPartNeuron(m, "A");
+        PatternPartNeuron nb = new PatternPartNeuron(m, "B");
+        PatternPartNeuron nc = new PatternPartNeuron(m, "C");
         InhibitoryNeuron inhib = new InhibitoryNeuron(m, "I");
 
         Neuron.init(na.getProvider(), 1.0,
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(in)
                         .setWeight(10.0)
                         .setRecurrent(false),
@@ -37,7 +39,7 @@ public class MutualExclusionTest {
         );
 
         Neuron.init(nb.getProvider(), 1.5,
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(in)
                         .setWeight(10.0)
                         .setRecurrent(false),
@@ -48,7 +50,7 @@ public class MutualExclusionTest {
         );
 
         Neuron.init(nc.getProvider(), 1.2,
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(in)
                         .setWeight(10.0)
                         .setRecurrent(false),
@@ -69,8 +71,6 @@ public class MutualExclusionTest {
                         .setNeuron(nc)
                         .setWeight(1.0)
                 );
-
-
 
 
         Document doc = new Document(m, "test");

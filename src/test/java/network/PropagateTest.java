@@ -6,6 +6,9 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.pattern.PatternNeuron;
+import network.aika.neuron.pattern.PatternPartNeuron;
+import network.aika.neuron.pattern.PatternPartSynapse;
 import org.junit.Test;
 
 public class PropagateTest {
@@ -15,11 +18,11 @@ public class PropagateTest {
     public void testPropagation() {
         Model m = new Model();
 
-        ExcitatoryNeuron in = new ExcitatoryNeuron(m, "IN");
-        ExcitatoryNeuron na = new ExcitatoryNeuron(m, "A");
+        PatternNeuron in = new PatternNeuron(m, "IN");
+        PatternPartNeuron na = new PatternPartNeuron(m, "A");
 
         Neuron.init(na.getProvider(), 1.0,
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(in)
                         .setWeight(10.0)
                         .setRecurrent(false)

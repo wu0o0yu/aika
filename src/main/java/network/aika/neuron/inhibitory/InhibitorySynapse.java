@@ -25,7 +25,7 @@ import network.aika.neuron.*;
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
+public class InhibitorySynapse extends Synapse<TNeuron, InhibitoryNeuron> {
 
     private static byte type;
 
@@ -34,7 +34,7 @@ public class InhibitorySynapse extends TSynapse<TNeuron, InhibitoryNeuron> {
     }
 
     public InhibitorySynapse(Neuron input, Neuron output) {
-        super(input, output, true, 0);
+        super(input, output, true);
     }
 
     @Override

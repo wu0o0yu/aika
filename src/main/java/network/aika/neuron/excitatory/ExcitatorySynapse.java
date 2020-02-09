@@ -37,8 +37,8 @@ public abstract class ExcitatorySynapse<I extends TNeuron, O extends Conjunctive
         super();
     }
 
-    public ExcitatorySynapse(Neuron input, Neuron output, boolean propagate, int lastCount) {
-        super(input, output, propagate, lastCount);
+    public ExcitatorySynapse(Neuron input, Neuron output, boolean propagate) {
+        super(input, output, propagate);
     }
 
     @Override

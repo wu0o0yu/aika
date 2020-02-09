@@ -8,8 +8,8 @@ public class PositiveRecurrentSynapse extends ExcitatorySynapse<PatternNeuron, P
 
     public static byte type;
 
-    public PositiveRecurrentSynapse(Neuron input, Neuron output, boolean propagate, int lastCount) {
-        super(input, output, propagate, lastCount);
+    public PositiveRecurrentSynapse(Neuron input, Neuron output, boolean propagate) {
+        super(input, output, propagate);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class PositiveRecurrentSynapse extends ExcitatorySynapse<PatternNeuron, P
         }
 
         protected Synapse.SynapseFactory getSynapseFactory() {
-            return (input, output) -> new PositiveRecurrentSynapse(input, output, propagate, output.getModel().charCounter);
+            return (input, output) -> new PositiveRecurrentSynapse(input, output, propagate);
         }
     }
 

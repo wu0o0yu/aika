@@ -7,6 +7,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.pattern.PatternNeuron;
+import network.aika.neuron.pattern.PatternPartNeuron;
+import network.aika.neuron.pattern.PatternPartSynapse;
 import org.junit.Test;
 
 public class PatternTest {
@@ -20,75 +22,75 @@ public class PatternTest {
         PatternNeuron inB = new PatternNeuron(m, "IN B");
         PatternNeuron inC = new PatternNeuron(m, "IN C");
 
-        ExcitatoryNeuron relN = new ExcitatoryNeuron(m, "Rel");
+        PatternPartNeuron relN = new PatternPartNeuron(m, "Rel");
 
 
-        ExcitatoryNeuron eA = new ExcitatoryNeuron(m, "E A");
-        ExcitatoryNeuron eB = new ExcitatoryNeuron(m, "E B");
-        ExcitatoryNeuron eC = new ExcitatoryNeuron(m, "E C");
+        PatternPartNeuron eA = new PatternPartNeuron(m, "E A");
+        PatternPartNeuron eB = new PatternPartNeuron(m, "E B");
+        PatternPartNeuron eC = new PatternPartNeuron(m, "E C");
 
         PatternNeuron out = new PatternNeuron(m, "OUT");
 
 
         Neuron.init(eA.getProvider(), 1.0,
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(inA)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(out)
                         .setWeight(10.0)
                         .setRecurrent(true)
         );
 
         Neuron.init(eB.getProvider(), 1.0,
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(eA)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(relN)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(out)
                         .setWeight(10.0)
                         .setRecurrent(true)
         );
 
         Neuron.init(eC.getProvider(), 1.0,
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(inC)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(eB)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(relN)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(out)
                         .setWeight(10.0)
                         .setRecurrent(true)
         );
 
         Neuron.init(out.getProvider(), 1.0,
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(eA)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(eB)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new ExcitatorySynapse.Builder()
+                new PatternPartSynapse.Builder()
                         .setNeuron(eC)
                         .setWeight(10.0)
                         .setRecurrent(false)

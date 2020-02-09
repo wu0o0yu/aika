@@ -7,6 +7,7 @@ import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.pattern.PatternNeuron;
+import network.aika.neuron.pattern.PatternPartNeuron;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,7 +32,7 @@ public class SyllableExperiment {
     public void init() {
         model = new Model();
 
-        relNeuron = new ExcitatoryNeuron(model, "Char-Relation");
+        relNeuron = new PatternPartNeuron(model, "Char-Relation");
     }
 
 

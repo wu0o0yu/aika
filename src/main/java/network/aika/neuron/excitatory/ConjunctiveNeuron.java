@@ -22,11 +22,9 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.TSynapse;
 import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -43,14 +41,14 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  *
  * @author Lukas Molzberger
  */
-public abstract class ConjunctiveNeuron<S extends TSynapse> extends TNeuron<S> {
+public abstract class ConjunctiveNeuron<S extends Synapse> extends TNeuron<S> {
 
     private InhibitoryNeuron inhibitoryNeuron;
 
     private volatile double directConjunctiveBias;
     private volatile double recurrentConjunctiveBias;
 
-    TreeMap<Neuron, S> inputSynapses = new TreeMap<>();
+    protected TreeMap<Neuron, S> inputSynapses = new TreeMap<>();
 
 
     public ConjunctiveNeuron() {
@@ -66,8 +64,6 @@ public abstract class ConjunctiveNeuron<S extends TSynapse> extends TNeuron<S> {
         super(model, label);
     }
 
-
-
     @Override
     public void suspend() {
         for (Synapse s : inputSynapses.values()) {
@@ -79,11 +75,9 @@ public abstract class ConjunctiveNeuron<S extends TSynapse> extends TNeuron<S> {
         }
     }
 
-
     @Override
     public void reactivate() {
     }
-
 
     public void addInputSynapse(S s) {
         inputSynapses.put(s.getPInput(), s);
@@ -96,7 +90,6 @@ public abstract class ConjunctiveNeuron<S extends TSynapse> extends TNeuron<S> {
         }
     }
 
-
     public void addOutputSynapse(Synapse s) {
         outputSynapses.put(s.getPOutput(), s);
         setModified();
@@ -108,31 +101,25 @@ public abstract class ConjunctiveNeuron<S extends TSynapse> extends TNeuron<S> {
         }
     }
 
-
     public S getInputSynapse(Neuron in) {
         return inputSynapses.get(in);
     }
-
 
     public Collection<S> getInputSynapses() {
         return inputSynapses.values();
     }
 
-
     public InhibitoryNeuron getInhibitoryNeuron() {
         return inhibitoryNeuron;
     }
-
 
     public void setInhibitoryNeuron(InhibitoryNeuron inhibitoryNeuron) {
         this.inhibitoryNeuron = inhibitoryNeuron;
     }
 
-
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
     }
-
 
     @Override
     public Fired incrementFired(Fired f) {

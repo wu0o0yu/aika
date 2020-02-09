@@ -17,7 +17,6 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.Synapse;
-import network.aika.neuron.TSynapse;
 
 import java.util.Comparator;
 
@@ -27,45 +26,20 @@ import java.util.Comparator;
  */
 public enum Direction {
     INPUT(
-            Comparator.comparing(s -> s.getInput()),
-            (ts, iAct, oAct) -> ts.updateCountValue(iAct, oAct),
-            (ts, alpha, iAct, oAct) -> ts.updateFrequencies(alpha, iAct, oAct)
+            Comparator.comparing(s -> s.getInput())
     ),
 
     OUTPUT(
-            Comparator.comparing(s -> s.getOutput()),
-            (ts, iAct, oAct) -> ts.updateCountValue(oAct, iAct),
-            (ts, alpha, iAct, oAct) -> ts.updateFrequencies(alpha, oAct, iAct)
+            Comparator.comparing(s -> s.getOutput())
     );
 
     Comparator<Synapse> synapseComparator;
-    UpdateCounts updateCounts;
-    UpdateFrequencies updateFrequencies;
 
-    Direction(Comparator<Synapse> synComp, UpdateCounts uc, UpdateFrequencies uf) {
+    Direction(Comparator<Synapse> synComp) {
         synapseComparator = synComp;
-        updateCounts = uc;
-        updateFrequencies = uf;
     }
 
     public Comparator<Synapse> getSynapseComparator() {
         return synapseComparator;
     }
-
-    public UpdateCounts getUpdateCounts() {
-        return updateCounts;
-    }
-
-    public UpdateFrequencies getUpdateFrequencies() {
-        return updateFrequencies;
-    }
-
-    public interface UpdateCounts {
-        void updateCounts(TSynapse ts, Activation iAct, Activation oAct);
-    }
-
-    public interface UpdateFrequencies {
-        void updateFrequencies(TSynapse ts, double alpha, Activation iAct, Activation oAct);
-    }
-
 }

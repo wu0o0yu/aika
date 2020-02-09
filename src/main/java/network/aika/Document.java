@@ -24,13 +24,10 @@ import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Linker;
 import network.aika.neuron.activation.Queue;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.pattern.PatternPartNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Function;
 
 
 /**
@@ -156,27 +153,20 @@ public class Document implements Comparable<Document> {
     public void train(Config c) {
         createV = getNewVisitedId();
 
-        Function<Activation, ExcitatoryNeuron> callback = act -> new PatternPartNeuron(getModel(), act.getLabel());
-
+        TreeSet<TNeuron> activatedNeurons = new TreeSet<>();
         for(Activation act: new ArrayList<>(getActivations())) {
             if(act.isActive()) {
                 TNeuron n = act.getINeuron();
+                activatedNeurons.add(n);
 
-                n.prepareTrainingStep(c, act, callback);
+                n.count(act);
             }
         }
 
-        for(Activation act: new ArrayList<>(getActivations())) {
-            if(act.isActive()) {
-                TNeuron n = act.getINeuron();
+        for(TNeuron n: activatedNeurons) {
+            n.applyMovingAverage();
 
-                n.updateFrequencies(act);
-                n.initCountValues();
-
-                n.train(c, act);
-
-//                act.targetNeuron.commit(act.targetNeuron.getInputSynapses());
-            }
+//          act.targetNeuron.commit(act.targetNeuron.getInputSynapses());
         }
 
 //        propagate();

@@ -11,8 +11,8 @@ public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, Pattern
     public PatternSynapse() {
     }
 
-    public PatternSynapse(Neuron input, Neuron output, boolean propagate, int lastCount) {
-        super(input, output, propagate, lastCount);
+    public PatternSynapse(Neuron input, Neuron output, boolean propagate) {
+        super(input, output, propagate);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, Pattern
         }
 
         protected SynapseFactory getSynapseFactory() {
-            return (input, output) -> new PatternSynapse(input, output, propagate, output.getModel().charCounter);
+            return (input, output) -> new PatternSynapse(input, output, propagate);
         }
     }
 }

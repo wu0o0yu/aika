@@ -21,18 +21,12 @@ import network.aika.Config;
 import network.aika.Model;
 import network.aika.Utils;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
-
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
 
 
 /**
@@ -44,18 +38,10 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
     public static double RELIABILITY_THRESHOLD = 10.0;
 
 
-    public double countValue;
     public double binaryFrequency;
-    public double posFrequency;
-    public double negFrequency;
+    public double frequency;
     public double N;
-    public int lastCount;
     public double alpha = 0.99;
-
-    public double lengthSum;
-    public int numActs;
-
-    public double trainingBias = 0.0;
 
 
     protected TNeuron() {
@@ -68,122 +54,32 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 
     public TNeuron(Model model, String label) {
         super(model, label);
-        this.lastCount = model.charCounter;
     }
 
     public abstract boolean isMature(Config c);
 
-    public void initCountValues() {
-        countValue = 0.0;
-
-        for(Direction dir: Direction.values()) {
-            getSynapses(dir)
-                    .stream()
-                    .map(s -> (TSynapse) s)
-                    .forEach(s -> s.initCountValues());
-        }
-    }
-
-    public double getAvgLength() {
-        return lengthSum / (double) numActs;
-    }
 
     public void count(Activation act) {
-        countValue += act.value * act.getP();
-
-        countSynapses(act, INPUT);
-        countSynapses(act, OUTPUT);
+        double v = act.value * act.getP();
+        frequency += v;
+        binaryFrequency += (v > 0.0 ? 1.0 : 0.0);
     }
 
-    private void countSynapses(Activation act, Direction dir) {
-        Set<Synapse> rest = new TreeSet<>(dir.getSynapseComparator());
-        rest.addAll(getSynapses(dir));
-
-        act.getLinks(dir)
-                .stream()
-                .filter(l -> l.getSynapse() != null)
-                .forEach(l -> {
-                    TSynapse ts = (TSynapse) l.getSynapse();
-
-                    rest.remove(ts);
-
-                    dir.getUpdateCounts().updateCounts(ts, l.getActivation(dir), act);
-                });
-
-        rest
-                .stream()
-                .map(s -> (TSynapse) s)
-                .forEach(s -> dir.getUpdateCounts().updateCounts(s, null, act));
-    }
-
-    public void updateFrequencies(Activation act) {
-        int beginPos = 0; //StatUtil.getCurrentPos(act, BEGIN);
-        int endPos = 0; //StatUtil.getCurrentPos(act, END);
-
-        int stepsBefore = beginPos - lastCount;
-        int stepsWithin = endPos - beginPos;
-
-        lengthSum += stepsWithin;
-        numActs++;
-
-        lastCount = endPos;
-
-        posFrequency = (stepsWithin * countValue) + (alpha * posFrequency);
-        negFrequency = stepsBefore + ((double) stepsWithin * (1.0 - countValue)) + (alpha * negFrequency);
-        binaryFrequency = (countValue > 0.0 ? 1.0 : 0.0) + (alpha * binaryFrequency);
-        N = stepsBefore + stepsWithin + (alpha * N);
-
-        updateSynapseFrequencies(act, INPUT);
-        updateSynapseFrequencies(act, OUTPUT);
-    }
-
-    private void updateSynapseFrequencies(Activation act, Direction dir) {
-        Set<Synapse> rest = new TreeSet<>(dir.getSynapseComparator());
-        rest.addAll(getSynapses(dir));
-
-        act.getLinks(dir)
-                .stream()
-                .filter(l -> l.getSynapse() != null)
-                .forEach(l -> {
-                    TSynapse ts = (TSynapse) l.getSynapse();
-
-                    rest.remove(ts);
-                    dir.getUpdateFrequencies().updateFrequencies(ts, alpha, l.getActivation(dir), act);
-                });
-
-        rest
-                .stream()
-                .map(s -> (TSynapse) s)
-                .forEach(s -> dir.getUpdateFrequencies().updateFrequencies(s, alpha, null, act));
+    public void applyMovingAverage() {
+        frequency *= alpha;
+        binaryFrequency *= alpha;
+        N *= alpha;
     }
 
     public double getP() {
-        return posFrequency / N;
+        return frequency / N;
     }
 
     public double getReliability() {
         return binaryFrequency >= RELIABILITY_THRESHOLD ? Math.log(binaryFrequency - (RELIABILITY_THRESHOLD - 1.0)) : 0.0;
     }
 
-    public void prepareTrainingStep(Config c, Activation o, Function<Activation, ExcitatoryNeuron> callback) {
-        count(o);
-    }
 
-    public void train(Config c, Activation act) {
-//      if((o.p * (1.0 - getCoverage(o))) > THRESHOLD) {
-        if (isMature(c)) {
-//            generateNeuron(act);
-        }
-//      }
-    }
-
-    /*
-    private void generateNeuron(Activation act) {
-        ExcitatoryNeuron targetNeuron = new ExcitatoryNeuron(getModel(), "DERIVED-FROM-(" + act.getLabel() + ")");
-
-        targetNeuron.init(act);
-    }
-*/
     private double getCoverage(Activation seedAct) {
         double maxCoverage = 0.0;
         for(Map.Entry<Activation, Link> me: seedAct.outputLinks.entrySet()) {
@@ -199,29 +95,24 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
         return Math.min(Math.max(0.0, oAct.net), Math.max(0.0, ol.getInput().value * ol.getSynapse().getWeight())) / n.getBias();
     }
 
-    // TODO: store and retrieve targetSynapseIds
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeDouble(posFrequency);
+        out.writeDouble(frequency);
+        out.writeDouble(binaryFrequency);
         out.writeDouble(N);
-        out.writeInt(lastCount);
-
-        out.writeDouble(trainingBias);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
-        posFrequency = in.readDouble();
+        frequency = in.readDouble();
+        binaryFrequency = in.readDouble();
         N = in.readDouble();
-        lastCount = in.readInt();
-
-        trainingBias = in.readDouble();
     }
 
     public String freqToString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Pos:" + Utils.round(posFrequency));
-        sb.append(" Neg:" + Utils.round(N - posFrequency));
+        sb.append("Pos:" + Utils.round(frequency));
+        sb.append(" Neg:" + Utils.round(N - frequency));
         return sb.toString();
     }
 
@@ -231,22 +122,12 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
         sb.append(" Neg:" + Utils.round(Sign.NEG.getP(this)));
         return sb.toString();
     }
+
     protected String toDetailedString() {
         return super.toDetailedString() + " f:(" + freqToString() + ")";
     }
 
     public void dumpStat() {
-        System.out.println("OUT:  " +getLabel() + "  Freq:(" + freqToString() + ")  P(" + propToString() + ")");
-
-        for(Synapse s: getProvider().getActiveInputSynapses()) {
-            TSynapse ts = (TSynapse) s;
-
-            System.out.println("IN:  " + ts.getInput().getLabel());
-            System.out.println("     Freq:(" + ts.freqToString() + ")");
-            System.out.println("     PXi(" + ts.pXiToString() + ")");
-            System.out.println("     PXout(" + ts.pXoutToString() + ")");
-            System.out.println("     P(" + ts.propToString() + ")");
-            System.out.println("     Rel:" + ts.getReliability());
-        }
+        System.out.println("OUT:  " + getLabel() + "  Freq:(" + freqToString() + ")  P(" + propToString() + ")");
     }
 }

@@ -3,18 +3,18 @@ package network.aika.neuron.excitatory;
 
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.TSynapse;
 
-public abstract class ConjunctiveSynapse<I extends TNeuron, O extends ConjunctiveNeuron> extends TSynapse<I, O> {
+public abstract class ConjunctiveSynapse<I extends TNeuron, O extends ConjunctiveNeuron> extends Synapse<I, O> {
 
 
     public ConjunctiveSynapse() {
         super();
     }
 
-    public ConjunctiveSynapse(Neuron input, Neuron output, boolean propagate, int lastCount) {
-        super(input, output, propagate, lastCount);
+    public ConjunctiveSynapse(Neuron input, Neuron output, boolean propagate) {
+        super(input, output, propagate);
     }
 
 
