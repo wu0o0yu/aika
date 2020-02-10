@@ -56,19 +56,32 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
     }
 
     public double getSurprisal(Sign si, Sign so) {
-        double pXi = si.getP(getPrimaryInput().getInput());
-        double pXo = so.getP(getPatternInput().getInput());
+        double fz = getPrimaryInput().getInput().frequency;
+        double Nz = getPrimaryInput().getInput().N;
+        double fy = getPatternInput().getInput().frequency;
+        double Ny = getPatternInput().getInput().N;
 
-        double pXio = 0.0;
-        if(si == so) {
-            pXio = si.getP(this);
+        double pXi = fz / Nz;
+        pXi = si == Sign.POS ? pXi : 1.0 - pXi;
+
+        double pXo = fy / Ny;
+        pXo = so == Sign.POS ? pXo : 1.0 - pXo;
+
+        double f;
+        if(si == Sign.POS) {
+            if(so == Sign.POS) {
+                f = frequency;
+            } else {
+                f = fz - frequency;
+            }
         } else {
-            if(si == Sign.POS) {
-
-            } else if(so == Sign.POS) {
-
+            if(so == Sign.POS) {
+                f = fy - frequency;
+            } else {
+                f = N + frequency - (fz + fy);
             }
         }
+        double pXio = f / N;
 
         return Math.log(pXio) - (Math.log(pXi) + Math.log(pXo));
     }
