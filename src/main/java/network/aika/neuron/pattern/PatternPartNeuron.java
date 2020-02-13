@@ -105,20 +105,32 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
         return getPatternSynapse(true);
     }
 
-
-    public double computeWeightDelta(Link il) {
+    public double computeWeightGradient(Link il) {
         double g = il.getInput().value * getActivationFunction().outerGrad(il.getOutput().net);
 
-        double sum = g;
+        double sum = getSurprisal(Sign.POS, Sign.POS) * g;
         for(Link ol: il.getOutput().outputLinks.values()) {
             Activation oAct = ol.getOutput();
 
-            sum += oAct.getINeuron().computeInputDelta(g, ol);
+            sum += oAct.getINeuron().computeInputGradient(g, ol, 0);
         }
 
         return sum;
     }
 
+
+    public double computeInputGradient(double g, Link il, int depth) {
+        g *= il.getSynapse().getWeight() * getActivationFunction().outerGrad(il.getOutput().net);
+
+        double sum = getSurprisal(Sign.POS, Sign.POS) * g;
+        for(Link ol: il.getOutput().outputLinks.values()) {
+            Activation oAct = ol.getOutput();
+
+            sum += oAct.getINeuron().computeInputGradient(g, ol, depth + 1);
+        }
+
+        return sum;
+    }
 
     public Activation init(Activation iAct) {
         Document doc = iAct.getDocument();

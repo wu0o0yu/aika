@@ -200,7 +200,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         return state == CURRENT ? bias : bias + biasDelta;
     }
 
-    public double computeInputDelta(double g, Link l) {
+    public double computeInputGradient(double g, Link l, int depth) {
         return 0.0;
     }
 

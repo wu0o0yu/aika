@@ -22,6 +22,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 /**
@@ -43,6 +44,20 @@ public class PatternNeuron extends ExcitatoryNeuron {
     @Override
     public byte getType() {
         return type;
+    }
+
+
+    public double computeInputGradient(double g, Link il, int depth) {
+        g *= il.getSynapse().getWeight() * getActivationFunction().outerGrad(il.getOutput().net);
+
+        double sum = getSurprisal(Sign.POS) * g;
+        for(Link ol: il.getOutput().outputLinks.values()) {
+            Activation oAct = ol.getOutput();
+
+            sum += oAct.getINeuron().computeInputGradient(g, ol, depth + 1);
+        }
+
+        return sum;
     }
 
     public boolean isMature(Config c) {
