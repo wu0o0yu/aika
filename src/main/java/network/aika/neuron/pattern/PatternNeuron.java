@@ -46,18 +46,8 @@ public class PatternNeuron extends ExcitatoryNeuron {
         return type;
     }
 
-
-    public double computeInputGradient(double g, Link il, int depth) {
-        g *= il.getSynapse().getWeight() * getActivationFunction().outerGrad(il.getOutput().net);
-
-        double sum = getSurprisal(Sign.POS) * g;
-        for(Link ol: il.getOutput().outputLinks.values()) {
-            Activation oAct = ol.getOutput();
-
-            sum += oAct.getINeuron().computeInputGradient(g, ol, depth + 1);
-        }
-
-        return sum;
+    public double getCost(Sign s) {
+        return Math.log(s.getP(this));
     }
 
     public boolean isMature(Config c) {
@@ -67,9 +57,5 @@ public class PatternNeuron extends ExcitatoryNeuron {
     @Override
     protected void createCandidateSynapse(Config c, Activation iAct, Activation targetAct) {
 
-    }
-
-    public double getSurprisal(Sign s) {
-        return Math.log(s.getP(this));
     }
 }

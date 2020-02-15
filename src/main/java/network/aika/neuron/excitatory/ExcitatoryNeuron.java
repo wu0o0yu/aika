@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  *
@@ -45,6 +46,26 @@ public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynap
 
     public ExcitatoryNeuron(Model model, String label) {
         super(model, label);
+    }
+
+    public double computeWeightGradient(Link il) {
+        return computeGradient(il, 0, l -> l.getInput().value);
+    }
+
+    public double computeGradient(Link il, int depth, Function<Link, Double> f) {
+        if(depth > 2) return 0.0;
+
+        double g = f.apply(il) * getActivationFunction().outerGrad(il.getOutput().net);
+
+        double sum = 0.0;
+        for (Sign s : Sign.values()) {
+            sum += s.getSign() * getCost(s) * g;
+            for (Link ol : il.getOutput().outputLinks.values()) {
+                sum += ol.getOutput().getINeuron().computeGradient(ol, depth + 1, l -> g * il.getSynapse().getWeight());
+            }
+        }
+
+        return sum;
     }
 
     protected abstract void createCandidateSynapse(Config c, Activation iAct, Activation targetAct);

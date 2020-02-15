@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author Lukas Molzberger
  */
 public class PatternPartNeuron extends ExcitatoryNeuron {
@@ -55,11 +54,15 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
         return binaryFrequency >= c.getMaturityThreshold();  // Sign.NEG, Sign.POS
     }
 
-    public double getSurprisal(Sign si, Sign so) {
-        double fz = getPrimaryInput().getInput().frequency;
-        double Nz = getPrimaryInput().getInput().N;
-        double fy = getPatternInput().getInput().frequency;
-        double Ny = getPatternInput().getInput().N;
+    /*
+    public double getInformationGain(Sign si, Sign so) {
+        TNeuron primaryInput = getPrimaryInput().getInput();
+        TNeuron patternInput = getPatternInput().getInput();
+
+        double fz = primaryInput.frequency;
+        double Nz = primaryInput.N;
+        double fy = patternInput.frequency;
+        double Ny = patternInput.N;
 
         double pXi = fz / Nz;
         pXi = si == Sign.POS ? pXi : 1.0 - pXi;
@@ -85,7 +88,29 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
 
         return Math.log(pXio) - (Math.log(pXi) + Math.log(pXo));
     }
+    */
 
+    public double getCost(Sign s) {
+        TNeuron primaryInput = getPrimaryInput().getInput();
+        TNeuron patternInput = getPatternInput().getInput();
+
+        double fz = primaryInput.frequency;
+        double Nz = primaryInput.N;
+        double fy = patternInput.frequency;
+        double Ny = patternInput.N;
+
+        double pXi = fz / Nz;
+        double pXo = fy / Ny;
+
+        double pXio = frequency / N;
+        double pXioIndep = pXi * pXo;
+
+        if (s == Sign.POS) {
+            return Math.log(pXio) - Math.log(pXioIndep);
+        } else {
+            return Math.log(1.0 - pXio) - Math.log(1.0 - pXioIndep);
+        }
+    }
 
     private Synapse<TNeuron, TNeuron> getPatternSynapse(boolean isRecurrent) {
         return inputSynapses
@@ -105,33 +130,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
         return getPatternSynapse(true);
     }
 
-    public double computeWeightGradient(Link il) {
-        double g = il.getInput().value * getActivationFunction().outerGrad(il.getOutput().net);
-
-        double sum = getSurprisal(Sign.POS, Sign.POS) * g;
-        for(Link ol: il.getOutput().outputLinks.values()) {
-            Activation oAct = ol.getOutput();
-
-            sum += oAct.getINeuron().computeInputGradient(g, ol, 0);
-        }
-
-        return sum;
-    }
-
-
-    public double computeInputGradient(double g, Link il, int depth) {
-        g *= il.getSynapse().getWeight() * getActivationFunction().outerGrad(il.getOutput().net);
-
-        double sum = getSurprisal(Sign.POS, Sign.POS) * g;
-        for(Link ol: il.getOutput().outputLinks.values()) {
-            Activation oAct = ol.getOutput();
-
-            sum += oAct.getINeuron().computeInputGradient(g, ol, depth + 1);
-        }
-
-        return sum;
-    }
-
     public Activation init(Activation iAct) {
         Document doc = iAct.getDocument();
 
@@ -145,7 +143,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
 
         s.link();
 
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
         }
 
@@ -161,7 +159,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
         Neuron targetNeuron = targetAct.getNeuron();
         Neuron inputNeuron = iAct.getNeuron();
 
-        if(!((TNeuron) inputNeuron.get()).isMature(c)) {
+        if (!((TNeuron) inputNeuron.get()).isMature(c)) {
             return;
         }
 
@@ -169,7 +167,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
 
         s.link();
 
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
         }
 

@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Function;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Direction.INPUT;
@@ -142,6 +143,32 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         propagateTargets.remove(target);
     }
 
+    public void setBias(double b) {
+        biasDelta = b - bias;
+    }
+
+    public void updateBiasDelta(double biasDelta) {
+        this.biasDelta += biasDelta;
+    }
+
+    public abstract double getTotalBias(boolean initialRound, Synapse.State state);
+
+    public double getBias() {
+        return bias;
+    }
+
+    protected double getBias(Synapse.State state) {
+        return state == CURRENT ? bias : bias + biasDelta;
+    }
+
+    public double getCost(Sign s) {
+        return 0.0;
+    }
+
+    public double computeGradient(Link l, int depth, Function<Link, Double> f) {
+        return 0.0;
+    }
+
     public int compareTo(INeuron n) {
         if (this == n) return 0;
         return Integer.compare(getId(), n.getId());
@@ -180,28 +207,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
             Synapse syn = m.readSynapse(in);
             outputSynapses.put(syn.getPOutput(), syn);
         }
-    }
-
-    public void setBias(double b) {
-        biasDelta = b - bias;
-    }
-
-    public void updateBiasDelta(double biasDelta) {
-        this.biasDelta += biasDelta;
-    }
-
-    public abstract double getTotalBias(boolean initialRound, Synapse.State state);
-
-    public double getBias() {
-        return bias;
-    }
-
-    protected double getBias(Synapse.State state) {
-        return state == CURRENT ? bias : bias + biasDelta;
-    }
-
-    public double computeInputGradient(double g, Link l, int depth) {
-        return 0.0;
     }
 
     public String toString() {
