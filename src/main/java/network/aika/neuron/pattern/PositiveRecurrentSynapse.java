@@ -4,7 +4,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 
-public class PositiveRecurrentSynapse extends ExcitatorySynapse<PatternNeuron, PatternPartNeuron> {
+public class PositiveRecurrentSynapse extends PatternPartSynapse<PatternNeuron> {
 
     public static byte type;
 

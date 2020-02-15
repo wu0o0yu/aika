@@ -32,7 +32,7 @@ import java.util.function.Function;
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatoryNeuron extends ConjunctiveNeuron<ExcitatorySynapse> {
+public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends ConjunctiveNeuron<S> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 

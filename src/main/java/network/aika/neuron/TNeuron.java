@@ -79,7 +79,6 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
         return binaryFrequency >= RELIABILITY_THRESHOLD ? Math.log(binaryFrequency - (RELIABILITY_THRESHOLD - 1.0)) : 0.0;
     }
 
-
     private double getCoverage(Activation seedAct) {
         double maxCoverage = 0.0;
         for(Map.Entry<Activation, Link> me: seedAct.outputLinks.entrySet()) {

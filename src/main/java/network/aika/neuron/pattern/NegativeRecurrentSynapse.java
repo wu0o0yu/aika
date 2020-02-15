@@ -25,7 +25,7 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
  *
  * @author Lukas Molzberger
  */
-public class NegativeRecurrentSynapse extends ExcitatorySynapse<InhibitoryNeuron, PatternPartNeuron> {
+public class NegativeRecurrentSynapse extends PatternPartSynapse<InhibitoryNeuron> {
 
     public static byte type;
 

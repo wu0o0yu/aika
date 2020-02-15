@@ -5,7 +5,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 
-public class PatternPartSynapse extends ExcitatorySynapse<TNeuron, PatternPartNeuron> {
+public class PatternPartSynapse<I extends TNeuron> extends ExcitatorySynapse<I, PatternPartNeuron> {
 
     public static byte type;
 
@@ -43,5 +43,4 @@ public class PatternPartSynapse extends ExcitatorySynapse<TNeuron, PatternPartNe
             return (input, output) -> new PatternPartSynapse(input, output, propagate);
         }
     }
-
 }

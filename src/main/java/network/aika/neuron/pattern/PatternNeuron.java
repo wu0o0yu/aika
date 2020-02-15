@@ -21,15 +21,17 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.TNeuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.excitatory.ExcitatorySynapse;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PatternNeuron extends ExcitatoryNeuron {
+public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     public static byte type;
 
@@ -48,6 +50,14 @@ public class PatternNeuron extends ExcitatoryNeuron {
 
     public double getCost(Sign s) {
         return Math.log(s.getP(this));
+    }
+
+    public void updateN() {
+        N = 0.0;
+        for(PatternSynapse s: inputSynapses.values()) {
+            N += s.getInput().N;
+        }
+        N /= Math.pow(inputSynapses.size(), 2.0);
     }
 
     public boolean isMature(Config c) {
