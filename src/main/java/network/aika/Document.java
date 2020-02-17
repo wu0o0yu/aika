@@ -176,6 +176,7 @@ public class Document implements Comparable<Document> {
         getModel().charCounter += length();
     }
 
+
     public void notifyWeightModified(Synapse synapse) {
         Set<Synapse> is = modifiedWeights.get(synapse.getOutput());
         if(is == null) {

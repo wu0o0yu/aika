@@ -40,7 +40,8 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 
     public double binaryFrequency;
     public double frequency;
-    public double N;
+    public double coveredFactorSum;
+    public double coveredFactorCount;
     public double alpha = 0.99;
 
 
@@ -63,16 +64,24 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
         double v = act.value * act.getP();
         frequency += v;
         binaryFrequency += (v > 0.0 ? 1.0 : 0.0);
+
+        coveredFactorSum += act.rangeCoverage;
+        coveredFactorCount += 1.0;
     }
 
     public void applyMovingAverage() {
         frequency *= alpha;
         binaryFrequency *= alpha;
-        N *= alpha;
+        getN() *= alpha;
     }
 
     public double getP() {
-        return frequency / N;
+        return frequency / getN();
+    }
+
+    public double getN() {
+        double coveredFactor = coveredFactorSum / coveredFactorCount;
+        return getModel().charCounter / coveredFactor;
     }
 
     public double getReliability() {
@@ -98,20 +107,22 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
     public void write(DataOutput out) throws IOException {
         out.writeDouble(frequency);
         out.writeDouble(binaryFrequency);
-        out.writeDouble(N);
+        out.writeDouble(coveredFactorSum);
+        out.writeDouble(coveredFactorCount);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         frequency = in.readDouble();
         binaryFrequency = in.readDouble();
-        N = in.readDouble();
+        coveredFactorSum = in.readDouble();
+        coveredFactorCount = in.readDouble();
     }
 
     public String freqToString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Pos:" + Utils.round(frequency));
-        sb.append(" Neg:" + Utils.round(N - frequency));
+        sb.append(" Neg:" + Utils.round(getN() - frequency));
         return sb.toString();
     }
 

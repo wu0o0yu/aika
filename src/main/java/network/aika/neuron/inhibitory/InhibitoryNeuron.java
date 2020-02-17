@@ -20,6 +20,7 @@ import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.Config;
 import network.aika.neuron.TNeuron;
@@ -47,6 +48,10 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
 
     public InhibitoryNeuron(Model model, String label) {
         super(model, label);
+    }
+
+    public double propagateRangeCoverage(Activation iAct) {
+        return iAct.rangeCoverage;
     }
 
     @Override

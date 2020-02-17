@@ -52,12 +52,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         return Math.log(s.getP(this));
     }
 
-    public void updateN() {
-        N = 0.0;
-        for(PatternSynapse s: inputSynapses.values()) {
-            N += s.getInput().N;
-        }
-        N /= Math.pow(inputSynapses.size(), 2.0);
+    public double propagateRangeCoverage(Activation iAct) {
+        return iAct.rangeCoverage;
     }
 
     public boolean isMature(Config c) {

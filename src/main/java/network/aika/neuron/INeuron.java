@@ -169,6 +169,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         return 0.0;
     }
 
+    public abstract double propagateRangeCoverage(Activation iAct);
+
     public int compareTo(INeuron n) {
         if (this == n) return 0;
         return Integer.compare(getId(), n.getId());

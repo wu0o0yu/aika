@@ -42,6 +42,8 @@ public class Activation implements Comparable<Activation> {
     public double net;
     public Fired fired = NOT_FIRED;
 
+    public double rangeCoverage;
+
     private int id;
     private INeuron<?> neuron;
     private Document doc;
@@ -241,6 +243,7 @@ public class Activation implements Comparable<Activation> {
 
         double w = l.synapse.getWeight();
         net += l.input.value * w;
+        rangeCoverage += getINeuron().propagateRangeCoverage(l.input);
 
         checkIfFired(l);
     }

@@ -90,19 +90,23 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
     */
 
+    public double propagateRangeCoverage(Activation iAct) {
+        return getPrimaryInput() == iAct.getINeuron() ? iAct.rangeCoverage : 0.0;
+    }
+
     public double getCost(Sign s) {
-        TNeuron primaryInput = getPrimaryInput().getInput();
-        TNeuron patternInput = getPatternInput().getInput();
+        TNeuron primaryInput = getPrimaryInput();
+        TNeuron patternInput = getPatternInput();
 
         double fz = primaryInput.frequency;
-        double Nz = primaryInput.N;
+        double Nz = primaryInput.getN();
         double fy = patternInput.frequency;
-        double Ny = patternInput.N;
+        double Ny = patternInput.getN();
 
         double pXi = fz / Nz;
         double pXo = fy / Ny;
 
-        double pXio = frequency / N;
+        double pXio = frequency / getN();
         double pXioIndep = pXi * pXo;
 
         if (s == Sign.POS) {
@@ -122,12 +126,12 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
                 .orElse(null);
     }
 
-    public Synapse<TNeuron, TNeuron> getPrimaryInput() {
-        return getPatternSynapse(false);
+    public TNeuron getPrimaryInput() {
+        return getPatternSynapse(false).getInput();
     }
 
-    public Synapse<TNeuron, TNeuron> getPatternInput() {
-        return getPatternSynapse(true);
+    public TNeuron getPatternInput() {
+        return getPatternSynapse(true).getInput();
     }
 
     public Activation init(Activation iAct) {
