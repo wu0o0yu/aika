@@ -163,6 +163,7 @@ public class Document implements Comparable<Document> {
             }
         }
 
+        model.applyMovingAverage();
         for(TNeuron n: activatedNeurons) {
             n.applyMovingAverage();
 
@@ -173,7 +174,7 @@ public class Document implements Comparable<Document> {
 
         commit();
 
-        getModel().charCounter += length();
+        getModel().N += length();
     }
 
 

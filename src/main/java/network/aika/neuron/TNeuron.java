@@ -42,7 +42,6 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
     public double frequency;
     public double coveredFactorSum;
     public double coveredFactorCount;
-    public double alpha = 0.99;
 
 
     protected TNeuron() {
@@ -70,9 +69,9 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
     }
 
     public void applyMovingAverage() {
+        double alpha = getModel().ALPHA;
         frequency *= alpha;
         binaryFrequency *= alpha;
-        getN() *= alpha;
     }
 
     public double getP() {
@@ -81,7 +80,7 @@ public abstract class TNeuron<S extends Synapse> extends INeuron<S> {
 
     public double getN() {
         double coveredFactor = coveredFactorSum / coveredFactorCount;
-        return getModel().charCounter / coveredFactor;
+        return getModel().N / coveredFactor;
     }
 
     public double getReliability() {

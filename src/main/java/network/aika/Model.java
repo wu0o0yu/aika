@@ -56,7 +56,9 @@ public class Model {
 
     private static final Logger log = LoggerFactory.getLogger(Model.class);
 
-    public int charCounter = 0;
+    public static double ALPHA = 0.99;
+
+    public int N = 0; // needs to be stored
 
     public static Map<Byte, Class> typeRegistry = new HashMap<>();
 
@@ -86,6 +88,10 @@ public class Model {
 
     public Model(SuspensionHook sh) {
         suspensionHook = sh;
+    }
+
+    public void applyMovingAverage() {
+        N *= ALPHA;
     }
 
     private static void register(Class clazz) {
