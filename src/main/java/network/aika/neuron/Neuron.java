@@ -91,6 +91,9 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         return init(n, bias, getSynapseBuilders(inputs));
     }
 
+    public static Neuron init(INeuron<?> n, double bias, Builder... inputs) {
+        return init(n.getProvider(), bias, inputs);
+    }
 
     /**
      * Creates a neuron with the given bias.

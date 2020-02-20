@@ -9,6 +9,7 @@ import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.pattern.PatternNeuron;
 import network.aika.neuron.pattern.PatternPartNeuron;
 import network.aika.neuron.pattern.PatternPartSynapse;
+import network.aika.neuron.pattern.PatternSynapse;
 import org.junit.Test;
 
 public class PatternTest {
@@ -32,7 +33,7 @@ public class PatternTest {
         PatternNeuron out = new PatternNeuron(m, "OUT");
 
 
-        Neuron.init(eA.getProvider(), 1.0,
+        Neuron.init(eA, 1.0,
                 new PatternPartSynapse.Builder()
                         .setNeuron(inA)
                         .setWeight(10.0)
@@ -43,7 +44,7 @@ public class PatternTest {
                         .setRecurrent(true)
         );
 
-        Neuron.init(eB.getProvider(), 1.0,
+        Neuron.init(eB, 1.0,
                 new PatternPartSynapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0)
@@ -62,7 +63,7 @@ public class PatternTest {
                         .setRecurrent(true)
         );
 
-        Neuron.init(eC.getProvider(), 1.0,
+        Neuron.init(eC, 1.0,
                 new PatternPartSynapse.Builder()
                         .setNeuron(inC)
                         .setWeight(10.0)
@@ -81,16 +82,16 @@ public class PatternTest {
                         .setRecurrent(true)
         );
 
-        Neuron.init(out.getProvider(), 1.0,
-                new PatternPartSynapse.Builder()
+        Neuron.init(out, 1.0,
+                new PatternSynapse.Builder()
                         .setNeuron(eA)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new PatternPartSynapse.Builder()
+                new PatternSynapse.Builder()
                         .setNeuron(eB)
                         .setWeight(10.0)
                         .setRecurrent(false),
-                new PatternPartSynapse.Builder()
+                new PatternSynapse.Builder()
                         .setNeuron(eC)
                         .setWeight(10.0)
                         .setRecurrent(false)

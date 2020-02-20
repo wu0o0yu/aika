@@ -151,24 +151,21 @@ public class Document implements Comparable<Document> {
     }
 
     public void train(Config c) {
-        createV = getNewVisitedId();
-
-        TreeSet<TNeuron> activatedNeurons = new TreeSet<>();
-        for(Activation act: new ArrayList<>(getActivations())) {
-            if(act.isActive()) {
-                TNeuron n = act.getINeuron();
-                activatedNeurons.add(n);
-
-                n.count(act);
-            }
-        }
-
+        long v = getNewVisitedId();
+        createV = v;
+/*
         model.applyMovingAverage();
         for(TNeuron n: activatedNeurons) {
-            n.applyMovingAverage();
-
-//          act.targetNeuron.commit(act.targetNeuron.getInputSynapses());
+            n.applyMovingAverage(v);
         }
+*/
+        getActivations()
+                .stream()
+                .filter(act -> act.isActive())
+                .forEach(act -> {
+                    TNeuron n = act.getINeuron();
+                    n.count(act);
+                });
 
 //        propagate();
 

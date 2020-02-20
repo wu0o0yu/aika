@@ -27,7 +27,7 @@ import network.aika.neuron.*;
  */
 public class InhibitorySynapse extends Synapse<TNeuron, InhibitoryNeuron> {
 
-    private static byte type;
+    public static byte type;
 
     public InhibitorySynapse() {
         super();
