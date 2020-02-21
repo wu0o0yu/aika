@@ -34,7 +34,7 @@ public class InhibitorySynapse extends Synapse<TNeuron, InhibitoryNeuron> {
     }
 
     public InhibitorySynapse(Neuron input, Neuron output) {
-        super(input, output, true);
+        super(input, output);
     }
 
     @Override
@@ -50,6 +50,11 @@ public class InhibitorySynapse extends Synapse<TNeuron, InhibitoryNeuron> {
     @Override
     public boolean isNegative() {
         return false;
+    }
+
+    @Override
+    public boolean isPropagate() {
+        return true;
     }
 
     protected void addLinkInternal(INeuron in, INeuron out) {

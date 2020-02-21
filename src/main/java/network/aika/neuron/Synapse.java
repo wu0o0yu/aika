@@ -24,7 +24,6 @@ import network.aika.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.*;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 
@@ -39,8 +38,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     protected Neuron input;
     protected Neuron output;
 
-    private boolean propagate;
-
     private double weight;
     private double weightDelta;
 
@@ -48,13 +45,14 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     public Synapse() {
     }
 
-    public Synapse(Neuron input, Neuron output, boolean propagate) {
+    public Synapse(Neuron input, Neuron output) {
         this.input = input;
         this.output = output;
-        setPropagate(propagate);
     }
 
     public abstract byte getType();
+
+    public abstract boolean isPropagate();
 
     public abstract boolean isRecurrent();
 
@@ -106,6 +104,9 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         (dir ? out : in).lock.acquireWriteLock();
 
         input.lock.acquireWriteLock();
+        if(isPropagate()) {
+            in.addPropagateTarget(output);
+        }
         input.activeOutputSynapses.put(output, this);
         input.lock.releaseWriteLock();
 
@@ -130,6 +131,9 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         (dir ? out : in).lock.acquireWriteLock();
 
         input.lock.acquireWriteLock();
+        if(isPropagate()) {
+            in.removePropagateTarget(output);
+        }
         input.activeOutputSynapses.remove(this);
         input.lock.releaseWriteLock();
 
@@ -177,19 +181,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         }
     }
 
-    public boolean isPropagate() {
-        return propagate;
-    }
-
-    public void setPropagate(boolean propagate) {
-        this.propagate = propagate;
-
-        if(propagate) {
-            input.get().addPropagateTarget(output);
-        } else {
-            input.get().removePropagateTarget(output);
-        }
-    }
 
     @Override
     public void write(DataOutput out) throws IOException {
@@ -199,8 +190,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         out.writeInt(output.getId());
 
         out.writeDouble(weight);
-
-        out.writeBoolean(propagate);
     }
 
     @Override
@@ -209,8 +198,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         output = m.lookupNeuron(in.readInt());
 
         weight = in.readDouble();
-
-        propagate = in.readBoolean();
 
         output.addActiveInputSynapse(this);
         input.addActiveOutputSynapse(this);
@@ -236,9 +223,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     public static abstract class Builder implements Neuron.Builder {
 
         private Neuron neuron;
-
-        protected boolean recurrent;
-        protected boolean propagate;
         double weight;
 
 
@@ -263,11 +247,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         public Builder setNeuron(INeuron<?> neuron) {
             assert neuron != null;
             this.neuron = neuron.getProvider();
-            return this;
-        }
-
-        public Builder setRecurrent(boolean recurrent) {
-            this.recurrent = recurrent;
             return this;
         }
 

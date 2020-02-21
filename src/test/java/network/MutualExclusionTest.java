@@ -4,14 +4,13 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
-import network.aika.neuron.pattern.NegativeRecurrentSynapse;
-import network.aika.neuron.pattern.PatternNeuron;
+import network.aika.neuron.excitatory.patternpart.NegativeRecurrentSynapse;
+import network.aika.neuron.excitatory.pattern.PatternNeuron;
+import network.aika.neuron.excitatory.patternpart.PrimarySynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.pattern.PatternPartNeuron;
-import network.aika.neuron.pattern.PatternPartSynapse;
+import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
+import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import org.junit.Test;
 
 public class MutualExclusionTest {
@@ -28,36 +27,30 @@ public class MutualExclusionTest {
         InhibitoryNeuron inhib = new InhibitoryNeuron(m, "I");
 
         Neuron.init(na.getProvider(), 1.0,
-                new PatternPartSynapse.Builder()
+                new PrimarySynapse.Builder()
                         .setNeuron(in)
-                        .setWeight(10.0)
-                        .setRecurrent(false),
+                        .setWeight(10.0),
                 new NegativeRecurrentSynapse.Builder()
                         .setNeuron(inhib)
                         .setWeight(-100.0)
-                        .setRecurrent(true)
         );
 
         Neuron.init(nb.getProvider(), 1.5,
-                new PatternPartSynapse.Builder()
+                new PrimarySynapse.Builder()
                         .setNeuron(in)
-                        .setWeight(10.0)
-                        .setRecurrent(false),
+                        .setWeight(10.0),
                 new NegativeRecurrentSynapse.Builder()
                         .setNeuron(inhib)
                         .setWeight(-100.0)
-                        .setRecurrent(true)
         );
 
         Neuron.init(nc.getProvider(), 1.2,
-                new PatternPartSynapse.Builder()
+                new PrimarySynapse.Builder()
                         .setNeuron(in)
-                        .setWeight(10.0)
-                        .setRecurrent(false),
+                        .setWeight(10.0),
                 new NegativeRecurrentSynapse.Builder()
                         .setNeuron(inhib)
                         .setWeight(-100.0)
-                        .setRecurrent(true)
         );
 
         Neuron.init(inhib.getProvider(), 0.0,

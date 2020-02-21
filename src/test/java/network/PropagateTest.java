@@ -4,11 +4,10 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
-import network.aika.neuron.pattern.PatternNeuron;
-import network.aika.neuron.pattern.PatternPartNeuron;
-import network.aika.neuron.pattern.PatternPartSynapse;
+import network.aika.neuron.excitatory.pattern.PatternNeuron;
+import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
+import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
+import network.aika.neuron.excitatory.patternpart.PrimarySynapse;
 import org.junit.Test;
 
 public class PropagateTest {
@@ -22,10 +21,9 @@ public class PropagateTest {
         PatternPartNeuron na = new PatternPartNeuron(m, "A");
 
         Neuron.init(na.getProvider(), 1.0,
-                new PatternPartSynapse.Builder()
+                new PrimarySynapse.Builder()
                         .setNeuron(in)
                         .setWeight(10.0)
-                        .setRecurrent(false)
                 );
 
 

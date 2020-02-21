@@ -7,10 +7,12 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.pattern.PatternNeuron;
-import network.aika.neuron.pattern.PatternPartNeuron;
-import network.aika.neuron.pattern.PatternPartSynapse;
-import network.aika.neuron.pattern.PatternSynapse;
+import network.aika.neuron.excitatory.pattern.PatternNeuron;
+import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
+import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
+import network.aika.neuron.excitatory.pattern.PatternSynapse;
+import network.aika.neuron.excitatory.patternpart.PositiveRecurrentSynapse;
+import network.aika.neuron.excitatory.patternpart.PrimarySynapse;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -104,10 +106,12 @@ public class SyllableExperiment {
     public void testTrainingDer() throws IOException {
         PatternNeuron derN = initDer();
 
-        for(String word: Util.loadExamplesAsWords(new File("/Users/lukas.molzberger/aika-ws/maerchen"))) {
+        train("der ");
+
+/*        for(String word: Util.loadExamplesAsWords(new File("/Users/lukas.molzberger/aika-ws/maerchen"))) {
             train( word + " ");
         }
-
+*/
         model.dumpModel();
         System.out.println();
     }
@@ -122,67 +126,54 @@ public class SyllableExperiment {
 
 
         Neuron.init(eD, 1.0,
-                new PatternPartSynapse.Builder()
+                new PrimarySynapse.Builder()
                         .setNeuron(lookupChar('d'))
-                        .setWeight(10.0)
-                        .setRecurrent(false),
-                new PatternPartSynapse.Builder()
+                        .setWeight(10.0),
+                new PositiveRecurrentSynapse.Builder()
                         .setNeuron(derN)
                         .setWeight(10.0)
-                        .setRecurrent(true)
         );
 
         Neuron.init(eE, 1.0,
-                new PatternPartSynapse.Builder()
+                new PrimarySynapse.Builder()
                         .setNeuron(lookupChar('e'))
-                        .setWeight(10.0)
-                        .setRecurrent(false),
+                        .setWeight(10.0),
                 new PatternPartSynapse.Builder()
                         .setNeuron(eD)
-                        .setWeight(10.0)
-                        .setRecurrent(false),
+                        .setWeight(10.0),
                 new PatternPartSynapse.Builder()
                         .setNeuron(relN)
-                        .setWeight(10.0)
-                        .setRecurrent(false),
-                new PatternPartSynapse.Builder()
+                        .setWeight(10.0),
+                new PositiveRecurrentSynapse.Builder()
                         .setNeuron(derN)
                         .setWeight(10.0)
-                        .setRecurrent(true)
         );
 
         Neuron.init(eR, 1.0,
-                new PatternPartSynapse.Builder()
+                new PrimarySynapse.Builder()
                         .setNeuron(lookupChar('r'))
-                        .setWeight(10.0)
-                        .setRecurrent(false),
+                        .setWeight(10.0),
                 new PatternPartSynapse.Builder()
                         .setNeuron(eE)
-                        .setWeight(10.0)
-                        .setRecurrent(false),
+                        .setWeight(10.0),
                 new PatternPartSynapse.Builder()
                         .setNeuron(relN)
-                        .setWeight(10.0)
-                        .setRecurrent(false),
-                new PatternPartSynapse.Builder()
+                        .setWeight(10.0),
+                new PositiveRecurrentSynapse.Builder()
                         .setNeuron(derN)
                         .setWeight(10.0)
-                        .setRecurrent(true)
         );
 
         Neuron.init(derN, 1.0,
                 new PatternSynapse.Builder()
                         .setNeuron(eD)
-                        .setWeight(10.0)
-                        .setRecurrent(false),
+                        .setWeight(10.0),
                 new PatternSynapse.Builder()
                         .setNeuron(eE)
-                        .setWeight(10.0)
-                        .setRecurrent(false),
+                        .setWeight(10.0),
                 new PatternSynapse.Builder()
                         .setNeuron(eR)
                         .setWeight(10.0)
-                        .setRecurrent(false)
         );
 
         return derN;

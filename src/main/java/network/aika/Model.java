@@ -23,11 +23,11 @@ import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
-import network.aika.neuron.pattern.NegativeRecurrentSynapse;
+import network.aika.neuron.excitatory.patternpart.NegativeRecurrentSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.pattern.PatternNeuron;
-import network.aika.neuron.pattern.PatternPartNeuron;
+import network.aika.neuron.excitatory.pattern.PatternNeuron;
+import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

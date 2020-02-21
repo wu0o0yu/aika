@@ -186,22 +186,6 @@ public abstract class ConjunctiveNeuron<S extends Synapse> extends TNeuron<S> {
             }
         }
 
-        TreeSet<Synapse> sortedSynapses = new TreeSet<>(
-                Comparator.<Synapse>comparingDouble(s -> s.getWeight()).reversed()
-                        .thenComparing(Direction.INPUT.getSynapseComparator())
-        );
-
-        sortedSynapses.addAll(inputSynapses.values());
-
-        double sum = getBias(CURRENT);
-        for(Synapse s: sortedSynapses) {
-            if(!s.isRecurrent() && !s.isNegative()) {
-                s.setPropagate(sum > 0.0);
-
-                sum -= s.getWeight();
-            }
-        }
-
         setModified();
     }
 }

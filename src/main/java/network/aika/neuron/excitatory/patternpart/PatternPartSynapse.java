@@ -1,4 +1,4 @@
-package network.aika.neuron.pattern;
+package network.aika.neuron.excitatory.patternpart;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
@@ -12,13 +12,18 @@ public class PatternPartSynapse<I extends TNeuron> extends ExcitatorySynapse<I, 
     public PatternPartSynapse() {
     }
 
-    public PatternPartSynapse(Neuron input, Neuron output, boolean propagate) {
-        super(input, output, propagate);
+    public PatternPartSynapse(Neuron input, Neuron output) {
+        super(input, output);
     }
 
     @Override
     public byte getType() {
         return type;
+    }
+
+    @Override
+    public boolean isPropagate() {
+        return false;
     }
 
     @Override
@@ -40,7 +45,7 @@ public class PatternPartSynapse<I extends TNeuron> extends ExcitatorySynapse<I, 
         }
 
         protected Synapse.SynapseFactory getSynapseFactory() {
-            return (input, output) -> new PatternPartSynapse(input, output, propagate);
+            return (input, output) -> new PatternPartSynapse(input, output);
         }
     }
 }

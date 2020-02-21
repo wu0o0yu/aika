@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.pattern;
+package network.aika.neuron.excitatory.patternpart;
 
 import network.aika.Config;
 import network.aika.Document;
@@ -26,6 +26,7 @@ import network.aika.neuron.TNeuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,7 +142,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
         int actBegin = 0; // iAct.getSlot(BEGIN).getFinalPosition();
 
-        PatternPartSynapse s = new PatternPartSynapse(iAct.getNeuron(), getProvider(), true);
+        PatternPartSynapse s = new PatternPartSynapse(iAct.getNeuron(), getProvider());
 
         s.updateDelta(doc, 2.0);
 
@@ -167,7 +168,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
             return;
         }
 
-        PatternPartSynapse s = new PatternPartSynapse(inputNeuron, targetNeuron, false);
+        PatternPartSynapse s = new PatternPartSynapse(inputNeuron, targetNeuron);
 
         s.link();
 

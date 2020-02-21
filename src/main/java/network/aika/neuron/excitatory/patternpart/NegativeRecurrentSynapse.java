@@ -14,33 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.pattern;
+package network.aika.neuron.excitatory.patternpart;
 
-import network.aika.Config;
-import network.aika.Model;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.TNeuron;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
+public class NegativeRecurrentSynapse extends PatternPartSynapse<InhibitoryNeuron> {
 
     public static byte type;
 
-    public PatternNeuron(Neuron p) {
-        super(p);
+    public NegativeRecurrentSynapse() {
+        super();
     }
 
-    public PatternNeuron(Model model, String label) {
-        super(model, label);
+    public NegativeRecurrentSynapse(Neuron input, Neuron output) {
+        super(input, output);
     }
 
     @Override
@@ -48,20 +41,27 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         return type;
     }
 
-    public double getCost(Sign s) {
-        return Math.log(s.getP(this));
-    }
-
-    public double propagateRangeCoverage(Activation iAct) {
-        return iAct.rangeCoverage;
-    }
-
-    public boolean isMature(Config c) {
-        return binaryFrequency >= c.getMaturityThreshold();  // Sign.NEG, Sign.POS
+    @Override
+    public boolean isRecurrent() {
+        return true;
     }
 
     @Override
-    protected void createCandidateSynapse(Config c, Activation iAct, Activation targetAct) {
+    public boolean isNegative() {
+        return true;
+    }
 
+
+    public static class Builder extends Synapse.Builder {
+
+        public Synapse getSynapse(Neuron outputNeuron) {
+            NegativeRecurrentSynapse s = (NegativeRecurrentSynapse) super.getSynapse(outputNeuron);
+
+            return s;
+        }
+
+        protected Synapse.SynapseFactory getSynapseFactory() {
+            return (input, output) -> new NegativeRecurrentSynapse(input, output);
+        }
     }
 }

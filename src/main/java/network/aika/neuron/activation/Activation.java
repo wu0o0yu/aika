@@ -21,7 +21,7 @@ import network.aika.Utils;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.pattern.PatternNeuron;
+import network.aika.neuron.excitatory.pattern.PatternNeuron;
 
 import java.util.*;
 import java.util.stream.Stream;
