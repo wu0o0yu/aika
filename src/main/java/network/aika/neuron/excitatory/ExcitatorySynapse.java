@@ -30,8 +30,6 @@ import java.io.IOException;
  */
 public abstract class ExcitatorySynapse<I extends TNeuron, O extends ConjunctiveNeuron> extends ConjunctiveSynapse<I, O> {
 
-    public static byte type;
-
 
     public ExcitatorySynapse() {
         super();
@@ -41,18 +39,4 @@ public abstract class ExcitatorySynapse<I extends TNeuron, O extends Conjunctive
         super(input, output);
     }
 
-    @Override
-    public byte getType() {
-        return type;
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws IOException {
-        super.readFields(in, m);
-    }
 }
