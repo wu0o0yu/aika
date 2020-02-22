@@ -55,7 +55,6 @@ public abstract class ConjunctiveNeuron<S extends Synapse> extends TNeuron<S> {
         super();
     }
 
-
     public ConjunctiveNeuron(Neuron p) {
         super(p);
     }
@@ -109,14 +108,6 @@ public abstract class ConjunctiveNeuron<S extends Synapse> extends TNeuron<S> {
         return inputSynapses.values();
     }
 
-    public InhibitoryNeuron getInhibitoryNeuron() {
-        return inhibitoryNeuron;
-    }
-
-    public void setInhibitoryNeuron(InhibitoryNeuron inhibitoryNeuron) {
-        this.inhibitoryNeuron = inhibitoryNeuron;
-    }
-
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
     }
@@ -126,22 +117,13 @@ public abstract class ConjunctiveNeuron<S extends Synapse> extends TNeuron<S> {
         return new Fired(f.getInputTimestamp(), f.getFired() + 1);
     }
 
-
     public boolean isWeak(Synapse s, Synapse.State state) {
         return s.getWeight(state) < getBias();
     }
 
-
     public double getTotalBias(boolean initialRound, Synapse.State state) {
-        return getBias(state) - (initialRound ? 0.0 : getConjunctiveBias());
+        return getBias(state) - (directConjunctiveBias + (initialRound ? 0.0 : recurrentConjunctiveBias));
     }
-
-
-    public double getConjunctiveBias() {
-        return directConjunctiveBias + recurrentConjunctiveBias;
-    }
-
-
 
     @Override
     public void write(DataOutput out) throws IOException {
@@ -155,7 +137,6 @@ public abstract class ConjunctiveNeuron<S extends Synapse> extends TNeuron<S> {
         }
         out.writeBoolean(false);
     }
-
 
     @Override
     public void readFields(DataInput in, Model m) throws Exception {

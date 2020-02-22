@@ -22,7 +22,6 @@ public abstract class ConjunctiveSynapse<I extends TNeuron, O extends Conjunctiv
         out.addInputSynapse(this);
     }
 
-
     protected void removeLinkInternal(INeuron in, INeuron out) {
         out.removeInputSynapse(this);
     }
