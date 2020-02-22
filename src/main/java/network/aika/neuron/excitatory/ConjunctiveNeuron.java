@@ -43,8 +43,6 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  */
 public abstract class ConjunctiveNeuron<S extends Synapse> extends TNeuron<S> {
 
-    private InhibitoryNeuron inhibitoryNeuron;
-
     private volatile double directConjunctiveBias;
     private volatile double recurrentConjunctiveBias;
 
@@ -147,8 +145,6 @@ public abstract class ConjunctiveNeuron<S extends Synapse> extends TNeuron<S> {
             inputSynapses.put(syn.getPInput(), syn);
         }
     }
-
-
 
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
         commitBias();

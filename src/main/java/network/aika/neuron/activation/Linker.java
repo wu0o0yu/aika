@@ -52,7 +52,7 @@ public class Linker {
             if(cAct.getINeuron() instanceof InhibitoryNeuron) return;
 
             Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
-            if(s == null || !act.outputLinkExists(cAct.getINeuron())) return;
+            if(s == null || act.outputLinkExists(cAct.getINeuron())) return;
 
             new Entry(cAct)
                     .addCandidate(s, act)
