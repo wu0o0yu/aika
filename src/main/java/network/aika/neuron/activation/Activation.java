@@ -201,6 +201,10 @@ public class Activation implements Comparable<Activation> {
         this.fired = fired;
     }
 
+    public void setRangeCoverage(double rangeCoverage) {
+        this.rangeCoverage = rangeCoverage;
+    }
+
     public boolean isActive() {
         return value > 0.0;
     }

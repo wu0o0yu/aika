@@ -121,6 +121,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
         act.setValue(input.value);
         act.setFired(new Fired(input.inputTimestamp, input.fired));
+        act.setRangeCoverage(input.rangeCoverage);
 
         act.isFinal = true;
 
