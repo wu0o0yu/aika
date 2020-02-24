@@ -68,12 +68,18 @@ public class MutualExclusionTest {
 
         Document doc = new Document(m, "test");
 
-        in.addInput(doc,
+        Activation inAct = in.addInput(doc,
                 new Activation.Builder()
                     .setValue(1.0)
                     .setInputTimestamp(0)
                     .setFired(0)
         );
+
+        Activation act = inAct.outputLinks.firstEntry().getValue().getOutput();
+
+        PatternPartNeuron.computeP(act);
+
+        double p = act.getP();
 
         System.out.println(doc.activationsToString());
     }

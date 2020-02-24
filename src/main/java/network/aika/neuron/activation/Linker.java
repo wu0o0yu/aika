@@ -65,7 +65,7 @@ public class Linker {
                 .map(n -> n.get().getProvider())
                 .map(n -> act.getNeuron().getOutputSynapse(n))
                 .forEach(s ->
-                        new Entry(new Activation(doc, s.getOutput(), null, 0))
+                        new Entry(new Activation(doc, s.getOutput(), false, null, 0))
                                 .addCandidate(s, act)
                                 .addToQueue(queue)
                 );

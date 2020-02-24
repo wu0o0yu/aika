@@ -30,6 +30,9 @@ import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * @author Lukas Molzberger
  */
@@ -152,7 +155,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
             log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
         }
 
-        Activation targetAct = new Activation(doc, this, null, 0);
+        Activation targetAct = new Activation(doc, this, false, null, 0);
 
         Link l = new Link(s, iAct, targetAct);
         targetAct.addLink(l, false);
@@ -179,5 +182,26 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         Link l = new Link(s, iAct, targetAct);
 
         targetAct.addLink(l, false);
+    }
+
+
+    public static void computeP(Activation act) {
+        if(!act.isActive()) return;
+
+        Set<Activation> conflictingActs = act.branches
+                .stream()
+                .flatMap(bAct -> bAct.inputLinks.values().stream())
+                .filter(l -> l.isConflict())
+                .flatMap(l -> l.getInput().inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
+                .map(l -> l.getInput())
+                .collect(Collectors.toSet());
+
+        final double[] offset = new double[] {act.net};
+        conflictingActs.stream().forEach(cAct -> offset[0] = Math.min(offset[0], cAct.net));
+
+        final double[] norm = new double[] {Math.exp(act.net - offset[0])};
+        conflictingActs.stream().forEach(cAct -> norm[0] += Math.exp(cAct.net - offset[0]));
+
+        act.p = Math.exp(act.net - offset[0]) / norm[0];
     }
 }

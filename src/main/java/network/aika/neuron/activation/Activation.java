@@ -64,12 +64,15 @@ public class Activation implements Comparable<Activation> {
     public Activation nextRound;
     public Activation lastRound;
 
+    public Set<Activation> branches;
+    public Activation mainBranch;
+
     private Activation(int id, INeuron<?> n) {
         this.id = id;
         this.neuron = n;
     }
 
-    public Activation(Document doc, INeuron<?> n, Activation lastRound, int round) {
+    public Activation(Document doc, INeuron<?> n, boolean branch, Activation lastRound, int round) {
         this.id = doc.getNewActivationId();
         this.doc = doc;
         this.neuron = n;
@@ -77,9 +80,17 @@ public class Activation implements Comparable<Activation> {
 
         this.net = n.getTotalBias(isInitialRound(), CURRENT);
 
-        this.lastRound = lastRound;
-        if(lastRound != null) {
-            lastRound.nextRound = this;
+        if(branch) {
+            if(lastRound.branches == null) {
+                lastRound.branches = new TreeSet<>();
+            }
+            lastRound.branches.add(this);
+            mainBranch = lastRound;
+        } else {
+            this.lastRound = lastRound;
+            if (lastRound != null) {
+                lastRound.nextRound = this;
+            }
         }
 
         doc.addActivation(this);
@@ -171,7 +182,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Activation cloneAct(boolean branch) {
-        Activation clonedAct = new Activation(doc, neuron, branch ? null : this, round + 1);
+        Activation clonedAct = new Activation(doc, neuron, branch, this, round + 1);
 
         inputLinks
                 .values()
