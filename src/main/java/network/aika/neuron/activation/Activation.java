@@ -206,7 +206,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public double getP() {
-        return 0.0;
+        return 1.0;
     }
 
     public boolean outputLinkExists(INeuron n) {
@@ -312,6 +312,8 @@ public class Activation implements Comparable<Activation> {
         public int fired;
         public List<Activation> inputLinks = new ArrayList<>();
 
+        public double rangeCoverage;
+
 
         public Builder setValue(double value) {
             this.value = value;
@@ -334,6 +336,11 @@ public class Activation implements Comparable<Activation> {
 
         public Builder addInputLink(Activation iAct) {
             inputLinks.add(iAct);
+            return this;
+        }
+
+        public Builder setRangeCoverage(double rangeCoverage) {
+            this.rangeCoverage = rangeCoverage;
             return this;
         }
     }

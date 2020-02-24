@@ -64,6 +64,7 @@ public class SyllableExperiment {
                             .setInputTimestamp(i)
                             .setFired(0)
                             .setValue(1.0)
+                            .setRangeCoverage(1.0)
             );
 
             if(lastAct != null) {
