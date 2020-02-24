@@ -126,7 +126,7 @@ public class SyllableExperiment {
         PatternNeuron derN = new PatternNeuron(model, "P-der");
 
 
-        Neuron.init(eD, 1.0,
+        Neuron.init(eD, 5.0,
                 new PrimarySynapse.Builder()
                         .setNeuron(lookupChar('d'))
                         .setWeight(10.0),
@@ -135,7 +135,7 @@ public class SyllableExperiment {
                         .setWeight(10.0)
         );
 
-        Neuron.init(eE, 1.0,
+        Neuron.init(eE, 5.0,
                 new PrimarySynapse.Builder()
                         .setNeuron(lookupChar('e'))
                         .setWeight(10.0),
@@ -150,7 +150,7 @@ public class SyllableExperiment {
                         .setWeight(10.0)
         );
 
-        Neuron.init(eR, 1.0,
+        Neuron.init(eR, 5.0,
                 new PrimarySynapse.Builder()
                         .setNeuron(lookupChar('r'))
                         .setWeight(10.0),

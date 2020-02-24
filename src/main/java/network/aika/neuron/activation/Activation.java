@@ -241,12 +241,14 @@ public class Activation implements Comparable<Activation> {
     public void addLink(Link l, boolean processMode) {
         assert l.output == null;
 
+        boolean firedInOrder = inputLinks.isEmpty() || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().input.fired) >= 0;
+
         l.output = this;
         l.link();
 
         if(isFinal || (isInitialRound() && l.isRecurrent())) return;
 
-        if(inputLinks.size() == 1 || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().input.fired) > 0) {
+        if(firedInOrder) {
             sumUpLink(l, processMode);
         } else {
             compute(processMode);
@@ -254,7 +256,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void sumUpLink(Link l, boolean processMode) {
-        if(l.synapse == null && (processMode || !l.isRecurrent() || l.isNegative())) return;
+        if(l.synapse == null || (!processMode && l.isRecurrent())) return;
 
         double w = l.synapse.getWeight();
         net += l.input.value * w;
