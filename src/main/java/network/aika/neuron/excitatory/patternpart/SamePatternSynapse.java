@@ -4,14 +4,14 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 
-public class PrimarySynapse extends PatternPartSynapse<PatternNeuron> {
+public class SamePatternSynapse extends PatternPartSynapse<PatternNeuron> {
 
     public static byte type;
 
-    public PrimarySynapse() {
+    public SamePatternSynapse() {
     }
 
-    public PrimarySynapse(Neuron input, Neuron output) {
+    public SamePatternSynapse(Neuron input, Neuron output) {
         super(input, output);
     }
 
@@ -32,19 +32,19 @@ public class PrimarySynapse extends PatternPartSynapse<PatternNeuron> {
 
     @Override
     public boolean isPropagate() {
-        return true;
+        return false;
     }
 
     public static class Builder extends PatternPartSynapse.Builder {
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            PrimarySynapse s = (PrimarySynapse) super.getSynapse(outputNeuron);
+            SamePatternSynapse s = (SamePatternSynapse) super.getSynapse(outputNeuron);
 
             return s;
         }
 
-        protected Synapse.SynapseFactory getSynapseFactory() {
-            return (input, output) -> new PrimarySynapse(input, output);
+        protected SynapseFactory getSynapseFactory() {
+            return (input, output) -> new SamePatternSynapse(input, output);
         }
     }
 }

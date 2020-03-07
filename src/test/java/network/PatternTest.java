@@ -9,7 +9,7 @@ import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.excitatory.patternpart.PositiveRecurrentSynapse;
-import network.aika.neuron.excitatory.patternpart.PrimarySynapse;
+import network.aika.neuron.excitatory.patternpart.PrimaryInputSynapse;
 import org.junit.Test;
 
 public class PatternTest {
@@ -34,7 +34,7 @@ public class PatternTest {
 
 
         Neuron.init(eA, 1.0,
-                new PrimarySynapse.Builder()
+                new PrimaryInputSynapse.Builder()
                         .setNeuron(inA)
                         .setWeight(10.0),
                 new PositiveRecurrentSynapse.Builder()
@@ -43,7 +43,7 @@ public class PatternTest {
         );
 
         Neuron.init(eB, 1.0,
-                new PrimarySynapse.Builder()
+                new PrimaryInputSynapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
@@ -58,7 +58,7 @@ public class PatternTest {
         );
 
         Neuron.init(eC, 1.0,
-                new PrimarySynapse.Builder()
+                new PrimaryInputSynapse.Builder()
                         .setNeuron(inC)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()

@@ -1,0 +1,50 @@
+package network.aika.neuron.excitatory.patternpart;
+
+import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.excitatory.pattern.PatternNeuron;
+
+public class SecondaryInputSynapse extends PatternPartSynapse<PatternNeuron> {
+
+    public static byte type;
+
+    public SecondaryInputSynapse() {
+    }
+
+    public SecondaryInputSynapse(Neuron input, Neuron output) {
+        super(input, output);
+    }
+
+    @Override
+    public byte getType() {
+        return type;
+    }
+
+    @Override
+    public boolean isRecurrent() {
+        return false;
+    }
+
+    @Override
+    public boolean isNegative() {
+        return false;
+    }
+
+    @Override
+    public boolean isPropagate() {
+        return false;
+    }
+
+    public static class Builder extends PatternPartSynapse.Builder {
+
+        public Synapse getSynapse(Neuron outputNeuron) {
+            SecondaryInputSynapse s = (SecondaryInputSynapse) super.getSynapse(outputNeuron);
+
+            return s;
+        }
+
+        protected SynapseFactory getSynapseFactory() {
+            return (input, output) -> new SecondaryInputSynapse(input, output);
+        }
+    }
+}

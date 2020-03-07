@@ -6,11 +6,10 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.patternpart.NegativeRecurrentSynapse;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
-import network.aika.neuron.excitatory.patternpart.PrimarySynapse;
+import network.aika.neuron.excitatory.patternpart.PrimaryInputSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
-import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import org.junit.Test;
 
 public class MutualExclusionTest {
@@ -27,7 +26,7 @@ public class MutualExclusionTest {
         InhibitoryNeuron inhib = new InhibitoryNeuron(m, "I");
 
         Neuron.init(na, 1.0,
-                new PrimarySynapse.Builder()
+                new PrimaryInputSynapse.Builder()
                         .setNeuron(in)
                         .setWeight(10.0),
                 new NegativeRecurrentSynapse.Builder()
@@ -36,7 +35,7 @@ public class MutualExclusionTest {
         );
 
         Neuron.init(nb, 1.5,
-                new PrimarySynapse.Builder()
+                new PrimaryInputSynapse.Builder()
                         .setNeuron(in)
                         .setWeight(10.0),
                 new NegativeRecurrentSynapse.Builder()
@@ -45,7 +44,7 @@ public class MutualExclusionTest {
         );
 
         Neuron.init(nc, 1.2,
-                new PrimarySynapse.Builder()
+                new PrimaryInputSynapse.Builder()
                         .setNeuron(in)
                         .setWeight(10.0),
                 new NegativeRecurrentSynapse.Builder()

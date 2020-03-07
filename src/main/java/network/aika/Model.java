@@ -22,7 +22,6 @@ import network.aika.neuron.Neuron;
 import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
@@ -67,8 +66,9 @@ public class Model {
         register(PatternSynapse.class);
 
         register(PatternPartNeuron.class);
-        register(PatternPartSynapse.class);
-        register(PrimarySynapse.class);
+        register(PrimaryInputSynapse.class);
+        register(SecondaryInputSynapse.class);
+        register(SamePatternSynapse.class);
         register(PositiveRecurrentSynapse.class);
         register(NegativeRecurrentSynapse.class);
 
