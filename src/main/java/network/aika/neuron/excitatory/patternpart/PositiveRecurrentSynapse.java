@@ -2,6 +2,8 @@ package network.aika.neuron.excitatory.patternpart;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Linker;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 
 public class PositiveRecurrentSynapse extends PatternPartSynapse<PatternNeuron> {
@@ -25,6 +27,11 @@ public class PositiveRecurrentSynapse extends PatternPartSynapse<PatternNeuron> 
     @Override
     public boolean isNegative() {
         return false;
+    }
+
+    @Override
+    public void collectLinkingCandidates(Link l, Linker.CollectResults c) {
+
     }
 
     public static class Builder extends Synapse.Builder {

@@ -3,6 +3,8 @@ package network.aika.neuron.excitatory.pattern;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Linker;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 
@@ -36,6 +38,11 @@ public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, Pattern
     @Override
     public boolean isNegative() {
         return false;
+    }
+
+    @Override
+    public void collectLinkingCandidates(Link l, Linker.CollectResults c) {
+
     }
 
 

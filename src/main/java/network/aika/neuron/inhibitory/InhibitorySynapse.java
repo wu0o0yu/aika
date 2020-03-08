@@ -18,6 +18,8 @@ package network.aika.neuron.inhibitory;
 
 
 import network.aika.neuron.*;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Linker;
 
 
 /**
@@ -62,6 +64,11 @@ public class InhibitorySynapse extends Synapse<TNeuron, InhibitoryNeuron> {
 
     protected void removeLinkInternal(INeuron in, INeuron out) {
         in.removeOutputSynapse(this);
+    }
+
+    @Override
+    public void collectLinkingCandidates(Link l, Linker.CollectResults c) {
+
     }
 
     public static class Builder extends Synapse.Builder {

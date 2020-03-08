@@ -20,6 +20,9 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Document;
 import network.aika.Writable;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Linker.CollectResults;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -61,6 +64,9 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     protected abstract void addLinkInternal(INeuron in, INeuron out);
 
     protected abstract void removeLinkInternal(INeuron in, INeuron out);
+
+    public abstract void collectLinkingCandidates(Link l, CollectResults c);
+
 
     public Neuron getPInput() {
         return input;

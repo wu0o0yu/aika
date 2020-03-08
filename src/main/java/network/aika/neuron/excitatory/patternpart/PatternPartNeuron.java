@@ -145,7 +145,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
         int actBegin = 0; // iAct.getSlot(BEGIN).getFinalPosition();
 
-        PatternPartSynapse s = new PatternPartSynapse(iAct.getNeuron(), getProvider());
+        PatternPartSynapse s = null; //new PatternPartSynapse(iAct.getNeuron(), getProvider());
 
         s.updateDelta(doc, 2.0);
 
@@ -171,7 +171,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
             return;
         }
 
-        PatternPartSynapse s = new PatternPartSynapse(inputNeuron, targetNeuron);
+        PatternPartSynapse s = null; //new PatternPartSynapse(inputNeuron, targetNeuron);
 
         s.link();
 

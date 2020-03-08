@@ -141,8 +141,6 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         n.commit(modifiedSynapses);
     }
 
-
-
     public Synapse getInputSynapse(Neuron n) {
         lock.acquireReadLock();
         Synapse s = activeInputSynapses.get(n);

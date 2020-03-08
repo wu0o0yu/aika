@@ -22,6 +22,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
+import network.aika.neuron.activation.Linker.CollectResults;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -148,10 +149,14 @@ public class Activation implements Comparable<Activation> {
         return dir == INPUT ? inputLinks.values() : outputLinks.values();
     }
 
-    public interface CollectResults {
-        void collect(Activation act);
+    public void collectLinkingCandidates(CollectResults collectResults) {
+        inputLinks
+                .values()
+                .stream()
+                .forEach(l -> l.synapse.collectLinkingCandidates(l, collectResults));
     }
 
+/*
     public void followDown(long v, CollectResults c) {
         if(visitedDown == v) return;
         visitedDown = v;
@@ -180,7 +185,7 @@ public class Activation implements Comparable<Activation> {
                 .stream()
                 .forEach(l -> l.output.followUp(v, c));
     }
-
+*/
     public Activation cloneAct(boolean branch) {
         Activation clonedAct = new Activation(doc, neuron, branch, this, round + 1);
 

@@ -30,6 +30,10 @@ import java.util.*;
  */
 public class Linker {
 
+    public interface CollectResults {
+        void collect(Activation act);
+    }
+
     public void linkForward(Activation act, boolean processMode) {
         ArrayDeque<Entry> queue = new ArrayDeque<>();
         Document doc = act.getDocument();
@@ -48,7 +52,7 @@ public class Linker {
             act.lastRound = null;
         }
 
-        act.followDown(doc.getNewVisitedId(), cAct -> {
+        act.collectLinkingCandidates(cAct -> {
             if(cAct.getINeuron() instanceof InhibitoryNeuron) return;
 
             Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
@@ -129,7 +133,7 @@ public class Linker {
     public void findLinkingCandidates(Entry e, Link l) {
         if(((e.act.getINeuron() instanceof InhibitoryNeuron) || l.isConflict())) return;
 
-        l.input.followDown(l.input.getDocument().getNewVisitedId(), act -> {
+        l.input.collectLinkingCandidates(act -> {
             Synapse is = e.act.getNeuron().getInputSynapse(act.getNeuron());
             if (is == null || l.synapse == is) return;
 
