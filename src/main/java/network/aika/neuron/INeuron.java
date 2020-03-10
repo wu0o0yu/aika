@@ -116,7 +116,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         Activation act = new Activation(doc, this, false, null, 0);
 
         for(Activation iAct: input.getInputLinks()) {
-            act.addLink(new Link(null, iAct, null), false);
+            Synapse s = getProvider().getInputSynapse(iAct.getNeuron());
+            act.addLink(new Link(s, iAct, null), false);
         }
 
         act.setValue(input.value);

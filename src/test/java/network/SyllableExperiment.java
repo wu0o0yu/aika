@@ -8,11 +8,8 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
-import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
-import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
+import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
-import network.aika.neuron.excitatory.patternpart.PositiveRecurrentSynapse;
-import network.aika.neuron.excitatory.patternpart.PrimaryInputSynapse;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -139,10 +136,10 @@ public class SyllableExperiment {
                 new PrimaryInputSynapse.Builder()
                         .setNeuron(lookupChar('e'))
                         .setWeight(10.0),
-                new PatternPartSynapse.Builder()
+                new SamePatternSynapse.Builder()
                         .setNeuron(eD)
                         .setWeight(10.0),
-                new PatternPartSynapse.Builder()
+                new SecondaryInputSynapse.Builder()
                         .setNeuron(relN)
                         .setWeight(10.0),
                 new PositiveRecurrentSynapse.Builder()
@@ -154,10 +151,10 @@ public class SyllableExperiment {
                 new PrimaryInputSynapse.Builder()
                         .setNeuron(lookupChar('r'))
                         .setWeight(10.0),
-                new PatternPartSynapse.Builder()
+                new SamePatternSynapse.Builder()
                         .setNeuron(eE)
                         .setWeight(10.0),
-                new PatternPartSynapse.Builder()
+                new SecondaryInputSynapse.Builder()
                         .setNeuron(relN)
                         .setWeight(10.0),
                 new PositiveRecurrentSynapse.Builder()

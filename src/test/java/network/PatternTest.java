@@ -5,11 +5,8 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
-import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
-import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
+import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
-import network.aika.neuron.excitatory.patternpart.PositiveRecurrentSynapse;
-import network.aika.neuron.excitatory.patternpart.PrimaryInputSynapse;
 import org.junit.Test;
 
 public class PatternTest {
@@ -46,10 +43,10 @@ public class PatternTest {
                 new PrimaryInputSynapse.Builder()
                         .setNeuron(inB)
                         .setWeight(10.0),
-                new PatternPartSynapse.Builder()
+                new SamePatternSynapse.Builder()
                         .setNeuron(eA)
                         .setWeight(10.0),
-                new PatternPartSynapse.Builder()
+                new SecondaryInputSynapse.Builder()
                         .setNeuron(relN)
                         .setWeight(10.0),
                 new PositiveRecurrentSynapse.Builder()
@@ -61,10 +58,10 @@ public class PatternTest {
                 new PrimaryInputSynapse.Builder()
                         .setNeuron(inC)
                         .setWeight(10.0),
-                new PatternPartSynapse.Builder()
+                new SamePatternSynapse.Builder()
                         .setNeuron(eB)
                         .setWeight(10.0),
-                new PatternPartSynapse.Builder()
+                new SecondaryInputSynapse.Builder()
                         .setNeuron(relN)
                         .setWeight(10.0),
                 new PositiveRecurrentSynapse.Builder()

@@ -33,8 +33,12 @@ public class PrimaryInputSynapse extends PatternPartSynapse<PatternNeuron> {
     }
 
     @Override
-    public void collectLinkingCandidates(Link l, Linker.CollectResults c) {
-
+    public void collectLinkingCandidates(Link downLink, Linker.CollectResults c) {
+        downLink.getInput().outputLinks
+                .values()
+                .stream()
+                .filter(l -> l.getSynapse() instanceof PositiveRecurrentSynapse)  // Gibt es da eine bessere Lösung?
+                .forEach(l -> c.collect(l.getOutput()));
     }
 
     @Override

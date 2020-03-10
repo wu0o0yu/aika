@@ -33,8 +33,16 @@ public class SecondaryInputSynapse extends PatternPartSynapse<PatternNeuron> {
     }
 
     @Override
-    public void collectLinkingCandidates(Link l, Linker.CollectResults c) {
-
+    public void collectLinkingCandidates(Link downLink, Linker.CollectResults c) {
+        downLink.getInput().inputLinks
+                .values()
+                .stream()
+                .filter(l -> l.getSynapse() instanceof SecondaryInputSynapse)  // Gibt es da eine bessere Lösung?
+                .flatMap(l -> l.getInput().inputLinks.values().stream())
+                .filter(l -> l.getSynapse() instanceof SecondaryInputSynapse)
+                .flatMap(l -> l.getInput().outputLinks.values().stream())
+                .filter(l -> l.getSynapse() instanceof PrimaryInputSynapse)
+                .forEach(l -> c.collect(l.getOutput()));
     }
 
     @Override
