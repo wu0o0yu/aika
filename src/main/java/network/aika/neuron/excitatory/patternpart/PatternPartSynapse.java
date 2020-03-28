@@ -3,11 +3,23 @@ package network.aika.neuron.excitatory.patternpart;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Linker;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 
-public abstract class PatternPartSynapse<I extends TNeuron> extends ExcitatorySynapse<I, PatternPartNeuron> {
+public class PatternPartSynapse<I extends TNeuron> extends ExcitatorySynapse<I, PatternPartNeuron> {
 
     public static byte type;
+
+    public enum PatternScope {
+        INPUT_PATTERN,
+        SAME_PATTERN
+    }
+
+    private PatternScope patternScope;
+
+    private boolean isRecurrent;
+
 
     public PatternPartSynapse() {
     }
@@ -21,18 +33,46 @@ public abstract class PatternPartSynapse<I extends TNeuron> extends ExcitatorySy
         return type;
     }
 
+
+
+    public PatternScope getPatternScope() {
+        return patternScope;
+    }
+
+    public void setPatternScope(PatternScope patternScope) {
+        this.patternScope = patternScope;
+    }
+
     @Override
     public boolean isPropagate() {
         return false;
     }
 
+    public void setRecurrent(boolean recurrent) {
+        isRecurrent = recurrent;
+    }
+
     @Override
     public boolean isRecurrent() {
-        return false;
+        return isRecurrent;
     }
 
     @Override
     public boolean isNegative() {
         return false;
+    }
+
+
+    public static class Builder extends Synapse.Builder {
+
+        public Synapse getSynapse(Neuron outputNeuron) {
+            PatternPartSynapse s = (PatternPartSynapse) super.getSynapse(outputNeuron);
+
+            return s;
+        }
+
+        protected SynapseFactory getSynapseFactory() {
+            return (input, output) -> new PatternPartSynapse(input, output);
+        }
     }
 }

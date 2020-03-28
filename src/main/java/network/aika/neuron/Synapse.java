@@ -65,9 +65,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
     protected abstract void removeLinkInternal(INeuron in, INeuron out);
 
-    public abstract void collectLinkingCandidates(Link l, CollectResults c);
-
-
     public Neuron getPInput() {
         return input;
     }

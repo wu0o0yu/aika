@@ -40,12 +40,6 @@ public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, Pattern
         return false;
     }
 
-    @Override
-    public void collectLinkingCandidates(Link l, Linker.CollectResults c) {
-
-    }
-
-
     public boolean isPropagate() {
         return propagate;
     }

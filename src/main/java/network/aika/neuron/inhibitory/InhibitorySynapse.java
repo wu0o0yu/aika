@@ -66,10 +66,6 @@ public class InhibitorySynapse extends Synapse<TNeuron, InhibitoryNeuron> {
         in.removeOutputSynapse(this);
     }
 
-    @Override
-    public void collectLinkingCandidates(Link l, Linker.CollectResults c) {
-
-    }
 
     public static class Builder extends Synapse.Builder {
         protected SynapseFactory getSynapseFactory() {

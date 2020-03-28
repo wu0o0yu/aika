@@ -149,13 +149,6 @@ public class Activation implements Comparable<Activation> {
         return dir == INPUT ? inputLinks.values() : outputLinks.values();
     }
 
-    public void collectLinkingCandidates(CollectResults collectResults) {
-        inputLinks
-                .values()
-                .stream()
-                .forEach(l -> l.synapse.collectLinkingCandidates(l, collectResults));
-    }
-
 /*
     public void followDown(long v, CollectResults c) {
         if(visitedDown == v) return;

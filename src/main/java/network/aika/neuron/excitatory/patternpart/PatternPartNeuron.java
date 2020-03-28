@@ -25,6 +25,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Linker;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import org.slf4j.Logger;
@@ -96,6 +97,25 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     public double propagateRangeCoverage(Activation iAct) {
         return getPrimaryInput() == iAct.getINeuron() ? iAct.rangeCoverage : 0.0;
+    }
+
+    @Override
+    public void collectLinkingCandidates(Activation act, Linker.CollectResults c) {
+        collectSameInputLinkingCandidates(act, c);
+        collectRelatedLinkingCandidates(act, c);
+    }
+
+    public void collectSameInputLinkingCandidates(Activation act, Linker.CollectResults c) {
+        act
+                .inputLinks.values().stream()
+                .filter(l -> ((PatternPartSynapse) l.getSynapse()).getPatternScope() == PatternPartSynapse.PatternScope.INPUT_PATTERN)
+                .map(l -> l.getInput())
+                .filter(a -> a.getINeuron() instanceof PatternNeuron)
+                .forEach(a -> ((PatternNeuron) a.getINeuron()).collectPPSameInputLinkingCandidates(a, c));
+    }
+
+    public void collectRelatedLinkingCandidates(Activation act, Linker.CollectResults c) {
+
     }
 
     public double getCost(Sign s) {

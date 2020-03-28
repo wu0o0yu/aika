@@ -18,10 +18,7 @@ package network.aika.neuron;
 
 
 import network.aika.*;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Direction;
-import network.aika.neuron.activation.Fired;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,6 +169,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
     public abstract double propagateRangeCoverage(Activation iAct);
+
+    public abstract void collectLinkingCandidates(Activation act, Linker.CollectResults c);
 
     public int compareTo(INeuron n) {
         if (this == n) return 0;

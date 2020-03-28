@@ -66,11 +66,7 @@ public class Model {
         register(PatternSynapse.class);
 
         register(PatternPartNeuron.class);
-        register(PrimaryInputSynapse.class);
-        register(SecondaryInputSynapse.class);
-        register(SamePatternSynapse.class);
-        register(PositiveRecurrentSynapse.class);
-        register(NegativeRecurrentSynapse.class);
+        register(PatternPartSynapse.class);
 
         register(InhibitoryNeuron.class);
         register(InhibitorySynapse.class);

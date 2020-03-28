@@ -24,6 +24,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.Config;
 import network.aika.neuron.TNeuron;
+import network.aika.neuron.activation.Linker;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 
 import java.util.Collection;
@@ -52,6 +53,11 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
 
     public double propagateRangeCoverage(Activation iAct) {
         return iAct.rangeCoverage;
+    }
+
+    @Override
+    public void collectLinkingCandidates(Activation act, Linker.CollectResults c) {
+        // Nothing to do!
     }
 
     @Override

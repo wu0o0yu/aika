@@ -23,6 +23,7 @@ import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
+import network.aika.neuron.activation.Linker;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 import java.util.Collection;
@@ -60,6 +61,16 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         return iAct.rangeCoverage;
     }
 
+    @Override
+    public void collectLinkingCandidates(Activation act, Linker.CollectResults c) {
+        act
+                .inputLinks
+                .values()
+                .stream()
+                .flatMap(l -> l.getInput().outputLinks.values().stream())
+                .forEach(l -> c.collect(l.getOutput()));
+    }
+
     public boolean isMature(Config c) {
         return binaryFrequency >= c.getMaturityThreshold();  // Sign.NEG, Sign.POS
     }
@@ -88,5 +99,9 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
                 sum -= s.getWeight();
             }
         }
+    }
+
+    public void collectPPSameInputLinkingCandidates(Activation act, Linker.CollectResults c) {
+
     }
 }

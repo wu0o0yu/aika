@@ -7,6 +7,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import org.junit.Test;
 
 public class PatternTest {
@@ -21,6 +22,17 @@ public class PatternTest {
         PatternNeuron inC = new PatternNeuron(m, "IN C");
 
         PatternPartNeuron relN = new PatternPartNeuron(m, "Rel");
+
+        InhibitoryNeuron inputInhibN = new InhibitoryNeuron(m, "INPUT INHIB");
+
+        Neuron.init(relN, 1.0,
+                new PrimaryInputSynapse.Builder()
+                        .setNeuron(inputInhibN)
+                        .setWeight(10.0),
+                new PositiveRecurrentSynapse.Builder()
+                        .setNeuron(inputInhibN)
+                        .setWeight(10.0)
+        );
 
 
         PatternPartNeuron eA = new PatternPartNeuron(m, "E A");

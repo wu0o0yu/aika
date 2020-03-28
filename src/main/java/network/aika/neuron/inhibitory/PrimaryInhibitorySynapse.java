@@ -14,27 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory.patternpart;
+package network.aika.neuron.inhibitory;
 
+
+import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.TNeuron;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Linker;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
+
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class NegativeRecurrentSynapse extends PatternPartSynapse<InhibitoryNeuron> {
+public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
     public static byte type;
 
-    public NegativeRecurrentSynapse() {
+    public PrimaryInhibitorySynapse() {
         super();
     }
 
-    public NegativeRecurrentSynapse(Neuron input, Neuron output) {
+    public PrimaryInhibitorySynapse(Neuron input, Neuron output) {
         super(input, output);
     }
 
@@ -45,30 +48,30 @@ public class NegativeRecurrentSynapse extends PatternPartSynapse<InhibitoryNeuro
 
     @Override
     public boolean isRecurrent() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isNegative() {
-        return true;
+        return false;
     }
 
     @Override
-    public void collectLinkingCandidates(Link l, Linker.CollectResults c) {
-
+    public boolean isPropagate() {
+        return true;
     }
 
+    protected void addLinkInternal(INeuron in, INeuron out) {
+        in.addOutputSynapse(this);
+    }
+
+    protected void removeLinkInternal(INeuron in, INeuron out) {
+        in.removeOutputSynapse(this);
+    }
 
     public static class Builder extends Synapse.Builder {
-
-        public Synapse getSynapse(Neuron outputNeuron) {
-            NegativeRecurrentSynapse s = (NegativeRecurrentSynapse) super.getSynapse(outputNeuron);
-
-            return s;
-        }
-
-        protected Synapse.SynapseFactory getSynapseFactory() {
-            return (input, output) -> new NegativeRecurrentSynapse(input, output);
+        protected SynapseFactory getSynapseFactory() {
+            return (input, output) -> new PrimaryInhibitorySynapse(input, output);
         }
     }
 }
