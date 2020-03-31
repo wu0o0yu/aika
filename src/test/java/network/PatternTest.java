@@ -10,6 +10,9 @@ import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import org.junit.Test;
 
+import static network.aika.neuron.excitatory.patternpart.PatternPartSynapse.PatternScope.INPUT_PATTERN;
+import static network.aika.neuron.excitatory.patternpart.PatternPartSynapse.PatternScope.SAME_PATTERN;
+
 public class PatternTest {
 
 
@@ -26,10 +29,16 @@ public class PatternTest {
         InhibitoryNeuron inputInhibN = new InhibitoryNeuron(m, "INPUT INHIB");
 
         Neuron.init(relN, 1.0,
-                new PrimaryInputSynapse.Builder()
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(INPUT_PATTERN)
+                        .setRecurrent(false)
+                        .setNegative(false)
                         .setNeuron(inputInhibN)
                         .setWeight(10.0),
-                new PositiveRecurrentSynapse.Builder()
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(SAME_PATTERN)
+                        .setRecurrent(true)
+                        .setNegative(false)
                         .setNeuron(inputInhibN)
                         .setWeight(10.0)
         );
@@ -43,40 +52,70 @@ public class PatternTest {
 
 
         Neuron.init(eA, 1.0,
-                new PrimaryInputSynapse.Builder()
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(INPUT_PATTERN)
+                        .setRecurrent(false)
+                        .setNegative(false)
                         .setNeuron(inA)
                         .setWeight(10.0),
-                new PositiveRecurrentSynapse.Builder()
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(SAME_PATTERN)
+                        .setRecurrent(true)
+                        .setNegative(false)
                         .setNeuron(out)
                         .setWeight(10.0)
         );
 
         Neuron.init(eB, 1.0,
-                new PrimaryInputSynapse.Builder()
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(INPUT_PATTERN)
+                        .setRecurrent(false)
+                        .setNegative(false)
                         .setNeuron(inB)
                         .setWeight(10.0),
-                new SamePatternSynapse.Builder()
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(SAME_PATTERN)
+                        .setRecurrent(false)
+                        .setNegative(false)
                         .setNeuron(eA)
                         .setWeight(10.0),
-                new SecondaryInputSynapse.Builder()
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(INPUT_PATTERN)
+                        .setRecurrent(false)
+                        .setNegative(false)
                         .setNeuron(relN)
                         .setWeight(10.0),
-                new PositiveRecurrentSynapse.Builder()
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(SAME_PATTERN)
+                        .setRecurrent(true)
+                        .setNegative(false)
                         .setNeuron(out)
                         .setWeight(10.0)
         );
 
         Neuron.init(eC, 1.0,
-                new PrimaryInputSynapse.Builder()
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(INPUT_PATTERN)
+                        .setRecurrent(false)
+                        .setNegative(false)
                         .setNeuron(inC)
                         .setWeight(10.0),
-                new SamePatternSynapse.Builder()
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(SAME_PATTERN)
+                        .setRecurrent(false)
+                        .setNegative(false)
                         .setNeuron(eB)
                         .setWeight(10.0),
-                new SecondaryInputSynapse.Builder()
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(INPUT_PATTERN)
+                        .setRecurrent(false)
+                        .setNegative(false)
                         .setNeuron(relN)
                         .setWeight(10.0),
-                new PositiveRecurrentSynapse.Builder()
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(SAME_PATTERN)
+                        .setRecurrent(true)
+                        .setNegative(false)
                         .setNeuron(out)
                         .setWeight(10.0)
         );

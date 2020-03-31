@@ -237,4 +237,11 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         }
         return sb.toString();
     }
+
+
+    public void collectPPSameInputLinkingCandidatesUp(Activation act, Linker.CollectResults c) {
+    }
+
+    public void collectPPRelatedInputRPLinkingCandidatesDown(Activation act, Linker.CollectResults c) {
+    }
 }

@@ -60,6 +60,16 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
         // Nothing to do!
     }
 
+    public void collectPPSameInputLinkingCandidatesUp(Activation act, Linker.CollectResults c) {
+        act.outputLinks.values()
+                .forEach(l -> l.getOutput().getINeuron().collectPPSameInputLinkingCandidatesUp(l.getOutput(), c));
+    }
+
+    public void collectPPRelatedInputRPLinkingCandidatesDown(Activation act, Linker.CollectResults c) {
+        act.inputLinks.values()
+                .forEach(l -> l.getOutput().getINeuron().collectPPRelatedInputRPLinkingCandidatesDown(l.getInput(), c));
+    }
+
     @Override
     public Fired incrementFired(Fired f) {
         return f;

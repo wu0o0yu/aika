@@ -25,10 +25,12 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Linker;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 
@@ -101,7 +103,13 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         }
     }
 
-    public void collectPPSameInputLinkingCandidates(Activation act, Linker.CollectResults c) {
+    public void collectPPSameInputLinkingCandidatesDown(Activation act, Linker.CollectResults c) {
+        act
+                .outputLinks.values()
+                .forEach(l -> l.getOutput().getINeuron().collectPPSameInputLinkingCandidatesUp(l.getOutput(), c));
+    }
 
+    public void collectPPRelatedInputRPLinkingCandidatesDown(Activation act, Linker.CollectResults c) {
+        c.collect(act);
     }
 }

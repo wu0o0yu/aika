@@ -111,11 +111,29 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
                 .filter(l -> ((PatternPartSynapse) l.getSynapse()).getPatternScope() == PatternPartSynapse.PatternScope.INPUT_PATTERN)
                 .map(l -> l.getInput())
                 .filter(a -> a.getINeuron() instanceof PatternNeuron)
-                .forEach(a -> ((PatternNeuron) a.getINeuron()).collectPPSameInputLinkingCandidates(a, c));
+                .forEach(a -> ((PatternNeuron) a.getINeuron()).collectPPSameInputLinkingCandidatesDown(a, c));
     }
 
     public void collectRelatedLinkingCandidates(Activation act, Linker.CollectResults c) {
+        act
+                .inputLinks.values().stream()
+                .filter(l -> ((PatternPartSynapse) l.getSynapse()).getPatternScope() == PatternPartSynapse.PatternScope.INPUT_PATTERN)
+                .map(l -> l.getInput())
+                .filter(a -> a.getINeuron() instanceof PatternPartNeuron)
+                .forEach(a -> ((PatternPartNeuron) a.getINeuron()).collectPPRelatedInputLinkingCandidatesDown(a, c));
+    }
 
+    private void collectPPRelatedInputLinkingCandidatesDown(Activation act, Linker.CollectResults c) {
+        act
+                .inputLinks.values().stream()
+                .filter(l -> ((PatternPartSynapse) l.getSynapse()).getPatternScope() == PatternPartSynapse.PatternScope.INPUT_PATTERN)
+                .map(l -> l.getInput())
+                .filter(a -> a.getINeuron() instanceof PatternPartNeuron)
+                .forEach(a -> a.getINeuron().collectPPRelatedInputRPLinkingCandidatesDown(a, c));
+    }
+
+    public void collectPPSameInputLinkingCandidatesUp(Activation act, Linker.CollectResults c) {
+        c.collect(act);
     }
 
     public double getCost(Sign s) {
