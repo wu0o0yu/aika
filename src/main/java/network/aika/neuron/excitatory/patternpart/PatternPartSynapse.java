@@ -6,6 +6,7 @@ import network.aika.neuron.TNeuron;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Linker;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.pattern.PatternNeuron;
 
 public class PatternPartSynapse<I extends TNeuron> extends ExcitatorySynapse<I, PatternPartNeuron> {
 
@@ -46,7 +47,7 @@ public class PatternPartSynapse<I extends TNeuron> extends ExcitatorySynapse<I, 
 
     @Override
     public boolean isPropagate() {
-        return false;
+        return input.get() instanceof PatternNeuron;
     }
 
     public void setRecurrent(boolean recurrent) {
