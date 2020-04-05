@@ -1,6 +1,6 @@
 package network.aika.neuron.activation.linker;
 
-import network.aika.neuron.Synapse;
+import network.aika.neuron.Synapse.PatternScope;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 
@@ -8,12 +8,11 @@ import java.util.stream.Stream;
 
 public class LMatchingLink extends LLink {
 
-
-    protected Synapse.PatternScope patternScope;
+    protected PatternScope patternScope;
     protected Byte inputNeuronType;
     protected Byte outputNeuronType;
 
-    public LMatchingLink(LNode input, LNode output, Synapse.PatternScope patternScope, Byte inputNeuronType, Byte outputNeuronType) {
+    public LMatchingLink(LNode input, LNode output, PatternScope patternScope, Byte inputNeuronType, Byte outputNeuronType) {
         super(input, output);
         this.patternScope = patternScope;
         this.inputNeuronType = inputNeuronType;
@@ -75,5 +74,4 @@ public class LMatchingLink extends LLink {
 
         return true;
     }
-
 }
