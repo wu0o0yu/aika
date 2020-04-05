@@ -42,11 +42,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     private double weight;
     private double weightDelta;
 
-    public enum PatternScope {
-        INPUT_PATTERN,
-        SAME_PATTERN
-    }
-
     public Synapse() {
     }
 

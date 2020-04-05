@@ -59,8 +59,6 @@ public class Linker {
         }
 
         act.getINeuron().collectLinkingCandidates(act, INPUT, cAct -> {
-            if(cAct.getINeuron() instanceof InhibitoryNeuron) return;
-
             Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
             if(s == null || act.outputLinkExists(cAct.getINeuron())) return;
 
@@ -137,7 +135,7 @@ public class Linker {
     }
 
     public void findLinkingCandidates(Entry e, Link l) {
-        if(((e.act.getINeuron() instanceof InhibitoryNeuron) || l.isConflict())) return;
+ //       if(((e.act.getINeuron() instanceof InhibitoryNeuron) || l.isConflict())) return;
 
         l.getInput().getINeuron().collectLinkingCandidates(l.getInput(), OUTPUT, act -> {
             Synapse is = e.act.getNeuron().getInputSynapse(act.getNeuron());

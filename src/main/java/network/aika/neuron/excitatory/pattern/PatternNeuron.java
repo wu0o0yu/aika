@@ -23,14 +23,15 @@ import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
-import network.aika.neuron.activation.linker.LTargetLink;
-import network.aika.neuron.activation.linker.Linker;
+import network.aika.neuron.activation.linker.*;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
 
+import static network.aika.neuron.PatternScope.SAME_PATTERN;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 
@@ -43,6 +44,20 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     public static byte type;
 
     public static LTargetLink inputLink;
+
+    static {
+        LNode target = new LNode(PatternType.CURRENT);
+        LNode inputA = new LNode(PatternType.CURRENT);
+        LNode inputB = new LNode(PatternType.CURRENT);
+
+        inputLink = new LTargetLink(inputB, target, SAME_PATTERN);
+        LLink l1 = new LMatchingLink(inputA, inputB, SAME_PATTERN, PatternPartNeuron.type, PatternPartNeuron.type);
+        LLink l2 = new LMatchingLink(inputA, target, SAME_PATTERN, PatternPartNeuron.type, PatternNeuron.type);
+
+        target.setLinks(inputLink, l2);
+        inputA.setLinks(l1, l2);
+        inputB.setLinks(l1, inputLink);
+    }
 
     public PatternNeuron(Neuron p) {
         super(p);

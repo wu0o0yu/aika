@@ -7,16 +7,12 @@ public class LNode {
     LLink[] links;
     PatternType patternType;
 
-    enum PatternType {
-        CURRENT,
-        INPUT,
-        RELATED
+    public LNode(PatternType patternType) {
+        this.patternType = patternType;
     }
 
-
-    public LNode(PatternType patternType, LLink... links) {
+    public void setLinks(LLink... links) {
         this.links = links;
-        this.patternType = patternType;
     }
 
     public void follow(Activation act, LLink from, long v, Linker.CollectResults c) {

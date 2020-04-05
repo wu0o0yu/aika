@@ -1,6 +1,6 @@
 package network.aika.neuron.activation.linker;
 
-import network.aika.neuron.Synapse.PatternScope;
+import network.aika.neuron.PatternScope;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 
