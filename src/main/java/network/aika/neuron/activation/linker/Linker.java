@@ -22,10 +22,14 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.excitatory.pattern.PatternNeuron;
+import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
 
+import static network.aika.neuron.PatternScope.INPUT_PATTERN;
+import static network.aika.neuron.PatternScope.SAME_PATTERN;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 
@@ -35,6 +39,68 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
  * @author Lukas Molzberger
  */
 public class Linker {
+
+    public static LTargetLink inputLink;
+    public static LTargetLink sameInputLink;
+    public static LTargetLink relatedInputLink;
+
+    static {
+        // Pattern
+        {
+            LNode target = new LNode(PatternType.CURRENT, PatternPartNeuron.type);
+            LNode inputA = new LNode(PatternType.CURRENT, PatternPartNeuron.type);
+            LNode inputB = new LNode(PatternType.CURRENT, PatternNeuron.type);
+
+            inputLink = new LTargetLink(inputB, target, SAME_PATTERN);
+            LLink l1 = new LMatchingLink(inputA, inputB, SAME_PATTERN);
+            LLink l2 = new LMatchingLink(inputA, target, SAME_PATTERN);
+
+            target.setLinks(inputLink, l2);
+            inputA.setLinks(l1, l2);
+            inputB.setLinks(l1, inputLink);
+        }
+
+        // Same Input
+        {
+            LNode target = new LNode(PatternType.CURRENT, PatternPartNeuron.type);
+            LNode inputPattern = new LNode(PatternType.INPUT, PatternNeuron.type);
+            LNode inputRel = new LNode(PatternType.INPUT, PatternPartNeuron.type);
+            LNode inhib = new LNode(PatternType.INPUT, InhibitoryNeuron.type);
+
+            sameInputLink = new LTargetLink(inputRel, target, INPUT_PATTERN);
+            LLink l1 = new LMatchingLink(inputPattern, inputRel, SAME_PATTERN);
+            LLink l2 = new LMatchingLink(inhib, inputRel, SAME_PATTERN);
+            LLink inhibLink = new LMatchingLink(inputPattern, inhib, SAME_PATTERN);
+            LLink inputPatternLink = new LMatchingLink(inputPattern, target, INPUT_PATTERN);
+
+            target.setLinks(sameInputLink, inputPatternLink);
+            inputPattern.setLinks(l1, inhibLink, inputPatternLink);
+            inputRel.setLinks(sameInputLink, l1, l2);
+            inhib.setLinks(inhibLink, l2);
+        }
+
+        // Related Input
+        {
+            LNode target = new LNode(PatternType.CURRENT, PatternPartNeuron.type);
+            LNode samePatternPP = new LNode(PatternType.CURRENT, PatternPartNeuron.type);
+            LNode inputRel = new LNode(PatternType.INPUT, PatternPartNeuron.type);
+            LNode relPattern = new LNode(PatternType.RELATED, PatternNeuron.type);
+            LNode inhib = new LNode(PatternType.INPUT, InhibitoryNeuron.type);
+
+            relatedInputLink = new LTargetLink(samePatternPP, target, SAME_PATTERN);
+            LLink inputRelLink = new LMatchingLink(inputRel, target, INPUT_PATTERN);
+            LLink relPatternLink1 = new LMatchingLink(relPattern, inputRel, INPUT_PATTERN);
+            LLink relPatternLink2 = new LMatchingLink(relPattern, samePatternPP, INPUT_PATTERN);
+            LLink inhibLink = new LMatchingLink(relPattern, inhib, SAME_PATTERN);
+            LLink relPatternLink3 = new LMatchingLink(inhib, inputRel, INPUT_PATTERN);
+
+            target.setLinks(relatedInputLink, inputRelLink);
+            samePatternPP.setLinks(relatedInputLink, relPatternLink2);
+            inputRel.setLinks(inputRelLink, relPatternLink1, relPatternLink3);
+            relPattern.setLinks(relPatternLink1, relPatternLink2, inhibLink);
+            inhib.setLinks(inhibLink, relPatternLink3);
+        }
+    }
 
     public interface CollectResults {
         void collect(Activation act);

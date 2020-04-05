@@ -16,8 +16,7 @@ public class LTargetLink extends LLink {
 
 
     public LTargetLink(LNode input, LNode output, PatternScope patternScope) {
-        super(input, output);
-        this.patternScope = patternScope;
+        super(input, output, patternScope);
     }
 
     public void follow(Activation act, LNode from, long v, Linker.CollectResults c) {

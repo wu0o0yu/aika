@@ -24,8 +24,7 @@ import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.linker.LTargetLink;
-import network.aika.neuron.activation.linker.Linker;
+import network.aika.neuron.activation.linker.*;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import org.slf4j.Logger;
@@ -34,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.PatternScope.INPUT_PATTERN;
+import static network.aika.neuron.PatternScope.SAME_PATTERN;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 
@@ -44,9 +45,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 
     public static byte type;
-
-    public static LTargetLink sameInputLink;
-    public static LTargetLink relatedInputLink;
 
     public PatternPartNeuron(Neuron p) {
         super(p);
@@ -110,14 +108,14 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         Document doc = act.getDocument();
 
         if(dir == OUTPUT) {
-            sameInputLink.output.follow(act, sameInputLink, doc.getNewVisitedId(), c);
-            relatedInputLink.output.follow(act, relatedInputLink, doc.getNewVisitedId(), c);
+            Linker.sameInputLink.output.follow(act, Linker.sameInputLink, doc.getNewVisitedId(), c);
+            Linker.relatedInputLink.output.follow(act, Linker.relatedInputLink, doc.getNewVisitedId(), c);
         }
 
         if(dir == INPUT) {
-            sameInputLink.input.follow(act, sameInputLink, doc.getNewVisitedId(), c);
-            relatedInputLink.input.follow(act, relatedInputLink, doc.getNewVisitedId(), c);
-            PatternNeuron.inputLink.input.follow(act, PatternNeuron.inputLink, doc.getNewVisitedId(), c);
+            Linker.sameInputLink.input.follow(act, Linker.sameInputLink, doc.getNewVisitedId(), c);
+            Linker.relatedInputLink.input.follow(act, Linker.relatedInputLink, doc.getNewVisitedId(), c);
+            Linker.inputLink.input.follow(act, Linker.inputLink, doc.getNewVisitedId(), c);
         }
     }
 

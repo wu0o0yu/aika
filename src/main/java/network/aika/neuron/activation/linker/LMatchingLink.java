@@ -8,15 +8,8 @@ import java.util.stream.Stream;
 
 public class LMatchingLink extends LLink {
 
-    protected PatternScope patternScope;
-    protected Byte inputNeuronType;
-    protected Byte outputNeuronType;
-
-    public LMatchingLink(LNode input, LNode output, PatternScope patternScope, Byte inputNeuronType, Byte outputNeuronType) {
-        super(input, output);
-        this.patternScope = patternScope;
-        this.inputNeuronType = inputNeuronType;
-        this.outputNeuronType = outputNeuronType;
+    public LMatchingLink(LNode input, LNode output, PatternScope patternScope) {
+        super(input, output, patternScope);
     }
 
     protected LNode getTo(LNode from) {
@@ -61,14 +54,6 @@ public class LMatchingLink extends LLink {
 
     private boolean checkLink(Link l, LNode from, LNode to) {
         if(patternScope != null && patternScope != l.getSynapse().getPatternScope()) {
-            return false;
-        }
-
-        if(inputNeuronType != null && inputNeuronType != l.getInput().getINeuron().getType()) {
-            return false;
-        }
-
-        if(outputNeuronType != null && outputNeuronType != l.getOutput().getINeuron().getType()) {
             return false;
         }
 

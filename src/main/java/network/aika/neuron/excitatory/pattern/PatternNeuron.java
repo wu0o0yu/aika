@@ -43,22 +43,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     public static byte type;
 
-    public static LTargetLink inputLink;
-
-    static {
-        LNode target = new LNode(PatternType.CURRENT);
-        LNode inputA = new LNode(PatternType.CURRENT);
-        LNode inputB = new LNode(PatternType.CURRENT);
-
-        inputLink = new LTargetLink(inputB, target, SAME_PATTERN);
-        LLink l1 = new LMatchingLink(inputA, inputB, SAME_PATTERN, PatternPartNeuron.type, PatternPartNeuron.type);
-        LLink l2 = new LMatchingLink(inputA, target, SAME_PATTERN, PatternPartNeuron.type, PatternNeuron.type);
-
-        target.setLinks(inputLink, l2);
-        inputA.setLinks(l1, l2);
-        inputB.setLinks(l1, inputLink);
-    }
-
     public PatternNeuron(Neuron p) {
         super(p);
     }
@@ -112,7 +96,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     @Override
     public void collectLinkingCandidates(Activation act, Direction dir, Linker.CollectResults c) {
         if(dir == OUTPUT) {
-            inputLink.output.follow(act, inputLink, act.getDocument().getNewVisitedId(), c);
+            Linker.inputLink.output.follow(act, Linker.inputLink, act.getDocument().getNewVisitedId(), c);
         }
     }
 }
