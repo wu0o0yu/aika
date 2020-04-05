@@ -24,7 +24,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.Config;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.activation.Linker;
+import network.aika.neuron.activation.linker.Linker;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 
 import java.util.Collection;

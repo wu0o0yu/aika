@@ -21,7 +21,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
-import network.aika.neuron.activation.Linker;
+import network.aika.neuron.activation.linker.Linker;
 import network.aika.neuron.activation.Queue;
 import network.aika.neuron.TNeuron;
 import org.slf4j.Logger;

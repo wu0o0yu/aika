@@ -23,14 +23,13 @@ import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
-import network.aika.neuron.activation.Linker;
+import network.aika.neuron.activation.linker.LTargetLink;
+import network.aika.neuron.activation.linker.Linker;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
-import java.util.stream.Stream;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 
@@ -41,6 +40,8 @@ import static network.aika.neuron.Synapse.State.CURRENT;
 public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     public static byte type;
+
+    public static LTargetLink inputLink;
 
     public PatternNeuron(Neuron p) {
         super(p);
@@ -72,7 +73,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     }
 
-
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
         super.commit(modifiedSynapses);
 
@@ -93,24 +93,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         }
     }
 
-
     @Override
-    public void collectLinkingCandidates(Activation act, Linker.CollectResults c) {
-        act
-                .inputLinks
-                .values()
-                .stream()
-                .flatMap(l -> l.getInput().outputLinks.values().stream())
-                .forEach(l -> c.collect(l.getOutput()));
-    }
-
-    public void collectPPSameInputLinkingCandidatesDown(Activation act, Linker.CollectResults c) {
-        act
-                .outputLinks.values()
-                .forEach(l -> l.getOutput().getINeuron().collectPPSameInputLinkingCandidatesUp(l.getOutput(), c));
-    }
-
-    public void collectPPRelatedInputRPLinkingCandidatesDown(Activation act, Linker.CollectResults c) {
-        c.collect(act);
+    public void collectLinkingCandidates(Activation act, Direction dir, Linker.CollectResults c) {
+        inputLink.output.follow(act, inputLink, act.getDocument().getNewVisitedId(), c);
     }
 }

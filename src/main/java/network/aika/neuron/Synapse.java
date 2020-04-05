@@ -20,9 +20,6 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Document;
 import network.aika.Writable;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Linker.CollectResults;
 
 import java.io.DataInput;
 import java.io.DataOutput;

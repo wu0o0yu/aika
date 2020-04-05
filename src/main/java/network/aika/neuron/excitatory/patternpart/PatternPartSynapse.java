@@ -3,8 +3,6 @@ package network.aika.neuron.excitatory.patternpart;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Linker;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 

@@ -18,8 +18,6 @@ package network.aika.neuron.inhibitory;
 
 
 import network.aika.neuron.*;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Linker;
 
 
 /**

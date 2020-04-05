@@ -21,8 +21,6 @@ import network.aika.Utils;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
-import network.aika.neuron.activation.Linker.CollectResults;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -60,6 +58,7 @@ public class Activation implements Comparable<Activation> {
 
     public long visitedDown;
     public long visitedUp;
+    public long visited;
 
     public int round; // Nur als Abbruchbedingung
     public Activation nextRound;

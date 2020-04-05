@@ -23,9 +23,9 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Linker;
+import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.linker.LTargetLink;
+import network.aika.neuron.activation.linker.Linker;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import org.slf4j.Logger;
@@ -41,6 +41,9 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 
     public static byte type;
+
+    public static LTargetLink sameInputLink;
+    public static LTargetLink relatedInputLink;
 
     public PatternPartNeuron(Neuron p) {
         super(p);
@@ -100,41 +103,18 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     @Override
-    public void collectLinkingCandidates(Activation act, Linker.CollectResults c) {
-        collectSameInputLinkingCandidates(act, c);
-        collectRelatedLinkingCandidates(act, c);
+    public void collectLinkingCandidates(Activation act, Direction dir, Linker.CollectResults c) {
+        Document doc = act.getDocument();
+
+        sameInputLink.output.follow(act, sameInputLink, doc.getNewVisitedId(), c);
+        sameInputLink.input.follow(act, sameInputLink, doc.getNewVisitedId(), c);
+
+        relatedInputLink.output.follow(act, relatedInputLink, doc.getNewVisitedId(), c);
+        relatedInputLink.input.follow(act, relatedInputLink, doc.getNewVisitedId(), c);
+
+        PatternNeuron.inputLink.input.follow(act, PatternNeuron.inputLink, doc.getNewVisitedId(), c);
     }
 
-    public void collectSameInputLinkingCandidates(Activation act, Linker.CollectResults c) {
-        act
-                .inputLinks.values().stream()
-                .filter(l -> ((PatternPartSynapse) l.getSynapse()).getPatternScope() == PatternPartSynapse.PatternScope.INPUT_PATTERN)
-                .map(l -> l.getInput())
-                .filter(a -> a.getINeuron() instanceof PatternNeuron)
-                .forEach(a -> ((PatternNeuron) a.getINeuron()).collectPPSameInputLinkingCandidatesDown(a, c));
-    }
-
-    public void collectRelatedLinkingCandidates(Activation act, Linker.CollectResults c) {
-        act
-                .inputLinks.values().stream()
-                .filter(l -> ((PatternPartSynapse) l.getSynapse()).getPatternScope() == PatternPartSynapse.PatternScope.INPUT_PATTERN)
-                .map(l -> l.getInput())
-                .filter(a -> a.getINeuron() instanceof PatternPartNeuron)
-                .forEach(a -> ((PatternPartNeuron) a.getINeuron()).collectPPRelatedInputLinkingCandidatesDown(a, c));
-    }
-
-    private void collectPPRelatedInputLinkingCandidatesDown(Activation act, Linker.CollectResults c) {
-        act
-                .inputLinks.values().stream()
-                .filter(l -> ((PatternPartSynapse) l.getSynapse()).getPatternScope() == PatternPartSynapse.PatternScope.INPUT_PATTERN)
-                .map(l -> l.getInput())
-                .filter(a -> a.getINeuron() instanceof PatternPartNeuron)
-                .forEach(a -> a.getINeuron().collectPPRelatedInputRPLinkingCandidatesDown(a, c));
-    }
-
-    public void collectPPSameInputLinkingCandidatesUp(Activation act, Linker.CollectResults c) {
-        c.collect(act);
-    }
 
     public double getCost(Sign s) {
         TNeuron primaryInput = getPrimaryInput();
