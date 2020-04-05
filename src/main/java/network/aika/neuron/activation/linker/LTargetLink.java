@@ -1,7 +1,8 @@
 package network.aika.neuron.activation.linker;
 
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Activation;
+
 
 public class LTargetLink extends LLink {
 
@@ -11,7 +12,7 @@ public class LTargetLink extends LLink {
     }
 
 
-    public void follow(Link l, LNode from, long v, Linker.CollectResults c) {
+    public void follow(Activation act, LNode from, long v, Linker.CollectResults c) {
 
     }
 

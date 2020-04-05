@@ -20,6 +20,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Document;
 import network.aika.Writable;
+import network.aika.neuron.excitatory.pattern.PatternNeuron;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -41,6 +42,10 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     private double weight;
     private double weightDelta;
 
+    public enum PatternScope {
+        INPUT_PATTERN,
+        SAME_PATTERN
+    }
 
     public Synapse() {
     }
@@ -57,6 +62,8 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     public abstract boolean isRecurrent();
 
     public abstract boolean isNegative();
+
+    public abstract PatternScope getPatternScope();
 
     protected abstract void addLinkInternal(INeuron in, INeuron out);
 

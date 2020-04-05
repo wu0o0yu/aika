@@ -26,6 +26,9 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
 
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
+
 
 /**
  *
@@ -46,16 +49,16 @@ public class Linker {
             act.lastRound.outputLinks
                     .values()
                     .forEach(l -> {
-                        new Entry(l.output)
-                                .addCandidate(l.synapse, act)
+                        new Entry(l.getOutput())
+                                .addCandidate(l.getSynapse(), act)
                                 .addToQueue(queue);
-                        propagationTargets.remove(l.output.getNeuron());
+                        propagationTargets.remove(l.getOutput().getNeuron());
                     });
             act.lastRound.unlink();
             act.lastRound = null;
         }
 
-        act.getINeuron().collectLinkingCandidates(act, cAct -> {
+        act.getINeuron().collectLinkingCandidates(act, INPUT, cAct -> {
             if(cAct.getINeuron() instanceof InhibitoryNeuron) return;
 
             Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
@@ -102,7 +105,7 @@ public class Linker {
         public Entry cloneEntry(boolean branch) {
             Entry ce = new Entry();
             ce.act = act.cloneAct(branch);
-            candidates.forEach(l -> ce.addCandidate(l.synapse, l.input));
+            candidates.forEach(l -> ce.addCandidate(l.getSynapse(), l.getInput()));
             return ce;
         }
 
@@ -136,11 +139,11 @@ public class Linker {
     public void findLinkingCandidates(Entry e, Link l) {
         if(((e.act.getINeuron() instanceof InhibitoryNeuron) || l.isConflict())) return;
 
-        l.input.getINeuron().collectLinkingCandidates(l.input, act -> {
+        l.getInput().getINeuron().collectLinkingCandidates(l.getInput(), OUTPUT, act -> {
             Synapse is = e.act.getNeuron().getInputSynapse(act.getNeuron());
-            if (is == null || l.synapse == is) return;
+            if (is == null || l.getSynapse() == is) return;
 
-            if (act.getOutputLinks(is).noneMatch(la -> la.output == e.act)) {
+            if (act.getOutputLinks(is).noneMatch(la -> la.getOutput() == e.act)) {
                 e.addCandidate(is, act);
             }
         });

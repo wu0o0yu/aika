@@ -32,6 +32,7 @@ import java.util.Comparator;
 import java.util.TreeSet;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  *
@@ -95,6 +96,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     @Override
     public void collectLinkingCandidates(Activation act, Direction dir, Linker.CollectResults c) {
-        inputLink.output.follow(act, inputLink, act.getDocument().getNewVisitedId(), c);
+        if(dir == OUTPUT) {
+            inputLink.output.follow(act, inputLink, act.getDocument().getNewVisitedId(), c);
+        }
     }
 }

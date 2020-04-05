@@ -34,6 +34,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
+
 /**
  * @author Lukas Molzberger
  */
@@ -106,13 +109,16 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public void collectLinkingCandidates(Activation act, Direction dir, Linker.CollectResults c) {
         Document doc = act.getDocument();
 
-        sameInputLink.output.follow(act, sameInputLink, doc.getNewVisitedId(), c);
-        sameInputLink.input.follow(act, sameInputLink, doc.getNewVisitedId(), c);
+        if(dir == OUTPUT) {
+            sameInputLink.output.follow(act, sameInputLink, doc.getNewVisitedId(), c);
+            relatedInputLink.output.follow(act, relatedInputLink, doc.getNewVisitedId(), c);
+        }
 
-        relatedInputLink.output.follow(act, relatedInputLink, doc.getNewVisitedId(), c);
-        relatedInputLink.input.follow(act, relatedInputLink, doc.getNewVisitedId(), c);
-
-        PatternNeuron.inputLink.input.follow(act, PatternNeuron.inputLink, doc.getNewVisitedId(), c);
+        if(dir == INPUT) {
+            sameInputLink.input.follow(act, sameInputLink, doc.getNewVisitedId(), c);
+            relatedInputLink.input.follow(act, relatedInputLink, doc.getNewVisitedId(), c);
+            PatternNeuron.inputLink.input.follow(act, PatternNeuron.inputLink, doc.getNewVisitedId(), c);
+        }
     }
 
 

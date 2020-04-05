@@ -10,11 +10,6 @@ public class PatternPartSynapse<I extends TNeuron> extends ExcitatorySynapse<I, 
 
     public static byte type;
 
-    public enum PatternScope {
-        INPUT_PATTERN,
-        SAME_PATTERN
-    }
-
     private PatternScope patternScope;
     private boolean isRecurrent;
     private boolean isNegative;

@@ -1,9 +1,6 @@
 package network.aika.neuron.activation.linker;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-
-import java.util.stream.Stream;
 
 public class LNode {
 
@@ -32,14 +29,7 @@ public class LNode {
                 continue;
             }
 
-            Stream<Link> s = null;
-            if(this == ln.input) {
-                s = act.outputLinks.values().stream();
-            } else if(this == ln.output) {
-                s = act.inputLinks.values().stream();
-            }
-
-            s.forEach(l -> ln.follow(l, this, v, c));
+            ln.follow(act, this, v, c);
         }
     }
 }

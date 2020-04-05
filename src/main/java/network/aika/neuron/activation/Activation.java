@@ -148,36 +148,6 @@ public class Activation implements Comparable<Activation> {
         return dir == INPUT ? inputLinks.values() : outputLinks.values();
     }
 
-/*
-    public void followDown(long v, CollectResults c) {
-        if(visitedDown == v) return;
-        visitedDown = v;
-
-        inputLinks
-                .values()
-                .stream()
-                .forEach(l -> {
-                    if(!(l.input.getINeuron() instanceof PatternNeuron)) {
-                        l.input.followDown(v, c);
-                    }
-                    l.input.followUp(v, c);
-                });
-    }
-
-    public void followUp(long v, CollectResults c) {
-        if(visitedUp == v) return;
-        visitedUp = v;
-
-        if(isConflicting(v)) return;
-
-        c.collect(this);
-
-        outputLinks
-                .values()
-                .stream()
-                .forEach(l -> l.output.followUp(v, c));
-    }
-*/
     public Activation cloneAct(boolean branch) {
         Activation clonedAct = new Activation(doc, neuron, branch, this, round + 1);
 
