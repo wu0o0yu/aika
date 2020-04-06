@@ -8,8 +8,8 @@ import java.util.stream.Stream;
 
 public class LMatchingLink extends LLink {
 
-    public LMatchingLink(LNode input, LNode output, PatternScope patternScope) {
-        super(input, output, patternScope);
+    public LMatchingLink(LNode input, LNode output, PatternScope patternScope, String label) {
+        super(input, output, patternScope, label);
     }
 
     protected LNode getTo(LNode from) {

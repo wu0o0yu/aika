@@ -4,14 +4,17 @@ import network.aika.neuron.activation.Activation;
 
 public class LNode {
 
+    String label;
+
     LLink[] links;
     PatternType patternType;
 
     Byte neuronType;
 
-    public LNode(PatternType patternType, Byte neuronType) {
+    public LNode(PatternType patternType, Byte neuronType, String label) {
         this.patternType = patternType;
         this.neuronType = neuronType;
+        this.label = label;
     }
 
     public void setLinks(LLink... links) {

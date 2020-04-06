@@ -12,11 +12,9 @@ import java.util.stream.Stream;
 
 public class LTargetLink extends LLink {
 
-    protected PatternScope patternScope;
 
-
-    public LTargetLink(LNode input, LNode output, PatternScope patternScope) {
-        super(input, output, patternScope);
+    public LTargetLink(LNode input, LNode output, PatternScope patternScope, String label) {
+        super(input, output, patternScope, label);
     }
 
     public void follow(Activation act, LNode from, long v, Linker.CollectResults c) {
