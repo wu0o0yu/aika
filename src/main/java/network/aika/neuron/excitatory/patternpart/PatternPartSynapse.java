@@ -1,6 +1,7 @@
 package network.aika.neuron.excitatory.patternpart;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;

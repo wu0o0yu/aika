@@ -9,7 +9,7 @@ import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import org.junit.Test;
 
-import static network.aika.neuron.excitatory.patternpart.PatternPartSynapse.PatternScope.INPUT_PATTERN;
+import static network.aika.neuron.PatternScope.INPUT_PATTERN;
 
 public class PropagateTest {
 

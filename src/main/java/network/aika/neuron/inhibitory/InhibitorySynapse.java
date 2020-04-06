@@ -19,6 +19,8 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.*;
 
+import static network.aika.neuron.PatternScope.SAME_PATTERN;
+
 
 /**
  *
@@ -49,6 +51,11 @@ public class InhibitorySynapse extends Synapse<TNeuron, InhibitoryNeuron> {
     @Override
     public boolean isNegative() {
         return false;
+    }
+
+    @Override
+    public PatternScope getPatternScope() {
+        return SAME_PATTERN;
     }
 
     @Override

@@ -10,8 +10,8 @@ import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import org.junit.Test;
 
-import static network.aika.neuron.excitatory.patternpart.PatternPartSynapse.PatternScope.INPUT_PATTERN;
-import static network.aika.neuron.excitatory.patternpart.PatternPartSynapse.PatternScope.SAME_PATTERN;
+import static network.aika.neuron.PatternScope.INPUT_PATTERN;
+import static network.aika.neuron.PatternScope.SAME_PATTERN;
 
 public class PatternTest {
 

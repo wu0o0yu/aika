@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.function.Function;
 
+import static network.aika.neuron.activation.Direction.OUTPUT;
+
 /**
  *
  * @author Lukas Molzberger
@@ -92,7 +94,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Conj
 
         ArrayList<Activation> candidates = new ArrayList<>();
 
-        collectLinkingCandidates(targetAct, act -> {
+        collectLinkingCandidates(targetAct, OUTPUT, act -> {
             Synapse is = targetAct.getNeuron().getInputSynapse(act.getNeuron());
             if(is != null) return;
 

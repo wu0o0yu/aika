@@ -19,9 +19,6 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.*;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 
 
 /**

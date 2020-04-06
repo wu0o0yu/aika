@@ -2,6 +2,7 @@ package network.aika.neuron.excitatory.pattern;
 
 import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
@@ -9,6 +10,8 @@ import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+
+import static network.aika.neuron.PatternScope.SAME_PATTERN;
 
 public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, PatternNeuron> {
 
@@ -36,6 +39,11 @@ public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, Pattern
     @Override
     public boolean isNegative() {
         return false;
+    }
+
+    @Override
+    public PatternScope getPatternScope() {
+        return SAME_PATTERN;
     }
 
     public boolean isPropagate() {

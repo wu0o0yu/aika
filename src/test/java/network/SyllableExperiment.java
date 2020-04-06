@@ -17,8 +17,8 @@ import java.io.*;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static network.aika.neuron.excitatory.patternpart.PatternPartSynapse.PatternScope.INPUT_PATTERN;
-import static network.aika.neuron.excitatory.patternpart.PatternPartSynapse.PatternScope.SAME_PATTERN;
+import static network.aika.neuron.PatternScope.INPUT_PATTERN;
+import static network.aika.neuron.PatternScope.SAME_PATTERN;
 
 
 /**
