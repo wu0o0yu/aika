@@ -72,7 +72,7 @@ public class MutualExclusionTest {
                         .setWeight(-100.0)
         );
 
-        Neuron.init(inhib.getProvider(), 0.0,
+        Neuron.init(inhib, 0.0,
                 new InhibitorySynapse.Builder()
                         .setNeuron(na)
                         .setWeight(1.0),

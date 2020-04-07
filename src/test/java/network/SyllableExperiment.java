@@ -10,6 +10,7 @@ import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,6 +31,7 @@ public class SyllableExperiment {
     Model model;
 
     Map<Character, PatternNeuron> inputLetters = new TreeMap<>();
+    InhibitoryNeuron inputInhibN;
     ExcitatoryNeuron relN;
 
 
@@ -37,6 +39,7 @@ public class SyllableExperiment {
     public void init() {
         model = new Model();
 
+        inputInhibN = new InhibitoryNeuron(model, "INPUT INHIB");
         relN = new PatternPartNeuron(model, "Char-Relation");
     }
 
@@ -56,6 +59,7 @@ public class SyllableExperiment {
         System.out.println("DocId:" + doc.getId() + "  " + word);
 
         Activation lastAct = null;
+        Activation lastInInhibAct = null;
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.charAt(i);
 
@@ -67,18 +71,28 @@ public class SyllableExperiment {
                             .setRangeCoverage(1.0)
             );
 
+            Activation currentInInhibAct = inputInhibN.addInput(doc,
+                    new Activation.Builder()
+                            .setInputTimestamp(i)
+                            .setFired(0)
+                            .setValue(1.0)
+                            .setRangeCoverage(1.0)
+                            .addInputLink(currentAct)
+            );
+
             if(lastAct != null) {
                 relN.addInput(doc,
                         new Activation.Builder()
                             .setInputTimestamp(i)
                             .setFired(0)
                             .setValue(1.0)
-                            .addInputLink(lastAct)
-                            .addInputLink(currentAct)
+                            .addInputLink(lastInInhibAct)
+                            .addInputLink(currentInInhibAct)
                 );
             }
 
             lastAct = currentAct;
+            lastInInhibAct = currentInInhibAct;
         }
 
         System.out.println(doc.activationsToString());

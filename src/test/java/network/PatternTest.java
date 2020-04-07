@@ -8,6 +8,7 @@ import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
 import org.junit.Test;
 
 import static network.aika.neuron.PatternScope.INPUT_PATTERN;
@@ -24,10 +25,21 @@ public class PatternTest {
         PatternNeuron inB = new PatternNeuron(m, "IN B");
         PatternNeuron inC = new PatternNeuron(m, "IN C");
 
-        PatternPartNeuron relN = new PatternPartNeuron(m, "Rel");
 
         InhibitoryNeuron inputInhibN = new InhibitoryNeuron(m, "INPUT INHIB");
+        Neuron.init(inputInhibN, 0.0,
+                new InhibitorySynapse.Builder()
+                        .setNeuron(inA)
+                        .setWeight(1.0),
+                new InhibitorySynapse.Builder()
+                        .setNeuron(inB)
+                        .setWeight(1.0),
+                new InhibitorySynapse.Builder()
+                        .setNeuron(inC)
+                        .setWeight(1.0)
+        );
 
+        PatternPartNeuron relN = new PatternPartNeuron(m, "Rel");
         Neuron.init(relN, 1.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
@@ -142,6 +154,14 @@ public class PatternTest {
                         .setFired(0)
         );
 
+        Activation inInhibA = inputInhibN.addInput(doc,
+                new Activation.Builder()
+                        .setValue(1.0)
+                        .setInputTimestamp(0)
+                        .setFired(0)
+                        .addInputLink(actA)
+        );
+
         Activation actB = inB.addInput(doc,
                 new Activation.Builder()
                         .setValue(1.0)
@@ -149,13 +169,22 @@ public class PatternTest {
                         .setFired(0)
         );
 
+
+        Activation inInhibB = inputInhibN.addInput(doc,
+                new Activation.Builder()
+                        .setValue(1.0)
+                        .setInputTimestamp(0)
+                        .setFired(0)
+                        .addInputLink(actB)
+        );
+
         relN.addInput(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(1)
                         .setFired(0)
-                        .addInputLink(actA)
-                        .addInputLink(actB)
+                        .addInputLink(inInhibA)
+                        .addInputLink(inInhibB)
         );
 
         Activation actC = inC.addInput(doc,
@@ -165,13 +194,21 @@ public class PatternTest {
                         .setFired(0)
         );
 
+        Activation inInhibC = inputInhibN.addInput(doc,
+                new Activation.Builder()
+                        .setValue(1.0)
+                        .setInputTimestamp(0)
+                        .setFired(0)
+                        .addInputLink(actC)
+        );
+
         relN.addInput(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(2)
                         .setFired(0)
-                        .addInputLink(actB)
-                        .addInputLink(actC)
+                        .addInputLink(inInhibB)
+                        .addInputLink(inInhibC)
         );
 
 
