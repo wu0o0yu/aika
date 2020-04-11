@@ -32,7 +32,7 @@ public class LMatchingLink extends LLink {
         return null;
     }
 
-    public void follow(Activation act, LNode from, long v, Linker.CollectResults c) {
+    public void follow(Activation act, LNode from, Activation startAct, long v, Linker.CollectResults c) {
         Stream<Link> s = null;
         if(from == input) {
             s = act.outputLinks.values().stream();
@@ -40,16 +40,16 @@ public class LMatchingLink extends LLink {
             s = act.inputLinks.values().stream();
         }
 
-        s.forEach(l -> follow(l, from, v, c));
+        s.forEach(l -> follow(l, from, startAct, v, c));
     }
 
-    private void follow(Link l, LNode from, long v, Linker.CollectResults c) {
+    private void follow(Link l, LNode from, Activation startAct, long v, Linker.CollectResults c) {
         LNode to = getTo(from);
         if(!checkLink(l, from, to)) {
             return;
         }
 
-        to.follow(getToActivation(l, from), this, v, c);
+        to.follow(getToActivation(l, from), this, startAct, v, c);
     }
 
     private boolean checkLink(Link l, LNode from, LNode to) {

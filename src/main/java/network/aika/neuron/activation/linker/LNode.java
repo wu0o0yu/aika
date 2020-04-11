@@ -21,7 +21,7 @@ public class LNode {
         this.links = links;
     }
 
-    public void follow(Activation act, LLink from, long v, Linker.CollectResults c) {
+    public void follow(Activation act, LLink from, Activation startAct, long v, Linker.CollectResults c) {
         if(act.visited == v) return;
         act.visited = v;
 
@@ -35,7 +35,7 @@ public class LNode {
                 continue;
             }
 
-            ln.follow(act, this, v, c);
+            ln.follow(act, this, startAct, v, c);
         }
     }
 }

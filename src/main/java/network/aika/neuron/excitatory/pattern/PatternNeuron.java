@@ -96,7 +96,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     @Override
     public void collectLinkingCandidates(Activation act, Direction dir, Linker.CollectResults c) {
         if(dir == OUTPUT) {
-            Linker.inputLink.output.follow(act, Linker.inputLink, act.getDocument().getNewVisitedId(), c);
+            Linker.inputLink.output.follow(act, Linker.inputLink, act, act.getDocument().getNewVisitedId(), c);
         }
     }
 }

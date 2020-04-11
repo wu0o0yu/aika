@@ -19,5 +19,5 @@ public abstract class LLink {
         this.label = label;
     }
 
-    public abstract void follow(Activation act, LNode from, long v, Linker.CollectResults c);
+    public abstract void follow(Activation act, LNode from, Activation startAct, long v, Linker.CollectResults c);
 }

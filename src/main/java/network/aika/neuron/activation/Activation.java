@@ -180,13 +180,6 @@ public class Activation implements Comparable<Activation> {
         return 1.0;
     }
 
-    public boolean outputLinkExists(INeuron n) {
-        return !outputLinks.subMap(
-                new Activation(Integer.MIN_VALUE, n),
-                new Activation(Integer.MAX_VALUE, n)
-        ).isEmpty();
-    }
-
     public boolean isConflicting(long v) {
         if(isInitialRound()) {
             return false;

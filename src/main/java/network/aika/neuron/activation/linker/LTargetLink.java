@@ -4,10 +4,8 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.PatternScope;
 import network.aika.neuron.activation.Activation;
-
-import java.util.stream.Stream;
+import network.aika.neuron.activation.Link;
 
 
 public class LTargetLink extends LLink {
@@ -17,24 +15,34 @@ public class LTargetLink extends LLink {
         super(input, output, patternScope, label);
     }
 
-    public void follow(Activation act, LNode from, long v, Linker.CollectResults c) {
-        Neuron n = act.getNeuron();
-
-        Stream<Synapse> syns = null;
-        if(from == input) {
-            syns = n.getActiveOutputSynapses().stream();
-        } else if(from == output) {
-            syns = n.getActiveInputSynapses().stream();
-        }
-
-        syns.forEach(s -> follow(act, s, c));
-    }
-
-    public void follow(Activation act, Synapse s, Linker.CollectResults c) {
-        if(patternScope != null && patternScope != s.getPatternScope()) {
+    public void follow(Activation act, LNode from, Activation startAct, long v, Linker.CollectResults c) {
+        Link existingLink = lookupExistingLink(act, from, startAct);
+        if(existingLink != null) {
             return;
         }
 
-        c.collect(act);
+        Synapse ts = lookupTargetSynapse(from, startAct, act.getNeuron());
+
+        if(patternScope != null && patternScope != ts.getPatternScope()) {
+            return;
+        }
+
+        c.collect(act, ts);
+    }
+
+    public Synapse lookupTargetSynapse(LNode from, Activation startAct, Neuron n) {
+        if(from == input) {
+            return n.getOutputSynapse(startAct.getNeuron());
+        } else {
+            return n.getInputSynapse(startAct.getNeuron());
+        }
+    }
+
+    public Link lookupExistingLink(Activation act, LNode from, Activation startAct) {
+        if(from == output) {
+            return startAct.outputLinks.get(act);
+        } else {
+            return act.outputLinks.get(startAct);
+        }
     }
 }

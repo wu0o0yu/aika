@@ -103,7 +103,7 @@ public class Linker {
     }
 
     public interface CollectResults {
-        void collect(Activation act);
+        void collect(Activation act, Synapse s);
     }
 
     public void linkForward(Activation act, boolean processMode) {
@@ -124,10 +124,7 @@ public class Linker {
             act.lastRound = null;
         }
 
-        act.getINeuron().collectLinkingCandidates(act, INPUT, cAct -> {
-            Synapse s = act.getNeuron().getOutputSynapse(cAct.getNeuron());
-            if(s == null || act.outputLinkExists(cAct.getINeuron())) return;
-
+        act.getINeuron().collectLinkingCandidates(act, INPUT, (cAct, s) -> {
             new Entry(cAct)
                     .addCandidate(s, act)
                     .addToQueue(queue);
@@ -203,7 +200,7 @@ public class Linker {
     public void findLinkingCandidates(Entry e, Link l) {
  //       if(((e.act.getINeuron() instanceof InhibitoryNeuron) || l.isConflict())) return;
 
-        l.getInput().getINeuron().collectLinkingCandidates(l.getInput(), OUTPUT, act -> {
+        l.getInput().getINeuron().collectLinkingCandidates(l.getInput(), OUTPUT, (act, s) -> {
             Synapse is = e.act.getNeuron().getInputSynapse(act.getNeuron());
             if (is == null || l.getSynapse() == is) return;
 
