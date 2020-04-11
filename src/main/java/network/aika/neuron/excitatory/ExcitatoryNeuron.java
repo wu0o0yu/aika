@@ -94,11 +94,8 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Conj
 
         ArrayList<Activation> candidates = new ArrayList<>();
 
-        collectLinkingCandidates(targetAct, OUTPUT, act -> {
-            Synapse is = targetAct.getNeuron().getInputSynapse(act.getNeuron());
-            if(is != null) return;
-
-            candidates.add(act);
+        collectLinkingCandidates(targetAct, OUTPUT, (cAct, s) -> {
+            candidates.add(cAct);
         });
 
         candidates
