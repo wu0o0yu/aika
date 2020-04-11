@@ -198,15 +198,11 @@ public class Linker {
     }
 
     public void findLinkingCandidates(Entry e, Link l) {
- //       if(((e.act.getINeuron() instanceof InhibitoryNeuron) || l.isConflict())) return;
+ //       if(l.isConflict()) return;
 
-        l.getInput().getINeuron().collectLinkingCandidates(l.getInput(), OUTPUT, (act, s) -> {
-            Synapse is = e.act.getNeuron().getInputSynapse(act.getNeuron());
-            if (is == null || l.getSynapse() == is) return;
-
-            if (act.getOutputLinks(is).noneMatch(la -> la.getOutput() == e.act)) {
-                e.addCandidate(is, act);
-            }
-        });
+        Activation act = l.getInput();
+        act.getINeuron().collectLinkingCandidates(act, OUTPUT,
+                (cAct, s) -> e.addCandidate(s, cAct)
+        );
     }
 }
