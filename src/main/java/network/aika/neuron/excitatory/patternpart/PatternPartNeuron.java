@@ -105,17 +105,15 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void collectLinkingCandidates(Activation act, Direction dir, Linker.CollectResults c) {
-        Document doc = act.getDocument();
-
         if(dir == OUTPUT) {
-            Linker.sameInputLink.output.follow(act, Linker.sameInputLink, act, doc.getNewVisitedId(), c);
-            Linker.relatedInputLink.output.follow(act, Linker.relatedInputLink, act, doc.getNewVisitedId(), c);
+            Linker.sameInputLink.output.follow(act, Linker.sameInputLink, act, c);
+            Linker.relatedInputLink.output.follow(act, Linker.relatedInputLink, act, c);
         }
 
         if(dir == INPUT) {
-            Linker.sameInputLink.input.follow(act, Linker.sameInputLink,act, doc.getNewVisitedId(), c);
-            Linker.relatedInputLink.input.follow(act, Linker.relatedInputLink, act, doc.getNewVisitedId(), c);
-            Linker.inputLink.input.follow(act, Linker.inputLink, act, doc.getNewVisitedId(), c);
+            Linker.sameInputLink.input.follow(act, Linker.sameInputLink,act, c);
+            Linker.relatedInputLink.input.follow(act, Linker.relatedInputLink, act, c);
+            Linker.inputLink.input.follow(act, Linker.inputLink, act, c);
         }
     }
 

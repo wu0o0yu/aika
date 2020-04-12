@@ -105,6 +105,11 @@ public class Model {
         }
     }
 
+
+    public static Class getClassForType(byte type) {
+        return typeRegistry.get(type);
+    }
+
     public SuspensionHook getSuspensionHook() {
         return suspensionHook;
     }

@@ -19,5 +19,11 @@ public abstract class LLink {
         this.label = label;
     }
 
-    public abstract void follow(Activation act, LNode from, Activation startAct, long v, Linker.CollectResults c);
+    public abstract void follow(Activation act, LNode from, Activation startAct, Linker.CollectResults c);
+
+    public abstract String getTypeStr();
+
+    public String toString() {
+        return getTypeStr() + " " + label + " " + (patternScope != null ? patternScope : "X") + " " + input.label  + " -> " + output.label;
+    }
 }

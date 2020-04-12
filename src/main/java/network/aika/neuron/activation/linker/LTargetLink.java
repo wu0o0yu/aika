@@ -1,6 +1,5 @@
 package network.aika.neuron.activation.linker;
 
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
@@ -10,12 +9,11 @@ import network.aika.neuron.activation.Link;
 
 public class LTargetLink extends LLink {
 
-
     public LTargetLink(LNode input, LNode output, PatternScope patternScope, String label) {
         super(input, output, patternScope, label);
     }
 
-    public void follow(Activation act, LNode from, Activation startAct, long v, Linker.CollectResults c) {
+    public void follow(Activation act, LNode from, Activation startAct, Linker.CollectResults c) {
         Link existingLink = lookupExistingLink(act, from, startAct);
         if(existingLink != null) {
             return;
@@ -44,5 +42,10 @@ public class LTargetLink extends LLink {
         } else {
             return act.outputLinks.get(startAct);
         }
+    }
+
+    @Override
+    public String getTypeStr() {
+        return "T";
     }
 }

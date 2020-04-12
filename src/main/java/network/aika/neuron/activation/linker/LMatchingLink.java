@@ -32,7 +32,7 @@ public class LMatchingLink extends LLink {
         return null;
     }
 
-    public void follow(Activation act, LNode from, Activation startAct, long v, Linker.CollectResults c) {
+    public void follow(Activation act, LNode from, Activation startAct, Linker.CollectResults c) {
         Stream<Link> s = null;
         if(from == input) {
             s = act.outputLinks.values().stream();
@@ -40,23 +40,28 @@ public class LMatchingLink extends LLink {
             s = act.inputLinks.values().stream();
         }
 
-        s.forEach(l -> follow(l, from, startAct, v, c));
+        s.forEach(l -> follow(l, from, startAct, c));
     }
 
-    private void follow(Link l, LNode from, Activation startAct, long v, Linker.CollectResults c) {
+    private void follow(Link l, LNode from, Activation startAct, Linker.CollectResults c) {
         LNode to = getTo(from);
-        if(!checkLink(l, from, to)) {
+        if(!checkLink(l)) {
             return;
         }
 
-        to.follow(getToActivation(l, from), this, startAct, v, c);
+        to.follow(getToActivation(l, from), this, startAct, c);
     }
 
-    private boolean checkLink(Link l, LNode from, LNode to) {
+    private boolean checkLink(Link l) {
         if(patternScope != null && patternScope != l.getSynapse().getPatternScope()) {
             return false;
         }
 
         return true;
+    }
+
+    @Override
+    public String getTypeStr() {
+        return "M";
     }
 }
