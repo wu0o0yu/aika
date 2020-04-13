@@ -29,6 +29,8 @@ public class LNode {
             return;
         }
 
+        act.lNode = this;
+
         for(int i = 0; i < links.length; i++) {
             LLink ln = links[i];
             if(ln == from) {
@@ -37,6 +39,8 @@ public class LNode {
 
             ln.follow(act, this, startAct, c);
         }
+
+        act.lNode = null;
     }
 
     public String toString() {

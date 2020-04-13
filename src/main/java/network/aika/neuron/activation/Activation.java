@@ -19,6 +19,7 @@ package network.aika.neuron.activation;
 import network.aika.Document;
 import network.aika.Utils;
 import network.aika.neuron.*;
+import network.aika.neuron.activation.linker.LNode;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -54,9 +55,7 @@ public class Activation implements Comparable<Activation> {
 
     public boolean isFinal;
 
-
-    public long visitedDown;
-    public long visitedUp;
+    public LNode lNode;
 
     public int round; // Nur als Abbruchbedingung
     public Activation nextRound;
@@ -99,7 +98,7 @@ public class Activation implements Comparable<Activation> {
                 .thenComparing(l -> l.input)
         );
 
-        inputLinks = new TreeMap<>();
+        inputLinks = new TreeMap<>(INPUT_COMP);
 
         outputLinks = new TreeMap<>(Comparator
                 .<Activation, Neuron>comparing(act -> act.getNeuron())
@@ -186,7 +185,7 @@ public class Activation implements Comparable<Activation> {
         return inputLinks.values().stream()
                 .filter(l -> l.isConflict())
                 .flatMap(l -> l.input.inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
-                .anyMatch(l -> l.input.visitedDown != v);
+                .anyMatch(l -> l.input.lNode == null);
     }
 
     public Stream<Link> getOutputLinks(Synapse s) {

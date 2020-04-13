@@ -53,8 +53,8 @@ public class Linker {
             LNode inputB = new LNode(PatternType.CURRENT, PatternPartNeuron.type, "inputB");
 
             inputLink = new LTargetLink(inputB, target, SAME_PATTERN, "inputLink");
-            LLink l1 = new LMatchingLink(inputA, inputB, SAME_PATTERN, "l1");
-            LLink l2 = new LMatchingLink(inputA, target, SAME_PATTERN, "l2");
+            LLink l1 = new LMatchingLink(inputA, inputB, SAME_PATTERN, "l1", false);
+            LLink l2 = new LMatchingLink(inputA, target, SAME_PATTERN, "l2",true);
 
             target.setLinks(inputLink, l2);
             inputA.setLinks(l1, l2);
@@ -69,10 +69,10 @@ public class Linker {
             LNode inhib = new LNode(PatternType.INPUT, InhibitoryNeuron.type, "inhib");
 
             sameInputLink = new LTargetLink(inputRel, target, INPUT_PATTERN, "sameInputLink");
-            LLink l1 = new LMatchingLink(inputPattern, inputRel, SAME_PATTERN, "l1");
-            LLink l2 = new LMatchingLink(inhib, inputRel, SAME_PATTERN, "l2");
-            LLink inhibLink = new LMatchingLink(inputPattern, inhib, SAME_PATTERN, "inhibLink");
-            LLink inputPatternLink = new LMatchingLink(inputPattern, target, INPUT_PATTERN, "inputPatternLink");
+            LLink l1 = new LMatchingLink(inputPattern, inputRel, SAME_PATTERN, "l1", false);
+            LLink l2 = new LMatchingLink(inhib, inputRel, SAME_PATTERN, "l2", false);
+            LLink inhibLink = new LMatchingLink(inputPattern, inhib, SAME_PATTERN, "inhibLink", false);
+            LLink inputPatternLink = new LMatchingLink(inputPattern, target, INPUT_PATTERN, "inputPatternLink", true);
 
             target.setLinks(sameInputLink, inputPatternLink);
             inputPattern.setLinks(l1, inhibLink, inputPatternLink);
@@ -89,11 +89,11 @@ public class Linker {
             LNode inhib = new LNode(PatternType.INPUT, InhibitoryNeuron.type, "inhib");
 
             relatedInputLink = new LTargetLink(samePatternPP, target, SAME_PATTERN, "relatedInputLink");
-            LLink inputRelLink = new LMatchingLink(inputRel, target, INPUT_PATTERN, "inputRelLink");
-            LLink relPatternLink1 = new LMatchingLink(relPattern, inputRel, INPUT_PATTERN, "relPatternLink1");
-            LLink relPatternLink2 = new LMatchingLink(relPattern, samePatternPP, INPUT_PATTERN, "relPatternLink2");
-            LLink inhibLink = new LMatchingLink(relPattern, inhib, SAME_PATTERN, "inhibLink");
-            LLink relPatternLink3 = new LMatchingLink(inhib, inputRel, INPUT_PATTERN, "relPatternLink3");
+            LLink inputRelLink = new LMatchingLink(inputRel, target, INPUT_PATTERN, "inputRelLink", false);
+            LLink relPatternLink1 = new LMatchingLink(relPattern, inputRel, INPUT_PATTERN, "relPatternLink1", false);
+            LLink relPatternLink2 = new LMatchingLink(relPattern, samePatternPP, INPUT_PATTERN, "relPatternLink2", false);
+            LLink inhibLink = new LMatchingLink(relPattern, inhib, SAME_PATTERN, "inhibLink", false);
+            LLink relPatternLink3 = new LMatchingLink(inhib, inputRel, INPUT_PATTERN, "relPatternLink3", true);
 
             target.setLinks(relatedInputLink, inputRelLink);
             samePatternPP.setLinks(relatedInputLink, relPatternLink2);

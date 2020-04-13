@@ -19,10 +19,7 @@ package network.aika.neuron.excitatory.patternpart;
 import network.aika.Config;
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Sign;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.TNeuron;
+import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.linker.*;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
@@ -140,22 +137,22 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         }
     }
 
-    private Synapse<TNeuron, TNeuron> getPatternSynapse(boolean isRecurrent) {
+    private Synapse<TNeuron, TNeuron> getPatternSynapse(PatternScope ps) {
         return inputSynapses
                 .values()
                 .stream()
-                .filter(s -> isRecurrent == s.isRecurrent())
+                .filter(s -> ps == s.getPatternScope())
                 .filter(s -> s.getInput() instanceof PatternNeuron)
                 .findFirst()
                 .orElse(null);
     }
 
     public TNeuron getPrimaryInput() {
-        return getPatternSynapse(false).getInput();
+        return getPatternSynapse(INPUT_PATTERN).getInput();
     }
 
     public TNeuron getPatternInput() {
-        return getPatternSynapse(true).getInput();
+        return getPatternSynapse(SAME_PATTERN).getInput();
     }
 
     public Activation init(Activation iAct) {
