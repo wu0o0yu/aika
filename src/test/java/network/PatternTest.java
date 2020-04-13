@@ -159,7 +159,7 @@ public class PatternTest {
                         .setValue(1.0)
                         .setInputTimestamp(0)
                         .setFired(0)
-                        .addInputLink(actA)
+                        .addInputLink(SAME_PATTERN, actA)
         );
 
         Activation actB = inB.addInput(doc,
@@ -175,7 +175,7 @@ public class PatternTest {
                         .setValue(1.0)
                         .setInputTimestamp(0)
                         .setFired(0)
-                        .addInputLink(actB)
+                        .addInputLink(SAME_PATTERN, actB)
         );
 
         relN.addInput(doc,
@@ -183,8 +183,8 @@ public class PatternTest {
                         .setValue(1.0)
                         .setInputTimestamp(1)
                         .setFired(0)
-                        .addInputLink(inInhibA)
-                        .addInputLink(inInhibB)
+                        .addInputLink(INPUT_PATTERN, inInhibA)
+                        .addInputLink(SAME_PATTERN, inInhibB)
         );
 
         Activation actC = inC.addInput(doc,
@@ -199,7 +199,7 @@ public class PatternTest {
                         .setValue(1.0)
                         .setInputTimestamp(0)
                         .setFired(0)
-                        .addInputLink(actC)
+                        .addInputLink(SAME_PATTERN, actC)
         );
 
         relN.addInput(doc,
@@ -207,8 +207,8 @@ public class PatternTest {
                         .setValue(1.0)
                         .setInputTimestamp(2)
                         .setFired(0)
-                        .addInputLink(inInhibB)
-                        .addInputLink(inInhibC)
+                        .addInputLink(INPUT_PATTERN, inInhibB)
+                        .addInputLink(SAME_PATTERN, inInhibC)
         );
 
 

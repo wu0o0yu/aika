@@ -28,6 +28,7 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
 
+import static network.aika.neuron.OutputKey.OUTPUT_COMP;
 import static network.aika.neuron.PatternScope.INPUT_PATTERN;
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
 import static network.aika.neuron.activation.Direction.INPUT;
@@ -109,7 +110,8 @@ public class Linker {
     public void linkForward(Activation act, boolean processMode) {
         ArrayDeque<Entry> queue = new ArrayDeque<>();
         Document doc = act.getDocument();
-        TreeSet<Neuron> propagationTargets = new TreeSet(act.getINeuron().getPropagationTargets());
+        TreeSet<Synapse> propagationTargets = new TreeSet(OUTPUT_COMP);
+        propagationTargets.addAll(act.getINeuron().getPropagationTargets());
 
         if(act.lastRound != null) {
             act.lastRound.outputLinks
@@ -132,9 +134,8 @@ public class Linker {
         });
 
         propagationTargets
-                .stream()
-                .map(n -> n.get().getProvider())
-                .map(n -> act.getNeuron().getOutputSynapse(n))
+                .stream() // Ensure that the output neurons get loaded.
+                .map(s -> act.getNeuron().getOutputSynapse(s.getPOutput(), s.getPatternScope()))
                 .forEach(s ->
                         new Entry(new Activation(doc, s.getOutput(), false, null, 0))
                                 .addCandidate(s, act)

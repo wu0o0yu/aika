@@ -5,6 +5,7 @@ import network.aika.Config;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.PatternScope;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
@@ -77,7 +78,7 @@ public class SyllableExperiment {
                             .setFired(0)
                             .setValue(1.0)
                             .setRangeCoverage(1.0)
-                            .addInputLink(currentAct)
+                            .addInputLink(SAME_PATTERN, currentAct)
             );
 
             if(lastAct != null) {
@@ -86,8 +87,8 @@ public class SyllableExperiment {
                             .setInputTimestamp(i)
                             .setFired(0)
                             .setValue(1.0)
-                            .addInputLink(lastInInhibAct)
-                            .addInputLink(currentInInhibAct)
+                            .addInputLink(INPUT_PATTERN, lastInInhibAct)
+                            .addInputLink(SAME_PATTERN, currentInInhibAct)
                 );
             }
 

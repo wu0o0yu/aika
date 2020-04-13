@@ -30,9 +30,9 @@ public class LTargetLink extends LLink {
 
     public Synapse lookupTargetSynapse(LNode from, Activation startAct, Neuron n) {
         if(from == input) {
-            return n.getOutputSynapse(startAct.getNeuron());
+            return n.getOutputSynapse(startAct.getNeuron(), patternScope);
         } else {
-            return n.getInputSynapse(startAct.getNeuron());
+            return n.getInputSynapse(startAct.getNeuron(), patternScope);
         }
     }
 

@@ -20,11 +20,11 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Document;
 import network.aika.Writable;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Comparator;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 
@@ -32,7 +32,7 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<I extends INeuron, O extends INeuron> implements Writable {
+public abstract class Synapse<I extends INeuron, O extends INeuron> implements Writable, InputKey, OutputKey {
 
     public static double TOLERANCE = 0.0000001;
 
@@ -107,13 +107,13 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
         input.lock.acquireWriteLock();
         if(isPropagate()) {
-            in.addPropagateTarget(output);
+            in.addPropagateTarget(this);
         }
-        input.activeOutputSynapses.put(output, this);
+        input.activeOutputSynapses.put(this, this);
         input.lock.releaseWriteLock();
 
         output.lock.acquireWriteLock();
-        output.activeInputSynapses.put(input, this);
+        output.activeInputSynapses.put(this, this);
         output.lock.releaseWriteLock();
 
         addLinkInternal(in, out);
@@ -134,7 +134,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
         input.lock.acquireWriteLock();
         if(isPropagate()) {
-            in.removePropagateTarget(output);
+            in.removePropagateTarget(this);
         }
         input.activeOutputSynapses.remove(this);
         input.lock.releaseWriteLock();

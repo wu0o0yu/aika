@@ -19,22 +19,20 @@ package network.aika.neuron.excitatory;
 
 import network.aika.ActivationFunction;
 import network.aika.Model;
+import network.aika.neuron.InputKey;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Fired;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.Synapse.INPUT_COMP;
 
 
 /**
@@ -46,7 +44,7 @@ public abstract class ConjunctiveNeuron<S extends Synapse> extends TNeuron<S> {
     private volatile double directConjunctiveBias;
     private volatile double recurrentConjunctiveBias;
 
-    protected TreeMap<Neuron, S> inputSynapses = new TreeMap<>();
+    protected TreeMap<InputKey, S> inputSynapses = new TreeMap<>(INPUT_COMP);
 
 
     public ConjunctiveNeuron() {
@@ -77,29 +75,25 @@ public abstract class ConjunctiveNeuron<S extends Synapse> extends TNeuron<S> {
     }
 
     public void addInputSynapse(S s) {
-        inputSynapses.put(s.getPInput(), s);
+        inputSynapses.put(s, s);
         setModified();
     }
 
     public void removeInputSynapse(S s) {
-        if(inputSynapses.remove(s.getPInput()) != null) {
+        if(inputSynapses.remove(s) != null) {
             setModified();
         }
     }
 
     public void addOutputSynapse(Synapse s) {
-        outputSynapses.put(s.getPOutput(), s);
+        outputSynapses.put(s, s);
         setModified();
     }
 
     public void removeOutputSynapse(Synapse s) {
-        if(outputSynapses.remove(s.getPOutput()) != null) {
+        if(outputSynapses.remove(s) != null) {
             setModified();
         }
-    }
-
-    public S getInputSynapse(Neuron in) {
-        return inputSynapses.get(in);
     }
 
     public Collection<S> getInputSynapses() {
@@ -142,7 +136,7 @@ public abstract class ConjunctiveNeuron<S extends Synapse> extends TNeuron<S> {
 
         while (in.readBoolean()) {
             S syn = (S) m.readSynapse(in);
-            inputSynapses.put(syn.getPInput(), syn);
+            inputSynapses.put(syn, syn);
         }
     }
 

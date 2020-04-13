@@ -54,9 +54,9 @@ public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, Pattern
         this.propagate = propagate;
 
         if(propagate) {
-            input.get().addPropagateTarget(output);
+            input.get().addPropagateTarget(this);
         } else {
-            input.get().removePropagateTarget(output);
+            input.get().removePropagateTarget(this);
         }
     }
 

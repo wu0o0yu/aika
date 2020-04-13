@@ -27,6 +27,7 @@ import java.io.*;
 import java.util.*;
 import java.util.function.Function;
 
+import static network.aika.neuron.Synapse.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Direction.INPUT;
 
@@ -43,8 +44,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     private volatile double bias;
     private volatile double biasDelta;
 
-    protected TreeMap<Neuron, Synapse> outputSynapses = new TreeMap<>();
-    protected Set<Neuron> propagateTargets = new TreeSet<>();
+    protected TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(OUTPUT_COMP);
+    protected Set<Synapse> propagateTargets = new TreeSet<>(OUTPUT_COMP);
 
     ReadWriteLock lock = new ReadWriteLock();
 
@@ -100,7 +101,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         return provider.getModel();
     }
 
-    public Set<Neuron> getPropagationTargets() {
+    public Set<Synapse> getPropagationTargets() {
         return propagateTargets;
     }
 
@@ -113,11 +114,14 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public Activation addInput(Document doc, Activation.Builder input) {
         Activation act = new Activation(doc, this, false, null, 0);
 
-        for(Activation iAct: input.getInputLinks()) {
-            Synapse s = getProvider().getInputSynapse(iAct.getNeuron());
-            act.addLink(new Link(s, iAct, null), false);
-        }
-
+        input.getInputLinks()
+                .entrySet()
+                .stream()
+                .forEach(me -> {
+            Synapse s = getProvider().getInputSynapse(me.getKey().getPInput(), me.getKey().getPatternScope());
+            act.addLink(new Link(s, me.getValue(), null), false);
+        });
+        
         act.setValue(input.value);
         act.setFired(new Fired(input.inputTimestamp, input.fired));
         act.setRangeCoverage(input.rangeCoverage);
@@ -135,11 +139,11 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         biasDelta = 0.0;
     }
 
-    public void addPropagateTarget(Neuron target) {
+    public void addPropagateTarget(Synapse target) {
         propagateTargets.add(target);
     }
 
-    public void removePropagateTarget(Neuron target) {
+    public void removePropagateTarget(Synapse target) {
         propagateTargets.remove(target);
     }
 
@@ -209,7 +213,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
         while (in.readBoolean()) {
             Synapse syn = m.readSynapse(in);
-            outputSynapses.put(syn.getPOutput(), syn);
+            outputSynapses.put(syn, syn);
         }
     }
 

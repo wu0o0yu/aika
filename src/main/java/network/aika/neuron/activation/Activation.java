@@ -18,13 +18,12 @@ package network.aika.neuron.activation;
 
 import network.aika.Document;
 import network.aika.Utils;
-import network.aika.neuron.INeuron;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
+import network.aika.neuron.*;
 
 import java.util.*;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.InputKey.INPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
@@ -50,7 +49,7 @@ public class Activation implements Comparable<Activation> {
     public double p;
 
     public TreeMap<Link, Link> inputLinksFiredOrder;
-    public Map<Neuron, Link> inputLinks;
+    public Map<InputKey, Link> inputLinks;
     public NavigableMap<Activation, Link> outputLinks;
 
     public boolean isFinal;
@@ -58,7 +57,6 @@ public class Activation implements Comparable<Activation> {
 
     public long visitedDown;
     public long visitedUp;
-    public long visited;
 
     public int round; // Nur als Abbruchbedingung
     public Activation nextRound;
@@ -276,7 +274,7 @@ public class Activation implements Comparable<Activation> {
         public double value = 1.0;
         public int inputTimestamp;
         public int fired;
-        public List<Activation> inputLinks = new ArrayList<>();
+        public Map<InputKey, Activation> inputLinks = new TreeMap<>(INPUT_COMP);
 
         public double rangeCoverage;
 
@@ -296,12 +294,24 @@ public class Activation implements Comparable<Activation> {
             return this;
         }
 
-        public List<Activation> getInputLinks() {
+        public Map<InputKey, Activation> getInputLinks() {
             return this.inputLinks;
         }
 
-        public Builder addInputLink(Activation iAct) {
-            inputLinks.add(iAct);
+        public Builder addInputLink(PatternScope ps, Activation iAct) {
+            InputKey ik = new InputKey() {
+                @Override
+                public Neuron getPInput() {
+                    return iAct.getNeuron();
+                }
+
+                @Override
+                public PatternScope getPatternScope() {
+                    return ps;
+                }
+            };
+
+            inputLinks.put(ik, iAct);
             return this;
         }
 

@@ -74,9 +74,7 @@ public class Link {
             input.outputLinks.put(output, this);
             output.inputLinksFiredOrder.put(this, this);
         }
-        Neuron inputN = input != null ? input.getNeuron() : synapse.getPInput();
-
-        Link ol = output.inputLinks.put(inputN, this);
+        Link ol = output.inputLinks.put(synapse, this);
         if(ol != null && ol != this) {
             output.inputLinksFiredOrder.remove(ol);
             ol.input.outputLinks.remove(ol.output);
