@@ -56,6 +56,11 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         return type;
     }
 
+    @Override
+    public byte getOuterType() {
+        return type;
+    }
+
     public boolean isMature(Config c) {
         return binaryFrequency >= c.getMaturityThreshold();  // Sign.NEG, Sign.POS
     }
@@ -142,7 +147,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
                 .values()
                 .stream()
                 .filter(s -> ps == s.getPatternScope())
-                .filter(s -> s.getInput() instanceof PatternNeuron)
+                .filter(s -> s.getInput().getOuterType() == PatternNeuron.type)
                 .findFirst()
                 .orElse(null);
     }

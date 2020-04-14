@@ -81,6 +81,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public abstract byte getType();
 
+    public abstract byte getOuterType();
+
     public Integer getId() {
         return provider.getId();
     }

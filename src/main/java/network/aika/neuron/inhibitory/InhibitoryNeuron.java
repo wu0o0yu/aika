@@ -27,6 +27,7 @@ import network.aika.Config;
 import network.aika.neuron.TNeuron;
 import network.aika.neuron.activation.linker.Linker;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 
 import java.util.Collection;
 import java.util.List;
@@ -40,6 +41,8 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
 
     public static byte type;
 
+    private byte outerType;
+
     protected InhibitoryNeuron() {
         super();
     }
@@ -48,8 +51,9 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
         super(p);
     }
 
-    public InhibitoryNeuron(Model model, String label) {
+    public InhibitoryNeuron(Model model, String label, byte outerType) {
         super(model, label);
+        this.outerType = outerType;
     }
 
     public double propagateRangeCoverage(Activation iAct) {
@@ -82,6 +86,11 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
 
     public byte getType() {
         return type;
+    }
+
+    @Override
+    public byte getOuterType() {
+        return outerType;
     }
 
     public double getTotalBias(boolean initialRound, Synapse.State state) {
@@ -121,7 +130,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
     public static InhibitoryNeuron induceIncoming(Model m, int threadId, List<ExcitatorySynapse> targetSyns) {
         // TODO: Prüfen, ob schon ein passendes inhibitorisches Neuron existiert.
 
-        InhibitoryNeuron n = new InhibitoryNeuron(m, "");
+        InhibitoryNeuron n = new InhibitoryNeuron(m, "", PatternPartNeuron.type);
         n.setBias(0.0);
 
         for(ExcitatorySynapse es: targetSyns) {

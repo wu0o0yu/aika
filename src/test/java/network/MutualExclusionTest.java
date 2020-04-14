@@ -25,7 +25,7 @@ public class MutualExclusionTest {
         PatternPartNeuron na = new PatternPartNeuron(m, "A");
         PatternPartNeuron nb = new PatternPartNeuron(m, "B");
         PatternPartNeuron nc = new PatternPartNeuron(m, "C");
-        InhibitoryNeuron inhib = new InhibitoryNeuron(m, "I");
+        InhibitoryNeuron inhib = new InhibitoryNeuron(m, "I", PatternPartNeuron.type);
 
         Neuron.init(na, 1.0,
                 new PatternPartSynapse.Builder()

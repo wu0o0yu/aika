@@ -26,7 +26,7 @@ public class PatternTest {
         PatternNeuron inC = new PatternNeuron(m, "IN C");
 
 
-        InhibitoryNeuron inputInhibN = new InhibitoryNeuron(m, "INPUT INHIB");
+        InhibitoryNeuron inputInhibN = new InhibitoryNeuron(m, "INPUT INHIB", PatternNeuron.type);
         Neuron.init(inputInhibN, 0.0,
                 new InhibitorySynapse.Builder()
                         .setNeuron(inA)

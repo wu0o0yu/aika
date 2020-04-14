@@ -18,6 +18,7 @@ package network.aika.neuron.inhibitory;
 
 
 import network.aika.neuron.*;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
 

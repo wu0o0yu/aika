@@ -56,6 +56,11 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         return type;
     }
 
+    @Override
+    public byte getOuterType() {
+        return type;
+    }
+
     public double getCost(Sign s) {
         return Math.log(s.getP(this));
     }

@@ -29,6 +29,8 @@ public class LNode {
             return;
         }
 
+        if(act.isConflicting()) return;
+
         act.lNode = this;
 
         for(int i = 0; i < links.length; i++) {

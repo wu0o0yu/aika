@@ -177,7 +177,7 @@ public class Activation implements Comparable<Activation> {
         return 1.0;
     }
 
-    public boolean isConflicting(long v) {
+    public boolean isConflicting() {
         if(isInitialRound()) {
             return false;
         }

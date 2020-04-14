@@ -40,7 +40,7 @@ public class SyllableExperiment {
     public void init() {
         model = new Model();
 
-        inputInhibN = new InhibitoryNeuron(model, "INPUT INHIB");
+        inputInhibN = new InhibitoryNeuron(model, "INPUT INHIB", PatternNeuron.type);
         relN = new PatternPartNeuron(model, "Char-Relation");
     }
 

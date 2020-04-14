@@ -16,17 +16,13 @@
  */
 package network.aika.neuron.excitatory;
 
-import network.aika.Model;
 import network.aika.neuron.*;
-
-
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatorySynapse<I extends TNeuron, O extends ConjunctiveNeuron> extends ConjunctiveSynapse<I, O> {
-
+public abstract class ExcitatorySynapse<I extends TNeuron, O extends ExcitatoryNeuron> extends Synapse<I, O> {
 
     public ExcitatorySynapse() {
         super();
@@ -36,4 +32,11 @@ public abstract class ExcitatorySynapse<I extends TNeuron, O extends Conjunctive
         super(input, output);
     }
 
+    protected void addLinkInternal(INeuron in, INeuron out) {
+        out.addInputSynapse(this);
+    }
+
+    protected void removeLinkInternal(INeuron in, INeuron out) {
+        out.removeInputSynapse(this);
+    }
 }

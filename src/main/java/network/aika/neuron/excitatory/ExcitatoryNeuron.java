@@ -16,27 +16,38 @@
  */
 package network.aika.neuron.excitatory;
 
+import network.aika.ActivationFunction;
 import network.aika.Config;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 
+import static network.aika.neuron.InputKey.INPUT_COMP;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends ConjunctiveNeuron<S> {
+public abstract class ExcitatoryNeuron<S extends Synapse> extends TNeuron<S> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
+
+    private volatile double directConjunctiveBias;
+    private volatile double recurrentConjunctiveBias;
+
+    protected TreeMap<InputKey, S> inputSynapses = new TreeMap<>(INPUT_COMP);
 
     public ExcitatoryNeuron() {
         super();
@@ -100,6 +111,108 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Conj
 
         candidates
                 .forEach(act -> createCandidateSynapse(c, act, targetAct));
+    }
+
+
+    @Override
+    public void suspend() {
+        for (Synapse s : inputSynapses.values()) {
+            s.getPInput().removeActiveOutputSynapse(s);
+        }
+
+        for (Synapse s : outputSynapses.values()) {
+            s.getPOutput().removeActiveInputSynapse(s);
+        }
+    }
+
+    @Override
+    public void reactivate() {
+    }
+
+    public void addInputSynapse(S s) {
+        inputSynapses.put(s, s);
+        setModified();
+    }
+
+    public void removeInputSynapse(S s) {
+        if(inputSynapses.remove(s) != null) {
+            setModified();
+        }
+    }
+
+    public void addOutputSynapse(Synapse s) {
+        outputSynapses.put(s, s);
+        setModified();
+    }
+
+    public void removeOutputSynapse(Synapse s) {
+        if(outputSynapses.remove(s) != null) {
+            setModified();
+        }
+    }
+
+    public Collection<S> getInputSynapses() {
+        return inputSynapses.values();
+    }
+
+    public ActivationFunction getActivationFunction() {
+        return ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+    }
+
+    @Override
+    public Fired incrementFired(Fired f) {
+        return new Fired(f.getInputTimestamp(), f.getFired() + 1);
+    }
+
+    public boolean isWeak(Synapse s, Synapse.State state) {
+        return s.getWeight(state) < getBias();
+    }
+
+    public double getTotalBias(boolean initialRound, Synapse.State state) {
+        return getBias(state) - (directConjunctiveBias + (initialRound ? 0.0 : recurrentConjunctiveBias));
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        for (Synapse s : inputSynapses.values()) {
+            if (s.getInput() != null) {
+                out.writeBoolean(true);
+                getModel().writeSynapse(s, out);
+            }
+        }
+        out.writeBoolean(false);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        super.readFields(in, m);
+
+        while (in.readBoolean()) {
+            S syn = (S) m.readSynapse(in);
+            inputSynapses.put(syn, syn);
+        }
+    }
+
+    public void commit(Collection<? extends Synapse> modifiedSynapses) {
+        commitBias();
+
+        directConjunctiveBias = 0.0;
+        recurrentConjunctiveBias = 0.0;
+        for (Synapse s : inputSynapses.values()) {
+            s.commit();
+
+            if(!s.isNegative()) {
+                if(!s.isRecurrent()) {
+                    directConjunctiveBias += s.getWeight();
+                } else  {
+                    recurrentConjunctiveBias += s.getWeight();
+                }
+            }
+        }
+
+        setModified();
     }
 
     public String typeToString() {
