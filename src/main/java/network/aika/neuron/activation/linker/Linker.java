@@ -120,7 +120,7 @@ public class Linker {
                         new Entry(l.getOutput())
                                 .addCandidate(l.getSynapse(), act)
                                 .addToQueue(queue);
-                        propagationTargets.remove(l.getOutput().getNeuron());
+                        propagationTargets.remove(l.getSynapse());
                     });
             act.lastRound.unlink();
             act.lastRound = null;
@@ -130,12 +130,10 @@ public class Linker {
             new Entry(cAct)
                     .addCandidate(s, act)
                     .addToQueue(queue);
-            propagationTargets.remove(cAct.getNeuron());
+            propagationTargets.remove(s);
         });
 
         propagationTargets
-                .stream() // Ensure that the output neurons get loaded.
-                .map(s -> act.getNeuron().getOutputSynapse(s.getPOutput(), s.getPatternScope()))
                 .forEach(s ->
                         new Entry(new Activation(doc, s.getOutput(), false, null, 0))
                                 .addCandidate(s, act)

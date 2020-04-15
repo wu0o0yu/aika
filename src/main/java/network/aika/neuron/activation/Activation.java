@@ -145,6 +145,14 @@ public class Activation implements Comparable<Activation> {
         return dir == INPUT ? inputLinks.values() : outputLinks.values();
     }
 
+    public Stream<Link> getOutputLinks(Neuron n, PatternScope ps) {
+        return outputLinks
+                .values()
+                .stream()
+                .filter(l -> l.output.getNeuron().getId() == n.getId())
+                .filter(l -> l.synapse.getPatternScope() == ps);
+    }
+
     public Activation cloneAct(boolean branch) {
         Activation clonedAct = new Activation(doc, neuron, branch, this, round + 1);
 
@@ -186,13 +194,6 @@ public class Activation implements Comparable<Activation> {
                 .filter(l -> l.isConflict())
                 .flatMap(l -> l.input.inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
                 .anyMatch(l -> l.input.lNode == null);
-    }
-
-    public Stream<Link> getOutputLinks(Synapse s) {
-        return outputLinks
-                .values()
-                .stream()
-                .filter(l -> l.synapse == s);
     }
 
     public void addLink(Link l, boolean processMode) {

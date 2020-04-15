@@ -3,7 +3,9 @@ package network;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.PatternScope;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
@@ -13,6 +15,7 @@ import org.junit.Test;
 
 import static network.aika.neuron.PatternScope.INPUT_PATTERN;
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 public class PatternTest {
 
@@ -154,13 +157,10 @@ public class PatternTest {
                         .setFired(0)
         );
 
-        Activation inInhibA = inputInhibN.addInput(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(0)
-                        .setFired(0)
-                        .addInputLink(SAME_PATTERN, actA)
-        );
+        Activation inInhibA = actA.getOutputLinks(inputInhibN.getProvider(), SAME_PATTERN)
+                .findAny()
+                .map(l -> l.getOutput())
+                .orElse(null);
 
         Activation actB = inB.addInput(doc,
                 new Activation.Builder()
@@ -169,14 +169,10 @@ public class PatternTest {
                         .setFired(0)
         );
 
-
-        Activation inInhibB = inputInhibN.addInput(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(0)
-                        .setFired(0)
-                        .addInputLink(SAME_PATTERN, actB)
-        );
+        Activation inInhibB = actB.getOutputLinks(inputInhibN.getProvider(), SAME_PATTERN)
+                .findAny()
+                .map(l -> l.getOutput())
+                .orElse(null);
 
         relN.addInput(doc,
                 new Activation.Builder()
@@ -194,13 +190,11 @@ public class PatternTest {
                         .setFired(0)
         );
 
-        Activation inInhibC = inputInhibN.addInput(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(0)
-                        .setFired(0)
-                        .addInputLink(SAME_PATTERN, actC)
-        );
+        Activation inInhibC = actC.getOutputLinks(inputInhibN.getProvider(), SAME_PATTERN)
+                .findAny()
+                .map(l -> l.getOutput())
+                .orElse(null);
+
 
         relN.addInput(doc,
                 new Activation.Builder()
