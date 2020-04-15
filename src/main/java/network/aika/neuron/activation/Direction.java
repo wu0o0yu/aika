@@ -16,21 +16,30 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.Synapse;
+
+import java.util.Comparator;
+
 /**
  *
  * @author Lukas Molzberger
  */
 public enum Direction {
-    INPUT,
-    OUTPUT;
+    INPUT(
+            Comparator.comparing(s -> s.getInput())
+    ),
 
-    public Direction getInverted() {
-        switch (this) {
-            case INPUT:
-                return OUTPUT;
-            case OUTPUT:
-                return INPUT;
-        }
-        return null;
+    OUTPUT(
+            Comparator.comparing(s -> s.getOutput())
+    );
+
+    Comparator<Synapse> synapseComparator;
+
+    Direction(Comparator<Synapse> synComp) {
+        synapseComparator = synComp;
+    }
+
+    public Comparator<Synapse> getSynapseComparator() {
+        return synapseComparator;
     }
 }

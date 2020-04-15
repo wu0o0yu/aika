@@ -22,6 +22,9 @@ import network.aika.neuron.activation.Activation;
 
 import java.util.*;
 
+import static network.aika.neuron.Synapse.INPUT_COMP;
+import static network.aika.neuron.Synapse.OUTPUT_COMP;
+
 
 /**
  * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
@@ -37,8 +40,8 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
 
     ReadWriteLock lock = new ReadWriteLock();
 
-    NavigableMap<Neuron, Synapse> activeInputSynapses = new TreeMap<>();
-    NavigableMap<Neuron, Synapse> activeOutputSynapses = new TreeMap<>();
+    NavigableMap<InputKey, Synapse> activeInputSynapses = new TreeMap<>(INPUT_COMP);
+    NavigableMap<OutputKey, Synapse> activeOutputSynapses = new TreeMap<>(OUTPUT_COMP);
 
 
     public Neuron(Model m, int id) {
@@ -91,6 +94,9 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         return init(n, bias, getSynapseBuilders(inputs));
     }
 
+    public static Neuron init(INeuron<?> n, double bias, Builder... inputs) {
+        return init(n.getProvider(), bias, inputs);
+    }
 
     /**
      * Creates a neuron with the given bias.
@@ -138,49 +144,71 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         n.commit(modifiedSynapses);
     }
 
-
-
-    public Synapse getInputSynapse(Neuron n) {
+    public Synapse getInputSynapse(Neuron n, PatternScope ps) {
         lock.acquireReadLock();
-        Synapse s = activeInputSynapses.get(n);
+        InputKey ik = new InputKey() {
+            @Override
+            public Neuron getPInput() {
+                return n;
+            }
+
+            @Override
+            public PatternScope getPatternScope() {
+                return ps;
+            }
+        };
+
+        Synapse s = activeInputSynapses.get(ik);
 
         lock.releaseReadLock();
         return s;
     }
 
-    public Synapse getOutputSynapse(Neuron n) {
+    public Synapse getOutputSynapse(Neuron n, PatternScope ps) {
         lock.acquireReadLock();
-        Synapse s = activeOutputSynapses.get(n);
+        OutputKey ok = new OutputKey() {
+            @Override
+            public Neuron getPOutput() {
+                return n;
+            }
+
+            @Override
+            public PatternScope getPatternScope() {
+                return ps;
+            }
+        };
+
+        Synapse s = activeOutputSynapses.get(ok);
 
         lock.releaseReadLock();
         return s;
     }
 
 
-    void addActiveInputSynapse(Synapse s) {
+    public void addActiveInputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        activeInputSynapses.put(s.getPInput(), s);
+        activeInputSynapses.put(s, s);
         lock.releaseWriteLock();
     }
 
 
-    void removeActiveInputSynapse(Synapse s) {
+    public void removeActiveInputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        activeInputSynapses.remove(s.getPInput());
+        activeInputSynapses.remove(s);
         lock.releaseWriteLock();
     }
 
 
-    void addActiveOutputSynapse(Synapse s) {
+    public void addActiveOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        activeOutputSynapses.put(s.getPOutput(), s);
+        activeOutputSynapses.put(s, s);
         lock.releaseWriteLock();
     }
 
 
-    void removeActiveOutputSynapse(Synapse s) {
+    public void removeActiveOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        activeOutputSynapses.remove(s.getPOutput());
+        activeOutputSynapses.remove(s);
         lock.releaseWriteLock();
     }
 

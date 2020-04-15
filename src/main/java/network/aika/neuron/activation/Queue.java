@@ -33,15 +33,15 @@ public class Queue {
                     .thenComparing(Activation::getId)
     );
 
-    public void add(Activation o) {
-        queue.add(o);
+    public void add(Activation act) {
+        queue.add(act);
     }
 
-    public void process() throws OscillatingActivationsException {
+    public void process(boolean processMode) throws OscillatingActivationsException {
         while (!queue.isEmpty()) {
             queue
                     .pollFirst()
-                    .process();
+                    .process(processMode);
         }
     }
 }

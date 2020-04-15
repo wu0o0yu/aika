@@ -18,15 +18,16 @@ package network.aika.neuron.activation;
 
 import network.aika.Document;
 import network.aika.Utils;
-import network.aika.neuron.INeuron;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.pattern.PatternNeuron;
+import network.aika.neuron.*;
+import network.aika.neuron.activation.linker.LNode;
 
 import java.util.*;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.InputKey.INPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Fired.NOT_FIRED;
 
 /**
  *
@@ -34,9 +35,13 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  */
 public class Activation implements Comparable<Activation> {
 
+    public static double TOLERANCE = 0.001;
+
     public double value;
     public double net;
-    public Fired fired;
+    public Fired fired = NOT_FIRED;
+
+    public double rangeCoverage;
 
     private int id;
     private INeuron<?> neuron;
@@ -44,49 +49,62 @@ public class Activation implements Comparable<Activation> {
 
     public double p;
 
-    public TreeMap<Link, Link> inputLinksFiredOrder = new TreeMap<>(FIRED_COMP);
-    public Map<Neuron, Link> inputLinks = new TreeMap<>();
-    public Map<Neuron, Link> outputLinks = new TreeMap<>();
+    public TreeMap<Link, Link> inputLinksFiredOrder;
+    public Map<InputKey, Link> inputLinks;
+    public NavigableMap<Activation, Link> outputLinks;
 
     public boolean isFinal;
 
-
-    public long visitedDown;
-    public long visitedUp;
+    public LNode lNode;
 
     public int round; // Nur als Abbruchbedingung
     public Activation nextRound;
     public Activation lastRound;
 
-    public static Comparator<Link> FIRED_COMP =
-            Comparator
-                    .<Link, Boolean>comparing(l -> !l.synapse.isRecurrent())
-                    .thenComparing(l -> l.input.getFired())
-                    .thenComparing(l -> l.input);
+    public Set<Activation> branches;
+    public Activation mainBranch;
 
-    public static Comparator<Link> INPUT_COMP =
-            Comparator.
-                    <Link, Fired>comparing(l -> l.getInput().getFired())
-                    .thenComparing(l -> l.getSynapse().getInput());
+    private Activation(int id, INeuron<?> n) {
+        this.id = id;
+        this.neuron = n;
+    }
 
-
-    public Activation(Document doc, INeuron<?> n, Activation lastRound, int round) {
+    public Activation(Document doc, INeuron<?> n, boolean branch, Activation lastRound, int round) {
         this.id = doc.getNewActivationId();
         this.doc = doc;
         this.neuron = n;
         this.round = round;
 
-        this.net = n.getTotalBias(CURRENT);
-        this.fired = null;
+        this.net = n.getTotalBias(isInitialRound(), CURRENT);
 
-        this.lastRound = lastRound;
-        if(lastRound != null) {
-            lastRound.nextRound = this;
+        if(branch) {
+            if(lastRound.branches == null) {
+                lastRound.branches = new TreeSet<>();
+            }
+            lastRound.branches.add(this);
+            mainBranch = lastRound;
+        } else {
+            this.lastRound = lastRound;
+            if (lastRound != null) {
+                lastRound.nextRound = this;
+            }
         }
 
         doc.addActivation(this);
-    }
 
+        inputLinksFiredOrder = new TreeMap<>(Comparator
+                .<Link, Boolean>comparing(l -> !l.isRecurrent())
+                .thenComparing(l -> l.input.getFired())
+                .thenComparing(l -> l.input)
+        );
+
+        inputLinks = new TreeMap<>(INPUT_COMP);
+
+        outputLinks = new TreeMap<>(Comparator
+                .<Activation, Neuron>comparing(act -> act.getNeuron())
+                .thenComparing(act -> act)
+        );
+    }
 
     public int getId() {
         return id;
@@ -96,60 +114,47 @@ public class Activation implements Comparable<Activation> {
         return doc;
     }
 
-
     public String getLabel() {
         return getINeuron().getLabel();
     }
 
+    public boolean isInitialRound() {
+        return round == 0;
+    }
 
     public <N extends INeuron> N getINeuron() {
         return (N) neuron;
     }
 
-
     public Neuron getNeuron() {
         return neuron.getProvider();
     }
-
 
     public Fired getFired() {
         return fired;
     }
 
-
-    public void followDown(long v, CollectResults c) {
-        if(visitedDown == v) return;
-        visitedDown = v;
-
-        inputLinks
+    public boolean hasPositiveRecurrentLinks() {
+        return inputLinks
                 .values()
                 .stream()
-                .forEach(l -> {
-                    if(!(l.input.getINeuron() instanceof PatternNeuron)) {
-                        l.input.followDown(v, c);
-                    }
-                    l.input.followUp(v, c);
-                });
+                .anyMatch(l -> l.isRecurrent() && !l.isNegative());
     }
 
+    public Collection<Link> getLinks(Direction dir) {
+        return dir == INPUT ? inputLinks.values() : outputLinks.values();
+    }
 
-    public void followUp(long v, CollectResults c) {
-        if(visitedUp == v) return;
-        visitedUp = v;
-
-        if(isConflicting(v, this)) return;
-
-        c.collect(this);
-
-        outputLinks
+    public Stream<Link> getOutputLinks(Neuron n, PatternScope ps) {
+        return outputLinks
                 .values()
                 .stream()
-                .forEach(l -> l.output.followUp(v, c));
+                .filter(l -> l.output.getNeuron().getId() == n.getId())
+                .filter(l -> l.synapse.getPatternScope() == ps);
     }
 
-
-    public Activation cloneAct() {
-        Activation clonedAct = new Activation(doc, neuron, this, round + 1);
+    public Activation cloneAct(boolean branch) {
+        Activation clonedAct = new Activation(doc, neuron, branch, this, round + 1);
 
         inputLinks
                 .values()
@@ -160,128 +165,124 @@ public class Activation implements Comparable<Activation> {
         return clonedAct;
     }
 
-
     public void setValue(double v) {
         this.value = v;
     }
-
 
     public void setFired(Fired fired) {
         this.fired = fired;
     }
 
-
-    @Override
-    public int compareTo(Activation act) {
-        return Integer.compare(id, act.id);
+    public void setRangeCoverage(double rangeCoverage) {
+        this.rangeCoverage = rangeCoverage;
     }
-
-
-    public interface CollectResults {
-        void collect(Activation act);
-    }
-
-
-    public boolean isConflicting(long v, Activation act) {
-        return act.inputLinks.values().stream()
-                .filter(l -> l.isRecurrent() && l.isNegative(CURRENT))
-                .flatMap(l -> l.input.inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
-                .anyMatch(l -> l.input.visitedDown != v);
-    }
-
-
-    public Stream<Link> getOutputLinks(Synapse s) {
-        return outputLinks.values().stream()
-                .filter(l -> l.synapse == s);
-    }
-
-
-    public void addLink(Link l) {
-        l.link();
-
-        if(isFinal) return;
-
-        if(inputLinks.size() == 1 || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().input.fired) > 0) {
-            sumUpLink(l);
-        } else {
-            compute();
-        }
-    }
-
-
-    public void sumUpLink(Link l) {
-        if(l.synapse == null) return;
-
-        double w = l.synapse.getWeight();
-
-        net += l.input.value * w;
-
-        checkIfFired(l);
-    }
-
-
-    private void compute() {
-        fired = null;
-        net = 0.0;
-        for (Link l: inputLinksFiredOrder.values()) {
-            sumUpLink(l);
-        }
-    }
-
-
-    public void checkIfFired(Link l) {
-        if(fired == null && net > 0.0) {
-            fired = neuron.incrementFired(l.input.fired);
-            doc.getQueue().add(this);
-        }
-    }
-
-
-    public void process() {
-        value = neuron.getActivationFunction().f(net);
-
-        isFinal = true;
-
-        doc.getLinker().linkForward(this);
-
-        lastRound = null;
-    }
-
 
     public boolean isActive() {
         return value > 0.0;
     }
 
-    public boolean equals(Activation s) {
-        return Math.abs(value - s.value) <= INeuron.WEIGHT_TOLERANCE;
+    public double getP() {
+        return 1.0;
     }
 
+    public boolean isConflicting() {
+        if(isInitialRound()) {
+            return false;
+        }
+
+        return inputLinks.values().stream()
+                .filter(l -> l.isConflict())
+                .flatMap(l -> l.input.inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
+                .anyMatch(l -> l.input.lNode == null);
+    }
+
+    public void addLink(Link l, boolean processMode) {
+        assert l.output == null;
+
+        boolean firedInOrder = inputLinks.isEmpty() || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().input.fired) >= 0;
+
+        l.output = this;
+        l.link();
+
+        if(isFinal || (isInitialRound() && l.isRecurrent())) return;
+
+        if(firedInOrder) {
+            sumUpLink(l, processMode);
+        } else {
+            compute(processMode);
+        }
+    }
+
+    public void sumUpLink(Link l, boolean processMode) {
+        if(l.synapse == null || (!processMode && l.isRecurrent())) return;
+
+        double w = l.synapse.getWeight();
+        net += l.input.value * w;
+        rangeCoverage += getINeuron().propagateRangeCoverage(l.input);
+
+        checkIfFired(l);
+    }
+
+    public void compute(boolean processMode) {
+        fired = NOT_FIRED;
+        net = neuron.getTotalBias(isInitialRound(), CURRENT);
+        for (Link l: inputLinksFiredOrder.values()) {
+            sumUpLink(l, processMode);
+        }
+    }
+
+    public void checkIfFired(Link l) {
+        if(fired == NOT_FIRED && net > 0.0) {
+            fired = neuron.incrementFired(l.input.fired);
+            doc.getQueue().add(this);
+        }
+    }
+
+    public void process(boolean processMode) {
+        value = neuron.getActivationFunction().f(net);
+        isFinal = true;
+        if(lastRound == null || !equals(lastRound)) {
+            doc.getLinker().linkForward(this, processMode);
+        }
+    }
+
+    public void unlink() {
+        inputLinks
+                .values()
+                .forEach(l -> l.unlink());
+    }
+
+    public boolean equals(Activation act) {
+        return Math.abs(value - act.value) <= TOLERANCE;
+    }
 
     public String toString() {
         return getId() + " " +
                 getINeuron().getClass().getSimpleName() + ":" + getLabel() +
                 " value:" + Utils.round(value) +
                 " net:" + Utils.round(net) +
-                " p:" + Utils.round(p);
+                " p:" + Utils.round(p) +
+                " round:" + round;
     }
 
-    public double getP() {
-        return 0.0;
+    @Override
+    public int compareTo(Activation act) {
+        return Integer.compare(id, act.id);
     }
-
 
     public static class Builder {
         public double value = 1.0;
         public int inputTimestamp;
         public int fired;
-        public List<Activation> inputLinks = new ArrayList<>();
+        public Map<InputKey, Activation> inputLinks = new TreeMap<>(INPUT_COMP);
+
+        public double rangeCoverage;
 
 
         public Builder setValue(double value) {
             this.value = value;
             return this;
         }
-
 
         public Builder setInputTimestamp(int inputTimestamp) {
             this.inputTimestamp = inputTimestamp;
@@ -293,18 +294,32 @@ public class Activation implements Comparable<Activation> {
             return this;
         }
 
-
-        public List<Activation> getInputLinks() {
+        public Map<InputKey, Activation> getInputLinks() {
             return this.inputLinks;
         }
 
+        public Builder addInputLink(PatternScope ps, Activation iAct) {
+            InputKey ik = new InputKey() {
+                @Override
+                public Neuron getPInput() {
+                    return iAct.getNeuron();
+                }
 
-        public Builder addInputLink(Activation iAct) {
-            inputLinks.add(iAct);
+                @Override
+                public PatternScope getPatternScope() {
+                    return ps;
+                }
+            };
+
+            inputLinks.put(ik, iAct);
+            return this;
+        }
+
+        public Builder setRangeCoverage(double rangeCoverage) {
+            this.rangeCoverage = rangeCoverage;
             return this;
         }
     }
-
 
     public static class OscillatingActivationsException extends RuntimeException {
 
@@ -316,10 +331,8 @@ public class Activation implements Comparable<Activation> {
             this.activationsDump = activationsDump;
         }
 
-
         public String getActivationsDump() {
             return activationsDump;
         }
     }
-
 }

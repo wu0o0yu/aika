@@ -20,11 +20,12 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Document;
 import network.aika.Writable;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.*;
+import java.util.Comparator;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 
@@ -32,18 +33,12 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<I extends INeuron, O extends INeuron> implements Writable {
+public abstract class Synapse<I extends INeuron, O extends INeuron> implements Writable, InputKey, OutputKey {
 
     public static double TOLERANCE = 0.0000001;
 
-    public static final Comparator<Synapse> INPUT_SYNAPSE_COMP = Comparator.comparing(s -> s.input);
-    public static final Comparator<Synapse> OUTPUT_SYNAPSE_COMP = Comparator.comparing(s -> s.output);
-
     protected Neuron input;
     protected Neuron output;
-
-    private boolean recurrent;
-    private boolean propagate;
 
     private double weight;
     private double weightDelta;
@@ -51,16 +46,24 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     public Synapse() {
     }
 
-
-    public Synapse(Neuron input, Neuron output, boolean recurrent, boolean propagate) {
+    public Synapse(Neuron input, Neuron output) {
         this.input = input;
         this.output = output;
-        this.recurrent = recurrent;
-        setPropagate(propagate);
     }
 
+    public abstract byte getType();
 
-    public abstract String getType();
+    public abstract boolean isPropagate();
+
+    public abstract boolean isRecurrent();
+
+    public abstract boolean isNegative();
+
+    public abstract PatternScope getPatternScope();
+
+    protected abstract void addLinkInternal(INeuron in, INeuron out);
+
+    protected abstract void removeLinkInternal(INeuron in, INeuron out);
 
     public Neuron getPInput() {
         return input;
@@ -70,11 +73,9 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         return output;
     }
 
-
     public I getInput() {
         return (I) input.get();
     }
-
 
     public O getOutput() {
         return (O) output.get();
@@ -106,11 +107,14 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         (dir ? out : in).lock.acquireWriteLock();
 
         input.lock.acquireWriteLock();
-        input.activeOutputSynapses.put(output, this);
+        if(isPropagate()) {
+            in.addPropagateTarget(this);
+        }
+        input.activeOutputSynapses.put(this, this);
         input.lock.releaseWriteLock();
 
         output.lock.acquireWriteLock();
-        output.activeInputSynapses.put(input, this);
+        output.activeInputSynapses.put(this, this);
         output.lock.releaseWriteLock();
 
         addLinkInternal(in, out);
@@ -130,6 +134,9 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         (dir ? out : in).lock.acquireWriteLock();
 
         input.lock.acquireWriteLock();
+        if(isPropagate()) {
+            in.removePropagateTarget(this);
+        }
         input.activeOutputSynapses.remove(this);
         input.lock.releaseWriteLock();
 
@@ -143,34 +150,23 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         (dir ? out : in).lock.releaseWriteLock();
     }
 
-
-    protected abstract void addLinkInternal(INeuron in, INeuron out);
-
-
-    protected abstract void removeLinkInternal(INeuron in, INeuron out);
-
-
     public void commit() {
         weight += weightDelta;
         weightDelta = 0.0;
     }
 
-
     public boolean isZero() {
         return Math.abs(weight) < TOLERANCE;
     }
-
 
     public enum State {
         NEXT,
         CURRENT
     }
 
-
     public boolean isWeak(State state) {
         return output.get().isWeak(this, state);
     }
-
 
     public void updateDelta(Document doc, double weightDelta) {
         this.weightDelta += weightDelta;
@@ -179,7 +175,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
             doc.notifyWeightModified(this);
         }
     }
-
 
     public void update(Document doc, double weight) {
         this.weightDelta = weight - this.weight;
@@ -190,51 +185,15 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     }
 
 
-    public boolean isNegative(State s) {
-        return getWeight(s) < 0.0;
-    }
-
-
-    public boolean isRecurrent() {
-        return recurrent;
-    }
-
-
-    public boolean isPropagate() {
-        return propagate;
-    }
-
-
-    public void setPropagate(boolean propagate) {
-        this.propagate = propagate;
-
-        if(propagate) {
-            input.get().addPropagateTarget(output);
-        } else {
-            input.get().removePropagateTarget(output);
-        }
-    }
-
-
-    public String toString() {
-        return "S W:" + Utils.round(getNewWeight()) + " " + input + "->" + output;
-    }
-
-
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeUTF(getType());
+        out.writeByte(getType());
 
         out.writeInt(input.getId());
         out.writeInt(output.getId());
 
         out.writeDouble(weight);
-
-        out.writeBoolean(recurrent);
-        out.writeBoolean(propagate);
     }
-
-
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
@@ -243,14 +202,9 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
         weight = in.readDouble();
 
-        recurrent = in.readBoolean();
-        propagate = in.readBoolean();
-
         output.addActiveInputSynapse(this);
         input.addActiveOutputSynapse(this);
     }
-
-
 
     public static Synapse createOrReplace(Neuron inputNeuron, Neuron outputNeuron, SynapseFactory synapseFactory) {
         Synapse s = synapseFactory.createSynapse(inputNeuron, outputNeuron);
@@ -259,7 +213,9 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         return s;
     }
 
-
+    public String toString() {
+        return "S W:" + Utils.round(getNewWeight()) + " " + input + "->" + output;
+    }
 
     /**
      * The {@code Builder} class is just a helper class which is used to initialize a neuron. Most of the parameters of this class
@@ -270,9 +226,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     public static abstract class Builder implements Neuron.Builder {
 
         private Neuron neuron;
-
-        protected boolean recurrent;
-        protected boolean propagate;
         double weight;
 
 
@@ -297,11 +250,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         public Builder setNeuron(INeuron<?> neuron) {
             assert neuron != null;
             this.neuron = neuron.getProvider();
-            return this;
-        }
-
-        public Builder setRecurrent(boolean recurrent) {
-            this.recurrent = recurrent;
             return this;
         }
 

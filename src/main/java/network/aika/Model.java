@@ -22,10 +22,13 @@ import network.aika.neuron.Neuron;
 import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.TNeuron;
+import network.aika.neuron.excitatory.pattern.PatternSynapse;
+import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.MetaInhibSynapse;
-import network.aika.neuron.meta.MetaNeuron;
-import network.aika.neuron.meta.MetaSynapse;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.neuron.excitatory.pattern.PatternNeuron;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -50,11 +53,24 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Model {
 
-    public int charCounter = 0;
+    private static final Logger log = LoggerFactory.getLogger(Model.class);
 
+    public static double ALPHA = 0.99;
 
-    public static Map<String, Class> typeRegistry = new HashMap<>();
+    public int N = 0; // needs to be stored
 
+    public static Map<Byte, Class> typeRegistry = new HashMap<>();
+
+    static {
+        register(PatternNeuron.class);
+        register(PatternSynapse.class);
+
+        register(PatternPartNeuron.class);
+        register(PatternPartSynapse.class);
+
+        register(InhibitoryNeuron.class);
+        register(InhibitorySynapse.class);
+    }
 
     public SuspensionHook suspensionHook;
 
@@ -67,57 +83,61 @@ public class Model {
 
     public static AtomicLong visitedCounter = new AtomicLong(1);
 
-
     public Model() {
         this(null);
     }
-
 
     public Model(SuspensionHook sh) {
         suspensionHook = sh;
     }
 
-
-    public static String register(String type, Class clazz) {
-        typeRegistry.put(type, clazz);
-        return type;
+    public void applyMovingAverage() {
+        N *= ALPHA;
     }
 
+    private static void register(Class clazz) {
+        byte type = (byte) typeRegistry.size();
+        typeRegistry.put(type, clazz);
+        try {
+            clazz.getField("type").setByte(null, type);
+        } catch (Exception e) {
+            log.error("Initialization error: ", e);
+        }
+    }
+
+
+    public static Class getClassForType(byte type) {
+        return typeRegistry.get(type);
+    }
 
     public SuspensionHook getSuspensionHook() {
         return suspensionHook;
     }
 
-
     public void setSuspensionHook(SuspensionHook suspensionHook) {
         this.suspensionHook = suspensionHook;
     }
 
-
     public INeuron readNeuron(DataInput in, Neuron p) throws Exception {
-        Constructor c = typeRegistry.get(in.readUTF()).getDeclaredConstructor(Neuron.class);
+        Constructor c = typeRegistry.get(in.readByte()).getDeclaredConstructor(Neuron.class);
         INeuron n = (INeuron) c.newInstance(p);
         n.readFields(in, this);
         return n;
     }
 
-
     public Synapse readSynapse(DataInput in) throws Exception {
-        Synapse s = (Synapse) typeRegistry.get(in.readUTF()).getDeclaredConstructor().newInstance();
+        Synapse s = (Synapse) typeRegistry.get(in.readByte()).getDeclaredConstructor().newInstance();
         s.readFields(in, this);
         return s;
     }
-
 
     public void writeSynapse(Synapse s, DataOutput out) throws IOException {
         s.write(out);
     }
 
-
     public int getNewDocumentId() {
         return docIdCounter.addAndGet(1);
     }
-
 
     public Collection<Neuron> getActiveNeurons() {
         List<Neuron> tmp = new ArrayList<>();
@@ -129,7 +149,6 @@ public class Model {
 
         return tmp;
     }
-
 
     public Neuron lookupNeuron(int id) {
         synchronized (providers) {
@@ -145,20 +164,17 @@ public class Model {
         }
     }
 
-
     public void register(Provider p) {
         synchronized (activeProviders) {
             activeProviders.put(p.id, p);
         }
     }
 
-
     public void unregister(Provider p) {
         synchronized (activeProviders) {
             activeProviders.remove(p.id);
         }
     }
-
 
     private boolean suspend(int docId, Provider<? extends AbstractNode> p, SuspensionMode sm) {
         AbstractNode an = p.getIfNotSuspended();
@@ -178,41 +194,6 @@ public class Model {
         }
     }
 
-
-    public MetaNeuron createMetaNeuron(String label) {
-        MetaNeuron metaNeuron = new MetaNeuron(this, "M-" + label);
-        InhibitoryNeuron inhibNeuron = new InhibitoryNeuron(this, "I-" + label);
-        metaNeuron.setInhibitoryNeuron(inhibNeuron);
-
-        return metaNeuron;
-    }
-
-
-    public void initMetaNeuron(MetaNeuron metaNeuron, double bias, double trainingBias, Synapse.Builder... inputs) {
-        InhibitoryNeuron inhibNeuron = metaNeuron.getInhibitoryNeuron();
-
-        List<Synapse.Builder> inputsList = new ArrayList<>(Arrays.asList(inputs));
-
-        inputsList.add(
-                new MetaSynapse.Builder()
-                        .setIsMetaVariable(false)
-                        .setNeuron(inhibNeuron.getProvider())
-                        .setWeight(-100.0)
-        );
-
-
-        metaNeuron.trainingBias = trainingBias;
-
-        Neuron.init(metaNeuron.getProvider(), bias + trainingBias, inputsList);
-
-        Neuron.init(inhibNeuron.getProvider(),
-                new MetaInhibSynapse.Builder()
-                        .setNeuron(metaNeuron.getProvider())
-                        .setWeight(1.0)
-        );
-    }
-
-
     public void dumpStat() {
         for(Neuron n: getActiveNeurons()) {
             TNeuron tn = (TNeuron) n.get();
@@ -220,7 +201,6 @@ public class Model {
         }
         System.out.println();
     }
-
 
     public void dumpModel() {
         System.out.println();
@@ -231,5 +211,4 @@ public class Model {
             System.out.println();
         }
     }
-
 }

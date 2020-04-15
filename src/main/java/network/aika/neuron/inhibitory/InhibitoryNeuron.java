@@ -17,24 +17,20 @@
 package network.aika.neuron.inhibitory;
 
 import network.aika.ActivationFunction;
-import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Fired;
 import network.aika.Config;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.activation.linker.Linker;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
-import network.aika.neuron.meta.MetaNeuron;
+import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
-
-import static network.aika.neuron.Synapse.State.CURRENT;
 
 
 /**
@@ -43,44 +39,63 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  */
 public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
 
-    public static final String TYPE_STR = Model.register("NI", InhibitoryNeuron.class);
+    public static byte type;
 
+    private byte outerType;
 
     protected InhibitoryNeuron() {
         super();
     }
 
-
     public InhibitoryNeuron(Neuron p) {
         super(p);
     }
 
-
-    public InhibitoryNeuron(Model model, String label) {
+    public InhibitoryNeuron(Model model, String label, byte outerType) {
         super(model, label);
+        this.outerType = outerType;
     }
 
+    public double propagateRangeCoverage(Activation iAct) {
+        return iAct.rangeCoverage;
+    }
+
+    @Override
+    public void collectLinkingCandidates(Activation act, Direction dir, Linker.CollectResults c) {
+        // Nothing to do!
+    }
+
+    public void collectPPSameInputLinkingCandidatesUp(Activation act, Linker.CollectResults c) {
+        act.outputLinks.values()
+                .forEach(l -> l.getOutput().getINeuron().collectPPSameInputLinkingCandidatesUp(l.getOutput(), c));
+    }
+
+    public void collectPPRelatedInputRPLinkingCandidatesDown(Activation act, Linker.CollectResults c) {
+        act.inputLinks.values()
+                .forEach(l -> l.getOutput().getINeuron().collectPPRelatedInputRPLinkingCandidatesDown(l.getInput(), c));
+    }
 
     @Override
     public Fired incrementFired(Fired f) {
         return f;
     }
 
-
     public boolean isWeak(Synapse s, Synapse.State state) {
         return s.getWeight(state) < -getBias();
     }
 
-
-    public String getType() {
-        return TYPE_STR;
+    public byte getType() {
+        return type;
     }
 
+    @Override
+    public byte getOuterType() {
+        return outerType;
+    }
 
-    public double getTotalBias(Synapse.State state) {
+    public double getTotalBias(boolean initialRound, Synapse.State state) {
         return getBias(state);
     }
-
 
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
@@ -88,24 +103,19 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
 
     @Override
     public void addInputSynapse(InhibitorySynapse inhibitorySynapse) {
-
     }
 
     @Override
     public void addOutputSynapse(Synapse synapse) {
-
     }
 
     @Override
     public void removeInputSynapse(InhibitorySynapse inhibitorySynapse) {
-
     }
 
     @Override
     public void removeOutputSynapse(Synapse s) {
-
     }
-
 
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
         commitBias();
@@ -117,11 +127,10 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
         setModified();
     }
 
-
     public static InhibitoryNeuron induceIncoming(Model m, int threadId, List<ExcitatorySynapse> targetSyns) {
         // TODO: Prüfen, ob schon ein passendes inhibitorisches Neuron existiert.
 
-        InhibitoryNeuron n = new InhibitoryNeuron(m, "");
+        InhibitoryNeuron n = new InhibitoryNeuron(m, "", PatternPartNeuron.type);
         n.setBias(0.0);
 
         for(ExcitatorySynapse es: targetSyns) {
@@ -136,65 +145,15 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
         return n;
     }
 
-/*
-    public static InhibitoryNeuron induceOutgoing(int threadId, MetaNeuron mn) {
-        // TODO: Prüfen, ob schon ein passendes inhibitorisches Neuron existiert.
-
-        InhibitoryNeuron n = new InhibitoryNeuron(mn.getModel(), "");
-        n.setBias(0.0);
-
-        int misSynId = n.getNewSynapseId();
-        MetaInhibSynapse mis = new MetaInhibSynapse(mn.getProvider(), n.getProvider(), misSynId);
-        mis.link();
-
-        mis.update(null, 1.0);
-
-        for(MetaNeuron.MappingLink ml: mn.targetNeurons.values()) {
-            ExcitatoryNeuron targetNeuron = ml.targetNeuron;
-
-            int isSynId = n.getNewSynapseId();
-            InhibitorySynapse is = new InhibitorySynapse(targetNeuron.getProvider(), n.getProvider(), isSynId);
-
-            is.link();
-
-            is.update(null, ml.nij);
-        }
-
-        n.commit(n.getProvider().getActiveInputSynapses());
-        return n;
-    }
-*/
-
-
-    public void prepareMetaTraining(Config c, Activation o, Function<Activation, ExcitatoryNeuron> callback) {
-        // Nothing to do.
-    }
-
-
-    public void train(MetaNeuron mn) {
-        for(Synapse s: getProvider().getActiveInputSynapses()) {
-            if(s instanceof InhibitorySynapse) {
-                InhibitorySynapse is = (InhibitorySynapse) s;
-                ExcitatoryNeuron targetNeuron = (ExcitatoryNeuron) is.getInput();
-
- //               is.update(null, ml.nij);
-            }
-        }
-    }
-
-
     public boolean isMature(Config c) {
         return true;
     }
 
     @Override
     public void dumpStat() {
-
     }
-
 
     public String typeToString() {
         return "INHIBITORY";
     }
-
 }

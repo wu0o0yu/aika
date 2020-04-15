@@ -16,11 +16,8 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.TSynapse;
-
-import static network.aika.neuron.Synapse.State.CURRENT;
-
 
 /**
  *
@@ -40,51 +37,59 @@ public class Link {
         this.output = output;
     }
 
-
     public Synapse getSynapse() {
         return synapse;
     }
-
 
     public Activation getInput() {
         return input;
     }
 
-
     public Activation getOutput() {
         return output;
     }
 
-
-    public boolean isNegative(Synapse.State s) {
-        return synapse.isNegative(s);
+    public double getP() {
+        return input != null ? input.getP() : 1.0;
     }
 
+    public boolean isNegative() {
+        return synapse.isNegative();
+    }
 
     public boolean isRecurrent() {
-        return synapse.isRecurrent();
+        return synapse != null && synapse.isRecurrent();
     }
-
 
     public boolean isConflict() {
-        return isRecurrent() && isNegative(CURRENT);
+        return isRecurrent() && isNegative();
     }
-
 
     public boolean isSelfRef() {
         return output == input.inputLinksFiredOrder.firstEntry().getValue().input;
     }
 
-
     public void link() {
-        input.outputLinks.put(output.getNeuron(), this);
-        output.inputLinks.put(input.getNeuron(), this);
-        output.inputLinksFiredOrder.put(this, this);
+        if(input != null) {
+            input.outputLinks.put(output, this);
+            output.inputLinksFiredOrder.put(this, this);
+        }
+        Link ol = output.inputLinks.put(synapse, this);
+        if(ol != null && ol != this) {
+            output.inputLinksFiredOrder.remove(ol);
+            ol.input.outputLinks.remove(ol.output);
+        }
     }
 
+    public void unlink() {
+        input.outputLinks.remove(this);
+    }
 
     public String toString() {
         return synapse + ": " + input + " --> " + output;
     }
 
+    public Activation getActivation(Direction dir) {
+        return dir == Direction.INPUT ? input : output;
+    }
 }

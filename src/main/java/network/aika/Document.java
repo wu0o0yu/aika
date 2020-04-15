@@ -20,16 +20,14 @@ package network.aika;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Linker;
+import network.aika.neuron.activation.Direction;
+import network.aika.neuron.activation.linker.Linker;
 import network.aika.neuron.activation.Queue;
 import network.aika.neuron.TNeuron;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 
 /**
@@ -68,7 +66,6 @@ public class Document implements Comparable<Document> {
         this(model, model.getNewDocumentId(), content);
     }
 
-
     public Document(Model model, int id, String content) {
         this.id = id;
         this.content = new StringBuilder(content);
@@ -76,61 +73,59 @@ public class Document implements Comparable<Document> {
         this.model = model;
     }
 
-
     public int getId() {
         return id;
     }
-
 
     public Model getModel() {
         return model;
     }
 
-
     public Queue getQueue() {
         return queue;
     }
-
 
     public Linker getLinker() {
         return linker;
     }
 
+    public void process() {
+        activationsById
+                .values()
+                .stream()
+                .filter(act -> act.hasPositiveRecurrentLinks())
+                .forEach(act -> act.compute(true));
+
+        queue.process(true);
+    }
 
     public long getNewVisitedId() {
         return visitedCounter++;
     }
 
-
     public int getNewActivationId() {
         return activationIdCounter++;
     }
-
 
     public void append(String txt) {
         content.append(txt);
     }
 
-
     public char charAt(int i) {
         return content.charAt(i);
     }
-
 
     public String getContent() {
         return content.toString();
     }
 
-
     public int length() {
         return content.length();
     }
 
-
     public String toString() {
 		return content.toString();
 	}
-
 
     public String getText(Integer begin, Integer end) {
         if(begin != null && end != null) {
@@ -143,40 +138,47 @@ public class Document implements Comparable<Document> {
         }
     }
 
-
     public void addActivation(Activation act) {
         activationsById.put(act.getId(), act);
     }
-
 
     public Collection<Activation> getActivations() {
         return activationsById.values();
     }
 
-
-    public Activation getNextActivation(Activation currentAct) {
-        Map.Entry<Integer, Activation> me = currentAct == null ?
-                activationsById.firstEntry() :
-                activationsById.higherEntry(currentAct.getId());
-        return me != null ? me.getValue() : null;
-    }
-
-
     public int getNumberOfActivations() {
         return activationsById.size();
     }
 
+    public void train(Config c) {
+        long v = getNewVisitedId();
+        createV = v;
+/*
+        model.applyMovingAverage();
+        for(TNeuron n: activatedNeurons) {
+            n.applyMovingAverage(v);
+        }
+*/
+        getActivations()
+                .stream()
+                .filter(act -> act.isActive())
+                .forEach(act -> {
+                    TNeuron n = act.getINeuron();
+                    n.count(act);
+                });
 
-    @Override
-    public int compareTo(Document doc) {
-        return Integer.compare(id, doc.id);
+//        propagate();
+
+        commit();
+
+        getModel().N += length();
     }
 
 
     public void notifyWeightModified(Synapse synapse) {
         Set<Synapse> is = modifiedWeights.get(synapse.getOutput());
         if(is == null) {
-            is = new TreeSet<>(Synapse.INPUT_SYNAPSE_COMP);
+            is = new TreeSet<>(Direction.INPUT.getSynapseComparator());
             modifiedWeights.put(synapse.getOutput(), is);
         }
         is.add(synapse);
@@ -227,42 +229,8 @@ public class Document implements Comparable<Document> {
         return sb.toString();
     }
 
-
-    public void train(Config c) {
-        createV = getNewVisitedId();
-
-        Function<Activation, ExcitatoryNeuron> callback = act -> new ExcitatoryNeuron(getModel(), act.getLabel());
-
-        for(Activation act: new ArrayList<>(getActivations())) {
-            if(act.isActive()) {
-                TNeuron n = act.getINeuron();
-
-                n.prepareTrainingStep(c, act, callback);
-            }
-        }
-
-        for(Activation act: new ArrayList<>(getActivations())) {
-            if(act.isActive()) {
-                TNeuron n = act.getINeuron();
-
-                n.updateFrequencies(act);
-                n.initCountValues();
-
-                n.train(c, act);
-
-//                act.targetNeuron.commit(act.targetNeuron.getInputSynapses());
-            }
-        }
-
-//        propagate();
-
-        getModifiedWeights().forEach((n, inputSyns) -> {
-            TNeuron tn = (TNeuron) n;
-            tn.computeOutputRelations();
-        });
-
-        commit();
-
-        getModel().charCounter += length();
+    @Override
+    public int compareTo(Document doc) {
+        return Integer.compare(id, doc.id);
     }
 }
