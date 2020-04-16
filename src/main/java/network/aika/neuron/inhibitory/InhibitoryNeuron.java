@@ -25,6 +25,7 @@ import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Fired;
 import network.aika.Config;
 import network.aika.neuron.TNeuron;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.linker.Linker;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
@@ -61,7 +62,12 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
     }
 
     @Override
-    public void collectLinkingCandidates(Activation act, Direction dir, Linker.CollectResults c) {
+    public void collectLinkingCandidatesForwards(Activation act, Linker.CollectResults c) {
+        // Nothing to do!
+    }
+
+    @Override
+    public void collectLinkingCandidatesBackwards(Link l, Linker.CollectResults c) {
         // Nothing to do!
     }
 

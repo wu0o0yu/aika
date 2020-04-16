@@ -23,15 +23,14 @@ import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.linker.*;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
 
-import static network.aika.neuron.PatternScope.SAME_PATTERN;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 
@@ -99,9 +98,11 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public void collectLinkingCandidates(Activation act, Direction dir, Linker.CollectResults c) {
-        if(dir == OUTPUT) {
-            Linker.inputLink.output.follow(act, Linker.inputLink, act, c);
-        }
+    public void collectLinkingCandidatesForwards(Activation act, Linker.CollectResults c) {
+    }
+
+    @Override
+    public void collectLinkingCandidatesBackwards(Link l, Linker.CollectResults c) {
+        Linker.patternInputLinkI.follow(l, Linker.patternInputLinkI.output, l.getOutput(), c);
     }
 }

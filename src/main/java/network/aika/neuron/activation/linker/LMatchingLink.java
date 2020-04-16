@@ -47,7 +47,7 @@ public class LMatchingLink extends LLink {
         s.forEach(l -> follow(l, from, startAct, c));
     }
 
-    private void follow(Link l, LNode from, Activation startAct, Linker.CollectResults c) {
+    public void follow(Link l, LNode from, Activation startAct, Linker.CollectResults c) {
         LNode to = getTo(from);
         if(!checkLink(l)) {
             return;

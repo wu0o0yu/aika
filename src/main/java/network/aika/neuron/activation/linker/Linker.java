@@ -17,7 +17,6 @@
 package network.aika.neuron.activation.linker;
 
 import network.aika.Document;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
@@ -31,9 +30,6 @@ import java.util.*;
 import static network.aika.neuron.OutputKey.OUTPUT_COMP;
 import static network.aika.neuron.PatternScope.INPUT_PATTERN;
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
-
 
 /**
  *
@@ -41,9 +37,14 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
  */
 public class Linker {
 
-    public static LTargetLink inputLink;
-    public static LTargetLink sameInputLink;
-    public static LTargetLink relatedInputLink;
+    public static LTargetLink patternInputLinkT;
+    public static LMatchingLink patternInputLinkI;
+
+    public static LTargetLink sameInputLinkT;
+    public static LMatchingLink sameInputLinkI;
+
+    public static LTargetLink relatedInputLinkT;
+    public static LMatchingLink relatedInputLinkI;
 
     static {
         // Pattern
@@ -52,13 +53,13 @@ public class Linker {
             LNode inputA = new LNode(PatternType.CURRENT, PatternPartNeuron.type, "inputA");
             LNode inputB = new LNode(PatternType.CURRENT, PatternPartNeuron.type, "inputB");
 
-            inputLink = new LTargetLink(inputB, target, SAME_PATTERN, "inputLink");
+            patternInputLinkT = new LTargetLink(inputB, target, SAME_PATTERN, "inputLink");
+            patternInputLinkI = new LMatchingLink(inputA, target, SAME_PATTERN, "l2",true);
             LLink l1 = new LMatchingLink(inputA, inputB, SAME_PATTERN, "l1", false);
-            LLink l2 = new LMatchingLink(inputA, target, SAME_PATTERN, "l2",true);
 
-            target.setLinks(inputLink, l2);
-            inputA.setLinks(l1, l2);
-            inputB.setLinks(l1, inputLink);
+            target.setLinks(patternInputLinkT, patternInputLinkI);
+            inputA.setLinks(l1, patternInputLinkI);
+            inputB.setLinks(l1, patternInputLinkT);
         }
 
         // Same Input
@@ -68,15 +69,15 @@ public class Linker {
             LNode inputRel = new LNode(PatternType.INPUT, PatternPartNeuron.type, "inputRel");
             LNode inhib = new LNode(PatternType.INPUT, InhibitoryNeuron.type, "inhib");
 
-            sameInputLink = new LTargetLink(inputRel, target, INPUT_PATTERN, "sameInputLink");
+            sameInputLinkT = new LTargetLink(inputRel, target, INPUT_PATTERN, "sameInputLink");
+            sameInputLinkI = new LMatchingLink(inputPattern, target, INPUT_PATTERN, "inputPatternLink", true);
             LLink l1 = new LMatchingLink(inputPattern, inputRel, SAME_PATTERN, "l1", false);
             LLink l2 = new LMatchingLink(inhib, inputRel, SAME_PATTERN, "l2", false);
             LLink inhibLink = new LMatchingLink(inputPattern, inhib, SAME_PATTERN, "inhibLink", false);
-            LLink inputPatternLink = new LMatchingLink(inputPattern, target, INPUT_PATTERN, "inputPatternLink", true);
 
-            target.setLinks(sameInputLink, inputPatternLink);
-            inputPattern.setLinks(l1, inhibLink, inputPatternLink);
-            inputRel.setLinks(sameInputLink, l1, l2);
+            target.setLinks(sameInputLinkT, sameInputLinkI);
+            inputPattern.setLinks(l1, inhibLink, sameInputLinkI);
+            inputRel.setLinks(sameInputLinkT, l1, l2);
             inhib.setLinks(inhibLink, l2);
         }
 
@@ -88,16 +89,16 @@ public class Linker {
             LNode relPattern = new LNode(PatternType.RELATED, PatternNeuron.type, "relPattern");
             LNode inhib = new LNode(PatternType.INPUT, InhibitoryNeuron.type, "inhib");
 
-            relatedInputLink = new LTargetLink(samePatternPP, target, SAME_PATTERN, "relatedInputLink");
-            LLink inputRelLink = new LMatchingLink(inputRel, target, INPUT_PATTERN, "inputRelLink", false);
+            relatedInputLinkT = new LTargetLink(samePatternPP, target, SAME_PATTERN, "relatedInputLink");
+            relatedInputLinkI = new LMatchingLink(inputRel, target, INPUT_PATTERN, "inputRelLink", false);
             LLink relPatternLink1 = new LMatchingLink(relPattern, inputRel, INPUT_PATTERN, "relPatternLink1", false);
             LLink relPatternLink2 = new LMatchingLink(relPattern, samePatternPP, INPUT_PATTERN, "relPatternLink2", false);
             LLink inhibLink = new LMatchingLink(relPattern, inhib, SAME_PATTERN, "inhibLink", false);
             LLink relPatternLink3 = new LMatchingLink(inhib, inputRel, INPUT_PATTERN, "relPatternLink3", true);
 
-            target.setLinks(relatedInputLink, inputRelLink);
-            samePatternPP.setLinks(relatedInputLink, relPatternLink2);
-            inputRel.setLinks(inputRelLink, relPatternLink1, relPatternLink3);
+            target.setLinks(relatedInputLinkT, relatedInputLinkI);
+            samePatternPP.setLinks(relatedInputLinkT, relPatternLink2);
+            inputRel.setLinks(relatedInputLinkI, relPatternLink1, relPatternLink3);
             relPattern.setLinks(relPatternLink1, relPatternLink2, inhibLink);
             inhib.setLinks(inhibLink, relPatternLink3);
         }
@@ -126,7 +127,7 @@ public class Linker {
             act.lastRound = null;
         }
 
-        act.getINeuron().collectLinkingCandidates(act, INPUT, (cAct, s) -> {
+        act.getINeuron().collectLinkingCandidatesForwards(act, (cAct, s) -> {
             new Entry(cAct)
                     .addCandidate(s, act)
                     .addToQueue(queue);
@@ -183,25 +184,22 @@ public class Linker {
     private void process(ArrayDeque<Entry> queue, boolean processMode) {
         while (!queue.isEmpty()) {
             Entry e = queue.pollFirst();
+            Activation act = e.act;
             Link l = e.candidates.pollFirst();
 
-            if(e.act.isFinal && !l.isSelfRef()) {
+            if(act.isFinal && !l.isSelfRef()) {
                 e.addToQueue(queue);
-                e = e.cloneEntry(e.act.isInitialRound() && l.isConflict());
+                e = e.cloneEntry(act.isInitialRound() && l.isConflict());
             }
 
-            e.act.addLink(l, processMode);
-            findLinkingCandidates(e, l);
+            act.addLink(l, processMode);
+
+            final Entry fe = e;
+            act.getINeuron().collectLinkingCandidatesBackwards(l,
+                    (cAct, s) -> fe.addCandidate(s, cAct)
+            );
+
             e.addToQueue(queue);
         }
-    }
-
-    public void findLinkingCandidates(Entry e, Link l) {
- //       if(l.isConflict()) return;
-
-        Activation act = l.getInput();
-        act.getINeuron().collectLinkingCandidates(act, OUTPUT,
-                (cAct, s) -> e.addCandidate(s, cAct)
-        );
     }
 }

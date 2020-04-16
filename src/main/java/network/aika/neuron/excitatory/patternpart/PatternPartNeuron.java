@@ -106,19 +106,17 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     @Override
-    public void collectLinkingCandidates(Activation act, Direction dir, Linker.CollectResults c) {
-        if(dir == OUTPUT) {
-            Linker.sameInputLink.output.follow(act, Linker.sameInputLink, act, c);
-            Linker.relatedInputLink.output.follow(act, Linker.relatedInputLink, act, c);
-        }
-
-        if(dir == INPUT) {
-            Linker.sameInputLink.input.follow(act, Linker.sameInputLink,act, c);
-            Linker.relatedInputLink.input.follow(act, Linker.relatedInputLink, act, c);
-            Linker.inputLink.input.follow(act, Linker.inputLink, act, c);
-        }
+    public void collectLinkingCandidatesForwards(Activation act, Linker.CollectResults c) {
+        Linker.sameInputLinkT.input.follow(act, Linker.sameInputLinkT,act, c);
+        Linker.relatedInputLinkT.input.follow(act, Linker.relatedInputLinkT, act, c);
+        Linker.patternInputLinkT.input.follow(act, Linker.patternInputLinkT, act, c);
     }
 
+    @Override
+    public void collectLinkingCandidatesBackwards(Link l, Linker.CollectResults c) {
+        Linker.sameInputLinkI.follow(l, Linker.sameInputLinkI.output, l.getOutput(), c);
+        Linker.relatedInputLinkI.follow(l, Linker.relatedInputLinkI.output, l.getOutput(), c);
+    }
 
     public double getCost(Sign s) {
         TNeuron primaryInput = getPrimaryInput();

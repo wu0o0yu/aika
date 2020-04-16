@@ -177,7 +177,9 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public abstract double propagateRangeCoverage(Activation iAct);
 
-    public abstract void collectLinkingCandidates(Activation act, Direction dir, Linker.CollectResults c);
+    public abstract void collectLinkingCandidatesForwards(Activation act, Linker.CollectResults c);
+
+    public abstract void collectLinkingCandidatesBackwards(Link l, Linker.CollectResults c);
 
     public int compareTo(INeuron n) {
         if (this == n) return 0;

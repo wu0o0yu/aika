@@ -104,11 +104,11 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends TNeuron<S> {
         }
 
         ArrayList<Activation> candidates = new ArrayList<>();
-
-        collectLinkingCandidates(targetAct, OUTPUT, (cAct, s) -> {
+/*
+        collectLinkingCandidatesForwards(targetAct, OUTPUT, (cAct, s) -> {
             candidates.add(cAct);
         });
-
+*/
         candidates
                 .forEach(act -> createCandidateSynapse(c, act, targetAct));
     }
