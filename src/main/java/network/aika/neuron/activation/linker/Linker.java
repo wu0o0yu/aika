@@ -17,6 +17,7 @@
 package network.aika.neuron.activation.linker;
 
 import network.aika.Document;
+import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
@@ -36,6 +37,10 @@ import static network.aika.neuron.PatternScope.SAME_PATTERN;
  * @author Lukas Molzberger
  */
 public class Linker {
+
+    public interface CollectResults {
+        void collect(Activation act, Synapse s);
+    }
 
     public static LTargetLink patternInputLinkT;
     public static LMatchingLink patternInputLinkI;
@@ -104,12 +109,8 @@ public class Linker {
         }
     }
 
-    public interface CollectResults {
-        void collect(Activation act, Synapse s);
-    }
-
     public void linkForward(Activation act, boolean processMode) {
-        ArrayDeque<Entry> queue = new ArrayDeque<>();
+        Deque<Link> queue = new ArrayDeque<>();
         Document doc = act.getDocument();
         TreeSet<Synapse> propagationTargets = new TreeSet(OUTPUT_COMP);
         propagationTargets.addAll(act.getINeuron().getPropagationTargets());
@@ -118,9 +119,7 @@ public class Linker {
             act.lastRound.outputLinks
                     .values()
                     .forEach(l -> {
-                        new Entry(l.getOutput())
-                                .addCandidate(l.getSynapse(), act)
-                                .addToQueue(queue);
+                        addLinkToQueue(queue, l.getSynapse(), act, l.getOutput());
                         propagationTargets.remove(l.getSynapse());
                     });
             act.lastRound.unlink();
@@ -128,78 +127,37 @@ public class Linker {
         }
 
         act.getINeuron().collectLinkingCandidatesForwards(act, (cAct, s) -> {
-            new Entry(cAct)
-                    .addCandidate(s, act)
-                    .addToQueue(queue);
+            addLinkToQueue(queue, s, act, cAct);
             propagationTargets.remove(s);
         });
 
         propagationTargets
                 .forEach(s ->
-                        new Entry(new Activation(doc, s.getOutput(), false, null, 0))
-                                .addCandidate(s, act)
-                                .addToQueue(queue)
+                        addLinkToQueue(queue, s, act, new Activation(doc, s.getOutput(), false, null, 0))
                 );
 
         process(queue, processMode);
     }
 
-    private static class Entry {
-        Activation act;
-        NavigableSet<Link> candidates = new TreeSet<>(Comparator.
-                <Link, Fired>comparing(l -> l.getInput().getFired())
-                .thenComparing(l -> l.getSynapse().getInput())
-        );
-
-        private Entry() {
-        }
-
-        public Entry(Activation act) {
-            this.act = act;
-       }
-
-        public Entry addCandidate(Synapse s, Activation input) {
-            candidates.add(new Link(s, input, null));
-            return this;
-        }
-
-        public Entry cloneEntry(boolean branch) {
-            Entry ce = new Entry();
-            ce.act = act.cloneAct(branch);
-            candidates.forEach(l -> ce.addCandidate(l.getSynapse(), l.getInput()));
-            return ce;
-        }
-
-        public void addToQueue(ArrayDeque<Entry> queue) {
-            if (!candidates.isEmpty()) {
-                queue.addLast(this);
-            }
-        }
-
-        public String toString() {
-            return "act:" + act;
-        }
-    }
-
-    private void process(ArrayDeque<Entry> queue, boolean processMode) {
+    private void process(Deque<Link> queue, boolean processMode) {
         while (!queue.isEmpty()) {
-            Entry e = queue.pollFirst();
-            Activation act = e.act;
-            Link l = e.candidates.pollFirst();
+            Link l = queue.pollFirst();
+            Activation act = l.getOutput();
+            INeuron n = act.getINeuron();
 
             if(act.isFinal && !l.isSelfRef()) {
-                e.addToQueue(queue);
-                e = e.cloneEntry(act.isInitialRound() && l.isConflict());
+                act = act.cloneAct(act.isInitialRound() && l.isConflict());
             }
 
             act.addLink(l, processMode);
 
-            final Entry fe = e;
-            act.getINeuron().collectLinkingCandidatesBackwards(l,
-                    (cAct, s) -> fe.addCandidate(s, cAct)
+            n.collectLinkingCandidatesBackwards(l,
+                    (cAct, s) -> addLinkToQueue(queue, s, cAct, null)
             );
-
-            e.addToQueue(queue);
         }
+    }
+
+    private static void addLinkToQueue(Deque<Link> queue, Synapse s, Activation iAct, Activation oAct) {
+        queue.add(new Link(s, iAct, oAct));
     }
 }
