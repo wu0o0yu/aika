@@ -197,8 +197,6 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void addLink(Link l, boolean processMode) {
-        assert l.output == null;
-
         boolean firedInOrder = inputLinks.isEmpty() || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().input.fired) >= 0;
 
         l.output = this;

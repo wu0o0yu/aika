@@ -126,8 +126,8 @@ public class Linker {
             act.lastRound = null;
         }
 
-        act.getINeuron().collectLinkingCandidatesForwards(act, (cAct, s) -> {
-            addLinkToQueue(queue, s, act, cAct);
+        act.getINeuron().collectLinkingCandidatesForwards(act, (oAct, s) -> {
+            addLinkToQueue(queue, s, act, oAct);
             propagationTargets.remove(s);
         });
 
@@ -151,8 +151,9 @@ public class Linker {
 
             act.addLink(l, processMode);
 
+            final Activation oAct = act;
             n.collectLinkingCandidatesBackwards(l,
-                    (cAct, s) -> addLinkToQueue(queue, s, cAct, null)
+                    (iAct, s) -> addLinkToQueue(queue, s, iAct, oAct)
             );
         }
     }
