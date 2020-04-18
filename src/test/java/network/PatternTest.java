@@ -66,7 +66,7 @@ public class PatternTest {
         PatternNeuron out = new PatternNeuron(m, "OUT");
 
 
-        Neuron.init(eA, 1.0,
+        Neuron.init(eA, 4.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -81,7 +81,7 @@ public class PatternTest {
                         .setWeight(10.0)
         );
 
-        Neuron.init(eB, 1.0,
+        Neuron.init(eB, 4.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -108,7 +108,7 @@ public class PatternTest {
                         .setWeight(10.0)
         );
 
-        Neuron.init(eC, 1.0,
+        Neuron.init(eC, 4.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -135,7 +135,7 @@ public class PatternTest {
                         .setWeight(10.0)
         );
 
-        Neuron.init(out, 1.0,
+        Neuron.init(out, 4.0,
                 new PatternSynapse.Builder()
                         .setNeuron(eA)
                         .setWeight(10.0),

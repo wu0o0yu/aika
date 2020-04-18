@@ -115,6 +115,9 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
      */
     public Activation addInput(Document doc, Activation.Builder input) {
         Activation act = new Activation(doc, this, false, null, 0);
+        act.setValue(input.value);
+        act.setFired(new Fired(input.inputTimestamp, input.fired));
+        act.setRangeCoverage(input.rangeCoverage);
 
         input.getInputLinks()
                 .entrySet()
@@ -123,10 +126,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
             Synapse s = getProvider().getInputSynapse(me.getKey().getPInput(), me.getKey().getPatternScope());
             act.addLink(new Link(s, me.getValue(), null), false);
         });
-        
-        act.setValue(input.value);
-        act.setFired(new Fired(input.inputTimestamp, input.fired));
-        act.setRangeCoverage(input.rangeCoverage);
 
         act.isFinal = true;
 
