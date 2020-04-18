@@ -129,7 +129,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
         act.isFinal = true;
 
-        doc.getLinker().linkForward(act, false);
+        Linker.linkForward(act, false);
         doc.getQueue().process(false);
 
         return act;

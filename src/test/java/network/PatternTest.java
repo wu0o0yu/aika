@@ -205,6 +205,7 @@ public class PatternTest {
                         .addInputLink(SAME_PATTERN, inInhibC)
         );
 
+        doc.process();
 
         System.out.println(doc.activationsToString());
     }

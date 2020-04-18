@@ -109,7 +109,7 @@ public class Linker {
         }
     }
 
-    public void linkForward(Activation act, boolean processMode) {
+    public static void linkForward(Activation act, boolean processMode) {
         Deque<Link> queue = new ArrayDeque<>();
         Document doc = act.getDocument();
         TreeSet<Synapse> propagationTargets = new TreeSet(OUTPUT_COMP);
@@ -139,7 +139,7 @@ public class Linker {
         process(queue, processMode);
     }
 
-    private void process(Deque<Link> queue, boolean processMode) {
+    private static void process(Deque<Link> queue, boolean processMode) {
         while (!queue.isEmpty()) {
             Link l = queue.pollFirst();
             Activation act = l.getOutput();

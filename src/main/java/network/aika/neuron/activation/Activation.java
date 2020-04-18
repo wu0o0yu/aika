@@ -20,6 +20,7 @@ import network.aika.Document;
 import network.aika.Utils;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.linker.LNode;
+import network.aika.neuron.activation.linker.Linker;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -240,7 +241,7 @@ public class Activation implements Comparable<Activation> {
         value = neuron.getActivationFunction().f(net);
         isFinal = true;
         if(lastRound == null || !equals(lastRound)) {
-            doc.getLinker().linkForward(this, processMode);
+            Linker.linkForward(this, processMode);
         }
     }
 
