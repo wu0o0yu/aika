@@ -51,6 +51,9 @@ public class Linker {
     public static LTargetLink relatedInputLinkT;
     public static LMatchingLink relatedInputLinkI;
 
+    public static LTargetLink inhibitoryLinkT;
+    public static LMatchingLink inhibitoryLinkI;
+
     static {
         // Pattern
         {
@@ -107,7 +110,26 @@ public class Linker {
             relPattern.setLinks(relPatternLink1, relPatternLink2, inhibLink);
             inhib.setLinks(inhibLink, relPatternLink3);
         }
+
+        // Inhibitory
+        {
+            LNode target = new LNode(PatternType.CURRENT, PatternPartNeuron.type, "target");
+            LNode inhib = new LNode(null, InhibitoryNeuron.type, "inhib");
+            LNode patternpart = new LNode(PatternType.CURRENT, PatternNeuron.type, "patternpart");
+            LNode input = new LNode(PatternType.INPUT, PatternNeuron.type, "input");
+
+            inhibitoryLinkT = new LTargetLink(inhib, target, null, "inhibLink");
+            inhibitoryLinkI = new LMatchingLink(input, target, INPUT_PATTERN, "l1", true);
+            LLink l2 = new LMatchingLink(input, patternpart, INPUT_PATTERN, "l2", false);
+            LLink l3 = new LMatchingLink(patternpart, inhib, SAME_PATTERN, "l3", false);
+
+            target.setLinks(inhibitoryLinkT, inhibitoryLinkI);
+            inhib.setLinks(inhibitoryLinkT, l3);
+            patternpart.setLinks(l2, l3);
+            input.setLinks(inhibitoryLinkI, l2);
+        }
     }
+
 
     public static void linkForward(Activation act, boolean processMode) {
         Deque<Link> queue = new ArrayDeque<>();
