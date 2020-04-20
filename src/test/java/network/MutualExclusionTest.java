@@ -11,8 +11,7 @@ import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import org.junit.Test;
 
-import static network.aika.neuron.PatternScope.INPUT_PATTERN;
-import static network.aika.neuron.PatternScope.SAME_PATTERN;
+import static network.aika.neuron.PatternScope.*;
 
 public class MutualExclusionTest {
 
@@ -35,7 +34,7 @@ public class MutualExclusionTest {
                         .setNeuron(in)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
+                        .setPatternScope(CONFLICTING_PATTERN)
                         .setRecurrent(true)
                         .setNegative(true)
                         .setNeuron(inhib)
@@ -50,7 +49,7 @@ public class MutualExclusionTest {
                         .setNeuron(in)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
+                        .setPatternScope(CONFLICTING_PATTERN)
                         .setRecurrent(true)
                         .setNegative(true)
                         .setNeuron(inhib)
@@ -65,7 +64,7 @@ public class MutualExclusionTest {
                         .setNeuron(in)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
+                        .setPatternScope(CONFLICTING_PATTERN)
                         .setRecurrent(true)
                         .setNegative(true)
                         .setNeuron(inhib)

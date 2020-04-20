@@ -55,7 +55,7 @@ public class PatternPartSynapse<I extends TNeuron> extends ExcitatorySynapse<I, 
 
     @Override
     public boolean isNegative() {
-        return false;
+        return isNegative;
     }
 
 
