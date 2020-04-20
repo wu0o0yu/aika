@@ -116,6 +116,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public void collectLinkingCandidatesBackwards(Link l, Linker.CollectResults c) {
         Linker.sameInputLinkI.follow(l, Linker.sameInputLinkI.output, l.getOutput(), c);
         Linker.relatedInputLinkI.follow(l, Linker.relatedInputLinkI.output, l.getOutput(), c);
+        Linker.inhibitoryLinkI.follow(l, Linker.inhibitoryLinkI.output, l.getOutput(), c);
     }
 
     public double getCost(Sign s) {

@@ -54,6 +54,9 @@ public class Linker {
     public static LTargetLink inhibitoryLinkT;
     public static LMatchingLink inhibitoryLinkI;
 
+    public static LTargetLink posRecLinkT;
+    public static LMatchingLink posRecLinkI;
+
     static {
         // Pattern
         {
@@ -61,7 +64,7 @@ public class Linker {
             LNode inputA = new LNode(PatternType.CURRENT, PatternPartNeuron.type, "inputA");
             LNode inputB = new LNode(PatternType.CURRENT, PatternPartNeuron.type, "inputB");
 
-            patternInputLinkT = new LTargetLink(inputB, target, SAME_PATTERN, "inputLink");
+            patternInputLinkT = new LTargetLink(inputB, target, SAME_PATTERN, "inputLink", false, false);
             patternInputLinkI = new LMatchingLink(inputA, target, SAME_PATTERN, "l2",true);
             LLink l1 = new LMatchingLink(inputA, inputB, SAME_PATTERN, "l1", false);
 
@@ -77,7 +80,7 @@ public class Linker {
             LNode inputRel = new LNode(PatternType.INPUT, PatternPartNeuron.type, "inputRel");
             LNode inhib = new LNode(PatternType.INPUT, InhibitoryNeuron.type, "inhib");
 
-            sameInputLinkT = new LTargetLink(inputRel, target, INPUT_PATTERN, "sameInputLink");
+            sameInputLinkT = new LTargetLink(inputRel, target, INPUT_PATTERN, "sameInputLink", false, false);
             sameInputLinkI = new LMatchingLink(inputPattern, target, INPUT_PATTERN, "inputPatternLink", true);
             LLink l1 = new LMatchingLink(inputPattern, inputRel, SAME_PATTERN, "l1", false);
             LLink l2 = new LMatchingLink(inhib, inputRel, SAME_PATTERN, "l2", false);
@@ -97,7 +100,7 @@ public class Linker {
             LNode relPattern = new LNode(PatternType.RELATED, PatternNeuron.type, "relPattern");
             LNode inhib = new LNode(PatternType.INPUT, InhibitoryNeuron.type, "inhib");
 
-            relatedInputLinkT = new LTargetLink(samePatternPP, target, SAME_PATTERN, "relatedInputLink");
+            relatedInputLinkT = new LTargetLink(samePatternPP, target, SAME_PATTERN, "relatedInputLink", false, false);
             relatedInputLinkI = new LMatchingLink(inputRel, target, INPUT_PATTERN, "inputRelLink", false);
             LLink relPatternLink1 = new LMatchingLink(relPattern, inputRel, INPUT_PATTERN, "relPatternLink1", false);
             LLink relPatternLink2 = new LMatchingLink(relPattern, samePatternPP, INPUT_PATTERN, "relPatternLink2", false);
@@ -118,7 +121,7 @@ public class Linker {
             LNode patternpart = new LNode(PatternType.CURRENT, PatternNeuron.type, "patternpart");
             LNode input = new LNode(PatternType.INPUT, PatternNeuron.type, "input");
 
-            inhibitoryLinkT = new LTargetLink(inhib, target, null, "inhibLink");
+            inhibitoryLinkT = new LTargetLink(inhib, target, null, "inhibLink", true, true);
             inhibitoryLinkI = new LMatchingLink(input, target, INPUT_PATTERN, "l1", true);
             LLink l2 = new LMatchingLink(input, patternpart, INPUT_PATTERN, "l2", false);
             LLink l3 = new LMatchingLink(patternpart, inhib, SAME_PATTERN, "l3", false);
@@ -127,6 +130,18 @@ public class Linker {
             inhib.setLinks(inhibitoryLinkT, l3);
             patternpart.setLinks(l2, l3);
             input.setLinks(inhibitoryLinkI, l2);
+        }
+
+        // Positive Recurrent Pattern Link
+        {
+            LNode target = new LNode(PatternType.CURRENT, PatternPartNeuron.type, "target");
+            LNode pattern = new LNode(PatternType.CURRENT, PatternNeuron.type, "pattern");
+
+            posRecLinkT = new LTargetLink(pattern, target, SAME_PATTERN, "posRecLink", true, false);
+            posRecLinkI = new LMatchingLink(target, pattern, SAME_PATTERN, "patternLink", true);
+
+            target.setLinks(posRecLinkT, posRecLinkI);
+            pattern.setLinks(posRecLinkT, posRecLinkI);
         }
     }
 

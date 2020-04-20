@@ -9,8 +9,13 @@ import network.aika.neuron.activation.Link;
 
 public class LTargetLink extends LLink {
 
-    public LTargetLink(LNode input, LNode output, PatternScope patternScope, String label) {
+    Boolean isRecurrent;
+    Boolean isNegative;
+
+    public LTargetLink(LNode input, LNode output, PatternScope patternScope, String label, Boolean isRecurrent, Boolean isNegative) {
         super(input, output, patternScope, label);
+        this.isRecurrent = isRecurrent;
+        this.isNegative = isNegative;
     }
 
     public void follow(Activation act, LNode from, Activation startAct, Linker.CollectResults c) {
@@ -22,6 +27,14 @@ public class LTargetLink extends LLink {
         Synapse ts = lookupTargetSynapse(from, startAct, act.getNeuron());
 
         if(patternScope != null && patternScope != ts.getPatternScope()) {
+            return;
+        }
+
+        if(isRecurrent != null && isRecurrent.booleanValue() != ts.isRecurrent()) {
+            return;
+        }
+
+        if(isNegative != null && isNegative.booleanValue() != ts.isNegative()) {
             return;
         }
 

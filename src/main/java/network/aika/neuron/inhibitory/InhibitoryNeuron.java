@@ -63,7 +63,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
 
     @Override
     public void collectLinkingCandidatesForwards(Activation act, Linker.CollectResults c) {
-        // Nothing to do!
+        Linker.inhibitoryLinkT.input.follow(act, Linker.inhibitoryLinkT,act, c);
     }
 
     @Override
