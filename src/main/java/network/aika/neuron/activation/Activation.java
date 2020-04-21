@@ -62,7 +62,7 @@ public class Activation implements Comparable<Activation> {
     public Activation nextRound;
     public Activation lastRound;
 
-    public Set<Activation> branches;
+    public Set<Activation> branches = new TreeSet<>();
     public Activation mainBranch;
 
     private Activation(int id, INeuron<?> n) {
@@ -79,9 +79,6 @@ public class Activation implements Comparable<Activation> {
         this.net = n.getTotalBias(isInitialRound(), CURRENT);
 
         if(branch) {
-            if(lastRound.branches == null) {
-                lastRound.branches = new TreeSet<>();
-            }
             lastRound.branches.add(this);
             mainBranch = lastRound;
         } else {
