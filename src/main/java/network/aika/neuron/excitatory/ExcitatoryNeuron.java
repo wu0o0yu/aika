@@ -168,6 +168,11 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends TNeuron<S> {
         return s.getWeight(state) < getBias();
     }
 
+    @Override
+    public boolean hasPositiveRecurrentSynapses() {
+        return false;
+    }
+
     public double getTotalBias(boolean initialRound, Synapse.State state) {
         return getBias(state) - (directConjunctiveBias + (initialRound ? 0.0 : recurrentConjunctiveBias));
     }

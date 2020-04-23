@@ -78,6 +78,7 @@ public class Activation implements Comparable<Activation> {
         this.round = round;
 
         this.net = n.getTotalBias(isInitialRound(), CURRENT);
+        this.assumePosRecLinks
 
         if(branch) {
             lastRound.branches.add(this);
