@@ -54,6 +54,7 @@ public class Activation implements Comparable<Activation> {
     public Map<InputKey, Link> inputLinks;
     public NavigableMap<Activation, Link> outputLinks;
 
+    public boolean assumePosRecLinks;
     public boolean isFinal;
 
     public LNode lNode;
@@ -77,6 +78,7 @@ public class Activation implements Comparable<Activation> {
         this.round = round;
 
         this.net = n.getTotalBias(isInitialRound(), CURRENT);
+        this.assumePosRecLinks
 
         if(branch) {
             lastRound.branches.add(this);
@@ -194,7 +196,7 @@ public class Activation implements Comparable<Activation> {
                 .anyMatch(l -> l.input.lNode == null);
     }
 
-    public void addLink(Link l, boolean processMode) {
+    public void addLink(Link l) {
         boolean firedInOrder = inputLinks.isEmpty() || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().input.fired) >= 0;
 
         l.output = this;
@@ -203,15 +205,13 @@ public class Activation implements Comparable<Activation> {
         if(isFinal || (isInitialRound() && l.isRecurrent())) return;
 
         if(firedInOrder) {
-            sumUpLink(l, processMode);
+            sumUpLink(l);
         } else {
-            compute(processMode);
+            compute();
         }
     }
 
-    public void sumUpLink(Link l, boolean processMode) {
-        if(l.synapse == null || (!processMode && l.isRecurrent())) return;
-
+    public void sumUpLink(Link l) {
         double w = l.synapse.getWeight();
         net += l.input.value * w;
         rangeCoverage += getINeuron().propagateRangeCoverage(l.input);
@@ -219,11 +219,11 @@ public class Activation implements Comparable<Activation> {
         checkIfFired(l);
     }
 
-    public void compute(boolean processMode) {
+    public void compute() {
         fired = NOT_FIRED;
         net = neuron.getTotalBias(isInitialRound(), CURRENT);
         for (Link l: inputLinksFiredOrder.values()) {
-            sumUpLink(l, processMode);
+            sumUpLink(l);
         }
     }
 

@@ -103,6 +103,11 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
         return getBias(state);
     }
 
+    @Override
+    public boolean hasPositiveRecurrentSynapses() {
+        return false;
+    }
+
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
     }
