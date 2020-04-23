@@ -99,7 +99,7 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
         return outerType;
     }
 
-    public double getTotalBias(boolean initialRound, Synapse.State state) {
+    public double getTotalBias(boolean assumePosRecLinks, Synapse.State state) {
         return getBias(state);
     }
 

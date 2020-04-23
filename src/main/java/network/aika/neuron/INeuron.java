@@ -156,7 +156,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         this.biasDelta += biasDelta;
     }
 
-    public abstract double getTotalBias(boolean initialRound, Synapse.State state);
+    public abstract double getTotalBias(boolean assumePosRecLinks, Synapse.State state);
 
     public abstract boolean hasPositiveRecurrentSynapses();
 

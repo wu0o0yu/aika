@@ -88,7 +88,7 @@ public class Document implements Comparable<Document> {
         activationsById
                 .values()
                 .stream()
-                .filter(act -> act.hasPositiveRecurrentLinks())
+                .filter(act -> act.assumePosRecLinks())
                 .forEach(act -> act.compute(true));
 
         queue.process(true);

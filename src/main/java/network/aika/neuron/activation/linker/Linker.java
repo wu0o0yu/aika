@@ -147,7 +147,7 @@ public class Linker {
     }
 
 
-    public static void linkForward(Activation act, boolean processMode) {
+    public static void linkForward(Activation act, LinkingPhase linkingPhase) {
         Deque<Link> queue = new ArrayDeque<>();
         Document doc = act.getDocument();
         TreeSet<Synapse> propagationTargets = new TreeSet(OUTPUT_COMP);
@@ -171,13 +171,13 @@ public class Linker {
 
         propagationTargets
                 .forEach(s ->
-                        addLinkToQueue(queue, s, act, new Activation(doc, s.getOutput(), false, null, 0))
+                        addLinkToQueue(queue, s, act, new Activation(doc, s.getOutput(), false, linkingPhase, null, 0))
                 );
 
-        process(queue, processMode);
+        process(queue, linkingPhase);
     }
 
-    private static void process(Deque<Link> queue, boolean processMode) {
+    private static void process(Deque<Link> queue, LinkingPhase linkingPhase) {
         while (!queue.isEmpty()) {
             Link l = queue.pollFirst();
             Activation act = l.getOutput();
@@ -187,7 +187,7 @@ public class Linker {
                 act = act.cloneAct(act.isInitialRound() && l.isConflict());
             }
 
-            act.addLink(l, processMode);
+            act.addLink(l);
 
             final Activation oAct = act;
             n.collectLinkingCandidatesBackwards(l,

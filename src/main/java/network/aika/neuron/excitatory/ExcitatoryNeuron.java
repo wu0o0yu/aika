@@ -173,8 +173,8 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends TNeuron<S> {
         return false;
     }
 
-    public double getTotalBias(boolean initialRound, Synapse.State state) {
-        return getBias(state) - (directConjunctiveBias + (initialRound ? 0.0 : recurrentConjunctiveBias));
+    public double getTotalBias(boolean assumePosRecLinks, Synapse.State state) {
+        return getBias(state) - (directConjunctiveBias + (assumePosRecLinks ? 0.0 : recurrentConjunctiveBias));
     }
 
     @Override

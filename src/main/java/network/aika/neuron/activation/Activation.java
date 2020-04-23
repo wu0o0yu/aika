@@ -21,6 +21,7 @@ import network.aika.Utils;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.linker.LNode;
 import network.aika.neuron.activation.linker.Linker;
+import network.aika.neuron.activation.linker.LinkingPhase;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -54,7 +55,7 @@ public class Activation implements Comparable<Activation> {
     public Map<InputKey, Link> inputLinks;
     public NavigableMap<Activation, Link> outputLinks;
 
-    public boolean assumePosRecLinks;
+    public LinkingPhase linkingPhase;
     public boolean isFinal;
 
     public LNode lNode;
@@ -71,14 +72,14 @@ public class Activation implements Comparable<Activation> {
         this.neuron = n;
     }
 
-    public Activation(Document doc, INeuron<?> n, boolean branch, Activation lastRound, int round) {
+    public Activation(Document doc, INeuron<?> n, boolean branch, LinkingPhase linkingPhase, Activation lastRound, int round) {
         this.id = doc.getNewActivationId();
         this.doc = doc;
         this.neuron = n;
         this.round = round;
+        this.linkingPhase = linkingPhase;
 
-        this.net = n.getTotalBias(isInitialRound(), CURRENT);
-        this.assumePosRecLinks
+        this.net = n.getTotalBias(assumePosRecLinks(), CURRENT);
 
         if(branch) {
             lastRound.branches.add(this);
@@ -122,6 +123,10 @@ public class Activation implements Comparable<Activation> {
         return round == 0;
     }
 
+    public boolean assumePosRecLinks() {
+        return linkingPhase == LinkingPhase.INITIAL && neuron.hasPositiveRecurrentSynapses();
+    }
+
     public <N extends INeuron> N getINeuron() {
         return (N) neuron;
     }
@@ -132,13 +137,6 @@ public class Activation implements Comparable<Activation> {
 
     public Fired getFired() {
         return fired;
-    }
-
-    public boolean hasPositiveRecurrentLinks() {
-        return inputLinks
-                .values()
-                .stream()
-                .anyMatch(l -> l.isRecurrent() && !l.isNegative());
     }
 
     public Collection<Link> getLinks(Direction dir) {
@@ -154,7 +152,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Activation cloneAct(boolean branch) {
-        Activation clonedAct = new Activation(doc, neuron, branch, this, round + 1);
+        Activation clonedAct = new Activation(doc, neuron, branch, linkingPhase, this, round + 1);
 
         inputLinks
                 .values()
@@ -202,7 +200,7 @@ public class Activation implements Comparable<Activation> {
         l.output = this;
         l.link();
 
-        if(isFinal || (isInitialRound() && l.isRecurrent())) return;
+        if(isFinal) return;
 
         if(firedInOrder) {
             sumUpLink(l);
@@ -221,7 +219,7 @@ public class Activation implements Comparable<Activation> {
 
     public void compute() {
         fired = NOT_FIRED;
-        net = neuron.getTotalBias(isInitialRound(), CURRENT);
+        net = neuron.getTotalBias(assumePosRecLinks(), CURRENT);
         for (Link l: inputLinksFiredOrder.values()) {
             sumUpLink(l);
         }
