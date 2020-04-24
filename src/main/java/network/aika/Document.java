@@ -88,10 +88,10 @@ public class Document implements Comparable<Document> {
         activationsById
                 .values()
                 .stream()
-                .filter(act -> act.assumePosRecLinks())
-                .forEach(act -> act.compute(true));
+                .filter(act -> act.assumePosRecLinks)
+                .forEach(act -> Linker.linkPosRec(act));
 
-        queue.process(true);
+        queue.process();
     }
 
     public long getNewVisitedId() {

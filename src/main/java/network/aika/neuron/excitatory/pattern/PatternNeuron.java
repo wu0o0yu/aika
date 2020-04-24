@@ -105,4 +105,9 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     public void collectLinkingCandidatesBackwards(Link l, Linker.CollectResults c) {
         Linker.patternInputLinkI.follow(l, Linker.patternInputLinkI.output, l.getOutput(), c);
     }
+
+    @Override
+    public void collectPosRecLinkingCandidates(Activation act, Linker.CollectResults c) {
+
+    }
 }

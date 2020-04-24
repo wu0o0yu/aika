@@ -32,9 +32,6 @@ import java.util.stream.Collectors;
 
 import static network.aika.neuron.PatternScope.INPUT_PATTERN;
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
-import static network.aika.neuron.activation.linker.LinkingPhase.INITIAL;
 
 /**
  * @author Lukas Molzberger
@@ -121,6 +118,11 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         Linker.inhibitoryLinkI.follow(l, Linker.inhibitoryLinkI.output, l.getOutput(), c);
     }
 
+    @Override
+    public void collectPosRecLinkingCandidates(Activation act, Linker.CollectResults c) {
+
+    }
+
     public double getCost(Sign s) {
         TNeuron primaryInput = getPrimaryInput();
         TNeuron patternInput = getPatternInput();
@@ -183,7 +185,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
                 doc,
                 this,
                 false,
-                INITIAL,
+                true,
                 null,
                 0
         );

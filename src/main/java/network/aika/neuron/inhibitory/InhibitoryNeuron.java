@@ -72,6 +72,11 @@ public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
     }
 
     @Override
+    public void collectPosRecLinkingCandidates(Activation act, Linker.CollectResults c) {
+
+    }
+
+    @Override
     public Fired incrementFired(Fired f) {
         return f;
     }

@@ -21,7 +21,6 @@ import network.aika.Utils;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.linker.LNode;
 import network.aika.neuron.activation.linker.Linker;
-import network.aika.neuron.activation.linker.LinkingPhase;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -55,7 +54,7 @@ public class Activation implements Comparable<Activation> {
     public Map<InputKey, Link> inputLinks;
     public NavigableMap<Activation, Link> outputLinks;
 
-    public LinkingPhase linkingPhase;
+    public boolean assumePosRecLinks;
     public boolean isFinal;
 
     public LNode lNode;
@@ -72,14 +71,14 @@ public class Activation implements Comparable<Activation> {
         this.neuron = n;
     }
 
-    public Activation(int id, Document doc, INeuron<?> n, boolean branch, LinkingPhase linkingPhase, Activation lastRound, int round) {
+    public Activation(int id, Document doc, INeuron<?> n, boolean branch, boolean assumePosRecLinks, Activation lastRound, int round) {
         this.id = id;
         this.doc = doc;
         this.neuron = n;
         this.round = round;
-        this.linkingPhase = linkingPhase;
+        this.assumePosRecLinks = assumePosRecLinks && neuron.hasPositiveRecurrentSynapses();;
 
-        this.net = n.getTotalBias(assumePosRecLinks(), CURRENT);
+        this.net = n.getTotalBias(this.assumePosRecLinks, CURRENT);
 
         if(branch) {
             lastRound.branches.add(this);
@@ -123,10 +122,6 @@ public class Activation implements Comparable<Activation> {
         return round == 0;
     }
 
-    public boolean assumePosRecLinks() {
-        return linkingPhase == LinkingPhase.INITIAL && neuron.hasPositiveRecurrentSynapses();
-    }
-
     public <N extends INeuron> N getINeuron() {
         return (N) neuron;
     }
@@ -157,7 +152,7 @@ public class Activation implements Comparable<Activation> {
                 doc,
                 neuron,
                 branch,
-                linkingPhase,
+                assumePosRecLinks,
                 this,
                 round + 1
         );
@@ -165,7 +160,8 @@ public class Activation implements Comparable<Activation> {
         inputLinks
                 .values()
                 .forEach(l -> {
-                    new Link(l.synapse, l.input, clonedAct).link();
+                    new Link(l.synapse, l.input, clonedAct)
+                            .link();
                 });
 
         return clonedAct;
@@ -227,7 +223,7 @@ public class Activation implements Comparable<Activation> {
 
     public void compute() {
         fired = NOT_FIRED;
-        net = neuron.getTotalBias(assumePosRecLinks(), CURRENT);
+        net = neuron.getTotalBias(assumePosRecLinks, CURRENT);
         for (Link l: inputLinksFiredOrder.values()) {
             sumUpLink(l);
         }
@@ -240,11 +236,11 @@ public class Activation implements Comparable<Activation> {
         }
     }
 
-    public void process(boolean processMode) {
+    public void process() {
         value = neuron.getActivationFunction().f(net);
         isFinal = true;
         if(lastRound == null || !equals(lastRound)) {
-            Linker.linkForward(this, processMode);
+            Linker.linkForward(this);
         }
     }
 

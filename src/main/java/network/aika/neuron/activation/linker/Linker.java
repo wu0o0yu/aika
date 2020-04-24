@@ -20,7 +20,6 @@ import network.aika.Document;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
@@ -147,7 +146,7 @@ public class Linker {
     }
 
 
-    public static void linkForward(Activation act, LinkingPhase linkingPhase) {
+    public static void linkForward(Activation act) {
         Deque<Link> queue = new ArrayDeque<>();
         Document doc = act.getDocument();
         TreeSet<Synapse> propagationTargets = new TreeSet(OUTPUT_COMP);
@@ -177,17 +176,17 @@ public class Linker {
                                         doc,
                                         s.getOutput(),
                                         false,
-                                        linkingPhase,
+                                        true,
                                         null,
                                         0
                                 )
                         )
                 );
 
-        process(queue, linkingPhase);
+        process(queue);
     }
 
-    private static void process(Deque<Link> queue, LinkingPhase linkingPhase) {
+    private static void process(Deque<Link> queue) {
         while (!queue.isEmpty()) {
             Link l = queue.pollFirst();
             Activation act = l.getOutput();
@@ -208,5 +207,16 @@ public class Linker {
 
     private static void addLinkToQueue(Deque<Link> queue, Synapse s, Activation iAct, Activation oAct) {
         queue.add(new Link(s, iAct, oAct));
+    }
+
+    public static void linkPosRec(Activation act) {
+        INeuron n = act.getINeuron();
+        Activation clonedAct = act.cloneAct(false);
+
+        n.collectPosRecLinkingCandidates(act,
+                (iAct, s) -> clonedAct.addLink(new Link(s, iAct, clonedAct))
+        );
+
+        clonedAct.compute();
     }
 }

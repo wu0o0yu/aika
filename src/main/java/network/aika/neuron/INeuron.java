@@ -30,7 +30,6 @@ import java.util.function.Function;
 import static network.aika.neuron.Synapse.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.linker.LinkingPhase.INITIAL;
 
 /**
  *
@@ -120,7 +119,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
                 doc,
                 this,
                 false,
-                INITIAL,
+                true,
                 null,
                 0
         );
@@ -139,8 +138,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
         act.isFinal = true;
 
-        Linker.linkForward(act, INITIAL);
-        doc.getQueue().process(false);
+        Linker.linkForward(act);
+        doc.getQueue().process();
 
         return act;
     }
@@ -191,6 +190,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public abstract void collectLinkingCandidatesForwards(Activation act, Linker.CollectResults c);
 
     public abstract void collectLinkingCandidatesBackwards(Link l, Linker.CollectResults c);
+
+    public abstract void collectPosRecLinkingCandidates(Activation act, Linker.CollectResults c);
 
     public int compareTo(INeuron n) {
         if (this == n) return 0;
