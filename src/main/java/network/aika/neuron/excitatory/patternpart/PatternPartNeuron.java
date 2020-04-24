@@ -106,7 +106,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void collectLinkingCandidatesForwards(Activation act, Linker.CollectResults c) {
-        Linker.sameInputLinkT.input.follow(act, Linker.sameInputLinkT,act, c);
+        Linker.sameInputLinkT.input.follow(act, Linker.sameInputLinkT, act, c);
         Linker.relatedInputLinkT.input.follow(act, Linker.relatedInputLinkT, act, c);
         Linker.patternInputLinkT.input.follow(act, Linker.patternInputLinkT, act, c);
     }
