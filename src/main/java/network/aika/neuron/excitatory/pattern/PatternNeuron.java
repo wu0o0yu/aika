@@ -108,6 +108,5 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     @Override
     public void collectPosRecLinkingCandidates(Activation act, Linker.CollectResults c) {
-        Linker.posRecLinkT.input.follow(act, Linker.posRecLinkT, act, c);
     }
 }

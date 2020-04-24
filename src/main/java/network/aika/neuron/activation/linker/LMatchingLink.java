@@ -39,6 +39,9 @@ public class LMatchingLink extends LLink {
     public void follow(Activation act, LNode from, Activation startAct, Linker.CollectResults c) {
         Stream<Link> s = null;
         if(from == input) {
+            if(!act.isFinal && act.lastRound != null) {
+                act = act.lastRound;
+            }
             s = act.outputLinks.values().stream();
         } else if(from == output) {
             s = act.inputLinks.values().stream();

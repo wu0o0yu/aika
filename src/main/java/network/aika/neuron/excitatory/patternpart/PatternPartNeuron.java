@@ -120,7 +120,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void collectPosRecLinkingCandidates(Activation act, Linker.CollectResults c) {
-
+        Linker.posRecLinkT.input.follow(act, Linker.posRecLinkT, act, c);
     }
 
     public double getCost(Sign s) {
