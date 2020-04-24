@@ -71,24 +71,12 @@ public class Activation implements Comparable<Activation> {
         this.neuron = n;
     }
 
-    public Activation(int id, Document doc, INeuron<?> n, boolean branch, boolean assumePosRecLinks, Activation lastRound, int round) {
+    public Activation(int id, Document doc, INeuron<?> n) {
         this.id = id;
         this.doc = doc;
         this.neuron = n;
-        this.round = round;
-        this.assumePosRecLinks = assumePosRecLinks && neuron.hasPositiveRecurrentSynapses();;
-
+        this.assumePosRecLinks = neuron.hasPositiveRecurrentSynapses();
         this.net = n.getTotalBias(this.assumePosRecLinks, CURRENT);
-
-        if(branch) {
-            lastRound.branches.add(this);
-            mainBranch = lastRound;
-        } else {
-            this.lastRound = lastRound;
-            if (lastRound != null) {
-                lastRound.nextRound = this;
-            }
-        }
 
         doc.addActivation(this);
 
@@ -99,7 +87,6 @@ public class Activation implements Comparable<Activation> {
         );
 
         inputLinks = new TreeMap<>(INPUT_COMP);
-
         outputLinks = new TreeMap<>(Comparator
                 .<Activation, Neuron>comparing(act -> act.getNeuron())
                 .thenComparing(act -> act)
@@ -120,6 +107,14 @@ public class Activation implements Comparable<Activation> {
 
     public boolean isInitialRound() {
         return round == 0;
+    }
+
+    public void setLastRound(Activation lrAct) {
+        this.lastRound = lrAct;
+
+        if (lrAct != null) {
+            lrAct.nextRound = this;
+        }
     }
 
     public <N extends INeuron> N getINeuron() {
@@ -146,25 +141,43 @@ public class Activation implements Comparable<Activation> {
                 .filter(l -> l.synapse.getPatternScope() == ps);
     }
 
-    public Activation cloneAct(boolean branch) {
+    public Activation createBranch() {
         Activation clonedAct = new Activation(
-                branch ? doc.getNewActivationId() : id,
+                doc.getNewActivationId(),
                 doc,
-                neuron,
-                branch,
-                assumePosRecLinks,
-                this,
-                round + 1
+                neuron
         );
+        setRound(round + 1);
+        branches.add(this);
+        clonedAct.mainBranch = lastRound;
+        linkClone(clonedAct);
+        return clonedAct;
+    }
 
+    public Activation createUpdate() {
+        Activation clonedAct = new Activation(
+                id,
+                doc,
+                neuron
+        );
+        setRound(round + 1);
+        clonedAct.setLastRound(this);
+        linkClone(clonedAct);
+        return clonedAct;
+    }
+
+    private void linkClone(Activation clonedAct) {
+        clonedAct.assumePosRecLinks = assumePosRecLinks;
         inputLinks
                 .values()
                 .forEach(l -> {
                     new Link(l.synapse, l.input, clonedAct)
                             .link();
                 });
+    }
 
-        return clonedAct;
+    private void setRound(int r) {
+        this.round = r;
     }
 
     public void setValue(double v) {

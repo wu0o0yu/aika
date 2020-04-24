@@ -117,11 +117,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         Activation act = new Activation(
                 doc.getNewActivationId(),
                 doc,
-                this,
-                false,
-                true,
-                null,
-                0
+                this
         );
         act.setValue(input.value);
         act.setFired(new Fired(input.inputTimestamp, input.fired));

@@ -183,11 +183,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         Activation targetAct = new Activation(
                 doc.getNewActivationId(),
                 doc,
-                this,
-                false,
-                true,
-                null,
-                0
+                this
         );
 
         Link l = new Link(s, iAct, targetAct);

@@ -174,11 +174,7 @@ public class Linker {
                                 new Activation(
                                         doc.getNewActivationId(),
                                         doc,
-                                        s.getOutput(),
-                                        false,
-                                        true,
-                                        null,
-                                        0
+                                        s.getOutput()
                                 )
                         )
                 );
@@ -193,7 +189,11 @@ public class Linker {
             INeuron n = act.getINeuron();
 
             if(act.isFinal && !l.isSelfRef()) {
-                act = act.cloneAct(l.isConflict());
+                if(l.isConflict()) {
+                    act = act.createBranch();
+                } else {
+                    act = act.createUpdate();
+                }
             }
 
             act.addLink(l);
@@ -211,12 +211,13 @@ public class Linker {
 
     public static void linkPosRec(Activation act) {
         INeuron n = act.getINeuron();
-        Activation clonedAct = act.cloneAct(false);
+        Activation clonedAct = act.createUpdate();
 
         n.collectPosRecLinkingCandidates(act,
                 (iAct, s) -> clonedAct.addLink(new Link(s, iAct, clonedAct))
         );
 
+        clonedAct.assumePosRecLinks = false;
         clonedAct.compute();
     }
 }
