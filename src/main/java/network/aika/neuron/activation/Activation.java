@@ -72,8 +72,8 @@ public class Activation implements Comparable<Activation> {
         this.neuron = n;
     }
 
-    public Activation(Document doc, INeuron<?> n, boolean branch, LinkingPhase linkingPhase, Activation lastRound, int round) {
-        this.id = doc.getNewActivationId();
+    public Activation(int id, Document doc, INeuron<?> n, boolean branch, LinkingPhase linkingPhase, Activation lastRound, int round) {
+        this.id = id;
         this.doc = doc;
         this.neuron = n;
         this.round = round;
@@ -152,7 +152,15 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Activation cloneAct(boolean branch) {
-        Activation clonedAct = new Activation(doc, neuron, branch, linkingPhase, this, round + 1);
+        Activation clonedAct = new Activation(
+                branch ? doc.getNewActivationId() : id,
+                doc,
+                neuron,
+                branch,
+                linkingPhase,
+                this,
+                round + 1
+        );
 
         inputLinks
                 .values()

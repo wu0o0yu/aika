@@ -171,7 +171,17 @@ public class Linker {
 
         propagationTargets
                 .forEach(s ->
-                        addLinkToQueue(queue, s, act, new Activation(doc, s.getOutput(), false, linkingPhase, null, 0))
+                        addLinkToQueue(queue, s, act,
+                                new Activation(
+                                        doc.getNewActivationId(),
+                                        doc,
+                                        s.getOutput(),
+                                        false,
+                                        linkingPhase,
+                                        null,
+                                        0
+                                )
+                        )
                 );
 
         process(queue, linkingPhase);
@@ -184,7 +194,7 @@ public class Linker {
             INeuron n = act.getINeuron();
 
             if(act.isFinal && !l.isSelfRef()) {
-                act = act.cloneAct(act.isInitialRound() && l.isConflict());
+                act = act.cloneAct(l.isConflict());
             }
 
             act.addLink(l);

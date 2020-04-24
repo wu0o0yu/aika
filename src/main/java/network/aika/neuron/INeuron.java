@@ -30,6 +30,7 @@ import java.util.function.Function;
 import static network.aika.neuron.Synapse.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.linker.LinkingPhase.INITIAL;
 
 /**
  *
@@ -114,7 +115,15 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
      * @param input
      */
     public Activation addInput(Document doc, Activation.Builder input) {
-        Activation act = new Activation(doc, this, false, null, 0);
+        Activation act = new Activation(
+                doc.getNewActivationId(),
+                doc,
+                this,
+                false,
+                INITIAL,
+                null,
+                0
+        );
         act.setValue(input.value);
         act.setFired(new Fired(input.inputTimestamp, input.fired));
         act.setRangeCoverage(input.rangeCoverage);
@@ -124,12 +133,13 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
                 .stream()
                 .forEach(me -> {
             Synapse s = getProvider().getInputSynapse(me.getKey().getPInput(), me.getKey().getPatternScope());
-            act.addLink(new Link(s, me.getValue(), null), false);
+            Link l = new Link(s, me.getValue(), null);
+            act.addLink(l);
         });
 
         act.isFinal = true;
 
-        Linker.linkForward(act, false);
+        Linker.linkForward(act, INITIAL);
         doc.getQueue().process(false);
 
         return act;
@@ -207,7 +217,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         out.writeBoolean(false);
     }
 
-
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         if(in.readBoolean()) {
@@ -246,12 +255,5 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
             sb.append("\n");
         }
         return sb.toString();
-    }
-
-
-    public void collectPPSameInputLinkingCandidatesUp(Activation act, Linker.CollectResults c) {
-    }
-
-    public void collectPPRelatedInputRPLinkingCandidatesDown(Activation act, Linker.CollectResults c) {
     }
 }

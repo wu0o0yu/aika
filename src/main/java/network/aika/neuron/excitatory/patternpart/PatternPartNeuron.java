@@ -34,6 +34,7 @@ import static network.aika.neuron.PatternScope.INPUT_PATTERN;
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
+import static network.aika.neuron.activation.linker.LinkingPhase.INITIAL;
 
 /**
  * @author Lukas Molzberger
@@ -177,10 +178,18 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
             log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
         }
 
-        Activation targetAct = new Activation(doc, this, false, null, 0);
+        Activation targetAct = new Activation(
+                doc.getNewActivationId(),
+                doc,
+                this,
+                false,
+                INITIAL,
+                null,
+                0
+        );
 
         Link l = new Link(s, iAct, targetAct);
-        targetAct.addLink(l, false);
+        targetAct.addLink(l);
 
         return targetAct;
     }
@@ -203,7 +212,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
         Link l = new Link(s, iAct, targetAct);
 
-        targetAct.addLink(l, false);
+        targetAct.addLink(l);
     }
 
 
