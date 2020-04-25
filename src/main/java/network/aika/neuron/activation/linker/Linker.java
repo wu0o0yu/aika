@@ -171,11 +171,7 @@ public class Linker {
         propagationTargets
                 .forEach(s ->
                         addLinkToQueue(queue, s, act,
-                                new Activation(
-                                        doc.getNewActivationId(),
-                                        doc,
-                                        s.getOutput()
-                                )
+                                new Activation(doc.getNewActivationId(), doc, s.getOutput())
                         )
                 );
 

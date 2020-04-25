@@ -120,7 +120,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void collectPosRecLinkingCandidates(Activation act, Linker.CollectResults c) {
-        Linker.posRecLinkT.input.follow(act, Linker.posRecLinkT, act, c);
+        Linker.posRecLinkT.output.follow(act, Linker.posRecLinkT, act, c);
     }
 
     public double getCost(Sign s) {
@@ -180,12 +180,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
             log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
         }
 
-        Activation targetAct = new Activation(
-                doc.getNewActivationId(),
-                doc,
-                this
-        );
-
+        Activation targetAct = new Activation(doc.getNewActivationId(), doc, this);
         Link l = new Link(s, iAct, targetAct);
         targetAct.addLink(l);
 

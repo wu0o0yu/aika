@@ -142,11 +142,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Activation createBranch() {
-        Activation clonedAct = new Activation(
-                doc.getNewActivationId(),
-                doc,
-                neuron
-        );
+        Activation clonedAct = new Activation(doc.getNewActivationId(), doc, neuron);
         setRound(round + 1);
         branches.add(this);
         clonedAct.mainBranch = lastRound;
@@ -155,11 +151,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Activation createUpdate() {
-        Activation clonedAct = new Activation(
-                id,
-                doc,
-                neuron
-        );
+        Activation clonedAct = new Activation(id, doc, neuron);
         setRound(round + 1);
         clonedAct.setLastRound(this);
         linkClone(clonedAct);

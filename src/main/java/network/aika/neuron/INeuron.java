@@ -114,11 +114,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
      * @param input
      */
     public Activation addInput(Document doc, Activation.Builder input) {
-        Activation act = new Activation(
-                doc.getNewActivationId(),
-                doc,
-                this
-        );
+        Activation act = new Activation(doc.getNewActivationId(), doc, this);
         act.setValue(input.value);
         act.setFired(new Fired(input.inputTimestamp, input.fired));
         act.setRangeCoverage(input.rangeCoverage);
