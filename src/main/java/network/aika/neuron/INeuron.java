@@ -113,26 +113,9 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
      * @param doc   The current document
      * @param input
      */
-    public Activation addInput(Document doc, Activation.Builder input) {
+    public Activation addInputActivation(Document doc, Activation.Builder input) {
         Activation act = new Activation(doc.getNewActivationId(), doc, this);
-        act.setValue(input.value);
-        act.setFired(new Fired(input.inputTimestamp, input.fired));
-        act.setRangeCoverage(input.rangeCoverage);
-
-        input.getInputLinks()
-                .entrySet()
-                .stream()
-                .forEach(me -> {
-            Synapse s = getProvider().getInputSynapse(me.getKey().getPInput(), me.getKey().getPatternScope());
-            Link l = new Link(s, me.getValue(), null);
-            act.addLink(l);
-        });
-
-        act.isFinal = true;
-
-        Linker.linkForward(act);
-        doc.getQueue().process();
-
+        act.initInputActivation(input);
         return act;
     }
 

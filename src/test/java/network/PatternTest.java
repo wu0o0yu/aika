@@ -3,9 +3,7 @@ package network;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.PatternScope;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Direction;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
@@ -15,7 +13,6 @@ import org.junit.Test;
 
 import static network.aika.neuron.PatternScope.INPUT_PATTERN;
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
-import static network.aika.neuron.activation.Direction.OUTPUT;
 
 public class PatternTest {
 
@@ -150,7 +147,7 @@ public class PatternTest {
 
         Document doc = new Document(m, "ABC");
 
-        Activation actA = inA.addInput(doc,
+        Activation actA = inA.addInputActivation(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(0)
@@ -162,7 +159,7 @@ public class PatternTest {
                 .map(l -> l.getOutput())
                 .orElse(null);
 
-        Activation actB = inB.addInput(doc,
+        Activation actB = inB.addInputActivation(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(1)
@@ -174,7 +171,7 @@ public class PatternTest {
                 .map(l -> l.getOutput())
                 .orElse(null);
 
-        relN.addInput(doc,
+        relN.addInputActivation(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(1)
@@ -183,7 +180,7 @@ public class PatternTest {
                         .addInputLink(SAME_PATTERN, inInhibB)
         );
 
-        Activation actC = inC.addInput(doc,
+        Activation actC = inC.addInputActivation(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(2)
@@ -196,7 +193,7 @@ public class PatternTest {
                 .orElse(null);
 
 
-        relN.addInput(doc,
+        relN.addInputActivation(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(2)

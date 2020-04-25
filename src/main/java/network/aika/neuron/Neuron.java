@@ -67,7 +67,7 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
      * @param inputAct
      */
     public Activation addInput(Document doc, Activation.Builder inputAct) {
-        return get(doc).addInput(doc, inputAct);
+        return get(doc).addInputActivation(doc, inputAct);
     }
 
 

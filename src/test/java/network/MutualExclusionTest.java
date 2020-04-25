@@ -86,7 +86,7 @@ public class MutualExclusionTest {
 
         Document doc = new Document(m, "test");
 
-        Activation inAct = in.addInput(doc,
+        Activation inAct = in.addInputActivation(doc,
                 new Activation.Builder()
                     .setValue(1.0)
                     .setInputTimestamp(0)

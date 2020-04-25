@@ -141,6 +141,27 @@ public class Activation implements Comparable<Activation> {
                 .filter(l -> l.synapse.getPatternScope() == ps);
     }
 
+    public void initInputActivation(Activation.Builder input) {
+        setValue(input.value);
+        setFired(new Fired(input.inputTimestamp, input.fired));
+        setRangeCoverage(input.rangeCoverage);
+
+        input.getInputLinks()
+                .entrySet()
+                .stream()
+                .forEach(me -> {
+                    Synapse s = getNeuron().getInputSynapse(me.getKey().getPInput(), me.getKey().getPatternScope());
+                    Link l = new Link(s, me.getValue(), null);
+                    addLink(l);
+                });
+
+        isFinal = true;
+        assumePosRecLinks = false;
+
+        Linker.linkForward(this);
+        doc.getQueue().process();
+    }
+
     public Activation createBranch() {
         Activation clonedAct = new Activation(doc.getNewActivationId(), doc, neuron);
         setRound(round + 1);

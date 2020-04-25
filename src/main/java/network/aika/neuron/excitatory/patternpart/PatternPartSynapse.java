@@ -41,7 +41,7 @@ public class PatternPartSynapse<I extends TNeuron> extends ExcitatorySynapse<I, 
 
     @Override
     public boolean isPropagate() {
-        return input.get() instanceof PatternNeuron;
+        return !isRecurrent && input.get() instanceof PatternNeuron;
     }
 
     public void setRecurrent(boolean recurrent) {

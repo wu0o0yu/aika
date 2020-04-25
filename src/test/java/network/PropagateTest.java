@@ -33,7 +33,7 @@ public class PropagateTest {
 
         Document doc = new Document(m, "test");
 
-        in.addInput(doc,
+        in.addInputActivation(doc,
                 new Activation.Builder()
                     .setValue(1.0)
                     .setInputTimestamp(0)
