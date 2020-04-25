@@ -170,7 +170,7 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends TNeuron<S> {
 
     @Override
     public boolean hasPositiveRecurrentSynapses() {
-        return false;
+        return recurrentConjunctiveBias != 0.0;
     }
 
     public double getTotalBias(boolean assumePosRecLinks, Synapse.State state) {
