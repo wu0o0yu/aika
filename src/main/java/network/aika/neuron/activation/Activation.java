@@ -164,16 +164,16 @@ public class Activation implements Comparable<Activation> {
 
     public Activation createBranch() {
         Activation clonedAct = new Activation(doc.getNewActivationId(), doc, neuron);
-        setRound(round + 1);
+        clonedAct.setRound(round + 1);
         branches.add(this);
-        clonedAct.mainBranch = lastRound;
+        clonedAct.mainBranch = this;
         linkClone(clonedAct);
         return clonedAct;
     }
 
     public Activation createUpdate() {
         Activation clonedAct = new Activation(id, doc, neuron);
-        setRound(round + 1);
+        clonedAct.setRound(round + 1);
         clonedAct.setLastRound(this);
         linkClone(clonedAct);
         return clonedAct;
@@ -214,10 +214,6 @@ public class Activation implements Comparable<Activation> {
     }
 
     public boolean isConflicting() {
-        if(isInitialRound()) {
-            return false;
-        }
-
         return inputLinks.values().stream()
                 .filter(l -> l.isConflict())
                 .flatMap(l -> l.input.inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.

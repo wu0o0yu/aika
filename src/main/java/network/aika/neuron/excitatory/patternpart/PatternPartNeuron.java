@@ -221,10 +221,18 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
                 .collect(Collectors.toSet());
 
         final double[] offset = new double[] {act.net};
-        conflictingActs.stream().forEach(cAct -> offset[0] = Math.min(offset[0], cAct.net));
+        conflictingActs
+                .stream()
+                .forEach(
+                        cAct -> offset[0] = Math.min(offset[0], cAct.net)
+                );
 
         final double[] norm = new double[] {Math.exp(act.net - offset[0])};
-        conflictingActs.stream().forEach(cAct -> norm[0] += Math.exp(cAct.net - offset[0]));
+        conflictingActs
+                .stream()
+                .forEach(
+                        cAct -> norm[0] += Math.exp(cAct.net - offset[0])
+                );
 
         act.p = Math.exp(act.net - offset[0]) / norm[0];
     }
