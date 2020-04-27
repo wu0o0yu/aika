@@ -165,7 +165,7 @@ public class Activation implements Comparable<Activation> {
     public Activation createBranch() {
         Activation clonedAct = new Activation(doc.getNewActivationId(), doc, neuron);
         clonedAct.setRound(round + 1);
-        branches.add(this);
+        branches.add(clonedAct);
         clonedAct.mainBranch = this;
         linkClone(clonedAct);
         return clonedAct;
@@ -210,12 +210,12 @@ public class Activation implements Comparable<Activation> {
     }
 
     public double getP() {
-        return 1.0;
+        return p;
     }
 
     public boolean isConflicting() {
         return inputLinks.values().stream()
-                .filter(l -> l.isConflict())
+                .filter(l -> l.isConflict() && !l.isSelfRef())
                 .flatMap(l -> l.input.inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
                 .anyMatch(l -> l.input.lNode == null);
     }
