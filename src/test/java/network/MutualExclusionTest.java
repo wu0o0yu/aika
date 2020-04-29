@@ -93,6 +93,8 @@ public class MutualExclusionTest {
                     .setFired(0)
         );
 
+        doc.process();
+
         Activation act = inAct.outputLinks.firstEntry().getValue().getOutput();
 
         PatternPartNeuron.computeP(act);

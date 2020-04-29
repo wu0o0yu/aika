@@ -92,6 +92,14 @@ public class Document implements Comparable<Document> {
                 .forEach(act -> Linker.linkPosRec(act));
 
         queue.process();
+
+        activationsById
+                .values()
+                .stream()
+                .filter(act -> act.assumePosRecLinks)
+                .forEach(act -> act.computeP());
+
+        queue.process();
     }
 
     public long getNewVisitedId() {

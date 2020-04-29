@@ -23,6 +23,7 @@ import network.aika.neuron.activation.linker.LNode;
 import network.aika.neuron.activation.linker.Linker;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.InputKey.INPUT_COMP;
@@ -48,7 +49,7 @@ public class Activation implements Comparable<Activation> {
     private INeuron<?> neuron;
     private Document doc;
 
-    public double p;
+    public double p = 1.0;
 
     public TreeMap<Link, Link> inputLinksFiredOrder;
     public Map<InputKey, Link> inputLinks;
@@ -259,7 +260,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void process() {
-        value = neuron.getActivationFunction().f(net);
+        value = p * neuron.getActivationFunction().f(net);
         isFinal = true;
         if(lastRound == null || !equals(lastRound)) {
             Linker.linkForward(this);
@@ -270,6 +271,41 @@ public class Activation implements Comparable<Activation> {
         inputLinks
                 .values()
                 .forEach(l -> l.unlink());
+    }
+
+    public void computeP() {
+        if(!isActive()) return;
+
+        Set<Activation> conflictingActs = branches
+                .stream()
+                .flatMap(bAct -> bAct.inputLinks.values().stream())
+                .filter(l -> l.isConflict())
+                .flatMap(l -> l.getInput().inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
+                .map(l -> l.getInput())
+                .collect(Collectors.toSet());
+
+        final double[] offset = new double[] {net};
+        conflictingActs
+                .stream()
+                .forEach(
+                        cAct -> offset[0] = Math.min(offset[0], cAct.net)
+                );
+
+        final double[] norm = new double[] {Math.exp(net - offset[0])};
+        conflictingActs
+                .stream()
+                .forEach(
+                        cAct -> norm[0] += Math.exp(cAct.net - offset[0])
+                );
+
+        double p = Math.exp(net - offset[0]) / norm[0];
+
+        if(Math.abs(p - getP()) <= TOLERANCE) return;
+
+        Activation cAct = isFinal ? createUpdate() : this;
+        cAct.p = p;
+
+        doc.getQueue().add(cAct);
     }
 
     public boolean equals(Activation act) {
