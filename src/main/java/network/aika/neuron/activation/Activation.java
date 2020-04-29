@@ -303,6 +303,7 @@ public class Activation implements Comparable<Activation> {
         if(Math.abs(p - getP()) <= TOLERANCE) return;
 
         Activation cAct = isFinal ? createUpdate() : this;
+        cAct.net = net;
         cAct.p = p;
 
         doc.getQueue().add(cAct);

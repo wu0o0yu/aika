@@ -82,7 +82,7 @@ public class Link {
     }
 
     public void unlink() {
-        input.outputLinks.remove(this);
+        input.outputLinks.remove(input);
     }
 
     public String toString() {

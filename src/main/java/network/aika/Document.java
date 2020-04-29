@@ -96,7 +96,6 @@ public class Document implements Comparable<Document> {
         activationsById
                 .values()
                 .stream()
-                .filter(act -> act.assumePosRecLinks)
                 .forEach(act -> act.computeP());
 
         queue.process();
