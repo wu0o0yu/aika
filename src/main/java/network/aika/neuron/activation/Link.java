@@ -49,10 +49,6 @@ public class Link {
         return output;
     }
 
-    public double getP() {
-        return input != null ? input.getP() : 1.0;
-    }
-
     public boolean isNegative() {
         return synapse.isNegative();
     }
