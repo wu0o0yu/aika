@@ -21,7 +21,6 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.TNeuron;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
@@ -196,7 +195,7 @@ public class Model {
 
     public void dumpStat() {
         for(Neuron n: getActiveNeurons()) {
-            TNeuron tn = (TNeuron) n.get();
+            INeuron tn = n.get();
             tn.dumpStat();
         }
         System.out.println();
@@ -206,7 +205,7 @@ public class Model {
         System.out.println();
         System.out.println("Dump Model:");
         for(Neuron n: getActiveNeurons()) {
-            TNeuron tn = (TNeuron) n.get();
+            INeuron tn = n.get();
             System.out.println(tn.toStringWithSynapses());
             System.out.println();
         }

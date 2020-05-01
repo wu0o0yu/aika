@@ -27,7 +27,7 @@ import static network.aika.neuron.PatternScope.SAME_PATTERN;
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse extends Synapse<TNeuron, InhibitoryNeuron> {
+public class InhibitorySynapse extends Synapse<INeuron, InhibitoryNeuron> {
 
     public static byte type;
 

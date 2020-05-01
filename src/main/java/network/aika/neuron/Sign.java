@@ -17,10 +17,10 @@ public enum Sign {
     );
 
     private Function<Activation, Double> actF;
-    private Function<TNeuron, Double> neuronF;
+    private Function<INeuron, Double> neuronF;
     private double sign;
 
-    Sign(Function<Activation, Double> actF, Function<TNeuron, Double> neuronF, double sign) {
+    Sign(Function<Activation, Double> actF, Function<INeuron, Double> neuronF, double sign) {
         this.actF = actF;
         this.neuronF = neuronF;
         this.sign = sign;
@@ -30,7 +30,7 @@ public enum Sign {
         return actF.apply(act);
     }
 
-    public double getP(TNeuron n) {
+    public double getP(INeuron n) {
         return neuronF.apply(n);
     }
 

@@ -23,7 +23,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.linker.Linker;
 import network.aika.neuron.activation.Queue;
-import network.aika.neuron.TNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,7 +156,7 @@ public class Document implements Comparable<Document> {
         createV = v;
 /*
         model.applyMovingAverage();
-        for(TNeuron n: activatedNeurons) {
+        for(INeuron n: activatedNeurons) {
             n.applyMovingAverage(v);
         }
 */
@@ -165,7 +164,7 @@ public class Document implements Comparable<Document> {
                 .stream()
                 .filter(act -> act.isActive())
                 .forEach(act -> {
-                    TNeuron n = act.getINeuron();
+                    INeuron n = act.getINeuron();
                     n.count(act);
                 });
 

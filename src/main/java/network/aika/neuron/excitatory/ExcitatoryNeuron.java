@@ -40,7 +40,7 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatoryNeuron<S extends Synapse> extends TNeuron<S> {
+public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 

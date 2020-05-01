@@ -24,7 +24,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Fired;
 import network.aika.Config;
-import network.aika.neuron.TNeuron;
+import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.linker.Linker;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author Lukas Molzberger
  */
-public class InhibitoryNeuron extends TNeuron<InhibitorySynapse> {
+public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
 
     public static byte type;
 

@@ -20,12 +20,10 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Document;
 import network.aika.Writable;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Comparator;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 

@@ -37,6 +37,8 @@ import static network.aika.neuron.activation.Direction.INPUT;
  */
 public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> implements Comparable<INeuron> {
 
+    public static double RELIABILITY_THRESHOLD = 10.0;
+
     private static final Logger log = LoggerFactory.getLogger(INeuron.class);
 
     private String label;
@@ -48,6 +50,11 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     protected Set<Synapse> propagateTargets = new TreeSet<>(OUTPUT_COMP);
 
     ReadWriteLock lock = new ReadWriteLock();
+
+    public double binaryFrequency;
+    public double frequency;
+    public double coveredFactorSum;
+    public double coveredFactorCount;
 
 
     protected INeuron() {
@@ -173,6 +180,53 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         return Integer.compare(getId(), n.getId());
     }
 
+
+    public abstract boolean isMature(Config c);
+
+    public void count(Activation act) {
+        double v = act.value * act.getP();
+        frequency += v;
+        binaryFrequency += (v > 0.0 ? 1.0 : 0.0);
+
+        coveredFactorSum += act.rangeCoverage;
+        coveredFactorCount += 1.0;
+    }
+
+    public void applyMovingAverage() {
+        double alpha = getModel().ALPHA;
+        frequency *= alpha;
+        binaryFrequency *= alpha;
+    }
+
+    public double getP() {
+        return frequency / getN();
+    }
+
+    public double getN() {
+        double coveredFactor = coveredFactorSum / coveredFactorCount;
+        return getModel().N / coveredFactor;
+    }
+
+    public double getReliability() {
+        return binaryFrequency >= RELIABILITY_THRESHOLD ? Math.log(binaryFrequency - (RELIABILITY_THRESHOLD - 1.0)) : 0.0;
+    }
+
+    private double getCoverage(Activation seedAct) {
+        double maxCoverage = 0.0;
+        for(Map.Entry<Activation, Link> me: seedAct.outputLinks.entrySet()) {
+            maxCoverage = Math.max(maxCoverage, getCoverage(me.getValue()));
+        }
+
+        return maxCoverage;
+    }
+
+    private static double getCoverage(Link ol) {
+        Activation oAct = ol.getOutput();
+        INeuron n = oAct.getINeuron();
+        return Math.min(Math.max(0.0, oAct.net), Math.max(0.0, ol.getInput().value * ol.getSynapse().getWeight())) / n.getBias();
+    }
+
+
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeByte(getType());
@@ -191,6 +245,11 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
             }
         }
         out.writeBoolean(false);
+
+        out.writeDouble(frequency);
+        out.writeDouble(binaryFrequency);
+        out.writeDouble(coveredFactorSum);
+        out.writeDouble(coveredFactorCount);
     }
 
     @Override
@@ -205,6 +264,11 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
             Synapse syn = m.readSynapse(in);
             outputSynapses.put(syn, syn);
         }
+
+        frequency = in.readDouble();
+        binaryFrequency = in.readDouble();
+        coveredFactorSum = in.readDouble();
+        coveredFactorCount = in.readDouble();
     }
 
     public String toString() {
@@ -231,5 +295,23 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    public String freqToString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Pos:" + Utils.round(frequency));
+        sb.append(" Neg:" + Utils.round(getN() - frequency));
+        return sb.toString();
+    }
+
+    public String propToString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Pos:" + Utils.round(Sign.POS.getP(this)));
+        sb.append(" Neg:" + Utils.round(Sign.NEG.getP(this)));
+        return sb.toString();
+    }
+
+    public void dumpStat() {
+        System.out.println("OUT:  " + getLabel() + "  Freq:(" + freqToString() + ")  P(" + propToString() + ")");
     }
 }

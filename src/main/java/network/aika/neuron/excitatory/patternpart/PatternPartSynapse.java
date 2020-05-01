@@ -3,11 +3,11 @@ package network.aika.neuron.excitatory.patternpart;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.TNeuron;
+import network.aika.neuron.INeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 
-public class PatternPartSynapse<I extends TNeuron> extends ExcitatorySynapse<I, PatternPartNeuron> {
+public class PatternPartSynapse<I extends INeuron> extends ExcitatorySynapse<I, PatternPartNeuron> {
 
     public static byte type;
 

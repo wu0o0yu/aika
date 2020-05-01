@@ -66,8 +66,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     /*
     public double getInformationGain(Sign si, Sign so) {
-        TNeuron primaryInput = getPrimaryInput().getInput();
-        TNeuron patternInput = getPatternInput().getInput();
+        INeuron primaryInput = getPrimaryInput().getInput();
+        INeuron patternInput = getPatternInput().getInput();
 
         double fz = primaryInput.frequency;
         double Nz = primaryInput.N;
@@ -124,8 +124,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     public double getCost(Sign s) {
-        TNeuron primaryInput = getPrimaryInput();
-        TNeuron patternInput = getPatternInput();
+        INeuron primaryInput = getPrimaryInput();
+        INeuron patternInput = getPatternInput();
 
         double fz = primaryInput.frequency;
         double Nz = primaryInput.getN();
@@ -145,7 +145,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         }
     }
 
-    private Synapse<TNeuron, TNeuron> getPatternSynapse(PatternScope ps) {
+    private Synapse<INeuron, INeuron> getPatternSynapse(PatternScope ps) {
         return inputSynapses
                 .values()
                 .stream()
@@ -155,11 +155,11 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
                 .orElse(null);
     }
 
-    public TNeuron getPrimaryInput() {
+    public INeuron getPrimaryInput() {
         return getPatternSynapse(INPUT_PATTERN).getInput();
     }
 
-    public TNeuron getPatternInput() {
+    public INeuron getPatternInput() {
         return getPatternSynapse(SAME_PATTERN).getInput();
     }
 
@@ -191,7 +191,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         Neuron targetNeuron = targetAct.getNeuron();
         Neuron inputNeuron = iAct.getNeuron();
 
-        if (!((TNeuron) inputNeuron.get()).isMature(c)) {
+        if (!(inputNeuron.get()).isMature(c)) {
             return;
         }
 
