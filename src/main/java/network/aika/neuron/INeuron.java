@@ -183,6 +183,10 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public abstract boolean isMature(Config c);
 
+    public abstract Synapse createSynapse(Neuron input, PatternScope patternScope, Boolean isRecurrent, Boolean isNegative);
+
+    public abstract void createSynapses(Config c, Activation act);
+
     public void count(Activation act) {
         double v = act.value * act.getP();
         frequency += v;
@@ -196,6 +200,10 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         double alpha = getModel().ALPHA;
         frequency *= alpha;
         binaryFrequency *= alpha;
+    }
+
+    public void train(Config c, Activation act) {
+        createSynapses(c, act);
     }
 
     public double getP() {
@@ -225,7 +233,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         INeuron n = oAct.getINeuron();
         return Math.min(Math.max(0.0, oAct.net), Math.max(0.0, ol.getInput().value * ol.getSynapse().getWeight())) / n.getBias();
     }
-
 
     @Override
     public void write(DataOutput out) throws IOException {

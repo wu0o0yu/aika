@@ -18,7 +18,6 @@ package network.aika.neuron.excitatory;
 
 import network.aika.ActivationFunction;
 import network.aika.Config;
-import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
@@ -34,7 +33,6 @@ import java.util.*;
 import java.util.function.Function;
 
 import static network.aika.neuron.InputKey.INPUT_COMP;
-import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  *
@@ -81,11 +79,9 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
         return sum;
     }
 
-    protected abstract void createCandidateSynapse(Config c, Activation iAct, Activation targetAct);
-
     public void train(Config c, Activation act) {
         addDummyLinks(act);
-        createCandidateSynapses(c, act);
+        super.train(c, act);
     }
 
     protected void addDummyLinks(Activation act) {
@@ -95,24 +91,6 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
                 .filter(s -> !act.inputLinks.containsKey(s))
                 .forEach(s -> new Link(s, null, act).link());
     }
-
-    private void createCandidateSynapses(Config c, Activation targetAct) {
-        Document doc = targetAct.getDocument();
-
-        if(log.isDebugEnabled()) {
-            log.debug("Created Synapses for Neuron: " + targetAct.getINeuron().getId() + ":" + targetAct.getINeuron().getLabel());
-        }
-
-        ArrayList<Activation> candidates = new ArrayList<>();
-/*
-        collectLinkingCandidatesForwards(targetAct, OUTPUT, (cAct, s) -> {
-            candidates.add(cAct);
-        });
-*/
-        candidates
-                .forEach(act -> createCandidateSynapse(c, act, targetAct));
-    }
-
 
     @Override
     public void suspend() {

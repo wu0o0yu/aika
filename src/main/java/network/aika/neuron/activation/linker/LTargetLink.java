@@ -1,5 +1,6 @@
 package network.aika.neuron.activation.linker;
 
+import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
@@ -18,7 +19,7 @@ public class LTargetLink extends LLink {
         this.isNegative = isNegative;
     }
 
-    public void follow(Activation act, LNode from, Activation startAct, Linker.CollectResults c) {
+    public void follow(Mode m, Activation act, LNode from, Activation startAct, Linker.CollectResults c) {
         Link existingLink = lookupExistingLink(act, from, startAct);
         if(existingLink != null) {
             return;
@@ -26,19 +27,27 @@ public class LTargetLink extends LLink {
 
         Synapse ts = lookupTargetSynapse(from, startAct, act.getNeuron());
 
+        if(ts != null && m == Mode.LINKING && matchSynapse(ts)) {
+            c.collect(act, ts);
+        } else if(ts == null && m == Mode.SYNAPSE_INDUCTION) {
+            INeuron<?>[] ioN = lookupIONeuron(from, startAct, act.getNeuron());
+            c.collect(act, ioN[1].createSynapse(ioN[0].getProvider(), patternScope, isRecurrent, isNegative));
+        }
+    }
+
+    public boolean matchSynapse(Synapse ts) {
         if(patternScope != null && patternScope != ts.getPatternScope()) {
-            return;
+            return false;
         }
 
         if(isRecurrent != null && isRecurrent.booleanValue() != ts.isRecurrent()) {
-            return;
+            return false;
         }
 
         if(isNegative != null && isNegative.booleanValue() != ts.isNegative()) {
-            return;
+            return false;
         }
-
-        c.collect(act, ts);
+        return true;
     }
 
     public Synapse lookupTargetSynapse(LNode from, Activation startAct, Neuron n) {
@@ -46,6 +55,14 @@ public class LTargetLink extends LLink {
             return n.getOutputSynapse(startAct.getNeuron(), patternScope);
         } else {
             return n.getInputSynapse(startAct.getNeuron(), patternScope);
+        }
+    }
+
+    public INeuron[] lookupIONeuron(LNode from, Activation startAct, Neuron n) {
+        if(from == input) {
+            return new INeuron[]{n.get(), startAct.getINeuron()};
+        } else {
+            return new INeuron[]{startAct.getINeuron(), n.get()};
         }
     }
 

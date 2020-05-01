@@ -24,7 +24,7 @@ public class LNode {
         this.links = links;
     }
 
-    public void follow(Activation act, LLink from, Activation startAct, Linker.CollectResults c) {
+    public void follow(Mode m, Activation act, LLink from, Activation startAct, Linker.CollectResults c) {
         if(neuronType != null && neuronType != act.getINeuron().getType()) {
             return;
         }
@@ -39,7 +39,7 @@ public class LNode {
                 continue;
             }
 
-            ln.follow(act, this, startAct, c);
+            ln.follow(m, act, this, startAct, c);
         }
 
         act.lNode = null;

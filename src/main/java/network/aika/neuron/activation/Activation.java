@@ -309,6 +309,11 @@ public class Activation implements Comparable<Activation> {
         doc.getQueue().add(cAct);
     }
 
+    public void count() {
+        if(!isActive()) return;
+        getINeuron().count(this);
+    }
+
     public boolean equals(Activation act) {
         return Math.abs(value - act.value) <= TOLERANCE;
     }

@@ -27,17 +27,16 @@ import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import static network.aika.neuron.PatternScope.INPUT_PATTERN;
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
+import static network.aika.neuron.activation.linker.Mode.LINKING;
+import static network.aika.neuron.activation.linker.Mode.SYNAPSE_INDUCTION;
 
 /**
  * @author Lukas Molzberger
  */
 public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
-    private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
+    private static final Logger log = LoggerFactory.getLogger(PatternPartNeuron.class);
 
     public static byte type;
 
@@ -106,21 +105,21 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void collectLinkingCandidatesForwards(Activation act, Linker.CollectResults c) {
-        Linker.sameInputLinkT.input.follow(act, Linker.sameInputLinkT, act, c);
-        Linker.relatedInputLinkT.input.follow(act, Linker.relatedInputLinkT, act, c);
-        Linker.patternInputLinkT.input.follow(act, Linker.patternInputLinkT, act, c);
+        Linker.sameInputLinkT.input.follow(LINKING, act, Linker.sameInputLinkT, act, c);
+        Linker.relatedInputLinkT.input.follow(LINKING, act, Linker.relatedInputLinkT, act, c);
+        Linker.patternInputLinkT.input.follow(LINKING, act, Linker.patternInputLinkT, act, c);
     }
 
     @Override
     public void collectLinkingCandidatesBackwards(Link l, Linker.CollectResults c) {
-        Linker.sameInputLinkI.follow(l, Linker.sameInputLinkI.output, l.getOutput(), c);
-        Linker.relatedInputLinkI.follow(l, Linker.relatedInputLinkI.output, l.getOutput(), c);
-        Linker.inhibitoryLinkI.follow(l, Linker.inhibitoryLinkI.output, l.getOutput(), c);
+        Linker.sameInputLinkI.follow(LINKING, l, Linker.sameInputLinkI.output, l.getOutput(), c);
+        Linker.relatedInputLinkI.follow(LINKING, l, Linker.relatedInputLinkI.output, l.getOutput(), c);
+        Linker.inhibitoryLinkI.follow(LINKING, l, Linker.inhibitoryLinkI.output, l.getOutput(), c);
     }
 
     @Override
     public void collectPosRecLinkingCandidates(Activation act, Linker.CollectResults c) {
-        Linker.posRecLinkT.output.follow(act, Linker.posRecLinkT, act, c);
+        Linker.posRecLinkT.output.follow(LINKING, act, Linker.posRecLinkT, act, c);
     }
 
     public double getCost(Sign s) {
@@ -187,24 +186,18 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         return targetAct;
     }
 
-    protected void createCandidateSynapse(Config c, Activation iAct, Activation targetAct) {
-        Neuron targetNeuron = targetAct.getNeuron();
-        Neuron inputNeuron = iAct.getNeuron();
+    public void collectNewSynapseCandidates(Activation act, Linker.CollectResults c) {
+        Linker.sameInputLinkT.output.follow(SYNAPSE_INDUCTION, act, Linker.sameInputLinkT, act, c);
+        Linker.relatedInputLinkT.output.follow(SYNAPSE_INDUCTION, act, Linker.relatedInputLinkT, act, c);
+    }
 
-        if (!(inputNeuron.get()).isMature(c)) {
-            return;
-        }
+    @Override
+    public Synapse createSynapse(Neuron input, PatternScope patternScope, Boolean isRecurrent, Boolean isNegative) {
+        return new PatternPartSynapse(input, getProvider(), patternScope, isRecurrent, isNegative);
+    }
 
-        PatternPartSynapse s = null; //new PatternPartSynapse(inputNeuron, targetNeuron);
+    @Override
+    public void createSynapses(Config c, Activation act) {
 
-        s.link();
-
-        if (log.isDebugEnabled()) {
-            log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
-        }
-
-        Link l = new Link(s, iAct, targetAct);
-
-        targetAct.addLink(l);
     }
 }

@@ -161,12 +161,7 @@ public class Document implements Comparable<Document> {
         }
 */
         getActivations()
-                .stream()
-                .filter(act -> act.isActive())
-                .forEach(act -> {
-                    INeuron n = act.getINeuron();
-                    n.count(act);
-                });
+                .forEach(act -> act.count());
 
 //        propagate();
 
@@ -195,9 +190,9 @@ public class Document implements Comparable<Document> {
      * It applies the weight and bias delta values and reflects the changes in the logic node structure.
      */
     public void commit() {
-        modifiedWeights.forEach((n, inputSyns) -> {
-            n.commit(inputSyns);
-        });
+        modifiedWeights.forEach((n, inputSyns) ->
+            n.commit(inputSyns)
+        );
         modifiedWeights.clear();
     }
 

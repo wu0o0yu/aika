@@ -19,6 +19,7 @@ package network.aika.neuron.excitatory.pattern;
 import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.PatternScope;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -26,6 +27,8 @@ import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.linker.*;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -33,12 +36,14 @@ import java.util.TreeSet;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
+import static network.aika.neuron.activation.linker.Mode.LINKING;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
+    private static final Logger log = LoggerFactory.getLogger(PatternNeuron.class);
 
     public static byte type;
 
@@ -72,11 +77,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         return binaryFrequency >= c.getMaturityThreshold();  // Sign.NEG, Sign.POS
     }
 
-    @Override
-    protected void createCandidateSynapse(Config c, Activation iAct, Activation targetAct) {
-
-    }
-
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
         super.commit(modifiedSynapses);
 
@@ -103,10 +103,19 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     @Override
     public void collectLinkingCandidatesBackwards(Link l, Linker.CollectResults c) {
-        Linker.patternInputLinkI.follow(l, Linker.patternInputLinkI.output, l.getOutput(), c);
+        Linker.patternInputLinkI.follow(LINKING, l, Linker.patternInputLinkI.output, l.getOutput(), c);
     }
 
     @Override
     public void collectPosRecLinkingCandidates(Activation act, Linker.CollectResults c) {
+    }
+
+    @Override
+    public Synapse createSynapse(Neuron input, PatternScope patternScope, Boolean isRecurrent, Boolean isNegative) {
+        return new PatternSynapse(input, getProvider());
+    }
+
+    public void createSynapses(Config c, Activation act) {
+
     }
 }

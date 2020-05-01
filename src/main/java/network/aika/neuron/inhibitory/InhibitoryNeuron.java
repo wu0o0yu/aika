@@ -19,6 +19,7 @@ package network.aika.neuron.inhibitory;
 import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
@@ -32,6 +33,8 @@ import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 
 import java.util.Collection;
 import java.util.List;
+
+import static network.aika.neuron.activation.linker.Mode.LINKING;
 
 
 /**
@@ -63,7 +66,7 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
 
     @Override
     public void collectLinkingCandidatesForwards(Activation act, Linker.CollectResults c) {
-        Linker.inhibitoryLinkT.input.follow(act, Linker.inhibitoryLinkT,act, c);
+        Linker.inhibitoryLinkT.input.follow(LINKING, act, Linker.inhibitoryLinkT,act, c);
     }
 
     @Override
@@ -161,5 +164,15 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
 
     public String typeToString() {
         return "INHIBITORY";
+    }
+
+    @Override
+    public Synapse createSynapse(Neuron input, PatternScope patternScope, Boolean isRecurrent, Boolean isNegative) {
+        return null;
+    }
+
+    @Override
+    public void createSynapses(Config c, Activation act) {
+
     }
 }

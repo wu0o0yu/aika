@@ -19,7 +19,7 @@ public abstract class LLink {
         this.label = label;
     }
 
-    public abstract void follow(Activation act, LNode from, Activation startAct, Linker.CollectResults c);
+    public abstract void follow(Mode m, Activation act, LNode from, Activation startAct, Linker.CollectResults c);
 
     public abstract String getTypeStr();
 
