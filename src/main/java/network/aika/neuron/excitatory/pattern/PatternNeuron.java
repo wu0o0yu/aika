@@ -74,7 +74,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     public boolean isMature(Config c) {
-        return binaryFrequency >= c.getMaturityThreshold();  // Sign.NEG, Sign.POS
+        return binaryFrequency >= c.getMaturityThreshold();
     }
 
     public void commit(Collection<? extends Synapse> modifiedSynapses) {

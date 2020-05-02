@@ -3,11 +3,14 @@ package network.aika.neuron.activation.linker;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LNode {
 
     String label;
 
-    LLink[] links;
+    List<LLink> links = new ArrayList<>();
     PatternType patternType;
 
     Byte neuronType;
@@ -20,8 +23,8 @@ public class LNode {
         this.label = label;
     }
 
-    public void setLinks(LLink... links) {
-        this.links = links;
+    public void addLink(LLink l) {
+        links.add(l);
     }
 
     public void follow(Mode m, Activation act, LLink from, Activation startAct, Linker.CollectResults c) {
@@ -33,14 +36,9 @@ public class LNode {
 
         act.lNode = this;
 
-        for(int i = 0; i < links.length; i++) {
-            LLink ln = links[i];
-            if(ln == from) {
-                continue;
-            }
-
-            ln.follow(m, act, this, startAct, c);
-        }
+        links.stream()
+                .filter(l -> l != from)
+                .forEach(l -> l.follow(m, act, this, startAct, c));
 
         act.lNode = null;
     }

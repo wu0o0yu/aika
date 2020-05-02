@@ -66,11 +66,7 @@ public class Linker {
 
             patternInputLinkT = new LTargetLink(inputB, target, SAME_PATTERN, "inputLink", false, false);
             patternInputLinkI = new LMatchingLink(inputA, target, SAME_PATTERN, "l2",true);
-            LLink l1 = new LMatchingLink(inputA, inputB, SAME_PATTERN, "l1", false);
-
-            target.setLinks(patternInputLinkT, patternInputLinkI);
-            inputA.setLinks(l1, patternInputLinkI);
-            inputB.setLinks(l1, patternInputLinkT);
+            new LMatchingLink(inputA, inputB, SAME_PATTERN, "l1", false);
         }
 
         // Same Input
@@ -82,14 +78,9 @@ public class Linker {
 
             sameInputLinkT = new LTargetLink(inputRel, target, INPUT_PATTERN, "sameInputLink", false, false);
             sameInputLinkI = new LMatchingLink(inputPattern, target, INPUT_PATTERN, "inputPatternLink", true);
-            LLink l1 = new LMatchingLink(inputPattern, inputRel, SAME_PATTERN, "l1", false);
-            LLink l2 = new LMatchingLink(inhib, inputRel, SAME_PATTERN, "l2", false);
-            LLink inhibLink = new LMatchingLink(inputPattern, inhib, SAME_PATTERN, "inhibLink", false);
-
-            target.setLinks(sameInputLinkT, sameInputLinkI);
-            inputPattern.setLinks(l1, inhibLink, sameInputLinkI);
-            inputRel.setLinks(sameInputLinkT, l1, l2);
-            inhib.setLinks(inhibLink, l2);
+            new LMatchingLink(inputPattern, inputRel, SAME_PATTERN, "l1", false);
+            new LMatchingLink(inhib, inputRel, SAME_PATTERN, "l2", false);
+            new LMatchingLink(inputPattern, inhib, SAME_PATTERN, "inhibLink", false);
         }
 
         // Related Input
@@ -102,16 +93,10 @@ public class Linker {
 
             relatedInputLinkT = new LTargetLink(samePatternPP, target, SAME_PATTERN, "relatedInputLink", false, false);
             relatedInputLinkI = new LMatchingLink(inputRel, target, INPUT_PATTERN, "inputRelLink", false);
-            LLink relPatternLink1 = new LMatchingLink(relPattern, inputRel, INPUT_PATTERN, "relPatternLink1", false);
-            LLink relPatternLink2 = new LMatchingLink(relPattern, samePatternPP, INPUT_PATTERN, "relPatternLink2", false);
-            LLink inhibLink = new LMatchingLink(relPattern, inhib, SAME_PATTERN, "inhibLink", false);
-            LLink relPatternLink3 = new LMatchingLink(inhib, inputRel, INPUT_PATTERN, "relPatternLink3", true);
-
-            target.setLinks(relatedInputLinkT, relatedInputLinkI);
-            samePatternPP.setLinks(relatedInputLinkT, relPatternLink2);
-            inputRel.setLinks(relatedInputLinkI, relPatternLink1, relPatternLink3);
-            relPattern.setLinks(relPatternLink1, relPatternLink2, inhibLink);
-            inhib.setLinks(inhibLink, relPatternLink3);
+            new LMatchingLink(relPattern, inputRel, INPUT_PATTERN, "relPatternLink1", false);
+            new LMatchingLink(relPattern, samePatternPP, INPUT_PATTERN, "relPatternLink2", false);
+            new LMatchingLink(relPattern, inhib, SAME_PATTERN, "inhibLink", false);
+            new LMatchingLink(inhib, inputRel, INPUT_PATTERN, "relPatternLink3", true);
         }
 
         // Inhibitory
@@ -123,13 +108,8 @@ public class Linker {
 
             inhibitoryLinkT = new LTargetLink(inhib, target, CONFLICTING_PATTERN, "inhibLink", true, true);
             inhibitoryLinkI = new LMatchingLink(input, target, INPUT_PATTERN, "l1", true);
-            LLink l2 = new LMatchingLink(input, patternpart, INPUT_PATTERN, "l2", false);
-            LLink l3 = new LMatchingLink(patternpart, inhib, SAME_PATTERN, "l3", false);
-
-            target.setLinks(inhibitoryLinkT, inhibitoryLinkI);
-            inhib.setLinks(inhibitoryLinkT, l3);
-            patternpart.setLinks(l2, l3);
-            input.setLinks(inhibitoryLinkI, l2);
+            new LMatchingLink(input, patternpart, INPUT_PATTERN, "l2", false);
+            new LMatchingLink(patternpart, inhib, SAME_PATTERN, "l3", false);
         }
 
         // Positive Recurrent Pattern Link
@@ -139,9 +119,6 @@ public class Linker {
 
             posRecLinkT = new LTargetLink(pattern, target, SAME_PATTERN, "posRecLink", true, false);
             posRecLinkI = new LMatchingLink(target, pattern, SAME_PATTERN, "patternLink", true);
-
-            target.setLinks(posRecLinkT, posRecLinkI);
-            pattern.setLinks(posRecLinkT, posRecLinkI);
         }
     }
 

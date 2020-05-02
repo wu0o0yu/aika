@@ -17,6 +17,9 @@ public abstract class LLink {
         this.output = output;
         this.patternScope = patternScope;
         this.label = label;
+
+        input.addLink(this);
+        output.addLink(this);
     }
 
     public abstract void follow(Mode m, Activation act, LNode from, Activation startAct, Linker.CollectResults c);
