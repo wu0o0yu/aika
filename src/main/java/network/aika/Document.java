@@ -52,6 +52,7 @@ public class Document implements Comparable<Document> {
     private Model model;
 
     private Queue queue = new Queue();
+    private Linker linker = new Linker();
 
     private TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
 
@@ -83,12 +84,18 @@ public class Document implements Comparable<Document> {
         return queue;
     }
 
+    public Linker getLinker() {
+        return linker;
+    }
+
     public void process() {
         activationsById
                 .values()
                 .stream()
                 .filter(act -> act.assumePosRecLinks)
-                .forEach(act -> Linker.linkPosRec(act));
+                .forEach(act ->
+                        act.getINeuron().linkPosRecSynapses(act)
+                );
 
         queue.process();
 

@@ -22,7 +22,7 @@ public abstract class LLink {
         output.addLink(this);
     }
 
-    public abstract void follow(Mode m, Activation act, LNode from, Activation startAct, Linker.CollectResults c);
+    public abstract void follow(Mode m, Activation act, LNode from, Activation startAct);
 
     public abstract String getTypeStr();
 

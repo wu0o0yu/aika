@@ -16,9 +16,7 @@
  */
 package network.aika.neuron.activation.linker;
 
-import network.aika.Document;
 import network.aika.neuron.INeuron;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
@@ -27,7 +25,6 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
 
-import static network.aika.neuron.OutputKey.OUTPUT_COMP;
 import static network.aika.neuron.PatternScope.*;
 import static network.aika.neuron.activation.linker.PatternType.CURRENT;
 import static network.aika.neuron.activation.linker.PatternType.INPUT;
@@ -38,9 +35,7 @@ import static network.aika.neuron.activation.linker.PatternType.INPUT;
  */
 public class Linker {
 
-    public interface CollectResults {
-        void collect(Activation act, Synapse s);
-    }
+    Deque<Link> queue = new ArrayDeque<>();
 
     public static LTargetLink patternInputLinkT;
     public static LMatchingLink patternInputLinkI;
@@ -64,7 +59,7 @@ public class Linker {
             LNode inputA = new LNode(CURRENT, PatternPartNeuron.type, "inputA");
             LNode inputB = new LNode(CURRENT, PatternPartNeuron.type, "inputB");
 
-            patternInputLinkT = new LTargetLink(inputB, target, SAME_PATTERN, "inputLink", false, false);
+            patternInputLinkT = new LTargetLink(inputB, target, SAME_PATTERN, "inputLink", false, false, null);
             patternInputLinkI = new LMatchingLink(inputA, target, SAME_PATTERN, "l2",true);
             new LMatchingLink(inputA, inputB, SAME_PATTERN, "l1", false);
         }
@@ -76,7 +71,7 @@ public class Linker {
             LNode inputRel = new LNode(INPUT, PatternPartNeuron.type, "inputRel");
             LNode inhib = new LNode(INPUT, InhibitoryNeuron.type, "inhib");
 
-            sameInputLinkT = new LTargetLink(inputRel, target, INPUT_PATTERN, "sameInputLink", false, false);
+            sameInputLinkT = new LTargetLink(inputRel, target, INPUT_PATTERN, "sameInputLink", false, false, null);
             sameInputLinkI = new LMatchingLink(inputPattern, target, INPUT_PATTERN, "inputPatternLink", true);
             new LMatchingLink(inputPattern, inputRel, SAME_PATTERN, "l1", false);
             new LMatchingLink(inhib, inputRel, SAME_PATTERN, "l2", false);
@@ -91,7 +86,7 @@ public class Linker {
             LNode relPattern = new LNode(PatternType.RELATED, PatternNeuron.type, "relPattern");
             LNode inhib = new LNode(INPUT, InhibitoryNeuron.type, "inhib");
 
-            relatedInputLinkT = new LTargetLink(samePatternPP, target, SAME_PATTERN, "relatedInputLink", false, false);
+            relatedInputLinkT = new LTargetLink(samePatternPP, target, SAME_PATTERN, "relatedInputLink", false, false, null);
             relatedInputLinkI = new LMatchingLink(inputRel, target, INPUT_PATTERN, "inputRelLink", false);
             new LMatchingLink(relPattern, inputRel, INPUT_PATTERN, "relPatternLink1", false);
             new LMatchingLink(relPattern, samePatternPP, INPUT_PATTERN, "relPatternLink2", false);
@@ -106,7 +101,7 @@ public class Linker {
             LNode patternpart = new LNode(CURRENT, PatternPartNeuron.type, "patternpart");
             LNode input = new LNode(INPUT, PatternNeuron.type, "input");
 
-            inhibitoryLinkT = new LTargetLink(inhib, target, CONFLICTING_PATTERN, "inhibLink", true, true);
+            inhibitoryLinkT = new LTargetLink(inhib, target, CONFLICTING_PATTERN, "inhibLink", true, true, null);
             inhibitoryLinkI = new LMatchingLink(input, target, INPUT_PATTERN, "l1", true);
             new LMatchingLink(input, patternpart, INPUT_PATTERN, "l2", false);
             new LMatchingLink(patternpart, inhib, SAME_PATTERN, "l3", false);
@@ -117,45 +112,29 @@ public class Linker {
             LNode target = new LNode(CURRENT, PatternPartNeuron.type, "target");
             LNode pattern = new LNode(CURRENT, PatternNeuron.type, "pattern");
 
-            posRecLinkT = new LTargetLink(pattern, target, SAME_PATTERN, "posRecLink", true, false);
+            posRecLinkT = new LTargetLink(pattern, target, SAME_PATTERN, "posRecLink", true, false, null);
             posRecLinkI = new LMatchingLink(target, pattern, SAME_PATTERN, "patternLink", true);
         }
     }
 
 
-    public static void linkForward(Activation act) {
-        Deque<Link> queue = new ArrayDeque<>();
-        Document doc = act.getDocument();
-        TreeSet<Synapse> propagationTargets = new TreeSet(OUTPUT_COMP);
-        propagationTargets.addAll(act.getINeuron().getPropagationTargets());
-
+    public void linkForward(Activation act) {
         if(act.lastRound != null) {
             act.lastRound.outputLinks
                     .values()
-                    .forEach(l -> {
-                        addLinkToQueue(queue, l.getSynapse(), act, l.getOutput());
-                        propagationTargets.remove(l.getSynapse());
-                    });
+                    .forEach(l ->
+                            queue.add(Link.link(l.getSynapse(), act, l.getOutput()))
+                    );
             act.lastRound.unlink();
             act.lastRound = null;
         }
 
-        act.getINeuron().collectLinkingCandidatesForwards(act, (oAct, s) -> {
-            addLinkToQueue(queue, s, act, oAct);
-            propagationTargets.remove(s);
-        });
+        act.getINeuron().linkForwards(act);
 
-        propagationTargets
-                .forEach(s ->
-                        addLinkToQueue(queue, s, act,
-                                new Activation(doc.getNewActivationId(), doc, s.getOutput())
-                        )
-                );
-
-        process(queue);
+        process();
     }
 
-    private static void process(Deque<Link> queue) {
+    public void process() {
         while (!queue.isEmpty()) {
             Link l = queue.pollFirst();
             Activation act = l.getOutput();
@@ -171,26 +150,7 @@ public class Linker {
 
             act.addLink(l);
 
-            final Activation oAct = act;
-            n.collectLinkingCandidatesBackwards(l,
-                    (iAct, s) -> addLinkToQueue(queue, s, iAct, oAct)
-            );
+            n.linkBackwards(l);
         }
-    }
-
-    private static void addLinkToQueue(Deque<Link> queue, Synapse s, Activation iAct, Activation oAct) {
-        queue.add(new Link(s, iAct, oAct));
-    }
-
-    public static void linkPosRec(Activation act) {
-        INeuron n = act.getINeuron();
-        Activation clonedAct = act.createUpdate();
-
-        n.collectPosRecLinkingCandidates(act,
-                (iAct, s) -> clonedAct.addLink(new Link(s, iAct, clonedAct))
-        );
-
-        clonedAct.assumePosRecLinks = false;
-        clonedAct.compute();
     }
 }

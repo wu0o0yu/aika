@@ -27,7 +27,7 @@ public class LNode {
         links.add(l);
     }
 
-    public void follow(Mode m, Activation act, LLink from, Activation startAct, Linker.CollectResults c) {
+    public void follow(Mode m, Activation act, LLink from, Activation startAct) {
         if(neuronType != null && neuronType != act.getINeuron().getType()) {
             return;
         }
@@ -38,7 +38,7 @@ public class LNode {
 
         links.stream()
                 .filter(l -> l != from)
-                .forEach(l -> l.follow(m, act, this, startAct, c));
+                .forEach(l -> l.follow(m, act, this, startAct));
 
         act.lNode = null;
     }

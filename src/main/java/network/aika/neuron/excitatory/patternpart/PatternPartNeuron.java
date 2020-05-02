@@ -104,22 +104,22 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     @Override
-    public void collectLinkingCandidatesForwards(Activation act, Linker.CollectResults c) {
-        Linker.sameInputLinkT.input.follow(LINKING, act, Linker.sameInputLinkT, act, c);
-        Linker.relatedInputLinkT.input.follow(LINKING, act, Linker.relatedInputLinkT, act, c);
-        Linker.patternInputLinkT.input.follow(LINKING, act, Linker.patternInputLinkT, act, c);
+    public void linkForwards(Activation act) {
+        Linker.sameInputLinkT.input.follow(LINKING, act, Linker.sameInputLinkT, act);
+        Linker.relatedInputLinkT.input.follow(LINKING, act, Linker.relatedInputLinkT, act);
+        Linker.patternInputLinkT.input.follow(LINKING, act, Linker.patternInputLinkT, act);
     }
 
     @Override
-    public void collectLinkingCandidatesBackwards(Link l, Linker.CollectResults c) {
-        Linker.sameInputLinkI.follow(LINKING, l, Linker.sameInputLinkI.output, l.getOutput(), c);
-        Linker.relatedInputLinkI.follow(LINKING, l, Linker.relatedInputLinkI.output, l.getOutput(), c);
-        Linker.inhibitoryLinkI.follow(LINKING, l, Linker.inhibitoryLinkI.output, l.getOutput(), c);
+    public void linkBackwards(Link l) {
+        Linker.sameInputLinkI.follow(LINKING, l, Linker.sameInputLinkI.output, l.getOutput());
+        Linker.relatedInputLinkI.follow(LINKING, l, Linker.relatedInputLinkI.output, l.getOutput());
+        Linker.inhibitoryLinkI.follow(LINKING, l, Linker.inhibitoryLinkI.output, l.getOutput());
     }
 
     @Override
-    public void collectPosRecLinkingCandidates(Activation act, Linker.CollectResults c) {
-        Linker.posRecLinkT.output.follow(LINKING, act, Linker.posRecLinkT, act, c);
+    public void linkPosRecSynapses(Activation act) {
+        Linker.posRecLinkT.output.follow(LINKING, act, Linker.posRecLinkT, act);
     }
 
     public double getCost(Sign s) {
@@ -186,9 +186,9 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         return targetAct;
     }
 
-    public void collectNewSynapseCandidates(Activation act, Linker.CollectResults c) {
-        Linker.sameInputLinkT.output.follow(SYNAPSE_INDUCTION, act, Linker.sameInputLinkT, act, c);
-        Linker.relatedInputLinkT.output.follow(SYNAPSE_INDUCTION, act, Linker.relatedInputLinkT, act, c);
+    public void collectNewSynapseCandidates(Activation act) {
+        Linker.sameInputLinkT.output.follow(SYNAPSE_INDUCTION, act, Linker.sameInputLinkT, act);
+        Linker.relatedInputLinkT.output.follow(SYNAPSE_INDUCTION, act, Linker.relatedInputLinkT, act);
     }
 
     @Override

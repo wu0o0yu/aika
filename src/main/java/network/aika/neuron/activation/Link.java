@@ -37,6 +37,13 @@ public class Link {
         this.output = output;
     }
 
+    public static Link link(Synapse s, Activation input, Activation output) {
+        if(output != null && output.isFinal) {
+            output = output.createUpdate();
+        }
+        return new Link(s, input, output);
+    }
+
     public Synapse getSynapse() {
         return synapse;
     }

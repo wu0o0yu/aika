@@ -12,26 +12,39 @@ public class LTargetLink extends LLink {
 
     Boolean isRecurrent;
     Boolean isNegative;
+    Boolean isPropagate;
 
-    public LTargetLink(LNode input, LNode output, PatternScope patternScope, String label, Boolean isRecurrent, Boolean isNegative) {
+    public LTargetLink(LNode input, LNode output, PatternScope patternScope, String label, Boolean isRecurrent, Boolean isNegative, Boolean isPropagate) {
         super(input, output, patternScope, label);
         this.isRecurrent = isRecurrent;
         this.isNegative = isNegative;
+        this.isPropagate = isPropagate;
     }
 
-    public void follow(Mode m, Activation act, LNode from, Activation startAct, Linker.CollectResults c) {
+    public void follow(Mode m, Activation act, LNode from, Activation startAct) {
         Link existingLink = lookupExistingLink(act, from, startAct);
         if(existingLink != null) {
             return;
         }
 
-        Synapse ts = lookupTargetSynapse(from, startAct, act.getNeuron());
+        Activation iAct = from == input ? act : startAct;
+        Activation oAct = from == input ? startAct : act;
 
-        if(ts != null && m == Mode.LINKING && matchSynapse(ts)) {
-            c.collect(act, ts);
-        } else if(ts == null && m == Mode.SYNAPSE_INDUCTION) {
-            INeuron<?>[] ioN = lookupIONeuron(from, startAct, act.getNeuron());
-            c.collect(act, ioN[1].createSynapse(ioN[0].getProvider(), patternScope, isRecurrent, isNegative));
+        Neuron in = iAct.getNeuron();
+        Neuron on = oAct.getNeuron();
+
+        Synapse s = on.getInputSynapse(in, patternScope);
+
+        if(m == Mode.LINKING && !matchSynapse(s)) {
+            return;
+        }
+
+        if(s == null && m == Mode.SYNAPSE_INDUCTION) {
+            s = on.get().createSynapse(in, patternScope, isRecurrent, isNegative);
+        }
+
+        if(s != null) {
+            act.getDocument().getLinker().queue.add(Link.link(s, iAct, oAct));
         }
     }
 
@@ -47,23 +60,11 @@ public class LTargetLink extends LLink {
         if(isNegative != null && isNegative.booleanValue() != ts.isNegative()) {
             return false;
         }
+
+        if(isPropagate != null && isPropagate.booleanValue() != ts.isPropagate()) {
+            return false;
+        }
         return true;
-    }
-
-    public Synapse lookupTargetSynapse(LNode from, Activation startAct, Neuron n) {
-        if(from == input) {
-            return n.getOutputSynapse(startAct.getNeuron(), patternScope);
-        } else {
-            return n.getInputSynapse(startAct.getNeuron(), patternScope);
-        }
-    }
-
-    public INeuron[] lookupIONeuron(LNode from, Activation startAct, Neuron n) {
-        if(from == input) {
-            return new INeuron[]{n.get(), startAct.getINeuron()};
-        } else {
-            return new INeuron[]{startAct.getINeuron(), n.get()};
-        }
     }
 
     public Link lookupExistingLink(Activation act, LNode from, Activation startAct) {

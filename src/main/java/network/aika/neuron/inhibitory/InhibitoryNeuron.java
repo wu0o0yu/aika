@@ -65,17 +65,17 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
     }
 
     @Override
-    public void collectLinkingCandidatesForwards(Activation act, Linker.CollectResults c) {
-        Linker.inhibitoryLinkT.input.follow(LINKING, act, Linker.inhibitoryLinkT,act, c);
+    public void linkForwards(Activation act) {
+        Linker.inhibitoryLinkT.input.follow(LINKING, act, Linker.inhibitoryLinkT, act);
     }
 
     @Override
-    public void collectLinkingCandidatesBackwards(Link l, Linker.CollectResults c) {
+    public void linkBackwards(Link l) {
         // Nothing to do!
     }
 
     @Override
-    public void collectPosRecLinkingCandidates(Activation act, Linker.CollectResults c) {
+    public void linkPosRecSynapses(Activation act) {
 
     }
 

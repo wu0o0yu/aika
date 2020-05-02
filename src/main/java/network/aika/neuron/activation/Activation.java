@@ -152,14 +152,13 @@ public class Activation implements Comparable<Activation> {
                 .stream()
                 .forEach(me -> {
                     Synapse s = getNeuron().getInputSynapse(me.getKey().getPInput(), me.getKey().getPatternScope());
-                    Link l = new Link(s, me.getValue(), null);
-                    addLink(l);
+                    addLink(new Link(s, me.getValue(), this));
                 });
 
         isFinal = true;
         assumePosRecLinks = false;
 
-        Linker.linkForward(this);
+        doc.getLinker().linkForward(this);
         doc.getQueue().process();
     }
 
@@ -263,7 +262,7 @@ public class Activation implements Comparable<Activation> {
         value = p * neuron.getActivationFunction().f(net);
         isFinal = true;
         if(lastRound == null || !equals(lastRound)) {
-            Linker.linkForward(this);
+            doc.getLinker().linkForward(this);
         }
     }
 
