@@ -10,18 +10,9 @@ public class LMatchingNode<N extends INeuron> extends LNode<N> {
         super(patternType, neuronClass, label);
     }
 
-
-    protected Activation getToActivation(Link l, LLink from) {
-        if(from == input) {
-            return l.getOutput();
-        }
-        if(from == output) {
-            return l.getInput();
-        }
-        return null;
-    }
-
     public void follow(Mode m, Link l, LLink from, Activation startAct) {
+        Activation act = from.getToActivation(l, this);
+
         if(neuronClass != null && act.getINeuron().getClass().equals(neuronClass)) {
             return;
         }

@@ -27,16 +27,6 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
         return null;
     }
 
-    protected Activation getToActivation(Link l, LNode from) {
-        if(from == input) {
-            return l.getOutput();
-        }
-        if(from == output) {
-            return l.getInput();
-        }
-        return null;
-    }
-
     public void follow(Mode m, Activation act, LNode from, Activation startAct) {
         Stream<Link> s = null;
         if(from == input) {
@@ -57,7 +47,7 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
             return;
         }
 
-        to.follow(m, getToActivation(l, from), this, startAct);
+        to.follow(m, l, this, startAct);
     }
 
     private boolean checkLink(Link l) {
