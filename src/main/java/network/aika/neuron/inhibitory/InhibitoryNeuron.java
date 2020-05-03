@@ -66,7 +66,7 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
 
     @Override
     public void linkForwards(Activation act) {
-        Linker.inhibitoryLinkT.input.follow(LINKING, act, Linker.inhibitoryLinkT, act);
+        Linker.inhibitoryLinkT.input.follow(LINKING, act.getINeuron(), act, Linker.inhibitoryLinkT, act);
     }
 
     @Override

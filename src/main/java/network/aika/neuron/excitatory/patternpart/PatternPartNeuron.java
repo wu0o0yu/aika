@@ -105,9 +105,9 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void linkForwards(Activation act) {
-        Linker.sameInputLinkT.input.follow(LINKING, act, Linker.sameInputLinkT, act);
-        Linker.relatedInputLinkT.input.follow(LINKING, act, Linker.relatedInputLinkT, act);
-        Linker.patternInputLinkT.input.follow(LINKING, act, Linker.patternInputLinkT, act);
+        Linker.sameInputLinkT.input.follow(LINKING, act.getINeuron(), act, Linker.sameInputLinkT, act);
+        Linker.relatedInputLinkT.input.follow(LINKING, act.getINeuron(), act, Linker.relatedInputLinkT, act);
+        Linker.patternInputLinkT.input.follow(LINKING, act.getINeuron(), act, Linker.patternInputLinkT, act);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void linkPosRecSynapses(Activation act) {
-        Linker.posRecLinkT.output.follow(LINKING, act, Linker.posRecLinkT, act);
+        Linker.posRecLinkT.output.follow(LINKING, act.getINeuron(), act, Linker.posRecLinkT, act);
     }
 
     public double getCost(Sign s) {
@@ -187,8 +187,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     public void collectNewSynapseCandidates(Activation act) {
-        Linker.sameInputLinkT.output.follow(INDUCTION, act, Linker.sameInputLinkT, act);
-        Linker.relatedInputLinkT.output.follow(INDUCTION, act, Linker.relatedInputLinkT, act);
+        Linker.sameInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, Linker.sameInputLinkT, act);
+        Linker.relatedInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, Linker.relatedInputLinkT, act);
     }
 
     @Override

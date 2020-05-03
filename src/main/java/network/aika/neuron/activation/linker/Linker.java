@@ -21,6 +21,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
+import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
@@ -50,6 +51,10 @@ public class Linker {
 
     public static LTargetLink posRecLinkT;
     public static LMatchingLink posRecLinkI;
+
+    public static LTargetLink propagateT;
+
+    public static LTargetLink inducePatternPart;
 
     static {
         // Pattern
@@ -113,6 +118,22 @@ public class Linker {
 
             posRecLinkT = new LTargetLink(pattern, target, SAME_PATTERN, null, "posRecLink", true, false, null);
             posRecLinkI = new LMatchingLink(target, pattern, SAME_PATTERN, null, "patternLink", true);
+        }
+
+        // Propagate
+        {
+            LNode target = new LTargetNode(null, null, "target", null);
+            LNode input = new LMatchingNode(null, null, "input");
+
+            propagateT = new LTargetLink(input, target, null, null, "propagateLink", null, false, true);
+        }
+
+        // Induce Pattern Part
+        {
+            LNode target = new LTargetNode(CURRENT, PatternPartNeuron.class, "target", null);
+            LNode input = new LMatchingNode(INPUT, PatternNeuron.class, "input");
+
+            inducePatternPart = new LTargetLink(input, target, INPUT_PATTERN, PatternPartSynapse.class, "inducePatternPart", false, false, true);
         }
     }
 
